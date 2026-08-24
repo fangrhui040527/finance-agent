@@ -75,7 +75,7 @@ Verdicts: **ADOPT** = copy and adapt the code · **PATTERN** = read it, then wri
 | T15 | `always_on_hn_briefing_agent` | 883 | 7 | **ADOPT** | Scheduler + `tests/unit` + `tests/eval`. But see `release_radar_agent` in §4.4 — it is bigger and has a better eval set |
 | T16 | `llm_app_personalized_memory` | **74** | 1 | **DOWNGRADE** | A mem0 wrapper. Your memory needs risk tolerance, constraints, journal and lesson store — that is a schema you design |
 | T17 | `multi_mcp_agent_router` | 371 | 1 | **PATTERN** | Sound router shape, small |
-| T18 | `ai_self_evolving_agent` | **86** | 1 | **DOWNGRADE hard** | `BUILD_PLAN.md` §8 makes this the entire L4 self-evolving-workflow layer. It is 86 lines. **Treat L4 as unbuilt** — which is fine, it is the layer behind a human approval gate anyway |
+| T18 | `ai_self_evolving_agent` | **86** | 1 | **DOWNGRADE hard** | `BUILD_PLAN.md` §8 makes this the entire L4 self-evolving-workflow layer. It is 86 lines. Not a usable reference — but see [`13-SELF-LEARNING-LOOP.md`](13-SELF-LEARNING-LOOP.md): `hermes-agent` supplies the L4 reference this template does not |
 | T19 | `self-improving-agent-skills` | 2,408 | 13 | **ADOPT** | Real implementation with a frontend and backend. The L3 skill-evolution layer genuinely exists here |
 | T20 | `google_adk_crash_course` | 3,679 | 49 | **ADOPT selectively** | Not one app — a 49-file course. Take `6_callbacks` (884 LOC — **the guardrail hook point**), `9_multi_agent_patterns` (sequential + loop agents), `3_structured_output_agent`. Skip the rest |
 | T21 | `headroom_context_optimization` | 203 | 1 | **PATTERN** | Small; the idea matters more than the code |
