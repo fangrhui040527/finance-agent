@@ -1,0 +1,43 @@
+# Capability registry - the L1 growth surface (docs/01 section 10).
+# Adding an agent, tool or market is an entry here plus an adapter class,
+# never a change to the orchestrator.
+#
+# Ratchet rule: nothing registers without an eval suite.
+
+version: 1
+
+agents:
+  - id: a0_supervisor
+    layer: orchestration
+    tools: [plan, budget, route, refuse]
+    tier_hint: cheap
+    eval_suite: evals/a0_routing.yaml
+
+  - id: a9_attribution
+    layer: synthesis
+    knowledge: [factor_returns, price_bars, event_base_rates]
+    tools: [decompose, abnormal_return, candidate_causes, long_horizon_decompose]
+    tier_hint: balanced
+    eval_suite: evals/a9_attribution.yaml   # includes the pure-beta negative suite
+
+  - id: a13_sizing
+    layer: portfolio
+    knowledge: [ledger, holdings, goals]
+    tools: [investable_capital, risk_budget_cap, kelly_cap, concentration_cap,
+            liquidity_cap, cost_floor, vol_target_scalar, lot_round]
+    tier_hint: balanced
+    eval_suite: evals/a13_sizing.yaml
+
+# Every knowledge store carries a provenance marker (docs/13 section 2.1).
+# created_by: human means read-only to every agent, forever.
+knowledge:
+  kb_lessons:     {created_by: agent, managed: true}
+  kb_craft:       {created_by: human, managed: false}
+  kb_method_valuation: {created_by: human, managed: false}
+  kb_method_technical: {created_by: human, managed: false}
+  kb_failures:    {created_by: human, managed: false}
+  kb_filings:     {created_by: human, managed: false}
+  kb_news:        {created_by: human, managed: false}
+
+# There is no execution tool in this registry, and NoExecutionPolicy denies the
+# names by hand regardless of what is listed here.

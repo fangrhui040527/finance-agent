@@ -27,4 +27,24 @@ Start at **[`docs/README.md`](docs/README.md)**.
 
 ## Status
 
-Planning complete. No implementation code yet — see [`docs/07-BUILD-ORDER.md`](docs/07-BUILD-ORDER.md) for the phase sequence.
+**P0 shipped.** Skeleton, inference choke point, guardrail chain, provenance ledger.
+Phases P1–P19 remain — see [`docs/07-BUILD-ORDER.md`](docs/07-BUILD-ORDER.md).
+
+```bash
+make install && make test    # 52 tests
+make verify                  # full pipeline on mock data, no keys, <1s
+make up                      # postgres+timescale · qdrant · neo4j · redis · minio
+```
+
+### What P0 enforces
+
+| Guarantee | Where | Test |
+|---|---|---|
+| Callers cannot pick a model tier — it derives from `TaskClass` | `core/llm/tiers.py` | `test_tier_routing.py` |
+| No order-placement code exists anywhere in the repo | `core/guardrails/policy.py` + repo grep | `test_no_execution_anywhere.py` |
+| All five rails run on every request; no bypass path | `core/guardrails/chain.py` | `test_guardrail_chain.py` |
+| A claim without a verified verbatim citation is dropped individually | `core/contracts/answer.py` | `test_answer_contract.py` |
+| The ledger is append-only — UPDATE and DELETE abort | `core/provenance/ledger.py` | `test_provenance.py` |
+| Human-authored knowledge is never agent-editable | `core/contracts/provenance_marker.py` | `test_provenance.py` |
+| Budget exhaustion raises; it never downgrades silently | `core/llm/client.py` | `test_inference_client.py` |
+| Telemetry sits beside content, never inside it | `core/provenance/sidecar.py` | `test_sidecar.py` |
