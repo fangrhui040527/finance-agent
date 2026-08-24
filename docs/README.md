@@ -36,6 +36,7 @@ Three things are genuinely new here:
 | **07** | [Build order](07-BUILD-ORDER.md) | Phases with definitions of done, what to cut if time runs out, done-ness criteria for the whole module |
 | **08** | [Cost breakdown](08-COST-BREAKDOWN.md) | Three tiers with the token math shown, break-even portfolio size, cost controls ranked by impact, recommended starting position |
 | **09** | [Research sources](09-RESEARCH-SOURCES.md) | Every source behind every design decision, organised by the decision it supports |
+| **10** | [Repository references](10-REPOSITORY-REFERENCES.md) | Every GitHub repo behind the plan, verified licence, what each licence requires, and what has no upstream at all |
 
 ---
 

@@ -140,7 +140,7 @@ Purged walk-forward with embargo, full cost model, deflated Sharpe, benchmark co
 
 ### P13–P15 — Learning and surface (5 weeks)
 
-Reflection, calibration panel, decision journal, teacher, annotated charts, daily brief. **DoD:** the live reliability curve is a permanent UI element; the annotated chart renders `no_identified_catalyst` moves in the same visual language as explained ones.
+Reflection, calibration panel, decision journal, teacher, annotated charts, daily brief. **DoD:** the live reliability curve is a permanent UI element; the annotated chart renders `no_identified_catalyst` moves in the same visual language as explained ones; the chart library's `attributionLogo` option is enabled — its licence requires the attribution notice and vendor link on the user-facing page, and this is the most visible screen in the product (see `10-REPOSITORY-REFERENCES.md` §6.3).
 
 ### P16 — Paper trade gate (3–6 months, elapsed not effort)
 

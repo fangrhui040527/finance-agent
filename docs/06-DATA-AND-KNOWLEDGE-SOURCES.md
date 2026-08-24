@@ -343,12 +343,17 @@ gantt
 
 ## 7. Licence boundaries — decide before writing code
 
+Named dependencies, their verified licences and the full obligation map live in **[`10-REPOSITORY-REFERENCES.md`](10-REPOSITORY-REFERENCES.md)**. The summary that matters here:
+
 | Component | Licence | Obligation |
 |---|---|---|
-| Template code from permissively-licensed repos | Apache-2.0 | Keep notices; fork and ship freely |
+| Template code from permissively-licensed repos | Apache-2.0 / MIT | Keep notices; fork and ship freely |
 | WorldMonitor source | AGPL-3.0-only | **Hosted API use over the network is normal API use.** Self-hosting a modified instance and exposing it to users triggers source-availability obligations |
 | The 100+-provider data abstraction layer | AGPL-3.0 | Same question |
+| **Two of the backtest frameworks** | ⚠️ **Apache-2.0 + Commons Clause** | Free to use, including commercially — but **you may not sell a product or service whose value derives substantially from them.** Not an OSI-approved licence; "Apache-2.0" alone in a dependency audit is a misreading |
+| The chart library | Apache-2.0 **+ attribution** | Requires the NOTICE attribution and a link to the vendor on the user-facing page. One option flag — and forgetting it is a breach on the most visible screen in the product |
+| Graph and timeseries stores | GPL-3.0 Community / dual Apache-TSL | Running them as separate services you talk to over the wire is the ordinary arrangement. Offering either as a managed service to third parties is the restricted case |
 | Market data from vendors | Per provider | **Redistribution is usually prohibited.** Check before exposing raw quotes to anyone but yourself |
 | Tier B educational content | Copyrighted | Link only. Never ingest the body. Enforced at retrieval, tested in CI |
 
-**If this stays a personal tool, none of this bites.** If it ever becomes a product, the AGPL conversation is unavoidable and should happen *before* the codebase entangles them. Keep any fork of an AGPL component in a separate repository so the boundary is unambiguous.
+**If this stays a personal tool, none of this bites** — AGPL's network clause triggers on providing software to users, the Commons Clause on selling, GPL and LGPL on distribution. Running software privately is none of those. If it ever becomes a product, the conversation is unavoidable and should happen *before* the codebase entangles these. Keep any fork of an AGPL component in a separate repository so the boundary is unambiguous.

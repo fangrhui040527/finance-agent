@@ -20,6 +20,7 @@ Start at **[`docs/README.md`](docs/README.md)**.
 | [07 Build order](docs/07-BUILD-ORDER.md) | Phases, definitions of done, what to cut |
 | [08 Cost breakdown](docs/08-COST-BREAKDOWN.md) | Three tiers, token math, break-even analysis, cost controls |
 | [09 Research sources](docs/09-RESEARCH-SOURCES.md) | Every source behind every design decision |
+| [10 Repository references](docs/10-REPOSITORY-REFERENCES.md) | Every GitHub repo used, verified licences, obligation map |
 
 ## Status
 
