@@ -38,6 +38,7 @@ Three things are genuinely new here:
 | **09** | [Research sources](09-RESEARCH-SOURCES.md) | Every source behind every design decision, organised by the decision it supports |
 | **10** | [Repository references](10-REPOSITORY-REFERENCES.md) | Every GitHub repo behind the plan, verified licence, what each licence requires, and what has no upstream at all |
 | **11** | [Template audit](11-TEMPLATE-AUDIT.md) | `awesome-llm-apps` measured rather than assumed: what T1-T22 actually contain, what to adopt, and four templates the original selection missed |
+| **12** | [Code reference map](12-CODE-REFERENCE-MAP.md) | Where to look, file and line, for each piece you build — pinned to commit SHAs so line numbers stay valid |
 
 ---
 

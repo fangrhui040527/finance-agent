@@ -22,6 +22,7 @@ Start at **[`docs/README.md`](docs/README.md)**.
 | [09 Research sources](docs/09-RESEARCH-SOURCES.md) | Every source behind every design decision |
 | [10 Repository references](docs/10-REPOSITORY-REFERENCES.md) | Every GitHub repo used, verified licences, obligation map |
 | [11 Template audit](docs/11-TEMPLATE-AUDIT.md) | What `awesome-llm-apps` actually contains, measured; what to adopt and what to drop |
+| [12 Code reference map](docs/12-CODE-REFERENCE-MAP.md) | Exact file:line pointers into each upstream repo, pinned to commit SHAs |
 
 ## Status
 

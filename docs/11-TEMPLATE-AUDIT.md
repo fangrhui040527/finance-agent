@@ -6,6 +6,8 @@ What is actually in the repository, measured rather than assumed, and what shoul
 
 **Licence.** Apache-2.0. Fork, ship, sell — keep the notices on anything you copy.
 
+**Exact file and line pointers for everything recommended here live in [`12-CODE-REFERENCE-MAP.md`](12-CODE-REFERENCE-MAP.md)**, pinned to commit SHAs.
+
 ---
 
 ## 1. The headline finding

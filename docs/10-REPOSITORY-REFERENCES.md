@@ -6,6 +6,10 @@ Every GitHub repository behind this plan, with its verified licence and what tha
 
 ---
 
+**Looking for specific code?** [`12-CODE-REFERENCE-MAP.md`](12-CODE-REFERENCE-MAP.md) gives file-and-line pointers into these repos, organised by what you are building.
+
+---
+
 ## 1. Foundations — carried in from the earlier plan
 
 These three came from `BUILD_PLAN.md` and `RESEARCH.md`. They are the load-bearing external dependencies.
