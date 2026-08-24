@@ -37,6 +37,7 @@ Three things are genuinely new here:
 | **08** | [Cost breakdown](08-COST-BREAKDOWN.md) | Three tiers with the token math shown, break-even portfolio size, cost controls ranked by impact, recommended starting position |
 | **09** | [Research sources](09-RESEARCH-SOURCES.md) | Every source behind every design decision, organised by the decision it supports |
 | **10** | [Repository references](10-REPOSITORY-REFERENCES.md) | Every GitHub repo behind the plan, verified licence, what each licence requires, and what has no upstream at all |
+| **11** | [Template audit](11-TEMPLATE-AUDIT.md) | `awesome-llm-apps` measured rather than assumed: what T1-T22 actually contain, what to adopt, and four templates the original selection missed |
 
 ---
 
