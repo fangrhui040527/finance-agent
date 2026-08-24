@@ -110,6 +110,36 @@ The engine flags that lot granularity is forcing a sub-optimal size at this capi
 
 ---
 
+## 3.5 Two corrections found by building it
+
+Implementing §3 surfaced two places where the written plan contradicts itself or
+the market. Both are now encoded in `engines/sizing/` with tests.
+
+**The 30 bps cost floor is unreachable on Bursa.** A round trip there is
+2 × (0.1% brokerage + 0.03% clearing + 0.1% stamp) ≈ **46 bps** before the RM 8
+brokerage minimum, and only falls under 30 bps above roughly RM 4m of
+consideration once the RM 1,000 caps bind. A single global floor would refuse
+every Bursa position ever taken. The floor is therefore **per-market**, set near
+1.3× each market's asymptotic cost: 60 bps for XKLS, 5 bps for XNAS.
+
+The useful number that falls out: **the minimum economic Bursa position is about
+RM 4,700.** Below that the RM 8 minimum dominates and the round trip eats more
+than the floor allows. A single lot at RM 6.20 costs 284 bps to trade — nine times
+the floor. This is the "donation to brokers" in §3.1, computed rather than asserted.
+
+**The worked example in §3.4 trips the sanity ceiling in `09 §8`.** Its arithmetic
+is right — p = 0.56, b = 1.8 gives f\* = 0.316 and quarter-Kelly 7.9% — but 31.6%
+clears the rule that a claimed 30% edge means the model is broken. The ceiling
+wins: a 56% hit rate at 1.8:1 is an extraordinary strategy, not an illustration,
+and `04 §1` puts the honest short-horizon ceiling at 53–56%. Realistic inputs
+(p = 0.54, b = 1.5) give f\* = 0.233 and pass.
+
+**And one calibration note on §4.** Clearing 5 effective bets needs roughly ten
+names at 0.10 correlation or better. Six names at 0.15 correlation gives 3.4.
+The bar measures independence, not headcount, and it is demanding on purpose.
+
+---
+
 ## 4. Layer 3 — "Don't put all the eggs in one basket", made mechanical
 
 The instinct is right and the naive implementation is wrong. Holding twenty stocks is not diversification if they are twenty banks in one country. The system therefore measures concentration four ways and enforces all four.

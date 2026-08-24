@@ -1,0 +1,102 @@
+"""The market adapter contract.
+
+docs/06 section 2. Adding a market is filling this in and passing the seven
+conformance tests. No orchestrator code changes - that is the whole point of the
+L2 growth layer.
+
+Every field is here because getting it wrong produces a silent, plausible-looking
+error rather than a crash.
+"""
+
+from __future__ import annotations
+
+from abc import ABC, abstractmethod
+from dataclasses import dataclass
+from datetime import date
+from decimal import Decimal
+from enum import Enum
+
+from core.market.calendar import SessionCalendar
+
+
+class AccountingStandard(str, Enum):
+    IFRS = "IFRS"
+    US_GAAP = "US_GAAP"
+    LOCAL = "LOCAL"
+
+
+class KnownAtStrategy(str, Enum):
+    VENDOR = "vendor"
+    SELF_BUILT = "self_built"
+    UNAVAILABLE = "unavailable"
+
+
+@dataclass(frozen=True)
+class FeeLeg:
+    """One charge. rate is a fraction; cap/minimum are in market currency."""
+
+    name: str
+    rate: Decimal = Decimal(0)
+    minimum: Decimal = Decimal(0)
+    cap: Decimal | None = None
+    per_side: bool = True
+
+    def charge(self, consideration: Decimal) -> Decimal:
+        amt = consideration * self.rate
+        if self.cap is not None:
+            amt = min(amt, self.cap)
+        return max(amt, self.minimum)
+
+
+@dataclass(frozen=True)
+class FeeSchedule:
+    legs: tuple[FeeLeg, ...]
+
+    def one_side(self, consideration: Decimal) -> Decimal:
+        return sum((leg.charge(consideration) for leg in self.legs), Decimal(0))
+
+    def round_trip(self, consideration: Decimal) -> Decimal:
+        """docs/04 section 6.3: cost is computed before any signal is discussed."""
+        return self.one_side(consideration) * 2
+
+    def round_trip_bps(self, consideration: Decimal) -> Decimal:
+        if consideration <= 0:
+            return Decimal(0)
+        return self.round_trip(consideration) / consideration * Decimal(10_000)
+
+
+class MarketAdapter(ABC):
+    mic: str
+    country: str
+    currency: str
+    tier: int
+    accounting_standard: AccountingStandard
+    local_index: str
+    settlement_days: int
+    known_at_strategy: KnownAtStrategy
+
+    @property
+    @abstractmethod
+    def calendar(self) -> SessionCalendar: ...
+
+    @property
+    @abstractmethod
+    def fee_schedule(self) -> FeeSchedule: ...
+
+    @abstractmethod
+    def lot_size(self, instrument_id: str) -> int: ...
+
+    @abstractmethod
+    def tick_size(self, price: Decimal) -> Decimal: ...
+
+    @abstractmethod
+    def withholding(self, income_type: str, holder_country: str) -> Decimal: ...
+
+    def lot_round_down(self, units: int, instrument_id: str) -> int:
+        lot = self.lot_size(instrument_id)
+        return (units // lot) * lot
+
+    def supports_factor_model(self) -> bool:
+        """docs/06 section 1: tier 3 returns attribution_unavailable for style
+        components rather than inventing a factor model that does not exist."""
+        return self.tier <= 2

@@ -27,14 +27,36 @@ Start at **[`docs/README.md`](docs/README.md)**.
 
 ## Status
 
-**P0 shipped.** Skeleton, inference choke point, guardrail chain, provenance ledger.
-Phases P1–P19 remain — see [`docs/07-BUILD-ORDER.md`](docs/07-BUILD-ORDER.md).
+**P0–P4, P10–P11 built.** 150 tests, no network or keys needed to run any of it.
 
 ```bash
-make install && make test    # 52 tests
-make verify                  # full pipeline on mock data, no keys, <1s
+make install && make test    # full suite
+make verify                  # end-to-end on mock data, <1s
 make up                      # postgres+timescale · qdrant · neo4j · redis · minio
 ```
+
+| Phase | Ships | Module |
+|---|---|---|
+| P0 | Tier router, guardrail chain, provenance ledger, typed answers | `core/` |
+| P1 | Instrument identity, session calendars, price adjustment, FX | `core/market/` |
+| P2 | Market adapter contract + XKLS + XNAS + conformance | `markets/` |
+| P3.5 | Point-in-time `known_at` store, survivorship-safe universes | `core/market/pointintime.py` |
+| P4 | Attribution: robust regression, decomposition, long-horizon | `engines/attribution/` |
+| P10 | Concentration: HHI, effective bets, correlation clusters | `engines/risk/` |
+| P11 | Waterfall, five caps, unconstructable-if-breached decisions | `engines/sizing/` |
+
+**Not built:** P3 RAG stack, P5–P6 news + base rates, P7–P9 agents + graph,
+P12 backtest harness, P13–P15 reflection + UI, P16 paper-trade gate, P17–P19 growth.
+See [`docs/07-BUILD-ORDER.md`](docs/07-BUILD-ORDER.md).
+
+### Two things building it found
+
+- **The 30 bps cost floor is unreachable on Bursa** — a round trip is ~46 bps
+  before the RM 8 minimum. The floor is now per-market, and the minimum economic
+  Bursa position is **~RM 4,700**. A single lot at RM 6.20 costs 284 bps to trade.
+- **The plan's own Kelly worked example trips its own sanity ceiling** —
+  p=0.56, b=1.8 gives f\*=31.6%, over the "30% edge means the model is broken"
+  rule. The ceiling wins. Both recorded in [`docs/05`](docs/05-RISK-AND-GUARDRAILS.md) §3.5.
 
 ### What P0 enforces
 

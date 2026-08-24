@@ -98,6 +98,37 @@ def main() -> int:
     myr = usd.convert("MYR", Decimal("4.15"), NOW)
     check("USD -> MYR carries fx_asof", myr.fx_asof is not None, str(myr))
 
+    print("\n6. Attribution engine")
+    import random
+    from datetime import date
+    from engines.attribution.decompose import Verdict, decompose
+    from engines.attribution.regression import huber_fit
+    rng = random.Random(11)
+    rows = [[rng.gauss(0, 0.01), rng.gauss(0, 0.008)] for _ in range(250)]
+    ys = [1.1 * a + 0.6 * b + rng.gauss(0, 0.005) for a, b in rows]
+    fit = huber_fit(rows, ys)
+    w = (date(2026, 8, 1), date(2026, 8, 12))
+    mkt = decompose("X", w, -0.068, -0.015, {}, -0.094, 0.0, fit)
+    check("market selloff gets no company story",
+          mkt.verdict in (Verdict.MARKET_DRIVEN, Verdict.NOT_SIGNIFICANT)
+          and not mkt.needs_cause_hunt(), mkt.verdict.value)
+    idio = decompose("X", w, -0.002, 0.001, {}, 0.072, 0.0, fit)
+    check("idiosyncratic move triggers a hunt", idio.needs_cause_hunt(),
+          f"{idio.unexplained_share:.0%} unexplained")
+
+    print("\n7. Risk and sizing")
+    from decimal import Decimal as DD
+    from engines.risk.concentration import Limits, Position, check as ccheck, effective_number_of_bets
+    from engines.sizing.caps import cost_floor_value
+    from markets.registry import get as mget
+    banks = [Position(f"B{i}", 0.10, "Financials", "MY", "MYR", 0.006) for i in range(10)]
+    corr = [[1.0 if i == j else 0.85 for j in range(10)] for i in range(10)]
+    eb = effective_number_of_bets([p.weight for p in banks], corr)
+    check("10 correlated names read as ~1 bet", eb < 1.5, f"{eb:.2f} effective bets")
+    check("breaches reported", len(ccheck(banks, corr, Limits())) >= 4)
+    floor = cost_floor_value(mget("XKLS").fee_schedule.round_trip, "XKLS")
+    check("Bursa minimum economic position", DD("3000") < floor < DD("8000"), f"RM {floor:,.0f}")
+
     dt = time.time() - t0
     print(f"\n{'PASS' if not failures else 'FAIL: ' + ', '.join(failures)}  ({dt:.2f}s)\n")
     return 1 if failures else 0
