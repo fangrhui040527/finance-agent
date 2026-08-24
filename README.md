@@ -27,7 +27,7 @@ Start at **[`docs/README.md`](docs/README.md)**.
 
 ## Status
 
-**P0–P4, P10–P11 built.** 150 tests, no network or keys needed to run any of it.
+**P0–P4, P10–P12 built.** 202 tests, no network or keys needed to run any of it.
 
 ```bash
 make install && make test    # full suite
@@ -42,11 +42,14 @@ make up                      # postgres+timescale · qdrant · neo4j · redis ·
 | P2 | Market adapter contract + XKLS + XNAS + conformance | `markets/` |
 | P3.5 | Point-in-time `known_at` store, survivorship-safe universes | `core/market/pointintime.py` |
 | P4 | Attribution: robust regression, decomposition, long-horizon | `engines/attribution/` |
+| P3 | Parent-child chunking, hybrid BM25+dense+RRF, grader, scoped router | `knowledge/` |
 | P10 | Concentration: HHI, effective bets, correlation clusters | `engines/risk/` |
 | P11 | Waterfall, five caps, unconstructable-if-breached decisions | `engines/sizing/` |
+| P12 | Purged walk-forward, cost model, deflated Sharpe, 3 benchmarks | `engines/backtest/` |
 
-**Not built:** P3 RAG stack, P5–P6 news + base rates, P7–P9 agents + graph,
-P12 backtest harness, P13–P15 reflection + UI, P16 paper-trade gate, P17–P19 growth.
+**Not built:** P5–P6 news ingest + base rates (needs live GDELT), P7–P9 agents +
+graph, P13–P15 reflection + UI, P16 paper-trade gate (3–6 months elapsed),
+P17–P19 growth.
 See [`docs/07-BUILD-ORDER.md`](docs/07-BUILD-ORDER.md).
 
 ### Two things building it found
@@ -56,7 +59,11 @@ See [`docs/07-BUILD-ORDER.md`](docs/07-BUILD-ORDER.md).
   Bursa position is **~RM 4,700**. A single lot at RM 6.20 costs 284 bps to trade.
 - **The plan's own Kelly worked example trips its own sanity ceiling** —
   p=0.56, b=1.8 gives f\*=31.6%, over the "30% edge means the model is broken"
-  rule. The ceiling wins. Both recorded in [`docs/05`](docs/05-RISK-AND-GUARDRAILS.md) §3.5.
+  rule. The ceiling wins.
+- **Market impact dwarfs fees at the liquidity cap** — a fill at 5% of ADV costs
+  ~224 bps of impact against 23 bps of Bursa fees. The cost floor is a lower
+  bound on cost, not an estimate of it. All three in
+  [`docs/05`](docs/05-RISK-AND-GUARDRAILS.md) §3.5.
 
 ### What P0 enforces
 

@@ -134,6 +134,18 @@ wins: a 56% hit rate at 1.8:1 is an extraordinary strategy, not an illustration,
 and `04 §1` puts the honest short-horizon ceiling at 53–56%. Realistic inputs
 (p = 0.54, b = 1.5) give f\* = 0.233 and pass.
 
+**A third correction, from building the cost model.** The cost floor above is
+computed from the *fee schedule* only. Market impact is not in it, and at
+realistic size it dominates: square-root impact means a fill at 5% of 20-day ADV —
+the liquidity cap itself — costs roughly **224 bps of impact** against 23 bps of
+Bursa fees. Ten times the size is 3.2× the *rate* and 32× the total cost.
+
+Two consequences. The liquidity cap is not only about being able to exit; staying
+well inside it is what keeps impact from eating the edge. And the cost floor as
+specified is a **lower bound on cost, not an estimate of it** — the backtest
+harness applies the full model (fees + half-spread + participation slippage + FX
+leg + withholding), and that is the number any signal must clear.
+
 **And one calibration note on §4.** Clearing 5 effective bets needs roughly ten
 names at 0.10 correlation or better. Six names at 0.15 correlation gives 3.4.
 The bar measures independence, not headcount, and it is demanding on purpose.
