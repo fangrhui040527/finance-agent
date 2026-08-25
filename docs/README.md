@@ -40,6 +40,7 @@ Three things are genuinely new here:
 | **11** | [Template audit](11-TEMPLATE-AUDIT.md) | `awesome-llm-apps` measured rather than assumed: what T1-T22 actually contain, what to adopt, and four templates the original selection missed |
 | **12** | [Code reference map](12-CODE-REFERENCE-MAP.md) | Where to look, file and line, for each piece you build — pinned to commit SHAs so line numbers stay valid |
 | **13** | [The self-learning loop](13-SELF-LEARNING-LOOP.md) | What `hermes-agent` does, which four mechanisms land here, and the one bias to invert |
+| [14 Operations runbook](14-OPERATIONS-RUNBOOK.md) | What to do next, what to monitor, and what should make you stop |
 
 ---
 

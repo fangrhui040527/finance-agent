@@ -33,42 +33,42 @@ agents:
   - id: a3_price_technical
     layer: evidence
     knowledge: [kb_method_technical, price_bars]
-    tools: [retrieve, trend_state, volatility, drawdown, relative_strength, volume_profile]
+    tools: [retrieve, ohlcv, atr, drawdown, base_rate]
     tier_hint: balanced
     eval_suite: evals/a3_price_technical.yaml
 
   - id: a4_news_narrative
     layer: evidence
     knowledge: [kb_news]
-    tools: [retrieve, extract_features, dedup, source_reliability]
+    tools: [retrieve, search_news, extract_features, source_reliability]
     tier_hint: cheap
     eval_suite: evals/a4_news_narrative.yaml
 
   - id: a5_catalyst_events
     layer: evidence
     knowledge: [kb_events, event_base_rates]
-    tools: [retrieve, classify_event, lookup_base_rate, score_candidate]
+    tools: [retrieve, events_in_window, base_rate, blackout_check]
     tier_hint: balanced
     eval_suite: evals/a5_catalyst_events.yaml
 
   - id: a6_macro_regime
     layer: evidence
     knowledge: [kb_macro]
-    tools: [retrieve, regime_state, rate_path, currency_state]
+    tools: [series, regime_label, country_stress]
     tier_hint: balanced
     eval_suite: evals/a6_macro_regime.yaml
 
   - id: a7_sector_technology
     layer: evidence
     knowledge: [kb_sector, kb_supply_chain]
-    tools: [retrieve, traverse_graph, adoption_curve, capex_cycle]
+    tools: [retrieve, traverse, peers, sector_primer]
     tier_hint: balanced
     eval_suite: evals/a7_sector_technology.yaml
 
   - id: a8_ownership_flow
     layer: evidence
     knowledge: [kb_ownership]
-    tools: [retrieve, insider_activity, institutional_flow, short_interest, crowding]
+    tools: [insider_activity, ownership_change, short_interest_trend]
     tier_hint: balanced
     eval_suite: evals/a8_ownership_flow.yaml
 
@@ -105,8 +105,7 @@ agents:
   - id: a13_sizing
     layer: portfolio
     knowledge: [ledger, holdings, goals]
-    tools: [investable_capital, risk_budget_cap, kelly_cap, concentration_cap,
-            liquidity_cap, cost_floor, vol_target_scalar, lot_round]
+    tools: [investable_capital, risk_budget_cap, kelly_cap, concentration_cap, liquidity_cap, cost_floor, vol_target_scalar, lot_round]
     tier_hint: balanced
     eval_suite: evals/a13_sizing.yaml
 

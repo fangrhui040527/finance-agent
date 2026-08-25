@@ -134,7 +134,7 @@ class A2Valuation(Agent):
 class A3PriceTechnical(Agent):
     """Describes what price did. Never predicts from a pattern."""
 
-    agent_id = "a3_price"
+    agent_id = "a3_price_technical"
     collections = ("kb_method_technical",)
     tools = ("retrieve", "ohlcv", "atr", "drawdown", "base_rate")
     tier = TaskClass.ADHOC_QUERY
@@ -172,7 +172,7 @@ class A3PriceTechnical(Agent):
 class A4NewsNarrative(Agent):
     """Extracts features from text. Never asked whether a price will rise."""
 
-    agent_id = "a4_news"
+    agent_id = "a4_news_narrative"
     collections = ("kb_news",)
     tools = ("retrieve", "search_news", "extract_features", "source_reliability")
     tier = TaskClass.NEWS_TRIAGE
@@ -199,7 +199,7 @@ class A4NewsNarrative(Agent):
 class A5CatalystEvents(Agent):
     """A time-indexed catalogue, and what each event type has been worth."""
 
-    agent_id = "a5_events"
+    agent_id = "a5_catalyst_events"
     collections = ("kb_filings",)
     tools = ("retrieve", "events_in_window", "base_rate", "blackout_check")
     tier = TaskClass.CATALYST_MATCH
@@ -231,7 +231,7 @@ class A5CatalystEvents(Agent):
 class A6MacroRegime(Agent):
     """The conditions everything else happens inside. Never forecasts a rate."""
 
-    agent_id = "a6_macro"
+    agent_id = "a6_macro_regime"
     collections = ()
     tools = ("series", "regime_label", "country_stress")
     tier = TaskClass.MACRO_READ
@@ -257,7 +257,7 @@ class A6MacroRegime(Agent):
 class A7SectorTechnology(Agent):
     """Did the company do something, or did its industry change underneath it?"""
 
-    agent_id = "a7_sector"
+    agent_id = "a7_sector_technology"
     collections = ("kb_sector",)
     tools = ("retrieve", "traverse", "peers", "sector_primer")
     tier = TaskClass.SECTOR_READ
@@ -288,7 +288,7 @@ class A7SectorTechnology(Agent):
 class A8OwnershipFlow(Agent):
     """Who is buying and selling. Routine insider selling is not a signal."""
 
-    agent_id = "a8_flow"
+    agent_id = "a8_ownership_flow"
     collections = ()
     tools = ("insider_activity", "ownership_change", "short_interest_trend")
     tier = TaskClass.FLOW_READ

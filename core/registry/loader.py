@@ -75,6 +75,17 @@ class Registry:
     def may_use(self, agent_id: str, tool: str) -> bool:
         return tool in self.agent(agent_id).tools
 
+    def allowlist(self) -> dict[str, set[str]]:
+        """The tool allowlist, derived from the registry rather than hand-written.
+
+        This is what makes the registry load-bearing instead of decorative. It
+        was decorative once: the registry named tools like `ohlcv` as
+        `trend_state`, so an allowlist built from it denied the agents' own
+        calls. Nothing caught that, because the runtime allowlist was a separate
+        hand-maintained dict that happened to be right.
+        """
+        return {aid: set(spec.tools) for aid, spec in self.agents.items()}
+
     def may_write(self, agent_id: str, store: str) -> bool:
         """docs/13: human-created knowledge is read-only to every agent, forever."""
         spec = self.knowledge.get(store)

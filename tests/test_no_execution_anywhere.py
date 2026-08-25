@@ -24,6 +24,7 @@ ALLOWED_PATHS = {
     "tests/test_guardrail_chain.py",
     "tests/test_registry.py",
     "tests/test_agents.py",
+    "tests/test_evidence_agents.py",
 }
 
 

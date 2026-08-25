@@ -151,7 +151,7 @@ leg + withholding), and that is the number any signal must clear.
 names at 0.10 correlation or better. Six names at 0.15 correlation gives 3.4.
 The bar measures independence, not headcount, and it is demanding on purpose.
 
-### 3.5.1 Four more, from building the agent layer
+### 3.5.1 Six more, from building the agent layer
 
 **A rejected catalyst was rendering as the cause.** `ui/render.py` branched on
 whether the candidate list was empty rather than on the verdict. A story that
@@ -174,6 +174,31 @@ through the intent table to the concept-explainer. A one-word gap in a regex
 routed a price-move question to a teacher. **Lesson: intent classification needs
 negative-case evals, not just happy-path ones — which is now what the ratchet in
 `core/registry/loader.py` requires before anything can register.**
+
+**Six agent ids drifted from the registry — and nothing crashed.** The classes
+said `a5_events`; the registry said `a5_catalyst_events`. No exception, no failed
+test, no log line. What actually happened: `A10Thesis.REQUIRED_EVIDENCE` names the
+registry ids, so two agents that *were* reporting were counted as missing. Every
+thesis therefore carried two phantom evidence gaps, docked its own confidence by
+0.24 (0.75 → 0.51) **on every run, forever**, and the red team raised a `coverage`
+challenge every single time — a challenge that always fires carries exactly as
+much information as one that never fires.
+
+**This is the defining failure mode of a system whose job is to express
+uncertainty: a bug does not look like a crash, it looks like a slightly-too-humble
+answer, permanently.** A system that is wrong in the confident direction gets
+caught within a day. One that is wrong in the modest direction can run for years,
+and every one of its outputs is subtly, invisibly degraded.
+
+**The registry was decorative, which is how the drift survived.** The tool
+allowlist was a separate hand-maintained dict that happened to be correct, so the
+registry's own tool names were never exercised. They had drifted too: the registry
+called A3's tools `trend_state` and `volatility` while the code guarded `ohlcv`
+and `atr`. Building the allowlist from the registry — the entire purpose of a
+capability registry — made A3 deny its own first call. Both are fixed by
+`Registry.allowlist()` plus two tests that fail if any class drifts from the
+registry on either identity or tools. **The lesson is not "check your strings": it
+is that a registry nothing reads is a comment, and comments rot.**
 
 **The `should_i_buy` floor leaves only 2× headroom.** The plan's minimum honest
 plan for a buy question (fundamentals + valuation + thesis + red team) costs

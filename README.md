@@ -23,11 +23,19 @@ Start at **[`docs/README.md`](docs/README.md)**.
 | [10 Repository references](docs/10-REPOSITORY-REFERENCES.md) | Every GitHub repo used, verified licences, obligation map |
 | [11 Template audit](docs/11-TEMPLATE-AUDIT.md) | What `awesome-llm-apps` actually contains, measured; what to adopt and what to drop |
 | [12 Code reference map](docs/12-CODE-REFERENCE-MAP.md) | Exact file:line pointers into each upstream repo, pinned to commit SHAs |
-| [13 The self-learning loop](docs/13-SELF-LEARNING-LOOP.md) | Hermes-agent studied; the assembled A14 loop and its provenance gate |
+| [13 The self-learning loop](docs/13-SELF-LEARNING-LOOP.md) | Hermes-agent studied; the assembled A15 loop and its provenance gate |
+| [14 Operations runbook](docs/14-OPERATIONS-RUNBOOK.md) | **What to do next, what to monitor, and what should make you stop** |
 
 ## Status
 
-**P0–P6, P10–P12 built.** 232 tests, no network or keys needed to run any of it.
+**Everything except P16 is built and tested.** 404 tests, no network and no keys
+needed to run any of it. CI runs the suite, `verify.py`, the eval ratchet and the
+no-execution grep on every push.
+
+P16 is the paper-trade gate: 3–6 months of elapsed forward time, not unbuilt
+work. Its machinery exists and refuses to grade a prediction before its horizon.
+P18–P19 wait on P16. **If you are picking this up, start at
+[`docs/14-OPERATIONS-RUNBOOK.md`](docs/14-OPERATIONS-RUNBOOK.md).**
 
 ```bash
 make install && make test    # full suite
@@ -48,14 +56,21 @@ make up                      # postgres+timescale · qdrant · neo4j · redis ·
 | P10 | Concentration: HHI, effective bets, correlation clusters | `engines/risk/` |
 | P11 | Waterfall, five caps, unconstructable-if-breached decisions | `engines/sizing/` |
 | P12 | Purged walk-forward, cost model, deflated Sharpe, 3 benchmarks | `engines/backtest/` |
+| P7 | A1–A8 evidence agents, each owning one collection | `agents/evidence/` |
+| P8 | A9 attribution, A10 thesis, A11 red team, A0 supervisor | `agents/synthesis/`, `agents/supervisor.py` |
+| P9 | Entity graph, per-hop decay, path-required impact claims | `knowledge/graph/` |
+| P13 | Deferred outcome queue, inverted lesson gate, calibration | `agents/learning/reflection.py` |
+| P14 | 30-concept curriculum with an enforced prerequisite graph | `agents/learning/teacher.py` |
+| P15 | Decomposition bars, annotated chart, thesis memo, daily brief | `ui/render.py` |
+| P17 | Capability registry and the eval ratchet, 16 suites | `core/registry/`, `evals/` |
 
-**Not built:** P7–P9 agents + knowledge graph, P13–P15 reflection + UI,
-P16 paper-trade gate (3–6 months elapsed), P17–P19 growth. The P5 feed adapters
-are mocked — real GDELT/vendor ingest needs a key in `.env`; everything
-downstream of the adapter seam is built and tested.
-See [`docs/07-BUILD-ORDER.md`](docs/07-BUILD-ORDER.md).
+**Not built:** P16 paper-trade gate (3–6 months elapsed, not effort) and
+P18–P19, which depend on it. Live feed ingest is deliberately unwired —
+`GdeltFeed._fetch_raw` raises rather than returning empty, so the offline build
+cannot pretend to have data. Everything downstream of the adapter seam is built
+and tested. See [`docs/07-BUILD-ORDER.md`](docs/07-BUILD-ORDER.md) §0.
 
-### Two things building it found
+### What building it found
 
 - **The 30 bps cost floor is unreachable on Bursa** — a round trip is ~46 bps
   before the RM 8 minimum. The floor is now per-market, and the minimum economic
@@ -65,7 +80,16 @@ See [`docs/07-BUILD-ORDER.md`](docs/07-BUILD-ORDER.md).
   rule. The ceiling wins.
 - **Market impact dwarfs fees at the liquidity cap** — a fill at 5% of ADV costs
   ~224 bps of impact against 23 bps of Bursa fees. The cost floor is a lower
-  bound on cost, not an estimate of it. All three in
+  bound on cost, not an estimate of it.
+- **A rejected catalyst was rendering as the cause** — the renderer branched on
+  list emptiness instead of the verdict, so a story scoring 0.11 appeared under
+  the move as though it explained it.
+- **Six agent ids drifted from the registry.** Nothing crashed. A10 simply
+  reported two evidence gaps that were in fact covered, docked its own
+  confidence by 0.24 on **every** thesis, and the red team raised a coverage
+  challenge on every thesis forever — which is the same as never raising one.
+  The registry is now load-bearing: the tool allowlist is derived from it, and a
+  test fails if any class drifts. All in
   [`docs/05`](docs/05-RISK-AND-GUARDRAILS.md) §3.5.
 
 ### What P0 enforces
@@ -80,3 +104,8 @@ See [`docs/07-BUILD-ORDER.md`](docs/07-BUILD-ORDER.md).
 | Human-authored knowledge is never agent-editable | `core/contracts/provenance_marker.py` | `test_provenance.py` |
 | Budget exhaustion raises; it never downgrades silently | `core/llm/client.py` | `test_inference_client.py` |
 | Telemetry sits beside content, never inside it | `core/provenance/sidecar.py` | `test_sidecar.py` |
+| Nothing registers without an eval suite carrying negative cases | `core/registry/loader.py` | `test_registry.py` |
+| Agent identity and tools cannot drift from the registry | `core/registry/loader.py` | `test_evidence_agents.py` |
+| A significant move with no catalyst is never given one | `engines/attribution/` + `ui/render.py` | `test_render.py` |
+| A prediction cannot be graded before its stated horizon | `agents/learning/reflection.py` | `test_learning.py` |
+| A concept cannot be taught before its prerequisites | `agents/learning/teacher.py` | `test_learning.py` |

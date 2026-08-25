@@ -148,3 +148,47 @@ def test_a_crash_is_scored_as_a_failure_not_an_error(tmp_path):
     r = run_suite(tmp_path / "s.yaml", "a99", boom)
     assert r.failed == r.total
     assert "RuntimeError" in r.details[0][2]
+
+
+def test_the_allowlist_derived_from_the_registry_permits_every_real_call():
+    """The registry is load-bearing, not decorative.
+
+    Regression: the registry named A3's tools trend_state/volatility while the
+    code guarded ohlcv/atr. An allowlist built from the registry - the whole
+    point of a capability registry - denied the agent's own first call.
+    """
+    import random
+    from datetime import date, datetime, timedelta, timezone
+
+    from agents.base import AgentContext
+    from agents.evidence.agents import A3PriceTechnical, A6MacroRegime
+    from core.guardrails.defaults import default_engine
+    from core.market.prices import Bar, PriceSeries
+    from knowledge.retrieval.pipeline import Router
+
+    reg = load(REGISTRY)
+    ctx = AgentContext(router=Router({}), engine=default_engine(reg.allowlist()),
+                       now=datetime(2026, 8, 25, tzinfo=timezone.utc))
+
+    rng = random.Random(4)
+    bars, px, d = [], 10.0, date(2026, 5, 1)
+    for i in range(60):
+        px *= 1 + rng.gauss(0, 0.01)
+        bars.append(Bar(d + timedelta(days=i), px, px * 1.01, px * 0.99, px, 100_000))
+
+    assert A3PriceTechnical(ctx).run(PriceSeries("X", bars))
+    assert A6MacroRegime(ctx).run([rng.gauss(0, 0.01) for _ in range(120)])
+
+
+def test_the_allowlist_still_denies_what_is_not_registered():
+    from agents.base import AgentContext
+    from agents.evidence.agents import A3PriceTechnical
+    from core.guardrails.defaults import default_engine
+    from knowledge.retrieval.pipeline import Router
+
+    reg = load(REGISTRY)
+    ctx = AgentContext(router=Router({}), engine=default_engine(reg.allowlist()))
+    agent = object.__new__(A3PriceTechnical)
+    agent.ctx = ctx
+    with pytest.raises(Exception):
+        agent._guard_tool("reverse_dcf")
