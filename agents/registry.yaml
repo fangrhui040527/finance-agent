@@ -1,0 +1,152 @@
+# Capability registry - the L1 growth surface (docs/01 section 10).
+# Adding an agent, tool or market is an entry here plus an adapter class,
+# never a change to the orchestrator.
+#
+# Ratchet rule: nothing registers without an eval suite, and no suite registers
+# without negative cases. core/registry/loader.py refuses at load time.
+
+version: 1
+
+agents:
+  - id: a0_supervisor
+    layer: orchestration
+    knowledge: []
+    tools: [plan, budget, route, refuse]
+    tier_hint: cheap
+    eval_suite: evals/a0_routing.yaml
+
+  # -- evidence layer: owns knowledge, emits typed findings, never talks to peers
+  - id: a1_fundamentals
+    layer: evidence
+    knowledge: [kb_filings]
+    tools: [retrieve, get_statement, dupont, accrual_ratio, restatement_diff]
+    tier_hint: balanced
+    eval_suite: evals/a1_fundamentals.yaml
+
+  - id: a2_valuation
+    layer: evidence
+    knowledge: [kb_method_valuation]
+    tools: [retrieve, multiple_vs_history, reverse_dcf, peer_multiples]
+    tier_hint: balanced
+    eval_suite: evals/a2_valuation.yaml
+
+  - id: a3_price_technical
+    layer: evidence
+    knowledge: [kb_method_technical, price_bars]
+    tools: [retrieve, ohlcv, atr, drawdown, base_rate]
+    tier_hint: balanced
+    eval_suite: evals/a3_price_technical.yaml
+
+  - id: a4_news_narrative
+    layer: evidence
+    knowledge: [kb_news]
+    tools: [retrieve, search_news, extract_features, source_reliability]
+    tier_hint: cheap
+    eval_suite: evals/a4_news_narrative.yaml
+
+  - id: a5_catalyst_events
+    layer: evidence
+    knowledge: [kb_events, event_base_rates]
+    tools: [retrieve, events_in_window, base_rate, blackout_check]
+    tier_hint: balanced
+    eval_suite: evals/a5_catalyst_events.yaml
+
+  - id: a6_macro_regime
+    layer: evidence
+    knowledge: [kb_macro]
+    tools: [series, regime_label, country_stress]
+    tier_hint: balanced
+    eval_suite: evals/a6_macro_regime.yaml
+
+  - id: a7_sector_technology
+    layer: evidence
+    knowledge: [kb_sector, kb_supply_chain]
+    tools: [retrieve, traverse, peers, sector_primer]
+    tier_hint: balanced
+    eval_suite: evals/a7_sector_technology.yaml
+
+  - id: a8_ownership_flow
+    layer: evidence
+    knowledge: [kb_ownership]
+    tools: [insider_activity, ownership_change, short_interest_trend]
+    tier_hint: balanced
+    eval_suite: evals/a8_ownership_flow.yaml
+
+  # -- synthesis layer: reads findings, may not retrieve to patch a gap
+  - id: a9_attribution
+    layer: synthesis
+    knowledge: [factor_returns, price_bars, event_base_rates]
+    tools: [decompose, abnormal_return, candidate_causes, long_horizon_decompose]
+    tier_hint: reason
+    eval_suite: evals/a9_attribution.yaml   # includes the pure-beta negative suite
+
+  - id: a10_thesis
+    layer: synthesis
+    knowledge: []
+    tools: [compose, check_coverage]
+    tier_hint: reason
+    eval_suite: evals/a10_thesis.yaml
+
+  - id: a11_red_team
+    layer: synthesis
+    knowledge: [kb_failures, kb_news, kb_filings]
+    tools: [retrieve, find_disconfirming, check_crowding]
+    tier_hint: reason
+    eval_suite: evals/a11_red_team.yaml
+
+  # -- portfolio layer: the only agents that produce a number a cap can reject
+  - id: a12_portfolio_risk
+    layer: portfolio
+    knowledge: [kb_method_risk, holdings]
+    tools: [concentration_check, heat, effective_bets, drawdown_state, stress]
+    tier_hint: balanced
+    eval_suite: evals/a12_portfolio_risk.yaml
+
+  - id: a13_sizing
+    layer: portfolio
+    knowledge: [ledger, holdings, goals]
+    tools: [investable_capital, risk_budget_cap, kelly_cap, concentration_cap, liquidity_cap, cost_floor, vol_target_scalar, lot_round]
+    tier_hint: balanced
+    eval_suite: evals/a13_sizing.yaml
+
+  # -- learning layer
+  - id: a14_teacher
+    layer: learning
+    knowledge: [kb_craft]
+    tools: [retrieve, explain, next_concept, quiz]
+    tier_hint: balanced
+    eval_suite: evals/a14_teacher.yaml
+
+  - id: a15_reflection
+    layer: learning
+    knowledge: [kb_lessons, outcomes]
+    tools: [grade_queue, propose_lesson, calibrate, curate]
+    tier_hint: reason
+    eval_suite: evals/a15_reflection.yaml
+
+# Every knowledge store carries a provenance marker (docs/13 section 2.1).
+# created_by: human means read-only to every agent, forever.
+knowledge:
+  kb_lessons:           {created_by: agent, managed: true}
+  kb_craft:             {created_by: human, managed: false}
+  kb_method_valuation:  {created_by: human, managed: false}
+  kb_method_technical:  {created_by: human, managed: false}
+  kb_method_risk:       {created_by: human, managed: false}
+  kb_failures:          {created_by: human, managed: false}
+  kb_filings:           {created_by: human, managed: false}
+  kb_news:              {created_by: human, managed: false}
+  kb_events:            {created_by: human, managed: false}
+  kb_macro:             {created_by: human, managed: false}
+  kb_sector:            {created_by: human, managed: false}
+  kb_supply_chain:      {created_by: human, managed: false}
+  kb_ownership:         {created_by: human, managed: false}
+  event_base_rates:     {created_by: agent, managed: true}
+  factor_returns:       {created_by: human, managed: false}
+  price_bars:           {created_by: human, managed: false}
+  holdings:             {created_by: human, managed: false}
+  ledger:               {created_by: human, managed: false}
+  goals:                {created_by: human, managed: false}
+  outcomes:             {created_by: agent, managed: true}
+
+# There is no execution tool in this registry, and both NoExecutionPolicy and
+# loader.FORBIDDEN_TOOLS deny the names by hand regardless of what is listed here.

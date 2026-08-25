@@ -1,0 +1,28 @@
+# A7. Negatives: multi-hop supply-chain claims decay to speculation and must be
+# labelled as such, never asserted.
+agent: a7_sector_technology
+cases:
+  - name: direct_supplier_link
+    hops: 1
+    expect: direct
+  - name: two_hop_labelled_indirect
+    hops: 2
+    expect: indirect
+  - name: three_hop_labelled_speculative
+    hops: 3
+    expect: speculative
+  - name: adoption_curve_stage
+    expect: sector_state
+  - name: capex_cycle_position
+    expect: sector_state
+  # -- negatives -----------------------------------------------------------
+  - name: no_path_no_claim
+    hops: 0
+    expect: refuse
+    negative: true
+    near_miss: true
+  - name: uncitable_edge_excluded
+    edge_citable: false
+    expect: refuse
+    negative: true
+    near_miss: true

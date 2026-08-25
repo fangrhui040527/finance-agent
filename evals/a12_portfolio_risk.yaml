@@ -1,0 +1,29 @@
+agent: a12_portfolio_risk
+cases:
+  - name: single_name_breach
+    weights: [0.20, 0.15, 0.15, 0.15, 0.15, 0.20]
+    expect: breach
+  - name: sector_breach
+    sector_weight: 0.34
+    expect: breach
+  - name: heat_breach
+    heat: 0.09
+    expect: breach
+  - name: drawdown_tier_two
+    drawdown: 0.16
+    expect: breach
+  - name: correlated_banks_low_hhi_high_risk
+    names: 10
+    correlation: 0.8
+    expect: breach
+    near_miss: true
+  # -- negatives -----------------------------------------------------------
+  - name: genuinely_diversified_passes
+    names: 10
+    correlation: 0.10
+    expect: no_view
+    negative: true
+  - name: empty_book_is_not_a_breach
+    weights: []
+    expect: no_view
+    negative: true

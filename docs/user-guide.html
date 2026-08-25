@@ -1,0 +1,659 @@
+<title>Running the Analyst Mind</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+
+<style>
+:root{
+  --ground:#F6F8F7; --panel:#FFFFFF; --panel-2:#EFF2F1; --term:#12201F;
+  --ink:#15191B; --ink-2:#3A4448; --muted:#606D71;
+  --rule:#D6DBD9; --rule-2:#C2C9C6;
+  --accent:#0F5C63; --accent-soft:#DCEAEA;
+  --neg:#9E3626; --neg-soft:#F3E0DC;
+  --pos:#3B6A38; --pos-soft:#E1EBDF;
+  --warn:#8A5B12; --warn-soft:#F5E9D4;
+  --term-ink:#D6E3E1; --term-dim:#7E948F; --term-accent:#6FBFC4; --term-pos:#8CBE85; --term-neg:#DB8571;
+  --shadow:0 1px 2px rgba(21,25,27,.05),0 8px 24px -16px rgba(21,25,27,.28);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#101413; --panel:#171C1B; --panel-2:#1E2423; --term:#0C1413;
+    --ink:#E7EBE9; --ink-2:#BFC8C6; --muted:#8B9895;
+    --rule:#2A3231; --rule-2:#3A4442;
+    --accent:#5FB3B9; --accent-soft:#17312F;
+    --neg:#D9705C; --neg-soft:#33201C;
+    --pos:#7FAE79; --pos-soft:#1D2A1D;
+    --warn:#C79A4E; --warn-soft:#2C2416;
+    --term-ink:#D6E3E1; --term-dim:#7E948F; --term-accent:#6FBFC4; --term-pos:#8CBE85; --term-neg:#DB8571;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -16px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#101413; --panel:#171C1B; --panel-2:#1E2423; --term:#0C1413;
+  --ink:#E7EBE9; --ink-2:#BFC8C6; --muted:#8B9895;
+  --rule:#2A3231; --rule-2:#3A4442;
+  --accent:#5FB3B9; --accent-soft:#17312F;
+  --neg:#D9705C; --neg-soft:#33201C;
+  --pos:#7FAE79; --pos-soft:#1D2A1D;
+  --warn:#C79A4E; --warn-soft:#2C2416;
+  --term-ink:#D6E3E1; --term-dim:#7E948F; --term-accent:#6FBFC4; --term-pos:#8CBE85; --term-neg:#DB8571;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -16px rgba(0,0,0,.7);
+}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);
+  font-family:"Public Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size:16.5px;line-height:1.65;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:Newsreader,Georgia,"Times New Roman",serif;font-weight:500;
+  text-wrap:balance;margin:0;line-height:1.2}
+code,kbd{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
+a{color:var(--accent);text-underline-offset:3px}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
+
+.wrap{max-width:1100px;margin:0 auto;padding:0 24px}
+.shell{display:grid;grid-template-columns:186px minmax(0,1fr);gap:52px;align-items:start}
+@media(max-width:920px){.shell{grid-template-columns:1fr;gap:0}}
+
+/* masthead */
+.mast{border-bottom:1px solid var(--rule);background:var(--panel)}
+.mast-in{padding:50px 0 32px}
+.eyebrow{font-size:11.5px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--muted);margin:0 0 16px;display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.eyebrow .dot{width:5px;height:5px;border-radius:50%;background:var(--accent)}
+h1{font-size:clamp(36px,5.6vw,56px);letter-spacing:-.02em;margin:0 0 13px}
+.standfirst{font-size:18.5px;line-height:1.55;color:var(--ink-2);max-width:62ch;
+  margin:0 0 26px;font-weight:300}
+.standfirst em{font-style:normal;color:var(--ink);font-weight:500;
+  box-shadow:inset 0 -.5em 0 var(--accent-soft)}
+
+/* nav */
+nav.rail{position:sticky;top:26px;padding:42px 0 0;font-size:13.5px}
+nav.rail ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:1px}
+nav.rail a{display:grid;grid-template-columns:20px 1fr;gap:8px;align-items:baseline;
+  padding:5px 8px 5px 0;color:var(--muted);text-decoration:none;transition:color .12s}
+nav.rail a:hover{color:var(--accent)}
+nav.rail .n{font-family:"JetBrains Mono",monospace;font-size:11px;opacity:.6}
+nav.rail .sep{height:1px;background:var(--rule);margin:12px 0}
+nav.rail .note{font-size:12px;color:var(--muted);line-height:1.5;padding-right:8px}
+@media(max-width:920px){nav.rail{display:none}}
+
+main{padding:42px 0 92px;min-width:0}
+section{margin:0 0 58px;scroll-margin-top:24px}
+.sec-head{display:grid;grid-template-columns:auto 1fr;gap:13px;align-items:baseline;
+  margin:0 0 20px;padding-bottom:11px;border-bottom:1px solid var(--rule)}
+.sec-num{font-family:"JetBrains Mono",monospace;font-size:12px;font-weight:700;
+  color:var(--accent);padding-top:5px}
+h2{font-size:clamp(24px,3.3vw,31px);letter-spacing:-.015em}
+.sec-head p{grid-column:2;margin:6px 0 0;color:var(--muted);font-size:15px;max-width:62ch}
+h3{font-size:18.5px;margin:30px 0 10px}
+h3:first-child{margin-top:0}
+p{margin:0 0 14px;max-width:68ch}
+ul,ol{max-width:68ch;padding-left:20px;margin:0 0 14px}
+li{margin:0 0 7px}
+strong{font-weight:600}
+
+/* terminal — the guide's centrepiece, so it gets a real one */
+.term{background:var(--term);border-radius:4px;margin:16px 0;overflow:hidden;
+  box-shadow:var(--shadow);border:1px solid var(--rule-2)}
+.term-bar{display:flex;align-items:center;gap:7px;padding:8px 13px;
+  border-bottom:1px solid rgba(255,255,255,.07)}
+.term-bar span{width:9px;height:9px;border-radius:50%;background:var(--term-dim);opacity:.45}
+.term-bar b{margin-left:6px;font-family:"JetBrains Mono",monospace;font-size:10.5px;
+  font-weight:500;color:var(--term-dim);letter-spacing:.06em;text-transform:uppercase}
+.term pre{margin:0;padding:14px 16px;overflow-x:auto;font-size:12.8px;line-height:1.62;
+  color:var(--term-ink);font-family:"JetBrains Mono",monospace}
+.term .p{color:var(--term-accent);font-weight:700}
+.term .c{color:var(--term-dim);font-style:italic}
+.term .o{color:var(--term-dim)}
+.term .g{color:var(--term-pos)}
+.term .r{color:var(--term-neg)}
+.term .hl{color:var(--term-ink);font-weight:700}
+
+:not(pre)>code{background:var(--panel-2);border:1px solid var(--rule);border-radius:2px;
+  padding:1px 5px;font-size:.87em}
+
+/* callouts */
+.box{background:var(--panel);border:1px solid var(--rule);border-radius:3px;
+  padding:17px 19px;margin:20px 0;box-shadow:var(--shadow)}
+.box.stop{border-left:3px solid var(--neg);background:var(--neg-soft)}
+.box.key{border-left:3px solid var(--accent);background:var(--accent-soft)}
+.box.warn{border-left:3px solid var(--warn);background:var(--warn-soft)}
+.box p:last-child{margin-bottom:0}
+.box .lbl{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;
+  color:var(--muted);margin:0 0 7px;display:block}
+.box.stop .lbl{color:var(--neg)} .box.key .lbl{color:var(--accent)} .box.warn .lbl{color:var(--warn)}
+
+/* setup steps — installation genuinely is a sequence */
+.steps{counter-reset:s;list-style:none;padding:0;margin:20px 0;display:flex;
+  flex-direction:column;gap:0}
+.steps > li{counter-increment:s;display:grid;grid-template-columns:30px 1fr;gap:16px;
+  margin:0;padding:18px 0;border-bottom:1px solid var(--rule)}
+.steps > li:last-child{border-bottom:0}
+.steps > li::before{content:counter(s);font-family:"JetBrains Mono",monospace;font-size:12px;
+  font-weight:700;color:var(--panel);background:var(--accent);width:22px;height:22px;
+  border-radius:50%;display:grid;place-items:center;margin-top:3px}
+.steps h4{font-size:17px;margin:0 0 5px}
+.steps p{margin:0 0 8px;font-size:15px;color:var(--ink-2)}
+.steps p:last-child,.steps .term:last-child{margin-bottom:0}
+
+/* command cards */
+.cmds{display:flex;flex-direction:column;gap:0;margin:20px 0;
+  border:1px solid var(--rule);border-radius:3px;overflow:hidden}
+.cmd{background:var(--panel);border-bottom:1px solid var(--rule);padding:17px 19px}
+.cmd:last-child{border-bottom:0}
+.cmd-h{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap;margin:0 0 6px}
+.cmd-h code{background:none;border:0;padding:0;font-size:14.5px;font-weight:700;color:var(--accent)}
+.cmd-h .when{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;font-weight:600;
+  color:var(--muted);background:var(--panel-2);padding:2px 7px;border-radius:9px}
+.cmd p{margin:0;font-size:14.5px;color:var(--ink-2)}
+.cmd .term{margin:11px 0 0}
+
+/* cadence — the "when doing what" spine */
+.cadence{margin:22px 0;border:1px solid var(--rule);border-radius:3px;overflow:hidden}
+.cad-row{display:grid;grid-template-columns:118px 1fr;gap:0;border-bottom:1px solid var(--rule);
+  background:var(--panel)}
+.cad-row:last-child{border-bottom:0}
+.cad-when{padding:15px 16px;background:var(--panel-2);border-right:1px solid var(--rule);
+  display:flex;flex-direction:column;gap:2px}
+.cad-when b{font-family:"JetBrains Mono",monospace;font-size:11.5px;font-weight:700;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.cad-when small{font-size:11.5px;color:var(--muted);line-height:1.4}
+.cad-what{padding:15px 17px;display:flex;flex-direction:column;gap:7px}
+.cad-what div{display:grid;grid-template-columns:auto 1fr;gap:11px;align-items:baseline;font-size:14.5px}
+.cad-what code{font-size:12.5px;white-space:nowrap;color:var(--accent)}
+.cad-what span{color:var(--ink-2)}
+@media(max-width:620px){
+  .cad-row{grid-template-columns:1fr}
+  .cad-when{border-right:0;border-bottom:1px solid var(--rule);flex-direction:row;
+    align-items:baseline;gap:9px}
+  .cad-what div{grid-template-columns:1fr;gap:1px}
+}
+
+/* phase timeline */
+.tl{margin:22px 0;border-left:1px solid var(--rule-2)}
+.tl-item{display:grid;grid-template-columns:98px 1fr;gap:18px;padding:17px 0 17px 20px;
+  border-bottom:1px solid var(--rule);position:relative}
+.tl-item:last-child{border-bottom:0}
+.tl-item::before{content:"";position:absolute;left:-4.5px;top:25px;width:8px;height:8px;
+  border-radius:50%;background:var(--accent);border:2px solid var(--ground)}
+.tl-when{font-family:"JetBrains Mono",monospace;font-size:11.5px;font-weight:700;
+  letter-spacing:.05em;text-transform:uppercase;color:var(--accent);padding-top:3px}
+.tl-body h4{font-size:17px;margin:0 0 5px}
+.tl-body p{margin:0 0 9px;font-size:15px;color:var(--ink-2)}
+.tl-body p:last-child,.tl-body .term:last-child,.tl-body .box:last-child{margin-bottom:0}
+
+/* tables */
+.tw{overflow-x:auto;margin:16px 0;border:1px solid var(--rule);border-radius:3px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:520px}
+th{text-align:left;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;
+  color:var(--muted);padding:10px 14px;border-bottom:1px solid var(--rule-2);background:var(--panel-2);
+  white-space:nowrap}
+td{padding:10px 14px;border-bottom:1px solid var(--rule);vertical-align:top;line-height:1.5}
+tr:last-child td{border-bottom:0}
+td.k{font-weight:500;color:var(--ink)}
+td code{font-size:12.5px}
+td.num{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums;text-align:right}
+.chip{display:inline-block;font-size:11.5px;font-weight:500;padding:2px 8px;border-radius:10px;
+  white-space:nowrap;line-height:1.5}
+.chip.ok{background:var(--pos-soft);color:var(--pos)}
+.chip.no{background:var(--neg-soft);color:var(--neg)}
+.chip.wait{background:var(--warn-soft);color:var(--warn)}
+
+footer{border-top:1px solid var(--rule);padding:25px 0 44px;color:var(--muted);font-size:13px}
+footer p{max-width:70ch;margin:0 0 8px}
+footer b{color:var(--ink-2)}
+</style>
+
+<div class="mast">
+  <div class="wrap mast-in">
+    <p class="eyebrow"><span class="dot"></span> FinPlanet · Module 5 · The Analyst Mind</p>
+    <h1>Running the Analyst Mind</h1>
+    <p class="standfirst">Install it, ask it something, and start the clock that makes the rest worth doing. Three commands cover almost everything; the fourth thing you need is <em>a habit on a schedule</em>, which is what the cadence below is for.</p>
+    <div class="term" style="max-width:640px">
+      <div class="term-bar"><span></span><span></span><span></span><b>the whole surface</b></div>
+<pre><span class="p">$</span> make install <span class="c"># once</span>
+<span class="p">$</span> python ask.py why MYX:1155 --move -0.09 --market -0.08
+<span class="p">$</span> python predict.py log MYX:1155 +1 63d 0.62 <span class="hl">"NIM recovers"</span>
+<span class="p">$</span> make due <span class="c"># every Monday, forever</span></pre>
+    </div>
+  </div>
+</div>
+
+<div class="wrap shell">
+
+  <nav class="rail" aria-label="Sections">
+    <ol>
+      <li><a href="#s1"><span class="n">01</span><span>Install</span></a></li>
+      <li><a href="#s2"><span class="n">02</span><span>Commands</span></a></li>
+      <li><a href="#s3"><span class="n">03</span><span>Cadence</span></a></li>
+      <li><a href="#s4"><span class="n">04</span><span>First four months</span></a></li>
+      <li><a href="#s5"><span class="n">05</span><span>Reading output</span></a></li>
+      <li><a href="#s6"><span class="n">06</span><span>Troubleshooting</span></a></li>
+      <li><a href="#s7"><span class="n">07</span><span>Limits</span></a></li>
+    </ol>
+    <div class="sep"></div>
+    <p class="note">Section 03 is the one that decides whether any of this was worth building.</p>
+  </nav>
+
+  <main>
+
+    <!-- 01 -->
+    <section id="s1">
+      <div class="sec-head">
+        <span class="sec-num">01</span>
+        <h2>Install</h2>
+        <p>Five minutes. No API key, no database, no network needed to run the whole test suite.</p>
+      </div>
+
+      <ol class="steps">
+        <li>
+          <h4>Check you have Python 3.11 and uv</h4>
+          <p><code>uv</code> is the installer the Makefile uses. Any 3.11+ interpreter works.</p>
+          <div class="term"><div class="term-bar"><span></span><span></span><span></span><b>prerequisites</b></div>
+<pre><span class="p">$</span> python3 --version
+<span class="o">Python 3.11.15</span>
+<span class="p">$</span> uv --version   <span class="c"># or: curl -LsSf https://astral.sh/uv/install.sh | sh</span></pre></div>
+        </li>
+
+        <li>
+          <h4>Clone and install</h4>
+          <p>Creates <code>.venv</code>, installs the package and its test extras. Two runtime dependencies only: <code>pydantic</code> and <code>pyyaml</code>.</p>
+          <div class="term"><div class="term-bar"><span></span><span></span><span></span><b>install</b></div>
+<pre><span class="p">$</span> git clone https://github.com/fangrhui040527/finance-agent
+<span class="p">$</span> cd finance-agent
+<span class="p">$</span> make install</pre></div>
+        </li>
+
+        <li>
+          <h4>Prove it works before you trust it</h4>
+          <p><code>make verify</code> walks all fourteen sections of the pipeline on mock data in about a tenth of a second.</p>
+          <div class="term"><div class="term-bar"><span></span><span></span><span></span><b>make test &amp;&amp; make verify</b></div>
+<pre><span class="p">$</span> make test
+<span class="g">445 passed in 2.93s</span>
+
+<span class="p">$</span> make verify
+<span class="o">FinPlanet P0 verification (mock data only)
+
+1. Tier routing</span>
+  <span class="g">[OK]</span> <span class="o">news triage -&gt; cheap</span>
+  <span class="g">[OK]</span> <span class="o">thesis -&gt; reason</span>
+<span class="o">...
+14. Surface: the honest answer is as easy to show</span>
+  <span class="g">[OK]</span> <span class="o">unexplained share is always on screen</span>
+
+<span class="g">PASS</span>  <span class="o">(0.13s)</span></pre></div>
+          <div class="box warn">
+            <span class="lbl">If verify ever asks for a network or a key</span>
+            <p>That is a defect, not a configuration problem. The whole point of <code>verify.py</code> is that it runs offline; if it stops doing so, something has leaked across the data-adapter seam.</p>
+          </div>
+        </li>
+
+        <li>
+          <h4>Optional — the datastores</h4>
+          <p>You do not need these to use the system today. They matter when you wire a live feed in month 2. Copy <code>.env.example</code> to <code>.env</code> first; it is gitignored.</p>
+          <div class="term"><div class="term-bar"><span></span><span></span><span></span><b>docker</b></div>
+<pre><span class="p">$</span> cp .env.example .env
+<span class="p">$</span> make up       <span class="c"># postgres, qdrant, redis, minio</span>
+<span class="p">$</span> make health
+<span class="p">$</span> make down</pre></div>
+          <p>Leave <code>ANTHROPIC_API_KEY</code> empty until you actually want model calls. Nothing in the commands below needs it.</p>
+        </li>
+      </ol>
+    </section>
+
+    <!-- 02 -->
+    <section id="s2">
+      <div class="sec-head">
+        <span class="sec-num">02</span>
+        <h2>The commands</h2>
+        <p>Two scripts and five Make targets. That is the entire interface.</p>
+      </div>
+
+      <div class="cmds">
+        <div class="cmd">
+          <div class="cmd-h"><code>ask.py why</code> <span class="when">as needed</span></div>
+          <p>Decomposes a move into market, sector, style, currency and stock-specific parts <em>before</em> naming any cause. Returns are arguments, not a live fetch — the feed seam is deliberately unwired, so anything that pretended to fetch prices would be inventing them.</p>
+          <div class="term"><div class="term-bar"><span></span><span></span><span></span><b>a 9% fall on a bad day for the index</b></div>
+<pre><span class="p">$</span> python ask.py why MYX:1155 --move -0.090 --market -0.080 --sector -0.020
+
+<span class="hl">MYX:1155   2026-08-24 to 2026-08-25   -9.00% (MYR)</span>
+
+  <span class="o">market          -8.76pp  <span class="r">############################</span>|                    b=+1.10
+  sector          -1.03pp                       <span class="r">###</span>|                    b=+0.51
+  style            0.00pp                          |
+  currency         0.00pp                          |
+  idiosyncratic    0.77pp                          |<span class="g">##</span>
+
+  unexplained         7%   verdict: <span class="hl">market_driven</span>
+  only 7% of the move is company-specific; the market and sector moved</span>
+
+<span class="o">MYX:1155 returned -9.0% in MYR; market -8.8%; sector -1.0%;
+stock-specific +0.8%. <span class="hl">This was the market, not the company.
+No cause was sought.</span></span></pre></div>
+          <p style="margin-top:11px">Pass <code>--history returns.csv</code> (120+ rows of <code>instrument,market,sector</code>) to estimate real betas. Without it the betas are stated, and the output says so on every run.</p>
+        </div>
+
+        <div class="cmd">
+          <div class="cmd-h"><code>ask.py plan</code> <span class="when">as needed</span></div>
+          <p>Shows what the system <em>would</em> do with a question, which agents it would route to, and what that costs in ringgit — before spending anything. Refusals exit <code>2</code>.</p>
+          <div class="term"><div class="term-bar"><span></span><span></span><span></span><b>routing, and a refusal</b></div>
+<pre><span class="p">$</span> python ask.py plan <span class="hl">"why did maybank fall today"</span> --instrument MYX:1155
+<span class="o">intent    why_it_moved
+cost      about RM 0.99
+agents    5
+            a3_price_technical
+            a4_news_narrative
+            a5_catalyst_events
+            a6_macro_regime
+            a9_attribution</span>
+
+<span class="p">$</span> python ask.py plan <span class="hl">"buy 1000 shares of tenaga for me"</span>
+<span class="r">CANNOT ANSWER THIS</span>
+<span class="o">--------------------------------------------------------------------
+  This system cannot place orders. It has no broker connection by design.
+
+  What would help: Ask for the analysis instead; you place the order yourself.</span></pre></div>
+        </div>
+
+        <div class="cmd">
+          <div class="cmd-h"><code>predict.py log</code> <span class="when">2–3 × per week</span></div>
+          <p>The single most important command here. Records a view <em>before</em> you find out, with the horizon fixed at the moment you commit to it.</p>
+          <div class="term"><div class="term-bar"><span></span><span></span><span></span><b>instrument · direction · horizon · confidence · statement</b></div>
+<pre><span class="p">$</span> python predict.py log MYX:1155 +1 63d 0.62 <span class="hl">"NIM stabilises above 2.25%"</span>
+<span class="o">logged <span class="hl">2026-08-25-myx1155-8c2c</span>
+  MYX:1155 up over 63d, stated 62%
+  grades on 2026-11-21 - not before, and the code enforces that
+  1 pending, 0 graded
+  30 more graded calls before calibration means anything</span></pre></div>
+          <p style="margin-top:11px">Direction is <code>+1</code>, <code>-1</code> or <code>0</code>. Horizons are <code>1d 5d 21d 63d 252d</code>. Confidence is your honest number, not a flattering one.</p>
+        </div>
+
+        <div class="cmd">
+          <div class="cmd-h"><code>predict.py due</code> · <code>make due</code> <span class="when">weekly</span></div>
+          <p>What has reached its horizon and needs scoring. Overdue items are flagged with how late they are.</p>
+          <div class="term"><div class="term-bar"><span></span><span></span><span></span><b>make due</b></div>
+<pre><span class="p">$</span> make due
+<span class="o">nothing due as at 2026-08-25. Next grades 2026-11-21.</span></pre></div>
+        </div>
+
+        <div class="cmd">
+          <div class="cmd-h"><code>predict.py grade</code> <span class="when">when due</span></div>
+          <p>Scores a call against a <em>benchmark</em>, never against zero. Being up 3.1% in a window the index rose 4.8% is being wrong, and it will say so.</p>
+          <div class="term"><div class="term-bar"><span></span><span></span><span></span><b>a positive return, scored wrong</b></div>
+<pre><span class="p">$</span> python predict.py grade 2026-08-25-myx1155-8c2c \
+      --return 0.031 --benchmark 0.048
+<span class="o">graded 2026-08-25-myx1155-8c2c: <span class="r">wrong</span>
+  realised +3.10% vs benchmark +4.80%  (excess -1.70%)
+  1 graded, 0 still pending</span></pre></div>
+        </div>
+
+        <div class="cmd">
+          <div class="cmd-h"><code>predict.py status</code> · <code>make status</code> <span class="when">monthly</span></div>
+          <p>The calibration table. Below 30 graded calls it tells you how far you have to go rather than showing numbers that mean nothing.</p>
+          <div class="term"><div class="term-bar"><span></span><span></span><span></span><b>make status</b></div>
+<pre><span class="p">$</span> make status
+<span class="o">prediction log  data/learning.db
+  logged   0
+  graded   0
+  pending  0
+  lessons  0 active
+
+<span class="hl">30 more graded calls before the calibration table measures
+skill rather than luck.</span></span></pre></div>
+        </div>
+      </div>
+
+      <div class="box key">
+        <span class="lbl">Where your data lives</span>
+        <p>Everything goes to <code>data/learning.db</code>, which is gitignored. Your prediction log never leaves the machine. It is also <strong>append-only</strong>: SQLite triggers refuse an <code>UPDATE</code> on a logged prediction and a <code>DELETE</code> on any of them. A log you can revise is a memory, and a log missing its losers produces confident, wrong calibration.</p>
+      </div>
+    </section>
+
+    <!-- 03 -->
+    <section id="s3">
+      <div class="sec-head">
+        <span class="sec-num">03</span>
+        <h2>Cadence — what to do when</h2>
+        <p>The rhythm matters more than any single command. This is the part that decides whether the rest was worth building.</p>
+      </div>
+
+      <div class="cadence">
+        <div class="cad-row">
+          <div class="cad-when"><b>2–3 ×/week</b><small>5 min each</small></div>
+          <div class="cad-what">
+            <div><code>predict.py log</code><span>Log every view you form — including the ones you do not act on, and especially the ones you later feel embarrassed by.</span></div>
+            <div><code>ask.py why</code><span>Whenever something moves and you catch yourself reaching for an explanation. Check the decomposition before you believe the story.</span></div>
+          </div>
+        </div>
+        <div class="cad-row">
+          <div class="cad-when"><b>Weekly</b><small>Monday, 5 min</small></div>
+          <div class="cad-what">
+            <div><code>make due</code><span>Grade anything that reached its horizon. Nothing should sit overdue more than a week.</span></div>
+            <div><code>—</code><span>Check portfolio heat under 6%, effective bets at or above 5, drawdown scalar still 1.0.</span></div>
+          </div>
+        </div>
+        <div class="cad-row">
+          <div class="cad-when"><b>Monthly</b><small>30 min</small></div>
+          <div class="cad-what">
+            <div><code>make status</code><span>Brier flat or falling. Any confidence band stating more than 10pp above what it realised is the thing to fix.</span></div>
+            <div><code>—</code><span>Compare the provenance ledger's actual spend against the planning figures in <code>docs/08</code>.</span></div>
+          </div>
+        </div>
+        <div class="cad-row">
+          <div class="cad-when"><b>Quarterly</b><small>half a day</small></div>
+          <div class="cad-what">
+            <div><code>—</code><span>Review lessons written. More than about one a month means the gate is too loose.</span></div>
+            <div><code>—</code><span>Re-verify exchange fee schedules. The cost floor is computed straight from them, so a stale schedule silently mis-sizes every position.</span></div>
+          </div>
+        </div>
+        <div class="cad-row">
+          <div class="cad-when"><b>After any change</b><small>3 min</small></div>
+          <div class="cad-what">
+            <div><code>make test</code><span>445 tests, under three seconds.</span></div>
+            <div><code>make verify</code><span>Catches silent degradation across the agent layer that unit tests miss.</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="box key">
+        <span class="lbl">Why the weekly slot is non-negotiable</span>
+        <p>Miss enough weeks and the log lapses. The moment it lapses, calibration, lessons and the reliability curve are all measuring a past that no longer describes you — and there is no way to reconstruct it later. <strong>This is the only thing in the system that cannot be caught up on by working harder.</strong></p>
+      </div>
+    </section>
+
+    <!-- 04 -->
+    <section id="s4">
+      <div class="sec-head">
+        <span class="sec-num">04</span>
+        <h2>The first four months</h2>
+        <p>Each phase earns the next. Skipping ahead costs you the months you skipped.</p>
+      </div>
+
+      <div class="tl">
+        <div class="tl-item">
+          <div class="tl-when">Week 1</div>
+          <div class="tl-body">
+            <h4>Install, verify, and start the clock the same day</h4>
+            <p>Do not wire live data yet. Wiring a feed before you are logging predictions means the first three months of outcomes are ungraded, and ungraded months cannot be recovered.</p>
+            <p>Log your first three views this week, even if they feel obvious. Obvious views that turn out wrong are the most instructive rows in the table.</p>
+          </div>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-when">Month 1</div>
+          <div class="tl-body">
+            <h4>Run it read-only against answers you already know</h4>
+            <p>You are testing the <em>system</em>, not the market. Feed it moves whose cause you already understand and check that it behaves:</p>
+            <div class="tw">
+              <table>
+                <thead><tr><th>Ask</th><th>Healthy answer</th></tr></thead>
+                <tbody>
+                  <tr><td class="k">A stock down on a broad down-day</td><td><span class="chip ok">market_driven</span> no cause hunted</td></tr>
+                  <tr><td class="k">A stock down after real news</td><td>a named catalyst, its score, and the unexplained share</td></tr>
+                  <tr><td class="k">An ordinary day, small move</td><td><span class="chip ok">not_significant</span> no story at all</td></tr>
+                  <tr><td class="k">"Should I buy X" with thin evidence</td><td><span class="chip ok">no_view</span> gaps named</td></tr>
+                  <tr><td class="k">"What will X be worth in December"</td><td><span class="chip no">refused</span> with the reason</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p><strong>The refusals are the product.</strong> If it never refuses, something is broken — check the guardrail chain before you trust a single answer.</p>
+          </div>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-when">Month 2</div>
+          <div class="tl-body">
+            <h4>Wire one live feed, not five</h4>
+            <p><code>GdeltFeed._fetch_raw</code> is the only method a live source needs. Subclass <code>FeedAdapter</code>, implement it, and dedup, entity linking, feature extraction and freshness gating all apply automatically.</p>
+            <p>Run it beside the fixture feed for two weeks and compare: duplicates the dedup misses, entities it cannot link, items the freshness SLA should have dropped.</p>
+          </div>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-when">Month 3</div>
+          <div class="tl-body">
+            <h4>Populate the base rates</h4>
+            <p>The catalyst scorer needs <code>BaseRateTable</code> filled for your markets. Empty, every candidate scores on prior alone and the six-factor score collapses to "was there news that day" — the exact failure the design exists to prevent.</p>
+            <p>Target 30+ observations per <code>event_type × market × cap_band × surprise</code> cell you use. <code>BaseRate.thin</code> flags what is missing, and the agents surface that caveat. Do not suppress it.</p>
+          </div>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-when">Month 4+</div>
+          <div class="tl-body">
+            <h4>Small real positions — and mind the floor</h4>
+            <p>Not because four months is proof. Because paper trading stops teaching you anything once you stop feeling it. Size so that being completely wrong is boring.</p>
+            <div class="tw">
+              <table>
+                <thead><tr><th>Market</th><th>Round trip @ 10k</th><th>Minimum economic position</th></tr></thead>
+                <tbody>
+                  <tr><td class="k">Bursa <code>XKLS</code></td><td class="num">46 bps</td><td class="num">RM 4,700</td></tr>
+                  <tr><td class="k">Singapore <code>XSES</code></td><td class="num">28 bps</td><td class="num">SGD 9,100</td></tr>
+                  <tr><td class="k">NASDAQ <code>XNAS</code></td><td class="num">0.6 bps</td><td class="num">trivial</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p>Singapore is cheaper than Bursa at every size, yet its minimum position is roughly twice as large — the SGD 10 brokerage minimum bites harder relative to the rate. <strong>Cheaper per unit is not more accessible.</strong></p>
+          </div>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-when">Month 6+</div>
+          <div class="tl-body">
+            <h4>The four numbers that decide whether to continue</h4>
+            <p>After roughly 50 graded predictions, these answer the only question that matters.</p>
+            <div class="tw">
+              <table>
+                <thead><tr><th>Number</th><th>The bar</th></tr></thead>
+                <tbody>
+                  <tr><td class="k">Brier vs. the base rate</td><td>Beat a naive "always predict the base rate" forecaster, or the evidence layer adds nothing.</td></tr>
+                  <tr><td class="k">Calibration at 60–80%</td><td>Where real decisions live. Say 70% and realise 45% and sizing built on it is dangerous.</td></tr>
+                  <tr><td class="k">Deflated Sharpe</td><td>Not Sharpe. Twenty variants deflate a 0.37 to roughly zero. Report the trial count honestly.</td></tr>
+                  <tr><td class="k">Realised vs. modelled cost</td><td>Fills materially worse than the model means every backtest is optimistic.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="box stop">
+        <span class="lbl">Stop entirely — no new positions, review first</span>
+        <p>Drawdown at or beyond <strong>25%</strong> (the risk scalar goes to zero, mechanically, and is not overridable by conviction) · calibration <strong>inverted</strong>, where high-confidence calls resolve worse than low-confidence ones · Brier rising <strong>three months</strong> running · you <strong>stopped logging</strong> · you <strong>overrode a cap</strong>, once, any cap.</p>
+      </div>
+    </section>
+
+    <!-- 05 -->
+    <section id="s5">
+      <div class="sec-head">
+        <span class="sec-num">05</span>
+        <h2>Reading the output</h2>
+        <p>Six verdicts, three of which decline to explain. Those three are working correctly.</p>
+      </div>
+
+      <div class="tw">
+        <table>
+          <thead><tr><th>Verdict</th><th>Means</th><th>What to do</th></tr></thead>
+          <tbody>
+            <tr><td class="k"><code>market_driven</code></td><td>Under 20% of the move was company-specific.</td><td>Nothing. The company did not do anything.</td></tr>
+            <tr><td class="k"><code>not_significant</code></td><td>Within normal daily variation for this name.</td><td>Nothing. Most moves are noise.</td></tr>
+            <tr><td class="k"><code>no_identified_catalyst</code></td><td>Real, significant, unexplained. No candidate cleared the threshold.</td><td>Treat as a finding. Unexplained moves of this size have historically tended to <em>reverse</em>.</td></tr>
+            <tr><td class="k"><code>partially_explained</code></td><td>A catalyst matched, but a large residual remains.</td><td>Read the unexplained share before you act on the story.</td></tr>
+            <tr><td class="k"><code>explained</code></td><td>A catalyst matched with a strong score.</td><td>Still check the unexplained share. It is never zero.</td></tr>
+            <tr><td class="k"><code>attribution_unavailable</code></td><td>Fewer than 120 usable observations, or collinear factors.</td><td>Get more history. Do not interpret the bars.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="box key">
+        <span class="lbl">The number to look at first</span>
+        <p><strong>The unexplained share, every time.</strong> It is always on screen, and it is the honest part. A system that explains 100% of every move is not being clever — it is fitting noise and telling you a story about it.</p>
+      </div>
+    </section>
+
+    <!-- 06 -->
+    <section id="s6">
+      <div class="sec-head">
+        <span class="sec-num">06</span>
+        <h2>When something goes wrong</h2>
+        <p>Most of these are the system working as designed. Two are real.</p>
+      </div>
+
+      <div class="tw">
+        <table>
+          <thead><tr><th>You see</th><th>What it is</th><th>Fix</th></tr></thead>
+          <tbody>
+            <tr><td class="k"><code>CANNOT ANSWER THIS</code>, exit 2</td><td><span class="chip ok">by design</span> A refusal, not a crash.</td><td>Read what it says would help. Usually: ask for analysis instead of a forecast or an order.</td></tr>
+            <tr><td class="k"><code>grading it on … would score noise</code></td><td><span class="chip ok">by design</span> You tried to grade before the horizon.</td><td>Wait. Use <code>--today</code> only for testing.</td></tr>
+            <tr><td class="k"><code>attribution unavailable</code></td><td><span class="chip ok">by design</span> Not enough history, or collinear factors.</td><td>Supply 120+ rows via <code>--history</code>.</td></tr>
+            <tr><td class="k"><code>a prediction is written once</code></td><td><span class="chip ok">by design</span> You tried to edit the log.</td><td>Log a new prediction. Never revise an old one.</td></tr>
+            <tr><td class="k"><code>NotImplementedError: live GDELT ingest is not wired</code></td><td><span class="chip wait">expected</span> The feed seam is deliberately unwired.</td><td>Subclass <code>FeedAdapter</code> and implement <code>_fetch_raw</code>.</td></tr>
+            <tr><td class="k">Consistently low confidence, or the red team always objecting</td><td><span class="chip no">real bug</span> Probably phantom evidence gaps.</td><td>Run <code>make verify</code>. This exact failure shipped once and cost 0.24 of confidence on every thesis.</td></tr>
+            <tr><td class="k">Never any refusals</td><td><span class="chip no">real bug</span> A guardrail rail is being skipped.</td><td>Run <code>make test</code>; check the guardrail chain before trusting any output.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="box warn">
+        <span class="lbl">The failure mode worth memorising</span>
+        <p>In a system whose job is to express uncertainty, <strong>a bug does not look like a crash — it looks like a slightly-too-humble answer, forever.</strong> Wrong-and-confident gets caught in a day. Wrong-and-modest can run for years with every output quietly degraded. That is why the last two rows above matter more than the first five.</p>
+      </div>
+    </section>
+
+    <!-- 07 -->
+    <section id="s7">
+      <div class="sec-head">
+        <span class="sec-num">07</span>
+        <h2>What it will not do</h2>
+        <p>Stated plainly, so you are not waiting for something that is never coming.</p>
+      </div>
+
+      <div class="tw">
+        <table>
+          <tbody>
+            <tr><td class="k">Place an order</td><td>There is no broker connection anywhere in the repository, enforced three ways including a repo-wide grep. It is a one-way door by design.</td></tr>
+            <tr><td class="k">Give a price target</td><td>Point forecasts are refused. You get a valuation range and what has to be true at each end of it.</td></tr>
+            <tr><td class="k">Tell you what to buy</td><td>Candidacy bands, probabilities, attributions and sizing constraints — with evidence chains. The decision stays yours.</td></tr>
+            <tr><td class="k">Fetch live prices or news</td><td>Not yet. The adapter seam is built and tested; the live implementations are not written, and the code refuses rather than returning empty.</td></tr>
+            <tr><td class="k">Show a track record</td><td>Nothing here has been tested against a market. Nine of ten done-ness criteria are met; the tenth is a reliability curve only time produces.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Where to read next</h3>
+      <ul>
+        <li><code>docs/14-OPERATIONS-RUNBOOK.md</code> — what to monitor and what should make you stop, in more depth than section 03 here.</li>
+        <li><code>docs/03-WHY-IT-MOVED.md</code> — the attribution model, and why decomposition comes before narrative.</li>
+        <li><code>docs/05-RISK-AND-GUARDRAILS.md</code> — the risk machinery, and seven defects the build found in its own plan.</li>
+        <li><code>docs/08-COST-BREAKDOWN.md</code> — three tiers priced in ringgit, with break-even portfolio sizes.</li>
+      </ul>
+    </section>
+
+    <footer>
+      <p><b>Not financial advice.</b> This system produces candidacy bands, calibrated probabilities, attributions and sizing constraints with evidence chains. It makes no recommendations and cannot place orders.</p>
+      <p><b>Verify the fee schedules before trading.</b> Exchange figures were read in Aug 2026 and the cost floor is computed straight from them — a stale schedule silently mis-sizes every position.</p>
+      <p>Source: <code>docs/user-guide.html</code> · 445 tests · <code>make verify</code> in 0.13s</p>
+    </footer>
+
+  </main>
+</div>

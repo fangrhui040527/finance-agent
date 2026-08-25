@@ -1,0 +1,41 @@
+# A15. Almost every case is a negative, by design. docs/13 section 4.
+agent: a15_reflection
+cases:
+  - name: genuine_repeated_pattern
+    instances: 8
+    distinct: 5
+    hit_rate: 0.75
+    expect: lesson_written
+  - name: reconfirms_existing
+    instances: 9
+    distinct: 4
+    hit_rate: 0.70
+    existing: true
+    expect: lesson_confirmed
+  - name: archives_decayed_lesson
+    hit_rate: 0.38
+    expect: lesson_archived
+  # -- negatives -----------------------------------------------------------
+  - name: one_vivid_trade
+    instances: 1
+    distinct: 1
+    hit_rate: 1.0
+    expect: no_lesson
+    negative: true
+    near_miss: true
+  - name: repeated_but_one_instrument
+    instances: 12
+    distinct: 1
+    hit_rate: 0.83
+    expect: no_lesson
+    negative: true
+    near_miss: true
+  - name: enough_instances_weak_edge
+    instances: 20
+    distinct: 8
+    hit_rate: 0.52
+    expect: no_lesson
+    negative: true
+  - name: grading_before_horizon
+    expect: no_lesson
+    negative: true

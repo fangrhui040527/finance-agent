@@ -1,0 +1,51 @@
+# P0 stack. `docker compose -f infra/docker-compose.yml up -d` then `make health`.
+# docs/01 section 6: two hosts in production; one compose file in development.
+name: finance-agent
+
+services:
+  postgres:
+    image: timescale/timescaledb:latest-pg16
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-finplanet}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-devonly}
+      POSTGRES_DB: ${POSTGRES_DB:-finplanet}
+    ports: ["5432:5432"]
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-finplanet}"]
+      interval: 10s
+      retries: 5
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    ports: ["6333:6333", "6334:6334"]
+    volumes: ["qdrantdata:/qdrant/storage"]
+
+  neo4j:
+    image: neo4j:5-community
+    environment:
+      NEO4J_AUTH: neo4j/${NEO4J_PASSWORD:-devonlypass}
+    ports: ["7474:7474", "7687:7687"]
+    volumes: ["neo4jdata:/data"]
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    ports: ["6379:6379"]
+    volumes: ["redisdata:/data"]
+
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_USER:-finplanet}
+      MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD:-devonlypass}
+    ports: ["9000:9000", "9001:9001"]
+    volumes: ["miniodata:/data"]
+
+volumes:
+  pgdata:
+  qdrantdata:
+  neo4jdata:
+  redisdata:
+  miniodata:

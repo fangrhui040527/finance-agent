@@ -1,0 +1,25 @@
+# A3. Negatives guard against reading meaning into noise and into blackouts.
+agent: a3_price_technical
+cases:
+  - name: uptrend_state
+    expect: trend_state
+  - name: realised_vol_reported
+    expect: volatility
+  - name: relative_strength_vs_index
+    expect: relative_strength
+  - name: drawdown_from_peak
+    expect: drawdown
+  - name: thin_volume_flagged
+    adv: 50000
+    expect: liquidity_warning
+  # -- negatives -----------------------------------------------------------
+  - name: silent_in_earnings_blackout
+    days_to_earnings: 1
+    expect: refuse
+    negative: true
+    near_miss: true
+  - name: no_signal_from_twenty_bars
+    bars: 20
+    expect: not_significant
+    negative: true
+    near_miss: true

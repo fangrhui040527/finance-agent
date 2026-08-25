@@ -1,0 +1,38 @@
+# A9. The near-misses are the point: a pure-beta move that LOOKS dramatic must
+# not attract a story. docs/03 section 8.
+agent: a9_attribution
+cases:
+  - name: idiosyncratic_with_catalyst
+    residual: 0.072
+    sar: 16.5
+    events: ["earnings_beat"]
+    expect: explained
+  - name: partial_explanation
+    residual: 0.041
+    sar: 6.2
+    events: ["analyst_upgrade"]
+    expect: partially_explained
+  - name: significant_but_unexplained
+    residual: 0.058
+    sar: 9.1
+    events: []
+    expect: no_identified_catalyst
+    near_miss: true
+  # -- negatives -----------------------------------------------------------
+  - name: pure_beta_dramatic_headline
+    residual: 0.002
+    sar: 0.3
+    events: ["sector_wide_selloff_headline"]
+    expect: market_driven
+    negative: true
+    near_miss: true
+  - name: ordinary_day
+    residual: 0.004
+    sar: 0.6
+    events: ["routine_press_release"]
+    expect: not_significant
+    negative: true
+  - name: short_history
+    observations: 40
+    expect: attribution_unavailable
+    negative: true

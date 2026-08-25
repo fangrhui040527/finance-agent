@@ -1,0 +1,29 @@
+# A4. Negatives: wire duplicates and unlinked entities must not become findings.
+agent: a4_news_narrative
+cases:
+  - name: extracts_five_dimensions
+    expect: features
+  - name: high_uncertainty_low_polarity
+    expect: features
+  - name: escalates_ambiguous_item
+    expect: escalate
+  - name: source_reliability_weights_claim
+    expect: features
+  - name: forwardness_detected
+    text: "the company expects margins to recover next year"
+    expect: features
+  # -- negatives -----------------------------------------------------------
+  - name: wire_duplicate_dropped
+    duplicate_of: reuters_original
+    expect: refuse
+    negative: true
+    near_miss: true
+  - name: unlinked_entity_not_attributed
+    entities: []
+    expect: refuse
+    negative: true
+  - name: link_only_body_never_quoted
+    licence: link_only
+    expect: refuse
+    negative: true
+    near_miss: true

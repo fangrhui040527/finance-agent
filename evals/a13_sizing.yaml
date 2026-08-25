@@ -1,0 +1,45 @@
+# A13. Negatives are no-position outcomes, which are common and correct.
+agent: a13_sizing
+cases:
+  - name: risk_binds
+    portfolio: 100000
+    stop_distance: 0.12
+    expect: risk
+  - name: concentration_binds
+    portfolio: 100000
+    stop_distance: 0.03
+    expect: concentration
+  - name: liquidity_binds
+    portfolio: 5000000
+    adv: 200000
+    expect: liquidity
+  - name: kelly_binds
+    win_rate: 0.54
+    payoff: 1.5
+    trades: 120
+    expect: kelly
+  - name: vol_scalar_applied
+    realised_vol: 0.40
+    target_vol: 0.20
+    expect: risk
+  # -- negatives -----------------------------------------------------------
+  - name: below_cost_floor_bursa
+    portfolio: 20000
+    price: 6.20
+    lot: 100
+    mic: XKLS
+    expect: no_position
+    negative: true
+    near_miss: true
+  - name: no_investable_capital
+    liquid: 30000
+    essential_monthly: 5000
+    expect: no_position
+    negative: true
+  - name: implausible_edge_refused
+    win_rate: 0.75
+    payoff: 3.0
+    trades: 200
+    expect: no_position
+    negative: true
+    near_miss: true
