@@ -23,6 +23,7 @@ from dataclasses import dataclass, field
 from decimal import Decimal
 from pathlib import Path
 
+from core.provenance.ledger import DEFAULT_FX_MYR_PER_USD
 from engines.risk.concentration import Limits
 
 #: config.local.toml wins when present, so personal numbers stay out of git.
@@ -165,7 +166,7 @@ def load(path: str | Path | None = None) -> Config:
     return Config(
         base_currency=str(_get(data, "account.base_currency", "MYR")).upper(),
         markets=markets,
-        fx_myr_per_usd=dec("account.fx_myr_per_usd", 4.15),
+        fx_myr_per_usd=dec("account.fx_myr_per_usd", DEFAULT_FX_MYR_PER_USD),
         risk_per_trade=dec("risk.risk_per_trade", 0.0075),
         target_volatility=dec("risk.target_volatility", 0.20),
         max_participation=dec("risk.max_participation", 0.05),

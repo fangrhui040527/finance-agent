@@ -190,3 +190,52 @@ def test_the_batch_file_refuses_to_run_without_a_venv():
     bat = BAT.read_text()
     assert "No virtual environment found" in bat
     assert "run install" in bat
+
+
+# -- no re-duplication -------------------------------------------------------
+
+def test_the_planning_rate_has_one_python_source():
+    """It was in four places: config.toml, .env.example, a literal in the config
+    loader, and the ledger constant - with no code reading the env var at all.
+    Editing .env did nothing, which is worse than the value being wrong."""
+    from core.provenance.ledger import DEFAULT_FX_MYR_PER_USD
+    loader = (ROOT / "core" / "config.py").read_text()
+    assert "DEFAULT_FX_MYR_PER_USD" in loader
+    assert "4.15" not in loader, "the loader must not restate the rate literal"
+    assert load(ROOT / "config.toml").fx_myr_per_usd == DEFAULT_FX_MYR_PER_USD
+
+
+def test_the_env_example_holds_no_settings_that_config_toml_owns():
+    """Two places to set one number is one place too many: whichever the reader
+    edits, the other silently wins."""
+    env = (ROOT / ".env.example").read_text()
+    for key in ("FX_MYR_PER_USD", "DAILY_BUDGET_MYR"):
+        assert key not in env, f"{key} duplicates config.toml and is read by nothing"
+
+
+def test_every_env_example_key_is_actually_used_somewhere():
+    """A key that sets nothing is worse than a missing key: it reads as
+    configured."""
+    import re
+    env = (ROOT / ".env.example").read_text()
+    keys = re.findall(r"^([A-Z_]+)=", env, re.M)
+    compose = (ROOT / "infra" / "docker-compose.yml").read_text()
+    unused = [k for k in keys
+              if k not in compose and k not in {"ANTHROPIC_API_KEY"}]
+    assert not unused, f"env keys referenced nowhere: {unused}"
+
+
+def test_no_package_contains_only_an_init_file():
+    """knowledge/provenance/ was one: created in P0, superseded by
+    core/provenance/, and left behind as an importable empty package."""
+    import subprocess
+    files = subprocess.run(["git", "ls-files", "*/__init__.py"], cwd=ROOT,
+                           capture_output=True, text=True).stdout.split()
+    empty = []
+    for init in files:
+        pkg = str(Path(init).parent)
+        siblings = subprocess.run(["git", "ls-files", f"{pkg}/*.py"], cwd=ROOT,
+                                  capture_output=True, text=True).stdout.split()
+        if len(siblings) == 1:
+            empty.append(pkg)
+    assert not empty, f"packages with nothing in them: {empty}"
