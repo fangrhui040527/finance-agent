@@ -36,7 +36,7 @@ Full design detail starts at **[`docs/README.md`](docs/README.md)**.
 
 ## Status
 
-**Everything except P16 is built and tested.** 445 tests, no network and no keys
+**Everything except P16 is built and tested.** 469 tests, no network and no keys
 needed to run any of it. CI runs the suite, `verify.py`, the eval ratchet and the
 no-execution grep on every push.
 
@@ -46,7 +46,8 @@ P18–P19 wait on P16. **If you are picking this up, start at
 [`docs/14-OPERATIONS-RUNBOOK.md`](docs/14-OPERATIONS-RUNBOOK.md).**
 
 ```bash
-make install && make test    # full suite
+make install && make test    # full suite   (Windows: run install && run test)
+make config                  # settings, and the bounds they cannot cross
 make verify                  # end-to-end on mock data, <1s
 python ask.py why MYX:1155 --move -0.09 --market -0.08
 python predict.py log MYX:1155 +1 63d 0.62 "NIM recovers"
