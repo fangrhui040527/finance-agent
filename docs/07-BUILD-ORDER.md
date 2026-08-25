@@ -4,6 +4,49 @@ Phases with deliverables and a definition of done. The ordering rule throughout:
 
 ---
 
+## 0. Build status
+
+Every phase except P16 and its dependants is implemented, tested and running on
+mock data. `python verify.py` walks the whole pipeline in under a second with no
+network and no keys; `pytest` runs 361 tests.
+
+| Phase | Status | Where |
+|---|---|---|
+| P0 skeleton | done | `core/contracts/`, `core/llm/`, `core/guardrails/`, `core/provenance/` |
+| P1 ingest and identity | done | `core/market/instrument.py`, `knowledge/feeds/adapter.py` |
+| P2 market adapters | done | `markets/` — XKLS, XNAS, registry |
+| P3 filings and RAG | done | `knowledge/chunking/`, `knowledge/retrieval/` |
+| P3.5 point-in-time store | done | `core/market/pointintime.py` |
+| P4 attribution engine | done | `engines/attribution/` |
+| P5 news corpus | done | `knowledge/news/features.py` |
+| P6 base rates and catalysts | done | `engines/events/` |
+| P7 evidence agents | done | `agents/base.py`, `agents/evidence/agents.py` |
+| P8 synthesis | done | `agents/synthesis/agents.py`, `agents/supervisor.py` |
+| P9 graph | done | `knowledge/graph/entity_graph.py` |
+| P10–P11 risk and sizing | done | `engines/risk/`, `engines/sizing/`, `agents/portfolio/` |
+| P12 backtest harness | done | `engines/backtest/` |
+| P13 reflection | done | `agents/learning/reflection.py` |
+| P14 teacher | done | `agents/learning/teacher.py` — 30 concepts, enforced prerequisite graph |
+| P15 surface | done | `ui/render.py` |
+| P17 registry and ratchet | done | `core/registry/loader.py`, `evals/` — 16 suites |
+| **P16 paper trade gate** | **blocked on elapsed time** | needs 3–6 months of live forward outcomes |
+| P18–P19 | blocked on P16 | cannot start until the gate closes |
+
+**What "blocked" means here.** P16 is not unbuilt work; it is a waiting period.
+The machinery it needs — the deferred outcome queue, the calibration table, the
+lesson gate — is built and tested in `agents/learning/reflection.py`. What cannot
+be compressed is the accumulation of predictions that have actually resolved at
+their stated horizons. Grading them early is refused by the code on purpose
+(`OutcomeQueue.grade` raises), because a 21-day call scored on day 3 is noise
+wearing a track record's clothes.
+
+**What is deliberately unwired.** `GdeltFeed._fetch_raw` raises
+`NotImplementedError` rather than returning empty. Every live source is one
+subclass of `FeedAdapter`; everything downstream of the fetch is built and
+tested. The offline build cannot silently pretend to have data.
+
+---
+
 ## 1. Roadmap
 
 ```mermaid
@@ -182,3 +225,20 @@ The system is done when all of the following are simultaneously true on a live d
 8. Every agent retrieves only from the collections it owns.
 9. No order-placement code exists anywhere in the repository.
 10. The nightly eval suite runs, and a regression on any existing suite blocks promotion.
+
+### 4.1 Where each criterion stands
+
+| # | Criterion | Status |
+|---|---|---|
+| 1 | components before narrative, `unexplained_share` reported | met — `engines/attribution/`, `ui/render.py` |
+| 2 | five-year log-additive decomposition | met — `long_horizon_decompose` |
+| 3 | 12-step workup with gates | met — `agents/evidence/agents.py` |
+| 4 | every claim cited or dropped | met — `verify_answer`, per-claim drop |
+| 5 | binding cap named, no cap breachable | met — `SizingDecision.__post_init__` raises |
+| 6 | live reliability curve and Brier kill switch | **machinery met, curve needs P16** |
+| 7 | new market = one adapter + a YAML entry | met — `markets/registry.py`, `core/registry/loader.py` |
+| 8 | every agent retrieves only from what it owns | met — `Router.get` raises `CollectionScopeError` |
+| 9 | no order-placement code anywhere | met — policy, registry denylist, and a repo-wide grep with a rot check |
+| 10 | eval regression blocks promotion | met — ratchet refuses registration; near-miss failures disqualify regardless of pass rate |
+
+Criterion 6 is the only one that time, rather than code, still gates.

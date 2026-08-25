@@ -110,10 +110,11 @@ The engine flags that lot granularity is forcing a sub-optimal size at this capi
 
 ---
 
-## 3.5 Two corrections found by building it
+## 3.5 Corrections found by building it
 
-Implementing §3 surfaced two places where the written plan contradicts itself or
-the market. Both are now encoded in `engines/sizing/` with tests.
+Implementing §3 surfaced places where the written plan contradicted itself or
+the market. All are now encoded in code with tests, and each is listed with the
+file that enforces the correction.
 
 **The 30 bps cost floor is unreachable on Bursa.** A round trip there is
 2 × (0.1% brokerage + 0.03% clearing + 0.1% stamp) ≈ **46 bps** before the RM 8
@@ -149,6 +150,38 @@ leg + withholding), and that is the number any signal must clear.
 **And one calibration note on §4.** Clearing 5 effective bets needs roughly ten
 names at 0.10 correlation or better. Six names at 0.15 correlation gives 3.4.
 The bar measures independence, not headcount, and it is demanding on purpose.
+
+### 3.5.1 Four more, from building the agent layer
+
+**A rejected catalyst was rendering as the cause.** `ui/render.py` branched on
+whether the candidate list was empty rather than on the verdict. A story that
+scored 0.11 — below the 0.25 threshold, explicitly rejected — appeared under the
+move as though it explained it. This is precisely the failure the whole
+attribution design exists to prevent, reintroduced at the last inch by the
+presentation layer. The renderer now branches on `Verdict` first and labels
+rejected candidates `BELOW THRESHOLD`. **Lesson: an output rail is not enforced
+until the renderer enforces it too.**
+
+**The no-execution guard allowlisted by basename.** `tests/test_no_execution_anywhere.py`
+exempted `policy.py` — meaning any *new* file called `policy.py`, anywhere in the
+tree, would have inherited the exemption. Now exact paths, plus a second test that
+fails when an exemption is no longer needed. That rot check immediately earned
+itself: it caught a stale entry for `agents/registry.yaml` within a minute of
+being written.
+
+**Routing matched "fell" but not "fall".** `why did maybank fall today` fell
+through the intent table to the concept-explainer. A one-word gap in a regex
+routed a price-move question to a teacher. **Lesson: intent classification needs
+negative-case evals, not just happy-path ones — which is now what the ratchet in
+`core/registry/loader.py` requires before anything can register.**
+
+**The `should_i_buy` floor leaves only 2× headroom.** The plan's minimum honest
+plan for a buy question (fundamentals + valuation + thesis + red team) costs
+RM 1.48 against RM 2.95 for the full twelve-agent version. Trimming to fit a
+budget therefore has very little room before it must refuse instead. That is the
+intended behaviour — `01 §4.3` says a cheap wrong answer is worse than a refusal —
+but it means **budget-constrained routing will refuse more often than it trims**,
+and the UI should say so rather than implying a cheaper answer exists.
 
 ---
 
