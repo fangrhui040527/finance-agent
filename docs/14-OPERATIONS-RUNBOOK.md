@@ -220,7 +220,8 @@ silent degradation.
 
 ## 7. If you hand this to someone else
 
-Point them at, in order: this document, then `README.md`, then
+Point them at, in order: `docs/user-guide.html` (install and cadence), this
+document, then `README.md`, then
 `docs/03-WHY-IT-MOVED.md` (the differentiator) and
 `docs/05-RISK-AND-GUARDRAILS.md` (the part that protects them).
 

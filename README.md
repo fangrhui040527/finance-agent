@@ -5,9 +5,17 @@ A multi-agent, multi-market equity research system that explains *why* a price m
 
 > **Not financial advice.** Candidacy bands, calibrated probabilities, attributions and sizing constraints with evidence chains. No recommendations, no execution.
 
+## Start here
+
+**New to this? Open [`docs/user-guide.html`](docs/user-guide.html) in a browser.**
+Install, every command, and the weekly-to-quarterly cadence for using it.
+
+Then [`docs/14-OPERATIONS-RUNBOOK.md`](docs/14-OPERATIONS-RUNBOOK.md) for what to
+monitor and what should make you stop.
+
 ## The implementation plan
 
-Start at **[`docs/README.md`](docs/README.md)**.
+Full design detail starts at **[`docs/README.md`](docs/README.md)**.
 
 | Doc | Covers |
 |---|---|
@@ -28,7 +36,7 @@ Start at **[`docs/README.md`](docs/README.md)**.
 
 ## Status
 
-**Everything except P16 is built and tested.** 434 tests, no network and no keys
+**Everything except P16 is built and tested.** 445 tests, no network and no keys
 needed to run any of it. CI runs the suite, `verify.py`, the eval ratchet and the
 no-execution grep on every push.
 
@@ -40,6 +48,8 @@ P18–P19 wait on P16. **If you are picking this up, start at
 ```bash
 make install && make test    # full suite
 make verify                  # end-to-end on mock data, <1s
+python ask.py why MYX:1155 --move -0.09 --market -0.08
+python predict.py log MYX:1155 +1 63d 0.62 "NIM recovers"
 make due                     # predictions that have reached their horizon
 make status                  # the calibration table
 make up                      # postgres+timescale · qdrant · neo4j · redis · minio
@@ -66,6 +76,7 @@ make up                      # postgres+timescale · qdrant · neo4j · redis ·
 | P15 | Decomposition bars, annotated chart, thesis memo, daily brief | `ui/render.py` |
 | P17 | Capability registry and the eval ratchet, 16 suites | `core/registry/`, `evals/` |
 | P16 tooling | Durable prediction log + CLI — the clock the gate needs | `agents/learning/store.py`, `predict.py` |
+| Entrypoint | `ask why` / `ask plan` — decomposition and routing from the shell | `ask.py` |
 | P18 | Singapore (XSES), the first T2 market | `markets/xses.py` |
 
 **Not built:** P16's forward record — 3–6 months of elapsed time, not effort;

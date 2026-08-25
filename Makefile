@@ -1,4 +1,4 @@
-.PHONY: install test verify up down health lint log due status
+.PHONY: install test verify up down health lint due status
 install: ; uv venv --python 3.11 .venv && . .venv/bin/activate && uv pip install -e ".[dev]"
 test:    ; . .venv/bin/activate && python -m pytest
 verify:  ; . .venv/bin/activate && python verify.py
