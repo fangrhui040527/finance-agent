@@ -1,0 +1,84 @@
+# FinPlanet Module 5 - user settings.
+#
+# Everything here is a DEFAULT you may change. The BOUNDS are not here, and are
+# not changeable from a file: engines/risk/concentration.py refuses a single-name
+# cap above 15% and an effective-bets floor below 3, whatever this file says.
+# That is deliberate. A risk limit you can loosen by editing a config file is not
+# a risk limit - it is a suggestion, and it gets loosened on exactly the day it
+# would have saved you.
+#
+# Copy to config.local.toml to keep personal numbers out of git. The loader
+# prefers config.local.toml when it exists.
+
+[account]
+# The currency everything is reported in. Foreign holdings are converted at an
+# explicit rate with an as-of stamp; there is no implicit global rate.
+base_currency = "MYR"
+
+# Markets you actually trade. Adding one means an adapter class plus a registry
+# entry (see docs/06 appendix); listing a MIC with no adapter is refused at load.
+markets = ["XKLS", "XNAS"]
+
+# docs/08 planning rate: mid-market ~4.04 plus roughly 2.5% card FX markup.
+# Used for cost estimates only. Real conversions carry their own dated rate.
+fx_myr_per_usd = 4.15
+
+
+[risk]
+# Fraction of the portfolio you accept losing if a stop fills. 0.0075 = 0.75%.
+# This bounds the LOSS, not the position - size is derived from it and the stop
+# distance, never chosen first.
+risk_per_trade = 0.0075
+
+# Annualised volatility you are targeting. Realised vol above this scales the
+# position down; below it does NOT scale up beyond the caps.
+target_volatility = 0.20
+
+# Maximum share of 20-day average daily value you are willing to be. Above ~5%
+# your own order moves the price: at the cap, market impact (~224 bps) dwarfs
+# fees (~23 bps on Bursa). Raising this is the least reversible setting here.
+max_participation = 0.05
+
+
+[limits]
+# Concentration, measured four ways. Bounds enforced in code are noted.
+single_name = 0.08            # hard ceiling 0.15, whatever this says
+sector = 0.25
+country = 0.40
+non_base_currency = 0.50
+correlation_cluster = 0.30
+hhi = 0.18
+
+# The measure that matters most, and the one a position count hides: ten
+# correlated banks have a comfortable HHI and roughly one bet.
+min_effective_bets = 5.0      # hard floor 3.0, whatever this says
+
+# Sum of per-trade risk across every open position. The scenario that matters is
+# not one stop filling; it is all of them filling in the same week.
+portfolio_heat = 0.06
+min_positions = 5
+
+
+[waterfall]
+# Months of essential spending held before any of it is investable. Locked.
+emergency_months = 6
+
+# Debt above this annual rate is repaid before equities are bought. Paying down
+# 17% card debt is a guaranteed 17% return; no equity thesis beats that.
+debt_hurdle = 0.08
+
+
+[budget]
+# Refuse rather than cheapen: a question whose minimum honest plan costs more
+# than this comes back as a refusal, not as a cheaper wrong answer.
+daily_myr = 25.0
+per_question_myr = 5.0
+
+
+[learning]
+# Where the prediction log lives. Gitignored. Never leaves the machine.
+database = "data/learning.db"
+
+# Graded calls before the calibration table means anything rather than measuring
+# luck. Lowering this does not make you calibrated sooner.
+min_graded_for_calibration = 30

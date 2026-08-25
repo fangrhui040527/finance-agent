@@ -211,7 +211,7 @@ footer b{color:var(--ink-2)}
     <p class="standfirst">Install it, ask it something, and start the clock that makes the rest worth doing. Three commands cover almost everything; the fourth thing you need is <em>a habit on a schedule</em>, which is what the cadence below is for.</p>
     <div class="term" style="max-width:640px">
       <div class="term-bar"><span></span><span></span><span></span><b>the whole surface</b></div>
-<pre><span class="p">$</span> make install <span class="c"># once</span>
+<pre><span class="p">$</span> make install <span class="c"># once  (Windows: run install)</span>
 <span class="p">$</span> python ask.py why MYX:1155 --move -0.09 --market -0.08
 <span class="p">$</span> python predict.py log MYX:1155 +1 63d 0.62 <span class="hl">"NIM recovers"</span>
 <span class="p">$</span> make due <span class="c"># every Monday, forever</span></pre>
@@ -269,7 +269,7 @@ footer b{color:var(--ink-2)}
           <p><code>make verify</code> walks all fourteen sections of the pipeline on mock data in about a tenth of a second.</p>
           <div class="term"><div class="term-bar"><span></span><span></span><span></span><b>make test &amp;&amp; make verify</b></div>
 <pre><span class="p">$</span> make test
-<span class="g">445 passed in 2.93s</span>
+<span class="g">469 passed in 2.85s</span>
 
 <span class="p">$</span> make verify
 <span class="o">FinPlanet P0 verification (mock data only)
@@ -285,6 +285,39 @@ footer b{color:var(--ink-2)}
           <div class="box warn">
             <span class="lbl">If verify ever asks for a network or a key</span>
             <p>That is a defect, not a configuration problem. The whole point of <code>verify.py</code> is that it runs offline; if it stops doing so, something has leaked across the data-adapter seam.</p>
+          </div>
+        </li>
+
+        <li>
+          <h4>On Windows, use <code>run.bat</code> instead of <code>make</code></h4>
+          <p>Same surface, same commands. A test fails if the two ever drift apart.</p>
+          <div class="term"><div class="term-bar"><span></span><span></span><span></span><b>cmd.exe</b></div>
+<pre><span class="p">&gt;</span> run install
+<span class="p">&gt;</span> run verify
+<span class="p">&gt;</span> run why MYX:1155 --move -0.09 --market -0.08
+<span class="p">&gt;</span> run log MYX:1155 +1 63d 0.62 <span class="hl">"NIM stabilises"</span>
+<span class="p">&gt;</span> run due
+<span class="p">&gt;</span> run          <span class="c"># no argument lists everything</span></pre></div>
+        </li>
+
+        <li>
+          <h4>Adjust your settings — within bounds</h4>
+          <p>Edit <code>config.toml</code>, or copy it to <code>config.local.toml</code> to keep personal numbers out of git. The loader prefers the local file.</p>
+          <div class="term"><div class="term-bar"><span></span><span></span><span></span><b>make config</b></div>
+<pre><span class="p">$</span> make config
+<span class="o">config from config.toml
+  base currency        MYR
+  markets              XKLS, XNAS
+  risk per trade       0.75%
+  single-name cap      8%   <span class="hl">(hard ceiling 15%)</span>
+  min effective bets   5.0   <span class="hl">(hard floor 3.0)</span>
+  portfolio heat       6.0%
+  max participation    5.0%
+  daily budget         RM 25.00</span></pre></div>
+          <div class="box stop">
+            <span class="lbl">What the file cannot do</span>
+            <p>Tighten any limit freely. <strong>Loosening stops at a bound the file cannot cross</strong> — a single-name cap above 15%, effective bets below 3, more than 2% risk per trade, more than 10% of daily volume, no emergency floor, or calibrating on fewer than 30 graded calls are all refused at startup with the reason.</p>
+            <p style="margin-top:9px">A risk limit you can switch off by editing a config file is not a limit. It is a suggestion, and it gets switched off on exactly the day it would have saved you.</p>
           </div>
         </li>
 
@@ -449,7 +482,7 @@ skill rather than luck.</span></span></pre></div>
         <div class="cad-row">
           <div class="cad-when"><b>After any change</b><small>3 min</small></div>
           <div class="cad-what">
-            <div><code>make test</code><span>445 tests, under three seconds.</span></div>
+            <div><code>make test</code><span>469 tests, under three seconds.</span></div>
             <div><code>make verify</code><span>Catches silent degradation across the agent layer that unit tests miss.</span></div>
           </div>
         </div>
@@ -652,7 +685,7 @@ skill rather than luck.</span></span></pre></div>
     <footer>
       <p><b>Not financial advice.</b> This system produces candidacy bands, calibrated probabilities, attributions and sizing constraints with evidence chains. It makes no recommendations and cannot place orders.</p>
       <p><b>Verify the fee schedules before trading.</b> Exchange figures were read in Aug 2026 and the cost floor is computed straight from them — a stale schedule silently mis-sizes every position.</p>
-      <p>Source: <code>docs/user-guide.html</code> · 445 tests · <code>make verify</code> in 0.13s</p>
+      <p>Source: <code>docs/user-guide.html</code> · 469 tests · <code>make verify</code> in 0.13s</p>
     </footer>
 
   </main>

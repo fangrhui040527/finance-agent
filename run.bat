@@ -1,0 +1,138 @@
+@echo off
+REM FinPlanet Module 5 - Windows commands.
+REM
+REM The Makefile is Unix-only; this is the same surface for Windows. Run with no
+REM argument to see what is available.
+REM
+REM   run install     first time setup
+REM   run test        the full suite
+REM   run verify      the whole pipeline on mock data, no network, no keys
+REM   run config      show settings and where they came from
+REM   run why ...     decompose a move before naming a cause
+REM   run plan ...    what the system would do with a question
+REM   run log ...     log a view before you find out
+REM   run due         what has reached its horizon
+REM   run grade ...   score a call
+REM   run status      the calibration table
+REM   run up/down/health   the datastores, via Docker
+
+setlocal
+set "PY=.venv\Scripts\python.exe"
+set "CMD=%~1"
+if "%CMD%"=="" goto usage
+
+REM Everything except install needs the venv.
+if /I not "%CMD%"=="install" (
+  if not exist "%PY%" (
+    echo No virtual environment found at %PY%.
+    echo Run:  run install
+    exit /b 1
+  )
+)
+
+REM Shift the subcommand off so %* is just the arguments.
+shift
+set "ARGS="
+:collect
+if "%~1"=="" goto dispatch
+set "ARGS=%ARGS% %1"
+shift
+goto collect
+
+:dispatch
+if /I "%CMD%"=="install" goto install
+if /I "%CMD%"=="test"    goto test
+if /I "%CMD%"=="verify"  goto verify
+if /I "%CMD%"=="config"  goto config
+if /I "%CMD%"=="why"     goto why
+if /I "%CMD%"=="plan"    goto plan
+if /I "%CMD%"=="log"     goto log
+if /I "%CMD%"=="due"     goto due
+if /I "%CMD%"=="grade"   goto grade
+if /I "%CMD%"=="status"  goto status
+if /I "%CMD%"=="up"      goto up
+if /I "%CMD%"=="down"    goto down
+if /I "%CMD%"=="health"  goto health
+echo Unknown command: %CMD%
+echo.
+goto usage
+
+:install
+where uv >nul 2>&1
+if errorlevel 1 (
+  echo uv is not installed. Install it with:
+  echo   powershell -c "irm https://astral.sh/uv/install.ps1 ^| iex"
+  exit /b 1
+)
+uv venv --python 3.11 .venv || exit /b 1
+uv pip install --python "%PY%" -e ".[dev]" || exit /b 1
+echo.
+echo Installed. Next:  run verify
+goto :eof
+
+:test
+"%PY%" -m pytest
+goto :eof
+
+:verify
+"%PY%" verify.py
+goto :eof
+
+:config
+"%PY%" -c "from core.config import load; print(load().describe())"
+goto :eof
+
+:why
+"%PY%" ask.py why%ARGS%
+goto :eof
+
+:plan
+"%PY%" ask.py plan%ARGS%
+goto :eof
+
+:log
+"%PY%" predict.py log%ARGS%
+goto :eof
+
+:due
+"%PY%" predict.py due%ARGS%
+goto :eof
+
+:grade
+"%PY%" predict.py grade%ARGS%
+goto :eof
+
+:status
+"%PY%" predict.py status%ARGS%
+goto :eof
+
+:up
+docker compose -f infra\docker-compose.yml up -d
+goto :eof
+
+:down
+docker compose -f infra\docker-compose.yml down
+goto :eof
+
+:health
+docker compose -f infra\docker-compose.yml ps
+goto :eof
+
+:usage
+echo FinPlanet Module 5 - The Analyst Mind
+echo.
+echo   run install                       create .venv and install
+echo   run test                          the full suite
+echo   run verify                        whole pipeline on mock data
+echo   run config                        settings, and where they came from
+echo.
+echo   run why MYX:1155 --move -0.09 --market -0.08
+echo   run plan "why did maybank fall today" --instrument MYX:1155
+echo.
+echo   run log MYX:1155 +1 63d 0.62 "NIM stabilises above 2.25%%"
+echo   run due                           what has reached its horizon
+echo   run grade ID --return 0.031 --benchmark 0.048
+echo   run status                        the calibration table
+echo.
+echo   run up ^| down ^| health            the datastores, via Docker
+exit /b 1

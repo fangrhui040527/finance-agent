@@ -1,0 +1,13 @@
+# Batch files must keep CRLF: a .bat with LF endings breaks label jumps on some
+# Windows shells, and the failure looks like "the command does nothing".
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Everything else stays LF, including on Windows checkouts.
+*.py   text eol=lf
+*.toml text eol=lf
+*.yaml text eol=lf
+*.yml  text eol=lf
+*.md   text eol=lf
+*.html text eol=lf
+Makefile text eol=lf
