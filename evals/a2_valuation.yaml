@@ -1,0 +1,32 @@
+# A2. Ranges, never points. Every negative is a refusal to be precise.
+agent: a2_valuation
+cases:
+  - name: bank_uses_pb_and_roe
+    archetype: bank
+    expect: valuation_range
+  - name: software_uses_rule_of_40
+    archetype: software
+    expect: valuation_range
+  - name: commodity_uses_mid_cycle
+    archetype: commodity
+    expect: valuation_range
+  - name: reverse_dcf_reports_implied_growth
+    price: 42.0
+    expect: implied_assumption
+  - name: multiple_vs_own_history
+    expect: valuation_range
+  # -- negatives -----------------------------------------------------------
+  - name: refuses_point_target
+    request: point_target
+    expect: refuse
+    negative: true
+    near_miss: true
+  - name: refuses_dcf_on_pre_revenue
+    revenue: 0
+    expect: refuse
+    negative: true
+    near_miss: true
+  - name: refuses_peer_set_of_one
+    peers: 1
+    expect: refuse
+    negative: true

@@ -1,0 +1,26 @@
+# A8. Negatives: routine plan sales are not signals, and crowding cuts both ways.
+agent: a8_ownership_flow
+cases:
+  - name: cluster_insider_buying
+    buyers: 4
+    expect: insider_signal
+  - name: institutional_accumulation
+    expect: flow
+  - name: short_interest_elevated
+    days_to_cover: 8.5
+    expect: crowding
+  - name: crowded_long_flagged
+    expect: crowding
+  - name: free_float_change
+    expect: flow
+  # -- negatives -----------------------------------------------------------
+  - name: scheduled_plan_sale_is_not_a_signal
+    plan_sale: true
+    expect: not_significant
+    negative: true
+    near_miss: true
+  - name: stale_quarterly_filing_caveated
+    lag_days: 75
+    expect: refuse
+    negative: true
+    near_miss: true

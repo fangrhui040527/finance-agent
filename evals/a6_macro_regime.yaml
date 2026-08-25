@@ -1,0 +1,25 @@
+# A6. Negatives: a regime call from one cycle is not a regime call.
+agent: a6_macro_regime
+cases:
+  - name: identifies_tightening_regime
+    expect: regime
+  - name: rate_path_from_published_curve
+    expect: rate_path
+  - name: currency_state_reported
+    pair: USDMYR
+    expect: currency_state
+  - name: commodity_exporter_linkage
+    market: XKLS
+    expect: regime
+  - name: regime_change_flagged
+    expect: regime
+  # -- negatives -----------------------------------------------------------
+  - name: refuses_rate_forecast
+    request: forecast_next_hike
+    expect: refuse
+    negative: true
+    near_miss: true
+  - name: single_cycle_is_not_evidence
+    cycles: 1
+    expect: not_significant
+    negative: true

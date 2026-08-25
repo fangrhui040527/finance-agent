@@ -1,0 +1,30 @@
+agent: a14_teacher
+cases:
+  - name: teaches_l1_from_zero
+    concept: share
+    known: []
+    expect: explain
+  - name: teaches_after_prerequisites
+    concept: cash_flow
+    known: [share, income_statement]
+    expect: explain
+  - name: next_concept_is_reachable
+    known: [share]
+    expect: next
+  - name: syllabus_counts_progress
+    known: [share, compounding]
+    expect: syllabus
+  - name: link_only_source_not_quoted
+    concept: kelly
+    expect: further_reading
+  # -- negatives -----------------------------------------------------------
+  - name: blocks_kelly_before_expected_value
+    concept: kelly
+    known: [share]
+    expect: refuse
+    negative: true
+    near_miss: true
+  - name: unknown_concept
+    concept: crypto_moon_math
+    expect: refuse
+    negative: true

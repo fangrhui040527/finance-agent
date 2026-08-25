@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import sys
 import time
-from datetime import datetime, timezone
+from datetime import date as _date, datetime, timezone
 from decimal import Decimal
 
 from core.contracts.answer import Citation, Claim, TrustTier, verify_answer
@@ -165,6 +165,123 @@ def main() -> int:
         tbl, {"e2": 1}, "XKLS"))
     check("routine dividend cannot explain a 7% move",
           idio2.verdict.value == "no_identified_catalyst")
+
+    # ---------------------------------------------------------------- 9
+    print("\n9. Agents: the seam and the refusals")
+    from agents.base import AgentContext, Finding
+    from agents.portfolio.agents import A12PortfolioRisk, A13Sizing
+    from agents.supervisor import A0Supervisor, Intent
+    from agents.synthesis.agents import A9Attribution, A10Thesis, A11RedTeam, Breaker, Stance
+    from knowledge.retrieval.pipeline import Router
+
+    allow = {
+        "a0_supervisor": {"plan", "budget", "route", "refuse"},
+        "a9_attribution": {"decompose", "candidate_causes", "long_horizon_decompose"},
+        "a10_thesis": {"compose", "check_coverage"},
+        "a11_red_team": {"find_disconfirming"},
+        "a12_portfolio_risk": {"concentration_check", "drawdown_state"},
+        "a13_sizing": {"investable_capital", "risk_budget_cap", "kelly_cap", "lot_round"},
+        "a14_teacher": {"explain", "next_concept", "quiz"},
+        "a15_reflection": {"grade_queue", "propose_lesson", "calibrate", "curate"},
+    }
+    ctx = AgentContext(router=Router({}), engine=default_engine(allow), now=NOW)
+
+    a0 = A0Supervisor(ctx)
+    check("supervisor refuses to place an order",
+          not a0.plan("buy 1000 shares of tenaga for me").allowed)
+    check("supervisor refuses a point price forecast",
+          not a0.plan("what will nvidia be worth in december").allowed)
+    plan = a0.plan("why did maybank fall today", instrument_ids=("MYX:1155",))
+    check("routing picks the documented playbook",
+          plan.intent is Intent.WHY_IT_MOVED and "a9_attribution" in plan.agents,
+          f"RM {plan.estimated_cost.amount:.2f} estimated")
+    try:
+        a0.retrieve("kb_filings", "x")
+        check("supervisor cannot retrieve", False)
+    except PermissionError:
+        check("supervisor cannot retrieve evidence itself", True)
+
+    a10 = A10Thesis(ctx)
+    ev = [Finding(a, "fact", "x") for a in
+          ("a1_fundamentals", "a2_valuation", "a5_catalyst_events", "a6_macro_regime")]
+    a10.run("MYX:1155", ev, proposed_stance=Stance.ACCUMULATE, breakers=[])
+    check("no breakers means no stance", a10.last.stance is Stance.NO_VIEW)
+    brk = [Breaker("NIM below 2.0%", "nim < 0.020", "kb_filings", _date(2027, 2, 1)),
+           Breaker("credit cost above 60bps", "credit_cost > 0.006", "kb_filings")]
+    a10.run("MYX:1155", ev, proposed_stance=Stance.ACCUMULATE, breakers=brk)
+    check("two checkable breakers make a thesis actionable", a10.last.is_actionable())
+
+    a11 = A11RedTeam(ctx)
+    check("red team is never silent on a live thesis", bool(a11.run(a10.last)))
+
+    # ---------------------------------------------------------------- 10
+    print("\n10. Graph: no path, no claim")
+    from knowledge.graph.entity_graph import (
+        Edge, EdgeKind, EntityGraph, Node, NodeKind, PathRequired, require_path)
+
+    g = EntityGraph()
+    for nid, kind, lbl in [("EV:redsea", NodeKind.EVENT, "Red Sea disruption"),
+                           ("SEC:shipping", NodeKind.SECTOR, "Shipping"),
+                           ("CO:MISC", NodeKind.COMPANY, "MISC Berhad")]:
+        g.add_node(Node(nid, kind, lbl))
+    g.add_edge(Edge("EV:redsea", "SEC:shipping", EdgeKind.AFFECTS, 1.0, "doc:1"))
+    g.add_edge(Edge("SEC:shipping", "CO:MISC", EdgeKind.CLASSIFIED_IN, 1.0, "doc:2"))
+    hit = dict(g.impact_of("EV:redsea", {"CO:MISC"}))["CO:MISC"]
+    check("multi-hop impact ships with its path and decay",
+          hit.strength == "indirect" and hit.citable, hit.describe()[:60])
+    try:
+        require_path("shipping hits Maybank", None)
+        check("unpathed impact claim is blocked", False)
+    except PathRequired:
+        check("unpathed impact claim cannot be emitted", True)
+
+    # ---------------------------------------------------------------- 11
+    print("\n11. Reflection: the loop that mostly declines to learn")
+    from agents.learning.reflection import (
+        A15Reflection, LessonStore, Outcome, OutcomeQueue, Status)
+
+    a15 = A15Reflection(ctx, OutcomeQueue(), LessonStore())
+    one = [Outcome("p0", NOW.date(), 0.05, 0.01, True)]
+    check("one vivid trade writes nothing",
+          a15.propose("ceo sounded confident", one, NOW.date(), {"MYX:1155"})[0].kind == "no_lesson")
+    many_one_name = [Outcome(f"p{i}", NOW.date(), 0.05, 0.01, i < 10) for i in range(12)]
+    check("twelve repeats on one instrument still write nothing",
+          a15.propose("gap down", many_one_name, NOW.date(), {"MYX:1155"})[0].kind == "no_lesson")
+    spread = [Outcome(f"q{i}", NOW.date(), 0.05, 0.01, i < 6) for i in range(8)]
+    check("a genuinely repeated pattern is allowed through",
+          a15.propose("unexplained gap reverses", spread, NOW.date(),
+                      {f"S{i}" for i in range(5)})[0].kind == "lesson_written")
+
+    # ---------------------------------------------------------------- 12
+    print("\n12. Registry: the ratchet")
+    from core.registry.loader import load as load_registry
+    reg = load_registry("agents/registry.yaml")
+    check("all 16 agents register with an eval suite carrying negatives",
+          len(reg.agents) == 16, f"{len(reg.knowledge)} knowledge stores")
+    check("no agent may write to human-authored knowledge",
+          not any(reg.may_write(a, "kb_craft") for a in reg.agents))
+    check("the lessons store is the agent-writable one",
+          reg.may_write("a15_reflection", "kb_lessons"))
+
+    # ---------------------------------------------------------------- 13
+    print("\n13. Teacher: order is enforced, not suggested")
+    from agents.learning.teacher import A14Teacher, Learner, CURRICULUM, validate_graph
+    validate_graph()
+    t = A14Teacher(ctx)
+    check(f"curriculum graph is acyclic across {len(CURRICULUM)} concepts", True)
+    check("kelly cannot be taught before expected value",
+          t.run("kelly", Learner(known={"share"}))[0].kind == "prerequisite")
+
+    # ---------------------------------------------------------------- 14
+    print("\n14. Surface: the honest answer is as easy to show")
+    from ui.render import daily_brief, decomposition_bars
+    bars_out = decomposition_bars(idio2)
+    check("unexplained share is always on screen", "unexplained" in bars_out)
+    check("no-catalyst gets a layout, not an empty slot",
+          "no catalyst cleared the evidence threshold" in bars_out)
+    brief = daily_brief(NOW, [mkt], [], [])
+    check("a quiet day is rendered as a quiet day",
+          "Nothing needs a decision today" in brief)
 
     dt = time.time() - t0
     print(f"\n{'PASS' if not failures else 'FAIL: ' + ', '.join(failures)}  ({dt:.2f}s)\n")

@@ -12,9 +12,19 @@ FORBIDDEN = re.compile(
     r"alpaca|ib_insync|ccxt\.)\b", re.I,
 )
 SKIP_DIRS = {".git", ".venv", "docs", "__pycache__", ".pytest_cache", "node_modules"}
-# The policy that denies these names, and this test, must both mention them.
-ALLOWED_FILES = {"policy.py", "test_no_execution_anywhere.py", "test_guardrail_chain.py",
-                 "registry.yaml", "verify.py"}
+
+# Files that must name the forbidden tools in order to deny them. Exact paths,
+# not basenames: a basename allowlist would hand a free pass to any new file
+# called policy.py anywhere in the tree.
+ALLOWED_PATHS = {
+    "core/guardrails/policy.py",            # NoExecutionPolicy, denies by name
+    "core/registry/loader.py",              # FORBIDDEN_TOOLS, refuses at load
+    "verify.py",
+    "tests/test_no_execution_anywhere.py",
+    "tests/test_guardrail_chain.py",
+    "tests/test_registry.py",
+    "tests/test_agents.py",
+}
 
 
 def test_no_execution_code_in_repo():
@@ -22,10 +32,22 @@ def test_no_execution_code_in_repo():
     for path in ROOT.rglob("*"):
         if not path.is_file() or path.suffix not in {".py", ".yaml", ".yml", ".toml"}:
             continue
-        if SKIP_DIRS & set(path.relative_to(ROOT).parts):
+        rel = path.relative_to(ROOT)
+        if SKIP_DIRS & set(rel.parts):
             continue
-        if path.name in ALLOWED_FILES:
+        if rel.as_posix() in ALLOWED_PATHS:
             continue
         if FORBIDDEN.search(path.read_text(errors="replace")):
-            offenders.append(str(path.relative_to(ROOT)))
+            offenders.append(rel.as_posix())
     assert not offenders, f"execution-adjacent code found in: {offenders}"
+
+
+def test_the_allowlist_has_not_rotted():
+    """Every exemption must still exist and still be denying something. An
+    allowlist entry for a deleted file is how the next one slips through."""
+    for rel in ALLOWED_PATHS:
+        path = ROOT / rel
+        assert path.exists(), f"allowlisted {rel} no longer exists; remove the exemption"
+        assert FORBIDDEN.search(path.read_text()), (
+            f"{rel} no longer mentions a forbidden tool; it does not need an exemption"
+        )

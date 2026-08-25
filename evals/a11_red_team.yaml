@@ -1,0 +1,34 @@
+agent: a11_red_team
+cases:
+  - name: kills_thesis_with_no_valuation
+    stance: accumulate
+    valuation_range: null
+    expect: thesis_rejected
+  - name: kills_thesis_with_many_gaps
+    gaps: 3
+    expect: thesis_rejected
+  - name: weakens_on_three_material
+    gaps: 1
+    accounting_checked: false
+    macro_present: false
+    expect: thesis_weakened
+  - name: survives_complete_thesis
+    gaps: 0
+    breakers: 3
+    accounting_checked: true
+    macro_present: true
+    expect: thesis_survives
+  - name: flags_uncalibrated_confidence
+    confidence: 0.85
+    gaps: 1
+    expect: thesis_weakened
+  # -- negatives -----------------------------------------------------------
+  - name: refuses_to_use_bull_sources
+    excluded_overlap: true
+    expect: refuse
+    negative: true
+    near_miss: true
+  - name: no_view_thesis_needs_no_challenge
+    stance: no_view
+    expect: thesis_survives
+    negative: true
