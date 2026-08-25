@@ -157,3 +157,60 @@ def test_us_dividends_withhold_30pc_for_a_malaysian_holder():
 
 def test_tier_three_market_would_not_claim_a_factor_model():
     assert get("XKLS").supports_factor_model() is True
+
+
+# --- XSES: the first T2 market, and the test of the extensibility claim -----
+
+def test_adding_a_market_did_not_change_any_engine_or_agent():
+    """docs/01 section 10: a new market is one adapter class plus one registry
+    entry. XSES is the proof - the conformance suite above is parameterised over
+    supported(), so registering it subjected it to every conformance test with
+    no new test code at all."""
+    assert "XSES" in supported()
+    assert len(supported()) == 3
+
+
+def test_singapore_charges_no_stamp_duty_unlike_bursa():
+    sg, my = get("XSES"), get("XKLS")
+    assert not any(leg.name == "stamp_duty" for leg in sg.fee_schedule.legs)
+    assert any(leg.name == "stamp_duty" for leg in my.fee_schedule.legs)
+
+
+def test_singapore_is_structurally_cheaper_than_bursa_at_every_size():
+    sg, my = get("XSES"), get("XKLS")
+    for v in (D("10000"), D("50000"), D("200000")):
+        assert sg.fee_schedule.round_trip_bps(v) < my.fee_schedule.round_trip_bps(v)
+
+
+def test_the_singapore_clearing_cap_binds_at_large_size():
+    sg = get("XSES")
+    small = sg.fee_schedule.round_trip_bps(D("200000"))
+    large = sg.fee_schedule.round_trip_bps(D("5000000"))
+    assert large < small, "the SGD 600 clearing cap should pull the rate down"
+
+
+def test_a_malaysian_holder_pays_no_withholding_on_singapore_dividends():
+    """Singapore's one-tier system, unlike the 30% XNAS applies."""
+    assert get("XSES").withholding("dividend", "MY") == D(0)
+    assert get("XNAS").withholding("dividend", "MY") == D("0.30")
+
+
+def test_singapore_trades_one_continuous_session_not_two():
+    assert len(get("XSES").calendar.windows) == 1
+    assert len(get("XKLS").calendar.windows) == 2
+
+
+def test_every_supported_market_has_an_explicit_cost_floor():
+    """A market falling back to the generic default is an accident waiting to
+    be inherited by the next market added (docs/05 section 3.5)."""
+    from engines.sizing.caps import COST_FLOOR_BPS_BY_MIC
+    missing = [m for m in supported() if m not in COST_FLOOR_BPS_BY_MIC]
+    assert not missing, f"markets with no explicit cost floor: {missing}"
+
+
+def test_the_singapore_minimum_economic_position_is_about_nine_thousand():
+    """Roughly twice Bursa's RM 4,700 in nominal terms - the brokerage minimum
+    is higher relative to the rate, so small positions are punished harder."""
+    sg = get("XSES")
+    assert sg.fee_schedule.round_trip_bps(D("9100")) <= D("30")
+    assert sg.fee_schedule.round_trip_bps(D("5000")) > D("30")

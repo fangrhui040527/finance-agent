@@ -29,16 +29,23 @@ network and no keys; `pytest` runs 361 tests.
 | P14 teacher | done | `agents/learning/teacher.py` — 30 concepts, enforced prerequisite graph |
 | P15 surface | done | `ui/render.py` |
 | P17 registry and ratchet | done | `core/registry/loader.py`, `evals/` — 16 suites |
-| **P16 paper trade gate** | **blocked on elapsed time** | needs 3–6 months of live forward outcomes |
-| P18–P19 | blocked on P16 | cannot start until the gate closes |
+| **P16 paper trade gate** | **waiting on elapsed time** | tooling built (`predict.py`, `agents/learning/store.py`); needs 3–6 months of graded outcomes |
+| P18 T2 market onboarding | **ready, not started** | depends on P17, which is done — one adapter class plus a registry entry per market |
+| P19 short-horizon classifier | blocked on P16 | needs the forward record P16 produces |
 
-**What "blocked" means here.** P16 is not unbuilt work; it is a waiting period.
-The machinery it needs — the deferred outcome queue, the calibration table, the
-lesson gate — is built and tested in `agents/learning/reflection.py`. What cannot
-be compressed is the accumulation of predictions that have actually resolved at
-their stated horizons. Grading them early is refused by the code on purpose
-(`OutcomeQueue.grade` raises), because a 21-day call scored on day 3 is noise
-wearing a track record's clothes.
+**What "waiting" means here.** P16 is not unbuilt work; it is a waiting period.
+The machinery is built and tested: the deferred outcome queue and calibration in
+`agents/learning/reflection.py`, durable storage in `agents/learning/store.py`,
+and a command-line log in `predict.py`. What cannot be compressed is the
+accumulation of predictions that have actually resolved at their stated horizons.
+Grading them early is refused on purpose (`OutcomeQueue.grade` raises), because a
+21-day call scored on day 3 is noise wearing a track record's clothes.
+
+**P18 was previously listed as blocked on P16. That was wrong** — the roadmap has
+it after P17, which is done. Onboarding a T2 market needs no forward record; it
+needs one `MarketAdapter` subclass, a registry entry, and the conformance tests
+that already exist. It is the most useful thing available to work on today that
+does not require waiting.
 
 **What is deliberately unwired.** `GdeltFeed._fetch_raw` raises
 `NotImplementedError` rather than returning empty. Every live source is one

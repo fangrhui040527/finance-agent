@@ -151,7 +151,7 @@ leg + withholding), and that is the number any signal must clear.
 names at 0.10 correlation or better. Six names at 0.15 correlation gives 3.4.
 The bar measures independence, not headcount, and it is demanding on purpose.
 
-### 3.5.1 Six more, from building the agent layer
+### 3.5.1 Seven more, from building the agent layer and the first T2 market
 
 **A rejected catalyst was rendering as the cause.** `ui/render.py` branched on
 whether the candidate list was empty rather than on the verdict. A story that
@@ -199,6 +199,14 @@ capability registry — made A3 deny its own first call. Both are fixed by
 `Registry.allowlist()` plus two tests that fail if any class drifts from the
 registry on either identity or tools. **The lesson is not "check your strings": it
 is that a registry nothing reads is a comment, and comments rot.**
+
+**A market with no explicit cost floor inherits the default by accident.**
+Onboarding XSES showed the gap: it fell through to `COST_FLOOR_BPS_DEFAULT`
+without anyone deciding that was right. It happens to be right — Singapore's
+asymptote is ~24 bps, so 30 is reachable — but that was luck, and the next market
+added would have inherited the same silence. XSES now has an explicit 30 bps
+entry *because* it agrees with the default, and a test fails if any supported
+market lacks one.
 
 **The `should_i_buy` floor leaves only 2× headroom.** The plan's minimum honest
 plan for a buy question (fundamentals + valuation + thesis + red team) costs

@@ -27,7 +27,12 @@ COST_FLOOR_BPS_DEFAULT = Decimal("30")
 COST_FLOOR_BPS_BY_MIC: dict[str, Decimal] = {
     "XKLS": Decimal("60"),   # asymptote ~46 bps
     "XNAS": Decimal("5"),    # asymptote ~0.6 bps
+    "XSES": Decimal("30"),   # asymptote ~24 bps before the SGD 600 clearing cap binds
 }
+# XSES happens to land on the same number as the generic default, and that is
+# precisely why it is written down. An entry that agrees with the default by
+# coincidence is a decision; a missing entry that falls back to it is an
+# accident, and the next market added would inherit the accident silently.
 
 
 def cost_floor_bps(mic: str | None) -> Decimal:

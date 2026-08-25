@@ -28,7 +28,7 @@ Start at **[`docs/README.md`](docs/README.md)**.
 
 ## Status
 
-**Everything except P16 is built and tested.** 404 tests, no network and no keys
+**Everything except P16 is built and tested.** 434 tests, no network and no keys
 needed to run any of it. CI runs the suite, `verify.py`, the eval ratchet and the
 no-execution grep on every push.
 
@@ -40,6 +40,8 @@ P18–P19 wait on P16. **If you are picking this up, start at
 ```bash
 make install && make test    # full suite
 make verify                  # end-to-end on mock data, <1s
+make due                     # predictions that have reached their horizon
+make status                  # the calibration table
 make up                      # postgres+timescale · qdrant · neo4j · redis · minio
 ```
 
@@ -47,7 +49,7 @@ make up                      # postgres+timescale · qdrant · neo4j · redis ·
 |---|---|---|
 | P0 | Tier router, guardrail chain, provenance ledger, typed answers | `core/` |
 | P1 | Instrument identity, session calendars, price adjustment, FX | `core/market/` |
-| P2 | Market adapter contract + XKLS + XNAS + conformance | `markets/` |
+| P2 | Market adapter contract + XKLS + XNAS + XSES + conformance | `markets/` |
 | P3.5 | Point-in-time `known_at` store, survivorship-safe universes | `core/market/pointintime.py` |
 | P4 | Attribution: robust regression, decomposition, long-horizon | `engines/attribution/` |
 | P5 | News corpus: five-dimension features, wire dedup, escalation gate | `knowledge/news/` |
@@ -63,9 +65,13 @@ make up                      # postgres+timescale · qdrant · neo4j · redis ·
 | P14 | 30-concept curriculum with an enforced prerequisite graph | `agents/learning/teacher.py` |
 | P15 | Decomposition bars, annotated chart, thesis memo, daily brief | `ui/render.py` |
 | P17 | Capability registry and the eval ratchet, 16 suites | `core/registry/`, `evals/` |
+| P16 tooling | Durable prediction log + CLI — the clock the gate needs | `agents/learning/store.py`, `predict.py` |
+| P18 | Singapore (XSES), the first T2 market | `markets/xses.py` |
 
-**Not built:** P16 paper-trade gate (3–6 months elapsed, not effort) and
-P18–P19, which depend on it. Live feed ingest is deliberately unwired —
+**Not built:** P16's forward record — 3–6 months of elapsed time, not effort;
+its tooling is built and its clock starts with `python predict.py log`. P19
+depends on that record. P18 is started, not finished: XSES is onboarded, HK/JP/UK/AU
+are not. Live feed ingest is deliberately unwired —
 `GdeltFeed._fetch_raw` raises rather than returning empty, so the offline build
 cannot pretend to have data. Everything downstream of the adapter seam is built
 and tested. See [`docs/07-BUILD-ORDER.md`](docs/07-BUILD-ORDER.md) §0.
@@ -109,3 +115,5 @@ and tested. See [`docs/07-BUILD-ORDER.md`](docs/07-BUILD-ORDER.md) §0.
 | A significant move with no catalyst is never given one | `engines/attribution/` + `ui/render.py` | `test_render.py` |
 | A prediction cannot be graded before its stated horizon | `agents/learning/reflection.py` | `test_learning.py` |
 | A concept cannot be taught before its prerequisites | `agents/learning/teacher.py` | `test_learning.py` |
+| A logged prediction can never be edited or deleted | `agents/learning/store.py` | `test_learning_store.py` |
+| Every supported market has an explicit cost floor | `engines/sizing/caps.py` | `test_market_foundation.py` |

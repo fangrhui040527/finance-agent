@@ -35,22 +35,20 @@ outcomes takes three months.
 
 So the first real task is not analysis. It is **starting the clock**.
 
-```python
-from agents.learning.reflection import Horizon, OutcomeQueue, Prediction
+```bash
+# log a view. instrument, direction, horizon, confidence, statement
+python predict.py log MYX:1155 +1 63d 0.62 "NIM stabilises above 2.25%"
 
-queue = OutcomeQueue()
-queue.enqueue(Prediction(
-    prediction_id="2026-08-25-maybank-nim",
-    instrument_id="MYX:1155",
-    agent="a10_thesis",
-    made_at=now,
-    horizon=Horizon.D63,           # fixed NOW, never revised later
-    statement="NIM stabilises above 2.25% and the multiple re-rates",
-    direction=+1,
-    confidence=0.62,               # your honest number, not a flattering one
-    grade_on=date(2026, 11, 26),   # computed from the horizon, in the future
-))
+python predict.py due        # what has reached its horizon
+python predict.py grade 2026-08-25-myx1155-8c2c --return 0.031 --benchmark 0.048
+python predict.py status     # the calibration table
+
+make due                     # the same two you will run most
+make status
 ```
+
+Everything lands in `data/learning.db` and survives restarts. The file is
+gitignored: your prediction log is yours and never leaves the machine.
 
 Rules that make this worth doing, all enforced in code:
 
@@ -60,7 +58,10 @@ Rules that make this worth doing, all enforced in code:
   `grade_on`. A 63-day call scored on day 4 is noise wearing a track record's
   clothes.
 - **Correctness is measured against a benchmark**, not against zero. Being up 6%
-  in a month the index rose 8% is being wrong.
+  in a month the index rose 8% is being wrong, and `predict grade` will say so.
+- **Nothing can be edited or deleted.** SQLite triggers refuse an `UPDATE` on a
+  logged prediction and a `DELETE` on any of them. A log you can revise is a
+  memory, and a log missing its losers produces confident, wrong calibration.
 
 Log **every** view, including the ones you do not act on and the ones you later
 feel embarrassed by. A prediction log with the losers quietly missing is worse

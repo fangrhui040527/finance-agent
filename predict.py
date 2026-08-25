@@ -1,0 +1,179 @@
+#!/usr/bin/env python3
+"""The prediction log, as a command.
+
+docs/14 section 2: the outcome clock is the one part of this system that cannot
+be compressed by working harder, and it only works if logging a view is easier
+than not logging it. A REPL snippet is not easier than not logging it.
+
+    python predict.py log MYX:1155 +1 63d 0.62 "NIM stabilises above 2.25%"
+    python predict.py due
+    python predict.py grade 2026-08-25-myx1155-a1b2 --return 0.031 --benchmark 0.012
+    python predict.py status
+
+Everything lands in data/learning.db and survives restarts. Nothing is ever
+edited or deleted - the triggers refuse.
+"""
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import sys
+from datetime import date, datetime, timedelta, timezone
+
+from agents.learning.reflection import Horizon, Outcome, Prediction, calibrate
+from agents.learning.store import DEFAULT_PATH, LearningStore
+
+SESSIONS_PER_WEEK = 5
+
+
+def _grade_date(made: datetime, horizon: Horizon) -> date:
+    """Sessions -> calendar days, roughly. Weekends are not trading days."""
+    weeks = horizon.sessions / SESSIONS_PER_WEEK
+    return (made + timedelta(days=weeks * 7)).date()
+
+
+def _new_id(instrument: str, made: datetime, statement: str) -> str:
+    slug = instrument.replace(":", "").lower()
+    h = hashlib.sha256(f"{instrument}{made.isoformat()}{statement}".encode()).hexdigest()[:4]
+    return f"{made:%Y-%m-%d}-{slug}-{h}"
+
+
+def cmd_log(a) -> int:
+    made = datetime.now(timezone.utc)
+    horizon = Horizon(a.horizon)
+    grade_on = date.fromisoformat(a.grade_on) if a.grade_on else _grade_date(made, horizon)
+
+    p = Prediction(
+        prediction_id=a.id or _new_id(a.instrument, made, a.statement),
+        instrument_id=a.instrument, agent=a.agent, made_at=made, horizon=horizon,
+        statement=a.statement, direction=a.direction, confidence=a.confidence,
+        grade_on=grade_on,
+    )
+    with LearningStore(a.db) as s:
+        s.record(p)
+        n = s.counts()
+    arrow = {1: "up", -1: "down", 0: "no directional view"}[p.direction]
+    print(f"logged {p.prediction_id}")
+    print(f"  {p.instrument_id} {arrow} over {horizon.value}, stated {p.confidence:.0%}")
+    print(f"  grades on {grade_on} - not before, and the code enforces that")
+    print(f"  {n['pending']} pending, {n['graded']} graded")
+    if n["graded"] < 30:
+        print(f"  {30 - n['graded']} more graded calls before calibration means anything")
+    return 0
+
+
+def cmd_due(a) -> int:
+    today = date.fromisoformat(a.today) if a.today else date.today()
+    with LearningStore(a.db) as s:
+        due = [p for p in s.pending() if p.grade_on <= today]
+        upcoming = [p for p in s.pending() if p.grade_on > today]
+    if not due:
+        print(f"nothing due as at {today}." +
+              (f" Next grades {min(p.grade_on for p in upcoming)}." if upcoming else ""))
+        return 0
+    print(f"{len(due)} due for grading as at {today}:\n")
+    for p in due:
+        overdue = (today - p.grade_on).days
+        flag = f"  [{overdue}d overdue]" if overdue > 0 else ""
+        print(f"  {p.prediction_id}{flag}")
+        print(f"    {p.instrument_id}  {p.statement}")
+        print(f"    stated {p.confidence:.0%} on {p.made_at:%Y-%m-%d} over {p.horizon.value}\n")
+    return 0
+
+
+def cmd_grade(a) -> int:
+    today = date.fromisoformat(a.today) if a.today else date.today()
+    with LearningStore(a.db) as s:
+        queue = s.load_queue()
+        try:
+            o = queue.grade(a.prediction_id, today, a.realised, a.benchmark, a.note or "")
+        except (KeyError, ValueError) as e:
+            print(f"refused: {e}", file=sys.stderr)
+            return 1
+        s.record_outcome(o)
+        n = s.counts()
+        pairs = s.calibration_pairs()
+
+    print(f"graded {o.prediction_id}: {'correct' if o.correct else 'wrong'}")
+    print(f"  realised {o.realised_return:+.2%} vs benchmark {o.benchmark_return:+.2%}"
+          f"  (excess {o.excess:+.2%})")
+    print(f"  {n['graded']} graded, {n['pending']} still pending")
+    if len(pairs) >= 10:
+        c = calibrate(pairs)
+        print(f"  Brier {c.brier:.3f} over {c.n}")
+        for stated, realised, k in c.overconfident_bands():
+            print(f"  overconfident: stated {stated:.0%}, realised {realised:.0%} over {k} calls")
+    return 0
+
+
+def cmd_status(a) -> int:
+    with LearningStore(a.db) as s:
+        n = s.counts()
+        pairs = s.calibration_pairs()
+        pending = s.pending()
+    today = date.today()
+    overdue = [p for p in pending if p.grade_on < today]
+
+    print(f"prediction log  {a.db}")
+    print(f"  logged   {n['logged']}")
+    print(f"  graded   {n['graded']}")
+    print(f"  pending  {n['pending']}" + (f"  ({len(overdue)} overdue)" if overdue else ""))
+    print(f"  lessons  {n['lessons']} active")
+
+    if len(pairs) < 30:
+        print(f"\n{30 - len(pairs)} more graded calls before the calibration table "
+              "measures skill rather than luck.")
+        return 0
+
+    c = calibrate(pairs)
+    print(f"\ncalibration over {c.n} graded calls   Brier {c.brier:.3f}")
+    print(f"  {'stated':>8} {'realised':>9} {'n':>5}")
+    for stated, realised, k in c.buckets:
+        gap = stated - realised
+        mark = "  <- overconfident" if (k >= 5 and gap > 0.10) else ""
+        print(f"  {stated:>7.0%} {realised:>9.0%} {k:>5}{mark}")
+    return 0
+
+
+def main(argv=None) -> int:
+    ap = argparse.ArgumentParser(
+        prog="predict", description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--db", default=str(DEFAULT_PATH), help="prediction log (default: %(default)s)")
+    sub = ap.add_subparsers(dest="cmd", required=True)
+
+    lg = sub.add_parser("log", help="log a view before you find out")
+    lg.add_argument("instrument")
+    lg.add_argument("direction", type=int, choices=[1, 0, -1],
+                    help="+1 up, -1 down, 0 no directional view")
+    lg.add_argument("horizon", choices=[h.value for h in Horizon])
+    lg.add_argument("confidence", type=float, help="0-1, your honest number")
+    lg.add_argument("statement", help="what has to be true, in one sentence")
+    lg.add_argument("--agent", default="human", help="who made the call")
+    lg.add_argument("--id", help="override the generated id")
+    lg.add_argument("--grade-on", help="override the computed grading date (YYYY-MM-DD)")
+    lg.set_defaults(fn=cmd_log)
+
+    du = sub.add_parser("due", help="what needs grading")
+    du.add_argument("--today", help="override today (YYYY-MM-DD)")
+    du.set_defaults(fn=cmd_due)
+
+    gr = sub.add_parser("grade", help="score a call that has reached its horizon")
+    gr.add_argument("prediction_id")
+    gr.add_argument("--return", dest="realised", type=float, required=True)
+    gr.add_argument("--benchmark", type=float, required=True,
+                    help="being up 6%% when the index rose 8%% is being wrong")
+    gr.add_argument("--note", help="what you learned, if anything")
+    gr.add_argument("--today", help="override today (YYYY-MM-DD)")
+    gr.set_defaults(fn=cmd_grade)
+
+    st = sub.add_parser("status", help="the calibration table")
+    st.set_defaults(fn=cmd_status)
+
+    a = ap.parse_args(argv)
+    return a.fn(a)
+
+
+if __name__ == "__main__":
+    sys.exit(main())

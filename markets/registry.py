@@ -5,8 +5,9 @@ from __future__ import annotations
 from markets.contract import MarketAdapter
 from markets.xkls import XKLS
 from markets.xnas import XNAS
+from markets.xses import XSES
 
-_ADAPTERS: dict[str, type[MarketAdapter]] = {"XKLS": XKLS, "XNAS": XNAS}
+_ADAPTERS: dict[str, type[MarketAdapter]] = {"XKLS": XKLS, "XNAS": XNAS, "XSES": XSES}
 _CACHE: dict[str, MarketAdapter] = {}
 
 
