@@ -27,7 +27,7 @@ Start at **[`docs/README.md`](docs/README.md)**.
 
 ## Status
 
-**P0–P4, P10–P12 built.** 202 tests, no network or keys needed to run any of it.
+**P0–P6, P10–P12 built.** 232 tests, no network or keys needed to run any of it.
 
 ```bash
 make install && make test    # full suite
@@ -42,14 +42,17 @@ make up                      # postgres+timescale · qdrant · neo4j · redis ·
 | P2 | Market adapter contract + XKLS + XNAS + conformance | `markets/` |
 | P3.5 | Point-in-time `known_at` store, survivorship-safe universes | `core/market/pointintime.py` |
 | P4 | Attribution: robust regression, decomposition, long-horizon | `engines/attribution/` |
+| P5 | News corpus: five-dimension features, wire dedup, escalation gate | `knowledge/news/` |
+| P6 | Event taxonomy, base-rate table, six-factor catalyst scoring | `engines/events/` |
 | P3 | Parent-child chunking, hybrid BM25+dense+RRF, grader, scoped router | `knowledge/` |
 | P10 | Concentration: HHI, effective bets, correlation clusters | `engines/risk/` |
 | P11 | Waterfall, five caps, unconstructable-if-breached decisions | `engines/sizing/` |
 | P12 | Purged walk-forward, cost model, deflated Sharpe, 3 benchmarks | `engines/backtest/` |
 
-**Not built:** P5–P6 news ingest + base rates (needs live GDELT), P7–P9 agents +
-graph, P13–P15 reflection + UI, P16 paper-trade gate (3–6 months elapsed),
-P17–P19 growth.
+**Not built:** P7–P9 agents + knowledge graph, P13–P15 reflection + UI,
+P16 paper-trade gate (3–6 months elapsed), P17–P19 growth. The P5 feed adapters
+are mocked — real GDELT/vendor ingest needs a key in `.env`; everything
+downstream of the adapter seam is built and tested.
 See [`docs/07-BUILD-ORDER.md`](docs/07-BUILD-ORDER.md).
 
 ### Two things building it found

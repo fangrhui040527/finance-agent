@@ -129,6 +129,43 @@ def main() -> int:
     floor = cost_floor_value(mget("XKLS").fee_schedule.round_trip, "XKLS")
     check("Bursa minimum economic position", DD("3000") < floor < DD("8000"), f"RM {floor:,.0f}")
 
+    print("\n8. News features and catalyst matching")
+    from datetime import datetime as _dt, timezone as _tz
+    from knowledge.news.features import LexiconExtractor, near_duplicate_hash
+    from engines.events.taxonomy import (
+        BaseRateTable, CapBand, Event, EventType, Observation, SurpriseBucket)
+    from engines.events.catalyst import attach, score_candidates
+    ex = LexiconExtractor()
+    probe = ex.extract("Maybank may face a probe, the outcome is uncertain", ["Maybank"])
+    plunge = ex.extract("Maybank shares plunged sharply after the group cut guidance", ["Maybank"])
+    check("intensity separates what polarity collapses",
+          probe.polarity < 0 and plunge.polarity < 0 and plunge.intensity > probe.intensity)
+    body = "The group cut guidance for the coming year amid weaker demand across segments"
+    check("wire duplicates collapse", near_duplicate_hash(body) == near_duplicate_hash("(Reuters) " + body))
+
+    ts = _dt(2026, 8, 12, tzinfo=_tz.utc)
+    tbl = BaseRateTable()
+    import random as _r
+    _r.seed(3)
+    for i in range(60):
+        e = Event(f"h{i}", "X", EventType.EARNINGS_RESULT, ts, market="XKLS",
+                  cap_band=CapBand.LARGE, surprise=SurpriseBucket.BIG_BEAT, source_doc_id="d")
+        tbl.observe(Observation(e, _r.gauss(0.004, 0.01), _r.gauss(0.029, 0.02), _r.gauss(0.005, 0.03)))
+    br = tbl.lookup(EventType.EARNINGS_RESULT, "XKLS", CapBand.LARGE, SurpriseBucket.BIG_BEAT)
+    check("base rate carries n and IQR", br.n == 60, br.describe()[:70])
+
+    cands = score_candidates(mkt, [Event("e1", "X", EventType.EARNINGS_RESULT, ts,
+                                         market="XKLS", cap_band=CapBand.LARGE,
+                                         surprise=SurpriseBucket.BIG_MISS, source_doc_id="d")],
+                             tbl, {"e1": 1}, "XKLS")
+    check("market-driven move gets no candidates scored", cands == [])
+    idio2 = attach(idio, score_candidates(
+        idio, [Event("e2", "X", EventType.DIVIDEND_CHANGE, ts, market="XKLS",
+                     cap_band=CapBand.LARGE, source_doc_id="d")],
+        tbl, {"e2": 1}, "XKLS"))
+    check("routine dividend cannot explain a 7% move",
+          idio2.verdict.value == "no_identified_catalyst")
+
     dt = time.time() - t0
     print(f"\n{'PASS' if not failures else 'FAIL: ' + ', '.join(failures)}  ({dt:.2f}s)\n")
     return 1 if failures else 0
