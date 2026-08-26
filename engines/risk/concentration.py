@@ -43,19 +43,55 @@ class Limits:
 
 
 def hhi(weights: list[float]) -> float:
-    """Herfindahl. Punishes a heavy tail that a position count hides."""
+    """Herfindahl. Punishes a heavy tail that a position count hides.
+
+    Bounded [0, 1] and compared against a 0.18 limit, so an out-of-range input
+    makes the comparison meaningless rather than merely wrong. Stress testing
+    found weights of [-0.5, 1.5] returning 2.5 - which passes no limit and looks
+    like an extreme concentration reading rather than bad data.
+    """
+    for w in weights:
+        if not math.isfinite(w):
+            raise ValueError(f"weight {w} is not a number")
+        if w < 0:
+            raise ValueError(
+                f"weight {w} is negative. This system holds long positions only; a negative "
+                "weight is a data error, and it inflates HHI above its own [0, 1] range."
+            )
     return sum(w * w for w in weights)
 
 
 def effective_number_of_bets(weights: list[float], corr: list[list[float]]) -> float:
-    """1 / (w' R w) normalised so that uncorrelated equal weights gives n."""
+    """1 / (w' R w) normalised so that uncorrelated equal weights gives n.
+
+    The result is bounded [1, n]: one perfectly-correlated bet at worst, n
+    independent ones at best. Stress testing fed it a correlation of 2.0 and got
+    0.67 bets from two positions - an impossible answer from an impossible
+    matrix. This is the number the entire eggs-in-one-basket rule rests on, so
+    the matrix is validated rather than trusted.
+    """
     n = len(weights)
     if n == 0:
         return 0.0
+    if len(corr) != n or any(len(row) != n for row in corr):
+        raise ValueError(f"correlation matrix must be {n}x{n}, got {len(corr)} rows")
+    for i in range(n):
+        if abs(corr[i][i] - 1.0) > 1e-9:
+            raise ValueError(f"corr[{i}][{i}] = {corr[i][i]}; a variable correlates 1.0 with itself")
+        for j in range(n):
+            v = corr[i][j]
+            if not math.isfinite(v) or not -1.0 - 1e-9 <= v <= 1.0 + 1e-9:
+                raise ValueError(
+                    f"corr[{i}][{j}] = {v} is outside [-1, 1] and is not a correlation"
+                )
     total = sum(weights) or 1.0
     w = [x / total for x in weights]
     var = sum(w[i] * w[j] * corr[i][j] for i in range(n) for j in range(n))
-    return 1.0 / var if var > 1e-12 else float(n)
+    if var <= 1e-12:
+        return float(n)
+    # Clamp to the mathematically possible range: floating-point error on a
+    # near-singular matrix must not present as a bet count outside [1, n].
+    return max(1.0, min(float(n), 1.0 / var))
 
 
 def correlation_clusters(corr: list[list[float]], threshold: float = 0.6) -> list[list[int]]:

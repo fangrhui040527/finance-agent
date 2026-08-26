@@ -126,3 +126,28 @@ def test_currency_driven_return_says_nothing_about_the_company():
 def test_zero_start_values_are_rejected_rather_than_producing_infinity():
     with pytest.raises(ValueError):
         long_horizon_decompose(0.0, 0.5, 12.0, 13.0, 0.1, 4.0, 4.1, 5)
+
+
+# --- found by stress testing (stress/run.py) --------------------------------
+
+@pytest.mark.parametrize("bad", [float("nan"), float("inf"), float("-inf")])
+def test_a_non_finite_return_never_reaches_a_verdict(bad):
+    """A NaN return produced verdict=no_identified_catalyst with unexplained=nan,
+    which renders to a user as a confident finding with 'nan% unexplained'. That
+    is the failure this design exists to prevent, arriving through the data."""
+    m = decompose("X", WINDOW, 0.0, 0.0, {}, bad, 0.0, synthetic_fit())
+    assert m.verdict is Verdict.ATTRIBUTION_UNAVAILABLE
+    assert "non-finite input" in m.reason
+    assert m.unexplained_share == 1.0
+
+
+def test_a_non_finite_factor_return_is_caught_too():
+    m = decompose("X", WINDOW, float("nan"), 0.0, {}, -0.05, 0.0, synthetic_fit())
+    assert m.verdict is Verdict.ATTRIBUTION_UNAVAILABLE
+    assert "event_market" in m.reason
+
+
+def test_a_non_finite_style_return_is_caught():
+    m = decompose("X", WINDOW, 0.0, 0.0, {"value": float("inf")}, -0.05, 0.0, synthetic_fit())
+    assert m.verdict is Verdict.ATTRIBUTION_UNAVAILABLE
+    assert "style:value" in m.reason
