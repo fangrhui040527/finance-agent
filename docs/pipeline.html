@@ -1,0 +1,631 @@
+<title>The Analyst Mind Pipeline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Public+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+
+<style>
+:root{
+  --ground:#F6F8F7; --panel:#FFFFFF; --panel-2:#EFF2F1;
+  --ink:#15191B; --ink-2:#3A4448; --muted:#606D71;
+  --rule:#D6DBD9; --rule-2:#C2C9C6;
+  --accent:#0F5C63; --accent-soft:#DCEAEA;
+  --drop:#9E3626; --drop-soft:#F3E0DC;
+  --keep:#3B6A38; --keep-soft:#E1EBDF;
+  --warn:#8A5B12; --warn-soft:#F5E9D4;
+  --shadow:0 1px 2px rgba(21,25,27,.05),0 8px 24px -16px rgba(21,25,27,.28);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#101413; --panel:#171C1B; --panel-2:#1E2423;
+    --ink:#E7EBE9; --ink-2:#BFC8C6; --muted:#8B9895;
+    --rule:#2A3231; --rule-2:#3F4A48;
+    --accent:#5FB3B9; --accent-soft:#17312F;
+    --drop:#D9705C; --drop-soft:#33201C;
+    --keep:#7FAE79; --keep-soft:#1D2A1D;
+    --warn:#C79A4E; --warn-soft:#2C2416;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -16px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#101413; --panel:#171C1B; --panel-2:#1E2423;
+  --ink:#E7EBE9; --ink-2:#BFC8C6; --muted:#8B9895;
+  --rule:#2A3231; --rule-2:#3F4A48;
+  --accent:#5FB3B9; --accent-soft:#17312F;
+  --drop:#D9705C; --drop-soft:#33201C;
+  --keep:#7FAE79; --keep-soft:#1D2A1D;
+  --warn:#C79A4E; --warn-soft:#2C2416;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -16px rgba(0,0,0,.7);
+}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);
+  font-family:"Public Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size:16.5px;line-height:1.65;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:Newsreader,Georgia,"Times New Roman",serif;font-weight:500;
+  text-wrap:balance;margin:0;line-height:1.2}
+code{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
+a{color:var(--accent);text-underline-offset:3px}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
+
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+.shell{display:grid;grid-template-columns:178px minmax(0,1fr);gap:52px;align-items:start}
+@media(max-width:940px){.shell{grid-template-columns:1fr;gap:0}}
+
+.mast{border-bottom:1px solid var(--rule);background:var(--panel)}
+.mast-in{padding:50px 0 34px}
+.eyebrow{font-size:11.5px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--muted);margin:0 0 16px;display:flex;gap:9px;align-items:center}
+.eyebrow .dot{width:5px;height:5px;border-radius:50%;background:var(--accent)}
+h1{font-size:clamp(36px,5.6vw,56px);letter-spacing:-.02em;margin:0 0 13px}
+.standfirst{font-size:18.5px;line-height:1.55;color:var(--ink-2);max-width:64ch;
+  margin:0;font-weight:300}
+.standfirst em{font-style:normal;color:var(--ink);font-weight:500;
+  box-shadow:inset 0 -.5em 0 var(--accent-soft)}
+
+nav.rail{position:sticky;top:26px;padding:42px 0 0;font-size:13.5px}
+nav.rail ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:1px}
+nav.rail a{display:grid;grid-template-columns:18px 1fr;gap:8px;align-items:baseline;
+  padding:5px 8px 5px 0;color:var(--muted);text-decoration:none;transition:color .12s}
+nav.rail a:hover{color:var(--accent)}
+nav.rail .n{font-family:"JetBrains Mono",monospace;font-size:11px;opacity:.6}
+nav.rail .sep{height:1px;background:var(--rule);margin:12px 0}
+nav.rail .note{font-size:12px;color:var(--muted);line-height:1.5;padding-right:8px}
+@media(max-width:940px){nav.rail{display:none}}
+
+main{padding:42px 0 92px;min-width:0}
+section{margin:0 0 62px;scroll-margin-top:24px}
+.sec-head{display:grid;grid-template-columns:auto 1fr;gap:13px;align-items:baseline;
+  margin:0 0 8px;padding-bottom:11px;border-bottom:1px solid var(--rule)}
+.sec-num{font-family:"JetBrains Mono",monospace;font-size:12px;font-weight:700;
+  color:var(--accent);padding-top:5px}
+h2{font-size:clamp(23px,3.2vw,29px);letter-spacing:-.015em}
+.claim{grid-column:2;margin:6px 0 0;color:var(--ink-2);font-size:15.5px;max-width:64ch}
+p{margin:0 0 14px;max-width:68ch}
+ul{max-width:68ch;padding-left:20px;margin:0 0 14px}
+li{margin:0 0 6px}
+strong{font-weight:600}
+:not(pre)>code{background:var(--panel-2);border:1px solid var(--rule);border-radius:2px;
+  padding:1px 5px;font-size:.86em}
+
+figure{margin:22px 0;padding:20px 20px 16px;background:var(--panel);
+  border:1px solid var(--rule);border-radius:3px;box-shadow:var(--shadow);
+  overflow-x:auto}
+figure svg{display:block;max-width:100%;height:auto;color:var(--ink-2)}
+figcaption{margin:14px 0 0;padding-top:12px;border-top:1px solid var(--rule);
+  font-size:13.5px;color:var(--muted);line-height:1.55;max-width:74ch}
+figcaption b{color:var(--ink);font-weight:600}
+
+.svg-box{fill:var(--panel-2);stroke:var(--rule-2)}
+.svg-box-key{fill:var(--accent-soft);stroke:var(--accent)}
+.svg-lbl{fill:var(--ink);font-family:"Public Sans",sans-serif;font-size:13px;font-weight:500}
+.svg-sub{fill:var(--muted);font-family:"JetBrains Mono",monospace;font-size:10.5px}
+.svg-edge{fill:var(--muted);font-family:"Public Sans",sans-serif;font-size:11.5px}
+.svg-drop{fill:var(--drop);font-family:"Public Sans",sans-serif;font-size:11.5px}
+.svg-keep{fill:var(--keep);font-family:"Public Sans",sans-serif;font-size:11.5px}
+.ln{stroke:currentColor;stroke-width:1.4;fill:none}
+.ln-drop{stroke:var(--drop);stroke-width:1.4;fill:none;stroke-dasharray:4 3}
+.ln-rail{stroke:var(--accent);stroke-width:1.4;fill:none}
+
+.drops{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:1px;
+  background:var(--rule);border:1px solid var(--rule);border-radius:3px;margin:18px 0;
+  overflow:hidden}
+.drops > div{background:var(--panel);padding:14px 16px}
+.drops h3{font-size:14px;margin:0 0 5px;font-family:"Public Sans",sans-serif;
+  font-weight:600;color:var(--drop)}
+.drops p{font-size:14px;color:var(--ink-2);margin:0;max-width:none;line-height:1.5}
+
+.note{background:var(--panel);border:1px solid var(--rule);border-left:3px solid var(--accent);
+  border-radius:3px;padding:16px 18px;margin:20px 0;box-shadow:var(--shadow)}
+.note .lbl{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;
+  color:var(--accent);margin:0 0 7px;display:block}
+.note p:last-child{margin-bottom:0}
+
+.tw{overflow-x:auto;margin:16px 0;border:1px solid var(--rule);border-radius:3px;
+  background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:520px}
+th{text-align:left;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  font-weight:600;color:var(--muted);padding:10px 14px;background:var(--panel-2);
+  border-bottom:1px solid var(--rule-2);white-space:nowrap}
+td{padding:10px 14px;border-bottom:1px solid var(--rule);vertical-align:top;line-height:1.5}
+tr:last-child td{border-bottom:0}
+td.k{font-weight:500}
+td code{font-size:12.5px;white-space:nowrap}
+
+footer{border-top:1px solid var(--rule);padding:24px 0 44px;color:var(--muted);font-size:13px}
+footer p{max-width:72ch;margin:0 0 8px}
+footer b{color:var(--ink-2)}
+</style>
+
+<div class="mast">
+  <div class="wrap mast-in">
+    <p class="eyebrow"><span class="dot"></span> FinPlanet · Module 5 · The Analyst Mind</p>
+    <h1>The Analyst Mind Pipeline</h1>
+    <p class="standfirst">Six stages from a raw wire story to a position size. Every one of them is a gate — so each diagram draws what <em>falls out</em> alongside what passes through. The dropping is the design; a pipeline that kept everything would produce a confident answer for every input.</p>
+  </div>
+</div>
+
+<div class="wrap shell">
+
+  <nav class="rail" aria-label="Stages">
+    <ol>
+      <li><a href="#s0"><span class="n">—</span><span>The whole flow</span></a></li>
+      <li><a href="#s1"><span class="n">1</span><span>Ingest</span></a></li>
+      <li><a href="#s2"><span class="n">2</span><span>Retrieval</span></a></li>
+      <li><a href="#s3"><span class="n">3</span><span>Attribution</span></a></li>
+      <li><a href="#s4"><span class="n">4</span><span>Sizing</span></a></li>
+      <li><a href="#s5"><span class="n">5</span><span>The loop</span></a></li>
+      <li><a href="#s6"><span class="n">—</span><span>What is wired</span></a></li>
+    </ol>
+    <div class="sep"></div>
+    <p class="note-txt" style="font-size:12px;color:var(--muted);line-height:1.5;padding-right:8px">Red dashed arrows are things the system throws away. Count them.</p>
+  </nav>
+
+  <main>
+
+    <!-- ============ OVERVIEW ============ -->
+    <section id="s0">
+      <div class="sec-head">
+        <span class="sec-num">▪</span>
+        <h2>The whole flow</h2>
+        <p class="claim">Data enters once, on the left. It is reduced at every boundary, and the guardrail rails fire on the right at each one.</p>
+      </div>
+
+      <figure>
+        <svg viewBox="0 0 800 618" role="img" aria-label="Vertical pipeline: sources feed ingest, knowledge, engines, agents and the surface. At each boundary material is dropped on the left and a guardrail rail fires on the right.">
+          <defs>
+            <marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+              <polygon points="0,1 8,4 0,7" fill="currentColor"/>
+            </marker>
+            <marker id="ad" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+              <polygon points="0,1 8,4 0,7" fill="var(--drop)"/>
+            </marker>
+            <marker id="ar" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+              <polygon points="0,1 8,4 0,7" fill="var(--accent)"/>
+            </marker>
+          </defs>
+
+          <!-- stage boxes -->
+          <rect class="svg-box" x="270" y="16"  width="260" height="54" rx="3"/>
+          <text class="svg-lbl" x="400" y="38"  text-anchor="middle">Sources</text>
+          <text class="svg-sub" x="400" y="55"  text-anchor="middle">GDELT · EDGAR · exchange · prices</text>
+
+          <rect class="svg-box" x="270" y="114" width="260" height="54" rx="3"/>
+          <text class="svg-lbl" x="400" y="136" text-anchor="middle">Ingest</text>
+          <text class="svg-sub" x="400" y="153" text-anchor="middle">FeedAdapter · bronze → silver</text>
+
+          <rect class="svg-box" x="270" y="212" width="260" height="54" rx="3"/>
+          <text class="svg-lbl" x="400" y="234" text-anchor="middle">Knowledge</text>
+          <text class="svg-sub" x="400" y="251" text-anchor="middle">chunk · index · retrieve · grade</text>
+
+          <rect class="svg-box" x="270" y="310" width="260" height="54" rx="3"/>
+          <text class="svg-lbl" x="400" y="332" text-anchor="middle">Engines</text>
+          <text class="svg-sub" x="400" y="349" text-anchor="middle">attribution · events · risk · sizing</text>
+
+          <rect class="svg-box" x="270" y="408" width="260" height="54" rx="3"/>
+          <text class="svg-lbl" x="400" y="430" text-anchor="middle">Agents</text>
+          <text class="svg-sub" x="400" y="447" text-anchor="middle">A0 · A1–A8 · A9–A11 · A12–A13</text>
+
+          <rect class="svg-box-key" x="270" y="506" width="260" height="54" rx="3"/>
+          <text class="svg-lbl" x="400" y="528" text-anchor="middle">Surface</text>
+          <text class="svg-sub" x="400" y="545" text-anchor="middle">bars · memo · brief · refusal card</text>
+
+          <!-- main spine -->
+          <line class="ln" x1="400" y1="70"  x2="400" y2="108" marker-end="url(#a)"/>
+          <line class="ln" x1="400" y1="168" x2="400" y2="206" marker-end="url(#a)"/>
+          <line class="ln" x1="400" y1="266" x2="400" y2="304" marker-end="url(#a)"/>
+          <line class="ln" x1="400" y1="364" x2="400" y2="402" marker-end="url(#a)"/>
+          <line class="ln" x1="400" y1="462" x2="400" y2="500" marker-end="url(#a)"/>
+
+          <!-- drops, left -->
+          <polyline class="ln-drop" points="400,89 180,89" marker-end="url(#ad)"/>
+          <text class="svg-drop" x="172" y="86"  text-anchor="end">duplicates, unlinked items</text>
+
+          <polyline class="ln-drop" points="400,187 180,187" marker-end="url(#ad)"/>
+          <text class="svg-drop" x="172" y="184" text-anchor="end">stale, off-licence, out-of-scope</text>
+
+          <polyline class="ln-drop" points="400,285 180,285" marker-end="url(#ad)"/>
+          <text class="svg-drop" x="172" y="282" text-anchor="end">hits that fail the grader</text>
+
+          <polyline class="ln-drop" points="400,383 180,383" marker-end="url(#ad)"/>
+          <text class="svg-drop" x="172" y="380" text-anchor="end">the cause hunt, when it is the market</text>
+
+          <polyline class="ln-drop" points="400,481 180,481" marker-end="url(#ad)"/>
+          <text class="svg-drop" x="172" y="478" text-anchor="end">claims with no citation</text>
+
+          <!-- rails, right -->
+          <polyline class="ln-rail" points="530,89 640,89" marker-end="url(#ar)"/>
+          <text class="svg-edge" x="648" y="86">input rail</text>
+
+          <polyline class="ln-rail" points="530,187 640,187" marker-end="url(#ar)"/>
+          <text class="svg-edge" x="648" y="184">retrieval rail</text>
+
+          <polyline class="ln-rail" points="530,285 640,285" marker-end="url(#ar)"/>
+          <text class="svg-edge" x="648" y="282">tool rail</text>
+
+          <polyline class="ln-rail" points="530,383 640,383" marker-end="url(#ar)"/>
+          <text class="svg-edge" x="648" y="380">output rail</text>
+
+          <polyline class="ln-rail" points="530,481 640,481" marker-end="url(#ar)"/>
+          <text class="svg-edge" x="648" y="478">publication rail</text>
+
+          <!-- the door that is not there -->
+          <line class="ln" x1="400" y1="560" x2="400" y2="590" stroke-dasharray="3 3"/>
+          <rect x="286" y="590" width="228" height="24" rx="3" fill="none" stroke="var(--drop)" stroke-width="1.2" stroke-dasharray="4 3"/>
+          <text class="svg-drop" x="400" y="606" text-anchor="middle">no broker connection exists</text>
+        </svg>
+        <figcaption><b>The five rails are not a wrapper around the pipeline; they sit at its boundaries.</b> Each fires as data crosses from one stage to the next, in the fixed order input → retrieval → tool → output → publication. The dashed box at the bottom is drawn because it is load-bearing: the pipeline terminates at a rendered answer, and there is no order-placement code anywhere in the repository to continue it.</figcaption>
+      </figure>
+    </section>
+
+    <!-- ============ INGEST ============ -->
+    <section id="s1">
+      <div class="sec-head">
+        <span class="sec-num">1</span>
+        <h2>Ingest — bronze to silver</h2>
+        <p class="claim">Dedup runs <em>before</em> indexing, so a wire story syndicated to forty outlets is one document, not forty pieces of corroborating evidence.</p>
+      </div>
+
+      <figure>
+        <svg viewBox="0 0 940 250" role="img" aria-label="Ingest chain: fetch produces raw records, then dedup, entity linking, feature extraction and an escalation gate. Duplicates and unlinked items drop out along the way.">
+          <defs>
+            <marker id="b" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+              <polygon points="0,1 8,4 0,7" fill="currentColor"/>
+            </marker>
+            <marker id="bd" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+              <polygon points="0,1 8,4 0,7" fill="var(--drop)"/>
+            </marker>
+          </defs>
+
+          <rect class="svg-box" x="20"  y="60" width="140" height="56" rx="3"/>
+          <text class="svg-lbl" x="90"  y="83"  text-anchor="middle">fetch()</text>
+          <text class="svg-sub" x="90"  y="100" text-anchor="middle">RawRecord</text>
+
+          <rect class="svg-box" x="212" y="60" width="140" height="56" rx="3"/>
+          <text class="svg-lbl" x="282" y="83"  text-anchor="middle">dedup</text>
+          <text class="svg-sub" x="282" y="100" text-anchor="middle">min-hash</text>
+
+          <rect class="svg-box" x="404" y="60" width="140" height="56" rx="3"/>
+          <text class="svg-lbl" x="474" y="83"  text-anchor="middle">link entities</text>
+          <text class="svg-sub" x="474" y="100" text-anchor="middle">longest match</text>
+
+          <rect class="svg-box" x="596" y="60" width="140" height="56" rx="3"/>
+          <text class="svg-lbl" x="666" y="83"  text-anchor="middle">features</text>
+          <text class="svg-sub" x="666" y="100" text-anchor="middle">5 dimensions</text>
+
+          <rect class="svg-box-key" x="788" y="60" width="132" height="56" rx="3"/>
+          <text class="svg-lbl" x="854" y="83"  text-anchor="middle">Article</text>
+          <text class="svg-sub" x="854" y="100" text-anchor="middle">silver</text>
+
+          <line class="ln" x1="160" y1="88" x2="206" y2="88" marker-end="url(#b)"/>
+          <line class="ln" x1="352" y1="88" x2="398" y2="88" marker-end="url(#b)"/>
+          <line class="ln" x1="544" y1="88" x2="590" y2="88" marker-end="url(#b)"/>
+          <line class="ln" x1="736" y1="88" x2="782" y2="88" marker-end="url(#b)"/>
+
+          <polyline class="ln-drop" points="282,116 282,168" marker-end="url(#bd)"/>
+          <text class="svg-drop" x="282" y="186" text-anchor="middle">duplicates</text>
+          <text class="svg-sub"  x="282" y="202" text-anchor="middle">one story, not forty</text>
+
+          <polyline class="ln-drop" points="474,116 474,168" marker-end="url(#bd)"/>
+          <text class="svg-drop" x="474" y="186" text-anchor="middle">unlinked</text>
+          <text class="svg-sub"  x="474" y="202" text-anchor="middle">counted, never attributed</text>
+
+          <polyline class="ln" points="666,116 666,158" marker-end="url(#b)"/>
+          <text class="svg-edge" x="666" y="176" text-anchor="middle">escalation gate</text>
+          <text class="svg-sub"  x="666" y="192" text-anchor="middle">local model first</text>
+
+          <text class="svg-sub" x="20" y="34">BRONZE — payload exactly as the source returned it</text>
+          <text class="svg-sub" x="920" y="34" text-anchor="end">SILVER — typed, linked, feature-extracted</text>
+        </svg>
+        <figcaption><b>Order matters more than the steps.</b> Deduplicating before the index means the same story cannot vote twice; linking after dedup means the entity resolver runs once per story rather than once per copy. An item that links to no instrument is <em>counted in the stats and kept out of attribution</em> — it never becomes evidence for a name it merely mentioned.</figcaption>
+      </figure>
+
+      <div class="drops">
+        <div><h3>Duplicates</h3><p>Near-duplicate hash on the body. Syndication collapses to one document.</p></div>
+        <div><h3>Unlinked items</h3><p>No resolvable instrument, so no claim can rest on it.</p></div>
+        <div><h3>Stale items</h3><p>Freshness is a hard filter at retrieval, not a ranking penalty.</p></div>
+      </div>
+    </section>
+
+    <!-- ============ RETRIEVAL ============ -->
+    <section id="s2">
+      <div class="sec-head">
+        <span class="sec-num">2</span>
+        <h2>Retrieval — and the two rewrites</h2>
+        <p class="claim">Web search is never the default. It fires only after two failed rewrites, and only if the calling agent opted in.</p>
+      </div>
+
+      <figure>
+        <svg viewBox="0 0 940 300" role="img" aria-label="Retrieval loop: a scoped query runs hybrid search, reciprocal rank fusion and reranking, then a grader. On failure the query is rewritten up to twice, then optionally web search, then refusal.">
+          <defs>
+            <marker id="c" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+              <polygon points="0,1 8,4 0,7" fill="currentColor"/>
+            </marker>
+            <marker id="cd" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+              <polygon points="0,1 8,4 0,7" fill="var(--drop)"/>
+            </marker>
+            <marker id="ck" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+              <polygon points="0,1 8,4 0,7" fill="var(--keep)"/>
+            </marker>
+          </defs>
+
+          <rect class="svg-box" x="20"  y="76" width="126" height="54" rx="3"/>
+          <text class="svg-lbl" x="83"  y="98"  text-anchor="middle">Router.get</text>
+          <text class="svg-sub" x="83"  y="115" text-anchor="middle">scope check</text>
+
+          <rect class="svg-box" x="188" y="76" width="126" height="54" rx="3"/>
+          <text class="svg-lbl" x="251" y="98"  text-anchor="middle">BM25 + dense</text>
+          <text class="svg-sub" x="251" y="115" text-anchor="middle">hybrid</text>
+
+          <rect class="svg-box" x="356" y="76" width="126" height="54" rx="3"/>
+          <text class="svg-lbl" x="419" y="98"  text-anchor="middle">RRF → rerank</text>
+          <text class="svg-sub" x="419" y="115" text-anchor="middle">local</text>
+
+          <rect class="svg-box-key" x="524" y="76" width="126" height="54" rx="3"/>
+          <text class="svg-lbl" x="587" y="98"  text-anchor="middle">grade()</text>
+          <text class="svg-sub" x="587" y="115" text-anchor="middle">pass / fail</text>
+
+          <rect class="svg-box" x="750" y="30" width="170" height="50" rx="3"/>
+          <text class="svg-lbl" x="835" y="51"  text-anchor="middle">expand to parents</text>
+          <text class="svg-sub" x="835" y="68"  text-anchor="middle">context returned</text>
+
+          <rect class="svg-box" x="750" y="120" width="170" height="50" rx="3"/>
+          <text class="svg-lbl" x="835" y="141" text-anchor="middle">web search</text>
+          <text class="svg-sub" x="835" y="158" text-anchor="middle">only if opted in</text>
+
+          <rect x="750" y="208" width="170" height="50" rx="3" fill="var(--drop-soft)" stroke="var(--drop)" stroke-width="1.2"/>
+          <text class="svg-lbl" x="835" y="229" text-anchor="middle">refuse</text>
+          <text class="svg-sub" x="835" y="246" text-anchor="middle">insufficient evidence</text>
+
+          <line class="ln" x1="146" y1="103" x2="182" y2="103" marker-end="url(#c)"/>
+          <line class="ln" x1="314" y1="103" x2="350" y2="103" marker-end="url(#c)"/>
+          <line class="ln" x1="482" y1="103" x2="518" y2="103" marker-end="url(#c)"/>
+
+          <polyline class="ln" points="650,92 700,92 700,55 744,55" marker-end="url(#ck)" stroke="var(--keep)"/>
+          <text class="svg-keep" x="702" y="82">PASS</text>
+
+          <polyline class="ln-drop" points="587,130 587,180 251,180 251,136" marker-end="url(#cd)"/>
+          <text class="svg-drop" x="419" y="198" text-anchor="middle">rewrite — at most twice</text>
+
+          <polyline class="ln-drop" points="650,114 700,114 700,145 744,145" marker-end="url(#cd)"/>
+          <polyline class="ln-drop" points="700,145 700,233 744,233" marker-end="url(#cd)"/>
+          <text class="svg-drop" x="706" y="200">after 2 rewrites</text>
+
+          <polyline class="ln-drop" points="83,130 83,180 40,180" marker-end="url(#cd)"/>
+          <text class="svg-drop" x="20" y="198">out-of-scope corpus</text>
+          <text class="svg-sub"  x="20" y="214">CollectionScopeError</text>
+        </svg>
+        <figcaption><b>The scope check comes first, and it raises rather than returning empty.</b> An agent asking a collection it does not own is a programming error, not a miss. Downstream, the grader is the only thing that can promote hits into context — and it is allowed to fail three times before the query is abandoned, which is why a refusal here means the corpus genuinely lacks the answer.</figcaption>
+      </figure>
+    </section>
+
+    <!-- ============ ATTRIBUTION ============ -->
+    <section id="s3">
+      <div class="sec-head">
+        <span class="sec-num">3</span>
+        <h2>Attribution — the gate before the story</h2>
+        <p class="claim">The decomposition decides whether a cause is even sought. This ordering is the single most important edge in the system.</p>
+      </div>
+
+      <figure>
+        <svg viewBox="0 0 940 330" role="img" aria-label="Attribution gate: a move is decomposed into factors, then two tests decide whether a cause hunt runs at all. Non-finite inputs, insignificant moves and market-driven moves all exit without a story.">
+          <defs>
+            <marker id="d" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+              <polygon points="0,1 8,4 0,7" fill="currentColor"/>
+            </marker>
+            <marker id="dd" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+              <polygon points="0,1 8,4 0,7" fill="var(--drop)"/>
+            </marker>
+          </defs>
+
+          <rect class="svg-box" x="20"  y="120" width="140" height="56" rx="3"/>
+          <text class="svg-lbl" x="90"  y="143" text-anchor="middle">realised move</text>
+          <text class="svg-sub" x="90"  y="160" text-anchor="middle">local + FX</text>
+
+          <rect class="svg-box" x="204" y="120" width="150" height="56" rx="3"/>
+          <text class="svg-lbl" x="279" y="143" text-anchor="middle">decompose()</text>
+          <text class="svg-sub" x="279" y="160" text-anchor="middle">mkt·sec·sty·fx·idio</text>
+
+          <rect class="svg-box-key" x="400" y="120" width="140" height="56" rx="3"/>
+          <text class="svg-lbl" x="470" y="143" text-anchor="middle">|SAR| &gt; 1.5 ?</text>
+          <text class="svg-sub" x="470" y="160" text-anchor="middle">significance</text>
+
+          <rect class="svg-box-key" x="586" y="120" width="150" height="56" rx="3"/>
+          <text class="svg-lbl" x="661" y="143" text-anchor="middle">idio &gt; 20% ?</text>
+          <text class="svg-sub" x="661" y="160" text-anchor="middle">company-specific</text>
+
+          <rect class="svg-box" x="782" y="120" width="140" height="56" rx="3"/>
+          <text class="svg-lbl" x="852" y="143" text-anchor="middle">cause hunt</text>
+          <text class="svg-sub" x="852" y="160" text-anchor="middle">6-factor score</text>
+
+          <line class="ln" x1="160" y1="148" x2="198" y2="148" marker-end="url(#d)"/>
+          <line class="ln" x1="354" y1="148" x2="394" y2="148" marker-end="url(#d)"/>
+          <line class="ln" x1="540" y1="148" x2="580" y2="148" marker-end="url(#d)"/>
+          <text class="svg-edge" x="560" y="140" text-anchor="middle">yes</text>
+          <line class="ln" x1="736" y1="148" x2="776" y2="148" marker-end="url(#d)"/>
+          <text class="svg-edge" x="756" y="140" text-anchor="middle">yes</text>
+
+          <!-- exits without a story -->
+          <polyline class="ln-drop" points="279,120 279,64" marker-end="url(#dd)"/>
+          <text class="svg-drop" x="279" y="52" text-anchor="middle">attribution_unavailable</text>
+          <text class="svg-sub"  x="279" y="36" text-anchor="middle">NaN, or under 120 observations</text>
+
+          <polyline class="ln-drop" points="470,176 470,232" marker-end="url(#dd)"/>
+          <text class="svg-drop" x="470" y="250" text-anchor="middle">not_significant</text>
+          <text class="svg-sub"  x="470" y="266" text-anchor="middle">an ordinary day. no story at all</text>
+
+          <polyline class="ln-drop" points="661,176 661,232" marker-end="url(#dd)"/>
+          <text class="svg-drop" x="661" y="250" text-anchor="middle">market_driven</text>
+          <text class="svg-sub"  x="661" y="266" text-anchor="middle">the market moved, not the company</text>
+
+          <polyline class="ln-drop" points="852,176 852,232" marker-end="url(#dd)"/>
+          <text class="svg-drop" x="852" y="250" text-anchor="middle">no_identified_catalyst</text>
+          <text class="svg-sub"  x="852" y="266" text-anchor="middle">real, significant, unexplained</text>
+
+          <line x1="20" y1="296" x2="920" y2="296" stroke="var(--rule-2)" stroke-width="1"/>
+          <text class="svg-sub" x="20" y="316">Three of the six verdicts decline to explain. Those three are the system working, not failing.</text>
+        </svg>
+        <figcaption><b>Read the edges, not the boxes.</b> Nothing reaches the cause hunt until two gates have passed, and each gate has an exit that produces a complete, honest answer. A system that explained every move would have no exits here — which is exactly how a plausible story gets attached to a random 1% wobble.</figcaption>
+      </figure>
+
+      <div class="note">
+        <span class="lbl">Why the first exit exists</span>
+        <p>The <code>attribution_unavailable</code> branch was added after stress testing: a <code>NaN</code> return used to reach a verdict and render as <strong>"nan% unexplained"</strong> — a confident finding built on a value that was not a number. The gate now refuses at the boundary and names the offending field.</p>
+      </div>
+    </section>
+
+    <!-- ============ SIZING ============ -->
+    <section id="s4">
+      <div class="sec-head">
+        <span class="sec-num">4</span>
+        <h2>Sizing — four caps, one floor</h2>
+        <p class="claim">Four ceilings and one floor. The smallest ceiling wins; the floor is a separate gate. A decision that breaches any of them cannot be constructed at all.</p>
+      </div>
+
+      <figure>
+        <svg viewBox="0 0 940 340" role="img" aria-label="Sizing chain: five caps converge on a minimum, then a volatility scalar, then rounding down to a board lot, then the cost floor. Failing the floor yields no position.">
+          <defs>
+            <marker id="e" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+              <polygon points="0,1 8,4 0,7" fill="currentColor"/>
+            </marker>
+            <marker id="ed" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+              <polygon points="0,1 8,4 0,7" fill="var(--drop)"/>
+            </marker>
+          </defs>
+
+          <rect class="svg-box" x="20" y="32"  width="150" height="38" rx="3"/>
+          <text class="svg-lbl" x="95" y="56" text-anchor="middle">risk budget</text>
+          <rect class="svg-box" x="20" y="80"  width="150" height="38" rx="3"/>
+          <text class="svg-lbl" x="95" y="104" text-anchor="middle">quarter-Kelly</text>
+          <rect class="svg-box" x="20" y="128" width="150" height="38" rx="3"/>
+          <text class="svg-lbl" x="95" y="152" text-anchor="middle">concentration</text>
+          <rect class="svg-box" x="20" y="176" width="150" height="38" rx="3"/>
+          <text class="svg-lbl" x="95" y="200" text-anchor="middle">liquidity</text>
+          <text class="svg-sub" x="95" y="20"  text-anchor="middle">FOUR CAPS — ceilings</text>
+
+          <path class="ln" d="M170,51  L214,51  L214,135"/>
+          <path class="ln" d="M170,99  L214,99"/>
+          <path class="ln" d="M170,147 L214,147"/>
+          <path class="ln" d="M170,195 L214,195 L214,135"/>
+          <line class="ln" x1="214" y1="135" x2="242" y2="135" marker-end="url(#e)"/>
+
+          <line class="ln" x1="368" y1="135" x2="404" y2="135" marker-end="url(#e)"/>
+          <line class="ln" x1="540" y1="135" x2="576" y2="135" marker-end="url(#e)"/>
+          <line class="ln" x1="712" y1="135" x2="748" y2="135" marker-end="url(#e)"/>
+
+          <rect x="754" y="204" width="166" height="52" rx="3" fill="var(--keep-soft)" stroke="var(--keep)" stroke-width="1.2"/>
+          <text class="svg-lbl" x="837" y="225" text-anchor="middle">SizingDecision</text>
+          <text class="svg-sub" x="837" y="242" text-anchor="middle">units · stop · breakers</text>
+
+          <line class="ln" x1="837" y1="162" x2="837" y2="198" marker-end="url(#e)" stroke="var(--keep)"/>
+          <text class="svg-keep" x="845" y="184">yes</text>
+
+          <polyline class="ln-drop" points="754,135 600,135 600,232 540,232" marker-end="url(#ed)"/>
+          <rect x="374" y="206" width="164" height="52" rx="3" fill="var(--drop-soft)" stroke="var(--drop)" stroke-width="1.2"/>
+          <text class="svg-lbl" x="456" y="227" text-anchor="middle">NoPosition</text>
+          <text class="svg-sub" x="456" y="244" text-anchor="middle">with the reason attached</text>
+          <text class="svg-drop" x="610" y="180">below the floor</text>
+
+          <line x1="20" y1="292" x2="920" y2="292" stroke="var(--rule-2)" stroke-width="1"/>
+          <text class="svg-sub" x="20" y="312">Bursa needs roughly RM 4,700 to clear its floor. Singapore needs about SGD 9,100 — cheaper per unit, larger minimum.</text>
+          <text class="svg-sub" x="20" y="328">A decision that breaches any cap raises CapBreach in __post_init__. The object cannot exist in a breaching state.</text>
+        </svg>
+        <figcaption><b>Four caps, then one floor — they are not five of the same thing.</b> A cap is a ceiling, so the smallest wins <code>min()</code>; the cost floor is a <em>minimum</em>, which is why it sits at the end as a separate gate rather than competing in the same comparison. (The plan's prose says "min of five caps"; the code is more careful, and the code is right.) <b>Rounding down before the floor check is the other load-bearing order:</b> size is cut to whole board lots first and only then tested, so a position viable in theory but not in lots gets refused rather than quietly rounded up.</figcaption>
+      </figure>
+    </section>
+
+    <!-- ============ THE LOOP ============ -->
+    <section id="s5">
+      <div class="sec-head">
+        <span class="sec-num">5</span>
+        <h2>The learning loop — the only cycle</h2>
+        <p class="claim">Everything above is a one-way flow. This is the single feedback edge, and it is deliberately slow: the gate's default answer is "no lesson".</p>
+      </div>
+
+      <figure>
+        <svg viewBox="0 0 940 300" role="img" aria-label="Learning loop: a prediction is logged with a fixed horizon, waits in a deferred queue, is graded against a benchmark, and feeds calibration. Most candidate lessons are refused by the gate.">
+          <defs>
+            <marker id="f" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+              <polygon points="0,1 8,4 0,7" fill="currentColor"/>
+            </marker>
+            <marker id="fd" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+              <polygon points="0,1 8,4 0,7" fill="var(--drop)"/>
+            </marker>
+          </defs>
+
+          <rect class="svg-box" x="20"  y="80" width="150" height="56" rx="3"/>
+          <text class="svg-lbl" x="95"  y="103" text-anchor="middle">log a view</text>
+          <text class="svg-sub" x="95"  y="120" text-anchor="middle">horizon fixed now</text>
+
+          <rect class="svg-box-key" x="214" y="80" width="160" height="56" rx="3"/>
+          <text class="svg-lbl" x="294" y="103" text-anchor="middle">deferred queue</text>
+          <text class="svg-sub" x="294" y="120" text-anchor="middle">21d · 63d · 252d</text>
+
+          <rect class="svg-box" x="418" y="80" width="150" height="56" rx="3"/>
+          <text class="svg-lbl" x="493" y="103" text-anchor="middle">grade</text>
+          <text class="svg-sub" x="493" y="120" text-anchor="middle">vs benchmark</text>
+
+          <rect class="svg-box" x="612" y="80" width="150" height="56" rx="3"/>
+          <text class="svg-lbl" x="687" y="103" text-anchor="middle">calibration</text>
+          <text class="svg-sub" x="687" y="120" text-anchor="middle">Brier + bands</text>
+
+          <rect class="svg-box" x="806" y="80" width="114" height="56" rx="3"/>
+          <text class="svg-lbl" x="863" y="103" text-anchor="middle">lesson</text>
+          <text class="svg-sub" x="863" y="120" text-anchor="middle">gate</text>
+
+          <line class="ln" x1="170" y1="108" x2="208" y2="108" marker-end="url(#f)"/>
+          <line class="ln" x1="374" y1="108" x2="412" y2="108" marker-end="url(#f)"/>
+          <line class="ln" x1="568" y1="108" x2="606" y2="108" marker-end="url(#f)"/>
+          <line class="ln" x1="762" y1="108" x2="800" y2="108" marker-end="url(#f)"/>
+
+          <text class="svg-edge" x="294" y="66" text-anchor="middle">months pass here</text>
+          <line class="ln" x1="228" y1="72" x2="360" y2="72" stroke-dasharray="2 3"/>
+
+          <polyline class="ln-drop" points="294,136 294,182" marker-end="url(#fd)"/>
+          <text class="svg-drop" x="294" y="200" text-anchor="middle">graded early → refused</text>
+          <text class="svg-sub"  x="294" y="216" text-anchor="middle">a 63-day call scored on day 4 is noise</text>
+
+          <polyline class="ln-drop" points="863,136 863,182" marker-end="url(#fd)"/>
+          <text class="svg-drop" x="920" y="200" text-anchor="end">no lesson</text>
+          <text class="svg-sub"  x="920" y="216" text-anchor="end">the usual outcome</text>
+
+          <polyline class="ln" points="687,136 687,252 95,252 95,142" marker-end="url(#f)"/>
+          <text class="svg-edge" x="391" y="270" text-anchor="middle">the only feedback edge in the system</text>
+        </svg>
+        <figcaption><b>The lesson gate is inverted on purpose.</b> Writing a lesson needs five instances across three distinct instruments; below that the candidate is refused as an anecdote. A loop that produced memory eagerly would fill with vivid single trades — so the default output is nothing, and a lesson has to survive to be born.</figcaption>
+      </figure>
+    </section>
+
+    <!-- ============ WHAT IS WIRED ============ -->
+    <section id="s6">
+      <div class="sec-head">
+        <span class="sec-num">▪</span>
+        <h2>What is actually wired</h2>
+        <p class="claim">The diagrams above are the design. This is the honest state of each stage today.</p>
+      </div>
+
+      <div class="tw">
+        <table>
+          <thead><tr><th>Stage</th><th>State</th><th>Where</th></tr></thead>
+          <tbody>
+            <tr><td class="k">Sources</td><td>Fixture feed only. <code>GdeltFeed._fetch_raw</code> raises rather than returning empty, so the offline build cannot pretend to have data.</td><td><code>knowledge/feeds/</code></td></tr>
+            <tr><td class="k">Ingest</td><td>Built and tested end to end — dedup, linking, features, escalation.</td><td><code>adapter.py</code></td></tr>
+            <tr><td class="k">Knowledge</td><td>Built. Chunking, hybrid retrieval, grader, scoped router.</td><td><code>knowledge/</code></td></tr>
+            <tr><td class="k">Engines</td><td>Built. Attribution, events, risk, sizing, backtest.</td><td><code>engines/</code></td></tr>
+            <tr><td class="k">Agents</td><td>All 16 registered, each matching the capability registry.</td><td><code>agents/</code></td></tr>
+            <tr><td class="k">Surface</td><td>Built. Bars, memo, brief, refusal card.</td><td><code>ui/render.py</code></td></tr>
+            <tr><td class="k">Base rates</td><td><strong>Ship empty.</strong> Until populated, catalyst scores lean on priors and are weaker than the design intends.</td><td><code>engines/events/</code></td></tr>
+            <tr><td class="k">The loop</td><td>Machinery built; the record needs 3–6 months of elapsed time that cannot be compressed.</td><td><code>agents/learning/</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>The whole flow runs on mock data with no network and no API key — <code>make verify</code> walks all fourteen sections in about a tenth of a second. If it ever needs a network connection, something has leaked across the adapter seam and that is a defect, not a configuration problem.</p>
+    </section>
+
+    <footer>
+      <p><b>Not financial advice.</b> This pipeline produces candidacy bands, calibrated probabilities, attributions and sizing constraints with evidence chains. It makes no recommendations and cannot place orders.</p>
+      <p>Companion pages: <code>docs/user-guide.html</code> for install and cadence, <code>docs/14-OPERATIONS-RUNBOOK.md</code> for what to monitor.</p>
+    </footer>
+
+  </main>
+</div>
