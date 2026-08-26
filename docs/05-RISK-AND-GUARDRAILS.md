@@ -216,6 +216,50 @@ intended behaviour — `01 §4.3` says a cheap wrong answer is worse than a refu
 but it means **budget-constrained routing will refuse more often than it trims**,
 and the UI should say so rather than implying a cheaper answer exists.
 
+### 3.5.2 Four more, from stress testing
+
+`stress/run.py` exists to break the system rather than confirm it: volume it was
+not sized for, numbers that are not numbers, inputs sitting exactly on a
+threshold, eight concurrent writers, and text trying to talk to the model. It
+runs in CI and exits with the finding count. First run: **six findings, four of
+them real defects, all in the same family.**
+
+**A non-finite return reached a verdict.** `decompose` with a NaN return produced
+`no_identified_catalyst` with `unexplained_share = nan` — which renders to a user
+as a confident finding with "nan% unexplained". This is precisely the failure the
+whole attribution design exists to prevent, arriving through the *data* rather
+than through the model. Non-finite inputs now return `attribution_unavailable`
+naming the offending field.
+
+**A cap could go negative and therefore always win.** `liquidity_cap` passed a
+negative ADV straight through. A negative cap is the smallest of the five, so it
+wins `CapSet.binding()` every time and carries a negative target size downstream —
+**a cap that inverts the thing it is meant to bound.** Refused at the source now.
+
+**HHI could exceed its own range.** Weights of `[-0.5, 1.5]` returned 2.5. HHI is
+bounded [0, 1] and compared against a 0.18 limit, so 2.5 does not read as bad
+data; it reads as extreme concentration. Negative and non-finite weights are
+refused.
+
+**The diversification number could be impossible.** A correlation of 2.0 gave
+**0.67 effective bets from two positions**, when the range is [1, n]. The matrix
+is now validated — off-diagonal within [-1, 1], unit diagonal, square — and the
+result clamped to [1, n] against floating-point error on a near-singular matrix.
+
+**What the four have in common** is the theme of §3.5.1 restated in a different
+register: none of them crashed. Each produced a number that looked like an
+answer. Three of the four would have shown a *more alarming* reading than the
+truth, and the fourth a nonsense one — and a system whose outputs are numbers a
+human acts on cannot tell the difference between a bad number and a bad input
+unless it checks at the boundary.
+
+**What held.** 500-name concentration checks in 34 ms, 26 years of bars, a
+400-node graph, eight concurrent writers landing 200/200 rows, every cap binding
+exactly at its threshold, 2,000 randomised decompositions keeping the unexplained
+share inside [0, 1], and seven hostile documents — prompt injection, null bytes,
+a 200k-character body, SQL and path traversal — ingested without one linking
+itself to a traded instrument.
+
 ---
 
 ## 4. Layer 3 — "Don't put all the eggs in one basket", made mechanical

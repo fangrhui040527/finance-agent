@@ -38,6 +38,11 @@ jobs:
       - name: Verify pipeline on mock data
         run: python verify.py
 
+      # Adversarial, not a second happy path: volume, non-finite numbers, exact
+      # thresholds, concurrent writers, hostile text. Exits with the finding count.
+      - name: Stress
+        run: python stress/run.py
+
       - name: Eval ratchet
         run: |
           python - <<'PY'

@@ -1,7 +1,8 @@
-.PHONY: install test verify config up down health lint due status
+.PHONY: install test verify stress config up down health lint due status
 install: ; uv venv --python 3.11 .venv && . .venv/bin/activate && uv pip install -e ".[dev]"
 test:    ; . .venv/bin/activate && python -m pytest
 verify:  ; . .venv/bin/activate && python verify.py
+stress:  ; . .venv/bin/activate && python stress/run.py
 config:  ; . .venv/bin/activate && python -c "from core.config import load; print(load().describe())"
 due:     ; . .venv/bin/activate && python predict.py due
 status:  ; . .venv/bin/activate && python predict.py status

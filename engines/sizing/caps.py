@@ -123,7 +123,20 @@ def concentration_cap(portfolio_value: Decimal, single_name_limit: Decimal) -> D
 
 
 def liquidity_cap(adv_20d: Decimal, participation: Decimal = Decimal("0.05")) -> Decimal:
-    """You must be able to exit in a bad week, when volume falls too."""
+    """You must be able to exit in a bad week, when volume falls too.
+
+    Negative or non-positive ADV is refused rather than passed through. A
+    negative cap is the smallest of the five and therefore always wins
+    CapSet.binding(), which would carry a negative target size downstream -
+    a cap that inverts the thing it is meant to bound.
+    """
+    if adv_20d < 0:
+        raise ValueError(
+            f"average daily value cannot be negative (got {adv_20d}); a negative liquidity "
+            "cap would win binding() and invert the constraint"
+        )
+    if participation <= 0 or participation > 1:
+        raise ValueError(f"participation must be in (0, 1], got {participation}")
     return adv_20d * participation
 
 

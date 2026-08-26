@@ -43,6 +43,7 @@ goto collect
 if /I "%CMD%"=="install" goto install
 if /I "%CMD%"=="test"    goto test
 if /I "%CMD%"=="verify"  goto verify
+if /I "%CMD%"=="stress"  goto stress
 if /I "%CMD%"=="config"  goto config
 if /I "%CMD%"=="why"     goto why
 if /I "%CMD%"=="plan"    goto plan
@@ -76,6 +77,10 @@ goto :eof
 
 :verify
 "%PY%" verify.py
+goto :eof
+
+:stress
+"%PY%" stress\run.py
 goto :eof
 
 :config
@@ -124,6 +129,7 @@ echo.
 echo   run install                       create .venv and install
 echo   run test                          the full suite
 echo   run verify                        whole pipeline on mock data
+echo   run stress                        adversarial stress suite
 echo   run config                        settings, and where they came from
 echo.
 echo   run why MYX:1155 --move -0.09 --market -0.08

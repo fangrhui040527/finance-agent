@@ -250,3 +250,54 @@ def test_trade_breaching_concentration_after_the_fact_is_refused():
              existing=existing, limits=Limits(), corr=corr,
              candidate_meta={"sector": "Financials", "country": "MY", "currency": "MYR"},
              mic="XKLS")
+
+
+# --- found by stress testing (stress/run.py) --------------------------------
+
+def test_a_negative_weight_is_refused_because_it_inflates_hhi_past_its_own_range():
+    """HHI is bounded [0,1] and compared against a 0.18 limit. Weights of
+    [-0.5, 1.5] returned 2.5 - which reads as extreme concentration rather than
+    as the data error it is."""
+    import pytest as _pytest
+    from engines.risk.concentration import hhi
+    with _pytest.raises(ValueError, match="negative"):
+        hhi([-0.5, 1.5])
+    with _pytest.raises(ValueError, match="not a number"):
+        hhi([float("nan"), 0.5])
+
+
+def test_an_impossible_correlation_matrix_is_refused():
+    """corr=2.0 gave 0.67 effective bets from two positions. The range is [1, n],
+    and this is the number the entire eggs-in-one-basket rule rests on."""
+    import pytest as _pytest
+    from engines.risk.concentration import effective_number_of_bets
+    with _pytest.raises(ValueError, match=r"outside \[-1, 1\]"):
+        effective_number_of_bets([0.5, 0.5], [[1.0, 2.0], [2.0, 1.0]])
+    with _pytest.raises(ValueError, match="correlates 1.0 with itself"):
+        effective_number_of_bets([0.5, 0.5], [[0.5, 0.1], [0.1, 1.0]])
+    with _pytest.raises(ValueError, match="must be 3x3"):
+        effective_number_of_bets([0.3, 0.3, 0.4], [[1.0, 0.1], [0.1, 1.0]])
+
+
+def test_effective_bets_never_leaves_its_mathematical_range():
+    import random as _random
+    from engines.risk.concentration import effective_number_of_bets
+    rng = _random.Random(23)
+    for _ in range(200):
+        k = rng.randint(2, 8)
+        rho = rng.uniform(-0.99, 0.99)
+        corr = [[1.0 if i == j else rho for j in range(k)] for i in range(k)]
+        bets = effective_number_of_bets([rng.random() for _ in range(k)], corr)
+        assert 1.0 - 1e-9 <= bets <= k + 1e-9, f"{bets} bets from {k} positions"
+
+
+def test_a_negative_adv_cannot_produce_a_negative_liquidity_cap():
+    """A negative cap is the smallest of the five, so it always wins binding()
+    and carries a negative target size downstream - a cap that inverts."""
+    import pytest as _pytest
+    from decimal import Decimal as _D
+    from engines.sizing.caps import liquidity_cap
+    with _pytest.raises(ValueError, match="cannot be negative"):
+        liquidity_cap(_D("-1000000"))
+    with _pytest.raises(ValueError, match="participation"):
+        liquidity_cap(_D("1000000"), _D("2.0"))

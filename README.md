@@ -49,6 +49,7 @@ P18–P19 wait on P16. **If you are picking this up, start at
 make install && make test    # full suite   (Windows: run install && run test)
 make config                  # settings, and the bounds they cannot cross
 make verify                  # end-to-end on mock data, <1s
+make stress                  # adversarial: volume, NaN, exact thresholds, concurrency
 python ask.py why MYX:1155 --move -0.09 --market -0.08
 python predict.py log MYX:1155 +1 63d 0.62 "NIM recovers"
 make due                     # predictions that have reached their horizon
@@ -107,8 +108,13 @@ and tested. See [`docs/07-BUILD-ORDER.md`](docs/07-BUILD-ORDER.md) §0.
   confidence by 0.24 on **every** thesis, and the red team raised a coverage
   challenge on every thesis forever — which is the same as never raising one.
   The registry is now load-bearing: the tool allowlist is derived from it, and a
-  test fails if any class drifts. All in
-  [`docs/05`](docs/05-RISK-AND-GUARDRAILS.md) §3.5.
+  test fails if any class drifts.
+- **Four more from stress testing, none of which crashed.** A NaN return reached
+  a verdict as `nan% unexplained`; `liquidity_cap` could go negative and so win
+  `binding()` every time — a cap that inverts what it bounds; HHI could exceed
+  its own [0,1] range; and an invalid correlation matrix gave **0.67 effective
+  bets from two positions**. Each produced something that looked like an answer.
+  All in [`docs/05`](docs/05-RISK-AND-GUARDRAILS.md) §3.5.
 
 ### What P0 enforces
 
@@ -129,3 +135,6 @@ and tested. See [`docs/07-BUILD-ORDER.md`](docs/07-BUILD-ORDER.md) §0.
 | A concept cannot be taught before its prerequisites | `agents/learning/teacher.py` | `test_learning.py` |
 | A logged prediction can never be edited or deleted | `agents/learning/store.py` | `test_learning_store.py` |
 | Every supported market has an explicit cost floor | `engines/sizing/caps.py` | `test_market_foundation.py` |
+| A non-finite input never reaches a verdict | `engines/attribution/decompose.py` | `test_attribution.py` |
+| No cap can go negative and win `binding()` | `engines/sizing/caps.py` | `test_risk_sizing.py` |
+| Effective bets never leaves `[1, n]` | `engines/risk/concentration.py` | `test_risk_sizing.py` |

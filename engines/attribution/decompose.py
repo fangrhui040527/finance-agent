@@ -127,6 +127,24 @@ def decompose(
     base_currency: str = "MYR",
     style_names: list[str] | None = None,
 ) -> MoveExplanation:
+    # A non-finite input must never reach a verdict. Found by stress testing: a
+    # NaN return produced verdict=no_identified_catalyst with unexplained=nan,
+    # which renders to the user as a confident finding with "nan% unexplained".
+    # That is the failure this whole design exists to prevent, arriving through
+    # the data rather than through the model.
+    dirty = [n for n, v in (("realised_local", realised_local), ("fx_return", fx_return),
+                            ("event_market", event_market), ("event_sector", event_sector))
+             if not math.isfinite(v)]
+    dirty += [f"style:{k}" for k, v in event_styles.items() if not math.isfinite(v)]
+    if dirty:
+        return MoveExplanation(
+            instrument_id, window, base_currency, 0.0, 0.0,
+            [], 0.0, None, 1.0, Verdict.ATTRIBUTION_UNAVAILABLE,
+            reason=f"non-finite input: {', '.join(dirty)}. A move cannot be decomposed from "
+                   "a value that is not a number, and reporting one anyway would be worse "
+                   "than reporting nothing.",
+        )
+
     total_base = (1.0 + realised_local) * (1.0 + fx_return) - 1.0
 
     if fit is None:
