@@ -217,11 +217,18 @@ def test_every_env_example_key_is_actually_used_somewhere():
     """A key that sets nothing is worse than a missing key: it reads as
     configured."""
     import re
+    import subprocess
     env = (ROOT / ".env.example").read_text()
     keys = re.findall(r"^([A-Z_]+)=", env, re.M)
     compose = (ROOT / "infra" / "docker-compose.yml").read_text()
+    # Compose is not the only consumer: an adapter that reads os.environ counts
+    # too. Checking only compose forces a growing exemption list, and the
+    # exemptions are exactly where an unread key would hide.
+    src = subprocess.run(["git", "grep", "-lF", "--", "os.environ"], cwd=ROOT,
+                         capture_output=True, text=True).stdout
+    code = "".join((ROOT / f).read_text() for f in src.split())
     unused = [k for k in keys
-              if k not in compose and k not in {"ANTHROPIC_API_KEY"}]
+              if k not in compose and k not in code and k not in {"ANTHROPIC_API_KEY"}]
     assert not unused, f"env keys referenced nowhere: {unused}"
 
 

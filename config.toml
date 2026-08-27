@@ -82,3 +82,25 @@ database = "data/learning.db"
 # Graded calls before the calibration table means anything rather than measuring
 # luck. Lowering this does not make you calibrated sooner.
 min_graded_for_calibration = 30
+
+
+[sources]
+# Which feeds are live. Everything here is offline-safe: a disabled feed, or one
+# whose key is missing, is skipped and says so. It never returns an empty list
+# and lets you read that as a quiet news day.
+#
+# The full world register - what exists, what it costs, what it needs a key for -
+# is docs/world-sources.html.
+enabled = ["gdelt"]
+
+# GDELT DOC 2.0: free, no key, 100+ languages, worldwide. The API refuses a
+# window under 15 minutes, and the adapter floors it there whatever you set.
+gdelt_poll_minutes = 15
+
+# Source languages to keep, by GDELT's own names. Empty means every language it
+# monitors - which is the point of using it. Narrow this only if the volume is
+# genuinely unusable.
+gdelt_languages = []
+
+# Source countries, ISO-style codes as GDELT spells them. Empty means worldwide.
+gdelt_countries = []

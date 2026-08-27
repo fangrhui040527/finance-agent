@@ -17,7 +17,8 @@ These three came from `BUILD_PLAN.md` and `RESEARCH.md`. They are the load-beari
 | Repository | Role | Licence |
 |---|---|---|
 | [Shubhamsaboo/awesome-llm-apps](https://github.com/Shubhamsaboo/awesome-llm-apps) | Source of templates T1–T22. "100+ AI Agents, Agent Skills and RAG Apps" | **Apache-2.0** |
-| [koala73/worldmonitor](https://github.com/koala73/worldmonitor) | Curated news layer, Country Instability Index, market composite, MCP server | **AGPL-3.0-only** |
+| [sjkncs/worldmonitor](https://github.com/sjkncs/worldmonitor) | Curated news layer, 54-country Country Instability Index, 92-exchange finance radar, 7-signal market composite. The larger, actively-developed instance | **AGPL-3.0-only** |
+| [koala73/worldmonitor](https://github.com/koala73/worldmonitor) | The same project, earlier lineage. Kept here because the plan cites it | **AGPL-3.0-only** |
 | [OpenBB-finance/OpenBB](https://github.com/OpenBB-finance/OpenBB) | "Open Data Platform for analysts, quants and AI agents" — 100+ providers behind one interface. Effectively the L2 data-plugin layer, already written | **AGPL-3.0** |
 
 ---
@@ -93,6 +94,7 @@ Then the licence conversation is unavoidable, and it should happen **before** th
 | **GPL-3.0** | backtrader, neo4j (Community) | Distributing a work derived from it means distributing that work under GPL-3.0. For Neo4j specifically, running it as a **separate service you talk to over Bolt** is the ordinary arrangement and is not linking; embedding the database in your binary is a different question. Enterprise Edition is a commercial licence |
 | **LGPL-3.0** | nautilus_trader | **Linking is permitted** without your code becoming LGPL, provided users can replace the library. Modifying nautilus itself is what triggers copyleft on those modifications |
 | **Timescale (TSL)** | timescaledb | The Apache-2.0 core is unrestricted. **TSL-licensed features may not be offered as a database-as-a-service to third parties.** Irrelevant for a personal tool; decisive if you ever host for others |
+| **CC BY-NC 4.0** | OpenSanctions (data, not code) | **Non-commercial only.** Their terms treat sanctions screening inside a for-profit business as commercial use *"even though it generates no revenue"* — the trap is that the restriction bites on who you are, not on whether you charge. Free for a personal tool; a licence purchase for anything else |
 | **Apache-2.0 / MIT** | awesome-llm-apps, TradingAgents, FinMem, FinGPT, finBERT, zipline-reloaded, Lean, qdrant, lightweight-charts | Keep the notices. Fork, ship, sell |
 
 This is a summary of what the licence texts say, not legal advice. Get advice before commercialising anything that touches the AGPL or Commons Clause rows.
@@ -137,6 +139,7 @@ Checked against the repository page on 24 August 2026. Exact casing matters for 
 | Repository | Name verified | Licence verified |
 |---|---|---|
 | Shubhamsaboo/awesome-llm-apps | ✓ | ✓ Apache-2.0 |
+| sjkncs/worldmonitor | ✓ | ✓ AGPL-3.0-only |
 | koala73/worldmonitor | ✓ | ✓ AGPL-3.0-only |
 | OpenBB-finance/OpenBB | ✓ | ✓ AGPLv3 |
 | TauricResearch/TradingAgents | ✓ | ✓ Apache-2.0 |

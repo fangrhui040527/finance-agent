@@ -5,8 +5,8 @@ from datetime import datetime, timedelta, timezone
 import pytest
 
 from knowledge.feeds.adapter import (
-    FeedAdapter, FixtureFeed, GdeltFeed, IngestStats, RawRecord, REGISTRY,
-    link_entities,
+    FeedAdapter, FeedError, FixtureFeed, GdeltFeed, IngestStats, RawRecord,
+    REGISTRY, link_entities,
 )
 from knowledge.graph.entity_graph import (
     EDGE_DECAY, Edge, EdgeKind, EntityGraph, MAX_HOPS, MIN_PATH_WEIGHT, Node,
@@ -79,13 +79,28 @@ def test_dedup_state_persists_across_fetches_within_one_adapter():
 
 
 def test_the_live_feed_refuses_to_pretend_it_has_data():
-    with pytest.raises(NotImplementedError, match="not wired"):
-        GdeltFeed().fetch(SINCE)
+    """GDELT is wired now, but the property that mattered when it was a stub
+    still holds: a feed that cannot be read says so. It never returns [].
+    Detail lives in tests/test_gdelt_feed.py; this is the seam-level guard."""
+    def unreachable(req, timeout=None):
+        raise OSError("network down")
+
+    with pytest.raises(FeedError):
+        GdeltFeed(opener=unreachable).fetch(SINCE)
 
 
-def test_the_unwired_feed_still_names_the_one_method_to_implement():
-    with pytest.raises(NotImplementedError, match="_fetch_raw"):
-        GdeltFeed().fetch(SINCE)
+def test_the_live_feed_never_touches_the_network_under_test():
+    """CI is offline by design (docs/12 section 2.5). Any test that reaches
+    GDELT for real would pass on a laptop and fail in the pipeline."""
+    calls: list = []
+
+    def record(req, timeout=None):
+        calls.append(req.full_url)
+        raise OSError("refused")
+
+    with pytest.raises(FeedError):
+        GdeltFeed(opener=record).fetch(SINCE)
+    assert calls and calls[0].startswith(GdeltFeed.DOC_API)
 
 
 def test_a_new_source_is_a_registry_entry_not_a_pipeline_change():

@@ -11,7 +11,9 @@ A multi-agent, multi-market equity research system that explains *why* a price m
 Install, every command, and the weekly-to-quarterly cadence for using it.
 
 Then [`docs/pipeline.html`](docs/pipeline.html) to see the data flow end to end,
-and [`docs/14-OPERATIONS-RUNBOOK.md`](docs/14-OPERATIONS-RUNBOOK.md) for what to
+[`docs/world-sources.html`](docs/world-sources.html) for where knowledge can come
+in from worldwide and what each source costs, and
+[`docs/14-OPERATIONS-RUNBOOK.md`](docs/14-OPERATIONS-RUNBOOK.md) for what to
 monitor and what should make you stop.
 
 ## The implementation plan

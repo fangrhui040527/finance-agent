@@ -172,11 +172,30 @@ class FixtureFeed(FeedAdapter):
         )
 
 
-class GdeltFeed(FeedAdapter):
-    """GDELT 2.0. Free, no key, 15-minute cadence.
+class FeedError(RuntimeError):
+    """A source could not be read. Deliberately NOT an empty result.
 
-    _fetch_raw is the ONLY method a live implementation needs to replace; it is
-    left unimplemented so the offline build cannot silently pretend to have data.
+    The distinction this whole class exists to preserve: a feed that is broken
+    must never be indistinguishable from a feed reporting a quiet hour. Silence
+    is an answer the system is entitled to act on; failure is not.
+    """
+
+
+class GdeltFeed(FeedAdapter):
+    """GDELT 2.0 DOC API. Free, no key, 15-minute cadence, 100+ languages.
+
+    The widest free net in the world and the reason it is wired first: no
+    signup, no quota, and coverage of markets no vendor sells cheaply.
+
+    Two properties worth stating because they are easy to break later:
+
+      1. A malformed response RAISES. GDELT answers errors with plain text
+         rather than JSON ("your query was too short"), so a decode failure is
+         a real failure and is reported as one. An explicitly empty article
+         list is NOT a failure - it is a quiet window, and returns [].
+      2. timespan is floored at the documented 15-minute minimum. Asking for
+         less returns an error, and a caller polling on a fast loop would
+         otherwise turn its own impatience into an outage.
     """
 
     name = "gdelt"
@@ -184,12 +203,101 @@ class GdeltFeed(FeedAdapter):
     cadence = timedelta(minutes=15)
     DOC_API = "https://api.gdeltproject.org/api/v2/doc/doc"
 
-    def _fetch_raw(self, since: datetime, limit: int) -> list[RawRecord]:
-        raise NotImplementedError(
-            "live GDELT ingest is not wired. Implement _fetch_raw against "
-            f"{self.DOC_API}, or use FixtureFeed offline. Everything downstream "
-            "of this method is built and tested."
+    #: Below this the API refuses the query outright.
+    MIN_TIMESPAN = timedelta(minutes=15)
+    #: One page. Paging past this is a later problem; over-asking is refused.
+    MAX_RECORDS = 250
+    TIMEOUT = 30
+    DEFAULT_USER_AGENT = "finplanet-analyst-mind/0.1 (personal research)"
+
+    def __init__(
+        self,
+        query: str = "",
+        languages: tuple[str, ...] = (),
+        countries: tuple[str, ...] = (),
+        user_agent: str = "",
+        opener=None,
+        extractor: FeatureExtractor | None = None,
+    ) -> None:
+        import os
+
+        super().__init__(extractor)
+        self.query = query
+        self.languages = languages
+        self.countries = countries
+        # GDELT_USER_AGENT should carry a real contact address. Optional here,
+        # mandatory at EDGAR next, so the habit is worth forming on the easy one.
+        self.user_agent = user_agent or os.environ.get(
+            "GDELT_USER_AGENT", self.DEFAULT_USER_AGENT
         )
+        self._opener = opener
+
+    def _timespan(self, since: datetime, now: datetime | None = None) -> str:
+        """Whole minutes back from now, never under the documented minimum."""
+        now = now or datetime.now(timezone.utc)
+        if since.tzinfo is None:
+            since = since.replace(tzinfo=timezone.utc)
+        span = max(now - since, self.MIN_TIMESPAN)
+        return f"{max(1, -(-int(span.total_seconds()) // 60))}min"
+
+    def _url(self, since: datetime, limit: int) -> str:
+        from urllib.parse import urlencode
+
+        terms = [self.query] if self.query else []
+        if self.languages:
+            terms.append("(" + " OR ".join(f"sourcelang:{c}" for c in self.languages) + ")")
+        if self.countries:
+            terms.append("(" + " OR ".join(f"sourcecountry:{c}" for c in self.countries) + ")")
+
+        params = {
+            "query": " ".join(terms) if terms else "domainis:reuters.com",
+            "mode": "artlist",
+            "format": "json",
+            "sort": "datedesc",
+            "timespan": self._timespan(since),
+            "maxrecords": min(max(1, limit), self.MAX_RECORDS),
+        }
+        return f"{self.DOC_API}?{urlencode(params)}"
+
+    def _fetch_raw(self, since: datetime, limit: int) -> list[RawRecord]:
+        import urllib.error
+        import urllib.request
+
+        url = self._url(since, limit)
+        opener = self._opener or urllib.request.urlopen
+        req = urllib.request.Request(url, headers={"User-Agent": self.user_agent})
+
+        try:
+            with opener(req, timeout=self.TIMEOUT) as resp:
+                body = resp.read()
+        except urllib.error.URLError as e:                      # includes HTTPError
+            raise FeedError(f"GDELT fetch failed: {e}") from e
+        except OSError as e:
+            raise FeedError(f"GDELT fetch failed: {e}") from e
+
+        if isinstance(body, bytes):
+            body = body.decode("utf-8", errors="replace")
+        try:
+            payload = json.loads(body)
+        except json.JSONDecodeError as e:
+            raise FeedError(
+                f"GDELT returned non-JSON, which is how it reports errors: "
+                f"{body[:200]!r}"
+            ) from e
+
+        if not isinstance(payload, dict) or "articles" not in payload:
+            raise FeedError(f"GDELT response has no articles key: {str(payload)[:200]!r}")
+
+        rows = payload["articles"]
+        if not isinstance(rows, list):
+            raise FeedError(f"GDELT articles is not a list: {type(rows).__name__}")
+
+        fetched = datetime.now(timezone.utc)
+        return [
+            RawRecord(self.name, row.get("url", ""), fetched, row)
+            for row in rows
+            if isinstance(row, dict)
+        ]
 
     def _to_article(self, rec: RawRecord) -> Article | None:
         p = rec.payload
@@ -207,3 +315,40 @@ class GdeltFeed(FeedAdapter):
 
 
 REGISTRY: dict[str, type[FeedAdapter]] = {"fixture": FixtureFeed, "gdelt": GdeltFeed}
+
+
+def _smoke(argv: list[str] | None = None) -> int:
+    """Hand-run smoke test. Never in CI - CI stays offline by design.
+
+        python -m knowledge.feeds.adapter --gdelt --minutes 60 --limit 5
+    """
+    import argparse
+
+    ap = argparse.ArgumentParser(description="Pull live headlines and print them.")
+    ap.add_argument("--gdelt", action="store_true", help="use the GDELT DOC API")
+    ap.add_argument("--minutes", type=int, default=60, help="how far back to look")
+    ap.add_argument("--limit", type=int, default=5)
+    ap.add_argument("--query", default="", help="GDELT query terms, optional")
+    ap.add_argument("--lang", default="", help="comma-separated source languages")
+    args = ap.parse_args(argv)
+
+    if not args.gdelt:
+        ap.error("no feed selected; pass --gdelt")
+
+    feed = GdeltFeed(
+        query=args.query,
+        languages=tuple(c for c in args.lang.split(",") if c),
+    )
+    since = datetime.now(timezone.utc) - timedelta(minutes=args.minutes)
+    records = feed.fetch(since, limit=args.limit)
+    articles, stats = feed.normalize(records)
+
+    for a in articles:
+        print(f"[{a.language:>3}] {','.join(a.countries) or '--':<12} {a.source_domain}")
+        print(f"      {a.title[:100]}")
+    print(f"\n{stats}")
+    return 0
+
+
+if __name__ == "__main__":                                      # pragma: no cover
+    raise SystemExit(_smoke())
