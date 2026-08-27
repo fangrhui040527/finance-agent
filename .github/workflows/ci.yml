@@ -8,6 +8,11 @@ on:
   push:
     branches: ["**"]
   pull_request:
+  # A workflow you cannot fire by hand is a workflow you cannot recover. Added
+  # after a push produced no run at all - not queued, not slow, no run object -
+  # with no way to retry it short of an empty commit, which is worse than the
+  # missing check it would paper over.
+  workflow_dispatch:
 
 permissions:
   contents: read

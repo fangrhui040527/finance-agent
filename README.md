@@ -10,7 +10,8 @@ A multi-agent, multi-market equity research system that explains *why* a price m
 **New to this? Open [`docs/user-guide.html`](docs/user-guide.html) in a browser.**
 Install, every command, and the weekly-to-quarterly cadence for using it.
 
-Then [`docs/14-OPERATIONS-RUNBOOK.md`](docs/14-OPERATIONS-RUNBOOK.md) for what to
+Then [`docs/pipeline.html`](docs/pipeline.html) to see the data flow end to end,
+and [`docs/14-OPERATIONS-RUNBOOK.md`](docs/14-OPERATIONS-RUNBOOK.md) for what to
 monitor and what should make you stop.
 
 ## The implementation plan
