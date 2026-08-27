@@ -1,0 +1,465 @@
+<title>World Source Register</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Public+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+
+<style>
+:root{
+  --ground:#F6F8F7; --panel:#FFFFFF; --panel-2:#EFF2F1;
+  --ink:#15191B; --ink-2:#3A4448; --muted:#606D71;
+  --rule:#D6DBD9; --rule-2:#C2C9C6;
+  --accent:#0F5C63; --accent-soft:#DCEAEA;
+  --drop:#9E3626; --drop-soft:#F3E0DC;
+  --keep:#3B6A38; --keep-soft:#E1EBDF;
+  --warn:#8A5B12; --warn-soft:#F5E9D4;
+  --shadow:0 1px 2px rgba(21,25,27,.05),0 8px 24px -16px rgba(21,25,27,.28);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#101413; --panel:#171C1B; --panel-2:#1E2423;
+    --ink:#E7EBE9; --ink-2:#BFC8C6; --muted:#8B9895;
+    --rule:#2A3231; --rule-2:#3F4A48;
+    --accent:#5FB3B9; --accent-soft:#17312F;
+    --drop:#D9705C; --drop-soft:#33201C;
+    --keep:#7FAE79; --keep-soft:#1D2A1D;
+    --warn:#C79A4E; --warn-soft:#2C2416;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -16px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#101413; --panel:#171C1B; --panel-2:#1E2423;
+  --ink:#E7EBE9; --ink-2:#BFC8C6; --muted:#8B9895;
+  --rule:#2A3231; --rule-2:#3F4A48;
+  --accent:#5FB3B9; --accent-soft:#17312F;
+  --drop:#D9705C; --drop-soft:#33201C;
+  --keep:#7FAE79; --keep-soft:#1D2A1D;
+  --warn:#C79A4E; --warn-soft:#2C2416;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -16px rgba(0,0,0,.7);
+}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);
+  font-family:"Public Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size:16.5px;line-height:1.65;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:Newsreader,Georgia,"Times New Roman",serif;font-weight:500;
+  text-wrap:balance;margin:0;line-height:1.2}
+code{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
+a{color:var(--accent);text-underline-offset:3px}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
+
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+.shell{display:grid;grid-template-columns:186px minmax(0,1fr);gap:52px;align-items:start}
+@media(max-width:960px){.shell{grid-template-columns:1fr;gap:0}}
+
+.mast{border-bottom:1px solid var(--rule);background:var(--panel)}
+.mast-in{padding:50px 0 34px}
+.eyebrow{font-size:11.5px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--muted);margin:0 0 16px;display:flex;gap:9px;align-items:center}
+.eyebrow .dot{width:5px;height:5px;border-radius:50%;background:var(--accent)}
+h1{font-size:clamp(36px,5.6vw,56px);letter-spacing:-.02em;margin:0 0 13px}
+.standfirst{font-size:18.5px;line-height:1.55;color:var(--ink-2);max-width:66ch;
+  margin:0;font-weight:300}
+.standfirst em{font-style:normal;color:var(--ink);font-weight:500;
+  box-shadow:inset 0 -.5em 0 var(--accent-soft)}
+
+nav.rail{position:sticky;top:26px;padding:42px 0 0;font-size:13.5px}
+nav.rail ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:1px}
+nav.rail a{display:grid;grid-template-columns:26px 1fr;gap:8px;align-items:baseline;
+  padding:5px 8px 5px 0;color:var(--muted);text-decoration:none;transition:color .12s}
+nav.rail a:hover{color:var(--accent)}
+nav.rail .n{font-family:"JetBrains Mono",monospace;font-size:10.5px;opacity:.7;
+  letter-spacing:-.02em}
+nav.rail .sep{height:1px;background:var(--rule);margin:12px 0}
+nav.rail .foot{font-size:12px;color:var(--muted);line-height:1.5;padding-right:8px}
+@media(max-width:960px){nav.rail{display:none}}
+
+main{padding:42px 0 92px;min-width:0}
+section{margin:0 0 62px;scroll-margin-top:24px}
+.sec-head{display:grid;grid-template-columns:auto 1fr;gap:13px;align-items:baseline;
+  margin:0 0 8px;padding-bottom:11px;border-bottom:1px solid var(--rule)}
+.sec-num{font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:700;
+  color:var(--accent);padding-top:6px;white-space:nowrap;letter-spacing:-.02em}
+h2{font-size:clamp(23px,3.2vw,29px);letter-spacing:-.015em}
+.claim{grid-column:2;margin:6px 0 0;color:var(--ink-2);font-size:15.5px;max-width:66ch}
+h3{font-size:17.5px;margin:26px 0 8px;font-family:"Public Sans",sans-serif;
+  font-weight:600;letter-spacing:-.005em}
+p{margin:0 0 14px;max-width:70ch}
+ul{max-width:70ch;padding-left:20px;margin:0 0 14px}
+li{margin:0 0 6px}
+strong{font-weight:600}
+:not(pre)>code{background:var(--panel-2);border:1px solid var(--rule);border-radius:2px;
+  padding:1px 5px;font-size:.86em}
+
+.chip{display:inline-block;font-size:10.5px;font-weight:600;letter-spacing:.06em;
+  text-transform:uppercase;padding:2px 7px;border-radius:2px;white-space:nowrap;
+  border:1px solid transparent;line-height:1.5}
+.chip.free{background:var(--keep-soft);color:var(--keep);border-color:var(--keep)}
+.chip.key{background:var(--warn-soft);color:var(--warn);border-color:var(--warn)}
+.chip.paid{background:var(--drop-soft);color:var(--drop);border-color:var(--drop)}
+
+.tw{overflow-x:auto;margin:16px 0;border:1px solid var(--rule);border-radius:3px;
+  background:var(--panel);box-shadow:var(--shadow)}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:660px}
+th{text-align:left;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  font-weight:600;color:var(--muted);padding:10px 14px;background:var(--panel-2);
+  border-bottom:1px solid var(--rule-2);white-space:nowrap}
+td{padding:10px 14px;border-bottom:1px solid var(--rule);vertical-align:top;line-height:1.5}
+tr:last-child td{border-bottom:0}
+td.k{font-weight:600;white-space:nowrap}
+td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+td code{font-size:12.5px}
+
+.note{background:var(--panel);border:1px solid var(--rule);border-left:3px solid var(--accent);
+  border-radius:3px;padding:16px 18px;margin:20px 0;box-shadow:var(--shadow)}
+.note .lbl{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;
+  color:var(--accent);margin:0 0 7px;display:block}
+.note p:last-child{margin-bottom:0}
+.note.hazard{border-left-color:var(--drop)}
+.note.hazard .lbl{color:var(--drop)}
+
+.ladder{display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);
+  border-radius:3px;margin:20px 0;overflow:hidden;box-shadow:var(--shadow)}
+.rung{background:var(--panel);padding:11px 16px;display:grid;
+  grid-template-columns:34px 172px minmax(0,1fr);gap:14px;align-items:baseline;font-size:14px}
+@media(max-width:640px){.rung{grid-template-columns:34px minmax(0,1fr)}
+  .rung .rung-why{grid-column:2}}
+.rung .rung-n{font-family:"JetBrains Mono",monospace;font-size:12px;font-weight:700;
+  color:var(--accent);font-variant-numeric:tabular-nums}
+.rung .rung-name{font-family:"JetBrains Mono",monospace;font-size:12.5px;color:var(--ink);
+  font-weight:500}
+.rung .rung-why{color:var(--ink-2);line-height:1.5}
+.rung.wired{background:var(--accent-soft)}
+
+footer{border-top:1px solid var(--rule);padding:24px 0 44px;color:var(--muted);font-size:13px}
+footer p{max-width:74ch;margin:0 0 8px}
+footer b{color:var(--ink-2)}
+</style>
+
+<div class="mast">
+  <div class="wrap mast-in">
+    <p class="eyebrow"><span class="dot"></span> FinPlanet · Module 5 · The Analyst Mind</p>
+    <h1>World Source Register</h1>
+    <p class="standfirst">Where knowledge can come into this system from, worldwide — what each source covers, what it costs, whether it needs a key, and what its licence forbids. Ordered by <em>how much the system is allowed to trust it</em>, because that ordering is enforced in code and everything else follows from it.</p>
+  </div>
+</div>
+
+<div class="wrap shell">
+
+  <nav class="rail" aria-label="Sections">
+    <ol>
+      <li><a href="#s0"><span class="n">▪</span><span>The one rule</span></a></li>
+      <li><a href="#s1"><span class="n">T6</span><span>Web search</span></a></li>
+      <li><a href="#s2"><span class="n">T5</span><span>News, worldwide</span></a></li>
+      <li><a href="#s3"><span class="n">T2</span><span>Filings by market</span></a></li>
+      <li><a href="#s4"><span class="n">T1</span><span>Prices and FX</span></a></li>
+      <li><a href="#s5"><span class="n">T3</span><span>Macro statistics</span></a></li>
+      <li><a href="#s6"><span class="n">▪</span><span>Identity</span></a></li>
+      <li><a href="#s7"><span class="n">T3</span><span>Method knowledge</span></a></li>
+      <li><a href="#s8"><span class="n">▪</span><span>Sanctions</span></a></li>
+      <li><a href="#s9"><span class="n">▪</span><span>The legal line</span></a></li>
+      <li><a href="#s10"><span class="n">▪</span><span>Wired vs not</span></a></li>
+    </ol>
+    <div class="sep"></div>
+    <p class="foot"><span class="chip free">no key</span> costs nothing and needs no signup. Count them — most of this list is free.</p>
+  </nav>
+
+  <main>
+
+    <!-- ============ THE RULE ============ -->
+    <section id="s0">
+      <div class="sec-head">
+        <span class="sec-num">▪</span>
+        <h2>The one rule this whole register hangs on</h2>
+        <p class="claim">A source's tier decides what it is allowed to do. Nothing on a lower rung may ever overwrite something on a higher one.</p>
+      </div>
+
+      <p>The ladder is not a style guide. It is <code>TrustTier</code> in <code>core/contracts/answer.py</code>, and the comment beside it says a web result <em>"may never overwrite a filing or a price series"</em>. Every row in every table below inherits a rung, and that rung decides whether the thing it says can be treated as evidence, as a pointer, or as colour.</p>
+
+      <div class="ladder">
+        <div class="rung"><span class="rung-n">0</span><span class="rung-name">LEDGER</span><span class="rung-why">Your own holdings and trades. Nothing outranks it and nothing external may correct it.</span></div>
+        <div class="rung"><span class="rung-n">1</span><span class="rung-name">MARKET_SERIES</span><span class="rung-why">Prices, volumes, corporate actions. What actually happened.</span></div>
+        <div class="rung"><span class="rung-n">2</span><span class="rung-name">FILINGS</span><span class="rung-why">What the company itself reported, with the date it became public.</span></div>
+        <div class="rung"><span class="rung-n">3</span><span class="rung-name">METHOD_KB</span><span class="rung-why">The craft library and official statistics. How to think, and the state of the world.</span></div>
+        <div class="rung"><span class="rung-n">4</span><span class="rung-name">TRANSCRIPTS</span><span class="rung-why">What management said out loud. First-hand, but self-interested.</span></div>
+        <div class="rung wired"><span class="rung-n">5</span><span class="rung-name">CURATED_NEWS</span><span class="rung-why">Edited reporting. The highest rung anything wired today reaches.</span></div>
+        <div class="rung wired"><span class="rung-n">6</span><span class="rung-name">WEB_SEARCH</span><span class="rung-why">A pointer to evidence. Never the evidence.</span></div>
+      </div>
+
+      <div class="note">
+        <span class="lbl">How to read the tables</span>
+        <p><span class="chip free">no key</span> nothing to sign up for. <span class="chip key">free key</span> a signup, then free. <span class="chip paid">paid</span> or licence-restricted — read the notes column before building on it.</p>
+      </div>
+    </section>
+
+    <!-- ============ TIER 6 ============ -->
+    <section id="s1">
+      <div class="sec-head">
+        <span class="sec-num">T6</span>
+        <h2>Web search — the bridge you can use today</h2>
+        <p class="claim">The fastest way to get knowledge in, and the easiest way to quietly destroy the trust ladder. Used correctly it is a pointer, not a source.</p>
+      </div>
+
+      <p>A search result is not evidence. It is a claim that evidence exists somewhere. The correct shape is: <strong>search finds that a filing exists → you fetch the filing from the exchange → the filing is the citation.</strong> If a search snippet ever becomes the thing you cite, tier 2 and tier 6 have collapsed into each other and the whole ladder above is decoration.</p>
+
+      <div class="tw">
+        <table>
+          <thead><tr><th>Provider</th><th>Free tier</th><th>Key</th><th>What it is good at</th></tr></thead>
+          <tbody>
+            <tr><td class="k">Tavily</td><td class="num">1,000 / month</td><td><span class="chip key">free key</span></td><td>Built for agent retrieval rather than for humans reading a results page. <strong>The chosen default here.</strong></td></tr>
+            <tr><td class="k">Exa</td><td class="num">1,000 / month</td><td><span class="chip key">free key</span></td><td>Semantic rather than keyword — good at "find me more things like this one". Billing counts documents <em>and</em> crawled pages, so spend climbs faster than the request count suggests.</td></tr>
+            <tr><td class="k">Serper</td><td class="num">2,500 total</td><td><span class="chip key">free key</span></td><td>Google results as an API. Note the free tier is a one-off allowance, <strong>not monthly</strong>.</td></tr>
+            <tr><td class="k">Google Programmable Search</td><td class="num">100 / day</td><td><span class="chip key">free key</span></td><td>Narrow index unless you configure it to search the whole web.</td></tr>
+            <tr><td class="k">Anthropic native search</td><td class="num">none</td><td><span class="chip paid">$10 / 1k</span></td><td>No extra signup — it uses the key the system already has. Billed on top of tokens.</td></tr>
+            <tr><td class="k">Brave Search API</td><td class="num">withdrawn</td><td><span class="chip paid">paid</span></td><td>The free tier ended in late 2025. Roughly $5 of credit, then a monthly plan.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note hazard">
+        <span class="lbl">The failure this prevents</span>
+        <p>A search-sourced claim that gets stored as a fact does not announce itself. It sits in the index looking exactly like a filing, and it will be retrieved, cited and acted on. That is why <code>LicenceFilterPolicy</code> defaults scraped bodies to <code>link_only</code> — title and URL survive, the body never gets emitted.</p>
+      </div>
+    </section>
+
+    <!-- ============ TIER 5 ============ -->
+    <section id="s2">
+      <div class="sec-head">
+        <span class="sec-num">T5</span>
+        <h2>News — the widest free net in the world</h2>
+        <p class="claim">One free, keyless source covers more of the world than every paid vendor on this page combined. It is the one already wired.</p>
+      </div>
+
+      <div class="tw">
+        <table>
+          <thead><tr><th>Source</th><th>Coverage</th><th>Key</th><th>Cadence</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="k">GDELT 2.0 DOC</td><td>100+ languages, worldwide, 65 machine-translated in realtime</td><td><span class="chip free">no key</span></td><td class="num">15 min</td><td><code>api.gdeltproject.org/api/v2/doc/doc</code>. Filters by source language, country and domain. Default window is the last 3 months; the API refuses a span under 15 minutes. <strong>Wired.</strong></td></tr>
+            <tr><td class="k">Common Crawl CC-NEWS</td><td>Every news article crawled since 2016, 176 languages</td><td><span class="chip free">no key</span></td><td class="num">daily</td><td>Free on AWS Open Data. <strong>This is where history comes from</strong> — no live API gives you a five-year back corpus.</td></tr>
+            <tr><td class="k">WorldMonitor</td><td>150+ curated feeds; 54-country instability index; 92 exchanges</td><td><span class="chip free">no key</span></td><td class="num">5 min</td><td>AGPL-3.0, self-hostable, no login or paywall. Also carries conflict (UCDP, ACLED), seismic (USGS, GDACS), economic (FRED, EIA, World Bank) and infrastructure layers. The judgement layer over GDELT's volume.</td></tr>
+            <tr><td class="k">Marketaux</td><td>80+ markets, 200k+ entities, company-tagged</td><td><span class="chip key">free key</span></td><td class="num">100/day</td><td>Company-level rather than world-level. Useful once a watchlist exists.</td></tr>
+            <tr><td class="k">Finnhub</td><td>Company news, global</td><td><span class="chip key">free key</span></td><td class="num">60/min</td><td>Generous per-minute limit for a free tier.</td></tr>
+            <tr><td class="k">Alpha Vantage</td><td>News with sentiment scores</td><td><span class="chip key">free key</span></td><td class="num">25/day</td><td>Tight quota. Sentiment is per-article, which is the granularity that makes it citable.</td></tr>
+            <tr><td class="k">Direct RSS</td><td>Whatever you choose, in any language</td><td><span class="chip free">no key</span></td><td class="num">yours</td><td>Free and unlimited if polled politely: store <code>ETag</code> and <code>Last-Modified</code>, send them back, honour <code>304 Not Modified</code>. Skipping this is how a hobby aggregator gets blocked.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p><strong>Why GDELT first, and why free beats paid here.</strong> No signup, no quota, and it monitors Malay, Chinese and Tamil-language Malaysian media that no Western vendor prices reasonably. The docs already made this argument: <em>GDELT gives volume, WorldMonitor gives judgement — and divergence between raw tone and curated synthesis is itself a signal worth logging.</em></p>
+    </section>
+
+    <!-- ============ TIER 2 ============ -->
+    <section id="s3">
+      <div class="sec-head">
+        <span class="sec-num">T2</span>
+        <h2>Filings — free in every market that matters</h2>
+        <p class="claim">The highest-trust company evidence in the system, and almost none of it costs anything. What it costs is engineering.</p>
+      </div>
+
+      <div class="tw">
+        <table>
+          <thead><tr><th>Market</th><th>Source</th><th>Key</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="k">United States</td><td>SEC EDGAR — <code>data.sec.gov</code> (companyfacts XBRL) and <code>efts.sec.gov</code> (full text)</td><td><span class="chip free">no key</span></td><td>10 requests/second. A descriptive <code>User-Agent</code> with a contact address is <strong>mandatory</strong> — without it you get 403. Pull <code>companyfacts.zip</code> in bulk rather than making 13,000 calls.</td></tr>
+            <tr><td class="k">Korea</td><td>OpenDART (Financial Supervisory Service)</td><td><span class="chip key">free key</span></td><td>KOSPI, KOSDAQ and KONEX, with XBRL. One of the best-documented regulator APIs anywhere.</td></tr>
+            <tr><td class="k">Japan</td><td>EDINET (Financial Services Agency)</td><td><span class="chip key">free key</span></td><td>XBRL mandatory since 2008. J-GAAP taxonomy, so tag mapping is real work.</td></tr>
+            <tr><td class="k">United Kingdom</td><td>Companies House API, plus RNS for listed announcements</td><td><span class="chip key">free key</span></td><td>Companies House covers every registered company, not just the listed ones.</td></tr>
+            <tr><td class="k">Hong Kong</td><td>HKEXnews</td><td><span class="chip free">no key</span></td><td>No formal API; the announcement search is scrapeable and stable.</td></tr>
+            <tr><td class="k">Singapore</td><td>SGXNET</td><td><span class="chip free">no key</span></td><td>Announcement timestamps are published, so the "when did this become public" date is obtainable.</td></tr>
+            <tr><td class="k">Malaysia</td><td>Bursa announcements, plus newsroom RSS</td><td><span class="chip free">no key</span></td><td><strong>The known problem.</strong> No vendor supplies a point-in-time date for Bursa. It has to be self-built by stamping each figure with its announcement date — which is exactly what <code>markets/xkls.py</code> already says.</td></tr>
+            <tr><td class="k">India</td><td>BSE and NSE announcement feeds</td><td><span class="chip free">no key</span></td><td>Two exchanges, two formats, most companies on both.</td></tr>
+            <tr><td class="k">Australia</td><td>ASX announcements</td><td><span class="chip free">no key</span></td><td>Continuous-disclosure regime makes the announcement stream unusually complete.</td></tr>
+            <tr><td class="k">Canada</td><td>SEDAR+</td><td><span class="chip free">no key</span></td><td>Replaced the old SEDAR; document retrieval is straightforward.</td></tr>
+            <tr><td class="k">Taiwan</td><td>MOPS</td><td><span class="chip free">no key</span></td><td>Chinese-language primary, with English summaries for larger issuers.</td></tr>
+            <tr><td class="k">EU</td><td>National storage mechanisms (OAMs) today; ESAP consolidates them later</td><td><span class="chip free">no key</span></td><td>27 separate systems until ESAP lands. This is the one region where "worldwide" is genuinely more work than everywhere else combined.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note">
+        <span class="lbl">Why the point-in-time date is the whole game</span>
+        <p>US 10-K deadlines run 60, 75 or 90 days after year end depending on filer class, and late filers exceed even that. Joining on the period a figure <em>describes</em> rather than the date it became <em>public</em> silently gives every backtest information it could not have had. One published audit found <strong>11% of ticker-months</strong> corrupted this way. That is why <code>FactStore</code> stamps <code>known_at</code> on every fact and refuses queries that would read past it.</p>
+      </div>
+    </section>
+
+    <!-- ============ TIER 1 ============ -->
+    <section id="s4">
+      <div class="sec-head">
+        <span class="sec-num">T1</span>
+        <h2>Prices and exchange rates</h2>
+        <p class="claim">Cheap and plentiful. The trap here is not cost, it is redistribution terms.</p>
+      </div>
+
+      <div class="tw">
+        <table>
+          <thead><tr><th>Source</th><th>Coverage</th><th>Key</th><th>Limit</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="k">Stooq</td><td>Global daily bars — US, Europe, Asia</td><td><span class="chip free">no key</span></td><td class="num">—</td><td>CSV over HTTP. Unglamorous and extremely reliable for end-of-day history.</td></tr>
+            <tr><td class="k">Tiingo</td><td>US deep history, global coverage</td><td><span class="chip key">free key</span></td><td class="num">1,000/day</td><td>Explicit terms, attribution required, <strong>no resale</strong>. Honest about what the free tier is for.</td></tr>
+            <tr><td class="k">Twelve Data</td><td>Global equities, FX, crypto</td><td><span class="chip key">free key</span></td><td class="num">800/day</td><td>Wide market coverage on the free tier.</td></tr>
+            <tr><td class="k">Alpha Vantage</td><td>Global equities and FX</td><td><span class="chip key">free key</span></td><td class="num">25/day</td><td>Quota is small enough that it only suits a nightly batch.</td></tr>
+            <tr><td class="k">yfinance</td><td>Whatever Yahoo shows</td><td><span class="chip free">no key</span></td><td class="num">—</td><td><span class="chip paid">unofficial</span> Not an API. The backend has broken repeatedly since 2023 and there is nobody to complain to. Fine for exploration, never for a pipeline you depend on.</td></tr>
+            <tr><td class="k">Frankfurter</td><td>ECB reference rates</td><td><span class="chip free">no key</span></td><td class="num">—</td><td>Daily fixes straight from the ECB. The right default for a European or Asian base currency.</td></tr>
+            <tr><td class="k">exchangerate.host</td><td>170+ currencies</td><td><span class="chip free">no key</span></td><td class="num">—</td><td>Wider currency list than the ECB set, including thinner Asian pairs.</td></tr>
+            <tr><td class="k">Bank Negara Malaysia OpenAPI</td><td>27 currency pairs, plus rates and statistics</td><td><span class="chip free">no key</span></td><td class="num">—</td><td><strong>No authentication at all.</strong> The authoritative source for MYR, from the central bank that sets it.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p><strong>Redistribution is the thing to check, not price.</strong> Most vendors let you use data freely and forbid you passing it on. For a personal tool that distinction never bites. The day anything gets shared with another person, it does.</p>
+    </section>
+
+    <!-- ============ TIER 3 MACRO ============ -->
+    <section id="s5">
+      <div class="sec-head">
+        <span class="sec-num">T3</span>
+        <h2>Macro and official statistics</h2>
+        <p class="claim">Six of the biggest publishers speak the same format, so one client reads all of them.</p>
+      </div>
+
+      <p><strong>SDMX is the shared language.</strong> The IMF, World Bank, OECD, Eurostat, ECB and BIS all publish through it. Write one client shape and six sources come free — which is unusual enough in this field to be worth planning around.</p>
+
+      <div class="tw">
+        <table>
+          <thead><tr><th>Source</th><th>Coverage</th><th>Key</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="k">FRED</td><td>The widest single series catalogue — US and international</td><td><span class="chip key">free key</span></td><td>St Louis Fed. Quota is generous enough not to think about.</td></tr>
+            <tr><td class="k">World Bank</td><td>World Development Indicators, every country</td><td><span class="chip free">no key</span></td><td>Long histories, consistent country codes.</td></tr>
+            <tr><td class="k">IMF</td><td><code>data.imf.org</code>, SDMX 2.1 and 3.0</td><td><span class="chip free">no key</span></td><td>Balance of payments, government finance, IFS.</td></tr>
+            <tr><td class="k">OECD</td><td>Member-country economic and social statistics</td><td><span class="chip free">no key</span></td><td>SDMX.</td></tr>
+            <tr><td class="k">Eurostat</td><td>EU statistics at region level</td><td><span class="chip free">no key</span></td><td>SDMX, plus bulk download.</td></tr>
+            <tr><td class="k">ECB and BIS</td><td>Euro-area rates; global banking and credit</td><td><span class="chip free">no key</span></td><td>BIS credit-to-GDP gaps are hard to get anywhere else.</td></tr>
+            <tr><td class="k">OpenDOSM / <code>api.data.gov.my</code></td><td>Malaysian official statistics</td><td><span class="chip free">no key</span></td><td>CPI, labour, trade, straight from the statistics department.</td></tr>
+            <tr><td class="k"><code>data.gov.sg</code></td><td>5,000+ datasets across 70 agencies</td><td><span class="chip free">no key</span></td><td>One of the best-run open data portals anywhere.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============ IDENTITY ============ -->
+    <section id="s6">
+      <div class="sec-head">
+        <span class="sec-num">▪</span>
+        <h2>Identity — the layer that makes "worldwide" real</h2>
+        <p class="claim">Not a data source. The thing without which every source above is a separate island.</p>
+      </div>
+
+      <p>A Malay-language article says <strong>Maybank</strong>. Bursa says <code>MAYBANK</code>. A price feed says <code>1155.KL</code>. A filing says <strong>Malayan Banking Berhad</strong>. Four strings, one company — and today <code>link_entities</code> resolves them by matching against a hand-written dictionary. That works for one market. It does not survive the second, and it certainly does not survive the twelfth.</p>
+
+      <div class="tw">
+        <table>
+          <thead><tr><th>Source</th><th>What it resolves</th><th>Key</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="k">GLEIF</td><td>Name → LEI. Also BIC → LEI, ISIN → LEI, and parent/child relationships</td><td><span class="chip free">no key</span></td><td>The Global LEI Index — the closest thing to a universal company identifier, and it is public. The relationship records also give you group structure for free.</td></tr>
+            <tr><td class="k">OpenFIGI</td><td>ISIN, CUSIP, SEDOL or ticker → FIGI, with exchange and security type</td><td><span class="chip key">free key</span></td><td>Free without a key at a lower rate limit. Solves the "same company, different listing" problem that breaks naive ticker matching.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note">
+        <span class="lbl">Why this is the prerequisite, not a nice-to-have</span>
+        <p>Every market added without it costs a bespoke mapping file that someone has to maintain by hand and that silently rots. With it, a new market costs an adapter and nothing else. This is the single highest-leverage piece of unbuilt work in the register.</p>
+      </div>
+    </section>
+
+    <!-- ============ METHOD ============ -->
+    <section id="s7">
+      <div class="sec-head">
+        <span class="sec-num">T3</span>
+        <h2>Method knowledge — the craft library</h2>
+        <p class="claim">Free, bulk-downloadable, and legitimately ingestible in full. That last part is rarer than it sounds.</p>
+      </div>
+
+      <div class="tw">
+        <table>
+          <thead><tr><th>Source</th><th>Coverage</th><th>Key</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="k">OpenAlex</td><td>250M+ scholarly works, authors, institutions</td><td><span class="chip free">no key</span></td><td>~100k requests/day. Titles, abstracts, citations, topics. Bulk snapshot available.</td></tr>
+            <tr><td class="k">arXiv</td><td>q-fin preprints, full text</td><td><span class="chip free">no key</span></td><td>Where quantitative finance methods appear first.</td></tr>
+            <tr><td class="k">Semantic Scholar</td><td>200M+ papers, with a citation graph</td><td><span class="chip key">free key</span></td><td>Key raises the rate limit; works without one.</td></tr>
+            <tr><td class="k">Crossref</td><td>DOI metadata for essentially all published research</td><td><span class="chip free">no key</span></td><td>The canonical identifier layer for citations.</td></tr>
+            <tr><td class="k">SSRN</td><td>Finance and economics working papers</td><td><span class="chip paid">no API</span></td><td>No programmatic access. Link only — never ingest the body.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>These land in the "ingest freely" licence tier the docs already define, which matters: the craft library is the one knowledge base where the full text genuinely needs to be indexed, not just linked.</p>
+    </section>
+
+    <!-- ============ SANCTIONS ============ -->
+    <section id="s8">
+      <div class="sec-head">
+        <span class="sec-num">▪</span>
+        <h2>Sanctions and entity risk</h2>
+        <p class="claim">Free to download. Not free to use, in a way that is easy to miss.</p>
+      </div>
+
+      <div class="tw">
+        <table>
+          <thead><tr><th>Source</th><th>Coverage</th><th>Key</th><th>Licence</th></tr></thead>
+          <tbody>
+            <tr><td class="k">OpenSanctions</td><td>Consolidated global sanctions, PEPs, watchlists</td><td><span class="chip free">no key</span></td><td><span class="chip paid">CC BY-NC 4.0</span> Non-commercial only</td></tr>
+            <tr><td class="k">OFAC SDN</td><td>US sanctions list</td><td><span class="chip free">no key</span></td><td>US government, public domain</td></tr>
+            <tr><td class="k">EU consolidated list</td><td>EU restrictive measures</td><td><span class="chip free">no key</span></td><td>Official publication</td></tr>
+            <tr><td class="k">UN Security Council</td><td>UN sanctions</td><td><span class="chip free">no key</span></td><td>Official publication</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note hazard">
+        <span class="lbl">The trap</span>
+        <p>OpenSanctions' terms treat screening inside a for-profit business as <strong>commercial use "even though it generates no revenue"</strong>. The restriction bites on <em>who you are</em>, not on whether you charge for anything. Free for a personal tool; a licence purchase the moment this stops being one. The underlying government lists carry no such restriction — they are simply more work to consolidate.</p>
+      </div>
+    </section>
+
+    <!-- ============ LEGAL ============ -->
+    <section id="s9">
+      <div class="sec-head">
+        <span class="sec-num">▪</span>
+        <h2>The legal line moved in 2026</h2>
+        <p class="claim">robots.txt stopped being a courtesy and started carrying copyright weight.</p>
+      </div>
+
+      <p>Under Article 4 of the EU copyright directive, a machine-readable opt-out from text and data mining now has legal force, and the AI Act obligations that began on <strong>2 August 2026</strong> require respecting it. Scraping is still not illegal by default anywhere that matters — but what used to be an etiquette question is now a rights question.</p>
+
+      <p>Three practical consequences for this build, none of them onerous:</p>
+      <ul>
+        <li><strong>Honour <code>robots.txt</code>.</strong> Check it, cache it, obey it.</li>
+        <li><strong>Keep the fetch log.</strong> What you fetched, from where, when, and under which rule you believed you were allowed to. This is cheap to record now and impossible to reconstruct later.</li>
+        <li><strong>Default every scraped body to <code>link_only</code>.</strong> Title and URL survive; the body never gets emitted. The system already enforces this at retrieval rather than trusting the ingest side to remember.</li>
+      </ul>
+
+      <p>Terms of service are a separate question from copyright. Breaking them rarely produces a lawsuit; it reliably produces a block, which for a pipeline you depend on is the same problem wearing different clothes.</p>
+    </section>
+
+    <!-- ============ STATUS ============ -->
+    <section id="s10">
+      <div class="sec-head">
+        <span class="sec-num">▪</span>
+        <h2>What is wired, what is not, what I could not check</h2>
+        <p class="claim">A register that overstated its own status would be the first thing in this system to do so.</p>
+      </div>
+
+      <h3>Wired</h3>
+      <p><strong>GDELT 2.0</strong>, and nothing else. One source, free, keyless, worldwide. It fails loudly: a malformed response raises rather than returning an empty list, because a broken feed must never be indistinguishable from a quiet news day. An explicitly empty result — the API answered, there was nothing — is not an error and returns normally.</p>
+
+      <h3>Not wired</h3>
+      <p>Everything else on this page. The knowledge shelves are still empty and nothing else in the repository makes a network call. The point-in-time fact store is filled only by tests. That is a statement of fact, not an apology: the machinery downstream of ingest is built and tested, and each source above is now a known quantity rather than a research task.</p>
+
+      <h3>Could not verify from this session</h3>
+      <p>The network here blocks <code>worldmonitor.app</code> and <code>blog.gdeltproject.org</code> directly. Their figures above come from the project's own repository and from API write-ups rather than from the vendor documentation pages. Two specifics to confirm before building against them: <strong>WorldMonitor's public endpoint surface</strong> — the repository describes a REST gateway with rate limiting, but not which routes are stable — and <strong>GDELT's exact <code>maxrecords</code> ceiling</strong>, cited variously as 100 and 250. The adapter caps at 250 and pages; if the real limit is lower the API will say so and the fetch will raise rather than silently truncate.</p>
+
+      <div class="note">
+        <span class="lbl">The order to build in</span>
+        <p><strong>1.</strong> GDELT — done. <strong>2.</strong> Identity (GLEIF and OpenFIGI) — the prerequisite for market number three. <strong>3.</strong> SEC EDGAR — free, keyless, and the first tier-2 evidence in the system. <strong>4.</strong> Bursa announcements — the point-in-time date nobody sells. <strong>5.</strong> Web search, last, because it is the one that can quietly bypass the ladder everything else depends on.</p>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <div class="wrap">
+    <p><b>Status of these figures.</b> Free tiers, rate limits and licence terms were checked in August 2026 and they move. Anything marked <span class="chip free">no key</span> or <span class="chip key">free key</span> is worth re-checking before you depend on it commercially; the licence rows are worth re-checking before you depend on them at all.</p>
+    <p><b>Not legal advice.</b> The licence notes summarise what the terms say. Get advice before commercialising anything touching the non-commercial or AGPL rows.</p>
+  </div>
+</footer>

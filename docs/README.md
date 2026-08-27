@@ -43,6 +43,7 @@ Three things are genuinely new here:
 | [14 Operations runbook](14-OPERATIONS-RUNBOOK.md) | What to do next, what to monitor, and what should make you stop |
 | [User guide](user-guide.html) | Install, every command, and the cadence for using it — open in a browser |
 | [Pipeline diagrams](pipeline.html) | Six diagrams tracing data from a wire story to a position size — open in a browser |
+| [World source register](world-sources.html) | Every source knowledge can come in from, worldwide — coverage, keys, rate limits, licences — ordered by trust tier |
 
 ---
 

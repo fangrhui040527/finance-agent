@@ -114,7 +114,7 @@ An abstraction layer over 100+ providers behind one Python interface exists and 
 | Source | Role | Cost | Cadence |
 |---|---|---|---|
 | **GDELT 2.0** | The free, unlimited backbone. 100+ languages, ~300 event categories back to 1979, georeferenced; the Global Knowledge Graph resolves persons, organisations, locations, themes and tone. Full-text search over a multi-year window; bulk access via BigQuery | Free, no key | 15 min |
-| **WorldMonitor** | The curated, higher-trust layer: synthesised briefs across 500+ feeds, Country Instability Index for 31 countries, 7-signal market composite, 29-exchange finance radar. MCP + REST + SDK | Free tier / Pro key | 5 min |
+| **WorldMonitor** | The curated, higher-trust layer: 150+ curated RSS feeds plus conflict (UCDP, ACLED), seismic (USGS, GDACS, NASA EONET), economic (FRED, EIA, World Bank) and infrastructure streams. **Country Instability Index for 54 countries** with adaptive per-country weighting, 7-signal market composite, **92-exchange finance radar**, 34 country-ETF correlations, 13 central banks, 19 financial centres. REST gateway with rate limits and `Retry-After` | Free, self-hostable, no login | 5 min |
 | **Article-level sentiment vendor** | Direction *and* magnitude at article level — the granularity that makes a sentiment claim citable | Paid slot | REST |
 | **Per-ticker news vendor** | Company-level coverage and buzz | Free tier | Real-time |
 
@@ -354,6 +354,7 @@ Named dependencies, their verified licences and the full obligation map live in 
 | The chart library | Apache-2.0 **+ attribution** | Requires the NOTICE attribution and a link to the vendor on the user-facing page. One option flag — and forgetting it is a breach on the most visible screen in the product |
 | Graph and timeseries stores | GPL-3.0 Community / dual Apache-TSL | Running them as separate services you talk to over the wire is the ordinary arrangement. Offering either as a managed service to third parties is the restricted case |
 | Market data from vendors | Per provider | **Redistribution is usually prohibited.** Check before exposing raw quotes to anyone but yourself |
+| **OpenSanctions** (sanctions and PEP screening) | ⚠️ **CC BY-NC 4.0** | Free for a personal tool. Their terms treat compliance screening inside a for-profit business as **commercial use "even though it generates no revenue"** — so the licence question arrives the day this stops being personal, not the day it starts earning |
 | Tier B educational content | Copyrighted | Link only. Never ingest the body. Enforced at retrieval, tested in CI |
 
 **If this stays a personal tool, none of this bites** — AGPL's network clause triggers on providing software to users, the Commons Clause on selling, GPL and LGPL on distribution. Running software privately is none of those. If it ever becomes a product, the conversation is unavoidable and should happen *before* the codebase entangles these. Keep any fork of an AGPL component in a separate repository so the boundary is unambiguous.
