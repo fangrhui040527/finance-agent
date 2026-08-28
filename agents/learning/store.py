@@ -80,6 +80,8 @@ BEFORE DELETE ON outcomes
 BEGIN SELECT RAISE(ABORT, 'outcomes are never deleted'); END;
 """
 
+from core.provenance.ledger import _enable_wal
+
 DEFAULT_PATH = Path("data/learning.db")
 
 
@@ -98,13 +100,9 @@ class LearningStore:
             self.path.parent.mkdir(parents=True, exist_ok=True)
         self.db = sqlite3.connect(self.path, timeout=self.BUSY_TIMEOUT_MS / 1000)
         self.db.row_factory = sqlite3.Row
-        if str(self.path) != ":memory:":
-            # Under the default rollback journal a writer and a reader block each
-            # other. Two processes share this file - a background sweep writing
-            # grades and an interactive session reading them - and the one that
-            # would wait is the interactive one.
-            self.db.execute("PRAGMA journal_mode=WAL")
-        self.db.execute(f"PRAGMA busy_timeout={self.BUSY_TIMEOUT_MS}")
+        # Shared helper: busy_timeout first, then WAL, tolerating a lost race.
+        # See core/provenance/ledger._enable_wal for why both matter.
+        _enable_wal(self.db, str(self.path), self.BUSY_TIMEOUT_MS)
         self.db.executescript(SCHEMA)
         self.db.commit()
 

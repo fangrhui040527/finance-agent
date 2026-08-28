@@ -76,6 +76,33 @@ CREATE INDEX IF NOT EXISTS llm_calls_run ON llm_calls(run_id);
 DEFAULT_FX_MYR_PER_USD = Decimal("4.15")
 
 
+def _enable_wal(conn: sqlite3.Connection, path: str, timeout_ms: int) -> None:
+    """WAL, so a writing daemon and a reading session coexist.
+
+    Order and tolerance both matter, and getting either wrong is worse than not
+    setting WAL at all:
+
+      1. busy_timeout is set FIRST. Changing journal_mode needs a brief exclusive
+         lock, so the PRAGMA that makes concurrency safe is itself a concurrency
+         hazard. Without a timeout already in force it fails instantly against a
+         competing writer.
+      2. Losing the race is fine. journal_mode is a persistent property of the
+         DATABASE FILE, not of the connection - once any connection sets WAL,
+         every later one inherits it. So a failure here means someone else
+         already did it, or is doing it now.
+
+    Raising would turn a harmless race into a lost write on the one log that
+    cannot be reconstructed.
+    """
+    conn.execute(f"PRAGMA busy_timeout={timeout_ms}")
+    if path == ":memory:":
+        return                       # memory databases have no journal to switch
+    try:
+        conn.execute("PRAGMA journal_mode=WAL")
+    except sqlite3.OperationalError:
+        pass
+
+
 def prompt_hash(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()[:16]
 
@@ -114,12 +141,7 @@ class ProvenanceLedger:
             Path(path).parent.mkdir(parents=True, exist_ok=True)
         self.conn = sqlite3.connect(path, timeout=self.BUSY_TIMEOUT_MS / 1000)
         self.run_id = run_id
-        if path != ":memory:":
-            # WAL lets a writing daemon and a reading MCP session coexist. Under
-            # the default rollback journal they block each other, and the reader
-            # is the interactive one - the session waits on the background job.
-            self.conn.execute("PRAGMA journal_mode=WAL")
-        self.conn.execute(f"PRAGMA busy_timeout={self.BUSY_TIMEOUT_MS}")
+        _enable_wal(self.conn, path, self.BUSY_TIMEOUT_MS)
         self.conn.executescript(SCHEMA)
         self._migrate()
         self.conn.executescript(INDEXES)
