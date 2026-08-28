@@ -212,7 +212,8 @@ footer b{color:var(--ink-2)}
     <div class="term" style="max-width:640px">
       <div class="term-bar"><span></span><span></span><span></span><b>the whole surface</b></div>
 <pre><span class="p">$</span> make install <span class="c"># once  (Windows: run install)</span>
-<span class="p">$</span> python ask.py why MYX:1155 --move -0.09 --market -0.08
+<span class="p">$</span> python ask.py backend <span class="c"># is a model answering, or the stub?</span>
+<span class="p">$</span> python ask.py why MYX:1155 --fetch --against XNAS:SPY --days 5
 <span class="p">$</span> python predict.py log MYX:1155 +1 63d 0.62 <span class="hl">"NIM recovers"</span>
 <span class="p">$</span> make due <span class="c"># every Monday, forever</span></pre>
     </div>
@@ -225,6 +226,8 @@ footer b{color:var(--ink-2)}
     <ol>
       <li><a href="#s1"><span class="n">01</span><span>Install</span></a></li>
       <li><a href="#s2"><span class="n">02</span><span>Commands</span></a></li>
+      <li><a href="#s2b"><span class="n">02b</span><span>Connect to Claude</span></a></li>
+      <li><a href="#s2c"><span class="n">02c</span><span>Tracing</span></a></li>
       <li><a href="#s3"><span class="n">03</span><span>Cadence</span></a></li>
       <li><a href="#s4"><span class="n">04</span><span>First four months</span></a></li>
       <li><a href="#s5"><span class="n">05</span><span>Reading output</span></a></li>
@@ -303,6 +306,11 @@ footer b{color:var(--ink-2)}
         <li>
           <h4>Adjust your settings — within bounds</h4>
           <p>Edit <code>config.toml</code>, or copy it to <code>config.local.toml</code> to keep personal numbers out of git. The loader prefers the local file.</p>
+          <div class="box warn">
+            <span class="lbl">Set holdings and watchlist before anything else</span>
+            <p>They start empty, and empty means the escalation gate can never fire &mdash; nothing will ever be surfaced as worth your attention. <code>make config</code> says so out loud when both are blank. Keep the watchlist <strong>short</strong>: the gate exists so a person can read the output, and a list long enough to fill a queue you stop reading is worse than no queue.</p>
+          </div>
+
           <div class="term"><div class="term-bar"><span></span><span></span><span></span><b>make config</b></div>
 <pre><span class="p">$</span> make config
 <span class="o">config from config.toml
@@ -339,13 +347,13 @@ footer b{color:var(--ink-2)}
       <div class="sec-head">
         <span class="sec-num">02</span>
         <h2>The commands</h2>
-        <p>Two scripts and five Make targets. That is the entire interface.</p>
+        <p>Two scripts and nine Make targets. <code>ask.py</code> reaches the agents, <code>predict.py</code> runs the forward record.</p>
       </div>
 
       <div class="cmds">
         <div class="cmd">
           <div class="cmd-h"><code>ask.py why</code> <span class="when">as needed</span></div>
-          <p>Decomposes a move into market, sector, style, currency and stock-specific parts <em>before</em> naming any cause. Returns are arguments, not a live fetch — the feed seam is deliberately unwired, so anything that pretended to fetch prices would be inventing them.</p>
+          <p>Decomposes a move into market, sector, style, currency and stock-specific parts <em>before</em> naming any cause. Type the returns in, or pass <code>--fetch --against &lt;proxy&gt;</code> to measure <strong>both</strong> legs from the live price feed. Mixing them is refused: a measured instrument return against a typed market return is a subtraction dressed as a decomposition.</p>
           <div class="term"><div class="term-bar"><span></span><span></span><span></span><b>a 9% fall on a bad day for the index</b></div>
 <pre><span class="p">$</span> python ask.py why MYX:1155 --move -0.090 --market -0.080 --sector -0.020
 
@@ -434,12 +442,183 @@ agents    5
 <span class="hl">30 more graded calls before the calibration table measures
 skill rather than luck.</span></span></pre></div>
         </div>
+
+        <div class="cmd">
+          <div class="cmd-h"><code>ask.py prices</code> <span class="when">as needed</span></div>
+          <p>Daily bars from the live feed, with 20-day ADV and ATR. <code>--on</code> bounds the result so no bar after that date comes back — use it whenever you are reasoning about what was knowable at a past date. A source that cannot answer says <code>NO DATA</code>; it never returns an empty series, because empty reads downstream as &ldquo;the stock did not trade.&rdquo;</p>
+          <div class="term"><div class="term-bar"><span></span><span></span><span></span><b>ask.py prices</b></div>
+<pre><span class="p">$</span> python ask.py prices XNAS:NVDA --days 30</pre></div>
+        </div>
+
+        <div class="cmd">
+          <div class="cmd-h"><code>ask.py thesis</code> <span class="when">per name</span></div>
+          <p>Composes a stance from supplied evidence, then immediately red-teams it. Every breaker needs an <em>executable query</em> — a thesis nothing could falsify is refused rather than defaulted through. Fewer than two breakers forfeits the stance entirely.</p>
+          <div class="term"><div class="term-bar"><span></span><span></span><span></span><b>ask.py thesis</b></div>
+<pre><span class="p">$</span> python ask.py thesis MYX:1155 \
+    --breaker <span class="hl">"NIM below 2.0%|nim &lt; 0.020|kb_filings"</span> \
+    --breaker <span class="hl">"CASA below 22%|casa &lt; 0.22|kb_filings"</span> \
+    --evidence <span class="hl">"a1_fundamentals=CASA fell to 24%"</span> \
+    --stance accumulate</pre></div>
+        </div>
+
+        <div class="cmd">
+          <div class="cmd-h"><code>ask.py risk</code> · <code>ask.py size</code> <span class="when">before any position</span></div>
+          <p><code>risk</code> reports concentration, effective bets, portfolio heat and every breach. <code>size</code> applies all five caps and the market&rsquo;s real fee schedule. <strong>No position</strong> is a frequent and correct outcome — asking again with a smaller portfolio just refuses again.</p>
+          <div class="term"><div class="term-bar"><span></span><span></span><span></span><b>ask.py size</b></div>
+<pre><span class="p">$</span> python ask.py size MYX:1155 --portfolio 200000 \
+    --price 6.20 --stop 5.60 --adv 900000
+<span class="o">cost      XKLS fee schedule
+  binding cap is risk at 15,500.00; cost floor requires
+  at least <span class="hl">4,705.88</span> (60 bps round trip on XKLS)</span></pre></div>
+        </div>
+
+        <div class="cmd">
+          <div class="cmd-h"><code>ask.py backend</code> <span class="when">after adding a key</span></div>
+          <p>Says whether a real model is answering or the deterministic stub is. Worth one command: a system that quietly ran on <code>EchoBackend</code> for a week is indistinguishable from one that worked.</p>
+          <div class="term"><div class="term-bar"><span></span><span></span><span></span><b>ask.py backend</b></div>
+<pre><span class="p">$</span> python ask.py backend
+<span class="o">backend   EchoBackend
+reason    <span class="hl">echo (no ANTHROPIC_API_KEY): deterministic stub,
+          NOT a model</span> &mdash; narrative output is placeholder text</span></pre></div>
+        </div>
+
+        <div class="cmd">
+          <div class="cmd-h"><code>ask.py learn</code> <span class="when">whenever</span></div>
+          <p>Thirty concepts in an order the code enforces. Asking for one whose prerequisites you have not recorded exits non-zero and names what has to come first.</p>
+          <div class="term"><div class="term-bar"><span></span><span></span><span></span><b>ask.py learn</b></div>
+<pre><span class="p">$</span> python ask.py learn --syllabus
+<span class="p">$</span> python ask.py learn kelly</pre></div>
+        </div>
       </div>
 
       <div class="box key">
         <span class="lbl">Where your data lives</span>
-        <p>Everything goes to <code>data/learning.db</code>, which is gitignored. Your prediction log never leaves the machine. It is also <strong>append-only</strong>: SQLite triggers refuse an <code>UPDATE</code> on a logged prediction and a <code>DELETE</code> on any of them. A log you can revise is a memory, and a log missing its losers produces confident, wrong calibration.</p>
+        <p>The prediction log goes to <code>data/learning.db</code> and the provenance ledger to <code>data/provenance.db</code>. Both are gitignored. Your prediction log never leaves the machine. It is also <strong>append-only</strong>: SQLite triggers refuse an <code>UPDATE</code> on a logged prediction and a <code>DELETE</code> on any of them. A log you can revise is a memory, and a log missing its losers produces confident, wrong calibration.</p>
       </div>
+    </section>
+
+
+    <!-- 02b -->
+    <section id="s2b">
+      <div class="sec-head">
+        <span class="sec-num">02b</span>
+        <h2>Connect it to Claude</h2>
+        <p>The reasoning runs on your Claude session. The engines still decide every number.</p>
+      </div>
+
+      <p>This repository is about nine thousand lines of deterministic finance code and, deliberately, almost no prompting. Attribution, the five sizing caps, concentration limits, cost floors, point-in-time correctness &mdash; all arithmetic that must give the same answer every time, and none of it wants a language model near it.</p>
+
+      <p>What it <em>does</em> want a model for is the part code is bad at: reading a filing, weighing conflicting evidence, writing a thesis you can argue with, and attacking that thesis honestly. MCP splits it exactly along that line.</p>
+
+      <div class="tw">
+        <table>
+          <thead><tr><th>Layer</th><th>Decides</th><th>Runs where</th></tr></thead>
+          <tbody>
+            <tr><td class="k">Engines</td><td>every number, every limit, every refusal</td><td>this process, deterministic</td></tr>
+            <tr><td class="k">Claude</td><td>narrative, judgement, synthesis</td><td>your Claude session</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Check it before connecting</h3>
+      <div class="term"><div class="term-bar"><span></span><span></span><span></span><b>make mcp-check</b></div>
+<pre><span class="p">$</span> make mcp-check
+<span class="o">protocol      2024-11-05
+tools         11
+responses     3 for 3 requests
+
+<span class="hl">SELFTEST PASS</span></span></pre></div>
+      <p>Runs the whole <code>initialize &rarr; tools/list &rarr; tools/call</code> handshake against itself, with no client and no network. If that fails, no client will do better &mdash; fix it here, where the error is visible.</p>
+
+      <h3>Claude Desktop</h3>
+      <p>In <code>claude_desktop_config.json</code> (macOS <code>~/Library/Application&nbsp;Support/Claude/</code>, Windows <code>%APPDATA%\Claude\</code>). Absolute paths, and the project&rsquo;s own interpreter:</p>
+      <div class="term"><div class="term-bar"><span></span><span></span><span></span><b>claude_desktop_config.json</b></div>
+<pre><span class="o">{
+  "mcpServers": {
+    "analyst-mind": {
+      "command": "<span class="hl">/ABSOLUTE/PATH</span>/finance-agent/.venv/bin/python",
+      "args": ["-m", "mcp_server.server"],
+      "cwd": "<span class="hl">/ABSOLUTE/PATH</span>/finance-agent"
+    }
+  }
+}</span></pre></div>
+
+      <h3>Claude Code</h3>
+      <div class="term"><div class="term-bar"><span></span><span></span><span></span><b>one line</b></div>
+<pre><span class="p">$</span> claude mcp add analyst-mind -- \
+    /ABSOLUTE/PATH/.venv/bin/python -m mcp_server.server</pre></div>
+
+      <div class="box key">
+        <span class="lbl">It must run locally, and that is the right answer</span>
+        <p><code>check_portfolio_risk</code> takes your real book and <code>log_prediction</code> writes your real calls. Over stdio that data goes to a subprocess you own and nowhere else &mdash; no port, no token, no TLS to get wrong. The SQLite ledger, prediction log and <code>config.toml</code> are files on your disk by design.</p>
+        <p style="margin-top:10px">This also means it <strong>cannot</strong> be connected to a Claude Code <em>web</em> session, which runs in a container elsewhere and cannot reach your machine. Use the Claude Code CLI or Claude Desktop on the machine holding the data.</p>
+      </div>
+
+      <h3>What the model cannot do through these tools</h3>
+      <p>Worth being concrete, because &ldquo;let the model drive&rdquo; sounds alarming for something that touches money. All of this is enforced in code and covered by tests:</p>
+      <div class="tw">
+        <table>
+          <tbody>
+            <tr><td class="k">Place an order</td><td>No such tool exists. A repo-wide grep fails the build if one is added.</td></tr>
+            <tr><td class="k">Size past a cap</td><td>All five caps run on every call. Asking seven times with a smaller portfolio refuses seven times.</td></tr>
+            <tr><td class="k">Widen a limit</td><td>A single-name cap above 15% is refused by the code, not by a prompt.</td></tr>
+            <tr><td class="k">Beat the cost floor</td><td>RM&nbsp;4,706 on Bursa, HKD&nbsp;28,081 on HKEX. Below it the round trip cannot pay for itself.</td></tr>
+            <tr><td class="k">Invent a price</td><td>A missing feed returns <code>NO DATA</code>, never silence.</td></tr>
+            <tr><td class="k">Take a stance unfalsifiably</td><td>Two machine-checkable breakers, or no stance.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="box">
+        <span class="lbl">Subscription or API?</span>
+        <p>Interactive research &mdash; you asking, Claude calling tools &mdash; is what a Max plan is for, and the better setup: no per-token cost, and you get the strongest model rather than the one a budget rail allows. <strong>Unattended and scheduled work</strong> is what the API and <code>core/llm/backends.py</code> are for. Both can be true at once; the seam supports both.</p>
+      </div>
+    </section>
+
+    <!-- 02c -->
+    <section id="s2c">
+      <div class="sec-head">
+        <span class="sec-num">02c</span>
+        <h2>Tracing &mdash; every bone and organ</h2>
+        <p>One command records everything the system did, including every prompt.</p>
+      </div>
+
+      <div class="term"><div class="term-bar"><span></span><span></span><span></span><b>make trace</b></div>
+<pre><span class="p">$</span> make trace
+<span class="o">  run          20260828T152037-ad06ff
+  events       105  in 111 ms
+  model calls  4  (97 in / 80 out, RM 0.0082)
+  agents seen  <span class="hl">16</span>: a0_supervisor, a10_thesis, a11_red_team, ...
+  refusals     8      errors 0
+
+  debug/20260828T152037-ad06ff/
+    anatomy.md
+    session.log
+    report.html
+    trace.jsonl
+    prompts/</span></pre></div>
+
+      <div class="tw">
+        <table>
+          <thead><tr><th>File</th><th>Answers</th></tr></thead>
+          <tbody>
+            <tr><td class="k">session.log</td><td>&ldquo;walk me through the run&rdquo; &mdash; chronological, indented by call depth</td></tr>
+            <tr><td class="k">anatomy.md</td><td>&ldquo;what are the parts, which fired&rdquo; &mdash; per-agent table and a call graph</td></tr>
+            <tr><td class="k">report.html</td><td>&ldquo;let me dig&rdquo; &mdash; navigable, prompts inline</td></tr>
+            <tr><td class="k">trace.jsonl</td><td>machine-readable, one event per line, flushed as it happens</td></tr>
+            <tr><td class="k">prompts/</td><td>every value too long to inline, whole</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>Two event kinds are worth watching in particular. <strong><code>verification</code></strong> records every claim the citation check dropped and why &mdash; that check is the only real output gate in the system, so what it drops is the most informative line in any trace. And <strong><code>allowed</code></strong> is recorded as well as <code>denied</code>, because &ldquo;which rail let this through&rdquo; is as much a debugging question as &ldquo;what blocked it.&rdquo;</p>
+
+      <div class="box warn">
+        <span class="lbl">Traces hold verbatim prompts</span>
+        <p><code>debug/</code> is gitignored, and every report carries a banner saying why. A trace may contain your positions, your instrument ids and full model output. The provenance ledger &mdash; the thing that keeps history permanently &mdash; stores a <em>prompt hash</em> rather than the prompt, for exactly this reason. Read a trace before sharing it.</p>
+      </div>
+
+      <p>Reading one when something looks wrong: <code>summary.json</code> for errors and refusal count, then <code>anatomy.md</code> to see whether the agent you expected actually fired (a zero row means never invoked, which is different from invoked-and-found-nothing), then the <code>verification</code> events in <code>session.log</code>, then <code>report.html</code> to read the prompt whole.</p>
     </section>
 
     <!-- 03 -->
@@ -482,7 +661,7 @@ skill rather than luck.</span></span></pre></div>
         <div class="cad-row">
           <div class="cad-when"><b>After any change</b><small>3 min</small></div>
           <div class="cad-what">
-            <div><code>make test</code><span>469 tests, under three seconds.</span></div>
+            <div><code>make test</code><span>712 tests, about five seconds.</span></div>
             <div><code>make verify</code><span>Catches silent degradation across the agent layer that unit tests miss.</span></div>
           </div>
         </div>
@@ -640,7 +819,9 @@ skill rather than luck.</span></span></pre></div>
             <tr><td class="k"><code>grading it on … would score noise</code></td><td><span class="chip ok">by design</span> You tried to grade before the horizon.</td><td>Wait. Use <code>--today</code> only for testing.</td></tr>
             <tr><td class="k"><code>attribution unavailable</code></td><td><span class="chip ok">by design</span> Not enough history, or collinear factors.</td><td>Supply 120+ rows via <code>--history</code>.</td></tr>
             <tr><td class="k"><code>a prediction is written once</code></td><td><span class="chip ok">by design</span> You tried to edit the log.</td><td>Log a new prediction. Never revise an old one.</td></tr>
-            <tr><td class="k"><code>NotImplementedError: live GDELT ingest is not wired</code></td><td><span class="chip wait">expected</span> The feed seam is deliberately unwired.</td><td>Subclass <code>FeedAdapter</code> and implement <code>_fetch_raw</code>.</td></tr>
+            <tr><td class="k"><code>FeedError: GDELT fetch failed</code></td><td><span class="chip wait">check</span> GDELT is wired and live, so this is a real network or source failure &mdash; never a quiet news day.</td><td>Retry; if it persists check connectivity. The adapter raises rather than returning <code>[]</code> precisely so you cannot mistake this for silence.</td></tr>
+            <tr><td class="k"><code>NO DATA for &lt;instrument&gt;</code></td><td><span class="chip wait">expected</span> The price source carries nothing for that symbol or window.</td><td>Check coverage with <code>ask.py prices</code>. An unmapped market raises rather than guessing a suffix &mdash; a guess returns another company&rsquo;s prices.</td></tr>
+            <tr><td class="k"><code>AuthError: ANTHROPIC_API_KEY is empty or unset</code></td><td><span class="chip wait">expected</span> A real backend was asked for without a key.</td><td>Set it in <code>.env</code>, or run <code>ask.py backend --use echo</code> to work offline deliberately.</td></tr>
             <tr><td class="k">Consistently low confidence, or the red team always objecting</td><td><span class="chip no">real bug</span> Probably phantom evidence gaps.</td><td>Run <code>make verify</code>. This exact failure shipped once and cost 0.24 of confidence on every thesis.</td></tr>
             <tr><td class="k">Never any refusals</td><td><span class="chip no">real bug</span> A guardrail rail is being skipped.</td><td>Run <code>make test</code>; check the guardrail chain before trusting any output.</td></tr>
           </tbody>
@@ -667,7 +848,8 @@ skill rather than luck.</span></span></pre></div>
             <tr><td class="k">Place an order</td><td>There is no broker connection anywhere in the repository, enforced three ways including a repo-wide grep. It is a one-way door by design.</td></tr>
             <tr><td class="k">Give a price target</td><td>Point forecasts are refused. You get a valuation range and what has to be true at each end of it.</td></tr>
             <tr><td class="k">Tell you what to buy</td><td>Candidacy bands, probabilities, attributions and sizing constraints — with evidence chains. The decision stays yours.</td></tr>
-            <tr><td class="k">Fetch live prices or news</td><td>Not yet. The adapter seam is built and tested; the live implementations are not written, and the code refuses rather than returning empty.</td></tr>
+            <tr><td class="k">Fetch filings, ownership or macro</td><td>Not yet. Prices (Stooq) and news (GDELT) are wired and live; the rest have a tested adapter seam and no implementation. Every one of them refuses rather than returning empty, so a missing source can never read as a quiet day.</td></tr>
+            <tr><td class="k">Run itself on a schedule</td><td>Not yet. There is no daemon; every command is one-shot. The design for a gap-aware catch-up runner is written up but unbuilt.</td></tr>
             <tr><td class="k">Show a track record</td><td>Nothing here has been tested against a market. Nine of ten done-ness criteria are met; the tenth is a reliability curve only time produces.</td></tr>
           </tbody>
         </table>
@@ -685,7 +867,7 @@ skill rather than luck.</span></span></pre></div>
     <footer>
       <p><b>Not financial advice.</b> This system produces candidacy bands, calibrated probabilities, attributions and sizing constraints with evidence chains. It makes no recommendations and cannot place orders.</p>
       <p><b>Verify the fee schedules before trading.</b> Exchange figures were read in Aug 2026 and the cost floor is computed straight from them — a stale schedule silently mis-sizes every position.</p>
-      <p>Source: <code>docs/user-guide.html</code> · 469 tests · <code>make verify</code> in 0.13s</p>
+      <p>Source: <code>docs/user-guide.html</code> · 712 tests · 93% coverage · <code>make verify</code> in 0.12s · stress 99 held, 0 findings</p>
     </footer>
 
   </main>

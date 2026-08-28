@@ -15,3 +15,9 @@ htmlcov/
 # provenance ledger is the thing that keeps history, and it stores a prompt hash
 # rather than the prompt for exactly this reason.
 debug/
+
+# Tooling that must never enter a commit. A `npm ls` run in this directory
+# creates node_modules/ and `git add -A` sweeps it in - 368,000 lines of
+# vendored JavaScript that would live in the history forever.
+node_modules/
+package-lock.json
