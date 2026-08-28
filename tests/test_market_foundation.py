@@ -167,7 +167,8 @@ def test_adding_a_market_did_not_change_any_engine_or_agent():
     supported(), so registering it subjected it to every conformance test with
     no new test code at all."""
     assert "XSES" in supported()
-    assert len(supported()) == 3
+    assert "XHKG" in supported()
+    assert len(supported()) == 4
 
 
 def test_singapore_charges_no_stamp_duty_unlike_bursa():
@@ -214,3 +215,64 @@ def test_the_singapore_minimum_economic_position_is_about_nine_thousand():
     sg = get("XSES")
     assert sg.fee_schedule.round_trip_bps(D("9100")) <= D("30")
     assert sg.fee_schedule.round_trip_bps(D("5000")) > D("30")
+
+
+# --- XHKG: the second T2 market, and the one that inverts the intuition -----
+
+def test_hong_kong_is_the_most_expensive_market_here_not_the_cheapest():
+    """A developed market with uncapped both-sided stamp duty and 0.25% retail
+    brokerage costs more than Bursa at every size. Sorting markets by how
+    developed they are gets the cost ranking backwards."""
+    from engines.sizing.caps import cost_floor_bps
+    big = D("10000000")
+    hk = get("XHKG").fee_schedule.round_trip_bps(big)
+    my = get("XKLS").fee_schedule.round_trip_bps(big)
+    us = get("XNAS").fee_schedule.round_trip_bps(big)
+    assert us < my < hk
+    assert cost_floor_bps("XHKG") > cost_floor_bps("XKLS") > cost_floor_bps("XNAS")
+
+
+def test_hong_kong_stamp_duty_is_uncapped_unlike_bursa():
+    hk_stamp = next(l for l in get("XHKG").fee_schedule.legs if l.name == "stamp_duty")
+    my_stamp = next(l for l in get("XKLS").fee_schedule.legs if l.name == "stamp_duty")
+    assert hk_stamp.cap is None
+    assert my_stamp.cap is not None
+
+
+def test_hong_kong_stamp_duty_rounds_up_to_the_whole_dollar():
+    """0.1% of 3,000 is 3.00; of 2,600 it is 2.60 and charged as 3. Modelling it
+    as a plain rate understates cost on exactly the small trades that decide the
+    floor."""
+    stamp = next(l for l in get("XHKG").fee_schedule.legs if l.name == "stamp_duty")
+    assert stamp.charge(D("2600")) == D("3")
+    assert stamp.charge(D("3000")) == D("3")
+    assert stamp.charge(D("3001")) == D("4")
+
+
+def test_hong_kong_board_lots_vary_by_issuer_unlike_singapore():
+    hk = get("XHKG")
+    assert hk.lot_size("XHKG:0700") == 100
+    assert hk.lot_size("XHKG:0939") == 1000
+    assert get("XSES").lot_size("XSES:D05") == get("XSES").lot_size("XSES:U11")
+
+
+def test_an_unknown_hong_kong_lot_says_it_is_a_default_not_a_fact():
+    """A wrong board lot produces an order that cannot fill."""
+    hk = get("XHKG")
+    assert hk.lot_size_is_known("XHKG:0700") is True
+    assert hk.lot_size_is_known("XHKG:8888") is False
+    assert hk.lot_size("XHKG:8888") == 1000
+
+
+def test_hong_kong_codes_are_zero_padded_to_the_hkex_form():
+    hk = get("XHKG")
+    assert hk.lot_size("XHKG:700") == hk.lot_size("XHKG:0700")
+
+
+def test_hong_kong_keeps_a_lunch_break_unlike_singapore():
+    assert len(get("XHKG").calendar.windows) == 2
+    assert len(get("XSES").calendar.windows) == 1
+
+
+def test_hong_kong_dividends_reach_a_malaysian_holder_gross():
+    assert get("XHKG").withholding("dividend", "MY") == D(0)

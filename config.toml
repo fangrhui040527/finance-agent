@@ -23,6 +23,18 @@ markets = ["XKLS", "XNAS"]
 # Used for cost estimates only. Real conversions carry their own dated rate.
 fx_myr_per_usd = 4.15
 
+# What you actually own, and what you are considering. These are not decoration:
+# the escalation gate (knowledge/news/features.py should_escalate) only lets an
+# item through if it touches one of these names. With both empty NOTHING ever
+# escalates, and a background sweep would run every night and surface nothing.
+#
+# Keep the watchlist SHORT. The gate exists so a person can read the output; a
+# list long enough to fill a queue you stop reading is worse than no queue.
+# Ids carry their market prefix and are validated at load - a typo here does not
+# crash, it silently stops matching a name you think is being watched.
+holdings = []
+watchlist = []
+
 
 [risk]
 # Fraction of the portfolio you accept losing if a stop fills. 0.0075 = 0.75%.
@@ -73,6 +85,24 @@ debt_hurdle = 0.08
 # than this comes back as a refusal, not as a cheaper wrong answer.
 daily_myr = 25.0
 per_question_myr = 5.0
+
+# Unattended work gets its own ceiling, kept separate from the interactive one
+# above. Not a saving - a fault guard. A background job with a bug can spend all
+# night making calls nobody asked for, and if it shares your budget you discover
+# it when your own question is refused the next morning.
+#
+# Budgets are windowed over the last 24 hours, not lifetime.
+daemon_daily_myr = 10.0
+
+
+[provenance]
+# Every model call: agent, task class, tier, tokens, cost, and the run that made
+# it. Append-only, enforced by SQLite triggers rather than convention.
+#
+# This must be a real path for cost monitoring to be possible at all. It used to
+# default to :memory: everywhere, so the ledger evaporated at process exit and
+# docs/14's "compare cost monthly" had nothing to compare.
+database = "data/provenance.db"
 
 
 [learning]

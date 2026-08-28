@@ -59,5 +59,16 @@ jobs:
               print(f"  {spec.id:22} {spec.eval_suite}")
           PY
 
+      # The only end-to-end run that uses the REAL registry-derived allowlist.
+      # verify.py and the unit tests pass hand-written allowlists with invented
+      # agent ids, which is how a missing llm_complete grant survived unnoticed.
+      - name: Traced full-system run
+        run: python trace_run.py
+
+      # The MCP handshake, run against itself. If the server cannot complete
+      # initialize -> tools/list -> tools/call offline, no client will fare better.
+      - name: MCP server selftest
+        run: python -m mcp_server.server --selftest
+
       - name: No execution code anywhere
         run: python -m pytest tests/test_no_execution_anywhere.py -q

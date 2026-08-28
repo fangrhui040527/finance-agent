@@ -13,4 +13,4 @@ testpaths = ["tests"]
 addopts = "-q"
 
 [tool.setuptools.packages.find]
-include = ["core*", "knowledge*", "markets*", "engines*", "agents*", "ui*"]
+include = ["core*", "knowledge*", "markets*", "engines*", "agents*", "ui*", "mcp_server*"]

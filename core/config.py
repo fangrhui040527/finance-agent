@@ -71,6 +71,14 @@ class Config:
     per_question_budget_myr: Decimal
     database: str
     min_graded_for_calibration: int
+    # Defaulted so a hand-built Config stays easy to write in tests, and so an
+    # older config file loads without them. An empty holdings/watchlist is a
+    # legitimate starting state - it just means nothing can escalate yet, which
+    # describe() says out loud rather than leaving you to discover.
+    holdings: tuple[str, ...] = ()
+    watchlist: tuple[str, ...] = ()
+    provenance_db: str = "data/provenance.db"
+    daemon_budget_myr: Decimal = Decimal("10.0")
     source: str = "<defaults>"
 
     def describe(self) -> str:
@@ -85,9 +93,48 @@ class Config:
             f"   (hard floor 3.0)\n"
             f"  portfolio heat       {self.limits.portfolio_heat:.1%}\n"
             f"  max participation    {self.max_participation:.1%}\n"
-            f"  daily budget         RM {self.daily_budget_myr:.2f}\n"
-            f"  prediction log       {self.database}"
+            f"  daily budget         RM {self.daily_budget_myr:.2f}"
+            f"   (interactive)\n"
+            f"  daemon budget        RM {self.daemon_budget_myr:.2f}"
+            f"   (unattended; separate so a runaway job cannot eat the above)\n"
+            f"  prediction log       {self.database}\n"
+            f"  provenance ledger    {self.provenance_db}\n"
+            f"  holdings             {', '.join(self.holdings) or '(none)'}\n"
+            f"  watchlist            {', '.join(self.watchlist) or '(none)'}"
+            + ("\n  NOTE: with neither holdings nor watchlist set, the escalation "
+               "gate\n        (knowledge/news/features.py should_escalate) can never "
+               "fire\n        and nothing will ever reach the review queue."
+               if not (self.holdings or self.watchlist) else "")
         )
+
+
+def _instruments(data: dict, dotted: str) -> tuple[str, ...]:
+    """Instrument ids, each validated against a market that actually exists.
+
+    A typo here does not crash - it silently narrows what the escalation gate
+    can ever match, so the system goes quiet for a name you think it is watching.
+    Refusing at load is the only place that is visible.
+    """
+    from markets.registry import known_prefixes, mic_of
+
+    raw = _get(data, dotted, [])
+    if isinstance(raw, str):
+        raise ConfigError(f"{dotted} must be a list of instrument ids, not a string")
+    out = []
+    for item in raw:
+        ident = str(item).strip()
+        try:
+            mic_of(ident)
+        except ValueError:
+            raise ConfigError(
+                f"{dotted}: {ident!r} has no market prefix. Write e.g. 'MYX:1155' "
+                f"or 'XNAS:NVDA'. Known prefixes: {', '.join(known_prefixes())}"
+            ) from None
+        out.append(ident)
+    dupes = {i for i in out if out.count(i) > 1}
+    if dupes:
+        raise ConfigError(f"{dotted} lists {sorted(dupes)} more than once")
+    return tuple(out)
 
 
 def _get(data: dict, dotted: str, default):
@@ -171,6 +218,10 @@ def load(path: str | Path | None = None) -> Config:
         target_volatility=dec("risk.target_volatility", 0.20),
         max_participation=dec("risk.max_participation", 0.05),
         limits=limits,
+        holdings=_instruments(data, "account.holdings"),
+        watchlist=_instruments(data, "account.watchlist"),
+        provenance_db=str(_get(data, "provenance.database", "data/provenance.db")),
+        daemon_budget_myr=dec("budget.daemon_daily_myr", 10.0),
         emergency_months=int(_get(data, "waterfall.emergency_months", 6)),
         debt_hurdle=dec("waterfall.debt_hurdle", 0.08),
         daily_budget_myr=dec("budget.daily_myr", 25.0),

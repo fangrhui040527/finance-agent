@@ -174,7 +174,7 @@ class A4NewsNarrative(Agent):
 
     agent_id = "a4_news_narrative"
     collections = ("kb_news",)
-    tools = ("retrieve", "search_news", "extract_features", "source_reliability")
+    tools = ("retrieve", "search_news", "extract_features", "source_reliability", "llm_complete")
     tier = TaskClass.NEWS_TRIAGE
 
     def run(self, instrument_id: str, query: str, max_age=None) -> list[Finding]:

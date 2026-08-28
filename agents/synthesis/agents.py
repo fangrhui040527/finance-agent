@@ -225,7 +225,7 @@ class A10Thesis(Agent):
 
     agent_id = "a10_thesis"
     collections = ()
-    tools = ("compose", "check_coverage")
+    tools = ("compose", "check_coverage", "llm_complete")
     tier = TaskClass.THESIS_SYNTHESIS
 
     REQUIRED_EVIDENCE = ("a1_fundamentals", "a2_valuation", "a5_catalyst_events", "a6_macro_regime")
@@ -325,7 +325,7 @@ class A11RedTeam(Agent):
 
     agent_id = "a11_red_team"
     collections = ("kb_failures", "kb_news", "kb_filings")
-    tools = ("retrieve", "find_disconfirming", "check_crowding")
+    tools = ("retrieve", "find_disconfirming", "check_crowding", "llm_complete")
     tier = TaskClass.RED_TEAM
 
     #: docs/04 section 7. The list is fixed so the challenge cannot be tuned to pass.

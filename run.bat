@@ -11,6 +11,9 @@ REM   run config      show settings and where they came from
 REM   run why ...     decompose a move before naming a cause
 REM   run plan ...    what the system would do with a question
 REM   run log ...     log a view before you find out
+REM   run trace       full traced system run -> debug\<run_id>\
+REM   run mcp         serve MCP on stdio (Claude Desktop / Claude Code)
+REM   run mcp-check   MCP handshake selftest, no client needed
 REM   run due         what has reached its horizon
 REM   run grade ...   score a call
 REM   run status      the calibration table
@@ -48,6 +51,9 @@ if /I "%CMD%"=="config"  goto config
 if /I "%CMD%"=="why"     goto why
 if /I "%CMD%"=="plan"    goto plan
 if /I "%CMD%"=="log"     goto log
+if /I "%CMD%"=="trace"   goto trace
+if /I "%CMD%"=="mcp"     goto mcp
+if /I "%CMD%"=="mcp-check" goto mcpcheck
 if /I "%CMD%"=="due"     goto due
 if /I "%CMD%"=="grade"   goto grade
 if /I "%CMD%"=="status"  goto status
@@ -98,6 +104,18 @@ goto :eof
 :log
 "%PY%" predict.py log%ARGS%
 goto :eof
+
+:trace
+"%PY%" trace_run.py%ARGS%
+goto end
+
+:mcp
+"%PY%" -m mcp_server.server%ARGS%
+goto end
+
+:mcpcheck
+"%PY%" -m mcp_server.server --selftest
+goto end
 
 :due
 "%PY%" predict.py due%ARGS%

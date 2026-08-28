@@ -47,7 +47,9 @@ needs one `MarketAdapter` subclass, a registry entry, and the conformance tests
 that already exist. It is the most useful thing available to work on today that
 does not require waiting.
 
-**What is deliberately unwired.** `GdeltFeed._fetch_raw` raises
+**What is now wired.** GDELT (news) and Stooq (daily bars) are both live and keyless. Filings, ownership and macro remain unwired: their adapters raise
+rather than returning empty, so a missing source can never read as a quiet
+day. Historically `GdeltFeed._fetch_raw` raised
 `NotImplementedError` rather than returning empty. Every live source is one
 subclass of `FeedAdapter`; everything downstream of the fetch is built and
 tested. The offline build cannot silently pretend to have data.

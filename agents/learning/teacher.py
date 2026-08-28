@@ -243,6 +243,18 @@ class Learner:
     level: Level = Level.L1_MONEY
 
     def mastered(self, key: str) -> None:
+        """Record a demonstrated concept. An unknown key is refused HERE.
+
+        It used to be accepted and then raised a bare KeyError from `level` on
+        the next call - a failure at a place with no idea what was mis-typed.
+        Worse, a mis-typed prerequisite also reads as unmet forever, so the
+        learner is told to go back to a concept they have already done.
+        """
+        if key not in BY_KEY:
+            raise KeyError(
+                f"{key!r} is not in the curriculum; mastery cannot be recorded for a "
+                f"concept that does not exist ({len(CURRICULUM)} concepts, L1-L8)"
+            )
         self.known.add(key)
         highest = max((BY_KEY[k].level for k in self.known), default=Level.L1_MONEY)
         self.level = highest

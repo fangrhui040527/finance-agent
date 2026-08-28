@@ -284,6 +284,17 @@ class PolicyEngine:
     def enforce(self, action: Action) -> PolicyResult:
         """Evaluate and raise on denial. Callers get an exception, not a warning."""
         result = self.evaluate(action)
+        from core.trace import emit, is_tracing
+
+        if is_tracing():
+            # Allowed decisions are traced too, not just denials. "Which rail let
+            # this through" is as much a debugging question as "what blocked it",
+            # and a log of only refusals cannot answer it.
+            emit("denied" if result.decision is Decision.DENY else "allowed",
+                 action.name, agent=action.agent, rail=action.rail.value,
+                 action=action.name, decision=result.decision.value,
+                 rule=result.policy_name, reason=result.reason,
+                 payload={k: str(v)[:200] for k, v in (action.payload or {}).items()})
         if result.decision is Decision.DENY:
             raise PolicyViolation(result, action)
         return result
