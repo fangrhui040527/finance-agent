@@ -12,6 +12,7 @@ touches this file only.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from typing import Protocol
 
@@ -62,12 +63,14 @@ class InferenceClient:
         ledger: ProvenanceLedger,
         daily_budget_myr: Decimal | None = None,
         fx_rate: Decimal = DEFAULT_FX_MYR_PER_USD,
+        budget_window: timedelta = timedelta(days=1),
     ) -> None:
         self.backend = backend
         self.engine = engine
         self.ledger = ledger
         self.daily_budget_myr = daily_budget_myr
         self.fx_rate = fx_rate
+        self.budget_window = budget_window
 
     def complete(
         self, agent: str, task: TaskClass, prompt: str, system: str | None = None
@@ -85,10 +88,19 @@ class InferenceClient:
         )
 
         if self.daily_budget_myr is not None:
-            spent = self.ledger.total_cost_myr()
+            # Windowed, not lifetime. This compared total_cost_myr() - a sum over
+            # every row ever written - against a field named daily_budget_myr.
+            # Harmless while every ledger was in-memory and died with the process,
+            # because lifetime and today were the same number. Against a durable
+            # ledger it is a one-way cap: once cumulative spend passes the daily
+            # budget the client raises forever and never recovers, which for an
+            # unattended job means it stops and nothing says why.
+            since = datetime.now(timezone.utc) - self.budget_window
+            spent = self.ledger.cost_since(since)
             if spent >= self.daily_budget_myr:
                 raise BudgetExceeded(
-                    f"daily budget RM {self.daily_budget_myr} exhausted (spent RM {spent:.2f}); "
+                    f"budget RM {self.daily_budget_myr} exhausted for the last "
+                    f"{self.budget_window} (spent RM {spent:.2f}); "
                     "plan truncated and disclosed, not downgraded silently"
                 )
 

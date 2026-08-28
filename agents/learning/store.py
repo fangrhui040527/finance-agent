@@ -86,12 +86,25 @@ DEFAULT_PATH = Path("data/learning.db")
 class LearningStore:
     """One SQLite file holding the record that time cannot be caught up on."""
 
+    #: Ten seconds. A daemon writing the night's grades must not fail an
+    #: interactive read, and an interactive read must not fail because a daemon
+    #: is mid-sweep. Long enough to ride out either; short enough that a genuine
+    #: deadlock surfaces rather than hanging the session.
+    BUSY_TIMEOUT_MS = 10_000
+
     def __init__(self, path: str | Path = DEFAULT_PATH) -> None:
         self.path = Path(path)
         if self.path.parent != Path(""):
             self.path.parent.mkdir(parents=True, exist_ok=True)
-        self.db = sqlite3.connect(self.path)
+        self.db = sqlite3.connect(self.path, timeout=self.BUSY_TIMEOUT_MS / 1000)
         self.db.row_factory = sqlite3.Row
+        if str(self.path) != ":memory:":
+            # Under the default rollback journal a writer and a reader block each
+            # other. Two processes share this file - a background sweep writing
+            # grades and an interactive session reading them - and the one that
+            # would wait is the interactive one.
+            self.db.execute("PRAGMA journal_mode=WAL")
+        self.db.execute(f"PRAGMA busy_timeout={self.BUSY_TIMEOUT_MS}")
         self.db.executescript(SCHEMA)
         self.db.commit()
 
@@ -154,9 +167,17 @@ class LearningStore:
                         bool(r["correct"]), r["note"]) for r in rows]
 
     def calibration_pairs(self) -> list[tuple[float, bool]]:
+        """Graded (confidence, correct) pairs, EXCLUDING no-view predictions.
+
+        direction 0 expresses no view, so it can be neither right nor wrong.
+        Counting it would let a run of honest "I don't know" entries lift the
+        hit rate for free - which is the opposite of what a calibration record
+        is for.
+        """
         rows = self.db.execute(
             "SELECT p.confidence, o.correct FROM predictions p"
             " JOIN outcomes o USING (prediction_id)"
+            " WHERE p.direction != 0"
         ).fetchall()
         return [(r["confidence"], bool(r["correct"])) for r in rows]
 

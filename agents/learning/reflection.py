@@ -117,7 +117,13 @@ class OutcomeQueue:
                 f"{prediction_id} grades on {p.grade_on}; grading it on {today} would "
                 "score noise and flatter the model"
             )
-        correct = (p.direction == 0) or (p.direction * (realised - benchmark) > 0)
+        # A direction of 0 is "no view expressed". It makes no claim, so it can
+        # be neither right nor wrong - and it used to be recorded as CORRECT,
+        # which inflates hit rate and Brier for free. It is recorded as resolved
+        # and excluded from calibration instead (LearningStore.calibration_pairs).
+        correct = p.direction != 0 and p.direction * (realised - benchmark) > 0
+        if p.direction == 0 and not note:
+            note = "no view expressed; resolved but not scored"
         o = Outcome(prediction_id, today, realised, benchmark, correct, note)
         self._graded.append(o)
         del self._pending[prediction_id]
@@ -249,7 +255,15 @@ class A15Reflection(Agent):
         self.queue = queue
         self.store = store
 
-    def run(self, today: date, cohort: dict[str, list[Outcome]] | None = None) -> list[Finding]:
+    def run(self, today: date, cohort: dict[str, list[Outcome]] | None = None,
+            instruments: dict[str, set[str]] | None = None) -> list[Finding]:
+        """Sweep the queue and consider each cohort for a lesson.
+
+        `instruments` maps pattern -> the distinct instruments its outcomes came
+        from. It is not optional in spirit: without it `propose` cannot check the
+        distinct-instrument bar and one of three gates silently stops applying.
+        `LearningStore.instruments_for(prediction_ids)` supplies it.
+        """
         self._guard_tool("grade_queue")
         due = self.queue.due(today)
         out = [Finding(
@@ -259,16 +273,34 @@ class A15Reflection(Agent):
         )]
         if cohort:
             for pattern, outcomes in sorted(cohort.items()):
-                out.extend(self.propose(pattern, outcomes, today))
+                known = (instruments or {}).get(pattern)
+                out.extend(self.propose(pattern, outcomes, today, known))
         out.extend(self.curate(today))
         return out
 
     def propose(self, pattern: str, outcomes: list[Outcome],
                 today: date, instruments: set[str] | None = None) -> list[Finding]:
-        """The gate. Most candidates die here, and that is the feature."""
+        """The gate. Most candidates die here, and that is the feature.
+
+        `instruments=None` means the distinct-instrument bar CANNOT be checked,
+        and an uncheckable gate refuses. It used to fall back to `distinct = n`,
+        which made the bar identical to the instance bar and therefore always
+        satisfied - one of three gates silently gone. docs/14 section 6 names this
+        exact failure: "lessons accumulating fast: the inverted gate stopped
+        inverting."
+        """
         self._guard_tool("propose_lesson")
         n = len(outcomes)
-        distinct = len(instruments) if instruments is not None else n
+        if instruments is None:
+            return [Finding(
+                self.agent_id, "no_lesson",
+                f"cannot consider {pattern!r}: the instruments behind these "
+                f"{n} outcomes were not supplied, so the distinct-instrument bar "
+                f"cannot be checked",
+                caveats=["an unverifiable gate refuses; pass "
+                         "LearningStore.instruments_for(prediction_ids)"],
+            )]
+        distinct = len(instruments)
         hits = sum(1 for o in outcomes if o.correct)
         rate = hits / n if n else 0.0
 
