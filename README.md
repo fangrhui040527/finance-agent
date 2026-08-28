@@ -36,6 +36,7 @@ Full design detail starts at **[`docs/README.md`](docs/README.md)**.
 | [12 Code reference map](docs/12-CODE-REFERENCE-MAP.md) | Exact file:line pointers into each upstream repo, pinned to commit SHAs |
 | [13 The self-learning loop](docs/13-SELF-LEARNING-LOOP.md) | Hermes-agent studied; the assembled A15 loop and its provenance gate |
 | [14 Operations runbook](docs/14-OPERATIONS-RUNBOOK.md) | **What to do next, what to monitor, and what should make you stop** |
+| [15 MCP setup](docs/15-MCP-SETUP.md) | **Run it as an MCP server so the reasoning is your Claude session** |
 
 ## Status
 
@@ -52,7 +53,9 @@ P18–P19 wait on P16. **If you are picking this up, start at
 make install && make test    # full suite   (Windows: run install && run test)
 make config                  # settings, and the bounds they cannot cross
 make verify                  # end-to-end on mock data, <1s
-make stress                  # adversarial: volume, NaN, thresholds, concurrency, live seams
+make stress                  # adversarial: volume, NaN, thresholds, concurrency, live seams, MCP
+make mcp-check               # MCP handshake selftest, no client needed
+make mcp                     # serve MCP on stdio -> docs/15-MCP-SETUP.md
 python ask.py backend                        # which model is actually answering
 python ask.py why MYX:1155 --move -0.09 --market -0.08
 python ask.py why XNAS:NVDA --fetch --against XNAS:SPY --days 5
@@ -94,6 +97,7 @@ make up                      # postgres+timescale · qdrant · neo4j · redis ·
 | Model | Anthropic Messages backend behind the one `Backend` seam | `core/llm/backends.py` |
 | Prices | Stooq daily bars, validated at the seam | `core/market/feed.py` |
 | Entrypoints | `thesis` · `risk` · `size` · `learn` · `prices` · `backend` | `ask.py` |
+| MCP | 11 tools over stdio — the engines decide, your Claude narrates | `mcp_server/` |
 
 **Not built:** P16's forward record — 3–6 months of elapsed time, not effort;
 its tooling is built and its clock starts with `python predict.py log`. P19

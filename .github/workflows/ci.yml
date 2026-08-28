@@ -59,5 +59,10 @@ jobs:
               print(f"  {spec.id:22} {spec.eval_suite}")
           PY
 
+      # The MCP handshake, run against itself. If the server cannot complete
+      # initialize -> tools/list -> tools/call offline, no client will fare better.
+      - name: MCP server selftest
+        run: python -m mcp_server.server --selftest
+
       - name: No execution code anywhere
         run: python -m pytest tests/test_no_execution_anywhere.py -q
