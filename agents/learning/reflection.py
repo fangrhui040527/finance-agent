@@ -234,7 +234,7 @@ class A15Reflection(Agent):
 
     agent_id = "a15_reflection"
     collections = ("kb_lessons",)
-    tools = ("grade_queue", "propose_lesson", "calibrate", "curate")
+    tools = ("grade_queue", "propose_lesson", "calibrate", "curate", "llm_complete")
     tier = TaskClass.REFLECTION_DEEP
 
     #: The inverted prompt. docs/13 section 4: the default answer is no lesson.

@@ -11,6 +11,7 @@ touches this file only.
 
 from __future__ import annotations
 
+import time
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
@@ -104,9 +105,25 @@ class InferenceClient:
                     "plan truncated and disclosed, not downgraded silently"
                 )
 
+        from core.trace import emit, is_tracing
+
+        t0 = time.perf_counter()
         text, usage = self.backend.complete(model_id, prompt, system)
+        elapsed = (time.perf_counter() - t0) * 1000
         rec = self.ledger.record_call(
             agent=agent, task_class=task, tier=tier, model_id=model_id,
             prompt=prompt, usage=usage, fx_rate=self.fx_rate,
         )
+        if is_tracing():
+            # The ledger keeps prompt_hash only, by design. The trace keeps the
+            # text, because "what exactly did we send it" is the first question
+            # of every debugging session and a hash cannot answer it.
+            emit("llm_call", agent,
+                 agent=agent, task_class=task.value, tier=tier.value,
+                 model_id=model_id, backend=type(self.backend).__name__,
+                 system=system or "", prompt=prompt, response=text,
+                 input_tokens=usage.input_tokens, output_tokens=usage.output_tokens,
+                 cached_tokens=usage.cached_input_tokens,
+                 cost_myr=str(rec.cost_myr), prompt_hash=rec.prompt_hash,
+                 latency_ms=round(elapsed, 2))
         return Completion(text, usage, tier, model_id, rec.cost_myr)

@@ -20,6 +20,8 @@ ALLOWED_PATHS = {
     "core/guardrails/policy.py",            # NoExecutionPolicy, denies by name
     "core/registry/loader.py",              # FORBIDDEN_TOOLS, refuses at load
     "verify.py",
+    "trace_run.py",                         # traces the refusal, by name
+    "tests/test_trace.py",                  # asserts that refusal is recorded
     "tests/test_no_execution_anywhere.py",
     "tests/test_guardrail_chain.py",
     "tests/test_registry.py",

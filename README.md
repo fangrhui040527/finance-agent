@@ -37,6 +37,7 @@ Full design detail starts at **[`docs/README.md`](docs/README.md)**.
 | [13 The self-learning loop](docs/13-SELF-LEARNING-LOOP.md) | Hermes-agent studied; the assembled A15 loop and its provenance gate |
 | [14 Operations runbook](docs/14-OPERATIONS-RUNBOOK.md) | **What to do next, what to monitor, and what should make you stop** |
 | [15 MCP setup](docs/15-MCP-SETUP.md) | **Run it as an MCP server so the reasoning is your Claude session** |
+| [16 Tracing and anatomy](docs/16-TRACING-AND-ANATOMY.md) | **Every prompt, every guardrail decision, every dropped claim — `make trace`** |
 
 ## Status
 
@@ -54,6 +55,7 @@ make install && make test    # full suite   (Windows: run install && run test)
 make config                  # settings, and the bounds they cannot cross
 make verify                  # end-to-end on mock data, <1s
 make stress                  # adversarial: volume, NaN, thresholds, concurrency, live seams, MCP
+make trace                   # full traced system run -> debug/<run_id>/
 make mcp-check               # MCP handshake selftest, no client needed
 make mcp                     # serve MCP on stdio -> docs/15-MCP-SETUP.md
 python ask.py backend                        # which model is actually answering
@@ -98,6 +100,7 @@ make up                      # postgres+timescale · qdrant · neo4j · redis ·
 | Prices | Stooq daily bars, validated at the seam | `core/market/feed.py` |
 | Entrypoints | `thesis` · `risk` · `size` · `learn` · `prices` · `backend` | `ask.py` |
 | MCP | 11 tools over stdio — the engines decide, your Claude narrates | `mcp_server/` |
+| Trace | Every prompt, rail decision and dropped claim; 4 reports per run | `core/trace/`, `trace_run.py` |
 
 **Not built:** P16's forward record — 3–6 months of elapsed time, not effort;
 its tooling is built and its clock starts with `python predict.py log`. P19

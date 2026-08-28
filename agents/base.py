@@ -65,16 +65,52 @@ class Agent(ABC):
             Action(name=name, rail=Rail.TOOL, agent=self.agent_id, payload=payload or {})
         )
 
+    def traced(self, method: str, **inputs):
+        """Wrap one agent call so its inputs, outputs and timing are recorded.
+
+        Findings are what agents hand each other - A9's decomposition becomes
+        A10's evidence, which becomes A11's target. Tracing the boundary is how
+        you answer "where did this claim come from", which is the question the
+        whole evidence contract exists to make answerable.
+        """
+        from core.trace import span
+        return span(f"{self.agent_id}.{method}", kind="agent",
+                    agent=self.agent_id, method=method,
+                    tier=self.tier.value,
+                    collections=list(self.collections), **inputs)
+
     def retrieve(self, corpus: str, query: str, **kw):
+        from core.trace import emit, is_tracing
         from knowledge.retrieval.pipeline import retrieve as _retrieve
         self._guard_tool("retrieve", {"corpus": corpus})
-        return _retrieve(self.agent_id, corpus, query, self.ctx.router,
-                         now=self.ctx.now, **kw)
+        result = _retrieve(self.agent_id, corpus, query, self.ctx.router,
+                           now=self.ctx.now, **kw)
+        if is_tracing():
+            emit("retrieval", self.agent_id, agent=self.agent_id, corpus=corpus,
+                 query=query, n_hits=len(getattr(result, "hits", []) or []),
+                 n_context=len(getattr(result, "context", []) or []),
+                 grade=getattr(getattr(result, "grade", None), "grade", None)
+                 and result.grade.grade.value,
+                 relevance=getattr(getattr(result, "grade", None), "relevance", None),
+                 reason=getattr(getattr(result, "grade", None), "reason", None))
+        return result
 
     def emit(self, findings: list[Finding], chunk_lookup, confidence: float) -> Answer:
         """Findings -> verified Answer. Unsupported claims are dropped, not hedged."""
-        return verify_answer([f.to_claim() for f in findings], chunk_lookup,
-                             self.ctx.now, confidence)
+        answer = verify_answer([f.to_claim() for f in findings], chunk_lookup,
+                               self.ctx.now, confidence)
+        from core.trace import emit as _emit
+        from core.trace import is_tracing
+        if is_tracing():
+            # Which claims died, and why. The mechanical citation check is the
+            # only real output gate in the system, so what it drops is the
+            # single most informative thing in a trace.
+            _emit("verification", self.agent_id, agent=self.agent_id,
+                  proposed=len(findings), kept=len(answer.claims),
+                  dropped=[{"text": c.text[:300], "why": c.dropped_reason}
+                           for c in answer.dropped],
+                  answered=answer.answered, confidence=answer.confidence)
+        return answer
 
     @abstractmethod
     def run(self, **kwargs) -> list[Finding]: ...

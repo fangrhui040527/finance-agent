@@ -9,3 +9,9 @@ data/
 config.local.toml
 .coverage
 htmlcov/
+
+# Traces. These hold VERBATIM prompts, model responses and whatever portfolio
+# positions were passed in - a debugging artefact, not an audit record. The
+# provenance ledger is the thing that keeps history, and it stores a prompt hash
+# rather than the prompt for exactly this reason.
+debug/
