@@ -82,8 +82,19 @@ def test_config_cannot_declare_you_calibrated_early(tmp_path):
 
 
 def test_config_cannot_reach_a_market_with_no_adapter(tmp_path):
+    """Named a market with no adapter -> refused.
+
+    The unsupported MIC is chosen at runtime rather than hard-coded. This test
+    used to name XHKG, and silently changed meaning the day Hong Kong was
+    registered: it went on passing for a while, then failed for a reason that
+    had nothing to do with the guard it exists to hold.
+    """
+    from markets.registry import supported
+
+    unsupported = next(m for m in ("XFRA", "XETR", "XAMS", "XPAR")
+                       if m not in supported())
     with pytest.raises(ConfigError, match="does not create one"):
-        load(write(tmp_path, '[account]\nmarkets = ["XKLS", "XHKG"]\n'))
+        load(write(tmp_path, f'[account]\nmarkets = ["XKLS", "{unsupported}"]\n'))
 
 
 def test_a_misspelled_limit_is_refused_not_silently_ignored(tmp_path):

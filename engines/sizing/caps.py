@@ -28,7 +28,14 @@ COST_FLOOR_BPS_BY_MIC: dict[str, Decimal] = {
     "XKLS": Decimal("60"),   # asymptote ~46 bps
     "XNAS": Decimal("5"),    # asymptote ~0.6 bps
     "XSES": Decimal("30"),   # asymptote ~24 bps before the SGD 600 clearing cap binds
+    "XHKG": Decimal("95"),   # asymptote ~72 bps - the WORST of the four, see below
 }
+# XHKG is the entry that contradicts the intuition. Hong Kong is a developed
+# market and is nonetheless the most expensive here: 0.25% retail brokerage is
+# 50 bps round trip on its own, and stamp duty is 0.1% on BOTH sides with NO cap,
+# unlike Bursa's RM 1,000. Cost therefore never falls below ~72 bps at any size,
+# where Bursa reaches ~46 and XNAS ~0.6. Sorting markets by how developed they
+# are gets the cost ranking backwards.
 # XSES happens to land on the same number as the generic default, and that is
 # precisely why it is written down. An entry that agrees with the default by
 # coincidence is a decision; a missing entry that falls back to it is an
@@ -36,9 +43,18 @@ COST_FLOOR_BPS_BY_MIC: dict[str, Decimal] = {
 
 
 def cost_floor_bps(mic: str | None) -> Decimal:
+    """The market's floor, resolved through the alias map.
+
+    Resolution is not a nicety. Instrument ids in this repo say `MYX`, the table
+    is keyed `XKLS`, and a straight dict lookup silently returned the 30 bps
+    DEFAULT for every Bursa position - half the real 60. A wrong floor does not
+    crash; it just sizes positions that can never pay their own spread.
+    """
     if mic is None:
         return COST_FLOOR_BPS_DEFAULT
-    return COST_FLOOR_BPS_BY_MIC.get(mic.upper(), COST_FLOOR_BPS_DEFAULT)
+    from markets.registry import resolve_mic
+
+    return COST_FLOOR_BPS_BY_MIC.get(resolve_mic(mic), COST_FLOOR_BPS_DEFAULT)
 
 
 class Band(str, Enum):
