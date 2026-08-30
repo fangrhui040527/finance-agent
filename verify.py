@@ -217,16 +217,21 @@ def main() -> int:
     # ---------------------------------------------------------------- 10
     print("\n10. Graph: no path, no claim")
     from knowledge.graph.entity_graph import (
-        Edge, EdgeKind, EntityGraph, Node, NodeKind, PathRequired, require_path)
+        Confidence, Edge, EdgeKind, EntityGraph, Node, NodeKind, PathRequired,
+        path_to_citations, require_path)
 
+    OPENED = _date(2026, 1, 1)
     g = EntityGraph()
     for nid, kind, lbl in [("EV:redsea", NodeKind.EVENT, "Red Sea disruption"),
                            ("SEC:shipping", NodeKind.SECTOR, "Shipping"),
                            ("CO:MISC", NodeKind.COMPANY, "MISC Berhad")]:
         g.add_node(Node(nid, kind, lbl))
-    g.add_edge(Edge("EV:redsea", "SEC:shipping", EdgeKind.AFFECTS, 1.0, "doc:1"))
-    g.add_edge(Edge("SEC:shipping", "CO:MISC", EdgeKind.CLASSIFIED_IN, 1.0, "doc:2"))
-    hit = dict(g.impact_of("EV:redsea", {"CO:MISC"}))["CO:MISC"]
+    g.add_edge(Edge("EV:redsea", "SEC:shipping", EdgeKind.AFFECTS, 1.0, "doc:1",
+                    Confidence.EXTRACTED, OPENED))
+    g.add_edge(Edge("SEC:shipping", "CO:MISC", EdgeKind.CLASSIFIED_IN, 1.0, "doc:2",
+                    Confidence.EXTRACTED, OPENED))
+    today = NOW.date()
+    hit = dict(g.impact_of("EV:redsea", {"CO:MISC"}, asof=today))["CO:MISC"]
     check("multi-hop impact ships with its path and decay",
           hit.strength == "indirect" and hit.citable, hit.describe()[:60])
     try:
@@ -234,6 +239,33 @@ def main() -> int:
         check("unpathed impact claim is blocked", False)
     except PathRequired:
         check("unpathed impact claim cannot be emitted", True)
+
+    # An edge inferred from a shared label may be traversed and shown. It may not
+    # be cited. This is the distinction the binary `citable` could not express.
+    g.add_node(Node("CO:GUESS", NodeKind.COMPANY, "Guess Bhd"))
+    g.add_edge(Edge("SEC:shipping", "CO:GUESS", EdgeKind.CLASSIFIED_IN, 1.0, "doc:2",
+                    Confidence.INFERRED, OPENED))
+    check("an inferred edge cannot back an emitted claim",
+          "CO:GUESS" not in dict(g.impact_of("EV:redsea", {"CO:GUESS"}, asof=today)))
+
+    # Point in time: an edge that opens tomorrow is invisible to a question asked
+    # today, exactly as a fact whose known_at has not arrived.
+    later = Edge("EV:redsea", "CO:MISC", EdgeKind.AFFECTS, 1.0, "doc:3",
+                 Confidence.EXTRACTED, _date(2027, 1, 1))
+    check("an edge is invisible before its validity begins", not later.live_at(today))
+
+    corpus = {"doc:1": "The Red Sea disruption has closed the Suez routing for shipping.",
+              "doc:2": "MISC Berhad is classified within the shipping sector."}
+    cites = path_to_citations(hit, lambda d: Citation(
+        source="kb_sector", chunk_id=d, quoted_span=corpus[d][:40],
+        trust=TrustTier.METHOD_KB, as_of=NOW) if d in corpus else None)
+    check("a traversal path becomes citations the output gate can verify",
+          len(cites) == hit.n_hops, f"{len(cites)} citations for {hit.n_hops} hops")
+    try:
+        path_to_citations(hit, lambda d: None)
+        check("a partially cited path is refused", False)
+    except PathRequired:
+        check("a path the corpus cannot cite is refused whole", True)
 
     # ---------------------------------------------------------------- 11
     print("\n11. Reflection: the loop that mostly declines to learn")

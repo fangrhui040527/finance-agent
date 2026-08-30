@@ -262,25 +262,48 @@ class A7SectorTechnology(Agent):
     tools = ("retrieve", "traverse", "peers", "sector_primer")
     tier = TaskClass.SECTOR_READ
 
-    def __init__(self, ctx: AgentContext, graph=None) -> None:
+    def __init__(self, ctx: AgentContext, graph=None, evidence=None) -> None:
         super().__init__(ctx)
         self.graph = graph
+        #: source_doc_id -> Citation. The corpus talking: the graph records which
+        #: document supports an edge, only the corpus knows its text. Without
+        #: this every exposure finding reaches the output gate uncited and is
+        #: dropped, so a multi-hop claim could not be emitted at all.
+        self.evidence = evidence
 
-    def run(self, event_node: str, holdings: set[str]) -> list[Finding]:
-        from knowledge.graph.entity_graph import require_path
+    def run(self, event_node: str, holdings: set[str],
+            asof: date | None = None) -> list[Finding]:
+        from knowledge.graph.entity_graph import PathRequired, path_to_citations, require_path
         self._guard_tool("traverse")
         if self.graph is None:
             return [Finding(self.agent_id, "exposure", "no graph is loaded",
                             caveats=["multi-hop exposure unavailable"])]
+        on = asof or self.ctx.now.date()
         out = []
-        for iid, path in self.graph.impact_of(event_node, holdings):
+        for iid, path in self.graph.impact_of(event_node, holdings, asof=on):
             require_path(f"{event_node} affects {iid}", path)
+            caveats = [f"{path.strength} link"] + (
+                ["three or more hops: treat as speculative"] if path.n_hops >= 3 else [])
+            citations = []
+            if self.evidence is not None:
+                try:
+                    citations = path_to_citations(path, self.evidence)
+                except PathRequired as exc:
+                    # Emitted uncited on purpose rather than dropped here. The
+                    # output gate will refuse it and record WHY in answer.dropped;
+                    # skipping it silently would lose the fact that the graph
+                    # points at a document the corpus cannot produce.
+                    caveats.append(f"evidence unavailable: {exc}")
             out.append(Finding(
                 self.agent_id, "exposure",
                 f"{self.graph.label(iid)} is exposed via {path.describe()}",
+                citations=citations,
                 numbers={"path_weight": path.weight, "hops": float(path.n_hops)},
-                caveats=[f"{path.strength} link"] + (
-                    ["three or more hops: treat as speculative"] if path.n_hops >= 3 else []),
+                caveats=caveats,
+                # One citation per hop, and the conclusion needs all of them. A
+                # chain missing a link is not a weaker claim, it is a different
+                # claim that nothing supports.
+                all_citations_required=True,
             ))
         return out
 

@@ -68,7 +68,8 @@ Named in `RESEARCH.md` §6 and reused in `07-BUILD-ORDER.md` P12. **Two of these
 |---|---|---|
 | [qdrant/qdrant](https://github.com/qdrant/qdrant) | The nine vector collections in `02-AGENTS-AND-RAG.md` | **Apache-2.0** |
 | [timescale/timescaledb](https://github.com/timescale/timescaledb) | Prices, `known_at` fundamentals, FX, macro, factor returns. A Postgres extension, so one dialect across ledger and market data | **Dual: Apache-2.0 / Timescale License (TSL)** — some features are TSL-only |
-| [neo4j/neo4j](https://github.com/neo4j/neo4j) | Entity and supply-chain graph for A7's multi-hop traversal | **GPL-3.0** (Community Edition; Enterprise is commercial) |
+| [neo4j/neo4j](https://github.com/neo4j/neo4j) | Entity and supply-chain graph for A7's multi-hop traversal. **Not currently used** — `knowledge/graph/store.py` is SQLite, behind the interface a Neo4j driver would expose, so this remains a swap rather than a dependency | **GPL-3.0** (Community Edition; Enterprise is commercial) |
+| [Graphify-Labs/graphify](https://github.com/Graphify-Labs/graphify) | **Ideas adapted, no code copied.** Studied at `680e3ed`. Contributed the three-way edge confidence (`EXTRACTED / INFERRED / AMBIGUOUS`), provenance required on edges rather than only nodes, the schema gate ahead of build, the pure-stage pipeline shape, and god-node filtering. See `17-KNOWLEDGE-GRAPH.md` §2 for what was taken and what was deliberately not | **Apache-2.0** (prior MIT lineage) |
 | [tradingview/lightweight-charts](https://github.com/tradingview/lightweight-charts) | The annotated price chart in `03-WHY-IT-MOVED.md` §5 | **Apache-2.0 — with an attribution requirement.** See §6.3 |
 
 ---

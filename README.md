@@ -38,6 +38,7 @@ Full design detail starts at **[`docs/README.md`](docs/README.md)**.
 | [14 Operations runbook](docs/14-OPERATIONS-RUNBOOK.md) | **What to do next, what to monitor, and what should make you stop** |
 | [15 MCP setup](docs/15-MCP-SETUP.md) | **Run it as an MCP server so the reasoning is your Claude session** |
 | [16 Tracing and anatomy](docs/16-TRACING-AND-ANATOMY.md) | **Every prompt, every guardrail decision, every dropped claim — `make trace`** |
+| [17 Knowledge graph](docs/17-KNOWLEDGE-GRAPH.md) | **Multi-hop exposure: edge confidence, validity intervals, and the seam that lets a path be cited** |
 
 ## Status
 

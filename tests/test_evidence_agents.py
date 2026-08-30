@@ -22,7 +22,7 @@ from core.market.prices import Bar, PriceSeries
 from core.registry.loader import load
 from engines.events.taxonomy import BaseRateTable, CapBand, Event, EventType, Observation
 from knowledge.graph.entity_graph import (
-    Edge, EdgeKind, EntityGraph, Node, NodeKind, PathRequired,
+    Confidence, Edge, EdgeKind, EntityGraph, Node, NodeKind, PathRequired,
 )
 from knowledge.retrieval.pipeline import Router
 from markets.contract import AccountingStandard
@@ -300,14 +300,19 @@ def test_the_regime_label_is_described_as_a_rule_not_a_forecast():
 
 # -- A7 sector ---------------------------------------------------------------
 
+GRAPH_OPENED = date(2026, 1, 1)
+
+
 def graph():
     g = EntityGraph()
     for nid, kind, lbl in [("EV:x", NodeKind.EVENT, "Shock"),
                            ("SEC:s", NodeKind.SECTOR, "Shipping"),
                            ("CO:a", NodeKind.COMPANY, "Alpha")]:
         g.add_node(Node(nid, kind, lbl))
-    g.add_edge(Edge("EV:x", "SEC:s", EdgeKind.AFFECTS, 1.0, "doc:1"))
-    g.add_edge(Edge("SEC:s", "CO:a", EdgeKind.CLASSIFIED_IN, 1.0, "doc:2"))
+    g.add_edge(Edge("EV:x", "SEC:s", EdgeKind.AFFECTS, 1.0, "doc:1",
+                    Confidence.EXTRACTED, GRAPH_OPENED))
+    g.add_edge(Edge("SEC:s", "CO:a", EdgeKind.CLASSIFIED_IN, 1.0, "doc:2",
+                    Confidence.EXTRACTED, GRAPH_OPENED))
     return g
 
 

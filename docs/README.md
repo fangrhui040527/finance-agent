@@ -40,7 +40,10 @@ Three things are genuinely new here:
 | **11** | [Template audit](11-TEMPLATE-AUDIT.md) | `awesome-llm-apps` measured rather than assumed: what T1-T22 actually contain, what to adopt, and four templates the original selection missed |
 | **12** | [Code reference map](12-CODE-REFERENCE-MAP.md) | Where to look, file and line, for each piece you build — pinned to commit SHAs so line numbers stay valid |
 | **13** | [The self-learning loop](13-SELF-LEARNING-LOOP.md) | What `hermes-agent` does, which four mechanisms land here, and the one bias to invert |
-| [14 Operations runbook](14-OPERATIONS-RUNBOOK.md) | What to do next, what to monitor, and what should make you stop |
+| **14** | [Operations runbook](14-OPERATIONS-RUNBOOK.md) | What to do next, what to monitor, and what should make you stop |
+| **15** | [MCP setup](15-MCP-SETUP.md) | Serve the system over stdio so the reasoning runs on your Claude session |
+| **16** | [Tracing and anatomy](16-TRACING-AND-ANATOMY.md) | Every prompt, rail decision and dropped claim, recorded end to end |
+| **17** | [Knowledge graph](17-KNOWLEDGE-GRAPH.md) | Multi-hop exposure: edge confidence, validity intervals, and the seam that lets a path be cited |
 | [User guide](user-guide.html) | Install, every command, and the cadence for using it — open in a browser |
 | [Pipeline diagrams](pipeline.html) | Six diagrams tracing data from a wire story to a position size — open in a browser |
 | [World source register](world-sources.html) | Every source knowledge can come in from, worldwide — coverage, keys, rate limits, licences — ordered by trust tier |

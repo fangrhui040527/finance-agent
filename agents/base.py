@@ -44,9 +44,13 @@ class Finding:
     numbers: dict[str, float] = field(default_factory=dict)
     as_of: datetime | None = None
     caveats: list[str] = field(default_factory=list)
+    #: True when the citations form a chain rather than redundant support, so
+    #: losing one breaks the claim. See Claim.all_citations_required.
+    all_citations_required: bool = False
 
     def to_claim(self) -> Claim:
-        return Claim(text=self.text, citations=list(self.citations))
+        return Claim(text=self.text, citations=list(self.citations),
+                     all_citations_required=self.all_citations_required)
 
 
 class Agent(ABC):
