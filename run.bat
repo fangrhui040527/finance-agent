@@ -13,6 +13,8 @@ REM   run plan ...    what the system would do with a question
 REM   run log ...     log a view before you find out
 REM   run trace       full traced system run -> debug\<run_id>\
 REM   run graph       build the knowledge graph -> data\graph.db
+REM   run codegraph   build the repo graph -> data\codegraph.db
+REM   run graph-report  hubs, orphans, review queue, surprises
 REM   run mcp         serve MCP on stdio (Claude Desktop / Claude Code)
 REM   run mcp-check   MCP handshake selftest, no client needed
 REM   run due         what has reached its horizon
@@ -54,6 +56,8 @@ if /I "%CMD%"=="plan"    goto plan
 if /I "%CMD%"=="log"     goto log
 if /I "%CMD%"=="trace"   goto trace
 if /I "%CMD%"=="graph"   goto graph
+if /I "%CMD%"=="codegraph" goto codegraph
+if /I "%CMD%"=="graph-report" goto graphreport
 if /I "%CMD%"=="mcp"     goto mcp
 if /I "%CMD%"=="mcp-check" goto mcpcheck
 if /I "%CMD%"=="due"     goto due
@@ -113,6 +117,14 @@ goto end
 
 :graph
 "%PY%" -m knowledge.graph.build --rebuild%ARGS%
+goto end
+
+:codegraph
+"%PY%" -m knowledge.graph.build --code --rebuild%ARGS%
+goto end
+
+:graphreport
+"%PY%" ask.py graph --report%ARGS%
 goto end
 
 :mcp

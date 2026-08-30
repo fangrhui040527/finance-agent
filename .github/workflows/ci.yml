@@ -68,6 +68,15 @@ jobs:
           python -m knowledge.graph.build --db /tmp/graph-b.db --rebuild
           cmp /tmp/graph-a.db /tmp/graph-b.db
 
+      # The code graph is a maintainer's tool, but it parses every file in the
+      # repository - so a build failure here is a syntax error somewhere, and
+      # the reproducibility guarantee has to hold for it too.
+      - name: Codebase graph builds, twice, identically
+        run: |
+          python -m knowledge.graph.build --code --db /tmp/code-a.db --rebuild
+          python -m knowledge.graph.build --code --db /tmp/code-b.db --rebuild
+          cmp /tmp/code-a.db /tmp/code-b.db
+
       # The only end-to-end run that uses the REAL registry-derived allowlist.
       # verify.py and the unit tests pass hand-written allowlists with invented
       # agent ids, which is how a missing llm_complete grant survived unnoticed.

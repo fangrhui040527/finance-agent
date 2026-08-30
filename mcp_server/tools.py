@@ -620,3 +620,80 @@ def calibration_status(db: str = "") -> str:
         for k, v in sorted(buckets.items()))
     return (f"CALIBRATION on {len(pairs)} graded predictions\n{rows}\n\n"
             f"  Stated above actual = overconfident. {len(pending)} still pending.")
+
+
+def explain_path(a: str, b: str, asof: str = "", db: str = "") -> str:
+    """Why are these two connected, and how strongly - the multi-hop question.
+
+    docs/02 section 5 names this as the whole point of P9: vector search cannot
+    answer "the Strait of Hormuz closed, which of my holdings is exposed",
+    because no single document contains the chain.
+
+    Three things this returns that a similarity search cannot: the chain itself,
+    a weight that decays per hop so a three-hop guess is visibly weaker than a
+    filing, and one citation per link - which the caller may verify.
+    """
+    from datetime import date as _date
+    from pathlib import Path as _P
+
+    from knowledge.graph.build import DEFAULT_DB
+    from knowledge.graph.entity_graph import PathRequired, path_to_citations
+    from knowledge.graph.evidence import CuratedCorpus
+    from knowledge.graph.store import GraphStore
+
+    path_db = db or DEFAULT_DB
+    if path_db != ":memory:" and not _P(path_db).exists():
+        return (f"REFUSED: no graph at {path_db}. Build it with `make graph` "
+                f"(offline, no keys). Answering without one would mean guessing.")
+    try:
+        on = _date.fromisoformat(asof) if asof else _date.today()
+    except ValueError:
+        return f"REFUSED: as-of {asof!r} is not an ISO date (YYYY-MM-DD)."
+
+    with GraphStore(path_db) as store:
+        g = store.load()
+
+        src, dst = (g.resolve(a) or a), (g.resolve(b) or b)
+        for nid, raw in ((src, a), (dst, b)):
+            if g.node(nid) is None:
+                options = g.candidates(raw)
+                if len(options) > 1:
+                    return (f"REFUSED: {raw!r} is ambiguous - it could be "
+                            f"{', '.join(options)}. Name one; guessing which "
+                            f"you meant would answer a different question.")
+                return (f"REFUSED: {raw!r} is not in the graph. It holds "
+                        f"{len(g.nodes())} entities; add it to "
+                        f"knowledge/graph/data/ and rebuild rather than "
+                        f"inferring what it might be.")
+        if src == dst:
+            return f"REFUSED: {a!r} and {b!r} are the same entity."
+
+        paths = g.traverse(src, asof=on, target=dst)
+        if not paths:
+            return (f"No path from {g.label(src)} to {g.label(dst)} as of {on}.\n\n"
+                    f"Traversal is a best-first heuristic, not an exhaustive "
+                    f"search, so this means NOT FOUND CHEAPLY - never that the "
+                    f"two are unconnected. Do not report them as unrelated.")
+
+        best = paths[0]
+        lines = [f"{g.label(src)} -> {g.label(dst)}, as of {on}",
+                 f"  {best.describe()}",
+                 f"  strength: {best.strength} ({best.n_hops} hop"
+                 f"{'s' if best.n_hops != 1 else ''}, weight {best.weight:.2f})"]
+        if best.n_hops >= 3:
+            lines.append("  three or more hops: treat as speculative")
+
+        corpus = CuratedCorpus()
+        try:
+            cites = path_to_citations(best, corpus.citation)
+            lines.append("\n  evidence, one document per link:")
+            lines += [f"    [{c.chunk_id}] {c.quoted_span}" for c in cites]
+        except PathRequired as exc:
+            lines.append(f"\n  NOT CITABLE: {exc}\n"
+                         "  The chain exists and cannot support an emitted claim.")
+
+        if len(paths) > 1:
+            lines.append(f"\n  {len(paths) - 1} weaker route"
+                         f"{'s' if len(paths) > 2 else ''} also found; the "
+                         f"strongest is shown.")
+        return "\n".join(lines)

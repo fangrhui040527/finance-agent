@@ -36,6 +36,7 @@ from knowledge.graph.store import DETERMINISTIC, GraphStore
 from knowledge.graph.validate import parse
 
 DEFAULT_DB = "data/graph.db"
+CODE_DB = "data/codegraph.db"
 
 
 @dataclass
@@ -78,7 +79,7 @@ def default_extractors(cfg=None):
 
 
 def build(store: GraphStore, extractors=None, cfg=None,
-          tier: str = DETERMINISTIC) -> BuildReport:
+          tier: str = DETERMINISTIC, skip_markets: bool = False) -> BuildReport:
     from knowledge.graph.extractors.market_registry import MarketsExtractor
 
     extractors = list(default_extractors(cfg) if extractors is None else extractors)
@@ -91,7 +92,7 @@ def build(store: GraphStore, extractors=None, cfg=None,
         collected.append((ex.name, nodes, edges))
         instruments |= {n.node_id for n in nodes if n.kind is NodeKind.COMPANY}
 
-    if not any(getattr(e, "name", "") == "markets" for e in extractors):
+    if not skip_markets and not any(getattr(e, "name", "") == "markets" for e in extractors):
         mx = MarketsExtractor(sorted(instruments))
         nodes, edges = parse(mx.extract(), mx.name)
         collected.append((mx.name, nodes, edges))
@@ -118,16 +119,25 @@ def build(store: GraphStore, extractors=None, cfg=None,
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="build the knowledge graph, offline")
     ap.add_argument("--db", default=DEFAULT_DB, help=f"output (default {DEFAULT_DB})")
+    ap.add_argument("--code", action="store_true",
+                    help="build the CODEBASE graph instead: modules, symbols, "
+                         f"imports and calls over this repository (-> {CODE_DB})")
+    ap.add_argument("--root", default=".", help="repository root for --code")
     ap.add_argument("--rebuild", action="store_true",
                     help="delete the database first. Edges are append-only, so a "
                          "rebuild that must not inherit history needs a new file.")
     args = ap.parse_args(argv)
 
-    path = Path(args.db)
+    path = Path(args.db if args.db != DEFAULT_DB or not args.code else CODE_DB)
     if args.rebuild and path.exists():
         path.unlink()
     with GraphStore(path) as store:
-        report = build(store)
+        if args.code:
+            from knowledge.graph.extractors.code import CodeExtractor
+            report = build(store, extractors=[CodeExtractor(args.root)],
+                           skip_markets=True)
+        else:
+            report = build(store)
     print(report.describe())
     print(f"\n  written to {path}")
     return 0

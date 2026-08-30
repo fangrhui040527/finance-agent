@@ -771,6 +771,9 @@ def s_mcp():
         "log_prediction": {"instrument": "MYX:1155", "direction": 1, "horizon_days": 63,
                            "confidence": 0.6, "thesis": "t", "db": ":memory:"},
         "calibration_status": {"db": ":memory:"},
+        # A graph path the tool cannot reach: with no database it must refuse,
+        # which is the honest answer and the one this suite is checking for.
+        "explain_path": {"a": "Maybank", "b": "MISC", "db": ":memory:"},
     }
     uncovered = [t for t in S.tools if t not in minimal]
     if uncovered:
@@ -781,6 +784,50 @@ def s_mcp():
         expect_no_crash(f"{name} callable with required args only",
                         lambda n=name, a=args: body(call(n, **a)),
                         why="A tool the model cannot call minimally is a tool it will misuse.")
+
+    # -- explain_path: an empty result is never "unrelated" -------------------
+    with tempfile.TemporaryDirectory() as tmp:
+        from knowledge.graph.build import build as _build_graph
+        from knowledge.graph.store import GraphStore as _GS
+        gpath = str(Path(tmp) / "g.db")
+        with _GS(gpath) as _gs:
+            _build_graph(_gs)
+
+        far = body(call("explain_path", a="MISC", b="NVIDIA",
+                        asof="2026-08-28", db=gpath))
+        if "unconnected" in far.lower() and "never" not in far.lower():
+            finding("explain_path reports an unreached pair as unconnected",
+                    "Traversal is a best-first heuristic. Phrasing an empty "
+                    "result as 'unrelated' invites a negative claim the graph "
+                    "cannot support.")
+        else:
+            held("an unreached pair is 'not found cheaply', not 'unconnected'", "")
+
+        amb = body(call("explain_path", a="Aluminium", b="Press Metal",
+                        asof="2026-08-28", db=gpath))
+        if not amb.startswith("REFUSED"):
+            finding("an ambiguous entity name was silently disambiguated",
+                    "'Aluminium' is both a sub-sector and a commodity; picking "
+                    "one answers a question nobody asked.")
+        else:
+            held("an ambiguous entity name is refused with its options", "")
+
+        for label, kw in (("a date that is not a date", {"asof": "last tuesday"}),
+                          ("an entity that does not exist", {"a": "Atlantis"}),
+                          ("an entity against itself", {"a": "MISC", "b": "MISC"})):
+            args = {"a": "MISC", "b": "Maybank", "db": gpath, **kw}
+            out = body(call("explain_path", **args))
+            if not out.startswith("REFUSED"):
+                finding(f"explain_path accepted {label}", out[:140])
+        held("explain_path refuses bad dates, unknown entities and self-pairs", "3 checked")
+
+        cited = body(call("explain_path", a="Crude oil", b="MISC",
+                          asof="2026-08-28", db=gpath))
+        if cited.count("curated:supply_chain#") < 2:
+            finding("a two-hop explanation did not cite both links",
+                    "A partially cited chain reads as evidence and is not.")
+        else:
+            held("a two-hop explanation cites every link", "2 documents")
 
     # -- the disclaimer cannot be lost ---------------------------------------
     for name in ("why_did_it_move", "check_portfolio_risk", "size_position"):

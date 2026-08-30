@@ -8,9 +8,9 @@ one non-negotiable rule: **every multi-hop claim ships with its traversal path
 attached**, decayed per hop, so a three-hop inference is visibly weaker than a
 direct link. An impact claim without a path cannot be emitted.
 
-This document covers phases 1 and 2: the schema, the store, the seam that lets a
-graph-backed claim actually reach a user, and the deterministic extractors that
-put something in the graph for it to answer from.
+This document covers all four phases: the schema, the store, the seam that lets a
+graph-backed claim reach a user, the deterministic extractors that put something
+in it, the surfaces that query and review it, and the codebase graph.
 
 ---
 
@@ -312,18 +312,123 @@ checked-in yaml → extractor → validator → store → traversal
 
 ---
 
-## 11. What is not here yet
+## 11. Looking at the graph, not querying it
 
-- **Phase 3** — `analyze` (god nodes, surprising connections, graph diff,
-  orphans), a review surface for the `INFERRED` and `AMBIGUOUS` edges the news
-  layer produces, an MCP `explain_path` tool, `ask.py graph`, and a token
-  benchmark measuring subgraph vs corpus in the MYR the ledger already counts.
-- **Phase 4** — the codebase graph over `finance-agent` itself, using stdlib
-  `ast`. A maintainer tool, deliberately last.
+Prevention lives in `entity_graph`: hubs are not routed through, uncitable edges
+are not traversed. `analyze.py` is **detection** — what the graph has quietly
+become, which is a different question and the one nobody asks until an answer
+looks wrong. Every function is a pure read, so running an analysis can never be
+what changed the answer.
 
-The GDELT extractor exists and is tested, but is **not in the default build** —
-it needs a feed to read, and the review surface that gives its `INFERRED` edges
-somewhere to go arrives in phase 3.
+```
+make graph-report          # or: python ask.py graph --report
+```
+
+| | What it finds |
+|---|---|
+| `god_nodes` | Nodes traversal already refuses to route through — **and** `HUB_KINDS` nodes past half the threshold, which is why that list survives the move to a degree-only rule. `Malaysia` at degree 30 is on its way to connecting everything, and the moment to notice is while splitting it is still cheap |
+| `orphans` | Entities nothing connects to. Not a bug — the graph saying it has never been told anything about this one, which `docs/02` §3 makes the web-search trigger |
+| `review_queue` | `INFERRED` and `AMBIGUOUS` edges, weakest first. Without a queue this is not a workflow but a landfill: edges accumulate, nothing reads them, and the graph fills with material neither trusted nor discarded |
+| `surprising_connections` | Company pairs the graph **composed** that no single row states |
+| `graph_diff` | What one build changed. The unit of review, and the reason byte-reproducibility matters |
+
+**`surprising_connections` carries the whole idea in two filters.** `min_hops=2`,
+because a one-hop link is a row somebody typed and reporting it back to them is
+noise — a surprise is something the graph composed. And no taxonomy hop
+(`CLASSIFIED_IN`, `OPERATES_IN`, `REGULATED_BY`), because almost every pair in a
+classification graph is "connected" through its sub-sector or country, and
+reporting those buries the handful that carry information. Citable paths only: a
+surprise you cannot source is a rumour, and this list exists for a person
+deciding where to spend time.
+
+---
+
+## 12. The two surfaces
+
+```
+python ask.py graph --path "Crude oil" MISC --asof 2026-08-28
+python ask.py graph --impact "crude oil" --holding MISC
+python ask.py graph --report
+python ask.py graph --benchmark CM:aluminium "Press Metal"
+python ask.py graph --diff other.db
+python ask.py graph --db data/codegraph.db --uses cost_floor_bps
+```
+
+and the MCP tool `explain_path(a, b, asof)` — the multi-hop question `docs/02`
+§5 names as the whole point of P9. Both go through **one resolver**,
+`EntityGraph.resolve`, because each surface grew its own and each forgot a
+different `NodeKind`.
+
+**Ambiguity is refused, never broken by enum order.** `Aluminium` is both a
+sub-sector and a commodity in the shipped data; silently preferring one answers a
+question the user did not ask. Both surfaces list the candidates instead.
+
+**An empty result is phrased carefully, in both.** Traversal is a best-first
+heuristic (§7), so nothing found means *not found cheaply* — never that two
+entities are unconnected. A surface that says "unrelated" invites a negative
+claim the graph cannot support, and the stress suite checks the wording.
+
+---
+
+## 13. Does the graph earn its place?
+
+`benchmark.py` measures a path's context against handing over the whole corpus,
+in tokens, because that is a claim about money and should be measurable rather
+than asserted. On the shipped data an answerable question costs **~15× fewer
+tokens** than the corpus.
+
+It is allowed to come out badly, and does: a question the graph cannot reach
+scores 1.0× and is reported as *not answerable*. A graph that cannot find the
+answer has earned nothing on that question.
+
+**Estimated, not counted.** Exact counts need the Anthropic `count_tokens`
+endpoint, which needs a key and a network; this repo runs offline. The estimate
+is `len(text) // 4` — deliberately the same heuristic `EchoBackend` already uses,
+because two offline estimates that disagree are worse than one honestly
+approximate. It is not a billing figure; the ledger records real usage.
+
+---
+
+## 14. The codebase graph
+
+```
+make codegraph        # -> data/codegraph.db, ~1,500 nodes / ~2,700 edges
+python ask.py graph --db data/codegraph.db --uses cost_floor_bps
+```
+
+The same core, over `finance-agent` itself, using stdlib `ast` — not
+tree-sitter, whose 27 pinned grammar packages would break the two-dependency
+rule for a convenience. Modules and top-level symbols become nodes; imports and
+calls become edges.
+
+**Why the call edges are `INFERRED`.** A static pass reads names, not bindings.
+`self.store.record(...)` is recorded against whichever `record` is defined —
+dynamic dispatch, `getattr`, rebinding decorators and re-exports are all
+invisible. So a call edge means "this name is referenced here and defined there",
+a strong hint and not a fact, and `Edge.citable` refuses it exactly as it refuses
+a substring match in the news layer. Imports are `EXTRACTED`: an import statement
+names its target literally.
+
+Three refusals rather than guesses: a name defined in two places produces **no
+edge** (no edge beats several wrong ones); a name on the stop-list — `run`,
+`main`, `get` — is skipped, which is graphify's god-node list in its original
+form; and a file that will not parse is skipped, not guessed at.
+
+The degree rule generalises without changes: on this repository the hubs are
+`ask.py`, `mcp_server/tools.py` and the large test files — exactly the waypoints
+that would otherwise connect everything to everything.
+
+---
+
+## 15. What is not here yet
+
+The **GDELT extractor** exists and is tested but is **not in the default build** —
+it needs a feed to read. Its `INFERRED` edges now have somewhere to go
+(`review_queue`), so wiring it is a config change rather than new machinery.
+
+A **semantic tier** — a model proposing edges — is the obvious next step and is
+deliberately unbuilt. The `tier` column exists so it cannot wipe the
+deterministic tier when it arrives, and vice versa.
 
 The honest expectation: the shipped build is 47 nodes and 84 edges, most of them
 classification. That is not impressive to look at, and it is the right starting
@@ -339,7 +444,7 @@ against a primary source in this repository. The file says so at the top.
 
 ---
 
-## 12. Files
+## 16. Files
 
 | Path | Role |
 |---|---|
@@ -349,12 +454,19 @@ against a primary source in this repository. The file says so at the top.
 | `knowledge/graph/ids.py` | One canonical id, three producers |
 | `knowledge/graph/build.py` | extract → validate → store. `make graph` |
 | `knowledge/graph/evidence.py` | The curated files, read as a corpus |
-| `knowledge/graph/extractors/` | Five deterministic sources, one contract |
+| `knowledge/graph/analyze.py` | Hubs, orphans, the review queue, surprises, diff |
+| `knowledge/graph/report.py` | All of the above, on one page |
+| `knowledge/graph/benchmark.py` | Subgraph vs corpus tokens |
+| `knowledge/graph/extractors/` | Six deterministic sources, one contract |
+| `knowledge/graph/extractors/code.py` | The repository as a graph, over `ast` |
 | `knowledge/graph/data/*.yaml` | Human-authored: entities, sectors, supply chain |
 | `tests/test_graph_schema.py` | Confidence, validity, inversion, the seam, the validator |
 | `tests/test_graph_store.py` | Append-only, as-of reads, determinism, tiers |
 | `tests/test_graph_ids.py` | Idempotence, the fold-before-filter order, aliases |
 | `tests/test_graph_extract.py` | Each extractor against its own source |
 | `tests/test_graph_build.py` | Determinism, hubs, parallel edges, the whole loop |
+| `tests/test_graph_analyze.py` | Detection, the review queue, diff, the report |
+| `tests/test_graph_code.py` | What a static pass can and cannot see |
+| `tests/test_graph_surfaces.py` | `ask.py graph` and `explain_path`, same refusals |
 | `tests/test_feeds_graph.py` | The original P9 traversal tests |
 | `stress/run.py` §10 | 10k edges, cycles, broken chains, hubs, history rewrites |
