@@ -15,13 +15,17 @@ turned into a market, is the fix.
 from __future__ import annotations
 
 from markets.contract import MarketAdapter
+from markets.xasx import XASX
 from markets.xhkg import XHKG
 from markets.xkls import XKLS
+from markets.xlon import XLON
 from markets.xnas import XNAS
 from markets.xses import XSES
+from markets.xtks import XTKS
 
 _ADAPTERS: dict[str, type[MarketAdapter]] = {
     "XKLS": XKLS, "XNAS": XNAS, "XSES": XSES, "XHKG": XHKG,
+    "XTKS": XTKS, "XLON": XLON, "XASX": XASX,
 }
 _CACHE: dict[str, MarketAdapter] = {}
 
@@ -35,6 +39,15 @@ ALIASES: dict[str, str] = {
     "NASDAQ": "XNAS",
     "HKEX": "XHKG",
     "SEHK": "XHKG",
+    # XJPX is the Japan Exchange Group operator MIC; XTKS is the Tokyo Stock
+    # Exchange segment where shares actually trade. docs/06 wrote XJPX while
+    # core/market/feed.py already wrote XTKS - the same doc-versus-code drift
+    # MYX/XKLS caused, mapped here before it can cost anything.
+    "XJPX": "XTKS",
+    "TSE": "XTKS",     # Tokyo; also the initialism for several other exchanges,
+    "TYO": "XTKS",     # which is exactly why the MIC is the canonical form
+    "LSE": "XLON",
+    "ASX": "XASX",
 }
 
 

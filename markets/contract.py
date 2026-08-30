@@ -40,6 +40,13 @@ class FeeLeg:
     minimum: Decimal = Decimal(0)
     cap: Decimal | None = None
     per_side: bool = True
+    """False for a charge levied on ONE leg only.
+
+    UK Stamp Duty Reserve Tax is the case that matters: 0.5% on purchases and
+    nothing on sales. Every other charge in this repository is symmetric, which
+    is why this field sat declared and unread until London arrived - and why
+    round_trip used to double everything unconditionally.
+    """
 
     def charge(self, consideration: Decimal) -> Decimal:
         amt = consideration * self.rate
@@ -53,11 +60,23 @@ class FeeSchedule:
     legs: tuple[FeeLeg, ...]
 
     def one_side(self, consideration: Decimal) -> Decimal:
+        """Everything a single trade pays, one-way legs included - what a buy costs."""
         return sum((leg.charge(consideration) for leg in self.legs), Decimal(0))
 
+    def one_way(self, consideration: Decimal) -> Decimal:
+        """Charges levied on a single leg only - the buy side, by convention."""
+        return sum((leg.charge(consideration) for leg in self.legs
+                    if not leg.per_side), Decimal(0))
+
     def round_trip(self, consideration: Decimal) -> Decimal:
-        """docs/04 section 6.3: cost is computed before any signal is discussed."""
-        return self.one_side(consideration) * 2
+        """docs/04 section 6.3: cost is computed before any signal is discussed.
+
+        Symmetric legs are charged twice; one-way legs once. Doubling a buy-only
+        stamp duty overstates the cost floor, which sounds conservative and is
+        not: an overstated floor refuses positions that would have cleared it.
+        """
+        return sum((leg.charge(consideration) for leg in self.legs
+                    if leg.per_side), Decimal(0)) * 2 + self.one_way(consideration)
 
     def round_trip_bps(self, consideration: Decimal) -> Decimal:
         if consideration <= 0:

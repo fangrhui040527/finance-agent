@@ -30,7 +30,7 @@ network and no keys; `pytest` runs 361 tests.
 | P15 surface | done | `ui/render.py` |
 | P17 registry and ratchet | done | `core/registry/loader.py`, `evals/` — 16 suites |
 | **P16 paper trade gate** | **waiting on elapsed time** | tooling built (`predict.py`, `agents/learning/store.py`); needs 3–6 months of graded outcomes |
-| P18 T2 market onboarding | **ready, not started** | depends on P17, which is done — one adapter class plus a registry entry per market |
+| P18 T2 market onboarding | **done for SG HK JP UK AU** | `markets/` — 7 adapters. India, Taiwan, Korea and Germany remain |
 | P19 short-horizon classifier | blocked on P16 | needs the forward record P16 produces |
 
 **What "waiting" means here.** P16 is not unbuilt work; it is a waiting period.
@@ -44,8 +44,22 @@ Grading them early is refused on purpose (`OutcomeQueue.grade` raises), because 
 **P18 was previously listed as blocked on P16. That was wrong** — the roadmap has
 it after P17, which is done. Onboarding a T2 market needs no forward record; it
 needs one `MarketAdapter` subclass, a registry entry, and the conformance tests
-that already exist. It is the most useful thing available to work on today that
-does not require waiting.
+that already exist.
+
+The five markets the gantt named (SG, HK, JP, UK, AU) are now registered, and
+the claim held: no engine, agent or orchestrator changed. Two things did surface,
+and neither was visible before a market needed them —
+
+- `FeeLeg.per_side` was declared and never read, so `round_trip` doubled every
+  charge. UK Stamp Duty Reserve Tax is levied on purchases only, and doubling it
+  overstates the London floor by 50 bps. An overstated floor refuses positions
+  that would have cleared the real one.
+- `docs/06` named Japan `XJPX` while `core/market/feed.py` already wrote `XTKS`.
+  Both are real MICs — the group operator and the exchange segment — and it is
+  the MYX/XKLS drift again. Aliased before it could cost anything.
+
+India (XNSE), Taiwan (XTAI), Korea (XKRX) and Germany (XETR) remain, and are the
+same shape of work.
 
 **What is now wired.** GDELT (news) and Stooq (daily bars) are both live and keyless. Filings, ownership and macro remain unwired: their adapters raise
 rather than returning empty, so a missing source can never read as a quiet

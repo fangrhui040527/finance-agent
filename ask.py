@@ -451,6 +451,18 @@ def cmd_backend(a) -> int:
     return 0
 
 
+def cmd_fitness(a) -> int:
+    """docs/01 section 10, computed. Mostly a report of what is missing."""
+    from core.config import load as load_cfg
+    from core.provenance.fitness import compute
+    from core.provenance.ledger import ProvenanceLedger
+
+    cfg = load_cfg()
+    with ProvenanceLedger(a.db or cfg.provenance_db) as led:
+        print(compute(led, window_days=a.days).describe())
+    return 0
+
+
 # ---------------------------------------------------------------- graph
 def _graph(db: str | None):
     """Load the built graph, or explain how to build it. Never guesses."""
@@ -670,6 +682,11 @@ def main(argv=None) -> int:
     ln.add_argument("--mastered", action="append", help="repeatable")
     ln.add_argument("--syllabus", action="store_true")
     ln.set_defaults(fn=cmd_learn)
+
+    ft = sub.add_parser("fitness", help="can the system score itself yet?")
+    ft.add_argument("--days", type=int, default=30, help="window (default 30)")
+    ft.add_argument("--db", help="ledger path (default from config)")
+    ft.set_defaults(fn=cmd_fitness)
 
     gr = sub.add_parser("graph", help="the entity graph: paths, impact, review")
     gr.add_argument("--path", nargs=2, metavar=("FROM", "TO"),

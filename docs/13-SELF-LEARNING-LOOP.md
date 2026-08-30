@@ -205,4 +205,49 @@ So the assembled A14 is: **Hermes's fork mechanism and provenance gate + Trading
 | **P17** | Inactivity-triggered curator: stale → archive, pinned opt-out, **never delete** | `curator.py` L233, L305 |
 | **P17** | Lesson-precision metric in the nightly fitness function | `01 §10` |
 
+### 5.1 Status, re-checked August 2026
+
+Re-read at `main` on 30 Aug 2026 against the August study at `652f5d74`. **The
+four mechanisms above are still the right four** — nothing in the newer modules
+changes the analysis:
+
+| Module (new since the study) | What it is | Verdict |
+|---|---|---|
+| `agent/learning_graph.py` | a desktop visualisation of which skills connect to which memories; edges from lexical token overlap, no confidence, no decay | Weaker than `knowledge/graph/`, which already models exactly that edge as `INFERRED` and refuses to cite it |
+| `agent/insights.py` | usage analytics — tokens, cost, tool frequency, activity streaks | `core/provenance/ledger.py` already computes this |
+| `agent/error_classifier.py` | a priority-ordered taxonomy of ~20 API failure modes → retry / rotate credential / compress / abort | **Genuinely better than ours.** See below |
+| `agent/learning_mutations.py` | mutation operations over the learning graph | Not applicable — that graph is a display artefact |
+
+**The one thing worth taking is not about learning at all.** `core/llm/backends.py`
+has a flat `RETRY_STATUS = {429, 500, 502, 503, 529}`. Hermes distinguishes
+*retryable* auth from *permanent* auth, and separates **context overflow** —
+which must compress rather than retry — from a generic 400. Retrying a context
+overflow is an infinite loop that bills for every attempt. Worth adopting when
+the key is wired; it costs nothing to build offline and cannot be tested without
+one.
+
+Of the eight items in the table above, **five are built**: provenance markers
+(`core/contracts/provenance_marker.py`), sidecar telemetry
+(`core/provenance/sidecar.py`), the deferred outcome queue and the inverted
+prompt (`agents/learning/reflection.py`), and the inactivity curator
+(`A15Reflection.curate`, which archives on hit rate and marks stale on age).
+
+Two are now built here:
+
+- **Lesson retrieval scoring** — `agents/learning/scoring.py`. The store returned
+  `active()` in insertion order, so with twenty lessons the twentieth was read
+  last regardless of merit. Multiplicative, following FinMem's compound score:
+  recency × relevance × evidence, so a lesson failing any term sinks rather than
+  being carried by a strong one. **Importance is evidence, not an LLM rating** —
+  a model asked how important its own lesson is will say "very".
+- **The nightly fitness function** — `core/provenance/fitness.py`, specified in
+  `01 §10` and never computed. Three of its seven terms cannot be computed from
+  anything recorded today, so it **emits no headline score at all** and instead
+  reports what is missing and what would supply it. That report is the useful
+  output: `python ask.py fitness`.
+
+**Fork-based reflection remains unbuilt**, and deliberately: the mechanism is a
+restricted tool surface for a review context, which only means anything once a
+model is doing the reviewing.
+
 **Do not skip the P0 items.** They are two fields and a JSON file, they cost an afternoon, and without them the L4 gate in `01 §10` has nothing to enforce against. Every other item on this list depends on being able to answer "did a human write this?" — and that question cannot be answered retroactively.

@@ -80,7 +80,7 @@ make up                      # postgres+timescale · qdrant · neo4j · redis ·
 |---|---|---|
 | P0 | Tier router, guardrail chain, provenance ledger, typed answers | `core/` |
 | P1 | Instrument identity, session calendars, price adjustment, FX | `core/market/` |
-| P2 | Market adapter contract + XKLS + XNAS + XSES + XHKG + conformance | `markets/` |
+| P2 | Market adapter contract + 7 markets + conformance | `markets/` |
 | P3.5 | Point-in-time `known_at` store, survivorship-safe universes | `core/market/pointintime.py` |
 | P4 | Attribution: robust regression, decomposition, long-horizon | `engines/attribution/` |
 | P5 | News corpus: five-dimension features, wire dedup, escalation gate | `knowledge/news/` |
@@ -98,7 +98,7 @@ make up                      # postgres+timescale · qdrant · neo4j · redis ·
 | P17 | Capability registry and the eval ratchet, 16 suites | `core/registry/`, `evals/` |
 | P16 tooling | Durable prediction log + CLI — the clock the gate needs | `agents/learning/store.py`, `predict.py` |
 | Entrypoint | `ask why` / `ask plan` — decomposition and routing from the shell | `ask.py` |
-| P18 | Singapore (XSES), the first T2 market | `markets/xses.py` |
+| P18 | T2 markets: SG, HK, JP, UK, AU | `markets/x{ses,hkg,tks,lon,asx}.py` |
 | P18 | Hong Kong (XHKG), the second — per-issuer board lots, uncapped stamp | `markets/xhkg.py` |
 | Model | Anthropic Messages backend behind the one `Backend` seam | `core/llm/backends.py` |
 | Prices | Stooq daily bars, validated at the seam | `core/market/feed.py` |
@@ -108,8 +108,9 @@ make up                      # postgres+timescale · qdrant · neo4j · redis ·
 
 **Not built:** P16's forward record — 3–6 months of elapsed time, not effort;
 its tooling is built and its clock starts with `python predict.py log`. P19
-depends on that record. P18 is started, not finished: XSES and XHKG are
-onboarded, JP/UK/AU are not.
+depends on that record. P18 covers the five T2 markets the roadmap named
+(SG, HK, JP, UK, AU); India, Taiwan, Korea and Germany remain and are the same
+shape of work.
 
 **Two live sources are wired**, both free and keyless: GDELT for news
 (`knowledge/feeds/adapter.py`) and Stooq for daily bars (`core/market/feed.py`).

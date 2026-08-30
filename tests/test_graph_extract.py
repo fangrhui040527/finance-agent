@@ -150,7 +150,15 @@ def test_it_accepts_an_already_minted_node_id_as_well_as_an_instrument_id():
 
 
 def test_a_market_with_no_adapter_is_skipped_rather_than_crashing_the_build():
-    nodes, edges = checked(MarketsExtractor(["XTKS:7203", "not-an-instrument"]))
+    """The unsupported MIC is chosen at RUNTIME, not written down. This test
+    named XTKS until Tokyo was registered, at which point it started asserting
+    the opposite of what it says - the same trap that already cost this
+    repository one stale test."""
+    from markets.registry import supported
+    unsupported = next(m for m in ("XTAE", "XBOM", "XKRX", "XSWX", "XPAR")
+                       if m not in supported())
+    nodes, edges = checked(MarketsExtractor([f"{unsupported}:0001",
+                                             "not-an-instrument"]))
     assert (nodes, edges) == ([], [])
 
 
