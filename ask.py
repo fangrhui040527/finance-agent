@@ -492,6 +492,20 @@ def cmd_graph(a) -> int:
             print(f"{raw!r} is not in the graph", file=sys.stderr)
         return 2
 
+    if a.untested:
+        from knowledge.graph.analyze import untested_modules
+        missing = untested_modules(g, ignore=("tests_", "_pycache"))
+        if not missing:
+            print("every module has a test importing it.")
+            return 0
+        print(f"{len(missing)} module{'s' if len(missing) != 1 else ''} no test "
+              f"imports:")
+        for nid in missing:
+            print(f"  {g.label(nid)}")
+        print("\n  INFERRED: a module exercised only through a helper reads as "
+              "untested here. The list over-reports rather than under-reports.")
+        return 0
+
     if a.uses:
         target = resolve(a.uses)
         if g.node(target) is None:
@@ -664,6 +678,8 @@ def main(argv=None) -> int:
                     help="what this event or commodity reaches")
     gr.add_argument("--holding", action="append",
                     help="limit --impact to these; repeatable")
+    gr.add_argument("--untested", action="store_true",
+                    help="modules no test imports; point --db at the code graph")
     gr.add_argument("--uses", metavar="SYMBOL",
                     help="what references this? point --db at the code graph")
     gr.add_argument("--report", action="store_true",

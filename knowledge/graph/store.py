@@ -183,6 +183,46 @@ class GraphStore:
             )
         self.conn.commit()
 
+    def close_missing(self, tier: str, keep, on: date) -> list[tuple]:
+        """Close every OPEN edge in `tier` that `keep` no longer contains.
+
+        This is the half of "re-extraction replaces only its own tier" that the
+        module docstring promised and nothing implemented. Without it a curated
+        row deleted from the yaml left its edge asserted forever, and the only
+        way to drop it was `--rebuild`, which deletes the whole file - taking
+        every other tier with it, including a semantic one that no deterministic
+        source could reproduce.
+
+        CLOSED, never deleted. A relationship the sources stopped asserting on a
+        given date is exactly what valid_to records, so "what did we believe in
+        March" survives a source being corrected. Deleting would make every
+        conclusion drawn through that edge unauditable, which is the whole
+        reason edges are append-only.
+
+        Returns the keys it closed, so a build can report them.
+        """
+        wanted = {(e.src, e.dst, e.kind.value, _iso(e.valid_from) or "") for e in keep}
+        rows = self.conn.execute(
+            "SELECT src, dst, kind, valid_from FROM edges "
+            "WHERE tier = ? AND valid_to IS NULL", (tier,),
+        ).fetchall()
+        closed = []
+        for row in rows:
+            if tuple(row) in wanted:
+                continue
+            if row[3] and date.fromisoformat(row[3]) >= on:
+                # An edge that opens on or after the closing date would become an
+                # interval containing no days, which Edge refuses to construct.
+                continue
+            self.conn.execute(
+                "UPDATE edges SET valid_to = ? "
+                "WHERE src = ? AND dst = ? AND kind = ? AND valid_from = ?",
+                (_iso(on), *row),
+            )
+            closed.append(tuple(row))
+        self.conn.commit()
+        return closed
+
     # -- reads ----------------------------------------------------------------
 
     def _node_exists(self, node_id: str) -> bool:

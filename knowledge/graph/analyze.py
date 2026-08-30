@@ -92,6 +92,48 @@ def review_queue(graph: EntityGraph) -> list[Edge]:
                                           e.src, e.dst, e.kind.value))
 
 
+def untested_modules(graph: EntityGraph, *, ignore=()) -> list[str]:
+    """Modules nothing tests. The code graph's reason for existing, after
+    "what breaks if I change this".
+
+    Reads the reverse index for an inbound TESTS edge, so it costs one lookup
+    per module rather than a scan.
+
+    A module that DEFINES NOTHING is skipped. Two thirds of the first run of
+    this were empty `__init__.py` package markers, which have nothing to test and
+    drown the modules that do - a list nobody can read is the same as no list.
+
+    An INFERRED signal, and the direction of its error matters: a TESTS edge is
+    a test module importing this one, so a module exercised only indirectly -
+    through a helper, or by a test that never imports it - reads as untested.
+    The list over-reports and never under-reports, which is the safe way round
+    for a list whose purpose is deciding where to add a test.
+    """
+    ignored = tuple(ignore)
+    out = []
+    for n in graph.nodes():
+        if n.kind is not NodeKind.PRODUCT:
+            continue
+        if any(part in n.node_id for part in ignored):
+            continue
+        inbound = graph.inbound(n.node_id)
+        if not any(e.kind is EdgeKind.CLASSIFIED_IN for e in inbound):
+            continue                       # defines nothing; nothing to test
+        if not any(e.kind is EdgeKind.TESTS for e in inbound):
+            out.append(n.node_id)
+    return sorted(out)
+
+
+def undocumented_modules(graph: EntityGraph) -> list[str]:
+    """Modules no prose names. Weaker than untested - most modules need no page -
+    so this is read as a question about the ones you expected to be written up."""
+    return sorted(
+        n.node_id for n in graph.nodes()
+        if n.kind is NodeKind.PRODUCT
+        and any(e.kind is EdgeKind.CLASSIFIED_IN for e in graph.inbound(n.node_id))
+        and not any(e.kind is EdgeKind.DOCUMENTS for e in graph.inbound(n.node_id)))
+
+
 @dataclass(frozen=True)
 class Surprise:
     src: str

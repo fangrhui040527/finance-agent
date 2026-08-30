@@ -175,6 +175,15 @@ like last quarter.
 - **`tier`** marks what produced a row (`deterministic` now, `semantic` later),
   so a deterministic rebuild cannot wipe model-proposed edges. Carried before
   anything writes it, because it is expensive to retrofit.
+- **`close_missing(tier, keep, on)`** is the half of that promise that has teeth.
+  A curated row deleted from the yaml used to stay asserted forever, and the only
+  way to drop it was `--rebuild`, which deletes the whole file — taking every
+  other tier with it. `make graph` now takes `--prune`, which **closes** what this
+  tier stopped asserting and leaves the others alone. Closed, never deleted:
+  "what did we believe in March" survives a source being corrected.
+
+  Pruning is opt-in. Closing an edge is a claim about the world, and a build
+  should not make one by accident.
 
 `load(tier=...)` filters **edges only**. A node is an identity and an edge is an
 assertion — which tier first observed that Maybank exists says nothing about who
@@ -401,6 +410,53 @@ tree-sitter, whose 27 pinned grammar packages would break the two-dependency
 rule for a convenience. Modules and top-level symbols become nodes; imports and
 calls become edges.
 
+Four edge kinds, and their confidence differs because the evidence does:
+
+| Edge | Confidence | Why |
+|---|---|---|
+| `imports` (`supplies`) | `EXTRACTED` | the statement names its target literally |
+| `documents` | `EXTRACTED` | the markdown contains the path as a literal string |
+| `tests` | `INFERRED` | a test importing a module is evidence it exercises it, not proof |
+| `calls` (`exposed_to`) | `INFERRED` | a name, not a binding — see below |
+
+`DOCUMENT` was **added to the shared vocabulary** rather than stretched from an
+existing kind, because a filing describing a company is the same relation as a
+page describing a module and neither domain could express it before. `TESTS` is
+the one place the vocabulary is stretched for a single domain — `Module`, `Class`
+and `Function` all had honest analogues in `Product` and `Technology`; "tests"
+has none.
+
+Document matching is on the **file path**, not the dotted name: prose says
+`core/llm/tiers.py` and almost never `core.llm.tiers`, and matching the dotted
+form would fire on ordinary sentences containing dots.
+
+### What has nothing testing it
+
+```
+python ask.py graph --db data/codegraph.db --untested
+```
+
+A module that **defines nothing** is skipped — two thirds of the first run were
+empty `__init__.py` package markers, and a list nobody can read is the same as no
+list. The remainder is short enough to act on.
+
+The signal is `INFERRED`, and **the direction of its error matters**: a module
+exercised only through a helper, or by a test that never imports it, reads as
+untested. It over-reports and never under-reports, which is the safe way round
+for a list whose purpose is deciding where to add a test. On this repository the
+four market adapters are exactly that false positive — reached through
+`markets.registry`.
+
+It also found a true one: `core/contracts/money.py` has no test importing it,
+and no test file mentions `Money(` at all.
+
+**It does not answer "which agent has no eval", and an earlier version of this
+document and that module's docstring both said it did.** That question cannot
+arise: `core/registry/loader.py` runs `check_suite` on every agent at load, so an
+agent without a usable eval suite does not produce a report — it **refuses to
+register**. A graph query would be a weaker second answer to something already
+refused outright.
+
 **Why the call edges are `INFERRED`.** A static pass reads names, not bindings.
 `self.store.record(...)` is recorded against whichever `record` is defined —
 dynamic dispatch, `getattr`, rebinding decorators and re-exports are all
@@ -422,13 +478,18 @@ that would otherwise connect everything to everything.
 
 ## 15. What is not here yet
 
-The **GDELT extractor** exists and is tested but is **not in the default build** —
-it needs a feed to read. Its `INFERRED` edges now have somewhere to go
-(`review_queue`), so wiring it is a config change rather than new machinery.
+Everything in this document is built. Two things remain, and **both need a key
+or a live source**, which is why they stop here:
 
-A **semantic tier** — a model proposing edges — is the obvious next step and is
-deliberately unbuilt. The `tier` column exists so it cannot wipe the
-deterministic tier when it arrives, and vice versa.
+- The **GDELT extractor** is written and tested but is **not in the default
+  build** — it needs a feed to read. Its `INFERRED` edges now have somewhere to
+  go (`review_queue`), so wiring it is a config change rather than new machinery.
+- A **semantic tier** — a model proposing edges — is the obvious next step. The
+  `tier` column and `close_missing` exist so it cannot wipe the deterministic
+  tier when it arrives, and a deterministic rebuild cannot wipe it.
+
+One finding this work produced and did not act on: `core/contracts/money.py` has
+no test. That is a gap in the repository, not in the graph.
 
 The honest expectation: the shipped build is 47 nodes and 84 edges, most of them
 classification. That is not impressive to look at, and it is the right starting

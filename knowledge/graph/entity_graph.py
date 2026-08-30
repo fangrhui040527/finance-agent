@@ -57,6 +57,10 @@ class NodeKind(str, Enum):
     COMMODITY = "Commodity"
     REGULATOR = "Regulator"
     EVENT = "Event"
+    #: A filing, a research note, a markdown page. Added for the code graph and
+    #: immediately useful to the finance one: a document describing a company is
+    #: a relationship the vocabulary could not previously express.
+    DOCUMENT = "Document"
 
 
 class EdgeKind(str, Enum):
@@ -70,6 +74,13 @@ class EdgeKind(str, Enum):
     REGULATED_BY = "regulated_by"
     CLASSIFIED_IN = "classified_in"
     AFFECTS = "affects"
+    #: A document describes a thing. Both domains: a filing describes a company,
+    #: a markdown page describes a module.
+    DOCUMENTS = "documents"
+    #: A test constrains a module. Code only, and the one place the shared
+    #: vocabulary is stretched for a single domain - Module, Class and Function
+    #: all had honest analogues (Product, Technology); "tests" has none.
+    TESTS = "tests"
 
 
 class Confidence(str, Enum):
@@ -99,6 +110,11 @@ EDGE_DECAY: dict[EdgeKind, float] = {
     EdgeKind.CLASSIFIED_IN: 0.35,
     EdgeKind.REGULATED_BY: 0.50,
     EdgeKind.AFFECTS: 0.75,
+    #: A document about X is strong evidence about X, below a stated relation.
+    EdgeKind.DOCUMENTS: 0.65,
+    #: A test is tightly coupled to what it covers - changing one usually means
+    #: changing the other, which is exactly what "what breaks" is asking.
+    EdgeKind.TESTS: 0.80,
 }
 
 # The reverse reading of a relation, where one exists. Only these kinds may be

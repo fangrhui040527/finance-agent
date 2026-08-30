@@ -973,6 +973,34 @@ def s_graph():
              f"{st.counts()['edges']} edge, {st.counts()['closed']} closed")
         st.close()
 
+    # -- a source that stops asserting must not silently keep asserting ------
+    with tempfile.TemporaryDirectory() as tmp:
+        from knowledge.graph.store import DETERMINISTIC
+        st2 = GraphStore(Path(tmp) / "p.db")
+        for n in ("A", "B"):
+            st2.add_node(Node(n, NodeKind.COMPANY))
+        live = Edge("A", "B", EdgeKind.SUPPLIES, 1.0, "d", Confidence.EXTRACTED, OPEN)
+        gone = Edge("B", "A", EdgeKind.CUSTOMER_OF, 1.0, "d", Confidence.EXTRACTED, OPEN)
+        st2.add_edge(live)
+        st2.add_edge(gone)
+        st2.add_edge(Edge("A", "B", EdgeKind.EXPOSED_TO, 0.4, "m",
+                          Confidence.INFERRED, OPEN), tier="semantic")
+        st2.close_missing(DETERMINISTIC, [live], TODAY)
+        if st2.counts()["edges"] != 3:
+            finding("pruning deleted an edge instead of closing it",
+                    "History drawn through a deleted edge becomes unauditable.")
+        elif len(st2.load(tier="semantic").edges()) != 1:
+            finding("pruning one tier touched another",
+                    "A deterministic rebuild must not wipe model-proposed edges.")
+        elif any(e.kind is EdgeKind.CUSTOMER_OF
+                 for e in st2.load().neighbours("B") if e.live_at(TODAY)):
+            finding("a dropped source row is still asserted after a prune",
+                    "A curated row deleted from the yaml stayed in the graph.")
+        else:
+            held("a dropped row is closed, not deleted, and only in its own tier",
+                 "3 edges kept, 1 closed, semantic untouched")
+        st2.close()
+
     # -- the validator raises rather than degrading the graph quietly --------
     expect_raises("a malformed extraction is refused, not warned about",
                   ExtractionError,

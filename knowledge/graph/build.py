@@ -29,6 +29,7 @@ from __future__ import annotations
 import argparse
 import sys
 from dataclasses import dataclass, field
+from datetime import date
 from pathlib import Path
 
 from knowledge.graph.entity_graph import Confidence, NodeKind
@@ -46,6 +47,8 @@ class BuildReport:
     edges: int = 0
     citable: int = 0
     hubs: list[str] = field(default_factory=list)
+    closed: list[tuple] = field(default_factory=list)
+    """Edges this build's sources stopped asserting, closed rather than deleted."""
 
     def describe(self) -> str:
         lines = ["knowledge graph"]
@@ -62,6 +65,12 @@ class BuildReport:
                                      "none - no node is well connected enough to "
                                      "be a meaningless waypoint yet")
         )
+        if self.closed:
+            lines.append(f"  closed           {len(self.closed)} edge"
+                         f"{'s' if len(self.closed) != 1 else ''} the sources no "
+                         f"longer assert (closed, not deleted - history stands)")
+            lines += [f"    {src} --{kind}--> {dst}" for src, dst, kind, _ in
+                      self.closed[:10]]
         return "\n".join(lines)
 
 
@@ -79,7 +88,15 @@ def default_extractors(cfg=None):
 
 
 def build(store: GraphStore, extractors=None, cfg=None,
-          tier: str = DETERMINISTIC, skip_markets: bool = False) -> BuildReport:
+          tier: str = DETERMINISTIC, skip_markets: bool = False,
+          prune_on: date | None = None) -> BuildReport:
+    """Extract, validate, store.
+
+    `prune_on` closes edges of THIS tier that the sources no longer produce,
+    dated that day. Without it a deleted curated row stays asserted forever;
+    with it, only this tier is touched - a semantic tier's edges survive a
+    deterministic rebuild, which is what the tier column is for.
+    """
     from knowledge.graph.extractors.market_registry import MarketsExtractor
 
     extractors = list(default_extractors(cfg) if extractors is None else extractors)
@@ -108,6 +125,10 @@ def build(store: GraphStore, extractors=None, cfg=None,
                                               e.valid_from or "")):
             store.add_edge(e, tier=tier)
 
+    if prune_on is not None:
+        report.closed = store.close_missing(
+            tier, [e for _, _, edges in collected for e in edges], prune_on)
+
     counts = store.counts()
     report.nodes, report.edges = counts["nodes"], counts["edges"]
     report.citable = counts["citable"]
@@ -124,20 +145,25 @@ def main(argv=None) -> int:
                          f"imports and calls over this repository (-> {CODE_DB})")
     ap.add_argument("--root", default=".", help="repository root for --code")
     ap.add_argument("--rebuild", action="store_true",
-                    help="delete the database first. Edges are append-only, so a "
-                         "rebuild that must not inherit history needs a new file.")
+                    help="delete the database first, discarding EVERY tier's "
+                         "history. Prefer --prune, which closes only what this "
+                         "tier stopped asserting and leaves other tiers alone.")
+    ap.add_argument("--prune", action="store_true",
+                    help="close edges of this tier the sources no longer assert, "
+                         "dated today. Closed, never deleted.")
     args = ap.parse_args(argv)
 
     path = Path(args.db if args.db != DEFAULT_DB or not args.code else CODE_DB)
     if args.rebuild and path.exists():
         path.unlink()
     with GraphStore(path) as store:
+        prune_on = date.today() if args.prune else None
         if args.code:
             from knowledge.graph.extractors.code import CodeExtractor
             report = build(store, extractors=[CodeExtractor(args.root)],
-                           skip_markets=True)
+                           skip_markets=True, prune_on=prune_on)
         else:
-            report = build(store)
+            report = build(store, prune_on=prune_on)
     print(report.describe())
     print(f"\n  written to {path}")
     return 0

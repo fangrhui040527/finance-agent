@@ -359,3 +359,45 @@ def test_an_unknown_document_id_yields_nothing_rather_than_an_empty_citation():
 def test_the_corpus_is_empty_rather_than_broken_when_the_files_are_missing(tmp_path):
     from knowledge.graph.evidence import CuratedCorpus
     assert len(CuratedCorpus(tmp_path / "none.yaml", tmp_path / "gone.yaml")) == 0
+
+
+# -- pruning through the build ------------------------------------------------
+
+class OneEdge(Extractor):
+    name = "pair"
+
+    def __init__(self, emit: bool):
+        self.emit = emit
+
+    def extract(self):
+        a, b = company_node("MYX:1155"), company_node("MYX:1023")
+        rows = [edge(a["id"], b["id"], EdgeKind.COMPETES_WITH, doc="d",
+                     confidence=Confidence.EXTRACTED, valid_from=OPENED)] if self.emit else []
+        return sorted_payload([a, b], rows)
+
+
+def test_a_source_row_that_disappears_is_closed_by_the_next_build(tmp_path):
+    with GraphStore(tmp_path / "g.db") as s:
+        build(s, extractors=[OneEdge(True)], skip_markets=True)
+        assert s.counts()["edges"] == 1
+        report = build(s, extractors=[OneEdge(False)], skip_markets=True,
+                       prune_on=date(2026, 6, 1))
+        assert len(report.closed) == 1
+        assert s.counts() == {"nodes": 2, "edges": 1, "citable": 1, "closed": 1}
+        assert "closed" in report.describe()
+
+
+def test_without_prune_a_deleted_row_stays_asserted_forever(tmp_path):
+    """Why prune exists. The default is still no-prune, because closing an edge
+    is a claim about the world and a build should not make it by accident."""
+    with GraphStore(tmp_path / "g.db") as s:
+        build(s, extractors=[OneEdge(True)], skip_markets=True)
+        report = build(s, extractors=[OneEdge(False)], skip_markets=True)
+        assert report.closed == []
+        assert s.counts()["closed"] == 0
+
+
+def test_pruning_the_real_build_closes_nothing_when_the_sources_are_unchanged(tmp_path):
+    with GraphStore(tmp_path / "g.db") as s:
+        build(s)
+        assert build(s, prune_on=date(2026, 6, 1)).closed == []
