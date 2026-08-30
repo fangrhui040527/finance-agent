@@ -163,12 +163,16 @@ def test_tier_three_market_would_not_claim_a_factor_model():
 
 def test_adding_a_market_did_not_change_any_engine_or_agent():
     """docs/01 section 10: a new market is one adapter class plus one registry
-    entry. XSES is the proof - the conformance suite above is parameterised over
-    supported(), so registering it subjected it to every conformance test with
-    no new test code at all."""
-    assert "XSES" in supported()
-    assert "XHKG" in supported()
-    assert len(supported()) == 4
+    entry. Seven markets are the proof - the conformance suite above is
+    parameterised over supported(), so registering each one subjected it to
+    every conformance test with no new test code at all.
+
+    The count is asserted deliberately. It is the line that fails when someone
+    adds an adapter, and failing here is how they are told to come and read what
+    the claim above actually promises."""
+    for mic in ("XKLS", "XNAS", "XSES", "XHKG", "XTKS", "XLON", "XASX"):
+        assert mic in supported()
+    assert len(supported()) == 7
 
 
 def test_singapore_charges_no_stamp_duty_unlike_bursa():
@@ -276,3 +280,114 @@ def test_hong_kong_keeps_a_lunch_break_unlike_singapore():
 
 def test_hong_kong_dividends_reach_a_malaysian_holder_gross():
     assert get("XHKG").withholding("dividend", "MY") == D(0)
+
+
+# --- P18: Tokyo, London, Sydney ---------------------------------------------
+
+def test_a_one_way_charge_is_not_doubled_on_the_round_trip():
+    """FeeLeg.per_side sat declared and unread until London arrived. Every other
+    charge here is symmetric, so round_trip doubled everything - which for UK
+    Stamp Duty Reserve Tax, a purchase-only 0.5%, overstates the round trip by
+    50 bps.
+
+    An overstated cost floor sounds conservative and is not: it refuses
+    positions that would in fact have cleared the real one.
+    """
+
+    from markets.contract import FeeLeg, FeeSchedule
+    both = FeeSchedule((FeeLeg("sym", D("0.001")),))
+    buy_only = FeeSchedule((FeeLeg("duty", D("0.001"), per_side=False),))
+    assert both.round_trip(D("10000")) == D("20")
+    assert buy_only.round_trip(D("10000")) == D("10")
+    # one_side is what a single trade pays, one-way legs included.
+    assert buy_only.one_side(D("10000")) == D("10")
+
+
+def test_uk_stamp_duty_is_charged_on_the_buy_and_not_the_sell():
+    lon = get("XLON")
+    duty = next(l for l in lon.fee_schedule.legs if "stamp" in l.name)
+    assert duty.per_side is False
+    naive = lon.fee_schedule.one_side(D("10000")) * 2
+    assert lon.fee_schedule.round_trip(D("10000")) < naive
+    assert naive - lon.fee_schedule.round_trip(D("10000")) == D("50")
+
+
+def test_the_uk_withholds_nothing_on_dividends():
+    """The one market of the seven where a Malaysian holder loses nothing at
+    source - XNAS takes 30%."""
+    assert get("XLON").withholding("dividend", "MY") == D(0)
+    assert get("XNAS").withholding("dividend", "MY") > D("0.25")
+
+
+def test_london_ticks_are_sub_penny_in_pounds_so_pence_input_is_obvious():
+    """LSE quotes in pence and this adapter works in pounds. A feed handing over
+    2750 for a GBP 27.50 share produces a position a hundred times too large,
+    and every number downstream stays finite and plausible. Sub-penny ticks are
+    the tell: pass pence and the ticks come back absurdly fine, not quietly
+    reasonable."""
+    lon = get("XLON")
+    assert lon.tick_size(D("27.50")) < D("0.01")
+    assert lon.tick_size(D("2750")) == D("0.01")   # the coarse top band
+
+
+def test_tokyo_ticks_are_coarse_enough_that_spread_beats_fees():
+    """A JPY 4,000 stock ticks in JPY 5 - 12.5 bps per tick, against roughly
+    0.5 bps for a USD 200 US name. The sizing engine's cost floor only sees
+    fees, so Tokyo's real minimum position is worse than its schedule implies."""
+    tks = get("XTKS")
+    tick_bps = tks.tick_size(D("4000")) / D("4000") * 10_000
+    assert tick_bps > D("10")
+    us_bps = get("XNAS").tick_size(D("200")) / D("200") * 10_000
+    assert us_bps < D("1")
+
+
+def test_tokyo_trades_in_lots_of_a_hundred_so_the_minimum_ticket_is_large():
+    tks = get("XTKS")
+    assert tks.lot_size("XTKS:7203") == 100
+    assert tks.lot_round_down(150, "XTKS:7203") == 100
+    assert tks.lot_round_down(99, "XTKS:7203") == 0
+
+
+def test_tokyo_keeps_its_lunch_break_and_closes_at_half_past_three():
+    """TSE extended the afternoon close from 15:00 to 15:30 on 5 November 2024,
+    its first change in seventy years, and kept the break."""
+    cal = get("XTKS").calendar
+    assert len(cal.windows) == 2
+    assert cal.windows[-1].end == time(15, 30)
+
+
+def test_sydney_is_the_cheapest_market_here_after_the_united_states():
+    from engines.sizing.caps import cost_floor_bps
+    floors = {m: cost_floor_bps(m) for m in supported()}
+    assert floors["XASX"] < floors["XKLS"]
+    assert floors["XASX"] < floors["XSES"]
+    assert floors["XNAS"] < floors["XASX"]
+
+
+def test_sydney_charges_no_stamp_duty():
+    assert not any("stamp" in l.name for l in get("XASX").fee_schedule.legs)
+
+
+def test_the_unfranked_rate_is_returned_because_franking_is_not_a_market_fact():
+    """A fully franked Australian dividend is withheld at zero; an unfranked one
+    at 15% under the treaty. Franking is a per-payment fact the market does not
+    know, so the adapter returns the conservative case."""
+    asx = get("XASX")
+    assert asx.withholding("dividend", "MY") == D("0.15")
+    assert asx.withholding("interest", "MY") == D(0)
+
+
+def test_every_registered_market_has_a_written_cost_floor():
+    """A missing entry silently inherits the 30 bps default. That is how every
+    Bursa position got sized against half its real floor."""
+    from engines.sizing.caps import COST_FLOOR_BPS_BY_MIC
+    missing = [m for m in supported() if m not in COST_FLOOR_BPS_BY_MIC]
+    assert not missing, f"no written cost floor for {missing}"
+
+
+def test_every_registered_market_names_its_regulator_and_index():
+    for mic in supported():
+        a = get(mic)
+        assert a.regulator.strip() and a.local_index.strip()
+        assert a.settlement_days >= 1
+        assert a.currency.isupper() and len(a.currency) == 3

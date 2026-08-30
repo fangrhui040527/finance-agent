@@ -28,7 +28,10 @@ COST_FLOOR_BPS_BY_MIC: dict[str, Decimal] = {
     "XKLS": Decimal("60"),   # asymptote ~46 bps
     "XNAS": Decimal("5"),    # asymptote ~0.6 bps
     "XSES": Decimal("30"),   # asymptote ~24 bps before the SGD 600 clearing cap binds
-    "XHKG": Decimal("95"),   # asymptote ~72 bps - the WORST of the four, see below
+    "XHKG": Decimal("95"),   # asymptote ~72 bps - the WORST of the seven, see below
+    "XTKS": Decimal("55"),   # asymptote ~40 bps; the tick, not the fee, is the cost
+    "XLON": Decimal("75"),   # asymptote ~70 bps, almost all of it one-way stamp duty
+    "XASX": Decimal("25"),   # asymptote ~20 bps - the cheapest after XNAS
 }
 # XHKG is the entry that contradicts the intuition. Hong Kong is a developed
 # market and is nonetheless the most expensive here: 0.25% retail brokerage is
@@ -36,6 +39,14 @@ COST_FLOOR_BPS_BY_MIC: dict[str, Decimal] = {
 # unlike Bursa's RM 1,000. Cost therefore never falls below ~72 bps at any size,
 # where Bursa reaches ~46 and XNAS ~0.6. Sorting markets by how developed they
 # are gets the cost ranking backwards.
+# XTKS is the entry where the FEE table lies. Tokyo's round trip is ~40 bps, but
+# a JPY 4,000 stock ticks in JPY 5 - 12.5 bps of spread per tick, against ~0.5 bps
+# on a USD 200 US name. The floor here is set above the fee asymptote because the
+# fee asymptote is not what a Tokyo position actually costs to enter and leave.
+# XLON is ~70 bps and roughly fifty of those are Stamp Duty Reserve Tax, charged
+# on the BUY LEG ONLY. Doubling it - which FeeSchedule.round_trip did for every
+# leg until this market arrived - reads as prudence and is not: an overstated
+# floor refuses positions that would have cleared the real one.
 # XSES happens to land on the same number as the generic default, and that is
 # precisely why it is written down. An entry that agrees with the default by
 # coincidence is a decision; a missing entry that falls back to it is an

@@ -11,7 +11,7 @@ How the system goes international, where every fact comes from, and how each kno
 | Tier | Markets | Depth | Gate to enter |
 |---|---|---|---|
 | **T1 — Deep** | US (XNAS, XNYS), Malaysia (XKLS) | Full: prices, point-in-time fundamentals, filings, transcripts, events, base rates, factor model | All eval suites pass; ≥3y of survivorship-safe history |
-| **T2 — Analytical** | Singapore (XSES), Hong Kong (XHKG), Japan (XJPX), UK (XLON), Australia (XASX), India (XNSE), Taiwan (XTAI), Korea (XKRX), Germany (XETR) | Prices, fundamentals, filings, events. Factor model per market once ≥300 instruments have 3y history | Fundamentals coverage ≥80% of index constituents |
+| **T2 — Analytical** | Singapore (XSES), Hong Kong (XHKG), Japan (XTKS — the exchange segment; XJPX is the group operator MIC and aliases to it), UK (XLON), Australia (XASX), India (XNSE), Taiwan (XTAI), Korea (XKRX), Germany (XETR) | Prices, fundamentals, filings, events. Factor model per market once ≥300 instruments have 3y history | Fundamentals coverage ≥80% of index constituents |
 | **T3 — Contextual** | Indonesia, Thailand, Vietnam, Philippines, Canada, France, Netherlands, Switzerland, Brazil, Saudi | Prices, news, macro, graph edges. **No factor model, no attribution beyond market/FX** | Price history + calendar only |
 | **T4 — Reference** | Everything else | Referenced in the graph as an entity and exposure path; never a candidate | — |
 
