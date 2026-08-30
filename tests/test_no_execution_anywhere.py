@@ -23,6 +23,11 @@ ALLOWED_PATHS = {
     "trace_run.py",                         # traces the refusal, by name
     "tests/test_trace.py",                  # asserts that refusal is recorded
     "tests/test_no_execution_anywhere.py",
+    # The Trace screen RENDERS the refusal - a denied place_order with
+    # meta='no_execution' - which is the same reason trace_run.py is here. A
+    # design that showed the guardrail working without naming what it stopped
+    # would be showing nothing.
+    "design/b5.py",
     "tests/test_guardrail_chain.py",
     "tests/test_registry.py",
     "tests/test_agents.py",

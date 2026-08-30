@@ -163,16 +163,17 @@ def test_tier_three_market_would_not_claim_a_factor_model():
 
 def test_adding_a_market_did_not_change_any_engine_or_agent():
     """docs/01 section 10: a new market is one adapter class plus one registry
-    entry. Seven markets are the proof - the conformance suite above is
+    entry. Eleven markets are the proof - the conformance suite above is
     parameterised over supported(), so registering each one subjected it to
     every conformance test with no new test code at all.
 
     The count is asserted deliberately. It is the line that fails when someone
     adds an adapter, and failing here is how they are told to come and read what
     the claim above actually promises."""
-    for mic in ("XKLS", "XNAS", "XSES", "XHKG", "XTKS", "XLON", "XASX"):
+    for mic in ("XKLS", "XNAS", "XSES", "XHKG", "XTKS", "XLON", "XASX",
+                "XNSE", "XTAI", "XKRX", "XETR"):
         assert mic in supported()
-    assert len(supported()) == 7
+    assert len(supported()) == 11
 
 
 def test_singapore_charges_no_stamp_duty_unlike_bursa():
@@ -391,3 +392,81 @@ def test_every_registered_market_names_its_regulator_and_index():
         assert a.regulator.strip() and a.local_index.strip()
         assert a.settlement_days >= 1
         assert a.currency.isupper() and len(a.currency) == 3
+
+
+# --- P18 complete: India, Taiwan, Korea, Germany ----------------------------
+
+def test_taiwan_and_korea_tax_the_sell_side_only():
+    """Both levy their transaction tax on disposal. Doubling Taiwan's 0.3% would
+    put its floor 30 bps too high and refuse positions that clear the real one -
+    the same defect UK stamp duty exposed."""
+    for mic in ("XTAI", "XKRX"):
+        tax = next(l for l in get(mic).fee_schedule.legs if "transaction_tax" in l.name)
+        assert tax.per_side is False
+    tai = get("XTAI").fee_schedule
+    naive = tai.one_side(D("1000000")) * 2
+    assert naive - tai.round_trip(D("1000000")) == D("3000")     # 0.3% counted once
+
+
+def test_india_taxes_both_sides_which_is_what_makes_it_expensive():
+    """STT is 20 bps round trip before any brokerage - the only market here with
+    a full-rate transaction tax on both legs and no cap."""
+    stt = next(l for l in get("XNSE").fee_schedule.legs
+               if l.name == "securities_transaction_tax")
+    assert stt.per_side is True
+    assert stt.rate * 2 * 10_000 == D("20.000")
+
+
+def test_india_stamp_duty_is_buy_side_only_even_though_stt_is_not():
+    """Two taxes on the same trade with different sidedness. Getting either
+    wrong is silent."""
+    duty = next(l for l in get("XNSE").fee_schedule.legs if l.name == "stamp_duty")
+    assert duty.per_side is False
+
+
+def test_germany_is_the_cheapest_european_market_because_it_taxes_no_trades():
+    de = get("XETR")
+    assert not any("tax" in l.name or "stamp" in l.name for l in de.fee_schedule.legs)
+    uk = get("XLON").fee_schedule.round_trip_bps(D("100000"))
+    assert de.fee_schedule.round_trip_bps(D("100000")) < uk
+    assert uk > D("50")
+
+
+def test_germany_withholds_the_gross_rate_because_a_reclaim_is_not_a_receipt():
+    """26.375% leaves the account on the payment date. The treaty rate is
+    reclaimed, slowly - and the number a position's return must survive is what
+    actually left, not what may come back."""
+    assert get("XETR").withholding("dividend", "MY") == D("0.26375")
+
+
+def test_taiwan_trades_in_lots_of_a_thousand_at_a_flat_rate():
+    """A TWD 500 share is a TWD 500,000 minimum ticket - roughly RM 72,000. The
+    lot, not the fee, is what puts Taiwan out of reach of a small account.
+
+    Hong Kong also uses large lots but sets them PER INSTRUMENT (0001 is 500,
+    0700 is 100), so it cannot be asserted the same way - which is the point of
+    lot_size taking an instrument id at all."""
+    assert get("XTAI").lot_size("XTAI:2330") == 1000
+    hk = get("XHKG")
+    assert hk.lot_size("XHKG:0001") != hk.lot_size("XHKG:0700")
+
+
+def test_two_markets_settle_at_t_plus_one_and_the_rest_at_t_plus_two():
+    """India moved in 2023 and the US in May 2024. Assuming a uniform T+2 across
+    a portfolio would misdate every cash projection touching either."""
+    fast = {m for m in supported() if get(m).settlement_days == 1}
+    assert fast == {"XNSE", "XNAS"}
+    assert all(get(m).settlement_days == 2 for m in supported() if m not in fast)
+
+
+def test_every_market_taxing_one_side_only_says_so_and_none_says_it_wrongly():
+    """The sweep that would have caught the London bug. A leg whose name says
+    tax or duty must have made a deliberate choice about sidedness."""
+    one_way = {(m, l.name) for m in supported() for l in get(m).fee_schedule.legs
+               if not l.per_side}
+    assert one_way == {
+        ("XLON", "stamp_duty_reserve_tax"),
+        ("XNSE", "stamp_duty"),
+        ("XTAI", "securities_transaction_tax"),
+        ("XKRX", "securities_transaction_tax"),
+    }

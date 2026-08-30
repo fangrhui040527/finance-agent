@@ -171,7 +171,7 @@ def test_it_names_exactly_what_is_missing_and_what_would_supply_it():
     text = f.describe()
     assert "elapsed time, not effort" in text          # calibration needs P16
     assert "200 historical moves" in text              # attribution needs labels
-    assert "core/trace" in text                        # latency exists elsewhere
+    assert "excluded rather than counted as instant" in text   # untimed rows
 
 
 def test_groundedness_and_citation_validity_come_straight_from_the_ledger():
@@ -205,6 +205,32 @@ def test_brier_is_an_error_so_fitness_takes_one_minus_it():
                 calibration=Calibration(n=10, brier=0.25, buckets=()))
     cal = next(t for t in f.terms if t.name == "forecast_calibration")
     assert cal.value == pytest.approx(0.75)
+
+
+def test_an_untimed_call_is_excluded_rather_than_counted_as_instant():
+    """0.0 is the column default for rows written before latency_ms existed.
+    Counting them would make the p95 look better the more untimed history the
+    ledger holds - a metric that improves by aging is not a metric."""
+    led = ledger_with_claims()                  # record_call without a latency
+    assert led.latencies_between(
+        datetime(2000, 1, 1, tzinfo=timezone.utc), NOW + timedelta(days=1)) == []
+    lat = next(t for t in compute(led).terms if t.name == "p95_latency")
+    assert not lat.available
+
+
+def test_a_timed_call_reaches_the_fitness_function_without_tracing():
+    """The number was measured either way and reached the trace only when
+    tracing was on - so an ordinary run, the only kind production has, threw
+    away exactly what docs/01 section 10 asks for."""
+    from core.guardrails.defaults import default_engine
+    from core.llm.client import EchoBackend, InferenceClient
+
+    led = ProvenanceLedger(run_id="r1")
+    InferenceClient(EchoBackend(), default_engine({"a4": {"llm_complete"}}), led,
+                    daily_budget_myr=Decimal("25")).complete(
+        "a4", TaskClass.NEWS_TRIAGE, "headline")
+    lat = next(t for t in compute(led).terms if t.name == "p95_latency")
+    assert lat.available
 
 
 def test_latency_and_cost_are_penalties_and_bounded():

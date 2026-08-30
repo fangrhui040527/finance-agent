@@ -1,0 +1,273 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Public+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+    :root{
+      --ground:#F6F8F7; --panel:#FFFFFF; --panel-2:#EFF2F1; --term:#12201F;
+      --ink:#15191B; --ink-2:#3A4448; --muted:#606D71;
+      --rule:#D6DBD9; --rule-2:#C2C9C6;
+      --accent:#0F5C63; --accent-soft:#DCEAEA;
+      --neg:#9E3626; --neg-soft:#F3E0DC;
+      --pos:#3B6A38; --pos-soft:#E1EBDF;
+      --warn:#8A5B12; --warn-soft:#F5E9D4;
+      --term-ink:#D6E3E1; --term-dim:#7E948F; --term-accent:#6FBFC4;
+      --term-pos:#8CBE85; --term-neg:#DB8571;
+      --shadow:0 1px 2px rgba(21,25,27,.05),0 8px 24px -16px rgba(21,25,27,.28);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--ground);color:var(--ink);
+      font-family:"Public Sans",-apple-system,BlinkMacSystemFont,sans-serif;
+      font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+    h1,h2,h3{font-family:Newsreader,Georgia,serif;font-weight:500;margin:0;line-height:1.2}
+    code,.mono{font-family:"JetBrains Mono",ui-monospace,Menlo,monospace}
+    a{color:var(--accent);text-underline-offset:3px}
+    a:hover{color:#0a4247}
+    .app{display:grid;grid-template-columns:196px minmax(0,1fr);min-height:100%}
+    .rail{background:var(--panel);border-right:1px solid var(--rule);padding:22px 0;display:flex;flex-direction:column;gap:2px}
+    .brand{padding:0 20px 20px;border-bottom:1px solid var(--rule);margin-bottom:14px}
+    .brand b{font-family:Newsreader,serif;font-size:17px;font-weight:600;display:block;letter-spacing:-.01em}
+    .brand span{font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);font-weight:600}
+    .nav{display:flex;align-items:center;gap:10px;padding:8px 20px;color:var(--ink-2);
+      font-size:13.5px;font-weight:500;cursor:pointer;border-left:2px solid transparent;text-decoration:none}
+    .nav:hover{background:var(--panel-2);color:var(--ink)}
+    .nav.on{border-left-color:var(--accent);color:var(--accent);background:var(--accent-soft);font-weight:600}
+    .nav svg{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-width:1.6;
+      stroke-linecap:round;stroke-linejoin:round}
+    .railsep{height:1px;background:var(--rule);margin:14px 20px}
+    .main{padding:26px 32px 40px;min-width:0}
+    .head{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:22px}
+    .head h1{font-size:25px;letter-spacing:-.015em}
+    .head p{margin:5px 0 0;color:var(--muted);font-size:13.5px;max-width:64ch}
+    .eyebrow{font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+      color:var(--muted);margin:0 0 9px}
+    .card{background:var(--panel);border:1px solid var(--rule);border-radius:4px;padding:18px 20px;box-shadow:var(--shadow)}
+    .grid{display:grid;gap:16px}
+    .chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;
+      padding:2px 8px;border-radius:3px;letter-spacing:.02em;text-transform:uppercase}
+    .chip.ok{background:var(--pos-soft);color:var(--pos)}
+    .chip.no{background:var(--neg-soft);color:var(--neg)}
+    .chip.wait{background:var(--warn-soft);color:var(--warn)}
+    .chip.n{background:var(--panel-2);color:var(--muted)}
+    .box{border-left:3px solid var(--rule-2);background:var(--panel-2);padding:13px 16px;border-radius:0 3px 3px 0}
+    .box.key{border-left-color:var(--accent);background:var(--accent-soft)}
+    .box.warn{border-left-color:var(--warn);background:var(--warn-soft)}
+    .box.stop{border-left-color:var(--neg);background:var(--neg-soft)}
+    .box .lbl{font-size:10.5px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;
+      display:block;margin-bottom:5px;color:var(--accent)}
+    .box.warn .lbl{color:var(--warn)} .box.stop .lbl{color:var(--neg)}
+    .box p{margin:0;font-size:13px;color:var(--ink-2)}
+    .term{background:var(--term);border-radius:4px;overflow:hidden}
+    .term-bar{display:flex;align-items:center;gap:6px;padding:8px 12px;border-bottom:1px solid #1E2E2C}
+    .term-bar i{width:8px;height:8px;border-radius:50%;background:var(--term-dim);opacity:.4}
+    .term-bar b{margin-left:8px;font-family:"JetBrains Mono",monospace;font-size:10.5px;
+      color:var(--term-dim);font-weight:500;letter-spacing:.06em;text-transform:uppercase}
+    .term pre{margin:0;padding:14px 16px;font-family:"JetBrains Mono",monospace;font-size:12px;
+      line-height:1.7;color:var(--term-ink);white-space:pre-wrap;overflow-x:auto}
+    .term .p{color:var(--term-accent);font-weight:700}
+    .term .c{color:var(--term-dim);font-style:italic}
+    .term .o{color:var(--term-dim)}
+    .term .hl{color:var(--term-ink);font-weight:700}
+    .term .g{color:var(--term-pos)} .term .r{color:var(--term-neg)}
+    table{border-collapse:collapse;width:100%;font-size:13px}
+    th{text-align:left;font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;
+      color:var(--muted);font-weight:700;padding:0 12px 8px;border-bottom:1px solid var(--rule)}
+    td{padding:9px 12px;border-bottom:1px solid var(--rule)}
+    tr:last-child td{border-bottom:0}
+    .num{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums}
+    .btn{font-family:inherit;font-size:13px;font-weight:600;padding:7px 14px;border-radius:3px;
+      border:1px solid var(--rule-2);background:var(--panel);color:var(--ink-2);cursor:pointer}
+    .btn:hover{border-color:var(--accent);color:var(--accent)}
+    .btn.on{background:var(--accent);border-color:var(--accent);color:#fff}
+    .btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+    .stat b{display:block;font-family:"JetBrains Mono",monospace;font-size:23px;
+      font-weight:500;color:var(--ink);letter-spacing:-.02em;line-height:1.15}
+    .stat span{font-size:11px;color:var(--muted);letter-spacing:.03em}
+
+  </style>
+</helmet>
+<div class="app" style="width:1280px;min-height:900px">
+<div class="rail">
+<div class="brand"><span>FinPlanet</span><b>Analyst Mind</b></div>
+<a class="nav on"><svg viewBox="0 0 16 16"><path d="M8 2 2 5v6l6 3 6-3V5L8 2Z"/><path d="M8 8v6M2 5l6 3 6-3"/></svg>Ask</a>
+<a class="nav"><svg viewBox="0 0 16 16"><path d="M2 12l3.5-4 2.5 2.5L14 4"/><path d="M14 8V4h-4"/></svg>Why it moved</a>
+<a class="nav"><svg viewBox="0 0 16 16"><path d="M2 13h12"/><path d="M4 11V7M7 11V4M10 11V8M13 11V5"/></svg>Prices</a>
+<a class="nav"><svg viewBox="0 0 16 16"><path d="M4 2h6l3 3v9H4V2Z"/><path d="M10 2v3h3M6 8h4M6 11h3"/></svg>Thesis</a>
+<a class="nav"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5"/><path d="M8 2.5v5.5l3.9 3.9"/></svg>Portfolio</a>
+<a class="nav"><svg viewBox="0 0 16 16"><path d="M2 8h12"/><path d="M5 5 2 8l3 3M11 5l3 3-3 3"/></svg>Sizing</a>
+<a class="nav"><svg viewBox="0 0 16 16"><path d="M2 8h3l2-4 2 8 2-4h3"/></svg>Predictions</a>
+<a class="nav"><svg viewBox="0 0 16 16"><circle cx="4" cy="4" r="1.8"/><circle cx="12" cy="8" r="1.8"/><circle cx="6" cy="12" r="1.8"/><path d="M5.5 5.2 10.4 7M10.6 9.2 7.3 11.1"/></svg>Trace</a>
+<div class="railsep"></div>
+<a class="nav"><svg viewBox="0 0 16 16"><path d="M2 4.5 8 2l6 2.5L8 7 2 4.5Z"/><path d="M4.5 6v4c0 1 1.7 2 3.5 2s3.5-1 3.5-2V6"/></svg>Learn</a>
+<a class="nav"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.2"/><path d="M8 1.5v2M8 12.5v2M14.5 8h-2M3.5 8h-2M12.6 3.4l-1.4 1.4M4.8 11.2l-1.4 1.4M12.6 12.6l-1.4-1.4M4.8 4.8 3.4 3.4"/></svg>Settings</a>
+</div>
+<div class="main">
+
+<div class="head">
+  <div><h1>Ask</h1>
+  <p>Every question is planned before it is answered — you see which agents will run and
+     what it costs before anything is spent.</p></div>
+  <div style="display:flex;gap:8px;align-items:center">
+    <span class="chip ok">● feeds live</span><span class="chip wait">echo backend</span>
+  </div>
+</div>
+
+<div style="display:flex;gap:10px;margin-bottom:8px">
+  <div style="flex-grow:1;position:relative">
+    <input value="{{q}}" onInput="{{ setQ }}" placeholder="Ask about a holding, a move, a risk…"
+      style="width:100%;font-family:inherit;font-size:15px;padding:13px 16px;border-radius:4px;
+      border:1px solid var(--rule-2);background:var(--panel);color:var(--ink);box-shadow:var(--shadow)">
+  </div>
+  <button class="btn pri" style="padding:0 22px;font-size:14px">Plan</button>
+</div>
+<div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:22px">
+  <sc-for list="{{examples}}" as="ex" hint-placeholder-count="4">
+    <button class="btn" onClick="{{ ex.pick }}" style="font-size:12px;padding:5px 11px;font-weight:500">{{ex.short}}</button>
+  </sc-for>
+</div>
+
+<div class="grid" style="grid-template-columns:1fr 320px;align-items:start">
+  <div class="grid">
+    <div class="card" style="padding:0;overflow:hidden">
+      <div style="padding:15px 20px;border-bottom:1px solid var(--rule);display:flex;
+                  justify-content:space-between;align-items:center">
+        <div><p class="eyebrow" style="margin:0 0 3px">The plan</p>
+        <div style="font-size:14px;color:var(--ink-2)">{{plan.title}}</div></div>
+        <span class="chip n">{{plan.intent}}</span>
+      </div>
+      <sc-if value="{{plan.refused}}" hint-placeholder-val="{{false}}">
+        <div style="padding:18px 20px">
+          <div class="box stop"><span class="lbl">Refused</span>
+          <p>{{plan.reason}}</p></div>
+          <p style="font-size:12.5px;color:var(--muted);margin:12px 0 0">
+            <b style="color:var(--ink-2)">What would help —</b> {{plan.help}}</p>
+        </div>
+      </sc-if>
+      <sc-if value="{{plan.allowed}}" hint-placeholder-val="{{true}}">
+        <div style="padding:16px 20px">
+          <div style="display:flex;flex-direction:column;gap:1px">
+            <sc-for list="{{plan.agents}}" as="a" hint-placeholder-count="5">
+              <div style="display:flex;align-items:center;gap:12px;padding:8px 0;
+                          border-bottom:1px solid var(--rule)">
+                <code style="font-size:12px;color:var(--accent);font-weight:700;width:150px">{{a.id}}</code>
+                <span style="font-size:13px;color:var(--ink-2);flex-grow:1">{{a.does}}</span>
+                <span class="chip n">{{a.tier}}</span>
+                <span class="num" style="font-size:12px;color:var(--muted);width:62px;text-align:right">{{a.cost}}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline;padding-top:13px">
+            <span style="font-size:12.5px;color:var(--muted)">Estimated before anything is spent</span>
+            <span class="num" style="font-size:16px;font-weight:600">{{plan.cost}}</span>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+
+    <div class="box key"><span class="lbl">Refusals are the product</span>
+    <p>A question the system cannot answer honestly comes back as a refusal with what would
+       help — never as a cheaper wrong answer. If it never refuses, something is broken.</p></div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <p class="eyebrow">Needs you</p>
+      <div style="display:flex;flex-direction:column;gap:11px">
+        <div style="display:flex;gap:11px;align-items:flex-start">
+          <span class="chip wait" style="margin-top:2px">3</span>
+          <div><div style="font-weight:600;font-size:13px">Predictions reached horizon</div>
+          <div style="font-size:12px;color:var(--muted)">Grade them before you look at the chart</div></div>
+        </div>
+        <div style="display:flex;gap:11px;align-items:flex-start">
+          <span class="chip no" style="margin-top:2px">2</span>
+          <div><div style="font-weight:600;font-size:13px">Breakers past review date</div>
+          <div style="font-size:12px;color:var(--muted)">MYX:1155 · XNAS:NVDA</div></div>
+        </div>
+        <div style="display:flex;gap:11px;align-items:flex-start">
+          <span class="chip ok" style="margin-top:2px">OK</span>
+          <div><div style="font-weight:600;font-size:13px">Drawdown scalar 1.0</div>
+          <div style="font-size:12px;color:var(--muted)">No mechanical de-risk in force</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="eyebrow">Forward record</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="stat"><b>14</b><span>logged</span></div>
+        <div class="stat"><b>6</b><span>graded</span></div>
+      </div>
+      <div style="height:5px;border-radius:3px;background:var(--panel-2);margin:15px 0 8px;overflow:hidden">
+        <div style="width:20%;height:100%;background:var(--accent)"></div>
+      </div>
+      <p style="font-size:12px;color:var(--muted);margin:0">
+        24 more graded calls before the calibration table measures skill rather than luck.</p>
+    </div>
+
+    <div class="card" style="padding:15px 18px">
+      <p class="eyebrow" style="margin-bottom:7px">Sources</p>
+      <div style="display:flex;flex-direction:column;gap:7px;font-size:12.5px">
+        <div style="display:flex;justify-content:space-between"><span>GDELT news</span><span class="chip ok">live</span></div>
+        <div style="display:flex;justify-content:space-between"><span>Stooq bars</span><span class="chip ok">live</span></div>
+        <div style="display:flex;justify-content:space-between"><span>Filings</span><span class="chip n">unwired</span></div>
+        <div style="display:flex;justify-content:space-between"><span>Ownership · macro</span><span class="chip n">unwired</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{"$preview": {"width": 1280, "height": 900}}'>
+
+const PLANS = {
+  why: {title:'why did maybank fall today', intent:'why_it_moved', allowed:true, refused:false,
+    cost:'RM 0.99', agents:[
+      {id:'a3_price_technical', does:'What price actually did', tier:'balanced', cost:'0.12'},
+      {id:'a4_news_narrative', does:'Triage the day\u2019s stories', tier:'cheap', cost:'0.01'},
+      {id:'a5_catalyst_events', does:'Match candidates to base rates', tier:'balanced', cost:'0.12'},
+      {id:'a6_macro_regime', does:'Rates, curve, regime', tier:'balanced', cost:'0.12'},
+      {id:'a9_attribution', does:'Decompose before naming a cause', tier:'reason', cost:'0.62'}]},
+  buy: {title:'should I add to my Maybank position', intent:'should_i_buy', allowed:true, refused:false,
+    cost:'RM 1.49', agents:[
+      {id:'a1_fundamentals', does:'Statements as reported, point-in-time', tier:'balanced', cost:'0.12'},
+      {id:'a2_valuation', does:'Ranges and implied assumptions', tier:'balanced', cost:'0.12'},
+      {id:'a10_thesis', does:'Assemble a stance, or decline one', tier:'reason', cost:'0.62'},
+      {id:'a11_red_team', does:'The strongest case against', tier:'reason', cost:'0.62'}]},
+  target: {title:'what price will Tenaga hit next month', intent:'out_of_scope',
+    allowed:false, refused:true, cost:'RM 0.00', agents:[],
+    reason:'Point price forecasts are refused. A number with no distribution behind it reads as knowledge and is not.',
+    help:'Ask what the price already requires to be true, or what would falsify the thesis you hold.'},
+  own: {title:'what am I actually exposed to', intent:'what_do_i_own', allowed:true, refused:false,
+    cost:'RM 0.24', agents:[
+      {id:'a12_portfolio_risk', does:'Concentration, heat, effective bets', tier:'balanced', cost:'0.12'},
+      {id:'a8_ownership_flow', does:'Who else holds it', tier:'balanced', cost:'0.12'}]}
+};
+class Component extends DCLogic {
+  constructor(p){ super(p); this.state = { key:'why' }; }
+  renderVals(){
+    const plan = PLANS[this.state.key];
+    return {
+      q: plan.title,
+      setQ: () => {},
+      plan,
+      examples: [
+        {key:'why', short:'why did it move'},
+        {key:'buy', short:'should I add'},
+        {key:'own', short:'what do I own'},
+        {key:'target', short:'price target ⟶ refused'}
+      ].map(e => ({ ...e, pick: () => this.setState({ key:e.key }) }))
+    };
+  }
+}
+
+</script>
+</body>
+</html>

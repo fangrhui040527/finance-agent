@@ -1,0 +1,234 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Public+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+    :root{
+      --ground:#F6F8F7; --panel:#FFFFFF; --panel-2:#EFF2F1; --term:#12201F;
+      --ink:#15191B; --ink-2:#3A4448; --muted:#606D71;
+      --rule:#D6DBD9; --rule-2:#C2C9C6;
+      --accent:#0F5C63; --accent-soft:#DCEAEA;
+      --neg:#9E3626; --neg-soft:#F3E0DC;
+      --pos:#3B6A38; --pos-soft:#E1EBDF;
+      --warn:#8A5B12; --warn-soft:#F5E9D4;
+      --term-ink:#D6E3E1; --term-dim:#7E948F; --term-accent:#6FBFC4;
+      --term-pos:#8CBE85; --term-neg:#DB8571;
+      --shadow:0 1px 2px rgba(21,25,27,.05),0 8px 24px -16px rgba(21,25,27,.28);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--ground);color:var(--ink);
+      font-family:"Public Sans",-apple-system,BlinkMacSystemFont,sans-serif;
+      font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+    h1,h2,h3{font-family:Newsreader,Georgia,serif;font-weight:500;margin:0;line-height:1.2}
+    code,.mono{font-family:"JetBrains Mono",ui-monospace,Menlo,monospace}
+    a{color:var(--accent);text-underline-offset:3px}
+    a:hover{color:#0a4247}
+    .app{display:grid;grid-template-columns:196px minmax(0,1fr);min-height:100%}
+    .rail{background:var(--panel);border-right:1px solid var(--rule);padding:22px 0;display:flex;flex-direction:column;gap:2px}
+    .brand{padding:0 20px 20px;border-bottom:1px solid var(--rule);margin-bottom:14px}
+    .brand b{font-family:Newsreader,serif;font-size:17px;font-weight:600;display:block;letter-spacing:-.01em}
+    .brand span{font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);font-weight:600}
+    .nav{display:flex;align-items:center;gap:10px;padding:8px 20px;color:var(--ink-2);
+      font-size:13.5px;font-weight:500;cursor:pointer;border-left:2px solid transparent;text-decoration:none}
+    .nav:hover{background:var(--panel-2);color:var(--ink)}
+    .nav.on{border-left-color:var(--accent);color:var(--accent);background:var(--accent-soft);font-weight:600}
+    .nav svg{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-width:1.6;
+      stroke-linecap:round;stroke-linejoin:round}
+    .railsep{height:1px;background:var(--rule);margin:14px 20px}
+    .main{padding:26px 32px 40px;min-width:0}
+    .head{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:22px}
+    .head h1{font-size:25px;letter-spacing:-.015em}
+    .head p{margin:5px 0 0;color:var(--muted);font-size:13.5px;max-width:64ch}
+    .eyebrow{font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+      color:var(--muted);margin:0 0 9px}
+    .card{background:var(--panel);border:1px solid var(--rule);border-radius:4px;padding:18px 20px;box-shadow:var(--shadow)}
+    .grid{display:grid;gap:16px}
+    .chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;
+      padding:2px 8px;border-radius:3px;letter-spacing:.02em;text-transform:uppercase}
+    .chip.ok{background:var(--pos-soft);color:var(--pos)}
+    .chip.no{background:var(--neg-soft);color:var(--neg)}
+    .chip.wait{background:var(--warn-soft);color:var(--warn)}
+    .chip.n{background:var(--panel-2);color:var(--muted)}
+    .box{border-left:3px solid var(--rule-2);background:var(--panel-2);padding:13px 16px;border-radius:0 3px 3px 0}
+    .box.key{border-left-color:var(--accent);background:var(--accent-soft)}
+    .box.warn{border-left-color:var(--warn);background:var(--warn-soft)}
+    .box.stop{border-left-color:var(--neg);background:var(--neg-soft)}
+    .box .lbl{font-size:10.5px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;
+      display:block;margin-bottom:5px;color:var(--accent)}
+    .box.warn .lbl{color:var(--warn)} .box.stop .lbl{color:var(--neg)}
+    .box p{margin:0;font-size:13px;color:var(--ink-2)}
+    .term{background:var(--term);border-radius:4px;overflow:hidden}
+    .term-bar{display:flex;align-items:center;gap:6px;padding:8px 12px;border-bottom:1px solid #1E2E2C}
+    .term-bar i{width:8px;height:8px;border-radius:50%;background:var(--term-dim);opacity:.4}
+    .term-bar b{margin-left:8px;font-family:"JetBrains Mono",monospace;font-size:10.5px;
+      color:var(--term-dim);font-weight:500;letter-spacing:.06em;text-transform:uppercase}
+    .term pre{margin:0;padding:14px 16px;font-family:"JetBrains Mono",monospace;font-size:12px;
+      line-height:1.7;color:var(--term-ink);white-space:pre-wrap;overflow-x:auto}
+    .term .p{color:var(--term-accent);font-weight:700}
+    .term .c{color:var(--term-dim);font-style:italic}
+    .term .o{color:var(--term-dim)}
+    .term .hl{color:var(--term-ink);font-weight:700}
+    .term .g{color:var(--term-pos)} .term .r{color:var(--term-neg)}
+    table{border-collapse:collapse;width:100%;font-size:13px}
+    th{text-align:left;font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;
+      color:var(--muted);font-weight:700;padding:0 12px 8px;border-bottom:1px solid var(--rule)}
+    td{padding:9px 12px;border-bottom:1px solid var(--rule)}
+    tr:last-child td{border-bottom:0}
+    .num{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums}
+    .btn{font-family:inherit;font-size:13px;font-weight:600;padding:7px 14px;border-radius:3px;
+      border:1px solid var(--rule-2);background:var(--panel);color:var(--ink-2);cursor:pointer}
+    .btn:hover{border-color:var(--accent);color:var(--accent)}
+    .btn.on{background:var(--accent);border-color:var(--accent);color:#fff}
+    .btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+    .stat b{display:block;font-family:"JetBrains Mono",monospace;font-size:23px;
+      font-weight:500;color:var(--ink);letter-spacing:-.02em;line-height:1.15}
+    .stat span{font-size:11px;color:var(--muted);letter-spacing:.03em}
+
+  </style>
+</helmet>
+<div class="app" style="width:1280px;min-height:900px">
+<div class="rail">
+<div class="brand"><span>FinPlanet</span><b>Analyst Mind</b></div>
+<a class="nav"><svg viewBox="0 0 16 16"><path d="M8 2 2 5v6l6 3 6-3V5L8 2Z"/><path d="M8 8v6M2 5l6 3 6-3"/></svg>Ask</a>
+<a class="nav"><svg viewBox="0 0 16 16"><path d="M2 12l3.5-4 2.5 2.5L14 4"/><path d="M14 8V4h-4"/></svg>Why it moved</a>
+<a class="nav"><svg viewBox="0 0 16 16"><path d="M2 13h12"/><path d="M4 11V7M7 11V4M10 11V8M13 11V5"/></svg>Prices</a>
+<a class="nav"><svg viewBox="0 0 16 16"><path d="M4 2h6l3 3v9H4V2Z"/><path d="M10 2v3h3M6 8h4M6 11h3"/></svg>Thesis</a>
+<a class="nav"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5"/><path d="M8 2.5v5.5l3.9 3.9"/></svg>Portfolio</a>
+<a class="nav"><svg viewBox="0 0 16 16"><path d="M2 8h12"/><path d="M5 5 2 8l3 3M11 5l3 3-3 3"/></svg>Sizing</a>
+<a class="nav on"><svg viewBox="0 0 16 16"><path d="M2 8h3l2-4 2 8 2-4h3"/></svg>Predictions</a>
+<a class="nav"><svg viewBox="0 0 16 16"><circle cx="4" cy="4" r="1.8"/><circle cx="12" cy="8" r="1.8"/><circle cx="6" cy="12" r="1.8"/><path d="M5.5 5.2 10.4 7M10.6 9.2 7.3 11.1"/></svg>Trace</a>
+<div class="railsep"></div>
+<a class="nav"><svg viewBox="0 0 16 16"><path d="M2 4.5 8 2l6 2.5L8 7 2 4.5Z"/><path d="M4.5 6v4c0 1 1.7 2 3.5 2s3.5-1 3.5-2V6"/></svg>Learn</a>
+<a class="nav"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.2"/><path d="M8 1.5v2M8 12.5v2M14.5 8h-2M3.5 8h-2M12.6 3.4l-1.4 1.4M4.8 11.2l-1.4 1.4M12.6 12.6l-1.4-1.4M4.8 4.8 3.4 3.4"/></svg>Settings</a>
+</div>
+<div class="main">
+
+<div class="head">
+  <div><h1>Predictions</h1>
+  <p>Write the view down before you find out. Append-only — a log you can revise is a memory,
+     and one missing its losers produces confident, wrong calibration.</p></div>
+  <button class="btn pri">Log a view</button>
+</div>
+
+<div class="grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:18px">
+  <div class="card stat"><b>14</b><span>logged</span></div>
+  <div class="card stat"><b>6</b><span>graded</span></div>
+  <div class="card stat"><b style="color:var(--warn)">3</b><span>due now</span></div>
+  <div class="card stat"><b>0.241</b><span>Brier · lower is better</span></div>
+</div>
+
+<div class="grid" style="grid-template-columns:minmax(0,1fr) 340px;align-items:start">
+  <div class="card" style="padding:0;overflow:hidden">
+    <div style="padding:13px 18px;border-bottom:1px solid var(--rule);display:flex;gap:7px">
+      <sc-for list="{{tabs}}" as="t" hint-placeholder-count="3">
+        <button class="btn" onClick="{{ t.pick }}" style="{{t.style}}">{{t.label}}</button>
+      </sc-for>
+    </div>
+    <table>
+      <thead><tr><th>Instrument</th><th>View</th><th style="text-align:right">Conf</th>
+        <th>Horizon</th><th style="text-align:right">Outcome</th></tr></thead>
+      <tbody>
+        <sc-for list="{{rows}}" as="r" hint-placeholder-count="6">
+          <tr>
+            <td><code style="font-size:12.5px;font-weight:600">{{r.inst}}</code>
+              <div style="font-size:11.5px;color:var(--muted);max-width:34ch">{{r.thesis}}</div></td>
+            <td><span class="chip {{r.dirCls}}">{{r.dir}}</span></td>
+            <td class="num" style="text-align:right">{{r.conf}}</td>
+            <td style="color:var(--muted);font-size:12.5px">{{r.horizon}}<br>
+              <span style="font-size:11px">{{r.gradeOn}}</span></td>
+            <td style="text-align:right"><span class="chip {{r.outCls}}">{{r.out}}</span></td>
+          </tr>
+        </sc-for>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <p class="eyebrow">Calibration</p>
+      <div style="display:flex;flex-direction:column;gap:11px;margin-bottom:14px">
+        <sc-for list="{{bands}}" as="b" hint-placeholder-count="4">
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+              <span style="color:var(--ink-2)">said {{b.said}}</span>
+              <span class="num" style="color:{{b.color}}">was {{b.was}} <span style="color:var(--muted)">n={{b.n}}</span></span>
+            </div>
+            <div style="height:7px;background:var(--panel-2);border-radius:2px;position:relative">
+              <div style="{{b.barStyle}}"></div>
+              <div style="{{b.markStyle}}"></div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <div class="box warn"><span class="lbl">Not yet meaningful</span>
+      <p>24 more graded calls before this measures skill rather than luck. It cannot be
+         back-filled — only waited for.</p></div>
+    </div>
+
+    <div class="box key"><span class="lbl">Graded against the benchmark</span>
+    <p>Being up 6% in a month the index rose 8% is being wrong. A no-view call is recorded
+       as resolved and excluded from the score entirely.</p></div>
+  </div>
+</div>
+
+</div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{"$preview": {"width": 1280, "height": 900}}'>
+
+const POS='#3B6A38', NEG='#9E3626', WARN='#8A5B12', MUT='#606D71';
+const ALL = [
+  {inst:'MYX:1155', thesis:'NIM stabilises above 2.25%', dir:'+1', conf:'0.62', horizon:'63d', gradeOn:'due 18 Sep', state:'pending'},
+  {inst:'XNAS:NVDA', thesis:'Multiple compresses on supply normalising', dir:'−1', conf:'0.55', horizon:'63d', gradeOn:'due 02 Sep', state:'due'},
+  {inst:'XSES:D05', thesis:'Deposit franchise holds through the cut', dir:'+1', conf:'0.71', horizon:'21d', gradeOn:'due 29 Aug', state:'due'},
+  {inst:'MYX:5347', thesis:'Tariff review lands neutral', dir:'0', conf:'0.50', horizon:'21d', gradeOn:'graded 12 Aug', state:'noview'},
+  {inst:'MYX:1155', thesis:'CASA erosion continues a fourth quarter', dir:'+1', conf:'0.68', horizon:'63d', gradeOn:'graded 04 Aug', state:'hit'},
+  {inst:'XNAS:MSFT', thesis:'Azure reacceleration is already priced', dir:'−1', conf:'0.74', horizon:'63d', gradeOn:'graded 28 Jul', state:'miss'}
+];
+const OUT = {
+  pending:{t:'pending', c:'n'}, due:{t:'grade it', c:'wait'},
+  hit:{t:'correct', c:'ok'}, miss:{t:'wrong', c:'no'}, noview:{t:'unscored', c:'n'}
+};
+class Component extends DCLogic {
+  constructor(p){ super(p); this.state = { tab:'all' }; }
+  renderVals(){
+    const t = this.state.tab;
+    const rows = ALL.filter(r => t==='all'
+      || (t==='due' && r.state==='due')
+      || (t==='graded' && (r.state==='hit'||r.state==='miss'||r.state==='noview')));
+    const bands = [
+      {said:'50–59%', was:'50%', n:2, s:55, w:50},
+      {said:'60–69%', was:'67%', n:3, s:65, w:67},
+      {said:'70–79%', was:'40%', n:5, s:74, w:40},
+      {said:'80–89%', was:'—', n:0, s:84, w:0}
+    ];
+    return {
+      tabs: [['all','All 14'],['due','Due now'],['graded','Graded']].map(([k,label]) => ({
+        label, pick: () => this.setState({tab:k}),
+        style:`font-size:12px;padding:4px 11px;${t===k
+          ? 'background:#0F5C63;border-color:#0F5C63;color:#fff;font-weight:600'
+          : 'font-weight:500'}` })),
+      rows: rows.map(r => ({ ...r,
+        dirCls: r.dir==='+1'?'ok':(r.dir==='−1'?'no':'n'),
+        out: OUT[r.state].t, outCls: OUT[r.state].c })),
+      bands: bands.map(b => {
+        const over = b.n>=3 && (b.s - b.w) > 10;
+        return { ...b, n:String(b.n), color: b.n===0 ? MUT : (over?NEG:POS),
+          barStyle:`position:absolute;left:0;top:0;bottom:0;width:${b.w}%;
+            background:${b.n===0?'#C2C9C6':(over?NEG:POS)};border-radius:2px`,
+          markStyle:`position:absolute;left:${b.s}%;top:-3px;bottom:-3px;width:2px;
+            background:#15191B;opacity:.55` };
+      })
+    };
+  }
+}
+
+</script>
+</body>
+</html>

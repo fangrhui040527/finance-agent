@@ -32,6 +32,10 @@ COST_FLOOR_BPS_BY_MIC: dict[str, Decimal] = {
     "XTKS": Decimal("55"),   # asymptote ~40 bps; the tick, not the fee, is the cost
     "XLON": Decimal("75"),   # asymptote ~70 bps, almost all of it one-way stamp duty
     "XASX": Decimal("25"),   # asymptote ~20 bps - the cheapest after XNAS
+    "XNSE": Decimal("35"),   # asymptote ~26 bps; STT alone is 20 of them
+    "XTAI": Decimal("70"),   # asymptote ~59 bps, and 30 are paid ONLY on exit
+    "XKRX": Decimal("55"),   # asymptote ~45 bps; sell-side tax, half Taiwan's
+    "XETR": Decimal("25"),   # asymptote ~20 bps - no transaction tax at all
 }
 # XHKG is the entry that contradicts the intuition. Hong Kong is a developed
 # market and is nonetheless the most expensive here: 0.25% retail brokerage is
@@ -47,6 +51,15 @@ COST_FLOOR_BPS_BY_MIC: dict[str, Decimal] = {
 # on the BUY LEG ONLY. Doubling it - which FeeSchedule.round_trip did for every
 # leg until this market arrived - reads as prudence and is not: an overstated
 # floor refuses positions that would have cleared the real one.
+# XTAI and XKRX both levy their transaction tax on the SELL SIDE ONLY, which the
+# per_side field now expresses. Taiwan's 0.3% is 30 bps a round trip pays exactly
+# once - doubling it would put the floor 30 bps too high and refuse positions
+# that clear the real one. It also means the cost is paid on EXIT, so a position
+# never closed never pays it. That is a bad reason to hold and is named here so
+# nobody rediscovers it as a feature.
+# XETR is the cheapest European market here because Germany levies no financial
+# transaction tax. That is a fact with a shelf life; if one arrives, this entry
+# and markets/xetr.py are what need revisiting.
 # XSES happens to land on the same number as the generic default, and that is
 # precisely why it is written down. An entry that agrees with the default by
 # coincidence is a decision; a missing entry that falls back to it is an

@@ -206,6 +206,7 @@ def compute(ledger, *, now: datetime | None = None, window_days: int = 30,
                                 "elapsed time, not effort - a forward record "
                                 "cannot be back-filled, only waited for."))
 
+    latencies_ms = latencies_ms or ledger.latencies_between(since, now)
     if latencies_ms:
         ordered = sorted(latencies_ms)
         p95 = ordered[min(len(ordered) - 1, int(0.95 * len(ordered)))]
@@ -215,9 +216,10 @@ def compute(ledger, *, now: datetime | None = None, window_days: int = 30,
     else:
         terms.append(Term(
             "p95_latency", w["p95_latency"],
-            unavailable_because="the ledger does not record duration. core/trace "
-                                "does, per span - pass its durations in, or add a "
-                                "latency column to the ledger."))
+            unavailable_because=f"no timed calls in the last {window_days} days. "
+                                f"The ledger records latency_ms per call now; "
+                                f"rows written before it existed read 0 and are "
+                                f"excluded rather than counted as instant."))
 
     runs = ledger.runs_between(since, now)
     spend = ledger.cost_since(since)
