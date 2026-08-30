@@ -38,6 +38,7 @@ Full design detail starts at **[`docs/README.md`](docs/README.md)**.
 | [14 Operations runbook](docs/14-OPERATIONS-RUNBOOK.md) | **What to do next, what to monitor, and what should make you stop** |
 | [15 MCP setup](docs/15-MCP-SETUP.md) | **Run it as an MCP server so the reasoning is your Claude session** |
 | [16 Tracing and anatomy](docs/16-TRACING-AND-ANATOMY.md) | **Every prompt, every guardrail decision, every dropped claim — `make trace`** |
+| [17 Knowledge graph](docs/17-KNOWLEDGE-GRAPH.md) | **Multi-hop exposure: edge confidence, validity intervals, the citation seam, and `make graph`** |
 
 ## Status
 
@@ -57,6 +58,7 @@ make verify                  # end-to-end on mock data, <1s
 make stress                  # adversarial: volume, NaN, thresholds, concurrency, live seams, MCP
 make trace                   # full traced system run -> debug/<run_id>/
 make mcp-check               # MCP handshake selftest, no client needed
+make graph                   # build the knowledge graph -> data/graph.db
 make mcp                     # serve MCP on stdio -> docs/15-MCP-SETUP.md
 python ask.py backend                        # which model is actually answering
 python ask.py why MYX:1155 --move -0.09 --market -0.08

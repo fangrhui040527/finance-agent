@@ -1,0 +1,76 @@
+# Surface form -> instrument id. The identity table.
+#
+# Why this file exists: "Maybank", "Malayan Banking Berhad", "MYX:1155" and
+# "XKLS:1155" are one company. Without one table saying so, each producer invents
+# its own id and the graph quietly grows four Maybanks - nothing crashes, the
+# supply chain just forks and most exposure paths lead to a node no query names.
+#
+# Deliberately the same shape as the `entity_index` that
+# knowledge/feeds/adapter.link_entities already takes, so this one checked-in
+# file can serve both rather than two lists drifting apart.
+#
+# HUMAN-AUTHORED. kb_sector and kb_supply_chain are created_by: human in
+# agents/registry.yaml, so no agent may write here - only a person.
+#
+# Stock codes should be checked against the exchange before you trade on
+# anything derived from them. A wrong code here is a silently wrong company, not
+# an error.
+
+companies:
+  # --- Bursa Malaysia (XKLS; ids are written MYX: throughout this repo) ------
+  "MYX:1155":
+    - Maybank
+    - Malayan Banking
+    - Malayan Banking Berhad
+  "MYX:1023":
+    - CIMB
+    - CIMB Group
+    - CIMB Group Holdings
+  "MYX:1295":
+    - Public Bank
+    - Public Bank Berhad
+  "MYX:5347":
+    - Tenaga
+    - Tenaga Nasional
+    - TNB
+  "MYX:5183":
+    - Petronas Chemicals
+    - PCHEM
+    - Petronas Chemicals Group
+  "MYX:3816":
+    - MISC
+    - MISC Berhad
+  "MYX:4197":
+    - Sime Darby
+    - Sime Darby Berhad
+  "MYX:5225":
+    - IHH
+    - IHH Healthcare
+  "MYX:8869":
+    - Press Metal
+    - Press Metal Aluminium
+  "MYX:3182":
+    - Genting
+    - Genting Berhad
+
+  # --- Nasdaq (XNAS) --------------------------------------------------------
+  "XNAS:NVDA":
+    - NVIDIA
+    - Nvidia Corporation
+  "XNAS:AMD":
+    - AMD
+    - Advanced Micro Devices
+  "XNAS:INTC":
+    - Intel
+    - Intel Corporation
+  "XNAS:AAPL":
+    - Apple
+    - Apple Inc
+  "XNAS:MSFT":
+    - Microsoft
+    - Microsoft Corporation
+  "XNAS:AVGO":
+    - Broadcom
+  "XNAS:AMZN":
+    - Amazon
+    - Amazon.com

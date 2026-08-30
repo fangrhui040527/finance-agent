@@ -1,0 +1,46 @@
+# Company -> SubSector -> Sector. The classification spine.
+#
+# Two levels on purpose. One level puts sixty Malaysian names under "Financials"
+# and makes every pair of them look connected; the sub-sector is what carries
+# the distinction between a retail bank and an insurer. The degree-based hub
+# rule in entity_graph.hubs() then declines to route THROUGH whichever level has
+# grown too crowded to mean anything, which is why the split matters even before
+# the graph is large.
+#
+# Edges built from this file are EXTRACTED and cite this file: a human wrote the
+# classification down and vouches for it. That is the honest provenance - no
+# filing is being quoted.
+#
+# HUMAN-AUTHORED. kb_sector is created_by: human in agents/registry.yaml.
+
+sectors:
+  Financials:      [Banks, Insurance]
+  Energy:          [Integrated Oil and Gas, Oilfield Services]
+  Materials:       [Chemicals, Aluminium]
+  Industrials:     [Marine Transport, Conglomerates]
+  Utilities:       [Electric Utilities]
+  Healthcare:      [Hospitals]
+  Technology:      [Semiconductors, Software, Consumer Hardware]
+  ConsumerCyclical: [Leisure and Gaming, Online Retail]
+
+# valid_from is when the classification became the one this file asserts, not
+# when the company was founded. Reclassification closes the old edge and opens a
+# new one; it never edits this row.
+companies:
+  "MYX:1155":  {subsector: Banks,                valid_from: 2020-01-01}
+  "MYX:1023":  {subsector: Banks,                valid_from: 2020-01-01}
+  "MYX:1295":  {subsector: Banks,                valid_from: 2020-01-01}
+  "MYX:5347":  {subsector: Electric Utilities,   valid_from: 2020-01-01}
+  "MYX:5183":  {subsector: Chemicals,            valid_from: 2020-01-01}
+  "MYX:3816":  {subsector: Marine Transport,     valid_from: 2020-01-01}
+  "MYX:4197":  {subsector: Conglomerates,        valid_from: 2020-01-01}
+  "MYX:5225":  {subsector: Hospitals,            valid_from: 2020-01-01}
+  "MYX:8869":  {subsector: Aluminium,            valid_from: 2020-01-01}
+  "MYX:3182":  {subsector: Leisure and Gaming,   valid_from: 2020-01-01}
+  "XNAS:NVDA": {subsector: Semiconductors,       valid_from: 2020-01-01}
+  "XNAS:AMD":  {subsector: Semiconductors,       valid_from: 2020-01-01}
+  "XNAS:INTC": {subsector: Semiconductors,       valid_from: 2020-01-01}
+  "XNAS:AVGO": {subsector: Semiconductors,       valid_from: 2020-01-01}
+  "XNAS:AAPL": {subsector: Consumer Hardware,    valid_from: 2020-01-01}
+  "XNAS:MSFT": {subsector: Software,             valid_from: 2020-01-01}
+  "XNAS:AMZN": {subsector: Online Retail,        valid_from: 2020-01-01}

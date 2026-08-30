@@ -4,7 +4,11 @@ __pycache__/
 .pytest_cache/
 *.egg-info/
 .env
-data/
+# Anchored to the repository root on purpose. An unanchored `data/` matches ANY
+# directory of that name at any depth, which silently excluded the three
+# human-authored yaml files under knowledge/graph/data/ - checked-in sources the
+# graph build reads, not generated output.
+/data/
 *.db
 config.local.toml
 .coverage

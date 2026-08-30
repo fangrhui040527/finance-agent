@@ -146,6 +146,117 @@ def run(live: str | None = None) -> dict:
                     emit("refusal", "plan", question=q, reason=plan.refusal.reason,
                          what_would_help=plan.refusal.what_would_help)
 
+        # 5b ── A7: the multi-hop question, and the seam that lets it be answered
+        with span("a7_sector_technology", kind="agent", agent="a7_sector_technology"):
+            from agents.evidence.agents import A7SectorTechnology
+            from core.contracts.answer import Citation, TrustTier
+            from knowledge.graph.entity_graph import (
+                Confidence, Edge, EdgeKind, EntityGraph, Node, NodeKind)
+            from knowledge.graph.build import build as build_graph
+            from knowledge.graph.evidence import CuratedCorpus
+            from knowledge.graph.store import GraphStore
+
+            OPENED = date(2026, 1, 1)
+            corpus = {
+                "doc:port": ("A drone strike closed the Strait of Hormuz to tanker "
+                             "traffic for eleven days."),
+                "doc:sector": ("MISC Berhad is classified within the shipping and "
+                               "marine transport sector."),
+                "doc:chem": ("Petronas Chemicals is exposed to shipping freight "
+                             "rates through its export logistics."),
+            }
+            # The REAL build, from the checked-in sources, then one synthetic
+            # event laid on top. A trace over a hand-built toy graph proves the
+            # traversal works and says nothing about whether the extractors do.
+            store = GraphStore()          # in-memory: the trace must need no files
+            report = build_graph(store)
+            emit("engine", "graph.extracted", agent="a7_sector_technology",
+                 **{k: v for k, v in report.per_extractor.items()},
+                 nodes=report.nodes, edges=report.edges, citable=report.citable,
+                 hubs=report.hubs or ["none"])
+            for nid, kind, lbl in (("EV:hormuz", NodeKind.EVENT, "Strait of Hormuz closure"),
+                                   ("SEC:shipping", NodeKind.SECTOR, "Shipping"),
+                                   ("CO:MISC", NodeKind.COMPANY, "MISC Berhad"),
+                                   ("CO:PCHEM", NodeKind.COMPANY, "Petronas Chemicals"),
+                                   ("CO:RUMOUR", NodeKind.COMPANY, "Rumour Bhd")):
+                store.add_node(Node(nid, kind, lbl))
+            for src, dst, kind, doc, conf in (
+                    ("EV:hormuz", "SEC:shipping", EdgeKind.AFFECTS, "doc:port",
+                     Confidence.EXTRACTED),
+                    ("SEC:shipping", "CO:MISC", EdgeKind.CLASSIFIED_IN, "doc:sector",
+                     Confidence.EXTRACTED),
+                    ("SEC:shipping", "CO:PCHEM", EdgeKind.EXPOSED_TO, "doc:chem",
+                     Confidence.EXTRACTED),
+                    # Deduced from a shared label, not stated anywhere. Traversable,
+                    # never citable - the distinction a binary flag could not make.
+                    ("SEC:shipping", "CO:RUMOUR", EdgeKind.CLASSIFIED_IN, "doc:sector",
+                     Confidence.INFERRED)):
+                store.add_edge(Edge(src, dst, kind, 1.0, doc, conf, OPENED))
+            graph = store.load()
+            emit("engine", "graph.built", agent="a7_sector_technology",
+                 **{k: v for k, v in store.counts().items()},
+                 edges_detail=[f"{e.src} --{e.kind.value}[{e.confidence.value}]--> {e.dst}"
+                               for e in graph.edges()])
+
+            # The synthetic docs, plus the REAL curated files read as a corpus,
+            # so an extracted edge can be cited the same way a filing would be.
+            curated = CuratedCorpus()
+            evidence = {d: Citation(source="kb_sector", chunk_id=d,
+                                    quoted_span=text[:48],
+                                    trust=TrustTier.METHOD_KB, as_of=NOW)
+                        for d, text in corpus.items()}
+
+            def lookup(doc_id):
+                return evidence.get(doc_id) or curated.citation(doc_id, NOW)
+
+            def chunks(source, chunk_id):
+                return corpus.get(chunk_id) or curated.chunk(source, chunk_id)
+            holdings = {"CO:MISC", "CO:PCHEM", "CO:RUMOUR"}
+            # A question the EXTRACTED graph answers on its own, with no
+            # synthetic edges involved at all.
+            real = A7SectorTechnology(ctx, graph, lookup)
+            real_findings = real.run("CM:aluminium", {"CO:XKLS:8869"}, asof=TODAY)
+            for f in real_findings:
+                emit("engine", "graph.exposure.extracted", agent="a7_sector_technology",
+                     text=f.text, numbers=f.numbers, caveats=f.caveats,
+                     cited_documents=[c.chunk_id for c in f.citations])
+            extracted_answer = real.emit(real_findings, chunks, confidence=0.5)
+            emit("engine", "graph.answer.extracted", agent="a7_sector_technology",
+                 answered=extracted_answer.answered,
+                 claims=[{"text": c.text,
+                          "quoted": [x.quoted_span for x in c.citations]}
+                         for c in extracted_answer.claims],
+                 dropped=[c.dropped_reason for c in extracted_answer.dropped],
+                 note="checked-in yaml -> extractor -> store -> path -> citation -> gate")
+            a7 = A7SectorTechnology(ctx, graph, lookup)
+            findings = a7.run("EV:hormuz", holdings, asof=TODAY)
+            for f in findings:
+                emit("engine", "graph.exposure", agent="a7_sector_technology",
+                     text=f.text, numbers=f.numbers, caveats=f.caveats,
+                     cited_documents=[c.chunk_id for c in f.citations])
+            emit("refusal", "graph.inferred_edge_not_traversed",
+                 agent="a7_sector_technology",
+                 reason=("CO:RUMOUR is reachable but its only edge is INFERRED, so it "
+                         "cannot back an emitted claim and never enters a path"))
+
+            # The whole point of phase 1: this answer used to be impossible.
+            answer = a7.emit(findings, chunks, confidence=0.48)
+            emit("engine", "graph.answer", agent="a7_sector_technology",
+                 answered=answer.answered, kept=len(answer.claims),
+                 dropped=[c.dropped_reason for c in answer.dropped],
+                 claims=[{"text": c.text,
+                          "citations": [c2.chunk_id for c2 in c.citations]}
+                         for c in answer.claims])
+
+            # And the same findings with the corpus withheld: still refused.
+            blind = A7SectorTechnology(ctx, graph)
+            refused = blind.emit(blind.run("EV:hormuz", holdings, asof=TODAY),
+                                 chunks, confidence=0.48)
+            emit("refusal", "graph.uncited_path", agent="a7_sector_technology",
+                 reason=refused.dropped[0].dropped_reason,
+                 note="a path alone never emits a claim; the documents behind it must")
+            store.close()
+
         # 6 ── A9: decompose before naming a cause
         with span("a9_attribution", kind="agent", agent="a9_attribution"):
             a9 = A9Attribution(ctx)

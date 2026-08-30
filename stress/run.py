@@ -59,15 +59,20 @@ def s_volume():
     held("26 years of bars", f"ATR in {dt * 1000:.1f} ms")
 
     # Deep graph.
-    from knowledge.graph.entity_graph import Edge, EdgeKind, EntityGraph, Node, NodeKind
+    from knowledge.graph.entity_graph import (
+        Confidence, Edge, EdgeKind, EntityGraph, Node, NodeKind)
+    OPEN = date(2020, 1, 1)
+    ASOF = date(2026, 8, 28)
     g = EntityGraph()
     for i in range(400):
         g.add_node(Node(f"N{i}", NodeKind.COMPANY, f"Co {i}"))
     for i in range(400):
         for j in rng.sample(range(400), 6):
             if i != j:
-                g.add_edge(Edge(f"N{i}", f"N{j}", EdgeKind.SUPPLIES, 0.9, f"d{i}"))
-    paths, dt = timed("traverse a 400-node / 2400-edge graph", lambda: g.traverse("N0"))
+                g.add_edge(Edge(f"N{i}", f"N{j}", EdgeKind.SUPPLIES, 0.9, f"d{i}",
+                                Confidence.EXTRACTED, OPEN))
+    paths, dt = timed("traverse a 400-node / 2400-edge graph",
+                      lambda: g.traverse("N0", asof=ASOF))
     if dt > 10.0:
         finding("graph traversal does not terminate usefully",
                 f"{dt:.1f}s on 400 nodes. Best-first search may be exploring exponentially.")
@@ -785,9 +790,220 @@ def s_mcp():
     held("analysis tools carry their disclaimer", "3 checked")
 
 
+# ------------------------------------------------- 10. the knowledge graph
+def s_graph():
+    section("10. Knowledge graph - a chain is not partially true")
+    from knowledge.graph.entity_graph import (
+        Confidence, Edge, EdgeKind, EntityGraph, Node, NodeKind, PathRequired,
+        path_to_citations)
+    from knowledge.graph.store import EdgeNotOpen, GraphStore
+    from knowledge.graph.validate import ExtractionError, assert_valid
+    from core.contracts.answer import Citation, Claim, TrustTier, verify_claim
+
+    OPEN = date(2020, 1, 1)
+    rng = random.Random(909)
+
+    # -- a graph far larger than anything a build will produce ---------------
+    g = EntityGraph()
+    for i in range(2000):
+        g.add_node(Node(f"N{i}", NodeKind.COMPANY, f"Co {i}"))
+    for i in range(2000):
+        for j in rng.sample(range(2000), 5):
+            if i != j:
+                g.add_edge(Edge(f"N{i}", f"N{j}", EdgeKind.SUPPLIES, 0.9, f"d{i}",
+                                Confidence.EXTRACTED, OPEN))
+    paths, dt = timed("traverse a 2000-node / 10000-edge graph",
+                      lambda: g.traverse("N0", asof=TODAY))
+    if dt > 10.0:
+        finding("traversal does not terminate usefully at 10k edges",
+                f"{dt:.1f}s. Best-first search may be exploring exponentially.")
+    else:
+        held("10k-edge traversal", f"{dt * 1000:.0f} ms, {len(paths)} paths")
+
+    # -- a cycle, and a self-referential one ---------------------------------
+    c = EntityGraph()
+    for n in "ABC":
+        c.add_node(Node(n, NodeKind.COMPANY))
+    for a, b in (("A", "B"), ("B", "C"), ("C", "A")):
+        c.add_edge(Edge(a, b, EdgeKind.SUPPLIES, 1.0, "d", Confidence.EXTRACTED, OPEN))
+    cyc, dt = timed("traverse a closed cycle", lambda: c.traverse("A", asof=TODAY))
+    repeats = [p for p in cyc if len({h.edge.dst for h in p.hops}) != p.n_hops]
+    if repeats:
+        finding("a cycle produces a path that revisits a node", repeats[0].describe())
+    else:
+        held("a closed cycle terminates without repeating a node",
+             f"{len(cyc)} paths in {dt * 1000:.0f} ms")
+
+    # -- intervals that describe no time ------------------------------------
+    expect_raises("an interval containing no days is refused", ValueError,
+                  lambda: Edge("A", "B", EdgeKind.SUPPLIES,
+                               valid_from=date(2026, 6, 2), valid_to=date(2026, 6, 1)),
+                  why="A backwards interval would be live at no date and silently "
+                      "vanish from every query, which reads as 'no relationship'.")
+    expect_raises("a weight above 1 is refused", ValueError,
+                  lambda: Edge("A", "B", EdgeKind.SUPPLIES, weight=1.5),
+                  why="A hop that strengthens a path makes a four-hop guess "
+                      "outrank a filing.")
+
+    # -- an ambiguous edge trying to back a claim ----------------------------
+    amb = EntityGraph()
+    for n, k in (("EV", NodeKind.EVENT), ("CO", NodeKind.COMPANY)):
+        amb.add_node(Node(n, k))
+    amb.add_edge(Edge("EV", "CO", EdgeKind.AFFECTS, 1.0, "doc:1",
+                      Confidence.AMBIGUOUS, OPEN))
+    if amb.impact_of("EV", {"CO"}, asof=TODAY):
+        finding("an ambiguous edge reached an emitted claim",
+                "Confidence.AMBIGUOUS must never satisfy citable.")
+    else:
+        held("an ambiguous edge cannot back a claim", "refused at traversal")
+
+    # -- the reverse of 'supplies' is not 'supplies' -------------------------
+    bi = EntityGraph()
+    for n in "AB":
+        bi.add_node(Node(n, NodeKind.COMPANY))
+    bi.add_edge(Edge("A", "B", EdgeKind.SUPPLIES, 1.0, "d", Confidence.EXTRACTED, OPEN),
+                bidirectional=True)
+    back = bi.neighbours("B")[0].kind
+    if back is not EdgeKind.CUSTOMER_OF:
+        finding("a bidirectional supply edge reverses into the wrong relation",
+                f"B -> A came back as {back.value}, inverting the supply chain.")
+    else:
+        held("a bidirectional supply edge reverses into customer_of", "A supplies B")
+    expect_raises("a relation with no reverse reading cannot be bidirectional", ValueError,
+                  lambda: bi.add_edge(Edge("A", "B", EdgeKind.OWNS, 1.0, "d",
+                                           Confidence.EXTRACTED, OPEN),
+                                      bidirectional=True),
+                  why="'B owns A' is not implied by 'A owns B', and there is no "
+                      "vocabulary for the reverse.")
+
+    # -- a chain is cited whole or not at all --------------------------------
+    ch = EntityGraph()
+    for n, k in (("EV", NodeKind.EVENT), ("SEC", NodeKind.SECTOR), ("CO", NodeKind.COMPANY)):
+        ch.add_node(Node(n, k))
+    ch.add_edge(Edge("EV", "SEC", EdgeKind.AFFECTS, 1.0, "doc:1", Confidence.EXTRACTED, OPEN))
+    ch.add_edge(Edge("SEC", "CO", EdgeKind.CLASSIFIED_IN, 1.0, "doc:2",
+                     Confidence.EXTRACTED, OPEN))
+    path = dict(ch.impact_of("EV", {"CO"}, asof=TODAY))["CO"]
+    half = {"doc:1": Citation(source="kb", chunk_id="doc:1", quoted_span="the port closed",
+                             trust=TrustTier.METHOD_KB, as_of=NOW)}
+    expect_raises("a path the corpus can only half cite is refused", PathRequired,
+                  lambda: path_to_citations(path, half.get),
+                  why="A partially cited chain passes the output gate while the "
+                      "uncited hop carries the inference.")
+
+    chunks = {("kb", "doc:1"): "The port closed for eleven days.",
+              ("kb", "doc:2"): "Alpha sits inside the shipping sector."}
+    chained = Claim(text="CO is exposed", all_citations_required=True, citations=[
+        Citation(source="kb", chunk_id="doc:1", quoted_span="The port closed",
+                 trust=TrustTier.METHOD_KB, as_of=NOW),
+        Citation(source="kb", chunk_id="doc:2", quoted_span="Alpha runs the port",
+                 trust=TrustTier.METHOD_KB, as_of=NOW)])
+    if verify_claim(chained, lambda s_, c_: chunks.get((s_, c_))).supported:
+        finding("a broken chain survived the output gate",
+                "One of two conjunctive citations failed and the claim was kept.")
+    else:
+        held("a chain claim dies when one link fails verification", "1 of 2 verified")
+
+    # -- the store refuses to rewrite history --------------------------------
+    with tempfile.TemporaryDirectory() as tmp:
+        st = GraphStore(Path(tmp) / "g.db")
+        st.add_node(Node("A", NodeKind.COMPANY))
+        st.add_node(Node("B", NodeKind.COMPANY))
+        st.add_edge(Edge("A", "B", EdgeKind.SUPPLIES, 1.0, "d", Confidence.EXTRACTED, OPEN))
+        expect_raises("a stored edge cannot be deleted", sqlite3.IntegrityError,
+                      lambda: st.conn.execute("DELETE FROM edges"),
+                      why="Deleting an edge makes unauditable every conclusion drawn through it.")
+        expect_raises("a stored edge cannot be rewritten", sqlite3.IntegrityError,
+                      lambda: st.conn.execute("UPDATE edges SET weight = 0.1"),
+                      why="An edge that can change in place cannot answer "
+                          "'what did we believe last quarter'.")
+        st.close_edge("A", "B", EdgeKind.SUPPLIES, OPEN, date(2026, 1, 1))
+        expect_raises("a closed edge cannot be closed twice", EdgeNotOpen,
+                      lambda: st.close_edge("A", "B", EdgeKind.SUPPLIES, OPEN, TODAY),
+                      why="A second close would move an end date that has already "
+                          "been reported.")
+        held("a store survives a full write / close / reload cycle",
+             f"{st.counts()['edges']} edge, {st.counts()['closed']} closed")
+        st.close()
+
+    # -- the validator raises rather than degrading the graph quietly --------
+    expect_raises("a malformed extraction is refused, not warned about",
+                  ExtractionError,
+                  lambda: assert_valid({"nodes": [{"id": "A", "kind": "Company"}],
+                                        "edges": [{"source": "A", "target": "ghost",
+                                                   "relation": "supplies",
+                                                   "confidence": "extracted",
+                                                   "valid_from": "2020-01-01"}]}, "stress"),
+                  why="Graphify warns and builds anyway, so a bad extractor "
+                      "degrades the graph months before anyone notices.")
+    # -- a hub must not connect everything to everything ---------------------
+    from knowledge.graph.entity_graph import HUB_MIN_DEGREE
+    hub = EntityGraph()
+    hub.add_node(Node("CN:everywhere", NodeKind.COUNTRY, "Everywhere"))
+    for i in range(200):
+        hub.add_node(Node(f"CO:h{i}", NodeKind.COMPANY, f"Co {i}"))
+        hub.add_edge(Edge(f"CO:h{i}", "CN:everywhere", EdgeKind.OPERATES_IN, 1.0,
+                          "d", Confidence.EXTRACTED, OPEN))
+        hub.add_edge(Edge("CN:everywhere", f"CO:h{i}", EdgeKind.AFFECTS, 1.0,
+                          "d", Confidence.EXTRACTED, OPEN))
+    if "CN:everywhere" not in hub.hubs():
+        finding("a 400-degree node is not recognised as a hub",
+                f"degree {hub.degree('CN:everywhere')}, floor {HUB_MIN_DEGREE}")
+    else:
+        reached = {p.end for p in hub.traverse("CO:h0", asof=TODAY)}
+        if reached - {"CN:everywhere"}:
+            finding("traversal routes through a hub",
+                    f"CO:h0 reached {len(reached)} nodes through a 400-degree country; "
+                    "every company would be connected to every other one.")
+        else:
+            held("a hub is an endpoint, never a waypoint",
+                 f"degree {hub.degree('CN:everywhere')}, 1 node reachable not 200")
+        seeded = {p.end for p in hub.traverse("CN:everywhere", asof=TODAY)}
+        if len(seeded) < 200:
+            finding("a hub cannot answer a question about itself",
+                    f"{len(seeded)} of 200 neighbours reachable from the seed")
+        else:
+            held("asking a hub about itself still works", f"{len(seeded)} neighbours")
+
+    # -- a specific relation is never displaced by a generic one -------------
+    for order in ((EdgeKind.SUPPLIES, EdgeKind.CLASSIFIED_IN),
+                  (EdgeKind.CLASSIFIED_IN, EdgeKind.SUPPLIES)):
+        pair = EntityGraph()
+        for n in ("A", "B"):
+            pair.add_node(Node(n, NodeKind.COMPANY))
+        for k in order:
+            pair.add_edge(Edge("A", "B", k, 1.0, f"d:{k.value}",
+                               Confidence.EXTRACTED, OPEN))
+        kinds = {e.kind for e in pair.neighbours("A")}
+        if kinds != set(order):
+            finding("a parallel edge was lost to insertion order",
+                    f"inserted {[k.value for k in order]}, kept "
+                    f"{[k.value for k in kinds]}. Graphify rewrote 144 specific "
+                    "edges into generic ones exactly this way.")
+    held("parallel edges survive in both insertion orders", "supplies + classified_in")
+
+    # -- the shipped build, end to end ---------------------------------------
+    with tempfile.TemporaryDirectory() as tmp:
+        from knowledge.graph.build import build as build_graph
+        one, two = Path(tmp) / "a.db", Path(tmp) / "b.db"
+        for pth in (one, two):
+            with GraphStore(pth) as gs:
+                rep = build_graph(gs)
+        if one.read_bytes() != two.read_bytes():
+            finding("the graph build is not reproducible",
+                    "Two builds over identical sources differ byte for byte, so no "
+                    "graph diff can be reviewed.")
+        else:
+            held("two builds over identical sources are byte-identical",
+                 f"{rep.nodes} nodes, {rep.edges} edges")
+        if rep.citable != rep.edges:
+            note("the deterministic build produced an uncitable edge",
+                 f"{rep.edges - rep.citable} of {rep.edges}")
+
+
 def main() -> int:
     for fn in (s_volume, s_numbers, s_boundaries, s_concurrency, s_injection,
-               s_invariants, s_feeds, s_market_drift, s_mcp):
+               s_invariants, s_feeds, s_market_drift, s_mcp, s_graph):
         try:
             fn()
         except Exception:

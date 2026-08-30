@@ -1,6 +1,6 @@
 """L2 feed seam and P9 graph. Both exist to stop unsourced claims reaching a user."""
 import json
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 
 import pytest
 
@@ -9,8 +9,8 @@ from knowledge.feeds.adapter import (
     REGISTRY, link_entities,
 )
 from knowledge.graph.entity_graph import (
-    EDGE_DECAY, Edge, EdgeKind, EntityGraph, MAX_HOPS, MIN_PATH_WEIGHT, Node,
-    NodeKind, Path, PathRequired, require_path,
+    EDGE_DECAY, EDGE_INVERSE, Confidence, Edge, EdgeKind, EntityGraph, MAX_HOPS,
+    MIN_PATH_WEIGHT, Node, NodeKind, Path, PathRequired, path_to_citations, require_path,
 )
 
 NOW = datetime(2026, 8, 25, tzinfo=timezone.utc)
@@ -120,6 +120,10 @@ def test_reading_from_disk_matches_reading_inline(tmp_path):
 
 # -- graph -------------------------------------------------------------------
 
+OPENED = date(2026, 1, 1)
+ASOF = date(2026, 8, 28)
+
+
 def supply_chain():
     g = EntityGraph()
     for nid, kind, label in [
@@ -131,16 +135,20 @@ def supply_chain():
         ("CO:MAYBANK", NodeKind.COMPANY, "Maybank"),
     ]:
         g.add_node(Node(nid, kind, label))
-    g.add_edge(Edge("EV:redsea", "SEC:shipping", EdgeKind.AFFECTS, 1.0, "doc:1"))
-    g.add_edge(Edge("SEC:shipping", "CO:MISC", EdgeKind.CLASSIFIED_IN, 1.0, "doc:2"))
-    g.add_edge(Edge("SEC:shipping", "SEC:chemicals", EdgeKind.EXPOSED_TO, 0.8, "doc:3"))
-    g.add_edge(Edge("SEC:chemicals", "CO:PCHEM", EdgeKind.CLASSIFIED_IN, 1.0, "doc:4"))
+    g.add_edge(Edge("EV:redsea", "SEC:shipping", EdgeKind.AFFECTS, 1.0, "doc:1",
+                    Confidence.EXTRACTED, OPENED))
+    g.add_edge(Edge("SEC:shipping", "CO:MISC", EdgeKind.CLASSIFIED_IN, 1.0, "doc:2",
+                    Confidence.EXTRACTED, OPENED))
+    g.add_edge(Edge("SEC:shipping", "SEC:chemicals", EdgeKind.EXPOSED_TO, 0.8, "doc:3",
+                    Confidence.EXTRACTED, OPENED))
+    g.add_edge(Edge("SEC:chemicals", "CO:PCHEM", EdgeKind.CLASSIFIED_IN, 1.0, "doc:4",
+                    Confidence.EXTRACTED, OPENED))
     return g
 
 
 def test_more_hops_means_less_signal_and_the_label_says_so():
     g = supply_chain()
-    impacts = dict(g.impact_of("EV:redsea", {"CO:MISC", "CO:PCHEM"}))
+    impacts = dict(g.impact_of("EV:redsea", asof=ASOF, holdings={"CO:MISC", "CO:PCHEM"}))
     assert impacts["CO:MISC"].strength == "indirect"
     assert impacts["CO:PCHEM"].strength == "speculative"
     assert impacts["CO:MISC"].weight > impacts["CO:PCHEM"].weight
@@ -148,26 +156,27 @@ def test_more_hops_means_less_signal_and_the_label_says_so():
 
 def test_an_unrelated_holding_is_simply_absent_not_weakly_linked():
     g = supply_chain()
-    assert "CO:MAYBANK" not in dict(g.impact_of("EV:redsea", {"CO:MAYBANK"}))
+    assert "CO:MAYBANK" not in dict(g.impact_of("EV:redsea", asof=ASOF, holdings={"CO:MAYBANK"}))
 
 
 def test_an_edge_with_no_source_document_cannot_carry_a_claim():
     g = supply_chain()
     g.add_node(Node("CO:RUMOUR", NodeKind.COMPANY, "Rumour Bhd"))
-    g.add_edge(Edge("SEC:shipping", "CO:RUMOUR", EdgeKind.CLASSIFIED_IN, 1.0, source_doc_id=None))
-    assert "CO:RUMOUR" not in dict(g.impact_of("EV:redsea", {"CO:RUMOUR"}))
+    g.add_edge(Edge("SEC:shipping", "CO:RUMOUR", EdgeKind.CLASSIFIED_IN, 1.0,
+                    source_doc_id=None, confidence=Confidence.EXTRACTED, valid_from=OPENED))
+    assert "CO:RUMOUR" not in dict(g.impact_of("EV:redsea", asof=ASOF, holdings={"CO:RUMOUR"}))
 
 
 def test_every_path_ships_with_its_own_evidence():
     g = supply_chain()
-    path = dict(g.impact_of("EV:redsea", {"CO:PCHEM"}))["CO:PCHEM"]
+    path = dict(g.impact_of("EV:redsea", asof=ASOF, holdings={"CO:PCHEM"}))["CO:PCHEM"]
     assert set(path.evidence()) == {"doc:1", "doc:3", "doc:4"}
     assert path.citable
 
 
 def test_the_path_describes_itself_in_readable_form():
     g = supply_chain()
-    path = dict(g.impact_of("EV:redsea", {"CO:MISC"}))["CO:MISC"]
+    path = dict(g.impact_of("EV:redsea", asof=ASOF, holdings={"CO:MISC"}))["CO:MISC"]
     assert "--affects-->" in path.describe()
     assert "Red Sea shipping disruption" in path.describe()
 
@@ -180,8 +189,9 @@ def test_an_impact_claim_without_a_path_cannot_be_emitted():
 def test_an_impact_claim_over_an_unsourced_edge_cannot_be_emitted():
     g = supply_chain()
     g.add_node(Node("CO:X", NodeKind.COMPANY, "X"))
-    g.add_edge(Edge("SEC:shipping", "CO:X", EdgeKind.CLASSIFIED_IN, 1.0, source_doc_id=None))
-    paths = g.traverse("EV:redsea", target="CO:X", require_citable=False)
+    g.add_edge(Edge("SEC:shipping", "CO:X", EdgeKind.CLASSIFIED_IN, 1.0,
+                    source_doc_id=None, confidence=Confidence.EXTRACTED, valid_from=OPENED))
+    paths = g.traverse("EV:redsea", asof=ASOF, target="CO:X", require_citable=False)
     with pytest.raises(PathRequired, match="no source document"):
         require_path("shipping hits X", paths[0])
 
@@ -189,14 +199,15 @@ def test_an_impact_claim_over_an_unsourced_edge_cannot_be_emitted():
 def test_three_weak_hops_cannot_outrank_one_strong_link():
     g = supply_chain()
     g.add_node(Node("CO:DIRECT", NodeKind.COMPANY, "Direct Supplier"))
-    g.add_edge(Edge("EV:redsea", "CO:DIRECT", EdgeKind.AFFECTS, 1.0, "doc:9"))
-    ranked = g.impact_of("EV:redsea", {"CO:DIRECT", "CO:PCHEM"})
+    g.add_edge(Edge("EV:redsea", "CO:DIRECT", EdgeKind.AFFECTS, 1.0, "doc:9",
+                    Confidence.EXTRACTED, OPENED))
+    ranked = g.impact_of("EV:redsea", asof=ASOF, holdings={"CO:DIRECT", "CO:PCHEM"})
     assert ranked[0][0] == "CO:DIRECT"
 
 
 def test_traversal_stops_before_the_weight_becomes_meaningless():
     g = supply_chain()
-    for path in g.traverse("EV:redsea"):
+    for path in g.traverse("EV:redsea", asof=ASOF):
         assert path.weight >= MIN_PATH_WEIGHT
         assert path.n_hops <= MAX_HOPS
 
@@ -209,15 +220,18 @@ def test_an_edge_to_an_unknown_node_is_refused():
     g = EntityGraph()
     g.add_node(Node("A", NodeKind.COMPANY))
     with pytest.raises(KeyError, match="must be added before"):
-        g.add_edge(Edge("A", "B", EdgeKind.SUPPLIES, 1.0, "doc:1"))
+        g.add_edge(Edge("A", "B", EdgeKind.SUPPLIES, 1.0, "doc:1",
+                        Confidence.EXTRACTED, OPENED))
 
 
 def test_traversal_does_not_loop():
     g = EntityGraph()
     for n in "ABC":
         g.add_node(Node(n, NodeKind.COMPANY))
-    g.add_edge(Edge("A", "B", EdgeKind.SUPPLIES, 1.0, "d"), bidirectional=True)
-    g.add_edge(Edge("B", "C", EdgeKind.SUPPLIES, 1.0, "d"), bidirectional=True)
-    for p in g.traverse("A"):
+    g.add_edge(Edge("A", "B", EdgeKind.SUPPLIES, 1.0, "d", Confidence.EXTRACTED, OPENED),
+               bidirectional=True)
+    g.add_edge(Edge("B", "C", EdgeKind.SUPPLIES, 1.0, "d", Confidence.EXTRACTED, OPENED),
+               bidirectional=True)
+    for p in g.traverse("A", asof=ASOF):
         seen = [h.edge.dst for h in p.hops]
         assert len(seen) == len(set(seen))

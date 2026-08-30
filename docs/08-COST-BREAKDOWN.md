@@ -22,12 +22,12 @@ Using the mid-market rate to budget a USD subscription understates it every mont
 | Point-in-time fundamentals | DIY EDGAR + vendor free tier (S&P 500 only) | Bought for US, self-built for Bursa | Bought, full universe |
 | Infra | 1 small VPS | 2 dedicated-vCPU VPS | Managed vector + graph + timeseries |
 | **Data** | **RM 0–91** | **RM 826** | **RM 1,162** |
-| **LLM + embeddings** | **RM 50–83** | **RM 216** | **RM 664** |
+| **LLM + embeddings** | **RM 50–83** | **RM 183** | **RM 664** |
 | **Infra** | **RM 62** | **RM 407** | **RM 2,905** |
-| **Monthly total** | **≈ RM 112–237** | **≈ RM 1,448** | **≈ RM 4,731** |
-| **Annual** | **≈ RM 1,340–2,840** | **≈ RM 17,400** | **≈ RM 56,800** |
+| **Monthly total** | **≈ RM 112–237** | **≈ RM 1,415** | **≈ RM 4,731** |
+| **Annual** | **≈ RM 1,340–2,840** | **≈ RM 17,000** | **≈ RM 56,800** |
 | One-off embedding backfill | ~RM 42 | ~RM 374 | ~RM 1,619 |
-| *(monthly in USD)* | *$27–57* | *$349* | *$1,140* |
+| *(monthly in USD)* | *$27–57* | *$341* | *$1,140* |
 
 ---
 
@@ -83,7 +83,7 @@ Model rates (first-party API, Aug 2026), converted at RM 4.15/USD:
 | Tier | Model | Input RM/MTok | Output RM/MTok | *(USD)* |
 |---|---|---|---|---|
 | `reason` | Claude Opus 5 | RM 20.75 | RM 103.75 | *$5 / $25* |
-| `balanced` | Claude Sonnet 5 | RM 12.45 | RM 62.25 | *$3 / $15* |
+| `balanced` | Claude Sonnet 5 | RM 8.30 | RM 41.50 | *$2 / $10* |
 | `cheap` | Claude Haiku 4.5 | RM 4.15 | RM 20.75 | *$1 / $5* |
 | `embed` | third-party embeddings | RM 0.08–0.75 | — | *$0.02–0.18* |
 | `local` | FinBERT + cross-encoder | RM 0 marginal | — | — |
@@ -106,13 +106,13 @@ Model rates (first-party API, Aug 2026), converted at RM 4.15/USD:
 
 | Task | Volume/month | In (MTok) | Out (MTok) | Cost |
 |---|---|---|---|---|
-| Evidence agents on workups (8 × 8 agents) | 64 runs | 1.60 | 0.19 | RM 31.87 |
-| "Why did it move" | 60 | 1.08 | 0.15 | RM 22.78 |
-| Ad-hoc queries | 150 | 1.80 | 0.23 | RM 36.44 |
-| Daily brief | 30 | 1.20 | 0.12 | RM 22.41 |
-| Nightly breaker sweep + risk snapshot | 30 | 0.90 | 0.06 | RM 14.94 |
-| **Subtotal before caching** | | **6.58** | **0.75** | **RM 128** *($30.95)* |
-| *with prompt caching on stable prefixes* | | | | **≈ RM 99** *($23.80)* |
+| Evidence agents on workups (8 × 8 agents) | 64 runs | 1.60 | 0.19 | RM 21.16 |
+| "Why did it move" | 60 | 1.08 | 0.15 | RM 15.19 |
+| Ad-hoc queries | 150 | 1.80 | 0.23 | RM 24.48 |
+| Daily brief | 30 | 1.20 | 0.12 | RM 14.94 |
+| Nightly breaker sweep + risk snapshot | 30 | 0.90 | 0.06 | RM 9.96 |
+| **Subtotal before caching** | | **6.58** | **0.75** | **RM 86** *($20.66)* |
+| *with prompt caching on stable prefixes* | | | | **≈ RM 66** *($15.98)* |
 
 ### 4.4 Reason tier — Opus 5
 
@@ -141,10 +141,10 @@ Embeddings are close to free and reranking is free if run locally. **Do not pay 
 | | Monthly |
 |---|---|
 | Cheap (batched) | RM 56 |
-| Balanced (cached) | RM 99 |
+| Balanced (cached) | RM 66 |
 | Reason | RM 59 |
 | Embeddings ongoing | RM 2 |
-| **Total** | **≈ RM 216** *($52)* |
+| **Total** | **≈ RM 183** *($44)* |
 | One-off backfill | ~RM 353 *($85)* |
 
 **The same workload with everything routed to the reasoning tier:**
@@ -152,11 +152,11 @@ Embeddings are close to free and reranking is free if run locally. **Do not pay 
 | | Tiered | All-Opus |
 |---|---|---|
 | Cheap-tier work (11.2M in / 2.3M out) | RM 56 | RM 470 |
-| Balanced-tier work (6.58M in / 0.75M out) | RM 99 | RM 214 |
+| Balanced-tier work (6.58M in / 0.75M out) | RM 66 | RM 214 |
 | Reason-tier work | RM 59 | RM 59 |
-| **Total** | **RM 216** | **RM 743** |
+| **Total** | **RM 183** | **RM 743** |
 
-**3.4× the cost for no additional quality** — classification and tagging do not get better on a reasoning model. This is the single highest-leverage cost control in the system, and it is why tier routing lives at the inference choke point rather than being left to each agent's discretion. **RM 527/month, or RM 6,300/year, is the price of getting it wrong.**
+**4.1× the cost for no additional quality** — classification and tagging do not get better on a reasoning model. This is the single highest-leverage cost control in the system, and it is why tier routing lives at the inference choke point rather than being left to each agent's discretion. **RM 560/month, or RM 6,720/year, is the price of getting it wrong.**
 
 ---
 
@@ -206,7 +206,7 @@ One 2–4 vCPU / 8 GB instance runs the whole stack for one market with a 1-year
 
 **Put a number on the time and the ranking becomes obvious.** At a notional RM 100/hour, 420 hours is **RM 42,000** — more than two years of T1 subscriptions, and roughly fifteen times the entire first year at T0. Developer time is 90%+ of the true cost of this project at every tier.
 
-**Optimising a RM 216 monthly LLM bill by spending 40 hours on it costs RM 4,000 to save maybe RM 600 a year.** Do the tier routing, which is a day's work and saves RM 6,300/year, and then stop.
+**Optimising a RM 183 monthly LLM bill by spending 40 hours on it costs RM 4,000 to save maybe RM 500 a year.** Do the tier routing, which is a day's work and saves RM 6,720/year, and then stop.
 
 ---
 
@@ -214,7 +214,7 @@ One 2–4 vCPU / 8 GB instance runs the whole stack for one market with a 1-year
 
 | Control | Saving | Where |
 |---|---|---|
-| **Tier routing** — classification never hits the reasoning tier | **~70% of LLM spend · RM 6,300/yr** | Inference choke point |
+| **Tier routing** — classification never hits the reasoning tier | **~75% of LLM spend · RM 6,720/yr** | Inference choke point |
 | **Rule + local-model filter before any LLM call** on news | ~80% of article volume never reaches an API | A4 escalation ladder |
 | **Self-host rather than manage** | ~85% of infra · **RM 30,000/yr at T2 scale** | §5.3 |
 | **Batch API for non-latency-sensitive work** | 50% on that slice | Overnight jobs |

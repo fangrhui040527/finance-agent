@@ -80,10 +80,16 @@ ROUTING: dict[TaskClass, Tier] = {
 }
 
 # USD per million tokens, first-party API rates (docs/08 section 4).
+#
+# These are paired with MODEL_IDS below and must be changed together. BALANCED
+# was billed at $3/$15 - Sonnet 4.6's rate - while MODEL_IDS already pointed at
+# Sonnet 5, which is $2/$10. Nothing failed: every cost, every budget check and
+# every ledger row was simply 50% too high, and the daily budget refused
+# questions it could afford.
 PRICING_USD: dict[Tier, tuple[Decimal, Decimal]] = {
-    Tier.REASON: (Decimal("5.00"), Decimal("25.00")),
-    Tier.BALANCED: (Decimal("3.00"), Decimal("15.00")),
-    Tier.CHEAP: (Decimal("1.00"), Decimal("5.00")),
+    Tier.REASON: (Decimal("5.00"), Decimal("25.00")),      # claude-opus-5
+    Tier.BALANCED: (Decimal("2.00"), Decimal("10.00")),    # claude-sonnet-5
+    Tier.CHEAP: (Decimal("1.00"), Decimal("5.00")),      # claude-haiku-4-5
     Tier.EMBED: (Decimal("0.05"), Decimal("0")),
     Tier.LOCAL: (Decimal("0"), Decimal("0")),
 }

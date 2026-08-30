@@ -57,6 +57,18 @@ class Claim(BaseModel):
     text: str
     citations: list[Citation] = Field(default_factory=list)
     dropped_reason: str | None = None
+    all_citations_required: bool = False
+    """Are the citations redundant support, or a chain?
+
+    Default False: two sources for one assertion are alternatives, and one
+    surviving is enough - which is the docs/05 8.1 rule.
+
+    True for a claim whose citations are CONJUNCTIVE, each supporting a
+    different link. A multi-hop graph exposure is the case: 'Alpha is exposed
+    via port closure -> shipping -> Alpha' needs the document behind every hop.
+    Under the default rule that claim survives with the first hop cited and the
+    second unverified, and then reads as evidenced when the chain is broken.
+    """
 
     @property
     def supported(self) -> bool:
@@ -115,6 +127,17 @@ def verify_claim(claim: Claim, chunk_lookup) -> Claim:
         return claim.model_copy(
             update={"citations": [], "dropped_reason": "no citation verified against its chunk"}
         )
+    if claim.all_citations_required and len(good) < len(claim.citations):
+        # A chain is not partially true. Keeping the verified links would emit a
+        # conclusion that only holds if the unverified one does.
+        return claim.model_copy(update={
+            "citations": [],
+            "dropped_reason": (
+                f"{len(claim.citations) - len(good)} of {len(claim.citations)} citations "
+                "failed and this claim needs every one: each supports a different link "
+                "in its chain"
+            ),
+        })
     return claim.model_copy(update={"citations": good, "dropped_reason": None})
 
 

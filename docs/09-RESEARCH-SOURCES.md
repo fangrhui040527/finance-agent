@@ -198,7 +198,7 @@ Supports: `08-COST-BREAKDOWN.md`. **The most volatile section — re-verify ever
 
 | Source | What it establishes |
 |---|---|
-| Claude model pricing (first-party API, Aug 2026) | Opus 5 $5/$25 · Sonnet 5 $3/$15 · Haiku 4.5 $1/$5 per MTok. Batch API 50% off; prompt caching discounts cache reads. Claude on Microsoft Foundry bills at standard API rates |
+| Claude model pricing (first-party API, Aug 2026) | Opus 5 $5/$25 · Sonnet 5 $2/$10 · Haiku 4.5 $1/$5 per MTok. Batch API 50% off; prompt caching discounts cache reads. Claude on Microsoft Foundry bills at standard API rates |
 | [Text embedding model pricing 2026](https://tokenmix.ai/blog/text-embedding-models-comparison) · [OpenAI embedding pricing](https://tokenmix.ai/blog/openai-embedding-pricing) · [embedding model comparison](https://reintech.io/blog/embedding-models-comparison-2026-openai-cohere-voyage-bge) | $0.006–$0.18 per MTok depending on provider and quality tier |
 | [Hetzner pricing calculator](https://costgoat.com/pricing/hetzner) · [June 2026 price adjustment](https://www.hetzner.com/pressroom/standardization-and-price-adjustment-of-our-server-products/) | CPX22 €7.99/mo · CCX33 (8 dedicated vCPU / 32 GB) €48.49/mo · 20 TB egress included in EU regions |
 | [Hetzner vs AWS 2026](https://gartsolutions.com/hetzner-vs-aws/) · [AWS vs DO vs Hetzner](https://www.forasoft.com/blog/article/aws-vs-digitalocean-vs-hetzner-1302) | Roughly 3–5× cheaper for equivalent compute |

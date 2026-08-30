@@ -59,6 +59,15 @@ jobs:
               print(f"  {spec.id:22} {spec.eval_suite}")
           PY
 
+      # The graph is built from checked-in sources with no network and no keys.
+      # Built twice: a build that is not reproducible cannot have its diff
+      # reviewed, and an unreviewable diff is how a bad edge lives for a year.
+      - name: Knowledge graph builds, twice, identically
+        run: |
+          python -m knowledge.graph.build --db /tmp/graph-a.db --rebuild
+          python -m knowledge.graph.build --db /tmp/graph-b.db --rebuild
+          cmp /tmp/graph-a.db /tmp/graph-b.db
+
       # The only end-to-end run that uses the REAL registry-derived allowlist.
       # verify.py and the unit tests pass hand-written allowlists with invented
       # agent ids, which is how a missing llm_complete grant survived unnoticed.

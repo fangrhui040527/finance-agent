@@ -30,6 +30,7 @@ class XNAS(MarketAdapter):
     tier = 1
     accounting_standard = AccountingStandard.US_GAAP
     local_index = "SPX"
+    regulator = "US Securities and Exchange Commission"
     settlement_days = 1
     known_at_strategy = KnownAtStrategy.VENDOR
 

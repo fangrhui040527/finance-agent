@@ -75,9 +75,11 @@ def test_calls_can_be_grouped_by_the_run_that_made_them(tmp_path):
     """Without a run id the only grouping is agent plus timestamp proximity,
     which stops being the same question once two jobs overlap."""
     led = ProvenanceLedger(tmp_path / "p.db", run_id="nightly-2026-08-28")
-    _call(led)
-    _call(led)
-    _call(led, run_id="adhoc")
+    # Stamped explicitly. Leaving `at` unset takes the wall clock, so the window
+    # assertion below silently became false on the day real time walked past NOW.
+    _call(led, cost_at=NOW)
+    _call(led, cost_at=NOW)
+    _call(led, cost_at=NOW, run_id="adhoc")
 
     assert len(led.calls_for_run("nightly-2026-08-28")) == 2
     assert len(led.calls_for_run("adhoc")) == 1
