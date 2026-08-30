@@ -16,28 +16,7 @@ from knowledge.feeds.adapter import FeedError, GdeltFeed
 NOW = datetime(2026, 8, 27, 12, 0, tzinfo=timezone.utc)
 
 
-class _Response:
-    """Minimal stand-in for the context manager urlopen returns."""
-
-    def __init__(self, body: str):
-        self._body = body.encode()
-
-    def read(self) -> bytes:
-        return self._body
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, *exc):
-        return False
-
-
-def _opener(body: str, capture: list | None = None):
-    def open_(req, timeout=None):
-        if capture is not None:
-            capture.append(req)
-        return _Response(body)
-    return open_
+from tests.conftest import FakeResponse as _Response, opener_for as _opener
 
 
 def _article(url: str, title: str = "Bank posts record quarter", **kw) -> dict:

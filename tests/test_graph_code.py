@@ -318,3 +318,18 @@ def test_the_docstring_no_longer_claims_to_answer_the_eval_question():
     assert "refuses to register" in doc
     # And the promise it does make is the one the code delivers.
     assert "which module has nothing testing it" in doc
+
+
+def test_paths_are_posix_regardless_of_host_separator(tmp_path):
+    """Node paths and doc ids must use `/` on every OS. With `str(Path)` the
+    Windows build wrote `core\thing.py`, so the same repository produced a
+    different graph per machine and prose naming `core/thing.py` never matched."""
+    root = repo(tmp_path, {"core/thing.py": "x = 1\n",
+                           "docs/guide.md": "core/thing.py\n"})
+    nodes, _ = parse(CodeExtractor(root, asserted_from=ASOF).extract(), "code")
+    paths = [n.metadata.get("path") for n in nodes if n.metadata.get("path")]
+    assert paths, "expected at least one node carrying a path"
+    assert all("\\" not in p for p in paths), paths
+    assert "core/thing.py" in paths
+    doc = next(n for n in nodes if n.kind is NodeKind.DOCUMENT)
+    assert doc.node_id.endswith("docs_guide.md") or "/" in doc.metadata.get("path", "")

@@ -24,26 +24,7 @@ CSV = """Date,Open,High,Low,Close,Volume
 """
 
 
-class _Response:
-    def __init__(self, body: str):
-        self._body = body.encode()
-
-    def read(self) -> bytes:
-        return self._body
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, *exc):
-        return False
-
-
-def _opener(body: str, capture: list | None = None):
-    def open_(req, timeout=None):
-        if capture is not None:
-            capture.append(req)
-        return _Response(body)
-    return open_
+from tests.conftest import FakeResponse as _Response, opener_for as _opener
 
 
 # --- symbols are mapped, never guessed ------------------------------------

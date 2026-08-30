@@ -228,16 +228,17 @@ def test_every_env_example_key_is_actually_used_somewhere():
     """A key that sets nothing is worse than a missing key: it reads as
     configured."""
     import re
-    import subprocess
+    from tests._repo import iter_source_files
     env = (ROOT / ".env.example").read_text()
     keys = re.findall(r"^([A-Z_]+)=", env, re.M)
     compose = (ROOT / "infra" / "docker-compose.yml").read_text()
     # Compose is not the only consumer: an adapter that reads os.environ counts
     # too. Checking only compose forces a growing exemption list, and the
     # exemptions are exactly where an unread key would hide.
-    src = subprocess.run(["git", "grep", "-lF", "--", "os.environ"], cwd=ROOT,
-                         capture_output=True, text=True).stdout
-    code = "".join((ROOT / f).read_text() for f in src.split())
+    code = "".join(
+        p.read_text(encoding="utf-8", errors="replace")
+        for p in iter_source_files() if "os.environ" in p.read_text(encoding="utf-8", errors="replace")
+    )
     unused = [k for k in keys
               if k not in compose and k not in code and k not in {"ANTHROPIC_API_KEY"}]
     assert not unused, f"env keys referenced nowhere: {unused}"
@@ -246,14 +247,14 @@ def test_every_env_example_key_is_actually_used_somewhere():
 def test_no_package_contains_only_an_init_file():
     """knowledge/provenance/ was one: created in P0, superseded by
     core/provenance/, and left behind as an importable empty package."""
-    import subprocess
-    files = subprocess.run(["git", "ls-files", "*/__init__.py"], cwd=ROOT,
-                           capture_output=True, text=True).stdout.split()
+    from tests._repo import iter_source_files
+    inits = [p for p in iter_source_files() if p.name == "__init__.py"]
     empty = []
-    for init in files:
-        pkg = str(Path(init).parent)
-        siblings = subprocess.run(["git", "ls-files", f"{pkg}/*.py"], cwd=ROOT,
-                                  capture_output=True, text=True).stdout.split()
+    for init in inits:
+        pkg = init.parent
+        # Recursive on purpose: git's `pkg/*.py` pathspec spans `/`, so a
+        # package whose only children are subpackages was never flagged.
+        siblings = [p for p in pkg.rglob("*.py") if "__pycache__" not in p.parts]
         if len(siblings) == 1:
-            empty.append(pkg)
+            empty.append(pkg.relative_to(ROOT).as_posix())
     assert not empty, f"packages with nothing in them: {empty}"

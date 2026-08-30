@@ -109,7 +109,7 @@ class CodeExtractor(Extractor):
             except (SyntaxError, UnicodeDecodeError):
                 continue                       # a file we cannot read is skipped, not guessed at
             parsed[mod] = tree
-            mid = node(MODULE, mod, mod, path=str(path.relative_to(self.root)))
+            mid = node(MODULE, mod, mod, path=path.relative_to(self.root).as_posix())
             nodes.append(mid)
             for item in tree.body:
                 if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
@@ -181,7 +181,9 @@ class CodeExtractor(Extractor):
         """
         nodes: list[dict] = []
         edges: list[dict] = []
-        by_path = {str(p.relative_to(self.root)): mod for mod, p in modules.items()}
+        # as_posix(): prose names `core/thing.py`; on Windows str() yields a
+        # backslash path that never matches, and a per-OS graph is not reproducible.
+        by_path = {p.relative_to(self.root).as_posix(): mod for mod, p in modules.items()}
         pages = sorted(p for p in self.root.rglob("*")
                        if p.suffix in DOC_SUFFIXES
                        and not any(part in SKIP_DIRS for part in p.parts))
@@ -190,7 +192,7 @@ class CodeExtractor(Extractor):
                 text = page.read_text(encoding="utf-8")
             except (UnicodeDecodeError, OSError):
                 continue
-            rel = str(page.relative_to(self.root))
+            rel = page.relative_to(self.root).as_posix()
             hits = sorted({by_path[path] for path in by_path if path in text})
             if not hits:
                 continue                      # a page naming no code is not a code doc
