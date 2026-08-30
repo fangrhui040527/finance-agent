@@ -5,8 +5,8 @@ verify:  ; . .venv/bin/activate && python verify.py
 stress:  ; . .venv/bin/activate && python stress/run.py
 config:  ; . .venv/bin/activate && python -c "from core.config import load; print(load().describe())"
 trace:   ; . .venv/bin/activate && python trace_run.py
-graph:   ; . .venv/bin/activate && python -m knowledge.graph.build --rebuild
-codegraph: ; . .venv/bin/activate && python -m knowledge.graph.build --code --rebuild
+graph:   ; . .venv/bin/activate && python -m knowledge.graph.build --prune
+codegraph: ; . .venv/bin/activate && python -m knowledge.graph.build --code --prune
 graph-report: ; . .venv/bin/activate && python ask.py graph --report
 mcp:     ; . .venv/bin/activate && python -m mcp_server.server
 mcp-check: ; . .venv/bin/activate && python -m mcp_server.server --selftest

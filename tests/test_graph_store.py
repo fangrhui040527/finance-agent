@@ -192,3 +192,69 @@ def test_a_file_backed_store_uses_wal_so_a_build_and_a_query_can_overlap(tmp_pat
 
 def test_counts_separates_what_can_back_a_claim_from_what_merely_exists():
     assert store_with().counts() == {"nodes": 3, "edges": 2, "citable": 1, "closed": 0}
+
+
+# -- tier-scoped re-extraction -----------------------------------------------
+
+def test_an_edge_the_sources_stopped_asserting_is_closed_not_deleted():
+    """The half of "re-extraction replaces only its own tier" that the module
+    docstring promised and nothing implemented. A curated row deleted from the
+    yaml used to stay asserted forever."""
+    s = store_with()
+    kept = Edge("CO:a", "CO:b", EdgeKind.SUPPLIES, 0.9, "doc:1",
+                Confidence.EXTRACTED, OPENED)
+    closed = s.close_missing(DETERMINISTIC, [kept], date(2026, 6, 1))
+    assert closed == [("SEC:s", "CO:a", "classified_in", "2020-01-01")] or \
+           closed == [("SEC:s", "CO:a", "classified_in", OPENED.isoformat())]
+    assert s.counts()["edges"] == 2            # nothing deleted
+    assert s.counts()["closed"] == 1
+
+
+def test_what_we_believed_before_the_source_changed_still_answers():
+    """Closing preserves history; deleting would make every conclusion drawn
+    through that edge unauditable."""
+    s = store_with()
+    kept = Edge("CO:a", "CO:b", EdgeKind.SUPPLIES, 0.9, "doc:1",
+                Confidence.EXTRACTED, OPENED)
+    s.close_missing(DETERMINISTIC, [kept], date(2026, 6, 1))
+    assert [e.src for e in s.live_edges(date(2026, 3, 1))] == ["CO:a", "SEC:s"]
+    assert [e.src for e in s.live_edges(ASOF)] == ["CO:a"]
+
+
+def test_pruning_one_tier_leaves_another_tiers_edges_alone():
+    """The reason the tier column exists. `--rebuild` deletes the file and takes
+    every tier with it, including a semantic one no deterministic source could
+    reproduce."""
+    s = store_with()
+    s.add_edge(Edge("CO:b", "SEC:s", EdgeKind.EXPOSED_TO, 0.5, "model:1",
+                    Confidence.INFERRED, OPENED), tier="semantic")
+    s.close_missing(DETERMINISTIC, [], date(2026, 6, 1))
+    semantic = [e for e in s.load(tier="semantic").edges()]
+    assert len(semantic) == 1 and semantic[0].valid_to is None
+
+
+def test_pruning_nothing_closes_nothing():
+    s = store_with()
+    everything = s.load().edges()
+    assert s.close_missing(DETERMINISTIC, everything, date(2026, 6, 1)) == []
+    assert s.counts()["closed"] == 0
+
+
+def test_an_already_closed_edge_is_not_closed_twice():
+    s = store_with()
+    s.close_edge("CO:a", "CO:b", EdgeKind.SUPPLIES, OPENED, date(2026, 3, 1))
+    s.close_missing(DETERMINISTIC, [], date(2026, 6, 1))
+    e = next(x for x in s.load().neighbours("CO:a"))
+    assert e.valid_to == date(2026, 3, 1)      # the first close stands
+
+
+def test_an_edge_opening_after_the_closing_date_is_left_open():
+    """Closing it would make an interval containing no days, which Edge refuses
+    to construct - so the row would be unloadable."""
+    s = store_with()
+    s.add_edge(Edge("CO:b", "SEC:s", EdgeKind.SUPPLIES, 1.0, "d",
+                    Confidence.EXTRACTED, date(2027, 1, 1)))
+    s.close_missing(DETERMINISTIC, [], date(2026, 6, 1))
+    late = next(e for e in s.load().neighbours("CO:b"))
+    assert late.valid_to is None
+    assert s.load()                            # and the graph still loads

@@ -51,6 +51,7 @@ PREFIX: dict[NodeKind, str] = {
     NodeKind.COMMODITY: "CM",
     NodeKind.REGULATOR: "RG",
     NodeKind.EVENT: "EV",
+    NodeKind.DOCUMENT: "DOC",
 }
 
 #: An instrument id as this repo writes them: a market prefix, a colon, a code.

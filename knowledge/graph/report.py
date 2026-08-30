@@ -87,6 +87,23 @@ def render(graph: EntityGraph, *, asof: date, diff: Diff | None = None,
         for s in surprises:
             out.append(f"  {s.path.describe()}")
 
+    modules = [n for n in graph.nodes() if n.kind is NodeKind.PRODUCT]
+    if modules:
+        from knowledge.graph.analyze import undocumented_modules, untested_modules
+        out += ["", "CODE: NOTHING TESTS THESE", RULE]
+        untested = untested_modules(graph, ignore=("tests_",))
+        if not untested:
+            out.append("  none - every module that defines something has a test "
+                       "importing it")
+        else:
+            out += [f"  {graph.label(n)}" for n in untested[:limit]]
+            out.append("  INFERRED: a module exercised only through a helper "
+                       "reads as untested. Over-reports, never under-reports.")
+        undoc = undocumented_modules(graph)
+        out += ["", "CODE: NO PROSE NAMES THESE", RULE]
+        out.append(f"  {len(undoc)} of {len(modules)} modules. Most need no page - "
+                   "read this as a question about the ones you expected written up.")
+
     if diff is not None:
         out += ["", "WHAT THE LAST BUILD CHANGED", RULE, diff.describe()]
     return "\n".join(out)

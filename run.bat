@@ -116,11 +116,11 @@ goto :eof
 goto end
 
 :graph
-"%PY%" -m knowledge.graph.build --rebuild%ARGS%
+"%PY%" -m knowledge.graph.build --prune%ARGS%
 goto end
 
 :codegraph
-"%PY%" -m knowledge.graph.build --code --rebuild%ARGS%
+"%PY%" -m knowledge.graph.build --code --prune%ARGS%
 goto end
 
 :graphreport

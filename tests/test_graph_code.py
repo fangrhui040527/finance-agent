@@ -206,3 +206,115 @@ def test_a_code_edge_is_dated_so_it_is_traversable_at_all(tmp_path):
 
 def test_an_empty_repository_produces_an_empty_graph(tmp_path):
     assert extracted(tmp_path) == ([], [])
+
+
+# -- tests, docs, and the question this graph exists to answer ---------------
+
+def test_a_test_module_gets_a_tests_edge_not_an_import_edge(tmp_path):
+    """A test importing a module is the specific relation. Emitting the generic
+    `supplies` alongside it would say the test depends on the module, which is
+    true and much less useful than saying it covers it."""
+    root = repo(tmp_path, {"lib.py": "def f():\n    pass\n",
+                           "tests/test_lib.py": "import lib\n"})
+    _, edges = extracted(root)
+    kinds = {e.kind for e in edges if e.src == "PR:tests_test_lib"}
+    assert EdgeKind.TESTS in kinds
+    assert EdgeKind.SUPPLIES not in kinds
+
+
+def test_a_tests_edge_is_inferred_because_importing_is_not_testing(tmp_path):
+    """Test files import fixtures and helpers too. Importing is the best static
+    evidence available and still only evidence."""
+    root = repo(tmp_path, {"lib.py": "def f():\n    pass\n",
+                           "tests/test_lib.py": "import lib\n"})
+    _, edges = extracted(root)
+    t = next(e for e in edges if e.kind is EdgeKind.TESTS)
+    assert t.confidence is Confidence.INFERRED and not t.citable
+
+
+def test_a_file_named_test_something_counts_wherever_it_lives(tmp_path):
+    root = repo(tmp_path, {"lib.py": "def f():\n    pass\n",
+                           "pkg/test_lib.py": "import lib\n"})
+    _, edges = extracted(root)
+    assert any(e.kind is EdgeKind.TESTS for e in edges)
+
+
+def test_a_page_naming_a_module_documents_it_and_the_edge_is_citable(tmp_path):
+    """The one place EXTRACTED is fully earned in this graph: the markdown
+    contains the path as a literal string, so a reader can open it and check."""
+    root = repo(tmp_path, {"core/thing.py": "def f():\n    pass\n",
+                           "docs/guide.md": "See `core/thing.py` for details.\n"})
+    nodes, edges = extracted(root)
+    assert any(n.kind is NodeKind.DOCUMENT for n in nodes)
+    d = next(e for e in edges if e.kind is EdgeKind.DOCUMENTS)
+    assert d.dst == "PR:core_thing"
+    assert d.confidence is Confidence.EXTRACTED and d.citable
+
+
+def test_a_page_naming_no_code_is_not_treated_as_a_code_document(tmp_path):
+    root = repo(tmp_path, {"lib.py": "x = 1\n",
+                           "docs/prose.md": "A page about nothing in particular.\n"})
+    nodes, _ = extracted(root)
+    assert not [n for n in nodes if n.kind is NodeKind.DOCUMENT]
+
+
+def test_documents_match_on_the_path_not_the_dotted_name(tmp_path):
+    """Prose says 'core/llm/tiers.py' and almost never 'core.llm.tiers'; matching
+    the dotted form would fire on ordinary sentences containing dots."""
+    root = repo(tmp_path, {"core/thing.py": "x = 1\n",
+                           "docs/a.md": "core/thing.py\n",
+                           "docs/b.md": "core.thing is a nice idea.\n"})
+    nodes, _ = extracted(root)
+    docs = {n.label for n in nodes if n.kind is NodeKind.DOCUMENT}
+    assert docs == {"a.md"}
+
+
+def test_docs_can_be_turned_off(tmp_path):
+    root = repo(tmp_path, {"lib.py": "x = 1\n", "docs/g.md": "lib.py\n"})
+    nodes, _ = parse(CodeExtractor(root, asserted_from=ASOF, docs=False).extract(),
+                     "code")
+    assert not [n for n in nodes if n.kind is NodeKind.DOCUMENT]
+
+
+def test_which_module_has_nothing_testing_it(tmp_path):
+    from knowledge.graph.analyze import untested_modules
+    from knowledge.graph.entity_graph import EntityGraph
+    root = repo(tmp_path, {"covered.py": "def a():\n    pass\n",
+                           "bare.py": "def b():\n    pass\n",
+                           "tests/test_covered.py": "import covered\n"})
+    nodes, edges = extracted(root)
+    g = EntityGraph()
+    for n in nodes:
+        g.add_node(n)
+    for e in edges:
+        g.add_edge(e)
+    assert untested_modules(g, ignore=("tests_",)) == ["PR:bare"]
+
+
+def test_a_module_that_defines_nothing_is_not_reported_as_untested(tmp_path):
+    """Two thirds of the first run were empty __init__.py package markers. A
+    list nobody can read is the same as no list."""
+    from knowledge.graph.analyze import untested_modules
+    from knowledge.graph.entity_graph import EntityGraph
+    root = repo(tmp_path, {"pkg/__init__.py": "", "pkg/real.py": "def f():\n    pass\n"})
+    nodes, edges = extracted(root)
+    g = EntityGraph()
+    for n in nodes:
+        g.add_node(n)
+    for e in edges:
+        g.add_edge(e)
+    assert "PR:pkg" not in untested_modules(g)
+    assert "PR:pkg_real" in untested_modules(g)
+
+
+def test_the_docstring_no_longer_claims_to_answer_the_eval_question():
+    """It did, and it did not. core/registry/loader.py runs check_suite at load,
+    so an agent without an eval suite refuses to register - a graph query would
+    be a weaker second answer to something already refused outright."""
+    import knowledge.graph.extractors.code as mod
+    doc = mod.__doc__
+    # The phrase still appears - inside the correction that retracts it.
+    assert 'does NOT answer "which agent has no eval"' in doc
+    assert "refuses to register" in doc
+    # And the promise it does make is the one the code delivers.
+    assert "which module has nothing testing it" in doc
