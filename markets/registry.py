@@ -16,16 +16,21 @@ from __future__ import annotations
 
 from markets.contract import MarketAdapter
 from markets.xasx import XASX
+from markets.xetr import XETR
 from markets.xhkg import XHKG
+from markets.xkrx import XKRX
 from markets.xkls import XKLS
 from markets.xlon import XLON
 from markets.xnas import XNAS
+from markets.xnse import XNSE
 from markets.xses import XSES
+from markets.xtai import XTAI
 from markets.xtks import XTKS
 
 _ADAPTERS: dict[str, type[MarketAdapter]] = {
     "XKLS": XKLS, "XNAS": XNAS, "XSES": XSES, "XHKG": XHKG,
     "XTKS": XTKS, "XLON": XLON, "XASX": XASX,
+    "XNSE": XNSE, "XTAI": XTAI, "XKRX": XKRX, "XETR": XETR,
 }
 _CACHE: dict[str, MarketAdapter] = {}
 
@@ -48,6 +53,11 @@ ALIASES: dict[str, str] = {
     "TYO": "XTKS",     # which is exactly why the MIC is the canonical form
     "LSE": "XLON",
     "ASX": "XASX",
+    "NSE": "XNSE",
+    "TWSE": "XTAI",
+    "KRX": "XKRX",
+    "KOSPI": "XKRX",
+    "XETRA": "XETR",
 }
 
 

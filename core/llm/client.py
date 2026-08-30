@@ -113,6 +113,10 @@ class InferenceClient:
         rec = self.ledger.record_call(
             agent=agent, task_class=task, tier=tier, model_id=model_id,
             prompt=prompt, usage=usage, fx_rate=self.fx_rate,
+            # Measured either way. It used to reach the trace and nowhere else,
+            # so an ordinary run - the only kind that happens in production -
+            # threw away the number docs/01 section 10 asks for.
+            latency_ms=elapsed,
         )
         if is_tracing():
             # The ledger keeps prompt_hash only, by design. The trace keeps the

@@ -1,0 +1,227 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Public+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+    :root{
+      --ground:#F6F8F7; --panel:#FFFFFF; --panel-2:#EFF2F1; --term:#12201F;
+      --ink:#15191B; --ink-2:#3A4448; --muted:#606D71;
+      --rule:#D6DBD9; --rule-2:#C2C9C6;
+      --accent:#0F5C63; --accent-soft:#DCEAEA;
+      --neg:#9E3626; --neg-soft:#F3E0DC;
+      --pos:#3B6A38; --pos-soft:#E1EBDF;
+      --warn:#8A5B12; --warn-soft:#F5E9D4;
+      --term-ink:#D6E3E1; --term-dim:#7E948F; --term-accent:#6FBFC4;
+      --term-pos:#8CBE85; --term-neg:#DB8571;
+      --shadow:0 1px 2px rgba(21,25,27,.05),0 8px 24px -16px rgba(21,25,27,.28);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--ground);color:var(--ink);
+      font-family:"Public Sans",-apple-system,BlinkMacSystemFont,sans-serif;
+      font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+    h1,h2,h3{font-family:Newsreader,Georgia,serif;font-weight:500;margin:0;line-height:1.2}
+    code,.mono{font-family:"JetBrains Mono",ui-monospace,Menlo,monospace}
+    a{color:var(--accent);text-underline-offset:3px}
+    a:hover{color:#0a4247}
+    .app{display:grid;grid-template-columns:196px minmax(0,1fr);min-height:100%}
+    .rail{background:var(--panel);border-right:1px solid var(--rule);padding:22px 0;display:flex;flex-direction:column;gap:2px}
+    .brand{padding:0 20px 20px;border-bottom:1px solid var(--rule);margin-bottom:14px}
+    .brand b{font-family:Newsreader,serif;font-size:17px;font-weight:600;display:block;letter-spacing:-.01em}
+    .brand span{font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);font-weight:600}
+    .nav{display:flex;align-items:center;gap:10px;padding:8px 20px;color:var(--ink-2);
+      font-size:13.5px;font-weight:500;cursor:pointer;border-left:2px solid transparent;text-decoration:none}
+    .nav:hover{background:var(--panel-2);color:var(--ink)}
+    .nav.on{border-left-color:var(--accent);color:var(--accent);background:var(--accent-soft);font-weight:600}
+    .nav svg{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-width:1.6;
+      stroke-linecap:round;stroke-linejoin:round}
+    .railsep{height:1px;background:var(--rule);margin:14px 20px}
+    .main{padding:26px 32px 40px;min-width:0}
+    .head{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:22px}
+    .head h1{font-size:25px;letter-spacing:-.015em}
+    .head p{margin:5px 0 0;color:var(--muted);font-size:13.5px;max-width:64ch}
+    .eyebrow{font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+      color:var(--muted);margin:0 0 9px}
+    .card{background:var(--panel);border:1px solid var(--rule);border-radius:4px;padding:18px 20px;box-shadow:var(--shadow)}
+    .grid{display:grid;gap:16px}
+    .chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;
+      padding:2px 8px;border-radius:3px;letter-spacing:.02em;text-transform:uppercase}
+    .chip.ok{background:var(--pos-soft);color:var(--pos)}
+    .chip.no{background:var(--neg-soft);color:var(--neg)}
+    .chip.wait{background:var(--warn-soft);color:var(--warn)}
+    .chip.n{background:var(--panel-2);color:var(--muted)}
+    .box{border-left:3px solid var(--rule-2);background:var(--panel-2);padding:13px 16px;border-radius:0 3px 3px 0}
+    .box.key{border-left-color:var(--accent);background:var(--accent-soft)}
+    .box.warn{border-left-color:var(--warn);background:var(--warn-soft)}
+    .box.stop{border-left-color:var(--neg);background:var(--neg-soft)}
+    .box .lbl{font-size:10.5px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;
+      display:block;margin-bottom:5px;color:var(--accent)}
+    .box.warn .lbl{color:var(--warn)} .box.stop .lbl{color:var(--neg)}
+    .box p{margin:0;font-size:13px;color:var(--ink-2)}
+    .term{background:var(--term);border-radius:4px;overflow:hidden}
+    .term-bar{display:flex;align-items:center;gap:6px;padding:8px 12px;border-bottom:1px solid #1E2E2C}
+    .term-bar i{width:8px;height:8px;border-radius:50%;background:var(--term-dim);opacity:.4}
+    .term-bar b{margin-left:8px;font-family:"JetBrains Mono",monospace;font-size:10.5px;
+      color:var(--term-dim);font-weight:500;letter-spacing:.06em;text-transform:uppercase}
+    .term pre{margin:0;padding:14px 16px;font-family:"JetBrains Mono",monospace;font-size:12px;
+      line-height:1.7;color:var(--term-ink);white-space:pre-wrap;overflow-x:auto}
+    .term .p{color:var(--term-accent);font-weight:700}
+    .term .c{color:var(--term-dim);font-style:italic}
+    .term .o{color:var(--term-dim)}
+    .term .hl{color:var(--term-ink);font-weight:700}
+    .term .g{color:var(--term-pos)} .term .r{color:var(--term-neg)}
+    table{border-collapse:collapse;width:100%;font-size:13px}
+    th{text-align:left;font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;
+      color:var(--muted);font-weight:700;padding:0 12px 8px;border-bottom:1px solid var(--rule)}
+    td{padding:9px 12px;border-bottom:1px solid var(--rule)}
+    tr:last-child td{border-bottom:0}
+    .num{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums}
+    .btn{font-family:inherit;font-size:13px;font-weight:600;padding:7px 14px;border-radius:3px;
+      border:1px solid var(--rule-2);background:var(--panel);color:var(--ink-2);cursor:pointer}
+    .btn:hover{border-color:var(--accent);color:var(--accent)}
+    .btn.on{background:var(--accent);border-color:var(--accent);color:#fff}
+    .btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+    .stat b{display:block;font-family:"JetBrains Mono",monospace;font-size:23px;
+      font-weight:500;color:var(--ink);letter-spacing:-.02em;line-height:1.15}
+    .stat span{font-size:11px;color:var(--muted);letter-spacing:.03em}
+
+  </style>
+</helmet>
+<div class="app" style="width:1280px;min-height:900px">
+<div class="rail">
+<div class="brand"><span>FinPlanet</span><b>Analyst Mind</b></div>
+<a class="nav"><svg viewBox="0 0 16 16"><path d="M8 2 2 5v6l6 3 6-3V5L8 2Z"/><path d="M8 8v6M2 5l6 3 6-3"/></svg>Ask</a>
+<a class="nav"><svg viewBox="0 0 16 16"><path d="M2 12l3.5-4 2.5 2.5L14 4"/><path d="M14 8V4h-4"/></svg>Why it moved</a>
+<a class="nav on"><svg viewBox="0 0 16 16"><path d="M2 13h12"/><path d="M4 11V7M7 11V4M10 11V8M13 11V5"/></svg>Prices</a>
+<a class="nav"><svg viewBox="0 0 16 16"><path d="M4 2h6l3 3v9H4V2Z"/><path d="M10 2v3h3M6 8h4M6 11h3"/></svg>Thesis</a>
+<a class="nav"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5"/><path d="M8 2.5v5.5l3.9 3.9"/></svg>Portfolio</a>
+<a class="nav"><svg viewBox="0 0 16 16"><path d="M2 8h12"/><path d="M5 5 2 8l3 3M11 5l3 3-3 3"/></svg>Sizing</a>
+<a class="nav"><svg viewBox="0 0 16 16"><path d="M2 8h3l2-4 2 8 2-4h3"/></svg>Predictions</a>
+<a class="nav"><svg viewBox="0 0 16 16"><circle cx="4" cy="4" r="1.8"/><circle cx="12" cy="8" r="1.8"/><circle cx="6" cy="12" r="1.8"/><path d="M5.5 5.2 10.4 7M10.6 9.2 7.3 11.1"/></svg>Trace</a>
+<div class="railsep"></div>
+<a class="nav"><svg viewBox="0 0 16 16"><path d="M2 4.5 8 2l6 2.5L8 7 2 4.5Z"/><path d="M4.5 6v4c0 1 1.7 2 3.5 2s3.5-1 3.5-2V6"/></svg>Learn</a>
+<a class="nav"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.2"/><path d="M8 1.5v2M8 12.5v2M14.5 8h-2M3.5 8h-2M12.6 3.4l-1.4 1.4M4.8 11.2l-1.4 1.4M12.6 12.6l-1.4-1.4M4.8 4.8 3.4 3.4"/></svg>Settings</a>
+</div>
+<div class="main">
+
+<div class="head">
+  <div><h1>Prices</h1>
+  <p>Daily bars, bounded by an as-at date so no bar after it is ever returned. A source that
+     cannot answer says so — it never returns an empty series.</p></div>
+  <span class="chip ok">Stooq · free, no key</span>
+</div>
+
+<div style="display:flex;gap:8px;margin-bottom:18px">
+  <sc-for list="{{picks}}" as="p" hint-placeholder-count="4">
+    <button class="btn" onClick="{{ p.pick }}" style="{{p.style}}">{{p.label}}</button>
+  </sc-for>
+</div>
+
+<sc-if value="{{d.ok}}" hint-placeholder-val="{{true}}">
+  <div class="grid" style="grid-template-columns:minmax(0,1fr) 300px;align-items:start">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:18px">
+        <div><code style="font-size:15px;font-weight:700">{{d.inst}}</code>
+          <span style="font-size:12.5px;color:var(--muted);margin-left:10px">{{d.range}}</span></div>
+        <div class="num" style="font-size:22px;font-weight:600;color:{{d.retColor}}">{{d.ret}}</div>
+      </div>
+      <svg viewBox="0 0 600 170" style="width:100%;height:170px;display:block">
+        <polyline points="{{d.spark}}" fill="none" stroke="{{d.retColor}}" stroke-width="1.8"
+          stroke-linejoin="round" stroke-linecap="round"/>
+        <line x1="0" y1="150" x2="600" y2="150" stroke="#D6DBD9" stroke-width="1"/>
+      </svg>
+      <table style="margin-top:14px">
+        <thead><tr><th>Day</th><th style="text-align:right">Open</th><th style="text-align:right">High</th>
+          <th style="text-align:right">Low</th><th style="text-align:right">Close</th>
+          <th style="text-align:right">Volume</th></tr></thead>
+        <tbody>
+          <sc-for list="{{d.bars}}" as="b" hint-placeholder-count="5">
+            <tr><td class="num" style="color:var(--muted)">{{b.day}}</td>
+              <td class="num" style="text-align:right">{{b.o}}</td>
+              <td class="num" style="text-align:right">{{b.h}}</td>
+              <td class="num" style="text-align:right">{{b.l}}</td>
+              <td class="num" style="text-align:right;font-weight:600">{{b.c}}</td>
+              <td class="num" style="text-align:right;color:var(--muted)">{{b.v}}</td></tr>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <p class="eyebrow">Derived</p>
+        <table><tbody>
+          <tr><td style="color:var(--muted)">20d ADV</td><td class="num" style="text-align:right">{{d.adv}}</td></tr>
+          <tr><td style="color:var(--muted)">20d ATR</td><td class="num" style="text-align:right">{{d.atr}}</td></tr>
+          <tr><td style="color:var(--muted)">Bars held</td><td class="num" style="text-align:right">{{d.n}}</td></tr>
+          <tr><td style="color:var(--muted)">Board lot</td><td class="num" style="text-align:right">{{d.lot}}</td></tr>
+        </tbody></table>
+      </div>
+      <div class="box key"><span class="lbl">Validated at the seam</span>
+      <p>Non-finite prices, inverted bars and non-positive values are dropped before they can
+         become a Bar. A NaN return once reached a verdict as &ldquo;nan% unexplained&rdquo;.</p></div>
+    </div>
+  </div>
+</sc-if>
+<sc-if value="{{d.nodata}}" hint-placeholder-val="{{false}}">
+  <div class="card" style="border-left:3px solid var(--neg);background:var(--neg-soft)">
+    <code style="font-size:14px;font-weight:700;color:var(--neg)">NO DATA</code>
+    <p style="margin:8px 0 0;font-size:14px;color:var(--ink-2)">{{d.msg}}</p>
+    <p style="margin:10px 0 0;font-size:12.5px;color:var(--muted)">
+      An unmapped market raises rather than guessing a suffix — a guess returns another
+      company&rsquo;s prices, which is silent, plausible and wrong.</p>
+  </div>
+</sc-if>
+
+</div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{"$preview": {"width": 1280, "height": 900}}'>
+
+const POS='#3B6A38', NEG='#9E3626';
+function series(seed, n, base, drift){
+  let x = seed, out = [], p = base;
+  for (let i=0;i<n;i++){ x = (x*1103515245+12345)%2147483648;
+    p = p*(1 + drift + ((x/2147483648)-0.5)*0.028); out.push(p); }
+  return out;
+}
+function mk(inst, base, drift, lot, cur){
+  const px = series(inst.length*7+3, 30, base, drift);
+  const lo = Math.min(...px), hi = Math.max(...px);
+  const spark = px.map((v,i) => `${(i/(px.length-1)*600).toFixed(1)},${(150 - (v-lo)/((hi-lo)||1)*135).toFixed(1)}`).join(' ');
+  const ret = (px[px.length-1]/px[0]-1);
+  const days = ['2026-08-24','2026-08-25','2026-08-26','2026-08-27','2026-08-28'];
+  const bars = px.slice(-5).map((c,i) => ({ day:days[i],
+    o:(c*0.996).toFixed(2), h:(c*1.008).toFixed(2), l:(c*0.991).toFixed(2), c:c.toFixed(2),
+    v:(820000+i*41000).toLocaleString() }));
+  return { ok:true, nodata:false, inst, range:'30 bars to 28 Aug 2026',
+    ret:(ret>0?'+':'')+(ret*100).toFixed(2)+'%', retColor: ret>0?POS:NEG,
+    spark, bars, n:'2,847', lot:String(lot),
+    adv:cur+' '+(px[px.length-1]*880000/1000).toFixed(0)+'k',
+    atr:(px[px.length-1]*0.017).toFixed(3) };
+}
+const D = {
+  'MYX:1155': mk('MYX:1155', 6.20, 0.0009, 100, 'RM'),
+  'XNAS:NVDA': mk('XNAS:NVDA', 178.40, 0.0021, 1, 'USD'),
+  'XHKG:0700': mk('XHKG:0700', 402.60, -0.0006, 100, 'HKD'),
+  'XFRA:BMW': { ok:false, nodata:true, inst:'XFRA:BMW',
+    msg:'No Stooq suffix registered for market \'XFRA\'. Add it to StooqFeed.SUFFIX and verify with a live fetch.' }
+};
+class Component extends DCLogic {
+  constructor(p){ super(p); this.state = { k:'MYX:1155' }; }
+  renderVals(){
+    const k = this.state.k;
+    return { d: D[k],
+      picks: Object.keys(D).map(key => ({ label:key, pick: () => this.setState({k:key}),
+        style:`font-size:12px;padding:4px 12px;font-family:"JetBrains Mono",monospace;${k===key
+          ? 'background:#0F5C63;border-color:#0F5C63;color:#fff;font-weight:600' : ''}` })) };
+  }
+}
+
+</script>
+</body>
+</html>

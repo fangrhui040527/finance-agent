@@ -1,0 +1,250 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Public+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+    :root{
+      --ground:#F6F8F7; --panel:#FFFFFF; --panel-2:#EFF2F1; --term:#12201F;
+      --ink:#15191B; --ink-2:#3A4448; --muted:#606D71;
+      --rule:#D6DBD9; --rule-2:#C2C9C6;
+      --accent:#0F5C63; --accent-soft:#DCEAEA;
+      --neg:#9E3626; --neg-soft:#F3E0DC;
+      --pos:#3B6A38; --pos-soft:#E1EBDF;
+      --warn:#8A5B12; --warn-soft:#F5E9D4;
+      --term-ink:#D6E3E1; --term-dim:#7E948F; --term-accent:#6FBFC4;
+      --term-pos:#8CBE85; --term-neg:#DB8571;
+      --shadow:0 1px 2px rgba(21,25,27,.05),0 8px 24px -16px rgba(21,25,27,.28);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--ground);color:var(--ink);
+      font-family:"Public Sans",-apple-system,BlinkMacSystemFont,sans-serif;
+      font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+    h1,h2,h3{font-family:Newsreader,Georgia,serif;font-weight:500;margin:0;line-height:1.2}
+    code,.mono{font-family:"JetBrains Mono",ui-monospace,Menlo,monospace}
+    a{color:var(--accent);text-underline-offset:3px}
+    a:hover{color:#0a4247}
+    .app{display:grid;grid-template-columns:196px minmax(0,1fr);min-height:100%}
+    .rail{background:var(--panel);border-right:1px solid var(--rule);padding:22px 0;display:flex;flex-direction:column;gap:2px}
+    .brand{padding:0 20px 20px;border-bottom:1px solid var(--rule);margin-bottom:14px}
+    .brand b{font-family:Newsreader,serif;font-size:17px;font-weight:600;display:block;letter-spacing:-.01em}
+    .brand span{font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);font-weight:600}
+    .nav{display:flex;align-items:center;gap:10px;padding:8px 20px;color:var(--ink-2);
+      font-size:13.5px;font-weight:500;cursor:pointer;border-left:2px solid transparent;text-decoration:none}
+    .nav:hover{background:var(--panel-2);color:var(--ink)}
+    .nav.on{border-left-color:var(--accent);color:var(--accent);background:var(--accent-soft);font-weight:600}
+    .nav svg{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-width:1.6;
+      stroke-linecap:round;stroke-linejoin:round}
+    .railsep{height:1px;background:var(--rule);margin:14px 20px}
+    .main{padding:26px 32px 40px;min-width:0}
+    .head{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:22px}
+    .head h1{font-size:25px;letter-spacing:-.015em}
+    .head p{margin:5px 0 0;color:var(--muted);font-size:13.5px;max-width:64ch}
+    .eyebrow{font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+      color:var(--muted);margin:0 0 9px}
+    .card{background:var(--panel);border:1px solid var(--rule);border-radius:4px;padding:18px 20px;box-shadow:var(--shadow)}
+    .grid{display:grid;gap:16px}
+    .chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;
+      padding:2px 8px;border-radius:3px;letter-spacing:.02em;text-transform:uppercase}
+    .chip.ok{background:var(--pos-soft);color:var(--pos)}
+    .chip.no{background:var(--neg-soft);color:var(--neg)}
+    .chip.wait{background:var(--warn-soft);color:var(--warn)}
+    .chip.n{background:var(--panel-2);color:var(--muted)}
+    .box{border-left:3px solid var(--rule-2);background:var(--panel-2);padding:13px 16px;border-radius:0 3px 3px 0}
+    .box.key{border-left-color:var(--accent);background:var(--accent-soft)}
+    .box.warn{border-left-color:var(--warn);background:var(--warn-soft)}
+    .box.stop{border-left-color:var(--neg);background:var(--neg-soft)}
+    .box .lbl{font-size:10.5px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;
+      display:block;margin-bottom:5px;color:var(--accent)}
+    .box.warn .lbl{color:var(--warn)} .box.stop .lbl{color:var(--neg)}
+    .box p{margin:0;font-size:13px;color:var(--ink-2)}
+    .term{background:var(--term);border-radius:4px;overflow:hidden}
+    .term-bar{display:flex;align-items:center;gap:6px;padding:8px 12px;border-bottom:1px solid #1E2E2C}
+    .term-bar i{width:8px;height:8px;border-radius:50%;background:var(--term-dim);opacity:.4}
+    .term-bar b{margin-left:8px;font-family:"JetBrains Mono",monospace;font-size:10.5px;
+      color:var(--term-dim);font-weight:500;letter-spacing:.06em;text-transform:uppercase}
+    .term pre{margin:0;padding:14px 16px;font-family:"JetBrains Mono",monospace;font-size:12px;
+      line-height:1.7;color:var(--term-ink);white-space:pre-wrap;overflow-x:auto}
+    .term .p{color:var(--term-accent);font-weight:700}
+    .term .c{color:var(--term-dim);font-style:italic}
+    .term .o{color:var(--term-dim)}
+    .term .hl{color:var(--term-ink);font-weight:700}
+    .term .g{color:var(--term-pos)} .term .r{color:var(--term-neg)}
+    table{border-collapse:collapse;width:100%;font-size:13px}
+    th{text-align:left;font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;
+      color:var(--muted);font-weight:700;padding:0 12px 8px;border-bottom:1px solid var(--rule)}
+    td{padding:9px 12px;border-bottom:1px solid var(--rule)}
+    tr:last-child td{border-bottom:0}
+    .num{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums}
+    .btn{font-family:inherit;font-size:13px;font-weight:600;padding:7px 14px;border-radius:3px;
+      border:1px solid var(--rule-2);background:var(--panel);color:var(--ink-2);cursor:pointer}
+    .btn:hover{border-color:var(--accent);color:var(--accent)}
+    .btn.on{background:var(--accent);border-color:var(--accent);color:#fff}
+    .btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+    .stat b{display:block;font-family:"JetBrains Mono",monospace;font-size:23px;
+      font-weight:500;color:var(--ink);letter-spacing:-.02em;line-height:1.15}
+    .stat span{font-size:11px;color:var(--muted);letter-spacing:.03em}
+
+  </style>
+</helmet>
+<div class="app" style="width:1280px;min-height:900px">
+<div class="rail">
+<div class="brand"><span>FinPlanet</span><b>Analyst Mind</b></div>
+<a class="nav"><svg viewBox="0 0 16 16"><path d="M8 2 2 5v6l6 3 6-3V5L8 2Z"/><path d="M8 8v6M2 5l6 3 6-3"/></svg>Ask</a>
+<a class="nav"><svg viewBox="0 0 16 16"><path d="M2 12l3.5-4 2.5 2.5L14 4"/><path d="M14 8V4h-4"/></svg>Why it moved</a>
+<a class="nav"><svg viewBox="0 0 16 16"><path d="M2 13h12"/><path d="M4 11V7M7 11V4M10 11V8M13 11V5"/></svg>Prices</a>
+<a class="nav"><svg viewBox="0 0 16 16"><path d="M4 2h6l3 3v9H4V2Z"/><path d="M10 2v3h3M6 8h4M6 11h3"/></svg>Thesis</a>
+<a class="nav on"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5"/><path d="M8 2.5v5.5l3.9 3.9"/></svg>Portfolio</a>
+<a class="nav"><svg viewBox="0 0 16 16"><path d="M2 8h12"/><path d="M5 5 2 8l3 3M11 5l3 3-3 3"/></svg>Sizing</a>
+<a class="nav"><svg viewBox="0 0 16 16"><path d="M2 8h3l2-4 2 8 2-4h3"/></svg>Predictions</a>
+<a class="nav"><svg viewBox="0 0 16 16"><circle cx="4" cy="4" r="1.8"/><circle cx="12" cy="8" r="1.8"/><circle cx="6" cy="12" r="1.8"/><path d="M5.5 5.2 10.4 7M10.6 9.2 7.3 11.1"/></svg>Trace</a>
+<div class="railsep"></div>
+<a class="nav"><svg viewBox="0 0 16 16"><path d="M2 4.5 8 2l6 2.5L8 7 2 4.5Z"/><path d="M4.5 6v4c0 1 1.7 2 3.5 2s3.5-1 3.5-2V6"/></svg>Learn</a>
+<a class="nav"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.2"/><path d="M8 1.5v2M8 12.5v2M14.5 8h-2M3.5 8h-2M12.6 3.4l-1.4 1.4M4.8 11.2l-1.4 1.4M12.6 12.6l-1.4-1.4M4.8 4.8 3.4 3.4"/></svg>Settings</a>
+</div>
+<div class="main">
+
+<div class="head">
+  <div><h1>Portfolio</h1>
+  <p>Concentration, heat and every breach. Effective bets is the number to watch — a book can
+     look diversified by HHI and collapse into three real positions.</p></div>
+  <span class="chip n">base MYR</span>
+</div>
+
+<div class="grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:18px">
+  <div class="card stat"><b style="color:{{m.hhiColor}}">{{m.hhi}}</b><span>HHI · limit 0.18</span></div>
+  <div class="card stat"><b style="color:{{m.bimColor}}">{{m.bets}}</b><span>effective bets · floor 5.0</span></div>
+  <div class="card stat"><b style="color:{{m.heatColor}}">{{m.heat}}</b><span>portfolio heat · cap 6.0%</span></div>
+  <div class="card stat"><b>1.00</b><span>drawdown scalar</span></div>
+</div>
+
+<div class="grid" style="grid-template-columns:minmax(0,1fr) 360px;align-items:start">
+  <div class="card" style="padding:0;overflow:hidden">
+    <div style="padding:15px 20px;border-bottom:1px solid var(--rule);display:flex;
+                justify-content:space-between;align-items:center">
+      <p class="eyebrow" style="margin:0">Holdings · click to exclude</p>
+      <span style="font-size:12px;color:var(--muted)">{{m.n}} positions</span>
+    </div>
+    <table>
+      <thead><tr><th>Instrument</th><th>Sector</th><th style="text-align:right">Weight</th>
+        <th style="text-align:right">Risk to stop</th><th></th></tr></thead>
+      <tbody>
+        <sc-for list="{{rows}}" as="r" hint-placeholder-count="5">
+          <tr onClick="{{ r.toggle }}" style="{{r.style}}">
+            <td><code style="font-size:12.5px;font-weight:600;color:{{r.ink}}">{{r.id}}</code></td>
+            <td style="color:{{r.mut}}">{{r.sector}} · {{r.country}}</td>
+            <td class="num" style="text-align:right;color:{{r.wColor}};font-weight:{{r.wWeight}}">{{r.w}}</td>
+            <td class="num" style="text-align:right;color:{{r.mut}}">{{r.risk}}</td>
+            <td style="text-align:right"><span class="chip {{r.cls}}">{{r.flag}}</span></td>
+          </tr>
+        </sc-for>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <p class="eyebrow">Breaches</p>
+      <sc-if value="{{m.hasBreach}}" hint-placeholder-val="{{true}}">
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <sc-for list="{{breaches}}" as="b" hint-placeholder-count="4">
+            <div style="display:flex;gap:10px;align-items:flex-start">
+              <span class="chip no" style="flex:none;margin-top:1px">{{b.over}}</span>
+              <div><div style="font-size:13px;font-weight:600">{{b.kind}}</div>
+              <div style="font-size:12px;color:var(--muted)">{{b.detail}}</div></div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+      <sc-if value="{{m.clean}}" hint-placeholder-val="{{false}}">
+        <div class="box"><p>No limit is breached at these weights.</p></div>
+      </sc-if>
+    </div>
+
+    <div class="box warn"><span class="lbl">The dangerous case</span>
+    <p>HHI can look healthy while effective bets sits below five — that is correlation hiding
+       inside apparent diversification. Watch the second number, not the first.</p></div>
+
+    <div class="card" style="padding:15px 18px">
+      <p class="eyebrow" style="margin-bottom:9px">Correlation clusters</p>
+      <div style="display:flex;flex-direction:column;gap:7px;font-size:12.5px">
+        <div style="display:flex;justify-content:space-between">
+          <span>Banks <code style="font-size:11px;color:var(--muted)">ρ 0.71</code></span>
+          <span class="num">{{m.bankW}}</span></div>
+        <div style="display:flex;justify-content:space-between">
+          <span>US tech <code style="font-size:11px;color:var(--muted)">ρ 0.64</code></span>
+          <span class="num">{{m.techW}}</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{"$preview": {"width": 1280, "height": 900}}'>
+
+const NEG='#9E3626', POS='#3B6A38', MUT='#606D71', INK='#15191B', WARN='#8A5B12';
+const BOOK = [
+  {id:'MYX:1155', sector:'bank', country:'MY', w:0.22, risk:0.010},
+  {id:'XNAS:NVDA', sector:'tech', country:'US', w:0.18, risk:0.020},
+  {id:'XSES:D05', sector:'bank', country:'SG', w:0.15, risk:0.010},
+  {id:'MYX:5347', sector:'utility', country:'MY', w:0.11, risk:0.008},
+  {id:'XNAS:MSFT', sector:'tech', country:'US', w:0.09, risk:0.007}
+];
+class Component extends DCLogic {
+  constructor(p){ super(p); this.state = { off:{} }; }
+  renderVals(){
+    const live = BOOK.filter(p => !this.state.off[p.id]);
+    const tot = live.reduce((s,p)=>s+p.w, 0) || 1;
+    const ws = live.map(p => p.w/tot);
+    const hhi = ws.reduce((s,w)=>s+w*w, 0);
+    const bets = Math.max(1, Math.min(live.length, 1/hhi*0.62));
+    const heat = live.reduce((s,p)=>s+p.risk, 0);
+    const bankW = live.filter(p=>p.sector==='bank').reduce((s,p)=>s+p.w/tot,0);
+    const techW = live.filter(p=>p.sector==='tech').reduce((s,p)=>s+p.w/tot,0);
+
+    const breaches = [];
+    live.forEach(p => { if (p.w/tot > 0.08) breaches.push({
+      kind:'single_name', over:(p.w/tot*100).toFixed(0)+'%',
+      detail:p.id+' against a limit of 8%' }); });
+    if (bankW > 0.25) breaches.push({kind:'sector', over:(bankW*100).toFixed(0)+'%',
+      detail:'banks against a limit of 25%'});
+    if (hhi > 0.18) breaches.push({kind:'hhi', over:hhi.toFixed(2),
+      detail:'concentration index against a limit of 0.18'});
+    if (bets < 5) breaches.push({kind:'effective_bets', over:bets.toFixed(1),
+      detail:'below the floor of 5.0 independent positions'});
+
+    return {
+      m: { hhi:hhi.toFixed(3), hhiColor: hhi>0.18?NEG:POS,
+           bets:bets.toFixed(2), bimColor: bets<5?NEG:POS,
+           heat:(heat*100).toFixed(1)+'%', heatColor: heat>0.06?NEG:POS,
+           n:String(live.length), hasBreach:breaches.length>0, clean:breaches.length===0,
+           bankW:(bankW*100).toFixed(0)+'%', techW:(techW*100).toFixed(0)+'%' },
+      breaches,
+      rows: BOOK.map(p => {
+        const on = !this.state.off[p.id];
+        const w = on ? p.w/tot : 0;
+        return { id:p.id, sector:p.sector, country:p.country,
+          w: on ? (w*100).toFixed(1)+'%' : '—',
+          risk: on ? (p.risk*100).toFixed(1)+'%' : '—',
+          flag: on ? (w>0.08 ? 'over' : 'ok') : 'out',
+          cls: on ? (w>0.08 ? 'no' : 'ok') : 'n',
+          ink: on ? INK : MUT, mut: MUT,
+          wColor: on && w>0.08 ? NEG : (on ? INK : MUT),
+          wWeight: on && w>0.08 ? '700' : '400',
+          style:`cursor:pointer;opacity:${on?1:0.45}`,
+          toggle: () => this.setState({ off: {...this.state.off, [p.id]: on} }) };
+      })
+    };
+  }
+}
+
+</script>
+</body>
+</html>

@@ -30,7 +30,7 @@ network and no keys; `pytest` runs 361 tests.
 | P15 surface | done | `ui/render.py` |
 | P17 registry and ratchet | done | `core/registry/loader.py`, `evals/` — 16 suites |
 | **P16 paper trade gate** | **waiting on elapsed time** | tooling built (`predict.py`, `agents/learning/store.py`); needs 3–6 months of graded outcomes |
-| P18 T2 market onboarding | **done for SG HK JP UK AU** | `markets/` — 7 adapters. India, Taiwan, Korea and Germany remain |
+| P18 T2 market onboarding | done | `markets/` — 11 adapters, every T2 market docs/06 names |
 | P19 short-horizon classifier | blocked on P16 | needs the forward record P16 produces |
 
 **What "waiting" means here.** P16 is not unbuilt work; it is a waiting period.
@@ -58,8 +58,16 @@ and neither was visible before a market needed them —
   Both are real MICs — the group operator and the exchange segment — and it is
   the MYX/XKLS drift again. Aliased before it could cost anything.
 
-India (XNSE), Taiwan (XTAI), Korea (XKRX) and Germany (XETR) remain, and are the
-same shape of work.
+India, Taiwan, Korea and Germany followed, completing the T2 set `docs/06`
+names. The `per_side` fix London forced paid for itself immediately: Taiwan and
+Korea both tax the **sell side only** (0.3% and 0.15%), and India levies a
+buy-side stamp duty *alongside* a both-sides STT. Four more markets would have
+been mis-costed by the doubling bug, three of them by 15–30 bps.
+
+Two premises turned out to be wrong while testing, both about markets already
+registered: Hong Kong sets board lots **per instrument** rather than a flat
+1,000, and **XNAS has been T+1 since May 2024** — so India is not the only fast
+settler and a uniform T+2 assumption would misdate cash on both.
 
 **What is now wired.** GDELT (news) and Stooq (daily bars) are both live and keyless. Filings, ownership and macro remain unwired: their adapters raise
 rather than returning empty, so a missing source can never read as a quiet

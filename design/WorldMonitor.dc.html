@@ -1,0 +1,330 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Public+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+    :root{
+      --ground:#F6F8F7; --panel:#FFFFFF; --panel-2:#EFF2F1; --term:#12201F;
+      --ink:#15191B; --ink-2:#3A4448; --muted:#606D71;
+      --rule:#D6DBD9; --rule-2:#C2C9C6;
+      --accent:#0F5C63; --accent-soft:#DCEAEA;
+      --neg:#9E3626; --neg-soft:#F3E0DC;
+      --pos:#3B6A38; --pos-soft:#E1EBDF;
+      --warn:#8A5B12; --warn-soft:#F5E9D4;
+      --term-ink:#D6E3E1; --term-dim:#7E948F; --term-accent:#6FBFC4;
+      --term-pos:#8CBE85; --term-neg:#DB8571;
+      --shadow:0 1px 2px rgba(21,25,27,.05),0 8px 24px -16px rgba(21,25,27,.28);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--ground);color:var(--ink);
+      font-family:"Public Sans",-apple-system,BlinkMacSystemFont,sans-serif;
+      font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+    h1,h2,h3{font-family:Newsreader,Georgia,serif;font-weight:500;margin:0;line-height:1.2}
+    code,.mono{font-family:"JetBrains Mono",ui-monospace,Menlo,monospace}
+    a{color:var(--accent);text-underline-offset:3px}
+    a:hover{color:#0a4247}
+    .app{display:grid;grid-template-columns:196px minmax(0,1fr);min-height:100%}
+    .rail{background:var(--panel);border-right:1px solid var(--rule);padding:22px 0;display:flex;flex-direction:column;gap:2px}
+    .brand{padding:0 20px 20px;border-bottom:1px solid var(--rule);margin-bottom:14px}
+    .brand b{font-family:Newsreader,serif;font-size:17px;font-weight:600;display:block;letter-spacing:-.01em}
+    .brand span{font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);font-weight:600}
+    .nav{display:flex;align-items:center;gap:10px;padding:8px 20px;color:var(--ink-2);
+      font-size:13.5px;font-weight:500;cursor:pointer;border-left:2px solid transparent;text-decoration:none}
+    .nav:hover{background:var(--panel-2);color:var(--ink)}
+    .nav.on{border-left-color:var(--accent);color:var(--accent);background:var(--accent-soft);font-weight:600}
+    .nav svg{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-width:1.6;
+      stroke-linecap:round;stroke-linejoin:round}
+    .railsep{height:1px;background:var(--rule);margin:14px 20px}
+    .main{padding:26px 32px 40px;min-width:0}
+    .head{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:22px}
+    .head h1{font-size:25px;letter-spacing:-.015em}
+    .head p{margin:5px 0 0;color:var(--muted);font-size:13.5px;max-width:64ch}
+    .eyebrow{font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+      color:var(--muted);margin:0 0 9px}
+    .card{background:var(--panel);border:1px solid var(--rule);border-radius:4px;padding:18px 20px;box-shadow:var(--shadow)}
+    .grid{display:grid;gap:16px}
+    .chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;
+      padding:2px 8px;border-radius:3px;letter-spacing:.02em;text-transform:uppercase}
+    .chip.ok{background:var(--pos-soft);color:var(--pos)}
+    .chip.no{background:var(--neg-soft);color:var(--neg)}
+    .chip.wait{background:var(--warn-soft);color:var(--warn)}
+    .chip.n{background:var(--panel-2);color:var(--muted)}
+    .box{border-left:3px solid var(--rule-2);background:var(--panel-2);padding:13px 16px;border-radius:0 3px 3px 0}
+    .box.key{border-left-color:var(--accent);background:var(--accent-soft)}
+    .box.warn{border-left-color:var(--warn);background:var(--warn-soft)}
+    .box.stop{border-left-color:var(--neg);background:var(--neg-soft)}
+    .box .lbl{font-size:10.5px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;
+      display:block;margin-bottom:5px;color:var(--accent)}
+    .box.warn .lbl{color:var(--warn)} .box.stop .lbl{color:var(--neg)}
+    .box p{margin:0;font-size:13px;color:var(--ink-2)}
+    .term{background:var(--term);border-radius:4px;overflow:hidden}
+    .term-bar{display:flex;align-items:center;gap:6px;padding:8px 12px;border-bottom:1px solid #1E2E2C}
+    .term-bar i{width:8px;height:8px;border-radius:50%;background:var(--term-dim);opacity:.4}
+    .term-bar b{margin-left:8px;font-family:"JetBrains Mono",monospace;font-size:10.5px;
+      color:var(--term-dim);font-weight:500;letter-spacing:.06em;text-transform:uppercase}
+    .term pre{margin:0;padding:14px 16px;font-family:"JetBrains Mono",monospace;font-size:12px;
+      line-height:1.7;color:var(--term-ink);white-space:pre-wrap;overflow-x:auto}
+    .term .p{color:var(--term-accent);font-weight:700}
+    .term .c{color:var(--term-dim);font-style:italic}
+    .term .o{color:var(--term-dim)}
+    .term .hl{color:var(--term-ink);font-weight:700}
+    .term .g{color:var(--term-pos)} .term .r{color:var(--term-neg)}
+    table{border-collapse:collapse;width:100%;font-size:13px}
+    th{text-align:left;font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;
+      color:var(--muted);font-weight:700;padding:0 12px 8px;border-bottom:1px solid var(--rule)}
+    td{padding:9px 12px;border-bottom:1px solid var(--rule)}
+    tr:last-child td{border-bottom:0}
+    .num{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums}
+    .btn{font-family:inherit;font-size:13px;font-weight:600;padding:7px 14px;border-radius:3px;
+      border:1px solid var(--rule-2);background:var(--panel);color:var(--ink-2);cursor:pointer}
+    .btn:hover{border-color:var(--accent);color:var(--accent)}
+    .btn.on{background:var(--accent);border-color:var(--accent);color:#fff}
+    .btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+    .stat b{display:block;font-family:"JetBrains Mono",monospace;font-size:23px;
+      font-weight:500;color:var(--ink);letter-spacing:-.02em;line-height:1.15}
+    .stat span{font-size:11px;color:var(--muted);letter-spacing:.03em}
+
+  </style>
+</helmet>
+<div class="app" style="width:1280px;min-height:900px">
+<div class="rail">
+<div class="brand"><span>FinPlanet</span><b>Analyst Mind</b></div>
+<a class="nav"><svg viewBox="0 0 16 16"><path d="M8 2 2 5v6l6 3 6-3V5L8 2Z"/><path d="M8 8v6M2 5l6 3 6-3"/></svg>Ask</a>
+<a class="nav"><svg viewBox="0 0 16 16"><path d="M2 12l3.5-4 2.5 2.5L14 4"/><path d="M14 8V4h-4"/></svg>Why it moved</a>
+<a class="nav on"><svg viewBox="0 0 16 16"><path d="M2 13h12"/><path d="M4 11V7M7 11V4M10 11V8M13 11V5"/></svg>Prices</a>
+<a class="nav"><svg viewBox="0 0 16 16"><path d="M4 2h6l3 3v9H4V2Z"/><path d="M10 2v3h3M6 8h4M6 11h3"/></svg>Thesis</a>
+<a class="nav"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5"/><path d="M8 2.5v5.5l3.9 3.9"/></svg>Portfolio</a>
+<a class="nav"><svg viewBox="0 0 16 16"><path d="M2 8h12"/><path d="M5 5 2 8l3 3M11 5l3 3-3 3"/></svg>Sizing</a>
+<a class="nav"><svg viewBox="0 0 16 16"><path d="M2 8h3l2-4 2 8 2-4h3"/></svg>Predictions</a>
+<a class="nav"><svg viewBox="0 0 16 16"><circle cx="4" cy="4" r="1.8"/><circle cx="12" cy="8" r="1.8"/><circle cx="6" cy="12" r="1.8"/><path d="M5.5 5.2 10.4 7M10.6 9.2 7.3 11.1"/></svg>Trace</a>
+<div class="railsep"></div>
+<a class="nav"><svg viewBox="0 0 16 16"><path d="M2 4.5 8 2l6 2.5L8 7 2 4.5Z"/><path d="M4.5 6v4c0 1 1.7 2 3.5 2s3.5-1 3.5-2V6"/></svg>Learn</a>
+<a class="nav"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.2"/><path d="M8 1.5v2M8 12.5v2M14.5 8h-2M3.5 8h-2M12.6 3.4l-1.4 1.4M4.8 11.2l-1.4 1.4M12.6 12.6l-1.4-1.4M4.8 4.8 3.4 3.4"/></svg>Settings</a>
+</div>
+<div class="main">
+
+<div class="head">
+  <div><h1>World monitor</h1>
+  <p>What came in, from where, in what language — and which of it earned a model call.
+     A source that breaks says so; it never returns an empty list you could read as a quiet day.</p></div>
+  <div style="display:flex;gap:8px;align-items:center">
+    <span class="chip ok">● polling</span>
+    <span style="font-size:12px;color:var(--muted)">last 15:22:04 · next in 4m</span>
+  </div>
+</div>
+
+<div class="grid" style="grid-template-columns:repeat(5,1fr);margin-bottom:18px">
+  <div class="card stat"><b>1,284</b><span>fetched today</span></div>
+  <div class="card stat"><b style="color:var(--muted)">−961</b><span>wire duplicates</span></div>
+  <div class="card stat"><b>323</b><span>indexed</span></div>
+  <div class="card stat"><b style="color:var(--accent)">11</b><span>escalated</span></div>
+  <div class="card stat"><b>96</b><span>polls · 15 min</span></div>
+</div>
+
+<div class="grid" style="grid-template-columns:minmax(0,1fr) 360px;align-items:start">
+  <div class="grid">
+    <div class="card" style="padding:0;overflow:hidden">
+      <div style="padding:13px 18px;border-bottom:1px solid var(--rule);display:flex;
+                  justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+        <p class="eyebrow" style="margin:0">Incoming · click a story</p>
+        <div style="display:flex;gap:6px">
+          <sc-for list="{{filters}}" as="f" hint-placeholder-count="3">
+            <button class="btn" onClick="{{ f.pick }}" style="{{f.style}}">{{f.label}}</button>
+          </sc-for>
+        </div>
+      </div>
+      <div>
+        <sc-for list="{{stories}}" as="s" hint-placeholder-count="6">
+          <div onClick="{{ s.pick }}" style="{{s.rowStyle}}">
+            <div style="{{s.barStyle}}"></div>
+            <div style="flex-grow:1;min-width:0">
+              <div style="font-size:13.5px;font-weight:600;color:{{s.titleColor}};line-height:1.4">{{s.title}}</div>
+              <div style="font-size:11.5px;color:var(--muted);margin-top:2px">
+                {{s.domain}} · {{s.country}} · {{s.lang}} · {{s.ago}}</div>
+            </div>
+            <div style="text-align:right;flex:none">
+              <span class="chip {{s.cls}}">{{s.verdict}}</span>
+              <div class="num" style="font-size:11px;color:var(--muted);margin-top:3px">rel {{s.rel}}</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="eyebrow">Selected · five dimensions</p>
+      <div style="display:flex;gap:10px;align-items:baseline;margin-bottom:14px">
+        <span style="font-size:14.5px;font-weight:600;line-height:1.4">{{sel.title}}</span>
+      </div>
+      <sc-for list="{{sel.dims}}" as="d" hint-placeholder-count="5">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:9px">
+          <span style="width:96px;font-size:12.5px;color:var(--ink-2);text-align:right;flex:none">{{d.name}}</span>
+          <div style="flex-grow:1;height:16px;background:var(--panel-2);border-radius:2px;position:relative">
+            <div style="{{d.style}}"></div>
+            <div style="{{d.gate}}"></div>
+          </div>
+          <span class="num" style="width:44px;font-size:12px;text-align:right;flex:none">{{d.v}}</span>
+        </div>
+      </sc-for>
+      <div class="box {{sel.boxCls}}" style="margin-top:14px">
+        <span class="lbl">{{sel.gateTitle}}</span>
+        <p>{{sel.gateWhy}}</p>
+      </div>
+      <div style="display:flex;gap:16px;margin-top:13px;font-size:11.5px;color:var(--muted);flex-wrap:wrap">
+        <span>entities <code style="font-size:11px;color:var(--ink-2)">{{sel.entities}}</code></span>
+        <span>dedup hash <code style="font-size:11px">{{sel.hash}}</code></span>
+        <span>trust <span class="chip n">{{sel.trust}}</span></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <p class="eyebrow">Sources · what is actually wired</p>
+      <div style="display:flex;flex-direction:column;gap:0">
+        <sc-for list="{{sources}}" as="s" hint-placeholder-count="8">
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--rule)">
+            <span style="{{s.dot}}"></span>
+            <div style="flex-grow:1;min-width:0">
+              <div style="font-size:12.5px;font-weight:600;color:{{s.color}}">{{s.name}}</div>
+              <div style="font-size:11px;color:var(--muted)">{{s.note}}</div>
+            </div>
+            <span class="chip {{s.cls}}" style="flex:none">{{s.state}}</span>
+          </div>
+        </sc-for>
+      </div>
+      <p style="font-size:11.5px;color:var(--muted);margin:12px 0 0">
+        Keys for unwired sources are deliberately absent from <code style="font-size:11px">.env</code>.
+        A key that sets nothing reads as configured, and that is worse than a missing key.</p>
+    </div>
+
+    <div class="card">
+      <p class="eyebrow">Coverage this window</p>
+      <div style="margin-bottom:12px">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:6px">BY LANGUAGE</div>
+        <sc-for list="{{langs}}" as="l" hint-placeholder-count="5">
+          <div style="display:flex;align-items:center;gap:9px;margin-bottom:5px">
+            <span style="width:64px;font-size:11.5px;flex:none">{{l.name}}</span>
+            <div style="flex-grow:1;height:6px;background:var(--panel-2);border-radius:2px">
+              <div style="{{l.style}}"></div></div>
+            <span class="num" style="width:30px;font-size:11px;text-align:right;color:var(--muted)">{{l.n}}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:6px">BY COUNTRY</div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap">
+        <span class="chip n">MY 84</span><span class="chip n">US 61</span><span class="chip n">SG 39</span>
+        <span class="chip n">HK 28</span><span class="chip n">CN 24</span><span class="chip n">GB 19</span>
+        <span class="chip n">JP 14</span><span class="chip n">+22 more</span>
+      </div>
+    </div>
+
+    <div class="box warn"><span class="lbl">The record cap decides cadence</span>
+    <p>GDELT returns at most 250 records per call. A narrow watchlist never approaches it, so
+       catching up twice a day loses nothing — a whole-market query would lose coverage
+       silently.</p></div>
+  </div>
+</div>
+
+</div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{"$preview": {"width": 1280, "height": 900}}'>
+
+const ACC='#0F5C63', NEG='#9E3626', MUT='#606D71', INK='#15191B', WARN='#8A5B12';
+const STORIES = [
+  {id:1, title:'Maybank Q2 net interest margin slips to 2.04%, below guidance',
+   domain:'theedgemalaysia.com', country:'Malaysia', lang:'English', ago:'12m',
+   rel:0.92, pol:-0.61, inten:0.67, unc:0.12, fwd:0.33, ent:'MYX:1155', hash:'a71f2c9e4b0d',
+   trust:'CURATED_NEWS', held:true},
+  {id:2, title:'马来亚银行第二季净利息收益率降至2.04%',
+   domain:'sinchew.com.my', country:'Malaysia', lang:'Chinese', ago:'11m',
+   rel:0.88, pol:-0.58, inten:0.61, unc:0.14, fwd:0.30, ent:'MYX:1155', hash:'a71f2c9e4b0d',
+   trust:'CURATED_NEWS', held:true, dupe:true},
+  {id:3, title:'Nvidia supply constraints ease as CoWoS capacity comes online',
+   domain:'reuters.com', country:'United States', lang:'English', ago:'34m',
+   rel:0.71, pol:0.44, inten:0.52, unc:0.28, fwd:0.71, ent:'XNAS:NVDA', hash:'3d8b1a05fe72',
+   trust:'CURATED_NEWS', held:true},
+  {id:4, title:'Bank Negara holds OPR at 3.00% for a fifth meeting',
+   domain:'bnm.gov.my', country:'Malaysia', lang:'English', ago:'2h',
+   rel:0.55, pol:0.02, inten:0.31, unc:0.09, fwd:0.48, ent:'macro:MY_OPR', hash:'9c04e7f13ab6',
+   trust:'FILINGS', held:false, macro:true},
+  {id:5, title:'Analysts see regional banks under pressure into 2027',
+   domain:'seekingalpha.com', country:'United States', lang:'English', ago:'3h',
+   rel:0.29, pol:-0.33, inten:0.40, unc:0.55, fwd:0.66, ent:'sector:banks', hash:'5e2a91c7d804',
+   trust:'WEB_SEARCH', held:false},
+  {id:6, title:'Petronas awards offshore contract to local consortium',
+   domain:'nst.com.my', country:'Malaysia', lang:'English', ago:'4h',
+   rel:0.61, pol:0.38, inten:0.44, unc:0.19, fwd:0.29, ent:'MYX:5681', hash:'7b3f0d62ae19',
+   trust:'CURATED_NEWS', held:false}
+];
+function esc(s){ return s.rel >= 0.34 && s.held; }
+class Component extends DCLogic {
+  constructor(p){ super(p); this.state = { sel:1, f:'all' }; }
+  renderVals(){
+    const f = this.state.f;
+    const shown = STORIES.filter(s => f==='all'
+      || (f==='esc' && esc(s)) || (f==='dupe' && s.dupe));
+    const sel = STORIES.find(s => s.id === this.state.sel) || STORIES[0];
+    const on = esc(sel);
+    const dim = (name, v, gate) => ({ name, v: v.toFixed(2),
+      style:`position:absolute;left:0;top:2px;bottom:2px;width:${Math.abs(v)*100}%;
+        background:${name==='polarity' ? (v<0?NEG:'#3B6A38') : ACC};border-radius:2px`,
+      gate: gate ? `position:absolute;left:34%;top:-2px;bottom:-2px;width:2px;background:${NEG};opacity:.65` : '' });
+    return {
+      filters:[['all','All 1,284'],['esc','Escalated 11'],['dupe','Duplicates']].map(([k,label])=>({
+        label, pick:()=>this.setState({f:k}),
+        style:`font-size:11.5px;padding:4px 10px;${f===k
+          ?'background:#0F5C63;border-color:#0F5C63;color:#fff;font-weight:600':''}` })),
+      stories: shown.map(s => {
+        const e = esc(s), isSel = s.id === this.state.sel;
+        return { ...s, rel:s.rel.toFixed(2),
+          verdict: s.dupe ? 'duplicate' : (e ? 'escalated' : 'indexed'),
+          cls: s.dupe ? 'n' : (e ? 'ok' : 'n'),
+          titleColor: s.dupe ? MUT : INK,
+          barStyle:`width:3px;align-self:stretch;flex:none;border-radius:2px;
+            background:${s.dupe ? '#C2C9C6' : (e ? ACC : '#D6DBD9')}`,
+          rowStyle:`display:flex;gap:12px;align-items:center;padding:11px 18px;cursor:pointer;
+            border-bottom:1px solid #D6DBD9;background:${isSel?'#EFF2F1':'#FFFFFF'};
+            opacity:${s.dupe?0.6:1}`,
+          pick: () => this.setState({ sel:s.id }) };
+      }),
+      sel: { title: sel.title, entities: sel.ent, hash: sel.hash, trust: sel.trust,
+        dims: [dim('relevance', sel.rel, true), dim('polarity', sel.pol, false),
+               dim('intensity', sel.inten, false), dim('uncertainty', sel.unc, false),
+               dim('forwardness', sel.fwd, false)],
+        boxCls: on ? 'key' : '',
+        gateTitle: on ? 'Escalated — earns a model call' : 'Indexed only — no model call',
+        gateWhy: on
+          ? 'Relevance is above the 0.34 gate AND the entity is one you hold or watch. Both conditions are required; volume alone never buys a model call.'
+          : (sel.rel < 0.34
+             ? 'Relevance is below the 0.34 gate (the red line). It is stored and searchable, but nothing reads it for you.'
+             : 'Relevance clears the gate, but the entity touches nothing in your holdings or watchlist. The gate exists so the queue stays short enough to read.') },
+      sources: [
+        {name:'GDELT 2.0 DOC', note:'100+ languages, worldwide · no key', state:'live', cls:'ok'},
+        {name:'Stooq', note:'daily bars, 92 exchanges · no key', state:'live', cls:'ok'},
+        {name:'WorldMonitor', note:'150+ curated feeds, 54-country index', state:'registered', cls:'n'},
+        {name:'Bursa · SGXNET · HKEXnews', note:'exchange announcements', state:'registered', cls:'n'},
+        {name:'SEC EDGAR', note:'needs a contact User-Agent', state:'registered', cls:'n'},
+        {name:'Marketaux · Finnhub', note:'news with sentiment · key', state:'registered', cls:'n'},
+        {name:'Frankfurter', note:'ECB reference FX · no key', state:'registered', cls:'n'},
+        {name:'FRED', note:'macro series · key', state:'registered', cls:'n'}
+      ].map(s => ({ ...s, color: s.cls==='ok' ? INK : MUT,
+        dot:`width:7px;height:7px;border-radius:50%;flex:none;
+          background:${s.cls==='ok'?'#3B6A38':'transparent'};border:1.5px solid ${s.cls==='ok'?'#3B6A38':'#C2C9C6'}` })),
+      langs: [['English',148],['Chinese',61],['Malay',44],['Japanese',31],['Other',39]]
+        .map(([name,n]) => ({ name, n:String(n),
+          style:`width:${n/148*100}%;height:100%;background:${ACC};border-radius:2px` }))
+    };
+  }
+}
+
+</script>
+</body>
+</html>

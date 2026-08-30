@@ -1,0 +1,261 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Public+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+    :root{
+      --ground:#F6F8F7; --panel:#FFFFFF; --panel-2:#EFF2F1; --term:#12201F;
+      --ink:#15191B; --ink-2:#3A4448; --muted:#606D71;
+      --rule:#D6DBD9; --rule-2:#C2C9C6;
+      --accent:#0F5C63; --accent-soft:#DCEAEA;
+      --neg:#9E3626; --neg-soft:#F3E0DC;
+      --pos:#3B6A38; --pos-soft:#E1EBDF;
+      --warn:#8A5B12; --warn-soft:#F5E9D4;
+      --term-ink:#D6E3E1; --term-dim:#7E948F; --term-accent:#6FBFC4;
+      --term-pos:#8CBE85; --term-neg:#DB8571;
+      --shadow:0 1px 2px rgba(21,25,27,.05),0 8px 24px -16px rgba(21,25,27,.28);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--ground);color:var(--ink);
+      font-family:"Public Sans",-apple-system,BlinkMacSystemFont,sans-serif;
+      font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+    h1,h2,h3{font-family:Newsreader,Georgia,serif;font-weight:500;margin:0;line-height:1.2}
+    code,.mono{font-family:"JetBrains Mono",ui-monospace,Menlo,monospace}
+    a{color:var(--accent);text-underline-offset:3px}
+    a:hover{color:#0a4247}
+    .app{display:grid;grid-template-columns:196px minmax(0,1fr);min-height:100%}
+    .rail{background:var(--panel);border-right:1px solid var(--rule);padding:22px 0;display:flex;flex-direction:column;gap:2px}
+    .brand{padding:0 20px 20px;border-bottom:1px solid var(--rule);margin-bottom:14px}
+    .brand b{font-family:Newsreader,serif;font-size:17px;font-weight:600;display:block;letter-spacing:-.01em}
+    .brand span{font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);font-weight:600}
+    .nav{display:flex;align-items:center;gap:10px;padding:8px 20px;color:var(--ink-2);
+      font-size:13.5px;font-weight:500;cursor:pointer;border-left:2px solid transparent;text-decoration:none}
+    .nav:hover{background:var(--panel-2);color:var(--ink)}
+    .nav.on{border-left-color:var(--accent);color:var(--accent);background:var(--accent-soft);font-weight:600}
+    .nav svg{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-width:1.6;
+      stroke-linecap:round;stroke-linejoin:round}
+    .railsep{height:1px;background:var(--rule);margin:14px 20px}
+    .main{padding:26px 32px 40px;min-width:0}
+    .head{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:22px}
+    .head h1{font-size:25px;letter-spacing:-.015em}
+    .head p{margin:5px 0 0;color:var(--muted);font-size:13.5px;max-width:64ch}
+    .eyebrow{font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+      color:var(--muted);margin:0 0 9px}
+    .card{background:var(--panel);border:1px solid var(--rule);border-radius:4px;padding:18px 20px;box-shadow:var(--shadow)}
+    .grid{display:grid;gap:16px}
+    .chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;
+      padding:2px 8px;border-radius:3px;letter-spacing:.02em;text-transform:uppercase}
+    .chip.ok{background:var(--pos-soft);color:var(--pos)}
+    .chip.no{background:var(--neg-soft);color:var(--neg)}
+    .chip.wait{background:var(--warn-soft);color:var(--warn)}
+    .chip.n{background:var(--panel-2);color:var(--muted)}
+    .box{border-left:3px solid var(--rule-2);background:var(--panel-2);padding:13px 16px;border-radius:0 3px 3px 0}
+    .box.key{border-left-color:var(--accent);background:var(--accent-soft)}
+    .box.warn{border-left-color:var(--warn);background:var(--warn-soft)}
+    .box.stop{border-left-color:var(--neg);background:var(--neg-soft)}
+    .box .lbl{font-size:10.5px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;
+      display:block;margin-bottom:5px;color:var(--accent)}
+    .box.warn .lbl{color:var(--warn)} .box.stop .lbl{color:var(--neg)}
+    .box p{margin:0;font-size:13px;color:var(--ink-2)}
+    .term{background:var(--term);border-radius:4px;overflow:hidden}
+    .term-bar{display:flex;align-items:center;gap:6px;padding:8px 12px;border-bottom:1px solid #1E2E2C}
+    .term-bar i{width:8px;height:8px;border-radius:50%;background:var(--term-dim);opacity:.4}
+    .term-bar b{margin-left:8px;font-family:"JetBrains Mono",monospace;font-size:10.5px;
+      color:var(--term-dim);font-weight:500;letter-spacing:.06em;text-transform:uppercase}
+    .term pre{margin:0;padding:14px 16px;font-family:"JetBrains Mono",monospace;font-size:12px;
+      line-height:1.7;color:var(--term-ink);white-space:pre-wrap;overflow-x:auto}
+    .term .p{color:var(--term-accent);font-weight:700}
+    .term .c{color:var(--term-dim);font-style:italic}
+    .term .o{color:var(--term-dim)}
+    .term .hl{color:var(--term-ink);font-weight:700}
+    .term .g{color:var(--term-pos)} .term .r{color:var(--term-neg)}
+    table{border-collapse:collapse;width:100%;font-size:13px}
+    th{text-align:left;font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;
+      color:var(--muted);font-weight:700;padding:0 12px 8px;border-bottom:1px solid var(--rule)}
+    td{padding:9px 12px;border-bottom:1px solid var(--rule)}
+    tr:last-child td{border-bottom:0}
+    .num{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums}
+    .btn{font-family:inherit;font-size:13px;font-weight:600;padding:7px 14px;border-radius:3px;
+      border:1px solid var(--rule-2);background:var(--panel);color:var(--ink-2);cursor:pointer}
+    .btn:hover{border-color:var(--accent);color:var(--accent)}
+    .btn.on{background:var(--accent);border-color:var(--accent);color:#fff}
+    .btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+    .stat b{display:block;font-family:"JetBrains Mono",monospace;font-size:23px;
+      font-weight:500;color:var(--ink);letter-spacing:-.02em;line-height:1.15}
+    .stat span{font-size:11px;color:var(--muted);letter-spacing:.03em}
+
+  </style>
+</helmet>
+<div class="app" style="width:1280px;min-height:900px">
+<div class="rail">
+<div class="brand"><span>FinPlanet</span><b>Analyst Mind</b></div>
+<a class="nav"><svg viewBox="0 0 16 16"><path d="M8 2 2 5v6l6 3 6-3V5L8 2Z"/><path d="M8 8v6M2 5l6 3 6-3"/></svg>Ask</a>
+<a class="nav on"><svg viewBox="0 0 16 16"><path d="M2 12l3.5-4 2.5 2.5L14 4"/><path d="M14 8V4h-4"/></svg>Why it moved</a>
+<a class="nav"><svg viewBox="0 0 16 16"><path d="M2 13h12"/><path d="M4 11V7M7 11V4M10 11V8M13 11V5"/></svg>Prices</a>
+<a class="nav"><svg viewBox="0 0 16 16"><path d="M4 2h6l3 3v9H4V2Z"/><path d="M10 2v3h3M6 8h4M6 11h3"/></svg>Thesis</a>
+<a class="nav"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5"/><path d="M8 2.5v5.5l3.9 3.9"/></svg>Portfolio</a>
+<a class="nav"><svg viewBox="0 0 16 16"><path d="M2 8h12"/><path d="M5 5 2 8l3 3M11 5l3 3-3 3"/></svg>Sizing</a>
+<a class="nav"><svg viewBox="0 0 16 16"><path d="M2 8h3l2-4 2 8 2-4h3"/></svg>Predictions</a>
+<a class="nav"><svg viewBox="0 0 16 16"><circle cx="4" cy="4" r="1.8"/><circle cx="12" cy="8" r="1.8"/><circle cx="6" cy="12" r="1.8"/><path d="M5.5 5.2 10.4 7M10.6 9.2 7.3 11.1"/></svg>Trace</a>
+<div class="railsep"></div>
+<a class="nav"><svg viewBox="0 0 16 16"><path d="M2 4.5 8 2l6 2.5L8 7 2 4.5Z"/><path d="M4.5 6v4c0 1 1.7 2 3.5 2s3.5-1 3.5-2V6"/></svg>Learn</a>
+<a class="nav"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.2"/><path d="M8 1.5v2M8 12.5v2M14.5 8h-2M3.5 8h-2M12.6 3.4l-1.4 1.4M4.8 11.2l-1.4 1.4M12.6 12.6l-1.4-1.4M4.8 4.8 3.4 3.4"/></svg>Settings</a>
+</div>
+<div class="main">
+
+<div class="head">
+  <div><h1>Why it moved</h1>
+  <p>The decomposition runs before any cause is named. Most single-day moves are market and
+     sector; the unexplained share is always on screen.</p></div>
+  <span class="chip ok">measured from feed</span>
+</div>
+
+<div style="display:flex;gap:8px;margin-bottom:20px">
+  <sc-for list="{{scenarios}}" as="s" hint-placeholder-count="4">
+    <button class="btn" onClick="{{ s.pick }}" style="font-size:12.5px">{{s.label}}</button>
+  </sc-for>
+</div>
+
+<div class="grid" style="grid-template-columns:1fr 340px;align-items:start">
+  <div class="grid">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:20px">
+        <div><code style="font-size:15px;font-weight:700;color:var(--ink)">{{d.inst}}</code>
+        <span style="font-size:12.5px;color:var(--muted);margin-left:10px">{{d.window}}</span></div>
+        <div class="num" style="font-size:26px;font-weight:600;color:{{d.moveColor}}">{{d.move}}</div>
+      </div>
+
+      <sc-for list="{{d.bars}}" as="b" hint-placeholder-count="5">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:11px">
+          <span style="width:112px;font-size:12.5px;color:var(--ink-2);text-align:right;flex:none">{{b.name}}</span>
+          <div style="flex-grow:1;height:22px;background:var(--panel-2);border-radius:2px;position:relative">
+            <div style="position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--rule-2)"></div>
+            <div style="{{b.style}}"></div>
+          </div>
+          <span class="num" style="width:70px;font-size:12.5px;text-align:right;flex:none;color:{{b.color}}">{{b.val}}</span>
+        </div>
+      </sc-for>
+
+      <div style="border-top:1px solid var(--rule);margin-top:16px;padding-top:15px;
+                  display:flex;justify-content:space-between;align-items:baseline">
+        <span style="font-size:13px;color:var(--ink-2);font-weight:600">Unexplained</span>
+        <span class="num" style="font-size:18px;font-weight:600;color:{{d.unexColor}}">{{d.unex}}</span>
+      </div>
+    </div>
+
+    <div class="card" style="border-left:3px solid {{d.verdictColor}}">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <code style="font-size:13px;font-weight:700;color:{{d.verdictColor}}">{{d.verdict}}</code>
+      </div>
+      <p style="margin:0;font-size:14px;color:var(--ink-2);line-height:1.6">{{d.sentence}}</p>
+      <sc-for list="{{d.caveats}}" as="c" hint-placeholder-count="2">
+        <p style="margin:9px 0 0;font-size:12.5px;color:var(--muted)">
+          <span style="color:var(--warn);font-weight:700">caveat</span> · {{c.t}}</p>
+      </sc-for>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <p class="eyebrow">Candidate causes</p>
+      <sc-if value="{{d.hasCauses}}" hint-placeholder-val="{{true}}">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <sc-for list="{{d.causes}}" as="c" hint-placeholder-count="2">
+            <div style="padding-bottom:12px;border-bottom:1px solid var(--rule)">
+              <div style="display:flex;justify-content:space-between;gap:10px;margin-bottom:4px">
+                <span style="font-size:13px;font-weight:600;line-height:1.4">{{c.headline}}</span>
+                <span class="num chip {{c.cls}}" style="flex:none">{{c.score}}</span>
+              </div>
+              <div style="font-size:11.5px;color:var(--muted)">{{c.src}} · {{c.note}}</div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+      <sc-if value="{{d.noCauses}}" hint-placeholder-val="{{false}}">
+        <div class="box"><p><b style="color:var(--ink-2)">No catalyst cleared the bar.</b><br>
+        A significant move with no identified cause is rendered as exactly that — never given
+        a story to make it feel explained.</p></div>
+      </sc-if>
+    </div>
+
+    <div class="card">
+      <p class="eyebrow">Factor model</p>
+      <table><tbody>
+        <tr><td style="color:var(--muted)">β market</td><td class="num" style="text-align:right">{{d.bm}}</td></tr>
+        <tr><td style="color:var(--muted)">β sector</td><td class="num" style="text-align:right">{{d.bs}}</td></tr>
+        <tr><td style="color:var(--muted)">r²</td><td class="num" style="text-align:right">{{d.r2}}</td></tr>
+        <tr><td style="color:var(--muted)">observations</td><td class="num" style="text-align:right">{{d.n}}</td></tr>
+      </tbody></table>
+      <p style="font-size:11.5px;color:var(--muted);margin:12px 0 0">
+        Huber regression over a purged window. Below 120 observations the engine refuses
+        rather than fitting betas to noise.</p>
+    </div>
+  </div>
+</div>
+
+</div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{"$preview": {"width": 1280, "height": 900}}'>
+
+const NEG='#9E3626', POS='#3B6A38', ACC='#0F5C63', MUT='#606D71', WARN='#8A5B12';
+function bar(name, pct, color){
+  const w = Math.min(Math.abs(pct)*3.6, 49);
+  const side = pct < 0 ? `right:50%` : `left:50%`;
+  return { name, val: (pct>0?'+':'') + pct.toFixed(2) + '%', color,
+    style: `position:absolute;top:3px;bottom:3px;${side};width:${w}%;background:${color};border-radius:1px` };
+}
+const S = {
+  market: { label:'Market-wide fall', inst:'MYX:1155', window:'24 – 25 Aug 2026', move:'−9.00%',
+    moveColor:NEG, unex:'8%', unexColor:MUT, verdict:'market_driven', verdictColor:ACC,
+    bars:[bar('market',-8.80,NEG),bar('sector',-1.00,NEG),bar('style',-0.12,MUT),
+          bar('currency',0.00,MUT),bar('idiosyncratic',0.92,POS)],
+    sentence:'This was the market. 88% of the move is explained by the index and the sector — no company-specific cause was sought, and none should be read into it.',
+    caveats:[], hasCauses:false, noCauses:true, causes:[],
+    bm:'1.104', bs:'0.487', r2:'0.71', n:'250' },
+  idio: { label:'Idiosyncratic jump', inst:'XNAS:NVDA', window:'26 – 27 Aug 2026', move:'+7.20%',
+    moveColor:POS, unex:'92%', unexColor:NEG, verdict:'no_identified_catalyst', verdictColor:WARN,
+    bars:[bar('market',0.44,POS),bar('sector',0.10,POS),bar('style',0.05,MUT),
+          bar('currency',0.00,MUT),bar('idiosyncratic',6.61,POS)],
+    sentence:'92% of this move is unexplained by the factor model, and no catalyst scored above the threshold. Moves of this shape historically reverse more often than they continue.',
+    caveats:[{t:'unexplained share above 70% — treat any narrative offered for this with suspicion'},
+             {t:'entry on an unexplained move is staged, not full size'}],
+    hasCauses:false, noCauses:true, causes:[],
+    bm:'1.312', bs:'0.402', r2:'0.58', n:'250' },
+  catal: { label:'Real catalyst', inst:'MYX:1155', window:'12 – 13 Aug 2026', move:'−4.60%',
+    moveColor:NEG, unex:'61%', unexColor:WARN, verdict:'catalyst_matched', verdictColor:ACC,
+    bars:[bar('market',-1.10,NEG),bar('sector',-0.62,NEG),bar('style',-0.08,MUT),
+          bar('currency',-0.02,MUT),bar('idiosyncratic',-2.78,NEG)],
+    sentence:'A results miss on net interest margin matches the residual in direction, size and timing. The base rate for this event type on a T1 bank is a 3–6% single-day drawdown.',
+    caveats:[{t:'base-rate cell has 34 observations — thin, but above the 30 floor'}],
+    hasCauses:true, noCauses:false,
+    causes:[{headline:'Q2 NIM falls to 2.04%, below guidance', score:'0.78', cls:'ok',
+             src:'Bursa announcement', note:'timing matches to the session'},
+            {headline:'Sector downgrade from a regional broker', score:'0.31', cls:'n',
+             src:'wire', note:'below threshold — reported, not used'}],
+    bm:'1.104', bs:'0.487', r2:'0.71', n:'250' },
+  quiet: { label:'Quiet day', inst:'XSES:D05', window:'27 – 28 Aug 2026', move:'+0.10%',
+    moveColor:MUT, unex:'—', unexColor:MUT, verdict:'not_significant', verdictColor:MUT,
+    bars:[bar('market',0.08,MUT),bar('sector',0.01,MUT),bar('style',0.00,MUT),
+          bar('currency',0.00,MUT),bar('idiosyncratic',0.01,MUT)],
+    sentence:'Nothing happened. The move is inside the noise band for this instrument, so no decomposition is reported and no cause is sought.',
+    caveats:[], hasCauses:false, noCauses:false, causes:[],
+    bm:'0.912', bs:'0.531', r2:'0.66', n:'250' }
+};
+class Component extends DCLogic {
+  constructor(p){ super(p); this.state = { k:'market' }; }
+  renderVals(){
+    return { d: S[this.state.k],
+      scenarios: Object.keys(S).map(k => ({ label:S[k].label, pick: () => this.setState({k}) })) };
+  }
+}
+
+</script>
+</body>
+</html>

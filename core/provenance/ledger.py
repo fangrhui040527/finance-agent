@@ -37,7 +37,8 @@ CREATE TABLE IF NOT EXISTS llm_calls (
     cost_usd        TEXT    NOT NULL,
     cost_myr        TEXT    NOT NULL,
     fx_rate         TEXT    NOT NULL,
-    fx_asof         TEXT    NOT NULL
+    fx_asof         TEXT    NOT NULL,
+    latency_ms      REAL    NOT NULL DEFAULT 0
 );
 CREATE TABLE IF NOT EXISTS claims (
     id              INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -120,6 +121,7 @@ class CallRecord:
     fx_rate: Decimal
     at: datetime
     run_id: str = ""
+    latency_ms: float = 0.0
 
 
 class ProvenanceLedger:
@@ -151,14 +153,25 @@ class ProvenanceLedger:
         """Add run_id to ledgers written before it existed.
 
         ALTER TABLE ADD COLUMN is a schema change, not a row UPDATE, so the
-        append-only triggers do not fire. Existing rows get '' - correctly, since
-        no run owned them.
+        append-only triggers do not fire. Existing rows get the column default -
+        correctly, since no run owned them and nothing timed them.
+
+        `latency_ms` was added because the number already existed and was thrown
+        away: core/llm/client.py timed every call and emitted it to the trace
+        ONLY WHEN TRACING WAS ON, so an ordinary run lost it. docs/01 section 10
+        wants p95 latency in the nightly fitness function, and it could not have
+        it from a measurement that survived only under a debug flag.
         """
         for table in ("llm_calls", "claims"):
             cols = {r[1] for r in self.conn.execute(f"PRAGMA table_info({table})")}
             if "run_id" not in cols:
                 self.conn.execute(
                     f"ALTER TABLE {table} ADD COLUMN run_id TEXT NOT NULL DEFAULT ''")
+
+        calls = {r[1] for r in self.conn.execute("PRAGMA table_info(llm_calls)")}
+        if "latency_ms" not in calls:
+            self.conn.execute(
+                "ALTER TABLE llm_calls ADD COLUMN latency_ms REAL NOT NULL DEFAULT 0")
 
     def close(self) -> None:
         self.conn.close()
@@ -180,6 +193,7 @@ class ProvenanceLedger:
         fx_rate: Decimal = DEFAULT_FX_MYR_PER_USD,
         at: datetime | None = None,
         run_id: str | None = None,
+        latency_ms: float = 0.0,
     ) -> CallRecord:
         at = at or datetime.now(timezone.utc)
         rid = self.run_id if run_id is None else run_id
@@ -188,17 +202,18 @@ class ProvenanceLedger:
         ph = prompt_hash(prompt)
         self.conn.execute(
             "INSERT INTO llm_calls (at, agent, task_class, tier, model_id, prompt_hash, run_id,"
-            " input_tokens, output_tokens, cached_tokens, cost_usd, cost_myr, fx_rate, fx_asof)"
-            " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            " input_tokens, output_tokens, cached_tokens, cost_usd, cost_myr, fx_rate,"
+            " fx_asof, latency_ms)"
+            " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
             (
                 at.isoformat(), agent, task_class.value, tier.value, model_id, ph, rid,
                 usage.input_tokens, usage.output_tokens, usage.cached_input_tokens,
-                str(usd), str(myr), str(fx_rate), at.isoformat(),
+                str(usd), str(myr), str(fx_rate), at.isoformat(), float(latency_ms),
             ),
         )
         self.conn.commit()
         return CallRecord(agent, task_class, tier, model_id, ph, usage, usd, myr,
-                          fx_rate, at, rid)
+                          fx_rate, at, rid, float(latency_ms))
 
     def record_claim(
         self, agent: str, text: str, citations: list[dict], survived: bool,
@@ -277,6 +292,19 @@ class ProvenanceLedger:
         """Everything one job did, as a unit. This is what run_id is for."""
         return self._rows(
             "SELECT * FROM llm_calls WHERE run_id = ? ORDER BY id", (run_id,))
+
+    def latencies_between(self, start: datetime, end: datetime) -> list[float]:
+        """Every recorded call duration in a window, for the p95 fitness term.
+
+        Zeros are excluded: 0.0 is the column default for rows written before
+        the column existed and for callers that do not time. Counting them as
+        instant calls would make the p95 look better the more untimed history
+        the ledger holds.
+        """
+        rows = self._rows(
+            "SELECT latency_ms FROM llm_calls WHERE at >= ? AND at <= ? "
+            "AND latency_ms > 0", (start.isoformat(), end.isoformat()))
+        return [float(r["latency_ms"]) for r in rows]
 
     def runs_between(self, start: datetime, end: datetime) -> list[str]:
         return [r[0] for r in self.conn.execute(
