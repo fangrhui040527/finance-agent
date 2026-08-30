@@ -21,9 +21,17 @@ from knowledge.graph.validate import parse
 ASOF = date(2026, 8, 28)
 
 
-def repo(tmp_path, **files) -> Path:
+def repo(tmp_path, files: dict[str, str]) -> Path:
+    """Write a throwaway package. Paths are written literally.
+
+    An earlier version took **kwargs and mapped `__` to a separator, which
+    turned "__pycache__/skip.py" into "/pycache/skip.py" - an absolute path at
+    the filesystem root. It passed locally only because that shell runs as root,
+    and creating a directory outside its own tmpdir is worse than failing.
+    """
     for name, body in files.items():
-        p = tmp_path / name.replace("__", "/")
+        assert not name.startswith("/"), f"{name!r} must be relative to tmp_path"
+        p = tmp_path / name
         p.parent.mkdir(parents=True, exist_ok=True)
         p.write_text(body)
     return tmp_path
@@ -36,7 +44,7 @@ def extracted(root):
 # -- what it sees -------------------------------------------------------------
 
 def test_a_module_and_its_top_level_symbols_become_nodes(tmp_path):
-    root = repo(tmp_path, **{"a.py": "def one():\n    pass\n\nclass Two:\n    pass\n"})
+    root = repo(tmp_path, {"a.py": "def one():\n    pass\n\nclass Two:\n    pass\n"})
     nodes, _ = extracted(root)
     kinds = {n.node_id: n.kind for n in nodes}
     assert kinds["PR:a"] is MODULE
@@ -44,14 +52,14 @@ def test_a_module_and_its_top_level_symbols_become_nodes(tmp_path):
 
 
 def test_a_symbol_is_classified_into_the_module_that_defines_it(tmp_path):
-    root = repo(tmp_path, **{"a.py": "def one():\n    pass\n"})
+    root = repo(tmp_path, {"a.py": "def one():\n    pass\n"})
     _, edges = extracted(root)
     assert any(e.src == "TE:a_one" and e.dst == "PR:a"
                and e.kind is EdgeKind.CLASSIFIED_IN for e in edges)
 
 
 def test_an_import_is_extracted_because_the_statement_names_its_target(tmp_path):
-    root = repo(tmp_path, **{"a.py": "import b\n", "b.py": "x = 1\n"})
+    root = repo(tmp_path, {"a.py": "import b\n", "b.py": "x = 1\n"})
     _, edges = extracted(root)
     imp = [e for e in edges if e.kind is EdgeKind.SUPPLIES]
     assert imp and imp[0].src == "PR:a" and imp[0].dst == "PR:b"
@@ -59,7 +67,7 @@ def test_an_import_is_extracted_because_the_statement_names_its_target(tmp_path)
 
 
 def test_a_from_import_is_seen_too(tmp_path):
-    root = repo(tmp_path, **{"a.py": "from b import thing\n", "b.py": "thing = 1\n"})
+    root = repo(tmp_path, {"a.py": "from b import thing\n", "b.py": "thing = 1\n"})
     _, edges = extracted(root)
     assert any(e.dst == "PR:b" and e.kind is EdgeKind.SUPPLIES for e in edges)
 
@@ -70,7 +78,7 @@ def test_a_call_edge_is_inferred_because_a_static_pass_reads_names_not_bindings(
     """`self.store.record(...)` is recorded against whichever `record` is
     defined. Dynamic dispatch, getattr and rebinding decorators are invisible,
     so a call edge is a strong hint and never a fact."""
-    root = repo(tmp_path, **{"a.py": "import b\ndef go():\n    return b.unique_thing()\n",
+    root = repo(tmp_path, {"a.py": "import b\ndef go():\n    return b.unique_thing()\n",
                              "b.py": "def unique_thing():\n    return 1\n"})
     _, edges = extracted(root)
     calls = [e for e in edges if e.kind is EdgeKind.EXPOSED_TO]
@@ -82,7 +90,7 @@ def test_a_call_edge_is_inferred_because_a_static_pass_reads_names_not_bindings(
 def test_an_ambiguous_name_produces_no_edge_at_all(tmp_path):
     """Two definitions of one name means the call cannot be resolved. No edge
     beats four wrong ones, which is what guessing would mint."""
-    root = repo(tmp_path, **{
+    root = repo(tmp_path, {
         "a.py": "def shared():\n    pass\n",
         "b.py": "def shared():\n    pass\n",
         "c.py": "def go():\n    return shared()\n"})
@@ -93,7 +101,7 @@ def test_an_ambiguous_name_produces_no_edge_at_all(tmp_path):
 def test_a_common_name_is_stoplisted_rather_than_linked_from_everywhere(tmp_path):
     """graphify's god-node stop list in its original form. Without it, `run` and
     `main` collect an edge from every call site in the repository."""
-    root = repo(tmp_path, **{"a.py": "def main():\n    pass\n",
+    root = repo(tmp_path, {"a.py": "def main():\n    pass\n",
                              "b.py": "def go():\n    return main()\n"})
     _, edges = extracted(root)
     assert not [e for e in edges if e.kind is EdgeKind.EXPOSED_TO]
@@ -101,7 +109,7 @@ def test_a_common_name_is_stoplisted_rather_than_linked_from_everywhere(tmp_path
 
 
 def test_a_file_that_will_not_parse_is_skipped_rather_than_guessed_at(tmp_path):
-    root = repo(tmp_path, **{"good.py": "def ok():\n    pass\n",
+    root = repo(tmp_path, {"good.py": "def ok():\n    pass\n",
                              "bad.py": "def (((\n"})
     nodes, _ = extracted(root)
     ids = {n.node_id for n in nodes}
@@ -109,7 +117,7 @@ def test_a_file_that_will_not_parse_is_skipped_rather_than_guessed_at(tmp_path):
 
 
 def test_generated_and_vendored_directories_are_not_walked(tmp_path):
-    root = repo(tmp_path, **{"keep.py": "x = 1\n",
+    root = repo(tmp_path, {"keep.py": "x = 1\n",
                              "__pycache__/skip.py": "x = 1\n",
                              "debug/skip.py": "x = 1\n",
                              "node_modules/skip.py": "x = 1\n"})
@@ -117,13 +125,13 @@ def test_generated_and_vendored_directories_are_not_walked(tmp_path):
 
 
 def test_a_self_import_does_not_become_an_edge(tmp_path):
-    root = repo(tmp_path, **{"a.py": "import a\n"})
+    root = repo(tmp_path, {"a.py": "import a\n"})
     _, edges = extracted(root)
     assert not [e for e in edges if e.src == e.dst]
 
 
 def test_an_import_of_something_outside_the_repository_is_ignored(tmp_path):
-    root = repo(tmp_path, **{"a.py": "import json\nimport sqlite3\n"})
+    root = repo(tmp_path, {"a.py": "import json\nimport sqlite3\n"})
     _, edges = extracted(root)
     assert not [e for e in edges if e.kind is EdgeKind.SUPPLIES]
 
@@ -149,7 +157,7 @@ def test_the_code_graph_builds_into_its_own_database(tmp_path):
 
 
 def test_building_the_code_graph_twice_is_byte_identical(tmp_path):
-    root = repo(tmp_path / "src", **{"a.py": "import b\ndef go():\n    pass\n",
+    root = repo(tmp_path / "src", {"a.py": "import b\ndef go():\n    pass\n",
                                      "b.py": "def helper():\n    pass\n"})
     a, b = tmp_path / "a.db", tmp_path / "b.db"
     for p in (a, b):
@@ -190,7 +198,7 @@ def test_what_breaks_if_i_change_this(tmp_path):
 
 
 def test_a_code_edge_is_dated_so_it_is_traversable_at_all(tmp_path):
-    root = repo(tmp_path, **{"a.py": "import b\n", "b.py": "x = 1\n"})
+    root = repo(tmp_path, {"a.py": "import b\n", "b.py": "x = 1\n"})
     _, edges = extracted(root)
     assert all(e.valid_from == ASOF for e in edges)
     assert all(e.live_at(ASOF) for e in edges)
