@@ -936,11 +936,69 @@ def s_graph():
                                                    "valid_from": "2020-01-01"}]}, "stress"),
                   why="Graphify warns and builds anyway, so a bad extractor "
                       "degrades the graph months before anyone notices.")
-    note("hub routing is not yet bounded",
-         "God-node protection lands with the extractors in phase 2. Until then a "
-         "traversal may route THROUGH a Country or Sector node and connect "
-         "anything to anything. Nothing populates the graph yet, so there is no "
-         "hub to route through.")
+    # -- a hub must not connect everything to everything ---------------------
+    from knowledge.graph.entity_graph import HUB_MIN_DEGREE
+    hub = EntityGraph()
+    hub.add_node(Node("CN:everywhere", NodeKind.COUNTRY, "Everywhere"))
+    for i in range(200):
+        hub.add_node(Node(f"CO:h{i}", NodeKind.COMPANY, f"Co {i}"))
+        hub.add_edge(Edge(f"CO:h{i}", "CN:everywhere", EdgeKind.OPERATES_IN, 1.0,
+                          "d", Confidence.EXTRACTED, OPEN))
+        hub.add_edge(Edge("CN:everywhere", f"CO:h{i}", EdgeKind.AFFECTS, 1.0,
+                          "d", Confidence.EXTRACTED, OPEN))
+    if "CN:everywhere" not in hub.hubs():
+        finding("a 400-degree node is not recognised as a hub",
+                f"degree {hub.degree('CN:everywhere')}, floor {HUB_MIN_DEGREE}")
+    else:
+        reached = {p.end for p in hub.traverse("CO:h0", asof=TODAY)}
+        if reached - {"CN:everywhere"}:
+            finding("traversal routes through a hub",
+                    f"CO:h0 reached {len(reached)} nodes through a 400-degree country; "
+                    "every company would be connected to every other one.")
+        else:
+            held("a hub is an endpoint, never a waypoint",
+                 f"degree {hub.degree('CN:everywhere')}, 1 node reachable not 200")
+        seeded = {p.end for p in hub.traverse("CN:everywhere", asof=TODAY)}
+        if len(seeded) < 200:
+            finding("a hub cannot answer a question about itself",
+                    f"{len(seeded)} of 200 neighbours reachable from the seed")
+        else:
+            held("asking a hub about itself still works", f"{len(seeded)} neighbours")
+
+    # -- a specific relation is never displaced by a generic one -------------
+    for order in ((EdgeKind.SUPPLIES, EdgeKind.CLASSIFIED_IN),
+                  (EdgeKind.CLASSIFIED_IN, EdgeKind.SUPPLIES)):
+        pair = EntityGraph()
+        for n in ("A", "B"):
+            pair.add_node(Node(n, NodeKind.COMPANY))
+        for k in order:
+            pair.add_edge(Edge("A", "B", k, 1.0, f"d:{k.value}",
+                               Confidence.EXTRACTED, OPEN))
+        kinds = {e.kind for e in pair.neighbours("A")}
+        if kinds != set(order):
+            finding("a parallel edge was lost to insertion order",
+                    f"inserted {[k.value for k in order]}, kept "
+                    f"{[k.value for k in kinds]}. Graphify rewrote 144 specific "
+                    "edges into generic ones exactly this way.")
+    held("parallel edges survive in both insertion orders", "supplies + classified_in")
+
+    # -- the shipped build, end to end ---------------------------------------
+    with tempfile.TemporaryDirectory() as tmp:
+        from knowledge.graph.build import build as build_graph
+        one, two = Path(tmp) / "a.db", Path(tmp) / "b.db"
+        for pth in (one, two):
+            with GraphStore(pth) as gs:
+                rep = build_graph(gs)
+        if one.read_bytes() != two.read_bytes():
+            finding("the graph build is not reproducible",
+                    "Two builds over identical sources differ byte for byte, so no "
+                    "graph diff can be reviewed.")
+        else:
+            held("two builds over identical sources are byte-identical",
+                 f"{rep.nodes} nodes, {rep.edges} edges")
+        if rep.citable != rep.edges:
+            note("the deterministic build produced an uncitable edge",
+                 f"{rep.edges - rep.citable} of {rep.edges}")
 
 
 def main() -> int:

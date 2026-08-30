@@ -110,15 +110,40 @@ class GraphStore:
     # -- writes ---------------------------------------------------------------
 
     def add_node(self, node: Node, tier: str = DETERMINISTIC) -> None:
-        """Upsert. A node is an identity, not an assertion - relabelling is not
-        rewriting history, so unlike edges this is allowed to change in place."""
+        """Upsert, MERGING metadata, and writing nothing when nothing changed.
+
+        A node is an identity, not an assertion - relabelling is not rewriting
+        history, so unlike edges this may change in place. But several
+        extractors legitimately describe the same node from different angles:
+        the book knows it is held, the market registry knows its MIC. Replacing
+        metadata wholesale makes the node's attributes depend on which extractor
+        happened to run last, and `held` disappears the moment the registry
+        touches it.
+
+        Writing nothing when nothing changed is what keeps a rebuild over
+        unchanged sources byte-identical. A file that changes when the graph did
+        not makes every graph diff unreviewable, which is the reason to have a
+        stored graph at all.
+        """
+        row = self.conn.execute(
+            "SELECT kind, label, metadata_json, tier FROM nodes WHERE node_id = ?",
+            (node.node_id,),
+        ).fetchone()
+        metadata = dict(node.metadata)
+        if row is not None:
+            merged = json.loads(row[2])
+            merged.update(metadata)
+            metadata = merged
+        payload = (node.kind.value, node.label or (row[1] if row else ""),
+                   json.dumps(metadata, sort_keys=True), tier)
+        if row is not None and tuple(row) == payload:
+            return
         self.conn.execute(
             "INSERT INTO nodes (node_id, kind, label, metadata_json, tier) "
             "VALUES (?, ?, ?, ?, ?) ON CONFLICT(node_id) DO UPDATE SET "
             "kind=excluded.kind, label=excluded.label, "
             "metadata_json=excluded.metadata_json, tier=excluded.tier",
-            (node.node_id, node.kind.value, node.label,
-             json.dumps(node.metadata, sort_keys=True), tier),
+            (node.node_id, *payload),
         )
         self.conn.commit()
 

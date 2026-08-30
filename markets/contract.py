@@ -72,6 +72,10 @@ class MarketAdapter(ABC):
     tier: int
     accounting_standard: AccountingStandard
     local_index: str
+    #: The securities regulator whose rules bind an issuer on this market. On
+    #: the ABC rather than a lookup table so a market added later cannot forget
+    #: it, exactly as country and currency already work.
+    regulator: str
     settlement_days: int
     known_at_strategy: KnownAtStrategy
 

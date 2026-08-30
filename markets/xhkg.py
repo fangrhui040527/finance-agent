@@ -95,6 +95,7 @@ class XHKG(MarketAdapter):
     tier = 2
     accounting_standard = AccountingStandard.IFRS   # HKFRS, IFRS-converged
     local_index = "HSI"
+    regulator = "Securities and Futures Commission of Hong Kong"
     settlement_days = 2
     known_at_strategy = KnownAtStrategy.SELF_BUILT
 

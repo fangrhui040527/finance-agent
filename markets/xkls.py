@@ -36,6 +36,7 @@ class XKLS(MarketAdapter):
     tier = 1
     accounting_standard = AccountingStandard.IFRS
     local_index = "FBMKLCI"
+    regulator = "Securities Commission Malaysia"
     settlement_days = 2
     known_at_strategy = KnownAtStrategy.SELF_BUILT
 

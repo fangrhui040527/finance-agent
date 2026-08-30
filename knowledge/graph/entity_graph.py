@@ -117,10 +117,33 @@ EDGE_INVERSE: dict[EdgeKind, EdgeKind] = {
     EdgeKind.CUSTOMER_OF: EdgeKind.SUPPLIES,
     EdgeKind.COMPETES_WITH: EdgeKind.COMPETES_WITH,   # symmetric
     EdgeKind.SUBSTITUTES: EdgeKind.SUBSTITUTES,       # symmetric
+    # "A is exposed to B" and "B affects A" are one relationship read from each
+    # end, and both readings are needed: without the pair, "aluminium fell, who
+    # is hurt" traverses out of the commodity and finds nothing, because _out is
+    # directed. The decays differ deliberately - a shock propagating outward
+    # from a commodity (0.75) is a stronger inference than guessing a company's
+    # inputs from the company (0.60).
+    EdgeKind.EXPOSED_TO: EdgeKind.AFFECTS,
+    EdgeKind.AFFECTS: EdgeKind.EXPOSED_TO,
 }
 
 MAX_HOPS = 4
 MIN_PATH_WEIGHT = 0.05
+
+#: Below this degree nothing is a hub, however lopsided the graph is. Without a
+#: floor a five-node graph declares its busiest node a hub at degree 4 and stops
+#: answering anything.
+HUB_MIN_DEGREE = 50
+
+#: Hubs by nature, once they get big. NOT a traversal veto - the repo's own
+#: canonical path is event -> Sector -> your holding, and vetoing Sector by kind
+#: would delete the exact question the graph exists to answer. What makes
+#: `Malaysia` a bad waypoint is having four hundred neighbours, not being a
+#: Country, so the veto is degree-based (see EntityGraph.hubs) and this list is
+#: only the early-warning surface analyze.god_nodes() reports on.
+HUB_KINDS: frozenset[NodeKind] = frozenset(
+    {NodeKind.SECTOR, NodeKind.COUNTRY, NodeKind.COMMODITY}
+)
 
 
 def _check_tables() -> None:
@@ -285,6 +308,7 @@ class EntityGraph:
         self._nodes: dict[str, Node] = {}
         self._out: dict[str, list[Edge]] = {}
         self._in: dict[str, list[Edge]] = {}
+        self._hubs: frozenset[str] | None = None
 
     def add_node(self, node: Node) -> None:
         self._nodes[node.node_id] = node
@@ -310,6 +334,7 @@ class EntityGraph:
     def _index(self, edge: Edge) -> None:
         self._out.setdefault(edge.src, []).append(edge)
         self._in.setdefault(edge.dst, []).append(edge)
+        self._hubs = None                      # degrees changed; recompute lazily
 
     def node(self, node_id: str) -> Node | None:
         return self._nodes.get(node_id)
@@ -334,6 +359,32 @@ class EntityGraph:
 
     def degree(self, node_id: str) -> int:
         return len(self._out.get(node_id, [])) + len(self._in.get(node_id, []))
+
+    def hubs(self) -> frozenset[str]:
+        """Nodes too well connected to be a meaningful waypoint.
+
+        A node is a hub at degree >= max(HUB_MIN_DEGREE, p99 degree). Traversal
+        may terminate AT one; it may not route THROUGH one unless it is the seed.
+
+        Without this, "Maybank and NVDA are connected" is true - via
+        `Malaysia -> ... -> United States` - and worthless. The p99 term catches
+        a hub nobody predicted; the floor stops a sparse graph inventing one.
+
+        Degree, not kind. A shipping sector with three members IS the exposure
+        path; a financials sector with sixty is noise. The distinction is how
+        many neighbours it has, and only degree can see that.
+        """
+        if self._hubs is not None:
+            return self._hubs
+        degrees = sorted(self.degree(n) for n in self._nodes)
+        if not degrees:
+            self._hubs = frozenset()
+            return self._hubs
+        # Nearest-rank p99: the smallest degree at or above the 99th percentile.
+        p99 = degrees[min(len(degrees) - 1, int(0.99 * len(degrees)))]
+        cutoff = max(HUB_MIN_DEGREE, p99)
+        self._hubs = frozenset(n for n in self._nodes if self.degree(n) >= cutoff)
+        return self._hubs
 
     def traverse(
         self,
@@ -366,6 +417,10 @@ class EntityGraph:
         """
         if start not in self._nodes:
             return []
+        # Computed once per traversal. The seed is exempt: asking "what is
+        # exposed to Malaysia" is a legitimate question, and refusing to leave
+        # the node you were asked about answers nothing.
+        hubs = self.hubs() - {start}
         results: list[Path] = []
         # (-weight, counter, node, hops)
         counter = 0
@@ -393,6 +448,8 @@ class EntityGraph:
                 path = Path(new_hops, nw)
                 if target is None or edge.dst == target:
                     results.append(path)
+                if edge.dst in hubs:
+                    continue           # may end at a hub, never route through one
                 if nw > best_seen.get(edge.dst, 0.0):
                     best_seen[edge.dst] = nw
                     counter += 1

@@ -8,8 +8,9 @@ one non-negotiable rule: **every multi-hop claim ships with its traversal path
 attached**, decayed per hop, so a three-hop inference is visibly weaker than a
 direct link. An impact claim without a path cannot be emitted.
 
-This document covers phase 1: the schema, the store, and the seam that lets a
-graph-backed claim actually reach a user.
+This document covers phases 1 and 2: the schema, the store, the seam that lets a
+graph-backed claim actually reach a user, and the deterministic extractors that
+put something in the graph for it to answer from.
 
 ---
 
@@ -61,7 +62,7 @@ Five ideas were:
 | Provenance required on **edges**, not only nodes | `source_doc_id` existed; it is now structurally required for an EXTRACTED edge and validated before build |
 | A schema gate ahead of assembly | Matches the registry ratchet's posture |
 | Pure stages passing plain dicts | An extractor never imports the graph, so it is testable against its source alone |
-| God-node filtering | The finance equivalents are `Malaysia`, `banking`, `USD`. A query routed through a country node connects everything to everything (phase 2) |
+| God-node filtering | The finance equivalents are `Malaysia`, `banking`, `USD`. A query routed through a country node connects everything to everything. Adapted with one change — see §9 |
 
 **One of its choices deliberately inverted.** Graphify validates an extraction,
 prints a warning, and builds anyway (`build.py:875-893`), so a malformed
@@ -196,44 +197,164 @@ on one.
 
 ---
 
-## 8. What is not here yet
+## 8. Building it — `make graph`
 
-Phase 1 is schema, store, validator and seam. **Nothing populates the graph** —
-it is built only by tests, `verify.py` and `trace_run.py`. Still to come:
+```
+make graph                    # -> data/graph.db, offline, no keys
+python -m knowledge.graph.build --db /tmp/g.db --rebuild
+```
 
-- **Phase 2** — five deterministic extractors (markets registry, config book,
-  sector map, GDELT entities, a curated human-authored supply chain), canonical
-  ids, `build()`, both god-node rules, relation precedence, `make graph`.
-- **Phase 3** — `analyze` (god nodes, surprising connections, graph diff,
-  orphans), a review surface for `AMBIGUOUS` edges, an MCP `explain_path` tool,
-  `ask.py graph`, and a token benchmark measuring subgraph vs corpus in the MYR
-  the ledger already counts.
-- **Phase 4** — the codebase graph over `finance-agent` itself, using stdlib
-  `ast`. A maintainer tool, deliberately last.
+Five extractors, all deterministic, each speaking plain dicts so none of them
+imports the graph and each is testable against its own source alone:
 
-**Hub routing is unbounded until phase 2.** A traversal may route *through* a
-`Country` or `Sector` node, which would make "Maybank and NVDA are connected"
-true via `Malaysia → … → United States` and worthless. Nothing populates the
-graph yet, so there is no hub to route through — but the protection lands with
-the extractors, not after them.
+| Extractor | Source | Emits | Confidence |
+|---|---|---|---|
+| `config_book` | `config.toml` holdings + watchlist | Company seed nodes, **no edges** | — |
+| `sectors` | `data/sectors.yaml` | Company → SubSector → Sector | `EXTRACTED` |
+| `curated` | `data/supply_chain.yaml` | supplies / customer_of / competes_with / exposed_to | `EXTRACTED` |
+| `market_registry` | `markets/registry.py` + the adapters | Company `OPERATES_IN` Country, `REGULATED_BY` Regulator | `EXTRACTED` |
+| `gdelt` | news articles, entity-linked | Event `AFFECTS` Company | **`INFERRED`** |
 
-The honest expectation for phases 1–2: a few hundred edges, most of them
-classification. That is not impressive to look at, and it is the right starting
-point. The graph gets interesting when filings and ownership feeds are wired,
-which is separate work. Building a dense graph first by letting a model propose
-edges would invert this system's one non-negotiable rule — that a claim carries
-where it came from.
+**The book contributes nodes and no edges.** Owning two companies is a fact
+about you, not a relationship between them; an edge would let a traversal
+connect them through your account.
+
+**`market_registry` runs last**, over the union of every instrument the others
+declared — it maps companies to their market and cannot know which companies
+exist until they do. It takes that set as an argument, so it stays a pure
+function of its input.
+
+**GDELT edges are `INFERRED`, and that is the point.** `link_entities` is a
+substring match: it establishes that an article *mentions* a company, never that
+the event *affects* it — "Maybank was not among the banks named in the probe"
+links Maybank exactly as strongly as a story about Maybank's own probe. So those
+edges are traversable, displayable, and refused by `Edge.citable`. They
+accumulate for the phase-3 review surface, where a person promotes one into the
+curated file with a real basis or throws it away. A binary flag would have forced
+a choice between discarding the news layer and letting a substring match cite
+itself as evidence.
+
+### The build is reproducible to the byte
+
+Extractors emit sorted, `build` inserts sorted, the store's edge insert is
+idempotent on `(src, dst, kind, valid_from)`, and `add_node` merges metadata and
+**writes nothing when nothing changed**. Build twice, `cmp` the files, expect no
+difference — enforced in CI. A graph you cannot rebuild identically is one whose
+diff you cannot review, and an unreviewable diff is how a bad edge lives for a
+year.
+
+Node metadata **merges** rather than replaces. Several extractors describe the
+same node from different angles — the book knows it is held, the registry knows
+its MIC — and replacing wholesale makes a node's attributes depend on which
+extractor happened to run last.
+
+### Parallel edges are kept, never collapsed
+
+Two companies can both compete and share a sub-sector. Graphify's worst reported
+bug (`build.py:1268`) was alphabetical last-write-wins silently rewriting 144
+specific `calls` edges into generic `references`, dropping those call sites out
+of the call graph. That comes from collapsing to a simple graph; `_out` holds
+parallel edges, so both survive and insertion order decides nothing. Tested in
+both orders.
 
 ---
 
-## 9. Files
+## 9. Hubs — degree, not kind
+
+```python
+HUB_MIN_DEGREE = 50
+graph.hubs()      # degree >= max(HUB_MIN_DEGREE, p99_degree)
+```
+
+A traversal may terminate **at** a hub; it may not route **through** one, unless
+the hub is the seed. Without this, "Maybank and NVDA are connected" is true via
+`Malaysia → … → United States`, and worthless.
+
+**The rule is degree only.** An earlier design also vetoed `Sector`, `Country`
+and `Commodity` by kind. That is wrong here: the repo's canonical exposure path
+is `event → SEC:shipping → your holding`, and a kind veto deletes the exact
+question the graph exists to answer. What makes `Malaysia` a bad waypoint is
+having four hundred neighbours, not being a Country — a shipping sector with
+three members *is* the path; a financials sector with sixty is noise. Only degree
+can tell those apart. `HUB_KINDS` survives as the early-warning list
+`analyze.god_nodes()` will report on, never as a veto.
+
+The p99 term catches a hub nobody predicted; the floor of 50 stops a five-node
+graph declaring its busiest node a hub at degree 4 and answering nothing.
+
+---
+
+## 10. The curated files, read as a corpus
+
+An extracted edge cites `curated:supply_chain#misc-pchem-marine`. Something must
+hand back the text behind that id or `path_to_citations` refuses the path — the
+phase-1 blocker again, one layer out. `knowledge/graph/evidence.py` is that
+adapter.
+
+**What is being quoted, and why that is honest.** The curated yaml *is* the
+source document: a person wrote the relationship down and vouches for it, and
+`created_by: human` in `agents/registry.yaml` is what says so. The sentence
+rendered is that row formatted for reading, derived by a fixed rule with nothing
+added. It is not a filing and never claims to be — the trust tier is `METHOD_KB`,
+four steps below `FILINGS`, so a curated edge can never outrank a document from
+the company itself.
+
+The round trip is real: the citation's `quoted_span` is rechecked against that
+text by `verify_claim`, exactly as a filing chunk would be. **A row edited after
+a claim cited it fails verification**, which is the point.
+
+That closes the loop end to end, and there is a test for exactly it:
+
+```
+checked-in yaml → extractor → validator → store → traversal
+                → citation → output gate → answered=True
+```
+
+---
+
+## 11. What is not here yet
+
+- **Phase 3** — `analyze` (god nodes, surprising connections, graph diff,
+  orphans), a review surface for the `INFERRED` and `AMBIGUOUS` edges the news
+  layer produces, an MCP `explain_path` tool, `ask.py graph`, and a token
+  benchmark measuring subgraph vs corpus in the MYR the ledger already counts.
+- **Phase 4** — the codebase graph over `finance-agent` itself, using stdlib
+  `ast`. A maintainer tool, deliberately last.
+
+The GDELT extractor exists and is tested, but is **not in the default build** —
+it needs a feed to read, and the review surface that gives its `INFERRED` edges
+somewhere to go arrives in phase 3.
+
+The honest expectation: the shipped build is 47 nodes and 84 edges, most of them
+classification. That is not impressive to look at, and it is the right starting
+point — every edge traceable to a source, no model involved, reproducible to the
+byte. The graph gets interesting when filings and ownership feeds are wired,
+which is separate work. Building a dense graph first by letting a model propose
+edges would invert this system's one non-negotiable rule: that a claim carries
+where it came from.
+
+**Before you trade on any of it**, the rows in `data/supply_chain.yaml` are seed
+examples chosen because they are widely known, not because they were verified
+against a primary source in this repository. The file says so at the top.
+
+---
+
+## 12. Files
 
 | Path | Role |
 |---|---|
-| `knowledge/graph/entity_graph.py` | Schema, traversal, `require_path`, `path_to_citations` |
+| `knowledge/graph/entity_graph.py` | Schema, traversal, hubs, `require_path`, `path_to_citations` |
 | `knowledge/graph/validate.py` | The gate nothing reaches `build` past. Raises |
-| `knowledge/graph/store.py` | SQLite, WAL, append-only edges, as-of reads |
+| `knowledge/graph/store.py` | SQLite, WAL, append-only edges, as-of reads, tiers |
+| `knowledge/graph/ids.py` | One canonical id, three producers |
+| `knowledge/graph/build.py` | extract → validate → store. `make graph` |
+| `knowledge/graph/evidence.py` | The curated files, read as a corpus |
+| `knowledge/graph/extractors/` | Five deterministic sources, one contract |
+| `knowledge/graph/data/*.yaml` | Human-authored: entities, sectors, supply chain |
 | `tests/test_graph_schema.py` | Confidence, validity, inversion, the seam, the validator |
 | `tests/test_graph_store.py` | Append-only, as-of reads, determinism, tiers |
+| `tests/test_graph_ids.py` | Idempotence, the fold-before-filter order, aliases |
+| `tests/test_graph_extract.py` | Each extractor against its own source |
+| `tests/test_graph_build.py` | Determinism, hubs, parallel edges, the whole loop |
 | `tests/test_feeds_graph.py` | The original P9 traversal tests |
-| `stress/run.py` §10 | 10k edges, cycles, broken chains, history rewrites |
+| `stress/run.py` §10 | 10k edges, cycles, broken chains, hubs, history rewrites |

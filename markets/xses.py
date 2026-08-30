@@ -50,6 +50,7 @@ class XSES(MarketAdapter):
     tier = 2
     accounting_standard = AccountingStandard.IFRS   # SFRS(I), IFRS-converged
     local_index = "STI"
+    regulator = "Monetary Authority of Singapore"
     settlement_days = 2
     known_at_strategy = KnownAtStrategy.SELF_BUILT
 
