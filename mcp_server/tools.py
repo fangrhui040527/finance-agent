@@ -40,10 +40,11 @@ from core.registry.loader import load as load_registry
 from engines.attribution.decompose import MIN_OBSERVATIONS, decompose
 from engines.attribution.regression import huber_fit
 from engines.risk.concentration import Limits, Position
-from engines.sizing.caps import cost_floor_bps, cost_floor_value
+from core.contracts.money import BASE_CURRENCY
+from engines.sizing.caps import cost_floor_bps, cost_floor_value, to_base
 from knowledge.retrieval.pipeline import Router
 from markets.registry import get as market_get
-from markets.registry import known_prefixes, mic_of, supported
+from markets.registry import known_prefixes, market_currency, mic_of, supported
 from mcp_server.protocol import ToolError
 from ui.render import decomposition_bars
 
@@ -428,9 +429,19 @@ def check_portfolio_risk(
             raise ToolError(
                 f"weight must not be negative: {p!r}. A negative weight is a short, "
                 f"and the concentration limits here are not defined over shorts.")
+        # The currency defaults to the MARKET's, not to the country field. They
+        # are different strings for the same fact and only one of them is a
+        # currency: `country="MY"` gave `currency="MY"`, which is not "MYR", so
+        # a book of nothing but Bursa names reported 100% foreign-currency
+        # exposure and breached the 50% limit. A refusal caused by a field
+        # nobody was reading.
+        try:
+            default_ccy = market_currency(mic_of(str(p["instrument"])))
+        except ValueError:
+            default_ccy = BASE_CURRENCY
         parsed.append(Position(instrument_id=str(p["instrument"]), weight=weight,
                                sector=str(p["sector"]), country=str(p["country"]),
-                               currency=str(p.get("currency", p["country"])),
+                               currency=str(p.get("currency") or default_ccy).upper(),
                                risk_to_stop=risk))
 
     try:
@@ -459,11 +470,17 @@ def size_position(
     win_rate: float | None = None,
     payoff: float | None = None,
     n_trades: int = 0,
+    fx_myr_per_unit: float | None = None,
 ) -> str:
     """Five caps, the binding one, and the market's own fee schedule.
 
     "No position" is an outcome, not a failure - and it is the right one more
     often than the interface makes it feel.
+
+    `price` and `adv_20d` are in the MARKET's currency; `portfolio_value` is in
+    MYR. For any market that does not price in MYR, pass `fx_myr_per_unit` - the
+    two cannot be compared without it, and comparing them anyway is wrong by
+    exactly the exchange rate while looking entirely reasonable.
     """
     pv = _positive(portfolio_value, "portfolio_value")
     px = _positive(price, "price")
@@ -485,6 +502,15 @@ def size_position(
                 f"flat-bps stand-in has no fixed minimum, and it is the minimum "
                 f"that makes small positions uneconomic.")
 
+    quote = market_currency(mic)
+    fx = _positive(fx_myr_per_unit, "fx_myr_per_unit") if fx_myr_per_unit else None
+    if quote != BASE_CURRENCY and fx is None:
+        return (f"REFUSED: {mic} prices in {quote} and portfolio_value is "
+                f"{BASE_CURRENCY}. Pass fx_myr_per_unit (how many {BASE_CURRENCY} one "
+                f"{quote} buys) so the cap and the price can be compared. Without it "
+                f"the size is wrong by the {BASE_CURRENCY}/{quote} rate and still looks "
+                f"correctly bounded by whichever cap it names.")
+
     a13 = A13Sizing(context())
     caps, findings = a13.caps(
         portfolio_value=pv, stop_distance_frac=(px - stop) / px,
@@ -494,21 +520,28 @@ def size_position(
         single_name_limit=name_limit,
         participation=part,
         win_rate=win_rate, payoff=payoff, n_trades=n_trades, mic=mic,
+        fx_base_per_quote=fx,
     )
     binding, value = caps.binding()
     lot = adapter.lot_size(instrument)
     units = int(value / px) // lot * lot
     floor = cost_floor_value(adapter.fee_schedule.round_trip, mic)
 
+    def shown(v: Decimal) -> str:
+        """Native always; MYR alongside only when it is a different number."""
+        native = f"{quote} {v:,.2f}"
+        return native if quote == BASE_CURRENCY else \
+            f"{native} ({BASE_CURRENCY} {to_base(v, quote, fx):,.2f})"
+
     if units < lot:
-        verdict = (f"NO POSITION: the binding cap ({binding.value}, {value:,.2f}) does "
-                   f"not fund one {lot}-share lot at {px}.")
+        verdict = (f"NO POSITION: the binding cap ({binding.value}, {shown(value)}) does "
+                   f"not fund one {lot}-share lot at {quote} {px}.")
     elif Decimal(units) * px < floor:
-        verdict = (f"NO POSITION: {units:,} units is {Decimal(units) * px:,.2f}, below "
-                   f"the {floor:,.2f} minimum economic position on {mic}. The round "
+        verdict = (f"NO POSITION: {units:,} units is {shown(Decimal(units) * px)}, below "
+                   f"the {shown(floor)} minimum economic position on {mic}. The round "
                    f"trip cannot pay for itself.")
     else:
-        verdict = (f"{units:,} units = {Decimal(units) * px:,.2f}, in lots of {lot}, "
+        verdict = (f"{units:,} units = {shown(Decimal(units) * px)}, in lots of {lot}, "
                    f"bound by {binding.value}.")
 
     lot_note = ""
@@ -516,11 +549,14 @@ def size_position(
         lot_note = (f"\n  WARNING: {lot} is the DEFAULT board lot, not a looked-up fact "
                     f"for this issuer. A wrong lot produces an order that cannot fill.")
 
+    fx_line = "" if quote == BASE_CURRENCY else \
+        f"  fx 1 {quote} = {BASE_CURRENCY} {fx}\n"
     return (f"SIZING  {instrument} on {mic}\n"
-            f"  portfolio {pv:,.2f}  entry {px}  stop {stop}  "
-            f"stop distance {((px - stop) / px):.2%}\n"
+            f"  portfolio {BASE_CURRENCY} {pv:,.2f}  entry {quote} {px}  "
+            f"stop {quote} {stop}  stop distance {((px - stop) / px):.2%}\n"
+            f"{fx_line}"
             f"{_lines(findings)}\n"
-            f"  minimum economic position on {mic}: {floor:,.2f}{lot_note}\n\n"
+            f"  minimum economic position on {mic}: {shown(floor)}{lot_note}\n\n"
             f"  {verdict}{DISCLAIMER}")
 
 

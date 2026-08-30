@@ -19,11 +19,14 @@ from engines.risk.concentration import (
     Breach, Limits, Position, check, correlation_clusters,
     effective_number_of_bets, hhi,
 )
+from core.contracts.money import BASE_CURRENCY
 from engines.sizing.caps import (
-    Band, CapSet, ImplausibleEdge, concentration_cap, cost_floor_bps,
-    cost_floor_value, kelly_cap, liquidity_cap, risk_budget_cap,
+    Band, CapSet, CurrencyMismatch, ImplausibleEdge, concentration_cap,
+    cost_floor_bps, cost_floor_value, kelly_cap, liquidity_cap, risk_budget_cap,
+    to_base, to_quote,
 )
 from engines.sizing.decision import NoPosition, SizingDecision, size
+from markets.registry import market_currency
 from engines.sizing.waterfall import Goal, Liability, Waterfall, compute
 
 
@@ -182,10 +185,23 @@ class A13Sizing(Agent):
         payoff: Decimal | float | None = None,
         n_trades: int = 0,
         mic: str | None = None,
+        fx_base_per_quote: Decimal | None = None,
+        fx_asof=None,
     ) -> tuple[CapSet, list[Finding]]:
+        """`portfolio_value` is MYR; `adv_20d` and the fee schedule are the
+        market's own currency. Those meet in a `min()`, so one of them has to
+        move - and the portfolio is the side that converts, because lot sizes,
+        ticks and fee minimums are only meaningful natively.
+
+        The market's currency is read off its adapter rather than taken as an
+        argument: the adapter already declares it, and a caller who could pass
+        it could pass it wrong.
+        """
         self._guard_tool("risk_budget_cap")
-        risk = risk_budget_cap(portfolio_value, risk_per_trade, stop_distance_frac)
-        conc = concentration_cap(portfolio_value, single_name_limit)
+        quote = market_currency(mic)
+        pv = to_quote(portfolio_value, quote, fx_base_per_quote, fx_asof)
+        risk = risk_budget_cap(pv, risk_per_trade, stop_distance_frac)
+        conc = concentration_cap(pv, single_name_limit)
         liq = liquidity_cap(adv_20d, participation)
         floor = cost_floor_value(round_trip_cost_at, mic)
 
@@ -193,24 +209,42 @@ class A13Sizing(Agent):
         if win_rate is not None and payoff is not None:
             self._guard_tool("kelly_cap")
             try:
-                kelly = kelly_cap(portfolio_value, Decimal(str(win_rate)),
+                kelly = kelly_cap(pv, Decimal(str(win_rate)),
                                   Decimal(str(payoff)), n_trades)
             except ImplausibleEdge as e:
                 notes.append(f"Kelly cap refused: {e}")
             except ValueError as e:
                 notes.append(f"Kelly cap unavailable: {e}")
 
-        caps = CapSet(risk=risk, kelly=kelly, concentration=conc, liquidity=liq, cost_floor=floor)
+        caps = CapSet(risk=risk, kelly=kelly, concentration=conc, liquidity=liq,
+                      cost_floor=floor, currency=quote)
         binding, value = caps.binding()
+        value_base = to_base(value, quote, fx_base_per_quote, fx_asof)
+        floor_base = to_base(floor, quote, fx_base_per_quote, fx_asof)
+        if quote != BASE_CURRENCY:
+            notes.append(
+                f"caps are quoted in {quote} at {fx_base_per_quote} {BASE_CURRENCY} per "
+                f"{quote}; the {BASE_CURRENCY} figures move with that rate even if the "
+                "position does not"
+            )
+        # Only show the MYR figure alongside when it is a DIFFERENT number.
+        # Printing "USD 9,500 (MYR 39,900)" is information; printing
+        # "MYR 40,000 (MYR 40,000)" trains the reader to skip the parenthesis.
+        def both(v: Decimal, v_base: Decimal) -> str:
+            native = f"{quote} {v:,.2f}"
+            return native if quote == BASE_CURRENCY else \
+                f"{native} = {BASE_CURRENCY} {v_base:,.2f}"
+
         return caps, [Finding(
             self.agent_id, "caps",
-            f"binding cap is {binding.value} at {value:,.2f}; "
-            f"cost floor requires at least {floor:,.2f} "
+            f"binding cap is {binding.value} at {both(value, value_base)}; "
+            f"cost floor requires at least {both(floor, floor_base)} "
             f"({cost_floor_bps(mic)} bps round trip on {mic or 'default'})",
             numbers={"risk": float(risk), "concentration": float(conc),
                      "liquidity": float(liq), "cost_floor": float(floor),
                      "kelly": float(kelly) if kelly is not None else -1.0,
-                     "binding": float(value)},
+                     "binding": float(value), "binding_base": float(value_base),
+                     "cost_floor_base": float(floor_base)},
             caveats=notes,
         )]
 
@@ -223,11 +257,15 @@ class A13Sizing(Agent):
             return [Finding(self.agent_id, "no_position", str(e.reason),
                             caveats=["no position is the correct answer more often than "
                                      "the interface makes it feel"])]
+        native = f"{d.currency} {d.target_value:,.2f}"
+        both = native if d.currency == BASE_CURRENCY else \
+            f"{native} = {BASE_CURRENCY} {d.base_value:,.2f}"
         return [Finding(
             self.agent_id, "size",
             f"{d.target_units:,} units of {d.instrument_id} "
-            f"({d.target_value:,.2f}), bound by {d.binding_cap.value}",
+            f"({both}), bound by {d.binding_cap.value}",
             numbers={"units": float(d.target_units), "value": float(d.target_value),
+                     "value_base": float(d.base_value),
                      "tranches": float(len(d.tranches))},
             caveats=list(d.notes),
         )]

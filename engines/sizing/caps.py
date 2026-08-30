@@ -10,6 +10,8 @@ from dataclasses import dataclass
 from decimal import Decimal
 from enum import Enum
 
+from core.contracts.money import BASE_CURRENCY, Money
+
 # docs/09 section 8: ~50-100 logged outcomes before Kelly inputs mean anything.
 KELLY_MIN_TRADES = 50
 KELLY_FRACTION = Decimal("0.25")          # quarter-Kelly
@@ -106,13 +108,94 @@ class CapBreach(ValueError):
     """A decision that breaches a cap cannot exist."""
 
 
+class CurrencyMismatch(ValueError):
+    """Two amounts in different currencies met without a rate to join them.
+
+    Raised rather than guessed. The whole point of this class is that the
+    alternative is a finite, plausible, correctly-typed, wrong number.
+    """
+
+
+def to_quote(base_amount: Decimal, quote: str, base_per_quote: Decimal | None,
+             asof=None) -> Decimal:
+    """A MYR amount expressed in `quote`. Refuses without an explicit rate.
+
+    `base_per_quote` is MYR per ONE unit of `quote` - the direction a Malaysian
+    quotes it aloud ("the dollar is 4.20"), and the direction
+    `FxStore.rate_asof(quote, BASE_CURRENCY, d)` returns.
+    """
+    quote = quote.upper()
+    if quote == BASE_CURRENCY:
+        return base_amount
+    if base_per_quote is None:
+        raise CurrencyMismatch(
+            f"a {BASE_CURRENCY} amount cannot be compared with a {quote} one without an "
+            f"FX rate. Pass the {BASE_CURRENCY}-per-{quote} rate and the date it was "
+            f"struck; the alternative is comparing {BASE_CURRENCY} {base_amount:,.2f} "
+            f"against {quote} as bare numbers, which is off by the rate and looks fine."
+        )
+    if base_per_quote <= 0:
+        raise CurrencyMismatch(
+            f"{BASE_CURRENCY}-per-{quote} rate {base_per_quote} is not positive"
+        )
+    return base_amount / base_per_quote
+
+
+def to_base(quote_amount: Decimal, quote: str, base_per_quote: Decimal | None,
+            asof=None) -> Decimal:
+    """The reverse of `to_quote`, routed through Money so one rule guards both.
+
+    Money.convert already refuses a non-positive rate and treats same-currency
+    conversion as an identity that ignores the rate; reusing it means those two
+    decisions are made once rather than re-argued here.
+    """
+    quote = quote.upper()
+    if quote == BASE_CURRENCY:
+        return quote_amount
+    if base_per_quote is None:
+        raise CurrencyMismatch(
+            f"a {quote} amount cannot be reported in {BASE_CURRENCY} without an FX rate. "
+            f"Pass the {BASE_CURRENCY}-per-{quote} rate and the date it was struck."
+        )
+    return Money(amount=quote_amount, currency=quote).convert(
+        BASE_CURRENCY, base_per_quote, asof
+    ).amount
+
+
 @dataclass(frozen=True)
 class CapSet:
+    """Five caps, and the ONE currency all five are denominated in.
+
+    The currency field is not decoration. `binding()` is a `min()` across the
+    five, and until this field existed three of them came from the portfolio
+    (MYR) while two came from the market (its own currency): `liquidity` from
+    local turnover, `cost_floor` from a local fee schedule. `min()` then compared
+    MYR against USD as bare numbers and returned whichever was numerically
+    smaller regardless of unit.
+
+    That is not a rounding error. A thinly traded US name with USD 300k of daily
+    value gives a USD 15,000 liquidity cap; against an MYR 40,000 concentration
+    cap, `min` picks 15,000 and the system deploys roughly MYR 63,000 - a 58%
+    overshoot of the single-name limit it had just computed, reported as
+    compliant. Declaring the currency makes the mistake unconstructable instead
+    of undetectable.
+    """
+
     risk: Decimal
     kelly: Decimal | None
     concentration: Decimal
     liquidity: Decimal
     cost_floor: Decimal
+    currency: str = BASE_CURRENCY
+
+    def __post_init__(self) -> None:
+        c = str(self.currency).upper()
+        if len(c) != 3 or not c.isalpha():
+            raise CurrencyMismatch(
+                f"{self.currency!r} is not a currency code; a CapSet must name the one "
+                "currency all five of its caps are denominated in"
+            )
+        object.__setattr__(self, "currency", c)
 
     def binding(self) -> tuple[BindingCap, Decimal]:
         options = [

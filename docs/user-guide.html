@@ -467,9 +467,17 @@ skill rather than luck.</span></span></pre></div>
           <div class="term"><div class="term-bar"><span></span><span></span><span></span><b>ask.py size</b></div>
 <pre><span class="p">$</span> python ask.py size MYX:1155 --portfolio 200000 \
     --price 6.20 --stop 5.60 --adv 900000
-<span class="o">cost      XKLS fee schedule
-  binding cap is risk at 15,500.00; cost floor requires
-  at least <span class="hl">4,705.88</span> (60 bps round trip on XKLS)</span></pre></div>
+<span class="o">sizing    MYX:1155  portfolio <span class="hl">MYR</span> 200,000.00
+cost      XKLS fee schedule
+  binding cap is risk at <span class="hl">MYR</span> 15,500.00; cost floor requires
+  at least <span class="hl">MYR 4,705.88</span> (60 bps round trip on XKLS)</span></pre></div>
+          <p><strong>Your book is in ringgit; a foreign market is not.</strong> <code>--price</code> and <code>--adv</code> are always in the market’s own currency, so anything that does not price in MYR needs <code>--fx</code> — how many ringgit one unit buys. Without it the command refuses rather than comparing the two as bare numbers, which is wrong by exactly the exchange rate and still names a cap that it has already breached.</p>
+          <div class="term"><div class="term-bar"><span></span><span></span><span></span><b>a foreign market</b></div>
+<pre><span class="p">$</span> python ask.py size XNAS:NVDA --portfolio 500000 --lot 1 \
+    --price 180 --stop 165 --adv 30000000000 <span class="hl">--fx 4.20</span>
+<span class="o">fx        1 USD = MYR 4.2
+  binding cap is concentration at <span class="hl">USD 9,523.81 = MYR 40,000.00</span>
+  -&gt; 52 units (USD 9,360.00 = <span class="hl">MYR 39,312.00</span>) in lots of 1</span></pre></div>
         </div>
 
         <div class="cmd">

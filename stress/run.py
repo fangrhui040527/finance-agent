@@ -611,6 +611,90 @@ def s_market_drift():
                       lambda b=bad_id: mic_of(b),
                       why="An id with no market must not default to one.")
 
+    # --- currency drift: the same shape one layer along -------------------
+    # MYX/XKLS drift gave every Bursa position the wrong cost floor. An MYR cap
+    # meeting a foreign price is the same failure with a bigger multiplier: the
+    # answer is wrong by the exchange rate, nothing raises, and the position
+    # still names the cap that supposedly bound it.
+    from datetime import date as _date
+    from engines.sizing.caps import (
+        Band as _Band, BASE_CURRENCY, CapSet, CurrencyMismatch, concentration_cap,
+        to_base, to_quote)
+    from engines.sizing.decision import NoPosition as _NoPos, size as _size
+    from markets.registry import market_currency
+
+    for mic in supported():
+        ccy = market_currency(mic)
+        if len(ccy) != 3 or not ccy.isalpha():
+            finding(f"{mic}: currency is not an ISO code", repr(ccy))
+        else:
+            held(f"{mic}: declares a currency", ccy)
+
+    expect_raises("MYR value into a foreign report without a rate", CurrencyMismatch,
+                  lambda: to_base(Decimal("10000"), "USD", None),
+                  why="Reporting a USD figure as MYR at an implied rate of 1.0 is a "
+                      "4x error that reads as an ordinary number.")
+    expect_raises("CapSet with a country code for a currency", CurrencyMismatch,
+                  lambda: CapSet(Decimal(1), None, Decimal(1), Decimal(1), Decimal(1),
+                                 currency="MY"),
+                  why='"MY" is not "MYR", and check() counts anything that is not the '
+                      "base currency as foreign exposure.")
+
+    _brk = ("ROIC below 8% for two quarters", "net debt/EBITDA above 4x")
+    expect_raises("caps and price in different currencies", CurrencyMismatch,
+                  lambda: _size("XNAS:NVDA", _Band.ACCUMULATE, Decimal("500000"),
+                                CapSet(Decimal("40000"), None, Decimal("40000"),
+                                       Decimal("9e9"), Decimal("1")),
+                                Decimal("180"), 1, Decimal("165"), _brk,
+                                _date(2028, 1, 1),
+                                get("XNAS").fee_schedule.round_trip, mic="XNAS",
+                                currency="USD", fx_base_per_quote=Decimal("4.20")),
+                  why="An MYR cap divided by a USD price bought 4.2x the intended "
+                      "exposure and reported the cap it had just breached.")
+
+    # Every foreign market, sized against a real 8% limit: none may exceed it.
+    book = Decimal("500000")
+    rates = {"USD": "4.20", "SGD": "3.25", "HKD": "0.54", "JPY": "0.028",
+             "GBP": "5.60", "AUD": "2.80", "INR": "0.050", "TWD": "0.135",
+             "KRW": "0.0031", "EUR": "4.90", "MYR": "1"}
+    for mic in supported():
+        ccy = market_currency(mic)
+        rate = Decimal(rates.get(ccy, "0")) if ccy != BASE_CURRENCY else None
+        if ccy != BASE_CURRENCY and not rate:
+            finding(f"{mic}: no stress rate for {ccy}",
+                    "add one, or this market is never probed for currency drift")
+            continue
+        adapter = get(mic)
+        price = to_quote(Decimal("40"), ccy, rate)      # ~RM 40 a share everywhere
+        cap = to_quote(concentration_cap(book, Decimal("0.08")), ccy, rate)
+        try:
+            d = _size(f"{mic}:PROBE", _Band.ACCUMULATE, book,
+                      CapSet(cap * 2, None, cap, Decimal("9e30"),
+                             Decimal("0"), currency=ccy),
+                      price, adapter.lot_size(f"{mic}:PROBE"),
+                      price * Decimal("0.9"), _brk, _date(2028, 1, 1),
+                      adapter.fee_schedule.round_trip, mic=mic, currency=ccy,
+                      fx_base_per_quote=rate)
+        except _NoPos as e:
+            # A refusal is a pass here: no position is never an over-sized one.
+            # The reason (lot granularity or the cost floor) is the market's,
+            # not the currency boundary's, so it is reported rather than named.
+            held(f"{mic}: 8% of RM {book:,.0f} buys nothing", str(e.reason)[:90])
+            continue
+        # One sen of tolerance, because dividing by a rate and multiplying back
+        # does not round-trip in the last of Decimal's 28 digits, and a position
+        # sitting EXACTLY on its cap then reads as a hair above it. The drift
+        # this probe exists to catch is measured in tens of percent; the
+        # smallest real overshoot here is one board lot, which is ~RM 40.
+        limit = book * Decimal("0.08")
+        if d.base_value - limit > Decimal("0.01"):
+            finding(f"{mic}: 8% cap funded a larger position",
+                    f"{ccy} {d.target_value:,.2f} = RM {d.base_value:,.2f}, "
+                    f"above RM {limit:,.2f}")
+        else:
+            held(f"{mic}: 8% cap holds in MYR",
+                 f"{ccy} {d.target_value:,.2f} = RM {d.base_value:,.2f}")
+
 
 def s_mcp():
     section("9. MCP surface - a model that argues with the tools")
