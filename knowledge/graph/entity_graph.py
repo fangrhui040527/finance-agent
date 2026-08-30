@@ -357,6 +357,46 @@ class EntityGraph:
         """Edges arriving at this node. Answers 'who supplies X' without a scan."""
         return self._in.get(node_id, [])
 
+    def candidates(self, raw: str) -> list[str]:
+        """Every node a typed name could mean. Empty, one, or several.
+
+        The label pass matters because every report prints labels, so the
+        obvious thing a person does is copy one back in - and `Thermal coal` is
+        stored as `CM:coal`, which no minting rule would produce from its own
+        label.
+        """
+        from knowledge.graph.ids import IdError, node_id
+
+        if raw in self._nodes:
+            return [raw]
+        found: list[str] = []
+        for kind in NodeKind:
+            try:
+                candidate = node_id(kind, raw)
+            except IdError:
+                continue
+            if candidate in self._nodes and candidate not in found:
+                found.append(candidate)
+        folded = " ".join(raw.strip().split()).casefold()
+        found += [n.node_id for n in self._nodes.values()
+                  if n.label.casefold() == folded and n.node_id not in found]
+        return sorted(found)
+
+    def resolve(self, raw: str) -> str | None:
+        """A typed name -> exactly one node id, or None.
+
+        One resolver, on the graph, because every surface needs it and two
+        copies drift - the CLI and the MCP tool each grew their own, and each
+        forgot a different NodeKind.
+
+        AMBIGUITY IS REFUSED, not broken by enum order. `Aluminium` is both a
+        sub-sector and a commodity in the shipped data, and silently preferring
+        one answers a question the user did not ask. Callers show
+        `candidates()` and let the person choose.
+        """
+        found = self.candidates(raw)
+        return found[0] if len(found) == 1 else None
+
     def degree(self, node_id: str) -> int:
         return len(self._out.get(node_id, [])) + len(self._in.get(node_id, []))
 

@@ -219,6 +219,18 @@ S.tool("log_prediction",
            ["instrument", "direction", "horizon_days", "confidence", "thesis"]),
        )(T.log_prediction)
 
+S.tool("explain_path",
+       "Why are two entities connected, and how strongly? The multi-hop question "
+       "vector search cannot answer. Returns the chain, a per-hop decayed weight, "
+       "and one citation per link. An empty result means NOT FOUND CHEAPLY, never "
+       "that the two are unconnected.",
+       obj({"a": _str("an entity: a name, an instrument id, or a node id"),
+            "b": _str("the other entity"),
+            "asof": _str("YYYY-MM-DD; an edge is invisible outside its validity"),
+            "db": _str("optional graph path (default data/graph.db)")},
+           ["a", "b"]),
+       )(T.explain_path)
+
 S.tool("calibration_status",
        "Are the confident calls actually right more often? Stated confidence "
        "against realised hit rate. Cannot be back-filled - only waited for.",

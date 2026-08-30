@@ -112,6 +112,11 @@ class CuratedCorpus:
         return Citation(source=SOURCE, chunk_id=doc_id, quoted_span=text,
                         trust=TRUST, as_of=as_of or datetime.now(timezone.utc))
 
+    def all_chunks(self) -> list[str]:
+        """Every document, in a stable order. What "hand over the whole corpus"
+        actually means, for the benchmark that measures the alternative."""
+        return [self._chunks[k] for k in sorted(self._chunks)]
+
     def __len__(self) -> int:
         return len(self._chunks)
 

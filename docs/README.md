@@ -43,7 +43,7 @@ Three things are genuinely new here:
 | **14** | [Operations runbook](14-OPERATIONS-RUNBOOK.md) | What to do next, what to monitor, and what should make you stop |
 | **15** | [MCP setup](15-MCP-SETUP.md) | Serve the system over stdio so the reasoning runs on your Claude session |
 | **16** | [Tracing and anatomy](16-TRACING-AND-ANATOMY.md) | Every prompt, rail decision and dropped claim, recorded end to end |
-| **17** | [Knowledge graph](17-KNOWLEDGE-GRAPH.md) | Multi-hop exposure: edge confidence, validity intervals, the citation seam, and the deterministic build |
+| **17** | [Knowledge graph](17-KNOWLEDGE-GRAPH.md) | Multi-hop exposure end to end: confidence, validity, the citation seam, the deterministic build, the review surface, and the codebase graph |
 | [User guide](user-guide.html) | Install, every command, and the cadence for using it — open in a browser |
 | [Pipeline diagrams](pipeline.html) | Six diagrams tracing data from a wire story to a position size — open in a browser |
 | [World source register](world-sources.html) | Every source knowledge can come in from, worldwide — coverage, keys, rate limits, licences — ordered by trust tier |

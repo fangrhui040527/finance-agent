@@ -451,6 +451,132 @@ def cmd_backend(a) -> int:
     return 0
 
 
+# ---------------------------------------------------------------- graph
+def _graph(db: str | None):
+    """Load the built graph, or explain how to build it. Never guesses."""
+    from pathlib import Path as _P
+
+    from knowledge.graph.build import DEFAULT_DB
+    from knowledge.graph.store import GraphStore
+    path = db or DEFAULT_DB
+    if path != ":memory:" and not _P(path).exists():
+        print(f"no graph at {path}. Build it first:\n\n    make graph\n",
+              file=sys.stderr)
+        return None, None
+    store = GraphStore(path)
+    return store, store.load()
+
+
+def cmd_graph(a) -> int:
+    from knowledge.graph.analyze import graph_diff
+    from knowledge.graph.entity_graph import PathRequired, path_to_citations
+    from knowledge.graph.evidence import CuratedCorpus
+    from knowledge.graph.entity_graph import NodeKind
+
+    store, g = _graph(a.db)
+    if g is None:
+        return 2
+    asof = date.fromisoformat(a.asof) if a.asof else date.today()
+
+    def resolve(raw: str) -> str:
+        """'Maybank', 'MYX:1155', 'Thermal coal' or a minted id. Shared with the
+        MCP tool via EntityGraph.resolve so the two cannot drift."""
+        return g.resolve(raw) or raw
+
+    def reject(raw: str, nid: str) -> int:
+        options = g.candidates(raw)
+        if len(options) > 1:
+            print(f"{raw!r} is ambiguous: {', '.join(options)}. "
+                  f"Name one of them.", file=sys.stderr)
+        else:
+            print(f"{raw!r} is not in the graph", file=sys.stderr)
+        return 2
+
+    if a.uses:
+        target = resolve(a.uses)
+        if g.node(target) is None:
+            matches = [n.node_id for n in g.nodes()
+                       if n.label == a.uses or n.node_id.endswith(f".{a.uses}")]
+            if len(matches) != 1:
+                print(f"{a.uses!r} is not in the graph"
+                      + (f"; did you mean one of {matches}?" if matches else ""),
+                      file=sys.stderr)
+                return 2
+            target = matches[0]
+        callers = g.inbound(target)
+        if not callers:
+            print(f"nothing in the graph references {g.label(target)}.")
+            return 0
+        print(f"{len(callers)} reference{'s' if len(callers) != 1 else ''} to "
+              f"{g.label(target)} ({target}):")
+        for e in sorted(callers, key=lambda e: e.src):
+            note = "" if e.citable else "   (inferred from a name, not a binding)"
+            print(f"  {e.src} --{e.kind.value}-->{note}")
+        return 0
+
+    if a.report:
+        from knowledge.graph.report import render
+        print(render(g, asof=asof))
+        return 0
+
+    if a.benchmark:
+        from knowledge.graph import benchmark as bm
+        pairs = [(f"{g.label(resolve(x))} -> {g.label(resolve(y))}",
+                  resolve(x), resolve(y)) for x, y in (a.benchmark or [])]
+        print(bm.describe(bm.run(g, CuratedCorpus(), asof=asof, questions=pairs)))
+        return 0
+
+    if a.diff:
+        other, og = _graph(a.diff)
+        if og is None:
+            return 2
+        d = graph_diff(og, g)
+        print(d.describe())
+        other.close()
+        return 0
+
+    if a.impact:
+        start = resolve(a.impact)
+        if g.node(start) is None:
+            return reject(a.impact, start)
+        holdings = {resolve(h) for h in (a.holding or [])} or {
+            n.node_id for n in g.nodes() if n.kind is NodeKind.COMPANY}
+        hits = g.impact_of(start, holdings, asof=asof)
+        if not hits:
+            print(f"nothing reachable from {g.label(start)} as of {asof}.\n"
+                  "Traversal is a best-first heuristic, so this means 'not found "
+                  "cheaply', never 'no connection exists'.")
+            return 0
+        for iid, path in hits:
+            print(f"{g.label(iid)}: {path.describe()}")
+        return 0
+
+    if a.path:
+        src, dst = (resolve(x) for x in a.path)
+        for nid, raw in ((src, a.path[0]), (dst, a.path[1])):
+            if g.node(nid) is None:
+                return reject(raw, nid)
+        paths = g.traverse(src, asof=asof, target=dst)
+        if not paths:
+            print(f"no path from {g.label(src)} to {g.label(dst)} as of {asof}.\n"
+                  "Traversal is a best-first heuristic, so this is 'not found "
+                  "cheaply', never proof they are unconnected.")
+            return 0
+        best = paths[0]
+        print(best.describe())
+        corpus = CuratedCorpus()
+        try:
+            for c in path_to_citations(best, corpus.citation):
+                print(f"  [{c.chunk_id}] {c.quoted_span}")
+        except PathRequired as e:
+            print(f"  uncitable: {e}")
+        return 0
+
+    print("nothing asked. Try --path A B, --impact NODE, --report or --benchmark",
+          file=sys.stderr)
+    return 2
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="ask", description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -530,6 +656,24 @@ def main(argv=None) -> int:
     ln.add_argument("--mastered", action="append", help="repeatable")
     ln.add_argument("--syllabus", action="store_true")
     ln.set_defaults(fn=cmd_learn)
+
+    gr = sub.add_parser("graph", help="the entity graph: paths, impact, review")
+    gr.add_argument("--path", nargs=2, metavar=("FROM", "TO"),
+                    help="strongest citable path between two entities")
+    gr.add_argument("--impact", metavar="NODE",
+                    help="what this event or commodity reaches")
+    gr.add_argument("--holding", action="append",
+                    help="limit --impact to these; repeatable")
+    gr.add_argument("--uses", metavar="SYMBOL",
+                    help="what references this? point --db at the code graph")
+    gr.add_argument("--report", action="store_true",
+                    help="hubs, orphans, the review queue, surprising links")
+    gr.add_argument("--benchmark", nargs=2, action="append", metavar=("FROM", "TO"),
+                    help="subgraph vs corpus tokens for this question; repeatable")
+    gr.add_argument("--diff", metavar="OTHER_DB", help="what changed against another build")
+    gr.add_argument("--asof", help="YYYY-MM-DD; defaults to today")
+    gr.add_argument("--db", help="graph database (default data/graph.db)")
+    gr.set_defaults(fn=cmd_graph)
 
     bk = sub.add_parser("backend", help="which model is actually answering")
     bk.add_argument("--use", choices=["anthropic", "echo"], help="force one")
