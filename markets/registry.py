@@ -90,6 +90,35 @@ def get(mic: str) -> MarketAdapter:
     return _CACHE[mic]
 
 
+def market_currency(mic: str | None) -> str:
+    """What a price on this market is denominated in.
+
+    Read off the adapter, never guessed, because this is the value that decides
+    whether an MYR portfolio cap may be compared with a local turnover figure at
+    all. Eleven adapters, eight currencies: getting it from the one place that
+    already declares it means a market added later cannot disagree with it.
+
+    Two cases fall back to MYR, and both are the book's own currency rather than
+    a guess:
+
+      * `mic is None` - no market was named, so nothing foreign is in play.
+      * a MIC with no adapter - the caller must then supply the price, the daily
+        value and the fee model themselves, and those are unit-consistent in
+        whatever currency they chose. There is no adapter fact to contradict, so
+        the computation is treated as being in the book's currency; it is the
+        caller's job to keep its three inputs in one currency, which they had to
+        do anyway.
+    """
+    from core.contracts.money import BASE_CURRENCY
+
+    if mic is None:
+        return BASE_CURRENCY
+    try:
+        return get(mic).currency.upper()
+    except KeyError:
+        return BASE_CURRENCY
+
+
 def supported() -> list[str]:
     return sorted(_ADAPTERS)
 

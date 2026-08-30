@@ -41,9 +41,10 @@ from core.registry.loader import load as load_registry
 from engines.attribution.decompose import MIN_OBSERVATIONS
 from engines.attribution.regression import huber_fit
 from engines.risk.concentration import Limits, Position
-from engines.sizing.caps import cost_floor_bps
+from core.contracts.money import BASE_CURRENCY
+from engines.sizing.caps import cost_floor_bps, to_base
 from markets.registry import get as market_get
-from markets.registry import mic_of
+from markets.registry import market_currency, mic_of
 from knowledge.retrieval.pipeline import Router
 from ui.render import decomposition_bars, refusal_card
 
@@ -286,20 +287,30 @@ def _parse_evidence(pairs: list[str]):
 
 # --- portfolio risk -------------------------------------------------------
 def _parse_position(raw: str) -> Position:
-    """`MYX:1155:0.22:bank:MY[:0.01]` -> Position. Colons, because tickers have them."""
+    """`MYX:1155:0.22:bank:MY[:0.01[:MYR]]` -> Position. Colons, because tickers have them.
+
+    The currency comes from the MARKET, not from the country field. It used to be
+    `currency=parts[4]`, so a Bursa holding typed with country `MY` carried the
+    currency `MY`, which is not `MYR` - and `check()` counts anything that is not
+    the base currency as foreign-currency exposure. A book of nothing but Bursa
+    stocks therefore reported 100% foreign exposure and breached the 50% limit:
+    a refusal produced by a typo in a field nobody was looking at.
+    """
     parts = raw.split(":")
     if len(parts) < 5:
         raise SystemExit(
-            f"--position wants MIC:CODE:weight:sector:country[:risk_to_stop], got {raw!r}"
+            f"--position wants MIC:CODE:weight:sector:country[:risk_to_stop[:currency]], "
+            f"got {raw!r}"
         )
     instrument = f"{parts[0]}:{parts[1]}"
     try:
         weight = float(parts[2])
-        risk = float(parts[5]) if len(parts) > 5 else 0.0
+        risk = float(parts[5]) if len(parts) > 5 and parts[5] else 0.0
     except ValueError:
         raise SystemExit(f"--position weight/risk must be numbers, got {raw!r}")
+    currency = parts[6].upper() if len(parts) > 6 and parts[6] else market_currency(parts[0])
     return Position(instrument_id=instrument, weight=weight, sector=parts[3],
-                    country=parts[4], currency=parts[4], risk_to_stop=risk)
+                    country=parts[4], currency=currency, risk_to_stop=risk)
 
 
 def cmd_risk(a) -> int:
@@ -372,16 +383,32 @@ def cmd_size(a) -> int:
         cost_note = (f"no adapter for {mic}; using {a.cost_bps} bps with a "
                      f"{a.cost_minimum} minimum per side")
 
+    # --price, --adv and the fee schedule are in the MARKET's currency; --portfolio
+    # is the book's, which is MYR. Sizing one against the other without a rate is
+    # wrong by exactly that rate, so say so rather than print a plausible number.
+    quote = market_currency(mic)
+    fx = Decimal(str(a.fx)) if a.fx else None
+    if quote != BASE_CURRENCY and fx is None:
+        print(f"sizing    {a.instrument}")
+        print(f"  {mic} prices in {quote}; --portfolio is {BASE_CURRENCY}. Pass "
+              f"--fx <{BASE_CURRENCY} per {quote}> so the two can be compared.")
+        print(f"  Without it the position would be off by the {BASE_CURRENCY}/{quote} "
+              f"rate and would still look correctly sized.")
+        return 2
+
     caps, findings = a13.caps(
         portfolio_value=portfolio, stop_distance_frac=stop_frac,
         adv_20d=Decimal(str(a.adv)), round_trip_cost_at=round_trip_cost_at,
         risk_per_trade=Decimal(str(a.risk_per_trade)),
         single_name_limit=Decimal(str(a.single_name)),
         win_rate=a.win_rate, payoff=a.payoff, n_trades=a.n_trades, mic=mic,
+        fx_base_per_quote=fx,
     )
-    print(f"sizing    {a.instrument}  portfolio {portfolio:,.2f}  "
+    print(f"sizing    {a.instrument}  portfolio {BASE_CURRENCY} {portfolio:,.2f}  "
           f"stop distance {stop_frac:.1%}")
     print(f"cost      {cost_note}")
+    if quote != BASE_CURRENCY:
+        print(f"fx        1 {quote} = {BASE_CURRENCY} {fx}")
     for f in findings:
         print(f"  {f.text}")
         for c in f.caveats:
@@ -389,12 +416,17 @@ def cmd_size(a) -> int:
 
     binding, value = caps.binding()
     units = int(value / price) // a.lot * a.lot
-    print(f"\n  binding cap {binding.value} at {value:,.2f}")
+    print(f"\n  binding cap {binding.value} at {quote} {value:,.2f}")
     if units < a.lot:
         print(f"  -> no position: the binding cap does not fund one {a.lot}-share lot "
-              f"at {price}")
+              f"at {quote} {price}")
     else:
-        print(f"  -> {units:,} units ({units * float(price):,.2f}) in lots of {a.lot}")
+        native = Decimal(units) * price
+        base = to_base(native, quote, fx)
+        shown = f"{quote} {native:,.2f}"
+        if quote != BASE_CURRENCY:
+            shown += f" = {BASE_CURRENCY} {base:,.2f}"
+        print(f"  -> {units:,} units ({shown}) in lots of {a.lot}")
     return 0
 
 
@@ -660,8 +692,13 @@ def main(argv=None) -> int:
 
     sz = sub.add_parser("size", help="turn a stance into lots, or into a refusal")
     sz.add_argument("instrument")
-    sz.add_argument("--portfolio", type=float, required=True)
-    sz.add_argument("--price", type=float, required=True)
+    sz.add_argument("--portfolio", type=float, required=True,
+                    help=f"investable capital, in {BASE_CURRENCY}")
+    sz.add_argument("--price", type=float, required=True,
+                    help="in the market's own currency, like --adv")
+    sz.add_argument("--fx", type=float, default=0.0,
+                    help=f"{BASE_CURRENCY} per 1 unit of the market's currency; "
+                         f"required for any market that does not price in {BASE_CURRENCY}")
     sz.add_argument("--stop", type=float, required=True)
     sz.add_argument("--adv", type=float, required=True, help="20-day average daily volume")
     sz.add_argument("--lot", type=int, default=100)

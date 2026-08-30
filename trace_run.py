@@ -34,6 +34,7 @@ from agents.learning.reflection import (
 )
 from agents.learning.teacher import A14Teacher, Learner
 from agents.portfolio.agents import A12PortfolioRisk, A13Sizing
+from engines.sizing.caps import CurrencyMismatch
 from agents.supervisor import A0Supervisor
 from agents.synthesis.agents import (
     A9Attribution, A10Thesis, A11RedTeam, Breaker, Stance,
@@ -328,7 +329,36 @@ def run(live: str | None = None) -> dict:
                     binding, value = caps.binding()
                     emit("engine", f"sizing.{label}", agent="a13_sizing",
                          portfolio=str(pv), binding_cap=binding.value,
-                         cap_value=str(value), detail=fs[0].text)
+                         cap_value=str(value), currency=caps.currency,
+                         detail=fs[0].text)
+
+                # The book is MYR and this market is not. The trace should show
+                # BOTH numbers, because a cap in USD is not a fact about the
+                # book and a cap in MYR does not buy shares.
+                nas = market_get("XNAS")
+                caps, fs = a13.caps(
+                    portfolio_value=Decimal(200_000),
+                    stop_distance_frac=Decimal("0.0833"),
+                    adv_20d=Decimal(30_000_000_000),
+                    round_trip_cost_at=nas.fee_schedule.round_trip,
+                    mic="XNAS", fx_base_per_quote=Decimal("4.20"))
+                binding, value = caps.binding()
+                emit("engine", "sizing.foreign", agent="a13_sizing",
+                     portfolio="MYR 200000", binding_cap=binding.value,
+                     cap_value=str(value), currency=caps.currency,
+                     cap_value_myr=str(value * Decimal("4.20")), detail=fs[0].text)
+                try:
+                    a13.caps(
+                        portfolio_value=Decimal(200_000),
+                        stop_distance_frac=Decimal("0.0833"),
+                        adv_20d=Decimal(30_000_000_000),
+                        round_trip_cost_at=nas.fee_schedule.round_trip,
+                        mic="XNAS")
+                    emit("engine", "sizing.no_rate", agent="a13_sizing",
+                         result="NOT REFUSED - an MYR cap was compared with a USD price")
+                except CurrencyMismatch as e:
+                    emit("engine", "sizing.no_rate", agent="a13_sizing",
+                         result="refused", reason=str(e)[:120])
 
         # 9 ── A14: the curriculum refuses to skip ahead
         with span("a14_teacher", kind="agent", agent="a14_teacher"):

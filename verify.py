@@ -129,6 +129,39 @@ def main() -> int:
     floor = cost_floor_value(mget("XKLS").fee_schedule.round_trip, "XKLS")
     check("Bursa minimum economic position", DD("3000") < floor < DD("8000"), f"RM {floor:,.0f}")
 
+    # The book is MYR; a US price is not. Sizing one against the other is wrong
+    # by exactly the exchange rate and looks entirely reasonable, so the seam
+    # refuses rather than converts on a guess.
+    from datetime import date as _date
+    from engines.sizing.caps import (
+        Band as _Band, CapSet, CurrencyMismatch, concentration_cap, to_quote)
+    from engines.sizing.decision import size as _size
+    from markets.registry import market_currency
+    check("market currency comes from the adapter",
+          market_currency("MYX") == "MYR" and market_currency("XNAS") == "USD")
+    _brk = ("ROIC below 8% for two quarters", "net debt/EBITDA above 4x")
+    _nas = mget("XNAS")
+    try:
+        _size("XNAS:NVDA", _Band.ACCUMULATE, DD("500000"),
+              CapSet(DD("40000"), None, DD("40000"), DD("9e9"), DD("1")),
+              DD("180"), 1, DD("165"), _brk, _date(2028, 1, 1),
+              _nas.fee_schedule.round_trip, mic="XNAS", currency="USD",
+              fx_base_per_quote=DD("4.20"))
+        check("an MYR cap cannot size a USD price", False)
+    except CurrencyMismatch:
+        check("an MYR cap cannot size a USD price", True)
+    _book = DD("500000")
+    _d = _size("XNAS:NVDA", _Band.ACCUMULATE, _book,
+               CapSet(DD("45018"), None,
+                      to_quote(concentration_cap(_book, DD("0.08")), "USD", DD("4.20")),
+                      DD("9e9"), DD("1"), currency="USD"),
+               DD("180"), 1, DD("165"), _brk, _date(2028, 1, 1),
+               _nas.fee_schedule.round_trip, mic="XNAS", currency="USD",
+               fx_base_per_quote=DD("4.20"))
+    check("an 8% cap never funds a 33% position",
+          _d.base_value <= _book * DD("0.08"),
+          f"USD {_d.target_value:,.0f} = RM {_d.base_value:,.0f} of RM {_book:,.0f}")
+
     print("\n8. News features and catalyst matching")
     from datetime import datetime as _dt, timezone as _tz
     from knowledge.news.features import LexiconExtractor, near_duplicate_hash
