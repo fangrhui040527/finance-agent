@@ -507,17 +507,38 @@ def cmd_size(a) -> int:
     # wrong by exactly that rate, so say so rather than print a plausible number.
     quote = market_currency(mic)
     fx = Decimal(str(a.fx)) if a.fx else None
+    fx_note = ""
+    if quote != BASE_CURRENCY and fx is None and getattr(a, "fetch_fx", False):
+        from core.market.fx import BnmFxFeed, FxFeedError
+        from core.market.prices import FxStore
+
+        store = FxStore()
+        try:
+            BnmFxFeed().populate(store)
+        except FxFeedError as e:
+            print(f"no FX rate: {e}", file=sys.stderr)
+            return 3
+        hit = store.rate_asof(quote, BASE_CURRENCY, date.today())
+        if hit is None:
+            print(f"no FX rate: BNM publishes no {quote} rate", file=sys.stderr)
+            return 3
+        fx, asof = hit
+        fx_note = f"  fx 1 {quote} = {BASE_CURRENCY} {fx} (BNM middle rate, {asof})"
     if quote != BASE_CURRENCY and fx is None:
         print(f"sizing    {a.instrument}")
         print(
             f"  {mic} prices in {quote}; --portfolio is {BASE_CURRENCY}. Pass "
-            f"--fx <{BASE_CURRENCY} per {quote}> so the two can be compared."
+            f"--fx <{BASE_CURRENCY} per {quote}>, or --fetch-fx to look it up "
+            f"from BNM, so the two can be compared."
         )
         print(
             f"  Without it the position would be off by the {BASE_CURRENCY}/{quote} "
             f"rate and would still look correctly sized."
         )
         return 2
+
+    if fx_note:
+        print(fx_note)
 
     caps, findings = a13.caps(
         portfolio_value=portfolio,
@@ -598,6 +619,39 @@ def cmd_learn(a) -> int:
 
 
 # --- which model is actually answering ------------------------------------
+
+
+def cmd_news(a) -> int:
+    """Pull one configured source through the registry and show what arrived.
+
+    The ingest contract on the command line: a broken source raises and exits
+    3; a quiet window prints its own emptiness rather than pretending."""
+    from datetime import timedelta as _td
+
+    from knowledge.feeds.adapter import FeedError
+    from knowledge.feeds.registry import UnknownSource, adapter_for
+
+    try:
+        feed = adapter_for(a.source)
+    except UnknownSource as e:
+        print(str(e), file=sys.stderr)
+        return 2
+    since = datetime.now(UTC) - _td(hours=a.hours)
+    try:
+        records = feed.fetch(since, limit=a.limit)
+    except FeedError as e:
+        print(f"no news: {e}", file=sys.stderr)
+        return 3
+    articles, stats = feed.normalize(records)
+    print(f"{feed.name}  since {a.hours}h ago  {stats}")
+    for art in articles[: a.limit]:
+        when = art.published_at.strftime("%Y-%m-%d %H:%M")
+        print(f"  {when}  {art.source_domain:<24} {art.title}")
+    if not articles:
+        print("  (a quiet window, reported as one - not an error)")
+    return 0
+
+
 def cmd_doctor(a) -> int:
     from core.doctor import FAIL, render, run_checks
 
@@ -884,6 +938,12 @@ def main(argv=None) -> int:
         help=f"{BASE_CURRENCY} per 1 unit of the market's currency; "
         f"required for any market that does not price in {BASE_CURRENCY}",
     )
+    sz.add_argument(
+        "--fetch-fx",
+        action="store_true",
+        help="look the rate up from Bank Negara Malaysia (keyless, dated) "
+        "instead of typing --fx; the as-of date is printed with the answer",
+    )
     sz.add_argument("--stop", type=float, required=True)
     sz.add_argument("--adv", type=float, required=True, help="20-day average daily volume")
     sz.add_argument("--lot", type=int, default=100)
@@ -953,6 +1013,12 @@ def main(argv=None) -> int:
     bk = sub.add_parser("backend", help="which model is actually answering")
     bk.add_argument("--use", choices=["anthropic", "echo"], help="force one")
     bk.set_defaults(fn=cmd_backend)
+
+    nw = sub.add_parser("news", help="pull one source through the feed registry")
+    nw.add_argument("source", help="a name from knowledge/feeds/registry.py, e.g. gdelt")
+    nw.add_argument("--hours", type=int, default=24, help="window back from now")
+    nw.add_argument("--limit", type=int, default=20)
+    nw.set_defaults(fn=cmd_news)
 
     dr = sub.add_parser("doctor", help="preflight: what this installation can actually do")
     dr.add_argument("--offline", action="store_true", help="skip the two network probes")

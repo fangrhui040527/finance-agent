@@ -36,6 +36,15 @@ make lint         # ruff check + format check     make typecheck  # pyright
 make cov          # tests with the coverage floor (92%)
 ```
 
+## Added 2026-08-31
+
+```bash
+python ask.py news gdelt --hours 24     # one source through the feed registry
+python ask.py size XNAS:NVDA ... --fetch-fx   # BNM rate, dated, instead of --fx
+python predict.py reflect H-20260831-0042      # grade a cohort by its hypothesis
+python predict.py reflect H-... --second-opinion   # + advisory model read (spends)
+```
+
 Run all five before pushing. `make test` alone is not enough — see
 `08-VERIFICATION.md` for why each one exists.
 

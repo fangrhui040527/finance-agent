@@ -49,6 +49,16 @@ class AuthError(BackendError):
     """Missing, malformed or rejected credentials. Retrying cannot help."""
 
 
+class ContextOverflow(BackendError):
+    """The prompt exceeds the model's context window.
+
+    docs/13's taxonomy: this is neither transient (retrying the same prompt
+    hits the same wall) nor a generic bad request (the caller's next move is
+    to SHRINK - trim evidence, split the question - not to fix a field). A
+    flat 400 hid that distinction.
+    """
+
+
 class Billed(BackendError):
     """The model answered - and billed - but the answer cannot be returned.
 
@@ -206,6 +216,20 @@ class AnthropicBackend:
                 if e.status_code in (500, 502, 503, 529):
                     last = TransientError(f"Anthropic returned {e.status_code}: {e.message}")
                     retry_after = self._retry_after(e)
+                elif e.status_code == 400 and any(
+                    marker in str(e.message).lower()
+                    for marker in (
+                        "prompt is too long",
+                        "context length",
+                        "maximum context",
+                        "too many tokens",
+                    )
+                ):
+                    raise ContextOverflow(
+                        f"prompt exceeds the model's context window: {e.message}. "
+                        "Shrink the input - trim evidence or split the question; "
+                        "retrying the same prompt hits the same wall."
+                    ) from e
                 else:
                     raise BackendError(f"Anthropic returned {e.status_code}: {e.message}") from e
             except anthropic.APIConnectionError as e:  # includes APITimeoutError

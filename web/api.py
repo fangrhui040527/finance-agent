@@ -435,6 +435,22 @@ def trace_run(run_id: str) -> S.Envelope:
     )
 
 
+@router.get("/trace/runs/{run_id}/blob/{name}")
+def trace_blob(run_id: str, name: str) -> S.Envelope:
+    """One externalised prompt/response blob, verbatim. Names are sanitised the
+    same way the tracer writes them, so traversal cannot compose a path."""
+    from pathlib import Path
+
+    safe_run = "".join(c for c in run_id if c.isalnum() or c in "-_")
+    safe_name = "".join(c for c in name if c.isalnum() or c in "-_.")
+    p = Path("debug") / safe_run / "prompts" / safe_name
+    if safe_run != run_id or safe_name != name or not p.is_file() or p.suffix != ".txt":
+        raise HTTPException(status_code=404, detail=f"no blob {name!r} in {run_id!r}")
+    return S.Envelope(
+        text=p.read_text(encoding="utf-8"), data={"run_id": safe_run, "name": safe_name}
+    )
+
+
 # --- world and graph ------------------------------------------------------------
 
 

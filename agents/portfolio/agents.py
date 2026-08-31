@@ -258,7 +258,25 @@ class A13Sizing(Agent):
         liq = liquidity_cap(adv_20d, participation)
         floor = cost_floor_value(round_trip_cost_at, mic)
 
-        kelly, notes = None, []
+        # The liquidity cap is a LINEAR participation model. Above ~5% of ADV
+        # impact grows with the square root and linear understates it; below
+        # 0.5% fees dominate. Naming the regime keeps the cap honest about
+        # what it is and is not modelling.
+        from engines.backtest.costs import impact_model_for
+
+        regime = impact_model_for(float(participation))
+        impact_note = (
+            f"liquidity cap uses the linear participation model at "
+            f"{float(participation):.1%} of ADV"
+        )
+        if regime == "sqrt":
+            impact_note += (
+                " - ABOVE the linear regime; square-root impact says the true cost is higher"
+            )
+        elif regime == "fixed":
+            impact_note += " - below the impact floor; fees dominate at this size"
+
+        kelly, notes = None, [impact_note]
         if win_rate is not None and payoff is not None:
             self._guard_tool("kelly_cap")
             try:

@@ -58,6 +58,8 @@ if /I "%CMD%"=="typecheck" goto typecheck
 if /I "%CMD%"=="cov"     goto cov
 if /I "%CMD%"=="doctor"  goto doctor
 if /I "%CMD%"=="web"     goto web
+if /I "%CMD%"=="news"    goto news
+if /I "%CMD%"=="reflect" goto reflect
 if /I "%CMD%"=="verify"  goto verify
 if /I "%CMD%"=="stress"  goto stress
 if /I "%CMD%"=="config"  goto config
@@ -118,6 +120,14 @@ goto :eof
 
 :web
 "%PY%" -m web.serve
+goto :eof
+
+:news
+"%PY%" ask.py news%ARGS%
+goto :eof
+
+:reflect
+"%PY%" predict.py reflect%ARGS%
 goto :eof
 
 :verify
@@ -200,6 +210,8 @@ echo   run test                          the full suite
 echo   run lint ^| fmt ^| typecheck ^| cov  quality gates
 echo   run doctor                        preflight checks
 echo   run web                           the web app on 127.0.0.1:8765
+echo   run news gdelt                    pull one configured source
+echo   run reflect H-...                 grade a cohort by its hypothesis
 echo   run verify                        whole pipeline on mock data
 echo   run stress                        adversarial stress suite
 echo   run config                        settings, and where they came from
