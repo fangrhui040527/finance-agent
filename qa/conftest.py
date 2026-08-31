@@ -170,6 +170,11 @@ def scrubbed_env(tmp_path: Path, *, key: str | None = None) -> dict:
     env.pop("ANTHROPIC_API_KEY", None)
     env.pop("LLM_BACKEND", None)
     env.pop("FINPLANET_CHEAP", None)
+    # The CLI loads `.env` itself now (core/env.py), so popping variables from
+    # the parent is no longer enough to make a child keyless - the child would
+    # read the operator's populated file and quietly stop being the scenario
+    # under test. This is the loader's own documented opt-out.
+    env["FINPLANET_NO_DOTENV"] = "1"
     if key:
         env["ANTHROPIC_API_KEY"] = key
     env["PYTHONIOENCODING"] = "utf-8"
