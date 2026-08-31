@@ -128,7 +128,9 @@ class AnthropicBackend:
         max_attempts: int = 3,
         client: Any | None = None,
         sleep=None,
+        jitter=None,
     ) -> None:
+        import random
         import time
 
         if max_tokens < 1:
@@ -139,6 +141,9 @@ class AnthropicBackend:
         self.max_tokens = max_tokens
         self.max_attempts = max_attempts
         self._sleep = sleep if sleep is not None else time.sleep
+        # Injectable so the backoff curve is testable without waiting for it,
+        # and so a test can pin the randomness it is asserting about.
+        self._jitter = jitter if jitter is not None else random.uniform
         self.last_request_id: str | None = None
 
         if client is not None:
@@ -240,8 +245,18 @@ class AnthropicBackend:
                 raise last
             # The server's own instruction outranks the client's guess: a 429
             # says exactly how long the token bucket needs, and retrying sooner
-            # only extends the wait. Absent or unreadable, exponential as before.
-            self._sleep(retry_after if retry_after is not None else 2.0 ** (attempt - 1))
+            # only extends the wait. That one is obeyed EXACTLY - jittering an
+            # instruction is just disobeying it by a random amount.
+            #
+            # Absent a header, the wait is exponential with jitter. Without the
+            # jitter every client that hit the same 529 backs off on the same
+            # curve and returns at the same instant, which is the collision the
+            # backoff existed to avoid - and this system has three surfaces (CLI,
+            # MCP, web) that can be talking to the same overloaded endpoint.
+            if retry_after is not None:
+                self._sleep(retry_after)
+            else:
+                self._sleep(self._jitter(0.5, 1.0) * 2.0 ** (attempt - 1))
         raise last if last is not None else BackendError("retry loop exited without a result")
 
     @staticmethod

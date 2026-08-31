@@ -226,13 +226,33 @@ def test_retry_after_is_capped_so_a_hostile_header_cannot_park_a_call():
 
 
 def test_a_non_numeric_retry_after_falls_back_to_exponential_backoff():
+    """An HTTP-date retry-after is not seconds, so the computed curve applies.
+
+    That curve is jittered (a 529 is server-wide, and every client returning
+    together re-collides), so `jitter` is injected to keep the assertion exact.
+    """
     waits: list[float] = []
     fake, _ = _flaky(529, {"retry-after": "Wed, 21 Oct 2026 07:28:00 GMT"})
     with pytest.raises(TransientError):
-        AnthropicBackend(client=fake, max_attempts=3, sleep=waits.append).complete(
-            "claude-opus-5", "q", None
-        )
+        AnthropicBackend(
+            client=fake,
+            max_attempts=3,
+            sleep=waits.append,
+            jitter=lambda lo, hi: 1.0,
+        ).complete("claude-opus-5", "q", None)
     assert waits == [1.0, 2.0]
+
+
+def test_a_numeric_retry_after_is_obeyed_exactly_and_never_jittered():
+    """Jittering an instruction is disobeying it by a random amount."""
+    for _ in range(4):
+        waits: list[float] = []
+        fake, _ = _flaky(429, {"retry-after": "7"})
+        with pytest.raises(TransientError):
+            AnthropicBackend(client=fake, max_attempts=2, sleep=waits.append).complete(
+                "claude-opus-5", "q", None
+            )
+        assert waits == [7.0]
 
 
 # ---------------------------------------------------------------- 3. spend that raised

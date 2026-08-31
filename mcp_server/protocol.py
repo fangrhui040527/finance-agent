@@ -148,6 +148,17 @@ class Server:
         """Read requests until EOF. Injectable streams so this is testable."""
         stdin = stdin or sys.stdin
         stdout = stdout or sys.stdout
+        # stdout is the JSON-RPC wire, not a console. A Windows text stream
+        # rewrites every newline it is given as CR-LF, which put a stray CR
+        # on the end of every frame this server has ever sent. Turning the
+        # translation off is the only thing that actually stops it - writing
+        # the character some other way writes the same character.
+        reconfigure = getattr(stdout, "reconfigure", None)
+        if reconfigure is not None:
+            try:
+                reconfigure(newline=LF)
+            except (ValueError, OSError):
+                pass  # a wrapped or captured stream; framing still works
         for line in stdin:
             line = line.strip()
             if not line:
@@ -186,6 +197,26 @@ def _error(rid: Any, code: int, message: str, data: dict | None = None) -> dict:
     return {"jsonrpc": "2.0", "id": rid, "error": err}
 
 
+#: The frame terminator. Written as an explicit character so no stream's
+#: newline translation can turn it into something else.
+LF = chr(10)
+
+#: The frame terminator this protocol requires, named so the reconfigure
+#: call in `serve()` and the write in `_write` cannot drift apart.
+LF = chr(10)
+
+
 def _write(stream, payload: dict) -> None:
+    """One frame per line.
+
+    The terminator has to be a bare LF on every platform, and writing "\n"
+    is not enough to make it one: a Windows text stream translates the
+    newline on the way out, so every frame this server sent left ending
+    CR-LF. JSON treats the trailing CR as whitespace and a newline-splitting
+    client still parses it, which is why it went unnoticed - but the stdio
+    convention is a bare LF, and a client framing on raw bytes keeps a stray
+    CR on every message. `serve()` turns the translation off; this stays
+    simple so there is one place to look.
+    """
     stream.write(json.dumps(payload) + "\n")
     stream.flush()

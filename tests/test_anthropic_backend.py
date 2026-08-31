@@ -262,13 +262,40 @@ def test_a_retry_that_succeeds_returns_the_answer():
 
 
 def test_backoff_is_exponential_and_bounded():
+    """The curve doubles, and `jitter` is injected so it is still exact."""
     waits: list[float] = []
     fake = FakeAnthropic([http_status_error(500)] * 3)
     with pytest.raises(TransientError):
-        _backend(client=fake, max_attempts=3, sleep=waits.append).complete(
-            "claude-sonnet-5", "q", None
-        )
+        _backend(
+            client=fake,
+            max_attempts=3,
+            sleep=waits.append,
+            jitter=lambda lo, hi: 1.0,
+        ).complete("claude-sonnet-5", "q", None)
     assert waits == [1.0, 2.0]
+
+
+def test_backoff_is_jittered_so_clients_do_not_reconverge():
+    """Two clients that hit the same 529 must not return at the same instant.
+
+    Without jitter every caller backs off on the identical curve and collides
+    again on each attempt - the thundering herd the backoff exists to break up.
+    This system has three surfaces that can be talking to the same endpoint.
+    """
+    curves = []
+    for _ in range(6):
+        waits: list[float] = []
+        fake = FakeAnthropic([http_status_error(529)] * 3)
+        with pytest.raises(TransientError):
+            _backend(client=fake, max_attempts=3, sleep=waits.append).complete(
+                "claude-sonnet-5", "q", None
+            )
+        curves.append(tuple(waits))
+    assert len(set(curves)) > 1, f"identical curve every time: {curves[0]}"
+    # Still bounded, and still growing: draw n is in [0.5, 1.0] x 2^(n-1).
+    for first, second in curves:
+        assert 0.5 <= first <= 1.0
+        assert 1.0 <= second <= 2.0
 
 
 def test_an_unreachable_host_is_transient():

@@ -57,6 +57,7 @@ if /I "%CMD%"=="fmt"     goto fmt
 if /I "%CMD%"=="typecheck" goto typecheck
 if /I "%CMD%"=="cov"     goto cov
 if /I "%CMD%"=="doctor"  goto doctor
+if /I "%CMD%"=="audit"   goto audit
 if /I "%CMD%"=="web"     goto web
 if /I "%CMD%"=="news"    goto news
 if /I "%CMD%"=="watch"   goto watch
@@ -121,6 +122,10 @@ goto :eof
 
 :doctor
 "%PY%" ask.py doctor%ARGS%
+goto :eof
+
+:audit
+"%PY%" audit\run.py%ARGS%
 goto :eof
 
 :web
@@ -233,6 +238,7 @@ echo.
 echo   run install                       create .venv and install
 echo   run test                          the full suite
 echo   run lint ^| fmt ^| typecheck ^| cov  quality gates
+echo   run audit                          readiness audit: PERFUMES, OWASP, G-Eval
 echo   run doctor                        preflight checks
 echo   run web                           the web app on 127.0.0.1:8765
 echo   run news gdelt                    pull one configured source
