@@ -13,7 +13,10 @@ FORBIDDEN = re.compile(
     r"alpaca|ib_insync|ccxt\.)\b",
     re.I,
 )
-SKIP_DIRS = {".git", ".venv", "docs", "__pycache__", ".pytest_cache", "node_modules"}
+# `debug/` is gitignored runtime output: every trace report RENDERS the denied
+# place_order refusal by name (the same reason trace_run.py is allowlisted), so
+# the day the scan learned .html it started failing on its own evidence.
+SKIP_DIRS = {".git", ".venv", "docs", "debug", "__pycache__", ".pytest_cache", "node_modules"}
 
 # Files that must name the forbidden tools in order to deny them. Exact paths,
 # not basenames: a basename allowlist would hand a free pass to any new file
@@ -30,6 +33,7 @@ ALLOWED_PATHS = {
     # design that showed the guardrail working without naming what it stopped
     # would be showing nothing.
     "design/b5.py",
+    "design/Trace.dc.html",
     "tests/test_guardrail_chain.py",
     "tests/test_registry.py",
     "tests/test_agents.py",
@@ -40,7 +44,15 @@ ALLOWED_PATHS = {
 def test_no_execution_code_in_repo():
     offenders = []
     for path in ROOT.rglob("*"):
-        if not path.is_file() or path.suffix not in {".py", ".yaml", ".yml", ".toml"}:
+        if not path.is_file() or path.suffix not in {
+            ".py",
+            ".yaml",
+            ".yml",
+            ".toml",
+            ".js",
+            ".html",
+            ".css",
+        }:
             continue
         rel = path.relative_to(ROOT)
         if SKIP_DIRS & set(rel.parts):

@@ -45,7 +45,7 @@ dev = [
 ]
 
 [tool.setuptools.packages.find]
-include = ["core*", "knowledge*", "markets*", "engines*", "agents*", "ui*", "mcp_server*"]
+include = ["core*", "knowledge*", "markets*", "engines*", "agents*", "ui*", "mcp_server*", "web*"]
 
 # --- pytest ------------------------------------------------------------------
 [tool.pytest.ini_options]
@@ -58,7 +58,7 @@ filterwarnings = ["error::DeprecationWarning:core", "error::DeprecationWarning:e
 # points under it and ratchets up, never down. Root scripts (ask.py, predict.py,
 # verify.py, trace_run.py) are exercised through their own CI steps, not here.
 [tool.coverage.run]
-source = ["core", "engines", "markets", "agents", "knowledge", "mcp_server", "ui"]
+source = ["core", "engines", "markets", "agents", "knowledge", "mcp_server", "ui", "web"]
 omit = ["design/*", "stress/*", "qa/*", "debug/*", "tests/*", "*/__main__.py"]
 branch = false
 
@@ -111,7 +111,7 @@ line-ending = "lf"
 
 # --- pyright -----------------------------------------------------------------
 [tool.pyright]
-include = ["core", "engines", "markets", "agents", "mcp_server", "knowledge", "ui"]
+include = ["core", "engines", "markets", "agents", "mcp_server", "knowledge", "ui", "web"]
 exclude = ["**/__pycache__", ".venv", "debug", "qa"]
 typeCheckingMode = "basic"
 pythonVersion = "3.11"
