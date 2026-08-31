@@ -1145,6 +1145,7 @@ def s_mcp():
         },
         "plan_question": {"question": "why did it move"},
         "explain_concept": {},
+        "log_hypothesis": {"title": "t", "thesis": "x", "db": ":memory:"},
         "log_prediction": {
             "instrument": "MYX:1155",
             "direction": 1,

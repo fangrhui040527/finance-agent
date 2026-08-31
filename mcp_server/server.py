@@ -284,6 +284,21 @@ S.tool(
 )(T.log_prediction)
 
 S.tool(
+    "log_hypothesis",
+    "Register the IDEA above the predictions - append-only. A hypothesis "
+    "gains status events and prediction links over its life but is never "
+    "edited, so a thesis cannot quietly survive its own dead calls.",
+    obj(
+        {
+            "title": _str("short name for the idea"),
+            "thesis": _str("the falsifiable claim, one sentence"),
+            "db": _str("optional store path"),
+        },
+        ["title", "thesis"],
+    ),
+)(T.log_hypothesis)
+
+S.tool(
     "explain_path",
     "Why are two entities connected, and how strongly? The multi-hop question "
     "vector search cannot answer. Returns the chain, a per-hop decayed weight, "

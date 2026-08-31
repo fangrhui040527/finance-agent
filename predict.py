@@ -147,6 +147,46 @@ def cmd_status(a) -> int:
     return 0
 
 
+def cmd_hypothesis(a) -> int:
+    """The registry above the predictions: ideas, their lives, their cohorts."""
+    from agents.learning.hypotheses import STATUSES, HypothesisStore
+
+    with HypothesisStore(a.db) as store:
+        if a.hcmd == "new":
+            hid = store.create(a.title, a.thesis)
+            print(f"created {hid}  (status: exploring)")
+            print("  link predictions with:  predict hypothesis link " + hid + " <prediction_id>")
+            return 0
+        if a.hcmd == "status":
+            store.transition(a.hypothesis_id, a.to, note=a.note or "")
+            v = store.get(a.hypothesis_id)
+            print(
+                f"{v.hypothesis_id} -> {v.status}"
+                + (f"  ({v.status_note})" if v.status_note else "")
+            )
+            return 0
+        if a.hcmd == "link":
+            store.link(a.hypothesis_id, a.prediction_id)
+            v = store.get(a.hypothesis_id)
+            print(f"{v.hypothesis_id} now carries {len(v.prediction_ids)} prediction(s)")
+            return 0
+        # list
+        views = store.all(status=a.only)
+        if not views:
+            scope = f" with status {a.only}" if a.only else ""
+            print(f"no hypotheses{scope}. An idea worth money is worth a row here first.")
+            return 0
+        for v in views:
+            print(f"{v.hypothesis_id}  [{v.status:<10}] {v.title}")
+            print(f"    {v.thesis}")
+            if v.prediction_ids:
+                print(f"    predictions: {', '.join(v.prediction_ids)}")
+            if v.status_note and v.status in ("validated", "rejected"):
+                print(f"    verdict note: {v.status_note}")
+        print(f"\n{len(views)} hypothesis(es); statuses: {', '.join(STATUSES)}")
+        return 0
+
+
 def main(argv=None) -> int:
     from core.logging import configure as _configure_logging
 
@@ -189,6 +229,23 @@ def main(argv=None) -> int:
 
     st = sub.add_parser("status", help="the calibration table")
     st.set_defaults(fn=cmd_status)
+
+    hy = sub.add_parser("hypothesis", help="the idea above the predictions")
+    hsub = hy.add_subparsers(dest="hcmd", required=True)
+    hn = hsub.add_parser("new", help="register an idea, append-only")
+    hn.add_argument("title")
+    hn.add_argument("thesis", help="the falsifiable claim, one sentence")
+    hs = hsub.add_parser("status", help="record a transition (a new event, never an edit)")
+    hs.add_argument("hypothesis_id")
+    hs.add_argument("to", choices=["exploring", "testing", "validated", "rejected", "monitoring"])
+    hs.add_argument("--note", help="required for validated/rejected: the why")
+    hl = hsub.add_parser("link", help="tie a logged prediction to the idea it tests")
+    hl.add_argument("hypothesis_id")
+    hl.add_argument("prediction_id")
+    hls = hsub.add_parser("list", help="every idea and where it stands")
+    hls.add_argument("--only", help="filter by status")
+    for p_ in (hn, hs, hl, hls):
+        p_.set_defaults(fn=cmd_hypothesis)
 
     a = ap.parse_args(argv)
     return a.fn(a)

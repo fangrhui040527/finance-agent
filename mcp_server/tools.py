@@ -703,6 +703,32 @@ def explain_concept(concept: str = "", mastered: list | None = None) -> str:
     return _lines(a14.run(concept, learner))
 
 
+def log_hypothesis(
+    title: str,
+    thesis: str,
+    db=None,
+) -> str:
+    """Register the IDEA above the predictions. Append-only, like everything
+    else in the learning store: a hypothesis can gain events and links but can
+    never be edited, so a thesis cannot quietly survive its own dead calls."""
+    from agents.learning.hypotheses import HypothesisStore
+    from agents.learning.store import DEFAULT_PATH
+
+    if not title.strip() or not thesis.strip():
+        raise ToolError("a hypothesis needs both a title and a falsifiable thesis")
+    with HypothesisStore(db or DEFAULT_PATH) as store:
+        try:
+            hid = store.create(title, thesis, created_by="mcp")
+        except (ValueError, sqlite3.IntegrityError) as e:
+            return f"REFUSED: {e}"
+        n = len(store.all())
+    return (
+        f"registered {hid} (status: exploring)\n"
+        f"  the registry holds {n} hypothesis(es)\n"
+        f"  link predictions to it with log_prediction + predict.py hypothesis link"
+    )
+
+
 def log_prediction(
     instrument: str, direction: int, horizon_days: int, confidence: float, thesis: str, db: str = ""
 ) -> str:
