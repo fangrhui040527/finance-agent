@@ -1146,6 +1146,13 @@ def s_mcp():
         "plan_question": {"question": "why did it move"},
         "explain_concept": {},
         "log_hypothesis": {"title": "t", "thesis": "x", "db": ":memory:"},
+        # Observability tools: read-only, and each must answer on an EMPTY
+        # installation - "nothing has run yet" is the honest answer, and a
+        # monitor that crashes on a fresh machine is not a monitor.
+        "system_health": {"offline": True},
+        "operating_report": {"days": 1, "db": ":memory:"},
+        "recent_failures": {"runs": 1, "db": ":memory:"},
+        "run_anatomy": {},
         "log_prediction": {
             "instrument": "MYX:1155",
             "direction": 1,

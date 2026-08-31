@@ -164,3 +164,34 @@ this repository that tells you whether any of it works.
   offers its own - never claims a version it has not implemented.
 - The web app (`make web`) exposes the same tool functions over HTTP for a
   browser; the MCP surface remains the model-facing one.
+
+---
+
+## Watching the machine itself (2026-08-31)
+
+Four read-only tools let the model that drives this system also monitor it.
+They exist because a stubbed backend or a missing database explains more odd
+output than any amount of reasoning about the output.
+
+| Tool | Answers |
+|---|---|
+| `system_health` | What can this installation do right now, and what does each gap affect? (`offline=false` also probes the price and news sources.) |
+| `operating_report` | Over N days: calls, spend, budget headroom, which MODELS actually answered, p50/p95 latency, cache hits, and the dropped-claim rate. |
+| `recent_failures` | Across recent traced runs: errors with their text, guardrail denials, refusals, and the run id to open. |
+| `run_anatomy` | One run: where the time went, what was denied - and whether the METHODOLOGY changed since the run before it. |
+
+Two properties hold across all four:
+
+* **Absent evidence is reported as absent.** An empty ledger is "nothing has
+  run yet", never a clean bill of health; a failure scan states how many runs
+  it looked at, because an untraced run cannot be reported on.
+* **No prompt text is ever returned.** Traces hold verbatim prompts,
+  responses and whatever positions were passed in. These tools give the
+  error, the event and the run id; reading the text is a decision the
+  operator makes by opening `debug/<run_id>/`.
+
+`run_anatomy`'s methodology check is the one worth knowing about. The
+manifest hashes the system prompts, the registry, the tool surface and the
+package versions - never the run id or the timestamp - so an equal hash means
+an equal method, and a surprising run can be attributed to the DATA rather
+than to a change nobody remembers making.

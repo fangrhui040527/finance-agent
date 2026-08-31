@@ -42,6 +42,7 @@ from __future__ import annotations
 
 import sys
 
+from mcp_server import observability as O
 from mcp_server import tools as T
 from mcp_server.protocol import Server
 
@@ -67,6 +68,13 @@ Three habits that make the output trustworthy:
 3. NEVER INVENT A NUMBER A TOOL CAN GIVE YOU. If price data is absent the tool
    says NO DATA. Say so. An estimated price is indistinguishable from a real one
    once it is in the narrative, and this system is used to make money decisions.
+
+4. WHEN SOMETHING LOOKS WRONG, LOOK AT THE MACHINE. system_health says what
+   this installation can currently do; operating_report says what it has been
+   doing and what it cost; recent_failures says what broke and in which run;
+   run_anatomy opens one run and says whether the METHOD changed since the
+   last one. A stubbed backend or a missing database explains more odd output
+   than any amount of reasoning about the output itself.
 
 Nothing here places orders, and nothing here is financial advice. Output is
 analysis with an evidence chain.
@@ -297,6 +305,68 @@ S.tool(
         ["title", "thesis"],
     ),
 )(T.log_hypothesis)
+
+# --------------------------------------------------------------------------
+# Watching the machine itself. Read-only, and none of it returns prompt text.
+# --------------------------------------------------------------------------
+
+S.tool(
+    "system_health",
+    "Preflight: what this installation can actually do right now, and what "
+    "each gap affects - config, registry, stores, model backend, spend cap, "
+    "trace retention, and (with offline=false) whether the price and news "
+    "sources are reachable. Call this FIRST when anything behaves oddly: a "
+    "missing database or a stubbed backend explains more failures than any "
+    "amount of reasoning about the output.",
+    obj(
+        {
+            "offline": {
+                "type": "boolean",
+                "description": "skip the two network probes (default true)",
+            }
+        }
+    ),
+)(O.system_health)
+
+S.tool(
+    "operating_report",
+    "Cost, latency, model mix and citation health over the last N days: how "
+    "many model calls, at what price, on which models, how slow (p50/p95), "
+    "how close to the daily budget, and how many claims were DROPPED for "
+    "want of a citation. An empty ledger is reported as 'nothing has run', "
+    "never as a clean bill of health.",
+    obj(
+        {
+            "days": {"type": "integer", "description": "window in days (default 7)"},
+            "db": _str("optional ledger path"),
+        }
+    ),
+)(O.operating_report)
+
+S.tool(
+    "recent_failures",
+    "Errors, guardrail denials and dropped claims across recent traced runs. "
+    "Reports what failed, where, and how often - error text, event name, run "
+    "id - so a bug can be located. Never returns prompt or response text: "
+    "traces hold verbatim prompts and portfolio positions, and releasing "
+    "those is the operator's decision, not a tool's.",
+    obj(
+        {
+            "runs": {"type": "integer", "description": "how many recent runs to scan (default 10)"},
+            "db": _str("optional ledger path"),
+        }
+    ),
+)(O.recent_failures)
+
+S.tool(
+    "run_anatomy",
+    "One traced run in detail: where the time went, what was denied, what "
+    "raised - and whether the METHODOLOGY changed since the run before it. "
+    "That last part answers the question a surprising run actually raises: "
+    "did the system change, or did the world? Omit run_id for the most "
+    "recent run.",
+    obj({"run_id": _str("e.g. '20260831T083520-5963bf'; omit for the latest")}),
+)(O.run_anatomy)
 
 S.tool(
     "explain_path",

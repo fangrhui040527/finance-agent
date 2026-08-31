@@ -371,6 +371,19 @@ class ProvenanceLedger:
         )
         return [float(r["latency_ms"]) for r in rows]
 
+    def claims_between(self, start: datetime, end: datetime) -> list[sqlite3.Row]:
+        """Claims verified in a window, survivors and drops alike.
+
+        The table has been written since P0 and read by nothing but the
+        fitness function: a dropped claim is the system declining to say
+        something it could not support, which is the quality signal most
+        worth watching, and it was unreadable.
+        """
+        return self._rows(
+            "SELECT * FROM claims WHERE at >= ? AND at <= ? ORDER BY at",
+            (start.isoformat(), end.isoformat()),
+        )
+
     def runs_between(self, start: datetime, end: datetime) -> list[str]:
         return [
             r[0]
