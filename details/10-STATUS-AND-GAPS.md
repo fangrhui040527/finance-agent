@@ -61,6 +61,10 @@ surface; the artboards remain the visual specification the screens follow.
 marked "no key"**. Exactly **one is enabled** in `config.toml` — `gdelt`, which
 is free, keyless, worldwide and covers 100+ languages.
 
+A generic `knowledge/feeds/rss.RssFeed` (2026-08-31) now covers any RSS/Atom
+source as ONE LINE in `knowledge/feeds/registry.py`; the scoping judgement
+below still stands for which lines are worth adding.
+
 That leaves 32 sources that need no key and have no adapter. Each would be a
 class implementing the same offline-safe contract as
 `knowledge/feeds/adapter.py`: a disabled or failing feed must say so rather than
@@ -73,12 +77,11 @@ prevent.
 
 ### An FX rate source
 
-`core/market/prices.FxStore` exists and works — explicit dated rates,
-`rate_asof()` with bisect lookup and an inverse-pair fallback. **Nothing
-populates it.** The rate is supplied per call today.
-
-**Blocked on:** a source decision. `config.toml` carries
-`fx_myr_per_usd = 4.15` for cost estimates only and says so.
+**BUILT** (2026-08-31): `core/market/fx.BnmFxFeed` fills the store from Bank
+Negara Malaysia's public API — keyless, official, MYR-native, with per-100
+units honoured (JPY/IDR/KRW) and every rate dated. Sizing still takes an
+explicit rate per call; the store is the source an operator populates when
+they want dated rates instead of the planning constant.
 
 ### A semantic graph tier
 

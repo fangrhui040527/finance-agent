@@ -47,8 +47,8 @@ class FakeResponse:
         self.headers = headers or {}
         self.status = status
 
-    def read(self) -> bytes:
-        return self._body
+    def read(self, n: int = -1) -> bytes:
+        return self._body if n is None or n < 0 else self._body[:n]
 
     def getcode(self) -> int:
         return self.status
