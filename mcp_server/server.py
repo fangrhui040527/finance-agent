@@ -369,6 +369,20 @@ S.tool(
 )(O.run_anatomy)
 
 S.tool(
+    "open_alerts",
+    "Monitor rules currently tripped, and the history of when they opened and "
+    "cleared. The other observability tools answer when asked; this reports "
+    "what a scheduled `ask.py watch` found while nobody was looking. No "
+    "history at all means no rule has been EVALUATED - not that none would fire.",
+    obj(
+        {
+            "history": {"type": "integer", "description": "how many past events (default 10)"},
+            "alerts_db": _str("optional alert store path"),
+        }
+    ),
+)(O.open_alerts)
+
+S.tool(
     "explain_path",
     "Why are two entities connected, and how strongly? The multi-hop question "
     "vector search cannot answer. Returns the chain, a per-hop decayed weight, "

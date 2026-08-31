@@ -652,6 +652,46 @@ def cmd_news(a) -> int:
     return 0
 
 
+def cmd_watch(a) -> int:
+    """Evaluate the monitor rules and record what CHANGED.
+
+    Built to be scheduled. Exit codes are the interface: 0 nothing open,
+    1 something is open, 2 the check itself could not run - so a task
+    scheduler can act on it without parsing text.
+    """
+    from core.config import load as load_cfg
+    from core.monitor import check
+
+    try:
+        result = check(load_cfg(), db=a.db or "", alerts_db=a.alerts_db)
+    except Exception as e:  # a monitor that dies silently is the thing it exists to catch
+        print(f"monitor could not run: {type(e).__name__}: {e}", file=sys.stderr)
+        return 2
+    print(result.render())
+    return 1 if result.any_open else 0
+
+
+def cmd_alerts(a) -> int:
+    """What is open now, and the history of when things opened and cleared."""
+    from core.monitor import AlertLog
+
+    with AlertLog(a.alerts_db) as log:
+        open_now = log.open_rules()
+        rows = log.history(limit=a.limit)
+    if open_now:
+        print(f"{len(open_now)} open:")
+        for rule, r in sorted(open_now.items()):
+            print(f"  [{r['severity']}] {rule}: {r['title']}")
+            print(f"      open since {r['at'][:19]}")
+    else:
+        print("nothing open.")
+    if rows:
+        print("\nhistory (newest first)")
+        for r in rows:
+            print(f"  {r['at'][:19]}  {r['state']:<8} {r['rule']:<22} {r['title'][:60]}")
+    return 0
+
+
 def cmd_doctor(a) -> int:
     from core.doctor import FAIL, render, run_checks
 
@@ -1030,6 +1070,16 @@ def main(argv=None) -> int:
     nw.add_argument("--hours", type=int, default=24, help="window back from now")
     nw.add_argument("--limit", type=int, default=20)
     nw.set_defaults(fn=cmd_news)
+
+    wt = sub.add_parser("watch", help="evaluate the monitor rules; exit 1 if anything is open")
+    wt.add_argument("--db", help="provenance ledger path")
+    wt.add_argument("--alerts-db", default="data/alerts.db")
+    wt.set_defaults(fn=cmd_watch)
+
+    al = sub.add_parser("alerts", help="what is open, and when things opened and cleared")
+    al.add_argument("--alerts-db", default="data/alerts.db")
+    al.add_argument("--limit", type=int, default=20)
+    al.set_defaults(fn=cmd_alerts)
 
     dr = sub.add_parser("doctor", help="preflight: what this installation can actually do")
     dr.add_argument("--offline", action="store_true", help="skip the two network probes")

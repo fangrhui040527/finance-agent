@@ -134,3 +134,19 @@ gdelt_languages = []
 
 # Source countries, ISO-style codes as GDELT spells them. Empty means worldwide.
 gdelt_countries = []
+
+[monitor]
+# What `ask.py watch` alerts on. It records only state CHANGES, so a rule that
+# stays tripped does not re-fire every run - an alert that repeats hourly is
+# noise a person learns to ignore, which is worse than silence.
+#
+# Fraction of the daily budget that opens a spend alert.
+spend_fraction = 0.8
+# p95 latency over the last 24h, in milliseconds.
+p95_latency_ms = 20000
+# Share of claims dropped for want of a citation.
+dropped_claim_rate = 0.2
+# Hours of no model calls that counts as suspicious. 0 disables it: a personal
+# tool is allowed to sit idle, but a SCHEDULED one that dies quietly looks
+# exactly like a quiet week. Set this once something runs on a timer.
+silence_hours = 0

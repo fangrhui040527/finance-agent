@@ -59,6 +59,8 @@ if /I "%CMD%"=="cov"     goto cov
 if /I "%CMD%"=="doctor"  goto doctor
 if /I "%CMD%"=="web"     goto web
 if /I "%CMD%"=="news"    goto news
+if /I "%CMD%"=="watch"   goto watch
+if /I "%CMD%"=="alerts"  goto alerts
 if /I "%CMD%"=="reflect" goto reflect
 if /I "%CMD%"=="verify"  goto verify
 if /I "%CMD%"=="stress"  goto stress
@@ -124,6 +126,14 @@ goto :eof
 
 :news
 "%PY%" ask.py news%ARGS%
+goto :eof
+
+:watch
+"%PY%" ask.py watch%ARGS%
+goto :eof
+
+:alerts
+"%PY%" ask.py alerts%ARGS%
 goto :eof
 
 :reflect
@@ -211,6 +221,8 @@ echo   run lint ^| fmt ^| typecheck ^| cov  quality gates
 echo   run doctor                        preflight checks
 echo   run web                           the web app on 127.0.0.1:8765
 echo   run news gdelt                    pull one configured source
+echo   run watch                         evaluate the monitor rules
+echo   run alerts                        what is open, and since when
 echo   run reflect H-...                 grade a cohort by its hypothesis
 echo   run verify                        whole pipeline on mock data
 echo   run stress                        adversarial stress suite

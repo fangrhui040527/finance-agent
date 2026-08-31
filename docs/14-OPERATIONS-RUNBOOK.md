@@ -266,3 +266,58 @@ Tell them the three rules that are not negotiable:
 - docker-compose binds loopback only and refuses to start without passwords
   in `.env` (no more shipped defaults).
 - The web app: `make web` / `run web`, twelve screens on 127.0.0.1:8765.
+
+---
+
+## Alerting: rules that fire without being asked
+
+`ask.py watch` evaluates a small set of rules against the ledger and the
+traces, and records every state CHANGE to `data/alerts.db` (append-only, like
+every other record here). A rule that stays tripped writes nothing new - an
+alert repeating hourly is noise a person learns to ignore, which is worse
+than silence.
+
+Exit codes are the interface, so a scheduler can act without parsing text:
+
+| code | meaning |
+|---|---|
+| 0 | nothing open |
+| 1 | at least one rule is open |
+| 2 | the check itself could not run - the failure a monitor exists to catch |
+
+The rules, all thresholds in `config.toml [monitor]` and bounded in code:
+
+| rule | fires when |
+|---|---|
+| `spend_24h` | 24h spend crosses `spend_fraction` of the daily budget |
+| `latency_p95` | p95 latency over 24h exceeds `p95_latency_ms` |
+| `dropped_claims` | claims dropped for want of a citation exceed `dropped_claim_rate` |
+| `silence` | no model calls in `silence_hours`, on a ledger that HAS run before (0 = off) |
+| `run_errors` | the newest traced run contains an error event |
+| `methodology_changed` | the manifest hash moved between the last two runs |
+
+`silence_hours` is off by default because a personal tool is allowed to sit
+idle. **Turn it on the moment anything runs on a timer**: a job that dies
+quietly looks exactly like a quiet week, and telling those two apart is the
+whole point.
+
+### Scheduling it
+
+Windows Task Scheduler, hourly:
+
+```
+schtasks /create /tn "finplanet-watch" /sc hourly ^
+  /tr "C:\pathinance-agent\.venv\Scripts\python.exe C:\pathinance-agentsk.py watch" ^
+  /st 00:05
+```
+
+cron, hourly:
+
+```
+5 * * * * cd /path/finance-agent && .venv/bin/python ask.py watch >> data/watch.log 2>&1
+```
+
+Then read it from anywhere: `ask.py alerts` on the command line, the
+`open_alerts` MCP tool in a Claude session, or `GET /api/alerts` in the web
+app. An empty history means no rule has been EVALUATED - not that none would
+fire.

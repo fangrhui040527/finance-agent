@@ -60,6 +60,32 @@ HARD_BOUNDS: tuple[tuple[str, float, float, str], ...] = (
         "a per-question budget above RM 1,000 is a typo, not a decision",
     ),
     (
+        "monitor.spend_fraction",
+        0.0,
+        2.0,
+        "an alert threshold above twice the budget can never fire before the "
+        "budget rail already has",
+    ),
+    (
+        "monitor.p95_latency_ms",
+        0.0,
+        600_000.0,
+        "a latency threshold above ten minutes is not a threshold",
+    ),
+    (
+        "monitor.dropped_claim_rate",
+        0.0,
+        1.0,
+        "a share of dropped claims is a fraction of the claims checked; a "
+        "threshold above 1.0 can never fire and reads as monitoring",
+    ),
+    (
+        "monitor.silence_hours",
+        0,
+        8_760,
+        "silence detection beyond a year is not detection",
+    ),
+    (
         "learning.min_graded_for_calibration",
         30,
         1_000,
@@ -88,6 +114,13 @@ class Config:
     per_question_budget_myr: Decimal
     database: str
     min_graded_for_calibration: int
+    # Monitor thresholds. Defaulted so an older config file still loads, and
+    # so a fresh installation watches itself without being told to.
+    alert_spend_fraction: Decimal = Decimal("0.8")
+    alert_p95_latency_ms: float = 20_000.0
+    alert_dropped_claim_rate: Decimal = Decimal("0.2")
+    #: 0 disables. A personal tool is allowed to sit idle; a scheduled one is not.
+    alert_silence_hours: int = 0
     # Defaulted so a hand-built Config stays easy to write in tests, and so an
     # older config file loads without them. An empty holdings/watchlist is a
     # legitimate starting state - it just means nothing can escalate yet, which
@@ -239,6 +272,12 @@ def load(path: str | Path | None = None) -> Config:
             raise ConfigError(f"{k} must be a number, got {type(v).__name__}")
         return int(v)
 
+    def _float(k, d):
+        v = _get(data, k, d)
+        if isinstance(v, bool) or not isinstance(v, (int, float, str)):
+            raise ConfigError(f"{k} must be a number, got {type(v).__name__}")
+        return float(v)
+
     return Config(
         base_currency=str(_get(data, "account.base_currency", "MYR")).upper(),
         markets=markets,
@@ -257,5 +296,9 @@ def load(path: str | Path | None = None) -> Config:
         per_question_budget_myr=dec("budget.per_question_myr", 5.0),
         database=str(_get(data, "learning.database", "data/learning.db")),
         min_graded_for_calibration=_int("learning.min_graded_for_calibration", 30),
+        alert_spend_fraction=dec("monitor.spend_fraction", 0.8),
+        alert_p95_latency_ms=_float("monitor.p95_latency_ms", 20_000.0),
+        alert_dropped_claim_rate=dec("monitor.dropped_claim_rate", 0.2),
+        alert_silence_hours=_int("monitor.silence_hours", 0),
         source=source,
     )

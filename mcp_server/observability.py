@@ -406,3 +406,45 @@ def _diff_manifests(old: dict, new: dict) -> list[str]:
     # old.diff(new), not the reverse: RunManifest.diff renders "self -> other",
     # so calling it the other way round reports every upgrade as a downgrade.
     return build(old).diff(build(new)) or ["hash differs but no field-level change was identified"]
+
+
+# --------------------------------------------------------------------------
+# 5. what tripped while nobody was asking
+# --------------------------------------------------------------------------
+
+
+def open_alerts(history: int = 10, alerts_db: str = "data/alerts.db") -> str:
+    """Monitor rules currently tripped, and when things opened and cleared.
+
+    The other four tools answer when asked. This one reports what a scheduled
+    `ask.py watch` found while nobody was looking - and the history, because
+    "this has been open for three days" is a different fact from "this just
+    started".
+    """
+    from core.monitor import AlertLog
+
+    with AlertLog(alerts_db) as log:
+        open_now = log.open_rules()
+        rows = log.history(limit=max(1, history))
+
+    if not open_now and not rows:
+        return (
+            "No alert history. Nothing has run `ask.py watch` against this store yet - "
+            "which means no rule has been evaluated, not that no rule would fire."
+        )
+
+    lines = []
+    if open_now:
+        lines.append(f"{len(open_now)} OPEN")
+        for rule, r in sorted(open_now.items()):
+            lines.append(f"  [{r['severity']}] {rule}: {r['title']}")
+            lines.append(f"      open since {r['at'][:19]}")
+            if r["detail"]:
+                lines.append(f"      {r['detail']}")
+    else:
+        lines.append("Nothing open right now.")
+    if rows:
+        lines += ["", "history (newest first)"]
+        for r in rows:
+            lines.append(f"  {r['at'][:19]}  {r['state']:<8} {r['rule']:<22} {r['title'][:60]}")
+    return "\n".join(lines)

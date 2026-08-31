@@ -382,6 +382,40 @@ def log_hypothesis(body: S.HypothesisBody) -> S.Envelope:
     return _run(T.log_hypothesis, title=body.title, thesis=body.thesis)
 
 
+@router.get("/alerts")
+def alerts(history: int = 20) -> S.Envelope:
+    from core.monitor import AlertLog
+
+    with AlertLog() as log:
+        open_now = log.open_rules()
+        rows = log.history(limit=history)
+    return S.Envelope(
+        text=f"{len(open_now)} open, {len(rows)} event(s) in history",
+        data={
+            "open": [
+                {
+                    "rule": rule,
+                    "severity": r["severity"],
+                    "title": r["title"],
+                    "detail": r["detail"],
+                    "since": r["at"],
+                }
+                for rule, r in sorted(open_now.items())
+            ],
+            "history": [
+                {
+                    "at": r["at"],
+                    "state": r["state"],
+                    "rule": r["rule"],
+                    "title": r["title"],
+                    "severity": r["severity"],
+                }
+                for r in rows
+            ],
+        },
+    )
+
+
 # --- traces --------------------------------------------------------------------
 
 
