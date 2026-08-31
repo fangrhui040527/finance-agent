@@ -29,6 +29,7 @@ from collections.abc import Callable
 from datetime import UTC, date, datetime
 
 from core.market.prices import Bar, PriceSeries
+from core.net.breaker import CircuitBreaker
 
 
 class PriceFeedError(RuntimeError):
@@ -168,6 +169,42 @@ class PriceFeed(ABC):
         return Bar(day, vals["open"], vals["high"], vals["low"], vals["close"], volume)
 
 
+def _guarded_read(source, symbol, breaker, opener, req, timeout, sleep) -> str:
+    """Transport with retry and a per-feed circuit breaker.
+
+    Retries only what waiting can fix (connection errors, 408/425/429/5xx,
+    honouring Retry-After); a 404 becomes `NoData` - it is an answer about
+    coverage, not an outage - and neither NoData nor an unmappable symbol
+    ever trips the breaker. The Stooq HTML wall arrives as a 200, so it is
+    handled at parse level and deliberately never retried here.
+    """
+    import urllib.error
+
+    from core.net.breaker import CircuitOpen
+    from core.net.retry import with_retry
+
+    def _transport() -> bytes:
+        with opener(req, timeout=timeout) as resp:
+            return resp.read()
+
+    kwargs = {"sleep": sleep} if sleep is not None else {}
+    try:
+        breaker.before_call()
+        body = with_retry(_transport, **kwargs)
+    except CircuitOpen as e:
+        raise PriceFeedError(str(e)) from e
+    except urllib.error.HTTPError as e:
+        if e.code == 404:
+            raise NoData(f"{source} carries nothing at this URL for {symbol!r} (404)") from e
+        breaker.record_failure(e)
+        raise PriceFeedError(f"{source} fetch failed for {symbol!r}: {e}") from e
+    except (urllib.error.URLError, OSError) as e:
+        breaker.record_failure(e)
+        raise PriceFeedError(f"{source} fetch failed for {symbol!r}: {e}") from e
+    breaker.record_success()
+    return body.decode("utf-8", errors="replace") if isinstance(body, bytes) else body
+
+
 class StooqFeed(PriceFeed):
     """Stooq daily CSV. Free, no key, no quota - which is why it is wired first.
 
@@ -196,8 +233,10 @@ class StooqFeed(PriceFeed):
         "XTKS": "jp",
     }
 
-    def __init__(self, opener: Callable | None = None) -> None:
+    def __init__(self, opener: Callable | None = None, sleep: Callable | None = None) -> None:
         self._opener = opener
+        self._sleep = sleep
+        self._breaker = CircuitBreaker("stooq")
 
     def symbol_for(self, instrument_id: str) -> str:
         if ":" not in instrument_id:
@@ -234,17 +273,7 @@ class StooqFeed(PriceFeed):
             self._url(symbol),
             headers={"User-Agent": "finplanet-analyst-mind/0.1 (personal research)"},
         )
-        try:
-            with opener(req, timeout=self.TIMEOUT) as resp:
-                body = resp.read()
-        except urllib.error.URLError as e:  # includes HTTPError
-            raise PriceFeedError(f"Stooq fetch failed for {symbol!r}: {e}") from e
-        except OSError as e:
-            raise PriceFeedError(f"Stooq fetch failed for {symbol!r}: {e}") from e
-
-        if isinstance(body, bytes):
-            body = body.decode("utf-8", errors="replace")
-        return body
+        return _guarded_read("Stooq", symbol, self._breaker, opener, req, self.TIMEOUT, self._sleep)
 
 
 class YahooFeed(PriceFeed):
@@ -283,8 +312,10 @@ class YahooFeed(PriceFeed):
         "XETR": ".DE",
     }
 
-    def __init__(self, opener=None) -> None:
+    def __init__(self, opener=None, sleep=None) -> None:
         self._opener = opener
+        self._sleep = sleep
+        self._breaker = CircuitBreaker("yahoo")
 
     def symbol_for(self, instrument_id: str) -> str:
         if ":" not in instrument_id:
@@ -329,15 +360,7 @@ class YahooFeed(PriceFeed):
                 "Accept": "application/json",
             },
         )
-        try:
-            with opener(req, timeout=self.TIMEOUT) as resp:
-                body = resp.read()
-        except urllib.error.URLError as e:  # includes HTTPError
-            raise PriceFeedError(f"Yahoo fetch failed for {symbol!r}: {e}") from e
-        except OSError as e:
-            raise PriceFeedError(f"Yahoo fetch failed for {symbol!r}: {e}") from e
-        if isinstance(body, bytes):
-            body = body.decode("utf-8", errors="replace")
+        body = _guarded_read("Yahoo", symbol, self._breaker, opener, req, self.TIMEOUT, self._sleep)
 
         try:
             payload = json.loads(body)

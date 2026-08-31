@@ -10,6 +10,7 @@ and starts failing for reasons unrelated to the code.
 
 from __future__ import annotations
 
+import sqlite3
 import sys
 import time
 from datetime import UTC, datetime
@@ -38,6 +39,9 @@ def check(label: str, cond: bool, detail: str = "") -> None:
 
 
 def main() -> int:
+    from core.logging import configure as _configure_logging
+
+    _configure_logging()
     t0 = time.time()
     print("\nFinPlanet P0 verification (mock data only)\n")
 
@@ -114,8 +118,11 @@ def main() -> int:
     tamper = False
     try:
         ledger.conn.execute("DELETE FROM llm_calls")
-    except Exception:
-        tamper = True
+    except sqlite3.DatabaseError as e:
+        # Only the trigger's own refusal counts. Any other exception - a
+        # closed connection, a missing table - previously scored as a PASS
+        # on a security-relevant invariant.
+        tamper = "append-only" in str(e) or "no UPDATE" in str(e) or "never deleted" in str(e)
     check("append-only enforced", tamper)
 
     print("\n5. Money contract")

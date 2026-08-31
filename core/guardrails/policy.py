@@ -16,6 +16,7 @@ written as prompt text is a suggestion.
 from __future__ import annotations
 
 import time
+from collections import deque
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 from enum import Enum
@@ -278,7 +279,9 @@ class RateLimitPolicy(PolicyRule):
 class PolicyEngine:
     def __init__(self, rules: list[PolicyRule] | None = None) -> None:
         self.rules: list[PolicyRule] = list(rules or [])
-        self.audit_log: list[AuditEntry] = []
+        # Bounded: every rail appends on every action, and nothing drained it.
+        # 10k entries is hours of use; the trace file is the durable record.
+        self.audit_log: deque[AuditEntry] = deque(maxlen=10_000)
 
     def add_rule(self, rule: PolicyRule) -> PolicyEngine:
         self.rules.append(rule)

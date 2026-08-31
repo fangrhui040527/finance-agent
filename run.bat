@@ -56,6 +56,7 @@ if /I "%CMD%"=="lint"    goto lint
 if /I "%CMD%"=="fmt"     goto fmt
 if /I "%CMD%"=="typecheck" goto typecheck
 if /I "%CMD%"=="cov"     goto cov
+if /I "%CMD%"=="doctor"  goto doctor
 if /I "%CMD%"=="verify"  goto verify
 if /I "%CMD%"=="stress"  goto stress
 if /I "%CMD%"=="config"  goto config
@@ -108,6 +109,10 @@ goto :eof
 
 :cov
 "%PY%" -m pytest --cov --cov-report=term-missing
+goto :eof
+
+:doctor
+"%PY%" ask.py doctor%ARGS%
 goto :eof
 
 :verify
@@ -188,6 +193,7 @@ echo.
 echo   run install                       create .venv and install
 echo   run test                          the full suite
 echo   run lint ^| fmt ^| typecheck ^| cov  quality gates
+echo   run doctor                        preflight checks
 echo   run verify                        whole pipeline on mock data
 echo   run stress                        adversarial stress suite
 echo   run config                        settings, and where they came from

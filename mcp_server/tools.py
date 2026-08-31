@@ -23,6 +23,7 @@ So three invariants hold across every tool below:
 
 from __future__ import annotations
 
+import sqlite3
 from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal, InvalidOperation
 
@@ -737,7 +738,10 @@ def log_prediction(
     with LearningStore(db or DEFAULT_PATH) as store:
         try:
             store.record(p)
-        except Exception as e:
+        except sqlite3.IntegrityError as e:
+            # The append-only trigger or a duplicate id refusing the write is an
+            # ANSWER. Anything else - AttributeError, disk full - used to render
+            # identically, so a code defect read as a policy refusal.
             return f"REFUSED: {e}"
         counts = store.counts()
     return (

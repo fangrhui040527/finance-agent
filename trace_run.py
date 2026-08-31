@@ -80,6 +80,12 @@ def _fit(seed: int = 7):
 
 def run(live: str | None = None) -> dict:
     with start_run("full-system") as tracer:
+        try:
+            from core.provenance import manifest as _manifest
+
+            _manifest.write(tracer.dir, _manifest.current())
+        except Exception as e:  # a missing manifest must not kill the run it describes
+            print(f"  (manifest unavailable: {e})")
         # 1 ── configuration and the bounds it cannot cross
         with span("config", kind="span"):
             cfg = load_config()
@@ -693,6 +699,9 @@ def run(live: str | None = None) -> dict:
 
 
 def main(argv=None) -> int:
+    from core.logging import configure as _configure_logging
+
+    _configure_logging()
     ap = argparse.ArgumentParser(
         prog="trace_run", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )

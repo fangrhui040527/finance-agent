@@ -204,6 +204,7 @@ class EvalResult:
     failed: int
     near_miss_failed: int
     details: tuple[tuple[str, bool, str], ...] = ()
+    crashed: int = 0
 
     @property
     def total(self) -> int:
@@ -216,7 +217,7 @@ class EvalResult:
     def ok(self, threshold: float = 0.8) -> bool:
         """Near-miss failures are disqualifying regardless of the headline rate.
         docs/03 section 8: the near-misses are the whole test."""
-        return self.rate >= threshold and self.near_miss_failed == 0
+        return self.rate >= threshold and self.near_miss_failed == 0 and self.crashed == 0
 
 
 def run_suite(path: Path, agent_id: str, runner) -> EvalResult:
@@ -224,18 +225,25 @@ def run_suite(path: Path, agent_id: str, runner) -> EvalResult:
     suite = check_suite(path, agent_id)
     passed = failed = near_miss_failed = 0
     details: list[tuple[str, bool, str]] = []
+    crashed = 0
     for case in suite["cases"]:
         expect = case.get("expect")
+        did_crash = False
         try:
             got = runner(case)
-        except Exception as e:  # a crash is a failure, not an error
+        except Exception as e:  # a crash is a failure, and never a match
             got = f"error: {type(e).__name__}: {e}"
-        hit = got == expect
+            did_crash = True
+        # A crash can never equal `expect`: an eval whose expected value happens
+        # to be an error STRING would otherwise score a genuine crash as a pass.
+        hit = (not did_crash) and got == expect
         if hit:
             passed += 1
         else:
             failed += 1
+            crashed += did_crash
             if case.get("near_miss"):
                 near_miss_failed += 1
-        details.append((str(case.get("name", "?")), hit, f"expected {expect!r}, got {got!r}"))
-    return EvalResult(agent_id, passed, failed, near_miss_failed, tuple(details))
+        note = f"expected {expect!r}, got {got!r}" + (" [crashed]" if did_crash else "")
+        details.append((str(case.get("name", "?")), hit, note))
+    return EvalResult(agent_id, passed, failed, near_miss_failed, tuple(details), crashed)

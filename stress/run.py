@@ -1593,6 +1593,9 @@ def s_graph():
 
 
 def main() -> int:
+    from core.logging import configure as _configure_logging
+
+    _configure_logging()
     for fn in (
         s_volume,
         s_numbers,

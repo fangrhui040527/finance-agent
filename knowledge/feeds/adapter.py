@@ -17,6 +17,7 @@ from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
+from core.net.breaker import CircuitBreaker
 from knowledge.news.features import (
     Article,
     FeatureExtractor,
@@ -227,6 +228,7 @@ class GdeltFeed(FeedAdapter):
         countries: tuple[str, ...] = (),
         user_agent: str = "",
         opener=None,
+        sleep=None,
         extractor: FeatureExtractor | None = None,
     ) -> None:
         import os
@@ -243,6 +245,8 @@ class GdeltFeed(FeedAdapter):
         # trade-off named in .env.example: plain HTTP has no transport integrity.
         self.doc_api = os.environ.get("GDELT_DOC_API", "").strip() or self.DOC_API
         self._opener = opener
+        self._sleep = sleep
+        self._breaker = CircuitBreaker("gdelt")
 
     def _timespan(self, since: datetime, now: datetime | None = None) -> str:
         """Whole minutes back from now, never under the documented minimum."""
@@ -275,17 +279,30 @@ class GdeltFeed(FeedAdapter):
         import urllib.error
         import urllib.request
 
+        from core.net.breaker import CircuitOpen
+        from core.net.retry import with_retry
+
         url = self._url(since, limit)
         opener = self._opener or urllib.request.urlopen
         req = urllib.request.Request(url, headers={"User-Agent": self.user_agent})
 
-        try:
+        def _transport():
             with opener(req, timeout=self.TIMEOUT) as resp:
-                body = resp.read()
-        except urllib.error.URLError as e:  # includes HTTPError
+                return resp.read()
+
+        kwargs = {"sleep": self._sleep} if self._sleep is not None else {}
+        try:
+            self._breaker.before_call()
+            body = with_retry(_transport, **kwargs)
+        except CircuitOpen as e:
+            raise FeedError(str(e)) from e
+        except urllib.error.URLError as e:  # includes HTTPError after retries
+            self._breaker.record_failure(e)
             raise FeedError(f"GDELT fetch failed: {e}") from e
         except OSError as e:
+            self._breaker.record_failure(e)
             raise FeedError(f"GDELT fetch failed: {e}") from e
+        self._breaker.record_success()
 
         if isinstance(body, bytes):
             body = body.decode("utf-8", errors="replace")

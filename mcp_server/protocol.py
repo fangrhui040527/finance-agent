@@ -26,6 +26,10 @@ from dataclasses import dataclass, field
 from typing import Any
 
 PROTOCOL_VERSION = "2024-11-05"
+#: Versions this server can faithfully speak. Echoing back an UNKNOWN client
+#: version would claim capabilities we never implemented; offering only ours
+#: lets a compliant client downgrade or walk away - both honest outcomes.
+SUPPORTED_VERSIONS = ("2024-11-05", "2025-03-26", "2025-06-18")
 
 # JSON-RPC error codes, plus the one MCP adds.
 PARSE_ERROR = -32700
@@ -82,7 +86,7 @@ class Server:
 
         try:
             if method == "initialize":
-                result = self._initialize()
+                result = self._initialize(params)
             elif method == "tools/list":
                 result = {"tools": [t.as_json() for t in self.tools.values()]}
             elif method == "tools/call":
@@ -106,9 +110,11 @@ class Server:
             )
         return {"jsonrpc": "2.0", "id": rid, "result": result}
 
-    def _initialize(self) -> dict:
+    def _initialize(self, params: dict | None = None) -> dict:
+        requested = (params or {}).get("protocolVersion")
+        version = requested if requested in SUPPORTED_VERSIONS else PROTOCOL_VERSION
         return {
-            "protocolVersion": PROTOCOL_VERSION,
+            "protocolVersion": version,
             "capabilities": {"tools": {"listChanged": False}},
             "serverInfo": {"name": self.name, "version": self.version},
             "instructions": self.instructions,

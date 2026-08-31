@@ -1,8 +1,9 @@
-.PHONY: install test verify stress config up down health lint fmt typecheck cov due status mcp mcp-check trace graph codegraph graph-report
+.PHONY: install test verify stress doctor config up down health lint fmt typecheck cov due status mcp mcp-check trace graph codegraph graph-report
 install: ; uv sync --frozen --python 3.11
 lint:    ; . .venv/bin/activate && ruff check . && ruff format --check .
 fmt:     ; . .venv/bin/activate && ruff check --fix . && ruff format .
 typecheck: ; . .venv/bin/activate && pyright
+doctor:  ; . .venv/bin/activate && python ask.py doctor
 cov:     ; . .venv/bin/activate && python -m pytest --cov --cov-report=term-missing
 test:    ; . .venv/bin/activate && python -m pytest
 verify:  ; . .venv/bin/activate && python verify.py

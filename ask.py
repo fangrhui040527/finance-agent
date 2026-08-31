@@ -524,6 +524,14 @@ def cmd_learn(a) -> int:
 
 
 # --- which model is actually answering ------------------------------------
+def cmd_doctor(a) -> int:
+    from core.doctor import FAIL, render, run_checks
+
+    results = run_checks(offline=a.offline)
+    print(render(results))
+    return 1 if any(r.status == FAIL and r.critical for r in results) else 0
+
+
 def cmd_backend(a) -> int:
     """The difference between a real answer and a stub is worth one command."""
     from core.llm.backends import AuthError, backend_from_env
@@ -710,6 +718,9 @@ def cmd_graph(a) -> int:
 
 
 def main(argv=None) -> int:
+    from core.logging import configure as _configure_logging
+
+    _configure_logging()
     ap = argparse.ArgumentParser(
         prog="ask", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
@@ -863,6 +874,10 @@ def main(argv=None) -> int:
     bk = sub.add_parser("backend", help="which model is actually answering")
     bk.add_argument("--use", choices=["anthropic", "echo"], help="force one")
     bk.set_defaults(fn=cmd_backend)
+
+    dr = sub.add_parser("doctor", help="preflight: what this installation can actually do")
+    dr.add_argument("--offline", action="store_true", help="skip the two network probes")
+    dr.set_defaults(fn=cmd_doctor)
 
     a = ap.parse_args(argv)
     return a.fn(a)

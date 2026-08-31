@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from datetime import timedelta
 
 from core.guardrails.policy import (
@@ -31,8 +32,30 @@ CORPUS_SLA = {
 }
 
 
+#: Chat-template control tokens that must never survive inside retrieved text.
+#: They are not instructions to match on - their mere PRESENCE is the attack,
+#: because a downstream template would let them impersonate a role boundary.
+SPECIAL_TOKENS = ("<|im_start|>", "<|im_end|>", "[INST]", "[/INST]", "<<SYS>>", "<|system|>")
+
+
+def neutralize_special_tokens(text: str) -> str:
+    """Break template control tokens so quoted evidence stays quotable.
+
+    DENY is the right answer at the rail; this is for the one path that must
+    still SHOW hostile text to a human (a trace, a red-team report) without
+    re-arming it."""
+    for tok in SPECIAL_TOKENS:
+        text = text.replace(tok, tok.replace("|", "\u2758").replace("[", "(").replace("]", ")"))
+    return text
+
+
 class InjectionScanPolicy(PolicyRule):
-    """Input rail. Retrieved text is data, never instructions."""
+    """Input rail. Retrieved text is data, never instructions.
+
+    Two layers: substring markers for the classic phrasings, and regex rules
+    per category so a rewording ("kindly set aside all prior guidance") still
+    trips the same wire. Detection DENIES; nothing here rewrites and forwards.
+    """
 
     name = "injection_scan"
     rails = (Rail.INPUT,)
@@ -42,12 +65,38 @@ class InjectionScanPolicy(PolicyRule):
         "you are now",
         "reveal your system prompt",
     )
+    RULES: tuple[tuple[str, str], ...] = (
+        (
+            "override",
+            r"(?:ignore|disregard|forget|set aside)\s+(?:all\s+)?(?:previous|prior|earlier|above)\s+(?:instructions|guidance|rules|prompts)",
+        ),
+        ("override", r"(?:new|updated)\s+system\s+prompt\s*:"),
+        ("impersonation", r"you\s+are\s+now\s+(?:a|an|the|in)\b"),
+        (
+            "impersonation",
+            r"^\s*system\s*:",
+        ),
+        (
+            "exfiltration",
+            r"(?:reveal|print|repeat|show)\s+(?:your|the)\s+(?:system\s+prompt|instructions|api[\s_-]?key|credentials)",
+        ),
+        ("exfiltration", r"api[\s_-]?key\s*[:=]"),
+    )
 
     def evaluate(self, action: Action) -> PolicyResult | None:
-        text = str(action.payload.get("text", "")).lower()
+        raw = str(action.payload.get("text", ""))
+        text = raw.lower()
         for m in self.MARKERS:
             if m in text:
                 return PolicyResult(Decision.DENY, self.name, f"injection marker: {m!r}")
+        for tok in SPECIAL_TOKENS:
+            if tok.lower() in text:
+                return PolicyResult(Decision.DENY, self.name, f"template control token: {tok!r}")
+        for category, pattern in self.RULES:
+            if re.search(pattern, text, re.IGNORECASE | re.MULTILINE):
+                return PolicyResult(
+                    Decision.DENY, self.name, f"injection pattern ({category}): {pattern!r}"
+                )
         return None
 
 

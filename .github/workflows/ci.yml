@@ -109,6 +109,9 @@ jobs:
       - name: MCP server selftest
         run: uv run python -m mcp_server.server --selftest
 
+      - name: Preflight doctor (offline)
+        run: uv run python ask.py doctor --offline
+
       - name: No execution code anywhere
         run: uv run pytest tests/test_no_execution_anywhere.py -q
 

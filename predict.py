@@ -148,6 +148,9 @@ def cmd_status(a) -> int:
 
 
 def main(argv=None) -> int:
+    from core.logging import configure as _configure_logging
+
+    _configure_logging()
     ap = argparse.ArgumentParser(
         prog="predict", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )

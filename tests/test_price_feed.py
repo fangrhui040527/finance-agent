@@ -109,11 +109,14 @@ def test_transport_failure_raises():
         StooqFeed(opener=open_).fetch("XNAS:NVDA")
 
 
-def test_http_error_raises():
+def test_a_404_is_a_coverage_fact_not_an_outage():
+    """404 used to collapse into the same error as a 503, so a symbol the
+    source does not carry was indistinguishable from the source being down."""
+
     def open_(req, timeout=None):
         raise urllib.error.HTTPError("u", 404, "not found", {}, None)
 
-    with pytest.raises(PriceFeedError, match="fetch failed"):
+    with pytest.raises(NoData, match="carries nothing"):
         StooqFeed(opener=open_).fetch("XNAS:NVDA")
 
 

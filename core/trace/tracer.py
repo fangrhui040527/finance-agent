@@ -44,7 +44,7 @@ import uuid
 from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import asdict, dataclass, field
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -85,17 +85,23 @@ class Event:
 class Tracer:
     """One run. Writes trace.jsonl incrementally so a crash still leaves a trace."""
 
+    #: In-memory event cap. trace.jsonl on disk is always complete.
+    MAX_IN_MEMORY = 20_000
+
     def __init__(
         self, label: str = "run", root: Path | None = None, run_id: str | None = None
     ) -> None:
         self.run_id = run_id or f"{datetime.now(UTC):%Y%m%dT%H%M%S}-{uuid.uuid4().hex[:6]}"
         self.label = label
-        self.dir = Path(root or DEBUG_ROOT) / self.run_id
+        base = Path(root or DEBUG_ROOT)
+        self.prune(base)
+        self.dir = base / self.run_id
         self.prompts_dir = self.dir / "prompts"
         self.dir.mkdir(parents=True, exist_ok=True)
         self.prompts_dir.mkdir(exist_ok=True)
 
         self.events: list[Event] = []
+        self.dropped_from_memory = 0
         self.started = time.perf_counter()
         self.started_at = _now()
         self._seq = 0
@@ -124,6 +130,11 @@ class Tracer:
                 parent_id=self._stack[-1] if self._stack else None,
                 data=self._externalise(name, data),
             )
+            if len(self.events) >= self.MAX_IN_MEMORY:
+                # The FILE keeps everything; only the in-memory copy is bounded,
+                # so a long-lived session cannot grow without limit.
+                self.events.pop(0)
+                self.dropped_from_memory += 1
             self.events.append(ev)
             self._fh.write(ev.as_json() + "\n")
             self._fh.flush()
@@ -146,6 +157,41 @@ class Tracer:
             else:
                 out[k] = v
         return out
+
+    @classmethod
+    def prune(cls, root: Path, keep_last: int = 20, max_age_days: int = 14) -> list[str]:
+        """Delete old run directories. Retention here is a PRIVACY control, not
+        tidiness: traces hold verbatim prompts, responses and whatever
+        portfolio positions were passed in, and nothing else ever deleted them.
+
+        Keeps the newest `keep_last` regardless of age; anything older than
+        `max_age_days` beyond those is removed. Returns the run_ids removed.
+        """
+        import shutil
+
+        if not root.is_dir():
+            return []
+
+        def stamp_of(p: Path):
+            try:
+                return datetime.strptime(p.name.split("-")[0], "%Y%m%dT%H%M%S").replace(tzinfo=UTC)
+            except ValueError:
+                return None  # not a run directory this tracer wrote; leave it alone
+
+        runs = sorted(
+            ((p, when) for p in root.iterdir() if p.is_dir() and (when := stamp_of(p))),
+            key=lambda pair: pair[1],
+        )
+        removed: list[str] = []
+        cutoff = datetime.now(UTC) - timedelta(days=max_age_days)
+        protected = runs[-keep_last:] if keep_last else []
+        for p, when in runs:
+            if any(p is q for q, _ in protected):
+                continue
+            if when < cutoff:
+                shutil.rmtree(p, ignore_errors=True)
+                removed.append(p.name)
+        return removed
 
     # -- spans ---------------------------------------------------------------
 
@@ -172,11 +218,15 @@ class Tracer:
     # -- finishing -----------------------------------------------------------
 
     def close(self) -> dict:
-        summary = self.summary()
-        (self.dir / "summary.json").write_text(
-            json.dumps(summary, indent=2, default=str), encoding="utf-8"
-        )
-        self._fh.close()
+        try:
+            summary = self.summary()
+            (self.dir / "summary.json").write_text(
+                json.dumps(summary, indent=2, default=str), encoding="utf-8"
+            )
+        finally:
+            # A summary that fails to serialise must not leak the trace handle;
+            # trace.jsonl is complete either way.
+            self._fh.close()
         return summary
 
     def summary(self) -> dict:
