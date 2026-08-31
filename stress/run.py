@@ -529,8 +529,6 @@ def s_invariants():
 def s_feeds():
     section("7. Live seams - a broken source must never look like a quiet one")
 
-    import io
-    import json
     import urllib.error
 
     from core.llm.backends import AnthropicBackend, AuthError, BackendError, Truncated
@@ -661,64 +659,69 @@ def s_feeds():
         why="The first call is halfway through a budgeted plan.",
     )
 
-    def backend(body):
-        return AnthropicBackend(api_key="k", opener=opener(body), sleep=lambda _: None)
+    # The backend sits on the official SDK now (test seam: client=, not opener=).
+    # Wire-level malformations (non-JSON, error envelopes, missing content) are
+    # the SDK's parsing domain; what stays OURS to prove is the response
+    # contract - usage, text, stop reasons - and that retry terminates.
+    from types import SimpleNamespace
 
-    for label, body in (
-        ("non-JSON", "<html>502</html>"),
-        ("no content list", '{"type":"message","usage":{"input_tokens":1,"output_tokens":1}}'),
-        ("no usage", '{"type":"message","content":[{"type":"text","text":"hi"}]}'),
-        (
-            "empty text",
-            '{"type":"message","content":[{"type":"text","text":"  "}],'
-            '"usage":{"input_tokens":1,"output_tokens":1}}',
+    from tests._anthropic_double import FakeAnthropic, http_status_error, reply
+
+    def sdk_backend(script):
+        return AnthropicBackend(client=FakeAnthropic(script), sleep=lambda _: None)
+
+    no_usage = SimpleNamespace(
+        content=[SimpleNamespace(type="text", text="hi")], usage=None, stop_reason="end_turn"
+    )
+    bad_usage = SimpleNamespace(
+        content=[SimpleNamespace(type="text", text="x")],
+        usage=SimpleNamespace(
+            input_tokens="many",
+            output_tokens=1,
+            cache_read_input_tokens=0,
+            cache_creation_input_tokens=0,
         ),
-        ("error object", '{"type":"error","error":{"type":"overloaded","message":"busy"}}'),
-        (
-            "usage not numeric",
-            '{"type":"message","content":[{"type":"text","text":"x"}],'
-            '"usage":{"input_tokens":"many","output_tokens":1}}',
-        ),
+        stop_reason="end_turn",
+    )
+    for label, msg in (
+        ("no usage", no_usage),
+        ("empty text", reply("  ")),
+        ("usage not numeric", bad_usage),
     ):
         expect_raises(
             f"backend: {label} raises",
             BackendError,
-            lambda b=body: backend(b).complete("claude-opus-5", "q", None),
+            lambda m=msg: sdk_backend([m]).complete("claude-opus-5", "q", None),
             why="A silent stub answer is indistinguishable from a real one.",
         )
 
-    trunc = json.dumps(
-        {
-            "type": "message",
-            "stop_reason": "max_tokens",
-            "content": [{"type": "text", "text": "The thesis rests on three legs. First"}],
-            "usage": {"input_tokens": 10, "output_tokens": 4096},
-        }
+    trunc = reply(
+        "The thesis rests on three legs. First",
+        stop_reason="max_tokens",
+        usage={"input_tokens": 10, "output_tokens": 4096},
     )
     expect_raises(
         "backend: truncation raises rather than returning half a thesis",
         Truncated,
-        lambda: backend(trunc).complete("claude-opus-5", "q", None),
+        lambda: sdk_backend([trunc]).complete("claude-opus-5", "q", None),
         why="docs/08 8: truncation is disclosed, never silent.",
     )
 
     # Retry must terminate. An unbounded loop against a 529 is an outage of ours.
-    attempts = []
-
-    def flaky(req, timeout=None):
-        attempts.append(1)
-        raise urllib.error.HTTPError("u", 529, "overloaded", {}, io.BytesIO(b"{}"))
-
+    flaky_client = FakeAnthropic([http_status_error(500)] * 5)
     try:
-        AnthropicBackend(api_key="k", opener=flaky, max_attempts=3, sleep=lambda _: None).complete(
+        AnthropicBackend(client=flaky_client, max_attempts=3, sleep=lambda _: None).complete(
             "claude-opus-5", "q", None
         )
     except BackendError:
         pass
-    if len(attempts) == 3:
+    if len(flaky_client.calls) == 3:
         held("retry is bounded", "3 attempts, then raises")
     else:
-        finding("unbounded retry", f"{len(attempts)} attempts against a permanent 529")
+        finding(
+            "unbounded retry",
+            f"{len(flaky_client.calls)} attempts against a permanently failing endpoint",
+        )
 
 
 def s_market_drift():
