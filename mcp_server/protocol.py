@@ -1,11 +1,12 @@
 """MCP stdio transport: JSON-RPC 2.0 over stdin/stdout, no dependencies.
 
-Why hand-rolled rather than the `mcp` SDK. This repository's hard constraint is
-that everything runs and is tested with no network and no keys, on two runtime
-dependencies. MCP's stdio transport is line-delimited JSON-RPC - small enough
-that implementing it keeps CI dependency-free, which matters more here than the
-convenience of a client library. The same reasoning that put urllib in
-`knowledge/feeds/adapter.py` instead of an SDK.
+Why hand-rolled rather than the `mcp` SDK. The constraint that matters is that
+everything runs and is tested with no network and no keys. MCP's stdio
+transport is line-delimited JSON-RPC - small enough that implementing it keeps
+the test surface fully offline, which matters more here than the convenience
+of a client library. (The runtime does carry the official `anthropic` SDK for
+the MODEL seam, plus fastapi/uvicorn for the web surface - but the engines,
+this transport and every test import none of them.)
 
 The seam is `Tool` and `Server.dispatch`: if this is ever swapped for the
 official SDK, the tool functions do not change.

@@ -46,15 +46,14 @@ invisible.
 Main, WhyItMoved, Prices, Thesis, Portfolio, Sizing, Predictions, Trace, Learn,
 WorldMonitor, Agents, Settings.
 
-`ui/render.py` is **273 lines of terminal output**. No screen exists as running
-code.
-
-The design README says so plainly: *"These are the specification, not the
-product."* Shared CSS tokens are lifted verbatim from `docs/user-guide.html` so
-the design cannot drift from the documentation's palette.
-
-**Blocked on:** nothing but work. This is the largest single piece of unbuilt
-scope in the repository.
+**BUILT** (2026-08-31): all twelve screens run at `make web` /
+`run web` - `web/` is a FastAPI app on 127.0.0.1:8765 whose endpoints call the
+same tool functions the MCP server exposes (response text is parity-tested
+byte-identical), with vanilla ES-module screens, no build step, and the design
+tokens EXPORTED from `design/_css.txt` minus its font import so the app
+renders fully offline. Refusals are first-class cards; the portfolio book
+lives in the browser's localStorage only. `ui/render.py` remains the terminal
+surface; the artboards remain the visual specification the screens follow.
 
 ### 32 keyless feed adapters
 

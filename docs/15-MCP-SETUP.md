@@ -151,3 +151,16 @@ log_prediction: +1, 63 days, whatever confidence you actually hold.
 
 `calibration_status` is worthless for months and then becomes the only number in
 this repository that tells you whether any of it works.
+
+---
+
+## Transport notes (2026-08-31)
+
+- **stdout purity is tested**: the serve loop emits JSON-RPC lines only;
+  selftest/--list human output goes to stderr, and `print` is lint-forbidden
+  inside `mcp_server/`.
+- **Version negotiation**: `initialize` echoes the client's protocolVersion
+  when it is one this server actually speaks (2024-11-05 … 2025-06-18), else
+  offers its own - never claims a version it has not implemented.
+- The web app (`make web`) exposes the same tool functions over HTTP for a
+  browser; the MCP surface remains the model-facing one.

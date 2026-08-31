@@ -10,10 +10,13 @@ out explicitly.
 ## Setup
 
 ```bash
-make install      # uv venv --python 3.11 .venv && uv pip install -e ".[dev]"
+make install      # uv sync --frozen --python 3.11
 ```
 
-Two runtime dependencies: `pydantic`, `pyyaml`. Dev extras add `pytest`.
+Runtime dependencies: `pydantic`, `pyyaml`, `anthropic` (the model seam - lazily
+imported, `EchoBackend` keeps everything offline), and `fastapi` + `uvicorn`
+(the web surface). The engines and the tests import none of the last three.
+Dev tooling (`uv sync --frozen`): pytest, hypothesis, ruff, pyright, pre-commit.
 
 Windows: `run.bat` mirrors every `Makefile` target. `tests/test_config.py`
 asserts that parity, so a Windows user cannot be quietly running a smaller set
@@ -27,6 +30,10 @@ make verify       # 14 sections, PASS/FAIL
 make stress       # 161 held, exits with the finding count
 make trace        # end-to-end, writes debug/<run-id>/
 make mcp-check    # MCP handshake against itself
+make doctor       # preflight: what this installation can actually do
+make web          # the twelve screens on http://127.0.0.1:8765
+make lint         # ruff check + format check     make typecheck  # pyright
+make cov          # tests with the coverage floor (92%)
 ```
 
 Run all five before pushing. `make test` alone is not enough — see
