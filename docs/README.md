@@ -4,6 +4,8 @@ Implementation plan for a multi-agent, multi-market equity research system that 
 
 > **Not financial advice.** This system produces candidacy bands, calibrated probabilities, attributions and sizing constraints with full evidence chains. It does not recommend transactions, does not execute, and is built for its author's own use.
 
+> **And it does not pick stocks.** No screen, no ranked candidates, no ideas list. You bring the names. It answers *why did this move*, *what does the evidence say*, *how much of it could I hold*, *how does a budget split across these*, and *what changed against what I own*. The one question it will not answer is *which stocks should I look at* — a ranked list carries an implicit recommendation that no evidence chain here supports, and `Intent.SCREEN` refuses with exactly that reason.
+
 ---
 
 ## What this module adds to the existing plan
