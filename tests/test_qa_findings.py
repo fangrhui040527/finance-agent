@@ -24,9 +24,7 @@ Helpers are imported from the sibling suites so the fixtures stay in one place.
 
 from __future__ import annotations
 
-import io
 import json
-import urllib.error
 from datetime import UTC, date, timedelta
 from decimal import Decimal
 
@@ -36,7 +34,9 @@ from core.llm.backends import AnthropicBackend, BackendError, TransientError, Tr
 from core.llm.tiers import TaskClass, Tier, Usage, cost_usd
 from core.market.feed import NoData, PriceFeedError, StooqFeed, SymbolUnmappable
 from core.provenance.ledger import ProvenanceLedger
-from tests.test_anthropic_backend import KEY, _backend, _opener, _reply, _Response
+from tests._anthropic_double import FakeAnthropic, http_status_error
+from tests._anthropic_double import reply as _reply
+from tests.test_anthropic_backend import _backend as _sdk_backend
 from tests.test_price_feed import CSV
 from tests.test_price_feed import _opener as _feed_opener
 
@@ -196,33 +196,30 @@ def test_the_default_feed_is_stooq_then_yahoo_and_the_cli_uses_it():
 
 
 # ---------------------------------------------------------------- 2. retry-after
-def _flaky(status: int, headers: dict, then: str | None = None):
-    calls: list = []
-
-    def open_(req, timeout=None):
-        calls.append(req)
-        if then is not None and len(calls) > 1:
-            return _Response(then)
-        raise urllib.error.HTTPError("u", status, "busy", headers, io.BytesIO(b"{}"))
-
-    return open_, calls
+def _flaky(status: int, headers: dict, then=None):
+    """A FakeAnthropic that fails with `status` (+headers) until `then` answers."""
+    script = [http_status_error(status, headers=headers) for _ in range(3)]
+    if then is not None:
+        script = [http_status_error(status, headers=headers), then]
+    fake = FakeAnthropic(script)
+    return fake, fake.calls
 
 
 def test_retry_after_seconds_are_honoured_on_a_429():
     waits: list[float] = []
-    open_, calls = _flaky(429, {"Retry-After": "3"}, then=_reply("later"))
-    text, _ = AnthropicBackend(
-        api_key=KEY, opener=open_, max_attempts=3, sleep=waits.append
-    ).complete("claude-opus-5", "q", None)
+    fake, calls = _flaky(429, {"Retry-After": "3"}, then=_reply("later"))
+    text, _ = AnthropicBackend(client=fake, max_attempts=3, sleep=waits.append).complete(
+        "claude-opus-5", "q", None
+    )
     assert text == "later" and len(calls) == 2
     assert waits == [3.0], "the server said when; the client must not guess"
 
 
 def test_retry_after_is_capped_so_a_hostile_header_cannot_park_a_call():
     waits: list[float] = []
-    open_, _ = _flaky(429, {"retry-after": "600"})
+    fake, _ = _flaky(429, {"retry-after": "600"})
     with pytest.raises(TransientError):
-        AnthropicBackend(api_key=KEY, opener=open_, max_attempts=2, sleep=waits.append).complete(
+        AnthropicBackend(client=fake, max_attempts=2, sleep=waits.append).complete(
             "claude-opus-5", "q", None
         )
     assert waits == [60.0]
@@ -230,9 +227,9 @@ def test_retry_after_is_capped_so_a_hostile_header_cannot_park_a_call():
 
 def test_a_non_numeric_retry_after_falls_back_to_exponential_backoff():
     waits: list[float] = []
-    open_, _ = _flaky(529, {"retry-after": "Wed, 21 Oct 2026 07:28:00 GMT"})
+    fake, _ = _flaky(529, {"retry-after": "Wed, 21 Oct 2026 07:28:00 GMT"})
     with pytest.raises(TransientError):
-        AnthropicBackend(api_key=KEY, opener=open_, max_attempts=3, sleep=waits.append).complete(
+        AnthropicBackend(client=fake, max_attempts=3, sleep=waits.append).complete(
             "claude-opus-5", "q", None
         )
     assert waits == [1.0, 2.0]
@@ -245,7 +242,7 @@ class _Raising:
     def __init__(self, exc):
         self.exc = exc
 
-    def complete(self, model_id, prompt, system):
+    def complete(self, model_id, prompt, system, profile=None):
         raise self.exc
 
 
@@ -257,20 +254,20 @@ def _client(backend, ledger):
 
 
 def test_a_truncated_answer_carries_the_usage_it_cost():
-    body = _reply(
+    msg = _reply(
         "half", stop_reason="max_tokens", usage={"input_tokens": 900, "output_tokens": 4096}
     )
     with pytest.raises(Truncated) as exc:
-        _backend(_opener(body)).complete("claude-opus-5", "q", None)
+        _sdk_backend([msg]).complete("claude-opus-5", "q", None)
     assert exc.value.usage == Usage(900, 4096)
 
 
 def test_a_refusal_carries_the_usage_it_cost():
     from core.llm.backends import Declined
 
-    body = _reply("", stop_reason="refusal", usage={"input_tokens": 30, "output_tokens": 2})
+    msg = _reply("", stop_reason="refusal", usage={"input_tokens": 30, "output_tokens": 2})
     with pytest.raises(Declined, match="declined") as exc:
-        _backend(_opener(body)).complete("claude-opus-5", "q", None)
+        _sdk_backend([msg]).complete("claude-opus-5", "q", None)
     assert isinstance(exc.value, BackendError) and exc.value.usage == Usage(30, 2)
 
 
@@ -286,13 +283,17 @@ def test_a_truncated_call_is_ledgered_before_it_is_raised():
     assert rows[0]["output_tokens"] == 4096 and Decimal(rows[0]["cost_usd"]) > 0
 
 
-def test_a_declined_call_is_ledgered_before_it_is_raised():
+def test_a_declined_call_is_ledgered_and_returned_as_content():
+    """A refusal is an ANSWER now (commitment 6): ledgered, then handed back as
+    a Completion with refused=True - the same semantics as every REFUSED string
+    in the MCP tools - rather than raised at the caller."""
     from core.llm.backends import Declined
 
     led = ProvenanceLedger()
     client = _client(_Raising(Declined("declined", usage=Usage(30, 2))), led)
-    with pytest.raises(Declined):
-        client.complete("a1", TaskClass.RED_TEAM, "x")
+    done = client.complete("a1", TaskClass.RED_TEAM, "x")
+    assert done.refused is True and done.text == ""
+    assert "declined" in (done.refusal_reason or "")
     assert len(list(led.calls())) == 1
 
 
@@ -319,25 +320,24 @@ def test_a_call_that_raised_is_still_traced_with_its_error(tmp_path):
 
 # ---------------------------------------------------------------- 4. caching and its price
 def test_the_system_prompt_is_sent_as_a_cacheable_block():
-    seen: list = []
-    _backend(_opener(_reply(), seen)).complete("claude-opus-5", "q", "you are terse")
-    body = json.loads(seen[0].data)
-    assert body["system"] == [
+    fake = FakeAnthropic([_reply()])
+    _sdk_backend(client=fake).complete("claude-opus-5", "q", "you are terse")
+    assert fake.calls[0]["system"] == [
         {"type": "text", "text": "you are terse", "cache_control": {"type": "ephemeral"}}
     ]
 
 
 def test_cache_writes_are_parsed_from_the_usage_block():
-    body = _reply(
+    msg = _reply(
         usage={
-            "input_tokens": 50,
-            "output_tokens": 10,
+            "input_tokens": 10,
+            "output_tokens": 5,
             "cache_read_input_tokens": 0,
-            "cache_creation_input_tokens": 3000,
+            "cache_creation_input_tokens": 640,
         }
     )
-    _, usage = _backend(_opener(body)).complete("claude-opus-5", "q", None)
-    assert usage.cache_write_tokens == 3000 and usage.cached_input_tokens == 0
+    _, usage = _sdk_backend([msg]).complete("claude-opus-5", "q", None)
+    assert usage.cache_write_tokens == 640
 
 
 def test_input_tokens_are_the_uncached_remainder_so_cache_reads_add_a_tenth():

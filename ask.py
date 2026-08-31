@@ -326,6 +326,57 @@ def cmd_thesis(a) -> int:
     for c in sorted(challenges, key=lambda f: -f.numbers.get("severity_rank", 0)):
         kind = c.caveats[0].split(": ")[-1] if c.caveats else "?"
         print(f"  [{kind}] {c.text}")
+
+    if getattr(a, "narrate", False):
+        code = _narrate(ctx, thesis, challenges)
+        if code:
+            return code
+    return 0
+
+
+def _narrate(ctx, thesis, challenges) -> int:
+    """Model prose over engine numbers. The label names the backend, because a
+    placeholder that reads like analysis is the failure the label prevents."""
+    from decimal import Decimal
+
+    from agents.synthesis.narrate import narrate_thesis
+    from core.config import load as load_config
+    from core.guardrails.policy import Action, PolicyViolation, Rail
+    from core.llm.backends import backend_from_env
+    from core.llm.client import InferenceClient
+    from core.provenance.ledger import ProvenanceLedger
+
+    backend, reason = backend_from_env()
+    cfg = load_config()
+    client = InferenceClient(
+        backend,
+        ctx.engine,
+        ProvenanceLedger(cfg.provenance_db),
+        daily_budget_myr=Decimal(str(cfg.daily_budget_myr)),
+    )
+    done = narrate_thesis(client, thesis, challenges)
+    if done.refused:
+        print(f"\nnarrative refused by the model: {done.refusal_reason}")
+        print("  (the analysis above stands; only the prose is missing)")
+        return 0
+    # The output rail sees the model text BEFORE a human does. A banned verb
+    # from the model is the same violation as one typed by hand.
+    try:
+        ctx.engine.enforce(
+            Action(
+                name="narrate",
+                rail=Rail.OUTPUT,
+                agent="a10_thesis",
+                payload={"text": done.text},
+            )
+        )
+    except PolicyViolation as e:
+        print(f"\nnarrative BLOCKED by the output rail: {e}")
+        return 0
+    print(f"\nnarrative  [{type(backend).__name__} - {reason.split(':')[0]}]")
+    for line in done.text.strip().splitlines():
+        print(f"  {line}")
+    print("\n  This is analysis, not advice, and this system cannot place orders.")
     return 0
 
 
@@ -795,6 +846,11 @@ def main(argv=None) -> int:
         action="append",
         metavar="AGENT=TEXT",
         help="repeatable, e.g. a1_fundamentals=CASA fell to 24%%",
+    )
+    th.add_argument(
+        "--narrate",
+        action="store_true",
+        help="add three model-written paragraphs over the engine numbers (echo backend prints a labelled placeholder)",
     )
     th.add_argument("--stance", default="hold", choices=[s.value for s in Stance])
     th.add_argument("--horizon", type=int, default=12, help="months")

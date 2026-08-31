@@ -132,6 +132,57 @@ class Usage:
     cache_write_tokens: int = 0  # cache_creation_input_tokens, billed at 1.25x
 
 
+@dataclass(frozen=True)
+class RequestProfile:
+    """How a request is SHAPED for the model a tier resolves to.
+
+    Haiku 4.5 rejects `thinking`/`effort` with a 400; the Opus/Sonnet 5 family
+    wants adaptive thinking and an effort level, and long generations should
+    stream so they cannot die on an HTTP idle timeout. The table below is the
+    single place that knowledge lives - the backend never guesses.
+    """
+
+    max_tokens: int
+    adaptive_thinking: bool = False
+    effort: str | None = None
+    stream: bool = False
+
+
+REQUEST_PROFILES: dict[Tier, RequestProfile] = {
+    Tier.REASON: RequestProfile(
+        max_tokens=16000, adaptive_thinking=True, effort="high", stream=True
+    ),
+    Tier.BALANCED: RequestProfile(max_tokens=8000, adaptive_thinking=True, effort="medium"),
+    Tier.CHEAP: RequestProfile(max_tokens=1024),
+    Tier.EMBED: RequestProfile(max_tokens=1),
+    Tier.LOCAL: RequestProfile(max_tokens=1),
+}
+
+
+def cheap_capped() -> bool:
+    """FINPLANET_CHEAP=1 forces every Messages tier onto the cheapest model.
+
+    The development budget rule: live testing runs on Haiku, always, and the
+    cap is DISCLOSED everywhere a backend is named - never silent. Promoted
+    from qa/_support/cheap.py so a dev run cannot accidentally bill Opus.
+    """
+    import os
+
+    return os.environ.get("FINPLANET_CHEAP", "").strip() in ("1", "true", "yes")
+
+
+def effective_tier(tier: Tier) -> Tier:
+    """The tier that will actually be called AND billed.
+
+    Under the cheap cap, REASON and BALANCED resolve to CHEAP - model and
+    price move together, so the ledger records what was truly spent rather
+    than what the task class would normally cost. EMBED/LOCAL are untouched.
+    """
+    if cheap_capped() and tier in (Tier.REASON, Tier.BALANCED):
+        return Tier.CHEAP
+    return tier
+
+
 #: First-party rates: a cache read costs a tenth of fresh input, a five-minute
 #: cache write a quarter more. Both scale the tier's own input rate.
 CACHE_READ_MULTIPLIER = Decimal("0.1")

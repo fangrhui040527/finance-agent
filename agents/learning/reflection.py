@@ -20,6 +20,9 @@ import hashlib
 from dataclasses import dataclass, field
 from datetime import UTC, date, datetime
 from enum import Enum
+from typing import Literal
+
+from pydantic import BaseModel
 
 from agents.base import Agent, Finding
 from core.contracts.provenance_marker import Author, ProvenanceMarker, is_managed
@@ -228,6 +231,29 @@ class LessonStore:
         return new
 
 
+class LessonProposal(BaseModel):
+    """A lesson the model believes clears every bar. Still advisory."""
+
+    kind: Literal["lesson"] = "lesson"
+    text: str
+    pattern: str
+    counter_example_search: str
+
+
+class NoLesson(BaseModel):
+    """The default answer, stated with what would change it."""
+
+    kind: Literal["no_lesson"] = "no_lesson"
+    reason: str
+    evidence_that_would_change_this: str = ""
+
+
+class ReflectionReply(BaseModel):
+    """The union the model must answer with. `reply.root.kind` discriminates."""
+
+    root: LessonProposal | NoLesson
+
+
 class A15Reflection(Agent):
     """Reviews graded outcomes and mostly declines to write anything."""
 
@@ -253,6 +279,35 @@ class A15Reflection(Agent):
         super().__init__(ctx)
         self.queue = queue
         self.store = store
+
+    def second_opinion(self, client, pattern: str, outcomes: list[Outcome]):
+        """A structured model read of a cohort. ADVISORY ONLY: the deterministic
+        gates in propose() still decide - a model may talk itself into a lesson,
+        and the whole design of this agent is that enthusiasm is not evidence.
+
+        Returns (reply, completion): reply is a ReflectionReply or None (None
+        when the model refused - completion.refused says so). A reply that
+        fails to validate raises BackendError; a malformed answer is never
+        quietly read as NO LESSON, because silence and refusal must stay
+        distinguishable from breakage.
+        """
+        wins = sum(1 for o in outcomes if o.correct)
+        digest = (
+            f"pattern: {pattern}\n"
+            f"outcomes: {len(outcomes)} graded, {wins} correct\n"
+            + "\n".join(
+                f"  - {o.prediction_id}: {'correct' if o.correct else 'wrong'}, "
+                f"return {o.realised_return:+.4f} vs benchmark {o.benchmark_return:+.4f}"
+                for o in outcomes
+            )
+        )
+        return client.complete_structured(
+            self.agent_id,
+            TaskClass.REFLECTION_DEEP,
+            digest,
+            ReflectionReply,
+            system=self.SYSTEM,
+        )
 
     def run(
         self,
