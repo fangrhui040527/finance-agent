@@ -256,7 +256,12 @@ class GdeltFeed(FeedAdapter):
         span = max(now - since, self.MIN_TIMESPAN)
         return f"{max(1, -(-int(span.total_seconds()) // 60))}min"
 
-    def _url(self, since: datetime, limit: int) -> str:
+    def _url(
+        self,
+        since: datetime,
+        limit: int,
+        window: tuple[datetime, datetime] | None = None,
+    ) -> str:
         from urllib.parse import urlencode
 
         terms = [self.query] if self.query else []
@@ -270,19 +275,49 @@ class GdeltFeed(FeedAdapter):
             "mode": "artlist",
             "format": "json",
             "sort": "datedesc",
-            "timespan": self._timespan(since),
             "maxrecords": min(max(1, limit), self.MAX_RECORDS),
         }
+        if window is not None:
+            # The DOC API has no cursor. Paging is done by slicing TIME:
+            # startdatetime/enddatetime bound one slice each.
+            start, end = window
+            params["startdatetime"] = start.astimezone(UTC).strftime("%Y%m%d%H%M%S")
+            params["enddatetime"] = end.astimezone(UTC).strftime("%Y%m%d%H%M%S")
+        else:
+            params["timespan"] = self._timespan(since)
         return f"{self.doc_api}?{urlencode(params)}"
 
     def _fetch_raw(self, since: datetime, limit: int) -> list[RawRecord]:
+        if limit <= self.MAX_RECORDS:
+            return self._fetch_page(self._url(since, limit))
+        # More than one page: slice [since, now] into equal windows and dedupe
+        # by url. GDELT has no cursor - time is the only pagination there is.
+        now = datetime.now(UTC)
+        if since.tzinfo is None:
+            since = since.replace(tzinfo=UTC)
+        pages = -(-limit // self.MAX_RECORDS)
+        step = (now - since) / pages
+        seen: set[str] = set()
+        out: list[RawRecord] = []
+        for i in range(pages):
+            lo, hi = since + step * i, since + step * (i + 1)
+            for rec in self._fetch_page(self._url(since, self.MAX_RECORDS, window=(lo, hi))):
+                key = str(rec.payload.get("url", ""))
+                if key and key in seen:
+                    continue
+                seen.add(key)
+                out.append(rec)
+                if len(out) >= limit:
+                    return out
+        return out
+
+    def _fetch_page(self, url: str) -> list[RawRecord]:
         import urllib.error
         import urllib.request
 
         from core.net.breaker import CircuitOpen
         from core.net.retry import with_retry
 
-        url = self._url(since, limit)
         opener = self._opener or urllib.request.urlopen
         req = urllib.request.Request(url, headers={"User-Agent": self.user_agent})
 

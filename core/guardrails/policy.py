@@ -257,13 +257,27 @@ class RateLimitPolicy(PolicyRule):
     name = "rate_limit"
     rails = (Rail.TOOL,)
 
-    def __init__(self, max_calls: int, window_seconds: float, clock=time.monotonic) -> None:
+    def __init__(
+        self, max_calls: int, window_seconds: float, clock=time.monotonic, store=None
+    ) -> None:
         self.max_calls = max_calls
         self.window = window_seconds
         self._clock = clock
         self._hits: list[float] = []
+        #: Optional shared counter (core/guardrails/ratestore.py). Without it the
+        #: limit is per-process, and CLI + MCP + web each get a full allowance.
+        self.store = store
 
     def evaluate(self, action: Action) -> PolicyResult | None:
+        if self.store is not None:
+            n = self.store.count_and_add(self.rails[0].value, self.window)
+            if n >= self.max_calls:
+                return PolicyResult(
+                    Decision.DENY,
+                    self.name,
+                    f"rate limit {self.max_calls}/{self.window}s exhausted (shared)",
+                )
+            return None
         now = self._clock()
         self._hits = [t for t in self._hits if now - t < self.window]
         if len(self._hits) >= self.max_calls:

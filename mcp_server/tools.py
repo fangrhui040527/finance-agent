@@ -237,8 +237,17 @@ def why_did_it_move(
 
     if market_proxy:
         try:
-            instrument_return, first, last = _window_return(instrument, bars, end)
-            market_return, _, _ = _window_return(market_proxy, bars, end)
+            if instrument == market_proxy:
+                instrument_return, first, last = _window_return(instrument, bars, end)
+                market_return = instrument_return
+            else:
+                from concurrent.futures import ThreadPoolExecutor
+
+                with ThreadPoolExecutor(max_workers=2) as pool:
+                    fa = pool.submit(_window_return, instrument, bars, end)
+                    fb = pool.submit(_window_return, market_proxy, bars, end)
+                    instrument_return, first, last = fa.result()
+                    market_return, _, _ = fb.result()
             window, measured = (first, last), True
         except PriceFeedError as e:
             return f"NO DATA: {e}"

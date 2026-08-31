@@ -73,7 +73,13 @@ class PriceFeed(ABC):
         tomorrow's bar makes every downstream guard irrelevant.
         """
         symbol = self.symbol_for(instrument_id)
-        bars = self.parse(self._fetch_csv(symbol), symbol)
+        cache = getattr(self, "cache", None)
+        body = cache.get(self.name, symbol) if cache is not None else None
+        if body is None:
+            body = self._fetch_csv(symbol)
+            if cache is not None:
+                cache.put(self.name, symbol, body)
+        bars = self.parse(body, symbol)
         if start is not None:
             bars = [b for b in bars if b.day >= start]
         if end is not None:
@@ -233,10 +239,13 @@ class StooqFeed(PriceFeed):
         "XTKS": "jp",
     }
 
-    def __init__(self, opener: Callable | None = None, sleep: Callable | None = None) -> None:
+    def __init__(
+        self, opener: Callable | None = None, sleep: Callable | None = None, cache=None
+    ) -> None:
         self._opener = opener
         self._sleep = sleep
         self._breaker = CircuitBreaker("stooq")
+        self.cache = cache
 
     def symbol_for(self, instrument_id: str) -> str:
         if ":" not in instrument_id:
@@ -312,10 +321,11 @@ class YahooFeed(PriceFeed):
         "XETR": ".DE",
     }
 
-    def __init__(self, opener=None, sleep=None) -> None:
+    def __init__(self, opener=None, sleep=None, cache=None) -> None:
         self._opener = opener
         self._sleep = sleep
         self._breaker = CircuitBreaker("yahoo")
+        self.cache = cache
 
     def symbol_for(self, instrument_id: str) -> str:
         if ":" not in instrument_id:
@@ -429,7 +439,23 @@ class ChainedFeed:
         )
 
 
+_DEFAULT: ChainedFeed | None = None
+
+
 def default_feed() -> ChainedFeed:
     """What the surfaces use. Stooq first for its depth of history; Yahoo when
-    Stooq is walled, down, or has no suffix for the market."""
-    return ChainedFeed([StooqFeed(), YahooFeed()])
+    Stooq is walled, down, or has no suffix for the market.
+
+    One instance per process, on purpose: the circuit breakers accumulate
+    evidence across calls, and both feeds share a same-trading-day cache so a
+    repeated question costs zero quota (Stooq counts daily hits)."""
+    global _DEFAULT
+    if _DEFAULT is None:
+        try:
+            from core.market.cache import PriceCache
+
+            cache = PriceCache()
+        except Exception:  # a broken cache must degrade to fetching, not block prices
+            cache = None
+        _DEFAULT = ChainedFeed([StooqFeed(cache=cache), YahooFeed(cache=cache)])
+    return _DEFAULT

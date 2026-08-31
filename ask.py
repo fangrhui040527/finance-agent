@@ -139,10 +139,15 @@ def cmd_why(a) -> int:
             )
             return 2
         try:
-            a.move, first_day, last_day = _window_return(a.instrument, a.days, end)
-            a.market, _, _ = _window_return(a.against, a.days, end)
+            legs = _window_returns(
+                [a.instrument, a.against] + ([a.sector_proxy] if a.sector_proxy else []),
+                a.days,
+                end,
+            )
+            a.move, first_day, last_day = legs[a.instrument]
+            a.market, _, _ = legs[a.against]
             if a.sector_proxy:
-                a.sector, _, _ = _window_return(a.sector_proxy, a.days, end)
+                a.sector, _, _ = legs[a.sector_proxy]
         except PriceFeedError as e:
             print(f"no prices: {e}", file=sys.stderr)
             return 3
@@ -192,6 +197,24 @@ def _feed():
     """The price seam. A chain, not a name: stooq.com walled itself off on
     2026-08-31 and a CLI wired to one source by name went dark with it."""
     return default_feed()
+
+
+def _window_returns(instruments: list[str], bars_back: int, end: date | None) -> dict:
+    """All legs of a decomposition, concurrently, each id fetched exactly once.
+
+    The legs are independent HTTP calls to a slow free source; serially they
+    cost up to 3x the timeout. Duplicates (instrument == market proxy) are
+    deduplicated BEFORE fetching, or the same URL would be paid for twice in
+    one command.
+    """
+    from concurrent.futures import ThreadPoolExecutor
+
+    unique = list(dict.fromkeys(instruments))
+    if len(unique) == 1:
+        return {unique[0]: _window_return(unique[0], bars_back, end)}
+    with ThreadPoolExecutor(max_workers=min(3, len(unique))) as pool:
+        futures = {i: pool.submit(_window_return, i, bars_back, end) for i in unique}
+        return {i: f.result() for i, f in futures.items()}
 
 
 def _window_return(instrument: str, bars_back: int, end: date | None):

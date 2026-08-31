@@ -102,6 +102,8 @@ class Tracer:
 
         self.events: list[Event] = []
         self.dropped_from_memory = 0
+        self._sync = os.environ.get("FINPLANET_TRACE_SYNC", "1") != "0"
+        self._unflushed = 0
         self.started = time.perf_counter()
         self.started_at = _now()
         self._seq = 0
@@ -137,7 +139,13 @@ class Tracer:
                 self.dropped_from_memory += 1
             self.events.append(ev)
             self._fh.write(ev.as_json() + "\n")
-            self._fh.flush()
+            # Sync by default: a crash mid-run must leave everything on disk.
+            # FINPLANET_TRACE_SYNC=0 batches (every 50th event, and always on
+            # error or span end) for long unattended runs.
+            self._unflushed += 1
+            if self._sync or kind in ("error", "span_end") or self._unflushed >= 50:
+                self._fh.flush()
+                self._unflushed = 0
             return ev
 
     def _externalise(self, name: str, data: dict) -> dict:

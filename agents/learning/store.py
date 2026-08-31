@@ -110,6 +110,10 @@ class LearningStore:
         # See core/provenance/ledger._enable_wal for why both matter.
         _enable_wal(self.db, str(self.path), self.BUSY_TIMEOUT_MS)
         self.db.executescript(SCHEMA)
+        self.db.executescript(
+            "CREATE INDEX IF NOT EXISTS outcomes_graded_on ON outcomes(graded_on);"
+            "CREATE INDEX IF NOT EXISTS predictions_grade_on ON predictions(grade_on);"
+        )
         self.db.commit()
 
     def close(self) -> None:
@@ -183,8 +187,19 @@ class LearningStore:
         ).fetchall()
         return [self._to_prediction(r) for r in rows]
 
-    def graded(self) -> list[Outcome]:
-        rows = self.db.execute("SELECT * FROM outcomes ORDER BY graded_on").fetchall()
+    def graded(self, limit: int | None = None, since: date | None = None) -> list[Outcome]:
+        sql = "SELECT * FROM outcomes"
+        args: list = []
+        if since is not None:
+            sql += " WHERE graded_on >= ?"
+            args.append(since.isoformat())
+        sql += " ORDER BY graded_on"
+        if limit is not None:
+            sql += " DESC LIMIT ?"
+            args.append(int(limit))
+        rows = self.db.execute(sql, args).fetchall()
+        if limit is not None:
+            rows = list(reversed(rows))  # newest-N, still presented oldest-first
         return [
             Outcome(
                 r["prediction_id"],

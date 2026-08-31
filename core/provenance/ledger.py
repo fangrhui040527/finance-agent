@@ -71,6 +71,7 @@ BEGIN SELECT RAISE(ABORT, 'provenance ledger is append-only'); END;
 INDEXES = """
 CREATE INDEX IF NOT EXISTS llm_calls_at ON llm_calls(at);
 CREATE INDEX IF NOT EXISTS llm_calls_run ON llm_calls(run_id);
+CREATE INDEX IF NOT EXISTS claims_at ON claims(at);
 """
 
 # docs/08: mid-market was ~4.04 on 24 Aug 2026; 4.15 is the planning rate that
@@ -177,6 +178,13 @@ class ProvenanceLedger:
             self.conn.execute(
                 "ALTER TABLE llm_calls ADD COLUMN cache_write_tokens INTEGER NOT NULL DEFAULT 0"
             )
+        # Exact-integer mirror of cost_myr (micro-MYR), so the windowed budget
+        # check is one SUM in SQL instead of every row ever written coming back
+        # to Python. TEXT cost_myr stays authoritative; legacy rows keep NULL
+        # here and are summed the old way - triggers forbid a backfill UPDATE,
+        # and that is the correct trade.
+        if "cost_myr_micro" not in calls:
+            self.conn.execute("ALTER TABLE llm_calls ADD COLUMN cost_myr_micro INTEGER")
 
     def close(self) -> None:
         self.conn.close()
@@ -208,8 +216,8 @@ class ProvenanceLedger:
         self.conn.execute(
             "INSERT INTO llm_calls (at, agent, task_class, tier, model_id, prompt_hash, run_id,"
             " input_tokens, output_tokens, cached_tokens, cache_write_tokens, cost_usd,"
-            " cost_myr, fx_rate, fx_asof, latency_ms)"
-            " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            " cost_myr_micro, cost_myr, fx_rate, fx_asof, latency_ms)"
+            " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
             (
                 at.isoformat(),
                 agent,
@@ -223,6 +231,7 @@ class ProvenanceLedger:
                 usage.cached_input_tokens,
                 usage.cache_write_tokens,
                 str(usd),
+                int(myr * 1_000_000),
                 str(myr),
                 str(fx_rate),
                 at.isoformat(),
@@ -272,14 +281,28 @@ class ProvenanceLedger:
         )
         self.conn.commit()
 
+    _LEGACY = "cost_myr_micro IS NULL"
+
+    def _sum(self, where: str = "", args: tuple = ()) -> Decimal:
+        """SUM(micro) in SQL for modern rows; Python-exact sum for legacy ones."""
+        clause = f" AND {where}" if where else ""
+        micro = self.conn.execute(
+            f"SELECT COALESCE(SUM(cost_myr_micro), 0) FROM llm_calls"
+            f" WHERE cost_myr_micro IS NOT NULL{clause}",
+            args,
+        ).fetchone()[0]
+        legacy = self.conn.execute(
+            f"SELECT cost_myr FROM llm_calls WHERE {self._LEGACY}{clause}", args
+        ).fetchall()
+        return Decimal(int(micro)) / 1_000_000 + sum((Decimal(r[0]) for r in legacy), Decimal(0))
+
     def total_cost_myr(self) -> Decimal:
-        row = self.conn.execute("SELECT cost_myr FROM llm_calls").fetchall()
-        return sum((Decimal(r[0]) for r in row), Decimal(0))
+        return self._sum()
 
     def cost_by_tier_myr(self) -> dict[str, Decimal]:
         out: dict[str, Decimal] = {}
-        for tier, cost in self.conn.execute("SELECT tier, cost_myr FROM llm_calls"):
-            out[tier] = out.get(tier, Decimal(0)) + Decimal(cost)
+        for (tier,) in self.conn.execute("SELECT DISTINCT tier FROM llm_calls"):
+            out[tier] = self._sum("tier = ?", (tier,))
         return out
 
     # -- windowed queries ----------------------------------------------------
@@ -294,20 +317,16 @@ class ProvenanceLedger:
         the budget a one-way cap that permanently bricks the caller once
         cumulative spend passes it.
         """
-        rows = self.conn.execute(
-            "SELECT cost_myr FROM llm_calls WHERE at >= ?", (start.isoformat(),)
-        ).fetchall()
-        return sum((Decimal(r[0]) for r in rows), Decimal(0))
+        return self._sum("at >= ?", (start.isoformat(),))
 
     def cost_by_agent_myr(self, since: datetime | None = None) -> dict[str, Decimal]:
-        sql = "SELECT agent, cost_myr FROM llm_calls"
-        args: tuple = ()
-        if since is not None:
-            sql += " WHERE at >= ?"
-            args = (since.isoformat(),)
         out: dict[str, Decimal] = {}
-        for agent, cost in self.conn.execute(sql, args):
-            out[agent] = out.get(agent, Decimal(0)) + Decimal(cost)
+        for (agent,) in self.conn.execute("SELECT DISTINCT agent FROM llm_calls"):
+            where, args = "agent = ?", [agent]
+            if since is not None:
+                where += " AND at >= ?"
+                args.append(since.isoformat())
+            out[agent] = self._sum(where, tuple(args))
         return out
 
     def _rows(self, sql: str, args: tuple = ()) -> list[sqlite3.Row]:
@@ -322,8 +341,11 @@ class ProvenanceLedger:
         cur.row_factory = sqlite3.Row
         return cur.execute(sql, args).fetchall()
 
-    def calls(self) -> Iterator[sqlite3.Row]:
-        yield from self._rows("SELECT * FROM llm_calls ORDER BY id")
+    def calls(self, limit: int | None = None) -> Iterator[sqlite3.Row]:
+        yield from self._rows(
+            "SELECT * FROM llm_calls ORDER BY id"
+            + (f" LIMIT {int(limit)}" if limit is not None else "")
+        )
 
     def calls_between(self, start: datetime, end: datetime) -> list[sqlite3.Row]:
         return self._rows(
