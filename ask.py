@@ -122,6 +122,14 @@ def cmd_plan(a) -> int:
 
 
 def cmd_why(a) -> int:
+    if not getattr(a, "fetch", False) and (a.move is None or a.market is None):
+        print(
+            "give --move AND --market, or --fetch --against <proxy> to measure both "
+            "from the price feed. One typed leg against one measured leg is a "
+            "subtraction, not a decomposition.",
+            file=sys.stderr,
+        )
+        return 2
     fit = _fit_from_csv(a.history) if a.history else _fit_synthetic(a.beta_market, a.beta_sector)
     end = date.fromisoformat(a.on) if a.on else date.today()
     window = (end - timedelta(days=a.days), end)
@@ -922,8 +930,12 @@ def main(argv=None) -> int:
 
     wy = sub.add_parser("why", help="decompose a move before naming a cause")
     wy.add_argument("instrument")
-    wy.add_argument("--move", type=float, required=True, help="realised local return, e.g. -0.09")
-    wy.add_argument("--market", type=float, required=True, help="index return over the same window")
+    # NOT required: --fetch exists to MEASURE these from the feed, and demanding
+    # them anyway made the measured path - the one this command is for -
+    # unreachable without typing the numbers you were asking it to measure.
+    # cmd_why enforces the real rule: typed, or fetched, never half of each.
+    wy.add_argument("--move", type=float, help="realised local return, e.g. -0.09")
+    wy.add_argument("--market", type=float, help="index return over the same window")
     wy.add_argument("--sector", type=float, default=0.0)
     wy.add_argument("--fx", type=float, default=0.0, help="base-currency leg")
     wy.add_argument("--currency", default="MYR")
