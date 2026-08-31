@@ -118,9 +118,21 @@ def test_the_report_names_dropped_claims_as_the_quality_signal(tmp_path):
 
 
 def test_the_cap_is_disclosed_in_the_report(tmp_path, monkeypatch):
+    """Either spelling of the pin, and the effort with it. A report that named
+    only the variable it happened to know about would be telling the truth about
+    that variable and lying about the run."""
     _ledger_with_calls(tmp_path / "l.db").close()
     monkeypatch.setenv("FINPLANET_CHEAP", "1")
-    assert "FINPLANET_CHEAP=1 is in force" in O.operating_report(days=7, db=str(tmp_path / "l.db"))
+    out = O.operating_report(days=7, db=str(tmp_path / "l.db"))
+    assert "selection in force" in out
+    assert "claude-haiku-4-5" in out
+
+    monkeypatch.delenv("FINPLANET_CHEAP")
+    monkeypatch.setenv("FINPLANET_MODEL", "opus")
+    monkeypatch.setenv("FINPLANET_EFFORT", "max")
+    out = O.operating_report(days=7, db=str(tmp_path / "l.db"))
+    assert "claude-opus-5" in out
+    assert "max" in out
 
 
 # --- failures across traced runs --------------------------------------------------

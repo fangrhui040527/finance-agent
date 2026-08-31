@@ -888,19 +888,44 @@ def cmd_backend(a) -> int:
         return 3
     print(f"backend   {type(backend).__name__}")
     print(f"reason    {reason}")
-    from core.llm.tiers import MODEL_IDS, cheap_capped, effective_tier
+    from core.llm.tiers import (
+        MESSAGES_TIERS,
+        MODEL_IDS,
+        cheap_capped,
+        effective_tier,
+        profile_for,
+        selected_effort,
+        selection_note,
+    )
 
-    # Under the cap the table must show what will ACTUALLY be called and
-    # billed. Printing the uncapped model here is how a disclosure command
-    # ends up disclosing the wrong thing.
+    # Under a pin the table must show what will ACTUALLY be called and billed.
+    # Printing the unpinned model here is how a disclosure command ends up
+    # disclosing the wrong thing. The reasoning column is the same rule applied
+    # to effort: what the request will carry, in the form that model accepts.
     for tier, model in MODEL_IDS.items():
         landed = effective_tier(tier)
-        if landed is tier:
-            print(f"  {tier.value:<9} {model}")
+        shape = profile_for(landed)
+        if landed in MESSAGES_TIERS:
+            if shape.thinking_budget is not None:
+                how = f"thinking budget {shape.thinking_budget}"
+            elif shape.effort:
+                how = f"effort {shape.effort}"
+            else:
+                how = "no thinking"
+            how = f"{how}, max {shape.max_tokens}" + (", streamed" if shape.stream else "")
         else:
-            print(f"  {tier.value:<9} {MODEL_IDS[landed]}   (capped from {model})")
+            how = "not a Messages model"
+        moved = "" if landed is tier else f"   (pinned from {model})"
+        print(f"  {tier.value:<9} {MODEL_IDS[landed]:<24} {how}{moved}")
+    note = selection_note()
+    if note:
+        print(f"  selection {note}")
     if cheap_capped():
-        print("  FINPLANET_CHEAP=1 is set; unset it to spend at each tier's own rate.")
+        print("  every Messages tier is on the cheapest model; unset the pin to")
+        print("  spend at each tier's own rate.")
+    if selected_effort() is None:
+        print("  effort unset: each tier keeps its own default (reason high, balanced")
+        print("  medium, cheap none). --effort low|medium|high|xhigh|max overrides it.")
     return 0
 
 
@@ -1080,6 +1105,35 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(
         prog="ask", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
+
+    # Model and effort are one selection, available to every subcommand, and
+    # they set the same environment variables an operator would export - so a
+    # flag and a shell export cannot mean two different things. The flag wins
+    # for the length of one command, which is the whole point of having it.
+    def _selection(parser, *, suppress: bool) -> None:
+        # On the subparsers the default is SUPPRESS, not None. With a plain
+        # default the subparser would write None over whatever the top-level
+        # parser had already parsed, and `ask.py --effort max why ...` would
+        # silently think at the default level - the exact silent-selection
+        # failure the disclosure line exists to prevent.
+        default = argparse.SUPPRESS if suppress else None
+        parser.add_argument(
+            "--model",
+            metavar="NAME",
+            default=default,
+            help="pin every Messages tier to one model: haiku | sonnet | opus "
+            "(or the exact model id). Default: the task class routes it.",
+        )
+        parser.add_argument(
+            "--effort",
+            metavar="LEVEL",
+            default=default,
+            help="how hard the model thinks: low | medium | high | xhigh | max. "
+            "On Haiku 4.5, which takes no effort parameter, this becomes a "
+            "thinking budget of the matching size.",
+        )
+
+    _selection(ap, suppress=False)
     sub = ap.add_subparsers(dest="cmd", required=True)
 
     pl = sub.add_parser("plan", help="what would the system do with this question")
@@ -1307,7 +1361,28 @@ def main(argv=None) -> int:
     dr.add_argument("--offline", action="store_true", help="skip the two network probes")
     dr.set_defaults(fn=cmd_doctor)
 
+    # A global flag that only worked BEFORE the subcommand is a flag people
+    # write after it and are told does not exist. Both positions accept it.
+    for _p in sub.choices.values():
+        _selection(_p, suppress=True)
+
     a = ap.parse_args(argv)
+    # Set them before dispatch, and validate immediately: a typo that silently
+    # selected Opus would be found on the invoice, not on the screen.
+    import os
+
+    if a.model:
+        os.environ["FINPLANET_MODEL"] = a.model
+    if a.effort:
+        os.environ["FINPLANET_EFFORT"] = a.effort
+    if a.model or a.effort:
+        from core.llm.tiers import ModelSelectionError, pinned_tier, selected_effort
+
+        try:
+            pinned_tier(), selected_effort()
+        except ModelSelectionError as e:
+            print(f"{e}", file=sys.stderr)
+            return 2
     return a.fn(a)
 
 

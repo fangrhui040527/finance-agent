@@ -80,6 +80,7 @@ make graph-report            # hubs, orphans, review queue, surprising links
 make codegraph               # the repo as a graph -> data/codegraph.db
 make mcp                     # serve MCP on stdio -> docs/15-MCP-SETUP.md
 python ask.py backend                        # which model is actually answering
+python ask.py --model opus --effort max backend   # pin the model, pick the reasoning
 python ask.py why MYX:1155 --move -0.09 --market -0.08
 python ask.py why XNAS:NVDA --fetch --against XNAS:SPY --days 5
 python ask.py prices XNAS:NVDA --days 30     # live daily bars
@@ -118,6 +119,7 @@ make up                      # postgres+timescale · qdrant · neo4j · redis ·
 | P18 | T2 markets: SG HK JP UK AU IN TW KR DE | `markets/` — 11 adapters |
 | P18 | Hong Kong (XHKG), the second — per-issuer board lots, uncapped stamp | `markets/xhkg.py` |
 | Model | Anthropic Messages backend behind the one `Backend` seam | `core/llm/backends.py` |
+| Model choice | `--model haiku\|sonnet\|opus` · `--effort low..max`, disclosed on every surface | `core/llm/tiers.py` |
 | Prices | Stooq daily bars, validated at the seam | `core/market/feed.py` |
 | Entrypoints | `thesis` · `risk` · `size` · `learn` · `prices` · `backend` | `ask.py` |
 | MCP | 11 tools over stdio — the engines decide, your Claude narrates | `mcp_server/` |

@@ -13,6 +13,11 @@ REM   run cov         tests with the coverage gate
 REM   run verify      the whole pipeline on mock data, no network, no keys
 REM   run config      show settings and where they came from
 REM   run why ...     decompose a move before naming a cause
+REM
+REM   Model and reasoning, on any subcommand:
+REM     --model  haiku / sonnet / opus              pin every tier to one model
+REM     --effort low / medium / high / xhigh / max  how hard it thinks
+REM   e.g.  run why MYX:1155 --move -0.09 --market -0.08 --effort max
 REM   run plan ...    what the system would do with a question
 REM   run log ...     log a view before you find out
 REM   run trace       full traced system run -> debug\<run_id>\

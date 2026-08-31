@@ -139,14 +139,14 @@ def run_checks(offline: bool = False) -> list[CheckResult]:
             "narrative output (numbers are engine-computed either way)",
         )
     )
-    cap = os.environ.get("FINPLANET_CHEAP", "")
+    from core.llm.tiers import cheap_capped, selection_note
+
+    note = selection_note()
     out.append(
         CheckResult(
             "spend-cap",
-            OK if cap else WARN,
-            "FINPLANET_CHEAP=1: every tier resolves to the cheapest model"
-            if cap
-            else "FINPLANET_CHEAP unset - live calls bill at each tier's own rate",
+            OK if cheap_capped() else WARN,
+            note or "no model pin - live calls bill at each tier's own rate",
             "spend",
         )
     )

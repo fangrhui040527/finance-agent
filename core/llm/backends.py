@@ -158,9 +158,22 @@ class AnthropicBackend:
             )
         import anthropic  # the ONE import site; lazy so echo never loads it
 
+        # An identity-linked key is scoped to a workspace and the API refuses
+        # every request that does not name one - a 400 before the model is
+        # reached, on all five effort levels, for the same reason. The header is
+        # sent when ANTHROPIC_WORKSPACE_ID is set and omitted when it is not,
+        # because a plain key rejects a workspace it does not have.
+        workspace = os.environ.get("ANTHROPIC_WORKSPACE_ID", "").strip()
+        self.workspace_id = workspace or None
+        extra: dict[str, Any] = {}
+        if workspace:
+            extra["default_headers"] = {"anthropic-workspace-id": workspace}
+
         # max_retries=0: the retry loop below owns backoff, so retry-after
         # capping and sleep injection stay testable and disclosed.
-        self._client = anthropic.Anthropic(api_key=key, max_retries=0, timeout=self.TIMEOUT)
+        self._client = anthropic.Anthropic(
+            api_key=key, max_retries=0, timeout=self.TIMEOUT, **extra
+        )
 
     # -- the seam -----------------------------------------------------------
 
@@ -184,9 +197,17 @@ class AnthropicBackend:
                 {"type": "text", "text": system, "cache_control": {"type": "ephemeral"}}
             ]
         if profile is not None:
-            # Haiku rejects thinking/effort with a 400; the profile table in
-            # tiers.py knows which model takes what. Nothing here guesses.
-            if profile.adaptive_thinking:
+            # Haiku 4.5 rejects adaptive thinking and `effort` with a 400, and
+            # takes the older budgeted form instead; the Opus/Sonnet 5 family is
+            # the other way round. `tiers.profile_for` knows which model takes
+            # what and the two forms are mutually exclusive by construction.
+            # Nothing here guesses.
+            if profile.thinking_budget is not None:
+                params["thinking"] = {
+                    "type": "enabled",
+                    "budget_tokens": profile.thinking_budget,
+                }
+            elif profile.adaptive_thinking:
                 params["thinking"] = {"type": "adaptive"}
             if profile.effort:
                 params["output_config"] = {"effort": profile.effort}
@@ -222,6 +243,18 @@ class AnthropicBackend:
                 if e.status_code in (500, 502, 503, 529):
                     last = TransientError(f"Anthropic returned {e.status_code}: {e.message}")
                     retry_after = self._retry_after(e)
+                elif e.status_code == 400 and "anthropic-workspace-id" in str(e.message).lower():
+                    # Neither transient nor a prompt problem: the credential is
+                    # incomplete. Left as a generic 400 it reads as "the request
+                    # was malformed" and sends the operator to look at the
+                    # request, which is the one place the fault is not.
+                    raise AuthError(
+                        "this API key is identity-linked and every request must name "
+                        "the workspace it acts in. Set ANTHROPIC_WORKSPACE_ID in .env "
+                        "to the workspace id from the Console URL "
+                        "(console.anthropic.com/settings/workspaces). "
+                        f"Anthropic said: {e.message}"
+                    ) from e
                 elif e.status_code == 400 and any(
                     marker in str(e.message).lower()
                     for marker in (
@@ -339,11 +372,12 @@ def backend_from_env(explicit: str | None = None):
     Returns (backend, reason).
     """
     from core.llm.client import EchoBackend
-    from core.llm.tiers import cheap_capped
+    from core.llm.tiers import cheap_capped, selection_note
 
-    cap = (
-        " | FINPLANET_CHEAP=1: every tier resolves to the cheapest model" if cheap_capped() else ""
-    )
+    note = selection_note()
+    cap = f" | {note}" if note else ""
+    if cheap_capped():
+        cap += " (every Messages tier resolves to the cheapest model)"
     choice = (explicit or os.environ.get("LLM_BACKEND", "")).strip().lower()
 
     if choice in ("echo", "none", "offline"):
@@ -354,7 +388,12 @@ def backend_from_env(explicit: str | None = None):
         raise ValueError(f"unknown LLM_BACKEND {choice!r}; expected 'anthropic' or 'echo'")
 
     if os.environ.get("ANTHROPIC_API_KEY", "").strip():
-        return AnthropicBackend(), "anthropic (ANTHROPIC_API_KEY is set, official SDK)" + cap
+        workspace = os.environ.get("ANTHROPIC_WORKSPACE_ID", "").strip()
+        where = f", workspace {workspace}" if workspace else ""
+        return (
+            AnthropicBackend(),
+            f"anthropic (ANTHROPIC_API_KEY is set, official SDK{where})" + cap,
+        )
     return EchoBackend(), (
         "echo (no ANTHROPIC_API_KEY): deterministic stub, NOT a model - "
         "narrative output is placeholder text" + cap

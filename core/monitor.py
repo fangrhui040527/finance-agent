@@ -154,7 +154,8 @@ def evaluate(
                     title=f"24h spend RM {spend:.4f} is {spend / budget:.0%} of the RM {budget:.2f} budget",
                     detail=f"the alert threshold is {fraction:.0%}",
                     next_step="operating_report to see which agent and model spent it; "
-                    "FINPLANET_CHEAP=1 caps every tier to the cheapest model",
+                    "FINPLANET_MODEL=haiku pins every tier to the cheapest model, and "
+                    "FINPLANET_EFFORT=low buys the same answers with less thinking",
                     evidence={"spend_myr": str(spend), "budget_myr": str(budget)},
                 )
             )

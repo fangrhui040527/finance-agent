@@ -126,9 +126,9 @@ def test_the_backend_command_shows_the_capped_model_not_the_uncapped_one(monkeyp
     monkeypatch.setenv("FINPLANET_CHEAP", "1")
     assert ask.main(["backend"]) == 0
     out = capsys.readouterr().out
-    assert "capped from claude-opus-5" in out
+    assert "pinned from claude-opus-5" in out
     assert "claude-haiku-4-5" in out
-    assert "unset it to spend" in out
+    assert "spend at each tier's own rate" in out
 
 
 def test_without_the_cap_the_table_is_the_plain_one(monkeypatch, capsys):
@@ -138,7 +138,7 @@ def test_without_the_cap_the_table_is_the_plain_one(monkeypatch, capsys):
     monkeypatch.delenv("FINPLANET_CHEAP", raising=False)
     assert ask.main(["backend"]) == 0
     out = capsys.readouterr().out
-    assert "capped from" not in out
+    assert "pinned from" not in out
     assert "claude-opus-5" in out
 
 

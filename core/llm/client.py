@@ -20,11 +20,11 @@ from typing import Protocol
 from core.guardrails.policy import Action, PolicyEngine, Rail
 from core.llm.tiers import (
     MODEL_IDS,
-    REQUEST_PROFILES,
     TaskClass,
     Tier,
     Usage,
     effective_tier,
+    profile_for,
     route,
 )
 from core.provenance.ledger import DEFAULT_FX_MYR_PER_USD, ProvenanceLedger
@@ -107,7 +107,10 @@ class InferenceClient:
     ) -> Completion:
         tier = effective_tier(route(task))  # callers never choose this; the cheap cap may lower it
         model_id = MODEL_IDS[tier]
-        profile = REQUEST_PROFILES[tier]
+        # profile_for, not REQUEST_PROFILES: the table is the default shape and
+        # this is the shape after the operator's FINPLANET_EFFORT selection.
+        # Reading the raw table here is how an effort setting becomes decoration.
+        profile = profile_for(tier)
 
         self.engine.enforce(
             Action(

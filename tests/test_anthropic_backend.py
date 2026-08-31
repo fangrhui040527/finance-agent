@@ -387,3 +387,95 @@ def test_the_capped_call_bills_at_haiku_rates_and_names_haiku(monkeypatch, tmp_p
     assert row["model_id"] == "claude-haiku-4-5" and row["tier"] == "cheap"
     # Haiku's input rate is $1/MTok; 100 tokens of fresh input ~ $0.0001.
     assert Decimal(row["cost_usd"]) < Decimal("0.001")
+
+
+# --- identity-linked keys ---------------------------------------------------------
+#
+# Found live, not offline: five calls at five effort levels all returned the same
+# 400 before the model was reached, because the key is scoped to a workspace and
+# nothing named one. Zero tokens, five failures, one cause.
+
+
+def _spy_on_client_construction(monkeypatch) -> dict:
+    """Record the kwargs the backend hands to `anthropic.Anthropic`."""
+    import anthropic
+
+    seen: dict = {}
+    real = anthropic.Anthropic
+
+    def spy(**kwargs):
+        seen.update(kwargs)
+        return real(**kwargs)
+
+    monkeypatch.setattr(anthropic, "Anthropic", spy)
+    return seen
+
+
+def test_a_workspace_id_is_sent_as_a_header_when_one_is_configured(monkeypatch):
+    seen = _spy_on_client_construction(monkeypatch)
+    monkeypatch.setenv("ANTHROPIC_WORKSPACE_ID", "wrkspc_test")
+    be = AnthropicBackend(api_key=KEY)
+    assert be.workspace_id == "wrkspc_test"
+    assert seen["default_headers"] == {"anthropic-workspace-id": "wrkspc_test"}
+
+
+def test_no_workspace_header_is_sent_when_none_is_configured(monkeypatch):
+    """A plain key rejects a workspace it does not have, so an unset variable
+    must send no header at all rather than an empty one."""
+    seen = _spy_on_client_construction(monkeypatch)
+    monkeypatch.delenv("ANTHROPIC_WORKSPACE_ID", raising=False)
+    be = AnthropicBackend(api_key=KEY)
+    assert be.workspace_id is None
+    assert "default_headers" not in seen
+
+
+def test_a_missing_workspace_is_an_auth_error_not_a_bad_request():
+    """Left as a generic 400 this reads as "your request was malformed" and
+    sends the operator to inspect the request, which is the one place the fault
+    is not. The credential is incomplete; retrying cannot help; and the message
+    has to name the variable that fixes it."""
+    import anthropic
+    import httpx2
+
+    err = anthropic.BadRequestError(
+        "anthropic-workspace-id is required when authenticating with an "
+        "identity-linked API key; send the id of the workspace this request acts in.",
+        response=httpx2.Response(
+            400, request=httpx2.Request("POST", "https://api.anthropic.com/v1/messages")
+        ),
+        body=None,
+    )
+    be = _backend(script=[err])
+    with pytest.raises(AuthError, match="ANTHROPIC_WORKSPACE_ID"):
+        be.complete("claude-haiku-4-5", "q", None)
+
+
+def test_the_workspace_400_is_not_retried():
+    """Three attempts against a credential fault is three identical failures."""
+    import anthropic
+    import httpx2
+
+    def err():
+        return anthropic.BadRequestError(
+            "anthropic-workspace-id is required when authenticating with an "
+            "identity-linked API key",
+            response=httpx2.Response(
+                400, request=httpx2.Request("POST", "https://api.anthropic.com/v1/messages")
+            ),
+            body=None,
+        )
+
+    client = FakeAnthropic([err(), reply()])
+    be = AnthropicBackend(client=client, sleep=lambda _s: None)
+    with pytest.raises(AuthError):
+        be.complete("claude-haiku-4-5", "q", None)
+    assert len(client.calls) == 1, "a workspace fault must fail on the first attempt"
+
+
+def test_the_backend_reason_names_the_workspace_it_will_bill(monkeypatch):
+    """`ask.py backend` exists to say what a live call will actually do. Which
+    workspace the spend lands in is part of that."""
+    monkeypatch.setenv("ANTHROPIC_API_KEY", KEY)
+    monkeypatch.setenv("ANTHROPIC_WORKSPACE_ID", "wrkspc_test")
+    _, reason = backend_from_env()
+    assert "wrkspc_test" in reason

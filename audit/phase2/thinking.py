@@ -56,20 +56,47 @@ def x2_thinking_is_only_asked_for_where_it_is_supported() -> Check:
         "Thinking and effort are sent only to models that accept them",
         "Haiku rejects thinking with a 400; the tier table has to know that",
     )
-    from core.llm.tiers import REQUEST_PROFILES, Tier
+    import os
 
-    cheap = REQUEST_PROFILES.get(Tier.CHEAP)
-    if cheap is None:
+    from core.llm.tiers import EFFORT_ORDER, REQUEST_PROFILES, Tier, profile_for
+
+    if REQUEST_PROFILES.get(Tier.CHEAP) is None:
         return c.failed("the cheap tier has no request profile")
-    if getattr(cheap, "adaptive_thinking", False) or getattr(cheap, "effort", ""):
-        return c.failed(
-            "the cheap profile asks for thinking or effort, which Haiku rejects "
-            "with an HTTP 400 - every cheap call would fail"
-        )
-    c.evidence = (
-        f"cheap profile: thinking={getattr(cheap, 'adaptive_thinking', False)}, "
-        f"effort={getattr(cheap, 'effort', '') or 'none'}"
-    )
+
+    # The default table is not enough any more: FINPLANET_EFFORT reshapes the
+    # request, and the shape that reaches the wire is `profile_for`. An audit
+    # that reads the table would pass while every cheap call under a selected
+    # effort returned a 400 - checking the wrong object is how the six drifted
+    # agent ids survived a green suite.
+    before = os.environ.get("FINPLANET_EFFORT")
+    seen = []
+    try:
+        for effort in (None, *EFFORT_ORDER):
+            if effort is None:
+                os.environ.pop("FINPLANET_EFFORT", None)
+            else:
+                os.environ["FINPLANET_EFFORT"] = effort.value
+            shape = profile_for(Tier.CHEAP)
+            label = effort.value if effort else "unset"
+            if shape.adaptive_thinking or shape.effort:
+                return c.failed(
+                    f"at effort={label} the cheap profile asks for "
+                    f"{'adaptive thinking' if shape.adaptive_thinking else 'an effort level'}, "
+                    "which Haiku 4.5 rejects with an HTTP 400 - every cheap call would fail"
+                )
+            if shape.thinking_budget is not None and shape.thinking_budget >= shape.max_tokens:
+                return c.failed(
+                    f"at effort={label} the thinking budget {shape.thinking_budget} is not "
+                    f"inside max_tokens {shape.max_tokens}; the answer would be truncated"
+                )
+            seen.append(f"{label}={shape.thinking_budget or 'no thinking'}/{shape.max_tokens}")
+    finally:
+        if before is None:
+            os.environ.pop("FINPLANET_EFFORT", None)
+        else:
+            os.environ["FINPLANET_EFFORT"] = before
+
+    c.evidence = "cheap tier budget/cap by effort: " + ", ".join(seen)
     return c.ok()
 
 

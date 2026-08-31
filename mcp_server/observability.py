@@ -213,10 +213,11 @@ def operating_report(days: int = 7, db: str = "") -> str:
     else:
         lines.append("    no claims recorded in this window (the emit path was not exercised)")
 
-    from core.llm.tiers import cheap_capped
+    from core.llm.tiers import selection_note
 
-    if cheap_capped():
-        lines += ["", "  FINPLANET_CHEAP=1 is in force: every tier resolves to the cheapest model."]
+    note = selection_note()
+    if note:
+        lines += ["", f"  selection in force: {note}"]
     return "\n".join(lines)
 
 
@@ -694,10 +695,11 @@ def efficiency_report(days: int = 7, db: str = "") -> str:
         cost = sum((Decimal(str(r["cost_myr"])) for r in rows), Decimal(0))
         share = cost / spend if spend else 0
         lines.append(f"    {tier:<10} {len(rows):>4} call(s)  RM {cost:.4f}  {share:.0%} of spend")
-    from core.llm.tiers import cheap_capped
+    from core.llm.tiers import selection_note
 
-    if cheap_capped():
-        lines.append("    FINPLANET_CHEAP=1: every tier resolved to the cheapest model")
+    note = selection_note()
+    if note:
+        lines.append(f"    selection in force: {note}")
 
     lines += ["", "  waste"]
     if wasted:

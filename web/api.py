@@ -43,15 +43,38 @@ def health() -> S.Envelope:
 @router.get("/backend")
 def backend() -> S.Envelope:
     from core.llm.backends import backend_from_env
-    from core.llm.tiers import cheap_capped
+    from core.llm.tiers import (
+        MODEL_IDS,
+        cheap_capped,
+        effective_tier,
+        pinned_tier,
+        profile_for,
+        selected_effort,
+    )
 
     b, reason = backend_from_env()
+    effort = selected_effort()
+    pin = pinned_tier()
     return S.Envelope(
         text=reason,
         data={
             "backend": type(b).__name__,
             "is_stub": type(b).__name__ == "EchoBackend",
             "cheap_capped": cheap_capped(),
+            "pinned_model": MODEL_IDS[pin] if pin is not None else None,
+            "effort": effort.value if effort is not None else None,
+            # What each tier will ACTUALLY call and how hard it will think.
+            # A screen that showed the routing table instead would be showing
+            # the design, not the run.
+            "tiers": {
+                tier.value: {
+                    "model": MODEL_IDS[effective_tier(tier)],
+                    "effort": profile_for(effective_tier(tier)).effort,
+                    "thinking_budget": profile_for(effective_tier(tier)).thinking_budget,
+                    "max_tokens": profile_for(effective_tier(tier)).max_tokens,
+                }
+                for tier in MODEL_IDS
+            },
         },
     )
 
