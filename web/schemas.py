@@ -158,3 +158,13 @@ class AllocateBody(BaseModel):
     single_name_limit: float = 0.08
     risk_per_trade: float = 0.0075
     participation: float = 0.05
+
+
+class RebalanceBody(BaseModel):
+    names: list[str] = Field(default_factory=list)
+    portfolio_value: float | None = None
+    from_plan: bool = False
+    fetch: bool = True
+    as_at: str = ""
+    single_name_limit: float = 0.08
+    risk_per_trade: float = 0.0075

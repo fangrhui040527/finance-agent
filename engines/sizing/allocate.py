@@ -26,6 +26,7 @@ explainable line by line to the person whose money it is.
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from decimal import ROUND_DOWN, Decimal
 
@@ -45,6 +46,11 @@ from engines.sizing.caps import (
 #: visible reason for stopping rather than a solver that might not converge.
 MAX_TRIM_PASSES = 200
 
+#: Caps that size ONE name. Anything else on a line ("country", "sector", "hhi")
+#: came from the trim loop and is a property of the book, which reads very
+#: differently to the user.
+_PER_NAME_CAPS = frozenset({"risk", "kelly", "concentration", "liquidity", "cost_floor"})
+
 
 @dataclass(frozen=True)
 class Candidate:
@@ -52,7 +58,10 @@ class Candidate:
 
     instrument_id: str
     price: Decimal
-    stop_price: Decimal
+    #: None means no stop was stated. The risk-budget cap is then undefined and
+    #: simply does not bind - inventing a stop would invent the risk budget with
+    #: it. Whoever sizes such a name says which cap it lost.
+    stop_price: Decimal | None
     adv_20d: Decimal
     sector: str = "unknown"
     country: str = "MY"
@@ -60,7 +69,7 @@ class Candidate:
     lot_size: int = 100
     mic: str | None = None
     fx_base_per_quote: Decimal | None = None
-    round_trip_cost_at: object = None  # Callable[[Decimal], Decimal]
+    round_trip_cost_at: Callable[[Decimal], Decimal] | None = None
 
 
 @dataclass(frozen=True)
@@ -149,22 +158,32 @@ def _cap_set(
     risk_per_trade: Decimal,
     single_name_limit: Decimal,
     participation: Decimal,
-) -> CapSet:
-    """The same five caps the single-name path uses, in the market's currency."""
-    stop_frac = (c.price - c.stop_price) / c.price
+) -> CapSet | tuple[str, Decimal, Decimal]:
+    """The same five caps the single-name path uses, in the market's currency.
+
+    Without a stop the risk budget is undefined, and a `CapSet` cannot express
+    that - its `binding()` always includes `risk`. Rather than fake a stop or
+    weaken the shared type, that case returns the binding cap already chosen
+    from the caps that ARE defined, so the missing one cannot be mistaken for
+    an applied one.
+    """
     pv_quote = (
         investable
         if c.currency == BASE_CURRENCY
         else investable / (c.fx_base_per_quote or Decimal(1))
     )
+    floor = cost_floor_value(c.round_trip_cost_at, c.mic) if c.round_trip_cost_at else Decimal(0)
+    conc = concentration_cap(pv_quote, single_name_limit)
+    liq = liquidity_cap(c.adv_20d, participation)
+    if c.stop_price is None:
+        cap, value = min([("concentration", conc), ("liquidity", liq)], key=lambda x: x[1])
+        return cap, value, floor
     return CapSet(
-        risk=risk_budget_cap(pv_quote, risk_per_trade, stop_frac),
+        risk=risk_budget_cap(pv_quote, risk_per_trade, (c.price - c.stop_price) / c.price),
         kelly=None,
-        concentration=concentration_cap(pv_quote, single_name_limit),
-        liquidity=liquidity_cap(c.adv_20d, participation),
-        cost_floor=cost_floor_value(c.round_trip_cost_at, c.mic)
-        if c.round_trip_cost_at
-        else Decimal(0),
+        concentration=conc,
+        liquidity=liq,
+        cost_floor=floor,
         currency=c.currency,
     )
 
@@ -199,7 +218,7 @@ def allocate(
     order = {c.instrument_id: i for i, c in enumerate(candidates)}
 
     for c in candidates:
-        if c.stop_price >= c.price:
+        if c.stop_price is not None and c.stop_price >= c.price:
             excluded.append(Excluded(c.instrument_id, "stop is at or above entry"))
             continue
         if c.currency != BASE_CURRENCY and c.fx_base_per_quote is None:
@@ -212,18 +231,22 @@ def allocate(
             )
             continue
         caps = _cap_set(c, investable, risk_per_trade, single_name_limit, participation)
-        binding, value = caps.binding()
+        if isinstance(caps, CapSet):
+            cap, value, floor = (*caps.binding(), caps.cost_floor)
+            label = cap.value
+        else:
+            label, value, floor = caps
         units = _lots(value, c.price, c.lot_size)
         if units <= 0:
             excluded.append(
                 Excluded(
                     c.instrument_id,
-                    f"the binding {binding.value} cap of {c.currency} {value:,.2f} does "
+                    f"the binding {label} cap of {c.currency} {value:,.2f} does "
                     f"not fund one {c.lot_size}-share lot at {c.price}",
                 )
             )
             continue
-        sized[c.instrument_id] = (c, units, caps.cost_floor, binding.value)
+        sized[c.instrument_id] = (c, units, floor, label)
 
     # Scale to fit the capital actually available, then re-round to whole lots.
     def value_base(c: Candidate, units: int) -> Decimal:
@@ -255,10 +278,30 @@ def allocate(
             del sized[iid]
 
     if not sized:
+        # "Too small" is not a satisfying answer without the number that makes it
+        # true. Two limits collide here: a position must clear the market's
+        # minimum economic position to pay for its own round trip, and it must
+        # stay under the single-name cap. Below floor/cap there is no size that
+        # satisfies both, and that threshold is worth stating outright.
+        floors = [
+            (cost_floor_value(c.round_trip_cost_at, c.mic), c)
+            for c in candidates
+            if c.round_trip_cost_at is not None
+        ]
+        need = ""
+        if floors and single_name_limit > 0:
+            floor, c = min(floors, key=lambda x: x[0])
+            need = (
+                f". The cheapest name to hold here needs {c.currency} {floor:,.2f} to clear "
+                f"the {c.mic or 'market'} cost floor, and a {single_name_limit:.0%} single-name "
+                f"cap puts that position inside a portfolio of at least {c.currency} "
+                f"{floor / single_name_limit:,.0f}. Below that, a position either breaches the "
+                f"cap or cannot pay for its own round trip"
+            )
         return Allocation(
             investable,
             excluded=tuple(excluded),
-            refusal="no nominated name could be funded at this capital level",
+            refusal=f"no nominated name could be funded at this capital level{need}",
         )
 
     # Trim until every concentration limit clears, or until it is clear that
@@ -308,12 +351,20 @@ def allocate(
     # read as a mistake.
     deployed = sum((x.value_base for x in lines), Decimal(0))
     if investable > 0 and (investable - deployed) / investable > Decimal("0.2"):
-        ceiling = Decimal(len(lines)) * single_name_limit
-        notes.append(
-            f"{len(lines)} names at a {single_name_limit:.0%} single-name cap can hold at "
-            f"most {ceiling:.0%} of capital; the rest stays in cash. Nominate more names to "
-            f"deploy more - raising the cap concentrates instead."
-        )
+        portfolio_caps = {x.binding_cap for x in lines if x.binding_cap not in _PER_NAME_CAPS}
+        if portfolio_caps:
+            notes.append(
+                f"deployment is bounded by the {', '.join(sorted(portfolio_caps))} limit, not "
+                f"by capital: the names given cannot hold more of it together and stay inside "
+                f"the limits. The rest stays in cash."
+            )
+        else:
+            ceiling = Decimal(len(lines)) * single_name_limit
+            notes.append(
+                f"{len(lines)} names at a {single_name_limit:.0%} single-name cap can hold at "
+                f"most {ceiling:.0%} of capital; the rest stays in cash. Nominate more names to "
+                f"deploy more - raising the cap concentrates instead."
+            )
 
     weights = [x.weight for x in lines]
     sub = _submatrix(corr, order, [x.instrument_id for x in lines])
@@ -345,7 +396,11 @@ def _positions(sized: dict, investable: Decimal) -> list[Position]:
     out = []
     for iid, (c, units, _, _) in sized.items():
         base = to_base(Decimal(units) * c.price, c.currency, c.fx_base_per_quote)
-        risk_native = Decimal(units) * (c.price - c.stop_price)
+        # No stop, no risk-to-stop: portfolio heat cannot count what was never
+        # stated, and counting it as zero is the honest reading - it is unbounded,
+        # and the caller was told the risk cap did not apply.
+        stop = c.stop_price if c.stop_price is not None else c.price
+        risk_native = Decimal(units) * (c.price - stop)
         out.append(
             Position(
                 instrument_id=iid,
@@ -384,11 +439,20 @@ def _lines(sized: dict, investable: Decimal) -> tuple[Line, ...]:
 
 def _trim_largest(sized: dict, positions: list[Position], breaches: list) -> bool:
     """Remove one board lot from the heaviest position. Returns False when
-    nothing can be trimmed, which is how the caller learns to stop."""
+    nothing can be trimmed, which is how the caller learns to stop.
+
+    The trimmed name takes the breached dimension as its binding cap. It was
+    sized by a per-name cap and then cut by a portfolio one, and reporting the
+    first hides the constraint that actually decided the number - a book of six
+    Malaysian names is bounded by the 40% country limit, not by the 8%
+    single-name cap that sized each of them.
+    """
     heaviest = max(positions, key=lambda p: p.weight, default=None)
     if heaviest is None:
         return False
     c, units, floor, binding = sized[heaviest.instrument_id]
+    if breaches:
+        binding = getattr(breaches[0], "limit", None) or binding
     new_units = units - c.lot_size
     if new_units <= 0:
         del sized[heaviest.instrument_id]

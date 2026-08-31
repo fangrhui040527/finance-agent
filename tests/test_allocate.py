@@ -53,8 +53,17 @@ def test_six_names_are_funded_within_every_limit():
     assert a.cash == Decimal("200000") - a.deployed
 
 
-def test_the_split_reports_its_binding_cap_per_name():
+def test_the_split_reports_the_limit_that_actually_decided_the_number():
+    """Six Malaysian names are each sized by the 8% single-name cap and then cut
+    by the 40% COUNTRY limit. Reporting the cap that sized them hides the one
+    that bound them."""
     a = allocate(Decimal("200000"), six())
+    assert {x.binding_cap for x in a.lines} == {"country"}
+    assert "bound by country" in a.explain()
+
+
+def test_a_per_name_cap_is_reported_when_no_portfolio_limit_bites():
+    a = allocate(Decimal("200000"), six(), limits=Limits(country=0.9))
     assert {x.binding_cap for x in a.lines} == {"concentration"}
     assert "bound by concentration" in a.explain()
 
@@ -263,8 +272,15 @@ def test_web_allocate_matches_the_mcp_tool():
 def test_undeployed_cash_states_the_arithmetic_that_caused_it():
     """6 names x an 8% cap cannot absorb more than 48%; a user reading a large
     cash balance with no explanation reads it as a bug."""
-    a = allocate(Decimal("200000"), six())
+    a = allocate(Decimal("200000"), six(), limits=Limits(country=0.9))
     note = " ".join(a.notes)
     assert "8% single-name cap" in note
     assert "48% of capital" in note
     assert "raising the cap concentrates" in note
+
+
+def test_undeployed_cash_names_the_portfolio_limit_when_that_is_the_cause():
+    """A Malaysia-only book stops at the 40% country limit long before it runs
+    out of capital, and the N-x-cap arithmetic would be the wrong explanation."""
+    note = " ".join(allocate(Decimal("200000"), six()).notes)
+    assert "bounded by the country limit, not by capital" in note

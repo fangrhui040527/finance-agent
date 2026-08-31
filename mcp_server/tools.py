@@ -25,7 +25,7 @@ from __future__ import annotations
 
 import sqlite3
 from datetime import UTC, date, datetime, timedelta
-from decimal import Decimal, InvalidOperation
+from decimal import ROUND_HALF_UP, Decimal, InvalidOperation
 
 from agents.base import AgentContext, Finding
 from agents.learning.teacher import A14Teacher, Learner
@@ -535,6 +535,26 @@ def check_portfolio_risk(
     return f"BOOK  {len(parsed)} positions, base {base_currency}\n{_lines(out)}{DISCLAIMER}"
 
 
+def _quoted(iid: str, close) -> Decimal:
+    """A fetched close is a float; a real quote sits on the market's tick.
+
+    Without snapping, a MYR 1.38 close reaches the user as
+    1.3799999952316284 - which is not a price anyone can trade, and it is what
+    the rebalance printed back at them beside their own stop.
+    """
+    from markets.registry import get as market_get
+    from markets.registry import mic_of
+
+    price = Decimal(str(close))
+    try:
+        tick = market_get(mic_of(iid)).tick_size(price)
+    except (ValueError, KeyError):
+        return price.quantize(Decimal("0.0001"), rounding=ROUND_HALF_UP)
+    if tick <= 0:
+        return price
+    return (price / tick).quantize(Decimal("1"), rounding=ROUND_HALF_UP) * tick
+
+
 def _candidates(specs: list, fetch: bool = False, end=None) -> list:
     """`MIC:CODE:PRICE:STOP:ADV:SECTOR` -> Candidates, one parser for every surface.
 
@@ -574,7 +594,7 @@ def _candidates(specs: list, fetch: bool = False, end=None) -> list:
             except PriceFeedError as e:
                 raise ToolError(f"{iid}: {e}") from None
             bars = series.raw()
-            price = price if price is not None else Decimal(str(bars[-1].close))
+            price = price if price is not None else _quoted(iid, bars[-1].close)
             adv = adv if adv is not None else Decimal(str(series.adv(20)))
 
         out.append(
@@ -819,6 +839,97 @@ def size_position(
 # --------------------------------------------------------------------------
 # planning, teaching, the forward record
 # --------------------------------------------------------------------------
+
+
+def rebalance_book(
+    names: list | None = None,
+    portfolio_value: float | None = None,
+    from_plan: bool = False,
+    fetch: bool = True,
+    as_at: str = "",
+    single_name_limit: float = 0.08,
+    risk_per_trade: float = 0.0075,
+) -> str:
+    """What to change versus what is held, with the cost of changing it.
+
+    The book comes from `account.holdings` in config.toml - a rebalance is
+    computed against real units, and there is no way to supply them here that
+    would not be a book the user never stated.
+
+    Capital defaults to the book's own market value: with nothing added, this
+    re-splits what is already there. `portfolio_value` or `from_plan` set it
+    instead, which is what makes room for the cash a book does not yet hold.
+    """
+    from agents.portfolio.agents import TYPED_CAPITAL_NOTE, plan_capital
+    from core.config import load as load_config
+    from engines.sizing.rebalance import rebalance as run_rebalance
+
+    cfg = load_config()
+    valued = [h for h in cfg.book if h.valued]
+    specs = [str(n) for n in (names or [])]
+    if not valued and not specs:
+        return (
+            "NOTHING TO REBALANCE: config.toml lists no holdings with units, and no "
+            "names were nominated.\n"
+            '  Write them as: holdings = [{ id = "MYX:1155", units = 1000, '
+            'avg_cost = 9.80, stop = 9.40, sector = "bank" }]\n'
+            "  Without units a name can still be watched and analysed; only the book "
+            "value and this rebalance need them." + DISCLAIMER
+        )
+
+    end = _parse_date(as_at) if as_at else None
+    nominated = _candidates(specs, fetch=fetch, end=end) if specs else []
+
+    prices: dict = {}
+    advs: dict = {}
+    for h in valued:
+        try:
+            series = _feed().fetch(h.id, end=end)
+        except PriceFeedError as e:
+            return (
+                f"NO PRICE for {h.id}: {e}\n"
+                f"  A book with an unpriced name cannot be weighed - every weight would "
+                f"be wrong, not just that one." + DISCLAIMER
+            )
+        bars = series.raw()
+        prices[h.id] = _quoted(h.id, bars[-1].close)
+        advs[h.id] = Decimal(str(series.adv(20)))
+
+    investable = None
+    capital_note = "capital is the book's own market value: this re-splits what is held"
+    if from_plan:
+        waterfall, _ = plan_capital(cfg, context())
+        if waterfall is None:
+            return (
+                "NO PLAN: from_plan was asked for but config.toml has no [capital] "
+                "block. Call investable_capital for what to fill in." + DISCLAIMER
+            )
+        investable = waterfall.investable
+        capital_note = f"capital derived through the waterfall: {investable:,.2f}"
+    elif portfolio_value is not None:
+        investable = _positive(portfolio_value, "portfolio_value")
+        capital_note = TYPED_CAPITAL_NOTE
+
+    result = run_rebalance(
+        valued,
+        nominated,
+        prices,
+        advs,
+        investable=investable,
+        limits=cfg.limits,
+        risk_per_trade=_positive(risk_per_trade, "risk_per_trade"),
+        single_name_limit=_positive(single_name_limit, "single_name_limit"),
+    )
+
+    shape = ""
+    if result.positions_now:
+        a12 = A12PortfolioRisk(context())
+        before = a12.run(list(result.positions_now), limits=cfg.limits)
+        shape = f"\n\n  BEFORE\n{_lines(before)}"
+        if result.positions_target:
+            after = a12.run(list(result.positions_target), limits=cfg.limits)
+            shape += f"\n  AFTER\n{_lines(after)}"
+    return f"  {capital_note}\n\n{result.explain()}{shape}{DISCLAIMER}"
 
 
 def plan_question(

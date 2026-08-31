@@ -62,6 +62,7 @@ if /I "%CMD%"=="news"    goto news
 if /I "%CMD%"=="watch"   goto watch
 if /I "%CMD%"=="capital" goto capital
 if /I "%CMD%"=="allocate" goto allocate
+if /I "%CMD%"=="rebalance" goto rebalance
 if /I "%CMD%"=="alerts"  goto alerts
 if /I "%CMD%"=="reflect" goto reflect
 if /I "%CMD%"=="verify"  goto verify
@@ -140,6 +141,10 @@ goto :eof
 
 :allocate
 "%PY%" ask.py allocate%ARGS%
+goto :eof
+
+:rebalance
+"%PY%" ask.py rebalance%ARGS%
 goto :eof
 
 :alerts
@@ -234,6 +239,7 @@ echo   run news gdelt                    pull one configured source
 echo   run watch                         evaluate the monitor rules
 echo   run capital                       how much may be invested at all
 echo   run allocate --name ...           split it across names you nominate
+echo   run rebalance                     what to change versus what you hold
 echo   run alerts                        what is open, and since when
 echo   run reflect H-...                 grade a cohort by its hypothesis
 echo   run verify                        whole pipeline on mock data

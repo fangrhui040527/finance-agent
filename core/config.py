@@ -148,6 +148,13 @@ class Holding:
     id: str
     units: Decimal | None = None
     avg_cost: Decimal | None = None
+    #: Where you would stop out. Optional, and its absence is not fatal: the
+    #: risk-budget cap simply cannot be computed for this name, and anything
+    #: that sizes it says which cap it lost rather than inventing a stop.
+    stop: Decimal | None = None
+    #: Sector for the concentration check. "unknown" is honest and it is also
+    #: how a book of six banks looks like six sectors, so it is reported.
+    sector: str = "unknown"
 
     @property
     def valued(self) -> bool:
@@ -385,18 +392,20 @@ def _book(data: dict) -> tuple[Holding, ...]:
             if "id" not in item:
                 raise ConfigError(f"account.holdings[{i}] is a table with no id")
             ident = str(item["id"]).strip()
-            unknown = set(item) - {"id", "units", "avg_cost"}
+            unknown = set(item) - {"id", "units", "avg_cost", "stop", "sector"}
             if unknown:
                 raise ConfigError(
                     f"account.holdings[{i}] has unknown keys {sorted(unknown)}; "
-                    "expected id, units, avg_cost"
+                    "expected id, units, avg_cost, stop, sector"
                 )
             units = money(item["units"], f"holdings[{i}].units") if "units" in item else None
             cost = (
                 money(item["avg_cost"], f"holdings[{i}].avg_cost") if "avg_cost" in item else None
             )
+            stop = money(item["stop"], f"holdings[{i}].stop") if "stop" in item else None
+            sector = str(item.get("sector", "unknown")).strip() or "unknown"
         else:
-            ident, units, cost = str(item).strip(), None, None
+            ident, units, cost, stop, sector = str(item).strip(), None, None, None, "unknown"
         try:
             mic_of(ident)
         except ValueError:
@@ -404,7 +413,7 @@ def _book(data: dict) -> tuple[Holding, ...]:
                 f"account.holdings: {ident!r} has no market prefix. Write e.g. "
                 f"'MYX:1155'. Known prefixes: {', '.join(known_prefixes())}"
             ) from None
-        out.append(Holding(ident, units, cost))
+        out.append(Holding(ident, units, cost, stop, sector))
     ids = [h.id for h in out]
     dupes = {i for i in ids if ids.count(i) > 1}
     if dupes:

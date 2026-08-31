@@ -829,6 +829,30 @@ def cmd_allocate(a) -> int:
     return 0
 
 
+def cmd_rebalance(a) -> int:
+    """What to change versus what you hold. The book lives in config.toml."""
+    from mcp_server.protocol import ToolError
+    from mcp_server.tools import rebalance_book
+
+    try:
+        text = rebalance_book(
+            names=list(a.name or []),
+            portfolio_value=a.portfolio,
+            from_plan=a.from_plan,
+            as_at=a.as_at or "",
+            single_name_limit=a.single_name,
+            risk_per_trade=a.risk_per_trade,
+        )
+    except ToolError as e:
+        print(str(e), file=sys.stderr)
+        return 2
+    if text.startswith("NOTHING TO REBALANCE"):
+        print(text, file=sys.stderr)
+        return 2
+    print(text)
+    return 0
+
+
 def cmd_doctor(a) -> int:
     from core.doctor import FAIL, render, run_checks
 
@@ -1245,6 +1269,20 @@ def main(argv=None) -> int:
     al2.add_argument("--risk-per-trade", type=float, default=0.0075)
     al2.add_argument("--single-name", type=float, default=0.08)
     al2.set_defaults(fn=cmd_allocate)
+
+    rb = sub.add_parser("rebalance", help="what to change versus what you hold")
+    rb.add_argument(
+        "--name",
+        action="append",
+        metavar="MIC:CODE:PRICE:STOP:ADV:SECTOR",
+        help="extra names to consider alongside the book (repeatable)",
+    )
+    rb.add_argument("--portfolio", type=float, help="capital; default is the book's own value")
+    rb.add_argument("--from-plan", action="store_true", help="derive capital from [capital]")
+    rb.add_argument("--as-at", help="point-in-time bound for prices (YYYY-MM-DD)")
+    rb.add_argument("--risk-per-trade", type=float, default=0.0075)
+    rb.add_argument("--single-name", type=float, default=0.08)
+    rb.set_defaults(fn=cmd_rebalance)
 
     cp = sub.add_parser("capital", help="how much may be invested at all, from [capital]")
     cp.set_defaults(fn=cmd_capital)

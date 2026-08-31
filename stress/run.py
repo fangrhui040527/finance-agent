@@ -1163,6 +1163,9 @@ def s_mcp():
         # An allocation with no names is a refusal, which is the honest answer
         # and the one this suite is checking the tool can still give.
         "allocate_capital": {"names": [], "portfolio_value": 200000},
+        # An empty book is a refusal, and refusing without touching the network
+        # is the property this suite checks.
+        "rebalance_book": {},
         "log_prediction": {
             "instrument": "MYX:1155",
             "direction": 1,

@@ -296,6 +296,11 @@ def allocate(body: S.AllocateBody) -> S.Envelope:
     return _run(T.allocate_capital, **body.model_dump())
 
 
+@router.post("/rebalance")
+def rebalance(body: S.RebalanceBody) -> S.Envelope:
+    return _run(T.rebalance_book, **body.model_dump())
+
+
 # --- portfolio -----------------------------------------------------------------
 
 
