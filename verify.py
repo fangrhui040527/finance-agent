@@ -39,8 +39,10 @@ def check(label: str, cond: bool, detail: str = "") -> None:
 
 
 def main() -> int:
+    from core.env import load as _load_dotenv
     from core.logging import configure as _configure_logging
 
+    _load_dotenv()
     _configure_logging()
     t0 = time.time()
     print("\nFinPlanet P0 verification (mock data only)\n")

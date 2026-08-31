@@ -699,8 +699,10 @@ def run(live: str | None = None) -> dict:
 
 
 def main(argv=None) -> int:
+    from core.env import load as _load_dotenv
     from core.logging import configure as _configure_logging
 
+    _load_dotenv()
     _configure_logging()
     ap = argparse.ArgumentParser(
         prog="trace_run", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter

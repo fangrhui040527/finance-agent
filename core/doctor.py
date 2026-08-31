@@ -15,6 +15,8 @@ import sqlite3
 from dataclasses import dataclass
 from pathlib import Path
 
+from core.env import parse as parse_env
+
 OK = "ok"
 WARN = "warn"
 FAIL = "fail"
@@ -101,6 +103,28 @@ def run_checks(offline: bool = False) -> list[CheckResult]:
             "multi-hop exposure claims",
         )
     )
+
+    # -- .env: loaded, or deliberately skipped?
+    from pathlib import Path as _P
+
+    dotenv = _P(".env")
+    if os.environ.get("FINPLANET_NO_DOTENV", "").strip():
+        out.append(
+            CheckResult("dotenv", OK, "FINPLANET_NO_DOTENV set: file ignored on purpose", "secrets")
+        )
+    elif dotenv.is_file():
+        names = sorted(parse_env(dotenv.read_text(encoding="utf-8")))
+        out.append(
+            CheckResult(
+                "dotenv", OK, f".env present, {len(names)} key(s): {', '.join(names)}", "secrets"
+            )
+        )
+    else:
+        out.append(
+            CheckResult(
+                "dotenv", WARN, ".env absent - keys must be exported in the environment", "secrets"
+            )
+        )
 
     # -- model backend
     from core.llm.backends import backend_from_env

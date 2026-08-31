@@ -32,6 +32,9 @@ def keyless_env(monkeypatch: pytest.MonkeyPatch) -> None:
     """No test sees a real key or a backend override unless it sets one."""
     for name in ("ANTHROPIC_API_KEY", "LLM_BACKEND", "FINPLANET_CHEAP", "FINPLANET_DEBUG_DIR"):
         monkeypatch.delenv(name, raising=False)
+    # Belt and braces: entrypoints load .env now, so deleting the variables is
+    # not enough - a main() called inside a test would put them straight back.
+    monkeypatch.setenv("FINPLANET_NO_DOTENV", "1")
 
 
 # --- urllib doubles -----------------------------------------------------------

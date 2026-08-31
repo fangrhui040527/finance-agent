@@ -362,8 +362,10 @@ def selftest() -> int:
 
 
 def main(argv=None) -> int:
+    from core.env import load as _load_dotenv
     from core.logging import configure as _configure_logging
 
+    _load_dotenv()
     _configure_logging()
     argv = sys.argv[1:] if argv is None else argv
     if "--selftest" in argv:

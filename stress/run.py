@@ -1597,8 +1597,10 @@ def s_graph():
 
 
 def main() -> int:
+    from core.env import load as _load_dotenv
     from core.logging import configure as _configure_logging
 
+    _load_dotenv()
     _configure_logging()
     for fn in (
         s_volume,

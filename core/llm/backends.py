@@ -147,8 +147,9 @@ class AnthropicBackend:
         key = api_key if api_key is not None else os.environ.get("ANTHROPIC_API_KEY", "")
         if not key.strip():
             raise AuthError(
-                "ANTHROPIC_API_KEY is empty or unset. Set it in .env, or pass "
-                "EchoBackend explicitly if you meant to run without a model."
+                "ANTHROPIC_API_KEY is empty or unset. Put it in .env (every "
+                "entrypoint loads that file; an exported variable wins over it), "
+                "or pass EchoBackend explicitly if you meant to run without a model."
             )
         import anthropic  # the ONE import site; lazy so echo never loads it
 
