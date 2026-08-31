@@ -8,6 +8,7 @@ gets a refusal, every time, from code rather than from a prompt.
 
 import io
 import json
+from pathlib import Path
 
 import pytest
 
@@ -574,3 +575,31 @@ def test_a_horizon_outside_the_ladder_is_refused_not_rounded(tmp_path):
         )
     )
     assert "horizon_days must be one of" in e["message"]
+
+
+# --- the working directory an MCP client hands us ---------------------------------
+
+
+def test_the_server_anchors_itself_to_its_own_repository(tmp_path, monkeypatch):
+    """A client launches this as a subprocess and it inherits the client's cwd;
+    neither `claude mcp add` nor .mcp.json has a field to correct that. Every
+    path here is relative, so from the wrong directory the server would load
+    default settings and open a new empty ledger - and answer normally."""
+    from mcp_server.server import ROOT, _anchor_to_the_repository
+
+    assert (ROOT / "config.toml").is_file(), "ROOT must be the repo, not the package"
+
+    monkeypatch.delenv("FINPLANET_NO_CHDIR", raising=False)
+    monkeypatch.chdir(tmp_path)
+    _anchor_to_the_repository()
+    assert Path.cwd().resolve() == ROOT
+
+
+def test_the_anchor_can_be_declined(tmp_path, monkeypatch):
+    """A caller that has deliberately arranged its own layout keeps it."""
+    from mcp_server.server import _anchor_to_the_repository
+
+    monkeypatch.setenv("FINPLANET_NO_CHDIR", "1")
+    monkeypatch.chdir(tmp_path)
+    _anchor_to_the_repository()
+    assert Path.cwd().resolve() == tmp_path.resolve()

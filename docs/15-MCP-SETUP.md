@@ -57,6 +57,16 @@ share is always on screen.
 
 Both clients need **absolute paths** and the project's own interpreter.
 
+**Working directory is handled for you.** An MCP client launches the server as a
+subprocess and it inherits the client's working directory; Claude Code's
+`claude mcp add` has no `cwd` flag to correct that. Every path this system reads
+is relative — `config.toml`, `data/provenance.db`, `data/graph.db` — so started
+elsewhere the server would not fail, it would quietly load *default* settings and
+write a *new empty* ledger beside wherever the client happened to be, answering
+every question as though this were a fresh installation. So the server anchors
+itself to its own repository at startup (`mcp_server/server.py`,
+`_anchor_to_the_repository`). `FINPLANET_NO_CHDIR=1` opts out.
+
 ### Claude Desktop
 
 `claude_desktop_config.json`
@@ -79,8 +89,17 @@ Windows: `"command": "C:\\path\\finance-agent\\.venv\\Scripts\\python.exe"`.
 ### Claude Code
 
 ```bash
-claude mcp add analyst-mind -- /ABSOLUTE/PATH/.venv/bin/python -m mcp_server.server
+claude mcp add analyst-mind --scope user -- /ABSOLUTE/PATH/.venv/bin/python -m mcp_server.server
 ```
+
+Windows, with the path spelled in full:
+
+```bash
+claude mcp add analyst-mind --scope user -- "C:/path/finance-agent/.venv/Scripts/python.exe" -m mcp_server.server
+```
+
+`--scope user` makes it available in every project; drop it for this project
+only. Confirm with `claude mcp list` — the row should say **Connected**.
 
 ### Verify before connecting
 

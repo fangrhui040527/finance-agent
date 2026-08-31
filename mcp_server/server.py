@@ -41,6 +41,7 @@ itself and needs no client.
 from __future__ import annotations
 
 import sys
+from pathlib import Path
 
 from mcp_server import observability as O
 from mcp_server import tools as T
@@ -589,7 +590,38 @@ def selftest() -> int:
     return 0 if ok else 1
 
 
+#: The repository root, derived from this file rather than from the process's
+#: working directory.
+ROOT = Path(__file__).resolve().parent.parent
+
+
+def _anchor_to_the_repository() -> None:
+    """Run against this repo's own files, wherever the client started us.
+
+    An MCP client launches the server as a subprocess and inherits its own
+    working directory - and neither Claude Code's `claude mcp add` nor the
+    `.mcp.json` schema has a `cwd` field to correct it. Every path this system
+    reads is relative: `config.toml`, `data/provenance.db`, `data/graph.db`.
+    Started from anywhere else the server does not fail - it quietly loads
+    DEFAULT settings, writes a NEW empty ledger next to wherever the client
+    happened to be, and answers every question as though this were a fresh
+    installation. Silent, plausible, and wrong: the same failure shape as the
+    echo backend answering while looking like a model.
+
+    So the server anchors itself. `FINPLANET_NO_CHDIR=1` opts out, for a caller
+    that has deliberately arranged its own layout.
+    """
+    import os
+
+    if os.environ.get("FINPLANET_NO_CHDIR", "").strip() in ("1", "true", "yes"):
+        return
+    if Path.cwd().resolve() != ROOT:
+        os.chdir(ROOT)
+
+
 def main(argv=None) -> int:
+    _anchor_to_the_repository()
+
     from core.env import load as _load_dotenv
     from core.logging import configure as _configure_logging
 
