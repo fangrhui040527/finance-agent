@@ -61,14 +61,10 @@ def config() -> S.Envelope:
     from core.config import HARD_BOUNDS, load
 
     cfg = load()
-    bounds = (
-        [
-            {"field": b[0], "bound": str(b[1]), "why": b[2] if len(b) > 2 else ""}
-            for b in HARD_BOUNDS
-        ]
-        if not hasattr(HARD_BOUNDS, "items")
-        else [{"field": k, "bound": str(v), "why": ""} for k, v in HARD_BOUNDS.items()]
-    )
+    bounds = [
+        {"field": key, "low": str(lo), "high": str(hi), "why": why}
+        for key, lo, hi, why in HARD_BOUNDS
+    ]
     return S.Envelope(
         text=cfg.describe(),
         data={
@@ -214,10 +210,10 @@ def _narrative(body: S.ThesisBody) -> dict:
     """Model prose over the engine's thesis - labelled, railed, refusal-aware."""
     from decimal import Decimal
 
+    from agents.base import Finding
     from agents.synthesis.agents import A10Thesis, A11RedTeam, Breaker, Stance
     from agents.synthesis.narrate import narrate_thesis
     from core.config import load as load_config
-    from core.contracts.answer import Finding
     from core.guardrails.policy import Action, PolicyViolation, Rail
     from core.llm.backends import backend_from_env
     from core.llm.client import InferenceClient
