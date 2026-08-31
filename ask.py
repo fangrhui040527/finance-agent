@@ -35,6 +35,8 @@ from agents.learning.teacher import A14Teacher, Learner
 from agents.portfolio.agents import A12PortfolioRisk, A13Sizing
 from agents.supervisor import A0Supervisor
 from agents.synthesis.agents import A9Attribution, A10Thesis, A11RedTeam, Breaker, Stance
+from core.config import ConfigError
+from core.config import load as load_config
 from core.contracts.money import BASE_CURRENCY
 from core.guardrails.defaults import default_engine
 from core.market.feed import PriceFeedError, default_feed
@@ -54,8 +56,23 @@ REGISTRY = "agents/registry.yaml"
 def context() -> AgentContext:
     """The allowlist comes from the registry, never a hand-written dict."""
     reg = load_registry(REGISTRY)
+    # holdings and watchlist come from config.toml. Without them
+    # `should_escalate` (knowledge/news/features.py) can never match an article
+    # to anything the user owns or is watching, so the news escalation gate was
+    # closed on every article regardless of what the file said.
+    try:
+        cfg = load_config()
+        holdings, watchlist = set(cfg.holdings), set(cfg.watchlist)
+    except ConfigError:
+        # A broken settings file must not take out every other command; the
+        # config commands report it properly.
+        holdings, watchlist = set(), set()
     return AgentContext(
-        router=Router({}), engine=default_engine(reg.allowlist()), now=datetime.now(UTC)
+        router=Router({}),
+        engine=default_engine(reg.allowlist()),
+        now=datetime.now(UTC),
+        holdings=holdings,
+        watchlist=watchlist,
     )
 
 
@@ -348,7 +365,6 @@ def _narrate(ctx, thesis, challenges) -> int:
     from decimal import Decimal
 
     from agents.synthesis.narrate import narrate_thesis
-    from core.config import load as load_config
     from core.guardrails.policy import Action, PolicyViolation, Rail
     from core.llm.backends import backend_from_env
     from core.llm.client import InferenceClient

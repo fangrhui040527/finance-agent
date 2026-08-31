@@ -38,6 +38,8 @@ from agents.synthesis.agents import (
     Breaker,
     Stance,
 )
+from core.config import ConfigError
+from core.config import load as load_config
 from core.contracts.money import BASE_CURRENCY
 from core.guardrails.defaults import default_engine
 from core.market.feed import ChainedFeed, PriceFeedError, default_feed
@@ -61,8 +63,23 @@ DISCLAIMER = (
 
 def context() -> AgentContext:
     reg = load_registry(REGISTRY)
+    # holdings and watchlist come from config.toml. Without them
+    # `should_escalate` (knowledge/news/features.py) can never match an article
+    # to anything the user owns or is watching, so the news escalation gate was
+    # closed on every article regardless of what the file said.
+    try:
+        cfg = load_config()
+        holdings, watchlist = set(cfg.holdings), set(cfg.watchlist)
+    except ConfigError:
+        # A broken settings file must not take out every other command; the
+        # config commands report it properly.
+        holdings, watchlist = set(), set()
     return AgentContext(
-        router=Router({}), engine=default_engine(reg.allowlist()), now=datetime.now(UTC)
+        router=Router({}),
+        engine=default_engine(reg.allowlist()),
+        now=datetime.now(UTC),
+        holdings=holdings,
+        watchlist=watchlist,
     )
 
 
@@ -622,7 +639,6 @@ def investable_capital(db: str = "") -> str:
     near-term goals inside 24 months, and debt above the hurdle.
     """
     from agents.portfolio.agents import plan_capital
-    from core.config import load as load_config
 
     cfg = load_config()
     waterfall, findings = plan_capital(cfg, context())
