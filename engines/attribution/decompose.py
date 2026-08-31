@@ -19,9 +19,9 @@ from enum import Enum
 from engines.attribution.regression import Fit, corrado_rank_z, huber_fit
 
 ESTIMATION_LOOKBACK = 260
-ESTIMATION_GAP = 10          # window ends 10 sessions before the event
+ESTIMATION_GAP = 10  # window ends 10 sessions before the event
 MIN_OBSERVATIONS = 120
-SAR_HUNT_THRESHOLD = 1.5     # below this, no cause hunt
+SAR_HUNT_THRESHOLD = 1.5  # below this, no cause hunt
 IDIO_SHARE_MARKET_DRIVEN = 0.20
 
 
@@ -84,8 +84,8 @@ class MoveExplanation:
     def needs_cause_hunt(self) -> bool:
         """Only a significant idiosyncratic move earns a search for a story."""
         return (
-            self.verdict not in (Verdict.NOT_SIGNIFICANT, Verdict.MARKET_DRIVEN,
-                                 Verdict.ATTRIBUTION_UNAVAILABLE)
+            self.verdict
+            not in (Verdict.NOT_SIGNIFICANT, Verdict.MARKET_DRIVEN, Verdict.ATTRIBUTION_UNAVAILABLE)
             and self.significance is not None
             and abs(self.significance.standardised_ar) > SAR_HUNT_THRESHOLD
         )
@@ -132,25 +132,48 @@ def decompose(
     # which renders to the user as a confident finding with "nan% unexplained".
     # That is the failure this whole design exists to prevent, arriving through
     # the data rather than through the model.
-    dirty = [n for n, v in (("realised_local", realised_local), ("fx_return", fx_return),
-                            ("event_market", event_market), ("event_sector", event_sector))
-             if not math.isfinite(v)]
+    dirty = [
+        n
+        for n, v in (
+            ("realised_local", realised_local),
+            ("fx_return", fx_return),
+            ("event_market", event_market),
+            ("event_sector", event_sector),
+        )
+        if not math.isfinite(v)
+    ]
     dirty += [f"style:{k}" for k, v in event_styles.items() if not math.isfinite(v)]
     if dirty:
         return MoveExplanation(
-            instrument_id, window, base_currency, 0.0, 0.0,
-            [], 0.0, None, 1.0, Verdict.ATTRIBUTION_UNAVAILABLE,
+            instrument_id,
+            window,
+            base_currency,
+            0.0,
+            0.0,
+            [],
+            0.0,
+            None,
+            1.0,
+            Verdict.ATTRIBUTION_UNAVAILABLE,
             reason=f"non-finite input: {', '.join(dirty)}. A move cannot be decomposed from "
-                   "a value that is not a number, and reporting one anyway would be worse "
-                   "than reporting nothing.",
+            "a value that is not a number, and reporting one anyway would be worse "
+            "than reporting nothing.",
         )
 
     total_base = (1.0 + realised_local) * (1.0 + fx_return) - 1.0
 
     if fit is None:
         return MoveExplanation(
-            instrument_id, window, base_currency, realised_local, total_base,
-            [], 0.0, None, 1.0, Verdict.ATTRIBUTION_UNAVAILABLE,
+            instrument_id,
+            window,
+            base_currency,
+            realised_local,
+            total_base,
+            [],
+            0.0,
+            None,
+            1.0,
+            Verdict.ATTRIBUTION_UNAVAILABLE,
             reason=f"fewer than {MIN_OBSERVATIONS} usable observations in the estimation window",
         )
 
@@ -176,9 +199,7 @@ def decompose(
     # Absolute values in the denominator: offsetting components must never
     # produce a share above 100% (docs/03 section 2.5).
     gross = sum(abs(v) for _, v, _ in contribs) or 1.0
-    components = [
-        AttributionComponent(c, v, abs(v) / gross, b) for c, v, b in contribs
-    ]
+    components = [AttributionComponent(c, v, abs(v) / gross, b) for c, v, b in contribs]
 
     sar = ar / fit.residual_sigma if fit.residual_sigma > 1e-12 else 0.0
     rank_z = corrado_rank_z(ar, fit.residuals)
@@ -188,27 +209,42 @@ def decompose(
     unexplained = idio_share
 
     if abs(sar) <= SAR_HUNT_THRESHOLD:
-        verdict, reason = Verdict.NOT_SIGNIFICANT, (
-            f"idiosyncratic move is {abs(sar):.2f} sigma, within normal variation for this instrument"
+        verdict, reason = (
+            Verdict.NOT_SIGNIFICANT,
+            (
+                f"idiosyncratic move is {abs(sar):.2f} sigma, within normal variation for this instrument"
+            ),
         )
     elif idio_share < IDIO_SHARE_MARKET_DRIVEN:
-        verdict, reason = Verdict.MARKET_DRIVEN, (
-            f"only {idio_share:.0%} of the move is company-specific; the market and sector moved"
+        verdict, reason = (
+            Verdict.MARKET_DRIVEN,
+            (f"only {idio_share:.0%} of the move is company-specific; the market and sector moved"),
         )
     else:
-        verdict, reason = Verdict.NO_IDENTIFIED_CATALYST, (
-            "significant idiosyncratic move; no catalyst matched yet"
+        verdict, reason = (
+            Verdict.NO_IDENTIFIED_CATALYST,
+            ("significant idiosyncratic move; no catalyst matched yet"),
         )
 
     return MoveExplanation(
-        instrument_id, window, base_currency, realised_local, total_base,
-        components, ar, sig, unexplained, verdict, reason=reason,
+        instrument_id,
+        window,
+        base_currency,
+        realised_local,
+        total_base,
+        components,
+        ar,
+        sig,
+        unexplained,
+        verdict,
+        reason=reason,
     )
 
 
 # --------------------------------------------------------------------------
 # Long-horizon decomposition (docs/03 section 4)
 # --------------------------------------------------------------------------
+
 
 @dataclass(frozen=True)
 class LongHorizon:
@@ -233,26 +269,36 @@ class LongHorizon:
         if driver == "earnings growth":
             return "The business compounded. Most durable shape."
         if driver == "multiple re-rating":
-            return ("Mostly a re-rating. Mean-reverting - the same mechanism runs "
-                    "in reverse, and this return borrowed from the future.")
+            return (
+                "Mostly a re-rating. Mean-reverting - the same mechanism runs "
+                "in reverse, and this return borrowed from the future."
+            )
         if driver == "currency":
             return "Mostly currency. Says nothing about the company."
         return "Mostly cash returned. Durable, but check whether buybacks were debt-funded."
 
     def residual(self) -> float:
         """Cross-term the four components do not capture. Reported, not hidden."""
-        modelled = math.exp(
-            math.log1p(self.eps_growth) + math.log1p(self.multiple_change)
-            + math.log1p(self.shareholder_yield) + math.log1p(self.fx)
-        ) - 1.0
+        modelled = (
+            math.exp(
+                math.log1p(self.eps_growth)
+                + math.log1p(self.multiple_change)
+                + math.log1p(self.shareholder_yield)
+                + math.log1p(self.fx)
+            )
+            - 1.0
+        )
         return self.total_return - modelled
 
 
 def long_horizon_decompose(
-    eps_start: float, eps_end: float,
-    multiple_start: float, multiple_end: float,
+    eps_start: float,
+    eps_end: float,
+    multiple_start: float,
+    multiple_end: float,
     cumulative_shareholder_yield: float,
-    fx_start: float, fx_end: float,
+    fx_start: float,
+    fx_end: float,
     years: float,
 ) -> LongHorizon:
     if eps_start <= 0 or multiple_start <= 0 or fx_start <= 0:

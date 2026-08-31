@@ -12,7 +12,7 @@ Three hard rules, and there is no override flag in this API:
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from decimal import Decimal
 
 

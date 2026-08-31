@@ -48,9 +48,9 @@ symmetric relation symmetric and an asymmetric one correct.
 ### Confidence
 
 ```python
-EXTRACTED   # a source says this
-INFERRED    # we derived it
-AMBIGUOUS   # default
+EXTRACTED  # a source says this
+INFERRED  # we derived it
+AMBIGUOUS  # default
 ```
 
 Defaults to `AMBIGUOUS` — the weakest — so an extractor that forgets to set it

@@ -84,16 +84,18 @@ class FactStore:
     def restatement_diff(self, instrument_id: str, concept: str, period_end: date):
         """First reported vs latest. A gap is a quality flag (docs/03 section 4.4)."""
         series = sorted(
-            (f for f in self._facts.get((instrument_id, concept), []) if f.period_end == period_end),
+            (
+                f
+                for f in self._facts.get((instrument_id, concept), [])
+                if f.period_end == period_end
+            ),
             key=lambda f: f.known_at,
         )
         if len(series) < 2:
             return None
         return series[0], series[-1]
 
-    def series_as_known_at(
-        self, instrument_id: str, concept: str, asof: date
-    ) -> list[Fact]:
+    def series_as_known_at(self, instrument_id: str, concept: str, asof: date) -> list[Fact]:
         """One fact per period, each the best version knowable on `asof`."""
         series = [f for f in self._facts.get((instrument_id, concept), []) if f.known_at <= asof]
         by_period: dict[date, Fact] = {}

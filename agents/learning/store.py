@@ -15,13 +15,20 @@ from __future__ import annotations
 
 import json
 import sqlite3
-from datetime import date, datetime, timezone
+from datetime import date, datetime
 from pathlib import Path
 
 from agents.learning.reflection import (
-    Horizon, Lesson, LessonStore, Outcome, OutcomeQueue, Prediction, Status,
+    Horizon,
+    Lesson,
+    LessonStore,
+    Outcome,
+    OutcomeQueue,
+    Prediction,
+    Status,
 )
 from core.contracts.provenance_marker import Author, ProvenanceMarker
+from core.provenance.ledger import _enable_wal
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS predictions (
@@ -80,7 +87,6 @@ BEFORE DELETE ON outcomes
 BEGIN SELECT RAISE(ABORT, 'outcomes are never deleted'); END;
 """
 
-from core.provenance.ledger import _enable_wal
 
 DEFAULT_PATH = Path("data/learning.db")
 
@@ -109,7 +115,7 @@ class LearningStore:
     def close(self) -> None:
         self.db.close()
 
-    def __enter__(self) -> "LearningStore":
+    def __enter__(self) -> LearningStore:
         return self
 
     def __exit__(self, *exc) -> None:
@@ -121,9 +127,18 @@ class LearningStore:
         try:
             self.db.execute(
                 "INSERT INTO predictions VALUES (?,?,?,?,?,?,?,?,?,?)",
-                (p.prediction_id, p.instrument_id, p.agent, p.made_at.isoformat(),
-                 p.horizon.value, p.statement, p.direction, p.confidence,
-                 p.grade_on.isoformat(), json.dumps(p.context)),
+                (
+                    p.prediction_id,
+                    p.instrument_id,
+                    p.agent,
+                    p.made_at.isoformat(),
+                    p.horizon.value,
+                    p.statement,
+                    p.direction,
+                    p.confidence,
+                    p.grade_on.isoformat(),
+                    json.dumps(p.context),
+                ),
             )
         except sqlite3.IntegrityError:
             raise ValueError(
@@ -135,17 +150,27 @@ class LearningStore:
     def record_outcome(self, o: Outcome) -> None:
         self.db.execute(
             "INSERT INTO outcomes VALUES (?,?,?,?,?,?)",
-            (o.prediction_id, o.graded_on.isoformat(), o.realised_return,
-             o.benchmark_return, int(o.correct), o.note),
+            (
+                o.prediction_id,
+                o.graded_on.isoformat(),
+                o.realised_return,
+                o.benchmark_return,
+                int(o.correct),
+                o.note,
+            ),
         )
         self.db.commit()
 
     def _to_prediction(self, r: sqlite3.Row) -> Prediction:
         return Prediction(
-            prediction_id=r["prediction_id"], instrument_id=r["instrument_id"],
-            agent=r["agent"], made_at=datetime.fromisoformat(r["made_at"]),
-            horizon=Horizon(r["horizon"]), statement=r["statement"],
-            direction=r["direction"], confidence=r["confidence"],
+            prediction_id=r["prediction_id"],
+            instrument_id=r["instrument_id"],
+            agent=r["agent"],
+            made_at=datetime.fromisoformat(r["made_at"]),
+            horizon=Horizon(r["horizon"]),
+            statement=r["statement"],
+            direction=r["direction"],
+            confidence=r["confidence"],
             grade_on=date.fromisoformat(r["grade_on"]),
             context=json.loads(r["context_json"]),
         )
@@ -160,9 +185,17 @@ class LearningStore:
 
     def graded(self) -> list[Outcome]:
         rows = self.db.execute("SELECT * FROM outcomes ORDER BY graded_on").fetchall()
-        return [Outcome(r["prediction_id"], date.fromisoformat(r["graded_on"]),
-                        r["realised_return"], r["benchmark_return"],
-                        bool(r["correct"]), r["note"]) for r in rows]
+        return [
+            Outcome(
+                r["prediction_id"],
+                date.fromisoformat(r["graded_on"]),
+                r["realised_return"],
+                r["benchmark_return"],
+                bool(r["correct"]),
+                r["note"],
+            )
+            for r in rows
+        ]
 
     def calibration_pairs(self) -> list[tuple[float, bool]]:
         """Graded (confidence, correct) pairs, EXCLUDING no-view predictions.
@@ -205,32 +238,49 @@ class LearningStore:
     def save_lesson(self, l: Lesson) -> None:
         self.db.execute(
             "INSERT OR REPLACE INTO lessons VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
-            (l.lesson_id, l.text, l.pattern, l.instances, l.distinct_instruments,
-             l.hit_rate, l.created_at.isoformat(), l.marker.created_by.value,
-             int(l.marker.pinned), l.status.value,
-             l.last_confirmed.isoformat() if l.last_confirmed else None,
-             l.supersedes, json.dumps(list(l.evidence))),
+            (
+                l.lesson_id,
+                l.text,
+                l.pattern,
+                l.instances,
+                l.distinct_instruments,
+                l.hit_rate,
+                l.created_at.isoformat(),
+                l.marker.created_by.value,
+                int(l.marker.pinned),
+                l.status.value,
+                l.last_confirmed.isoformat() if l.last_confirmed else None,
+                l.supersedes,
+                json.dumps(list(l.evidence)),
+            ),
         )
         self.db.commit()
 
     def load_lessons(self) -> LessonStore:
         store = LessonStore()
         for r in self.db.execute("SELECT * FROM lessons").fetchall():
-            store.add(Lesson(
-                lesson_id=r["lesson_id"], text=r["text"], pattern=r["pattern"],
-                instances=r["instances"], distinct_instruments=r["distinct_instruments"],
-                hit_rate=r["hit_rate"],
-                created_at=datetime.fromisoformat(r["created_at"]),
-                marker=ProvenanceMarker(
-                    created_by=Author(r["created_by"]),
+            store.add(
+                Lesson(
+                    lesson_id=r["lesson_id"],
+                    text=r["text"],
+                    pattern=r["pattern"],
+                    instances=r["instances"],
+                    distinct_instruments=r["distinct_instruments"],
+                    hit_rate=r["hit_rate"],
                     created_at=datetime.fromisoformat(r["created_at"]),
-                    pinned=bool(r["pinned"])),
-                status=Status(r["status"]),
-                last_confirmed=(datetime.fromisoformat(r["last_confirmed"])
-                                if r["last_confirmed"] else None),
-                supersedes=r["supersedes"],
-                evidence=tuple(json.loads(r["evidence_json"])),
-            ))
+                    marker=ProvenanceMarker(
+                        created_by=Author(r["created_by"]),
+                        created_at=datetime.fromisoformat(r["created_at"]),
+                        pinned=bool(r["pinned"]),
+                    ),
+                    status=Status(r["status"]),
+                    last_confirmed=(
+                        datetime.fromisoformat(r["last_confirmed"]) if r["last_confirmed"] else None
+                    ),
+                    supersedes=r["supersedes"],
+                    evidence=tuple(json.loads(r["evidence_json"])),
+                )
+            )
         return store
 
     def sync_lessons(self, store: LessonStore) -> int:
@@ -241,11 +291,15 @@ class LearningStore:
     # -- summary --------------------------------------------------------------
 
     def counts(self) -> dict[str, int]:
-        one = lambda q: self.db.execute(q).fetchone()[0]
+        def one(q):
+            return self.db.execute(q).fetchone()[0]
+
         return {
             "logged": one("SELECT COUNT(*) FROM predictions"),
             "graded": one("SELECT COUNT(*) FROM outcomes"),
-            "pending": one("SELECT COUNT(*) FROM predictions p LEFT JOIN outcomes o"
-                           " USING (prediction_id) WHERE o.prediction_id IS NULL"),
+            "pending": one(
+                "SELECT COUNT(*) FROM predictions p LEFT JOIN outcomes o"
+                " USING (prediction_id) WHERE o.prediction_id IS NULL"
+            ),
             "lessons": one("SELECT COUNT(*) FROM lessons WHERE status='active'"),
         }

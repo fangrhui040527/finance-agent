@@ -45,12 +45,14 @@ from decimal import Decimal
 
 from core.market.calendar import SessionCalendar, SessionWindow
 from markets.contract import (
-    AccountingStandard, FeeLeg, FeeSchedule, KnownAtStrategy, MarketAdapter,
+    AccountingStandard,
+    FeeLeg,
+    FeeSchedule,
+    KnownAtStrategy,
+    MarketAdapter,
 )
 
-TSE_FEES = FeeSchedule((
-    FeeLeg("brokerage", Decimal("0.0020"), minimum=Decimal("1500")),
-))
+TSE_FEES = FeeSchedule((FeeLeg("brokerage", Decimal("0.0020"), minimum=Decimal("1500")),))
 
 #: The standard table, for stocks outside TOPIX100. TOPIX100 constituents trade
 #: on a finer table (down to JPY 0.1 below JPY 1,000), so a large-cap name is
@@ -86,8 +88,10 @@ class XTKS(MarketAdapter):
 
     def __init__(self, holidays=frozenset(), half_days=frozenset()) -> None:
         self._cal = SessionCalendar(
-            windows=(SessionWindow(time(9, 0), time(11, 30)),
-                     SessionWindow(time(12, 30), time(15, 30))),
+            windows=(
+                SessionWindow(time(9, 0), time(11, 30)),
+                SessionWindow(time(12, 30), time(15, 30)),
+            ),
             tz_offset_hours=9,
             holidays=holidays,
             half_days=half_days,

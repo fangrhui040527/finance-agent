@@ -8,7 +8,7 @@ country. Position count is not a diversification measure.
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 
 @dataclass(frozen=True)
@@ -18,7 +18,7 @@ class Position:
     sector: str
     country: str
     currency: str
-    risk_to_stop: float = 0.0   # fraction of portfolio at risk if the stop fills
+    risk_to_stop: float = 0.0  # fraction of portfolio at risk if the stop fills
 
 
 @dataclass(frozen=True)
@@ -77,7 +77,9 @@ def effective_number_of_bets(weights: list[float], corr: list[list[float]]) -> f
         raise ValueError(f"correlation matrix must be {n}x{n}, got {len(corr)} rows")
     for i in range(n):
         if abs(corr[i][i] - 1.0) > 1e-9:
-            raise ValueError(f"corr[{i}][{i}] = {corr[i][i]}; a variable correlates 1.0 with itself")
+            raise ValueError(
+                f"corr[{i}][{i}] = {corr[i][i]}; a variable correlates 1.0 with itself"
+            )
         for j in range(n):
             v = corr[i][j]
             if not math.isfinite(v) or not -1.0 - 1e-9 <= v <= 1.0 + 1e-9:
@@ -177,8 +179,14 @@ def check(
     if corr:
         eb = effective_number_of_bets(weights, corr)
         if eb < limits.min_effective_bets:
-            out.append(Breach("effective_bets", eb, limits.min_effective_bets,
-                              "correlated holdings are one bet wearing many hats"))
+            out.append(
+                Breach(
+                    "effective_bets",
+                    eb,
+                    limits.min_effective_bets,
+                    "correlated holdings are one bet wearing many hats",
+                )
+            )
         for cluster in correlation_clusters(corr, cluster_threshold):
             w = sum(positions[i].weight for i in cluster)
             if w > limits.correlation_cluster:

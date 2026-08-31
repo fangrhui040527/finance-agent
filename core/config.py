@@ -19,7 +19,7 @@ So three rules hold here:
 from __future__ import annotations
 
 import tomllib
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from decimal import Decimal
 from pathlib import Path
 
@@ -32,23 +32,40 @@ SEARCH = ("config.local.toml", "config.toml")
 #: Bounds that no file may cross. Distinct from defaults, which live in the file.
 #: (key, minimum, maximum, why)
 HARD_BOUNDS: tuple[tuple[str, float, float, str], ...] = (
-    ("risk.risk_per_trade", 0.0, 0.02,
-     "risking more than 2% per trade turns a normal losing streak into ruin"),
-    ("risk.target_volatility", 0.02, 1.00,
-     "a volatility target outside 2%-100% annualised is not a target"),
-    ("risk.max_participation", 0.0, 0.10,
-     "above 10% of daily volume you are not taking the price, you are making it"),
-    ("waterfall.emergency_months", 3, 24,
-     "an emergency floor below three months is not a floor"),
-    ("waterfall.debt_hurdle", 0.0, 1.0,
-     "the debt hurdle is an annual rate"),
-    ("budget.daily_myr", 0.0, 10_000.0,
-     "a daily budget above RM 10,000 is a typo, not a decision"),
-    ("budget.per_question_myr", 0.0, 1_000.0,
-     "a per-question budget above RM 1,000 is a typo, not a decision"),
-    ("learning.min_graded_for_calibration", 30, 1_000,
-     "below 30 graded calls a calibration table measures luck; lowering the "
-     "threshold does not make you calibrated sooner"),
+    (
+        "risk.risk_per_trade",
+        0.0,
+        0.02,
+        "risking more than 2% per trade turns a normal losing streak into ruin",
+    ),
+    (
+        "risk.target_volatility",
+        0.02,
+        1.00,
+        "a volatility target outside 2%-100% annualised is not a target",
+    ),
+    (
+        "risk.max_participation",
+        0.0,
+        0.10,
+        "above 10% of daily volume you are not taking the price, you are making it",
+    ),
+    ("waterfall.emergency_months", 3, 24, "an emergency floor below three months is not a floor"),
+    ("waterfall.debt_hurdle", 0.0, 1.0, "the debt hurdle is an annual rate"),
+    ("budget.daily_myr", 0.0, 10_000.0, "a daily budget above RM 10,000 is a typo, not a decision"),
+    (
+        "budget.per_question_myr",
+        0.0,
+        1_000.0,
+        "a per-question budget above RM 1,000 is a typo, not a decision",
+    ),
+    (
+        "learning.min_graded_for_calibration",
+        30,
+        1_000,
+        "below 30 graded calls a calibration table measures luck; lowering the "
+        "threshold does not make you calibrated sooner",
+    ),
 )
 
 
@@ -101,10 +118,13 @@ class Config:
             f"  provenance ledger    {self.provenance_db}\n"
             f"  holdings             {', '.join(self.holdings) or '(none)'}\n"
             f"  watchlist            {', '.join(self.watchlist) or '(none)'}"
-            + ("\n  NOTE: with neither holdings nor watchlist set, the escalation "
-               "gate\n        (knowledge/news/features.py should_escalate) can never "
-               "fire\n        and nothing will ever reach the review queue."
-               if not (self.holdings or self.watchlist) else "")
+            + (
+                "\n  NOTE: with neither holdings nor watchlist set, the escalation "
+                "gate\n        (knowledge/news/features.py should_escalate) can never "
+                "fire\n        and nothing will ever reach the review queue."
+                if not (self.holdings or self.watchlist)
+                else ""
+            )
         )
 
 
@@ -202,6 +222,7 @@ def load(path: str | Path | None = None) -> Config:
 
     markets = tuple(_get(data, "account.markets", ["XKLS", "XNAS"]))
     from markets.registry import supported
+
     unknown = [m for m in markets if m not in supported()]
     if unknown:
         raise ConfigError(
@@ -209,7 +230,15 @@ def load(path: str | Path | None = None) -> Config:
             f"entry; listing a MIC here does not create one. Supported: {supported()}"
         )
 
-    dec = lambda k, d: Decimal(str(_get(data, k, d)))
+    def dec(k, d):
+        return Decimal(str(_get(data, k, d)))
+
+    def _int(k, d):
+        v = _get(data, k, d)
+        if isinstance(v, bool) or not isinstance(v, (int, float, str)):
+            raise ConfigError(f"{k} must be a number, got {type(v).__name__}")
+        return int(v)
+
     return Config(
         base_currency=str(_get(data, "account.base_currency", "MYR")).upper(),
         markets=markets,
@@ -222,11 +251,11 @@ def load(path: str | Path | None = None) -> Config:
         watchlist=_instruments(data, "account.watchlist"),
         provenance_db=str(_get(data, "provenance.database", "data/provenance.db")),
         daemon_budget_myr=dec("budget.daemon_daily_myr", 10.0),
-        emergency_months=int(_get(data, "waterfall.emergency_months", 6)),
+        emergency_months=_int("waterfall.emergency_months", 6),
         debt_hurdle=dec("waterfall.debt_hurdle", 0.08),
         daily_budget_myr=dec("budget.daily_myr", 25.0),
         per_question_budget_myr=dec("budget.per_question_myr", 5.0),
         database=str(_get(data, "learning.database", "data/learning.db")),
-        min_graded_for_calibration=int(_get(data, "learning.min_graded_for_calibration", 30)),
+        min_graded_for_calibration=_int("learning.min_graded_for_calibration", 30),
         source=source,
     )

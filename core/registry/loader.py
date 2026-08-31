@@ -19,10 +19,21 @@ import yaml
 from core.contracts.provenance_marker import Author, ProvenanceMarker
 
 #: Names that may never appear as a tool, whatever a YAML file says.
-FORBIDDEN_TOOLS = frozenset({
-    "place_order", "submit_order", "execute_trade", "buy", "sell", "cancel_order",
-    "modify_order", "short", "close_position", "broker_connect", "send_order",
-})
+FORBIDDEN_TOOLS = frozenset(
+    {
+        "place_order",
+        "submit_order",
+        "execute_trade",
+        "buy",
+        "sell",
+        "cancel_order",
+        "modify_order",
+        "short",
+        "close_position",
+        "broker_connect",
+        "send_order",
+    }
+)
 
 MIN_EVAL_CASES = 5
 MIN_NEGATIVE_CASES = 2
@@ -53,8 +64,11 @@ class KnowledgeSpec:
     managed: bool
 
     def marker(self, created_at) -> ProvenanceMarker:
-        return ProvenanceMarker(created_by=self.created_by, created_at=created_at,
-                                pinned=not self.managed and self.created_by is Author.AGENT)
+        return ProvenanceMarker(
+            created_by=self.created_by,
+            created_at=created_at,
+            pinned=not self.managed and self.created_by is Author.AGENT,
+        )
 
 
 @dataclass
@@ -94,8 +108,9 @@ class Registry:
         return spec.managed and spec.created_by is Author.AGENT
 
 
-def load(path: str | Path, evals_root: str | Path | None = None,
-         enforce_ratchet: bool = True) -> Registry:
+def load(
+    path: str | Path, evals_root: str | Path | None = None, enforce_ratchet: bool = True
+) -> Registry:
     raw = yaml.safe_load(Path(path).read_text())
     if not isinstance(raw, dict) or "version" not in raw:
         raise RegistryError(f"{path} is not a capability registry")
@@ -158,10 +173,21 @@ def check_suite(path: Path, agent_id: str) -> dict:
         raise RatchetError(
             f"{agent_id}: eval suite has {len(cases)} cases, minimum is {MIN_EVAL_CASES}"
         )
-    negatives = [c for c in cases if c.get("expect") in ("refuse", "no_lesson", "not_significant",
-                                                         "market_driven", "no_position",
-                                                         "no_identified_catalyst", "no_view")
-                 or c.get("negative") is True]
+    negatives = [
+        c
+        for c in cases
+        if c.get("expect")
+        in (
+            "refuse",
+            "no_lesson",
+            "not_significant",
+            "market_driven",
+            "no_position",
+            "no_identified_catalyst",
+            "no_view",
+        )
+        or c.get("negative") is True
+    ]
     if len(negatives) < MIN_NEGATIVE_CASES:
         raise RatchetError(
             f"{agent_id}: only {len(negatives)} negative cases. A suite where every case "
@@ -202,7 +228,7 @@ def run_suite(path: Path, agent_id: str, runner) -> EvalResult:
         expect = case.get("expect")
         try:
             got = runner(case)
-        except Exception as e:                    # a crash is a failure, not an error
+        except Exception as e:  # a crash is a failure, not an error
             got = f"error: {type(e).__name__}: {e}"
         hit = got == expect
         if hit:

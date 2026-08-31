@@ -18,8 +18,7 @@ from __future__ import annotations
 from datetime import date
 
 from knowledge.graph.entity_graph import Confidence, EdgeKind, NodeKind
-from knowledge.graph.extractors.base import (
-    Extractor, company_node, edge, node, sorted_payload)
+from knowledge.graph.extractors.base import Extractor, company_node, edge, node, sorted_payload
 from knowledge.graph.ids import PREFIX, instrument_id, node_id
 
 #: A registry entry is a stated fact about a market, so the registry is the
@@ -31,8 +30,7 @@ DOC = "markets/registry.py"
 #: honest floor: this is when the repository began asserting the mapping.
 ASSERTED_FROM = date(2020, 1, 1)
 
-COUNTRY_NAMES = {"MY": "Malaysia", "US": "United States",
-                 "SG": "Singapore", "HK": "Hong Kong"}
+COUNTRY_NAMES = {"MY": "Malaysia", "US": "United States", "SG": "Singapore", "HK": "Hong Kong"}
 
 
 class MarketsExtractor(Extractor):
@@ -50,29 +48,44 @@ class MarketsExtractor(Extractor):
         for raw in self.instruments:
             iid = instrument_id(_strip_prefix(raw))
             if not iid:
-                continue                       # not a listed instrument; skip quietly
+                continue  # not a listed instrument; skip quietly
             mic = iid.split(":", 1)[0]
             if mic in supported():
                 wanted.setdefault(mic, []).append(node_id(NodeKind.COMPANY, iid))
 
         for mic in sorted(wanted):
             a = get(mic)
-            country = node(NodeKind.COUNTRY, a.country,
-                           COUNTRY_NAMES.get(a.country, a.country), mic=mic)
+            country = node(
+                NodeKind.COUNTRY, a.country, COUNTRY_NAMES.get(a.country, a.country), mic=mic
+            )
             regulator = node(NodeKind.REGULATOR, a.regulator, mic=mic)
             nodes += [country, regulator]
             for cid in sorted(set(wanted[mic])):
                 nodes.append(company_node(cid, mic=mic))
-                edges.append(edge(cid, country["id"], EdgeKind.OPERATES_IN,
-                                  doc=f"{DOC}#{mic}", confidence=Confidence.EXTRACTED,
-                                  valid_from=ASSERTED_FROM))
-                edges.append(edge(cid, regulator["id"], EdgeKind.REGULATED_BY,
-                                  doc=f"{DOC}#{mic}", confidence=Confidence.EXTRACTED,
-                                  valid_from=ASSERTED_FROM))
+                edges.append(
+                    edge(
+                        cid,
+                        country["id"],
+                        EdgeKind.OPERATES_IN,
+                        doc=f"{DOC}#{mic}",
+                        confidence=Confidence.EXTRACTED,
+                        valid_from=ASSERTED_FROM,
+                    )
+                )
+                edges.append(
+                    edge(
+                        cid,
+                        regulator["id"],
+                        EdgeKind.REGULATED_BY,
+                        doc=f"{DOC}#{mic}",
+                        confidence=Confidence.EXTRACTED,
+                        valid_from=ASSERTED_FROM,
+                    )
+                )
         return sorted_payload(nodes, edges)
 
 
 def _strip_prefix(raw: str) -> str:
     """Accept either `MYX:1155` or an already-minted `CO:XKLS:1155`."""
     head = PREFIX[NodeKind.COMPANY] + ":"
-    return raw[len(head):] if raw.upper().startswith(head) else raw
+    return raw[len(head) :] if raw.upper().startswith(head) else raw

@@ -8,7 +8,8 @@ Both are the same shape and it is the shape this module exists to prevent - a
 wrong number that stays finite, plausible and correctly typed, and therefore
 survives every check downstream.
 """
-from datetime import datetime, timedelta, timezone
+
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 import pytest
@@ -16,7 +17,7 @@ from pydantic import ValidationError
 
 from core.contracts.money import BASE_CURRENCY, Money
 
-NOW = datetime(2026, 8, 30, tzinfo=timezone.utc)
+NOW = datetime(2026, 8, 30, tzinfo=UTC)
 
 
 def usd(amount="100"):
@@ -24,6 +25,7 @@ def usd(amount="100"):
 
 
 # -- the two defects ---------------------------------------------------------
+
 
 def test_a_negative_rate_is_refused_rather_than_negating_the_amount():
     """USD 100 became MYR -415. Finite, correctly typed, and wrong - it would
@@ -47,6 +49,7 @@ def test_a_currency_code_must_be_three_LETTERS_not_three_characters():
 
 
 # -- the contract ------------------------------------------------------------
+
 
 def test_every_amount_knows_its_currency():
     with pytest.raises(ValidationError):
@@ -80,6 +83,7 @@ def test_negative_amounts_are_allowed_because_losses_and_shorts_are_real():
 
 
 # -- conversion --------------------------------------------------------------
+
 
 def test_conversion_carries_the_rate_date_it_was_struck_at():
     """docs/06 4.1: never a bare number. A converted amount without an as-of is
@@ -127,6 +131,7 @@ def test_a_later_conversion_overwrites_the_stamp_with_its_own_date():
 
 
 # -- presentation ------------------------------------------------------------
+
 
 def test_it_prints_with_its_currency_so_a_bare_number_never_reaches_a_reader():
     assert str(Money(amount=Decimal("1234.5"), currency="MYR")) == "MYR 1,234.50"

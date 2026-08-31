@@ -14,25 +14,28 @@ docs/03 section 3. Two rules do the work:
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
 
 from engines.attribution.decompose import MoveExplanation, Verdict
-from engines.events.taxonomy import BaseRate, BaseRateTable, CapBand, Event, EventType
+from engines.events.taxonomy import BaseRate, BaseRateTable, Event, EventType
 
 SCORE_THRESHOLD = 0.25
 
 # docs/03 section 3.1: primary filing 1.0, exchange announcement 1.0,
 # curated news 0.8, general news 0.6, web search 0.4.
 SOURCE_TRUST = {
-    "filing": 1.0, "exchange": 1.0, "curated_news": 0.8,
-    "general_news": 0.6, "web": 0.4,
+    "filing": 1.0,
+    "exchange": 1.0,
+    "curated_news": 0.8,
+    "general_news": 0.6,
+    "web": 0.4,
 }
 
 # Historical mean direction per event type. Used ONLY for direction agreement -
 # magnitude always comes from the measured base-rate table.
 EXPECTED_SIGN: dict[EventType, int] = {
-    EventType.EARNINGS_RESULT: 0,          # depends on surprise
+    EventType.EARNINGS_RESULT: 0,  # depends on surprise
     EventType.GUIDANCE_CHANGE: 0,
     EventType.MA_TARGET: +1,
     EventType.MA_ACQUIRER: -1,
@@ -40,7 +43,7 @@ EXPECTED_SIGN: dict[EventType, int] = {
     EventType.DIVIDEND_CHANGE: 0,
     EventType.CAPITAL_RAISE: -1,
     EventType.INSIDER_BUY: +1,
-    EventType.INSIDER_SELL: 0,             # docs/02 A8: not a signal by default
+    EventType.INSIDER_SELL: 0,  # docs/02 A8: not a signal by default
     EventType.INDEX_ADD: +1,
     EventType.INDEX_DROP: -1,
     EventType.RATING_CHANGE: 0,
@@ -60,17 +63,28 @@ EXPECTED_SIGN: dict[EventType, int] = {
 # Prior probability that this event type produces a significant idiosyncratic
 # move at all. Overridden by the measured table wherever one exists.
 DEFAULT_PRIOR: dict[EventType, float] = {
-    EventType.EARNINGS_RESULT: 0.75, EventType.GUIDANCE_CHANGE: 0.80,
-    EventType.MA_TARGET: 0.95, EventType.MA_ACQUIRER: 0.60,
-    EventType.BUYBACK: 0.45, EventType.DIVIDEND_CHANGE: 0.25,
-    EventType.CAPITAL_RAISE: 0.65, EventType.INSIDER_BUY: 0.20,
-    EventType.INSIDER_SELL: 0.10, EventType.INDEX_ADD: 0.55,
-    EventType.INDEX_DROP: 0.55, EventType.RATING_CHANGE: 0.30,
-    EventType.CONTRACT_WIN: 0.40, EventType.PRODUCT_LAUNCH: 0.25,
-    EventType.REGULATORY_ACTION: 0.70, EventType.LITIGATION: 0.45,
-    EventType.EXECUTIVE_CHANGE: 0.35, EventType.GOING_CONCERN: 0.90,
-    EventType.HALT: 0.50, EventType.DELISTING: 0.85,
-    EventType.LOCKUP_EXPIRY: 0.30, EventType.MACRO_PRINT: 0.15,
+    EventType.EARNINGS_RESULT: 0.75,
+    EventType.GUIDANCE_CHANGE: 0.80,
+    EventType.MA_TARGET: 0.95,
+    EventType.MA_ACQUIRER: 0.60,
+    EventType.BUYBACK: 0.45,
+    EventType.DIVIDEND_CHANGE: 0.25,
+    EventType.CAPITAL_RAISE: 0.65,
+    EventType.INSIDER_BUY: 0.20,
+    EventType.INSIDER_SELL: 0.10,
+    EventType.INDEX_ADD: 0.55,
+    EventType.INDEX_DROP: 0.55,
+    EventType.RATING_CHANGE: 0.30,
+    EventType.CONTRACT_WIN: 0.40,
+    EventType.PRODUCT_LAUNCH: 0.25,
+    EventType.REGULATORY_ACTION: 0.70,
+    EventType.LITIGATION: 0.45,
+    EventType.EXECUTIVE_CHANGE: 0.35,
+    EventType.GOING_CONCERN: 0.90,
+    EventType.HALT: 0.50,
+    EventType.DELISTING: 0.85,
+    EventType.LOCKUP_EXPIRY: 0.30,
+    EventType.MACRO_PRINT: 0.15,
     EventType.PEER_EARNINGS: 0.20,
 }
 
@@ -89,14 +103,23 @@ class ScoreBreakdown:
 
     @property
     def score(self) -> float:
-        return (self.prior * self.proximity * self.specificity
-                * self.direction * self.magnitude * self.source_trust)
+        return (
+            self.prior
+            * self.proximity
+            * self.specificity
+            * self.direction
+            * self.magnitude
+            * self.source_trust
+        )
 
     def as_dict(self) -> dict[str, float]:
         return {
-            "prior": self.prior, "proximity": self.proximity,
-            "specificity": self.specificity, "direction": self.direction,
-            "magnitude": self.magnitude, "source_trust": self.source_trust,
+            "prior": self.prior,
+            "proximity": self.proximity,
+            "specificity": self.specificity,
+            "direction": self.direction,
+            "magnitude": self.magnitude,
+            "source_trust": self.source_trust,
         }
 
 
@@ -143,7 +166,7 @@ def direction_agreement(event: Event, residual: float, base_rate: BaseRate | Non
             s = event.surprise.value
             expected = 1 if "beat" in s else -1 if "miss" in s else 0
     if expected == 0:
-        return 0.6                                   # genuinely two-sided
+        return 0.6  # genuinely two-sided
     return 1.0 if (residual >= 0) == (expected > 0) else 0.2
 
 
@@ -185,27 +208,30 @@ def score_candidates(
 
     for ev in events:
         if not ev.citable:
-            continue                                  # docs/02 A5: unconfirmed cannot be cited
+            continue  # docs/02 A5: unconfirmed cannot be cited
         br = table.lookup(ev.event_type, market, ev.cap_band, ev.surprise)
         lag = session_lag.get(ev.event_id, 0)
         bd = ScoreBreakdown(
             prior=(br.hit_rate if br and br.n >= 10 else DEFAULT_PRIOR.get(ev.event_type, 0.2)),
             proximity=proximity(lag, market),
-            specificity=specificity(ev, explanation.instrument_id, peers,
-                                    ev.event_id in sector_wide),
+            specificity=specificity(
+                ev, explanation.instrument_id, peers, ev.event_id in sector_wide
+            ),
             direction=direction_agreement(ev, residual, br),
             magnitude=magnitude_plausibility(residual, br),
             source_trust=SOURCE_TRUST.get(source_kind.get(ev.event_id, "general_news"), 0.6),
         )
-        out.append(CandidateCause(
-            cause_type=ev.event_type.value,
-            description=ev.detail or ev.event_type.value,
-            occurred_at=ev.announced_at,
-            lag_sessions=lag,
-            breakdown=bd,
-            base_rate=br,
-            evidence=(ev.source_doc_id,) if ev.source_doc_id else (),
-        ))
+        out.append(
+            CandidateCause(
+                cause_type=ev.event_type.value,
+                description=ev.detail or ev.event_type.value,
+                occurred_at=ev.announced_at,
+                lag_sessions=lag,
+                breakdown=bd,
+                base_rate=br,
+                evidence=(ev.source_doc_id,) if ev.source_doc_id else (),
+            )
+        )
     out.sort(key=lambda c: -c.score)
     return out
 
@@ -217,8 +243,11 @@ def attach(explanation: MoveExplanation, candidates: list[CandidateCause]) -> Mo
     precision (docs/03 section 3.2 rule 2).
     """
     explanation.candidates = candidates
-    if explanation.verdict in (Verdict.NOT_SIGNIFICANT, Verdict.MARKET_DRIVEN,
-                               Verdict.ATTRIBUTION_UNAVAILABLE):
+    if explanation.verdict in (
+        Verdict.NOT_SIGNIFICANT,
+        Verdict.MARKET_DRIVEN,
+        Verdict.ATTRIBUTION_UNAVAILABLE,
+    ):
         return explanation
 
     if not candidates or candidates[0].score < SCORE_THRESHOLD:
@@ -232,9 +261,7 @@ def attach(explanation: MoveExplanation, candidates: list[CandidateCause]) -> Mo
 
     top = candidates[0]
     close = [c for c in candidates if c.score >= top.score * 0.8]
-    explanation.verdict = (
-        Verdict.EXPLAINED if top.score >= 0.5 else Verdict.PARTIALLY_EXPLAINED
-    )
+    explanation.verdict = Verdict.EXPLAINED if top.score >= 0.5 else Verdict.PARTIALLY_EXPLAINED
     if len(close) > 1:
         explanation.reason = (
             f"{len(close)} candidates score within 20% of each other and are all shown; "
@@ -243,7 +270,11 @@ def attach(explanation: MoveExplanation, candidates: list[CandidateCause]) -> Mo
     else:
         explanation.reason = (
             f"{top.cause_type} at lag {top.lag_sessions} scores {top.score:.2f}"
-            + (f"; historically worth a median {top.base_rate.median_car:+.2%} "
-               f"(n={top.base_rate.n})" if top.base_rate else "")
+            + (
+                f"; historically worth a median {top.base_rate.median_car:+.2%} "
+                f"(n={top.base_rate.n})"
+                if top.base_rate
+                else ""
+            )
         )
     return explanation

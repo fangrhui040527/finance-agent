@@ -31,7 +31,10 @@ class Fold:
 
 
 def purged_walk_forward(
-    n: int, n_folds: int = 5, label_horizon: int = 20, embargo: int | None = None,
+    n: int,
+    n_folds: int = 5,
+    label_horizon: int = 20,
+    embargo: int | None = None,
     min_train: int = 60,
 ) -> list[Fold]:
     """Expanding-window walk forward. Test blocks move strictly forward in time.

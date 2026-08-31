@@ -41,7 +41,7 @@ def participation_slippage(
     concave rather than linear.
     """
     if adv <= 0:
-        return consideration * Decimal("0.02")   # unknown liquidity: assume bad
+        return consideration * Decimal("0.02")  # unknown liquidity: assume bad
     rate = float(consideration / adv)
     return consideration * coefficient * Decimal(str(math.sqrt(max(rate, 0.0))))
 

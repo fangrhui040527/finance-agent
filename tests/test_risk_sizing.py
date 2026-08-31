@@ -1,15 +1,30 @@
 """P10/P11: concentration measured honestly, and caps that cannot be breached."""
+
 from datetime import date
 from decimal import Decimal as D
 
 import pytest
 
 from engines.risk.concentration import (
-    Breach, Limits, Position, check, correlation_clusters, effective_number_of_bets, hhi,
+    Limits,
+    Position,
+    check,
+    correlation_clusters,
+    effective_number_of_bets,
+    hhi,
 )
 from engines.sizing.caps import (
-    Band, BindingCap, CapSet, ImplausibleEdge, KELLY_MIN_TRADES, concentration_cap,
-    cost_floor_bps, cost_floor_value, kelly_cap, liquidity_cap, risk_budget_cap,
+    KELLY_MIN_TRADES,
+    Band,
+    BindingCap,
+    CapSet,
+    ImplausibleEdge,
+    concentration_cap,
+    cost_floor_bps,
+    cost_floor_value,
+    kelly_cap,
+    liquidity_cap,
+    risk_budget_cap,
     vol_target_scalar,
 )
 from engines.sizing.decision import CapBreach, NoPosition, SizingDecision, size
@@ -53,12 +68,21 @@ def test_genuinely_diversified_portfolio_passes():
     Six names at 0.15 correlation gives only 3.4 - see the test below. The bar
     is demanding on purpose: it measures independence, not headcount.
     """
-    sectors = ["Financials", "Utilities", "Tech", "Healthcare", "Industrials",
-               "Energy", "Staples", "Materials", "Telecom", "Property"]
+    sectors = [
+        "Financials",
+        "Utilities",
+        "Tech",
+        "Healthcare",
+        "Industrials",
+        "Energy",
+        "Staples",
+        "Materials",
+        "Telecom",
+        "Property",
+    ]
     countries = ["MY", "MY", "US", "US", "JP", "AU", "MY", "SG", "US", "MY"]
     ccys = ["MYR", "MYR", "USD", "USD", "JPY", "AUD", "MYR", "SGD", "USD", "MYR"]
-    pos = [Position(f"P{i}", 0.07, sectors[i], countries[i], ccys[i], 0.005)
-           for i in range(10)]
+    pos = [Position(f"P{i}", 0.07, sectors[i], countries[i], ccys[i], 0.005) for i in range(10)]
     corr = [[1.0 if i == j else 0.10 for j in range(10)] for i in range(10)]
     assert check(pos, corr, Limits()) == []
 
@@ -93,8 +117,13 @@ def test_effective_bets_floor_cannot_be_configured_below_three():
 
 # --- waterfall -----------------------------------------------------------
 def test_emergency_floor_and_reservations_come_out_first():
-    w = compute(D("42000"), D("3500"), [Goal("car", D("8000"), 18)],
-                [Liability("card", D("4000"), D("0.18"))], D("1500"))
+    w = compute(
+        D("42000"),
+        D("3500"),
+        [Goal("car", D("8000"), 18)],
+        [Liability("card", D("4000"), D("0.18"))],
+        D("1500"),
+    )
     assert w.investable == D("7500")
     assert [s.locked for s in w.steps][:3] == [True, True, True]
 
@@ -130,7 +159,8 @@ def test_kelly_is_disabled_below_the_trade_count_gate():
 def test_quarter_kelly_not_full_kelly():
     full_f = (P_WIN * PAYOFF - (1 - P_WIN)) / PAYOFF
     assert kelly_cap(D("20000"), P_WIN, PAYOFF, 60) == pytest.approx(
-        D("20000") * full_f * D("0.25"))
+        D("20000") * full_f * D("0.25")
+    )
 
 
 def test_implausible_edge_is_refused():
@@ -184,59 +214,145 @@ def caps_for(investable, price, atr, trades=12):
 def test_small_capital_correctly_yields_no_position():
     inv, price, atr = D("7500"), D("6.20"), D("0.31")
     with pytest.raises(NoPosition, match="does not fund one lot"):
-        size("1155.KL", Band.ACCUMULATE, inv, caps_for(inv, price, atr), price, 100,
-             price - D("2.5") * atr, BREAKERS, date(2028, 8, 24),
-             XKLS.fee_schedule.round_trip, mic="XKLS")
+        size(
+            "1155.KL",
+            Band.ACCUMULATE,
+            inv,
+            caps_for(inv, price, atr),
+            price,
+            100,
+            price - D("2.5") * atr,
+            BREAKERS,
+            date(2028, 8, 24),
+            XKLS.fee_schedule.round_trip,
+            mic="XKLS",
+        )
 
 
 def test_adequate_capital_produces_a_lot_rounded_position():
     inv, price, atr = D("400000"), D("6.20"), D("0.31")
-    d = size("1155.KL", Band.ACCUMULATE, inv, caps_for(inv, price, atr), price, 100,
-             price - D("2.5") * atr, BREAKERS, date(2028, 8, 24),
-             XKLS.fee_schedule.round_trip, mic="XKLS")
+    d = size(
+        "1155.KL",
+        Band.ACCUMULATE,
+        inv,
+        caps_for(inv, price, atr),
+        price,
+        100,
+        price - D("2.5") * atr,
+        BREAKERS,
+        date(2028, 8, 24),
+        XKLS.fee_schedule.round_trip,
+        mic="XKLS",
+    )
     assert d.target_units % 100 == 0 and d.target_units > 0
     assert d.binding_cap is BindingCap.RISK
 
 
 def test_binding_cap_is_surfaced_by_name():
     inv, price, atr = D("400000"), D("6.20"), D("0.31")
-    d = size("X", Band.ACCUMULATE, inv, caps_for(inv, price, atr), price, 100,
-             price - D("2.5") * atr, BREAKERS, date(2028, 1, 1),
-             XKLS.fee_schedule.round_trip, mic="XKLS")
+    d = size(
+        "X",
+        Band.ACCUMULATE,
+        inv,
+        caps_for(inv, price, atr),
+        price,
+        100,
+        price - D("2.5") * atr,
+        BREAKERS,
+        date(2028, 1, 1),
+        XKLS.fee_schedule.round_trip,
+        mic="XKLS",
+    )
     assert d.binding_cap in set(BindingCap)
 
 
 def test_sub_economic_position_is_refused_on_cost():
-    inv, price, atr = D("60000"), D("0.40"), D("0.02")
-    caps = CapSet(risk=D("900"), kelly=None, concentration=D("900"),
-                  liquidity=D("900000"), cost_floor=D("4706"))
+    inv, price, _atr = D("60000"), D("0.40"), D("0.02")
+    caps = CapSet(
+        risk=D("900"),
+        kelly=None,
+        concentration=D("900"),
+        liquidity=D("900000"),
+        cost_floor=D("4706"),
+    )
     with pytest.raises(NoPosition, match="bps floor"):
-        size("PENNY", Band.ACCUMULATE, inv, caps, price, 100, price - D("0.05"),
-             BREAKERS, date(2028, 1, 1), XKLS.fee_schedule.round_trip, mic="XKLS")
+        size(
+            "PENNY",
+            Band.ACCUMULATE,
+            inv,
+            caps,
+            price,
+            100,
+            price - D("0.05"),
+            BREAKERS,
+            date(2028, 1, 1),
+            XKLS.fee_schedule.round_trip,
+            mic="XKLS",
+        )
 
 
 def test_a_position_without_breakers_cannot_be_constructed():
     with pytest.raises(CapBreach, match="thesis breakers"):
-        SizingDecision("X", Band.ACCUMULATE, D("1000"), BindingCap.RISK, D("620"), 100,
-                       100, D("5"), (), date(2028, 1, 1))
+        SizingDecision(
+            "X",
+            Band.ACCUMULATE,
+            D("1000"),
+            BindingCap.RISK,
+            D("620"),
+            100,
+            100,
+            D("5"),
+            (),
+            date(2028, 1, 1),
+        )
 
 
 def test_one_breaker_is_not_enough():
     with pytest.raises(CapBreach, match="2-4 breakers"):
-        SizingDecision("X", Band.ACCUMULATE, D("1000"), BindingCap.RISK, D("620"), 100,
-                       100, D("5"), ("only one",), date(2028, 1, 1))
+        SizingDecision(
+            "X",
+            Band.ACCUMULATE,
+            D("1000"),
+            BindingCap.RISK,
+            D("620"),
+            100,
+            100,
+            D("5"),
+            ("only one",),
+            date(2028, 1, 1),
+        )
 
 
 def test_partial_lot_cannot_be_constructed():
     with pytest.raises(CapBreach, match="board lot"):
-        SizingDecision("X", Band.ACCUMULATE, D("1000"), BindingCap.RISK, D("620"), 157,
-                       100, D("5"), BREAKERS, date(2028, 1, 1))
+        SizingDecision(
+            "X",
+            Band.ACCUMULATE,
+            D("1000"),
+            BindingCap.RISK,
+            D("620"),
+            157,
+            100,
+            D("5"),
+            BREAKERS,
+            date(2028, 1, 1),
+        )
 
 
 def test_non_accumulate_bands_deploy_no_capital():
     for band in (Band.HOLD, Band.TRIM, Band.EXIT, Band.NO_SIGNAL):
-        d = size("X", band, D("20000"), caps_for(D("20000"), D("6"), D("0.3")), D("6"),
-                 100, D("5"), BREAKERS, date(2028, 1, 1), XKLS.fee_schedule.round_trip)
+        d = size(
+            "X",
+            band,
+            D("20000"),
+            caps_for(D("20000"), D("6"), D("0.3")),
+            D("6"),
+            100,
+            D("5"),
+            BREAKERS,
+            date(2028, 1, 1),
+            XKLS.fee_schedule.round_trip,
+        )
         assert d.target_units == 0 and d.binding_cap is BindingCap.NONE
 
 
@@ -245,21 +361,36 @@ def test_trade_breaching_concentration_after_the_fact_is_refused():
     existing = [Position(f"B{i}", 0.10, "Financials", "MY", "MYR", 0.005) for i in range(9)]
     corr = [[1.0 if i == j else 0.85 for j in range(10)] for i in range(10)]
     with pytest.raises(CapBreach, match="would breach"):
-        size("B9", Band.ACCUMULATE, inv, caps_for(inv, D("6.20"), D("0.31")), D("6.20"),
-             100, D("5.4"), BREAKERS, date(2028, 1, 1), XKLS.fee_schedule.round_trip,
-             existing=existing, limits=Limits(), corr=corr,
-             candidate_meta={"sector": "Financials", "country": "MY", "currency": "MYR"},
-             mic="XKLS")
+        size(
+            "B9",
+            Band.ACCUMULATE,
+            inv,
+            caps_for(inv, D("6.20"), D("0.31")),
+            D("6.20"),
+            100,
+            D("5.4"),
+            BREAKERS,
+            date(2028, 1, 1),
+            XKLS.fee_schedule.round_trip,
+            existing=existing,
+            limits=Limits(),
+            corr=corr,
+            candidate_meta={"sector": "Financials", "country": "MY", "currency": "MYR"},
+            mic="XKLS",
+        )
 
 
 # --- found by stress testing (stress/run.py) --------------------------------
+
 
 def test_a_negative_weight_is_refused_because_it_inflates_hhi_past_its_own_range():
     """HHI is bounded [0,1] and compared against a 0.18 limit. Weights of
     [-0.5, 1.5] returned 2.5 - which reads as extreme concentration rather than
     as the data error it is."""
     import pytest as _pytest
+
     from engines.risk.concentration import hhi
+
     with _pytest.raises(ValueError, match="negative"):
         hhi([-0.5, 1.5])
     with _pytest.raises(ValueError, match="not a number"):
@@ -270,7 +401,9 @@ def test_an_impossible_correlation_matrix_is_refused():
     """corr=2.0 gave 0.67 effective bets from two positions. The range is [1, n],
     and this is the number the entire eggs-in-one-basket rule rests on."""
     import pytest as _pytest
+
     from engines.risk.concentration import effective_number_of_bets
+
     with _pytest.raises(ValueError, match=r"outside \[-1, 1\]"):
         effective_number_of_bets([0.5, 0.5], [[1.0, 2.0], [2.0, 1.0]])
     with _pytest.raises(ValueError, match="correlates 1.0 with itself"):
@@ -281,7 +414,9 @@ def test_an_impossible_correlation_matrix_is_refused():
 
 def test_effective_bets_never_leaves_its_mathematical_range():
     import random as _random
+
     from engines.risk.concentration import effective_number_of_bets
+
     rng = _random.Random(23)
     for _ in range(200):
         k = rng.randint(2, 8)
@@ -294,9 +429,12 @@ def test_effective_bets_never_leaves_its_mathematical_range():
 def test_a_negative_adv_cannot_produce_a_negative_liquidity_cap():
     """A negative cap is the smallest of the five, so it always wins binding()
     and carries a negative target size downstream - a cap that inverts."""
-    import pytest as _pytest
     from decimal import Decimal as _D
+
+    import pytest as _pytest
+
     from engines.sizing.caps import liquidity_cap
+
     with _pytest.raises(ValueError, match="cannot be negative"):
         liquidity_cap(_D("-1000000"))
     with _pytest.raises(ValueError, match="participation"):

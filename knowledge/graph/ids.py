@@ -99,9 +99,7 @@ def fold(raw: str) -> str:
         prev = out
         out = unicodedata.normalize("NFKC", out).casefold()
     if out != prev:
-        raise IdError(
-            f"{raw!r} does not reach a stable normal form in {MAX_FOLD_PASSES} passes"
-        )
+        raise IdError(f"{raw!r} does not reach a stable normal form in {MAX_FOLD_PASSES} passes")
     return out
 
 
@@ -188,7 +186,7 @@ def node_id(kind: NodeKind, raw: str) -> str:
     # never re-slugged. Without this, node_id(k, node_id(k, x)) drifts on the
     # second call and half the producers disagree with the other half.
     if body.upper().startswith(prefix + ":"):
-        body = body[len(prefix) + 1:]
+        body = body[len(prefix) + 1 :]
         if kind is NodeKind.COMPANY:
             iid = instrument_id(body)
             return f"{prefix}:{iid}" if iid else f"{prefix}:{slug(body)}"

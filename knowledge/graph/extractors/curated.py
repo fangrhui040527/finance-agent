@@ -12,13 +12,12 @@ from __future__ import annotations
 
 from datetime import date
 from pathlib import Path
+from typing import Any
 
 import yaml
 
-from knowledge.graph.entity_graph import (
-    EDGE_INVERSE, Confidence, EdgeKind, NodeKind)
-from knowledge.graph.extractors.base import (
-    Extractor, company_node, edge, node, sorted_payload)
+from knowledge.graph.entity_graph import EDGE_INVERSE, Confidence, EdgeKind, NodeKind
+from knowledge.graph.extractors.base import Extractor, company_node, edge, node, sorted_payload
 from knowledge.graph.ids import kind_of, node_id
 
 DATA = Path(__file__).resolve().parents[1] / "data" / "supply_chain.yaml"
@@ -51,13 +50,17 @@ class CuratedExtractor(Extractor):
                 raise ValueError(f"{self.path.name}: duplicate row id {rid!r}")
             seen.add(rid)
             src, dst = _ref(row["source"]), _ref(row["target"])
-            nodes += [n for n in (_implied(row["source"]), _implied(row["target"]))
-                      if n is not None]
+            nodes += [
+                n for n in (_implied(row["source"]), _implied(row["target"])) if n is not None
+            ]
             kind = EdgeKind(row["relation"])
-            common = dict(doc=f"{DOC}#{rid}", confidence=Confidence.EXTRACTED,
-                          weight=float(row.get("weight", 1.0)),
-                          valid_from=_as_date(row["valid_from"]),
-                          valid_to=_as_date(row.get("valid_to")))
+            common: dict[str, Any] = dict(
+                doc=f"{DOC}#{rid}",
+                confidence=Confidence.EXTRACTED,
+                weight=float(row.get("weight", 1.0)),
+                valid_from=_as_date(row["valid_from"]),
+                valid_to=_as_date(row.get("valid_to")),
+            )
             edges.append(edge(src, dst, kind, **common))
             # Both readings, written out. The store holds literal edges, so a
             # relationship that is true from either end is stored from either

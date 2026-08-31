@@ -25,31 +25,33 @@ Adding a market is filling this in and passing conformance tests. No orchestrato
 
 ```python
 class MarketAdapter(Protocol):
-    mic: str                        # ISO 10383, e.g. "XKLS"
-    country: str                    # ISO 3166-1 alpha-2
-    currency: str                   # ISO 4217
+    mic: str  # ISO 10383, e.g. "XKLS"
+    country: str  # ISO 3166-1 alpha-2
+    currency: str  # ISO 4217
     tier: Literal[1, 2, 3, 4]
 
     # --- Trading mechanics -------------------------------------------------
-    def sessions(self, d: date) -> list[Session]: ...      # incl. lunch breaks
+    def sessions(self, d: date) -> list[Session]: ...  # incl. lunch breaks
     def holidays(self, year: int) -> list[date]: ...
     def lot_size(self, instrument_id: str) -> int: ...
     def tick_size(self, price: Decimal) -> Decimal: ...
     def settlement_days(self) -> int: ...
-    def price_limits(self) -> PriceLimit | None: ...       # limit up/down where applicable
+    def price_limits(self) -> PriceLimit | None: ...  # limit up/down where applicable
 
     # --- Costs -------------------------------------------------------------
-    def fee_schedule(self) -> FeeSchedule: ...             # commission, min, stamp,
-                                                           # clearing, levy, caps
+    def fee_schedule(self) -> FeeSchedule:
+        ...  # commission, min, stamp,
+        # clearing, levy, caps
+
     def withholding(self, income_type: str, holder_country: str) -> Decimal: ...
 
     # --- Reference ---------------------------------------------------------
-    def local_index(self) -> str: ...                      # the benchmark for attribution
-    def sector_scheme(self) -> str: ...                    # GICS / local scheme + mapping
-    def accounting_standard(self) -> str: ...              # IFRS / US GAAP / local
+    def local_index(self) -> str: ...  # the benchmark for attribution
+    def sector_scheme(self) -> str: ...  # GICS / local scheme + mapping
+    def accounting_standard(self) -> str: ...  # IFRS / US GAAP / local
 
     # --- Disclosure --------------------------------------------------------
-    def filing_calendar(self) -> FilingRules: ...          # deadlines by filer class
+    def filing_calendar(self) -> FilingRules: ...  # deadlines by filer class
     def announcement_source(self) -> SourceRef: ...
     def insider_disclosure(self) -> SourceRef | None: ...
     def short_interest(self) -> SourceRef | None: ...

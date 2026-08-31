@@ -12,15 +12,21 @@ from decimal import Decimal
 
 from core.market.calendar import SessionCalendar, SessionWindow
 from markets.contract import (
-    AccountingStandard, FeeLeg, FeeSchedule, KnownAtStrategy, MarketAdapter,
+    AccountingStandard,
+    FeeLeg,
+    FeeSchedule,
+    KnownAtStrategy,
+    MarketAdapter,
 )
 
 # Zero-commission retail brokerage; the SEC fee applies to sells only, but is
 # modelled per-side here as a conservative round-trip estimate.
-NASDAQ_FEES = FeeSchedule((
-    FeeLeg("commission", Decimal("0")),
-    FeeLeg("sec_fee", Decimal("0.0000278")),
-))
+NASDAQ_FEES = FeeSchedule(
+    (
+        FeeLeg("commission", Decimal("0")),
+        FeeLeg("sec_fee", Decimal("0.0000278")),
+    )
+)
 
 
 class XNAS(MarketAdapter):

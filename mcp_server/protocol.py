@@ -21,8 +21,9 @@ from __future__ import annotations
 import json
 import sys
 import traceback
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Any, Callable
+from typing import Any
 
 PROTOCOL_VERSION = "2024-11-05"
 
@@ -49,8 +50,7 @@ class Tool:
     fn: Callable[..., str]
 
     def as_json(self) -> dict:
-        return {"name": self.name, "description": self.description,
-                "inputSchema": self.schema}
+        return {"name": self.name, "description": self.description, "inputSchema": self.schema}
 
 
 @dataclass
@@ -64,6 +64,7 @@ class Server:
         def register(fn):
             self.tools[name] = Tool(name, description, schema, fn)
             return fn
+
         return register
 
     # -- dispatch ------------------------------------------------------------
@@ -96,10 +97,13 @@ class Server:
             # Caught by name before the generic handler: formatting a traceback
             # for a recursion error can itself recurse.
             return _error(rid, INVALID_PARAMS, "arguments are nested too deeply")
-        except Exception as e:                       # never kill the loop
-            return _error(rid, INTERNAL_ERROR,
-                          f"{type(e).__name__}: {e}",
-                          data={"traceback": traceback.format_exc(limit=4)})
+        except Exception as e:  # never kill the loop
+            return _error(
+                rid,
+                INTERNAL_ERROR,
+                f"{type(e).__name__}: {e}",
+                data={"traceback": traceback.format_exc(limit=4)},
+            )
         return {"jsonrpc": "2.0", "id": rid, "result": result}
 
     def _initialize(self) -> dict:
@@ -112,6 +116,8 @@ class Server:
 
     def _call(self, params: dict) -> dict:
         name = params.get("name")
+        if not isinstance(name, str):
+            raise ToolError(f"tool name must be a string, got {name!r}")
         tool = self.tools.get(name)
         if tool is None:
             raise ToolError(f"unknown tool {name!r}; have {sorted(self.tools)}")
@@ -148,8 +154,7 @@ class Server:
                 # Nesting depth is client-controlled. json.loads raises this
                 # rather than JSONDecodeError, and an uncaught one ends the
                 # session - a client can hang up the server with one line.
-                _write(stdout, _error(None, PARSE_ERROR,
-                                      "request nesting is too deep to parse"))
+                _write(stdout, _error(None, PARSE_ERROR, "request nesting is too deep to parse"))
                 continue
             if not isinstance(req, dict):
                 _write(stdout, _error(None, INVALID_REQUEST, "request must be an object"))

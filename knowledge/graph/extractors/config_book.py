@@ -11,7 +11,6 @@ something you hold, and a graph with no seeds answers nothing.
 
 from __future__ import annotations
 
-from knowledge.graph.entity_graph import NodeKind
 from knowledge.graph.extractors.base import Extractor, company_node, sorted_payload
 
 
@@ -23,15 +22,19 @@ class ConfigBookExtractor(Extractor):
         self.watchlist = tuple(watchlist)
 
     @classmethod
-    def from_config(cls, cfg=None) -> "ConfigBookExtractor":
+    def from_config(cls, cfg=None) -> ConfigBookExtractor:
         if cfg is None:
             from core.config import load
+
             cfg = load()
         return cls(cfg.holdings, cfg.watchlist)
 
     def extract(self) -> dict:
         nodes = [company_node(iid, held=True) for iid in self.holdings]
         held = {n["id"] for n in nodes}
-        nodes += [n for n in (company_node(iid, watched=True)
-                              for iid in self.watchlist) if n["id"] not in held]
+        nodes += [
+            n
+            for n in (company_node(iid, watched=True) for iid in self.watchlist)
+            if n["id"] not in held
+        ]
         return sorted_payload(nodes, [])

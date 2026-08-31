@@ -51,23 +51,47 @@ def _norm_ppf(p: float) -> float:
     """Acklam's rational approximation. Adequate for the tail values used here."""
     if not 0.0 < p < 1.0:
         raise ValueError("p must be in (0,1)")
-    a = [-3.969683028665376e01, 2.209460984245205e02, -2.759285104469687e02,
-         1.383577518672690e02, -3.066479806614716e01, 2.506628277459239e00]
-    b = [-5.447609879822406e01, 1.615858368580409e02, -1.556989798598866e02,
-         6.680131188771972e01, -1.328068155288572e01]
-    c = [-7.784894002430293e-03, -3.223964580411365e-01, -2.400758277161838e00,
-         -2.549732539343734e00, 4.374664141464968e00, 2.938163982698783e00]
-    d = [7.784695709041462e-03, 3.224671290700398e-01, 2.445134137142996e00,
-         3.754408661907416e00]
+    a = [
+        -3.969683028665376e01,
+        2.209460984245205e02,
+        -2.759285104469687e02,
+        1.383577518672690e02,
+        -3.066479806614716e01,
+        2.506628277459239e00,
+    ]
+    b = [
+        -5.447609879822406e01,
+        1.615858368580409e02,
+        -1.556989798598866e02,
+        6.680131188771972e01,
+        -1.328068155288572e01,
+    ]
+    c = [
+        -7.784894002430293e-03,
+        -3.223964580411365e-01,
+        -2.400758277161838e00,
+        -2.549732539343734e00,
+        4.374664141464968e00,
+        2.938163982698783e00,
+    ]
+    d = [7.784695709041462e-03, 3.224671290700398e-01, 2.445134137142996e00, 3.754408661907416e00]
     pl, ph = 0.02425, 1 - 0.02425
     if p < pl:
         q = math.sqrt(-2 * math.log(p))
-        return (((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1)
+        return (((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) / (
+            (((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1
+        )
     if p > ph:
         q = math.sqrt(-2 * math.log(1 - p))
-        return -(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1)
+        return -(((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) / (
+            (((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1
+        )
     q, r = p - 0.5, (p - 0.5) ** 2
-    return (((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q / (((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1)
+    return (
+        (((((a[0] * r + a[1]) * r + a[2]) * r + a[3]) * r + a[4]) * r + a[5])
+        * q
+        / (((((b[0] * r + b[1]) * r + b[2]) * r + b[3]) * r + b[4]) * r + 1)
+    )
 
 
 @dataclass(frozen=True)
@@ -85,8 +109,10 @@ class Performance:
     kurtosis: float
 
     def summary(self) -> str:
-        return (f"CAGR {self.cagr:+.2%}  vol {self.volatility:.2%}  Sharpe {self.sharpe:.2f}  "
-                f"maxDD {self.max_drawdown:.2%}  underwater {self.longest_underwater_days}d")
+        return (
+            f"CAGR {self.cagr:+.2%}  vol {self.volatility:.2%}  Sharpe {self.sharpe:.2f}  "
+            f"maxDD {self.max_drawdown:.2%}  underwater {self.longest_underwater_days}d"
+        )
 
 
 def drawdown_profile(returns: list[float]) -> tuple[float, int]:
@@ -128,17 +154,30 @@ def performance(returns: list[float], periods_per_year: int = TRADING_DAYS) -> P
     losses = [r for r in returns if r < 0]
     hit = len(wins) / n
     pf = (sum(wins) / abs(sum(losses))) if losses and sum(losses) != 0 else float("inf")
-    return Performance(n, cagr, vol, sharpe, sortino, max_dd, underwater, hit, pf,
-                       _skew(returns), _kurtosis(returns))
+    return Performance(
+        n,
+        cagr,
+        vol,
+        sharpe,
+        sortino,
+        max_dd,
+        underwater,
+        hit,
+        pf,
+        _skew(returns),
+        _kurtosis(returns),
+    )
 
 
-def probabilistic_sharpe(sharpe: float, returns: list[float], benchmark_sharpe: float = 0.0) -> float:
+def probabilistic_sharpe(
+    sharpe: float, returns: list[float], benchmark_sharpe: float = 0.0
+) -> float:
     """P(true Sharpe > benchmark), correcting for skew and fat tails."""
     n = len(returns)
     if n < 4:
         return 0.0
     g3, g4 = _skew(returns), _kurtosis(returns)
-    denom = math.sqrt(max(1e-12, 1 - g3 * sharpe + ((g4 - 1) / 4) * sharpe ** 2))
+    denom = math.sqrt(max(1e-12, 1 - g3 * sharpe + ((g4 - 1) / 4) * sharpe**2))
     return _norm_cdf(((sharpe - benchmark_sharpe) * math.sqrt(n - 1)) / denom)
 
 

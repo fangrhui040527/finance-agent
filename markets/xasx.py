@@ -34,12 +34,14 @@ from decimal import Decimal
 
 from core.market.calendar import SessionCalendar, SessionWindow
 from markets.contract import (
-    AccountingStandard, FeeLeg, FeeSchedule, KnownAtStrategy, MarketAdapter,
+    AccountingStandard,
+    FeeLeg,
+    FeeSchedule,
+    KnownAtStrategy,
+    MarketAdapter,
 )
 
-ASX_FEES = FeeSchedule((
-    FeeLeg("brokerage", Decimal("0.0010"), minimum=Decimal("10")),
-))
+ASX_FEES = FeeSchedule((FeeLeg("brokerage", Decimal("0.0010"), minimum=Decimal("10")),))
 
 
 class XASX(MarketAdapter):
@@ -47,7 +49,7 @@ class XASX(MarketAdapter):
     country = "AU"
     currency = "AUD"
     tier = 2
-    accounting_standard = AccountingStandard.IFRS   # AASB, IFRS-equivalent
+    accounting_standard = AccountingStandard.IFRS  # AASB, IFRS-equivalent
     local_index = "AS51"
     regulator = "Australian Securities and Investments Commission"
     settlement_days = 2

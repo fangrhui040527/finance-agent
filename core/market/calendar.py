@@ -8,7 +8,7 @@ returns compare correctly across markets.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import date, datetime, time, timedelta, timezone
+from datetime import UTC, date, datetime, time, timedelta
 
 
 @dataclass(frozen=True)
@@ -31,12 +31,12 @@ class TradingSession:
     def open_utc(self) -> datetime:
         w = self.windows[0]
         local = datetime.combine(self.day, w.start)
-        return (local - timedelta(hours=self.tz_offset_hours)).replace(tzinfo=timezone.utc)
+        return (local - timedelta(hours=self.tz_offset_hours)).replace(tzinfo=UTC)
 
     def close_utc(self) -> datetime:
         w = self.windows[-1]
         local = datetime.combine(self.day, w.end)
-        return (local - timedelta(hours=self.tz_offset_hours)).replace(tzinfo=timezone.utc)
+        return (local - timedelta(hours=self.tz_offset_hours)).replace(tzinfo=UTC)
 
 
 class SessionCalendar:

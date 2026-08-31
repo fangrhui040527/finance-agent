@@ -1,7 +1,10 @@
-exec(open("gen.py").read())
+from gen import page  # run via `python -m design.build` or from design/
 
 # ─────────────────────────────── THESIS + RED TEAM
-page("Thesis","thesis", """
+page(
+    "Thesis",
+    "thesis",
+    """
 <div class="head">
   <div><h1>Thesis</h1>
   <p>A stance you cannot falsify is not a thesis. Two machine-checkable breakers, or no
@@ -88,7 +91,8 @@ page("Thesis","thesis", """
     </div>
   </div>
 </div>
-""", logic="""
+""",
+    logic="""
 const ACC='#0F5C63', NEG='#9E3626', WARN='#8A5B12', MUT='#606D71', INK='#15191B';
 const ALL = [
   { id:'nim', statement:'NIM falls below 2.00%', query:'nim < 0.020', store:'kb_filings',
@@ -152,10 +156,14 @@ class Component extends DCLogic {
     };
   }
 }
-""")
+""",
+)
 
 # ─────────────────────────────── PORTFOLIO
-page("Portfolio","port", """
+page(
+    "Portfolio",
+    "port",
+    """
 <div class="head">
   <div><h1>Portfolio</h1>
   <p>Concentration, heat and every breach. Effective bets is the number to watch — a book can
@@ -230,7 +238,8 @@ page("Portfolio","port", """
     </div>
   </div>
 </div>
-""", logic="""
+""",
+    logic="""
 const NEG='#9E3626', POS='#3B6A38', MUT='#606D71', INK='#15191B', WARN='#8A5B12';
 const BOOK = [
   {id:'MYX:1155', sector:'bank', country:'MY', w:0.22, risk:0.010},
@@ -286,4 +295,5 @@ class Component extends DCLogic {
     };
   }
 }
-""")
+""",
+)

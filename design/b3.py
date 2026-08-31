@@ -1,6 +1,9 @@
-exec(open("gen.py").read())
+from gen import page  # run via `python -m design.build` or from design/
 
-page("Sizing","size", """
+page(
+    "Sizing",
+    "size",
+    """
 <div class="head">
   <div><h1>Sizing</h1>
   <p>Five caps run on every position. The smallest one binds — and below the market&rsquo;s cost
@@ -108,7 +111,8 @@ page("Sizing","size", """
     </div>
   </div>
 </div>
-""", logic="""
+""",
+    logic="""
 const ACC='#0F5C63', NEG='#9E3626', MUT='#606D71', INK='#15191B';
 const fmt = n => n.toLocaleString('en-MY',{minimumFractionDigits:2,maximumFractionDigits:2});
 function bursaOneSide(v){
@@ -177,4 +181,5 @@ class Component extends DCLogic {
     };
   }
 }
-""")
+""",
+)

@@ -1,11 +1,16 @@
 """P3.5: the phase that makes every downstream result honest."""
+
 from datetime import date
 from decimal import Decimal as D
 
 import pytest
 
 from core.market.pointintime import (
-    Fact, FactStore, LookaheadError, UniverseSnapshots, assert_no_lookahead,
+    Fact,
+    FactStore,
+    LookaheadError,
+    UniverseSnapshots,
+    assert_no_lookahead,
 )
 from markets.contract import AccountingStandard as AS
 
@@ -13,8 +18,9 @@ PE = date(2025, 12, 31)
 
 
 def f(known, value, restated=False):
-    return Fact("1155.KL", "revenue", PE, known, D(value), "MYR", AS.IFRS,
-                "doc", is_restatement=restated)
+    return Fact(
+        "1155.KL", "revenue", PE, known, D(value), "MYR", AS.IFRS, "doc", is_restatement=restated
+    )
 
 
 def store():

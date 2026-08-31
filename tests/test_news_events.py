@@ -1,24 +1,36 @@
 """P5/P6: text features, event taxonomy, base rates, catalyst scoring."""
+
 import random
-from datetime import date, datetime, timedelta, timezone
+from datetime import UTC, date, datetime, timedelta
 
 import pytest
 
 from engines.attribution.decompose import Verdict, decompose
 from engines.attribution.regression import huber_fit
 from engines.events.catalyst import (
-    SCORE_THRESHOLD, attach, direction_agreement, magnitude_plausibility,
-    proximity, score_candidates, specificity,
+    attach,
+    magnitude_plausibility,
+    proximity,
+    score_candidates,
+    specificity,
 )
 from engines.events.taxonomy import (
-    BaseRateTable, CapBand, Event, EventType, Observation, SurpriseBucket,
+    BaseRateTable,
+    CapBand,
+    Event,
+    EventType,
+    Observation,
+    SurpriseBucket,
     bucket_surprise,
 )
 from knowledge.news.features import (
-    Article, LexiconExtractor, SourceReliability, near_duplicate_hash, should_escalate,
+    LexiconExtractor,
+    SourceReliability,
+    near_duplicate_hash,
+    should_escalate,
 )
 
-NOW = datetime(2026, 8, 12, tzinfo=timezone.utc)
+NOW = datetime(2026, 8, 12, tzinfo=UTC)
 EX = LexiconExtractor()
 
 
@@ -32,11 +44,13 @@ def test_polarity_separates_good_from_bad_news():
 def test_intensity_and_uncertainty_separate_what_polarity_collapses():
     """The finding in docs/09 section 7: the two extra dimensions carry the signal."""
     probe = EX.extract(
-        "Maybank may face a probe. The outcome is uncertain and could take time.", ["Maybank"])
+        "Maybank may face a probe. The outcome is uncertain and could take time.", ["Maybank"]
+    )
     plunge = EX.extract(
-        "Maybank shares plunged sharply after the group cut FY27 guidance.", ["Maybank"])
-    assert probe.polarity < 0 and plunge.polarity < 0        # polarity says the same
-    assert plunge.intensity > probe.intensity                 # intensity does not
+        "Maybank shares plunged sharply after the group cut FY27 guidance.", ["Maybank"]
+    )
+    assert probe.polarity < 0 and plunge.polarity < 0  # polarity says the same
+    assert plunge.intensity > probe.intensity  # intensity does not
     assert probe.uncertainty > plunge.uncertainty
 
 
@@ -109,21 +123,43 @@ def build_table(n_beats=60, n_div=40, seed=3) -> BaseRateTable:
     random.seed(seed)
     t = BaseRateTable()
     for i in range(n_beats):
-        e = Event(f"h{i}", "X", EventType.EARNINGS_RESULT, NOW, market="XKLS",
-                  cap_band=CapBand.LARGE, surprise=SurpriseBucket.BIG_BEAT, source_doc_id="d")
-        t.observe(Observation(e, random.gauss(0.004, 0.01), random.gauss(0.029, 0.02),
-                              random.gauss(0.005, 0.03)))
+        e = Event(
+            f"h{i}",
+            "X",
+            EventType.EARNINGS_RESULT,
+            NOW,
+            market="XKLS",
+            cap_band=CapBand.LARGE,
+            surprise=SurpriseBucket.BIG_BEAT,
+            source_doc_id="d",
+        )
+        t.observe(
+            Observation(
+                e, random.gauss(0.004, 0.01), random.gauss(0.029, 0.02), random.gauss(0.005, 0.03)
+            )
+        )
     for i in range(n_div):
-        e = Event(f"d{i}", "X", EventType.DIVIDEND_CHANGE, NOW, market="XKLS",
-                  cap_band=CapBand.LARGE, source_doc_id="d")
-        t.observe(Observation(e, random.gauss(0, 0.003), random.gauss(0.002, 0.004),
-                              random.gauss(0, 0.01)))
+        e = Event(
+            f"d{i}",
+            "X",
+            EventType.DIVIDEND_CHANGE,
+            NOW,
+            market="XKLS",
+            cap_band=CapBand.LARGE,
+            source_doc_id="d",
+        )
+        t.observe(
+            Observation(
+                e, random.gauss(0, 0.003), random.gauss(0.002, 0.004), random.gauss(0, 0.01)
+            )
+        )
     return t
 
 
 def test_base_rate_reports_n_and_iqr():
-    br = build_table().lookup(EventType.EARNINGS_RESULT, "XKLS", CapBand.LARGE,
-                              SurpriseBucket.BIG_BEAT)
+    br = build_table().lookup(
+        EventType.EARNINGS_RESULT, "XKLS", CapBand.LARGE, SurpriseBucket.BIG_BEAT
+    )
     assert br.n == 60 and br.iqr[0] < br.median_car < br.iqr[1]
     assert "n=60" in br.describe()
 
@@ -135,15 +171,18 @@ def test_thin_samples_are_labelled_as_such():
 
 
 def test_pre_drift_is_measured_separately_because_information_leaks():
-    br = build_table().lookup(EventType.EARNINGS_RESULT, "XKLS", CapBand.LARGE,
-                              SurpriseBucket.BIG_BEAT)
-    assert br.pre_drift_median > 0     # beats leak before the announcement
+    br = build_table().lookup(
+        EventType.EARNINGS_RESULT, "XKLS", CapBand.LARGE, SurpriseBucket.BIG_BEAT
+    )
+    assert br.pre_drift_median > 0  # beats leak before the announcement
 
 
 def test_lookup_falls_back_to_a_coarser_bucket():
     t = build_table()
-    assert t.lookup(EventType.EARNINGS_RESULT, "XKLS", CapBand.MICRO,
-                    SurpriseBucket.BIG_BEAT) is not None
+    assert (
+        t.lookup(EventType.EARNINGS_RESULT, "XKLS", CapBand.MICRO, SurpriseBucket.BIG_BEAT)
+        is not None
+    )
 
 
 def test_too_few_observations_produce_no_base_rate():
@@ -156,19 +195,21 @@ def test_too_few_observations_produce_no_base_rate():
 # --- P6 scoring ----------------------------------------------------------
 def fit():
     random.seed(11)
-    rows = [[random.gauss(0, .01), random.gauss(0, .008)] for _ in range(250)]
-    ys = [1.1 * a + 0.6 * b + random.gauss(0, .005) for a, b in rows]
+    rows = [[random.gauss(0, 0.01), random.gauss(0, 0.008)] for _ in range(250)]
+    ys = [1.1 * a + 0.6 * b + random.gauss(0, 0.005) for a, b in rows]
     return huber_fit(rows, ys)
 
 
 def big_idio_move():
-    return decompose("1155.KL", (date(2026, 8, 10), date(2026, 8, 12)),
-                     -0.002, 0.001, {}, 0.072, 0.0, fit())
+    return decompose(
+        "1155.KL", (date(2026, 8, 10), date(2026, 8, 12)), -0.002, 0.001, {}, 0.072, 0.0, fit()
+    )
 
 
 def market_move():
-    return decompose("1155.KL", (date(2026, 8, 1), date(2026, 8, 12)),
-                     -0.068, -0.015, {}, -0.094, 0.0, fit())
+    return decompose(
+        "1155.KL", (date(2026, 8, 1), date(2026, 8, 12)), -0.068, -0.015, {}, -0.094, 0.0, fit()
+    )
 
 
 def ev(eid, etype, **kw):
@@ -179,9 +220,13 @@ def ev(eid, etype, **kw):
 def test_no_candidates_are_scored_for_a_market_driven_move():
     """The rule that makes the whole engine honest."""
     m = market_move()
-    cands = score_candidates(m, [ev("e1", EventType.EARNINGS_RESULT,
-                                    surprise=SurpriseBucket.BIG_MISS)],
-                             build_table(), {"e1": 1}, "XKLS")
+    cands = score_candidates(
+        m,
+        [ev("e1", EventType.EARNINGS_RESULT, surprise=SurpriseBucket.BIG_MISS)],
+        build_table(),
+        {"e1": 1},
+        "XKLS",
+    )
     assert cands == []
     m = attach(m, cands)
     assert m.verdict is Verdict.MARKET_DRIVEN
@@ -191,43 +236,67 @@ def test_unconfirmed_events_are_never_scored():
     cands = score_candidates(
         big_idio_move(),
         [Event("e9", "1155.KL", EventType.MA_TARGET, NOW, market="XKLS", confirmed=False)],
-        build_table(), {"e9": 0}, "XKLS")
+        build_table(),
+        {"e9": 0},
+        "XKLS",
+    )
     assert cands == []
 
 
 def test_all_six_factors_are_always_present():
-    c = score_candidates(big_idio_move(),
-                         [ev("e1", EventType.EARNINGS_RESULT, surprise=SurpriseBucket.BIG_BEAT)],
-                         build_table(), {"e1": 1}, "XKLS")[0]
+    c = score_candidates(
+        big_idio_move(),
+        [ev("e1", EventType.EARNINGS_RESULT, surprise=SurpriseBucket.BIG_BEAT)],
+        build_table(),
+        {"e1": 1},
+        "XKLS",
+    )[0]
     assert set(c.breakdown.as_dict()) == {
-        "prior", "proximity", "specificity", "direction", "magnitude", "source_trust"}
+        "prior",
+        "proximity",
+        "specificity",
+        "direction",
+        "magnitude",
+        "source_trust",
+    }
 
 
 def test_a_routine_dividend_cannot_explain_a_seven_percent_move():
     """Magnitude plausibility doing its job."""
     cands = score_candidates(
         big_idio_move(),
-        [ev("e1", EventType.EARNINGS_RESULT, surprise=SurpriseBucket.BIG_BEAT),
-         ev("e2", EventType.DIVIDEND_CHANGE)],
-        build_table(), {"e1": 1, "e2": 1}, "XKLS",
-        source_kind={"e1": "exchange", "e2": "exchange"})
+        [
+            ev("e1", EventType.EARNINGS_RESULT, surprise=SurpriseBucket.BIG_BEAT),
+            ev("e2", EventType.DIVIDEND_CHANGE),
+        ],
+        build_table(),
+        {"e1": 1, "e2": 1},
+        "XKLS",
+        source_kind={"e1": "exchange", "e2": "exchange"},
+    )
     by = {c.cause_type: c for c in cands}
     assert by["earnings_result"].score > by["dividend_change"].score * 5
     assert by["dividend_change"].breakdown.magnitude < 0.2
 
 
 def test_a_beat_does_not_explain_a_fall():
-    down = decompose("1155.KL", (date(2026, 8, 10), date(2026, 8, 12)),
-                     -0.002, 0.001, {}, -0.072, 0.0, fit())
-    c = score_candidates(down, [ev("e1", EventType.EARNINGS_RESULT,
-                                   surprise=SurpriseBucket.BIG_BEAT)],
-                         build_table(), {"e1": 1}, "XKLS")[0]
+    down = decompose(
+        "1155.KL", (date(2026, 8, 10), date(2026, 8, 12)), -0.002, 0.001, {}, -0.072, 0.0, fit()
+    )
+    c = score_candidates(
+        down,
+        [ev("e1", EventType.EARNINGS_RESULT, surprise=SurpriseBucket.BIG_BEAT)],
+        build_table(),
+        {"e1": 1},
+        "XKLS",
+    )[0]
     assert c.breakdown.direction == pytest.approx(0.2)
 
 
 def test_insider_selling_is_not_a_signal_by_default():
-    c = score_candidates(big_idio_move(), [ev("e1", EventType.INSIDER_SELL)],
-                         build_table(), {"e1": 1}, "XKLS")[0]
+    c = score_candidates(
+        big_idio_move(), [ev("e1", EventType.INSIDER_SELL)], build_table(), {"e1": 1}, "XKLS"
+    )[0]
     assert c.breakdown.prior <= 0.15
 
 
@@ -246,9 +315,17 @@ def test_specificity_ranks_direct_over_peer_over_sector():
 
 def test_no_catalyst_clearing_the_threshold_yields_the_no_news_verdict():
     m = big_idio_move()
-    m = attach(m, score_candidates(m, [ev("e2", EventType.DIVIDEND_CHANGE)],
-                                   build_table(), {"e2": 1}, "XKLS",
-                                   source_kind={"e2": "exchange"}))
+    m = attach(
+        m,
+        score_candidates(
+            m,
+            [ev("e2", EventType.DIVIDEND_CHANGE)],
+            build_table(),
+            {"e2": 1},
+            "XKLS",
+            source_kind={"e2": "exchange"},
+        ),
+    )
     assert m.verdict is Verdict.NO_IDENTIFIED_CATALYST
     assert "REVERSE" in m.reason
 
@@ -256,9 +333,13 @@ def test_no_catalyst_clearing_the_threshold_yields_the_no_news_verdict():
 def test_close_candidates_all_stay_shown():
     m = big_idio_move()
     cands = score_candidates(
-        m, [ev("e1", EventType.REGULATORY_ACTION), ev("e2", EventType.LITIGATION)],
-        build_table(), {"e1": 1, "e2": 1}, "XKLS",
-        source_kind={"e1": "exchange", "e2": "exchange"})
+        m,
+        [ev("e1", EventType.REGULATORY_ACTION), ev("e2", EventType.LITIGATION)],
+        build_table(),
+        {"e1": 1, "e2": 1},
+        "XKLS",
+        source_kind={"e1": "exchange", "e2": "exchange"},
+    )
     m = attach(m, cands)
     if len(cands) > 1 and cands[1].score >= cands[0].score * 0.8:
         assert "false precision" in m.reason
@@ -271,7 +352,13 @@ def test_magnitude_is_neutral_when_no_base_rate_exists():
 def test_candidates_are_ranked_by_score():
     cands = score_candidates(
         big_idio_move(),
-        [ev("e1", EventType.EARNINGS_RESULT, surprise=SurpriseBucket.BIG_BEAT),
-         ev("e2", EventType.DIVIDEND_CHANGE), ev("e3", EventType.INSIDER_SELL)],
-        build_table(), {"e1": 1, "e2": 1, "e3": 2}, "XKLS")
+        [
+            ev("e1", EventType.EARNINGS_RESULT, surprise=SurpriseBucket.BIG_BEAT),
+            ev("e2", EventType.DIVIDEND_CHANGE),
+            ev("e3", EventType.INSIDER_SELL),
+        ],
+        build_table(),
+        {"e1": 1, "e2": 1, "e3": 2},
+        "XKLS",
+    )
     assert [c.score for c in cands] == sorted((c.score for c in cands), reverse=True)

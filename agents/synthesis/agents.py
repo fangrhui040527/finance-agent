@@ -13,11 +13,11 @@ own sources is not a challenge.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import date, datetime
+from datetime import date
 from decimal import Decimal
 from enum import Enum
 
-from agents.base import Agent, AgentContext, Finding
+from agents.base import Agent, Finding
 from core.llm.tiers import TaskClass
 from engines.attribution.decompose import (
     Component,
@@ -59,8 +59,15 @@ class A9Attribution(Agent):
     ) -> list[Finding]:
         self._guard_tool("decompose")
         exp = decompose(
-            instrument_id, window, event_market, event_sector, event_styles,
-            realised_local, fx_return, fit, base_currency=base_currency,
+            instrument_id,
+            window,
+            event_market,
+            event_sector,
+            event_styles,
+            realised_local,
+            fx_return,
+            fit,
+            base_currency=base_currency,
         )
 
         # The cause hunt is gated on the decomposition, not on whether the move
@@ -68,8 +75,14 @@ class A9Attribution(Agent):
         if exp.needs_cause_hunt() and events and table is not None:
             self._guard_tool("candidate_causes")
             cands = score_candidates(
-                exp, events, table, session_lag or {}, market,
-                peers=peers, source_kind=source_kind, sector_wide=sector_wide,
+                exp,
+                events,
+                table,
+                session_lag or {},
+                market,
+                peers=peers,
+                source_kind=source_kind,
+                sector_wide=sector_wide,
             )
             exp = attach(exp, cands)
         else:
@@ -78,25 +91,31 @@ class A9Attribution(Agent):
         return self._to_findings(exp)
 
     def _to_findings(self, exp: MoveExplanation) -> list[Finding]:
-        out = [Finding(
-            self.agent_id, "decomposition",
-            self.narrate(exp),
-            numbers={
-                "total_return_base": exp.total_return_base,
-                "abnormal_return": exp.abnormal_return,
-                "unexplained_share": exp.unexplained_share,
-                **{c.component.value: c.contribution for c in exp.components},
-            },
-            caveats=([exp.reason] if exp.reason else []),
-        )]
+        out = [
+            Finding(
+                self.agent_id,
+                "decomposition",
+                self.narrate(exp),
+                numbers={
+                    "total_return_base": exp.total_return_base,
+                    "abnormal_return": exp.abnormal_return,
+                    "unexplained_share": exp.unexplained_share,
+                    **{c.component.value: c.contribution for c in exp.components},
+                },
+                caveats=([exp.reason] if exp.reason else []),
+            )
+        ]
         for c in exp.candidates:
-            out.append(Finding(
-                self.agent_id, "candidate_cause",
-                f"{c.cause_type}: {c.description} ({c.lag_sessions} sessions from the move)",
-                numbers={"score": c.score},
-                as_of=c.occurred_at,
-                caveats=self._candidate_caveats(c),
-            ))
+            out.append(
+                Finding(
+                    self.agent_id,
+                    "candidate_cause",
+                    f"{c.cause_type}: {c.description} ({c.lag_sessions} sessions from the move)",
+                    numbers={"score": c.score},
+                    as_of=c.occurred_at,
+                    caveats=self._candidate_caveats(c),
+                )
+            )
         return out
 
     @staticmethod
@@ -113,8 +132,13 @@ class A9Attribution(Agent):
     @staticmethod
     def narrate(exp: MoveExplanation) -> str:
         """The sentence a human reads. Numbers before nouns."""
-        pct = lambda x: f"{x * 100:+.1f}%"
-        parts = [f"{exp.instrument_id} returned {pct(exp.total_return_base)} in {exp.base_currency}"]
+
+        def pct(x):
+            return f"{x * 100:+.1f}%"
+
+        parts = [
+            f"{exp.instrument_id} returned {pct(exp.total_return_base)} in {exp.base_currency}"
+        ]
         for c in exp.components:
             if c.component is Component.IDIOSYNCRATIC:
                 continue
@@ -128,53 +152,79 @@ class A9Attribution(Agent):
         if exp.verdict is Verdict.MARKET_DRIVEN:
             return f"{head}. This was the market, not the company. No cause was sought."
         if exp.verdict is Verdict.NOT_SIGNIFICANT:
-            return f"{head}. Within normal daily variation for this name; no explanation is required."
+            return (
+                f"{head}. Within normal daily variation for this name; no explanation is required."
+            )
         if exp.verdict is Verdict.ATTRIBUTION_UNAVAILABLE:
             return f"{head}. Attribution unavailable: {exp.reason}"
         if exp.verdict is Verdict.NO_IDENTIFIED_CATALYST:
-            return (f"{head}. Statistically significant and unexplained: no catalyst cleared "
-                    f"the evidence threshold. {exp.unexplained_share * 100:.0f}% unexplained.")
+            return (
+                f"{head}. Statistically significant and unexplained: no catalyst cleared "
+                f"the evidence threshold. {exp.unexplained_share * 100:.0f}% unexplained."
+            )
         top = exp.candidates[0] if exp.candidates else None
         cause = f" Most likely cause: {top.description}." if top else ""
-        return (f"{head}.{cause} {exp.unexplained_share * 100:.0f}% of the move remains "
-                f"unexplained by the factors and the identified catalysts.")
+        return (
+            f"{head}.{cause} {exp.unexplained_share * 100:.0f}% of the move remains "
+            f"unexplained by the factors and the identified catalysts."
+        )
 
     def since_purchase(
         self,
         instrument_id: str,
-        eps_start: float, eps_end: float,
-        multiple_start: float, multiple_end: float,
+        eps_start: float,
+        eps_end: float,
+        multiple_start: float,
+        multiple_end: float,
         cumulative_shareholder_yield: float,
-        fx_start: float, fx_end: float,
+        fx_start: float,
+        fx_end: float,
         years: float,
     ) -> list[Finding]:
         """The question an owner actually asks: did I make money on the business
         or on the re-rating? docs/03 section 5."""
         self._guard_tool("long_horizon_decompose")
         lh = long_horizon_decompose(
-            eps_start, eps_end, multiple_start, multiple_end,
-            cumulative_shareholder_yield, fx_start, fx_end, years,
+            eps_start,
+            eps_end,
+            multiple_start,
+            multiple_end,
+            cumulative_shareholder_yield,
+            fx_start,
+            fx_end,
+            years,
         )
         driver = max(
-            (("earnings growth", lh.eps_growth), ("multiple change", lh.multiple_change),
-             ("shareholder yield", lh.shareholder_yield), ("currency", lh.fx)),
+            (
+                ("earnings growth", lh.eps_growth),
+                ("multiple change", lh.multiple_change),
+                ("shareholder yield", lh.shareholder_yield),
+                ("currency", lh.fx),
+            ),
             key=lambda kv: abs(kv[1]),
         )
         caveat = []
         if driver[0] == "multiple change":
-            caveat.append("the return came from sentiment re-rating, which is not repeatable "
-                          "and can reverse without the business changing")
-        return [Finding(
-            self.agent_id, "long_horizon",
-            f"over {years:.1f} years {instrument_id} returned {lh.total_return * 100:+.1f}%, "
-            f"driven mainly by {driver[0]} ({driver[1] * 100:+.1f}%)",
-            numbers={
-                "total": lh.total_return, "eps_growth": lh.eps_growth,
-                "multiple_change": lh.multiple_change,
-                "shareholder_yield": lh.shareholder_yield, "fx": lh.fx,
-            },
-            caveats=caveat,
-        )]
+            caveat.append(
+                "the return came from sentiment re-rating, which is not repeatable "
+                "and can reverse without the business changing"
+            )
+        return [
+            Finding(
+                self.agent_id,
+                "long_horizon",
+                f"over {years:.1f} years {instrument_id} returned {lh.total_return * 100:+.1f}%, "
+                f"driven mainly by {driver[0]} ({driver[1] * 100:+.1f}%)",
+                numbers={
+                    "total": lh.total_return,
+                    "eps_growth": lh.eps_growth,
+                    "multiple_change": lh.multiple_change,
+                    "shareholder_yield": lh.shareholder_yield,
+                    "fx": lh.fx,
+                },
+                caveats=caveat,
+            )
+        ]
 
 
 class Stance(str, Enum):
@@ -189,7 +239,7 @@ class Breaker:
     """A falsifier that a machine can check. Prose does not qualify."""
 
     statement: str
-    query: str                       # must be executable against a named store
+    query: str  # must be executable against a named store
     store: str
     check_by: date | None = None
 
@@ -261,9 +311,11 @@ class A10Thesis(Agent):
                 stance = Stance.NO_VIEW
                 notes.append("cannot accumulate without fundamentals and a valuation range")
 
-        unresolved = [f for f in findings
-                      if f.kind == "decomposition"
-                      and f.numbers.get("unexplained_share", 0.0) > 0.7]
+        unresolved = [
+            f
+            for f in findings
+            if f.kind == "decomposition" and f.numbers.get("unexplained_share", 0.0) > 0.7
+        ]
         if unresolved and stance is Stance.ACCUMULATE:
             notes.append("recent move is largely unexplained; entry is staged, not full size")
 
@@ -282,12 +334,16 @@ class A10Thesis(Agent):
             confidence=conf,
         )
         self.last = thesis
-        return [Finding(
-            self.agent_id, "thesis", thesis.in_one_sentence,
-            numbers={"confidence": conf, "breakers": float(len(breakers))},
-            citations=[c for f in findings for c in f.citations],
-            caveats=notes,
-        )]
+        return [
+            Finding(
+                self.agent_id,
+                "thesis",
+                thesis.in_one_sentence,
+                numbers={"confidence": conf, "breakers": float(len(breakers))},
+                citations=[c for f in findings for c in f.citations],
+                caveats=notes,
+            )
+        ]
 
     def coverage_gaps(self, findings: list[Finding]) -> list[str]:
         self._guard_tool("check_coverage")
@@ -308,15 +364,17 @@ class A10Thesis(Agent):
     def one_sentence(instrument_id: str, stance: Stance, findings: list[Finding]) -> str:
         if stance is Stance.NO_VIEW:
             return f"No view on {instrument_id}: the evidence does not support a stance."
-        return (f"{stance.value.capitalize()} {instrument_id} on {len(findings)} evidence "
-                f"findings, subject to the breakers below.")
+        return (
+            f"{stance.value.capitalize()} {instrument_id} on {len(findings)} evidence "
+            f"findings, subject to the breakers below."
+        )
 
 
 @dataclass(frozen=True)
 class Challenge:
     kind: str
     statement: str
-    severity: str            # fatal | material | minor
+    severity: str  # fatal | material | minor
     evidence: tuple[str, ...] = ()
 
 
@@ -348,37 +406,53 @@ class A11RedTeam(Agent):
             if self._applies(kind, thesis):
                 challenges.append(Challenge(kind, statement, "material"))
 
-        return [Finding(
-            self.agent_id, "challenge", c.statement,
-            numbers={"severity_rank": {"fatal": 3.0, "material": 2.0, "minor": 1.0}[c.severity]},
-            caveats=[f"challenge type: {c.kind}"],
-        ) for c in challenges]
+        return [
+            Finding(
+                self.agent_id,
+                "challenge",
+                c.statement,
+                numbers={
+                    "severity_rank": {"fatal": 3.0, "material": 2.0, "minor": 1.0}[c.severity]
+                },
+                caveats=[f"challenge type: {c.kind}"],
+            )
+            for c in challenges
+        ]
 
     def structural_challenges(self, thesis: Thesis):
         if thesis.gaps:
-            yield Challenge("coverage",
-                            "The thesis rests on incomplete evidence: " + ", ".join(thesis.gaps),
-                            "fatal" if len(thesis.gaps) > 2 else "material",
-                            tuple(thesis.gaps))
+            yield Challenge(
+                "coverage",
+                "The thesis rests on incomplete evidence: " + ", ".join(thesis.gaps),
+                "fatal" if len(thesis.gaps) > 2 else "material",
+                tuple(thesis.gaps),
+            )
         if thesis.valuation_range is None and thesis.stance is Stance.ACCUMULATE:
-            yield Challenge("valuation",
-                            "Accumulating with no valuation range means paying any price.",
-                            "fatal")
+            yield Challenge(
+                "valuation", "Accumulating with no valuation range means paying any price.", "fatal"
+            )
         if len(thesis.breakers) < 2:
-            yield Challenge("falsifiability",
-                            "Fewer than two checkable breakers: this thesis cannot be wrong, "
-                            "which means it cannot be right either.",
-                            "fatal")
+            yield Challenge(
+                "falsifiability",
+                "Fewer than two checkable breakers: this thesis cannot be wrong, "
+                "which means it cannot be right either.",
+                "fatal",
+            )
         for b in thesis.breakers:
             if b.check_by is None:
-                yield Challenge("breaker_timing",
-                                f"Breaker {b.statement!r} has no review date and will never fire.",
-                                "minor", (b.statement,))
+                yield Challenge(
+                    "breaker_timing",
+                    f"Breaker {b.statement!r} has no review date and will never fire.",
+                    "minor",
+                    (b.statement,),
+                )
         if thesis.confidence > 0.7 and thesis.gaps:
-            yield Challenge("calibration",
-                            f"Confidence of {thesis.confidence:.0%} is not earned with "
-                            f"{len(thesis.gaps)} evidence gaps outstanding.",
-                            "material")
+            yield Challenge(
+                "calibration",
+                f"Confidence of {thesis.confidence:.0%} is not earned with "
+                f"{len(thesis.gaps)} evidence gaps outstanding.",
+                "material",
+            )
 
     @staticmethod
     def _applies(kind: str, thesis: Thesis) -> bool:

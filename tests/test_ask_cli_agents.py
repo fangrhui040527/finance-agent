@@ -4,6 +4,7 @@ Before these, `ask.py` instantiated two of sixteen registered agents. A10, A11,
 A12, A13 and A14 were tested classes with no way for an operator to run them,
 and the price feed had no entrypoint at all.
 """
+
 import pytest
 
 import ask
@@ -25,10 +26,17 @@ def run(args, capsys):
 
 
 class _Response:
-    def __init__(self, body): self._body = body.encode()
-    def read(self): return self._body
-    def __enter__(self): return self
-    def __exit__(self, *e): return False
+    def __init__(self, body):
+        self._body = body.encode()
+
+    def read(self):
+        return self._body
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *e):
+        return False
 
 
 @pytest.fixture
@@ -46,19 +54,33 @@ def feed(monkeypatch):
             return _Response("No data\n")
 
         monkeypatch.setattr(ask, "_feed", lambda: StooqFeed(opener=opener))
+
     return install
 
 
 # -- thesis + red team (A10, A11) --------------------------------------------
 def test_a_thesis_with_two_breakers_and_its_evidence_is_actionable(capsys):
-    code, out = run(["thesis", "MYX:1155",
-                     "--breaker", "NIM below 2.0%|nim < 0.020|kb_filings",
-                     "--breaker", "CASA below 25%|casa < 0.25|kb_filings",
-                     "--evidence", "a1_fundamentals=CASA fell to 24%",
-                     "--evidence", "a2_valuation=P/B at the 12th percentile",
-                     "--evidence", "a5_catalyst_events=results due in 3 weeks",
-                     "--evidence", "a6_macro_regime=OPR on hold",
-                     "--stance", "accumulate"], capsys)
+    code, out = run(
+        [
+            "thesis",
+            "MYX:1155",
+            "--breaker",
+            "NIM below 2.0%|nim < 0.020|kb_filings",
+            "--breaker",
+            "CASA below 25%|casa < 0.25|kb_filings",
+            "--evidence",
+            "a1_fundamentals=CASA fell to 24%",
+            "--evidence",
+            "a2_valuation=P/B at the 12th percentile",
+            "--evidence",
+            "a5_catalyst_events=results due in 3 weeks",
+            "--evidence",
+            "a6_macro_regime=OPR on hold",
+            "--stance",
+            "accumulate",
+        ],
+        capsys,
+    )
     assert code == 0
     assert "actionable: yes" in out
     assert "red team" in out
@@ -67,20 +89,38 @@ def test_a_thesis_with_two_breakers_and_its_evidence_is_actionable(capsys):
 def test_accumulating_without_valuation_evidence_is_downgraded_not_allowed(capsys):
     """A10 refuses to accumulate on fundamentals alone. The CLI must surface that
     rather than printing the stance it was asked for."""
-    _, out = run(["thesis", "MYX:1155",
-                  "--breaker", "NIM below 2.0%|nim < 0.020|kb_filings",
-                  "--breaker", "CASA below 25%|casa < 0.25|kb_filings",
-                  "--evidence", "a1_fundamentals=CASA fell to 24%",
-                  "--stance", "accumulate"], capsys)
+    _, out = run(
+        [
+            "thesis",
+            "MYX:1155",
+            "--breaker",
+            "NIM below 2.0%|nim < 0.020|kb_filings",
+            "--breaker",
+            "CASA below 25%|casa < 0.25|kb_filings",
+            "--evidence",
+            "a1_fundamentals=CASA fell to 24%",
+            "--stance",
+            "accumulate",
+        ],
+        capsys,
+    )
     assert "No view" in out
     assert "cannot accumulate without fundamentals and a valuation range" in out
     assert "[coverage]" in out, "gaps must draw a challenge, not silence"
 
 
 def test_fewer_than_two_breakers_forfeits_the_stance(capsys):
-    _, out = run(["thesis", "MYX:1155",
-                  "--breaker", "NIM below 2.0%|nim < 0.020|kb_filings",
-                  "--stance", "accumulate"], capsys)
+    _, out = run(
+        [
+            "thesis",
+            "MYX:1155",
+            "--breaker",
+            "NIM below 2.0%|nim < 0.020|kb_filings",
+            "--stance",
+            "accumulate",
+        ],
+        capsys,
+    )
     assert "actionable: no" in out
     assert "no stance may be taken" in out
 
@@ -93,13 +133,27 @@ def test_a_breaker_with_no_query_is_refused_by_the_cli(capsys):
 
 
 def test_the_red_team_is_never_silent_on_a_live_thesis(capsys):
-    _, out = run(["thesis", "XNAS:NVDA",
-                  "--breaker", "a|q|s", "--breaker", "b|q|s",
-                  "--evidence", "a1_fundamentals=x",
-                  "--evidence", "a2_valuation=y",
-                  "--evidence", "a5_catalyst_events=z",
-                  "--evidence", "a6_macro_regime=w",
-                  "--stance", "accumulate"], capsys)
+    _, out = run(
+        [
+            "thesis",
+            "XNAS:NVDA",
+            "--breaker",
+            "a|q|s",
+            "--breaker",
+            "b|q|s",
+            "--evidence",
+            "a1_fundamentals=x",
+            "--evidence",
+            "a2_valuation=y",
+            "--evidence",
+            "a5_catalyst_events=z",
+            "--evidence",
+            "a6_macro_regime=w",
+            "--stance",
+            "accumulate",
+        ],
+        capsys,
+    )
     assert "(silent" not in out
 
 
@@ -110,9 +164,16 @@ def test_malformed_evidence_is_refused():
 
 # -- portfolio risk (A12) -----------------------------------------------------
 def test_a_concentrated_book_reports_every_breach(capsys):
-    code, out = run(["risk",
-                     "--position", "MYX:1155:0.22:bank:MY:0.01",
-                     "--position", "XNAS:NVDA:0.18:tech:US:0.02"], capsys)
+    code, out = run(
+        [
+            "risk",
+            "--position",
+            "MYX:1155:0.22:bank:MY:0.01",
+            "--position",
+            "XNAS:NVDA:0.18:tech:US:0.02",
+        ],
+        capsys,
+    )
     assert code == 0
     assert out.count("single_name breach") == 2
     assert "HHI" in out and "effective bets" in out
@@ -136,8 +197,21 @@ def test_a_non_numeric_weight_is_refused():
 
 # -- sizing (A13) -------------------------------------------------------------
 def test_sizing_uses_the_markets_own_fee_schedule(capsys):
-    code, out = run(["size", "MYX:1155", "--portfolio", "200000",
-                     "--price", "6.20", "--stop", "5.60", "--adv", "900000"], capsys)
+    code, out = run(
+        [
+            "size",
+            "MYX:1155",
+            "--portfolio",
+            "200000",
+            "--price",
+            "6.20",
+            "--stop",
+            "5.60",
+            "--adv",
+            "900000",
+        ],
+        capsys,
+    )
     assert code == 0
     assert "XKLS fee schedule" in out
     assert "60 bps round trip on XKLS" in out, "MYX must resolve to Bursa's floor, not the default"
@@ -147,28 +221,82 @@ def test_the_documented_minimum_bursa_position_appears(capsys):
     """README records ~RM 4,700. A flat-bps cost model cannot produce it: fees as
     a constant fraction never fall with size, so the bisection runs to its
     ceiling and reports RM 100,000,000."""
-    _, out = run(["size", "MYX:1155", "--portfolio", "200000",
-                  "--price", "6.20", "--stop", "5.60", "--adv", "900000"], capsys)
+    _, out = run(
+        [
+            "size",
+            "MYX:1155",
+            "--portfolio",
+            "200000",
+            "--price",
+            "6.20",
+            "--stop",
+            "5.60",
+            "--adv",
+            "900000",
+        ],
+        capsys,
+    )
     assert "4,705" in out
     assert "100,000,000" not in out
 
 
 def test_a_portfolio_too_small_to_fund_a_lot_gets_no_position(capsys):
-    _, out = run(["size", "MYX:1155", "--portfolio", "5000",
-                  "--price", "6.20", "--stop", "5.60", "--adv", "900000"], capsys)
+    _, out = run(
+        [
+            "size",
+            "MYX:1155",
+            "--portfolio",
+            "5000",
+            "--price",
+            "6.20",
+            "--stop",
+            "5.60",
+            "--adv",
+            "900000",
+        ],
+        capsys,
+    )
     assert "no position" in out
 
 
 def test_a_stop_above_the_entry_is_refused(capsys):
-    code, _ = run(["size", "MYX:1155", "--portfolio", "200000",
-                   "--price", "6.20", "--stop", "6.50", "--adv", "900000"], capsys)
+    code, _ = run(
+        [
+            "size",
+            "MYX:1155",
+            "--portfolio",
+            "200000",
+            "--price",
+            "6.20",
+            "--stop",
+            "6.50",
+            "--adv",
+            "900000",
+        ],
+        capsys,
+    )
     assert code == 2
 
 
 def test_an_unadaptered_market_falls_back_to_a_model_with_a_minimum(capsys):
     """Without a fixed minimum there is no floor to find at all."""
-    code, out = run(["size", "XFRA:BMW", "--portfolio", "200000", "--cost-bps", "5",
-                     "--price", "6.20", "--stop", "5.60", "--adv", "900000"], capsys)
+    code, out = run(
+        [
+            "size",
+            "XFRA:BMW",
+            "--portfolio",
+            "200000",
+            "--cost-bps",
+            "5",
+            "--price",
+            "6.20",
+            "--stop",
+            "5.60",
+            "--adv",
+            "900000",
+        ],
+        capsys,
+    )
     assert code == 0
     assert "no adapter for XFRA" in out
     assert "100,000,000" not in out
@@ -179,8 +307,23 @@ def test_a_cost_rate_above_the_floor_is_reported_as_impossible_not_as_rm_100m(ca
     round-trip cost already exceeds the floor, nothing satisfies it and the
     search returns its ceiling - which reads as a position requirement rather
     than the impossibility it is."""
-    code, out = run(["size", "XFRA:BMW", "--portfolio", "200000", "--cost-bps", "46",
-                     "--price", "6.20", "--stop", "5.60", "--adv", "900000"], capsys)
+    code, out = run(
+        [
+            "size",
+            "XFRA:BMW",
+            "--portfolio",
+            "200000",
+            "--cost-bps",
+            "46",
+            "--price",
+            "6.20",
+            "--stop",
+            "5.60",
+            "--adv",
+            "900000",
+        ],
+        capsys,
+    )
     assert code == 0
     assert "100,000,000" not in out
     assert "at ANY size" in out
@@ -207,8 +350,16 @@ def test_a_concept_that_does_not_exist_exits_nonzero(capsys):
 
 
 def test_the_full_prerequisite_chain_unlocks_the_concept(capsys):
-    chain = ["share", "compounding", "volatility", "trend_vs_noise",
-             "factor_decomposition", "base_rate", "expected_value", "position_sizing"]
+    chain = [
+        "share",
+        "compounding",
+        "volatility",
+        "trend_vs_noise",
+        "factor_decomposition",
+        "base_rate",
+        "expected_value",
+        "position_sizing",
+    ]
     args = ["learn", "kelly"]
     for k in chain:
         args += ["--mastered", k]
@@ -254,17 +405,31 @@ def test_an_unreachable_symbol_exits_nonzero_rather_than_printing_nothing(capsys
 # -- why --fetch --------------------------------------------------------------
 def test_fetch_measures_both_legs_from_the_feed(capsys, feed):
     feed({"nvda.us": CSV, "spy.us": MKT})
-    code, out = run(["why", "XNAS:NVDA", "--fetch", "--against", "XNAS:SPY",
-                     "--days", "2", "--on", "2026-01-07",
-                     "--move", "0", "--market", "0"], capsys)
+    code, out = run(
+        [
+            "why",
+            "XNAS:NVDA",
+            "--fetch",
+            "--against",
+            "XNAS:SPY",
+            "--days",
+            "2",
+            "--on",
+            "2026-01-07",
+            "--move",
+            "0",
+            "--market",
+            "0",
+        ],
+        capsys,
+    )
     assert code == 0
     assert "measured" in out
     assert "stated, not measured" not in out
 
 
 def test_fetch_without_a_market_proxy_is_refused(capsys):
-    code, _ = run(["why", "XNAS:NVDA", "--fetch",
-                   "--move", "0.05", "--market", "0.01"], capsys)
+    code, _ = run(["why", "XNAS:NVDA", "--fetch", "--move", "0.05", "--market", "0.01"], capsys)
     assert code == 2, "a measured leg against a typed leg is not a decomposition"
 
 
@@ -275,9 +440,24 @@ def test_typed_returns_are_labelled_as_stated(capsys):
 
 def test_too_few_bars_for_the_window_is_a_refusal_not_a_short_window(capsys, feed):
     feed({"nvda.us": CSV, "spy.us": MKT})
-    code, _ = run(["why", "XNAS:NVDA", "--fetch", "--against", "XNAS:SPY",
-                   "--days", "90", "--on", "2026-01-07",
-                   "--move", "0", "--market", "0"], capsys)
+    code, _ = run(
+        [
+            "why",
+            "XNAS:NVDA",
+            "--fetch",
+            "--against",
+            "XNAS:SPY",
+            "--days",
+            "90",
+            "--on",
+            "2026-01-07",
+            "--move",
+            "0",
+            "--market",
+            "0",
+        ],
+        capsys,
+    )
     assert code == 3
 
 

@@ -1,7 +1,10 @@
-exec(open("gen.py").read())
+from gen import page  # run via `python -m design.build` or from design/
 
 # ─────────────────────────────── PREDICTIONS
-page("Predictions","pred", """
+page(
+    "Predictions",
+    "pred",
+    """
 <div class="head">
   <div><h1>Predictions</h1>
   <p>Write the view down before you find out. Append-only — a log you can revise is a memory,
@@ -69,7 +72,8 @@ page("Predictions","pred", """
        as resolved and excluded from the score entirely.</p></div>
   </div>
 </div>
-""", logic="""
+""",
+    logic="""
 const POS='#3B6A38', NEG='#9E3626', WARN='#8A5B12', MUT='#606D71';
 const ALL = [
   {inst:'MYX:1155', thesis:'NIM stabilises above 2.25%', dir:'+1', conf:'0.62', horizon:'63d', gradeOn:'due 18 Sep', state:'pending'},
@@ -116,10 +120,14 @@ class Component extends DCLogic {
     };
   }
 }
-""")
+""",
+)
 
 # ─────────────────────────────── PRICES
-page("Prices","prices", """
+page(
+    "Prices",
+    "prices",
+    """
 <div class="head">
   <div><h1>Prices</h1>
   <p>Daily bars, bounded by an as-at date so no bar after it is ever returned. A source that
@@ -187,7 +195,8 @@ page("Prices","prices", """
       company&rsquo;s prices, which is silent, plausible and wrong.</p>
   </div>
 </sc-if>
-""", logic="""
+""",
+    logic="""
 const POS='#3B6A38', NEG='#9E3626';
 function series(seed, n, base, drift){
   let x = seed, out = [], p = base;
@@ -227,4 +236,5 @@ class Component extends DCLogic {
           ? 'background:#0F5C63;border-color:#0F5C63;color:#fff;font-weight:600' : ''}` })) };
   }
 }
-""")
+""",
+)

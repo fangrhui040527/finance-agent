@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import time
 from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from typing import Protocol
 
@@ -96,7 +96,7 @@ class InferenceClient:
             # ledger it is a one-way cap: once cumulative spend passes the daily
             # budget the client raises forever and never recovers, which for an
             # unattended job means it stops and nothing says why.
-            since = datetime.now(timezone.utc) - self.budget_window
+            since = datetime.now(UTC) - self.budget_window
             spent = self.ledger.cost_since(since)
             if spent >= self.daily_budget_myr:
                 raise BudgetExceeded(
@@ -105,14 +105,46 @@ class InferenceClient:
                     "plan truncated and disclosed, not downgraded silently"
                 )
 
+        t0 = time.perf_counter()
+        try:
+            text, usage = self.backend.complete(model_id, prompt, system)
+        except Exception as e:
+            # A backend error carrying a Usage is a call the model ANSWERED and
+            # billed - truncated, or refused - whose text cannot be used. The
+            # spend is real, so it is ledgered and traced before the error goes
+            # up. A transport failure carries no usage and costs nothing.
+            spent = getattr(e, "usage", None)
+            if isinstance(spent, Usage):
+                self._record(
+                    agent,
+                    task,
+                    tier,
+                    model_id,
+                    prompt,
+                    system,
+                    spent,
+                    (time.perf_counter() - t0) * 1000,
+                    text="",
+                    error=str(e),
+                )
+            raise
+        elapsed = (time.perf_counter() - t0) * 1000
+        rec = self._record(agent, task, tier, model_id, prompt, system, usage, elapsed, text)
+        return Completion(text, usage, tier, model_id, rec.cost_myr)
+
+    def _record(
+        self, agent, task, tier, model_id, prompt, system, usage, elapsed, text, error=None
+    ):
         from core.trace import emit, is_tracing
 
-        t0 = time.perf_counter()
-        text, usage = self.backend.complete(model_id, prompt, system)
-        elapsed = (time.perf_counter() - t0) * 1000
         rec = self.ledger.record_call(
-            agent=agent, task_class=task, tier=tier, model_id=model_id,
-            prompt=prompt, usage=usage, fx_rate=self.fx_rate,
+            agent=agent,
+            task_class=task,
+            tier=tier,
+            model_id=model_id,
+            prompt=prompt,
+            usage=usage,
+            fx_rate=self.fx_rate,
             # Measured either way. It used to reach the trace and nowhere else,
             # so an ordinary run - the only kind that happens in production -
             # threw away the number docs/01 section 10 asks for.
@@ -122,12 +154,24 @@ class InferenceClient:
             # The ledger keeps prompt_hash only, by design. The trace keeps the
             # text, because "what exactly did we send it" is the first question
             # of every debugging session and a hash cannot answer it.
-            emit("llm_call", agent,
-                 agent=agent, task_class=task.value, tier=tier.value,
-                 model_id=model_id, backend=type(self.backend).__name__,
-                 system=system or "", prompt=prompt, response=text,
-                 input_tokens=usage.input_tokens, output_tokens=usage.output_tokens,
-                 cached_tokens=usage.cached_input_tokens,
-                 cost_myr=str(rec.cost_myr), prompt_hash=rec.prompt_hash,
-                 latency_ms=round(elapsed, 2))
-        return Completion(text, usage, tier, model_id, rec.cost_myr)
+            emit(
+                "llm_call",
+                agent,
+                agent=agent,
+                task_class=task.value,
+                tier=tier.value,
+                model_id=model_id,
+                backend=type(self.backend).__name__,
+                system=system or "",
+                prompt=prompt,
+                response=text,
+                input_tokens=usage.input_tokens,
+                output_tokens=usage.output_tokens,
+                cached_tokens=usage.cached_input_tokens,
+                cache_write_tokens=usage.cache_write_tokens,
+                cost_myr=str(rec.cost_myr),
+                prompt_hash=rec.prompt_hash,
+                latency_ms=round(elapsed, 2),
+                error=error,
+            )
+        return rec

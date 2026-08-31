@@ -1,11 +1,18 @@
 """P0 DoD: tier routing unit-tested; classification never hits the reasoning tier."""
+
 from decimal import Decimal
 
 import pytest
 
 from core.llm.tiers import (
-    MODEL_IDS, ROUTING, PRICING_USD, TaskClass, Tier, TierRoutingError,
-    Usage, cost_usd, route,
+    MODEL_IDS,
+    PRICING_USD,
+    TaskClass,
+    Tier,
+    TierRoutingError,
+    Usage,
+    cost_usd,
+    route,
 )
 
 
@@ -16,8 +23,11 @@ def test_every_task_class_routes():
 
 def test_classification_never_reaches_reasoning_tier():
     cheap_work = {
-        TaskClass.INTENT_ROUTING, TaskClass.NEWS_TRIAGE, TaskClass.ENTITY_TAG,
-        TaskClass.DEDUP_ADJUDICATE, TaskClass.CATEGORY_CLASSIFY,
+        TaskClass.INTENT_ROUTING,
+        TaskClass.NEWS_TRIAGE,
+        TaskClass.ENTITY_TAG,
+        TaskClass.DEDUP_ADJUDICATE,
+        TaskClass.CATEGORY_CLASSIFY,
     }
     for task in cheap_work:
         assert route(task) is Tier.CHEAP, f"{task} must not escalate"
@@ -30,6 +40,7 @@ def test_local_tier_is_free():
 def test_unknown_task_raises():
     class Fake(str):
         pass
+
     with pytest.raises(TierRoutingError):
         route(Fake("not_a_task"))
 
@@ -45,7 +56,7 @@ def test_cost_arithmetic():
 
 def test_cached_input_bills_at_ten_percent():
     full = cost_usd(Tier.BALANCED, Usage(1_000_000, 0))
-    cached = cost_usd(Tier.BALANCED, Usage(1_000_000, 0, cached_input_tokens=1_000_000))
+    cached = cost_usd(Tier.BALANCED, Usage(0, 0, cached_input_tokens=1_000_000))
     assert cached == full * Decimal("0.1")
 
 

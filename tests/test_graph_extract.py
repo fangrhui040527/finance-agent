@@ -8,7 +8,8 @@ Every payload here goes through validate.parse. An extractor whose output does
 not satisfy the schema fails its own test rather than degrading the graph three
 builds later.
 """
-from datetime import date, datetime, timezone
+
+from datetime import UTC, date, datetime
 
 import pytest
 
@@ -17,7 +18,9 @@ from knowledge.graph.extractors.base import company_node, sorted_payload
 from knowledge.graph.extractors.config_book import ConfigBookExtractor
 from knowledge.graph.extractors.curated import CuratedExtractor
 from knowledge.graph.extractors.gdelt import (
-    EVENT_VALID_DAYS, GdeltExtractor, _index_from_aliases,
+    EVENT_VALID_DAYS,
+    GdeltExtractor,
+    _index_from_aliases,
 )
 from knowledge.graph.extractors.market_registry import MarketsExtractor
 from knowledge.graph.extractors.sectors import SectorExtractor
@@ -32,6 +35,7 @@ def checked(extractor):
 
 # -- the shipped data files ---------------------------------------------------
 
+
 def test_the_checked_in_sector_map_validates():
     nodes, edges = checked(SectorExtractor())
     assert nodes and edges
@@ -42,8 +46,13 @@ def test_the_checked_in_sector_map_validates():
 def test_the_checked_in_supply_chain_validates():
     nodes, edges = checked(CuratedExtractor())
     assert {e.kind for e in edges} <= {
-        EdgeKind.SUPPLIES, EdgeKind.CUSTOMER_OF, EdgeKind.COMPETES_WITH,
-        EdgeKind.SUBSTITUTES, EdgeKind.EXPOSED_TO, EdgeKind.AFFECTS}
+        EdgeKind.SUPPLIES,
+        EdgeKind.CUSTOMER_OF,
+        EdgeKind.COMPETES_WITH,
+        EdgeKind.SUBSTITUTES,
+        EdgeKind.EXPOSED_TO,
+        EdgeKind.AFFECTS,
+    }
     assert all(e.citable for e in edges)
 
 
@@ -65,23 +74,28 @@ def test_a_company_classified_under_a_subsector_no_sector_declares_is_refused(tm
     p = tmp_path / "sectors.yaml"
     p.write_text(
         "sectors:\n  Financials: [Banks]\n"
-        "companies:\n  'MYX:1155': {subsector: Wizardry, valid_from: 2020-01-01}\n")
+        "companies:\n  'MYX:1155': {subsector: Wizardry, valid_from: 2020-01-01}\n"
+    )
     with pytest.raises(ValueError, match="no sector declares"):
         SectorExtractor(p).extract()
 
 
 def test_a_curated_row_with_no_id_is_refused_because_it_could_not_be_cited(tmp_path):
     p = tmp_path / "sc.yaml"
-    p.write_text("edges:\n  - source: 'MYX:1155'\n    target: 'MYX:1023'\n"
-                 "    relation: competes_with\n    valid_from: 2020-01-01\n")
+    p.write_text(
+        "edges:\n  - source: 'MYX:1155'\n    target: 'MYX:1023'\n"
+        "    relation: competes_with\n    valid_from: 2020-01-01\n"
+    )
     with pytest.raises(ValueError, match="cannot be cited"):
         CuratedExtractor(p).extract()
 
 
 def test_a_duplicate_curated_row_id_is_refused(tmp_path):
     p = tmp_path / "sc.yaml"
-    row = ("  - id: dupe\n    source: 'MYX:1155'\n    target: 'MYX:1023'\n"
-           "    relation: competes_with\n    valid_from: 2020-01-01\n")
+    row = (
+        "  - id: dupe\n    source: 'MYX:1155'\n    target: 'MYX:1023'\n"
+        "    relation: competes_with\n    valid_from: 2020-01-01\n"
+    )
     p.write_text("edges:\n" + row + row)
     with pytest.raises(ValueError, match="duplicate row id"):
         CuratedExtractor(p).extract()
@@ -108,6 +122,7 @@ def test_a_symmetric_relation_is_not_duplicated_onto_itself():
 
 # -- the book -----------------------------------------------------------------
 
+
 def test_the_book_contributes_seeds_and_no_edges():
     """Owning two companies is a fact about you, not a relationship between
     them. An edge here would let a traversal connect them through your account."""
@@ -128,14 +143,13 @@ def test_an_empty_book_is_valid_and_empty():
 
 # -- the market registry ------------------------------------------------------
 
+
 def test_a_company_is_placed_in_its_country_and_under_its_regulator():
     nodes, edges = checked(MarketsExtractor(["MYX:1155"]))
     kinds = {(e.src, e.kind, e.dst) for e in edges}
     assert ("CO:XKLS:1155", EdgeKind.OPERATES_IN, "CN:my") in kinds
-    assert any(k is EdgeKind.REGULATED_BY and d.startswith("RG:")
-               for _, k, d in kinds)
-    assert {n.kind for n in nodes} == {NodeKind.COMPANY, NodeKind.COUNTRY,
-                                       NodeKind.REGULATOR}
+    assert any(k is EdgeKind.REGULATED_BY and d.startswith("RG:") for _, k, d in kinds)
+    assert {n.kind for n in nodes} == {NodeKind.COMPANY, NodeKind.COUNTRY, NodeKind.REGULATOR}
 
 
 def test_the_registry_is_named_as_the_source_rather_than_an_invented_filing():
@@ -155,27 +169,32 @@ def test_a_market_with_no_adapter_is_skipped_rather_than_crashing_the_build():
     the opposite of what it says - the same trap that already cost this
     repository one stale test."""
     from markets.registry import supported
-    unsupported = next(m for m in ("XTAE", "XBOM", "XKRX", "XSWX", "XPAR")
-                       if m not in supported())
-    nodes, edges = checked(MarketsExtractor([f"{unsupported}:0001",
-                                             "not-an-instrument"]))
+
+    unsupported = next(m for m in ("XTAE", "XBOM", "XKRX", "XSWX", "XPAR") if m not in supported())
+    nodes, edges = checked(MarketsExtractor([f"{unsupported}:0001", "not-an-instrument"]))
     assert (nodes, edges) == ([], [])
 
 
 def test_every_supported_market_names_a_regulator():
     """On the MarketAdapter ABC, so a market added later cannot forget it."""
     from markets.registry import get, supported
+
     for mic in supported():
         assert get(mic).regulator.strip()
 
 
 # -- gdelt: the one that must NOT be citable ----------------------------------
 
+
 def article(doc_id="doc:1", instruments=("MYX:1155",), when=None):
-    return Article(doc_id=doc_id, title="Bank probe widens", body="Regulators acted.",
-                   source_domain="example.com",
-                   published_at=when or datetime(2026, 8, 1, tzinfo=timezone.utc),
-                   instruments=list(instruments))
+    return Article(
+        doc_id=doc_id,
+        title="Bank probe widens",
+        body="Regulators acted.",
+        source_domain="example.com",
+        published_at=when or datetime(2026, 8, 1, tzinfo=UTC),
+        instruments=list(instruments),
+    )
 
 
 def test_a_news_link_is_inferred_and_therefore_cannot_back_a_claim():
@@ -209,18 +228,28 @@ def test_the_news_linker_and_the_graph_share_one_surface_form_table():
 
 def test_a_fixture_feed_can_drive_the_extractor_offline(tmp_path):
     import json
+
     p = tmp_path / "feed.jsonl"
-    p.write_text(json.dumps({
-        "id": "1", "title": "Maybank raises guidance",
-        "body": "The bank lifted its outlook.", "domain": "example.com",
-        "published_at": "2026-08-01T00:00:00+00:00", "language": "en",
-    }) + "\n")
+    p.write_text(
+        json.dumps(
+            {
+                "id": "1",
+                "title": "Maybank raises guidance",
+                "body": "The bank lifted its outlook.",
+                "domain": "example.com",
+                "published_at": "2026-08-01T00:00:00+00:00",
+                "language": "en",
+            }
+        )
+        + "\n"
+    )
     nodes, edges = checked(GdeltExtractor.from_fixture(p))
     assert any(n.kind is NodeKind.EVENT for n in nodes)
     assert edges and edges[0].dst == "CO:XKLS:1155"
 
 
 # -- the shared helpers -------------------------------------------------------
+
 
 def test_every_extractor_labels_a_company_the_same_way():
     """The store upserts nodes, so whichever extractor runs last decides the
@@ -238,7 +267,10 @@ def test_a_company_no_alias_table_knows_keeps_its_written_form():
 def test_payloads_come_out_ordered_because_determinism_depends_on_it():
     p = sorted_payload(
         [company_node("XNAS:NVDA"), company_node("MYX:1155"), company_node("MYX:1155")],
-        [{"source": "b", "target": "a", "relation": "supplies", "valid_from": "2020-01-01"},
-         {"source": "a", "target": "b", "relation": "supplies", "valid_from": "2020-01-01"}])
+        [
+            {"source": "b", "target": "a", "relation": "supplies", "valid_from": "2020-01-01"},
+            {"source": "a", "target": "b", "relation": "supplies", "valid_from": "2020-01-01"},
+        ],
+    )
     assert [n["id"] for n in p["nodes"]] == ["CO:XKLS:1155", "CO:XNAS:NVDA"]
     assert [e["source"] for e in p["edges"]] == ["a", "b"]

@@ -15,7 +15,7 @@ import json
 import logging
 import os
 import tempfile
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -56,7 +56,7 @@ def bump(collection_dir: Path, key: str, field: str = "retrieved") -> None:
         data = load(collection_dir)
         rec = data.setdefault(key, {})
         rec[field] = int(rec.get(field, 0)) + 1
-        rec["last_used_at"] = datetime.now(timezone.utc).isoformat()
+        rec["last_used_at"] = datetime.now(UTC).isoformat()
         _atomic_write(_path(collection_dir), data)
     except Exception:
         log.debug("sidecar bump failed for %s/%s", collection_dir, key, exc_info=True)

@@ -56,12 +56,27 @@ class Plan:
 
 #: Which evidence agents each intent needs. Fixed, so a plan is auditable.
 PLAYBOOK: dict[Intent, tuple[str, ...]] = {
-    Intent.WHY_IT_MOVED: ("a3_price_technical", "a4_news_narrative", "a5_catalyst_events",
-                          "a6_macro_regime", "a9_attribution"),
-    Intent.SHOULD_I_BUY: ("a1_fundamentals", "a2_valuation", "a3_price_technical",
-                          "a4_news_narrative", "a5_catalyst_events", "a6_macro_regime",
-                          "a7_sector_technology", "a8_ownership_flow", "a10_thesis",
-                          "a11_red_team", "a12_portfolio_risk", "a13_sizing"),
+    Intent.WHY_IT_MOVED: (
+        "a3_price_technical",
+        "a4_news_narrative",
+        "a5_catalyst_events",
+        "a6_macro_regime",
+        "a9_attribution",
+    ),
+    Intent.SHOULD_I_BUY: (
+        "a1_fundamentals",
+        "a2_valuation",
+        "a3_price_technical",
+        "a4_news_narrative",
+        "a5_catalyst_events",
+        "a6_macro_regime",
+        "a7_sector_technology",
+        "a8_ownership_flow",
+        "a10_thesis",
+        "a11_red_team",
+        "a12_portfolio_risk",
+        "a13_sizing",
+    ),
     Intent.WHAT_DO_I_OWN: ("a12_portfolio_risk", "a9_attribution"),
     Intent.EXPLAIN_CONCEPT: ("a14_teacher",),
     Intent.SCREEN: ("a1_fundamentals", "a2_valuation"),
@@ -72,8 +87,11 @@ PLAYBOOK: dict[Intent, tuple[str, ...]] = {
 
 #: Cheap, deterministic first pass. The model is only asked when this is unsure.
 _PATTERNS: tuple[tuple[Intent, str], ...] = (
-    (Intent.WHY_IT_MOVED, r"\bwhy\b.*\b(up|down|fall|fell|falling|rose|rise|rising|drop|dropp"
-                          r"|jump|crash|rall|mov|surg|slump|slid|slump|tank|spike|plunge|gain|los)"),
+    (
+        Intent.WHY_IT_MOVED,
+        r"\bwhy\b.*\b(up|down|fall|fell|falling|rose|rise|rising|drop|dropp"
+        r"|jump|crash|rall|mov|surg|slump|slid|slump|tank|spike|plunge|gain|los)",
+    ),
     (Intent.WHY_IT_MOVED, r"\b(what happened|what's going on)\b"),
     (Intent.SHOULD_I_BUY, r"\b(should i|worth) (buy|buying|add|accumulat|invest|enter)"),
     (Intent.SHOULD_I_BUY, r"\b(good|bad) (buy|entry|investment)\b"),
@@ -86,18 +104,32 @@ _PATTERNS: tuple[tuple[Intent, str], ...] = (
 
 #: Things this system will not do, whatever the phrasing.
 _OUT_OF_SCOPE: tuple[tuple[str, str, str], ...] = (
-    (r"\b(buy|sell|short|execut|place|submit).{0,20}\b(order|trade|shares|lots?)\b.*\bfor me\b",
-     "This system cannot place orders. It has no broker connection by design.",
-     "Ask for the analysis instead; you place the order yourself."),
-    (r"\b(guarantee|sure thing|can't lose|risk[- ]free|100% )",
-     "No outcome in markets is guaranteed and this system will not imply one.",
-     "Ask for the base rate and the range of outcomes."),
-    (r"\b(price target|exactly how much|what will .* be (worth|at)) (in|by|next)\b",
-     "Point price forecasts are not produced; they are false precision.",
-     "Ask for the valuation range and what has to be true for each end of it."),
-    (r"\b(insider|non[- ]public|leaked?)\b.*\b(info|information|tip)\b",
-     "This system works only from published, citable sources.",
-     "Ask what the public filings and disclosed flows show."),
+    (
+        r"\b(buy|sell|short|execut|place|submit).{0,20}\b(order|trade|shares|lots?)\b.*\bfor me\b",
+        "This system cannot place orders. It has no broker connection by design.",
+        "Ask for the analysis instead; you place the order yourself.",
+    ),
+    (
+        r"\b(guarantee|sure thing|can't lose|risk[- ]free|100% )",
+        "No outcome in markets is guaranteed and this system will not imply one.",
+        "Ask for the base rate and the range of outcomes.",
+    ),
+    (
+        # Every verb a point forecast hides behind. The live QA pass found
+        # "what price will it hit next month" routed to the teacher: this
+        # pattern only knew "be worth".
+        r"\b(price target|exactly how much|what will .* be (worth|at)"
+        r"|what price will .{0,40}\b(hit|reach|be|close)"
+        r"|how (high|low|far) (will|would|can) .{0,40}\b(go|get|rise|fall|climb|drop)"
+        r"|where will .{0,40}\b(price|stock|share|it) be) (in|by|next|this|over|before|at)\b",
+        "Point price forecasts are not produced; they are false precision.",
+        "Ask for the valuation range and what has to be true for each end of it.",
+    ),
+    (
+        r"\b(insider|non[- ]public|leaked?)\b.*\b(info|information|tip)\b",
+        "This system works only from published, citable sources.",
+        "Ask what the public filings and disclosed flows show.",
+    ),
 )
 
 
@@ -125,39 +157,63 @@ class A0Supervisor(Agent):
             "if it read evidence itself no one could audit which store backed a claim."
         )
 
-    def run(self, question: str, budget_myr: Decimal | None = None,
-            instrument_ids: tuple[str, ...] = ()) -> list[Finding]:
+    def run(
+        self, question: str, budget_myr: Decimal | None = None, instrument_ids: tuple[str, ...] = ()
+    ) -> list[Finding]:
         plan = self.plan(question, budget_myr, instrument_ids)
         if plan.refusal is not None:
-            return [Finding(self.agent_id, "refusal", plan.refusal.reason,
-                            caveats=[plan.refusal.what_would_help])]
-        return [Finding(
-            self.agent_id, "plan",
-            f"{plan.intent.value}: routing to {len(plan.agents)} agents",
-            numbers={"estimated_cost_myr": float(plan.estimated_cost.amount)},
-            caveats=plan.notes,
-        )]
+            return [
+                Finding(
+                    self.agent_id,
+                    "refusal",
+                    plan.refusal.reason,
+                    caveats=[plan.refusal.what_would_help],
+                )
+            ]
+        return [
+            Finding(
+                self.agent_id,
+                "plan",
+                f"{plan.intent.value}: routing to {len(plan.agents)} agents",
+                numbers={"estimated_cost_myr": float(plan.estimated_cost.amount)},
+                caveats=plan.notes,
+            )
+        ]
 
-    def plan(self, question: str, budget_myr: Decimal | None = None,
-             instrument_ids: tuple[str, ...] = ()) -> Plan:
+    def plan(
+        self, question: str, budget_myr: Decimal | None = None, instrument_ids: tuple[str, ...] = ()
+    ) -> Plan:
         self._guard_tool("plan")
         q = question.lower()
 
         refusal = self.scope_check(q)
         if refusal is not None:
-            return Plan(Intent.OUT_OF_SCOPE, instrument_ids, (), (),
-                        Money(amount=Decimal(0), currency="MYR"), refusal=refusal)
+            return Plan(
+                Intent.OUT_OF_SCOPE,
+                instrument_ids,
+                (),
+                (),
+                Money(amount=Decimal(0), currency="MYR"),
+                refusal=refusal,
+            )
 
         intent = self.classify(q)
         agents = PLAYBOOK[intent]
         notes: list[str] = []
 
         if intent in (Intent.WHY_IT_MOVED, Intent.SHOULD_I_BUY) and not instrument_ids:
-            return Plan(intent, (), (), (), Money(amount=Decimal(0), currency="MYR"),
-                        refusal=Refusal(
-                            "No instrument could be resolved from the question.",
-                            "Name the company or give the ticker with its market, "
-                            "e.g. MAYBANK on Bursa or NVDA on NASDAQ."))
+            return Plan(
+                intent,
+                (),
+                (),
+                (),
+                Money(amount=Decimal(0), currency="MYR"),
+                refusal=Refusal(
+                    "No instrument could be resolved from the question.",
+                    "Name the company or give the ticker with its market, "
+                    "e.g. MAYBANK on Bursa or NVDA on NASDAQ.",
+                ),
+            )
 
         classes = tuple(self.task_class_for(a) for a in agents)
         cost = self.estimate(classes)
@@ -165,12 +221,18 @@ class A0Supervisor(Agent):
         if budget_myr is not None and cost.amount > budget_myr:
             trimmed = self.trim(intent, agents, budget_myr)
             if trimmed is None:
-                return Plan(intent, instrument_ids, (), (), cost,
-                            refusal=Refusal(
-                                f"The minimum useful plan for this question costs about "
-                                f"RM {cost.amount:.2f}, above the RM {budget_myr:.2f} budget.",
-                                "Raise the budget or ask a narrower question "
-                                "(one agent, one instrument)."))
+                return Plan(
+                    intent,
+                    instrument_ids,
+                    (),
+                    (),
+                    cost,
+                    refusal=Refusal(
+                        f"The minimum useful plan for this question costs about "
+                        f"RM {cost.amount:.2f}, above the RM {budget_myr:.2f} budget.",
+                        "Raise the budget or ask a narrower question (one agent, one instrument).",
+                    ),
+                )
             agents = trimmed
             classes = tuple(self.task_class_for(a) for a in agents)
             cost = self.estimate(classes)
@@ -185,9 +247,14 @@ class A0Supervisor(Agent):
     def scope_check(self, q: str) -> Refusal | None:
         for pattern, reason, help_ in _OUT_OF_SCOPE:
             if re.search(pattern, q):
-                self.ctx.engine.enforce(Action(
-                    name="refuse", rail=Rail.INPUT, agent=self.agent_id,
-                    payload={"reason": reason}))
+                self.ctx.engine.enforce(
+                    Action(
+                        name="refuse",
+                        rail=Rail.INPUT,
+                        agent=self.agent_id,
+                        payload={"reason": reason},
+                    )
+                )
                 return Refusal(reason, help_)
         return None
 
@@ -223,8 +290,9 @@ class A0Supervisor(Agent):
         total = sum((self.UNIT_COST_MYR[ROUTING[c]] for c in classes), Decimal(0))
         return Money(amount=total, currency="MYR")
 
-    def trim(self, intent: Intent, agents: tuple[str, ...],
-             budget: Decimal) -> tuple[str, ...] | None:
+    def trim(
+        self, intent: Intent, agents: tuple[str, ...], budget: Decimal
+    ) -> tuple[str, ...] | None:
         """Drop the most expensive agents first, but never below the floor that
         makes the answer honest. docs/01 section 4.3: a cheap wrong answer is
         worse than a refusal."""

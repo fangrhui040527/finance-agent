@@ -7,7 +7,8 @@ output gate could verify. Every graph-backed claim was dropped as uncited and
 A7 was structurally incapable of answering. test_a_graph_backed_exposure_claim_
 survives_the_output_gate is that hole, closed.
 """
-from datetime import date, datetime, timezone
+
+from datetime import UTC, date, datetime
 
 import pytest
 
@@ -16,31 +17,54 @@ from agents.evidence.agents import A7SectorTechnology
 from core.contracts.answer import Citation, TrustTier
 from core.guardrails.defaults import default_engine
 from knowledge.graph.entity_graph import (
-    EDGE_DECAY, EDGE_INVERSE, Confidence, Edge, EdgeKind, EntityGraph,
-    GraphSchemaError, Node, NodeKind, Path, PathRequired, _check_tables,
+    EDGE_DECAY,
+    EDGE_INVERSE,
+    Confidence,
+    Edge,
+    EdgeKind,
+    EntityGraph,
+    GraphSchemaError,
+    Node,
+    NodeKind,
+    Path,
+    PathRequired,
+    _check_tables,
     path_to_citations,
 )
 from knowledge.graph.validate import (
-    ExtractionError, assert_valid, parse, validate_extraction,
+    ExtractionError,
+    assert_valid,
+    parse,
+    validate_extraction,
 )
 from knowledge.retrieval.pipeline import Router
 
-NOW = datetime(2026, 8, 25, tzinfo=timezone.utc)
+NOW = datetime(2026, 8, 25, tzinfo=UTC)
 ASOF = date(2026, 8, 25)
 OPENED = date(2026, 1, 1)
 
 
-def edge(src, dst, kind=EdgeKind.SUPPLIES, weight=1.0, doc="doc:1",
-         conf=Confidence.EXTRACTED, vf=OPENED, vt=None):
+def edge(
+    src,
+    dst,
+    kind=EdgeKind.SUPPLIES,
+    weight=1.0,
+    doc="doc:1",
+    conf=Confidence.EXTRACTED,
+    vf=OPENED,
+    vt=None,
+):
     return Edge(src, dst, kind, weight, doc, conf, vf, vt)
 
 
 def two_hop():
     """EV:x --affects--> SEC:s --classified_in--> CO:a, both extracted and live."""
     g = EntityGraph()
-    for nid, kind, lbl in [("EV:x", NodeKind.EVENT, "Port closure"),
-                           ("SEC:s", NodeKind.SECTOR, "Shipping"),
-                           ("CO:a", NodeKind.COMPANY, "Alpha Bhd")]:
+    for nid, kind, lbl in [
+        ("EV:x", NodeKind.EVENT, "Port closure"),
+        ("SEC:s", NodeKind.SECTOR, "Shipping"),
+        ("CO:a", NodeKind.COMPANY, "Alpha Bhd"),
+    ]:
         g.add_node(Node(nid, kind, lbl))
     g.add_edge(edge("EV:x", "SEC:s", EdgeKind.AFFECTS, doc="doc:1"))
     g.add_edge(edge("SEC:s", "CO:a", EdgeKind.CLASSIFIED_IN, doc="doc:2"))
@@ -48,6 +72,7 @@ def two_hop():
 
 
 # -- confidence --------------------------------------------------------------
+
 
 def test_an_unstated_confidence_falls_to_the_weakest_value_not_a_midpoint():
     """A missing label is an absence of evidence about the edge, not a coin flip."""
@@ -77,20 +102,17 @@ def test_only_an_extracted_edge_backed_by_a_document_is_citable():
 def test_an_inferred_edge_is_not_traversed_when_a_claim_is_the_goal():
     g = two_hop()
     g.add_node(Node("CO:guess", NodeKind.COMPANY, "Guess Bhd"))
-    g.add_edge(edge("SEC:s", "CO:guess", EdgeKind.CLASSIFIED_IN,
-                    conf=Confidence.INFERRED))
+    g.add_edge(edge("SEC:s", "CO:guess", EdgeKind.CLASSIFIED_IN, conf=Confidence.INFERRED))
     reached = {p.end for p in g.traverse("EV:x", asof=ASOF)}
     assert "CO:guess" not in reached
-    assert "CO:guess" in {p.end for p in g.traverse("EV:x", asof=ASOF,
-                                                    require_citable=False)}
+    assert "CO:guess" in {p.end for p in g.traverse("EV:x", asof=ASOF, require_citable=False)}
 
 
 def test_a_path_is_only_as_confident_as_its_weakest_hop():
     g = two_hop()
     g.add_node(Node("CO:b", NodeKind.COMPANY, "Beta"))
     g.add_edge(edge("SEC:s", "CO:b", EdgeKind.CLASSIFIED_IN, conf=Confidence.INFERRED))
-    path = next(p for p in g.traverse("EV:x", asof=ASOF, require_citable=False)
-                if p.end == "CO:b")
+    path = next(p for p in g.traverse("EV:x", asof=ASOF, require_citable=False) if p.end == "CO:b")
     assert path.weakest_confidence is Confidence.INFERRED
 
 
@@ -99,6 +121,7 @@ def test_an_empty_path_is_not_citable():
 
 
 # -- validity intervals ------------------------------------------------------
+
 
 def test_an_edge_is_invisible_before_its_validity_begins():
     e = edge("A", "B", vf=date(2026, 6, 1))
@@ -122,11 +145,9 @@ def test_an_edge_that_cannot_say_when_it_opened_is_traversable_at_no_date():
 
 def test_an_interval_containing_no_days_is_refused_at_construction():
     with pytest.raises(ValueError, match="contains no days"):
-        Edge("A", "B", EdgeKind.SUPPLIES, valid_from=date(2026, 6, 1),
-             valid_to=date(2026, 6, 1))
+        Edge("A", "B", EdgeKind.SUPPLIES, valid_from=date(2026, 6, 1), valid_to=date(2026, 6, 1))
     with pytest.raises(ValueError, match="contains no days"):
-        Edge("A", "B", EdgeKind.SUPPLIES, valid_from=date(2026, 6, 2),
-             valid_to=date(2026, 6, 1))
+        Edge("A", "B", EdgeKind.SUPPLIES, valid_from=date(2026, 6, 2), valid_to=date(2026, 6, 1))
 
 
 def test_an_edge_cannot_close_without_saying_when_it_opened():
@@ -137,8 +158,7 @@ def test_an_edge_cannot_close_without_saying_when_it_opened():
 def test_a_relation_that_has_ended_does_not_answer_todays_question():
     g = two_hop()
     g.add_node(Node("CO:old", NodeKind.COMPANY, "Former supplier"))
-    g.add_edge(edge("SEC:s", "CO:old", EdgeKind.SUPPLIES,
-                    vf=OPENED, vt=date(2026, 6, 1)))
+    g.add_edge(edge("SEC:s", "CO:old", EdgeKind.SUPPLIES, vf=OPENED, vt=date(2026, 6, 1)))
     assert "CO:old" not in {p.end for p in g.traverse("EV:x", asof=ASOF)}
     assert "CO:old" in {p.end for p in g.traverse("EV:x", asof=date(2026, 3, 1))}
 
@@ -152,6 +172,7 @@ def test_a_traversal_cannot_be_run_without_stating_its_as_of_date():
 
 # -- weight ------------------------------------------------------------------
 
+
 def test_a_weight_above_one_would_let_a_hop_strengthen_a_path_and_is_refused():
     with pytest.raises(ValueError, match=r"outside \(0, 1\]"):
         Edge("A", "B", EdgeKind.SUPPLIES, weight=1.4)
@@ -164,6 +185,7 @@ def test_a_zero_or_negative_weight_is_refused():
 
 
 # -- inversion ---------------------------------------------------------------
+
 
 def test_a_bidirectional_supply_edge_reverses_into_customer_of_not_supplies():
     """The bug: the reverse edge used to be minted with the SAME kind, so
@@ -199,15 +221,22 @@ def test_the_reverse_edge_keeps_the_originals_evidence_and_validity():
     g = EntityGraph()
     for n in "AB":
         g.add_node(Node(n, NodeKind.COMPANY))
-    g.add_edge(edge("A", "B", EdgeKind.SUPPLIES, weight=0.8, doc="doc:9",
-                    vf=OPENED, vt=date(2027, 1, 1)), bidirectional=True)
+    g.add_edge(
+        edge("A", "B", EdgeKind.SUPPLIES, weight=0.8, doc="doc:9", vf=OPENED, vt=date(2027, 1, 1)),
+        bidirectional=True,
+    )
     back = g.neighbours("B")[0]
-    assert (back.source_doc_id, back.weight, back.valid_from, back.valid_to,
-            back.confidence) == ("doc:9", 0.8, OPENED, date(2027, 1, 1),
-                                 Confidence.EXTRACTED)
+    assert (back.source_doc_id, back.weight, back.valid_from, back.valid_to, back.confidence) == (
+        "doc:9",
+        0.8,
+        OPENED,
+        date(2027, 1, 1),
+        Confidence.EXTRACTED,
+    )
 
 
 # -- load-time table checks --------------------------------------------------
+
 
 def test_an_edge_kind_with_no_decay_entry_fails_at_import_not_mid_query():
     """It used to be a KeyError inside a user's traversal, on whichever path
@@ -246,6 +275,7 @@ def test_the_shipped_tables_are_consistent():
 
 # -- reverse index -----------------------------------------------------------
 
+
 def test_who_supplies_this_company_is_answerable_without_a_full_scan():
     g = two_hop()
     assert [e.src for e in g.inbound("CO:a")] == ["SEC:s"]
@@ -254,6 +284,7 @@ def test_who_supplies_this_company_is_answerable_without_a_full_scan():
 
 
 # -- traversal is a heuristic ------------------------------------------------
+
 
 def test_traversal_can_miss_a_path_that_exists_and_the_docstring_says_so():
     """Recorded, not hidden. A node is re-expanded only on a strictly better
@@ -273,9 +304,9 @@ def test_traversal_can_miss_a_path_that_exists_and_the_docstring_says_so():
     for n in ("A", "P", "R", "X", "Q", "T"):
         g.add_node(Node(n, NodeKind.COMPANY))
     for a, b in (("A", "P"), ("P", "R"), ("R", "X"), ("X", "T")):
-        g.add_edge(edge(a, b, EdgeKind.OWNS))               # decay 0.85
+        g.add_edge(edge(a, b, EdgeKind.OWNS))  # decay 0.85
     for a, b in (("A", "Q"), ("Q", "X")):
-        g.add_edge(edge(a, b, EdgeKind.CLASSIFIED_IN))      # decay 0.35
+        g.add_edge(edge(a, b, EdgeKind.CLASSIFIED_IN))  # decay 0.35
 
     assert g.traverse("A", asof=ASOF, target="T", max_hops=3) == []
     assert g.traverse("A", asof=ASOF, target="T", max_hops=4) != []
@@ -289,12 +320,20 @@ CORPUS = {
     ("kb_sector", "doc:2"): "Alpha Bhd is classified within the shipping sector.",
 }
 EVIDENCE = {
-    "doc:1": Citation(source="kb_sector", chunk_id="doc:1",
-                      quoted_span="halted shipping through the strait",
-                      trust=TrustTier.METHOD_KB, as_of=NOW),
-    "doc:2": Citation(source="kb_sector", chunk_id="doc:2",
-                      quoted_span="classified within the shipping sector",
-                      trust=TrustTier.METHOD_KB, as_of=NOW),
+    "doc:1": Citation(
+        source="kb_sector",
+        chunk_id="doc:1",
+        quoted_span="halted shipping through the strait",
+        trust=TrustTier.METHOD_KB,
+        as_of=NOW,
+    ),
+    "doc:2": Citation(
+        source="kb_sector",
+        chunk_id="doc:2",
+        quoted_span="classified within the shipping sector",
+        trust=TrustTier.METHOD_KB,
+        as_of=NOW,
+    ),
 }
 
 
@@ -304,10 +343,14 @@ def chunk_lookup(source, chunk_id):
 
 def a7(graph=None, evidence=None):
     return A7SectorTechnology(
-        AgentContext(router=Router({}),
-                     engine=default_engine({"a7_sector_technology": {"traverse"}}),
-                     now=NOW),
-        graph, evidence)
+        AgentContext(
+            router=Router({}),
+            engine=default_engine({"a7_sector_technology": {"traverse"}}),
+            now=NOW,
+        ),
+        graph,
+        evidence,
+    )
 
 
 def test_a_path_becomes_one_citation_per_hop():
@@ -364,9 +407,13 @@ def test_a_fabricated_span_is_dropped_even_though_the_graph_vouched_for_it():
     """The graph says which document supports an edge. It does not get to say
     what the document contains - verify_claim rechecks that against the text."""
     bad = dict(EVIDENCE)
-    bad["doc:2"] = Citation(source="kb_sector", chunk_id="doc:2",
-                            quoted_span="Alpha Bhd supplies the entire strait",
-                            trust=TrustTier.METHOD_KB, as_of=NOW)
+    bad["doc:2"] = Citation(
+        source="kb_sector",
+        chunk_id="doc:2",
+        quoted_span="Alpha Bhd supplies the entire strait",
+        trust=TrustTier.METHOD_KB,
+        as_of=NOW,
+    )
     agent = a7(two_hop(), bad.get)
     answer = agent.emit(agent.run("EV:x", {"CO:a"}), chunk_lookup, confidence=0.55)
     assert answer.answered is False
@@ -390,13 +437,25 @@ def test_a7_dates_its_traversal_from_its_own_context_clock():
 
 # -- the validator -----------------------------------------------------------
 
+
 def clean_payload():
     return {
-        "nodes": [{"id": "CO:a", "kind": "Company", "label": "Alpha"},
-                  {"id": "CO:b", "kind": "Company", "label": "Beta"}],
-        "edges": [{"source": "CO:a", "target": "CO:b", "relation": "supplies",
-                   "confidence": "extracted", "source_doc_id": "doc:1",
-                   "weight": 0.9, "valid_from": "2026-01-01", "valid_to": None}],
+        "nodes": [
+            {"id": "CO:a", "kind": "Company", "label": "Alpha"},
+            {"id": "CO:b", "kind": "Company", "label": "Beta"},
+        ],
+        "edges": [
+            {
+                "source": "CO:a",
+                "target": "CO:b",
+                "relation": "supplies",
+                "confidence": "extracted",
+                "source_doc_id": "doc:1",
+                "weight": 0.9,
+                "valid_from": "2026-01-01",
+                "valid_to": None,
+            }
+        ],
     }
 
 
@@ -420,14 +479,30 @@ def test_a_malformed_extraction_raises_rather_than_warning_and_building():
 
 
 def test_every_error_is_reported_not_just_the_first():
-    bad = {"nodes": [{"id": "CO:a", "kind": "Planet"}],
-           "edges": [{"source": "CO:a", "target": "CO:ghost", "relation": "orbits",
-                      "confidence": "certain", "weight": 3.0, "valid_from": "yesterday"}]}
+    bad = {
+        "nodes": [{"id": "CO:a", "kind": "Planet"}],
+        "edges": [
+            {
+                "source": "CO:a",
+                "target": "CO:ghost",
+                "relation": "orbits",
+                "confidence": "certain",
+                "weight": 3.0,
+                "valid_from": "yesterday",
+            }
+        ],
+    }
     errors = validate_extraction(bad, "test")
     assert len(errors) >= 5
     joined = " ".join(errors)
-    for fragment in ("NodeKind", "EdgeKind", "Confidence", "not declared",
-                     "outside (0, 1]", "not an ISO date"):
+    for fragment in (
+        "NodeKind",
+        "EdgeKind",
+        "Confidence",
+        "not declared",
+        "outside (0, 1]",
+        "not an ISO date",
+    ):
         assert fragment in joined
 
 
@@ -474,8 +549,7 @@ def test_an_edge_with_a_null_valid_from_is_refused_as_silently_invisible():
 def test_a_missing_required_field_names_the_field():
     bad = clean_payload()
     del bad["edges"][0]["confidence"]
-    assert any("missing required field 'confidence'" in e
-               for e in validate_extraction(bad))
+    assert any("missing required field 'confidence'" in e for e in validate_extraction(bad))
 
 
 def test_something_that_is_not_an_extraction_at_all_is_rejected_cleanly():
@@ -485,9 +559,19 @@ def test_something_that_is_not_an_extraction_at_all_is_rejected_cleanly():
 
 
 def test_the_error_message_caps_its_own_length():
-    bad = {"nodes": [], "edges": [
-        {"source": "x", "target": "y", "relation": "nope",
-         "confidence": "nope", "valid_from": "nope"} for _ in range(30)]}
+    bad = {
+        "nodes": [],
+        "edges": [
+            {
+                "source": "x",
+                "target": "y",
+                "relation": "nope",
+                "confidence": "nope",
+                "valid_from": "nope",
+            }
+            for _ in range(30)
+        ],
+    }
     with pytest.raises(ExtractionError) as exc:
         assert_valid(bad, "flood")
     assert "and " in str(exc.value) and "more" in str(exc.value)
@@ -498,12 +582,25 @@ def test_the_validator_survives_input_that_is_not_shaped_like_an_extraction():
     """An extractor bug produces nonsense, not a tidy error. The gate must name
     what is wrong rather than raising on its own way in."""
     bad = {
-        "nodes": ["CO:a", {"id": "", "kind": "Company"}, {"id": 7, "kind": "Company"},
-                  {"id": "CO:b", "kind": "Company"}],
-        "edges": [None,
-                  {"source": "CO:b", "target": "CO:b", "relation": "supplies",
-                   "confidence": "extracted", "source_doc_id": 42,
-                   "weight": True, "valid_from": 20260101, "valid_to": ["soon"]}],
+        "nodes": [
+            "CO:a",
+            {"id": "", "kind": "Company"},
+            {"id": 7, "kind": "Company"},
+            {"id": "CO:b", "kind": "Company"},
+        ],
+        "edges": [
+            None,
+            {
+                "source": "CO:b",
+                "target": "CO:b",
+                "relation": "supplies",
+                "confidence": "extracted",
+                "source_doc_id": 42,
+                "weight": True,
+                "valid_from": 20260101,
+                "valid_to": ["soon"],
+            },
+        ],
     }
     errors = validate_extraction(bad, "chaos")
     joined = " ".join(errors)

@@ -30,12 +30,13 @@ driver would expose, so swapping the store touches this file only.
 from __future__ import annotations
 
 import heapq
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import date
 from enum import Enum
-from typing import Callable, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:                                  # pragma: no cover
+if TYPE_CHECKING:  # pragma: no cover
     from core.contracts.answer import Citation
 
 
@@ -92,9 +93,9 @@ class Confidence(str, Enum):
     a coin flip that reads as half-supported.
     """
 
-    EXTRACTED = "extracted"    # stated in a source: a filing field, a registry entry
-    INFERRED = "inferred"      # deduced: shared classification, co-occurrence
-    AMBIGUOUS = "ambiguous"    # uncertain - never backs a claim; goes to review
+    EXTRACTED = "extracted"  # stated in a source: a filing field, a registry entry
+    INFERRED = "inferred"  # deduced: shared classification, co-occurrence
+    AMBIGUOUS = "ambiguous"  # uncertain - never backs a claim; goes to review
 
 
 # How much signal survives one hop of each kind. A supply relationship carries
@@ -131,8 +132,8 @@ EDGE_DECAY: dict[EdgeKind, float] = {
 EDGE_INVERSE: dict[EdgeKind, EdgeKind] = {
     EdgeKind.SUPPLIES: EdgeKind.CUSTOMER_OF,
     EdgeKind.CUSTOMER_OF: EdgeKind.SUPPLIES,
-    EdgeKind.COMPETES_WITH: EdgeKind.COMPETES_WITH,   # symmetric
-    EdgeKind.SUBSTITUTES: EdgeKind.SUBSTITUTES,       # symmetric
+    EdgeKind.COMPETES_WITH: EdgeKind.COMPETES_WITH,  # symmetric
+    EdgeKind.SUBSTITUTES: EdgeKind.SUBSTITUTES,  # symmetric
     # "A is exposed to B" and "B affects A" are one relationship read from each
     # end, and both readings are needed: without the pair, "aluminium fell, who
     # is hurt" traverses out of the commodity and finds nothing, because _out is
@@ -157,9 +158,7 @@ HUB_MIN_DEGREE = 50
 #: `Malaysia` a bad waypoint is having four hundred neighbours, not being a
 #: Country, so the veto is degree-based (see EntityGraph.hubs) and this list is
 #: only the early-warning surface analyze.god_nodes() reports on.
-HUB_KINDS: frozenset[NodeKind] = frozenset(
-    {NodeKind.SECTOR, NodeKind.COUNTRY, NodeKind.COMMODITY}
-)
+HUB_KINDS: frozenset[NodeKind] = frozenset({NodeKind.SECTOR, NodeKind.COUNTRY, NodeKind.COMMODITY})
 
 
 def _check_tables() -> None:
@@ -170,8 +169,7 @@ def _check_tables() -> None:
             f"EDGE_DECAY has no entry for {', '.join(missing)}. Every EdgeKind needs "
             "one, or traversal fails mid-query on whichever path happens to reach it."
         )
-    bad = [f"{k.value}->{v.value}" for k, v in EDGE_INVERSE.items()
-           if EDGE_INVERSE.get(v) is not k]
+    bad = [f"{k.value}->{v.value}" for k, v in EDGE_INVERSE.items() if EDGE_INVERSE.get(v) is not k]
     if bad:
         raise GraphSchemaError(
             f"EDGE_INVERSE is not self-consistent: {', '.join(bad)}. "
@@ -296,8 +294,9 @@ class Path:
     def weakest_confidence(self) -> Confidence:
         """A path is only as good as its worst hop. What the review list sorts on."""
         order = [Confidence.AMBIGUOUS, Confidence.INFERRED, Confidence.EXTRACTED]
-        return min((h.edge.confidence for h in self.hops),
-                   key=order.index, default=Confidence.AMBIGUOUS)
+        return min(
+            (h.edge.confidence for h in self.hops), key=order.index, default=Confidence.AMBIGUOUS
+        )
 
     @property
     def strength(self) -> str:
@@ -342,15 +341,23 @@ class EntityGraph:
                     f"bidirectionally. Reversing it would assert something no document "
                     f"says. Add the reverse edge explicitly with its own source."
                 )
-            self._index(Edge(
-                edge.dst, edge.src, inverse, edge.weight, edge.source_doc_id,
-                edge.confidence, edge.valid_from, edge.valid_to,
-            ))
+            self._index(
+                Edge(
+                    edge.dst,
+                    edge.src,
+                    inverse,
+                    edge.weight,
+                    edge.source_doc_id,
+                    edge.confidence,
+                    edge.valid_from,
+                    edge.valid_to,
+                )
+            )
 
     def _index(self, edge: Edge) -> None:
         self._out.setdefault(edge.src, []).append(edge)
         self._in.setdefault(edge.dst, []).append(edge)
-        self._hubs = None                      # degrees changed; recompute lazily
+        self._hubs = None  # degrees changed; recompute lazily
 
     def node(self, node_id: str) -> Node | None:
         return self._nodes.get(node_id)
@@ -394,8 +401,11 @@ class EntityGraph:
             if candidate in self._nodes and candidate not in found:
                 found.append(candidate)
         folded = " ".join(raw.strip().split()).casefold()
-        found += [n.node_id for n in self._nodes.values()
-                  if n.label.casefold() == folded and n.node_id not in found]
+        found += [
+            n.node_id
+            for n in self._nodes.values()
+            if n.label.casefold() == folded and n.node_id not in found
+        ]
         return sorted(found)
 
     def resolve(self, raw: str) -> str | None:
@@ -496,7 +506,7 @@ class EntityGraph:
                 if not edge.live_at(asof):
                     continue
                 if any(h.edge.dst == edge.dst for h in hops) or edge.dst == start:
-                    continue                       # no cycles
+                    continue  # no cycles
                 nw = w * EDGE_DECAY[edge.kind] * edge.weight
                 if nw < min_weight:
                     continue
@@ -505,7 +515,7 @@ class EntityGraph:
                 if target is None or edge.dst == target:
                     results.append(path)
                 if edge.dst in hubs:
-                    continue           # may end at a hub, never route through one
+                    continue  # may end at a hub, never route through one
                 if nw > best_seen.get(edge.dst, 0.0):
                     best_seen[edge.dst] = nw
                     counter += 1
@@ -544,8 +554,8 @@ def require_path(claim: str, path: Path | None) -> Path:
 
 def path_to_citations(
     path: Path,
-    lookup: Callable[[str], "Citation | None"],
-) -> list["Citation"]:
+    lookup: Callable[[str], Citation | None],
+) -> list[Citation]:
     """Turn a traversal path into citations the output gate can verify.
 
     The seam that was missing. Path.evidence() hands back source_doc_id strings;
@@ -563,7 +573,7 @@ def path_to_citations(
     reads as evidence and is not. Refuse the whole path instead.
     """
     require_path("path -> citations", path)
-    out: list["Citation"] = []
+    out: list[Citation] = []
     for hop in path.hops:
         doc_id = hop.edge.source_doc_id
         cite = lookup(doc_id) if doc_id else None

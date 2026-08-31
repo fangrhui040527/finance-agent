@@ -4,6 +4,7 @@ Same property the GDELT tests hold the feed to: a BROKEN backend must never look
 like a QUIET one. Every failure path raises. Nothing here returns empty text, and
 nothing degrades a tier it was handed.
 """
+
 import io
 import json
 import urllib.error
@@ -56,20 +57,25 @@ def _opener(body: str, capture: list | None = None):
         if capture is not None:
             capture.append(req)
         return _Response(body)
+
     return open_
 
 
 def _http_error(status: int, body: str = '{"error":{"message":"nope"}}'):
     def open_(req, timeout=None):
         raise urllib.error.HTTPError(
-            "https://api.anthropic.com/v1/messages", status, "err", {},
+            "https://api.anthropic.com/v1/messages",
+            status,
+            "err",
+            {},
             io.BytesIO(body.encode()),
         )
+
     return open_
 
 
 def _backend(opener, **kw) -> AnthropicBackend:
-    kw.setdefault("sleep", lambda _s: None)          # no real waiting in tests
+    kw.setdefault("sleep", lambda _s: None)  # no real waiting in tests
     return AnthropicBackend(api_key=KEY, opener=opener, **kw)
 
 
@@ -102,26 +108,31 @@ def test_nonsense_bounds_are_refused():
 
 # --- the happy path -------------------------------------------------------
 def test_text_and_usage_come_back_off_the_wire():
-    text, usage = _backend(_opener(_reply("Funding cost.")))\
-        .complete("claude-sonnet-5", "why did it move", None)
+    text, usage = _backend(_opener(_reply("Funding cost."))).complete(
+        "claude-sonnet-5", "why did it move", None
+    )
     assert text == "Funding cost."
     assert usage == Usage(input_tokens=120, output_tokens=45, cached_input_tokens=0)
 
 
 def test_multiple_text_blocks_are_joined():
-    body = _reply(content=[
-        {"type": "text", "text": "one. "},
-        {"type": "text", "text": "two."},
-    ])
+    body = _reply(
+        content=[
+            {"type": "text", "text": "one. "},
+            {"type": "text", "text": "two."},
+        ]
+    )
     text, _ = _backend(_opener(body)).complete("claude-opus-5", "q", None)
     assert text == "one. two."
 
 
 def test_non_text_blocks_are_skipped_not_stringified():
-    body = _reply(content=[
-        {"type": "thinking", "thinking": "internal"},
-        {"type": "text", "text": "answer"},
-    ])
+    body = _reply(
+        content=[
+            {"type": "thinking", "thinking": "internal"},
+            {"type": "text", "text": "answer"},
+        ]
+    )
     text, _ = _backend(_opener(body)).complete("claude-opus-5", "q", None)
     assert text == "answer"
 
@@ -133,7 +144,7 @@ def test_request_carries_the_key_version_and_system_prompt():
     assert req.get_header("X-api-key") == KEY
     assert req.get_header("Anthropic-version") == "2023-06-01"
     body = json.loads(req.data)
-    assert body["system"] == "you are terse"
+    assert body["system"][0]["text"] == "you are terse"
     assert body["model"] == "claude-opus-5"
     assert body["messages"] == [{"role": "user", "content": "q"}]
 
@@ -154,22 +165,33 @@ def test_max_tokens_is_sent_and_configurable():
 def test_cache_reads_are_reported_so_cost_is_not_overstated():
     """Priced at 10% of base input. Dropping it inflates spend and trips the
     budget rail early - a wrong refusal, which is worse than a wrong bill."""
-    body = _reply(usage={
-        "input_tokens": 8000, "output_tokens": 100,
-        "cache_read_input_tokens": 7500, "cache_creation_input_tokens": 0,
-    })
+    body = _reply(
+        usage={
+            "input_tokens": 500,
+            "output_tokens": 100,
+            "cache_read_input_tokens": 7500,
+            "cache_creation_input_tokens": 0,
+        }
+    )
     _, usage = _backend(_opener(body)).complete("claude-opus-5", "q", None)
     assert usage.cached_input_tokens == 7500
 
+    # `input_tokens` is the UNCACHED remainder. 500 fresh + 7500 read at a tenth
+    # is far less than the 8000 fresh tokens the same prompt costs uncached.
     from core.llm.tiers import Tier, cost_usd
+
     billed = cost_usd(Tier.REASON, usage)
-    naive = cost_usd(Tier.REASON, Usage(8000, 100))
-    assert billed < naive
+    uncached = cost_usd(Tier.REASON, Usage(8000, 100))
+    assert billed == cost_usd(Tier.REASON, Usage(500, 100)) + cost_usd(
+        Tier.REASON, Usage(0, 0, 7500)
+    )
+    assert billed < uncached
 
 
 def test_a_response_with_no_usage_raises_rather_than_ledgering_zero():
-    body = json.dumps({"type": "message", "content": [{"type": "text", "text": "hi"}],
-                       "stop_reason": "end_turn"})
+    body = json.dumps(
+        {"type": "message", "content": [{"type": "text", "text": "hi"}], "stop_reason": "end_turn"}
+    )
     with pytest.raises(BackendError, match="no usage"):
         _backend(_opener(body)).complete("claude-opus-5", "q", None)
 
@@ -205,8 +227,9 @@ def test_bad_key_raises_auth_and_is_not_retried():
 
     def open_(req, timeout=None):
         calls.append(req)
-        raise urllib.error.HTTPError("u", 401, "unauthorized", {},
-                                     io.BytesIO(b'{"error":{"message":"bad key"}}'))
+        raise urllib.error.HTTPError(
+            "u", 401, "unauthorized", {}, io.BytesIO(b'{"error":{"message":"bad key"}}')
+        )
 
     with pytest.raises(AuthError, match="401"):
         _backend(open_, max_attempts=3).complete("claude-opus-5", "q", None)
@@ -260,8 +283,9 @@ def test_backoff_is_exponential_and_bounded():
         raise urllib.error.HTTPError("u", 529, "overloaded", {}, io.BytesIO(b"{}"))
 
     with pytest.raises(TransientError):
-        AnthropicBackend(api_key=KEY, opener=open_, max_attempts=4,
-                         sleep=waits.append).complete("claude-opus-5", "q", None)
+        AnthropicBackend(api_key=KEY, opener=open_, max_attempts=4, sleep=waits.append).complete(
+            "claude-opus-5", "q", None
+        )
     assert waits == [1.0, 2.0, 4.0], "one sleep fewer than attempts, doubling each time"
 
 
@@ -279,8 +303,9 @@ def test_non_json_body_raises():
 
 
 def test_api_level_error_object_raises():
-    body = json.dumps({"type": "error",
-                       "error": {"type": "invalid_request_error", "message": "too long"}})
+    body = json.dumps(
+        {"type": "error", "error": {"type": "invalid_request_error", "message": "too long"}}
+    )
     with pytest.raises(BackendError, match="too long"):
         _backend(_opener(body)).complete("claude-opus-5", "q", None)
 

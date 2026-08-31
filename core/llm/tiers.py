@@ -87,9 +87,9 @@ ROUTING: dict[TaskClass, Tier] = {
 # every ledger row was simply 50% too high, and the daily budget refused
 # questions it could afford.
 PRICING_USD: dict[Tier, tuple[Decimal, Decimal]] = {
-    Tier.REASON: (Decimal("5.00"), Decimal("25.00")),      # claude-opus-5
-    Tier.BALANCED: (Decimal("2.00"), Decimal("10.00")),    # claude-sonnet-5
-    Tier.CHEAP: (Decimal("1.00"), Decimal("5.00")),      # claude-haiku-4-5
+    Tier.REASON: (Decimal("5.00"), Decimal("25.00")),  # claude-opus-5
+    Tier.BALANCED: (Decimal("2.00"), Decimal("10.00")),  # claude-sonnet-5
+    Tier.CHEAP: (Decimal("1.00"), Decimal("5.00")),  # claude-haiku-4-5
     Tier.EMBED: (Decimal("0.05"), Decimal("0")),
     Tier.LOCAL: (Decimal("0"), Decimal("0")),
 }
@@ -116,16 +116,38 @@ def route(task: TaskClass) -> Tier:
 
 @dataclass(frozen=True)
 class Usage:
+    """Token counts exactly as the Messages API reports them.
+
+    `input_tokens` is the UNCACHED remainder. The API reports cache reads and
+    cache writes in fields of their own and does not fold them into it. The
+    first `cost_usd` subtracted the reads from `input_tokens` a second time -
+    invisible while nothing was ever cached, and a NEGATIVE bill on the first
+    day something was. Found by the live QA pass, because no offline test had
+    ever seen a non-zero cache read.
+    """
+
     input_tokens: int
     output_tokens: int
-    cached_input_tokens: int = 0
+    cached_input_tokens: int = 0  # cache_read_input_tokens, billed at 0.1x
+    cache_write_tokens: int = 0  # cache_creation_input_tokens, billed at 1.25x
+
+
+#: First-party rates: a cache read costs a tenth of fresh input, a five-minute
+#: cache write a quarter more. Both scale the tier's own input rate.
+CACHE_READ_MULTIPLIER = Decimal("0.1")
+CACHE_WRITE_MULTIPLIER = Decimal("1.25")
 
 
 def cost_usd(tier: Tier, usage: Usage) -> Decimal:
-    """Cached input reads bill at ~10% of base input."""
+    """Fresh input at the base rate, reads at a tenth, writes at a quarter over.
+
+    Every term is clamped at zero, so the sum can never be negative whatever a
+    malformed usage block says.
+    """
     in_rate, out_rate = PRICING_USD[tier]
     million = Decimal(1_000_000)
-    fresh = Decimal(usage.input_tokens - usage.cached_input_tokens) / million * in_rate
-    cached = Decimal(usage.cached_input_tokens) / million * in_rate * Decimal("0.1")
-    out = Decimal(usage.output_tokens) / million * out_rate
-    return fresh + cached + out
+    fresh = Decimal(max(usage.input_tokens, 0)) / million * in_rate
+    cached = Decimal(max(usage.cached_input_tokens, 0)) / million * in_rate * CACHE_READ_MULTIPLIER
+    written = Decimal(max(usage.cache_write_tokens, 0)) / million * in_rate * CACHE_WRITE_MULTIPLIER
+    out = Decimal(max(usage.output_tokens, 0)) / million * out_rate
+    return fresh + cached + written + out

@@ -11,6 +11,7 @@ Two properties every fixture here upholds:
     seam; no monkeypatching of `urllib` internals, so a refactor that stops
     honouring the seam fails loudly rather than silently bypassing the fake.
 """
+
 from __future__ import annotations
 
 import io
@@ -25,6 +26,7 @@ ROOT = Path(__file__).resolve().parent.parent
 
 # --- environment --------------------------------------------------------------
 
+
 @pytest.fixture(autouse=True)
 def keyless_env(monkeypatch: pytest.MonkeyPatch) -> None:
     """No test sees a real key or a backend override unless it sets one."""
@@ -34,11 +36,13 @@ def keyless_env(monkeypatch: pytest.MonkeyPatch) -> None:
 
 # --- urllib doubles -----------------------------------------------------------
 
+
 class FakeResponse:
     """Stands in for the object urllib.request.urlopen returns."""
 
-    def __init__(self, body: str | bytes, headers: dict[str, str] | None = None,
-                 status: int = 200) -> None:
+    def __init__(
+        self, body: str | bytes, headers: dict[str, str] | None = None, status: int = 200
+    ) -> None:
         self._body = body if isinstance(body, bytes) else body.encode()
         self.headers = headers or {}
         self.status = status
@@ -56,25 +60,30 @@ class FakeResponse:
         return False
 
 
-def http_error(status: int, body: str = '{"error":{"message":"nope"}}',
-               headers: dict[str, str] | None = None,
-               url: str = "https://example.invalid/") -> urllib.error.HTTPError:
+def http_error(
+    status: int,
+    body: str = '{"error":{"message":"nope"}}',
+    headers: dict[str, str] | None = None,
+    url: str = "https://example.invalid/",
+) -> urllib.error.HTTPError:
     """A ready-to-raise HTTPError with a readable body and optional headers."""
-    return urllib.error.HTTPError(url, status, f"http {status}", headers or {},
-                                  io.BytesIO(body.encode()))
+    return urllib.error.HTTPError(
+        url, status, f"http {status}", headers or {}, io.BytesIO(body.encode())
+    )
 
 
 def opener_for(body: str, capture: list | None = None) -> Callable:
     """An opener that returns the same body every time and records requests."""
+
     def open_(req, timeout=None):
         if capture is not None:
             capture.append(req)
         return FakeResponse(body)
+
     return open_
 
 
-def scripted_opener(steps: Iterable[str | BaseException],
-                    capture: list | None = None) -> Callable:
+def scripted_opener(steps: Iterable[str | BaseException], capture: list | None = None) -> Callable:
     """An opener that plays `steps` in order: a str is returned as a body, an
     exception instance is raised. Exhausting the script is an error - a test
     that makes more calls than it scripted has found a retry it did not expect."""
@@ -89,26 +98,31 @@ def scripted_opener(steps: Iterable[str | BaseException],
         if isinstance(step, BaseException):
             raise step
         return FakeResponse(step)
+
     return open_
 
 
 # --- stores and engines -------------------------------------------------------
 
+
 @pytest.fixture
 def tmp_ledger(tmp_path: Path):
     from core.provenance.ledger import ProvenanceLedger
+
     return ProvenanceLedger(tmp_path / "provenance.db")
 
 
 @pytest.fixture
 def tmp_learning_store(tmp_path: Path):
     from agents.learning.store import LearningStore
+
     return LearningStore(tmp_path / "learning.db")
 
 
 @pytest.fixture(scope="session")
 def registry():
     from core.registry.loader import load
+
     return load(str(ROOT / "agents" / "registry.yaml"))
 
 
@@ -117,4 +131,5 @@ def registry_engine(registry):
     """The REAL registry-derived allowlist, not a hand-written one - the only
     kind that catches a missing grant in agents/registry.yaml."""
     from core.guardrails.defaults import default_engine
+
     return default_engine(registry.allowlist())

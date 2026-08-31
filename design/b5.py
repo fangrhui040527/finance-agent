@@ -1,7 +1,10 @@
-exec(open("gen.py").read())
+from gen import page  # run via `python -m design.build` or from design/
 
 # ─────────────────────────────── TRACE
-page("Trace","trace", """
+page(
+    "Trace",
+    "trace",
+    """
 <div class="head">
   <div><h1>Trace</h1>
   <p>Every prompt, every guardrail decision, every dropped claim. Click a row to open it.</p></div>
@@ -84,7 +87,8 @@ page("Trace","trace", """
     </div>
   </div>
 </div>
-""", logic="""
+""",
+    logic="""
 const ACC='#0F5C63', NEG='#9E3626', MUT='#606D71', INK='#15191B';
 const EV = [
   {seq:31, kind:'allowed', name:'llm_complete', sym:'·', d:1, meta:'tool_allowlist',
@@ -147,4 +151,5 @@ class Component extends DCLogic {
     };
   }
 }
-""")
+""",
+)

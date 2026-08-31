@@ -10,15 +10,21 @@ instructive than the number.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import date
 from decimal import ROUND_DOWN, Decimal
 
-from engines.risk.concentration import Breach, Limits, Position, check
 from core.contracts.money import BASE_CURRENCY
+from engines.risk.concentration import Breach, Limits, Position, check
 from engines.sizing.caps import (
-    Band, BindingCap, CapBreach, CapSet, CurrencyMismatch, cost_floor_bps,
-    to_base, vol_target_scalar,
+    Band,
+    BindingCap,
+    CapBreach,
+    CapSet,
+    CurrencyMismatch,
+    cost_floor_bps,
+    to_base,
+    vol_target_scalar,
 )
 
 
@@ -134,10 +140,19 @@ def size(
         )
     if band is not Band.ACCUMULATE:
         return SizingDecision(
-            instrument_id, band, investable, BindingCap.NONE, Decimal(0), 0,
-            lot_size, stop_price, breakers, time_stop,
+            instrument_id,
+            band,
+            investable,
+            BindingCap.NONE,
+            Decimal(0),
+            0,
+            lot_size,
+            stop_price,
+            breakers,
+            time_stop,
             notes=(f"band is {band.value}; no new capital deployed",),
-            currency=currency, target_value_base=Decimal(0),
+            currency=currency,
+            target_value_base=Decimal(0),
         )
 
     binding, value = caps.binding()
@@ -181,12 +196,16 @@ def size(
         new_weight = float(final_value_base / port_value)
         risk_base = to_base(
             final_value * abs(price - stop_price) / price,
-            currency, fx_base_per_quote, fx_asof,
+            currency,
+            fx_base_per_quote,
+            fx_asof,
         )
         prospective = list(existing) + [
             Position(
-                instrument_id, new_weight,
-                meta.get("sector", "unknown"), meta.get("country", "unknown"),
+                instrument_id,
+                new_weight,
+                meta.get("sector", "unknown"),
+                meta.get("country", "unknown"),
                 meta.get("currency", currency),
                 risk_to_stop=float(risk_base / port_value),
             )
@@ -208,12 +227,22 @@ def size(
 
     third = final_value / 3
     tranches = tuple(
-        Tranche(i + 1, (third if i < 2 else final_value - third * 2), time_stop)
-        for i in range(3)
+        Tranche(i + 1, (third if i < 2 else final_value - third * 2), time_stop) for i in range(3)
     )
 
     return SizingDecision(
-        instrument_id, band, investable, binding, final_value, lot_units,
-        lot_size, stop_price, breakers, time_stop, tranches, tuple(notes),
-        currency=currency, target_value_base=final_value_base,
+        instrument_id,
+        band,
+        investable,
+        binding,
+        final_value,
+        lot_units,
+        lot_size,
+        stop_price,
+        breakers,
+        time_stop,
+        tranches,
+        tuple(notes),
+        currency=currency,
+        target_value_base=final_value_base,
     )

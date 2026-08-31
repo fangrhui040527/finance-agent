@@ -94,7 +94,7 @@ allowlist for *that agent id*. The check is not "is this a known tool" but "is
 this tool granted to this agent".
 
 ```python
-a0.retrieve("kb_filings", "x")   # raises — the supervisor has no retrieve
+a0.retrieve("kb_filings", "x")  # raises — the supervisor has no retrieve
 ```
 
 `verify.py` §9 asserts exactly that, along with the supervisor's refusals:

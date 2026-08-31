@@ -5,7 +5,9 @@ from __future__ import annotations
 from datetime import timedelta
 
 from core.guardrails.policy import (
+    Action,
     AdviceLanguagePolicy,
+    Decision,
     LicenceFilterPolicy,
     NoExecutionPolicy,
     PolicyEngine,
@@ -16,8 +18,6 @@ from core.guardrails.policy import (
     StalenessPolicy,
     TenantIsolationPolicy,
     ToolAllowlistPolicy,
-    Action,
-    Decision,
 )
 
 # docs/02 section 4
@@ -36,8 +36,12 @@ class InjectionScanPolicy(PolicyRule):
 
     name = "injection_scan"
     rails = (Rail.INPUT,)
-    MARKERS = ("ignore previous instructions", "disregard the system prompt",
-               "you are now", "reveal your system prompt")
+    MARKERS = (
+        "ignore previous instructions",
+        "disregard the system prompt",
+        "you are now",
+        "reveal your system prompt",
+    )
 
     def evaluate(self, action: Action) -> PolicyResult | None:
         text = str(action.payload.get("text", "")).lower()

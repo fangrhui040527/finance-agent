@@ -1,7 +1,10 @@
-exec(open("gen.py").read())
+from gen import page  # run via `python -m design.build` or from design/
 
 # ─────────────────────────────── LEARN
-page("Learn","learn", """
+page(
+    "Learn",
+    "learn",
+    """
 <div class="head">
   <div><h1>Learn</h1>
   <p>Thirty concepts in an order the code enforces. Asking for one whose prerequisites you
@@ -58,7 +61,8 @@ page("Learn","learn", """
       checked at load — you cannot be taught position sizing before you can price a coin flip.</p></div>
   </div>
 </div>
-""", logic="""
+""",
+    logic="""
 const ACC='#0F5C63', MUT='#606D71', INK='#15191B';
 const CUR = [
   ['L1 · Money', [['share','What a share actually is'],['compounding','Compounding, and its cost'],['inflation','Real versus nominal']]],
@@ -105,10 +109,14 @@ class Component extends DCLogic {
     };
   }
 }
-""")
+""",
+)
 
 # ─────────────────────────────── SETTINGS
-page("Settings","set", """
+page(
+    "Settings",
+    "set",
+    """
 <div class="head">
   <div><h1>Settings</h1>
   <p>Where the numbers come from, what is wired, and the bounds a config file cannot widen.</p></div>
@@ -231,7 +239,8 @@ page("Settings","set", """
     </div>
   </div>
 </div>
-""", logic="""
+""",
+    logic="""
 const ACC='#0F5C63', WARN='#8A5B12';
 class Component extends DCLogic {
   constructor(p){ super(p); this.state = { real:false, filled:false }; }
@@ -247,4 +256,5 @@ class Component extends DCLogic {
       fill: () => this.setState({ filled: !this.state.filled }) };
   }
 }
-""")
+""",
+)

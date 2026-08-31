@@ -20,7 +20,7 @@ row edited after a claim cited it fails verification, which is the point.
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import yaml
@@ -55,8 +55,9 @@ def _name(raw: str, labels: dict[str, str] | None = None) -> str:
 class CuratedCorpus:
     """Text behind every `curated:*` document id the extractors mint."""
 
-    def __init__(self, supply_chain: Path | str = SUPPLY_CHAIN,
-                 sectors: Path | str = SECTORS) -> None:
+    def __init__(
+        self, supply_chain: Path | str = SUPPLY_CHAIN, sectors: Path | str = SECTORS
+    ) -> None:
         self._chunks: dict[str, str] = {}
         self._load_supply_chain(Path(supply_chain))
         self._load_sectors(Path(sectors))
@@ -71,27 +72,29 @@ class CuratedCorpus:
             if not rid:
                 continue
             note = " ".join(str(row.get("note", "")).split())
-            stated = (f"{_name(row['source'], labels)} "
-                      f"{row['relation'].replace('_', ' ')} "
-                      f"{_name(row['target'], labels)}.")
-            self._chunks[f"curated:supply_chain#{rid}"] = (
-                f"{stated} {note}".strip())
+            stated = (
+                f"{_name(row['source'], labels)} "
+                f"{row['relation'].replace('_', ' ')} "
+                f"{_name(row['target'], labels)}."
+            )
+            self._chunks[f"curated:supply_chain#{rid}"] = f"{stated} {note}".strip()
 
     def _load_sectors(self, path: Path) -> None:
         if not path.exists():
             return
         raw = yaml.safe_load(path.read_text()) or {}
-        parent = {sub: sector
-                  for sector, subs in (raw.get("sectors") or {}).items()
-                  for sub in subs or []}
+        parent = {
+            sub: sector for sector, subs in (raw.get("sectors") or {}).items() for sub in subs or []
+        }
         for sub, sector in parent.items():
             self._chunks[f"curated:sectors#SUB:{_slug(sub)}"] = (
-                f"The {sub} sub-sector is classified within {sector}.")
+                f"The {sub} sub-sector is classified within {sector}."
+            )
         for iid, spec in (raw.get("companies") or {}).items():
             cid = f"CO:{instrument_id(str(iid)) or iid}"
             self._chunks[f"curated:sectors#{cid}"] = (
-                f"{_name(str(iid))} is classified within the "
-                f"{spec['subsector']} sub-sector.")
+                f"{_name(str(iid))} is classified within the {spec['subsector']} sub-sector."
+            )
 
     # -- the two seams A7 needs ----------------------------------------------
 
@@ -109,8 +112,13 @@ class CuratedCorpus:
         text = self._chunks.get(doc_id)
         if not text:
             return None
-        return Citation(source=SOURCE, chunk_id=doc_id, quoted_span=text,
-                        trust=TRUST, as_of=as_of or datetime.now(timezone.utc))
+        return Citation(
+            source=SOURCE,
+            chunk_id=doc_id,
+            quoted_span=text,
+            trust=TRUST,
+            as_of=as_of or datetime.now(UTC),
+        )
 
     def all_chunks(self) -> list[str]:
         """Every document, in a stable order. What "hand over the whole corpus"
@@ -123,4 +131,5 @@ class CuratedCorpus:
 
 def _slug(raw: str) -> str:
     from knowledge.graph.ids import slug
+
     return slug(raw)

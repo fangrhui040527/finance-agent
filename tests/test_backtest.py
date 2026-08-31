@@ -1,4 +1,5 @@
 """P12: the gate. Purged splits, realistic costs, multiple-testing correction."""
+
 import math
 import random
 from decimal import Decimal as D
@@ -8,7 +9,10 @@ import pytest
 from engines.backtest.costs import fill_cost, participation_slippage, round_trip_cost
 from engines.backtest.harness import Benchmark, Regime, run
 from engines.backtest.metrics import (
-    deflated_sharpe, drawdown_profile, expected_max_sharpe, performance,
+    deflated_sharpe,
+    drawdown_profile,
+    expected_max_sharpe,
+    performance,
     probabilistic_sharpe,
 )
 from engines.backtest.splitter import Fold, LeakageError, purged_walk_forward
@@ -43,6 +47,7 @@ def test_embargo_defaults_to_the_label_horizon():
 
 def test_there_is_no_shuffle_option_to_set_by_accident():
     import inspect
+
     assert "shuffle" not in inspect.signature(purged_walk_forward).parameters
     assert "random_state" not in inspect.signature(purged_walk_forward).parameters
 
@@ -127,15 +132,21 @@ def test_cross_border_adds_an_fx_leg():
 
 
 def test_dividend_withholding_accrues_over_the_holding_period():
-    held = round_trip_cost(XNAS, D("50000"), D("1000000"), cross_border=True,
-                           holding_years=2.0, dividend_yield=D("0.03"), holder_country="MY")
+    held = round_trip_cost(
+        XNAS,
+        D("50000"),
+        D("1000000"),
+        cross_border=True,
+        holding_years=2.0,
+        dividend_yield=D("0.03"),
+        holder_country="MY",
+    )
     flat = round_trip_cost(XNAS, D("50000"), D("1000000"), cross_border=True)
     assert held - flat == pytest.approx(D("50000") * D("0.03") * D("0.30") * 2)
 
 
 def test_bursa_dividends_carry_no_withholding():
-    a = round_trip_cost(XKLS, D("50000"), D("1000000"), holding_years=2.0,
-                        dividend_yield=D("0.05"))
+    a = round_trip_cost(XKLS, D("50000"), D("1000000"), holding_years=2.0, dividend_yield=D("0.05"))
     b = round_trip_cost(XKLS, D("50000"), D("1000000"))
     assert a == b
 
@@ -146,8 +157,10 @@ def make(seed=4, alpha=0.00035, cost=0.0004, n=1000):
     mkt = [random.gauss(0.0003, 0.010) for _ in range(n)]
     gross = [m * 0.9 + random.gauss(alpha, 0.006) for m in mkt]
     net = [g - cost for g in gross]
-    regimes = [Regime.RISK_ON if m > 0.004 else Regime.RISK_OFF if m < -0.004
-               else Regime.NEUTRAL for m in mkt]
+    regimes = [
+        Regime.RISK_ON if m > 0.004 else Regime.RISK_OFF if m < -0.004 else Regime.NEUTRAL
+        for m in mkt
+    ]
     benches = {
         Benchmark.LOCAL_INDEX: mkt,
         Benchmark.EQUAL_WEIGHT_UNIVERSE: [m * 0.98 for m in mkt],
@@ -197,8 +210,10 @@ def test_a_single_regime_edge_is_flagged_on_its_face():
     n = 600
     mkt = [random.gauss(0.0003, 0.010) for _ in range(n)]
     regimes = [Regime.RISK_ON if m > 0 else Regime.RISK_OFF for m in mkt]
-    net = [random.gauss(0.0020, 0.004) if r is Regime.RISK_ON
-           else random.gauss(-0.0002, 0.004) for r in regimes]
+    net = [
+        random.gauss(0.0020, 0.004) if r is Regime.RISK_ON else random.gauss(-0.0002, 0.004)
+        for r in regimes
+    ]
     rep = run(net, net, {Benchmark.LOCAL_INDEX: mkt}, regimes)
     assert rep.by_regime["risk_on"].sharpe > 0.3
     assert rep.by_regime["risk_off"].sharpe <= 0.3

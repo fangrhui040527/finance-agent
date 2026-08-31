@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import time
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from enum import Enum
 from typing import Any
 
@@ -92,9 +92,17 @@ class NoExecutionPolicy(PolicyRule):
     rails = (Rail.TOOL,)
     FORBIDDEN = frozenset(
         {
-            "place_order", "submit_order", "route_order", "schedule_order",
-            "cancel_order", "modify_order", "buy", "sell", "execute_trade",
-            "broker_connect", "broker_login",
+            "place_order",
+            "submit_order",
+            "route_order",
+            "schedule_order",
+            "cancel_order",
+            "modify_order",
+            "buy",
+            "sell",
+            "execute_trade",
+            "broker_connect",
+            "broker_login",
         }
     )
 
@@ -103,7 +111,8 @@ class NoExecutionPolicy(PolicyRule):
             return None
         if action.name.lower() in self.FORBIDDEN:
             return PolicyResult(
-                Decision.DENY, self.name,
+                Decision.DENY,
+                self.name,
                 "the system is a one-way door; it has no execution capability",
             )
         return None
@@ -128,7 +137,8 @@ class ToolAllowlistPolicy(PolicyRule):
             )
         if action.name not in permitted:
             return PolicyResult(
-                Decision.DENY, self.name,
+                Decision.DENY,
+                self.name,
                 f"agent {action.agent!r} may not call {action.name!r}",
             )
         return PolicyResult(Decision.ALLOW, self.name, "tool in allowlist", terminal=False)
@@ -147,10 +157,15 @@ class TenantIsolationPolicy(PolicyRule):
             leaked = self.PERSONAL_KEYS & set(action.payload)
             if leaked:
                 return PolicyResult(
-                    Decision.DENY, self.name,
+                    Decision.DENY,
+                    self.name,
                     f"outbound query carries personal data: {sorted(leaked)}",
                 )
-        if action.rail is Rail.RETRIEVAL and action.payload.get("shared_index") and action.payload.get("tenant_scoped"):
+        if (
+            action.rail is Rail.RETRIEVAL
+            and action.payload.get("shared_index")
+            and action.payload.get("tenant_scoped")
+        ):
             return PolicyResult(
                 Decision.DENY, self.name, "tenant data may not enter a shared index"
             )
@@ -180,7 +195,7 @@ class StalenessPolicy(PolicyRule):
 
     def __init__(self, sla: dict[str, timedelta], now=None) -> None:
         self.sla = sla
-        self._now = now or (lambda: datetime.now(timezone.utc))
+        self._now = now or (lambda: datetime.now(UTC))
 
     def evaluate(self, action: Action) -> PolicyResult | None:
         corpus = action.payload.get("corpus")
@@ -193,12 +208,14 @@ class StalenessPolicy(PolicyRule):
         age = self._now() - as_of
         if age > limit * 3:
             return PolicyResult(
-                Decision.DENY, self.name,
+                Decision.DENY,
+                self.name,
                 f"{corpus} is {age} old, beyond 3x its {limit} SLA",
             )
         if age > limit:
             return PolicyResult(
-                Decision.REQUIRE_APPROVAL, self.name,
+                Decision.REQUIRE_APPROVAL,
+                self.name,
                 f"{corpus} is stale ({age} > {limit}); disclose or refuse",
             )
         return None
@@ -210,8 +227,15 @@ class AdviceLanguagePolicy(PolicyRule):
     name = "advice_language"
     rails = (Rail.OUTPUT,)
     BANNED = (
-        "you should buy", "you should sell", "i recommend", "i suggest you buy",
-        "strong buy", "strong sell", "must buy", "must sell", "guaranteed return",
+        "you should buy",
+        "you should sell",
+        "i recommend",
+        "i suggest you buy",
+        "strong buy",
+        "strong sell",
+        "must buy",
+        "must sell",
+        "guaranteed return",
     )
 
     def evaluate(self, action: Action) -> PolicyResult | None:
@@ -243,7 +267,8 @@ class RateLimitPolicy(PolicyRule):
         self._hits = [t for t in self._hits if now - t < self.window]
         if len(self._hits) >= self.max_calls:
             return PolicyResult(
-                Decision.DENY, self.name,
+                Decision.DENY,
+                self.name,
                 f"rate limit {self.max_calls}/{self.window}s exhausted",
             )
         self._hits.append(now)
@@ -255,7 +280,7 @@ class PolicyEngine:
         self.rules: list[PolicyRule] = list(rules or [])
         self.audit_log: list[AuditEntry] = []
 
-    def add_rule(self, rule: PolicyRule) -> "PolicyEngine":
+    def add_rule(self, rule: PolicyRule) -> PolicyEngine:
         self.rules.append(rule)
         return self
 
@@ -272,7 +297,7 @@ class PolicyEngine:
                 verdict = result
         self.audit_log.append(
             AuditEntry(
-                at=datetime.now(timezone.utc),
+                at=datetime.now(UTC),
                 action=action,
                 decision=verdict.decision,
                 policy_name=verdict.policy_name,
@@ -290,11 +315,17 @@ class PolicyEngine:
             # Allowed decisions are traced too, not just denials. "Which rail let
             # this through" is as much a debugging question as "what blocked it",
             # and a log of only refusals cannot answer it.
-            emit("denied" if result.decision is Decision.DENY else "allowed",
-                 action.name, agent=action.agent, rail=action.rail.value,
-                 action=action.name, decision=result.decision.value,
-                 rule=result.policy_name, reason=result.reason,
-                 payload={k: str(v)[:200] for k, v in (action.payload or {}).items()})
+            emit(
+                "denied" if result.decision is Decision.DENY else "allowed",
+                action.name,
+                agent=action.agent,
+                rail=action.rail.value,
+                action=action.name,
+                decision=result.decision.value,
+                rule=result.policy_name,
+                reason=result.reason,
+                payload={k: str(v)[:200] for k, v in (action.payload or {}).items()},
+            )
         if result.decision is Decision.DENY:
             raise PolicyViolation(result, action)
         return result

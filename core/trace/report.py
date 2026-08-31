@@ -28,21 +28,23 @@ BANNER = (
 
 #: Rendering hints per event kind: symbol, and which data keys to summarise.
 KINDS = {
-    "run_start":    ("*", []),
-    "run_end":      ("*", []),
-    "span":         ("+", []),
-    "span_end":     ("",  []),
-    "agent":        ("@", ["agent", "method"]),
-    "llm_call":     ("~", ["model_id", "tier", "input_tokens", "output_tokens",
-                           "cost_myr", "latency_ms"]),
-    "retrieval":    ("?", ["corpus", "n_hits", "grade", "relevance"]),
+    "run_start": ("*", []),
+    "run_end": ("*", []),
+    "span": ("+", []),
+    "span_end": ("", []),
+    "agent": ("@", ["agent", "method"]),
+    "llm_call": (
+        "~",
+        ["model_id", "tier", "input_tokens", "output_tokens", "cost_myr", "latency_ms"],
+    ),
+    "retrieval": ("?", ["corpus", "n_hits", "grade", "relevance"]),
     "verification": ("=", ["proposed", "kept", "answered", "confidence"]),
-    "allowed":      (".", ["rail", "rule"]),
-    "denied":       ("!", ["rail", "rule", "reason"]),
-    "refusal":      ("!", ["reason"]),
-    "error":        ("X", ["error"]),
-    "engine":       ("#", []),
-    "feed":         ("<", ["source", "count"]),
+    "allowed": (".", ["rail", "rule"]),
+    "denied": ("!", ["rail", "rule", "reason"]),
+    "refusal": ("!", ["reason"]),
+    "error": ("X", ["error"]),
+    "engine": ("#", []),
+    "feed": ("<", ["source", "count"]),
 }
 
 
@@ -57,7 +59,7 @@ def load(run_dir: Path) -> list[dict]:
             try:
                 out.append(json.loads(line))
             except json.JSONDecodeError:
-                continue          # a torn final line from a hard crash
+                continue  # a torn final line from a hard crash
     return out
 
 
@@ -71,6 +73,7 @@ def _val(v) -> str:
 
 # -- session.log --------------------------------------------------------------
 
+
 def session_log(events: list[dict]) -> str:
     lines = [BANNER, "=" * 100, ""]
     for e in events:
@@ -81,8 +84,9 @@ def session_log(events: list[dict]) -> str:
         bits = [f"{k}={_val(e['data'][k])}" for k in keys if k in e["data"]]
         extra = f"   {' '.join(bits)}" if bits else ""
         dur = f"  ({e['duration_ms']:.1f}ms)" if e.get("duration_ms") else ""
-        lines.append(f"{e['seq']:>5} {e['at'][11:23]} {indent}{sym} "
-                     f"{e['kind']:<13} {e['name']}{extra}{dur}")
+        lines.append(
+            f"{e['seq']:>5} {e['at'][11:23]} {indent}{sym} {e['kind']:<13} {e['name']}{extra}{dur}"
+        )
         if e["kind"] == "llm_call":
             for field in ("system", "prompt", "response"):
                 v = e["data"].get(field)
@@ -94,15 +98,20 @@ def session_log(events: list[dict]) -> str:
                         lines.append(f"{'':>5} {'':>12} {indent}      | {ln}")
         if e["kind"] == "verification" and e["data"].get("dropped"):
             for d in e["data"]["dropped"]:
-                lines.append(f"{'':>5} {'':>12} {indent}    DROPPED: "
-                             f"{d.get('why')} :: {str(d.get('text'))[:90]}")
+                lines.append(
+                    f"{'':>5} {'':>12} {indent}    DROPPED: "
+                    f"{d.get('why')} :: {str(d.get('text'))[:90]}"
+                )
         if e["kind"] in ("denied", "error"):
-            lines.append(f"{'':>5} {'':>12} {indent}    -> "
-                         f"{e['data'].get('reason') or e['data'].get('error')}")
+            lines.append(
+                f"{'':>5} {'':>12} {indent}    -> "
+                f"{e['data'].get('reason') or e['data'].get('error')}"
+            )
     return "\n".join(lines) + "\n"
 
 
 # -- anatomy.md ---------------------------------------------------------------
+
 
 def anatomy(events: list[dict], summary: dict) -> str:
     agents: dict[str, dict] = {}
@@ -110,9 +119,18 @@ def anatomy(events: list[dict], summary: dict) -> str:
         a = e["data"].get("agent")
         if not a:
             continue
-        rec = agents.setdefault(a, {"calls": 0, "llm": 0, "retrievals": 0,
-                                    "denied": 0, "cost": 0.0, "tools": set(),
-                                    "ms": 0.0})
+        rec = agents.setdefault(
+            a,
+            {
+                "calls": 0,
+                "llm": 0,
+                "retrievals": 0,
+                "denied": 0,
+                "cost": 0.0,
+                "tools": set(),
+                "ms": 0.0,
+            },
+        )
         if e["kind"] == "agent":
             rec["calls"] += 1
         elif e["kind"] == "llm_call":
@@ -132,25 +150,36 @@ def anatomy(events: list[dict], summary: dict) -> str:
     for e in events:
         if e["kind"] == "agent":
             if stack:
-                edges[(stack[-1], e["data"]["agent"])] = \
+                edges[(stack[-1], e["data"]["agent"])] = (
                     edges.get((stack[-1], e["data"]["agent"]), 0) + 1
+                )
             stack.append(e["data"]["agent"])
         elif e["kind"] == "span_end" and stack:
             stack.pop()
 
-    L = [f"# Anatomy of run `{summary.get('run_id', '?')}`", "",
-         f"> {BANNER}", "",
-         f"**{summary.get('label')}** · {summary.get('events')} events · "
-         f"{summary.get('wall_ms', 0):.0f} ms wall · "
-         f"{summary['llm']['calls']} model calls · "
-         f"RM {summary['llm']['cost_myr']:.4f}", ""]
+    L = [
+        f"# Anatomy of run `{summary.get('run_id', '?')}`",
+        "",
+        f"> {BANNER}",
+        "",
+        f"**{summary.get('label')}** · {summary.get('events')} events · "
+        f"{summary.get('wall_ms', 0):.0f} ms wall · "
+        f"{summary['llm']['calls']} model calls · "
+        f"RM {summary['llm']['cost_myr']:.4f}",
+        "",
+    ]
 
-    L += ["## Organs — what fired", "",
-          "| Agent | Invocations | Model calls | Retrievals | Tools used | Denied | Cost MYR | ms |",
-          "|---|--:|--:|--:|--:|--:|--:|--:|"]
+    L += [
+        "## Organs — what fired",
+        "",
+        "| Agent | Invocations | Model calls | Retrievals | Tools used | Denied | Cost MYR | ms |",
+        "|---|--:|--:|--:|--:|--:|--:|--:|",
+    ]
     for a, r in sorted(agents.items()):
-        L.append(f"| `{a}` | {r['calls']} | {r['llm']} | {r['retrievals']} | "
-                 f"{len(r['tools'])} | {r['denied']} | {r['cost']:.4f} | {r['ms']:.0f} |")
+        L.append(
+            f"| `{a}` | {r['calls']} | {r['llm']} | {r['retrievals']} | "
+            f"{len(r['tools'])} | {r['denied']} | {r['cost']:.4f} | {r['ms']:.0f} |"
+        )
     if not agents:
         L.append("| *(none)* | | | | | | | |")
 
@@ -162,12 +191,10 @@ def anatomy(events: list[dict], summary: dict) -> str:
             L.append(f"  {src}-->|{n}|{dst}")
         L.append("```")
     else:
-        L.append("*No nested agent calls in this run — every agent was invoked "
-                 "at the top level.*")
+        L.append("*No nested agent calls in this run — every agent was invoked at the top level.*")
 
     counts = summary.get("by_kind", {})
-    L += ["", "## Skeleton — event vocabulary", "",
-          "| Kind | Count | Means |", "|---|--:|---|"]
+    L += ["", "## Skeleton — event vocabulary", "", "| Kind | Count | Means |", "|---|--:|---|"]
     meaning = {
         "llm_call": "a model was called; full prompt and response in prompts/",
         "allowed": "a guardrail permitted an action",
@@ -178,7 +205,8 @@ def anatomy(events: list[dict], summary: dict) -> str:
         "error": "an exception escaped a span",
         "span": "a named stage began",
         "span_end": "a named stage finished",
-        "run_start": "the run began", "run_end": "the run finished",
+        "run_start": "the run began",
+        "run_end": "the run finished",
         "feed": "an external source was polled",
         "engine": "a deterministic engine computed something",
     }
@@ -194,14 +222,20 @@ def anatomy(events: list[dict], summary: dict) -> str:
     for s in summary.get("slowest", [])[:10]:
         L.append(f"| {s['name']} | {s['kind']} | {s['ms']:.1f} |")
 
-    L += ["", "---", "",
-          "`trace.jsonl` holds every event, one JSON object per line.",
-          "`prompts/` holds every value too long to inline — prompts, responses, ",
-          "and any other large string, referenced from the trace by filename.", ""]
+    L += [
+        "",
+        "---",
+        "",
+        "`trace.jsonl` holds every event, one JSON object per line.",
+        "`prompts/` holds every value too long to inline — prompts, responses, ",
+        "and any other large string, referenced from the trace by filename.",
+        "",
+    ]
     return "\n".join(L)
 
 
 # -- report.html --------------------------------------------------------------
+
 
 def report_html(events: list[dict], summary: dict) -> str:
     rows = []
@@ -210,9 +244,12 @@ def report_html(events: list[dict], summary: dict) -> str:
             continue
         sym, keys = KINDS.get(e["kind"], ("-", []))
         pad = e["depth"] * 22
-        bits = " ".join(f"<span class=k>{html.escape(k)}</span>="
-                        f"<span class=v>{html.escape(_val(e['data'][k]))}</span>"
-                        for k in keys if k in e["data"])
+        bits = " ".join(
+            f"<span class=k>{html.escape(k)}</span>="
+            f"<span class=v>{html.escape(_val(e['data'][k]))}</span>"
+            for k in keys
+            if k in e["data"]
+        )
         detail = ""
         if e["kind"] == "llm_call":
             parts = []
@@ -220,20 +257,26 @@ def report_html(events: list[dict], summary: dict) -> str:
                 v = e["data"].get(f)
                 if not v:
                     continue
-                body = v["head"] + f"\n\n... full text in {v['_blob']}" \
-                    if isinstance(v, dict) else str(v)
+                body = (
+                    v["head"] + f"\n\n... full text in {v['_blob']}"
+                    if isinstance(v, dict)
+                    else str(v)
+                )
                 parts.append(f"<h4>{f}</h4><pre>{html.escape(body)}</pre>")
             detail = f"<details><summary>prompt / response</summary>{''.join(parts)}</details>"
         elif e["kind"] == "verification" and e["data"].get("dropped"):
             items = "".join(
                 f"<li><code>{html.escape(str(d.get('why')))}</code> — "
                 f"{html.escape(str(d.get('text'))[:200])}</li>"
-                for d in e["data"]["dropped"])
+                for d in e["data"]["dropped"]
+            )
             detail = f"<details><summary>dropped claims</summary><ul>{items}</ul></details>"
         elif e["kind"] in ("denied", "error"):
-            detail = (f"<div class=bad>"
-                      f"{html.escape(str(e['data'].get('reason') or e['data'].get('error')))}"
-                      f"</div>")
+            detail = (
+                f"<div class=bad>"
+                f"{html.escape(str(e['data'].get('reason') or e['data'].get('error')))}"
+                f"</div>"
+            )
         dur = f"{e['duration_ms']:.1f}ms" if e.get("duration_ms") else ""
         rows.append(
             f"<tr class='r {html.escape(e['kind'])}'>"
@@ -242,10 +285,11 @@ def report_html(events: list[dict], summary: dict) -> str:
             f"<td><span style='padding-left:{pad}px'>{sym} "
             f"<b>{html.escape(e['name'])}</b></span> "
             f"<span class=kind>{html.escape(e['kind'])}</span> {bits}{detail}</td>"
-            f"<td class=dur>{dur}</td></tr>")
+            f"<td class=dur>{dur}</td></tr>"
+        )
 
     llm = summary.get("llm", {})
-    return f"""<title>Trace {html.escape(str(summary.get('run_id')))}</title>
+    return f"""<title>Trace {html.escape(str(summary.get("run_id")))}</title>
 <style>
 :root{{--bg:#fff;--fg:#1a1a1a;--mut:#666;--line:#e5e5e5;--bad:#b00020;--acc:#0b5cad}}
 :root:not([data-theme=light]){{@media (prefers-color-scheme:dark){{
@@ -270,19 +314,19 @@ pre{{white-space:pre-wrap;word-break:break-word;background:color-mix(in srgb,var
 details{{margin-top:.3rem}} summary{{cursor:pointer;color:var(--acc)}}
 h4{{margin:.6rem 0 .2rem;color:var(--mut);font-size:.8rem;text-transform:uppercase}}
 </style>
-<h1>Trace {html.escape(str(summary.get('run_id')))} — {html.escape(str(summary.get('label')))}</h1>
+<h1>Trace {html.escape(str(summary.get("run_id")))} — {html.escape(str(summary.get("label")))}</h1>
 <div class=banner>{html.escape(BANNER)}</div>
 <div class=stats>
-<div class=stat><b>{summary.get('events', 0)}</b><span>events</span></div>
-<div class=stat><b>{summary.get('wall_ms', 0):.0f}</b><span>ms wall</span></div>
-<div class=stat><b>{llm.get('calls', 0)}</b><span>model calls</span></div>
-<div class=stat><b>{llm.get('input_tokens', 0):,}</b><span>tokens in</span></div>
-<div class=stat><b>{llm.get('output_tokens', 0):,}</b><span>tokens out</span></div>
-<div class=stat><b>RM {llm.get('cost_myr', 0):.4f}</b><span>cost</span></div>
-<div class=stat><b>{summary.get('refusals', 0)}</b><span>refusals</span></div>
-<div class=stat><b>{len(summary.get('errors', []))}</b><span>errors</span></div>
+<div class=stat><b>{summary.get("events", 0)}</b><span>events</span></div>
+<div class=stat><b>{summary.get("wall_ms", 0):.0f}</b><span>ms wall</span></div>
+<div class=stat><b>{llm.get("calls", 0)}</b><span>model calls</span></div>
+<div class=stat><b>{llm.get("input_tokens", 0):,}</b><span>tokens in</span></div>
+<div class=stat><b>{llm.get("output_tokens", 0):,}</b><span>tokens out</span></div>
+<div class=stat><b>RM {llm.get("cost_myr", 0):.4f}</b><span>cost</span></div>
+<div class=stat><b>{summary.get("refusals", 0)}</b><span>refusals</span></div>
+<div class=stat><b>{len(summary.get("errors", []))}</b><span>errors</span></div>
 </div>
-<div class=wrap><table>{''.join(rows)}</table></div>
+<div class=wrap><table>{"".join(rows)}</table></div>
 """
 
 
@@ -291,10 +335,19 @@ def write_all(run_dir: Path) -> dict:
     run_dir = Path(run_dir)
     events = load(run_dir)
     sfile = run_dir / "summary.json"
-    summary = json.loads(sfile.read_text()) if sfile.exists() else {
-        "run_id": run_dir.name, "label": "?", "events": len(events),
-        "by_kind": {}, "llm": {"calls": 0, "cost_myr": 0}, "slowest": [], "errors": [],
-    }
+    summary = (
+        json.loads(sfile.read_text())
+        if sfile.exists()
+        else {
+            "run_id": run_dir.name,
+            "label": "?",
+            "events": len(events),
+            "by_kind": {},
+            "llm": {"calls": 0, "cost_myr": 0},
+            "slowest": [],
+            "errors": [],
+        }
+    )
     (run_dir / "session.log").write_text(session_log(events), encoding="utf-8")
     (run_dir / "anatomy.md").write_text(anatomy(events, summary), encoding="utf-8")
     (run_dir / "report.html").write_text(report_html(events, summary), encoding="utf-8")

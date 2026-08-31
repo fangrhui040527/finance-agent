@@ -1,7 +1,8 @@
 """The trace layer: it must record everything, cost nothing when off, and never
 lose what it saw when the thing it was watching crashed.
 """
-import json
+
+from datetime import UTC
 
 import pytest
 
@@ -22,7 +23,7 @@ def test_nothing_is_recorded_and_nothing_raises_when_tracing_is_off():
     """Every emit site is on a hot path. A tracer that costs something when
     disabled is one people turn off and then cannot turn on."""
     assert not is_tracing()
-    emit("llm_call", "a1", prompt="x")          # must be a no-op, not an error
+    emit("llm_call", "a1", prompt="x")  # must be a no-op, not an error
     with span("stage") as s:
         assert s is None
 
@@ -47,9 +48,9 @@ def test_a_model_call_records_the_prompt_and_the_response_in_full(tmp_path):
     from core.provenance.ledger import ProvenanceLedger
 
     with start_run("llm", root=tmp_path) as t:
-        client = InferenceClient(EchoBackend(),
-                                 default_engine({"a10_thesis": {"llm_complete"}}),
-                                 ProvenanceLedger())
+        client = InferenceClient(
+            EchoBackend(), default_engine({"a10_thesis": {"llm_complete"}}), ProvenanceLedger()
+        )
         client.complete("a10_thesis", TaskClass.THESIS_SYNTHESIS, "why did it fall")
 
     call = next(e for e in _events(t.dir) if e["kind"] == "llm_call")
@@ -81,7 +82,7 @@ def test_both_allowed_and_denied_guardrail_decisions_are_recorded(tmp_path):
 def test_dropped_claims_are_recorded_with_the_reason(tmp_path):
     """The mechanical citation check is the only real output gate, so what it
     drops is the most informative thing in a trace."""
-    from datetime import datetime, timezone
+    from datetime import datetime
 
     from agents.base import Agent, AgentContext, Finding, cite
     from core.contracts.answer import TrustTier
@@ -90,13 +91,17 @@ def test_dropped_claims_are_recorded_with_the_reason(tmp_path):
 
     class Probe(Agent):
         agent_id = "a1_fundamentals"
+
         def run(self): ...
 
-    now = datetime(2026, 8, 28, tzinfo=timezone.utc)
+    now = datetime(2026, 8, 28, tzinfo=UTC)
     ctx = AgentContext(router=Router({}), engine=default_engine({}), now=now)
-    f = Finding("a1_fundamentals", "line_item", "revenue rose",
-                citations=[cite("kb_filings", "c1", "nowhere in the chunk",
-                                TrustTier.FILINGS, now)])
+    f = Finding(
+        "a1_fundamentals",
+        "line_item",
+        "revenue rose",
+        citations=[cite("kb_filings", "c1", "nowhere in the chunk", TrustTier.FILINGS, now)],
+    )
     with start_run("verify", root=tmp_path) as t:
         Probe(ctx).emit([f], lambda src, cid: "an unrelated chunk body", 0.7)
 
@@ -158,15 +163,21 @@ def test_a_long_value_is_written_whole_to_prompts_and_pointed_at(tmp_path):
 def test_every_report_is_written_and_carries_the_sensitivity_banner(tmp_path):
     with start_run("report", root=tmp_path) as t:
         with span("stage", agent="a10_thesis"):
-            emit("llm_call", "a10_thesis", prompt="p", response="r",
-                 cost_myr="0.01", input_tokens=5, output_tokens=2,
-                 model_id="claude-opus-5", tier="reason")
-            emit("denied", "place_order", rail="tool", rule="no_execution",
-                 reason="one-way door")
+            emit(
+                "llm_call",
+                "a10_thesis",
+                prompt="p",
+                response="r",
+                cost_myr="0.01",
+                input_tokens=5,
+                output_tokens=2,
+                model_id="claude-opus-5",
+                tier="reason",
+            )
+            emit("denied", "place_order", rail="tool", rule="no_execution", reason="one-way door")
 
     write_all(t.dir)
-    for name in ("session.log", "anatomy.md", "report.html", "summary.json",
-                 "trace.jsonl"):
+    for name in ("session.log", "anatomy.md", "report.html", "summary.json", "trace.jsonl"):
         assert (t.dir / name).exists(), name
     for name in ("session.log", "anatomy.md", "report.html"):
         assert "VERBATIM" in (t.dir / name).read_text()
@@ -183,8 +194,14 @@ def test_every_report_is_written_and_carries_the_sensitivity_banner(tmp_path):
 def test_the_summary_totals_cost_and_tokens(tmp_path):
     with start_run("sum", root=tmp_path) as t:
         for _ in range(3):
-            emit("llm_call", "a10_thesis", cost_myr="0.5",
-                 input_tokens=100, output_tokens=10, agent="a10_thesis")
+            emit(
+                "llm_call",
+                "a10_thesis",
+                cost_myr="0.5",
+                input_tokens=100,
+                output_tokens=10,
+                agent="a10_thesis",
+            )
         s = t.summary()
     assert s["llm"]["calls"] == 3
     assert s["llm"]["cost_myr"] == pytest.approx(1.5)
@@ -206,16 +223,20 @@ def test_reports_render_from_a_torn_trace(tmp_path):
 # --- the full run -----------------------------------------------------------
 def test_the_full_system_run_traces_every_registered_agent(tmp_path, monkeypatch):
     import core.trace.tracer as tracer_mod
+
     monkeypatch.setattr(tracer_mod, "DEBUG_ROOT", tmp_path)
 
     import trace_run
+
     summary = trace_run.run()
 
     from core.registry.loader import load as load_registry
+
     registered = set(load_registry("agents/registry.yaml").agents)
     assert set(summary["agents_seen"]) == registered, (
         "a traced full run must exercise every registered agent, or the trace "
-        "silently under-reports what the system contains")
+        "silently under-reports what the system contains"
+    )
     assert summary["errors"] == []
     assert summary["refusals"] > 0, "the refusals are the product"
     assert summary["llm"]["calls"] > 0
@@ -224,8 +245,8 @@ def test_the_full_system_run_traces_every_registered_agent(tmp_path, monkeypatch
 def test_only_the_four_granted_agents_may_call_the_model():
     """The allowlist stops being a control the moment it names everything."""
     from core.registry.loader import load as load_registry
+
     reg = load_registry("agents/registry.yaml")
     granted = {a for a, s in reg.agents.items() if "llm_complete" in s.tools}
-    assert granted == {"a4_news_narrative", "a10_thesis", "a11_red_team",
-                       "a15_reflection"}
+    assert granted == {"a4_news_narrative", "a10_thesis", "a11_red_team", "a15_reflection"}
     assert "a0_supervisor" not in granted, "routing here is deterministic by design"

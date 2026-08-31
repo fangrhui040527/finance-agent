@@ -19,7 +19,7 @@ from __future__ import annotations
 
 import json
 import os
-from typing import Callable
+from collections.abc import Callable
 
 from core.llm.tiers import Usage
 
@@ -39,7 +39,21 @@ class AuthError(BackendError):
     """Missing, malformed or rejected credentials. Retrying cannot help."""
 
 
-class Truncated(BackendError):
+class Billed(BackendError):
+    """The model answered - and billed - but the answer cannot be returned.
+
+    Carries the `Usage` the API reported, so the caller can ledger a spend that
+    produced no usable text. Before this, the tokens of every truncated or
+    refused call vanished from the ledger: under-reporting by exactly the calls
+    that went wrong, which is the worst possible selection.
+    """
+
+    def __init__(self, message: str, usage: Usage | None = None) -> None:
+        super().__init__(message)
+        self.usage = usage
+
+
+class Truncated(Billed):
     """The model hit max_tokens.
 
     docs/08 section 8: truncation is disclosed, never silent. A half-written
@@ -51,6 +65,16 @@ class Truncated(BackendError):
 #: Retried. 429 is a rate limit, 529 is Anthropic's overloaded signal, and the
 #: 5xx pair are ordinary gateway noise.
 RETRY_STATUS = frozenset({429, 500, 502, 503, 529})
+
+
+class Declined(Billed):
+    """The model refused to answer (stop_reason=refusal). Not an empty answer."""
+
+
+#: A `retry-after` header is obeyed up to this many seconds. Beyond it the
+#: server is asking the caller to park a plan the supervisor already budgeted
+#: for, and a bounded failure beats an unbounded wait.
+RETRY_AFTER_CAP = 60.0
 
 
 class AnthropicBackend:
@@ -101,7 +125,12 @@ class AnthropicBackend:
             "messages": [{"role": "user", "content": prompt}],
         }
         if system:
-            body["system"] = system
+            # The system prompt is the part that repeats call after call, so it
+            # carries the cache breakpoint. A prompt under the model's minimum
+            # cacheable length is simply not cached; the marker costs nothing.
+            body["system"] = [
+                {"type": "text", "text": system, "cache_control": {"type": "ephemeral"}}
+            ]
 
         payload = self._post(json.dumps(body).encode())
         return self._parse(payload)
@@ -117,6 +146,7 @@ class AnthropicBackend:
         last: BackendError | None = None
 
         for attempt in range(1, self.max_attempts + 1):
+            retry_after: float | None = None
             req = urllib.request.Request(
                 ANTHROPIC_URL,
                 data=data,
@@ -139,6 +169,7 @@ class AnthropicBackend:
                 if status not in RETRY_STATUS:
                     raise BackendError(f"Anthropic returned {status}: {detail}") from e
                 last = TransientError(f"Anthropic returned {status}: {detail}")
+                retry_after = self._retry_after(e)
             except urllib.error.URLError as e:
                 last = TransientError(f"Anthropic unreachable: {e.reason}")
             except OSError as e:
@@ -147,8 +178,11 @@ class AnthropicBackend:
             if attempt == self.max_attempts:
                 assert last is not None
                 raise last
-            self._sleep(2.0 ** (attempt - 1))
-        else:                                            # pragma: no cover - loop breaks or raises
+            # The server's own instruction outranks the client's guess: a 429
+            # says exactly how long the token bucket needs, and retrying sooner
+            # only extends the wait. Absent or unreadable, exponential as before.
+            self._sleep(retry_after if retry_after is not None else 2.0 ** (attempt - 1))
+        else:  # pragma: no cover - loop breaks or raises
             assert last is not None
             raise last
 
@@ -163,11 +197,36 @@ class AnthropicBackend:
         return payload
 
     @staticmethod
+    def _retry_after(err) -> float | None:
+        """Seconds the server asked for, capped; None if absent or not numeric.
+
+        HTTP-date forms are ignored rather than parsed: a wrong clock on either
+        side turns a date into a multi-hour sleep, and the exponential fallback
+        is the safer failure.
+        """
+        headers = getattr(err, "headers", None) or {}
+        try:
+            items = list(headers.items())
+        except AttributeError:  # pragma: no cover - defensive
+            return None
+        for name, value in items:
+            if str(name).lower() != "retry-after":
+                continue
+            try:
+                seconds = float(str(value).strip())
+            except ValueError:
+                return None
+            if seconds <= 0:
+                return None
+            return min(seconds, RETRY_AFTER_CAP)
+        return None
+
+    @staticmethod
     def _detail(err) -> str:
         """The API puts the useful part in the body, not the status line."""
         try:
             body = err.read()
-        except Exception:                                # pragma: no cover - defensive
+        except Exception:  # pragma: no cover - defensive
             return err.reason if hasattr(err, "reason") else ""
         if isinstance(body, bytes):
             body = body.decode("utf-8", errors="replace")
@@ -186,8 +245,7 @@ class AnthropicBackend:
             raise BackendError(f"Anthropic response has no content list: {str(payload)[:200]!r}")
 
         text = "".join(
-            b.get("text", "") for b in blocks
-            if isinstance(b, dict) and b.get("type") == "text"
+            b.get("text", "") for b in blocks if isinstance(b, dict) and b.get("type") == "text"
         )
 
         raw_usage = payload.get("usage")
@@ -200,7 +258,8 @@ class AnthropicBackend:
                 # Priced at 10% of base input in tiers.cost_usd. Dropping it does
                 # not under-report cost, it OVER-reports it, and an inflated spend
                 # trips the budget rail early - a wrong refusal, not a wrong bill.
-                cached_input_tokens=int(raw_usage.get("cache_read_input_tokens", 0)),
+                cached_input_tokens=int(raw_usage.get("cache_read_input_tokens", 0) or 0),
+                cache_write_tokens=int(raw_usage.get("cache_creation_input_tokens", 0) or 0),
             )
         except (TypeError, ValueError) as e:
             raise BackendError(f"Anthropic usage is not numeric: {raw_usage!r}") from e
@@ -210,10 +269,11 @@ class AnthropicBackend:
             raise Truncated(
                 f"model hit max_tokens after {usage.output_tokens} output tokens; "
                 "raise max_tokens or narrow the question - a truncated answer is "
-                "never returned as a whole one"
+                "never returned as a whole one",
+                usage=usage,
             )
         if stop == "refusal":
-            raise BackendError("model declined to answer (stop_reason=refusal)")
+            raise Declined("model declined to answer (stop_reason=refusal)", usage=usage)
 
         if not text.strip():
             raise BackendError(f"Anthropic returned no text block (stop_reason={stop!r})")
@@ -240,9 +300,7 @@ def backend_from_env(explicit: str | None = None):
     if choice in ("anthropic", "claude"):
         return AnthropicBackend(), "anthropic (explicitly selected)"
     if choice:
-        raise ValueError(
-            f"unknown LLM_BACKEND {choice!r}; expected 'anthropic' or 'echo'"
-        )
+        raise ValueError(f"unknown LLM_BACKEND {choice!r}; expected 'anthropic' or 'echo'")
 
     if os.environ.get("ANTHROPIC_API_KEY", "").strip():
         return AnthropicBackend(), "anthropic (ANTHROPIC_API_KEY is set)"

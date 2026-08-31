@@ -4,29 +4,36 @@ Every test here corresponds to a defect that was invisible while the system only
 ever ran as a single short-lived interactive process. None of them would have
 failed yesterday; all of them would have failed at 3am next month.
 """
-from datetime import date, datetime, timedelta, timezone
+
+from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
-from pathlib import Path
 
 import pytest
 
 from agents.learning.reflection import (
-    A15Reflection, Horizon, Outcome, OutcomeQueue, Prediction,
+    A15Reflection,
+    Horizon,
+    Outcome,
+    OutcomeQueue,
+    Prediction,
 )
 from agents.learning.store import LearningStore
 from core.llm.tiers import TaskClass, Tier, Usage
 from core.provenance.ledger import ProvenanceLedger
 
-NOW = datetime(2026, 8, 28, 12, 0, tzinfo=timezone.utc)
+NOW = datetime(2026, 8, 28, 12, 0, tzinfo=UTC)
 
 
 def _call(led, cost_at=None, **kw):
     return led.record_call(
         agent=kw.get("agent", "a1_fundamentals"),
-        task_class=TaskClass.FUNDAMENTALS_READ, tier=Tier.BALANCED,
-        model_id="claude-sonnet-5", prompt="p" * 4000,
+        task_class=TaskClass.FUNDAMENTALS_READ,
+        tier=Tier.BALANCED,
+        model_id="claude-sonnet-5",
+        prompt="p" * 4000,
         usage=Usage(input_tokens=100_000, output_tokens=1000),
-        at=cost_at, run_id=kw.get("run_id"),
+        at=cost_at,
+        run_id=kw.get("run_id"),
     )
 
 
@@ -56,8 +63,10 @@ def test_the_client_uses_the_window_and_recovers_the_next_day(tmp_path):
         _call(led, cost_at=NOW - timedelta(days=3))
 
     client = InferenceClient(
-        EchoBackend(), default_engine({"a1_fundamentals": {"llm_complete"}}),
-        led, daily_budget_myr=Decimal("5"),
+        EchoBackend(),
+        default_engine({"a1_fundamentals": {"llm_complete"}}),
+        led,
+        daily_budget_myr=Decimal("5"),
     )
     # Old spend must not block today. Under the lifetime sum this raised.
     out = client.complete("a1_fundamentals", TaskClass.FUNDAMENTALS_READ, "q")
@@ -65,7 +74,7 @@ def test_the_client_uses_the_window_and_recovers_the_next_day(tmp_path):
 
     # Today's own spend still binds.
     for _ in range(60):
-        _call(led, cost_at=datetime.now(timezone.utc))
+        _call(led, cost_at=datetime.now(UTC))
     with pytest.raises(BudgetExceeded, match="last"):
         client.complete("a1_fundamentals", TaskClass.FUNDAMENTALS_READ, "q")
 
@@ -83,8 +92,7 @@ def test_calls_can_be_grouped_by_the_run_that_made_them(tmp_path):
 
     assert len(led.calls_for_run("nightly-2026-08-28")) == 2
     assert len(led.calls_for_run("adhoc")) == 1
-    assert set(led.runs_between(NOW - timedelta(days=1),
-                                NOW + timedelta(days=1))) >= {"adhoc"}
+    assert set(led.runs_between(NOW - timedelta(days=1), NOW + timedelta(days=1))) >= {"adhoc"}
 
 
 def test_calls_between_bounds_a_window(tmp_path):
@@ -128,7 +136,7 @@ def test_both_stores_use_wal_so_a_writer_never_blocks_a_reader(tmp_path):
 def test_a_second_process_can_read_while_the_first_holds_the_file(tmp_path):
     a = ProvenanceLedger(tmp_path / "p.db")
     _call(a)
-    b = ProvenanceLedger(tmp_path / "p.db")      # the interactive session
+    b = ProvenanceLedger(tmp_path / "p.db")  # the interactive session
     assert len(list(b.calls())) == 1
     _call(b)
     assert len(list(a.calls())) == 2, "each connection must see the other's commits"
@@ -138,6 +146,7 @@ def test_an_older_ledger_without_run_id_still_opens(tmp_path):
     """A ledger written before run_id existed must migrate, not crash - and the
     append-only triggers must not block the schema change."""
     import sqlite3
+
     path = tmp_path / "old.db"
     old = sqlite3.connect(path)
     old.executescript("""
@@ -151,8 +160,10 @@ def test_an_older_ledger_without_run_id_still_opens(tmp_path):
         agent TEXT NOT NULL, claim_text TEXT NOT NULL, citations_json TEXT NOT NULL,
         survived INTEGER NOT NULL, dropped_reason TEXT);
     """)
-    old.execute("INSERT INTO llm_calls VALUES (1,'2026-01-01T00:00:00','a','t','balanced',"
-                "'m','h',1,1,0,'0.1','0.4','4.15','2026-01-01T00:00:00')")
+    old.execute(
+        "INSERT INTO llm_calls VALUES (1,'2026-01-01T00:00:00','a','t','balanced',"
+        "'m','h',1,1,0,'0.1','0.4','4.15','2026-01-01T00:00:00')"
+    )
     old.commit()
     old.close()
 
@@ -160,6 +171,7 @@ def test_an_older_ledger_without_run_id_still_opens(tmp_path):
     rows = list(led.calls())
     assert len(rows) == 1
     assert rows[0]["run_id"] == "", "rows from before runs existed belong to no run"
+    assert rows[0]["cache_write_tokens"] == 0, "rows from before caching existed wrote nothing"
     _call(led, run_id="new")
     assert len(led.calls_for_run("new")) == 1
 
@@ -168,6 +180,7 @@ def test_append_only_still_holds_after_the_migration(tmp_path):
     led = ProvenanceLedger(tmp_path / "p.db")
     _call(led)
     import sqlite3
+
     with pytest.raises(sqlite3.IntegrityError, match="append-only"):
         led.conn.execute("UPDATE llm_calls SET agent='x'")
     with pytest.raises(sqlite3.IntegrityError, match="append-only"):
@@ -177,8 +190,7 @@ def test_append_only_still_holds_after_the_migration(tmp_path):
 # --- the inverted gate that stopped inverting ------------------------------
 def _outcomes(n, correct=None):
     correct = n if correct is None else correct
-    return [Outcome(f"p{i}", date(2026, 8, 1), 0.05, 0.01, i < correct)
-            for i in range(n)]
+    return [Outcome(f"p{i}", date(2026, 8, 1), 0.05, 0.01, i < correct) for i in range(n)]
 
 
 def _agent():
@@ -187,6 +199,7 @@ def _agent():
     from core.guardrails.defaults import default_engine
     from core.registry.loader import load as load_registry
     from knowledge.retrieval.pipeline import Router
+
     reg = load_registry("agents/registry.yaml")
     ctx = AgentContext(router=Router({}), engine=default_engine(reg.allowlist()), now=NOW)
     return A15Reflection(ctx, OutcomeQueue(), LessonStore())
@@ -215,15 +228,25 @@ def test_run_without_instruments_refuses_rather_than_learning_freely():
 
 
 def test_a_genuinely_repeated_pattern_still_gets_through():
-    out = _agent().propose("pattern", _outcomes(8), date(2026, 8, 28),
-                           {"MYX:1155", "XNAS:NVDA", "XSES:D05"})
+    out = _agent().propose(
+        "pattern", _outcomes(8), date(2026, 8, 28), {"MYX:1155", "XNAS:NVDA", "XSES:D05"}
+    )
     assert any(f.kind != "no_lesson" for f in out), "the gate must not be impassable"
 
 
 # --- a no-view prediction must not score -----------------------------------
 def _pred(pid, direction, days=21):
-    return Prediction(pid, "MYX:1155", "human", NOW, Horizon.D21, "s",
-                      direction, 0.6, grade_on=(NOW + timedelta(days=days)).date())
+    return Prediction(
+        pid,
+        "MYX:1155",
+        "human",
+        NOW,
+        Horizon.D21,
+        "s",
+        direction,
+        0.6,
+        grade_on=(NOW + timedelta(days=days)).date(),
+    )
 
 
 def test_a_no_view_prediction_is_not_graded_correct():
@@ -242,8 +265,9 @@ def test_a_no_view_prediction_is_excluded_from_calibration(tmp_path):
         store.record(_pred("view", 1))
         store.record(_pred("noview", 0))
         for pid, correct in (("view", True), ("noview", False)):
-            store.record_outcome(Outcome(pid, (NOW + timedelta(days=22)).date(),
-                                         0.05, 0.01, correct))
+            store.record_outcome(
+                Outcome(pid, (NOW + timedelta(days=22)).date(), 0.05, 0.01, correct)
+            )
         pairs = store.calibration_pairs()
     assert len(pairs) == 1, "only the prediction that expressed a view may score"
     assert pairs[0][1] is True
@@ -261,17 +285,28 @@ def test_a_directional_prediction_is_still_graded_against_the_benchmark():
 def test_config_says_out_loud_when_nothing_can_ever_escalate():
     from core.config import Config
     from engines.risk.concentration import Limits
-    c = Config(base_currency="MYR", markets=("XKLS",), fx_myr_per_usd=Decimal("4.15"),
-               risk_per_trade=Decimal("0.0075"), target_volatility=Decimal("0.20"),
-               max_participation=Decimal("0.05"), limits=Limits(), emergency_months=6,
-               debt_hurdle=Decimal("0.08"), daily_budget_myr=Decimal("25"),
-               per_question_budget_myr=Decimal("5"), database="d", 
-               min_graded_for_calibration=30)
+
+    c = Config(
+        base_currency="MYR",
+        markets=("XKLS",),
+        fx_myr_per_usd=Decimal("4.15"),
+        risk_per_trade=Decimal("0.0075"),
+        target_volatility=Decimal("0.20"),
+        max_participation=Decimal("0.05"),
+        limits=Limits(),
+        emergency_months=6,
+        debt_hurdle=Decimal("0.08"),
+        daily_budget_myr=Decimal("25"),
+        per_question_budget_myr=Decimal("5"),
+        database="d",
+        min_graded_for_calibration=30,
+    )
     assert "can never fire" in c.describe()
 
 
 def test_holdings_and_watchlist_are_validated_at_load(tmp_path):
     from core.config import ConfigError, load
+
     p = tmp_path / "config.toml"
     p.write_text('[account]\nholdings = ["1155"]\n')
     with pytest.raises(ConfigError, match="no market prefix"):
@@ -280,6 +315,7 @@ def test_holdings_and_watchlist_are_validated_at_load(tmp_path):
 
 def test_a_duplicated_watchlist_entry_is_refused(tmp_path):
     from core.config import ConfigError, load
+
     p = tmp_path / "config.toml"
     p.write_text('[account]\nwatchlist = ["MYX:1155", "MYX:1155"]\n')
     with pytest.raises(ConfigError, match="more than once"):
@@ -289,11 +325,13 @@ def test_a_duplicated_watchlist_entry_is_refused(tmp_path):
 def test_valid_holdings_load_and_reach_the_gate(tmp_path):
     from core.config import load
     from knowledge.news.features import Features, should_escalate
+
     p = tmp_path / "config.toml"
     p.write_text('[account]\nholdings = ["MYX:1155"]\nwatchlist = ["XNAS:NVDA"]\n')
     c = load(p)
     assert c.holdings == ("MYX:1155",)
-    f = Features(relevance=0.9, polarity=-0.5, intensity=0.5,
-                 uncertainty=0.1, forwardness=0.2, extractor="t")
+    f = Features(
+        relevance=0.9, polarity=-0.5, intensity=0.5, uncertainty=0.1, forwardness=0.2, extractor="t"
+    )
     assert should_escalate(f, ["MYX:1155"], set(c.holdings), set(c.watchlist))
     assert not should_escalate(f, ["XKLS:9999"], set(c.holdings), set(c.watchlist))

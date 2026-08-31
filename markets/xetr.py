@@ -35,13 +35,19 @@ from decimal import Decimal
 
 from core.market.calendar import SessionCalendar, SessionWindow
 from markets.contract import (
-    AccountingStandard, FeeLeg, FeeSchedule, KnownAtStrategy, MarketAdapter,
+    AccountingStandard,
+    FeeLeg,
+    FeeSchedule,
+    KnownAtStrategy,
+    MarketAdapter,
 )
 
-XETRA_FEES = FeeSchedule((
-    FeeLeg("brokerage", Decimal("0.0010"), minimum=Decimal("8")),
-    FeeLeg("exchange", Decimal("0.000018")),
-))
+XETRA_FEES = FeeSchedule(
+    (
+        FeeLeg("brokerage", Decimal("0.0010"), minimum=Decimal("8")),
+        FeeLeg("exchange", Decimal("0.000018")),
+    )
+)
 
 TICKS = (
     (Decimal("10"), Decimal("0.001")),
@@ -57,7 +63,7 @@ class XETR(MarketAdapter):
     country = "DE"
     currency = "EUR"
     tier = 2
-    accounting_standard = AccountingStandard.IFRS      # EU-adopted IFRS
+    accounting_standard = AccountingStandard.IFRS  # EU-adopted IFRS
     local_index = "DAX"
     regulator = "Bundesanstalt fuer Finanzdienstleistungsaufsicht"
     settlement_days = 2
@@ -66,7 +72,7 @@ class XETR(MarketAdapter):
     def __init__(self, holidays=frozenset(), half_days=frozenset()) -> None:
         self._cal = SessionCalendar(
             windows=(SessionWindow(time(9, 0), time(17, 30)),),
-            tz_offset_hours=1,                          # CET; CEST in summer
+            tz_offset_hours=1,  # CET; CEST in summer
             holidays=holidays,
             half_days=half_days,
         )

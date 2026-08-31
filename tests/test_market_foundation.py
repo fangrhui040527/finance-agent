@@ -1,4 +1,5 @@
 """P1/P2: identity, calendars, price adjustment, adapter conformance."""
+
 from datetime import date, time
 from decimal import Decimal as D
 
@@ -7,15 +8,27 @@ import pytest
 from core.market.calendar import SessionCalendar, SessionWindow
 from core.market.instrument import IdentityResolver, Instrument, Status
 from core.market.prices import (
-    ActionKind, Bar, CorporateAction, FxStore, PriceSeries, base_currency_return,
+    ActionKind,
+    Bar,
+    CorporateAction,
+    FxStore,
+    PriceSeries,
+    base_currency_return,
 )
 from markets.registry import get, supported
 
 
 def mk(iid, ticker, mic="XKLS", first=date(2000, 1, 1), delisted=None, isin=None):
     return Instrument(
-        instrument_id=iid, primary_ticker=ticker, mic=mic, currency="MYR",
-        lot_size=100, name=iid, first_listed=first, delisted_at=delisted, isin=isin,
+        instrument_id=iid,
+        primary_ticker=ticker,
+        mic=mic,
+        currency="MYR",
+        lot_size=100,
+        name=iid,
+        first_listed=first,
+        delisted_at=delisted,
+        isin=isin,
         status=Status.DELISTED if delisted else Status.LISTED,
     )
 
@@ -31,8 +44,17 @@ def test_aliases_collapse_to_one_instrument():
 def test_mic_disambiguates_a_shared_ticker():
     r = IdentityResolver()
     r.register(mk("MY_X", "ABC", "XKLS"))
-    r.register(Instrument(instrument_id="US_X", primary_ticker="ABC", mic="XNAS",
-                          currency="USD", lot_size=1, name="US_X", first_listed=date(2000, 1, 1)))
+    r.register(
+        Instrument(
+            instrument_id="US_X",
+            primary_ticker="ABC",
+            mic="XNAS",
+            currency="USD",
+            lot_size=1,
+            name="US_X",
+            first_listed=date(2000, 1, 1),
+        )
+    )
     assert r.resolve("ABC", mic="XNAS").instrument_id == "US_X"
     assert r.resolve("ABC", mic="XKLS").instrument_id == "MY_X"
 
@@ -48,30 +70,33 @@ def test_universe_includes_the_dead():
 
 # --- calendars -----------------------------------------------------------
 def test_weekend_and_holiday_are_not_sessions():
-    cal = SessionCalendar((SessionWindow(time(9), time(17)),), 8,
-                          holidays=frozenset({date(2026, 5, 1)}))
-    assert cal.is_session(date(2026, 5, 4))       # Monday
-    assert not cal.is_session(date(2026, 5, 2))   # Saturday
-    assert not cal.is_session(date(2026, 5, 1))   # holiday
+    cal = SessionCalendar(
+        (SessionWindow(time(9), time(17)),), 8, holidays=frozenset({date(2026, 5, 1)})
+    )
+    assert cal.is_session(date(2026, 5, 4))  # Monday
+    assert not cal.is_session(date(2026, 5, 2))  # Saturday
+    assert not cal.is_session(date(2026, 5, 1))  # holiday
 
 
 def test_half_day_drops_the_afternoon_window():
     cal = SessionCalendar(
         (SessionWindow(time(9), time(12, 30)), SessionWindow(time(14, 30), time(17))),
-        8, half_days=frozenset({date(2026, 5, 4)}))
+        8,
+        half_days=frozenset({date(2026, 5, 4)}),
+    )
     assert len(cal.session(date(2026, 5, 4)).windows) == 1
     assert len(cal.session(date(2026, 5, 5)).windows) == 2
 
 
 def test_session_shift_skips_non_sessions():
     cal = SessionCalendar((SessionWindow(time(9), time(17)),), 8)
-    assert cal.shift(date(2026, 5, 1), 1) == date(2026, 5, 4)   # Fri -> Mon
+    assert cal.shift(date(2026, 5, 1), 1) == date(2026, 5, 4)  # Fri -> Mon
     assert cal.shift(date(2026, 5, 4), -1) == date(2026, 5, 1)
 
 
 def test_utc_alignment_uses_the_offset():
     cal = SessionCalendar((SessionWindow(time(9), time(17)),), 8)
-    assert cal.session(date(2026, 5, 4)).open_utc().hour == 1   # 09:00 UTC+8
+    assert cal.session(date(2026, 5, 4)).open_utc().hour == 1  # 09:00 UTC+8
 
 
 # --- prices --------------------------------------------------------------
@@ -146,7 +171,7 @@ def test_bursa_fee_matches_the_published_schedule():
 
 def test_bursa_brokerage_minimum_dominates_small_trades():
     fs = get("XKLS").fee_schedule
-    assert fs.round_trip_bps(D("620")) > 250     # a lot at RM 6.20 is uneconomic
+    assert fs.round_trip_bps(D("620")) > 250  # a lot at RM 6.20 is uneconomic
     assert fs.round_trip_bps(D("50000")) < 50
 
 
@@ -161,6 +186,7 @@ def test_tier_three_market_would_not_claim_a_factor_model():
 
 # --- XSES: the first T2 market, and the test of the extensibility claim -----
 
+
 def test_adding_a_market_did_not_change_any_engine_or_agent():
     """docs/01 section 10: a new market is one adapter class plus one registry
     entry. Eleven markets are the proof - the conformance suite above is
@@ -170,8 +196,19 @@ def test_adding_a_market_did_not_change_any_engine_or_agent():
     The count is asserted deliberately. It is the line that fails when someone
     adds an adapter, and failing here is how they are told to come and read what
     the claim above actually promises."""
-    for mic in ("XKLS", "XNAS", "XSES", "XHKG", "XTKS", "XLON", "XASX",
-                "XNSE", "XTAI", "XKRX", "XETR"):
+    for mic in (
+        "XKLS",
+        "XNAS",
+        "XSES",
+        "XHKG",
+        "XTKS",
+        "XLON",
+        "XASX",
+        "XNSE",
+        "XTAI",
+        "XKRX",
+        "XETR",
+    ):
         assert mic in supported()
     assert len(supported()) == 11
 
@@ -210,6 +247,7 @@ def test_every_supported_market_has_an_explicit_cost_floor():
     """A market falling back to the generic default is an accident waiting to
     be inherited by the next market added (docs/05 section 3.5)."""
     from engines.sizing.caps import COST_FLOOR_BPS_BY_MIC
+
     missing = [m for m in supported() if m not in COST_FLOOR_BPS_BY_MIC]
     assert not missing, f"markets with no explicit cost floor: {missing}"
 
@@ -224,11 +262,13 @@ def test_the_singapore_minimum_economic_position_is_about_nine_thousand():
 
 # --- XHKG: the second T2 market, and the one that inverts the intuition -----
 
+
 def test_hong_kong_is_the_most_expensive_market_here_not_the_cheapest():
     """A developed market with uncapped both-sided stamp duty and 0.25% retail
     brokerage costs more than Bursa at every size. Sorting markets by how
     developed they are gets the cost ranking backwards."""
     from engines.sizing.caps import cost_floor_bps
+
     big = D("10000000")
     hk = get("XHKG").fee_schedule.round_trip_bps(big)
     my = get("XKLS").fee_schedule.round_trip_bps(big)
@@ -285,6 +325,7 @@ def test_hong_kong_dividends_reach_a_malaysian_holder_gross():
 
 # --- P18: Tokyo, London, Sydney ---------------------------------------------
 
+
 def test_a_one_way_charge_is_not_doubled_on_the_round_trip():
     """FeeLeg.per_side sat declared and unread until London arrived. Every other
     charge here is symmetric, so round_trip doubled everything - which for UK
@@ -296,6 +337,7 @@ def test_a_one_way_charge_is_not_doubled_on_the_round_trip():
     """
 
     from markets.contract import FeeLeg, FeeSchedule
+
     both = FeeSchedule((FeeLeg("sym", D("0.001")),))
     buy_only = FeeSchedule((FeeLeg("duty", D("0.001"), per_side=False),))
     assert both.round_trip(D("10000")) == D("20")
@@ -328,7 +370,7 @@ def test_london_ticks_are_sub_penny_in_pounds_so_pence_input_is_obvious():
     reasonable."""
     lon = get("XLON")
     assert lon.tick_size(D("27.50")) < D("0.01")
-    assert lon.tick_size(D("2750")) == D("0.01")   # the coarse top band
+    assert lon.tick_size(D("2750")) == D("0.01")  # the coarse top band
 
 
 def test_tokyo_ticks_are_coarse_enough_that_spread_beats_fees():
@@ -359,6 +401,7 @@ def test_tokyo_keeps_its_lunch_break_and_closes_at_half_past_three():
 
 def test_sydney_is_the_cheapest_market_here_after_the_united_states():
     from engines.sizing.caps import cost_floor_bps
+
     floors = {m: cost_floor_bps(m) for m in supported()}
     assert floors["XASX"] < floors["XKLS"]
     assert floors["XASX"] < floors["XSES"]
@@ -382,6 +425,7 @@ def test_every_registered_market_has_a_written_cost_floor():
     """A missing entry silently inherits the 30 bps default. That is how every
     Bursa position got sized against half its real floor."""
     from engines.sizing.caps import COST_FLOOR_BPS_BY_MIC
+
     missing = [m for m in supported() if m not in COST_FLOOR_BPS_BY_MIC]
     assert not missing, f"no written cost floor for {missing}"
 
@@ -396,6 +440,7 @@ def test_every_registered_market_names_its_regulator_and_index():
 
 # --- P18 complete: India, Taiwan, Korea, Germany ----------------------------
 
+
 def test_taiwan_and_korea_tax_the_sell_side_only():
     """Both levy their transaction tax on disposal. Doubling Taiwan's 0.3% would
     put its floor 30 bps too high and refuse positions that clear the real one -
@@ -405,14 +450,13 @@ def test_taiwan_and_korea_tax_the_sell_side_only():
         assert tax.per_side is False
     tai = get("XTAI").fee_schedule
     naive = tai.one_side(D("1000000")) * 2
-    assert naive - tai.round_trip(D("1000000")) == D("3000")     # 0.3% counted once
+    assert naive - tai.round_trip(D("1000000")) == D("3000")  # 0.3% counted once
 
 
 def test_india_taxes_both_sides_which_is_what_makes_it_expensive():
     """STT is 20 bps round trip before any brokerage - the only market here with
     a full-rate transaction tax on both legs and no cap."""
-    stt = next(l for l in get("XNSE").fee_schedule.legs
-               if l.name == "securities_transaction_tax")
+    stt = next(l for l in get("XNSE").fee_schedule.legs if l.name == "securities_transaction_tax")
     assert stt.per_side is True
     assert stt.rate * 2 * 10_000 == D("20.000")
 
@@ -462,8 +506,7 @@ def test_two_markets_settle_at_t_plus_one_and_the_rest_at_t_plus_two():
 def test_every_market_taxing_one_side_only_says_so_and_none_says_it_wrongly():
     """The sweep that would have caught the London bug. A leg whose name says
     tax or duty must have made a deliberate choice about sidedness."""
-    one_way = {(m, l.name) for m in supported() for l in get(m).fee_schedule.legs
-               if not l.per_side}
+    one_way = {(m, l.name) for m in supported() for l in get(m).fee_schedule.legs if not l.per_side}
     assert one_way == {
         ("XLON", "stamp_duty_reserve_tax"),
         ("XNSE", "stamp_duty"),

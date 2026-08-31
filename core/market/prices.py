@@ -33,14 +33,16 @@ class ActionKind(str, Enum):
 class CorporateAction:
     ex_date: date
     kind: ActionKind
-    ratio: float = 1.0      # split: 2.0 means 2-for-1
-    amount: float = 0.0     # dividend per share, in instrument currency
+    ratio: float = 1.0  # split: 2.0 means 2-for-1
+    amount: float = 0.0  # dividend per share, in instrument currency
 
 
 class PriceSeries:
     """Raw bars in, adjusted bars out. The raw store is never mutated."""
 
-    def __init__(self, instrument_id: str, bars: list[Bar], actions: list[CorporateAction] | None = None):
+    def __init__(
+        self, instrument_id: str, bars: list[Bar], actions: list[CorporateAction] | None = None
+    ):
         self.instrument_id = instrument_id
         self._raw = sorted(bars, key=lambda b: b.day)
         self._days = [b.day for b in self._raw]
@@ -74,8 +76,16 @@ class PriceSeries:
         out = []
         for b in self._raw:
             f = self._factor_at(b.day)
-            out.append(Bar(b.day, b.open * f, b.high * f, b.low * f, b.close * f,
-                           b.volume / f if f else b.volume))
+            out.append(
+                Bar(
+                    b.day,
+                    b.open * f,
+                    b.high * f,
+                    b.low * f,
+                    b.close * f,
+                    b.volume / f if f else b.volume,
+                )
+            )
         return out
 
     def closes(self, adjusted: bool = True) -> list[float]:
@@ -85,7 +95,7 @@ class PriceSeries:
         c = self.closes(adjusted)
         return [(c[i] / c[i - 1]) - 1.0 for i in range(1, len(c))]
 
-    def slice(self, start: date, end: date) -> "PriceSeries":
+    def slice(self, start: date, end: date) -> PriceSeries:
         lo = bisect.bisect_left(self._days, start)
         hi = bisect.bisect_right(self._days, end)
         return PriceSeries(self.instrument_id, self._raw[lo:hi], self.actions)

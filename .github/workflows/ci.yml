@@ -2,6 +2,9 @@
 # promotion. The ratchet in core/registry/loader.py refuses to REGISTER a
 # capability without a usable suite; this workflow is what makes that refusal
 # happen on every push rather than only when someone runs it by hand.
+#
+# Runs on ubuntu AND windows. The dev machine is Windows; two tests failed there
+# for weeks while this file only ever ran on Linux.
 name: ci
 
 on:
@@ -23,35 +26,52 @@ concurrency:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ["3.11", "3.12"]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - uses: astral-sh/setup-uv@v6
         with:
-          python-version: "3.11"
+          python-version: ${{ matrix.python }}
+          enable-cache: true
 
+      # --frozen: the lockfile is the contract. A resolver that drifts between
+      # runs is a build that cannot be bisected.
       - name: Install
-        run: |
-          python -m pip install --upgrade pip
-          pip install -e ".[dev]"
+        run: uv sync --frozen
 
-      - name: Tests
-        run: python -m pytest -q
+      - name: Lint
+        run: |
+          uv run ruff check .
+          uv run ruff format --check .
+
+      - name: Type check
+        run: uv run pyright
+
+      # fail_under lives in pyproject [tool.coverage.report]; ratchet it there.
+      - name: Tests with coverage gate
+        run: uv run pytest -q --cov --cov-report=term
 
       # No network, no keys. If this needs either, the seam has leaked.
       - name: Verify pipeline on mock data
-        run: python verify.py
+        run: uv run python verify.py
 
       # Adversarial, not a second happy path: volume, non-finite numbers, exact
       # thresholds, concurrent writers, hostile text. Exits with the finding count.
       - name: Stress
-        run: python stress/run.py
+        run: uv run python stress/run.py
 
       - name: Eval ratchet
         run: |
-          python - <<'PY'
-          from pathlib import Path
+          uv run python - <<'PY'
           from core.registry.loader import load
           reg = load("agents/registry.yaml")
           print(f"{len(reg.agents)} agents registered, {len(reg.knowledge)} knowledge stores")
@@ -62,31 +82,42 @@ jobs:
       # The graph is built from checked-in sources with no network and no keys.
       # Built twice: a build that is not reproducible cannot have its diff
       # reviewed, and an unreviewable diff is how a bad edge lives for a year.
+      # runner.temp, not /tmp: this job also runs on Windows.
       - name: Knowledge graph builds, twice, identically
         run: |
-          python -m knowledge.graph.build --db /tmp/graph-a.db --rebuild
-          python -m knowledge.graph.build --db /tmp/graph-b.db --rebuild
-          cmp /tmp/graph-a.db /tmp/graph-b.db
+          uv run python -m knowledge.graph.build --db "${{ runner.temp }}/graph-a.db" --rebuild
+          uv run python -m knowledge.graph.build --db "${{ runner.temp }}/graph-b.db" --rebuild
+          uv run python -c "import sys;a,b=[open(p,'rb').read() for p in sys.argv[1:]];sys.exit(a!=b)" "${{ runner.temp }}/graph-a.db" "${{ runner.temp }}/graph-b.db"
 
       # The code graph is a maintainer's tool, but it parses every file in the
       # repository - so a build failure here is a syntax error somewhere, and
-      # the reproducibility guarantee has to hold for it too.
+      # the reproducibility guarantee has to hold for it too, on every OS.
       - name: Codebase graph builds, twice, identically
         run: |
-          python -m knowledge.graph.build --code --db /tmp/code-a.db --rebuild
-          python -m knowledge.graph.build --code --db /tmp/code-b.db --rebuild
-          cmp /tmp/code-a.db /tmp/code-b.db
+          uv run python -m knowledge.graph.build --code --db "${{ runner.temp }}/code-a.db" --rebuild
+          uv run python -m knowledge.graph.build --code --db "${{ runner.temp }}/code-b.db" --rebuild
+          uv run python -c "import sys;a,b=[open(p,'rb').read() for p in sys.argv[1:]];sys.exit(a!=b)" "${{ runner.temp }}/code-a.db" "${{ runner.temp }}/code-b.db"
 
       # The only end-to-end run that uses the REAL registry-derived allowlist.
       # verify.py and the unit tests pass hand-written allowlists with invented
       # agent ids, which is how a missing llm_complete grant survived unnoticed.
       - name: Traced full-system run
-        run: python trace_run.py
+        run: uv run python trace_run.py
 
       # The MCP handshake, run against itself. If the server cannot complete
       # initialize -> tools/list -> tools/call offline, no client will fare better.
       - name: MCP server selftest
-        run: python -m mcp_server.server --selftest
+        run: uv run python -m mcp_server.server --selftest
 
       - name: No execution code anywhere
-        run: python -m pytest tests/test_no_execution_anywhere.py -q
+        run: uv run pytest tests/test_no_execution_anywhere.py -q
+
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.11"
+      - name: Dependency vulnerability audit
+        run: uv run --frozen pip-audit --strict --desc

@@ -31,14 +31,16 @@ def _solve(a: list[list[float]], b: list[float]) -> list[float]:
 
 def _wls(X: list[list[float]], y: list[float], w: list[float]) -> list[float]:
     k = len(X[0])
-    ata = [[sum(w[i] * X[i][p] * X[i][q] for i in range(len(y))) for q in range(k)] for p in range(k)]
+    ata = [
+        [sum(w[i] * X[i][p] * X[i][q] for i in range(len(y))) for q in range(k)] for p in range(k)
+    ]
     atb = [sum(w[i] * X[i][p] * y[i] for i in range(len(y))) for p in range(k)]
     return _solve(ata, atb)
 
 
 @dataclass(frozen=True)
 class Fit:
-    coefficients: list[float]      # [alpha, beta_1 ... beta_k]
+    coefficients: list[float]  # [alpha, beta_1 ... beta_k]
     residuals: list[float]
     residual_sigma: float
     r_squared: float
@@ -48,7 +50,9 @@ class Fit:
         return self.coefficients[0] + sum(c * v for c, v in zip(self.coefficients[1:], row))
 
 
-def huber_fit(factors: list[list[float]], y: list[float], iterations: int = 6, c: float = 1.345) -> Fit:
+def huber_fit(
+    factors: list[list[float]], y: list[float], iterations: int = 6, c: float = 1.345
+) -> Fit:
     """Design matrix gets an intercept column prepended automatically."""
     n = len(y)
     if n != len(factors):

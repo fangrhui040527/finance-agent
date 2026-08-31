@@ -13,13 +13,13 @@ from __future__ import annotations
 import hashlib
 import json
 import sqlite3
+from collections.abc import Iterator
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from decimal import Decimal
 from pathlib import Path
-from typing import Iterator
 
-from core.llm.tiers import Tier, TaskClass, Usage, cost_usd
+from core.llm.tiers import TaskClass, Tier, Usage, cost_usd
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS llm_calls (
@@ -34,6 +34,7 @@ CREATE TABLE IF NOT EXISTS llm_calls (
     input_tokens    INTEGER NOT NULL,
     output_tokens   INTEGER NOT NULL,
     cached_tokens   INTEGER NOT NULL,
+    cache_write_tokens INTEGER NOT NULL DEFAULT 0,
     cost_usd        TEXT    NOT NULL,
     cost_myr        TEXT    NOT NULL,
     fx_rate         TEXT    NOT NULL,
@@ -97,7 +98,7 @@ def _enable_wal(conn: sqlite3.Connection, path: str, timeout_ms: int) -> None:
     """
     conn.execute(f"PRAGMA busy_timeout={timeout_ms}")
     if path == ":memory:":
-        return                       # memory databases have no journal to switch
+        return  # memory databases have no journal to switch
     try:
         conn.execute("PRAGMA journal_mode=WAL")
     except sqlite3.OperationalError:
@@ -165,18 +166,22 @@ class ProvenanceLedger:
         for table in ("llm_calls", "claims"):
             cols = {r[1] for r in self.conn.execute(f"PRAGMA table_info({table})")}
             if "run_id" not in cols:
-                self.conn.execute(
-                    f"ALTER TABLE {table} ADD COLUMN run_id TEXT NOT NULL DEFAULT ''")
+                self.conn.execute(f"ALTER TABLE {table} ADD COLUMN run_id TEXT NOT NULL DEFAULT ''")
 
         calls = {r[1] for r in self.conn.execute("PRAGMA table_info(llm_calls)")}
         if "latency_ms" not in calls:
+            self.conn.execute("ALTER TABLE llm_calls ADD COLUMN latency_ms REAL NOT NULL DEFAULT 0")
+        # Cache writes bill at 1.25x input and were never recorded, because the
+        # product never asked for a cache. It does now (core/llm/backends.py).
+        if "cache_write_tokens" not in calls:
             self.conn.execute(
-                "ALTER TABLE llm_calls ADD COLUMN latency_ms REAL NOT NULL DEFAULT 0")
+                "ALTER TABLE llm_calls ADD COLUMN cache_write_tokens INTEGER NOT NULL DEFAULT 0"
+            )
 
     def close(self) -> None:
         self.conn.close()
 
-    def __enter__(self) -> "ProvenanceLedger":
+    def __enter__(self) -> ProvenanceLedger:
         return self
 
     def __exit__(self, *exc) -> None:
@@ -195,38 +200,75 @@ class ProvenanceLedger:
         run_id: str | None = None,
         latency_ms: float = 0.0,
     ) -> CallRecord:
-        at = at or datetime.now(timezone.utc)
+        at = at or datetime.now(UTC)
         rid = self.run_id if run_id is None else run_id
         usd = cost_usd(tier, usage)
         myr = usd * fx_rate
         ph = prompt_hash(prompt)
         self.conn.execute(
             "INSERT INTO llm_calls (at, agent, task_class, tier, model_id, prompt_hash, run_id,"
-            " input_tokens, output_tokens, cached_tokens, cost_usd, cost_myr, fx_rate,"
-            " fx_asof, latency_ms)"
-            " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            " input_tokens, output_tokens, cached_tokens, cache_write_tokens, cost_usd,"
+            " cost_myr, fx_rate, fx_asof, latency_ms)"
+            " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
             (
-                at.isoformat(), agent, task_class.value, tier.value, model_id, ph, rid,
-                usage.input_tokens, usage.output_tokens, usage.cached_input_tokens,
-                str(usd), str(myr), str(fx_rate), at.isoformat(), float(latency_ms),
+                at.isoformat(),
+                agent,
+                task_class.value,
+                tier.value,
+                model_id,
+                ph,
+                rid,
+                usage.input_tokens,
+                usage.output_tokens,
+                usage.cached_input_tokens,
+                usage.cache_write_tokens,
+                str(usd),
+                str(myr),
+                str(fx_rate),
+                at.isoformat(),
+                float(latency_ms),
             ),
         )
         self.conn.commit()
-        return CallRecord(agent, task_class, tier, model_id, ph, usage, usd, myr,
-                          fx_rate, at, rid, float(latency_ms))
+        return CallRecord(
+            agent,
+            task_class,
+            tier,
+            model_id,
+            ph,
+            usage,
+            usd,
+            myr,
+            fx_rate,
+            at,
+            rid,
+            float(latency_ms),
+        )
 
     def record_claim(
-        self, agent: str, text: str, citations: list[dict], survived: bool,
-        dropped_reason: str | None = None, at: datetime | None = None,
+        self,
+        agent: str,
+        text: str,
+        citations: list[dict],
+        survived: bool,
+        dropped_reason: str | None = None,
+        at: datetime | None = None,
         run_id: str | None = None,
     ) -> None:
-        at = at or datetime.now(timezone.utc)
+        at = at or datetime.now(UTC)
         rid = self.run_id if run_id is None else run_id
         self.conn.execute(
             "INSERT INTO claims (at, agent, run_id, claim_text, citations_json, survived,"
             " dropped_reason) VALUES (?,?,?,?,?,?,?)",
-            (at.isoformat(), agent, rid, text, json.dumps(citations), int(survived),
-             dropped_reason),
+            (
+                at.isoformat(),
+                agent,
+                rid,
+                text,
+                json.dumps(citations),
+                int(survived),
+                dropped_reason,
+            ),
         )
         self.conn.commit()
 
@@ -286,12 +328,12 @@ class ProvenanceLedger:
     def calls_between(self, start: datetime, end: datetime) -> list[sqlite3.Row]:
         return self._rows(
             "SELECT * FROM llm_calls WHERE at >= ? AND at <= ? ORDER BY id",
-            (start.isoformat(), end.isoformat()))
+            (start.isoformat(), end.isoformat()),
+        )
 
     def calls_for_run(self, run_id: str) -> list[sqlite3.Row]:
         """Everything one job did, as a unit. This is what run_id is for."""
-        return self._rows(
-            "SELECT * FROM llm_calls WHERE run_id = ? ORDER BY id", (run_id,))
+        return self._rows("SELECT * FROM llm_calls WHERE run_id = ? ORDER BY id", (run_id,))
 
     def latencies_between(self, start: datetime, end: datetime) -> list[float]:
         """Every recorded call duration in a window, for the p95 fitness term.
@@ -302,11 +344,17 @@ class ProvenanceLedger:
         the ledger holds.
         """
         rows = self._rows(
-            "SELECT latency_ms FROM llm_calls WHERE at >= ? AND at <= ? "
-            "AND latency_ms > 0", (start.isoformat(), end.isoformat()))
+            "SELECT latency_ms FROM llm_calls WHERE at >= ? AND at <= ? AND latency_ms > 0",
+            (start.isoformat(), end.isoformat()),
+        )
         return [float(r["latency_ms"]) for r in rows]
 
     def runs_between(self, start: datetime, end: datetime) -> list[str]:
-        return [r[0] for r in self.conn.execute(
-            "SELECT DISTINCT run_id FROM llm_calls WHERE at >= ? AND at <= ?"
-            " AND run_id != '' ORDER BY run_id", (start.isoformat(), end.isoformat()))]
+        return [
+            r[0]
+            for r in self.conn.execute(
+                "SELECT DISTINCT run_id FROM llm_calls WHERE at >= ? AND at <= ?"
+                " AND run_id != '' ORDER BY run_id",
+                (start.isoformat(), end.isoformat()),
+            )
+        ]

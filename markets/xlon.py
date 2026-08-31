@@ -50,17 +50,23 @@ from decimal import Decimal
 
 from core.market.calendar import SessionCalendar, SessionWindow
 from markets.contract import (
-    AccountingStandard, FeeLeg, FeeSchedule, KnownAtStrategy, MarketAdapter,
+    AccountingStandard,
+    FeeLeg,
+    FeeSchedule,
+    KnownAtStrategy,
+    MarketAdapter,
 )
 
 #: PTM applies above GBP 10,000. Modelling it as a flat minimum on every trade
 #: overstates a small ticket by GBP 1 and is the conservative direction; the
 #: alternative is a threshold the FeeLeg contract cannot express.
-LSE_FEES = FeeSchedule((
-    FeeLeg("brokerage", Decimal("0.0010"), minimum=Decimal("8")),
-    FeeLeg("ptm_levy", Decimal(0), minimum=Decimal("1")),
-    FeeLeg("stamp_duty_reserve_tax", Decimal("0.005"), per_side=False),
-))
+LSE_FEES = FeeSchedule(
+    (
+        FeeLeg("brokerage", Decimal("0.0010"), minimum=Decimal("8")),
+        FeeLeg("ptm_levy", Decimal(0), minimum=Decimal("1")),
+        FeeLeg("stamp_duty_reserve_tax", Decimal("0.005"), per_side=False),
+    )
+)
 
 #: Price in POUNDS -> tick in POUNDS. See trap 2 in the module docstring.
 TICKS = (
@@ -79,7 +85,7 @@ class XLON(MarketAdapter):
     country = "GB"
     currency = "GBP"
     tier = 2
-    accounting_standard = AccountingStandard.IFRS   # UK-adopted IFRS
+    accounting_standard = AccountingStandard.IFRS  # UK-adopted IFRS
     local_index = "UKX"
     regulator = "Financial Conduct Authority"
     settlement_days = 2

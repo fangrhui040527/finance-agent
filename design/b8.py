@@ -1,6 +1,9 @@
-exec(open("gen.py").read())
+from gen import page  # run via `python -m design.build` or from design/
 
-page("WorldMonitor","prices", """
+page(
+    "WorldMonitor",
+    "prices",
+    """
 <div class="head">
   <div><h1>World monitor</h1>
   <p>What came in, from where, in what language — and which of it earned a model call.
@@ -123,7 +126,8 @@ page("WorldMonitor","prices", """
        silently.</p></div>
   </div>
 </div>
-""", logic="""
+""",
+    logic="""
 const ACC='#0F5C63', NEG='#9E3626', MUT='#606D71', INK='#15191B', WARN='#8A5B12';
 const STORIES = [
   {id:1, title:'Maybank Q2 net interest margin slips to 2.04%, below guidance',
@@ -211,4 +215,5 @@ class Component extends DCLogic {
     };
   }
 }
-""")
+""",
+)

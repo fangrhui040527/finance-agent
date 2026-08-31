@@ -5,33 +5,60 @@ fitness one matters most for what it REFUSES: three of its seven terms cannot
 be computed from anything recorded today, and a partial average would be a
 number that looks like fitness and is not.
 """
-from datetime import datetime, timedelta, timezone
+
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 import pytest
 
 from agents.learning.reflection import Calibration, Lesson, Status
 from agents.learning.scoring import (
-    CHANCE, MIN_DISTINCT, MIN_INSTANCES, RECENCY_HALFLIFE_DAYS,
-    evidence, rank, recency, relevance, score,
+    CHANCE,
+    MIN_DISTINCT,
+    MIN_INSTANCES,
+    RECENCY_HALFLIFE_DAYS,
+    evidence,
+    rank,
+    recency,
+    relevance,
+    score,
 )
 from core.contracts.provenance_marker import Author, ProvenanceMarker
 from core.llm.tiers import TaskClass, Tier, Usage
 from core.provenance.fitness import DEFAULT_WEIGHTS, compute
 from core.provenance.ledger import ProvenanceLedger
 
-NOW = datetime(2026, 8, 30, tzinfo=timezone.utc)
+NOW = datetime(2026, 8, 30, tzinfo=UTC)
 MARK = ProvenanceMarker(created_by=Author.AGENT, created_at=NOW)
 
 
-def lesson(lid="l1", *, instances=20, distinct=8, hit=0.8, confirmed_days=1,
-           pattern="bursa", status=Status.ACTIVE, created_days=400):
-    return Lesson(lid, f"lesson {lid}", pattern, instances, distinct, hit,
-                  NOW - timedelta(days=created_days), MARK, status=status,
-                  last_confirmed=NOW - timedelta(days=confirmed_days))
+def lesson(
+    lid="l1",
+    *,
+    instances=20,
+    distinct=8,
+    hit=0.8,
+    confirmed_days=1,
+    pattern="bursa",
+    status=Status.ACTIVE,
+    created_days=400,
+):
+    return Lesson(
+        lid,
+        f"lesson {lid}",
+        pattern,
+        instances,
+        distinct,
+        hit,
+        NOW - timedelta(days=created_days),
+        MARK,
+        status=status,
+        last_confirmed=NOW - timedelta(days=confirmed_days),
+    )
 
 
 # -- recency ------------------------------------------------------------------
+
 
 def test_recency_decays_from_last_confirmation_not_from_creation():
     """A lesson written a year ago and confirmed last week is current. Decaying
@@ -54,6 +81,7 @@ def test_a_lesson_never_confirmed_decays_from_when_it_was_written():
 
 # -- evidence -----------------------------------------------------------------
 
+
 def test_a_lesson_on_one_instrument_is_not_a_rule():
     assert evidence(lesson(distinct=1)) == 0.0
 
@@ -72,7 +100,8 @@ def test_breadth_and_depth_both_saturate_so_neither_can_carry_the_score():
     """A rule seen on eighty names is not ten times the rule seen on eight."""
     assert evidence(lesson(distinct=80)) == pytest.approx(evidence(lesson(distinct=8)))
     assert evidence(lesson(instances=2000)) == pytest.approx(
-        evidence(lesson(instances=200)), abs=0.05)
+        evidence(lesson(instances=200)), abs=0.05
+    )
 
 
 def test_a_lesson_exactly_at_the_write_gate_scores_low_but_not_zero():
@@ -83,6 +112,7 @@ def test_a_lesson_exactly_at_the_write_gate_scores_low_but_not_zero():
 
 
 # -- relevance ----------------------------------------------------------------
+
 
 def test_a_lesson_whose_pattern_does_not_match_is_demoted_not_hidden():
     l = lesson(pattern="bursa")
@@ -96,6 +126,7 @@ def test_with_no_context_a_lesson_ranks_on_merit_alone():
 
 # -- the composite ------------------------------------------------------------
 
+
 def test_the_score_is_multiplicative_so_failing_any_term_sinks_a_lesson():
     """Additive would let a great hit rate on one instrument outrank a real
     rule. A lesson has to be recent AND applicable AND evidenced."""
@@ -103,14 +134,16 @@ def test_the_score_is_multiplicative_so_failing_any_term_sinks_a_lesson():
     narrow = score(lesson(distinct=1), NOW)
     assert good.score > 0.3
     assert narrow.score == 0.0
-    assert narrow.recency > 0.9          # strong on one term, still zero overall
+    assert narrow.recency > 0.9  # strong on one term, still zero overall
 
 
 def test_ranking_puts_the_broad_recent_well_evidenced_lesson_first():
-    ls = [lesson("stale", confirmed_days=365),
-          lesson("thin", instances=MIN_INSTANCES, distinct=MIN_DISTINCT, hit=0.6),
-          lesson("best"),
-          lesson("narrow", distinct=1)]
+    ls = [
+        lesson("stale", confirmed_days=365),
+        lesson("thin", instances=MIN_INSTANCES, distinct=MIN_DISTINCT, hit=0.6),
+        lesson("best"),
+        lesson("narrow", distinct=1),
+    ]
     assert [s.lesson.lesson_id for s in rank(ls, NOW)][0] == "best"
     assert [s.lesson.lesson_id for s in rank(ls, NOW)][-1] == "narrow"
 
@@ -144,14 +177,20 @@ def test_an_empty_store_ranks_to_nothing():
 
 # -- fitness: what it refuses ------------------------------------------------
 
+
 def ledger_with_claims():
     led = ProvenanceLedger(run_id="nightly")
     led.record_claim("a10", "cited", [{"source": "f", "chunk_id": "c"}], survived=True)
     led.record_claim("a10", "uncited", [], survived=True)
     led.record_claim("a10", "dropped", [], survived=False, dropped_reason="no citation")
-    led.record_call(agent="a10", task_class=TaskClass.THESIS_SYNTHESIS,
-                    tier=Tier.REASON, model_id="claude-opus-5", prompt="p" * 400,
-                    usage=Usage(input_tokens=1000, output_tokens=200))
+    led.record_call(
+        agent="a10",
+        task_class=TaskClass.THESIS_SYNTHESIS,
+        tier=Tier.REASON,
+        model_id="claude-opus-5",
+        prompt="p" * 400,
+        usage=Usage(input_tokens=1000, output_tokens=200),
+    )
     return led
 
 
@@ -166,12 +205,16 @@ def test_a_partial_fitness_refuses_to_produce_a_headline_number():
 def test_it_names_exactly_what_is_missing_and_what_would_supply_it():
     f = compute(ledger_with_claims())
     missing = {t.name for t in f.missing}
-    assert missing == {"refusal_precision", "attribution_accuracy",
-                       "forecast_calibration", "p95_latency"}
+    assert missing == {
+        "refusal_precision",
+        "attribution_accuracy",
+        "forecast_calibration",
+        "p95_latency",
+    }
     text = f.describe()
-    assert "elapsed time, not effort" in text          # calibration needs P16
-    assert "200 historical moves" in text              # attribution needs labels
-    assert "excluded rather than counted as instant" in text   # untimed rows
+    assert "elapsed time, not effort" in text  # calibration needs P16
+    assert "200 historical moves" in text  # attribution needs labels
+    assert "excluded rather than counted as instant" in text  # untimed rows
 
 
 def test_groundedness_and_citation_validity_come_straight_from_the_ledger():
@@ -201,8 +244,7 @@ def test_a_complete_set_of_inputs_produces_a_score():
 
 
 def test_brier_is_an_error_so_fitness_takes_one_minus_it():
-    f = compute(ledger_with_claims(),
-                calibration=Calibration(n=10, brier=0.25, buckets=()))
+    f = compute(ledger_with_claims(), calibration=Calibration(n=10, brier=0.25, buckets=()))
     cal = next(t for t in f.terms if t.name == "forecast_calibration")
     assert cal.value == pytest.approx(0.75)
 
@@ -211,9 +253,8 @@ def test_an_untimed_call_is_excluded_rather_than_counted_as_instant():
     """0.0 is the column default for rows written before latency_ms existed.
     Counting them would make the p95 look better the more untimed history the
     ledger holds - a metric that improves by aging is not a metric."""
-    led = ledger_with_claims()                  # record_call without a latency
-    assert led.latencies_between(
-        datetime(2000, 1, 1, tzinfo=timezone.utc), NOW + timedelta(days=1)) == []
+    led = ledger_with_claims()  # record_call without a latency
+    assert led.latencies_between(datetime(2000, 1, 1, tzinfo=UTC), NOW + timedelta(days=1)) == []
     lat = next(t for t in compute(led).terms if t.name == "p95_latency")
     assert not lat.available
 
@@ -226,9 +267,9 @@ def test_a_timed_call_reaches_the_fitness_function_without_tracing():
     from core.llm.client import EchoBackend, InferenceClient
 
     led = ProvenanceLedger(run_id="r1")
-    InferenceClient(EchoBackend(), default_engine({"a4": {"llm_complete"}}), led,
-                    daily_budget_myr=Decimal("25")).complete(
-        "a4", TaskClass.NEWS_TRIAGE, "headline")
+    InferenceClient(
+        EchoBackend(), default_engine({"a4": {"llm_complete"}}), led, daily_budget_myr=Decimal("25")
+    ).complete("a4", TaskClass.NEWS_TRIAGE, "headline")
     lat = next(t for t in compute(led).terms if t.name == "p95_latency")
     assert lat.available
 

@@ -41,11 +41,12 @@ import os
 import threading
 import time
 import uuid
+from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import asdict, dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Iterator
+from typing import Any
 
 #: Where runs are written. Gitignored; see .gitignore.
 DEBUG_ROOT = Path(os.environ.get("FINPLANET_DEBUG_DIR", "debug"))
@@ -58,7 +59,7 @@ _local = threading.local()
 
 
 def _now() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 @dataclass
@@ -84,9 +85,10 @@ class Event:
 class Tracer:
     """One run. Writes trace.jsonl incrementally so a crash still leaves a trace."""
 
-    def __init__(self, label: str = "run", root: Path | None = None,
-                 run_id: str | None = None) -> None:
-        self.run_id = run_id or f"{datetime.now(timezone.utc):%Y%m%dT%H%M%S}-{uuid.uuid4().hex[:6]}"
+    def __init__(
+        self, label: str = "run", root: Path | None = None, run_id: str | None = None
+    ) -> None:
+        self.run_id = run_id or f"{datetime.now(UTC):%Y%m%dT%H%M%S}-{uuid.uuid4().hex[:6]}"
         self.label = label
         self.dir = Path(root or DEBUG_ROOT) / self.run_id
         self.prompts_dir = self.dir / "prompts"
@@ -112,8 +114,13 @@ class Tracer:
         with self._lock:
             self._seq += 1
             ev = Event(
-                seq=self._seq, at=_now(), kind=kind, name=name, depth=self._depth,
-                run_id=self.run_id, span_id=uuid.uuid4().hex[:8],
+                seq=self._seq,
+                at=_now(),
+                kind=kind,
+                name=name,
+                depth=self._depth,
+                run_id=self.run_id,
+                span_id=uuid.uuid4().hex[:8],
                 parent_id=self._stack[-1] if self._stack else None,
                 data=self._externalise(name, data),
             )
@@ -135,8 +142,7 @@ class Tracer:
                 safe = "".join(c if c.isalnum() or c in "-_" else "_" for c in name)[:40]
                 fname = f"{self._blob_n:04d}-{safe}-{k}.txt"
                 (self.prompts_dir / fname).write_text(v, encoding="utf-8")
-                out[k] = {"_blob": f"prompts/{fname}", "chars": len(v),
-                          "head": v[:200]}
+                out[k] = {"_blob": f"prompts/{fname}", "chars": len(v), "head": v[:200]}
             else:
                 out[k] = v
         return out
@@ -154,23 +160,22 @@ class Tracer:
             yield start
         except Exception as e:
             start.error = f"{type(e).__name__}: {e}"
-            self.emit("error", name, error=start.error,
-                      exc_type=type(e).__name__)
+            self.emit("error", name, error=start.error, exc_type=type(e).__name__)
             raise
         finally:
             with self._lock:
                 self._depth -= 1
                 self._stack.pop()
             start.duration_ms = (time.perf_counter() - t0) * 1000
-            self.emit("span_end", name, duration_ms=start.duration_ms,
-                      ok=start.error is None)
+            self.emit("span_end", name, duration_ms=start.duration_ms, ok=start.error is None)
 
     # -- finishing -----------------------------------------------------------
 
     def close(self) -> dict:
         summary = self.summary()
         (self.dir / "summary.json").write_text(
-            json.dumps(summary, indent=2, default=str), encoding="utf-8")
+            json.dumps(summary, indent=2, default=str), encoding="utf-8"
+        )
         self._fh.close()
         return summary
 
@@ -180,14 +185,18 @@ class Tracer:
             kinds[e.kind] = kinds.get(e.kind, 0) + 1
         slow = sorted(
             (e for e in self.events if e.duration_ms is not None),
-            key=lambda e: -(e.duration_ms or 0))[:15]
+            key=lambda e: -(e.duration_ms or 0),
+        )[:15]
         errors = [e for e in self.events if e.kind == "error"]
-        cost = sum(float(e.data.get("cost_myr", 0) or 0)
-                   for e in self.events if e.kind == "llm_call")
-        tokens_in = sum(int(e.data.get("input_tokens", 0) or 0)
-                        for e in self.events if e.kind == "llm_call")
-        tokens_out = sum(int(e.data.get("output_tokens", 0) or 0)
-                         for e in self.events if e.kind == "llm_call")
+        cost = sum(
+            float(e.data.get("cost_myr", 0) or 0) for e in self.events if e.kind == "llm_call"
+        )
+        tokens_in = sum(
+            int(e.data.get("input_tokens", 0) or 0) for e in self.events if e.kind == "llm_call"
+        )
+        tokens_out = sum(
+            int(e.data.get("output_tokens", 0) or 0) for e in self.events if e.kind == "llm_call"
+        )
         return {
             "run_id": self.run_id,
             "label": self.label,
@@ -196,18 +205,23 @@ class Tracer:
             "events": len(self.events),
             "by_kind": dict(sorted(kinds.items())),
             "errors": [{"name": e.name, "error": e.data.get("error")} for e in errors],
-            "llm": {"calls": kinds.get("llm_call", 0), "cost_myr": round(cost, 6),
-                    "input_tokens": tokens_in, "output_tokens": tokens_out},
-            "agents_seen": sorted({e.data.get("agent") for e in self.events
-                                   if e.data.get("agent")}),
+            "llm": {
+                "calls": kinds.get("llm_call", 0),
+                "cost_myr": round(cost, 6),
+                "input_tokens": tokens_in,
+                "output_tokens": tokens_out,
+            },
+            "agents_seen": sorted({a for e in self.events if (a := e.data.get("agent"))}),
             "refusals": sum(1 for e in self.events if e.kind in ("refusal", "denied")),
-            "slowest": [{"name": e.name, "kind": e.kind,
-                         "ms": round(e.duration_ms or 0, 2)} for e in slow],
+            "slowest": [
+                {"name": e.name, "kind": e.kind, "ms": round(e.duration_ms or 0, 2)} for e in slow
+            ],
             "dir": str(self.dir),
         }
 
 
 # -- module-level API -------------------------------------------------------
+
 
 def active() -> Tracer | None:
     return getattr(_local, "tracer", None)
@@ -219,8 +233,9 @@ def is_tracing() -> bool:
 
 
 @contextmanager
-def start_run(label: str = "run", root: Path | None = None,
-              run_id: str | None = None) -> Iterator[Tracer]:
+def start_run(
+    label: str = "run", root: Path | None = None, run_id: str | None = None
+) -> Iterator[Tracer]:
     previous = active()
     tracer = Tracer(label, root, run_id)
     _local.tracer = tracer

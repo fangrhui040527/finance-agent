@@ -33,14 +33,20 @@ from decimal import Decimal
 
 from core.market.calendar import SessionCalendar, SessionWindow
 from markets.contract import (
-    AccountingStandard, FeeLeg, FeeSchedule, KnownAtStrategy, MarketAdapter,
+    AccountingStandard,
+    FeeLeg,
+    FeeSchedule,
+    KnownAtStrategy,
+    MarketAdapter,
 )
 
-SGX_FEES = FeeSchedule((
-    FeeLeg("brokerage", Decimal("0.0008"), minimum=Decimal("10")),
-    FeeLeg("clearing", Decimal("0.000325"), cap=Decimal("600")),
-    FeeLeg("trading", Decimal("0.000075")),
-))
+SGX_FEES = FeeSchedule(
+    (
+        FeeLeg("brokerage", Decimal("0.0008"), minimum=Decimal("10")),
+        FeeLeg("clearing", Decimal("0.000325"), cap=Decimal("600")),
+        FeeLeg("trading", Decimal("0.000075")),
+    )
+)
 
 
 class XSES(MarketAdapter):
@@ -48,7 +54,7 @@ class XSES(MarketAdapter):
     country = "SG"
     currency = "SGD"
     tier = 2
-    accounting_standard = AccountingStandard.IFRS   # SFRS(I), IFRS-converged
+    accounting_standard = AccountingStandard.IFRS  # SFRS(I), IFRS-converged
     local_index = "STI"
     regulator = "Monetary Authority of Singapore"
     settlement_days = 2

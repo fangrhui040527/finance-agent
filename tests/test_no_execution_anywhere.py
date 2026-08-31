@@ -3,13 +3,15 @@
 docs/07 section 4, done-ness criterion 9. This is a grep, deliberately - it
 catches a broker client someone adds later, which a policy unit test would not.
 """
+
 import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 FORBIDDEN = re.compile(
     r"\b(place_order|submit_order|execute_trade|broker\.(buy|sell)|"
-    r"alpaca|ib_insync|ccxt\.)\b", re.I,
+    r"alpaca|ib_insync|ccxt\.)\b",
+    re.I,
 )
 SKIP_DIRS = {".git", ".venv", "docs", "__pycache__", ".pytest_cache", "node_modules"}
 
@@ -17,11 +19,11 @@ SKIP_DIRS = {".git", ".venv", "docs", "__pycache__", ".pytest_cache", "node_modu
 # not basenames: a basename allowlist would hand a free pass to any new file
 # called policy.py anywhere in the tree.
 ALLOWED_PATHS = {
-    "core/guardrails/policy.py",            # NoExecutionPolicy, denies by name
-    "core/registry/loader.py",              # FORBIDDEN_TOOLS, refuses at load
+    "core/guardrails/policy.py",  # NoExecutionPolicy, denies by name
+    "core/registry/loader.py",  # FORBIDDEN_TOOLS, refuses at load
     "verify.py",
-    "trace_run.py",                         # traces the refusal, by name
-    "tests/test_trace.py",                  # asserts that refusal is recorded
+    "trace_run.py",  # traces the refusal, by name
+    "tests/test_trace.py",  # asserts that refusal is recorded
     "tests/test_no_execution_anywhere.py",
     # The Trace screen RENDERS the refusal - a denied place_order with
     # meta='no_execution' - which is the same reason trace_run.py is here. A

@@ -41,8 +41,7 @@ def decomposition_bars(exp: MoveExplanation) -> str:
     is how a system trains its user to believe it knows more than it does.
     """
     if not exp.components:
-        return (f"{exp.instrument_id}  attribution unavailable\n"
-                f"  {exp.reason}")
+        return f"{exp.instrument_id}  attribution unavailable\n  {exp.reason}"
 
     scale = max(abs(c.contribution) for c in exp.components) or 0.01
     lines = [
@@ -53,11 +52,13 @@ def decomposition_bars(exp: MoveExplanation) -> str:
     for c in exp.components:
         label = c.component.value.replace("_", " ")
         beta = f"  b={c.beta:+.2f}" if c.beta is not None else ""
-        lines.append(f"  {label:<14}{c.contribution * 100:>7.2f}pp  "
-                     f"{_bar(c.contribution, scale)}{beta}")
+        lines.append(
+            f"  {label:<14}{c.contribution * 100:>7.2f}pp  {_bar(c.contribution, scale)}{beta}"
+        )
     lines.append("")
-    lines.append(f"  unexplained    {exp.unexplained_share * 100:>6.0f}%"
-                 f"   verdict: {exp.verdict.value}")
+    lines.append(
+        f"  unexplained    {exp.unexplained_share * 100:>6.0f}%   verdict: {exp.verdict.value}"
+    )
     if exp.reason:
         lines.append(f"  {exp.reason}")
     # Branch on the verdict, never on whether the candidate list is empty. A
@@ -72,14 +73,14 @@ def decomposition_bars(exp: MoveExplanation) -> str:
             lines.append("")
             lines.append(f"  {len(exp.candidates)} candidate(s) were scored and rejected:")
             for c in exp.candidates[:4]:
-                lines.append(f"    {c.score:.2f}  {c.description}  "
-                             f"(+{c.lag_sessions}s)  BELOW THRESHOLD")
+                lines.append(
+                    f"    {c.score:.2f}  {c.description}  (+{c.lag_sessions}s)  BELOW THRESHOLD"
+                )
     elif exp.candidates:
         lines.append("")
         lines.append("  candidate causes, scored against the residual:")
         for c in exp.candidates[:4]:
-            lines.append(f"    {c.score:.2f}  {c.description}  "
-                         f"(+{c.lag_sessions}s)")
+            lines.append(f"    {c.score:.2f}  {c.description}  (+{c.lag_sessions}s)")
     return "\n".join(lines)
 
 
@@ -89,7 +90,7 @@ class Annotation:
 
     at: date
     label: str
-    kind: str                    # event | breaker | entry | stop | review
+    kind: str  # event | breaker | entry | stop | review
     score: float | None = None
     source: str | None = None
 
@@ -138,8 +139,7 @@ def annotated_chart(
         src = f"  [{a.source}]" if a.source else ""
         legend.append(f"  {i}. {a.at}  {a.kind:<8}{a.label}{score}{src}")
 
-    out = [f"{instrument_id}   {dates[0]} to {dates[-1]}   "
-           f"high {hi:,.2f}  low {lo:,.2f}", ""]
+    out = [f"{instrument_id}   {dates[0]} to {dates[-1]}   high {hi:,.2f}  low {lo:,.2f}", ""]
     out += ["  " + "".join(row) for row in grid]
     out.append("  " + "".join(marks))
     if legend:
@@ -174,8 +174,11 @@ def thesis_memo(
         lines.append("")
     if valuation_range:
         lo, hi = valuation_range
-        lines += [f"VALUATION RANGE  {lo:,.2f} to {hi:,.2f}",
-                  "  A range, not a target. The width is the honest part.", ""]
+        lines += [
+            f"VALUATION RANGE  {lo:,.2f} to {hi:,.2f}",
+            "  A range, not a target. The width is the honest part.",
+            "",
+        ]
     if what_must_be_true:
         lines += ["WHAT MUST BE TRUE"]
         lines += [f"  - {w}" for w in what_must_be_true]
@@ -228,14 +231,14 @@ def daily_brief(
             idio = m.component(Component.IDIOSYNCRATIC)
             share = f"{idio.contribution * 100:+.1f}pp stock-specific" if idio else ""
             top = m.candidates[0].description if m.candidates else "no identified catalyst"
-            lines.append(f"  {m.instrument_id:<14}{m.total_return_base * 100:+6.2f}%  "
-                         f"{share:<24}{top}")
+            lines.append(
+                f"  {m.instrument_id:<14}{m.total_return_base * 100:+6.2f}%  {share:<24}{top}"
+            )
         lines.append("")
 
     if routine:
         lines += ["EVERYTHING ELSE MOVED WITH ITS MARKET"]
-        names = ", ".join(f"{m.instrument_id} {m.total_return_base * 100:+.1f}%"
-                          for m in routine)
+        names = ", ".join(f"{m.instrument_id} {m.total_return_base * 100:+.1f}%" for m in routine)
         lines.append(f"  {names}")
         lines.append("  No explanation is required for these and none is offered.")
         lines.append("")
@@ -257,17 +260,22 @@ def daily_brief(
         lines.append("")
 
     if not (breakers_due or needs_attention or breaches):
-        lines += ["Nothing needs a decision today.",
-                  "That is the most common correct state and it is shown as one.", ""]
+        lines += [
+            "Nothing needs a decision today.",
+            "That is the most common correct state and it is shown as one.",
+            "",
+        ]
     return "\n".join(lines)
 
 
 def refusal_card(reason: str, what_would_help: str) -> str:
     """A refusal gets a layout, so it does not read as a failure."""
-    return "\n".join([
-        "CANNOT ANSWER THIS",
-        "-" * 68,
-        f"  {reason}",
-        "",
-        f"  What would help: {what_would_help}",
-    ])
+    return "\n".join(
+        [
+            "CANNOT ANSWER THIS",
+            "-" * 68,
+            f"  {reason}",
+            "",
+            f"  What would help: {what_would_help}",
+        ]
+    )

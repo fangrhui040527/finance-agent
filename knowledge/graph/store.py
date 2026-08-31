@@ -32,7 +32,12 @@ from pathlib import Path as FsPath
 
 from core.provenance.ledger import _enable_wal
 from knowledge.graph.entity_graph import (
-    Confidence, Edge, EdgeKind, EntityGraph, Node, NodeKind,
+    Confidence,
+    Edge,
+    EdgeKind,
+    EntityGraph,
+    Node,
+    NodeKind,
 )
 
 DETERMINISTIC = "deterministic"
@@ -134,8 +139,12 @@ class GraphStore:
             merged = json.loads(row[2])
             merged.update(metadata)
             metadata = merged
-        payload = (node.kind.value, node.label or (row[1] if row else ""),
-                   json.dumps(metadata, sort_keys=True), tier)
+        payload = (
+            node.kind.value,
+            node.label or (row[1] if row else ""),
+            json.dumps(metadata, sort_keys=True),
+            tier,
+        )
         if row is not None and tuple(row) == payload:
             return
         self.conn.execute(
@@ -162,14 +171,23 @@ class GraphStore:
             "INSERT OR IGNORE INTO edges "
             "(src, dst, kind, valid_from, valid_to, weight, confidence, source_doc_id, tier) "
             "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            (edge.src, edge.dst, edge.kind.value, _iso(edge.valid_from) or "",
-             _iso(edge.valid_to), edge.weight, edge.confidence.value,
-             edge.source_doc_id, tier),
+            (
+                edge.src,
+                edge.dst,
+                edge.kind.value,
+                _iso(edge.valid_from) or "",
+                _iso(edge.valid_to),
+                edge.weight,
+                edge.confidence.value,
+                edge.source_doc_id,
+                tier,
+            ),
         )
         self.conn.commit()
 
-    def close_edge(self, src: str, dst: str, kind: EdgeKind,
-                   valid_from: date | None, valid_to: date) -> None:
+    def close_edge(
+        self, src: str, dst: str, kind: EdgeKind, valid_from: date | None, valid_to: date
+    ) -> None:
         """End a relationship. The only mutation this store permits."""
         cur = self.conn.execute(
             "UPDATE edges SET valid_to = ? "
@@ -203,8 +221,8 @@ class GraphStore:
         """
         wanted = {(e.src, e.dst, e.kind.value, _iso(e.valid_from) or "") for e in keep}
         rows = self.conn.execute(
-            "SELECT src, dst, kind, valid_from FROM edges "
-            "WHERE tier = ? AND valid_to IS NULL", (tier,),
+            "SELECT src, dst, kind, valid_from FROM edges WHERE tier = ? AND valid_to IS NULL",
+            (tier,),
         ).fetchall()
         closed = []
         for row in rows:
@@ -226,9 +244,10 @@ class GraphStore:
     # -- reads ----------------------------------------------------------------
 
     def _node_exists(self, node_id: str) -> bool:
-        return self.conn.execute(
-            "SELECT 1 FROM nodes WHERE node_id = ?", (node_id,)
-        ).fetchone() is not None
+        return (
+            self.conn.execute("SELECT 1 FROM nodes WHERE node_id = ?", (node_id,)).fetchone()
+            is not None
+        )
 
     def load(self, tier: str | None = None) -> EntityGraph:
         """Rebuild the in-memory graph. Deterministic order, so a dump is stable.
@@ -241,19 +260,32 @@ class GraphStore:
         exception.
         """
         g = EntityGraph()
-        eq = ("SELECT src, dst, kind, valid_from, valid_to, weight, confidence, "
-              "source_doc_id FROM edges")
+        eq = (
+            "SELECT src, dst, kind, valid_from, valid_to, weight, confidence, "
+            "source_doc_id FROM edges"
+        )
         args: tuple = ()
         if tier is not None:
             eq += " WHERE tier = ?"
             args = (tier,)
         for nid, kind, label, meta in self.conn.execute(
-                "SELECT node_id, kind, label, metadata_json FROM nodes ORDER BY node_id"):
+            "SELECT node_id, kind, label, metadata_json FROM nodes ORDER BY node_id"
+        ):
             g.add_node(Node(nid, NodeKind(kind), label, json.loads(meta)))
         rows = self.conn.execute(eq + " ORDER BY src, dst, kind, valid_from", args)
         for src, dst, kind, vf, vt, weight, conf, doc in rows:
-            g.add_edge(Edge(src, dst, EdgeKind(kind), weight, doc,
-                            Confidence(conf), _from_iso(vf), _from_iso(vt)))
+            g.add_edge(
+                Edge(
+                    src,
+                    dst,
+                    EdgeKind(kind),
+                    weight,
+                    doc,
+                    Confidence(conf),
+                    _from_iso(vf),
+                    _from_iso(vt),
+                )
+            )
         return g
 
     def live_edges(self, on: date) -> list[Edge]:
@@ -265,8 +297,10 @@ class GraphStore:
             "ORDER BY src, dst, kind, valid_from",
             (_iso(on), _iso(on)),
         )
-        return [Edge(s, d, EdgeKind(k), w, doc, Confidence(c), _from_iso(vf), _from_iso(vt))
-                for s, d, k, vf, vt, w, c, doc in rows]
+        return [
+            Edge(s, d, EdgeKind(k), w, doc, Confidence(c), _from_iso(vf), _from_iso(vt))
+            for s, d, k, vf, vt, w, c, doc in rows
+        ]
 
     def counts(self) -> dict[str, int]:
         n = self.conn.execute("SELECT COUNT(*) FROM nodes").fetchone()[0]
@@ -284,7 +318,7 @@ class GraphStore:
     def close(self) -> None:
         self.conn.close()
 
-    def __enter__(self) -> "GraphStore":
+    def __enter__(self) -> GraphStore:
         return self
 
     def __exit__(self, *exc) -> None:

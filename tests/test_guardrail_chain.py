@@ -1,12 +1,16 @@
 """P0 DoD: all five rails present, and no path bypasses them."""
-from datetime import datetime, timedelta, timezone
+
+from datetime import UTC, datetime, timedelta
 
 import pytest
 
 from core.guardrails.chain import RAIL_ORDER, GuardrailChain
 from core.guardrails.defaults import default_engine
 from core.guardrails.policy import (
-    Action, Decision, PolicyEngine, PolicyViolation, Rail,
+    Action,
+    Decision,
+    PolicyViolation,
+    Rail,
 )
 
 
@@ -73,7 +77,7 @@ def test_band_language_passes():
 
 def test_stale_beyond_three_times_sla_is_denied():
     engine = default_engine({"a3": {"retrieve"}})
-    old = datetime.now(timezone.utc) - timedelta(hours=80)
+    old = datetime.now(UTC) - timedelta(hours=80)
     with pytest.raises(PolicyViolation):
         engine.enforce(
             Action("retrieve", Rail.RETRIEVAL, "a3", {"corpus": "kb_filings", "as_of": old})
@@ -82,7 +86,7 @@ def test_stale_beyond_three_times_sla_is_denied():
 
 def test_mildly_stale_requires_disclosure_not_denial():
     engine = default_engine({"a3": {"retrieve"}})
-    old = datetime.now(timezone.utc) - timedelta(hours=30)
+    old = datetime.now(UTC) - timedelta(hours=30)
     res = engine.enforce(
         Action("retrieve", Rail.RETRIEVAL, "a3", {"corpus": "kb_filings", "as_of": old})
     )
