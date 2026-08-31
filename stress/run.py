@@ -1159,6 +1159,7 @@ def s_mcp():
         "maintainability_report": {"db": ":memory:"},
         "reasoning_report": {"runs": 1, "db": ":memory:"},
         "scorecard": {"db": ":memory:"},
+        "investable_capital": {},
         "log_prediction": {
             "instrument": "MYX:1155",
             "direction": 1,

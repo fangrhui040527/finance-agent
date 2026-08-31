@@ -535,6 +535,38 @@ def check_portfolio_risk(
     return f"BOOK  {len(parsed)} positions, base {base_currency}\n{_lines(out)}{DISCLAIMER}"
 
 
+def investable_capital(db: str = "") -> str:
+    """How much money is allowed to be in stocks at all, from [capital].
+
+    docs/05 section 2 puts this before any question about which stock. Three
+    steps are LOCKED and no argument here reduces them: the emergency floor,
+    near-term goals inside 24 months, and debt above the hurdle.
+    """
+    from agents.portfolio.agents import plan_capital
+    from core.config import load as load_config
+
+    cfg = load_config()
+    waterfall, findings = plan_capital(cfg, context())
+    if waterfall is None:
+        return (
+            "NO PLAN: config.toml has no [capital] block, so investable capital "
+            "cannot be derived.\n"
+            "  Fill liquid_assets and essential_monthly_spend (plus any goals and "
+            "liabilities).\n"
+            "  Until then size_position needs portfolio_value supplied by the caller, "
+            "which BYPASSES the emergency floor, near-term goals and debt hurdle." + DISCLAIMER
+        )
+    body = waterfall.explain()
+    notes = "\n".join(f"  {c}" for f in findings for c in f.caveats)
+    tail = ""
+    if waterfall.investable == 0:
+        tail = (
+            "\n\n  NO CAPITAL: the floor and reservations consume everything liquid. "
+            "The correct amount to invest today is zero - an answer, not a failure."
+        )
+    return f"{body}\n{notes}{tail}{DISCLAIMER}"
+
+
 def size_position(
     instrument: str,
     portfolio_value: float,
@@ -649,8 +681,14 @@ def size_position(
         )
 
     fx_line = "" if quote == BASE_CURRENCY else f"  fx 1 {quote} = {BASE_CURRENCY} {fx}\n"
+    # portfolio_value arrives as a number the caller chose. That is exactly what
+    # the waterfall exists to produce, so say which locks did not apply to it.
+    from agents.portfolio.agents import TYPED_CAPITAL_NOTE
+
+    capital_line = f"  {TYPED_CAPITAL_NOTE}\n"
     return (
         f"SIZING  {instrument} on {mic}\n"
+        f"{capital_line}"
         f"  portfolio {BASE_CURRENCY} {pv:,.2f}  entry {quote} {px}  "
         f"stop {quote} {stop}  stop distance {((px - stop) / px):.2%}\n"
         f"{fx_line}"

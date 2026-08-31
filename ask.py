@@ -460,8 +460,34 @@ def cmd_risk(a) -> int:
 
 # --- sizing ---------------------------------------------------------------
 def cmd_size(a) -> int:
-    a13 = A13Sizing(context())
-    portfolio = Decimal(str(a.portfolio))
+    from agents.portfolio.agents import TYPED_CAPITAL_NOTE, plan_capital
+    from core.config import load as load_cfg
+
+    ctx = context()
+    a13 = A13Sizing(ctx)
+    if getattr(a, "from_plan", False):
+        waterfall, _ = plan_capital(load_cfg(), ctx)
+        if waterfall is None:
+            print(
+                "--from-plan needs a [capital] block in config.toml. Run `ask.py capital`.",
+                file=sys.stderr,
+            )
+            return 2
+        if waterfall.investable == 0:
+            print("no position: the plan leaves nothing investable today.\n")
+            print(waterfall.explain())
+            return 0
+        portfolio = waterfall.investable
+        capital_note = f"capital DERIVED through the waterfall: {portfolio:,.2f} investable"
+    elif a.portfolio is None:
+        print(
+            "give --portfolio, or --from-plan to derive it from [capital] in config.toml.",
+            file=sys.stderr,
+        )
+        return 2
+    else:
+        portfolio = Decimal(str(a.portfolio))
+        capital_note = TYPED_CAPITAL_NOTE
     price = Decimal(str(a.price))
     stop = Decimal(str(a.stop))
     if stop >= price:
@@ -570,6 +596,7 @@ def cmd_size(a) -> int:
         mic=mic,
         fx_base_per_quote=fx,
     )
+    print(f"  {capital_note}")
     print(
         f"sizing    {a.instrument}  portfolio {BASE_CURRENCY} {portfolio:,.2f}  "
         f"stop distance {stop_frac:.1%}"
@@ -585,18 +612,31 @@ def cmd_size(a) -> int:
     binding, value = caps.binding()
     units = int(value / price) // a.lot * a.lot
     print(f"\n  binding cap {binding.value} at {quote} {value:,.2f}")
+
+    def shown(v: Decimal) -> str:
+        native_txt = f"{quote} {v:,.2f}"
+        if quote == BASE_CURRENCY:
+            return native_txt
+        return f"{native_txt} = {BASE_CURRENCY} {to_base(v, quote, fx):,.2f}"
+
+    native = Decimal(units) * price
     if units < a.lot:
         print(
             f"  -> no position: the binding cap does not fund one {a.lot}-share lot "
             f"at {quote} {price}"
         )
+    elif native < caps.cost_floor:
+        # The floor is computed and PRINTED two lines above, then was ignored
+        # here - so this command recommended positions the MCP tool refused for
+        # the same inputs. Below the minimum economic position the round trip
+        # cannot pay for itself at any edge; that is the whole point of it.
+        print(
+            f"  -> no position: {units:,} units is {shown(native)}, below the "
+            f"{shown(caps.cost_floor)} minimum economic position on {mic}. "
+            f"The round trip cannot pay for itself."
+        )
     else:
-        native = Decimal(units) * price
-        base = to_base(native, quote, fx)
-        shown = f"{quote} {native:,.2f}"
-        if quote != BASE_CURRENCY:
-            shown += f" = {BASE_CURRENCY} {base:,.2f}"
-        print(f"  -> {units:,} units ({shown}) in lots of {a.lot}")
+        print(f"  -> {units:,} units ({shown(native)}) in lots of {a.lot}")
     return 0
 
 
@@ -706,6 +746,37 @@ def cmd_alerts(a) -> int:
         print("\nhistory (newest first)")
         for r in rows:
             print(f"  {r['at'][:19]}  {r['state']:<8} {r['rule']:<22} {r['title'][:60]}")
+    return 0
+
+
+def cmd_capital(a) -> int:
+    """How much money is allowed to be in stocks at all.
+
+    docs/05 section 2 puts this before any question about which stock. The
+    first three steps are locked: no flag in this API reduces the emergency
+    floor, funds a near-term goal out of equities, or lets equities outrank
+    debt above the hurdle.
+    """
+    from agents.portfolio.agents import plan_capital
+    from core.config import load as load_cfg
+
+    cfg = load_cfg()
+    waterfall, findings = plan_capital(cfg, context())
+    if waterfall is None:
+        print("no [capital] plan in config.toml.")
+        print(
+            "  Fill liquid_assets and essential_monthly_spend (plus any goals and\n"
+            "  liabilities) and this command derives what is investable. Until then\n"
+            "  `size` needs --portfolio, which bypasses the emergency floor, the\n"
+            "  near-term goals and the debt hurdle."
+        )
+        return 2
+    print(waterfall.explain())
+    for f in findings:
+        for c in f.caveats:
+            print(f"\n  {c}")
+    if waterfall.investable == 0:
+        print("\n  Nothing is investable today. That is an answer, not a failure.")
     return 0
 
 
@@ -997,8 +1068,18 @@ def main(argv=None) -> int:
 
     sz = sub.add_parser("size", help="turn a stance into lots, or into a refusal")
     sz.add_argument("instrument")
+    # Not required: --from-plan derives it from [capital] through the waterfall.
+    # A typed figure still works, and is disclosed as the bypass it is.
     sz.add_argument(
-        "--portfolio", type=float, required=True, help=f"investable capital, in {BASE_CURRENCY}"
+        "--portfolio",
+        type=float,
+        help=f"investable capital in {BASE_CURRENCY}, typed (bypasses the waterfall)",
+    )
+    sz.add_argument(
+        "--from-plan",
+        action="store_true",
+        help="derive investable capital from [capital] in config.toml, applying the "
+        "emergency floor, near-term goals and debt hurdle",
     )
     sz.add_argument(
         "--price", type=float, required=True, help="in the market's own currency, like --adv"
@@ -1101,6 +1182,9 @@ def main(argv=None) -> int:
     al.add_argument("--alerts-db", default="data/alerts.db")
     al.add_argument("--limit", type=int, default=20)
     al.set_defaults(fn=cmd_alerts)
+
+    cp = sub.add_parser("capital", help="how much may be invested at all, from [capital]")
+    cp.set_defaults(fn=cmd_capital)
 
     dr = sub.add_parser("doctor", help="preflight: what this installation can actually do")
     dr.add_argument("--offline", action="store_true", help="skip the two network probes")

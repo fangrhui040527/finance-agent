@@ -60,6 +60,27 @@ HARD_BOUNDS: tuple[tuple[str, float, float, str], ...] = (
         "a per-question budget above RM 1,000 is a typo, not a decision",
     ),
     (
+        "capital.liquid_assets",
+        0.0,
+        1_000_000_000.0,
+        "a liquid balance must be a positive number under a billion; outside that "
+        "it is a typo, a sign error, or a different kind of problem entirely",
+    ),
+    (
+        "capital.essential_monthly_spend",
+        0.0,
+        10_000_000.0,
+        "essential monthly spending is what the emergency floor multiplies; a "
+        "wrong figure here moves the floor, which is the one number that never bends",
+    ),
+    (
+        "capital.planned_monthly_contribution",
+        0.0,
+        10_000_000.0,
+        "one month of planned contributions is held back as a cash buffer, so a "
+        "number this large would swallow the whole plan",
+    ),
+    (
         "monitor.spend_fraction",
         0.0,
         2.0,
@@ -100,6 +121,62 @@ class ConfigError(ValueError):
 
 
 @dataclass(frozen=True)
+class Goal:
+    """Money already spoken for, and when. Inside 24 months it holds cash."""
+
+    name: str
+    amount: Decimal
+    months_away: int
+
+
+@dataclass(frozen=True)
+class Liability:
+    """A debt. Above the hurdle it outranks equities, because paying off a 17%
+    card is a guaranteed 17% return no equity thesis can honestly promise."""
+
+    name: str
+    balance: Decimal
+    annual_rate: Decimal
+
+
+@dataclass(frozen=True)
+class Holding:
+    """What you actually own. `units` and `avg_cost` are optional so a file
+    that lists bare ids keeps loading - but without units the book cannot be
+    valued, and anything that needs a value says so rather than assuming one."""
+
+    id: str
+    units: Decimal | None = None
+    avg_cost: Decimal | None = None
+
+    @property
+    def valued(self) -> bool:
+        return self.units is not None
+
+
+@dataclass(frozen=True)
+class CapitalPlan:
+    """Your financial position, from which investable capital is DERIVED.
+
+    docs/05 section 2: before any question about which stock, there is a
+    question about how much money is allowed to be in stocks at all. This is
+    the input to that question; `engines/sizing/waterfall.compute` answers it.
+    """
+
+    liquid_assets: Decimal = Decimal(0)
+    essential_monthly_spend: Decimal = Decimal(0)
+    planned_monthly_contribution: Decimal = Decimal(0)
+    goals: tuple[Goal, ...] = ()
+    liabilities: tuple[Liability, ...] = ()
+
+    @property
+    def stated(self) -> bool:
+        """False when nothing has been entered. An unstated plan must never be
+        treated as a plan whose answer happens to be zero."""
+        return self.liquid_assets > 0 or self.essential_monthly_spend > 0
+
+
+@dataclass(frozen=True)
 class Config:
     base_currency: str
     markets: tuple[str, ...]
@@ -121,6 +198,11 @@ class Config:
     alert_dropped_claim_rate: Decimal = Decimal("0.2")
     #: 0 disables. A personal tool is allowed to sit idle; a scheduled one is not.
     alert_silence_hours: int = 0
+    #: The financial position the waterfall turns into investable capital.
+    capital: CapitalPlan = CapitalPlan()
+    #: Holdings with units where the file gives them; `holdings` keeps the bare
+    #: ids so every existing consumer is untouched.
+    book: tuple[Holding, ...] = ()
     # Defaulted so a hand-built Config stays easy to write in tests, and so an
     # older config file loads without them. An empty holdings/watchlist is a
     # legitimate starting state - it just means nothing can escalate yet, which
@@ -149,6 +231,14 @@ class Config:
             f"   (unattended; separate so a runaway job cannot eat the above)\n"
             f"  prediction log       {self.database}\n"
             f"  provenance ledger    {self.provenance_db}\n"
+            f"  investable capital   "
+            + (
+                f"{self.capital.liquid_assets:,.2f} liquid, "
+                f"{self.capital.essential_monthly_spend:,.2f}/month essential"
+                if self.capital.stated
+                else "(no [capital] plan - `ask.py size` cannot derive it)"
+            )
+            + "\n"
             f"  holdings             {', '.join(self.holdings) or '(none)'}\n"
             f"  watchlist            {', '.join(self.watchlist) or '(none)'}"
             + (
@@ -175,7 +265,9 @@ def _instruments(data: dict, dotted: str) -> tuple[str, ...]:
         raise ConfigError(f"{dotted} must be a list of instrument ids, not a string")
     out = []
     for item in raw:
-        ident = str(item).strip()
+        # A holdings entry may be a table with units; the id is what this
+        # function is for, and the table form is validated in _book.
+        ident = str(item["id"]).strip() if isinstance(item, dict) else str(item).strip()
         try:
             mic_of(ident)
         except ValueError:
@@ -187,6 +279,136 @@ def _instruments(data: dict, dotted: str) -> tuple[str, ...]:
     dupes = {i for i in out if out.count(i) > 1}
     if dupes:
         raise ConfigError(f"{dotted} lists {sorted(dupes)} more than once")
+    return tuple(out)
+
+
+def _capital(data: dict) -> CapitalPlan:
+    """The [capital] block. Every entry validated, nothing defaulted silently."""
+    section = data.get("capital", {}) or {}
+    known = {
+        "liquid_assets",
+        "essential_monthly_spend",
+        "planned_monthly_contribution",
+        "goals",
+        "liabilities",
+    }
+    unknown = set(section) - known
+    if unknown:
+        raise ConfigError(
+            f"unknown [capital] keys {sorted(unknown)}. A misspelled key here is "
+            "silently ignored, and the floor it was meant to raise never moves."
+        )
+
+    def money(value, where: str) -> Decimal:
+        if isinstance(value, bool) or not isinstance(value, (int, float, str)):
+            raise ConfigError(f"{where} must be a number, got {type(value).__name__}")
+        d = Decimal(str(value))
+        if d < 0:
+            raise ConfigError(f"{where} cannot be negative")
+        return d
+
+    goals = []
+    for i, raw in enumerate(section.get("goals") or []):
+        if not isinstance(raw, dict):
+            raise ConfigError(
+                f"[capital] goals[{i}] must be a table like "
+                '{ name = "car", amount = 30000, months_away = 18 }'
+            )
+        missing = [k for k in ("name", "amount", "months_away") if k not in raw]
+        if missing:
+            raise ConfigError(f"[capital] goals[{i}] is missing {missing}")
+        months = raw["months_away"]
+        if isinstance(months, bool) or not isinstance(months, int) or months < 0:
+            raise ConfigError(f"[capital] goals[{i}].months_away must be a whole number of months")
+        goals.append(
+            Goal(str(raw["name"]), money(raw["amount"], f"goals[{i}].amount"), int(months))
+        )
+
+    liabilities = []
+    for i, raw in enumerate(section.get("liabilities") or []):
+        if not isinstance(raw, dict):
+            raise ConfigError(
+                f"[capital] liabilities[{i}] must be a table like "
+                '{ name = "card", balance = 4000, annual_rate = 0.17 }'
+            )
+        missing = [k for k in ("name", "balance", "annual_rate") if k not in raw]
+        if missing:
+            raise ConfigError(f"[capital] liabilities[{i}] is missing {missing}")
+        rate = money(raw["annual_rate"], f"liabilities[{i}].annual_rate")
+        if rate > 1:
+            raise ConfigError(
+                f"[capital] liabilities[{i}].annual_rate is {rate}; write 0.17 for 17%, "
+                "not 17 - a rate read as 1700% would repay every debt before any equity"
+            )
+        liabilities.append(
+            Liability(str(raw["name"]), money(raw["balance"], f"liabilities[{i}].balance"), rate)
+        )
+
+    return CapitalPlan(
+        liquid_assets=money(section.get("liquid_assets", 0), "[capital] liquid_assets"),
+        essential_monthly_spend=money(
+            section.get("essential_monthly_spend", 0), "[capital] essential_monthly_spend"
+        ),
+        planned_monthly_contribution=money(
+            section.get("planned_monthly_contribution", 0),
+            "[capital] planned_monthly_contribution",
+        ),
+        goals=tuple(goals),
+        liabilities=tuple(liabilities),
+    )
+
+
+def _book(data: dict) -> tuple[Holding, ...]:
+    """account.holdings as Holdings. Accepts a bare id or a table with units.
+
+    The bare form is kept because every earlier config file uses it, and a
+    settings file that stops loading after an upgrade is a worse failure than
+    a book that cannot be valued.
+    """
+    from markets.registry import known_prefixes, mic_of
+
+    raw = _get(data, "account.holdings", [])
+    if isinstance(raw, str):
+        raise ConfigError("account.holdings must be a list, not a string")
+
+    def money(value, where: str) -> Decimal:
+        if isinstance(value, bool) or not isinstance(value, (int, float, str)):
+            raise ConfigError(f"{where} must be a number, got {type(value).__name__}")
+        d = Decimal(str(value))
+        if d < 0:
+            raise ConfigError(f"{where} cannot be negative")
+        return d
+
+    out: list[Holding] = []
+    for i, item in enumerate(raw):
+        if isinstance(item, dict):
+            if "id" not in item:
+                raise ConfigError(f"account.holdings[{i}] is a table with no id")
+            ident = str(item["id"]).strip()
+            unknown = set(item) - {"id", "units", "avg_cost"}
+            if unknown:
+                raise ConfigError(
+                    f"account.holdings[{i}] has unknown keys {sorted(unknown)}; "
+                    "expected id, units, avg_cost"
+                )
+            units = money(item["units"], f"holdings[{i}].units") if "units" in item else None
+            cost = (
+                money(item["avg_cost"], f"holdings[{i}].avg_cost") if "avg_cost" in item else None
+            )
+        else:
+            ident, units, cost = str(item).strip(), None, None
+        try:
+            mic_of(ident)
+        except ValueError:
+            raise ConfigError(
+                f"account.holdings: {ident!r} has no market prefix. Write e.g. "
+                f"'MYX:1155'. Known prefixes: {', '.join(known_prefixes())}"
+            ) from None
+        out.append(Holding(ident, units, cost))
+    ids = [h.id for h in out]
+    dupes = {i for i in ids if ids.count(i) > 1}
+    if dupes:
+        raise ConfigError(f"account.holdings lists {sorted(dupes)} more than once")
     return tuple(out)
 
 
@@ -300,5 +522,7 @@ def load(path: str | Path | None = None) -> Config:
         alert_p95_latency_ms=_float("monitor.p95_latency_ms", 20_000.0),
         alert_dropped_claim_rate=dec("monitor.dropped_claim_rate", 0.2),
         alert_silence_hours=_int("monitor.silence_hours", 0),
+        capital=_capital(data),
+        book=_book(data),
         source=source,
     )

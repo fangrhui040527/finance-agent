@@ -370,3 +370,37 @@ class A13Sizing(Agent):
                 caveats=list(d.notes),
             )
         ]
+
+
+def plan_capital(cfg, ctx) -> tuple:
+    """Config -> the waterfall, through A13. One path, so no surface re-derives it.
+
+    Returns (Waterfall | None, findings). None means the plan was never stated:
+    that is different from a plan whose answer is zero, and every caller has to
+    say which of the two it is.
+    """
+    from engines.sizing.waterfall import Goal as WGoal
+    from engines.sizing.waterfall import Liability as WLiability
+
+    plan = cfg.capital
+    if not plan.stated:
+        return None, []
+    a13 = A13Sizing(ctx)
+    return a13.investable_capital(
+        liquid_assets=plan.liquid_assets,
+        essential_monthly_spend=plan.essential_monthly_spend,
+        goals=[WGoal(g.name, g.amount, g.months_away) for g in plan.goals],
+        liabilities=[WLiability(x.name, x.balance, x.annual_rate) for x in plan.liabilities],
+        planned_monthly_contribution=plan.planned_monthly_contribution,
+        emergency_months=cfg.emergency_months,
+    )
+
+
+#: Printed wherever a caller supplies investable capital by hand. The three
+#: locked steps of the waterfall are exactly what a typed number skips, and a
+#: bypass nobody is told about is the same as a bypass nobody chose.
+TYPED_CAPITAL_NOTE = (
+    "capital was SUPPLIED, not derived: the emergency floor, near-term goals "
+    "and debt hurdle were not applied to it. Fill [capital] in config.toml and "
+    "use --from-plan to have them applied."
+)

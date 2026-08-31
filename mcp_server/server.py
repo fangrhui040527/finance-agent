@@ -251,6 +251,16 @@ S.tool(
 )(T.size_position)
 
 S.tool(
+    "investable_capital",
+    "How much money is allowed to be in stocks AT ALL, derived from the user's "
+    "[capital] plan: liquid assets minus the emergency floor, near-term goals "
+    "and debt above the hurdle. Call this BEFORE size_position - a "
+    "portfolio_value you were handed or guessed skips all three locks, and "
+    "size_position says so when that happens.",
+    obj({"db": _str("optional ledger path (unused today, reserved)")}),
+)(T.investable_capital)
+
+S.tool(
     "plan_question",
     "What the system would do with a question: which agents, what it would "
     "cost, and what it refuses outright. Useful before a long piece of work.",
