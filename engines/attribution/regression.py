@@ -45,18 +45,37 @@ class Fit:
     residual_sigma: float
     r_squared: float
     n: int
+    #: How hard the betas were pulled toward the prior (0 = pure Huber). Carried
+    #: so the output can SAY it - a shrunk beta presented as estimated is a lie.
+    shrinkage: float = 0.0
+    dof: int = 0
 
     def predict(self, row: list[float]) -> float:
         return self.coefficients[0] + sum(c * v for c, v in zip(self.coefficients[1:], row))
 
 
 def huber_fit(
-    factors: list[list[float]], y: list[float], iterations: int = 6, c: float = 1.345
+    factors: list[list[float]],
+    y: list[float],
+    iterations: int = 6,
+    c: float = 1.345,
+    shrink_to: list[float] | None = None,
+    shrink_lambda: float = 0.0,
 ) -> Fit:
-    """Design matrix gets an intercept column prepended automatically."""
+    """Design matrix gets an intercept column prepended automatically.
+
+    `shrink_to`/`shrink_lambda`: an optional ridge-style pull of the SLOPES
+    toward a prior (e.g. market beta 1.0, sector 0.0). Robust estimators still
+    carry sampling noise on short windows, and the literature's answer is to
+    shrink toward a structural prior rather than trust either alone. Lambda is
+    a fraction in [0, 1]: 0 is pure Huber, 1 is the prior verbatim. The blend
+    is recorded on the Fit so downstream output can disclose it.
+    """
     n = len(y)
     if n != len(factors):
         raise ValueError("factor rows and observations must align")
+    if not 0.0 <= shrink_lambda <= 1.0:
+        raise ValueError(f"shrink_lambda must be in [0, 1], got {shrink_lambda}")
     X = [[1.0] + row for row in factors]
     w = [1.0] * n
     coef = _wls(X, y, w)
@@ -67,13 +86,22 @@ def huber_fit(
             break
         w = [min(1.0, c * s / abs(r)) if abs(r) > 1e-12 else 1.0 for r in resid]
         coef = _wls(X, y, w)
+
+    if shrink_to is not None and shrink_lambda > 0.0:
+        if len(shrink_to) != len(coef) - 1:
+            raise ValueError(f"shrink_to has {len(shrink_to)} priors for {len(coef) - 1} slopes")
+        coef = [coef[0]] + [
+            (1.0 - shrink_lambda) * b + shrink_lambda * prior
+            for b, prior in zip(coef[1:], shrink_to)
+        ]
+
     resid = [y[i] - sum(coef[p] * X[i][p] for p in range(len(coef))) for i in range(n)]
     dof = max(n - len(coef), 1)
     sigma = math.sqrt(sum(r * r for r in resid) / dof)
     ybar = sum(y) / n
     sst = sum((v - ybar) ** 2 for v in y)
     r2 = 1.0 - (sum(r * r for r in resid) / sst) if sst > 1e-15 else 0.0
-    return Fit(coef, resid, sigma, r2, n)
+    return Fit(coef, resid, sigma, r2, n, shrinkage=shrink_lambda if shrink_to else 0.0, dof=dof)
 
 
 def _mad_sigma(resid: list[float]) -> float:
@@ -100,3 +128,58 @@ def corrado_rank_z(event_resid: float, estimation_resid: list[float]) -> float:
     k = ranks[-1] - mean_rank
     sd = math.sqrt(sum((r - mean_rank) ** 2 for r in ranks) / n)
     return k / sd if sd > 1e-12 else 0.0
+
+
+def patell_z(event_resid: float, estimation_resid: list[float]) -> float:
+    """Patell's standardised abnormal return test (single event day).
+
+    The residual is standardised by the ESTIMATION-period sigma, so one loud
+    event day cannot inflate its own denominator - the flaw the plain t on
+    event-window residuals has.
+    """
+    n = len(estimation_resid)
+    if n < 3:
+        return 0.0
+    s2 = sum(r * r for r in estimation_resid) / max(n - 2, 1)
+    if s2 < 1e-18:
+        return 0.0
+    return event_resid / math.sqrt(s2)
+
+
+def bmp_z(event_resids: list[float], estimation_resid: list[float]) -> float:
+    """Boehmer-Musumeci-Poulsen: Patell, made robust to event-induced variance.
+
+    Standardise each event-day residual by the estimation sigma FIRST, then
+    test the cross-section of standardised values. Volatility that arrives
+    WITH the event (it usually does) inflates plain Patell; BMP absorbs it.
+    """
+    n = len(event_resids)
+    if n == 0:
+        return 0.0
+    sar = [patell_z(r, estimation_resid) for r in event_resids]
+    mean = sum(sar) / n
+    if n == 1:
+        return sar[0]
+    var = sum((x - mean) ** 2 for x in sar) / (n - 1)
+    if var < 1e-18:
+        return 0.0
+    return mean / math.sqrt(var / n)
+
+
+def cowan_sign_z(event_resids: list[float], estimation_resid: list[float]) -> float:
+    """Cowan's generalised sign test: are positives more common than they were?
+
+    The baseline positive rate comes from the ESTIMATION window rather than
+    an assumed 0.5, so a security that drifts up on ordinary days does not
+    read every up-day as news.
+    """
+    n = len(event_resids)
+    m = len(estimation_resid)
+    if n == 0 or m == 0:
+        return 0.0
+    p_hat = sum(1 for r in estimation_resid if r > 0) / m
+    w = sum(1 for r in event_resids if r > 0)
+    denom = math.sqrt(n * p_hat * (1.0 - p_hat))
+    if denom < 1e-12:
+        return 0.0
+    return (w - n * p_hat) / denom

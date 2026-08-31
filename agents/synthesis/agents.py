@@ -70,6 +70,12 @@ class A9Attribution(Agent):
             base_currency=base_currency,
         )
 
+        # A short estimation window is a property of the NUMBER, so it rides
+        # along as a caveat on every finding built from this decomposition.
+        _window_caveats = (
+            [exp.estimation_note] if "short window" in getattr(exp, "estimation_note", "") else []
+        )
+
         # The cause hunt is gated on the decomposition, not on whether the move
         # felt large. This is the single most important ordering in the system.
         if exp.needs_cause_hunt() and events and table is not None:
@@ -102,7 +108,7 @@ class A9Attribution(Agent):
                     "unexplained_share": exp.unexplained_share,
                     **{c.component.value: c.contribution for c in exp.components},
                 },
-                caveats=([exp.reason] if exp.reason else []),
+                caveats=_window_caveats + ([exp.reason] if exp.reason else []),
             )
         ]
         for c in exp.candidates:

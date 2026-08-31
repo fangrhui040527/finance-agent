@@ -59,6 +59,10 @@ def decomposition_bars(exp: MoveExplanation) -> str:
     lines.append(
         f"  unexplained    {exp.unexplained_share * 100:>6.0f}%   verdict: {exp.verdict.value}"
     )
+    if getattr(exp, "estimation_note", ""):
+        # Commitment 10: the sample size travels with the number.
+        lines.append(f"  ({exp.estimation_note})")
+
     if exp.reason:
         lines.append(f"  {exp.reason}")
     # Branch on the verdict, never on whether the candidate list is empty. A

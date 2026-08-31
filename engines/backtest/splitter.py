@@ -72,3 +72,60 @@ def purged_walk_forward(
     if not folds:
         raise ValueError("no fold retained enough training data after purging")
     return folds
+
+
+def combinatorial_purged_splits(
+    n_obs: int, n_blocks: int = 6, test_blocks: int = 2, embargo: int = 0
+) -> list[Fold]:
+    """Every C(n_blocks, test_blocks) block combination as a purged fold.
+
+    One walk-forward path is one draw; CPCV scores a strategy across MANY
+    train/test paths, which is what makes PBO computable. Purging and embargo
+    follow the same rule as purged_walk_forward: train rows adjacent to a test
+    block are dropped so overlapping information cannot leak across the cut.
+    """
+    from itertools import combinations
+
+    if n_blocks < 2 or not 0 < test_blocks < n_blocks:
+        raise ValueError("need n_blocks >= 2 and 0 < test_blocks < n_blocks")
+    bounds = [round(i * n_obs / n_blocks) for i in range(n_blocks + 1)]
+    blocks = [list(range(bounds[i], bounds[i + 1])) for i in range(n_blocks)]
+    folds: list[Fold] = []
+    for combo in combinations(range(n_blocks), test_blocks):
+        test = [i for b in combo for i in blocks[b]]
+        train: list[int] = []
+        dropped = 0
+        for b in range(n_blocks):
+            if b in combo:
+                continue
+            for i in blocks[b]:
+                # purge + embargo around every test block boundary
+                if any(blocks[c][0] - embargo <= i <= blocks[c][-1] + embargo for c in combo):
+                    dropped += 1
+                    continue
+                train.append(i)
+        folds.append(Fold(list(train), list(test), purged=dropped, embargoed=embargo))
+    return folds
+
+
+@dataclass(frozen=True)
+class LeakageReport:
+    contaminated: tuple[tuple[int, int], ...]  # (fold_index, train_row)
+
+    @property
+    def clean(self) -> bool:
+        return not self.contaminated
+
+
+def detect_boundary_leakage(folds: list[Fold], horizon: int) -> LeakageReport:
+    """Audit folds AFTER construction: does any train row sit within `horizon`
+    rows of a test row? A splitter bug that leaks one overlapping label makes
+    every score built on it quietly optimistic; this is the check that refuses
+    to take the splitter's word for it."""
+    bad: list[tuple[int, int]] = []
+    for f_idx, fold in enumerate(folds):
+        test = set(fold.test)
+        for row in fold.train:
+            if any(abs(row - t) <= horizon for t in test):
+                bad.append((f_idx, row))
+    return LeakageReport(tuple(bad))

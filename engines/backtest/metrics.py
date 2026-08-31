@@ -200,3 +200,72 @@ def deflated_sharpe(
     this correction is how a backtest lies.
     """
     return probabilistic_sharpe(sharpe, returns, expected_max_sharpe(n_trials, sharpe_variance))
+
+
+def benjamini_hochberg(p_values: list[float], fdr: float = 0.10) -> list[bool]:
+    """Which hypotheses survive at the given false-discovery rate.
+
+    Testing thirty factors at p<0.05 and keeping the winners guarantees false
+    discoveries; BH controls the EXPECTED fraction of them instead. Returns a
+    keep/drop flag per input, in input order.
+    """
+    m = len(p_values)
+    if m == 0:
+        return []
+    order = sorted(range(m), key=lambda i: p_values[i])
+    cutoff = -1
+    for rank, idx in enumerate(order, start=1):
+        if p_values[idx] <= fdr * rank / m:
+            cutoff = rank
+    keep = [False] * m
+    for rank, idx in enumerate(order, start=1):
+        if rank <= cutoff:
+            keep[idx] = True
+    return keep
+
+
+def probability_of_backtest_overfitting(
+    performance_matrix: list[list[float]], n_splits: int = 16
+) -> float:
+    """Bailey et al.'s CSCV estimate of P(backtest overfitting), stdlib-only.
+
+    Rows are strategies, columns are per-period returns. Split the columns into
+    S even blocks; for every half-and-half combination of blocks, pick the
+    in-sample winner and ask where it ranks OUT of sample. PBO is the fraction
+    of combinations where the IS winner lands in the OOS bottom half - a
+    number, not a feeling, for "the best backtest was the luckiest one".
+    """
+    from itertools import combinations
+
+    if not performance_matrix or len(performance_matrix) < 2:
+        return 0.0
+    n_cols = len(performance_matrix[0])
+    if any(len(r) != n_cols for r in performance_matrix):
+        raise ValueError("performance matrix rows must be equal length")
+    s_blocks = min(n_splits, n_cols)
+    if s_blocks % 2:
+        s_blocks -= 1
+    if s_blocks < 2:
+        return 0.0
+    bounds = [round(i * n_cols / s_blocks) for i in range(s_blocks + 1)]
+    blocks = [range(bounds[i], bounds[i + 1]) for i in range(s_blocks)]
+
+    def sharpe(row: list[float], cols: list[int]) -> float:
+        vals = [row[c] for c in cols]
+        mu = sum(vals) / len(vals)
+        var = sum((v - mu) ** 2 for v in vals) / max(len(vals) - 1, 1)
+        return mu / math.sqrt(var) if var > 1e-18 else 0.0
+
+    below = 0
+    total = 0
+    for combo in combinations(range(s_blocks), s_blocks // 2):
+        is_cols = [c for b in combo for c in blocks[b]]
+        oos_cols = [c for b in range(s_blocks) if b not in combo for c in blocks[b]]
+        is_scores = [sharpe(r, is_cols) for r in performance_matrix]
+        oos_scores = [sharpe(r, oos_cols) for r in performance_matrix]
+        winner = max(range(len(is_scores)), key=lambda i: is_scores[i])
+        rank = sum(1 for x in oos_scores if x < oos_scores[winner])
+        rel = rank / (len(oos_scores) - 1) if len(oos_scores) > 1 else 1.0
+        below += rel < 0.5
+        total += 1
+    return below / total if total else 0.0

@@ -77,6 +77,9 @@ class MoveExplanation:
     method_version: str = "attribution-1.0"
     candidates: list = field(default_factory=list)
     reason: str = ""
+    #: Commitment 10: a number travels with its sample size. None when no fit.
+    estimation_n: int | None = None
+    estimation_note: str = ""
 
     def component(self, c: Component) -> AttributionComponent | None:
         return next((x for x in self.components if x.component is c), None)
@@ -178,6 +181,11 @@ def decompose(
         )
 
     names = style_names or sorted(event_styles)
+    est_note = f"betas from {fit.n} sessions"
+    if getattr(fit, "shrinkage", 0.0):
+        est_note += f", shrunk {fit.shrinkage:.0%} toward prior"
+    if fit.n < 2 * MIN_OBSERVATIONS:
+        est_note += " (short window; betas unstable)"
     betas = fit.coefficients[1:]
     b_mkt, b_sec = betas[0], betas[1]
     b_styles = dict(zip(names, betas[2:]))
@@ -237,6 +245,8 @@ def decompose(
         sig,
         unexplained,
         verdict,
+        estimation_n=fit.n,
+        estimation_note=est_note,
         reason=reason,
     )
 
