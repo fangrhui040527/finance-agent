@@ -140,3 +140,41 @@ def test_without_the_cap_the_table_is_the_plain_one(monkeypatch, capsys):
     out = capsys.readouterr().out
     assert "capped from" not in out
     assert "claude-opus-5" in out
+
+
+# --- console encoding ------------------------------------------------------------
+
+
+def test_utf8_streams_is_safe_when_a_stream_cannot_reconfigure(monkeypatch):
+    """pytest's capture objects have no reconfigure(); the helper must shrug."""
+    import sys
+
+    from core import logging as corelog
+
+    monkeypatch.setattr(corelog, "_STREAMS_UTF8", False)
+
+    class Dumb:
+        pass
+
+    monkeypatch.setattr(sys, "stdout", Dumb())
+    monkeypatch.setattr(sys, "stderr", Dumb())
+    assert corelog.use_utf8_streams() is False  # nothing changed, nothing raised
+
+
+def test_utf8_streams_reconfigures_a_real_text_stream(monkeypatch, tmp_path):
+    import io
+    import sys
+
+    from core import logging as corelog
+
+    monkeypatch.setattr(corelog, "_STREAMS_UTF8", False)
+    raw = tmp_path / "out.txt"
+    with raw.open("wb") as fh:
+        stream = io.TextIOWrapper(fh, encoding="cp1252", errors="strict")
+        monkeypatch.setattr(sys, "stdout", stream)
+        monkeypatch.setattr(sys, "stderr", stream)
+        assert corelog.use_utf8_streams() is True
+        assert stream.encoding == "utf-8"
+        stream.write("gaps close\u2014particularly")  # em dash: cp1252 cannot encode it
+        stream.flush()
+    assert "gaps close\u2014particularly" in raw.read_text(encoding="utf-8")

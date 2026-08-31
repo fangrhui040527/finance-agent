@@ -22,11 +22,44 @@ import os
 import sys
 
 _CONFIGURED = False
+_STREAMS_UTF8 = False
+
+
+def use_utf8_streams() -> bool:
+    """Make stdout/stderr UTF-8, whatever the console codepage says.
+
+    Windows consoles default to cp1252, and this system prints text it does
+    not control: model prose, news headlines in 100+ languages, instrument
+    names. On cp1252 an em dash arrives as a replacement character - the
+    output is quietly wrong rather than loudly broken, which is the failure
+    mode this repository exists to avoid. It also matters for correctness,
+    not just looks: the MCP server writes JSON-RPC to stdout, and JSON is
+    UTF-8 by specification.
+
+    `errors="replace"` on the way out, because a mangled character must never
+    take down a command that had a real answer to give.
+    """
+    global _STREAMS_UTF8
+    if _STREAMS_UTF8:
+        return True
+    changed = False
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        if reconfigure is None:
+            continue  # pytest's capture objects, pipes wrapped by a harness
+        try:
+            reconfigure(encoding="utf-8", errors="replace")
+            changed = True
+        except (ValueError, OSError):
+            pass  # a stream that refuses is not worth failing the command over
+    _STREAMS_UTF8 = changed
+    return changed
 
 
 def configure(level: str | int | None = None, stream=None) -> None:
     """Idempotent. Call from every entrypoint; the first call wins."""
     global _CONFIGURED
+    use_utf8_streams()
     if _CONFIGURED:
         return
     if level is None:
