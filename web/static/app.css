@@ -49,6 +49,18 @@
 
 .form-row { display: flex; gap: 14px; flex-wrap: wrap; align-items: end; margin-bottom: 14px; }
 
+/* One nominated name per line. Monospace because every field in it is a
+   number or a code, and a proportional font makes a typo in a price invisible. */
+textarea.names {
+  width: 100%; box-sizing: border-box; margin-bottom: 12px; padding: 8px 10px;
+  font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 12.5px;
+  line-height: 1.6; color: var(--ink); background: var(--panel);
+  border: 1px solid var(--rule-2); border-radius: 3px; resize: vertical;
+}
+textarea.names:focus { outline: 2px solid var(--accent-soft); border-color: var(--accent); }
+.card > h3 { margin: 0 0 6px; font-size: 15px; letter-spacing: -0.01em; }
+.card > h3 + p.history { margin-top: 0; margin-bottom: 12px; }
+
 .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
 
 .screen > .card, .screen > .term, .screen > .grid { margin-bottom: 16px; }

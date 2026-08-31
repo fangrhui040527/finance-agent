@@ -337,3 +337,38 @@ def test_web_capital_text_matches_the_mcp_tool():
 
     body = TestClient(create_app()).get("/api/capital").json()
     assert body["text"] == T.investable_capital()
+
+
+def test_from_plan_and_the_same_number_typed_agree_on_everything_but_the_note(
+    capsys, monkeypatch, tmp_path
+):
+    """The plan's own acceptance check: deriving capital and typing the figure
+    the derivation produces must size identically. Only the typed one carries
+    the disclosure, because only the typed one skipped the locks."""
+    import ask
+    import core.config as C
+
+    cfg_path = _write(tmp_path, PLAN)
+    real = C.load
+    monkeypatch.setattr(ask, "load_config", lambda path=None: real(cfg_path))
+    monkeypatch.setattr(C, "load", lambda path=None: real(cfg_path))
+
+    args = ["size", "MYX:1155", "--price", "10.68", "--stop", "9.90", "--adv", "22000000"]
+    assert ask.main([*args, "--from-plan"]) == 0
+    derived = capsys.readouterr().out
+
+    # 120,000 - (4,500 x 6) - 30,000 - 8,000 - 2,000
+    assert ask.main([*args, "--portfolio", "53000"]) == 0
+    typed = capsys.readouterr().out
+
+    assert "capital was SUPPLIED, not derived" in typed
+    assert "capital was SUPPLIED, not derived" not in derived
+    assert "DERIVED through the waterfall" in derived
+
+    def body(text: str) -> str:
+        """Everything but the one line saying where the capital came from."""
+        skip = ("SUPPLIED", "DERIVED", "were not applied")
+        return "\n".join(ln for ln in text.splitlines() if not any(k in ln for k in skip)).strip()
+
+    assert body(derived) == body(typed)
+    assert "MYR 53,000.00" in body(derived)  # and it is the derived figure
