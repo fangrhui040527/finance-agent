@@ -671,10 +671,19 @@ def cmd_backend(a) -> int:
         return 3
     print(f"backend   {type(backend).__name__}")
     print(f"reason    {reason}")
-    from core.llm.tiers import MODEL_IDS
+    from core.llm.tiers import MODEL_IDS, cheap_capped, effective_tier
 
+    # Under the cap the table must show what will ACTUALLY be called and
+    # billed. Printing the uncapped model here is how a disclosure command
+    # ends up disclosing the wrong thing.
     for tier, model in MODEL_IDS.items():
-        print(f"  {tier.value:<9} {model}")
+        landed = effective_tier(tier)
+        if landed is tier:
+            print(f"  {tier.value:<9} {model}")
+        else:
+            print(f"  {tier.value:<9} {MODEL_IDS[landed]}   (capped from {model})")
+    if cheap_capped():
+        print("  FINPLANET_CHEAP=1 is set; unset it to spend at each tier's own rate.")
     return 0
 
 
