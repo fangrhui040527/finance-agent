@@ -373,6 +373,15 @@ def _narrate(ctx, thesis, challenges) -> int:
     except PolicyViolation as e:
         print(f"\nnarrative BLOCKED by the output rail: {e}")
         return 0
+    from agents.synthesis.narrate import thesis_digest, unsupported_numbers
+
+    unsupported = unsupported_numbers(done.text, thesis_digest(thesis, challenges))
+    if unsupported:
+        # Not proof of invention - a rounded restatement lands here too - but
+        # every one of these is a number the engines did not supply, and that
+        # is the list worth reading before trusting the prose.
+        print(f"\n  UNVERIFIED NUMBERS in the narrative: {', '.join(unsupported)}")
+        print("  Each appears in the prose and not in the engine output it was given.")
     print(f"\nnarrative  [{type(backend).__name__} - {reason.split(':')[0]}]")
     for line in done.text.strip().splitlines():
         print(f"  {line}")

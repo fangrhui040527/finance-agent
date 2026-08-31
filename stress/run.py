@@ -1154,6 +1154,11 @@ def s_mcp():
         "recent_failures": {"runs": 1, "db": ":memory:"},
         "run_anatomy": {},
         "open_alerts": {"history": 1, "alerts_db": ":memory:"},
+        "quality_report": {"days": 1, "db": ":memory:"},
+        "efficiency_report": {"days": 1, "db": ":memory:"},
+        "maintainability_report": {"db": ":memory:"},
+        "reasoning_report": {"runs": 1, "db": ":memory:"},
+        "scorecard": {"db": ":memory:"},
         "log_prediction": {
             "instrument": "MYX:1155",
             "direction": 1,

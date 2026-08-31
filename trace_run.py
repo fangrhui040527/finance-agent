@@ -419,7 +419,10 @@ def run(live: str | None = None) -> dict:
                     move=mv,
                     market=mkt,
                     sector=sec,
+                    # The narration AND the code. A key called `verdict` that
+                    # holds prose makes every reader group by sentence.
                     verdict=findings[0].text[:200],
+                    verdict_code=exp.verdict.value,
                     numbers=findings[0].numbers,
                     bars=decomposition_bars(exp),
                 )

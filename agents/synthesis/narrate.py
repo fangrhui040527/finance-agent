@@ -67,3 +67,35 @@ def narrate_thesis(client: InferenceClient, thesis, challenges) -> Completion:
         thesis_digest(thesis, challenges),
         system=NARRATE_SYSTEM,
     )
+
+
+#: Numbers that carry no claim on their own - ordinals, small counts, years in
+#: prose. Flagging "three paragraphs" as an invented figure would make the
+#: check noise, and a noisy check gets switched off.
+_IGNORE = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "100"}
+
+
+def unsupported_numbers(narrative: str, source: str) -> list[str]:
+    """Numbers in the model's prose that do not appear in what we gave it.
+
+    Commitment: never invent a number a tool can give you. This is the
+    deterministic half of checking that - no model judges it. A number here is
+    not proof of invention (the model may have rounded 2.31 to 2.3), which is
+    why the result is a LIST to look at rather than a pass/fail verdict.
+    """
+    import re
+
+    def numbers(text: str) -> list[str]:
+        return re.findall(r"-?\d+(?:\.\d+)?", text.replace(",", ""))
+
+    have = set(numbers(source))
+    # A rounded restatement is not an invention: accept a prefix match against
+    # anything we supplied, so 2.3 passes when the source says 2.31.
+    out = []
+    for n in numbers(narrative):
+        if n in _IGNORE or n in have:
+            continue
+        if any(h.startswith(n) or n.startswith(h) for h in have):
+            continue
+        out.append(n)
+    return sorted(set(out), key=lambda x: (len(x), x))

@@ -179,8 +179,14 @@ output than any amount of reasoning about the output.
 | `operating_report` | Over N days: calls, spend, budget headroom, which MODELS actually answered, p50/p95 latency, cache hits, and the dropped-claim rate. |
 | `recent_failures` | Across recent traced runs: errors with their text, guardrail denials, refusals, and the run id to open. |
 | `run_anatomy` | One run: where the time went, what was denied - and whether the METHODOLOGY changed since the run before it. |
+| `open_alerts` | What a scheduled `ask.py watch` found while nobody was looking, and since when. |
+| `scorecard` | **Start here.** Every dimension in one line with its evidence, or an explicit CANNOT SCORE. |
+| `quality_report` | Calibration (Brier, stated vs realised), claim survival and why the rest dropped, verdict distribution, red-team activity, eval-ratchet health. |
+| `efficiency_report` | Cost per call and per 1k output, cache HIT RATE, tier discipline as a share of spend, and wasted spend. |
+| `maintainability_report` | Test and doc edges per module from the codebase graph, modules with neither, dependency versions. |
+| `reasoning_report` | How turns ENDED, what the rails stopped and under which rule, answered-vs-refused with reasons, numeric faithfulness. |
 
-Two properties hold across all four:
+Two properties hold across all of them:
 
 * **Absent evidence is reported as absent.** An empty ledger is "nothing has
   run yet", never a clean bill of health; a failure scan states how many runs
@@ -189,6 +195,18 @@ Two properties hold across all four:
   responses and whatever positions were passed in. These tools give the
   error, the event and the run id; reading the text is a decision the
   operator makes by opening `debug/<run_id>/`.
+
+### What each dimension rests on, and what it cannot say
+
+| Dimension | Evidence | Honest limit |
+|---|---|---|
+| performance | ledger latency, spend | none |
+| efficiency | ledger tokens, cache fields, stop_reason | rows written before those columns report "unrecorded" |
+| robustness | preflight checks, trace errors, guardrail denials | only traced runs can be reported on |
+| quality | graded predictions, claims table, verdict codes, eval suites | calibration refuses below the graded minimum; eval **shape**, never a pass rate nobody ran |
+| maintainability | codebase graph edges | counts EDGES, not coverage - a module without a test edge may still be covered indirectly |
+| usability | answered-vs-refused in traces | refusal RATE is not a score; the design optimises refusal PRECISION |
+| reasoning | stop_reason, rail denials, the numeric-faithfulness check | a flagged number may be a rounding, not an invention - it is a list to read, not a verdict |
 
 `run_anatomy`'s methodology check is the one worth knowing about. The
 manifest hashes the system prompts, the registry, the tool surface and the

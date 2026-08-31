@@ -185,6 +185,14 @@ class ProvenanceLedger:
         # and that is the correct trade.
         if "cost_myr_micro" not in calls:
             self.conn.execute("ALTER TABLE llm_calls ADD COLUMN cost_myr_micro INTEGER")
+        # How the turn ENDED, and the vendor's id for it. The P4 note said both
+        # would land here and only the trace got them - so a truncation or a
+        # model refusal was invisible to anything reading the durable record,
+        # which is exactly what a quality report needs to count.
+        if "stop_reason" not in calls:
+            self.conn.execute("ALTER TABLE llm_calls ADD COLUMN stop_reason TEXT")
+        if "request_id" not in calls:
+            self.conn.execute("ALTER TABLE llm_calls ADD COLUMN request_id TEXT")
 
     def close(self) -> None:
         self.conn.close()
@@ -207,6 +215,8 @@ class ProvenanceLedger:
         at: datetime | None = None,
         run_id: str | None = None,
         latency_ms: float = 0.0,
+        stop_reason: str = "",
+        request_id: str = "",
     ) -> CallRecord:
         at = at or datetime.now(UTC)
         rid = self.run_id if run_id is None else run_id
@@ -216,8 +226,9 @@ class ProvenanceLedger:
         self.conn.execute(
             "INSERT INTO llm_calls (at, agent, task_class, tier, model_id, prompt_hash, run_id,"
             " input_tokens, output_tokens, cached_tokens, cache_write_tokens, cost_usd,"
-            " cost_myr_micro, cost_myr, fx_rate, fx_asof, latency_ms)"
-            " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            " cost_myr_micro, cost_myr, fx_rate, fx_asof, latency_ms, stop_reason,"
+            " request_id)"
+            " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
             (
                 at.isoformat(),
                 agent,
@@ -236,6 +247,8 @@ class ProvenanceLedger:
                 str(fx_rate),
                 at.isoformat(),
                 float(latency_ms),
+                stop_reason,
+                request_id,
             ),
         )
         self.conn.commit()

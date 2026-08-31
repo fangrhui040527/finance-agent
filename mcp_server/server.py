@@ -69,12 +69,20 @@ Three habits that make the output trustworthy:
    says NO DATA. Say so. An estimated price is indistinguishable from a real one
    once it is in the narrative, and this system is used to make money decisions.
 
-4. WHEN SOMETHING LOOKS WRONG, LOOK AT THE MACHINE. system_health says what
-   this installation can currently do; operating_report says what it has been
-   doing and what it cost; recent_failures says what broke and in which run;
-   run_anatomy opens one run and says whether the METHOD changed since the
-   last one. A stubbed backend or a missing database explains more odd output
-   than any amount of reasoning about the output itself.
+4. WHEN SOMETHING LOOKS WRONG, LOOK AT THE MACHINE. Start at scorecard: one
+   line per dimension - robustness, performance, efficiency, quality,
+   maintainability, usability, reasoning - with the evidence, or an explicit
+   CANNOT SCORE where there is none. Then open the matching report:
+   system_health (can it run at all), operating_report (what it did and cost),
+   efficiency_report (cache, tiers, wasted spend), quality_report
+   (calibration, citations, verdicts), maintainability_report (tests and docs
+   per module), reasoning_report (how turns ended, what the rails stopped),
+   recent_failures (what broke, in which run), run_anatomy (one run, and
+   whether the METHOD changed), open_alerts (what tripped unattended).
+
+   A stubbed backend or a missing database explains more odd output than any
+   amount of reasoning about the output itself. And a dimension that says
+   CANNOT SCORE has not passed - it has not been measured.
 
 Nothing here places orders, and nothing here is financial advice. Output is
 analysis with an evidence chain.
@@ -381,6 +389,72 @@ S.tool(
         }
     ),
 )(O.open_alerts)
+
+S.tool(
+    "quality_report",
+    "Is the ANALYSIS any good? Forecast calibration (Brier, stated against "
+    "realised), how many claims survived citation verification and why the "
+    "rest were dropped, the distribution of attribution verdicts, red-team "
+    "activity, and the eval-suite ratchet's health. Refuses to score "
+    "calibration below the graded-call minimum rather than reporting luck.",
+    obj(
+        {
+            "days": {"type": "integer", "description": "window (default 30)"},
+            "db": _str("ledger path"),
+        }
+    ),
+)(O.quality_report)
+
+S.tool(
+    "efficiency_report",
+    "Am I paying for what I am getting? Cost per call and per 1k output "
+    "tokens, cache HIT RATE (a zero rate across repeated calls means the "
+    "cached prefix is changing), tier discipline as a share of spend, and "
+    "WASTED spend - calls that billed and returned nothing usable because "
+    "they were refused or truncated.",
+    obj(
+        {
+            "days": {"type": "integer", "description": "window (default 7)"},
+            "db": _str("ledger path"),
+        }
+    ),
+)(O.efficiency_report)
+
+S.tool(
+    "maintainability_report",
+    "Can this be changed safely? Test and documentation edges per module "
+    "from the codebase graph, which modules have neither, and the runtime "
+    "dependency versions. Counts EDGES, not coverage - a module without a "
+    "test edge may still be covered indirectly, and the report says so "
+    "rather than implying a number it did not measure.",
+    obj({"db": _str("codebase graph path (default data/codegraph.db)")}),
+)(O.maintainability_report)
+
+S.tool(
+    "reasoning_report",
+    "How is the model behaving, and what did the user get back? How turns "
+    "ENDED (refusal, truncation, end_turn), what the guardrails had to stop "
+    "and under which rule, the answered-against-refused split with its most "
+    "common reasons, and whether any narrative carried a number the engines "
+    "never supplied. Refusal RATE is not a quality score - the design "
+    "optimises refusal PRECISION - and the report says so.",
+    obj(
+        {
+            "runs": {"type": "integer", "description": "traced runs to scan (default 20)"},
+            "db": _str("ledger path"),
+        }
+    ),
+)(O.reasoning_report)
+
+S.tool(
+    "scorecard",
+    "Every dimension in one view - robustness, performance, efficiency, "
+    "quality, maintainability, usability, reasoning - each with a verdict "
+    "and the evidence behind it, or an explicit CANNOT SCORE where the "
+    "evidence does not exist yet. Start here, then open the report for "
+    "whichever line looks wrong.",
+    obj({"db": _str("ledger path")}),
+)(O.scorecard)
 
 S.tool(
     "explain_path",
