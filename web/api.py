@@ -104,6 +104,41 @@ def doctor(offline: bool = True) -> S.Envelope:
     )
 
 
+@router.get("/capital")
+def capital() -> S.Envelope:
+    """The waterfall, or an explicit NO PLAN. Never a zero that looks like an answer."""
+    from core.config import load as load_config
+
+    cfg = load_config()
+    plan = cfg.capital
+    env = _run(T.investable_capital)
+    env.data = {
+        "stated": plan.stated,
+        "liquid_assets": str(plan.liquid_assets),
+        "essential_monthly_spend": str(plan.essential_monthly_spend),
+        "planned_monthly_contribution": str(plan.planned_monthly_contribution),
+        "emergency_months": cfg.emergency_months,
+        "debt_hurdle": str(cfg.debt_hurdle),
+        "goals": [
+            {"name": g.name, "amount": str(g.amount), "months_away": g.months_away}
+            for g in plan.goals
+        ],
+        "liabilities": [
+            {"name": x.name, "balance": str(x.balance), "annual_rate": str(x.annual_rate)}
+            for x in plan.liabilities
+        ],
+        "book": [
+            {
+                "id": h.id,
+                "units": str(h.units) if h.units is not None else None,
+                "avg_cost": str(h.avg_cost) if h.avg_cost is not None else None,
+            }
+            for h in cfg.book
+        ],
+    }
+    return env
+
+
 # --- markets -------------------------------------------------------------------
 
 
@@ -254,6 +289,16 @@ def _narrative(body: S.ThesisBody) -> dict:
     except PolicyViolation as e:
         return {"blocked": True, "reason": str(e), "backend": type(backend_obj).__name__}
     return {"text": done.text, "backend": type(backend_obj).__name__, "reason": reason}
+
+
+@router.post("/allocate")
+def allocate(body: S.AllocateBody) -> S.Envelope:
+    return _run(T.allocate_capital, **body.model_dump())
+
+
+@router.post("/rebalance")
+def rebalance(body: S.RebalanceBody) -> S.Envelope:
+    return _run(T.rebalance_book, **body.model_dump())
 
 
 # --- portfolio -----------------------------------------------------------------

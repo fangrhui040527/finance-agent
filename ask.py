@@ -35,6 +35,8 @@ from agents.learning.teacher import A14Teacher, Learner
 from agents.portfolio.agents import A12PortfolioRisk, A13Sizing
 from agents.supervisor import A0Supervisor
 from agents.synthesis.agents import A9Attribution, A10Thesis, A11RedTeam, Breaker, Stance
+from core.config import ConfigError
+from core.config import load as load_config
 from core.contracts.money import BASE_CURRENCY
 from core.guardrails.defaults import default_engine
 from core.market.feed import PriceFeedError, default_feed
@@ -54,8 +56,23 @@ REGISTRY = "agents/registry.yaml"
 def context() -> AgentContext:
     """The allowlist comes from the registry, never a hand-written dict."""
     reg = load_registry(REGISTRY)
+    # holdings and watchlist come from config.toml. Without them
+    # `should_escalate` (knowledge/news/features.py) can never match an article
+    # to anything the user owns or is watching, so the news escalation gate was
+    # closed on every article regardless of what the file said.
+    try:
+        cfg = load_config()
+        holdings, watchlist = set(cfg.holdings), set(cfg.watchlist)
+    except ConfigError:
+        # A broken settings file must not take out every other command; the
+        # config commands report it properly.
+        holdings, watchlist = set(), set()
     return AgentContext(
-        router=Router({}), engine=default_engine(reg.allowlist()), now=datetime.now(UTC)
+        router=Router({}),
+        engine=default_engine(reg.allowlist()),
+        now=datetime.now(UTC),
+        holdings=holdings,
+        watchlist=watchlist,
     )
 
 
@@ -348,7 +365,6 @@ def _narrate(ctx, thesis, challenges) -> int:
     from decimal import Decimal
 
     from agents.synthesis.narrate import narrate_thesis
-    from core.config import load as load_config
     from core.guardrails.policy import Action, PolicyViolation, Rail
     from core.llm.backends import backend_from_env
     from core.llm.client import InferenceClient
@@ -460,8 +476,34 @@ def cmd_risk(a) -> int:
 
 # --- sizing ---------------------------------------------------------------
 def cmd_size(a) -> int:
-    a13 = A13Sizing(context())
-    portfolio = Decimal(str(a.portfolio))
+    from agents.portfolio.agents import TYPED_CAPITAL_NOTE, plan_capital
+    from core.config import load as load_cfg
+
+    ctx = context()
+    a13 = A13Sizing(ctx)
+    if getattr(a, "from_plan", False):
+        waterfall, _ = plan_capital(load_cfg(), ctx)
+        if waterfall is None:
+            print(
+                "--from-plan needs a [capital] block in config.toml. Run `ask.py capital`.",
+                file=sys.stderr,
+            )
+            return 2
+        if waterfall.investable == 0:
+            print("no position: the plan leaves nothing investable today.\n")
+            print(waterfall.explain())
+            return 0
+        portfolio = waterfall.investable
+        capital_note = f"capital DERIVED through the waterfall: {portfolio:,.2f} investable"
+    elif a.portfolio is None:
+        print(
+            "give --portfolio, or --from-plan to derive it from [capital] in config.toml.",
+            file=sys.stderr,
+        )
+        return 2
+    else:
+        portfolio = Decimal(str(a.portfolio))
+        capital_note = TYPED_CAPITAL_NOTE
     price = Decimal(str(a.price))
     stop = Decimal(str(a.stop))
     if stop >= price:
@@ -570,6 +612,7 @@ def cmd_size(a) -> int:
         mic=mic,
         fx_base_per_quote=fx,
     )
+    print(f"  {capital_note}")
     print(
         f"sizing    {a.instrument}  portfolio {BASE_CURRENCY} {portfolio:,.2f}  "
         f"stop distance {stop_frac:.1%}"
@@ -585,18 +628,31 @@ def cmd_size(a) -> int:
     binding, value = caps.binding()
     units = int(value / price) // a.lot * a.lot
     print(f"\n  binding cap {binding.value} at {quote} {value:,.2f}")
+
+    def shown(v: Decimal) -> str:
+        native_txt = f"{quote} {v:,.2f}"
+        if quote == BASE_CURRENCY:
+            return native_txt
+        return f"{native_txt} = {BASE_CURRENCY} {to_base(v, quote, fx):,.2f}"
+
+    native = Decimal(units) * price
     if units < a.lot:
         print(
             f"  -> no position: the binding cap does not fund one {a.lot}-share lot "
             f"at {quote} {price}"
         )
+    elif native < caps.cost_floor:
+        # The floor is computed and PRINTED two lines above, then was ignored
+        # here - so this command recommended positions the MCP tool refused for
+        # the same inputs. Below the minimum economic position the round trip
+        # cannot pay for itself at any edge; that is the whole point of it.
+        print(
+            f"  -> no position: {units:,} units is {shown(native)}, below the "
+            f"{shown(caps.cost_floor)} minimum economic position on {mic}. "
+            f"The round trip cannot pay for itself."
+        )
     else:
-        native = Decimal(units) * price
-        base = to_base(native, quote, fx)
-        shown = f"{quote} {native:,.2f}"
-        if quote != BASE_CURRENCY:
-            shown += f" = {BASE_CURRENCY} {base:,.2f}"
-        print(f"  -> {units:,} units ({shown}) in lots of {a.lot}")
+        print(f"  -> {units:,} units ({shown(native)}) in lots of {a.lot}")
     return 0
 
 
@@ -706,6 +762,110 @@ def cmd_alerts(a) -> int:
         print("\nhistory (newest first)")
         for r in rows:
             print(f"  {r['at'][:19]}  {r['state']:<8} {r['rule']:<22} {r['title'][:60]}")
+    return 0
+
+
+def cmd_capital(a) -> int:
+    """How much money is allowed to be in stocks at all.
+
+    docs/05 section 2 puts this before any question about which stock. The
+    first three steps are locked: no flag in this API reduces the emergency
+    floor, funds a near-term goal out of equities, or lets equities outrank
+    debt above the hurdle.
+    """
+    from agents.portfolio.agents import plan_capital
+    from core.config import load as load_cfg
+
+    cfg = load_cfg()
+    waterfall, findings = plan_capital(cfg, context())
+    if waterfall is None:
+        print("no [capital] plan in config.toml.")
+        print(
+            "  Fill liquid_assets and essential_monthly_spend (plus any goals and\n"
+            "  liabilities) and this command derives what is investable. Until then\n"
+            "  `size` needs --portfolio, which bypasses the emergency floor, the\n"
+            "  near-term goals and the debt hurdle."
+        )
+        return 2
+    print(waterfall.explain())
+    for f in findings:
+        for c in f.caveats:
+            print(f"\n  {c}")
+    if waterfall.investable == 0:
+        print("\n  Nothing is investable today. That is an answer, not a failure.")
+    return 0
+
+
+def cmd_allocate(a) -> int:
+    """Split capital across names YOU nominate. It does not choose them."""
+    from agents.portfolio.agents import TYPED_CAPITAL_NOTE, plan_capital
+    from core.config import load as load_cfg
+    from engines.sizing.allocate import allocate
+    from mcp_server.protocol import ToolError
+    from mcp_server.tools import _candidates
+
+    cfg = load_cfg()
+    if a.from_plan:
+        waterfall, _ = plan_capital(cfg, context())
+        if waterfall is None:
+            print("--from-plan needs a [capital] block. Run `ask.py capital`.", file=sys.stderr)
+            return 2
+        investable = waterfall.investable
+        note = f"capital derived through the waterfall: {investable:,.2f}"
+    elif a.portfolio is None:
+        print("give --portfolio, or --from-plan to derive it from [capital].", file=sys.stderr)
+        return 2
+    else:
+        investable = Decimal(str(a.portfolio))
+        note = TYPED_CAPITAL_NOTE
+
+    if not a.name:
+        print(
+            "nominate names with --name MIC:CODE:PRICE:STOP:ADV:SECTOR (repeatable).\n"
+            "This system does not choose them - it sizes and bounds the ones you bring.",
+            file=sys.stderr,
+        )
+        return 2
+
+    try:
+        candidates = _candidates(list(a.name), fetch=a.fetch, end=None)
+    except ToolError as e:
+        print(str(e), file=sys.stderr)
+        return 2
+
+    result = allocate(
+        investable,
+        candidates,
+        limits=cfg.limits,
+        risk_per_trade=Decimal(str(a.risk_per_trade)),
+        single_name_limit=Decimal(str(a.single_name)),
+    )
+    print(f"  {note}\n")
+    print(result.explain())
+    return 0
+
+
+def cmd_rebalance(a) -> int:
+    """What to change versus what you hold. The book lives in config.toml."""
+    from mcp_server.protocol import ToolError
+    from mcp_server.tools import rebalance_book
+
+    try:
+        text = rebalance_book(
+            names=list(a.name or []),
+            portfolio_value=a.portfolio,
+            from_plan=a.from_plan,
+            as_at=a.as_at or "",
+            single_name_limit=a.single_name,
+            risk_per_trade=a.risk_per_trade,
+        )
+    except ToolError as e:
+        print(str(e), file=sys.stderr)
+        return 2
+    if text.startswith("NOTHING TO REBALANCE"):
+        print(text, file=sys.stderr)
+        return 2
+    print(text)
     return 0
 
 
@@ -997,8 +1157,18 @@ def main(argv=None) -> int:
 
     sz = sub.add_parser("size", help="turn a stance into lots, or into a refusal")
     sz.add_argument("instrument")
+    # Not required: --from-plan derives it from [capital] through the waterfall.
+    # A typed figure still works, and is disclosed as the bypass it is.
     sz.add_argument(
-        "--portfolio", type=float, required=True, help=f"investable capital, in {BASE_CURRENCY}"
+        "--portfolio",
+        type=float,
+        help=f"investable capital in {BASE_CURRENCY}, typed (bypasses the waterfall)",
+    )
+    sz.add_argument(
+        "--from-plan",
+        action="store_true",
+        help="derive investable capital from [capital] in config.toml, applying the "
+        "emergency floor, near-term goals and debt hurdle",
     )
     sz.add_argument(
         "--price", type=float, required=True, help="in the market's own currency, like --adv"
@@ -1101,6 +1271,37 @@ def main(argv=None) -> int:
     al.add_argument("--alerts-db", default="data/alerts.db")
     al.add_argument("--limit", type=int, default=20)
     al.set_defaults(fn=cmd_alerts)
+
+    al2 = sub.add_parser("allocate", help="split capital across names you nominate")
+    al2.add_argument(
+        "--name",
+        action="append",
+        metavar="MIC:CODE:PRICE:STOP:ADV:SECTOR",
+        help="repeatable; leave PRICE and ADV empty with --fetch to measure them",
+    )
+    al2.add_argument("--portfolio", type=float, help="investable capital, typed")
+    al2.add_argument("--from-plan", action="store_true", help="derive it from [capital]")
+    al2.add_argument("--fetch", action="store_true", help="measure empty price/adv from the feed")
+    al2.add_argument("--risk-per-trade", type=float, default=0.0075)
+    al2.add_argument("--single-name", type=float, default=0.08)
+    al2.set_defaults(fn=cmd_allocate)
+
+    rb = sub.add_parser("rebalance", help="what to change versus what you hold")
+    rb.add_argument(
+        "--name",
+        action="append",
+        metavar="MIC:CODE:PRICE:STOP:ADV:SECTOR",
+        help="extra names to consider alongside the book (repeatable)",
+    )
+    rb.add_argument("--portfolio", type=float, help="capital; default is the book's own value")
+    rb.add_argument("--from-plan", action="store_true", help="derive capital from [capital]")
+    rb.add_argument("--as-at", help="point-in-time bound for prices (YYYY-MM-DD)")
+    rb.add_argument("--risk-per-trade", type=float, default=0.0075)
+    rb.add_argument("--single-name", type=float, default=0.08)
+    rb.set_defaults(fn=cmd_rebalance)
+
+    cp = sub.add_parser("capital", help="how much may be invested at all, from [capital]")
+    cp.set_defaults(fn=cmd_capital)
 
     dr = sub.add_parser("doctor", help="preflight: what this installation can actually do")
     dr.add_argument("--offline", action="store_true", help="skip the two network probes")

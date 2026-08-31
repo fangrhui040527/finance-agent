@@ -5,6 +5,12 @@ A multi-agent, multi-market equity research system that explains *why* a price m
 
 > **Not financial advice.** Candidacy bands, calibrated probabilities, attributions and sizing constraints with evidence chains. No recommendations, no execution.
 
+> **It does not pick stocks.** There is no screen and no ranked list of ideas.
+> You bring the names; it tells you why one moved, what the evidence says, how
+> much of it you could hold, how a budget splits across several, and what
+> changed against what you already own. Asking it to find stocks gets a refusal
+> that says this.
+
 ## Start here
 
 **New to this? Open [`docs/user-guide.html`](docs/user-guide.html) in a browser.**

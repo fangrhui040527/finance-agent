@@ -21,22 +21,59 @@ invisible.
 | Attribution engine — decomposition, unexplained share, non-finite refusal | complete |
 | Risk engine — HHI, effective bets, correlation clusters, 4 concentration measures | complete |
 | Sizing — 5 caps, binding cap, lot rounding, cost floor, `NoPosition` | complete |
-| Investable-capital waterfall — emergency floor, goals, debt hurdle | complete |
+| Investable-capital waterfall — emergency floor, goals, debt hurdle | complete, **and reachable since 2026-08-30** — see the note below |
 | 11 market adapters, fee schedules, alias map | complete |
 | **MYR unit-of-account boundary** | complete |
 | Knowledge graph — schema, store, ids, 6 extractors, reproducible build | complete |
 | Event taxonomy, base rates, catalyst attachment | complete |
 | Retrieval — hybrid, parent-child chunking, router | complete |
 | Backtest harness — walk-forward, costs, metrics, point-in-time | complete |
-| MCP server — 12 tools, protocol, selftest | complete |
+| MCP server — 26 tools, protocol, selftest | complete |
 | Teacher — 30 concepts, enforced prerequisite order | complete |
 | Reflection — grading, lesson proposal, calibration, scoring | complete |
 | Tracing — spans, HTML report, anatomy, prompts | complete |
-| CLI — 10 subcommands | complete |
+| CLI — 17 subcommands | complete |
 | Fitness function — refuses a partial score | complete |
 | CI — 10 steps, offline, keyless | complete |
 
 ---
+
+### The waterfall was complete, correct, and unreachable (fixed 2026-08-30)
+
+`engines/sizing/waterfall.py` computed liquid assets → emergency floor →
+near-term goals → debt above the hurdle → cash buffer → investable, with three
+*locked* steps, property tests, and an explicit refusal to raid the floor.
+`A13Sizing.investable_capital()` wrapped it. **Nothing outside the tests called
+either.** A grep for `waterfall|investable` across `ask.py`, `mcp_server/` and
+`web/` returned one hit: the help text of a `--portfolio` flag.
+
+The row above said "complete", which was true of the engine and wrong about the
+system. The consequence was not cosmetic: `size --portfolio <number>` made the
+user type the waterfall's **output** as its **input**, so the emergency floor,
+the near-term goals and the debt hurdle were bypassed by construction on every
+real invocation — silently, while `docs/05` said "before any question about
+which stock, there is a question about how much money is allowed to be in
+stocks at all."
+
+Now: `[capital]` in `config.toml`, `ask.py capital`, `size --from-plan`, the
+`investable_capital` MCP tool and `GET /api/capital` all run the one path. A
+typed `--portfolio` still works and now says in as many words which three locks
+did not apply to it.
+
+**The lesson for this table:** a row here describes what a USER can reach, not
+what exists in `engines/`. Two other rows were audited against that standard at
+the same time — the MCP tool count and the CLI subcommand count were simply
+stale, which is a different and much smaller kind of wrong.
+
+### What this system does NOT do
+
+It does not pick stocks. There is no screen, no ranked candidate list, no
+"here are five ideas". It evaluates names **you** bring, sizes them, splits a
+budget across them, and tells you what changed against what you hold.
+`Intent.SCREEN` now refuses and says so; before 2026-08-30 it routed to two
+per-instrument agents with no instrument and ran them against nothing.
+`docs/01`'s architecture diagram still draws a `Factor library → Ranked
+candidates` box: it is marked **unbuilt** there and it is not on the roadmap.
 
 ## Not built
 

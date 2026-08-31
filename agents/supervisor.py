@@ -79,7 +79,10 @@ PLAYBOOK: dict[Intent, tuple[str, ...]] = {
     ),
     Intent.WHAT_DO_I_OWN: ("a12_portfolio_risk", "a9_attribution"),
     Intent.EXPLAIN_CONCEPT: ("a14_teacher",),
-    Intent.SCREEN: ("a1_fundamentals", "a2_valuation"),
+    # Nothing. a1 and a2 are per-INSTRUMENT agents and a screen has no
+    # instrument, so routing here ran two agents against nothing at all.
+    # The boundary is stated in run() instead.
+    Intent.SCREEN: (),
     Intent.DAILY_BRIEF: ("a4_news_narrative", "a5_catalyst_events", "a12_portfolio_risk"),
     Intent.RISK_CHECK: ("a12_portfolio_risk",),
     Intent.OUT_OF_SCOPE: (),
@@ -93,13 +96,16 @@ _PATTERNS: tuple[tuple[Intent, str], ...] = (
         r"|jump|crash|rall|mov|surg|slump|slid|slump|tank|spike|plunge|gain|los)",
     ),
     (Intent.WHY_IT_MOVED, r"\b(what happened|what's going on)\b"),
+    # Ahead of SHOULD_I_BUY on purpose: "give me a list of banks worth buying"
+    # is a request for a LIST, and classified as should-i-buy it refused with
+    # "name the company" - which does not answer what was asked.
+    (Intent.SCREEN, r"\b(screen|find (me )?(stocks|companies)|list of)\b"),
     (Intent.SHOULD_I_BUY, r"\b(should i|worth) (buy|buying|add|accumulat|invest|enter)"),
     (Intent.SHOULD_I_BUY, r"\b(good|bad) (buy|entry|investment)\b"),
     (Intent.WHAT_DO_I_OWN, r"\b(my (portfolio|holdings|position)|what do i own|how am i doing)\b"),
     (Intent.RISK_CHECK, r"\b(too concentrat|risk check|am i (over)?exposed|diversif)"),
     (Intent.DAILY_BRIEF, r"\b(brief|what should i (know|watch)|morning)\b"),
     (Intent.EXPLAIN_CONCEPT, r"\b(what (is|are|does)|explain|how do(es)? .* work|teach me)\b"),
-    (Intent.SCREEN, r"\b(screen|find (me )?(stocks|companies)|list of)\b"),
 )
 
 #: Things this system will not do, whatever the phrasing.
@@ -200,6 +206,27 @@ class A0Supervisor(Agent):
         intent = self.classify(q)
         agents = PLAYBOOK[intent]
         notes: list[str] = []
+
+        if intent is Intent.SCREEN:
+            # A stated boundary beats agents run against nothing. This system
+            # evaluates names brought TO it; generating candidates is a
+            # different product with a different failure mode - a ranked list
+            # carries an implicit recommendation no evidence chain supports.
+            return Plan(
+                intent,
+                (),
+                (),
+                (),
+                Money(amount=Decimal(0), currency="MYR"),
+                refusal=Refusal(
+                    "This system does not screen for stocks or generate candidates. "
+                    "It evaluates names you bring to it.",
+                    "Name the companies you are considering and ask why one moved, "
+                    "what it is worth, or how much of it you could hold. To split a "
+                    "budget across several, use allocate; to compare against what you "
+                    "already own, use rebalance.",
+                ),
+            )
 
         if intent in (Intent.WHY_IT_MOVED, Intent.SHOULD_I_BUY) and not instrument_ids:
             return Plan(

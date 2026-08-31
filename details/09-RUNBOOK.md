@@ -79,6 +79,150 @@ item through if it touches one of these names. **With both empty, nothing ever
 escalates** — a background sweep would run every night and surface nothing.
 Keep the watchlist short: the gate exists so a person can read the output.
 
+> Until 2026-08-30 filling these in changed nothing: neither live surface copied
+> them into `AgentContext`, so the gate was closed on every article no matter
+> what the file said. Both surfaces read them now.
+
+---
+
+### `doctor` — what this installation can actually do
+
+```bash
+python ask.py doctor              # every check, including the network ones
+python ask.py doctor --offline    # skip anything that needs a network
+```
+
+Reports each dependency, key and feed as ready or not, and exits non-zero only
+when something **critical** is missing. A fresh checkout reports several
+non-critical checks as unavailable and still works: "nothing configured yet" is
+a valid state, not a broken one.
+
+### `watch` — evaluate the monitor rules
+
+```bash
+python ask.py watch               # exits 1 if any alert is open
+```
+
+Six rules over the ledger and the run log: 24-hour spend, p95 latency, dropped
+claims, silence (nothing has run when something should have), run errors, and a
+methodology change. Each alert names the number that fired it and the threshold
+it crossed. This is the command to put on a schedule.
+
+### `alerts` — what is open, and what has cleared
+
+```bash
+python ask.py alerts              # the log, newest first
+```
+
+The alert log is append-only: an alert that clears is not deleted, it gains a
+cleared row. Reading when something opened and when it cleared is the point —
+an alert that opens and clears nightly is a different problem from one that has
+been open for a week.
+
+---
+
+### `capital` — how much may be invested at all
+
+Before any question about *which* stock. Fill `[capital]` in `config.toml`:
+
+```toml
+[capital]
+liquid_assets = 120000.0            # cash and near-cash you could deploy
+essential_monthly_spend = 4500.0    # what the emergency floor multiplies
+planned_monthly_contribution = 2000.0
+goals = [{ name = "car", amount = 30000, months_away = 18 }]
+liabilities = [{ name = "card", balance = 8000, annual_rate = 0.17 }]
+```
+
+```bash
+python ask.py capital
+```
+
+Liquid assets → emergency floor → near-term goals inside 24 months → debt above
+the hurdle → cash buffer → **investable**. The first three steps are `[locked]`
+and no flag reduces them. If the floor and the reservations consume everything,
+the answer is **investable 0** — which is an answer, not a failure.
+
+`size --from-plan` takes its capital from here. `size --portfolio <number>`
+still works and says outright that the three locks were not applied to a figure
+you typed.
+
+### `allocate` — split a budget across names YOU nominate
+
+This does not choose the names. It answers the question after choosing them.
+
+```bash
+python ask.py allocate --portfolio 500000 \
+  --name MYX:1155:10.68:9.90:20000000:bank \
+  --name MYX:1023:6.40:5.95:18000000:telco \
+  --name MYX:5296:2.10:1.95:9000000:consumer \
+  --name MYX:6012:4.55:4.20:12000000:energy \
+  --name MYX:4197:7.80:7.20:15000000:plantation \
+  --name MYX:1961:22.40:21.00:8000000:reit
+```
+
+Each name is `MIC:CODE:PRICE:STOP:ADV:SECTOR`. With `--fetch`, an empty PRICE or
+ADV is measured from the feed; the **stop is never derived**, because where the
+stop goes is your risk decision and inventing one invents the risk budget.
+
+Two things it refuses to do:
+
+* **Fabricate diversification.** Fewer than five fundable names, or a book that
+  would behave as one bet, is a refusal — not a concentrated book that passes
+  arithmetic.
+* **Hide why a name got nothing.** Every excluded name carries its number: the
+  cap that stopped it, the minimum economic position it fell under, or the
+  missing FX rate.
+
+**Expect cash left over, and read the note that says why.** Six names at the 8%
+single-name cap can hold at most 48% of capital. Six *Malaysian* names stop
+earlier still, at the 40% country limit — and the line then reports `country`
+as its binding cap, because that is the limit that decided the number.
+
+**On a Bursa-only book there is a floor under the whole exercise.** The
+cheapest name that can pay for its own round trip needs MYR 4,705.88 (the 60 bps
+cost floor), and at an 8% single-name cap that position only fits inside a
+portfolio of **MYR 58,824 or more**. Below that, every name is either over the
+cap or under the floor, and `allocate` says so with both numbers.
+
+### `rebalance` — what to change versus what you hold
+
+The book comes from `account.holdings`, which grows from bare ids to tables:
+
+```toml
+holdings = [
+  { id = "MYX:1155", units = 1000, avg_cost = 9.80, stop = 9.40, sector = "bank" },
+]
+```
+
+`stop` and `sector` are optional and only this command reads them. Without a
+stop the risk-budget cap cannot be computed for that name, and the output says
+which cap it lost rather than inventing one.
+
+```bash
+python ask.py rebalance --portfolio 800000        # or --from-plan
+```
+
+Prices come live from the feed and are snapped to the market's tick. Every line
+is `hold`, `add`, `trim`, `exit`, `open` or `stop hit`, with the units, the
+value of the trade, its round-trip cost, and the limit that bound it.
+
+Three rules worth knowing before you read the output:
+
+* **A trade worth less than its own round trip comes back as `hold`**, with both
+  numbers. A rebalance smaller than its cost is a fee.
+* **A holding whose live price is at or below its own stop leads the output** as
+  `STOP BREACHED`. That is not a data error — it is your own rule, already
+  triggered — and it is reported even when no target could be built.
+* **Weights are measured against the whole portfolio, cash included**, which is
+  the denominator every limit in `engines/risk/concentration.py` is defined
+  over. If the capital you give is smaller than the book is worth, the output
+  says the two numbers disagree rather than picking one.
+
+`BEFORE` and `AFTER` are the same book run through `A12PortfolioRisk`, so the
+breaches you are carrying and the ones you would still be carrying are on the
+same screen.
+
 ---
 
 ## `ask.py` — the CLI

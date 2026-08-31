@@ -32,6 +32,14 @@ fx_myr_per_usd = 4.15
 # list long enough to fill a queue you stop reading is worse than no queue.
 # Ids carry their market prefix and are validated at load - a typo here does not
 # crash, it silently stops matching a name you think is being watched.
+# A holding may be a bare id, or a table carrying what you own:
+#   holdings = [{ id = "MYX:1155", units = 2000, avg_cost = 10.68, stop = 9.83, sector = "bank" }, { id = "MYX:1023", units = 2000, avg_cost = 7.96, stop = 7.32, sector = "telco" }, { id = "MYX:5296", units = 2000, avg_cost = 1.38, stop = 1.27, sector = "consumer" }, { id = "MYX:6012", units = 2000, avg_cost = 3.73, stop = 3.43, sector = "energy" }, { id = "MYX:4197", units = 2000, avg_cost = 2.60, stop = 2.39, sector = "plantation" }, { id = "MYX:1961", units = 2000, avg_cost = 4.68, stop = 4.31, sector = "reit" }]
+# `stop` and `sector` are optional and only rebalancing uses them: without a
+# stop the risk-budget cap cannot be computed for that name and the output says
+# which cap it lost; without a sector the name counts as its own sector, which
+# is how a book of six banks can look like six sectors.
+# Without units the name is still watched and analysed; only the book value
+# and anything that needs it (rebalancing) will say it cannot be computed.
 holdings = []
 watchlist = []
 
@@ -69,6 +77,35 @@ min_effective_bets = 5.0      # hard floor 3.0, whatever this says
 # not one stop filling; it is all of them filling in the same week.
 portfolio_heat = 0.06
 min_positions = 5
+
+
+[capital]
+# Your financial position. `engines/sizing/waterfall.py` turns this into
+# investable capital, in this order, and the first three steps are LOCKED:
+#
+#   liquid assets
+#     - emergency floor        (essential_monthly_spend x waterfall.emergency_months)
+#     - near-term goals        (anything <= 24 months away)
+#     - debt above the hurdle  (waterfall.debt_hurdle)
+#     - one month of planned contributions, held as cash
+#   = investable
+#
+# Leave these at zero and `ask.py size` cannot derive your capital - you would
+# have to type it with --portfolio, which BYPASSES all three locks. That is
+# supported and disclosed, never silent.
+liquid_assets = 0.0
+essential_monthly_spend = 0.0
+planned_monthly_contribution = 0.0
+
+# Money already spoken for. Inside 24 months it holds cash however good a
+# signal looks: a goal you have to sell into a drawdown to fund is not funded.
+#   goals = [{ name = "car deposit", amount = 30000, months_away = 18 }]
+goals = []
+
+# Debts. Anything above waterfall.debt_hurdle is repaid before equities.
+# Write the rate as a fraction: 0.17 is 17%.
+#   liabilities = [{ name = "credit card", balance = 4000, annual_rate = 0.17 }]
+liabilities = []
 
 
 [waterfall]

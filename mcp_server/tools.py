@@ -25,7 +25,7 @@ from __future__ import annotations
 
 import sqlite3
 from datetime import UTC, date, datetime, timedelta
-from decimal import Decimal, InvalidOperation
+from decimal import ROUND_HALF_UP, Decimal, InvalidOperation
 
 from agents.base import AgentContext, Finding
 from agents.learning.teacher import A14Teacher, Learner
@@ -38,6 +38,8 @@ from agents.synthesis.agents import (
     Breaker,
     Stance,
 )
+from core.config import ConfigError
+from core.config import load as load_config
 from core.contracts.money import BASE_CURRENCY
 from core.guardrails.defaults import default_engine
 from core.market.feed import ChainedFeed, PriceFeedError, default_feed
@@ -61,8 +63,23 @@ DISCLAIMER = (
 
 def context() -> AgentContext:
     reg = load_registry(REGISTRY)
+    # holdings and watchlist come from config.toml. Without them
+    # `should_escalate` (knowledge/news/features.py) can never match an article
+    # to anything the user owns or is watching, so the news escalation gate was
+    # closed on every article regardless of what the file said.
+    try:
+        cfg = load_config()
+        holdings, watchlist = set(cfg.holdings), set(cfg.watchlist)
+    except ConfigError:
+        # A broken settings file must not take out every other command; the
+        # config commands report it properly.
+        holdings, watchlist = set(), set()
     return AgentContext(
-        router=Router({}), engine=default_engine(reg.allowlist()), now=datetime.now(UTC)
+        router=Router({}),
+        engine=default_engine(reg.allowlist()),
+        now=datetime.now(UTC),
+        holdings=holdings,
+        watchlist=watchlist,
     )
 
 
@@ -535,6 +552,175 @@ def check_portfolio_risk(
     return f"BOOK  {len(parsed)} positions, base {base_currency}\n{_lines(out)}{DISCLAIMER}"
 
 
+def _quoted(iid: str, close) -> Decimal:
+    """A fetched close is a float; a real quote sits on the market's tick.
+
+    Without snapping, a MYR 1.38 close reaches the user as
+    1.3799999952316284 - which is not a price anyone can trade, and it is what
+    the rebalance printed back at them beside their own stop.
+    """
+    from markets.registry import get as market_get
+    from markets.registry import mic_of
+
+    price = Decimal(str(close))
+    try:
+        tick = market_get(mic_of(iid)).tick_size(price)
+    except (ValueError, KeyError):
+        return price.quantize(Decimal("0.0001"), rounding=ROUND_HALF_UP)
+    if tick <= 0:
+        return price
+    return (price / tick).quantize(Decimal("1"), rounding=ROUND_HALF_UP) * tick
+
+
+def _candidates(specs: list, fetch: bool = False, end=None) -> list:
+    """`MIC:CODE:PRICE:STOP:ADV:SECTOR` -> Candidates, one parser for every surface.
+
+    With `fetch`, an empty PRICE or ADV is measured from the price feed. A stop
+    is never derived: where the stop goes is the user's risk decision and
+    inventing one would invent the risk budget with it.
+    """
+    from engines.sizing.allocate import Candidate
+    from markets.registry import get as market_get
+    from markets.registry import market_currency, mic_of
+
+    out = []
+    for raw in specs:
+        parts = str(raw).split(":")
+        if len(parts) != 6:
+            raise ToolError(
+                f"candidate {raw!r} must be MIC:CODE:PRICE:STOP:ADV:SECTOR "
+                f"(leave PRICE and ADV empty only with fetch)"
+            )
+        market, code, price_s, stop_s, adv_s, sector = parts
+        iid = f"{market}:{code}"
+        try:
+            mic = mic_of(iid)
+            adapter = market_get(mic)
+        except (ValueError, KeyError) as e:
+            raise ToolError(f"{iid}: {e}") from None
+
+        price = _positive(price_s, f"{iid} price") if price_s.strip() else None
+        adv = _positive(adv_s, f"{iid} adv") if adv_s.strip() else None
+        if (price is None or adv is None) and not fetch:
+            raise ToolError(
+                f"{iid}: price and adv are required unless the caller asks to measure them"
+            )
+        if price is None or adv is None:
+            try:
+                series = _feed().fetch(iid, end=end)
+            except PriceFeedError as e:
+                raise ToolError(f"{iid}: {e}") from None
+            bars = series.raw()
+            price = price if price is not None else _quoted(iid, bars[-1].close)
+            adv = adv if adv is not None else Decimal(str(series.adv(20)))
+
+        out.append(
+            Candidate(
+                instrument_id=iid,
+                price=price,
+                stop_price=_positive(stop_s, f"{iid} stop"),
+                adv_20d=adv,
+                sector=sector or "unknown",
+                country=adapter.country,
+                currency=market_currency(mic),
+                lot_size=adapter.lot_size(iid),
+                mic=mic,
+                round_trip_cost_at=adapter.fee_schedule.round_trip,
+            )
+        )
+    return out
+
+
+def investable_capital(db: str = "") -> str:
+    """How much money is allowed to be in stocks at all, from [capital].
+
+    docs/05 section 2 puts this before any question about which stock. Three
+    steps are LOCKED and no argument here reduces them: the emergency floor,
+    near-term goals inside 24 months, and debt above the hurdle.
+    """
+    from agents.portfolio.agents import plan_capital
+
+    cfg = load_config()
+    waterfall, findings = plan_capital(cfg, context())
+    if waterfall is None:
+        return (
+            "NO PLAN: config.toml has no [capital] block, so investable capital "
+            "cannot be derived.\n"
+            "  Fill liquid_assets and essential_monthly_spend (plus any goals and "
+            "liabilities).\n"
+            "  Until then size_position needs portfolio_value supplied by the caller, "
+            "which BYPASSES the emergency floor, near-term goals and debt hurdle." + DISCLAIMER
+        )
+    body = waterfall.explain()
+    notes = "\n".join(f"  {c}" for f in findings for c in f.caveats)
+    tail = ""
+    if waterfall.investable == 0:
+        tail = (
+            "\n\n  NO CAPITAL: the floor and reservations consume everything liquid. "
+            "The correct amount to invest today is zero - an answer, not a failure."
+        )
+    return f"{body}\n{notes}{tail}{DISCLAIMER}"
+
+
+def allocate_capital(
+    names: list | None = None,
+    portfolio_value: float | None = None,
+    fetch: bool = False,
+    as_at: str = "",
+    single_name_limit: float = 0.08,
+    risk_per_trade: float = 0.0075,
+    participation: float = 0.05,
+) -> str:
+    """Split investable capital across names the CALLER nominated.
+
+    This does not choose names - it answers what comes after choosing them.
+    Omit portfolio_value to derive capital from the [capital] plan through the
+    waterfall; supply it and the emergency floor, near-term goals and debt
+    hurdle are bypassed, which the output says.
+
+    Refuses rather than fabricating diversification: too few fundable names,
+    or a book that would behave as one bet, is a refusal with the reason.
+    """
+    from agents.portfolio.agents import TYPED_CAPITAL_NOTE, plan_capital
+    from core.config import load as load_config
+    from engines.sizing.allocate import allocate
+
+    cfg = load_config()
+    if portfolio_value is None:
+        waterfall, _ = plan_capital(cfg, context())
+        if waterfall is None:
+            return (
+                "NO PLAN: no [capital] block in config.toml and no portfolio_value "
+                "supplied, so there is no capital to allocate. Call investable_capital "
+                "for what to fill in." + DISCLAIMER
+            )
+        investable = waterfall.investable
+        capital_note = f"capital derived through the waterfall: {investable:,.2f}"
+    else:
+        investable = _positive(portfolio_value, "portfolio_value")
+        capital_note = TYPED_CAPITAL_NOTE
+
+    specs = [str(n) for n in (names or [])]
+    if not specs:
+        return (
+            "NO CANDIDATES: nominate the names to split capital across, as "
+            "MIC:CODE:PRICE:STOP:ADV:SECTOR. This system does not choose them - it "
+            "sizes and bounds the ones you bring." + DISCLAIMER
+        )
+
+    end = _parse_date(as_at) if as_at else None
+    candidates = _candidates(specs, fetch=fetch, end=end)
+    result = allocate(
+        investable,
+        candidates,
+        limits=cfg.limits,
+        risk_per_trade=_positive(risk_per_trade, "risk_per_trade"),
+        single_name_limit=_positive(single_name_limit, "single_name_limit"),
+        participation=_positive(participation, "participation"),
+    )
+    return f"  {capital_note}\n\n{result.explain()}{DISCLAIMER}"
+
+
 def size_position(
     instrument: str,
     portfolio_value: float,
@@ -649,8 +835,14 @@ def size_position(
         )
 
     fx_line = "" if quote == BASE_CURRENCY else f"  fx 1 {quote} = {BASE_CURRENCY} {fx}\n"
+    # portfolio_value arrives as a number the caller chose. That is exactly what
+    # the waterfall exists to produce, so say which locks did not apply to it.
+    from agents.portfolio.agents import TYPED_CAPITAL_NOTE
+
+    capital_line = f"  {TYPED_CAPITAL_NOTE}\n"
     return (
         f"SIZING  {instrument} on {mic}\n"
+        f"{capital_line}"
         f"  portfolio {BASE_CURRENCY} {pv:,.2f}  entry {quote} {px}  "
         f"stop {quote} {stop}  stop distance {((px - stop) / px):.2%}\n"
         f"{fx_line}"
@@ -663,6 +855,97 @@ def size_position(
 # --------------------------------------------------------------------------
 # planning, teaching, the forward record
 # --------------------------------------------------------------------------
+
+
+def rebalance_book(
+    names: list | None = None,
+    portfolio_value: float | None = None,
+    from_plan: bool = False,
+    fetch: bool = True,
+    as_at: str = "",
+    single_name_limit: float = 0.08,
+    risk_per_trade: float = 0.0075,
+) -> str:
+    """What to change versus what is held, with the cost of changing it.
+
+    The book comes from `account.holdings` in config.toml - a rebalance is
+    computed against real units, and there is no way to supply them here that
+    would not be a book the user never stated.
+
+    Capital defaults to the book's own market value: with nothing added, this
+    re-splits what is already there. `portfolio_value` or `from_plan` set it
+    instead, which is what makes room for the cash a book does not yet hold.
+    """
+    from agents.portfolio.agents import TYPED_CAPITAL_NOTE, plan_capital
+    from core.config import load as load_config
+    from engines.sizing.rebalance import rebalance as run_rebalance
+
+    cfg = load_config()
+    valued = [h for h in cfg.book if h.valued]
+    specs = [str(n) for n in (names or [])]
+    if not valued and not specs:
+        return (
+            "NOTHING TO REBALANCE: config.toml lists no holdings with units, and no "
+            "names were nominated.\n"
+            '  Write them as: holdings = [{ id = "MYX:1155", units = 1000, '
+            'avg_cost = 9.80, stop = 9.40, sector = "bank" }]\n'
+            "  Without units a name can still be watched and analysed; only the book "
+            "value and this rebalance need them." + DISCLAIMER
+        )
+
+    end = _parse_date(as_at) if as_at else None
+    nominated = _candidates(specs, fetch=fetch, end=end) if specs else []
+
+    prices: dict = {}
+    advs: dict = {}
+    for h in valued:
+        try:
+            series = _feed().fetch(h.id, end=end)
+        except PriceFeedError as e:
+            return (
+                f"NO PRICE for {h.id}: {e}\n"
+                f"  A book with an unpriced name cannot be weighed - every weight would "
+                f"be wrong, not just that one." + DISCLAIMER
+            )
+        bars = series.raw()
+        prices[h.id] = _quoted(h.id, bars[-1].close)
+        advs[h.id] = Decimal(str(series.adv(20)))
+
+    investable = None
+    capital_note = "capital is the book's own market value: this re-splits what is held"
+    if from_plan:
+        waterfall, _ = plan_capital(cfg, context())
+        if waterfall is None:
+            return (
+                "NO PLAN: from_plan was asked for but config.toml has no [capital] "
+                "block. Call investable_capital for what to fill in." + DISCLAIMER
+            )
+        investable = waterfall.investable
+        capital_note = f"capital derived through the waterfall: {investable:,.2f}"
+    elif portfolio_value is not None:
+        investable = _positive(portfolio_value, "portfolio_value")
+        capital_note = TYPED_CAPITAL_NOTE
+
+    result = run_rebalance(
+        valued,
+        nominated,
+        prices,
+        advs,
+        investable=investable,
+        limits=cfg.limits,
+        risk_per_trade=_positive(risk_per_trade, "risk_per_trade"),
+        single_name_limit=_positive(single_name_limit, "single_name_limit"),
+    )
+
+    shape = ""
+    if result.positions_now:
+        a12 = A12PortfolioRisk(context())
+        before = a12.run(list(result.positions_now), limits=cfg.limits)
+        shape = f"\n\n  BEFORE\n{_lines(before)}"
+        if result.positions_target:
+            after = a12.run(list(result.positions_target), limits=cfg.limits)
+            shape += f"\n  AFTER\n{_lines(after)}"
+    return f"  {capital_note}\n\n{result.explain()}{shape}{DISCLAIMER}"
 
 
 def plan_question(

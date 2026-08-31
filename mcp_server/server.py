@@ -251,6 +251,76 @@ S.tool(
 )(T.size_position)
 
 S.tool(
+    "investable_capital",
+    "How much money is allowed to be in stocks AT ALL, derived from the user's "
+    "[capital] plan: liquid assets minus the emergency floor, near-term goals "
+    "and debt above the hurdle. Call this BEFORE size_position - a "
+    "portfolio_value you were handed or guessed skips all three locks, and "
+    "size_position says so when that happens.",
+    obj({"db": _str("optional ledger path (unused today, reserved)")}),
+)(T.investable_capital)
+
+S.tool(
+    "allocate_capital",
+    "Split investable capital across names the USER nominated, under every "
+    "concentration limit. It does not choose names - that is the question "
+    "before this one, and this system does not answer it. Omit portfolio_value "
+    "to derive capital from the [capital] plan. Refuses rather than fabricating "
+    "diversification: too few fundable names, or a book that would behave as "
+    "one bet, comes back as a refusal with the reason. The result is a CAPITAL "
+    "split, not a set of positions - each name still needs its own breakers.",
+    obj(
+        {
+            "names": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "MIC:CODE:PRICE:STOP:ADV:SECTOR; leave PRICE and ADV "
+                "empty with fetch=true to measure them",
+            },
+            "portfolio_value": _num("investable capital; omit to derive it from [capital]"),
+            "fetch": {"type": "boolean", "description": "measure empty price/adv from the feed"},
+            "as_at": _str("point-in-time bound for fetched prices (YYYY-MM-DD)"),
+            "single_name_limit": _num("fraction, default 0.08"),
+            "risk_per_trade": _num("fraction, default 0.0075"),
+            "participation": _num("fraction of ADV, default 0.05"),
+        },
+        ["names"],
+    ),
+)(T.allocate_capital)
+
+S.tool(
+    "rebalance_book",
+    "What to change versus what is HELD, with the round-trip cost of each "
+    "change. The book comes from account.holdings in config.toml (id, units, "
+    "avg_cost, stop, sector) - it cannot be passed in, because a book the user "
+    "never stated is not their book. Capital defaults to the book's own market "
+    "value; portfolio_value or from_plan sets it instead. Trades worth less "
+    "than their own round trip come back as 'hold' with the number, and the "
+    "shape of the book before and after is reported by the portfolio-risk "
+    "agent. Differences against a target CAPITAL split, not a set of positions.",
+    obj(
+        {
+            "names": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "extra names to consider alongside the book, as "
+                "MIC:CODE:PRICE:STOP:ADV:SECTOR",
+            },
+            "portfolio_value": _num("capital to split; omit to use the book's own value"),
+            "from_plan": {
+                "type": "boolean",
+                "description": "derive capital from the [capital] waterfall instead",
+            },
+            "fetch": {"type": "boolean", "description": "measure empty price/adv from the feed"},
+            "as_at": _str("point-in-time bound for fetched prices (YYYY-MM-DD)"),
+            "single_name_limit": _num("fraction, default 0.08"),
+            "risk_per_trade": _num("fraction, default 0.0075"),
+        },
+        [],
+    ),
+)(T.rebalance_book)
+
+S.tool(
     "plan_question",
     "What the system would do with a question: which agents, what it would "
     "cost, and what it refuses outright. Useful before a long piece of work.",
