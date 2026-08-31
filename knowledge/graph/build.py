@@ -32,7 +32,7 @@ from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
 
-from knowledge.graph.entity_graph import Confidence, NodeKind
+from knowledge.graph.entity_graph import NodeKind
 from knowledge.graph.store import DETERMINISTIC, GraphStore
 from knowledge.graph.validate import parse
 
@@ -61,16 +61,20 @@ class BuildReport:
             f"the rest are traversable only"
         )
         lines.append(
-            "  hubs             " + (", ".join(self.hubs) if self.hubs else
-                                     "none - no node is well connected enough to "
-                                     "be a meaningless waypoint yet")
+            "  hubs             "
+            + (
+                ", ".join(self.hubs)
+                if self.hubs
+                else "none - no node is well connected enough to be a meaningless waypoint yet"
+            )
         )
         if self.closed:
-            lines.append(f"  closed           {len(self.closed)} edge"
-                         f"{'s' if len(self.closed) != 1 else ''} the sources no "
-                         f"longer assert (closed, not deleted - history stands)")
-            lines += [f"    {src} --{kind}--> {dst}" for src, dst, kind, _ in
-                      self.closed[:10]]
+            lines.append(
+                f"  closed           {len(self.closed)} edge"
+                f"{'s' if len(self.closed) != 1 else ''} the sources no "
+                f"longer assert (closed, not deleted - history stands)"
+            )
+            lines += [f"    {src} --{kind}--> {dst}" for src, dst, kind, _ in self.closed[:10]]
         return "\n".join(lines)
 
 
@@ -84,12 +88,18 @@ def default_extractors(cfg=None):
     from knowledge.graph.extractors.config_book import ConfigBookExtractor
     from knowledge.graph.extractors.curated import CuratedExtractor
     from knowledge.graph.extractors.sectors import SectorExtractor
+
     return [ConfigBookExtractor.from_config(cfg), SectorExtractor(), CuratedExtractor()]
 
 
-def build(store: GraphStore, extractors=None, cfg=None,
-          tier: str = DETERMINISTIC, skip_markets: bool = False,
-          prune_on: date | None = None) -> BuildReport:
+def build(
+    store: GraphStore,
+    extractors=None,
+    cfg=None,
+    tier: str = DETERMINISTIC,
+    skip_markets: bool = False,
+    prune_on: date | None = None,
+) -> BuildReport:
     """Extract, validate, store.
 
     `prune_on` closes edges of THIS tier that the sources no longer produce,
@@ -121,13 +131,13 @@ def build(store: GraphStore, extractors=None, cfg=None,
         for n in sorted(nodes, key=lambda n: n.node_id):
             store.add_node(n, tier=tier)
     for _, _, edges in collected:
-        for e in sorted(edges, key=lambda e: (e.src, e.dst, e.kind.value,
-                                              e.valid_from or "")):
+        for e in sorted(edges, key=lambda e: (e.src, e.dst, e.kind.value, e.valid_from or "")):
             store.add_edge(e, tier=tier)
 
     if prune_on is not None:
         report.closed = store.close_missing(
-            tier, [e for _, _, edges in collected for e in edges], prune_on)
+            tier, [e for _, _, edges in collected for e in edges], prune_on
+        )
 
     counts = store.counts()
     report.nodes, report.edges = counts["nodes"], counts["edges"]
@@ -140,17 +150,26 @@ def build(store: GraphStore, extractors=None, cfg=None,
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="build the knowledge graph, offline")
     ap.add_argument("--db", default=DEFAULT_DB, help=f"output (default {DEFAULT_DB})")
-    ap.add_argument("--code", action="store_true",
-                    help="build the CODEBASE graph instead: modules, symbols, "
-                         f"imports and calls over this repository (-> {CODE_DB})")
+    ap.add_argument(
+        "--code",
+        action="store_true",
+        help="build the CODEBASE graph instead: modules, symbols, "
+        f"imports and calls over this repository (-> {CODE_DB})",
+    )
     ap.add_argument("--root", default=".", help="repository root for --code")
-    ap.add_argument("--rebuild", action="store_true",
-                    help="delete the database first, discarding EVERY tier's "
-                         "history. Prefer --prune, which closes only what this "
-                         "tier stopped asserting and leaves other tiers alone.")
-    ap.add_argument("--prune", action="store_true",
-                    help="close edges of this tier the sources no longer assert, "
-                         "dated today. Closed, never deleted.")
+    ap.add_argument(
+        "--rebuild",
+        action="store_true",
+        help="delete the database first, discarding EVERY tier's "
+        "history. Prefer --prune, which closes only what this "
+        "tier stopped asserting and leaves other tiers alone.",
+    )
+    ap.add_argument(
+        "--prune",
+        action="store_true",
+        help="close edges of this tier the sources no longer assert, "
+        "dated today. Closed, never deleted.",
+    )
     args = ap.parse_args(argv)
 
     path = Path(args.db if args.db != DEFAULT_DB or not args.code else CODE_DB)
@@ -160,8 +179,10 @@ def main(argv=None) -> int:
         prune_on = date.today() if args.prune else None
         if args.code:
             from knowledge.graph.extractors.code import CodeExtractor
-            report = build(store, extractors=[CodeExtractor(args.root)],
-                           skip_markets=True, prune_on=prune_on)
+
+            report = build(
+                store, extractors=[CodeExtractor(args.root)], skip_markets=True, prune_on=prune_on
+            )
         else:
             report = build(store, prune_on=prune_on)
     print(report.describe())
@@ -169,5 +190,5 @@ def main(argv=None) -> int:
     return 0
 
 
-if __name__ == "__main__":                      # pragma: no cover
+if __name__ == "__main__":  # pragma: no cover
     sys.exit(main())

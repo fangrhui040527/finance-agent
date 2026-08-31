@@ -5,39 +5,17 @@ one. Every failure path raises FeedError; only an explicitly empty article list
 returns an empty list. A feed that swallowed its own errors would hand the
 system a confident "no news" on the day the news mattered most.
 """
+
 import json
 import urllib.error
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import pytest
 
 from knowledge.feeds.adapter import FeedError, GdeltFeed
+from tests.conftest import opener_for as _opener
 
-NOW = datetime(2026, 8, 27, 12, 0, tzinfo=timezone.utc)
-
-
-class _Response:
-    """Minimal stand-in for the context manager urlopen returns."""
-
-    def __init__(self, body: str):
-        self._body = body.encode()
-
-    def read(self) -> bytes:
-        return self._body
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, *exc):
-        return False
-
-
-def _opener(body: str, capture: list | None = None):
-    def open_(req, timeout=None):
-        if capture is not None:
-            capture.append(req)
-        return _Response(body)
-    return open_
+NOW = datetime(2026, 8, 27, 12, 0, tzinfo=UTC)
 
 
 def _article(url: str, title: str = "Bank posts record quarter", **kw) -> dict:
@@ -135,10 +113,19 @@ def test_the_user_agent_can_carry_a_real_contact_address(monkeypatch):
 
 # --- normalisation is inherited, and still works on GDELT's shapes --------
 def test_a_non_english_article_keeps_its_language_and_country():
-    body = json.dumps({"articles": [
-        _article("https://a.my/1", "Maybank catat keuntungan rekod",
-                 language="Malay", sourcecountry="Malaysia", domain="a.my"),
-    ]})
+    body = json.dumps(
+        {
+            "articles": [
+                _article(
+                    "https://a.my/1",
+                    "Maybank catat keuntungan rekod",
+                    language="Malay",
+                    sourcecountry="Malaysia",
+                    domain="a.my",
+                ),
+            ]
+        }
+    )
     feed = GdeltFeed(opener=_opener(body))
     articles, stats = feed.normalize(feed.fetch(NOW - timedelta(hours=1)))
     assert len(articles) == 1
@@ -153,14 +140,18 @@ def test_gdelt_seendate_parses_to_an_aware_timestamp():
     body = json.dumps({"articles": [_article("https://a.my/1", seendate="20260827T113000Z")]})
     feed = GdeltFeed(opener=_opener(body))
     art = feed.normalize(feed.fetch(NOW - timedelta(hours=1)))[0][0]
-    assert art.published_at == datetime(2026, 8, 27, 11, 30, tzinfo=timezone.utc)
+    assert art.published_at == datetime(2026, 8, 27, 11, 30, tzinfo=UTC)
 
 
 def test_the_same_story_syndicated_to_two_domains_counts_once():
-    body = json.dumps({"articles": [
-        _article("https://a.com/1", "Maybank posts record quarter", domain="a.com"),
-        _article("https://b.com/9", "Maybank posts record quarter", domain="b.com"),
-    ]})
+    body = json.dumps(
+        {
+            "articles": [
+                _article("https://a.com/1", "Maybank posts record quarter", domain="a.com"),
+                _article("https://b.com/9", "Maybank posts record quarter", domain="b.com"),
+            ]
+        }
+    )
     feed = GdeltFeed(opener=_opener(body))
     articles, stats = feed.normalize(feed.fetch(NOW - timedelta(hours=1)))
     assert len(articles) == 1

@@ -4,7 +4,6 @@ Both answer the same question from the same graph, so both are tested against
 the same refusals - a surface that guesses where the other refuses is the drift
 that makes two front doors dangerous.
 """
-from datetime import date
 
 import pytest
 
@@ -24,12 +23,14 @@ def db(tmp_path_factory):
 
 def cli(db, *args, capsys):
     import ask
+
     code = ask.main(["graph", "--db", db, "--asof", ASOF, *args])
     out = capsys.readouterr()
     return code, out.out, out.err
 
 
 # -- paths --------------------------------------------------------------------
+
 
 def test_a_path_comes_back_with_its_evidence(db, capsys):
     code, out, _ = cli(db, "--path", "CM:aluminium", "Press Metal", capsys=capsys)
@@ -59,8 +60,7 @@ def test_an_unknown_entity_is_refused_rather_than_guessed(db, capsys):
     assert code == 2 and "not in the graph" in err
 
 
-def test_an_ambiguous_name_is_refused_with_the_options_not_broken_by_enum_order(
-        db, capsys):
+def test_an_ambiguous_name_is_refused_with_the_options_not_broken_by_enum_order(db, capsys):
     """'Aluminium' is both a sub-sector and a commodity in the shipped data.
     Silently preferring one answers a question the user did not ask."""
     code, _, err = cli(db, "--path", "Aluminium", "Press Metal", capsys=capsys)
@@ -71,11 +71,12 @@ def test_an_ambiguous_name_is_refused_with_the_options_not_broken_by_enum_order(
 
 # -- impact -------------------------------------------------------------------
 
+
 def test_impact_ranks_what_a_shock_reaches(db, capsys):
     code, out, _ = cli(db, "--impact", "crude oil", capsys=capsys)
     assert code == 0
     assert "Petronas Chemicals" in out and "MISC" in out
-    assert out.index("Petronas Chemicals") < out.index("MISC")   # nearer first
+    assert out.index("Petronas Chemicals") < out.index("MISC")  # nearer first
 
 
 def test_impact_can_be_narrowed_to_what_you_hold(db, capsys):
@@ -89,6 +90,7 @@ def test_impact_on_something_that_reaches_nothing_says_so(db, capsys):
 
 
 # -- report and benchmark -----------------------------------------------------
+
 
 def test_the_report_renders_from_the_cli(db, capsys):
     code, out, _ = cli(db, "--report", capsys=capsys)
@@ -115,6 +117,7 @@ def test_asking_nothing_is_an_error_not_an_empty_success(db, capsys):
 
 def test_a_missing_database_explains_how_to_build_one(capsys, tmp_path):
     import ask
+
     code = ask.main(["graph", "--db", str(tmp_path / "absent.db"), "--report"])
     assert code == 2
     assert "make graph" in capsys.readouterr().err
@@ -122,28 +125,32 @@ def test_a_missing_database_explains_how_to_build_one(capsys, tmp_path):
 
 # -- the MCP tool -------------------------------------------------------------
 
+
 def test_explain_path_returns_the_chain_and_one_citation_per_link(db):
     from mcp_server.tools import explain_path
+
     out = explain_path("Crude oil", "MISC", asof=ASOF, db=db)
     assert "Crude oil --affects--> Petronas Chemicals" in out
-    assert out.count("[curated:supply_chain#") == 2       # one per hop
+    assert out.count("[curated:supply_chain#") == 2  # one per hop
     assert "strength: indirect (2 hops" in out
 
 
 def test_explain_path_refuses_an_entity_it_does_not_hold(db):
     from mcp_server.tools import explain_path
+
     out = explain_path("Atlantis", "MISC", asof=ASOF, db=db)
     assert out.startswith("REFUSED:") and "rather than inferring" in out
 
 
 def test_explain_path_refuses_a_bad_date_rather_than_defaulting_to_today(db):
     from mcp_server.tools import explain_path
-    assert explain_path("MISC", "Maybank", asof="last tuesday", db=db).startswith(
-        "REFUSED:")
+
+    assert explain_path("MISC", "Maybank", asof="last tuesday", db=db).startswith("REFUSED:")
 
 
 def test_explain_path_refuses_to_answer_without_a_built_graph(tmp_path):
     from mcp_server.tools import explain_path
+
     out = explain_path("a", "b", db=str(tmp_path / "none.db"))
     assert "REFUSED" in out and "make graph" in out
     assert "guessing" in out
@@ -151,11 +158,13 @@ def test_explain_path_refuses_to_answer_without_a_built_graph(tmp_path):
 
 def test_explain_path_refuses_an_entity_against_itself(db):
     from mcp_server.tools import explain_path
+
     assert "same entity" in explain_path("MISC", "MISC", asof=ASOF, db=db)
 
 
 def test_explain_path_never_calls_an_empty_result_unconnected(db):
     from mcp_server.tools import explain_path
+
     out = explain_path("MISC", "NVIDIA", asof=ASOF, db=db)
     assert "NOT FOUND CHEAPLY" in out
     assert "Do not report them as unrelated" in out
@@ -164,6 +173,7 @@ def test_explain_path_never_calls_an_empty_result_unconnected(db):
 def test_explain_path_flags_a_speculative_chain(db):
     """Three or more hops carries the same caveat A7 attaches to a finding."""
     from mcp_server.tools import explain_path
+
     out = explain_path("Thermal coal", "Maybank", asof=ASOF, db=db)
     assert "NOT FOUND CHEAPLY" in out or "speculative" in out
     assert "REFUSED" not in out
@@ -171,6 +181,7 @@ def test_explain_path_flags_a_speculative_chain(db):
 
 def test_the_tool_is_registered_on_the_server():
     from mcp_server.server import S
+
     assert "explain_path" in S.tools
     schema = S.tools["explain_path"]
     assert "a" in str(schema) and "b" in str(schema)
@@ -179,5 +190,5 @@ def test_the_tool_is_registered_on_the_server():
 def test_an_edge_outside_its_validity_is_invisible_to_the_tool(db):
     """Point-in-time, through the surface a model actually calls."""
     from mcp_server.tools import explain_path
-    assert "No path" in explain_path("CM:aluminium", "Press Metal",
-                                     asof="2019-01-01", db=db)
+
+    assert "No path" in explain_path("CM:aluminium", "Press Metal", asof="2019-01-01", db=db)

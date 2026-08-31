@@ -249,3 +249,20 @@ Tell them the three rules that are not negotiable:
   and names misconceptions. It does not replace reading.
 - **Costs are planning estimates** at RM 4.15/USD, not measured bills. The
   provenance ledger records actuals from day one — compare monthly.
+
+---
+
+## Added in the 2026-08-31 hardening pass
+
+- `python ask.py doctor [--offline]` - preflight with named impact per check;
+  CI runs it offline on every push.
+- `FINPLANET_LOG=INFO|DEBUG` - stderr logging for every entrypoint (a healthy
+  run stays silent at the default WARNING).
+- `FINPLANET_CHEAP=1` - every Messages tier resolves to the cheapest model,
+  billed at its own rate; disclosed by `ask.py backend`, the doctor, and the
+  web Overview. This is the standing rule for live testing.
+- `debug/` traces are pruned automatically (newest 20 kept, 14-day cap) -
+  retention is a privacy control, the traces hold verbatim prompts.
+- docker-compose binds loopback only and refuses to start without passwords
+  in `.env` (no more shipped defaults).
+- The web app: `make web` / `run web`, twelve screens on 127.0.0.1:8765.

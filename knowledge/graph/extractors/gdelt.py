@@ -20,11 +20,10 @@ substring match cite itself as evidence.
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import UTC
 
 from knowledge.graph.entity_graph import Confidence, EdgeKind, NodeKind
-from knowledge.graph.extractors.base import (
-    Extractor, company_node, edge, node, sorted_payload)
+from knowledge.graph.extractors.base import Extractor, company_node, edge, node, sorted_payload
 from knowledge.graph.ids import node_id
 
 #: An event is news, and news decays. A story stops describing the world after a
@@ -45,12 +44,13 @@ class GdeltExtractor(Extractor):
     @classmethod
     def from_fixture(cls, path, entity_index=None, **kw):
         """Offline by default: the fixture feed reads newline-delimited JSON."""
-        from datetime import datetime, timezone
+        from datetime import datetime
 
         from knowledge.feeds.adapter import FixtureFeed
+
         feed = FixtureFeed(path=path)
         index = entity_index if entity_index is not None else _index_from_aliases()
-        since = kw.pop("since", datetime(1970, 1, 1, tzinfo=timezone.utc))
+        since = kw.pop("since", datetime(1970, 1, 1, tzinfo=UTC))
         articles, _ = feed.normalize(feed.fetch(since), entity_index=index, **kw)
         return cls(articles)
 
@@ -61,19 +61,25 @@ class GdeltExtractor(Extractor):
         edges: list[dict] = []
         for art in self.articles:
             if not art.instruments:
-                continue                        # nothing to attach it to
-            ev = node(NodeKind.EVENT, art.doc_id, art.title,
-                      source_domain=art.source_domain)
+                continue  # nothing to attach it to
+            ev = node(NodeKind.EVENT, art.doc_id, art.title, source_domain=art.source_domain)
             nodes.append(ev)
             opened = art.published_at.date()
             for iid in sorted(set(art.instruments)):
                 cid = node_id(NodeKind.COMPANY, iid)
                 nodes.append(company_node(iid))
-                edges.append(edge(
-                    ev["id"], cid, EdgeKind.AFFECTS,
-                    doc=art.doc_id, confidence=Confidence.INFERRED,
-                    weight=MENTION_WEIGHT, valid_from=opened,
-                    valid_to=opened + timedelta(days=EVENT_VALID_DAYS)))
+                edges.append(
+                    edge(
+                        ev["id"],
+                        cid,
+                        EdgeKind.AFFECTS,
+                        doc=art.doc_id,
+                        confidence=Confidence.INFERRED,
+                        weight=MENTION_WEIGHT,
+                        valid_from=opened,
+                        valid_to=opened + timedelta(days=EVENT_VALID_DAYS),
+                    )
+                )
         return sorted_payload(nodes, edges)
 
 
@@ -87,6 +93,7 @@ def _index_from_aliases() -> dict[str, str]:
     import yaml
 
     from knowledge.graph.ids import ENTITIES_FILE
+
     if not ENTITIES_FILE.exists():
         return {}
     raw = yaml.safe_load(ENTITIES_FILE.read_text()) or {}

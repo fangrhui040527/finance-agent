@@ -4,12 +4,21 @@ Nothing here crashes when it breaks - that is the whole problem. Two producers
 disagree about an id, the supply chain forks, and half the exposure paths lead
 to a node no query ever names.
 """
+
 import pytest
 
 from knowledge.graph.entity_graph import NodeKind
 from knowledge.graph.ids import (
-    IdError, MAX_FOLD_PASSES, PREFIX, aliases, display_names, fold, instrument_id,
-    kind_of, node_id, slug,
+    MAX_FOLD_PASSES,
+    PREFIX,
+    IdError,
+    aliases,
+    display_names,
+    fold,
+    instrument_id,
+    kind_of,
+    node_id,
+    slug,
 )
 
 CO = NodeKind.COMPANY
@@ -17,11 +26,22 @@ CO = NodeKind.COMPANY
 
 # -- the four spellings of one company ---------------------------------------
 
-@pytest.mark.parametrize("spelling", [
-    "MYX:1155", "XKLS:1155", "KLSE:1155", "myx:1155",
-    "Maybank", "maybank", "MAYBANK", "  Maybank  ",
-    "Malayan Banking", "Malayan Banking Berhad",
-])
+
+@pytest.mark.parametrize(
+    "spelling",
+    [
+        "MYX:1155",
+        "XKLS:1155",
+        "KLSE:1155",
+        "myx:1155",
+        "Maybank",
+        "maybank",
+        "MAYBANK",
+        "  Maybank  ",
+        "Malayan Banking",
+        "Malayan Banking Berhad",
+    ],
+)
 def test_every_spelling_of_maybank_is_one_id(spelling):
     assert node_id(CO, spelling) == "CO:XKLS:1155"
 
@@ -40,6 +60,7 @@ def test_an_unknown_name_gets_a_slug_rather_than_a_wrong_company():
 
 
 # -- the three guarantees ----------------------------------------------------
+
 
 @pytest.mark.parametrize("kind", list(NodeKind))
 def test_minting_an_id_twice_gives_the_same_id(kind):
@@ -60,16 +81,20 @@ def test_everything_after_the_prefix_is_word_characters():
     assert body.replace("_", "").isalnum()
 
 
-@pytest.mark.parametrize("a,b", [
-    ("Consumer Cyclical", "consumer   cyclical"),
-    ("E-Commerce", "e commerce"),
-    ("Semiconductors!", "semiconductors"),
-])
+@pytest.mark.parametrize(
+    "a,b",
+    [
+        ("Consumer Cyclical", "consumer   cyclical"),
+        ("E-Commerce", "e commerce"),
+        ("Semiconductors!", "semiconductors"),
+    ],
+)
 def test_spelling_spacing_and_punctuation_do_not_change_the_answer(a, b):
     assert node_id(NodeKind.SUBSECTOR, a) == node_id(NodeKind.SUBSECTOR, b)
 
 
 # -- the ordering trap graphify documents ------------------------------------
+
 
 def test_folding_happens_before_the_non_word_filter_not_after():
     """casefold can expand a character into a base plus a combining mark, which
@@ -93,11 +118,13 @@ def test_a_string_that_never_settles_raises_rather_than_hanging_the_build(monkey
     """The loop is bounded rather than `while True`. A pathological input should
     fail the build that fed it, not spin forever inside it."""
     import knowledge.graph.ids as ids
+
     calls = {"n": 0}
 
     def churn(form, s):
         calls["n"] += 1
-        return s + "a"                      # never reaches a fixed point
+        return s + "a"  # never reaches a fixed point
+
     monkeypatch.setattr(ids.unicodedata, "normalize", churn)
     with pytest.raises(IdError, match="stable normal form"):
         ids.fold("x")
@@ -105,6 +132,7 @@ def test_a_string_that_never_settles_raises_rather_than_hanging_the_build(monkey
 
 
 # -- refusals ----------------------------------------------------------------
+
 
 @pytest.mark.parametrize("bad", ["", "   ", None, 7])
 def test_something_that_cannot_be_an_id_is_refused(bad):
@@ -119,6 +147,7 @@ def test_a_name_of_pure_punctuation_is_refused_rather_than_becoming_an_empty_id(
 
 # -- the tables --------------------------------------------------------------
 
+
 def test_every_node_kind_has_a_prefix_and_no_two_share_one():
     assert set(PREFIX) == set(NodeKind)
     assert len(set(PREFIX.values())) == len(PREFIX)
@@ -127,7 +156,7 @@ def test_every_node_kind_has_a_prefix_and_no_two_share_one():
 def test_the_kind_can_be_read_back_off_an_id():
     assert kind_of(node_id(CO, "Maybank")) is CO
     assert kind_of(node_id(NodeKind.COMMODITY, "aluminium")) is NodeKind.COMMODITY
-    assert kind_of("MYX:1155") is None          # a raw instrument id is not a node id
+    assert kind_of("MYX:1155") is None  # a raw instrument id is not a node id
     assert kind_of("nonsense") is None
 
 

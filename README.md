@@ -42,9 +42,18 @@ Full design detail starts at **[`docs/README.md`](docs/README.md)**.
 
 ## Status
 
-**Everything except P16 is built and tested.** 621 tests, no network and no keys
-needed to run any of it. CI runs the suite, `verify.py`, the eval ratchet and the
-no-execution grep on every push.
+**Everything except P16 is built and tested - including the twelve-screen web
+app** (`make web`, 127.0.0.1 only). 1,400+ tests, no network and no keys needed
+to run any of them. CI runs lint (ruff), types (pyright), the suite with a 92%
+coverage floor, `verify.py`, stress, the eval ratchet, preflight doctor and the
+no-execution grep on ubuntu AND windows, 3.11 and 3.12, from a committed
+uv.lock.
+
+Runtime deps: `pydantic`, `pyyaml`, plus `anthropic` (model seam; EchoBackend
+keeps everything offline) and `fastapi`/`uvicorn` (web). Engines and tests
+import none of the last three. Live model testing runs under
+`FINPLANET_CHEAP=1`, which resolves every tier to the cheapest model and says
+so on every surface.
 
 P16 is the paper-trade gate: 3–6 months of elapsed forward time, not unbuilt
 work. Its machinery exists and refuses to grade a prediction before its horizon.
@@ -58,6 +67,8 @@ make verify                  # end-to-end on mock data, <1s
 make stress                  # adversarial: volume, NaN, thresholds, concurrency, live seams, MCP
 make trace                   # full traced system run -> debug/<run_id>/
 make mcp-check               # MCP handshake selftest, no client needed
+make doctor                  # preflight: what this installation can actually do
+make web                     # the twelve screens on http://127.0.0.1:8765
 make graph                   # build the knowledge graph -> data/graph.db
 make graph-report            # hubs, orphans, review queue, surprising links
 make codegraph               # the repo as a graph -> data/codegraph.db

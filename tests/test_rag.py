@@ -1,29 +1,51 @@
 """P3: chunking, hybrid retrieval, grading, scope isolation."""
-from datetime import datetime, timedelta, timezone
+
+from datetime import UTC, datetime, timedelta
 
 import pytest
 
 from core.contracts.answer import Citation, Claim, TrustTier, verify_answer
 from knowledge.chunking.parent_child import (
-    CHILD_TARGET_TOKENS, Chunk, PARENT_MAX_TOKENS, chunk_document, chunk_news,
-    chunk_transcript, count_tokens, split_sections, tables_to_markdown,
+    CHILD_TARGET_TOKENS,
+    PARENT_MAX_TOKENS,
+    Chunk,
+    chunk_document,
+    chunk_news,
+    chunk_transcript,
+    count_tokens,
+    split_sections,
+    tables_to_markdown,
 )
 from knowledge.retrieval.hybrid import (
-    BM25, Collection, HashingEmbedder, expand_to_parents, rerank, tokenize,
+    Collection,
+    HashingEmbedder,
+    expand_to_parents,
+    rerank,
+    tokenize,
 )
 from knowledge.retrieval.pipeline import (
-    CollectionScopeError, Grade, Router, WebTrigger, grade, retrieve,
+    CollectionScopeError,
+    Grade,
+    Router,
+    WebTrigger,
+    retrieve,
 )
 
-NOW = datetime.now(timezone.utc)
-FILING = ("ITEM 7. MANAGEMENT DISCUSSION\n" + "revenue grew across segments. " * 150
-          + "\nITEM 7A. MARKET RISK\n" + "exposure remained stable. " * 100)
+NOW = datetime.now(UTC)
+FILING = (
+    "ITEM 7. MANAGEMENT DISCUSSION\n"
+    + "revenue grew across segments. " * 150
+    + "\nITEM 7A. MARKET RISK\n"
+    + "exposure remained stable. " * 100
+)
 
 
 # --- chunking ------------------------------------------------------------
 def test_splits_on_structural_elements_not_paragraphs():
     assert [h for h, _ in split_sections(FILING)][:2] == [
-        "ITEM 7. MANAGEMENT DISCUSSION", "ITEM 7A. MARKET RISK"]
+        "ITEM 7. MANAGEMENT DISCUSSION",
+        "ITEM 7A. MARKET RISK",
+    ]
 
 
 def test_parents_respect_the_token_ceiling():
@@ -41,7 +63,7 @@ def test_children_are_small_and_point_at_a_parent():
 def test_children_overlap_so_a_sentence_is_not_orphaned():
     _, children = chunk_document("d", "word " * 900, "kb_filings", NOW)
     joined = sum(count_tokens(c.text) for c in children)
-    assert joined > 900          # overlap means the sum exceeds the original
+    assert joined > 900  # overlap means the sum exceeds the original
 
 
 def test_tables_become_markdown_before_chunking():
@@ -95,8 +117,9 @@ def test_freshness_is_a_hard_filter_not_a_hint():
     col = Collection("kb_news")
     col.add(Chunk("old", "market story", "kb_news", as_of=NOW - timedelta(days=400)))
     col.add(Chunk("new", "market story", "kb_news", as_of=NOW))
-    ids = {h.chunk.chunk_id for h in col.search("market story", 5,
-                                                max_age=timedelta(days=30), now=NOW)}
+    ids = {
+        h.chunk.chunk_id for h in col.search("market story", 5, max_age=timedelta(days=30), now=NOW)
+    }
     assert ids == {"new"}
 
 
@@ -165,10 +188,20 @@ def test_web_search_never_fires_by_default():
 
 def test_web_search_fires_only_when_opted_in_and_retries_are_exhausted():
     from knowledge.retrieval.hybrid import Hit
-    hits = [Hit(Chunk("w1", "web result", "web", as_of=NOW), 0.9),
-            Hit(Chunk("w2", "web result two", "web", as_of=NOW), 0.8)]
-    res = retrieve("a1", "kb_filings", "quantum lunar mining", router(), now=NOW,
-                   allow_web=True, web_search=lambda q: hits)
+
+    hits = [
+        Hit(Chunk("w1", "web result", "web", as_of=NOW), 0.9),
+        Hit(Chunk("w2", "web result two", "web", as_of=NOW), 0.8),
+    ]
+    res = retrieve(
+        "a1",
+        "kb_filings",
+        "quantum lunar mining",
+        router(),
+        now=NOW,
+        allow_web=True,
+        web_search=lambda q: hits,
+    )
     assert res.web_used is WebTrigger.GRADER_INSUFFICIENT and not res.refused
 
 
@@ -182,13 +215,24 @@ def test_pipeline_end_to_end_drops_an_unsupported_claim():
     col = corpus()
     res = retrieve("a1", "kb_filings", "margin compression", router(), now=NOW)
     assert res.grade.grade is Grade.PASS
-    good = Citation(source="kb_filings", chunk_id="c1",
-                    quoted_span="Net interest margin compressed to 2.05%",
-                    trust=TrustTier.FILINGS, as_of=NOW)
-    bad = Citation(source="kb_filings", chunk_id="c1",
-                   quoted_span="margin expanded to 4.00%",
-                   trust=TrustTier.FILINGS, as_of=NOW)
-    ans = verify_answer([Claim(text="NIM fell", citations=[good]),
-                         Claim(text="NIM rose", citations=[bad])],
-                        col.find_chunk, NOW, 0.6)
+    good = Citation(
+        source="kb_filings",
+        chunk_id="c1",
+        quoted_span="Net interest margin compressed to 2.05%",
+        trust=TrustTier.FILINGS,
+        as_of=NOW,
+    )
+    bad = Citation(
+        source="kb_filings",
+        chunk_id="c1",
+        quoted_span="margin expanded to 4.00%",
+        trust=TrustTier.FILINGS,
+        as_of=NOW,
+    )
+    ans = verify_answer(
+        [Claim(text="NIM fell", citations=[good]), Claim(text="NIM rose", citations=[bad])],
+        col.find_chunk,
+        NOW,
+        0.6,
+    )
     assert len(ans.claims) == 1 and len(ans.dropped) == 1

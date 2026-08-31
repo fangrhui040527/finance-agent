@@ -1,7 +1,10 @@
-exec(open("gen.py").read())
+from gen import page  # run via `python -m design.build` or from design/
 
 # ─────────────────────────────── WHY IT MOVED
-page("WhyItMoved","why", """
+page(
+    "WhyItMoved",
+    "why",
+    """
 <div class="head">
   <div><h1>Why it moved</h1>
   <p>The decomposition runs before any cause is named. Most single-day moves are market and
@@ -91,7 +94,8 @@ page("WhyItMoved","why", """
     </div>
   </div>
 </div>
-""", logic="""
+""",
+    logic="""
 const NEG='#9E3626', POS='#3B6A38', ACC='#0F5C63', MUT='#606D71', WARN='#8A5B12';
 function bar(name, pct, color){
   const w = Math.min(Math.abs(pct)*3.6, 49);
@@ -143,4 +147,5 @@ class Component extends DCLogic {
       scenarios: Object.keys(S).map(k => ({ label:S[k].label, pick: () => this.setState({k}) })) };
   }
 }
-""")
+""",
+)

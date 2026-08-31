@@ -251,3 +251,17 @@ One 2–4 vCPU / 8 GB instance runs the whole stack for one market with a 1-year
 | 7+ | ~RM 830–1,450/mo | Add the global data vendor when a second and third market genuinely matter, and article-level sentiment when A4's citations start failing the output rail for lack of traceable sources |
 
 The ordering rule mirrors the build order: **buy the data the week you have the code that uses it.** A point-in-time subscription with no backtest harness is RM 203/month of unused API quota, and a five-year news corpus with no attribution engine is a large, expensive text archive.
+
+---
+
+## Cache pricing correction (2026-08-31)
+
+The Messages API reports `input_tokens` as the UNCACHED remainder; cache reads
+and writes arrive in fields of their own. The original `cost_usd` subtracted
+reads from `input_tokens` a second time - invisible while nothing was cached,
+and a negative bill on the first day something was. The formula is now:
+
+    cost = input*rate + reads*0.1*rate + writes*1.25*rate + output*out_rate
+
+with every term clamped at zero, pinned by tests, and verified live against a
+metered QA run (ledger == meter under FINPLANET_CHEAP=1).

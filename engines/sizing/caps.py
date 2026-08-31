@@ -7,6 +7,7 @@ the constructor raises. Guardrails written as prompt text are suggestions.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import datetime
 from decimal import Decimal
 from enum import Enum
 
@@ -14,8 +15,8 @@ from core.contracts.money import BASE_CURRENCY, Money
 
 # docs/09 section 8: ~50-100 logged outcomes before Kelly inputs mean anything.
 KELLY_MIN_TRADES = 50
-KELLY_FRACTION = Decimal("0.25")          # quarter-Kelly
-IMPLAUSIBLE_EDGE = Decimal("0.30")        # a claimed 30% edge means the model is broken
+KELLY_FRACTION = Decimal("0.25")  # quarter-Kelly
+IMPLAUSIBLE_EDGE = Decimal("0.30")  # a claimed 30% edge means the model is broken
 # docs/05 section 3 quotes a single 30 bps cost floor. Building the Bursa fee
 # schedule showed that is unreachable there: 2 x (0.1% brokerage + 0.03% clearing
 # + 0.1% stamp) is ~46 bps before the RM 8 minimum, and only falls below 30 bps
@@ -27,17 +28,17 @@ IMPLAUSIBLE_EDGE = Decimal("0.30")        # a claimed 30% edge means the model i
 # floor, not that fees are cheap in absolute terms.
 COST_FLOOR_BPS_DEFAULT = Decimal("30")
 COST_FLOOR_BPS_BY_MIC: dict[str, Decimal] = {
-    "XKLS": Decimal("60"),   # asymptote ~46 bps
-    "XNAS": Decimal("5"),    # asymptote ~0.6 bps
-    "XSES": Decimal("30"),   # asymptote ~24 bps before the SGD 600 clearing cap binds
-    "XHKG": Decimal("95"),   # asymptote ~72 bps - the WORST of the seven, see below
-    "XTKS": Decimal("55"),   # asymptote ~40 bps; the tick, not the fee, is the cost
-    "XLON": Decimal("75"),   # asymptote ~70 bps, almost all of it one-way stamp duty
-    "XASX": Decimal("25"),   # asymptote ~20 bps - the cheapest after XNAS
-    "XNSE": Decimal("35"),   # asymptote ~26 bps; STT alone is 20 of them
-    "XTAI": Decimal("70"),   # asymptote ~59 bps, and 30 are paid ONLY on exit
-    "XKRX": Decimal("55"),   # asymptote ~45 bps; sell-side tax, half Taiwan's
-    "XETR": Decimal("25"),   # asymptote ~20 bps - no transaction tax at all
+    "XKLS": Decimal("60"),  # asymptote ~46 bps
+    "XNAS": Decimal("5"),  # asymptote ~0.6 bps
+    "XSES": Decimal("30"),  # asymptote ~24 bps before the SGD 600 clearing cap binds
+    "XHKG": Decimal("95"),  # asymptote ~72 bps - the WORST of the seven, see below
+    "XTKS": Decimal("55"),  # asymptote ~40 bps; the tick, not the fee, is the cost
+    "XLON": Decimal("75"),  # asymptote ~70 bps, almost all of it one-way stamp duty
+    "XASX": Decimal("25"),  # asymptote ~20 bps - the cheapest after XNAS
+    "XNSE": Decimal("35"),  # asymptote ~26 bps; STT alone is 20 of them
+    "XTAI": Decimal("70"),  # asymptote ~59 bps, and 30 are paid ONLY on exit
+    "XKRX": Decimal("55"),  # asymptote ~45 bps; sell-side tax, half Taiwan's
+    "XETR": Decimal("25"),  # asymptote ~20 bps - no transaction tax at all
 }
 # XHKG is the entry that contradicts the intuition. Hong Kong is a developed
 # market and is nonetheless the most expensive here: 0.25% retail brokerage is
@@ -116,8 +117,9 @@ class CurrencyMismatch(ValueError):
     """
 
 
-def to_quote(base_amount: Decimal, quote: str, base_per_quote: Decimal | None,
-             asof=None) -> Decimal:
+def to_quote(
+    base_amount: Decimal, quote: str, base_per_quote: Decimal | None, asof=None
+) -> Decimal:
     """A MYR amount expressed in `quote`. Refuses without an explicit rate.
 
     `base_per_quote` is MYR per ONE unit of `quote` - the direction a Malaysian
@@ -135,14 +137,13 @@ def to_quote(base_amount: Decimal, quote: str, base_per_quote: Decimal | None,
             f"against {quote} as bare numbers, which is off by the rate and looks fine."
         )
     if base_per_quote <= 0:
-        raise CurrencyMismatch(
-            f"{BASE_CURRENCY}-per-{quote} rate {base_per_quote} is not positive"
-        )
+        raise CurrencyMismatch(f"{BASE_CURRENCY}-per-{quote} rate {base_per_quote} is not positive")
     return base_amount / base_per_quote
 
 
-def to_base(quote_amount: Decimal, quote: str, base_per_quote: Decimal | None,
-            asof=None) -> Decimal:
+def to_base(
+    quote_amount: Decimal, quote: str, base_per_quote: Decimal | None, asof: datetime | None = None
+) -> Decimal:
     """The reverse of `to_quote`, routed through Money so one rule guards both.
 
     Money.convert already refuses a non-positive rate and treats same-currency
@@ -157,9 +158,11 @@ def to_base(quote_amount: Decimal, quote: str, base_per_quote: Decimal | None,
             f"a {quote} amount cannot be reported in {BASE_CURRENCY} without an FX rate. "
             f"Pass the {BASE_CURRENCY}-per-{quote} rate and the date it was struck."
         )
-    return Money(amount=quote_amount, currency=quote).convert(
-        BASE_CURRENCY, base_per_quote, asof
-    ).amount
+    return (
+        Money(amount=quote_amount, currency=quote)
+        .convert(BASE_CURRENCY, base_per_quote, asof)
+        .amount
+    )
 
 
 @dataclass(frozen=True)
@@ -209,7 +212,9 @@ class CapSet:
         return cap, value
 
 
-def risk_budget_cap(portfolio_value: Decimal, risk_per_trade: Decimal, stop_distance_frac: Decimal) -> Decimal:
+def risk_budget_cap(
+    portfolio_value: Decimal, risk_per_trade: Decimal, stop_distance_frac: Decimal
+) -> Decimal:
     """Bounds the LOSS, not the position."""
     if stop_distance_frac <= 0:
         raise ValueError("stop distance must be positive")

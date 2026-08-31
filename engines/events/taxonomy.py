@@ -15,8 +15,8 @@ Three construction rules from docs/03 section 6:
 from __future__ import annotations
 
 import statistics
-from dataclasses import dataclass, field
-from datetime import date, datetime
+from dataclasses import dataclass
+from datetime import datetime
 from enum import Enum
 
 
@@ -67,7 +67,10 @@ def bucket_surprise(actual: float | None, consensus: float | None) -> SurpriseBu
     """Consensus as it stood BEFORE the announcement, never a later revision."""
     if actual is None or consensus is None or consensus == 0:
         return SurpriseBucket.NA
-    s = (actual - consensus) / abs(consensus)
+    # Rounded before comparing: (0.90 - 1.0) / 1.0 is -0.09999999999999998 in
+    # binary, one ulp above the -10% edge, and read as MISS. A bucket edge is a
+    # decision boundary; it cannot depend on which side of an ulp it lands.
+    s = round((actual - consensus) / abs(consensus), 12)
     if s <= -0.10:
         return SurpriseBucket.BIG_MISS
     if s <= -0.02:
@@ -112,9 +115,9 @@ class BaseRate:
     n: int
     median_car: float
     iqr: tuple[float, float]
-    hit_rate: float          # share with CAR in the same direction as the median
+    hit_rate: float  # share with CAR in the same direction as the median
     pre_drift_median: float  # CAR over [-5,-1]: information leaks
-    reversal_rate: float     # share where [+2,+20] reverses [0,+1]
+    reversal_rate: float  # share where [+2,+20] reverses [0,+1]
 
     @property
     def thin(self) -> bool:
@@ -123,9 +126,11 @@ class BaseRate:
 
     def describe(self) -> str:
         band = "" if not self.thin else "  [THIN SAMPLE]"
-        return (f"{self.event_type.value} / {self.market} / {self.cap_band.value} / "
-                f"{self.surprise.value}: median {self.median_car:+.2%} "
-                f"(n={self.n}, IQR {self.iqr[0]:+.2%} to {self.iqr[1]:+.2%}){band}")
+        return (
+            f"{self.event_type.value} / {self.market} / {self.cap_band.value} / "
+            f"{self.surprise.value}: median {self.median_car:+.2%} "
+            f"(n={self.n}, IQR {self.iqr[0]:+.2%} to {self.iqr[1]:+.2%}){band}"
+        )
 
 
 @dataclass
@@ -133,9 +138,9 @@ class Observation:
     """One historical event with its measured windows."""
 
     event: Event
-    car_pre: float      # [-5,-1]
-    car_event: float    # [0,+1]
-    car_post: float     # [+2,+20]
+    car_pre: float  # [-5,-1]
+    car_event: float  # [0,+1]
+    car_post: float  # [+2,+20]
 
 
 class BaseRateTable:
@@ -161,14 +166,26 @@ class BaseRateTable:
             rev = sum(1 for o in obs if (o.car_post >= 0) != (o.car_event >= 0)) / len(obs)
             et, mkt, band, surp = key
             out[key] = BaseRate(
-                et, mkt, band, surp, len(obs), med, (q[0], q[-1]), same,
-                statistics.median([o.car_pre for o in obs]), rev,
+                et,
+                mkt,
+                band,
+                surp,
+                len(obs),
+                med,
+                (q[0], q[-1]),
+                same,
+                statistics.median([o.car_pre for o in obs]),
+                rev,
             )
         return out
 
     def lookup(
-        self, event_type: EventType, market: str, cap_band: CapBand,
-        surprise: SurpriseBucket = SurpriseBucket.NA, min_n: int = 3,
+        self,
+        event_type: EventType,
+        market: str,
+        cap_band: CapBand,
+        surprise: SurpriseBucket = SurpriseBucket.NA,
+        min_n: int = 3,
     ) -> BaseRate | None:
         """Falls back to a coarser bucket rather than returning nothing."""
         table = self.build(min_n)

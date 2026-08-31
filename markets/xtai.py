@@ -35,13 +35,19 @@ from decimal import Decimal
 
 from core.market.calendar import SessionCalendar, SessionWindow
 from markets.contract import (
-    AccountingStandard, FeeLeg, FeeSchedule, KnownAtStrategy, MarketAdapter,
+    AccountingStandard,
+    FeeLeg,
+    FeeSchedule,
+    KnownAtStrategy,
+    MarketAdapter,
 )
 
-TWSE_FEES = FeeSchedule((
-    FeeLeg("brokerage", Decimal("0.001425"), minimum=Decimal("20")),
-    FeeLeg("securities_transaction_tax", Decimal("0.003"), per_side=False),
-))
+TWSE_FEES = FeeSchedule(
+    (
+        FeeLeg("brokerage", Decimal("0.001425"), minimum=Decimal("20")),
+        FeeLeg("securities_transaction_tax", Decimal("0.003"), per_side=False),
+    )
+)
 
 TICKS = (
     (Decimal("10"), Decimal("0.01")),
@@ -58,7 +64,7 @@ class XTAI(MarketAdapter):
     country = "TW"
     currency = "TWD"
     tier = 2
-    accounting_standard = AccountingStandard.IFRS      # TIFRS, IFRS-converged
+    accounting_standard = AccountingStandard.IFRS  # TIFRS, IFRS-converged
     local_index = "TWSE"
     regulator = "Financial Supervisory Commission of Taiwan"
     settlement_days = 2

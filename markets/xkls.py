@@ -19,14 +19,20 @@ from decimal import Decimal
 
 from core.market.calendar import SessionCalendar, SessionWindow
 from markets.contract import (
-    AccountingStandard, FeeLeg, FeeSchedule, KnownAtStrategy, MarketAdapter,
+    AccountingStandard,
+    FeeLeg,
+    FeeSchedule,
+    KnownAtStrategy,
+    MarketAdapter,
 )
 
-BURSA_FEES = FeeSchedule((
-    FeeLeg("brokerage", Decimal("0.001"), minimum=Decimal("8")),
-    FeeLeg("clearing", Decimal("0.0003"), cap=Decimal("1000")),
-    FeeLeg("stamp_duty", Decimal("0.001"), cap=Decimal("1000")),
-))
+BURSA_FEES = FeeSchedule(
+    (
+        FeeLeg("brokerage", Decimal("0.001"), minimum=Decimal("8")),
+        FeeLeg("clearing", Decimal("0.0003"), cap=Decimal("1000")),
+        FeeLeg("stamp_duty", Decimal("0.001"), cap=Decimal("1000")),
+    )
+)
 
 
 class XKLS(MarketAdapter):

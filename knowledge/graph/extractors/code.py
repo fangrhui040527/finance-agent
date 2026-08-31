@@ -52,20 +52,73 @@ TEST_PREFIX = "test_"
 #: Prose that describes the code. Read as text, not parsed.
 DOC_SUFFIXES = (".md",)
 
-SKIP_DIRS = {".git", ".venv", "__pycache__", "node_modules", "debug", "data",
-             "htmlcov", ".pytest_cache", "build", "dist"}
+SKIP_DIRS = {
+    ".git",
+    ".venv",
+    "__pycache__",
+    "node_modules",
+    "debug",
+    "data",
+    "htmlcov",
+    ".pytest_cache",
+    "build",
+    "dist",
+}
 
 #: Names so common that an edge to them says nothing about this codebase.
 #: graphify's god-node stop list, in its original form: without it, `run`,
 #: `main` and `get` accumulate an edge from every call site in the repository.
-STOPLIST = frozenset({
-    "main", "run", "get", "set", "add", "load", "save", "close", "open",
-    "read", "write", "describe", "check", "print", "len", "str", "int",
-    "float", "list", "dict", "set_defaults", "append", "extend", "format",
-    "join", "split", "strip", "items", "keys", "values", "update", "sorted",
-    "range", "enumerate", "zip", "min", "max", "sum", "abs", "round", "type",
-    "isinstance", "hasattr", "getattr", "setattr", "super", "property",
-})
+STOPLIST = frozenset(
+    {
+        "main",
+        "run",
+        "get",
+        "set",
+        "add",
+        "load",
+        "save",
+        "close",
+        "open",
+        "read",
+        "write",
+        "describe",
+        "check",
+        "print",
+        "len",
+        "str",
+        "int",
+        "float",
+        "list",
+        "dict",
+        "set_defaults",
+        "append",
+        "extend",
+        "format",
+        "join",
+        "split",
+        "strip",
+        "items",
+        "keys",
+        "values",
+        "update",
+        "sorted",
+        "range",
+        "enumerate",
+        "zip",
+        "min",
+        "max",
+        "sum",
+        "abs",
+        "round",
+        "type",
+        "isinstance",
+        "hasattr",
+        "getattr",
+        "setattr",
+        "super",
+        "property",
+    }
+)
 
 
 def _module_name(path: Path, root: Path) -> str:
@@ -75,8 +128,7 @@ def _module_name(path: Path, root: Path) -> str:
 
 
 def python_files(root: Path) -> list[Path]:
-    return sorted(p for p in root.rglob("*.py")
-                  if not any(part in SKIP_DIRS for part in p.parts))
+    return sorted(p for p in root.rglob("*.py") if not any(part in SKIP_DIRS for part in p.parts))
 
 
 class CodeExtractor(Extractor):
@@ -84,8 +136,9 @@ class CodeExtractor(Extractor):
 
     name = "code"
 
-    def __init__(self, root: Path | str = ".", asserted_from: date | None = None,
-                 docs: bool = True) -> None:
+    def __init__(
+        self, root: Path | str = ".", asserted_from: date | None = None, docs: bool = True
+    ) -> None:
         self.root = Path(root).resolve()
         self.docs = docs
         #: Structure holds as of when the pass ran. A code graph has no history:
@@ -107,22 +160,33 @@ class CodeExtractor(Extractor):
             try:
                 tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
             except (SyntaxError, UnicodeDecodeError):
-                continue                       # a file we cannot read is skipped, not guessed at
+                continue  # a file we cannot read is skipped, not guessed at
             parsed[mod] = tree
-            mid = node(MODULE, mod, mod, path=str(path.relative_to(self.root)))
+            mid = node(MODULE, mod, mod, path=path.relative_to(self.root).as_posix())
             nodes.append(mid)
             for item in tree.body:
                 if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
                     sym = f"{mod}.{item.name}"
-                    nodes.append(node(SYMBOL, sym, item.name, module=mod,
-                                      symbol="class" if isinstance(item, ast.ClassDef)
-                                             else "function"))
-                    defined.setdefault(item.name, []).append(
-                        node(SYMBOL, sym)["id"])
-                    edges.append(edge(
-                        node(SYMBOL, sym)["id"], mid["id"], EdgeKind.CLASSIFIED_IN,
-                        doc=f"code:{mod}", confidence=Confidence.EXTRACTED,
-                        valid_from=self.asserted_from))
+                    nodes.append(
+                        node(
+                            SYMBOL,
+                            sym,
+                            item.name,
+                            module=mod,
+                            symbol="class" if isinstance(item, ast.ClassDef) else "function",
+                        )
+                    )
+                    defined.setdefault(item.name, []).append(node(SYMBOL, sym)["id"])
+                    edges.append(
+                        edge(
+                            node(SYMBOL, sym)["id"],
+                            mid["id"],
+                            EdgeKind.CLASSIFIED_IN,
+                            doc=f"code:{mod}",
+                            confidence=Confidence.EXTRACTED,
+                            valid_from=self.asserted_from,
+                        )
+                    )
 
         declared = {n["id"] for n in nodes}
         for mod, tree in parsed.items():
@@ -137,29 +201,48 @@ class CodeExtractor(Extractor):
                     # static evidence that it exercises it - and only evidence.
                     # Test files import helpers and fixtures too, so importing is
                     # not testing, and the edge says INFERRED because of it.
-                    edges.append(edge(src, dst, EdgeKind.TESTS,
-                                      doc=f"code:{mod}",
-                                      confidence=Confidence.INFERRED, weight=0.8,
-                                      valid_from=self.asserted_from))
+                    edges.append(
+                        edge(
+                            src,
+                            dst,
+                            EdgeKind.TESTS,
+                            doc=f"code:{mod}",
+                            confidence=Confidence.INFERRED,
+                            weight=0.8,
+                            valid_from=self.asserted_from,
+                        )
+                    )
                 else:
                     # An import statement names its target literally.
-                    edges.append(edge(src, dst, EdgeKind.SUPPLIES,
-                                      doc=f"code:{mod}",
-                                      confidence=Confidence.EXTRACTED,
-                                      valid_from=self.asserted_from))
+                    edges.append(
+                        edge(
+                            src,
+                            dst,
+                            EdgeKind.SUPPLIES,
+                            doc=f"code:{mod}",
+                            confidence=Confidence.EXTRACTED,
+                            valid_from=self.asserted_from,
+                        )
+                    )
             for called in _calls(tree):
                 if called in STOPLIST:
                     continue
                 where = defined.get(called, [])
                 if len(where) != 1:
-                    continue           # ambiguous or unknown: no edge beats a wrong one
+                    continue  # ambiguous or unknown: no edge beats a wrong one
                 dst = where[0]
                 if dst in declared and dst != src:
-                    edges.append(edge(src, dst, EdgeKind.EXPOSED_TO,
-                                      doc=f"code:{mod}",
-                                      confidence=Confidence.INFERRED,
-                                      weight=0.6,
-                                      valid_from=self.asserted_from))
+                    edges.append(
+                        edge(
+                            src,
+                            dst,
+                            EdgeKind.EXPOSED_TO,
+                            doc=f"code:{mod}",
+                            confidence=Confidence.INFERRED,
+                            weight=0.6,
+                            valid_from=self.asserted_from,
+                        )
+                    )
         if self.docs:
             n2, e2 = self._documents(declared, modules)
             nodes += n2
@@ -181,28 +264,39 @@ class CodeExtractor(Extractor):
         """
         nodes: list[dict] = []
         edges: list[dict] = []
-        by_path = {str(p.relative_to(self.root)): mod for mod, p in modules.items()}
-        pages = sorted(p for p in self.root.rglob("*")
-                       if p.suffix in DOC_SUFFIXES
-                       and not any(part in SKIP_DIRS for part in p.parts))
+        # as_posix(): prose names `core/thing.py`; on Windows str() yields a
+        # backslash path that never matches, and a per-OS graph is not reproducible.
+        by_path = {p.relative_to(self.root).as_posix(): mod for mod, p in modules.items()}
+        pages = sorted(
+            p
+            for p in self.root.rglob("*")
+            if p.suffix in DOC_SUFFIXES and not any(part in SKIP_DIRS for part in p.parts)
+        )
         for page in pages:
             try:
                 text = page.read_text(encoding="utf-8")
             except (UnicodeDecodeError, OSError):
                 continue
-            rel = str(page.relative_to(self.root))
+            rel = page.relative_to(self.root).as_posix()
             hits = sorted({by_path[path] for path in by_path if path in text})
             if not hits:
-                continue                      # a page naming no code is not a code doc
+                continue  # a page naming no code is not a code doc
             page_node = node(DOC, rel, page.name, path=rel)
             nodes.append(page_node)
             for mod in hits:
                 dst = node(MODULE, mod)["id"]
                 if dst in declared:
-                    edges.append(edge(page_node["id"], dst, EdgeKind.DOCUMENTS,
-                                      doc=f"doc:{rel}",
-                                      confidence=Confidence.EXTRACTED, weight=0.9,
-                                      valid_from=self.asserted_from))
+                    edges.append(
+                        edge(
+                            page_node["id"],
+                            dst,
+                            EdgeKind.DOCUMENTS,
+                            doc=f"doc:{rel}",
+                            confidence=Confidence.EXTRACTED,
+                            weight=0.9,
+                            valid_from=self.asserted_from,
+                        )
+                    )
         return nodes, edges
 
 

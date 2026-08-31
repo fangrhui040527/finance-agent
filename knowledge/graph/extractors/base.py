@@ -40,9 +40,17 @@ def node(kind: NodeKind, raw: str, label: str | None = None, **metadata) -> dict
     }
 
 
-def edge(src: str, dst: str, relation: EdgeKind, *, doc: str | None,
-         confidence: Confidence, valid_from: date, weight: float = 1.0,
-         valid_to: date | None = None) -> dict:
+def edge(
+    src: str,
+    dst: str,
+    relation: EdgeKind,
+    *,
+    doc: str | None,
+    confidence: Confidence,
+    valid_from: date,
+    weight: float = 1.0,
+    valid_to: date | None = None,
+) -> dict:
     return {
         "source": src,
         "target": dst,
@@ -64,9 +72,12 @@ def company_node(raw: str, **metadata) -> dict:
     """
     cid = node_id(NodeKind.COMPANY, raw)
     iid = cid.split(":", 1)[1]
-    return {"id": cid, "kind": NodeKind.COMPANY.value,
-            "label": display_names().get(iid) or _fallback_label(raw, iid),
-            "metadata": dict(metadata)}
+    return {
+        "id": cid,
+        "kind": NodeKind.COMPANY.value,
+        "label": display_names().get(iid) or _fallback_label(raw, iid),
+        "metadata": dict(metadata),
+    }
 
 
 def _fallback_label(raw: str, iid: str) -> str:
@@ -83,6 +94,7 @@ def sorted_payload(nodes: list[dict], edges: list[dict]) -> dict:
     by_id = {n["id"]: n for n in nodes}
     return {
         "nodes": [by_id[k] for k in sorted(by_id)],
-        "edges": sorted(edges, key=lambda e: (e["source"], e["target"],
-                                              e["relation"], e["valid_from"])),
+        "edges": sorted(
+            edges, key=lambda e: (e["source"], e["target"], e["relation"], e["valid_from"])
+        ),
     }

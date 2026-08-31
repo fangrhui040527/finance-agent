@@ -46,7 +46,11 @@ from decimal import ROUND_CEILING, Decimal
 
 from core.market.calendar import SessionCalendar, SessionWindow
 from markets.contract import (
-    AccountingStandard, FeeLeg, FeeSchedule, KnownAtStrategy, MarketAdapter,
+    AccountingStandard,
+    FeeLeg,
+    FeeSchedule,
+    KnownAtStrategy,
+    MarketAdapter,
 )
 
 
@@ -63,27 +67,29 @@ class StampDutyHK(FeeLeg):
         return max(duty, self.minimum)
 
 
-HKEX_FEES = FeeSchedule((
-    FeeLeg("brokerage", Decimal("0.0025"), minimum=Decimal("100")),
-    StampDutyHK("stamp_duty", Decimal("0.001")),
-    FeeLeg("sfc_levy", Decimal("0.000027")),
-    FeeLeg("frc_levy", Decimal("0.0000015")),
-    FeeLeg("trading_fee", Decimal("0.0000565")),
-    FeeLeg("settlement", Decimal("0.00002"), minimum=Decimal("2"), cap=Decimal("100")),
-))
+HKEX_FEES = FeeSchedule(
+    (
+        FeeLeg("brokerage", Decimal("0.0025"), minimum=Decimal("100")),
+        StampDutyHK("stamp_duty", Decimal("0.001")),
+        FeeLeg("sfc_levy", Decimal("0.000027")),
+        FeeLeg("frc_levy", Decimal("0.0000015")),
+        FeeLeg("trading_fee", Decimal("0.0000565")),
+        FeeLeg("settlement", Decimal("0.00002"), minimum=Decimal("2"), cap=Decimal("100")),
+    )
+)
 
 #: Board lots are set per issuer. This is the subset the system knows; anything
 #: absent falls back to DEFAULT_LOT and says so through `lot_size_is_known`.
 BOARD_LOTS: dict[str, int] = {
-    "0001": 500,     # CK Hutchison
-    "0005": 400,     # HSBC
-    "0700": 100,     # Tencent
-    "0939": 1000,    # CCB
-    "0941": 500,     # China Mobile
-    "1299": 200,     # AIA
-    "2318": 500,     # Ping An
-    "3690": 100,     # Meituan
-    "9988": 100,     # Alibaba
+    "0001": 500,  # CK Hutchison
+    "0005": 400,  # HSBC
+    "0700": 100,  # Tencent
+    "0939": 1000,  # CCB
+    "0941": 500,  # China Mobile
+    "1299": 200,  # AIA
+    "2318": 500,  # Ping An
+    "3690": 100,  # Meituan
+    "9988": 100,  # Alibaba
 }
 DEFAULT_LOT = 1000
 
@@ -93,7 +99,7 @@ class XHKG(MarketAdapter):
     country = "HK"
     currency = "HKD"
     tier = 2
-    accounting_standard = AccountingStandard.IFRS   # HKFRS, IFRS-converged
+    accounting_standard = AccountingStandard.IFRS  # HKFRS, IFRS-converged
     local_index = "HSI"
     regulator = "Securities and Futures Commission of Hong Kong"
     settlement_days = 2

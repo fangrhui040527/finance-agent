@@ -46,21 +46,24 @@ invisible.
 Main, WhyItMoved, Prices, Thesis, Portfolio, Sizing, Predictions, Trace, Learn,
 WorldMonitor, Agents, Settings.
 
-`ui/render.py` is **273 lines of terminal output**. No screen exists as running
-code.
-
-The design README says so plainly: *"These are the specification, not the
-product."* Shared CSS tokens are lifted verbatim from `docs/user-guide.html` so
-the design cannot drift from the documentation's palette.
-
-**Blocked on:** nothing but work. This is the largest single piece of unbuilt
-scope in the repository.
+**BUILT** (2026-08-31): all twelve screens run at `make web` /
+`run web` - `web/` is a FastAPI app on 127.0.0.1:8765 whose endpoints call the
+same tool functions the MCP server exposes (response text is parity-tested
+byte-identical), with vanilla ES-module screens, no build step, and the design
+tokens EXPORTED from `design/_css.txt` minus its font import so the app
+renders fully offline. Refusals are first-class cards; the portfolio book
+lives in the browser's localStorage only. `ui/render.py` remains the terminal
+surface; the artboards remain the visual specification the screens follow.
 
 ### 32 keyless feed adapters
 
 `docs/world-sources.html` registers **52 sources** across 8 tables, **33 of them
 marked "no key"**. Exactly **one is enabled** in `config.toml` — `gdelt`, which
 is free, keyless, worldwide and covers 100+ languages.
+
+A generic `knowledge/feeds/rss.RssFeed` (2026-08-31) now covers any RSS/Atom
+source as ONE LINE in `knowledge/feeds/registry.py`; the scoping judgement
+below still stands for which lines are worth adding.
 
 That leaves 32 sources that need no key and have no adapter. Each would be a
 class implementing the same offline-safe contract as
@@ -74,12 +77,11 @@ prevent.
 
 ### An FX rate source
 
-`core/market/prices.FxStore` exists and works — explicit dated rates,
-`rate_asof()` with bisect lookup and an inverse-pair fallback. **Nothing
-populates it.** The rate is supplied per call today.
-
-**Blocked on:** a source decision. `config.toml` carries
-`fx_myr_per_usd = 4.15` for cost estimates only and says so.
+**BUILT** (2026-08-31): `core/market/fx.BnmFxFeed` fills the store from Bank
+Negara Malaysia's public API — keyless, official, MYR-native, with per-100
+units honoured (JPY/IDR/KRW) and every rate dated. Sizing still takes an
+explicit rate per call; the store is the source an operator populates when
+they want dated rates instead of the planning constant.
 
 ### A semantic graph tier
 

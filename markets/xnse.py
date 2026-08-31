@@ -40,16 +40,22 @@ from decimal import Decimal
 
 from core.market.calendar import SessionCalendar, SessionWindow
 from markets.contract import (
-    AccountingStandard, FeeLeg, FeeSchedule, KnownAtStrategy, MarketAdapter,
+    AccountingStandard,
+    FeeLeg,
+    FeeSchedule,
+    KnownAtStrategy,
+    MarketAdapter,
 )
 
-NSE_FEES = FeeSchedule((
-    FeeLeg("brokerage", Decimal("0.0010"), minimum=Decimal("20"), cap=Decimal("20")),
-    FeeLeg("securities_transaction_tax", Decimal("0.001")),
-    FeeLeg("exchange_transaction", Decimal("0.0000297")),
-    FeeLeg("sebi_turnover", Decimal("0.000001")),
-    FeeLeg("stamp_duty", Decimal("0.00015"), per_side=False),
-))
+NSE_FEES = FeeSchedule(
+    (
+        FeeLeg("brokerage", Decimal("0.0010"), minimum=Decimal("20"), cap=Decimal("20")),
+        FeeLeg("securities_transaction_tax", Decimal("0.001")),
+        FeeLeg("exchange_transaction", Decimal("0.0000297")),
+        FeeLeg("sebi_turnover", Decimal("0.000001")),
+        FeeLeg("stamp_duty", Decimal("0.00015"), per_side=False),
+    )
+)
 
 
 class XNSE(MarketAdapter):
@@ -57,17 +63,17 @@ class XNSE(MarketAdapter):
     country = "IN"
     currency = "INR"
     tier = 2
-    accounting_standard = AccountingStandard.LOCAL     # Ind AS, IFRS-converged
+    accounting_standard = AccountingStandard.LOCAL  # Ind AS, IFRS-converged
     local_index = "NIFTY"
     regulator = "Securities and Exchange Board of India"
-    settlement_days = 1                                 # T+1 since Jan 2023
+    settlement_days = 1  # T+1 since Jan 2023
     known_at_strategy = KnownAtStrategy.SELF_BUILT
 
     def __init__(self, holidays=frozenset(), half_days=frozenset()) -> None:
         self._cal = SessionCalendar(
             windows=(SessionWindow(time(9, 15), time(15, 30)),),
-            tz_offset_hours=5,          # IST is UTC+5:30; the half hour is lost
-            holidays=holidays,          # here and matters only for intraday work
+            tz_offset_hours=5,  # IST is UTC+5:30; the half hour is lost
+            holidays=holidays,  # here and matters only for intraday work
             half_days=half_days,
         )
 
@@ -80,10 +86,10 @@ class XNSE(MarketAdapter):
         return NSE_FEES
 
     def lot_size(self, instrument_id: str) -> int:
-        return 1                        # cash equities trade in single shares
+        return 1  # cash equities trade in single shares
 
     def tick_size(self, price: Decimal) -> Decimal:
-        return Decimal("0.05")          # flat, across the cash segment
+        return Decimal("0.05")  # flat, across the cash segment
 
     def withholding(self, income_type: str, holder_country: str) -> Decimal:
         if income_type != "dividend":

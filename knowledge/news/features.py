@@ -20,7 +20,6 @@ Two biases this module is shaped to avoid:
 from __future__ import annotations
 
 import hashlib
-import math
 import re
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -31,29 +30,117 @@ WORD = re.compile(r"[a-z']+", re.IGNORECASE)
 # Deliberately small, auditable lexicons. The local model is the first pass;
 # these make it inspectable and give the tests something deterministic.
 NEGATIVE = {
-    "loss", "losses", "decline", "declined", "fell", "weak", "weaker", "miss",
-    "missed", "cut", "cuts", "downgrade", "impairment", "writedown", "default",
-    "probe", "investigation", "lawsuit", "resign", "resigned", "warning", "warned",
-    "shortfall", "delay", "delayed", "suspend", "suspended", "fraud", "breach",
+    "loss",
+    "losses",
+    "decline",
+    "declined",
+    "fell",
+    "weak",
+    "weaker",
+    "miss",
+    "missed",
+    "cut",
+    "cuts",
+    "downgrade",
+    "impairment",
+    "writedown",
+    "default",
+    "probe",
+    "investigation",
+    "lawsuit",
+    "resign",
+    "resigned",
+    "warning",
+    "warned",
+    "shortfall",
+    "delay",
+    "delayed",
+    "suspend",
+    "suspended",
+    "fraud",
+    "breach",
 }
 POSITIVE = {
-    "profit", "growth", "grew", "rose", "beat", "beats", "record", "upgrade",
-    "expansion", "wins", "won", "contract", "approval", "approved", "dividend",
-    "buyback", "strong", "stronger", "improved", "recovery", "surge",
+    "profit",
+    "growth",
+    "grew",
+    "rose",
+    "beat",
+    "beats",
+    "record",
+    "upgrade",
+    "expansion",
+    "wins",
+    "won",
+    "contract",
+    "approval",
+    "approved",
+    "dividend",
+    "buyback",
+    "strong",
+    "stronger",
+    "improved",
+    "recovery",
+    "surge",
 }
 UNCERTAIN = {
-    "may", "might", "could", "uncertain", "uncertainty", "possible", "possibly",
-    "potential", "risk", "risks", "unclear", "depends", "subject", "pending",
-    "estimate", "estimated", "approximately", "expects", "expected", "if",
+    "may",
+    "might",
+    "could",
+    "uncertain",
+    "uncertainty",
+    "possible",
+    "possibly",
+    "potential",
+    "risk",
+    "risks",
+    "unclear",
+    "depends",
+    "subject",
+    "pending",
+    "estimate",
+    "estimated",
+    "approximately",
+    "expects",
+    "expected",
+    "if",
 }
 FORWARD = {
-    "will", "guidance", "outlook", "forecast", "expects", "expected", "plans",
-    "targets", "anticipates", "next", "upcoming", "fy26", "fy27", "2027", "2028",
+    "will",
+    "guidance",
+    "outlook",
+    "forecast",
+    "expects",
+    "expected",
+    "plans",
+    "targets",
+    "anticipates",
+    "next",
+    "upcoming",
+    "fy26",
+    "fy27",
+    "2027",
+    "2028",
 }
 INTENSE = {
-    "surge", "surged", "plunge", "plunged", "collapse", "collapsed", "soar",
-    "soared", "slump", "slumped", "record", "unprecedented", "massive", "sharply",
-    "dramatically", "halted", "emergency", "crisis",
+    "surge",
+    "surged",
+    "plunge",
+    "plunged",
+    "collapse",
+    "collapsed",
+    "soar",
+    "soared",
+    "slump",
+    "slumped",
+    "record",
+    "unprecedented",
+    "massive",
+    "sharply",
+    "dramatically",
+    "halted",
+    "emergency",
+    "crisis",
 }
 
 
@@ -70,8 +157,10 @@ class Features:
 
     def as_dict(self) -> dict[str, float]:
         return {
-            "relevance": self.relevance, "polarity": self.polarity,
-            "intensity": self.intensity, "uncertainty": self.uncertainty,
+            "relevance": self.relevance,
+            "polarity": self.polarity,
+            "intensity": self.intensity,
+            "uncertainty": self.uncertainty,
             "forwardness": self.forwardness,
         }
 
@@ -108,7 +197,9 @@ class LexiconExtractor:
             relevance=relevance,
             polarity=max(-1.0, min(1.0, polarity)),
             intensity=min(1.0, len(wset & INTENSE) / 3.0),
-            uncertainty=min(1.0, sum(1 for w in words if w in UNCERTAIN) / (n * 0.08) if n else 0.0),
+            uncertainty=min(
+                1.0, sum(1 for w in words if w in UNCERTAIN) / (n * 0.08) if n else 0.0
+            ),
             forwardness=min(1.0, sum(1 for w in words if w in FORWARD) / (n * 0.06) if n else 0.0),
             extractor=self.name,
         )

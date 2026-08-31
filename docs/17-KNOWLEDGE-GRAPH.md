@@ -272,7 +272,7 @@ both orders.
 
 ```python
 HUB_MIN_DEGREE = 50
-graph.hubs()      # degree >= max(HUB_MIN_DEGREE, p99_degree)
+graph.hubs()  # degree >= max(HUB_MIN_DEGREE, p99_degree)
 ```
 
 A traversal may terminate **at** a hub; it may not route **through** one, unless

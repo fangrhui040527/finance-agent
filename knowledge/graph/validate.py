@@ -23,7 +23,11 @@ from __future__ import annotations
 from datetime import date
 
 from knowledge.graph.entity_graph import (
-    Confidence, Edge, EdgeKind, Node, NodeKind,
+    Confidence,
+    Edge,
+    EdgeKind,
+    Node,
+    NodeKind,
 )
 
 REQUIRED_NODE_FIELDS = ("id", "kind")
@@ -39,11 +43,14 @@ class ExtractionError(ValueError):
         self.origin = origin
         self.errors = errors
         shown = errors[:MAX_ERRORS_SHOWN]
-        more = "" if len(errors) <= MAX_ERRORS_SHOWN else f"\n  ... and {len(errors) - MAX_ERRORS_SHOWN} more"
+        more = (
+            ""
+            if len(errors) <= MAX_ERRORS_SHOWN
+            else f"\n  ... and {len(errors) - MAX_ERRORS_SHOWN} more"
+        )
         super().__init__(
             f"extraction from {origin!r} has {len(errors)} schema "
-            f"error{'s' if len(errors) != 1 else ''}:\n  "
-            + "\n  ".join(shown) + more
+            f"error{'s' if len(errors) != 1 else ''}:\n  " + "\n  ".join(shown) + more
         )
 
 
@@ -114,16 +121,20 @@ def validate_extraction(payload, origin: str = "extraction") -> list[str]:
         src, dst = raw.get("source"), raw.get("target")
         for role, nid in (("source", src), ("target", dst)):
             if nid is not None and nid not in declared:
-                errors.append(
-                    f"{where}: {role} {nid!r} is not declared in this extraction's nodes"
-                )
+                errors.append(f"{where}: {role} {nid!r} is not declared in this extraction's nodes")
         if src is not None and src == dst:
             errors.append(f"{where}: {src!r} relates to itself; a self-loop carries no signal")
 
-        kind = _enum(raw["relation"], EdgeKind, f"{where}.relation", errors) \
-            if "relation" in raw else None
-        conf = _enum(raw["confidence"], Confidence, f"{where}.confidence", errors) \
-            if "confidence" in raw else None
+        kind = (
+            _enum(raw["relation"], EdgeKind, f"{where}.relation", errors)
+            if "relation" in raw
+            else None
+        )
+        conf = (
+            _enum(raw["confidence"], Confidence, f"{where}.confidence", errors)
+            if "confidence" in raw
+            else None
+        )
 
         weight = raw.get("weight", 1.0)
         if not isinstance(weight, (int, float)) or isinstance(weight, bool):
@@ -152,9 +163,7 @@ def validate_extraction(payload, origin: str = "extraction") -> list[str]:
                 f"traversable at any as-of, so it would be silently invisible."
             )
         if vf and vt and vt <= vf:
-            errors.append(
-                f"{where}: valid [{vf}, {vt}) contains no days"
-            )
+            errors.append(f"{where}: valid [{vf}, {vt}) contains no days")
         del kind
     return errors
 

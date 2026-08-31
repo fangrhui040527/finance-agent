@@ -25,10 +25,11 @@ import csv
 import io
 import math
 from abc import ABC, abstractmethod
-from datetime import date, datetime
-from typing import Callable
+from collections.abc import Callable
+from datetime import UTC, date, datetime
 
 from core.market.prices import Bar, PriceSeries
+from core.net.breaker import CircuitBreaker
 
 
 class PriceFeedError(RuntimeError):
@@ -72,7 +73,13 @@ class PriceFeed(ABC):
         tomorrow's bar makes every downstream guard irrelevant.
         """
         symbol = self.symbol_for(instrument_id)
-        bars = self.parse(self._fetch_csv(symbol), symbol)
+        cache = getattr(self, "cache", None)
+        body = cache.get(self.name, symbol) if cache is not None else None
+        if body is None:
+            body = self._fetch_csv(symbol)
+            if cache is not None:
+                cache.put(self.name, symbol, body)
+        bars = self.parse(body, symbol)
         if start is not None:
             bars = [b for b in bars if b.day >= start]
         if end is not None:
@@ -96,6 +103,16 @@ class PriceFeed(ABC):
         if not text:
             raise NoData(f"empty response for {symbol!r}")
 
+        # A page, not data. stooq.com started answering every non-browser
+        # client with a JavaScript check on 2026-08-31; "missing column(s)" was
+        # true and told the operator nothing about what had happened.
+        if text.startswith("<"):
+            raise PriceFeedError(
+                f"response for {symbol!r} is an HTML page, not CSV - a browser or "
+                f"JavaScript check, or an error page, is standing in front of the "
+                f"data: {text[:100]!r}"
+            )
+
         # Sources answer a bad symbol with a plain-text apology, not a CSV. If
         # there is no header we are looking at prose, and prose is a failure.
         reader = csv.DictReader(io.StringIO(text))
@@ -106,8 +123,7 @@ class PriceFeed(ABC):
         missing = [c for c in cls.REQUIRED if c not in fields]
         if missing:
             raise PriceFeedError(
-                f"response for {symbol!r} is missing column(s) {missing}; "
-                f"got {sorted(fields)}"
+                f"response for {symbol!r} is missing column(s) {missing}; got {sorted(fields)}"
             )
 
         bars: list[Bar] = []
@@ -134,9 +150,9 @@ class PriceFeed(ABC):
             try:
                 v = float(raw)
             except ValueError:
-                return None                      # 'N/D', '', '-' all land here
+                return None  # 'N/D', '', '-' all land here
             if not math.isfinite(v) or v <= 0:
-                return None                      # a non-positive price is not a price
+                return None  # a non-positive price is not a price
             vals[col] = v
 
         raw_vol = (row.get("volume") or "0").strip() or "0"
@@ -157,6 +173,42 @@ class PriceFeed(ABC):
             return None
 
         return Bar(day, vals["open"], vals["high"], vals["low"], vals["close"], volume)
+
+
+def _guarded_read(source, symbol, breaker, opener, req, timeout, sleep) -> str:
+    """Transport with retry and a per-feed circuit breaker.
+
+    Retries only what waiting can fix (connection errors, 408/425/429/5xx,
+    honouring Retry-After); a 404 becomes `NoData` - it is an answer about
+    coverage, not an outage - and neither NoData nor an unmappable symbol
+    ever trips the breaker. The Stooq HTML wall arrives as a 200, so it is
+    handled at parse level and deliberately never retried here.
+    """
+    import urllib.error
+
+    from core.net.breaker import CircuitOpen
+    from core.net.retry import with_retry
+
+    def _transport() -> bytes:
+        with opener(req, timeout=timeout) as resp:
+            return resp.read()
+
+    kwargs = {"sleep": sleep} if sleep is not None else {}
+    try:
+        breaker.before_call()
+        body = with_retry(_transport, **kwargs)
+    except CircuitOpen as e:
+        raise PriceFeedError(str(e)) from e
+    except urllib.error.HTTPError as e:
+        if e.code == 404:
+            raise NoData(f"{source} carries nothing at this URL for {symbol!r} (404)") from e
+        breaker.record_failure(e)
+        raise PriceFeedError(f"{source} fetch failed for {symbol!r}: {e}") from e
+    except (urllib.error.URLError, OSError) as e:
+        breaker.record_failure(e)
+        raise PriceFeedError(f"{source} fetch failed for {symbol!r}: {e}") from e
+    breaker.record_success()
+    return body.decode("utf-8", errors="replace") if isinstance(body, bytes) else body
 
 
 class StooqFeed(PriceFeed):
@@ -187,8 +239,13 @@ class StooqFeed(PriceFeed):
         "XTKS": "jp",
     }
 
-    def __init__(self, opener: Callable | None = None) -> None:
+    def __init__(
+        self, opener: Callable | None = None, sleep: Callable | None = None, cache=None
+    ) -> None:
         self._opener = opener
+        self._sleep = sleep
+        self._breaker = CircuitBreaker("stooq")
+        self.cache = cache
 
     def symbol_for(self, instrument_id: str) -> str:
         if ":" not in instrument_id:
@@ -225,14 +282,180 @@ class StooqFeed(PriceFeed):
             self._url(symbol),
             headers={"User-Agent": "finplanet-analyst-mind/0.1 (personal research)"},
         )
-        try:
-            with opener(req, timeout=self.TIMEOUT) as resp:
-                body = resp.read()
-        except urllib.error.URLError as e:               # includes HTTPError
-            raise PriceFeedError(f"Stooq fetch failed for {symbol!r}: {e}") from e
-        except OSError as e:
-            raise PriceFeedError(f"Stooq fetch failed for {symbol!r}: {e}") from e
+        return _guarded_read("Stooq", symbol, self._breaker, opener, req, self.TIMEOUT, self._sleep)
 
-        if isinstance(body, bytes):
-            body = body.decode("utf-8", errors="replace")
-        return body
+
+class YahooFeed(PriceFeed):
+    """Yahoo Finance v8 chart endpoint. Free, no key, JSON, every market here.
+
+    Wired the day stooq.com put a JavaScript browser check in front of its CSV
+    (2026-08-31) and the only price source went dark. The JSON is rewritten into
+    the CSV shape the base class already validates, so a Yahoo bar passes
+    exactly the checks a Stooq bar does and nothing downstream knows which
+    source answered.
+
+    Same two rules as Stooq: a symbol is mapped from the MIC and never guessed,
+    and an unusable answer raises. The endpoint has no published contract; a
+    change in its shape shows up here as `PriceFeedError`, never as silence.
+    """
+
+    name = "yahoo"
+    CHART_URL = "https://query1.finance.yahoo.com/v8/finance/chart/"
+    TIMEOUT = 30
+    #: Long enough for the 260-session estimation window plus its gap.
+    RANGE = "5y"
+
+    #: Canonical MIC -> Yahoo suffix. Every registered adapter has one, which is
+    #: the coverage Stooq never had.
+    SUFFIX = {
+        "XNAS": "",
+        "XKLS": ".KL",
+        "XSES": ".SI",
+        "XHKG": ".HK",
+        "XLON": ".L",
+        "XTKS": ".T",
+        "XASX": ".AX",
+        "XNSE": ".NS",
+        "XTAI": ".TW",
+        "XKRX": ".KS",
+        "XETR": ".DE",
+    }
+
+    def __init__(self, opener=None, sleep=None, cache=None) -> None:
+        self._opener = opener
+        self._sleep = sleep
+        self._breaker = CircuitBreaker("yahoo")
+        self.cache = cache
+
+    def symbol_for(self, instrument_id: str) -> str:
+        if ":" not in instrument_id:
+            raise SymbolUnmappable(
+                f"{instrument_id!r} has no market prefix; expected e.g. 'XNAS:NVDA'"
+            )
+        from markets.registry import resolve_mic
+
+        raw_mic, _, local = instrument_id.partition(":")
+        mic, local = resolve_mic(raw_mic), local.strip().upper()
+        if not local:
+            raise SymbolUnmappable(f"{instrument_id!r} has an empty local code")
+        suffix = self.SUFFIX.get(mic)
+        if suffix is None:
+            raise SymbolUnmappable(
+                f"no Yahoo suffix registered for market {mic!r}. Add it to "
+                f"YahooFeed.SUFFIX and verify with a live fetch - guessing a suffix "
+                f"returns another company's prices."
+            )
+        if mic == "XHKG" and local.isdigit():
+            local = local.zfill(4)  # Yahoo writes 0005.HK, never 5.HK
+        return f"{local}{suffix}"
+
+    def _url(self, symbol: str) -> str:
+        from urllib.parse import quote, urlencode
+
+        return (
+            f"{self.CHART_URL}{quote(symbol)}?{urlencode({'range': self.RANGE, 'interval': '1d'})}"
+        )
+
+    def _fetch_csv(self, symbol: str) -> str:
+        """JSON in, the CSV the base class validates out."""
+        import json
+        import urllib.error
+        import urllib.request
+
+        opener = self._opener or urllib.request.urlopen
+        req = urllib.request.Request(
+            self._url(symbol),
+            headers={
+                "User-Agent": "finplanet-analyst-mind/0.1 (personal research)",
+                "Accept": "application/json",
+            },
+        )
+        body = _guarded_read("Yahoo", symbol, self._breaker, opener, req, self.TIMEOUT, self._sleep)
+
+        try:
+            payload = json.loads(body)
+        except json.JSONDecodeError as e:
+            raise PriceFeedError(f"response for {symbol!r} is not JSON: {body[:120]!r}") from e
+        chart = payload.get("chart") if isinstance(payload, dict) else None
+        if not isinstance(chart, dict):
+            raise PriceFeedError(f"response for {symbol!r} has no chart object: {body[:120]!r}")
+        results = chart.get("result")
+        if not results:
+            err = chart.get("error") or {}
+            raise NoData(
+                f"Yahoo carries nothing for {symbol!r}: "
+                f"{err.get('description') or err.get('code') or 'empty result'}"
+            )
+
+        result = results[0] if isinstance(results[0], dict) else {}
+        stamps = result.get("timestamp") or []
+        quotes = (result.get("indicators") or {}).get("quote") or [{}]
+        quote_block = quotes[0] if isinstance(quotes[0], dict) else {}
+        # Session timestamps are the exchange's open in UTC seconds; adding the
+        # exchange offset yields the exchange's own calendar day.
+        offset = int((result.get("meta") or {}).get("gmtoffset") or 0)
+
+        def cell(column: str, i: int) -> str:
+            series = quote_block.get(column) or []
+            value = series[i] if i < len(series) else None
+            return "" if value is None else repr(float(value))
+
+        rows = ["date,open,high,low,close,volume"]
+        for i, stamp in enumerate(stamps):
+            day = datetime.fromtimestamp(int(stamp) + offset, tz=UTC).date()
+            cells = [cell(c, i) for c in ("open", "high", "low", "close", "volume")]
+            rows.append(",".join([day.isoformat()] + cells))
+        return "\n".join(rows) + "\n"
+
+
+class ChainedFeed:
+    """Sources in order of preference; the first that answers wins.
+
+    Not a `PriceFeed` subclass, because it has no symbol of its own. Each
+    source keeps its own guarantees: one that raises is skipped, and when none
+    answers the error names every source tried, so a walled site, a missing
+    suffix and a real outage are all visible in one message rather than one at
+    a time. `source_used` records who answered, for the trace.
+    """
+
+    name = "chain"
+
+    def __init__(self, feeds) -> None:
+        self.feeds = list(feeds)
+        self.source_used = None
+
+    def fetch(self, instrument_id: str, start=None, end=None) -> PriceSeries:
+        failures = []
+        for feed in self.feeds:
+            try:
+                series = feed.fetch(instrument_id, start, end)
+            except PriceFeedError as e:
+                failures.append(f"{feed.name}: {e}")
+                continue
+            self.source_used = feed.name
+            return series
+        raise PriceFeedError(
+            f"every price source failed for {instrument_id!r}:\n  " + "\n  ".join(failures)
+        )
+
+
+_DEFAULT: ChainedFeed | None = None
+
+
+def default_feed() -> ChainedFeed:
+    """What the surfaces use. Stooq first for its depth of history; Yahoo when
+    Stooq is walled, down, or has no suffix for the market.
+
+    One instance per process, on purpose: the circuit breakers accumulate
+    evidence across calls, and both feeds share a same-trading-day cache so a
+    repeated question costs zero quota (Stooq counts daily hits)."""
+    global _DEFAULT
+    if _DEFAULT is None:
+        try:
+            from core.market.cache import PriceCache
+
+            cache = PriceCache()
+        except Exception:  # a broken cache must degrade to fetching, not block prices
+            cache = None
+        _DEFAULT = ChainedFeed([StooqFeed(cache=cache), YahooFeed(cache=cache)])
+    return _DEFAULT

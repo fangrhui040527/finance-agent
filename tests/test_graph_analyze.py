@@ -4,17 +4,29 @@ Prevention lives in entity_graph. This is the half that tells you what the graph
 has quietly become - which is a different question, and the one nobody asks
 until an answer looks wrong.
 """
+
 from datetime import date
 
 import pytest
 
 from knowledge.graph.analyze import (
-    Diff, TAXONOMY_EDGES, god_nodes, graph_diff, orphans, review_queue,
+    TAXONOMY_EDGES,
+    Diff,
+    god_nodes,
+    graph_diff,
+    orphans,
+    review_queue,
     surprising_connections,
 )
 from knowledge.graph.build import build
 from knowledge.graph.entity_graph import (
-    Confidence, Edge, EdgeKind, EntityGraph, HUB_MIN_DEGREE, Node, NodeKind,
+    HUB_MIN_DEGREE,
+    Confidence,
+    Edge,
+    EdgeKind,
+    EntityGraph,
+    Node,
+    NodeKind,
 )
 from knowledge.graph.evidence import CuratedCorpus
 from knowledge.graph.report import render
@@ -30,9 +42,13 @@ def e(src, dst, kind=EdgeKind.SUPPLIES, conf=Confidence.EXTRACTED, doc="d", w=1.
 
 def small():
     g = EntityGraph()
-    for nid, kind in (("CO:a", NodeKind.COMPANY), ("CO:b", NodeKind.COMPANY),
-                      ("CO:c", NodeKind.COMPANY), ("SUB:banks", NodeKind.SUBSECTOR),
-                      ("CM:tin", NodeKind.COMMODITY)):
+    for nid, kind in (
+        ("CO:a", NodeKind.COMPANY),
+        ("CO:b", NodeKind.COMPANY),
+        ("CO:c", NodeKind.COMPANY),
+        ("SUB:banks", NodeKind.SUBSECTOR),
+        ("CM:tin", NodeKind.COMMODITY),
+    ):
         g.add_node(Node(nid, kind, nid.split(":")[1]))
     return g
 
@@ -44,6 +60,7 @@ def built(tmp_path):
 
 
 # -- god nodes ----------------------------------------------------------------
+
 
 def hub_graph(leaves, kind=NodeKind.COUNTRY):
     g = EntityGraph()
@@ -66,7 +83,7 @@ def test_a_hub_by_nature_is_flagged_before_it_becomes_a_hub_by_degree():
     """Why HUB_KINDS survives after the traversal rule went degree-only.
     Malaysia at degree 30 is on its way to connecting everything, and the useful
     moment to notice is while splitting it is still cheap."""
-    g = hub_graph(16)                        # degree 32: past the warning, under the veto
+    g = hub_graph(16)  # degree 32: past the warning, under the veto
     assert g.degree("HUB") == 32
     assert g.hubs() == frozenset()
     found = god_nodes(g)
@@ -82,12 +99,13 @@ def test_an_ordinary_node_of_the_same_kind_is_not_flagged():
 def test_a_company_is_never_watched_no_matter_how_busy_until_it_actually_blocks():
     """Only HUB_KINDS get the early warning. A company with many suppliers is a
     well-documented company, not a taxonomy artefact."""
-    g = hub_graph(16, kind=NodeKind.COMPANY)     # same degree that flags a Country
+    g = hub_graph(16, kind=NodeKind.COMPANY)  # same degree that flags a Country
     assert g.degree("HUB") == 32
     assert god_nodes(g) == []
 
 
 # -- orphans ------------------------------------------------------------------
+
 
 def test_an_entity_nothing_connects_to_is_the_web_search_trigger():
     g = small()
@@ -103,9 +121,10 @@ def test_the_shipped_graph_has_no_orphans(tmp_path):
 
 # -- the review queue ---------------------------------------------------------
 
+
 def test_only_edges_needing_a_ruling_are_queued():
     g = small()
-    g.add_edge(e("CO:a", "CO:b"))                                    # extracted
+    g.add_edge(e("CO:a", "CO:b"))  # extracted
     g.add_edge(e("CO:a", "CO:c", conf=Confidence.INFERRED))
     g.add_edge(e("CO:b", "CO:c", conf=Confidence.AMBIGUOUS))
     queue = review_queue(g)
@@ -127,6 +146,7 @@ def test_the_deterministic_build_leaves_an_empty_queue(tmp_path):
 
 
 # -- surprising connections ---------------------------------------------------
+
 
 def taxonomy_pair():
     g = small()
@@ -162,8 +182,7 @@ def test_a_composed_link_running_through_a_shared_label_is_still_filtered():
     g.add_edge(e("CO:a", "SUB:banks", EdgeKind.CLASSIFIED_IN))
     g.add_edge(e("SUB:banks", "CO:b", EdgeKind.CLASSIFIED_IN))
     g.add_edge(e("CO:b", "CO:c", EdgeKind.SUPPLIES))
-    assert all(s.dst != "CO:c" or s.src != "CO:a"
-               for s in surprising_connections(g, asof=ASOF))
+    assert all(s.dst != "CO:c" or s.src != "CO:a" for s in surprising_connections(g, asof=ASOF))
 
 
 def test_an_uncitable_link_is_not_reported_because_a_rumour_is_not_a_lead():
@@ -174,8 +193,7 @@ def test_an_uncitable_link_is_not_reported_because_a_rumour_is_not_a_lead():
 
 
 def test_the_filter_names_the_edges_it_treats_as_taxonomy():
-    assert TAXONOMY_EDGES == {EdgeKind.CLASSIFIED_IN, EdgeKind.OPERATES_IN,
-                              EdgeKind.REGULATED_BY}
+    assert TAXONOMY_EDGES == {EdgeKind.CLASSIFIED_IN, EdgeKind.OPERATES_IN, EdgeKind.REGULATED_BY}
 
 
 def test_it_can_be_narrowed_to_the_things_you_actually_hold():
@@ -195,6 +213,7 @@ def test_the_shipped_graph_composes_something_no_row_states(tmp_path):
 
 
 # -- diff ---------------------------------------------------------------------
+
 
 def test_an_unchanged_graph_diffs_to_nothing(tmp_path):
     store = built(tmp_path)
@@ -246,12 +265,17 @@ def test_an_empty_diff_object_reports_itself_as_empty():
 
 # -- the report ---------------------------------------------------------------
 
+
 def test_the_report_covers_every_section_a_reviewer_needs(tmp_path):
     store = built(tmp_path)
     text = render(store.load(), asof=ASOF)
-    for heading in ("KNOWLEDGE GRAPH", "HUBS", "AWAITING A HUMAN RULING",
-                    "NOTHING IS CONNECTED TO THESE",
-                    "CONNECTED WITHOUT BEING WRITTEN DOWN"):
+    for heading in (
+        "KNOWLEDGE GRAPH",
+        "HUBS",
+        "AWAITING A HUMAN RULING",
+        "NOTHING IS CONNECTED TO THESE",
+        "CONNECTED WITHOUT BEING WRITTEN DOWN",
+    ):
         assert heading in text
     assert "47 nodes" in text or "nodes," in text
     store.close()
@@ -259,8 +283,7 @@ def test_the_report_covers_every_section_a_reviewer_needs(tmp_path):
 
 def test_the_report_says_what_an_empty_review_queue_means(tmp_path):
     store = built(tmp_path)
-    assert "every edge is EXTRACTED from a named source" in render(
-        store.load(), asof=ASOF)
+    assert "every edge is EXTRACTED from a named source" in render(store.load(), asof=ASOF)
     store.close()
 
 
@@ -286,11 +309,17 @@ def test_the_report_renders_an_empty_graph_without_crashing():
 
 # -- the benchmark ------------------------------------------------------------
 
+
 def test_a_path_answers_a_question_in_far_fewer_tokens_than_the_corpus(tmp_path):
     from knowledge.graph import benchmark as bm
+
     store = built(tmp_path)
-    results = bm.run(store.load(), CuratedCorpus(), asof=ASOF, questions=[
-        ("aluminium -> Press Metal", "CM:aluminium", "CO:XKLS:8869")])
+    results = bm.run(
+        store.load(),
+        CuratedCorpus(),
+        asof=ASOF,
+        questions=[("aluminium -> Press Metal", "CM:aluminium", "CO:XKLS:8869")],
+    )
     assert results[0].answered
     assert results[0].ratio > 3.0
     store.close()
@@ -300,9 +329,14 @@ def test_an_unanswerable_question_saves_nothing_and_says_so(tmp_path):
     """The benchmark is allowed to come out badly. A graph that cannot reach the
     answer has not earned anything on that question."""
     from knowledge.graph import benchmark as bm
+
     store = built(tmp_path)
-    results = bm.run(store.load(), CuratedCorpus(), asof=ASOF, questions=[
-        ("MISC -> NVIDIA", "CO:XKLS:3816", "CO:XNAS:NVDA")])
+    results = bm.run(
+        store.load(),
+        CuratedCorpus(),
+        asof=ASOF,
+        questions=[("MISC -> NVIDIA", "CO:XKLS:3816", "CO:XNAS:NVDA")],
+    )
     assert not results[0].answered
     assert results[0].ratio == pytest.approx(1.0)
     assert "not answerable" in bm.describe(results)
@@ -312,16 +346,17 @@ def test_the_estimate_agrees_with_the_one_the_echo_backend_already_uses():
     """Two offline estimates that disagree are worse than one honestly
     approximate. Exact counts need count_tokens, a key, and a network."""
     from knowledge.graph.benchmark import CHARS_PER_TOKEN, estimate_tokens
+
     assert CHARS_PER_TOKEN == 4
     assert estimate_tokens("x" * 400) == 100
-    assert estimate_tokens("") == 1                 # never zero
+    assert estimate_tokens("") == 1  # never zero
 
 
 def test_the_benchmark_costs_a_question_in_the_currency_the_ledger_counts():
     from decimal import Decimal
 
     from knowledge.graph.benchmark import Benchmark
-    b = Benchmark("q", subgraph_tokens=1_000_000, corpus_tokens=2_000_000,
-                  hops=2, answered=True)
+
+    b = Benchmark("q", subgraph_tokens=1_000_000, corpus_tokens=2_000_000, hops=2, answered=True)
     sub, corp = b.cost_myr(Decimal("2.00"), Decimal("4.15"))
     assert sub == Decimal("8.30") and corp == Decimal("16.60")

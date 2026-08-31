@@ -27,7 +27,7 @@ import argparse
 import csv
 import random
 import sys
-from datetime import date, datetime, timedelta, timezone
+from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 
 from agents.base import AgentContext, Finding
@@ -35,17 +35,17 @@ from agents.learning.teacher import A14Teacher, Learner
 from agents.portfolio.agents import A12PortfolioRisk, A13Sizing
 from agents.supervisor import A0Supervisor
 from agents.synthesis.agents import A9Attribution, A10Thesis, A11RedTeam, Breaker, Stance
+from core.contracts.money import BASE_CURRENCY
 from core.guardrails.defaults import default_engine
-from core.market.feed import PriceFeedError, StooqFeed
+from core.market.feed import PriceFeedError, default_feed
 from core.registry.loader import load as load_registry
 from engines.attribution.decompose import MIN_OBSERVATIONS
 from engines.attribution.regression import huber_fit
 from engines.risk.concentration import Limits, Position
-from core.contracts.money import BASE_CURRENCY
 from engines.sizing.caps import cost_floor_bps, to_base
+from knowledge.retrieval.pipeline import Router
 from markets.registry import get as market_get
 from markets.registry import market_currency, mic_of
-from knowledge.retrieval.pipeline import Router
 from ui.render import decomposition_bars, refusal_card
 
 REGISTRY = "agents/registry.yaml"
@@ -54,8 +54,9 @@ REGISTRY = "agents/registry.yaml"
 def context() -> AgentContext:
     """The allowlist comes from the registry, never a hand-written dict."""
     reg = load_registry(REGISTRY)
-    return AgentContext(router=Router({}), engine=default_engine(reg.allowlist()),
-                        now=datetime.now(timezone.utc))
+    return AgentContext(
+        router=Router({}), engine=default_engine(reg.allowlist()), now=datetime.now(UTC)
+    )
 
 
 def _fit_from_csv(path: str):
@@ -67,15 +68,17 @@ def _fit_from_csv(path: str):
             try:
                 inst, mkt, sec = float(r[0]), float(r[1]), float(r[2])
             except (ValueError, IndexError):
-                continue                      # header row
+                continue  # header row
             y.append(inst)
             rows.append([mkt, sec])
     # Same guard the engine applies in estimate(). Calling huber_fit directly
     # would slip past MIN_OBSERVATIONS and fit betas to noise.
     if len(y) < MIN_OBSERVATIONS:
-        print(f"note: {len(y)} usable rows in {path}, below the {MIN_OBSERVATIONS} the "
-              "engine requires. Reporting attribution_unavailable rather than guessing.",
-              file=sys.stderr)
+        print(
+            f"note: {len(y)} usable rows in {path}, below the {MIN_OBSERVATIONS} the "
+            "engine requires. Reporting attribution_unavailable rather than guessing.",
+            file=sys.stderr,
+        )
         return None
     try:
         return huber_fit(rows, y)
@@ -100,12 +103,14 @@ def _fit_synthetic(beta_mkt: float, beta_sec: float, seed: int = 7):
 
 def cmd_plan(a) -> int:
     a0 = A0Supervisor(context())
-    plan = a0.plan(a.question,
-                   budget_myr=Decimal(str(a.budget)) if a.budget else None,
-                   instrument_ids=tuple(a.instrument or ()))
+    plan = a0.plan(
+        a.question,
+        budget_myr=Decimal(str(a.budget)) if a.budget else None,
+        instrument_ids=tuple(a.instrument or ()),
+    )
     if not plan.allowed:
         print(refusal_card(plan.refusal.reason, plan.refusal.what_would_help))
-        return 2                                     # a refusal is not an error
+        return 2  # a refusal is not an error
     print(f"intent    {plan.intent.value}")
     print(f"cost      about RM {plan.estimated_cost.amount:.2f}")
     print(f"agents    {len(plan.agents)}")
@@ -127,34 +132,52 @@ def cmd_why(a) -> int:
         # instrument return against a typed market return is not a decomposition,
         # it is a subtraction dressed as one.
         if not a.against:
-            print("--fetch needs --against: an instrument return measured against a "
-                  "typed market return is not a decomposition.", file=sys.stderr)
+            print(
+                "--fetch needs --against: an instrument return measured against a "
+                "typed market return is not a decomposition.",
+                file=sys.stderr,
+            )
             return 2
         try:
-            a.move, first_day, last_day = _window_return(a.instrument, a.days, end)
-            a.market, _, _ = _window_return(a.against, a.days, end)
+            legs = _window_returns(
+                [a.instrument, a.against] + ([a.sector_proxy] if a.sector_proxy else []),
+                a.days,
+                end,
+            )
+            a.move, first_day, last_day = legs[a.instrument]
+            a.market, _, _ = legs[a.against]
             if a.sector_proxy:
-                a.sector, _, _ = _window_return(a.sector_proxy, a.days, end)
+                a.sector, _, _ = legs[a.sector_proxy]
         except PriceFeedError as e:
             print(f"no prices: {e}", file=sys.stderr)
             return 3
         window = (first_day, last_day)
         measured = True
-        print(f"measured  {a.instrument} {a.move:+.2%} against {a.against} "
-              f"{a.market:+.2%} over {first_day} to {last_day}\n")
+        print(
+            f"measured  {a.instrument} {a.move:+.2%} against {a.against} "
+            f"{a.market:+.2%} over {first_day} to {last_day}\n"
+        )
 
     a9 = A9Attribution(context())
     findings = a9.run(
-        a.instrument, window,
-        realised_local=a.move, event_market=a.market, event_sector=a.sector,
-        event_styles={}, fx_return=a.fx, fit=fit, base_currency=a.currency,
+        a.instrument,
+        window,
+        realised_local=a.move,
+        event_market=a.market,
+        event_sector=a.sector,
+        event_styles={},
+        fx_return=a.fx,
+        fit=fit,
+        base_currency=a.currency,
     )
     head = findings[0]
 
     # Rebuild the explanation for the renderer rather than re-deriving numbers.
     from engines.attribution.decompose import decompose
-    exp = decompose(a.instrument, window, a.market, a.sector, {}, a.move, a.fx,
-                    fit, base_currency=a.currency)
+
+    exp = decompose(
+        a.instrument, window, a.market, a.sector, {}, a.move, a.fx, fit, base_currency=a.currency
+    )
     print(decomposition_bars(exp))
     print()
     print(head.text)
@@ -171,7 +194,27 @@ def cmd_why(a) -> int:
 
 # --- live prices ----------------------------------------------------------
 def _feed():
-    return StooqFeed()
+    """The price seam. A chain, not a name: stooq.com walled itself off on
+    2026-08-31 and a CLI wired to one source by name went dark with it."""
+    return default_feed()
+
+
+def _window_returns(instruments: list[str], bars_back: int, end: date | None) -> dict:
+    """All legs of a decomposition, concurrently, each id fetched exactly once.
+
+    The legs are independent HTTP calls to a slow free source; serially they
+    cost up to 3x the timeout. Duplicates (instrument == market proxy) are
+    deduplicated BEFORE fetching, or the same URL would be paid for twice in
+    one command.
+    """
+    from concurrent.futures import ThreadPoolExecutor
+
+    unique = list(dict.fromkeys(instruments))
+    if len(unique) == 1:
+        return {unique[0]: _window_return(unique[0], bars_back, end)}
+    with ThreadPoolExecutor(max_workers=min(3, len(unique))) as pool:
+        futures = {i: pool.submit(_window_return, i, bars_back, end) for i in unique}
+        return {i: f.result() for i, f in futures.items()}
 
 
 def _window_return(instrument: str, bars_back: int, end: date | None):
@@ -188,7 +231,7 @@ def _window_return(instrument: str, bars_back: int, end: date | None):
             f"{instrument} has {len(bars)} bars up to {end or 'today'}, "
             f"need {bars_back + 1} to measure a {bars_back}-bar return"
         )
-    window = bars[-(bars_back + 1):]
+    window = bars[-(bars_back + 1) :]
     first, last = window[0], window[-1]
     return (last.close / first.close) - 1.0, first.day, last.day
 
@@ -200,12 +243,14 @@ def cmd_prices(a) -> int:
     except PriceFeedError as e:
         print(f"no prices: {e}", file=sys.stderr)
         return 3
-    bars = series.raw()[-a.days:]
+    bars = series.raw()[-a.days :]
     print(f"{a.instrument}  {len(series)} bars held, showing {len(bars)}")
     print(f"{'day':<12}{'open':>10}{'high':>10}{'low':>10}{'close':>10}{'volume':>14}")
     for b in bars:
-        print(f"{b.day.isoformat():<12}{b.open:>10.3f}{b.high:>10.3f}"
-              f"{b.low:>10.3f}{b.close:>10.3f}{b.volume:>14,.0f}")
+        print(
+            f"{b.day.isoformat():<12}{b.open:>10.3f}{b.high:>10.3f}"
+            f"{b.low:>10.3f}{b.close:>10.3f}{b.volume:>14,.0f}"
+        )
     if len(bars) > 1:
         ret = (bars[-1].close / bars[0].close) - 1.0
         print(f"\nreturn over the shown window  {ret:+.2%}")
@@ -226,7 +271,7 @@ def _parse_breaker(raw: str) -> Breaker:
     if len(parts) != 3 or not all(parts):
         raise SystemExit(
             f"--breaker wants 'statement|query|store', got {raw!r}\n"
-            "  e.g. --breaker \"NIM falls below 2.0%|nim < 0.020|kb_filings\"\n"
+            '  e.g. --breaker "NIM falls below 2.0%|nim < 0.020|kb_filings"\n'
             "  a breaker with no executable query is a wish, not a breaker."
         )
     statement, query, store = parts
@@ -244,18 +289,26 @@ def cmd_thesis(a) -> int:
 
     # Evidence is supplied, not retrieved: no collection is populated offline, and
     # a thesis built on an empty store would report full coverage of nothing.
-    findings = [Finding(agent, "supplied", text)
-                for agent, text in _parse_evidence(a.evidence or [])]
+    findings = [
+        Finding(agent, "supplied", text) for agent, text in _parse_evidence(a.evidence or [])
+    ]
 
     a10 = A10Thesis(ctx)
-    out = a10.run(a.instrument, findings, horizon_months=a.horizon,
-                  proposed_stance=Stance(a.stance), breakers=breakers)
+    out = a10.run(
+        a.instrument,
+        findings,
+        horizon_months=a.horizon,
+        proposed_stance=Stance(a.stance),
+        breakers=breakers,
+    )
 
     print(f"thesis    {a.instrument}   horizon {a.horizon}m")
     for f in out:
         print(f"  {f.text}")
-        print(f"  confidence {f.numbers.get('confidence', 0):.2f} "
-              f"on {int(f.numbers.get('breakers', 0))} breakers")
+        print(
+            f"  confidence {f.numbers.get('confidence', 0):.2f} "
+            f"on {int(f.numbers.get('breakers', 0))} breakers"
+        )
         for c in f.caveats:
             print(f"    caveat: {c}")
 
@@ -273,6 +326,57 @@ def cmd_thesis(a) -> int:
     for c in sorted(challenges, key=lambda f: -f.numbers.get("severity_rank", 0)):
         kind = c.caveats[0].split(": ")[-1] if c.caveats else "?"
         print(f"  [{kind}] {c.text}")
+
+    if getattr(a, "narrate", False):
+        code = _narrate(ctx, thesis, challenges)
+        if code:
+            return code
+    return 0
+
+
+def _narrate(ctx, thesis, challenges) -> int:
+    """Model prose over engine numbers. The label names the backend, because a
+    placeholder that reads like analysis is the failure the label prevents."""
+    from decimal import Decimal
+
+    from agents.synthesis.narrate import narrate_thesis
+    from core.config import load as load_config
+    from core.guardrails.policy import Action, PolicyViolation, Rail
+    from core.llm.backends import backend_from_env
+    from core.llm.client import InferenceClient
+    from core.provenance.ledger import ProvenanceLedger
+
+    backend, reason = backend_from_env()
+    cfg = load_config()
+    client = InferenceClient(
+        backend,
+        ctx.engine,
+        ProvenanceLedger(cfg.provenance_db),
+        daily_budget_myr=Decimal(str(cfg.daily_budget_myr)),
+    )
+    done = narrate_thesis(client, thesis, challenges)
+    if done.refused:
+        print(f"\nnarrative refused by the model: {done.refusal_reason}")
+        print("  (the analysis above stands; only the prose is missing)")
+        return 0
+    # The output rail sees the model text BEFORE a human does. A banned verb
+    # from the model is the same violation as one typed by hand.
+    try:
+        ctx.engine.enforce(
+            Action(
+                name="narrate",
+                rail=Rail.OUTPUT,
+                agent="a10_thesis",
+                payload={"text": done.text},
+            )
+        )
+    except PolicyViolation as e:
+        print(f"\nnarrative BLOCKED by the output rail: {e}")
+        return 0
+    print(f"\nnarrative  [{type(backend).__name__} - {reason.split(':')[0]}]")
+    for line in done.text.strip().splitlines():
+        print(f"  {line}")
+    print("\n  This is analysis, not advice, and this system cannot place orders.")
     return 0
 
 
@@ -307,17 +411,25 @@ def _parse_position(raw: str) -> Position:
         weight = float(parts[2])
         risk = float(parts[5]) if len(parts) > 5 and parts[5] else 0.0
     except ValueError:
-        raise SystemExit(f"--position weight/risk must be numbers, got {raw!r}")
+        raise SystemExit(f"--position weight/risk must be numbers, got {raw!r}") from None
     currency = parts[6].upper() if len(parts) > 6 and parts[6] else market_currency(parts[0])
-    return Position(instrument_id=instrument, weight=weight, sector=parts[3],
-                    country=parts[4], currency=currency, risk_to_stop=risk)
+    return Position(
+        instrument_id=instrument,
+        weight=weight,
+        sector=parts[3],
+        country=parts[4],
+        currency=currency,
+        risk_to_stop=risk,
+    )
 
 
 def cmd_risk(a) -> int:
     positions = [_parse_position(p) for p in (a.position or [])]
     limits = Limits(single_name=a.single_name) if a.single_name else Limits()
     out = A12PortfolioRisk(context()).run(
-        positions, limits=limits, base_currency=a.currency,
+        positions,
+        limits=limits,
+        base_currency=a.currency,
         equity=Decimal(str(a.equity)) if a.equity else None,
         peak_equity=Decimal(str(a.peak)) if a.peak else None,
     )
@@ -336,8 +448,10 @@ def cmd_size(a) -> int:
     price = Decimal(str(a.price))
     stop = Decimal(str(a.stop))
     if stop >= price:
-        print(f"stop {stop} is at or above price {price}; a stop above entry is not a stop.",
-              file=sys.stderr)
+        print(
+            f"stop {stop} is at or above price {price}; a stop above entry is not a stop.",
+            file=sys.stderr,
+        )
         return 2
 
     stop_frac = (price - stop) / price
@@ -362,7 +476,7 @@ def cmd_size(a) -> int:
         rate = Decimal(str(a.cost_bps)) / Decimal(10_000)
         minimum = Decimal(str(a.cost_minimum))
 
-        def round_trip_cost_at(value: Decimal) -> Decimal:      # noqa: E306
+        def round_trip_cost_at(value: Decimal) -> Decimal:  # noqa: E306
             return max(value * rate, minimum) * 2
 
         # The asymptote: what a round trip costs once the minimum stops binding.
@@ -374,14 +488,19 @@ def cmd_size(a) -> int:
         floor_bps = cost_floor_bps(mic)
         if asymptote_bps > floor_bps:
             print(f"sizing    {a.instrument}")
-            print(f"  no position: at {a.cost_bps} bps per side a round trip costs "
-                  f"{asymptote_bps} bps at ANY size, above the {floor_bps} bps floor "
-                  f"for {mic}.")
-            print("  No position can pay its own spread here. Lower --cost-bps to a "
-                  "real rate for this market, or register an adapter for it.")
+            print(
+                f"  no position: at {a.cost_bps} bps per side a round trip costs "
+                f"{asymptote_bps} bps at ANY size, above the {floor_bps} bps floor "
+                f"for {mic}."
+            )
+            print(
+                "  No position can pay its own spread here. Lower --cost-bps to a "
+                "real rate for this market, or register an adapter for it."
+            )
             return 0
-        cost_note = (f"no adapter for {mic}; using {a.cost_bps} bps with a "
-                     f"{a.cost_minimum} minimum per side")
+        cost_note = (
+            f"no adapter for {mic}; using {a.cost_bps} bps with a {a.cost_minimum} minimum per side"
+        )
 
     # --price, --adv and the fee schedule are in the MARKET's currency; --portfolio
     # is the book's, which is MYR. Sizing one against the other without a rate is
@@ -390,22 +509,33 @@ def cmd_size(a) -> int:
     fx = Decimal(str(a.fx)) if a.fx else None
     if quote != BASE_CURRENCY and fx is None:
         print(f"sizing    {a.instrument}")
-        print(f"  {mic} prices in {quote}; --portfolio is {BASE_CURRENCY}. Pass "
-              f"--fx <{BASE_CURRENCY} per {quote}> so the two can be compared.")
-        print(f"  Without it the position would be off by the {BASE_CURRENCY}/{quote} "
-              f"rate and would still look correctly sized.")
+        print(
+            f"  {mic} prices in {quote}; --portfolio is {BASE_CURRENCY}. Pass "
+            f"--fx <{BASE_CURRENCY} per {quote}> so the two can be compared."
+        )
+        print(
+            f"  Without it the position would be off by the {BASE_CURRENCY}/{quote} "
+            f"rate and would still look correctly sized."
+        )
         return 2
 
     caps, findings = a13.caps(
-        portfolio_value=portfolio, stop_distance_frac=stop_frac,
-        adv_20d=Decimal(str(a.adv)), round_trip_cost_at=round_trip_cost_at,
+        portfolio_value=portfolio,
+        stop_distance_frac=stop_frac,
+        adv_20d=Decimal(str(a.adv)),
+        round_trip_cost_at=round_trip_cost_at,
         risk_per_trade=Decimal(str(a.risk_per_trade)),
         single_name_limit=Decimal(str(a.single_name)),
-        win_rate=a.win_rate, payoff=a.payoff, n_trades=a.n_trades, mic=mic,
+        win_rate=a.win_rate,
+        payoff=a.payoff,
+        n_trades=a.n_trades,
+        mic=mic,
         fx_base_per_quote=fx,
     )
-    print(f"sizing    {a.instrument}  portfolio {BASE_CURRENCY} {portfolio:,.2f}  "
-          f"stop distance {stop_frac:.1%}")
+    print(
+        f"sizing    {a.instrument}  portfolio {BASE_CURRENCY} {portfolio:,.2f}  "
+        f"stop distance {stop_frac:.1%}"
+    )
     print(f"cost      {cost_note}")
     if quote != BASE_CURRENCY:
         print(f"fx        1 {quote} = {BASE_CURRENCY} {fx}")
@@ -418,8 +548,10 @@ def cmd_size(a) -> int:
     units = int(value / price) // a.lot * a.lot
     print(f"\n  binding cap {binding.value} at {quote} {value:,.2f}")
     if units < a.lot:
-        print(f"  -> no position: the binding cap does not fund one {a.lot}-share lot "
-              f"at {quote} {price}")
+        print(
+            f"  -> no position: the binding cap does not fund one {a.lot}-share lot "
+            f"at {quote} {price}"
+        )
     else:
         native = Decimal(units) * price
         base = to_base(native, quote, fx)
@@ -434,7 +566,7 @@ def cmd_size(a) -> int:
 def cmd_learn(a) -> int:
     a14 = A14Teacher(context())
     learner = Learner()
-    for k in (a.mastered or []):
+    for k in a.mastered or []:
         try:
             learner.mastered(k)
         except KeyError as e:
@@ -466,6 +598,14 @@ def cmd_learn(a) -> int:
 
 
 # --- which model is actually answering ------------------------------------
+def cmd_doctor(a) -> int:
+    from core.doctor import FAIL, render, run_checks
+
+    results = run_checks(offline=a.offline)
+    print(render(results))
+    return 1 if any(r.status == FAIL and r.critical for r in results) else 0
+
+
 def cmd_backend(a) -> int:
     """The difference between a real answer and a stub is worth one command."""
     from core.llm.backends import AuthError, backend_from_env
@@ -478,6 +618,7 @@ def cmd_backend(a) -> int:
     print(f"backend   {type(backend).__name__}")
     print(f"reason    {reason}")
     from core.llm.tiers import MODEL_IDS
+
     for tier, model in MODEL_IDS.items():
         print(f"  {tier.value:<9} {model}")
     return 0
@@ -502,10 +643,10 @@ def _graph(db: str | None):
 
     from knowledge.graph.build import DEFAULT_DB
     from knowledge.graph.store import GraphStore
+
     path = db or DEFAULT_DB
     if path != ":memory:" and not _P(path).exists():
-        print(f"no graph at {path}. Build it first:\n\n    make graph\n",
-              file=sys.stderr)
+        print(f"no graph at {path}. Build it first:\n\n    make graph\n", file=sys.stderr)
         return None, None
     store = GraphStore(path)
     return store, store.load()
@@ -513,9 +654,8 @@ def _graph(db: str | None):
 
 def cmd_graph(a) -> int:
     from knowledge.graph.analyze import graph_diff
-    from knowledge.graph.entity_graph import PathRequired, path_to_citations
+    from knowledge.graph.entity_graph import NodeKind, PathRequired, path_to_citations
     from knowledge.graph.evidence import CuratedCorpus
-    from knowledge.graph.entity_graph import NodeKind
 
     store, g = _graph(a.db)
     if g is None:
@@ -530,43 +670,51 @@ def cmd_graph(a) -> int:
     def reject(raw: str, nid: str) -> int:
         options = g.candidates(raw)
         if len(options) > 1:
-            print(f"{raw!r} is ambiguous: {', '.join(options)}. "
-                  f"Name one of them.", file=sys.stderr)
+            print(f"{raw!r} is ambiguous: {', '.join(options)}. Name one of them.", file=sys.stderr)
         else:
             print(f"{raw!r} is not in the graph", file=sys.stderr)
         return 2
 
     if a.untested:
         from knowledge.graph.analyze import untested_modules
+
         missing = untested_modules(g, ignore=("tests_", "_pycache"))
         if not missing:
             print("every module has a test importing it.")
             return 0
-        print(f"{len(missing)} module{'s' if len(missing) != 1 else ''} no test "
-              f"imports:")
+        print(f"{len(missing)} module{'s' if len(missing) != 1 else ''} no test imports:")
         for nid in missing:
             print(f"  {g.label(nid)}")
-        print("\n  INFERRED: a module exercised only through a helper reads as "
-              "untested here. The list over-reports rather than under-reports.")
+        print(
+            "\n  INFERRED: a module exercised only through a helper reads as "
+            "untested here. The list over-reports rather than under-reports."
+        )
         return 0
 
     if a.uses:
         target = resolve(a.uses)
         if g.node(target) is None:
-            matches = [n.node_id for n in g.nodes()
-                       if n.label == a.uses or n.node_id.endswith(f".{a.uses}")]
+            matches = [
+                n.node_id
+                for n in g.nodes()
+                if n.label == a.uses or n.node_id.endswith(f".{a.uses}")
+            ]
             if len(matches) != 1:
-                print(f"{a.uses!r} is not in the graph"
-                      + (f"; did you mean one of {matches}?" if matches else ""),
-                      file=sys.stderr)
+                print(
+                    f"{a.uses!r} is not in the graph"
+                    + (f"; did you mean one of {matches}?" if matches else ""),
+                    file=sys.stderr,
+                )
                 return 2
             target = matches[0]
         callers = g.inbound(target)
         if not callers:
             print(f"nothing in the graph references {g.label(target)}.")
             return 0
-        print(f"{len(callers)} reference{'s' if len(callers) != 1 else ''} to "
-              f"{g.label(target)} ({target}):")
+        print(
+            f"{len(callers)} reference{'s' if len(callers) != 1 else ''} to "
+            f"{g.label(target)} ({target}):"
+        )
         for e in sorted(callers, key=lambda e: e.src):
             note = "" if e.citable else "   (inferred from a name, not a binding)"
             print(f"  {e.src} --{e.kind.value}-->{note}")
@@ -574,13 +722,17 @@ def cmd_graph(a) -> int:
 
     if a.report:
         from knowledge.graph.report import render
+
         print(render(g, asof=asof))
         return 0
 
     if a.benchmark:
         from knowledge.graph import benchmark as bm
-        pairs = [(f"{g.label(resolve(x))} -> {g.label(resolve(y))}",
-                  resolve(x), resolve(y)) for x, y in (a.benchmark or [])]
+
+        pairs = [
+            (f"{g.label(resolve(x))} -> {g.label(resolve(y))}", resolve(x), resolve(y))
+            for x, y in (a.benchmark or [])
+        ]
         print(bm.describe(bm.run(g, CuratedCorpus(), asof=asof, questions=pairs)))
         return 0
 
@@ -598,12 +750,15 @@ def cmd_graph(a) -> int:
         if g.node(start) is None:
             return reject(a.impact, start)
         holdings = {resolve(h) for h in (a.holding or [])} or {
-            n.node_id for n in g.nodes() if n.kind is NodeKind.COMPANY}
+            n.node_id for n in g.nodes() if n.kind is NodeKind.COMPANY
+        }
         hits = g.impact_of(start, holdings, asof=asof)
         if not hits:
-            print(f"nothing reachable from {g.label(start)} as of {asof}.\n"
-                  "Traversal is a best-first heuristic, so this means 'not found "
-                  "cheaply', never 'no connection exists'.")
+            print(
+                f"nothing reachable from {g.label(start)} as of {asof}.\n"
+                "Traversal is a best-first heuristic, so this means 'not found "
+                "cheaply', never 'no connection exists'."
+            )
             return 0
         for iid, path in hits:
             print(f"{g.label(iid)}: {path.describe()}")
@@ -616,9 +771,11 @@ def cmd_graph(a) -> int:
                 return reject(raw, nid)
         paths = g.traverse(src, asof=asof, target=dst)
         if not paths:
-            print(f"no path from {g.label(src)} to {g.label(dst)} as of {asof}.\n"
-                  "Traversal is a best-first heuristic, so this is 'not found "
-                  "cheaply', never proof they are unconnected.")
+            print(
+                f"no path from {g.label(src)} to {g.label(dst)} as of {asof}.\n"
+                "Traversal is a best-first heuristic, so this is 'not found "
+                "cheaply', never proof they are unconnected."
+            )
             return 0
         best = paths[0]
         print(best.describe())
@@ -630,14 +787,17 @@ def cmd_graph(a) -> int:
             print(f"  uncitable: {e}")
         return 0
 
-    print("nothing asked. Try --path A B, --impact NODE, --report or --benchmark",
-          file=sys.stderr)
+    print("nothing asked. Try --path A B, --impact NODE, --report or --benchmark", file=sys.stderr)
     return 2
 
 
 def main(argv=None) -> int:
-    ap = argparse.ArgumentParser(prog="ask", description=__doc__,
-                                 formatter_class=argparse.RawDescriptionHelpFormatter)
+    from core.logging import configure as _configure_logging
+
+    _configure_logging()
+    ap = argparse.ArgumentParser(
+        prog="ask", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     sub = ap.add_subparsers(dest="cmd", required=True)
 
     pl = sub.add_parser("plan", help="what would the system do with this question")
@@ -658,8 +818,11 @@ def main(argv=None) -> int:
     wy.add_argument("--history", help="CSV of instrument,market,sector returns")
     wy.add_argument("--beta-market", type=float, default=1.1, help="used only without --history")
     wy.add_argument("--beta-sector", type=float, default=0.5, help="used only without --history")
-    wy.add_argument("--fetch", action="store_true",
-                    help="measure --move from the price feed instead of taking it typed")
+    wy.add_argument(
+        "--fetch",
+        action="store_true",
+        help="measure --move from the price feed instead of taking it typed",
+    )
     wy.add_argument("--against", help="market proxy instrument for --fetch, e.g. XNAS:SPY")
     wy.add_argument("--sector-proxy", help="sector proxy instrument for --fetch")
     wy.set_defaults(fn=cmd_why)
@@ -672,18 +835,34 @@ def main(argv=None) -> int:
 
     th = sub.add_parser("thesis", help="compose a thesis, then red-team it")
     th.add_argument("instrument")
-    th.add_argument("--breaker", action="append", metavar="STATEMENT|QUERY|STORE",
-                    help="repeatable; fewer than two means no stance may be taken")
-    th.add_argument("--evidence", action="append", metavar="AGENT=TEXT",
-                    help="repeatable, e.g. a1_fundamentals=CASA fell to 24%%")
-    th.add_argument("--stance", default="hold",
-                    choices=[s.value for s in Stance])
+    th.add_argument(
+        "--breaker",
+        action="append",
+        metavar="STATEMENT|QUERY|STORE",
+        help="repeatable; fewer than two means no stance may be taken",
+    )
+    th.add_argument(
+        "--evidence",
+        action="append",
+        metavar="AGENT=TEXT",
+        help="repeatable, e.g. a1_fundamentals=CASA fell to 24%%",
+    )
+    th.add_argument(
+        "--narrate",
+        action="store_true",
+        help="add three model-written paragraphs over the engine numbers (echo backend prints a labelled placeholder)",
+    )
+    th.add_argument("--stance", default="hold", choices=[s.value for s in Stance])
     th.add_argument("--horizon", type=int, default=12, help="months")
     th.set_defaults(fn=cmd_thesis)
 
     rk = sub.add_parser("risk", help="concentration, heat and drawdown state of a book")
-    rk.add_argument("--position", action="append",
-                    metavar="MIC:CODE:WEIGHT:SECTOR:COUNTRY[:RISK]", help="repeatable")
+    rk.add_argument(
+        "--position",
+        action="append",
+        metavar="MIC:CODE:WEIGHT:SECTOR:COUNTRY[:RISK]",
+        help="repeatable",
+    )
     rk.add_argument("--currency", default="MYR")
     rk.add_argument("--single-name", type=float, help="override the single-name cap")
     rk.add_argument("--equity", type=float)
@@ -692,23 +871,37 @@ def main(argv=None) -> int:
 
     sz = sub.add_parser("size", help="turn a stance into lots, or into a refusal")
     sz.add_argument("instrument")
-    sz.add_argument("--portfolio", type=float, required=True,
-                    help=f"investable capital, in {BASE_CURRENCY}")
-    sz.add_argument("--price", type=float, required=True,
-                    help="in the market's own currency, like --adv")
-    sz.add_argument("--fx", type=float, default=0.0,
-                    help=f"{BASE_CURRENCY} per 1 unit of the market's currency; "
-                         f"required for any market that does not price in {BASE_CURRENCY}")
+    sz.add_argument(
+        "--portfolio", type=float, required=True, help=f"investable capital, in {BASE_CURRENCY}"
+    )
+    sz.add_argument(
+        "--price", type=float, required=True, help="in the market's own currency, like --adv"
+    )
+    sz.add_argument(
+        "--fx",
+        type=float,
+        default=0.0,
+        help=f"{BASE_CURRENCY} per 1 unit of the market's currency; "
+        f"required for any market that does not price in {BASE_CURRENCY}",
+    )
     sz.add_argument("--stop", type=float, required=True)
     sz.add_argument("--adv", type=float, required=True, help="20-day average daily volume")
     sz.add_argument("--lot", type=int, default=100)
     sz.add_argument("--risk-per-trade", type=float, default=0.0075)
     sz.add_argument("--single-name", type=float, default=0.08)
-    sz.add_argument("--cost-bps", type=float, default=46.0,
-                    help="per-side cost in bps, used only when the market has no adapter")
-    sz.add_argument("--cost-minimum", type=float, default=8.0,
-                    help="fixed per-side minimum; this is what makes small positions "
-                         "uneconomic, so a model without one cannot find a floor")
+    sz.add_argument(
+        "--cost-bps",
+        type=float,
+        default=46.0,
+        help="per-side cost in bps, used only when the market has no adapter",
+    )
+    sz.add_argument(
+        "--cost-minimum",
+        type=float,
+        default=8.0,
+        help="fixed per-side minimum; this is what makes small positions "
+        "uneconomic, so a model without one cannot find a floor",
+    )
     sz.add_argument("--win-rate", type=float, help="with --payoff, enables the Kelly cap")
     sz.add_argument("--payoff", type=float)
     sz.add_argument("--n-trades", type=int, default=0)
@@ -726,20 +919,32 @@ def main(argv=None) -> int:
     ft.set_defaults(fn=cmd_fitness)
 
     gr = sub.add_parser("graph", help="the entity graph: paths, impact, review")
-    gr.add_argument("--path", nargs=2, metavar=("FROM", "TO"),
-                    help="strongest citable path between two entities")
-    gr.add_argument("--impact", metavar="NODE",
-                    help="what this event or commodity reaches")
-    gr.add_argument("--holding", action="append",
-                    help="limit --impact to these; repeatable")
-    gr.add_argument("--untested", action="store_true",
-                    help="modules no test imports; point --db at the code graph")
-    gr.add_argument("--uses", metavar="SYMBOL",
-                    help="what references this? point --db at the code graph")
-    gr.add_argument("--report", action="store_true",
-                    help="hubs, orphans, the review queue, surprising links")
-    gr.add_argument("--benchmark", nargs=2, action="append", metavar=("FROM", "TO"),
-                    help="subgraph vs corpus tokens for this question; repeatable")
+    gr.add_argument(
+        "--path",
+        nargs=2,
+        metavar=("FROM", "TO"),
+        help="strongest citable path between two entities",
+    )
+    gr.add_argument("--impact", metavar="NODE", help="what this event or commodity reaches")
+    gr.add_argument("--holding", action="append", help="limit --impact to these; repeatable")
+    gr.add_argument(
+        "--untested",
+        action="store_true",
+        help="modules no test imports; point --db at the code graph",
+    )
+    gr.add_argument(
+        "--uses", metavar="SYMBOL", help="what references this? point --db at the code graph"
+    )
+    gr.add_argument(
+        "--report", action="store_true", help="hubs, orphans, the review queue, surprising links"
+    )
+    gr.add_argument(
+        "--benchmark",
+        nargs=2,
+        action="append",
+        metavar=("FROM", "TO"),
+        help="subgraph vs corpus tokens for this question; repeatable",
+    )
     gr.add_argument("--diff", metavar="OTHER_DB", help="what changed against another build")
     gr.add_argument("--asof", help="YYYY-MM-DD; defaults to today")
     gr.add_argument("--db", help="graph database (default data/graph.db)")
@@ -748,6 +953,10 @@ def main(argv=None) -> int:
     bk = sub.add_parser("backend", help="which model is actually answering")
     bk.add_argument("--use", choices=["anthropic", "echo"], help="force one")
     bk.set_defaults(fn=cmd_backend)
+
+    dr = sub.add_parser("doctor", help="preflight: what this installation can actually do")
+    dr.add_argument("--offline", action="store_true", help="skip the two network probes")
+    dr.set_defaults(fn=cmd_doctor)
 
     a = ap.parse_args(argv)
     return a.fn(a)

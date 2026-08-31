@@ -32,6 +32,11 @@ cases:
     expect: refuse
     negative: true
     near_miss: true
+  - name: refuse_price_target_verb
+    question: "what price will maybank hit next month"
+    expect: refuse
+    negative: true
+    near_miss: true
   - name: refuse_no_instrument
     question: "why did it drop"
     expect: refuse

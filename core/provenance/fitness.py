@@ -40,7 +40,7 @@ Needs latency capture the ledger does not do:
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 #: Weights are a CHOICE, not a measurement, and they are written here rather
@@ -78,8 +78,10 @@ class Term:
     def describe(self) -> str:
         if not self.available:
             return f"  {self.name:22} UNAVAILABLE  {self.unavailable_because}"
-        return (f"  {self.name:22} {self.value:>6.3f}  (w {self.weight:+.2f})"
-                f"{'  ' + self.detail if self.detail else ''}")
+        return (
+            f"  {self.name:22} {self.value:>6.3f}  (w {self.weight:+.2f})"
+            f"{'  ' + self.detail if self.detail else ''}"
+        )
 
 
 @dataclass
@@ -100,7 +102,7 @@ class Fitness:
         """
         if self.missing:
             return None
-        return sum(t.weight * t.value for t in self.terms)
+        return sum(t.weight * v for t in self.terms if (v := t.value) is not None)
 
     def describe(self) -> str:
         lines = [f"FITNESS over the last {self.window_days} days", "-" * 66]
@@ -109,9 +111,11 @@ class Fitness:
         if self.score is not None:
             lines.append(f"  {'FITNESS':22} {self.score:>6.3f}")
             return "\n".join(lines)
-        lines.append(f"  NO SCORE. {len(self.missing)} of {len(self.terms)} terms "
-                     f"cannot be computed, and averaging the rest would produce a "
-                     f"number that looks like fitness and is not.")
+        lines.append(
+            f"  NO SCORE. {len(self.missing)} of {len(self.terms)} terms "
+            f"cannot be computed, and averaging the rest would produce a "
+            f"number that looks like fitness and is not."
+        )
         lines.append("")
         lines.append("  To score itself the system needs:")
         for t in self.missing:
@@ -130,9 +134,17 @@ def _normalise_penalty(value: float, reference: float) -> float:
     return max(0.0, min(1.0, value / reference))
 
 
-def compute(ledger, *, now: datetime | None = None, window_days: int = 30,
-            calibration=None, latencies_ms=None, labelled_moves=None,
-            labelled_refusals=None, weights=None) -> Fitness:
+def compute(
+    ledger,
+    *,
+    now: datetime | None = None,
+    window_days: int = 30,
+    calibration=None,
+    latencies_ms=None,
+    labelled_moves=None,
+    labelled_refusals=None,
+    weights=None,
+) -> Fitness:
     """Score what can be scored; name what cannot.
 
     `calibration`      an agents.learning.reflection.Calibration, from graded
@@ -142,96 +154,151 @@ def compute(ledger, *, now: datetime | None = None, window_days: int = 30,
     `labelled_moves`   (predicted_cause, true_cause) pairs for A9.
     `labelled_refusals` (was_refused, should_have_been) pairs.
     """
-    now = now or datetime.now(timezone.utc)
+    now = now or datetime.now(UTC)
     w = {**DEFAULT_WEIGHTS, **(weights or {})}
     since = now - timedelta(days=window_days)
     terms: list[Term] = []
 
     rows = ledger._rows(
-        "SELECT survived, citations_json FROM claims WHERE at >= ?",
-        (since.isoformat(),))
+        "SELECT survived, citations_json FROM claims WHERE at >= ?", (since.isoformat(),)
+    )
     proposed = len(rows)
     survived = [r for r in rows if r["survived"]]
 
     if proposed:
-        terms.append(Term("groundedness", w["groundedness"],
-                          len(survived) / proposed,
-                          detail=f"{len(survived)}/{proposed} claims survived the gate"))
+        terms.append(
+            Term(
+                "groundedness",
+                w["groundedness"],
+                len(survived) / proposed,
+                detail=f"{len(survived)}/{proposed} claims survived the gate",
+            )
+        )
         cited = sum(1 for r in survived if (r["citations_json"] or "[]") != "[]")
-        terms.append(Term(
-            "citation_validity", w["citation_validity"],
-            cited / len(survived) if survived else 0.0,
-            detail=f"{cited}/{len(survived)} surviving claims carry a citation"))
+        terms.append(
+            Term(
+                "citation_validity",
+                w["citation_validity"],
+                cited / len(survived) if survived else 0.0,
+                detail=f"{cited}/{len(survived)} surviving claims carry a citation",
+            )
+        )
     else:
-        why = (f"no claims recorded in the last {window_days} days. The ledger "
-               f"logs them; nothing has run.")
+        why = (
+            f"no claims recorded in the last {window_days} days. The ledger "
+            f"logs them; nothing has run."
+        )
         terms.append(Term("groundedness", w["groundedness"], unavailable_because=why))
-        terms.append(Term("citation_validity", w["citation_validity"],
-                          unavailable_because=why))
+        terms.append(Term("citation_validity", w["citation_validity"], unavailable_because=why))
 
     if labelled_refusals:
         warranted = sum(1 for _, should in labelled_refusals if should)
-        terms.append(Term("refusal_precision", w["refusal_precision"],
-                          warranted / len(labelled_refusals),
-                          detail=f"{warranted}/{len(labelled_refusals)} refusals warranted"))
+        terms.append(
+            Term(
+                "refusal_precision",
+                w["refusal_precision"],
+                warranted / len(labelled_refusals),
+                detail=f"{warranted}/{len(labelled_refusals)} refusals warranted",
+            )
+        )
     else:
-        terms.append(Term(
-            "refusal_precision", w["refusal_precision"],
-            unavailable_because="no labelled refusals. Needs a person to mark a "
-                                "sample warranted or not; the system cannot grade "
-                                "its own refusals without beginning to justify them."))
+        terms.append(
+            Term(
+                "refusal_precision",
+                w["refusal_precision"],
+                unavailable_because="no labelled refusals. Needs a person to mark a "
+                "sample warranted or not; the system cannot grade "
+                "its own refusals without beginning to justify them.",
+            )
+        )
 
     if labelled_moves:
         hits = sum(1 for pred, true in labelled_moves if pred == true)
-        terms.append(Term("attribution_accuracy", w["attribution_accuracy"],
-                          hits / len(labelled_moves),
-                          detail=f"{hits}/{len(labelled_moves)} causes matched"))
+        terms.append(
+            Term(
+                "attribution_accuracy",
+                w["attribution_accuracy"],
+                hits / len(labelled_moves),
+                detail=f"{hits}/{len(labelled_moves)} causes matched",
+            )
+        )
     else:
-        terms.append(Term(
-            "attribution_accuracy", w["attribution_accuracy"],
-            unavailable_because="no labelled move set. docs/01 section 10 specifies "
-                                "~200 historical moves with undisputed causes "
-                                "(earnings dates, announced M&A, index rebalances). "
-                                "It does not exist and is a day of human work."))
+        terms.append(
+            Term(
+                "attribution_accuracy",
+                w["attribution_accuracy"],
+                unavailable_because="no labelled move set. docs/01 section 10 specifies "
+                "~200 historical moves with undisputed causes "
+                "(earnings dates, announced M&A, index rebalances). "
+                "It does not exist and is a day of human work.",
+            )
+        )
 
     if calibration is not None and getattr(calibration, "n", 0) > 0:
         # Brier is an error: 0 is perfect, so fitness takes 1 - brier.
-        terms.append(Term("forecast_calibration", w["forecast_calibration"],
-                          1.0 - calibration.brier,
-                          detail=f"1 - Brier over {calibration.n} graded predictions"))
+        terms.append(
+            Term(
+                "forecast_calibration",
+                w["forecast_calibration"],
+                1.0 - calibration.brier,
+                detail=f"1 - Brier over {calibration.n} graded predictions",
+            )
+        )
     else:
-        terms.append(Term(
-            "forecast_calibration", w["forecast_calibration"],
-            unavailable_because="no graded predictions. P16 opens this and it is "
-                                "elapsed time, not effort - a forward record "
-                                "cannot be back-filled, only waited for."))
+        terms.append(
+            Term(
+                "forecast_calibration",
+                w["forecast_calibration"],
+                unavailable_because="no graded predictions. P16 opens this and it is "
+                "elapsed time, not effort - a forward record "
+                "cannot be back-filled, only waited for.",
+            )
+        )
 
     latencies_ms = latencies_ms or ledger.latencies_between(since, now)
     if latencies_ms:
         ordered = sorted(latencies_ms)
         p95 = ordered[min(len(ordered) - 1, int(0.95 * len(ordered)))]
-        terms.append(Term("p95_latency", w["p95_latency"],
-                          _normalise_penalty(p95, LATENCY_REFERENCE_MS),
-                          detail=f"p95 {p95:.0f} ms of {LATENCY_REFERENCE_MS:.0f} ms budget"))
+        terms.append(
+            Term(
+                "p95_latency",
+                w["p95_latency"],
+                _normalise_penalty(p95, LATENCY_REFERENCE_MS),
+                detail=f"p95 {p95:.0f} ms of {LATENCY_REFERENCE_MS:.0f} ms budget",
+            )
+        )
     else:
-        terms.append(Term(
-            "p95_latency", w["p95_latency"],
-            unavailable_because=f"no timed calls in the last {window_days} days. "
-                                f"The ledger records latency_ms per call now; "
-                                f"rows written before it existed read 0 and are "
-                                f"excluded rather than counted as instant."))
+        terms.append(
+            Term(
+                "p95_latency",
+                w["p95_latency"],
+                unavailable_because=f"no timed calls in the last {window_days} days. "
+                f"The ledger records latency_ms per call now; "
+                f"rows written before it existed read 0 and are "
+                f"excluded rather than counted as instant.",
+            )
+        )
 
     runs = ledger.runs_between(since, now)
     spend = ledger.cost_since(since)
     if runs:
         per = spend / Decimal(len(runs))
-        terms.append(Term("cost_per_query", w["cost_per_query"],
-                          _normalise_penalty(float(per), float(COST_REFERENCE_MYR)),
-                          detail=f"RM {per:.4f} over {len(runs)} runs"))
+        terms.append(
+            Term(
+                "cost_per_query",
+                w["cost_per_query"],
+                _normalise_penalty(float(per), float(COST_REFERENCE_MYR)),
+                detail=f"RM {per:.4f} over {len(runs)} runs",
+            )
+        )
     else:
-        terms.append(Term(
-            "cost_per_query", w["cost_per_query"],
-            unavailable_because=f"no runs with a run_id in the last {window_days} "
-                                f"days. Cost is recorded; nothing grouped it."))
+        terms.append(
+            Term(
+                "cost_per_query",
+                w["cost_per_query"],
+                unavailable_because=f"no runs with a run_id in the last {window_days} "
+                f"days. Cost is recorded; nothing grouped it.",
+            )
+        )
 
     return Fitness(terms, window_days)

@@ -20,7 +20,14 @@ from dataclasses import dataclass, field
 from datetime import date
 
 from knowledge.graph.entity_graph import (
-    HUB_KINDS, HUB_MIN_DEGREE, Confidence, Edge, EdgeKind, EntityGraph, NodeKind, Path,
+    HUB_KINDS,
+    HUB_MIN_DEGREE,
+    Confidence,
+    Edge,
+    EdgeKind,
+    EntityGraph,
+    NodeKind,
+    Path,
 )
 
 
@@ -60,8 +67,9 @@ def god_nodes(graph: EntityGraph, warn_at: float = 0.5) -> list[GodNode]:
         blocking = node.node_id in hubs
         watched = node.kind in HUB_KINDS and degree >= warn_at * HUB_MIN_DEGREE
         if blocking or watched:
-            out.append(GodNode(node.node_id, graph.label(node.node_id), node.kind,
-                               degree, blocking))
+            out.append(
+                GodNode(node.node_id, graph.label(node.node_id), node.kind, degree, blocking)
+            )
     return sorted(out, key=lambda g: (-g.degree, g.node_id))
 
 
@@ -88,8 +96,9 @@ def review_queue(graph: EntityGraph) -> list[Edge]:
     """
     order = {Confidence.AMBIGUOUS: 0, Confidence.INFERRED: 1}
     pending = [e for e in graph.edges() if e.confidence in order]
-    return sorted(pending, key=lambda e: (order[e.confidence], -e.weight,
-                                          e.src, e.dst, e.kind.value))
+    return sorted(
+        pending, key=lambda e: (order[e.confidence], -e.weight, e.src, e.dst, e.kind.value)
+    )
 
 
 def untested_modules(graph: EntityGraph, *, ignore=()) -> list[str]:
@@ -118,7 +127,7 @@ def untested_modules(graph: EntityGraph, *, ignore=()) -> list[str]:
             continue
         inbound = graph.inbound(n.node_id)
         if not any(e.kind is EdgeKind.CLASSIFIED_IN for e in inbound):
-            continue                       # defines nothing; nothing to test
+            continue  # defines nothing; nothing to test
         if not any(e.kind is EdgeKind.TESTS for e in inbound):
             out.append(n.node_id)
     return sorted(out)
@@ -128,10 +137,12 @@ def undocumented_modules(graph: EntityGraph) -> list[str]:
     """Modules no prose names. Weaker than untested - most modules need no page -
     so this is read as a question about the ones you expected to be written up."""
     return sorted(
-        n.node_id for n in graph.nodes()
+        n.node_id
+        for n in graph.nodes()
         if n.kind is NodeKind.PRODUCT
         and any(e.kind is EdgeKind.CLASSIFIED_IN for e in graph.inbound(n.node_id))
-        and not any(e.kind is EdgeKind.DOCUMENTS for e in graph.inbound(n.node_id)))
+        and not any(e.kind is EdgeKind.DOCUMENTS for e in graph.inbound(n.node_id))
+    )
 
 
 @dataclass(frozen=True)
@@ -145,8 +156,7 @@ class Surprise:
 
 
 #: A shared classification is not a discovery. Two banks are both banks.
-TAXONOMY_EDGES = frozenset({EdgeKind.CLASSIFIED_IN, EdgeKind.OPERATES_IN,
-                            EdgeKind.REGULATED_BY})
+TAXONOMY_EDGES = frozenset({EdgeKind.CLASSIFIED_IN, EdgeKind.OPERATES_IN, EdgeKind.REGULATED_BY})
 
 
 def surprising_connections(
@@ -175,24 +185,28 @@ def surprising_connections(
     Citable paths only: a surprise you cannot source is a rumour, and this list
     exists for a person deciding what to spend time looking into.
     """
-    companies = [n.node_id for n in graph.nodes() if n.kind is NodeKind.COMPANY
-                 and (among is None or n.node_id in among)]
+    companies = [
+        n.node_id
+        for n in graph.nodes()
+        if n.kind is NodeKind.COMPANY and (among is None or n.node_id in among)
+    ]
     out: list[Surprise] = []
     seen: set[tuple[str, str]] = set()
     for src in companies:
         for path in graph.traverse(src, asof=asof, max_hops=max_hops):
             dst = path.end
-            if dst == src or graph.node(dst) is None:
+            dst_node = graph.node(dst)
+            if dst == src or dst_node is None:
                 continue
-            if graph.node(dst).kind is not NodeKind.COMPANY:
+            if dst_node.kind is not NodeKind.COMPANY:
                 continue
             if among is not None and dst not in among:
                 continue
             if path.n_hops < min_hops:
-                continue                       # a stated row, not a discovery
+                continue  # a stated row, not a discovery
             if any(h.edge.kind in TAXONOMY_EDGES for h in path.hops):
                 continue
-            key = tuple(sorted((src, dst)))
+            key = (src, dst) if src <= dst else (dst, src)
             if key in seen:
                 continue
             seen.add(key)
@@ -213,8 +227,13 @@ class Diff:
 
     @property
     def empty(self) -> bool:
-        return not (self.added_nodes or self.removed_nodes or self.added_edges
-                    or self.removed_edges or self.relabelled)
+        return not (
+            self.added_nodes
+            or self.removed_nodes
+            or self.added_edges
+            or self.removed_edges
+            or self.relabelled
+        )
 
     def describe(self) -> str:
         if self.empty:
@@ -227,17 +246,29 @@ class Diff:
         for nid, before, after in self.relabelled:
             lines.append(f"  ~ node {nid}: {before!r} -> {after!r}")
         for e in self.added_edges:
-            lines.append(f"  + {e.src} --{e.kind.value}--> {e.dst} "
-                         f"[{e.confidence.value}, from {e.valid_from}]")
+            lines.append(
+                f"  + {e.src} --{e.kind.value}--> {e.dst} "
+                f"[{e.confidence.value}, from {e.valid_from}]"
+            )
         for e in self.removed_edges:
-            lines.append(f"  - {e.src} --{e.kind.value}--> {e.dst} "
-                         f"[{e.confidence.value}, from {e.valid_from}]")
+            lines.append(
+                f"  - {e.src} --{e.kind.value}--> {e.dst} "
+                f"[{e.confidence.value}, from {e.valid_from}]"
+            )
         return "\n".join(lines)
 
 
 def _edge_key(e: Edge):
-    return (e.src, e.dst, e.kind.value, e.valid_from, e.valid_to,
-            e.weight, e.confidence.value, e.source_doc_id)
+    return (
+        e.src,
+        e.dst,
+        e.kind.value,
+        e.valid_from,
+        e.valid_to,
+        e.weight,
+        e.confidence.value,
+        e.source_doc_id,
+    )
 
 
 def graph_diff(before: EntityGraph, after: EntityGraph) -> Diff:
@@ -265,8 +296,12 @@ def graph_diff(before: EntityGraph, after: EntityGraph) -> Diff:
             for nid in set(a_nodes) & set(b_nodes)
             if b_nodes[nid].label != a_nodes[nid].label
         ),
-        added_edges=[a_edges[k] for k in sorted(set(a_edges) - set(b_edges),
-                                                key=lambda k: tuple(map(str, k)))],
-        removed_edges=[b_edges[k] for k in sorted(set(b_edges) - set(a_edges),
-                                                  key=lambda k: tuple(map(str, k)))],
+        added_edges=[
+            a_edges[k]
+            for k in sorted(set(a_edges) - set(b_edges), key=lambda k: tuple(map(str, k)))
+        ],
+        removed_edges=[
+            b_edges[k]
+            for k in sorted(set(b_edges) - set(a_edges), key=lambda k: tuple(map(str, k)))
+        ],
     )

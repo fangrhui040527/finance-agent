@@ -1,7 +1,10 @@
-exec(open("gen.py").read())
+from gen import page  # run via `python -m design.build` or from design/
 
 # ─────────────────────────────── ASK / dashboard
-page("Main","ask", """
+page(
+    "Main",
+    "ask",
+    """
 <div class="head">
   <div><h1>Ask</h1>
   <p>Every question is planned before it is answered — you see which agents will run and
@@ -114,7 +117,8 @@ page("Main","ask", """
     </div>
   </div>
 </div>
-""", logic="""
+""",
+    logic="""
 const PLANS = {
   why: {title:'why did maybank fall today', intent:'why_it_moved', allowed:true, refused:false,
     cost:'RM 0.99', agents:[
@@ -155,4 +159,5 @@ class Component extends DCLogic {
     };
   }
 }
-""")
+""",
+)

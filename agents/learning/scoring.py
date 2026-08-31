@@ -50,9 +50,11 @@ class Scored:
     evidence: float
 
     def describe(self) -> str:
-        return (f"{self.score:.3f}  {self.lesson.text[:60]}\n"
-                f"        recency {self.recency:.2f} × relevance {self.relevance:.2f} "
-                f"× evidence {self.evidence:.2f}")
+        return (
+            f"{self.score:.3f}  {self.lesson.text[:60]}\n"
+            f"        recency {self.recency:.2f} × relevance {self.relevance:.2f} "
+            f"× evidence {self.evidence:.2f}"
+        )
 
 
 def recency(lesson: Lesson, now: datetime) -> float:
@@ -76,7 +78,7 @@ def relevance(lesson: Lesson, context: str) -> float:
     lesson may still be worth reading.
     """
     if not context:
-        return 1.0                      # no context given: rank on merit alone
+        return 1.0  # no context given: rank on merit alone
     return 1.0 if lesson.pattern.lower() in context.lower() else 0.1
 
 
@@ -108,8 +110,9 @@ def score(lesson: Lesson, now: datetime, context: str = "") -> Scored:
     return Scored(lesson, r * v * e, r, v, e)
 
 
-def rank(lessons, now: datetime, context: str = "", limit: int | None = None,
-         include_stale: bool = False) -> list[Scored]:
+def rank(
+    lessons, now: datetime, context: str = "", limit: int | None = None, include_stale: bool = False
+) -> list[Scored]:
     """Best first. Archived lessons never rank - they were retired for cause.
 
     Stale ones are excluded by default and can be asked for: `curate` marks a
@@ -117,6 +120,8 @@ def rank(lessons, now: datetime, context: str = "", limit: int | None = None,
     it, not a reason to pretend it was never written.
     """
     allowed = {Status.ACTIVE} | ({Status.STALE} if include_stale else set())
-    out = sorted((score(l, now, context) for l in lessons if l.status in allowed),
-                 key=lambda s: (-s.score, s.lesson.lesson_id))
+    out = sorted(
+        (score(l, now, context) for l in lessons if l.status in allowed),
+        key=lambda s: (-s.score, s.lesson.lesson_id),
+    )
     return out[:limit] if limit else out

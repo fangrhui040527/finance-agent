@@ -4,6 +4,7 @@ Instrument ids in this repo are written `MYX:1155`; the adapter MIC is `XKLS`.
 Nothing mapped between them, so every lookup keyed on the id prefix missed its
 table and fell back to a default. Nothing crashed - which is the point.
 """
+
 from decimal import Decimal
 
 import pytest

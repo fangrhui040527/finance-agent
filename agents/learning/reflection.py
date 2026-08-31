@@ -17,11 +17,12 @@ Three properties that follow from that inversion:
 from __future__ import annotations
 
 import hashlib
-import json
-import math
 from dataclasses import dataclass, field
-from datetime import date, datetime, timedelta, timezone
+from datetime import UTC, date, datetime
 from enum import Enum
+from typing import Literal
+
+from pydantic import BaseModel
 
 from agents.base import Agent, Finding
 from core.contracts.provenance_marker import Author, ProvenanceMarker, is_managed
@@ -65,7 +66,7 @@ class Prediction:
     made_at: datetime
     horizon: Horizon
     statement: str
-    direction: int                  # +1, -1, or 0 for "no view expressed"
+    direction: int  # +1, -1, or 0 for "no view expressed"
     confidence: float
     grade_on: date
     context: dict = field(default_factory=dict)
@@ -107,8 +108,9 @@ class OutcomeQueue:
     def due(self, today: date) -> list[Prediction]:
         return [p for p in self._pending.values() if p.grade_on <= today]
 
-    def grade(self, prediction_id: str, today: date, realised: float,
-              benchmark: float, note: str = "") -> Outcome:
+    def grade(
+        self, prediction_id: str, today: date, realised: float, benchmark: float, note: str = ""
+    ) -> Outcome:
         p = self._pending.get(prediction_id)
         if p is None:
             raise KeyError(f"{prediction_id} is not pending; it may already be graded")
@@ -143,7 +145,7 @@ class Lesson:
 
     lesson_id: str
     text: str
-    pattern: str                      # the machine-checkable condition it applies to
+    pattern: str  # the machine-checkable condition it applies to
     instances: int
     distinct_instruments: int
     hit_rate: float
@@ -169,7 +171,7 @@ class Calibration:
 
     n: int
     brier: float
-    buckets: tuple[tuple[float, float, int], ...]     # (stated, realised, n)
+    buckets: tuple[tuple[float, float, int], ...]  # (stated, realised, n)
 
     def overconfident_bands(self, tolerance: float = 0.10) -> list[tuple[float, float, int]]:
         return [b for b in self.buckets if b[2] >= 5 and b[0] - b[1] > tolerance]
@@ -229,6 +231,29 @@ class LessonStore:
         return new
 
 
+class LessonProposal(BaseModel):
+    """A lesson the model believes clears every bar. Still advisory."""
+
+    kind: Literal["lesson"] = "lesson"
+    text: str
+    pattern: str
+    counter_example_search: str
+
+
+class NoLesson(BaseModel):
+    """The default answer, stated with what would change it."""
+
+    kind: Literal["no_lesson"] = "no_lesson"
+    reason: str
+    evidence_that_would_change_this: str = ""
+
+
+class ReflectionReply(BaseModel):
+    """The union the model must answer with. `reply.root.kind` discriminates."""
+
+    root: LessonProposal | NoLesson
+
+
 class A15Reflection(Agent):
     """Reviews graded outcomes and mostly declines to write anything."""
 
@@ -255,8 +280,41 @@ class A15Reflection(Agent):
         self.queue = queue
         self.store = store
 
-    def run(self, today: date, cohort: dict[str, list[Outcome]] | None = None,
-            instruments: dict[str, set[str]] | None = None) -> list[Finding]:
+    def second_opinion(self, client, pattern: str, outcomes: list[Outcome]):
+        """A structured model read of a cohort. ADVISORY ONLY: the deterministic
+        gates in propose() still decide - a model may talk itself into a lesson,
+        and the whole design of this agent is that enthusiasm is not evidence.
+
+        Returns (reply, completion): reply is a ReflectionReply or None (None
+        when the model refused - completion.refused says so). A reply that
+        fails to validate raises BackendError; a malformed answer is never
+        quietly read as NO LESSON, because silence and refusal must stay
+        distinguishable from breakage.
+        """
+        wins = sum(1 for o in outcomes if o.correct)
+        digest = (
+            f"pattern: {pattern}\n"
+            f"outcomes: {len(outcomes)} graded, {wins} correct\n"
+            + "\n".join(
+                f"  - {o.prediction_id}: {'correct' if o.correct else 'wrong'}, "
+                f"return {o.realised_return:+.4f} vs benchmark {o.benchmark_return:+.4f}"
+                for o in outcomes
+            )
+        )
+        return client.complete_structured(
+            self.agent_id,
+            TaskClass.REFLECTION_DEEP,
+            digest,
+            ReflectionReply,
+            system=self.SYSTEM,
+        )
+
+    def run(
+        self,
+        today: date,
+        cohort: dict[str, list[Outcome]] | None = None,
+        instruments: dict[str, set[str]] | None = None,
+    ) -> list[Finding]:
         """Sweep the queue and consider each cohort for a lesson.
 
         `instruments` maps pattern -> the distinct instruments its outcomes came
@@ -266,11 +324,14 @@ class A15Reflection(Agent):
         """
         self._guard_tool("grade_queue")
         due = self.queue.due(today)
-        out = [Finding(
-            self.agent_id, "queue",
-            f"{len(due)} predictions due for grading, {self.queue.pending_count()} pending",
-            numbers={"due": float(len(due)), "pending": float(self.queue.pending_count())},
-        )]
+        out = [
+            Finding(
+                self.agent_id,
+                "queue",
+                f"{len(due)} predictions due for grading, {self.queue.pending_count()} pending",
+                numbers={"due": float(len(due)), "pending": float(self.queue.pending_count())},
+            )
+        ]
         if cohort:
             for pattern, outcomes in sorted(cohort.items()):
                 known = (instruments or {}).get(pattern)
@@ -278,8 +339,13 @@ class A15Reflection(Agent):
         out.extend(self.curate(today))
         return out
 
-    def propose(self, pattern: str, outcomes: list[Outcome],
-                today: date, instruments: set[str] | None = None) -> list[Finding]:
+    def propose(
+        self,
+        pattern: str,
+        outcomes: list[Outcome],
+        today: date,
+        instruments: set[str] | None = None,
+    ) -> list[Finding]:
         """The gate. Most candidates die here, and that is the feature.
 
         `instruments=None` means the distinct-instrument bar CANNOT be checked,
@@ -292,14 +358,19 @@ class A15Reflection(Agent):
         self._guard_tool("propose_lesson")
         n = len(outcomes)
         if instruments is None:
-            return [Finding(
-                self.agent_id, "no_lesson",
-                f"cannot consider {pattern!r}: the instruments behind these "
-                f"{n} outcomes were not supplied, so the distinct-instrument bar "
-                f"cannot be checked",
-                caveats=["an unverifiable gate refuses; pass "
-                         "LearningStore.instruments_for(prediction_ids)"],
-            )]
+            return [
+                Finding(
+                    self.agent_id,
+                    "no_lesson",
+                    f"cannot consider {pattern!r}: the instruments behind these "
+                    f"{n} outcomes were not supplied, so the distinct-instrument bar "
+                    f"cannot be checked",
+                    caveats=[
+                        "an unverifiable gate refuses; pass "
+                        "LearningStore.instruments_for(prediction_ids)"
+                    ],
+                )
+            ]
         distinct = len(instruments)
         hits = sum(1 for o in outcomes if o.correct)
         rate = hits / n if n else 0.0
@@ -308,24 +379,34 @@ class A15Reflection(Agent):
         if n < MIN_INSTANCES:
             reasons.append(f"only {n} instances, needs {MIN_INSTANCES}")
         if distinct < MIN_DISTINCT_INSTRUMENTS:
-            reasons.append(f"only {distinct} distinct instruments, needs {MIN_DISTINCT_INSTRUMENTS}")
+            reasons.append(
+                f"only {distinct} distinct instruments, needs {MIN_DISTINCT_INSTRUMENTS}"
+            )
         if rate < MIN_HIT_RATE:
             reasons.append(f"hit rate {rate:.0%} below the {MIN_HIT_RATE:.0%} bar")
         if reasons:
-            return [Finding(
-                self.agent_id, "no_lesson",
-                f"no lesson written for {pattern!r}: " + "; ".join(reasons),
-                numbers={"instances": float(n), "hit_rate": rate},
-                caveats=["a pattern that has not repeated is an anecdote"],
-            )]
+            return [
+                Finding(
+                    self.agent_id,
+                    "no_lesson",
+                    f"no lesson written for {pattern!r}: " + "; ".join(reasons),
+                    numbers={"instances": float(n), "hit_rate": rate},
+                    caveats=["a pattern that has not repeated is an anecdote"],
+                )
+            ]
 
-        now = datetime.now(timezone.utc)
-        text = (f"When {pattern}, the observed outcome held in {hits} of {n} cases "
-                f"across {distinct} instruments.")
+        now = datetime.now(UTC)
+        text = (
+            f"When {pattern}, the observed outcome held in {hits} of {n} cases "
+            f"across {distinct} instruments."
+        )
         lesson = Lesson(
             lesson_id=_lesson_id(pattern, text),
-            text=text, pattern=pattern, instances=n,
-            distinct_instruments=distinct, hit_rate=rate,
+            text=text,
+            pattern=pattern,
+            instances=n,
+            distinct_instruments=distinct,
+            hit_rate=rate,
             created_at=now,
             marker=ProvenanceMarker(created_by=Author.AGENT, created_at=now),
             last_confirmed=now,
@@ -334,21 +415,32 @@ class A15Reflection(Agent):
         existing = self.store.get(lesson.lesson_id)
         if existing is not None:
             self.store.transition(existing.lesson_id, Status.ACTIVE, now)
-            return [Finding(self.agent_id, "lesson_confirmed",
-                            f"existing lesson reconfirmed: {existing.text}",
-                            numbers={"hit_rate": rate})]
+            return [
+                Finding(
+                    self.agent_id,
+                    "lesson_confirmed",
+                    f"existing lesson reconfirmed: {existing.text}",
+                    numbers={"hit_rate": rate},
+                )
+            ]
         self.store.add(lesson)
-        return [Finding(
-            self.agent_id, "lesson_written", lesson.text,
-            numbers={"instances": float(n), "distinct": float(distinct), "hit_rate": rate},
-            caveats=["a written lesson biases future analysis; it is reviewed every "
-                     f"{STALE_AFTER_DAYS} days and archived if it stops working"],
-        )]
+        return [
+            Finding(
+                self.agent_id,
+                "lesson_written",
+                lesson.text,
+                numbers={"instances": float(n), "distinct": float(distinct), "hit_rate": rate},
+                caveats=[
+                    "a written lesson biases future analysis; it is reviewed every "
+                    f"{STALE_AFTER_DAYS} days and archived if it stops working"
+                ],
+            )
+        ]
 
     def curate(self, today: date) -> list[Finding]:
         """Lifecycle. Never deletes."""
         self._guard_tool("curate")
-        now = datetime.combine(today, datetime.min.time(), tzinfo=timezone.utc)
+        now = datetime.combine(today, datetime.min.time(), tzinfo=UTC)
         out: list[Finding] = []
         for l in self.store.active():
             if not l.editable():
@@ -356,14 +448,25 @@ class A15Reflection(Agent):
             age = (now - (l.last_confirmed or l.created_at)).days
             if l.hit_rate < STALE_HIT_RATE:
                 self.store.transition(l.lesson_id, Status.ARCHIVED, now)
-                out.append(Finding(self.agent_id, "lesson_archived",
-                                   f"archived {l.lesson_id}: hit rate fell to {l.hit_rate:.0%}",
-                                   caveats=["archived, not deleted; it can be revived if it "
-                                            "starts working again"]))
+                out.append(
+                    Finding(
+                        self.agent_id,
+                        "lesson_archived",
+                        f"archived {l.lesson_id}: hit rate fell to {l.hit_rate:.0%}",
+                        caveats=[
+                            "archived, not deleted; it can be revived if it starts working again"
+                        ],
+                    )
+                )
             elif age > STALE_AFTER_DAYS:
                 self.store.transition(l.lesson_id, Status.STALE, now)
-                out.append(Finding(self.agent_id, "lesson_stale",
-                                   f"{l.lesson_id} unconfirmed for {age} days; marked stale"))
+                out.append(
+                    Finding(
+                        self.agent_id,
+                        "lesson_stale",
+                        f"{l.lesson_id} unconfirmed for {age} days; marked stale",
+                    )
+                )
         return out
 
     def calibration(self, pairs: list[tuple[float, bool]]) -> list[Finding]:
@@ -372,10 +475,15 @@ class A15Reflection(Agent):
         if c.n == 0:
             return [Finding(self.agent_id, "calibration", "no graded predictions yet")]
         bands = c.overconfident_bands()
-        return [Finding(
-            self.agent_id, "calibration",
-            f"Brier {c.brier:.3f} over {c.n} graded predictions",
-            numbers={"brier": c.brier, "n": float(c.n)},
-            caveats=[f"stated {s:.0%} confidence realised {r:.0%} over {n} calls"
-                     for s, r, n in bands],
-        )]
+        return [
+            Finding(
+                self.agent_id,
+                "calibration",
+                f"Brier {c.brier:.3f} over {c.n} graded predictions",
+                numbers={"brier": c.brier, "n": float(c.n)},
+                caveats=[
+                    f"stated {s:.0%} confidence realised {r:.0%} over {n} calls"
+                    for s, r, n in bands
+                ],
+            )
+        ]

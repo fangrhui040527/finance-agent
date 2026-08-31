@@ -298,21 +298,23 @@ The pre-announcement window `[−5,−1]` is deliberate: information leaks. Meas
 ```python
 class AttributionComponent(BaseModel):
     component: Literal["market", "sector", "style", "currency", "idiosyncratic"]
-    contribution: float             # in return space, local or base ccy (stated)
+    contribution: float  # in return space, local or base ccy (stated)
     share_of_total: float
-    beta: float | None              # None for currency and idiosyncratic
+    beta: float | None  # None for currency and idiosyncratic
     r_squared_contribution: float | None
 
+
 class CandidateCause(BaseModel):
-    cause_type: str                 # from the A5 event taxonomy
+    cause_type: str  # from the A5 event taxonomy
     description: str
     occurred_at: datetime
     lag_sessions: int
     score: float
-    score_breakdown: dict[str, float]   # prior, proximity, specificity, direction,
-                                        # magnitude, source_trust — all six, always
-    base_rate: BaseRate | None          # n, median_car, iqr, hit_rate
-    evidence: list[Citation]            # filing / article / announcement, never empty
+    score_breakdown: dict[str, float]  # prior, proximity, specificity, direction,
+    # magnitude, source_trust — all six, always
+    base_rate: BaseRate | None  # n, median_car, iqr, hit_rate
+    evidence: list[Citation]  # filing / article / announcement, never empty
+
 
 class MoveExplanation(BaseModel):
     instrument_id: str
@@ -323,20 +325,20 @@ class MoveExplanation(BaseModel):
     components: list[AttributionComponent]
     abnormal_return: float
     standardised_ar: float
-    significance: Significance          # parametric + rank test, and whether they agree
-    candidates: list[CandidateCause]    # ranked, may be empty
+    significance: Significance  # parametric + rank test, and whether they agree
+    candidates: list[CandidateCause]  # ranked, may be empty
     unexplained_share: float
     verdict: Literal[
-        "explained",                    # top candidate clears τ
+        "explained",  # top candidate clears τ
         "partially_explained",
-        "no_identified_catalyst",       # significant idio move, nothing found
-        "not_significant",              # move was within normal variation
-        "market_driven",                # idio share below 20%
-        "attribution_unavailable",      # insufficient history
+        "no_identified_catalyst",  # significant idio move, nothing found
+        "not_significant",  # move was within normal variation
+        "market_driven",  # idio share below 20%
+        "attribution_unavailable",  # insufficient history
     ]
     regime: str
     as_of: datetime
-    method_version: str                 # so old explanations remain reproducible
+    method_version: str  # so old explanations remain reproducible
 ```
 
 `verdict` is the field the UI branches on. Five of its six values are ways of saying "there is less here than you think", and that ratio is intentional.

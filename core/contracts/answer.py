@@ -85,7 +85,7 @@ class Answer(BaseModel):
     as_of: datetime
 
     @model_validator(mode="after")
-    def answered_implies_support(self) -> "Answer":
+    def answered_implies_support(self) -> Answer:
         if self.answered and not self.claims:
             raise ValueError("an answered response requires at least one supported claim")
         if not self.answered and self.claims:
@@ -95,7 +95,7 @@ class Answer(BaseModel):
         return self
 
     @classmethod
-    def refusal(cls, reason: str, as_of: datetime, confidence: float = 0.0) -> "Answer":
+    def refusal(cls, reason: str, as_of: datetime, confidence: float = 0.0) -> Answer:
         """A refusal is a valid, logged, non-penalised outcome (docs/05 8.1)."""
         return cls(
             claims=[],
@@ -130,14 +130,16 @@ def verify_claim(claim: Claim, chunk_lookup) -> Claim:
     if claim.all_citations_required and len(good) < len(claim.citations):
         # A chain is not partially true. Keeping the verified links would emit a
         # conclusion that only holds if the unverified one does.
-        return claim.model_copy(update={
-            "citations": [],
-            "dropped_reason": (
-                f"{len(claim.citations) - len(good)} of {len(claim.citations)} citations "
-                "failed and this claim needs every one: each supports a different link "
-                "in its chain"
-            ),
-        })
+        return claim.model_copy(
+            update={
+                "citations": [],
+                "dropped_reason": (
+                    f"{len(claim.citations) - len(good)} of {len(claim.citations)} citations "
+                    "failed and this claim needs every one: each supports a different link "
+                    "in its chain"
+                ),
+            }
+        )
     return claim.model_copy(update={"citations": good, "dropped_reason": None})
 
 
@@ -147,9 +149,5 @@ def verify_answer(claims: list[Claim], chunk_lookup, as_of: datetime, confidence
     kept = [c for c in checked if c.supported]
     dropped = [c for c in checked if not c.supported]
     if not kept:
-        return Answer(
-            claims=[], dropped=dropped, confidence=0.0, answered=False, as_of=as_of
-        )
-    return Answer(
-        claims=kept, dropped=dropped, confidence=confidence, answered=True, as_of=as_of
-    )
+        return Answer(claims=[], dropped=dropped, confidence=0.0, answered=False, as_of=as_of)
+    return Answer(claims=kept, dropped=dropped, confidence=confidence, answered=True, as_of=as_of)

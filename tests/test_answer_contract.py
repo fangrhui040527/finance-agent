@@ -1,14 +1,20 @@
 """P0 DoD: a claim without a verified citation is dropped, not hedged."""
-from datetime import datetime, timezone
+
+from datetime import UTC, datetime
 
 import pytest
 from pydantic import ValidationError
 
 from core.contracts.answer import (
-    Answer, Citation, Claim, TrustTier, verify_answer, verify_claim,
+    Answer,
+    Citation,
+    Claim,
+    TrustTier,
+    verify_answer,
+    verify_claim,
 )
 
-NOW = datetime.now(timezone.utc)
+NOW = datetime.now(UTC)
 CHUNKS = {("10-K", "c1"): "Revenue rose 12% to RM 4.2 billion in the period."}
 
 
@@ -18,8 +24,11 @@ def lookup(source, chunk_id):
 
 def cite(span, source="10-K", chunk_id="c1"):
     return Citation(
-        source=source, chunk_id=chunk_id, quoted_span=span,
-        trust=TrustTier.FILINGS, as_of=NOW,
+        source=source,
+        chunk_id=chunk_id,
+        quoted_span=span,
+        trust=TrustTier.FILINGS,
+        as_of=NOW,
     )
 
 
@@ -34,7 +43,9 @@ def test_fabricated_quote_is_dropped():
 
 
 def test_unknown_chunk_is_dropped():
-    c = verify_claim(Claim(text="x", citations=[cite("Revenue rose 12%", chunk_id="ghost")]), lookup)
+    c = verify_claim(
+        Claim(text="x", citations=[cite("Revenue rose 12%", chunk_id="ghost")]), lookup
+    )
     assert not c.supported
 
 
@@ -50,7 +61,9 @@ def test_bad_claim_dropped_individually_good_one_kept():
             Claim(text="up 12%", citations=[cite("Revenue rose 12%")]),
             Claim(text="margin doubled", citations=[cite("Margin doubled")]),
         ],
-        lookup, NOW, confidence=0.7,
+        lookup,
+        NOW,
+        confidence=0.7,
     )
     assert ans.answered
     assert len(ans.claims) == 1 and len(ans.dropped) == 1
@@ -70,7 +83,10 @@ def test_refusal_carrying_claims_is_unconstructable():
     with pytest.raises(ValidationError):
         Answer(
             claims=[Claim(text="x", citations=[cite("Revenue rose 12%")])],
-            dropped=[], confidence=0.1, answered=False, as_of=NOW,
+            dropped=[],
+            confidence=0.1,
+            answered=False,
+            as_of=NOW,
         )
 
 

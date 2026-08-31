@@ -1,23 +1,39 @@
 """P13/P14: the loop that mostly refuses to learn, and the curriculum that
 refuses to teach out of order."""
-from datetime import date, datetime, timedelta, timezone
+
+from datetime import UTC, datetime, timedelta
 
 import pytest
 
 from agents.base import AgentContext
 from agents.learning.reflection import (
-    A15Reflection, Horizon, Lesson, LessonStore, MIN_DISTINCT_INSTRUMENTS,
-    MIN_INSTANCES, Outcome, OutcomeQueue, Prediction, Status, calibrate,
+    MIN_DISTINCT_INSTRUMENTS,
+    MIN_INSTANCES,
+    A15Reflection,
+    Horizon,
+    Lesson,
+    LessonStore,
+    Outcome,
+    OutcomeQueue,
+    Prediction,
+    Status,
+    calibrate,
 )
 from agents.learning.teacher import (
-    A14Teacher, BY_KEY, CURRICULUM, Learner, Level, Licence, PrerequisiteError,
-    prerequisites, validate_graph,
+    BY_KEY,
+    CURRICULUM,
+    A14Teacher,
+    Learner,
+    Level,
+    Licence,
+    prerequisites,
+    validate_graph,
 )
 from core.contracts.provenance_marker import Author, ProvenanceMarker
 from core.guardrails.defaults import default_engine
 from knowledge.retrieval.pipeline import Router
 
-NOW = datetime(2026, 8, 25, tzinfo=timezone.utc)
+NOW = datetime(2026, 8, 25, tzinfo=UTC)
 ALLOW = {
     "a15_reflection": {"grade_queue", "propose_lesson", "calibrate", "curate"},
     "a14_teacher": {"explain", "next_concept", "quiz", "retrieve"},
@@ -29,17 +45,25 @@ def ctx():
 
 
 def prediction(pid="p1", instrument="MYX:1155", days=21, conf=0.6):
-    return Prediction(pid, instrument, "a10_thesis", NOW, Horizon.D21,
-                      "margins recover", 1, conf,
-                      grade_on=(NOW + timedelta(days=days)).date())
+    return Prediction(
+        pid,
+        instrument,
+        "a10_thesis",
+        NOW,
+        Horizon.D21,
+        "margins recover",
+        1,
+        conf,
+        grade_on=(NOW + timedelta(days=days)).date(),
+    )
 
 
 # -- deferred grading --------------------------------------------------------
 
+
 def test_a_horizon_set_after_the_fact_is_not_a_horizon():
     with pytest.raises(ValueError, match="grade_on must be in the future"):
-        Prediction("p", "X", "a10_thesis", NOW, Horizon.D21, "s", 1, 0.6,
-                   grade_on=NOW.date())
+        Prediction("p", "X", "a10_thesis", NOW, Horizon.D21, "s", 1, 0.6, grade_on=NOW.date())
 
 
 def test_grading_before_the_date_is_refused_because_it_scores_noise():
@@ -77,6 +101,7 @@ def test_only_due_predictions_surface():
 
 # -- the inverted write bias -------------------------------------------------
 
+
 def outcomes(n, correct=None):
     correct = n if correct is None else correct
     return [Outcome(f"p{i}", NOW.date(), 0.05, 0.01, i < correct) for i in range(n)]
@@ -102,16 +127,21 @@ def test_a_pattern_on_one_instrument_writes_nothing_however_often_it_repeats():
 
 def test_enough_instances_with_a_weak_edge_writes_nothing():
     agent = a15()
-    out = agent.propose("monday reversals", outcomes(20, 10), NOW.date(),
-                        {f"S{i}" for i in range(8)})
+    out = agent.propose(
+        "monday reversals", outcomes(20, 10), NOW.date(), {f"S{i}" for i in range(8)}
+    )
     assert out[0].kind == "no_lesson"
     assert "hit rate" in out[0].text
 
 
 def test_a_genuinely_repeated_pattern_is_allowed_through():
     agent = a15()
-    out = agent.propose("unexplained gap reverses within five sessions",
-                        outcomes(8, 6), NOW.date(), {f"S{i}" for i in range(5)})
+    out = agent.propose(
+        "unexplained gap reverses within five sessions",
+        outcomes(8, 6),
+        NOW.date(),
+        {f"S{i}" for i in range(5)},
+    )
     assert out[0].kind == "lesson_written"
     assert agent.store.active()
 
@@ -130,11 +160,20 @@ def test_the_prompt_itself_defaults_to_no_lesson():
 
 # -- lifecycle ---------------------------------------------------------------
 
+
 def lesson(hit_rate=0.7, author=Author.AGENT, pinned=False, created=None):
     created = created or NOW
-    return Lesson("L1", "text", "pattern", 8, 5, hit_rate, created,
-                  ProvenanceMarker(created_by=author, created_at=created, pinned=pinned),
-                  last_confirmed=created)
+    return Lesson(
+        "L1",
+        "text",
+        "pattern",
+        8,
+        5,
+        hit_rate,
+        created,
+        ProvenanceMarker(created_by=author, created_at=created, pinned=pinned),
+        last_confirmed=created,
+    )
 
 
 def test_a_decayed_lesson_is_archived_and_never_deleted():
@@ -171,8 +210,16 @@ def test_a_pinned_agent_lesson_opts_out_of_the_lifecycle():
 def test_contradiction_supersedes_and_the_old_text_stays_readable():
     store = LessonStore()
     store.add(lesson())
-    new = Lesson("L2", "the opposite", "pattern", 9, 6, 0.72, NOW,
-                 ProvenanceMarker(created_by=Author.AGENT, created_at=NOW))
+    new = Lesson(
+        "L2",
+        "the opposite",
+        "pattern",
+        9,
+        6,
+        0.72,
+        NOW,
+        ProvenanceMarker(created_by=Author.AGENT, created_at=NOW),
+    )
     store.supersede("L1", new, NOW)
     assert store.get("L1").status is Status.ARCHIVED
     assert store.get("L1").text == "text"
@@ -180,6 +227,7 @@ def test_contradiction_supersedes_and_the_old_text_stays_readable():
 
 
 # -- calibration -------------------------------------------------------------
+
 
 def test_a_perfectly_calibrated_forecaster_scores_well():
     pairs = [(0.9, True)] * 9 + [(0.9, False)]
@@ -202,6 +250,7 @@ def test_no_graded_predictions_yields_no_calibration_claim():
 
 
 # -- the curriculum ----------------------------------------------------------
+
 
 def test_the_curriculum_graph_is_acyclic_and_never_inverts_a_level():
     validate_graph()
@@ -251,8 +300,9 @@ def test_an_unknown_concept_is_refused_not_improvised():
 def test_link_only_sources_are_linked_never_quoted():
     t = A14Teacher(ctx())
     c = BY_KEY["share"]
-    patched = type(c)(**{**c.__dict__,
-                         "sources": (("A Textbook", "https://example.org/x", Licence.LINK_ONLY),)})
+    patched = type(c)(
+        **{**c.__dict__, "sources": (("A Textbook", "https://example.org/x", Licence.LINK_ONLY),)}
+    )
     BY_KEY["share"] = patched
     try:
         out = t.run("share", Learner(known=set()))

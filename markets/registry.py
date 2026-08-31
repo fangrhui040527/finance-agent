@@ -18,8 +18,8 @@ from markets.contract import MarketAdapter
 from markets.xasx import XASX
 from markets.xetr import XETR
 from markets.xhkg import XHKG
-from markets.xkrx import XKRX
 from markets.xkls import XKLS
+from markets.xkrx import XKRX
 from markets.xlon import XLON
 from markets.xnas import XNAS
 from markets.xnse import XNSE
@@ -28,9 +28,17 @@ from markets.xtai import XTAI
 from markets.xtks import XTKS
 
 _ADAPTERS: dict[str, type[MarketAdapter]] = {
-    "XKLS": XKLS, "XNAS": XNAS, "XSES": XSES, "XHKG": XHKG,
-    "XTKS": XTKS, "XLON": XLON, "XASX": XASX,
-    "XNSE": XNSE, "XTAI": XTAI, "XKRX": XKRX, "XETR": XETR,
+    "XKLS": XKLS,
+    "XNAS": XNAS,
+    "XSES": XSES,
+    "XHKG": XHKG,
+    "XTKS": XTKS,
+    "XLON": XLON,
+    "XASX": XASX,
+    "XNSE": XNSE,
+    "XTAI": XTAI,
+    "XKRX": XKRX,
+    "XETR": XETR,
 }
 _CACHE: dict[str, MarketAdapter] = {}
 
@@ -38,8 +46,8 @@ _CACHE: dict[str, MarketAdapter] = {}
 #: Only for genuine aliases of a REGISTERED market. Adding a market goes in
 #: _ADAPTERS; adding a second spelling for one goes here.
 ALIASES: dict[str, str] = {
-    "MYX": "XKLS",     # Bursa Malaysia: ids say MYX, the MIC is XKLS
-    "KLSE": "XKLS",    # the pre-2004 name, still in older sources
+    "MYX": "XKLS",  # Bursa Malaysia: ids say MYX, the MIC is XKLS
+    "KLSE": "XKLS",  # the pre-2004 name, still in older sources
     "SGX": "XSES",
     "NASDAQ": "XNAS",
     "HKEX": "XHKG",
@@ -49,8 +57,8 @@ ALIASES: dict[str, str] = {
     # core/market/feed.py already wrote XTKS - the same doc-versus-code drift
     # MYX/XKLS caused, mapped here before it can cost anything.
     "XJPX": "XTKS",
-    "TSE": "XTKS",     # Tokyo; also the initialism for several other exchanges,
-    "TYO": "XTKS",     # which is exactly why the MIC is the canonical form
+    "TSE": "XTKS",  # Tokyo; also the initialism for several other exchanges,
+    "TYO": "XTKS",  # which is exactly why the MIC is the canonical form
     "LSE": "XLON",
     "ASX": "XASX",
     "NSE": "XNSE",

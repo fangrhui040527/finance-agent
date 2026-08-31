@@ -124,7 +124,7 @@ breach**.
 In `ask.py::_parse_position` and in the MCP `check_portfolio_risk` tool:
 
 ```python
-country=parts[4], currency=parts[4]     # "MY" is not "MYR"
+country = parts[4], currency = parts[4]  # "MY" is not "MYR"
 ```
 
 `check()` counts anything that is not the base currency as foreign exposure.

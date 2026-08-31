@@ -1,5 +1,6 @@
 """P0 DoD: append-only ledger, cost in both currencies, provenance markers."""
-from datetime import datetime, timezone
+
+from datetime import UTC, datetime
 from decimal import Decimal
 
 import pytest
@@ -12,8 +13,12 @@ from core.provenance.ledger import ProvenanceLedger
 def test_call_is_recorded_with_both_currencies():
     led = ProvenanceLedger()
     rec = led.record_call(
-        "a10", TaskClass.THESIS_SYNTHESIS, Tier.REASON, "claude-opus-5",
-        "prompt", Usage(1_000_000, 0),
+        "a10",
+        TaskClass.THESIS_SYNTHESIS,
+        Tier.REASON,
+        "claude-opus-5",
+        "prompt",
+        Usage(1_000_000, 0),
     )
     assert rec.cost_usd == Decimal("5.00")
     assert rec.cost_myr == Decimal("5.00") * Decimal("4.15")
@@ -49,12 +54,12 @@ def test_dropped_claims_are_logged_too():
 
 
 def test_human_authored_is_never_agent_editable():
-    m = ProvenanceMarker(created_by=Author.HUMAN, created_at=datetime.now(timezone.utc))
+    m = ProvenanceMarker(created_by=Author.HUMAN, created_at=datetime.now(UTC))
     assert m.managed is False
 
 
 def test_agent_created_is_editable_unless_pinned():
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     assert ProvenanceMarker(created_by=Author.AGENT, created_at=now).managed is True
     assert ProvenanceMarker(created_by=Author.AGENT, created_at=now, pinned=True).managed is False
 

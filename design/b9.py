@@ -1,6 +1,9 @@
-exec(open("gen.py").read())
+from gen import page  # run via `python -m design.build` or from design/
 
-page("Agents","ask", """
+page(
+    "Agents",
+    "ask",
+    """
 <div class="head">
   <div><h1>Agents</h1>
   <p>Sixteen registered capabilities in five layers. Evidence agents never talk to each other —
@@ -125,7 +128,8 @@ page("Agents","ask", """
     </div>
   </div>
 </div>
-""", logic="""
+""",
+    logic="""
 const ACC='#0F5C63', NEG='#9E3626', POS='#3B6A38', MUT='#606D71', INK='#15191B', WARN='#8A5B12';
 const T = { reason:'claude-opus-5', balanced:'claude-sonnet-5', cheap:'claude-haiku-4-5',
             none:'no model — deterministic' };
@@ -335,4 +339,7 @@ class Component extends DCLogic {
     };
   }
 }
-""", w=1440, h=1180)
+""",
+    w=1440,
+    h=1180,
+)

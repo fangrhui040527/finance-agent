@@ -12,7 +12,6 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from datetime import date
 from decimal import Decimal
 from enum import Enum
 
@@ -65,8 +64,7 @@ class FeeSchedule:
 
     def one_way(self, consideration: Decimal) -> Decimal:
         """Charges levied on a single leg only - the buy side, by convention."""
-        return sum((leg.charge(consideration) for leg in self.legs
-                    if not leg.per_side), Decimal(0))
+        return sum((leg.charge(consideration) for leg in self.legs if not leg.per_side), Decimal(0))
 
     def round_trip(self, consideration: Decimal) -> Decimal:
         """docs/04 section 6.3: cost is computed before any signal is discussed.
@@ -75,8 +73,9 @@ class FeeSchedule:
         stamp duty overstates the cost floor, which sounds conservative and is
         not: an overstated floor refuses positions that would have cleared it.
         """
-        return sum((leg.charge(consideration) for leg in self.legs
-                    if leg.per_side), Decimal(0)) * 2 + self.one_way(consideration)
+        return sum(
+            (leg.charge(consideration) for leg in self.legs if leg.per_side), Decimal(0)
+        ) * 2 + self.one_way(consideration)
 
     def round_trip_bps(self, consideration: Decimal) -> Decimal:
         if consideration <= 0:

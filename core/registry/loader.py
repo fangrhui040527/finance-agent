@@ -19,10 +19,21 @@ import yaml
 from core.contracts.provenance_marker import Author, ProvenanceMarker
 
 #: Names that may never appear as a tool, whatever a YAML file says.
-FORBIDDEN_TOOLS = frozenset({
-    "place_order", "submit_order", "execute_trade", "buy", "sell", "cancel_order",
-    "modify_order", "short", "close_position", "broker_connect", "send_order",
-})
+FORBIDDEN_TOOLS = frozenset(
+    {
+        "place_order",
+        "submit_order",
+        "execute_trade",
+        "buy",
+        "sell",
+        "cancel_order",
+        "modify_order",
+        "short",
+        "close_position",
+        "broker_connect",
+        "send_order",
+    }
+)
 
 MIN_EVAL_CASES = 5
 MIN_NEGATIVE_CASES = 2
@@ -53,8 +64,11 @@ class KnowledgeSpec:
     managed: bool
 
     def marker(self, created_at) -> ProvenanceMarker:
-        return ProvenanceMarker(created_by=self.created_by, created_at=created_at,
-                                pinned=not self.managed and self.created_by is Author.AGENT)
+        return ProvenanceMarker(
+            created_by=self.created_by,
+            created_at=created_at,
+            pinned=not self.managed and self.created_by is Author.AGENT,
+        )
 
 
 @dataclass
@@ -94,8 +108,9 @@ class Registry:
         return spec.managed and spec.created_by is Author.AGENT
 
 
-def load(path: str | Path, evals_root: str | Path | None = None,
-         enforce_ratchet: bool = True) -> Registry:
+def load(
+    path: str | Path, evals_root: str | Path | None = None, enforce_ratchet: bool = True
+) -> Registry:
     raw = yaml.safe_load(Path(path).read_text())
     if not isinstance(raw, dict) or "version" not in raw:
         raise RegistryError(f"{path} is not a capability registry")
@@ -158,10 +173,21 @@ def check_suite(path: Path, agent_id: str) -> dict:
         raise RatchetError(
             f"{agent_id}: eval suite has {len(cases)} cases, minimum is {MIN_EVAL_CASES}"
         )
-    negatives = [c for c in cases if c.get("expect") in ("refuse", "no_lesson", "not_significant",
-                                                         "market_driven", "no_position",
-                                                         "no_identified_catalyst", "no_view")
-                 or c.get("negative") is True]
+    negatives = [
+        c
+        for c in cases
+        if c.get("expect")
+        in (
+            "refuse",
+            "no_lesson",
+            "not_significant",
+            "market_driven",
+            "no_position",
+            "no_identified_catalyst",
+            "no_view",
+        )
+        or c.get("negative") is True
+    ]
     if len(negatives) < MIN_NEGATIVE_CASES:
         raise RatchetError(
             f"{agent_id}: only {len(negatives)} negative cases. A suite where every case "
@@ -178,6 +204,7 @@ class EvalResult:
     failed: int
     near_miss_failed: int
     details: tuple[tuple[str, bool, str], ...] = ()
+    crashed: int = 0
 
     @property
     def total(self) -> int:
@@ -190,7 +217,7 @@ class EvalResult:
     def ok(self, threshold: float = 0.8) -> bool:
         """Near-miss failures are disqualifying regardless of the headline rate.
         docs/03 section 8: the near-misses are the whole test."""
-        return self.rate >= threshold and self.near_miss_failed == 0
+        return self.rate >= threshold and self.near_miss_failed == 0 and self.crashed == 0
 
 
 def run_suite(path: Path, agent_id: str, runner) -> EvalResult:
@@ -198,18 +225,25 @@ def run_suite(path: Path, agent_id: str, runner) -> EvalResult:
     suite = check_suite(path, agent_id)
     passed = failed = near_miss_failed = 0
     details: list[tuple[str, bool, str]] = []
+    crashed = 0
     for case in suite["cases"]:
         expect = case.get("expect")
+        did_crash = False
         try:
             got = runner(case)
-        except Exception as e:                    # a crash is a failure, not an error
+        except Exception as e:  # a crash is a failure, and never a match
             got = f"error: {type(e).__name__}: {e}"
-        hit = got == expect
+            did_crash = True
+        # A crash can never equal `expect`: an eval whose expected value happens
+        # to be an error STRING would otherwise score a genuine crash as a pass.
+        hit = (not did_crash) and got == expect
         if hit:
             passed += 1
         else:
             failed += 1
+            crashed += did_crash
             if case.get("near_miss"):
                 near_miss_failed += 1
-        details.append((str(case.get("name", "?")), hit, f"expected {expect!r}, got {got!r}"))
-    return EvalResult(agent_id, passed, failed, near_miss_failed, tuple(details))
+        note = f"expected {expect!r}, got {got!r}" + (" [crashed]" if did_crash else "")
+        details.append((str(case.get("name", "?")), hit, note))
+    return EvalResult(agent_id, passed, failed, near_miss_failed, tuple(details), crashed)

@@ -4,6 +4,7 @@ The property under test throughout: an empty series must be impossible to obtain
 by accident. Downstream, [] reads as "the stock did not trade", and attribution
 will explain a move that never happened.
 """
+
 import urllib.error
 from datetime import date
 
@@ -16,34 +17,13 @@ from core.market.feed import (
     StooqFeed,
     SymbolUnmappable,
 )
+from tests.conftest import opener_for as _opener  # noqa: E402  (after importorskip-style header)
 
 CSV = """Date,Open,High,Low,Close,Volume
 2026-01-02,10.00,10.40,9.90,10.30,1000000
 2026-01-05,10.30,10.55,10.10,10.20,850000
 2026-01-06,10.20,10.60,10.15,10.55,910000
 """
-
-
-class _Response:
-    def __init__(self, body: str):
-        self._body = body.encode()
-
-    def read(self) -> bytes:
-        return self._body
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, *exc):
-        return False
-
-
-def _opener(body: str, capture: list | None = None):
-    def open_(req, timeout=None):
-        if capture is not None:
-            capture.append(req)
-        return _Response(body)
-    return open_
 
 
 # --- symbols are mapped, never guessed ------------------------------------
@@ -82,9 +62,11 @@ def test_bars_come_back_sorted_and_typed():
 
 
 def test_rows_arriving_out_of_order_are_sorted():
-    jumbled = "Date,Open,High,Low,Close,Volume\n" \
-              "2026-01-06,10.20,10.60,10.15,10.55,1\n" \
-              "2026-01-02,10.00,10.40,9.90,10.30,1\n"
+    jumbled = (
+        "Date,Open,High,Low,Close,Volume\n"
+        "2026-01-06,10.20,10.60,10.15,10.55,1\n"
+        "2026-01-02,10.00,10.40,9.90,10.30,1\n"
+    )
     bars = StooqFeed(opener=_opener(jumbled)).fetch("XNAS:NVDA").raw()
     assert [b.day for b in bars] == [date(2026, 1, 2), date(2026, 1, 6)]
 
@@ -127,11 +109,14 @@ def test_transport_failure_raises():
         StooqFeed(opener=open_).fetch("XNAS:NVDA")
 
 
-def test_http_error_raises():
+def test_a_404_is_a_coverage_fact_not_an_outage():
+    """404 used to collapse into the same error as a 503, so a symbol the
+    source does not carry was indistinguishable from the source being down."""
+
     def open_(req, timeout=None):
         raise urllib.error.HTTPError("u", 404, "not found", {}, None)
 
-    with pytest.raises(PriceFeedError, match="fetch failed"):
+    with pytest.raises(NoData, match="carries nothing"):
         StooqFeed(opener=open_).fetch("XNAS:NVDA")
 
 
@@ -165,17 +150,17 @@ def test_a_non_finite_close_is_dropped_not_passed_downstream():
 
 
 def test_an_inverted_bar_is_dropped():
-    body = CSV + "2026-01-07,10.00,9.00,11.00,10.50,1000\n"     # high < low
+    body = CSV + "2026-01-07,10.00,9.00,11.00,10.50,1000\n"  # high < low
     assert len(StooqFeed(opener=_opener(body)).fetch("XNAS:NVDA")) == 3
 
 
 def test_a_high_below_the_close_is_dropped():
-    body = CSV + "2026-01-07,10.00,10.20,9.90,10.90,1000\n"     # close above high
+    body = CSV + "2026-01-07,10.00,10.20,9.90,10.90,1000\n"  # close above high
     assert len(StooqFeed(opener=_opener(body)).fetch("XNAS:NVDA")) == 3
 
 
 def test_a_low_above_the_open_is_dropped():
-    body = CSV + "2026-01-07,9.50,10.20,9.90,10.10,1000\n"      # open below low
+    body = CSV + "2026-01-07,9.50,10.20,9.90,10.10,1000\n"  # open below low
     assert len(StooqFeed(opener=_opener(body)).fetch("XNAS:NVDA")) == 3
 
 

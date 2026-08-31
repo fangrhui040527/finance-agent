@@ -16,10 +16,10 @@ rather than suggested:
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Callable
 
 from knowledge.chunking.parent_child import Chunk
 from knowledge.retrieval.hybrid import Collection, Hit, expand_to_parents, rerank
@@ -89,21 +89,23 @@ class Router:
         return self._collections[corpus]
 
 
-def grade(hits: list[Hit], query: str, max_age: timedelta | None, now: datetime | None) -> GradeReport:
+def grade(
+    hits: list[Hit], query: str, max_age: timedelta | None, now: datetime | None
+) -> GradeReport:
     if not hits:
         return GradeReport(Grade.INSUFFICIENT, 0.0, False, 0, "no hits retrieved")
     top = max(h.score for h in hits)
     fresh = True
     if max_age is not None and now is not None:
-        fresh = all(
-            h.chunk.as_of is None or (now - h.chunk.as_of) <= max_age for h in hits
-        )
+        fresh = all(h.chunk.as_of is None or (now - h.chunk.as_of) <= max_age for h in hits)
     if top < RELEVANCE_MIN:
-        return GradeReport(Grade.WEAK, top, fresh, len(hits),
-                           f"top relevance {top:.2f} below {RELEVANCE_MIN}")
+        return GradeReport(
+            Grade.WEAK, top, fresh, len(hits), f"top relevance {top:.2f} below {RELEVANCE_MIN}"
+        )
     if len(hits) < SUFFICIENCY_MIN_HITS:
-        return GradeReport(Grade.WEAK, top, fresh, len(hits),
-                           "single supporting chunk is not sufficiency")
+        return GradeReport(
+            Grade.WEAK, top, fresh, len(hits), "single supporting chunk is not sufficiency"
+        )
     if not fresh:
         return GradeReport(Grade.WEAK, top, fresh, len(hits), "hits are past the freshness SLA")
     return GradeReport(Grade.PASS, top, fresh, len(hits), "relevant, fresh and sufficient")
@@ -131,7 +133,7 @@ def retrieve(
     web_search: Callable[[str], list[Hit]] | None = None,
     freshness_demanded: bool = False,
 ) -> RetrievalResult:
-    collection = router.get(agent, corpus)   # raises if out of scope
+    collection = router.get(agent, corpus)  # raises if out of scope
     trace: list[str] = []
     q = query
 
@@ -147,14 +149,16 @@ def retrieve(
 
     # Only now may web search fire, and only if this call opted in.
     if allow_web and web_search is not None:
-        trigger = (WebTrigger.EXPLICIT_FRESHNESS if freshness_demanded
-                   else WebTrigger.GRADER_INSUFFICIENT)
+        trigger = (
+            WebTrigger.EXPLICIT_FRESHNESS if freshness_demanded else WebTrigger.GRADER_INSUFFICIENT
+        )
         web_hits = web_search(query)
         trace.append(f"web search fired: {trigger.value}, {len(web_hits)} results")
         if web_hits:
             report = grade(web_hits, query, None, None)
-            return RetrievalResult(web_hits, [h.chunk for h in web_hits], report,
-                                   MAX_REWRITES, trigger, False, trace)
+            return RetrievalResult(
+                web_hits, [h.chunk for h in web_hits], report, MAX_REWRITES, trigger, False, trace
+            )
 
     trace.append("refused: insufficient evidence after retries")
     return RetrievalResult([], [], report, MAX_REWRITES, None, True, trace)

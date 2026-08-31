@@ -44,15 +44,18 @@ class Benchmark:
 
     def cost_myr(self, per_mtok_usd: Decimal, fx: Decimal) -> tuple[Decimal, Decimal]:
         def rm(t: int) -> Decimal:
-            return (Decimal(t) / Decimal(1_000_000) * per_mtok_usd * fx)
+            return Decimal(t) / Decimal(1_000_000) * per_mtok_usd * fx
+
         return rm(self.subgraph_tokens), rm(self.corpus_tokens)
 
     def describe(self) -> str:
         verdict = "answered" if self.answered else "NOT answered"
-        return (f"{self.question}\n"
-                f"    subgraph {self.subgraph_tokens:>7} tokens ({self.hops} hops, {verdict})\n"
-                f"    corpus   {self.corpus_tokens:>7} tokens\n"
-                f"    ratio    {self.ratio:>7.1f}x")
+        return (
+            f"{self.question}\n"
+            f"    subgraph {self.subgraph_tokens:>7} tokens ({self.hops} hops, {verdict})\n"
+            f"    corpus   {self.corpus_tokens:>7} tokens\n"
+            f"    ratio    {self.ratio:>7.1f}x"
+        )
 
 
 def path_context(graph: EntityGraph, path: Path, corpus: CuratedCorpus) -> str:
@@ -71,8 +74,9 @@ def corpus_context(corpus: CuratedCorpus) -> str:
     return "\n".join(corpus.all_chunks())
 
 
-def run(graph: EntityGraph, corpus: CuratedCorpus, *, asof: date,
-        questions: list[tuple[str, str, str]]) -> list[Benchmark]:
+def run(
+    graph: EntityGraph, corpus: CuratedCorpus, *, asof: date, questions: list[tuple[str, str, str]]
+) -> list[Benchmark]:
     """questions is [(label, start_node, target_node)]."""
     whole = estimate_tokens(corpus_context(corpus))
     out: list[Benchmark] = []
@@ -82,22 +86,33 @@ def run(graph: EntityGraph, corpus: CuratedCorpus, *, asof: date,
             out.append(Benchmark(label, whole, whole, 0, False))
             continue
         best = paths[0]
-        out.append(Benchmark(label, estimate_tokens(path_context(graph, best, corpus)),
-                             whole, best.n_hops, True))
+        out.append(
+            Benchmark(
+                label, estimate_tokens(path_context(graph, best, corpus)), whole, best.n_hops, True
+            )
+        )
     return out
 
 
 def describe(results: list[Benchmark]) -> str:
-    lines = ["TOKEN BENCHMARK - subgraph vs whole corpus",
-             "(estimated at 4 chars/token, offline; not a billing figure)", ""]
+    lines = [
+        "TOKEN BENCHMARK - subgraph vs whole corpus",
+        "(estimated at 4 chars/token, offline; not a billing figure)",
+        "",
+    ]
     lines += [r.describe() for r in results]
     answered = [r for r in results if r.answered]
     if answered:
         avg = sum(r.ratio for r in answered) / len(answered)
-        lines += ["", f"{len(answered)}/{len(results)} answerable from a path, "
-                      f"averaging {avg:.1f}x fewer tokens than the whole corpus."]
+        lines += [
+            "",
+            f"{len(answered)}/{len(results)} answerable from a path, "
+            f"averaging {avg:.1f}x fewer tokens than the whole corpus.",
+        ]
     unanswered = [r for r in results if not r.answered]
     if unanswered:
-        lines.append(f"{len(unanswered)} not answerable: the graph saves nothing on a "
-                     "question it cannot reach, and says so rather than guessing.")
+        lines.append(
+            f"{len(unanswered)} not answerable: the graph saves nothing on a "
+            "question it cannot reach, and says so rather than guessing."
+        )
     return "\n".join(lines)

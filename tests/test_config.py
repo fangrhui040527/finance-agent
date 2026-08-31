@@ -4,13 +4,14 @@
 The obvious config implementation - read TOML, splat into the dataclass - breaks
 that promise silently. These tests are the promise.
 """
+
 import re
 from decimal import Decimal
 from pathlib import Path
 
 import pytest
 
-from core.config import Config, ConfigError, HARD_BOUNDS, SEARCH, find, load
+from core.config import HARD_BOUNDS, Config, ConfigError, find, load
 from engines.risk.concentration import Limits
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -24,6 +25,7 @@ def write(tmp_path, body):
 
 # -- the shipped file --------------------------------------------------------
 
+
 def test_the_shipped_config_loads():
     c = load(ROOT / "config.toml")
     assert c.base_currency == "MYR"
@@ -32,13 +34,25 @@ def test_the_shipped_config_loads():
 
 def test_absent_config_gives_documented_defaults_not_zero_limits():
     """The dangerous failure would be a missing file meaning no limits at all."""
-    c = load(Path("/nonexistent/config.toml")) if False else Config(
-        base_currency="MYR", markets=("XKLS",), fx_myr_per_usd=Decimal("4.15"),
-        risk_per_trade=Decimal("0.0075"), target_volatility=Decimal("0.20"),
-        max_participation=Decimal("0.05"), limits=Limits(),
-        emergency_months=6, debt_hurdle=Decimal("0.08"),
-        daily_budget_myr=Decimal("25"), per_question_budget_myr=Decimal("5"),
-        database="data/learning.db", min_graded_for_calibration=30)
+    c = (
+        load(Path("/nonexistent/config.toml"))
+        if False
+        else Config(
+            base_currency="MYR",
+            markets=("XKLS",),
+            fx_myr_per_usd=Decimal("4.15"),
+            risk_per_trade=Decimal("0.0075"),
+            target_volatility=Decimal("0.20"),
+            max_participation=Decimal("0.05"),
+            limits=Limits(),
+            emergency_months=6,
+            debt_hurdle=Decimal("0.08"),
+            daily_budget_myr=Decimal("25"),
+            per_question_budget_myr=Decimal("5"),
+            database="data/learning.db",
+            min_graded_for_calibration=30,
+        )
+    )
     assert c.limits.single_name == 0.08
     assert c.limits.min_effective_bets == 5.0
 
@@ -50,6 +64,7 @@ def test_an_empty_file_still_produces_real_limits(tmp_path):
 
 
 # -- what a file may not do --------------------------------------------------
+
 
 def test_config_cannot_raise_the_single_name_cap(tmp_path):
     with pytest.raises(ConfigError, match="cannot be raised above 15%"):
@@ -91,8 +106,7 @@ def test_config_cannot_reach_a_market_with_no_adapter(tmp_path):
     """
     from markets.registry import supported
 
-    unsupported = next(m for m in ("XFRA", "XETR", "XAMS", "XPAR")
-                       if m not in supported())
+    unsupported = next(m for m in ("XFRA", "XETR", "XAMS", "XPAR") if m not in supported())
     with pytest.raises(ConfigError, match="does not create one"):
         load(write(tmp_path, f'[account]\nmarkets = ["XKLS", "{unsupported}"]\n'))
 
@@ -115,6 +129,7 @@ def test_a_non_numeric_bound_is_refused(tmp_path):
 
 
 # -- what a file may do ------------------------------------------------------
+
 
 def test_tightening_a_limit_is_always_allowed(tmp_path):
     c = load(write(tmp_path, "[limits]\nsingle_name = 0.04\nmin_effective_bets = 8.0\n"))
@@ -143,6 +158,7 @@ def test_the_local_override_is_gitignored():
 
 # -- the bounds themselves ---------------------------------------------------
 
+
 def test_every_hard_bound_explains_itself():
     for key, lo, hi, why in HARD_BOUNDS:
         assert lo < hi, key
@@ -152,6 +168,7 @@ def test_every_hard_bound_explains_itself():
 def test_the_shipped_config_sits_inside_every_hard_bound():
     """A shipped default outside its own bound would fail on first run."""
     import tomllib
+
     data = tomllib.loads((ROOT / "config.toml").read_text())
     for key, lo, hi, _ in HARD_BOUNDS:
         node = data
@@ -192,8 +209,14 @@ def test_the_batch_file_covers_every_make_target():
 
 def test_the_batch_file_exposes_the_two_clis():
     bat = BAT.read_text()
-    for token in ("ask.py why", "ask.py plan", "predict.py log",
-                  "predict.py due", "predict.py grade", "predict.py status"):
+    for token in (
+        "ask.py why",
+        "ask.py plan",
+        "predict.py log",
+        "predict.py due",
+        "predict.py grade",
+        "predict.py status",
+    ):
         assert token in bat, f"run.bat does not expose {token}"
 
 
@@ -205,11 +228,13 @@ def test_the_batch_file_refuses_to_run_without_a_venv():
 
 # -- no re-duplication -------------------------------------------------------
 
+
 def test_the_planning_rate_has_one_python_source():
     """It was in four places: config.toml, .env.example, a literal in the config
     loader, and the ledger constant - with no code reading the env var at all.
     Editing .env did nothing, which is worse than the value being wrong."""
     from core.provenance.ledger import DEFAULT_FX_MYR_PER_USD
+
     loader = (ROOT / "core" / "config.py").read_text()
     assert "DEFAULT_FX_MYR_PER_USD" in loader
     assert "4.15" not in loader, "the loader must not restate the rate literal"
@@ -228,32 +253,38 @@ def test_every_env_example_key_is_actually_used_somewhere():
     """A key that sets nothing is worse than a missing key: it reads as
     configured."""
     import re
-    import subprocess
+
+    from tests._repo import iter_source_files
+
     env = (ROOT / ".env.example").read_text()
     keys = re.findall(r"^([A-Z_]+)=", env, re.M)
     compose = (ROOT / "infra" / "docker-compose.yml").read_text()
     # Compose is not the only consumer: an adapter that reads os.environ counts
     # too. Checking only compose forces a growing exemption list, and the
     # exemptions are exactly where an unread key would hide.
-    src = subprocess.run(["git", "grep", "-lF", "--", "os.environ"], cwd=ROOT,
-                         capture_output=True, text=True).stdout
-    code = "".join((ROOT / f).read_text() for f in src.split())
-    unused = [k for k in keys
-              if k not in compose and k not in code and k not in {"ANTHROPIC_API_KEY"}]
+    code = "".join(
+        p.read_text(encoding="utf-8", errors="replace")
+        for p in iter_source_files()
+        if "os.environ" in p.read_text(encoding="utf-8", errors="replace")
+    )
+    unused = [
+        k for k in keys if k not in compose and k not in code and k not in {"ANTHROPIC_API_KEY"}
+    ]
     assert not unused, f"env keys referenced nowhere: {unused}"
 
 
 def test_no_package_contains_only_an_init_file():
     """knowledge/provenance/ was one: created in P0, superseded by
     core/provenance/, and left behind as an importable empty package."""
-    import subprocess
-    files = subprocess.run(["git", "ls-files", "*/__init__.py"], cwd=ROOT,
-                           capture_output=True, text=True).stdout.split()
+    from tests._repo import iter_source_files
+
+    inits = [p for p in iter_source_files() if p.name == "__init__.py"]
     empty = []
-    for init in files:
-        pkg = str(Path(init).parent)
-        siblings = subprocess.run(["git", "ls-files", f"{pkg}/*.py"], cwd=ROOT,
-                                  capture_output=True, text=True).stdout.split()
+    for init in inits:
+        pkg = init.parent
+        # Recursive on purpose: git's `pkg/*.py` pathspec spans `/`, so a
+        # package whose only children are subpackages was never flagged.
+        siblings = [p for p in pkg.rglob("*.py") if "__pycache__" not in p.parts]
         if len(siblings) == 1:
-            empty.append(pkg)
+            empty.append(pkg.relative_to(ROOT).as_posix())
     assert not empty, f"packages with nothing in them: {empty}"

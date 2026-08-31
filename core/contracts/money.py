@@ -33,12 +33,10 @@ class Money(BaseModel):
         summed like one."""
         v = v.upper()
         if not v.isalpha():
-            raise ValueError(
-                f"{v!r} is not a currency code; ISO 4217 codes are three letters"
-            )
+            raise ValueError(f"{v!r} is not a currency code; ISO 4217 codes are three letters")
         return v
 
-    def convert(self, to: str, rate: Decimal, asof: datetime) -> "Money":
+    def convert(self, to: str, rate: Decimal, asof: datetime | None) -> Money:
         """Convert at an explicit rate. There is no implicit/global rate lookup.
 
         The rate must be strictly positive. A negative rate turned USD 100 into

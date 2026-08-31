@@ -18,8 +18,7 @@ from pathlib import Path
 import yaml
 
 from knowledge.graph.entity_graph import Confidence, EdgeKind, NodeKind
-from knowledge.graph.extractors.base import (
-    Extractor, company_node, edge, node, sorted_payload)
+from knowledge.graph.extractors.base import Extractor, company_node, edge, node, sorted_payload
 from knowledge.graph.ids import node_id
 
 DATA = Path(__file__).resolve().parents[1] / "data" / "sectors.yaml"
@@ -45,10 +44,16 @@ class SectorExtractor(Extractor):
                 sub_node = node(NodeKind.SUBSECTOR, sub)
                 nodes.append(sub_node)
                 sub_to_sector[sub] = sector
-                edges.append(edge(
-                    sub_node["id"], s_node["id"], EdgeKind.CLASSIFIED_IN,
-                    doc=f"{DOC}#{sub_node['id']}", confidence=Confidence.EXTRACTED,
-                    valid_from=_ASSERTED_FROM))
+                edges.append(
+                    edge(
+                        sub_node["id"],
+                        s_node["id"],
+                        EdgeKind.CLASSIFIED_IN,
+                        doc=f"{DOC}#{sub_node['id']}",
+                        confidence=Confidence.EXTRACTED,
+                        valid_from=_ASSERTED_FROM,
+                    )
+                )
 
         for iid, spec in sorted((raw.get("companies") or {}).items()):
             sub = spec["subsector"]
@@ -59,11 +64,17 @@ class SectorExtractor(Extractor):
                 )
             cid = node_id(NodeKind.COMPANY, iid)
             nodes.append(company_node(iid))
-            edges.append(edge(
-                cid, node_id(NodeKind.SUBSECTOR, sub), EdgeKind.CLASSIFIED_IN,
-                doc=f"{DOC}#{cid}", confidence=Confidence.EXTRACTED,
-                valid_from=_as_date(spec["valid_from"]),
-                valid_to=_as_date(spec.get("valid_to"))))
+            edges.append(
+                edge(
+                    cid,
+                    node_id(NodeKind.SUBSECTOR, sub),
+                    EdgeKind.CLASSIFIED_IN,
+                    doc=f"{DOC}#{cid}",
+                    confidence=Confidence.EXTRACTED,
+                    valid_from=_required_date(iid, spec["valid_from"]),
+                    valid_to=_as_date(spec.get("valid_to")),
+                )
+            )
         return sorted_payload(nodes, edges)
 
 
@@ -76,3 +87,11 @@ def _as_date(v) -> date | None:
     if v is None or isinstance(v, date):
         return v
     return date.fromisoformat(str(v))
+
+
+def _required_date(owner: str, v) -> date:
+    """A classification with no start date cannot be bitemporal. Refuse, not guess."""
+    d = _as_date(v)
+    if d is None:
+        raise ValueError(f"{owner}: valid_from is required and must be a date")
+    return d

@@ -6,6 +6,10 @@ REM argument to see what is available.
 REM
 REM   run install     first time setup
 REM   run test        the full suite
+REM   run lint        ruff check + format check
+REM   run fmt         ruff autofix + format
+REM   run typecheck   pyright
+REM   run cov         tests with the coverage gate
 REM   run verify      the whole pipeline on mock data, no network, no keys
 REM   run config      show settings and where they came from
 REM   run why ...     decompose a move before naming a cause
@@ -48,6 +52,12 @@ goto collect
 :dispatch
 if /I "%CMD%"=="install" goto install
 if /I "%CMD%"=="test"    goto test
+if /I "%CMD%"=="lint"    goto lint
+if /I "%CMD%"=="fmt"     goto fmt
+if /I "%CMD%"=="typecheck" goto typecheck
+if /I "%CMD%"=="cov"     goto cov
+if /I "%CMD%"=="doctor"  goto doctor
+if /I "%CMD%"=="web"     goto web
 if /I "%CMD%"=="verify"  goto verify
 if /I "%CMD%"=="stress"  goto stress
 if /I "%CMD%"=="config"  goto config
@@ -77,14 +87,37 @@ if errorlevel 1 (
   echo   powershell -c "irm https://astral.sh/uv/install.ps1 ^| iex"
   exit /b 1
 )
-uv venv --python 3.11 .venv || exit /b 1
-uv pip install --python "%PY%" -e ".[dev]" || exit /b 1
+uv sync --frozen --python 3.11 || exit /b 1
 echo.
 echo Installed. Next:  run verify
 goto :eof
 
 :test
 "%PY%" -m pytest
+goto :eof
+
+:lint
+"%PY%" -m ruff check . && "%PY%" -m ruff format --check .
+goto :eof
+
+:fmt
+"%PY%" -m ruff check --fix . && "%PY%" -m ruff format .
+goto :eof
+
+:typecheck
+"%PY%" -m pyright
+goto :eof
+
+:cov
+"%PY%" -m pytest --cov --cov-report=term-missing
+goto :eof
+
+:doctor
+"%PY%" ask.py doctor%ARGS%
+goto :eof
+
+:web
+"%PY%" -m web.serve
 goto :eof
 
 :verify
@@ -164,6 +197,9 @@ echo FinPlanet Module 5 - The Analyst Mind
 echo.
 echo   run install                       create .venv and install
 echo   run test                          the full suite
+echo   run lint ^| fmt ^| typecheck ^| cov  quality gates
+echo   run doctor                        preflight checks
+echo   run web                           the web app on 127.0.0.1:8765
 echo   run verify                        whole pipeline on mock data
 echo   run stress                        adversarial stress suite
 echo   run config                        settings, and where they came from

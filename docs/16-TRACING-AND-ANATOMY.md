@@ -115,3 +115,18 @@ deterministic, and a trace showing A0 reasoning would mean that changed.
 **a bug does not look like a crash, it looks like a slightly-too-humble answer,
 forever.** The trace is how you tell the difference between honest uncertainty
 and a gate that quietly stopped firing.
+
+---
+
+## Added in the 2026-08-31 hardening pass
+
+- Every run directory now carries `manifest.json` - a methodology hash over
+  the system prompts, the registry, the tool surface and package versions
+  (never run_id or time). Equal hash = equal methodology; `RunManifest.diff`
+  names what changed between two runs.
+- Retention: `Tracer.prune` keeps the newest 20 runs within 14 days and runs
+  on every start. The in-memory event list is bounded (the FILE is complete).
+- `FINPLANET_TRACE_SYNC=0` batches flushes for long unattended runs; the
+  default remains flush-per-event so a crash still leaves everything on disk.
+- Each `llm_call` event records the API `request_id` alongside tokens, cache
+  reads/writes and cost.

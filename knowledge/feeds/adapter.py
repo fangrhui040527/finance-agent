@@ -13,12 +13,16 @@ from __future__ import annotations
 
 import json
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
-from datetime import datetime, timedelta, timezone
+from dataclasses import dataclass
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
+from core.net.breaker import CircuitBreaker
 from knowledge.news.features import (
-    Article, FeatureExtractor, LexiconExtractor, near_duplicate_hash,
+    Article,
+    FeatureExtractor,
+    LexiconExtractor,
+    near_duplicate_hash,
 )
 
 
@@ -44,16 +48,18 @@ class IngestStats:
     escalated: int = 0
 
     def __str__(self) -> str:
-        return (f"fetched {self.fetched}, kept {self.kept}, "
-                f"duplicates {self.duplicates}, unlinked {self.unlinked}, "
-                f"escalated {self.escalated}")
+        return (
+            f"fetched {self.fetched}, kept {self.kept}, "
+            f"duplicates {self.duplicates}, unlinked {self.unlinked}, "
+            f"escalated {self.escalated}"
+        )
 
 
 class FeedAdapter(ABC):
     """One source. Subclass and implement _fetch_raw; inherit everything else."""
 
     name: str
-    trust: str = "general_news"     # keys into catalyst.SOURCE_TRUST
+    trust: str = "general_news"  # keys into catalyst.SOURCE_TRUST
     cadence: timedelta = timedelta(minutes=15)
 
     def __init__(self, extractor: FeatureExtractor | None = None) -> None:
@@ -99,8 +105,9 @@ class FeedAdapter(ABC):
                 stats.unlinked += 1
 
             art.features = self.extractor.extract(art.text, art.instruments)
-            if should_escalate(art.features, art.instruments,
-                               holdings or set(), watchlist or set()):
+            if should_escalate(
+                art.features, art.instruments, holdings or set(), watchlist or set()
+            ):
                 stats.escalated += 1
             out.append(art)
             stats.kept += 1
@@ -130,8 +137,12 @@ class FixtureFeed(FeedAdapter):
     name = "fixture"
     trust = "curated_news"
 
-    def __init__(self, path: Path | str | None = None, records: list[dict] | None = None,
-                 extractor: FeatureExtractor | None = None) -> None:
+    def __init__(
+        self,
+        path: Path | str | None = None,
+        records: list[dict] | None = None,
+        extractor: FeatureExtractor | None = None,
+    ) -> None:
         super().__init__(extractor)
         self._path = Path(path) if path else None
         self._inline = records or []
@@ -148,16 +159,16 @@ class FixtureFeed(FeedAdapter):
         for row in self._rows()[:limit]:
             ts = datetime.fromisoformat(row["published_at"])
             if ts.tzinfo is None:
-                ts = ts.replace(tzinfo=timezone.utc)
+                ts = ts.replace(tzinfo=UTC)
             if ts >= since:
-                out.append(RawRecord(self.name, row["id"], datetime.now(timezone.utc), row))
+                out.append(RawRecord(self.name, row["id"], datetime.now(UTC), row))
         return out
 
     def _to_article(self, rec: RawRecord) -> Article | None:
         p = rec.payload
         ts = datetime.fromisoformat(p["published_at"])
         if ts.tzinfo is None:
-            ts = ts.replace(tzinfo=timezone.utc)
+            ts = ts.replace(tzinfo=UTC)
         return Article(
             doc_id=f"{self.name}:{p['id']}",
             title=p.get("title", ""),
@@ -217,6 +228,7 @@ class GdeltFeed(FeedAdapter):
         countries: tuple[str, ...] = (),
         user_agent: str = "",
         opener=None,
+        sleep=None,
         extractor: FeatureExtractor | None = None,
     ) -> None:
         import os
@@ -227,20 +239,29 @@ class GdeltFeed(FeedAdapter):
         self.countries = countries
         # GDELT_USER_AGENT should carry a real contact address. Optional here,
         # mandatory at EDGAR next, so the habit is worth forming on the easy one.
-        self.user_agent = user_agent or os.environ.get(
-            "GDELT_USER_AGENT", self.DEFAULT_USER_AGENT
-        )
+        self.user_agent = user_agent or os.environ.get("GDELT_USER_AGENT", self.DEFAULT_USER_AGENT)
+        # Measured 2026-08-31: from one network api.gdeltproject.org answers on
+        # port 80 and times out on 443. The operator gets a switch, with the
+        # trade-off named in .env.example: plain HTTP has no transport integrity.
+        self.doc_api = os.environ.get("GDELT_DOC_API", "").strip() or self.DOC_API
         self._opener = opener
+        self._sleep = sleep
+        self._breaker = CircuitBreaker("gdelt")
 
     def _timespan(self, since: datetime, now: datetime | None = None) -> str:
         """Whole minutes back from now, never under the documented minimum."""
-        now = now or datetime.now(timezone.utc)
+        now = now or datetime.now(UTC)
         if since.tzinfo is None:
-            since = since.replace(tzinfo=timezone.utc)
+            since = since.replace(tzinfo=UTC)
         span = max(now - since, self.MIN_TIMESPAN)
         return f"{max(1, -(-int(span.total_seconds()) // 60))}min"
 
-    def _url(self, since: datetime, limit: int) -> str:
+    def _url(
+        self,
+        since: datetime,
+        limit: int,
+        window: tuple[datetime, datetime] | None = None,
+    ) -> str:
         from urllib.parse import urlencode
 
         terms = [self.query] if self.query else []
@@ -254,26 +275,69 @@ class GdeltFeed(FeedAdapter):
             "mode": "artlist",
             "format": "json",
             "sort": "datedesc",
-            "timespan": self._timespan(since),
             "maxrecords": min(max(1, limit), self.MAX_RECORDS),
         }
-        return f"{self.DOC_API}?{urlencode(params)}"
+        if window is not None:
+            # The DOC API has no cursor. Paging is done by slicing TIME:
+            # startdatetime/enddatetime bound one slice each.
+            start, end = window
+            params["startdatetime"] = start.astimezone(UTC).strftime("%Y%m%d%H%M%S")
+            params["enddatetime"] = end.astimezone(UTC).strftime("%Y%m%d%H%M%S")
+        else:
+            params["timespan"] = self._timespan(since)
+        return f"{self.doc_api}?{urlencode(params)}"
 
     def _fetch_raw(self, since: datetime, limit: int) -> list[RawRecord]:
+        if limit <= self.MAX_RECORDS:
+            return self._fetch_page(self._url(since, limit))
+        # More than one page: slice [since, now] into equal windows and dedupe
+        # by url. GDELT has no cursor - time is the only pagination there is.
+        now = datetime.now(UTC)
+        if since.tzinfo is None:
+            since = since.replace(tzinfo=UTC)
+        pages = -(-limit // self.MAX_RECORDS)
+        step = (now - since) / pages
+        seen: set[str] = set()
+        out: list[RawRecord] = []
+        for i in range(pages):
+            lo, hi = since + step * i, since + step * (i + 1)
+            for rec in self._fetch_page(self._url(since, self.MAX_RECORDS, window=(lo, hi))):
+                key = str(rec.payload.get("url", ""))
+                if key and key in seen:
+                    continue
+                seen.add(key)
+                out.append(rec)
+                if len(out) >= limit:
+                    return out
+        return out
+
+    def _fetch_page(self, url: str) -> list[RawRecord]:
         import urllib.error
         import urllib.request
 
-        url = self._url(since, limit)
+        from core.net.breaker import CircuitOpen
+        from core.net.retry import with_retry
+
         opener = self._opener or urllib.request.urlopen
         req = urllib.request.Request(url, headers={"User-Agent": self.user_agent})
 
-        try:
+        def _transport():
             with opener(req, timeout=self.TIMEOUT) as resp:
-                body = resp.read()
-        except urllib.error.URLError as e:                      # includes HTTPError
+                return resp.read()
+
+        kwargs = {"sleep": self._sleep} if self._sleep is not None else {}
+        try:
+            self._breaker.before_call()
+            body = with_retry(_transport, **kwargs)
+        except CircuitOpen as e:
+            raise FeedError(str(e)) from e
+        except urllib.error.URLError as e:  # includes HTTPError after retries
+            self._breaker.record_failure(e)
             raise FeedError(f"GDELT fetch failed: {e}") from e
         except OSError as e:
+            self._breaker.record_failure(e)
             raise FeedError(f"GDELT fetch failed: {e}") from e
+        self._breaker.record_success()
 
         if isinstance(body, bytes):
             body = body.decode("utf-8", errors="replace")
@@ -281,8 +345,7 @@ class GdeltFeed(FeedAdapter):
             payload = json.loads(body)
         except json.JSONDecodeError as e:
             raise FeedError(
-                f"GDELT returned non-JSON, which is how it reports errors: "
-                f"{body[:200]!r}"
+                f"GDELT returned non-JSON, which is how it reports errors: {body[:200]!r}"
             ) from e
 
         if not isinstance(payload, dict) or "articles" not in payload:
@@ -292,7 +355,7 @@ class GdeltFeed(FeedAdapter):
         if not isinstance(rows, list):
             raise FeedError(f"GDELT articles is not a list: {type(rows).__name__}")
 
-        fetched = datetime.now(timezone.utc)
+        fetched = datetime.now(UTC)
         return [
             RawRecord(self.name, row.get("url", ""), fetched, row)
             for row in rows
@@ -320,7 +383,7 @@ REGISTRY: dict[str, type[FeedAdapter]] = {"fixture": FixtureFeed, "gdelt": Gdelt
 def _smoke(argv: list[str] | None = None) -> int:
     """Hand-run smoke test. Never in CI - CI stays offline by design.
 
-        python -m knowledge.feeds.adapter --gdelt --minutes 60 --limit 5
+    python -m knowledge.feeds.adapter --gdelt --minutes 60 --limit 5
     """
     import argparse
 
@@ -339,7 +402,7 @@ def _smoke(argv: list[str] | None = None) -> int:
         query=args.query,
         languages=tuple(c for c in args.lang.split(",") if c),
     )
-    since = datetime.now(timezone.utc) - timedelta(minutes=args.minutes)
+    since = datetime.now(UTC) - timedelta(minutes=args.minutes)
     records = feed.fetch(since, limit=args.limit)
     articles, stats = feed.normalize(records)
 
@@ -350,5 +413,5 @@ def _smoke(argv: list[str] | None = None) -> int:
     return 0
 
 
-if __name__ == "__main__":                                      # pragma: no cover
+if __name__ == "__main__":  # pragma: no cover
     raise SystemExit(_smoke())

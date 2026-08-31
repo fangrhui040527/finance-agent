@@ -34,13 +34,19 @@ from decimal import Decimal
 
 from core.market.calendar import SessionCalendar, SessionWindow
 from markets.contract import (
-    AccountingStandard, FeeLeg, FeeSchedule, KnownAtStrategy, MarketAdapter,
+    AccountingStandard,
+    FeeLeg,
+    FeeSchedule,
+    KnownAtStrategy,
+    MarketAdapter,
 )
 
-KRX_FEES = FeeSchedule((
-    FeeLeg("brokerage", Decimal("0.0015"), minimum=Decimal("1000")),
-    FeeLeg("securities_transaction_tax", Decimal("0.0015"), per_side=False),
-))
+KRX_FEES = FeeSchedule(
+    (
+        FeeLeg("brokerage", Decimal("0.0015"), minimum=Decimal("1000")),
+        FeeLeg("securities_transaction_tax", Decimal("0.0015"), per_side=False),
+    )
+)
 
 TICKS = (
     (Decimal("2000"), Decimal("1")),
@@ -58,7 +64,7 @@ class XKRX(MarketAdapter):
     country = "KR"
     currency = "KRW"
     tier = 2
-    accounting_standard = AccountingStandard.IFRS      # K-IFRS
+    accounting_standard = AccountingStandard.IFRS  # K-IFRS
     local_index = "KOSPI"
     regulator = "Financial Services Commission of Korea"
     settlement_days = 2

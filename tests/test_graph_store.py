@@ -5,13 +5,19 @@ cannot answer "what did we believe on 2026-03-01", so every conclusion drawn
 through a since-changed edge becomes unauditable - the same reason the
 provenance ledger refuses UPDATE and DELETE.
 """
+
 import sqlite3
 from datetime import date
 
 import pytest
 
 from knowledge.graph.entity_graph import (
-    Confidence, Edge, EdgeKind, EntityGraph, Node, NodeKind,
+    Confidence,
+    Edge,
+    EdgeKind,
+    EntityGraph,
+    Node,
+    NodeKind,
 )
 from knowledge.graph.store import DETERMINISTIC, EdgeNotOpen, GraphStore
 
@@ -21,14 +27,16 @@ ASOF = date(2026, 8, 25)
 
 def store_with(*, path=":memory:"):
     s = GraphStore(path)
-    for nid, kind, lbl in [("CO:a", NodeKind.COMPANY, "Alpha"),
-                           ("CO:b", NodeKind.COMPANY, "Beta"),
-                           ("SEC:s", NodeKind.SECTOR, "Shipping")]:
+    for nid, kind, lbl in [
+        ("CO:a", NodeKind.COMPANY, "Alpha"),
+        ("CO:b", NodeKind.COMPANY, "Beta"),
+        ("SEC:s", NodeKind.SECTOR, "Shipping"),
+    ]:
         s.add_node(Node(nid, kind, lbl, {"mic": "XKLS"}))
-    s.add_edge(Edge("CO:a", "CO:b", EdgeKind.SUPPLIES, 0.9, "doc:1",
-                    Confidence.EXTRACTED, OPENED))
-    s.add_edge(Edge("SEC:s", "CO:a", EdgeKind.CLASSIFIED_IN, 1.0, "doc:2",
-                    Confidence.INFERRED, OPENED))
+    s.add_edge(Edge("CO:a", "CO:b", EdgeKind.SUPPLIES, 0.9, "doc:1", Confidence.EXTRACTED, OPENED))
+    s.add_edge(
+        Edge("SEC:s", "CO:a", EdgeKind.CLASSIFIED_IN, 1.0, "doc:2", Confidence.INFERRED, OPENED)
+    )
     return s
 
 
@@ -37,9 +45,14 @@ def test_a_stored_graph_reloads_with_everything_that_makes_an_edge_citable():
     assert isinstance(g, EntityGraph)
     e = g.neighbours("CO:a")[0]
     assert (e.kind, e.weight, e.source_doc_id, e.confidence, e.valid_from) == (
-        EdgeKind.SUPPLIES, 0.9, "doc:1", Confidence.EXTRACTED, OPENED)
+        EdgeKind.SUPPLIES,
+        0.9,
+        "doc:1",
+        Confidence.EXTRACTED,
+        OPENED,
+    )
     assert e.citable
-    assert not g.neighbours("SEC:s")[0].citable   # inferred survives the round trip
+    assert not g.neighbours("SEC:s")[0].citable  # inferred survives the round trip
 
 
 def test_node_metadata_and_labels_survive_the_round_trip():
@@ -51,11 +64,13 @@ def test_node_metadata_and_labels_survive_the_round_trip():
 def test_an_edge_cannot_be_stored_before_the_nodes_it_joins():
     s = GraphStore()
     with pytest.raises(KeyError, match="must be stored before"):
-        s.add_edge(Edge("CO:ghost", "CO:other", EdgeKind.SUPPLIES, 1.0, "d",
-                        Confidence.EXTRACTED, OPENED))
+        s.add_edge(
+            Edge("CO:ghost", "CO:other", EdgeKind.SUPPLIES, 1.0, "d", Confidence.EXTRACTED, OPENED)
+        )
 
 
 # -- append-only -------------------------------------------------------------
+
 
 def test_an_edge_cannot_be_deleted():
     s = store_with()
@@ -112,12 +127,12 @@ def test_a_rerun_cannot_reopen_an_edge_that_has_since_been_closed():
     """Idempotent insert means the closed row wins by already being there."""
     s = store_with()
     s.close_edge("CO:a", "CO:b", EdgeKind.SUPPLIES, OPENED, date(2026, 6, 1))
-    s.add_edge(Edge("CO:a", "CO:b", EdgeKind.SUPPLIES, 0.9, "doc:1",
-                    Confidence.EXTRACTED, OPENED))
+    s.add_edge(Edge("CO:a", "CO:b", EdgeKind.SUPPLIES, 0.9, "doc:1", Confidence.EXTRACTED, OPENED))
     assert s.load().neighbours("CO:a")[0].valid_to == date(2026, 6, 1)
 
 
 # -- as-of reads -------------------------------------------------------------
+
 
 def test_live_edges_answers_what_the_graph_asserted_on_one_date():
     s = store_with()
@@ -129,13 +144,13 @@ def test_live_edges_answers_what_the_graph_asserted_on_one_date():
 
 def test_an_edge_with_no_start_date_is_stored_but_never_live():
     s = store_with()
-    s.add_edge(Edge("CO:b", "SEC:s", EdgeKind.CLASSIFIED_IN, 1.0, "d",
-                    Confidence.INFERRED))
+    s.add_edge(Edge("CO:b", "SEC:s", EdgeKind.CLASSIFIED_IN, 1.0, "d", Confidence.INFERRED))
     assert s.counts()["edges"] == 3
     assert all(e.src != "CO:b" for e in s.live_edges(ASOF))
 
 
 # -- determinism and tiers ---------------------------------------------------
+
 
 def test_building_the_same_graph_twice_produces_the_same_database(tmp_path):
     """The determinism guarantee, in the currency that matters: bytes."""
@@ -143,8 +158,9 @@ def test_building_the_same_graph_twice_produces_the_same_database(tmp_path):
     second = tmp_path / "b.db"
     for p in (first, second):
         s = store_with(path=str(p))
-        s.add_edge(Edge("CO:a", "CO:b", EdgeKind.SUPPLIES, 0.9, "doc:1",
-                        Confidence.EXTRACTED, OPENED))     # a redundant re-run
+        s.add_edge(
+            Edge("CO:a", "CO:b", EdgeKind.SUPPLIES, 0.9, "doc:1", Confidence.EXTRACTED, OPENED)
+        )  # a redundant re-run
         s.close()
     assert first.read_bytes() == second.read_bytes()
 
@@ -159,8 +175,10 @@ def test_a_deterministic_rebuild_does_not_wipe_another_tiers_edges():
     """Why `tier` is carried before anything writes it. When a model tier
     arrives, a deterministic rebuild must not delete what it proposed."""
     s = store_with()
-    s.add_edge(Edge("CO:b", "SEC:s", EdgeKind.EXPOSED_TO, 0.5, "doc:9",
-                    Confidence.INFERRED, OPENED), tier="semantic")
+    s.add_edge(
+        Edge("CO:b", "SEC:s", EdgeKind.EXPOSED_TO, 0.5, "doc:9", Confidence.INFERRED, OPENED),
+        tier="semantic",
+    )
     assert s.counts()["edges"] == 3
     assert len(s.load(tier=DETERMINISTIC).edges()) == 2
     assert len(s.load(tier="semantic").edges()) == 1
@@ -175,6 +193,7 @@ def test_a_node_may_be_relabelled_because_identity_is_not_an_assertion():
 
 
 # -- durability --------------------------------------------------------------
+
 
 def test_the_graph_outlives_the_process(tmp_path):
     p = tmp_path / "graph.db"
@@ -196,17 +215,18 @@ def test_counts_separates_what_can_back_a_claim_from_what_merely_exists():
 
 # -- tier-scoped re-extraction -----------------------------------------------
 
+
 def test_an_edge_the_sources_stopped_asserting_is_closed_not_deleted():
     """The half of "re-extraction replaces only its own tier" that the module
     docstring promised and nothing implemented. A curated row deleted from the
     yaml used to stay asserted forever."""
     s = store_with()
-    kept = Edge("CO:a", "CO:b", EdgeKind.SUPPLIES, 0.9, "doc:1",
-                Confidence.EXTRACTED, OPENED)
+    kept = Edge("CO:a", "CO:b", EdgeKind.SUPPLIES, 0.9, "doc:1", Confidence.EXTRACTED, OPENED)
     closed = s.close_missing(DETERMINISTIC, [kept], date(2026, 6, 1))
-    assert closed == [("SEC:s", "CO:a", "classified_in", "2020-01-01")] or \
-           closed == [("SEC:s", "CO:a", "classified_in", OPENED.isoformat())]
-    assert s.counts()["edges"] == 2            # nothing deleted
+    assert closed == [("SEC:s", "CO:a", "classified_in", "2020-01-01")] or closed == [
+        ("SEC:s", "CO:a", "classified_in", OPENED.isoformat())
+    ]
+    assert s.counts()["edges"] == 2  # nothing deleted
     assert s.counts()["closed"] == 1
 
 
@@ -214,8 +234,7 @@ def test_what_we_believed_before_the_source_changed_still_answers():
     """Closing preserves history; deleting would make every conclusion drawn
     through that edge unauditable."""
     s = store_with()
-    kept = Edge("CO:a", "CO:b", EdgeKind.SUPPLIES, 0.9, "doc:1",
-                Confidence.EXTRACTED, OPENED)
+    kept = Edge("CO:a", "CO:b", EdgeKind.SUPPLIES, 0.9, "doc:1", Confidence.EXTRACTED, OPENED)
     s.close_missing(DETERMINISTIC, [kept], date(2026, 6, 1))
     assert [e.src for e in s.live_edges(date(2026, 3, 1))] == ["CO:a", "SEC:s"]
     assert [e.src for e in s.live_edges(ASOF)] == ["CO:a"]
@@ -226,8 +245,10 @@ def test_pruning_one_tier_leaves_another_tiers_edges_alone():
     every tier with it, including a semantic one no deterministic source could
     reproduce."""
     s = store_with()
-    s.add_edge(Edge("CO:b", "SEC:s", EdgeKind.EXPOSED_TO, 0.5, "model:1",
-                    Confidence.INFERRED, OPENED), tier="semantic")
+    s.add_edge(
+        Edge("CO:b", "SEC:s", EdgeKind.EXPOSED_TO, 0.5, "model:1", Confidence.INFERRED, OPENED),
+        tier="semantic",
+    )
     s.close_missing(DETERMINISTIC, [], date(2026, 6, 1))
     semantic = [e for e in s.load(tier="semantic").edges()]
     assert len(semantic) == 1 and semantic[0].valid_to is None
@@ -245,16 +266,17 @@ def test_an_already_closed_edge_is_not_closed_twice():
     s.close_edge("CO:a", "CO:b", EdgeKind.SUPPLIES, OPENED, date(2026, 3, 1))
     s.close_missing(DETERMINISTIC, [], date(2026, 6, 1))
     e = next(x for x in s.load().neighbours("CO:a"))
-    assert e.valid_to == date(2026, 3, 1)      # the first close stands
+    assert e.valid_to == date(2026, 3, 1)  # the first close stands
 
 
 def test_an_edge_opening_after_the_closing_date_is_left_open():
     """Closing it would make an interval containing no days, which Edge refuses
     to construct - so the row would be unloadable."""
     s = store_with()
-    s.add_edge(Edge("CO:b", "SEC:s", EdgeKind.SUPPLIES, 1.0, "d",
-                    Confidence.EXTRACTED, date(2027, 1, 1)))
+    s.add_edge(
+        Edge("CO:b", "SEC:s", EdgeKind.SUPPLIES, 1.0, "d", Confidence.EXTRACTED, date(2027, 1, 1))
+    )
     s.close_missing(DETERMINISTIC, [], date(2026, 6, 1))
     late = next(e for e in s.load().neighbours("CO:b"))
     assert late.valid_to is None
-    assert s.load()                            # and the graph still loads
+    assert s.load()  # and the graph still loads

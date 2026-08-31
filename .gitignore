@@ -25,3 +25,6 @@ debug/
 # vendored JavaScript that would live in the history forever.
 node_modules/
 package-lock.json
+
+# QA session artefacts (metered live runs write here); the suite itself is tracked.
+qa/artifacts/
