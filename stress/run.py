@@ -1160,6 +1160,9 @@ def s_mcp():
         "reasoning_report": {"runs": 1, "db": ":memory:"},
         "scorecard": {"db": ":memory:"},
         "investable_capital": {},
+        # An allocation with no names is a refusal, which is the honest answer
+        # and the one this suite is checking the tool can still give.
+        "allocate_capital": {"names": [], "portfolio_value": 200000},
         "log_prediction": {
             "instrument": "MYX:1155",
             "direction": 1,

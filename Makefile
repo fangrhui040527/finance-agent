@@ -5,6 +5,7 @@ fmt:     ; . .venv/bin/activate && ruff check --fix . && ruff format .
 typecheck: ; . .venv/bin/activate && pyright
 doctor:  ; . .venv/bin/activate && python ask.py doctor
 capital: ; . .venv/bin/activate && python ask.py capital
+allocate: ; . .venv/bin/activate && python ask.py allocate
 watch:   ; . .venv/bin/activate && python ask.py watch
 web:     ; . .venv/bin/activate && python -m web.serve
 cov:     ; . .venv/bin/activate && python -m pytest --cov --cov-report=term-missing

@@ -780,6 +780,55 @@ def cmd_capital(a) -> int:
     return 0
 
 
+def cmd_allocate(a) -> int:
+    """Split capital across names YOU nominate. It does not choose them."""
+    from agents.portfolio.agents import TYPED_CAPITAL_NOTE, plan_capital
+    from core.config import load as load_cfg
+    from engines.sizing.allocate import allocate
+    from mcp_server.protocol import ToolError
+    from mcp_server.tools import _candidates
+
+    cfg = load_cfg()
+    if a.from_plan:
+        waterfall, _ = plan_capital(cfg, context())
+        if waterfall is None:
+            print("--from-plan needs a [capital] block. Run `ask.py capital`.", file=sys.stderr)
+            return 2
+        investable = waterfall.investable
+        note = f"capital derived through the waterfall: {investable:,.2f}"
+    elif a.portfolio is None:
+        print("give --portfolio, or --from-plan to derive it from [capital].", file=sys.stderr)
+        return 2
+    else:
+        investable = Decimal(str(a.portfolio))
+        note = TYPED_CAPITAL_NOTE
+
+    if not a.name:
+        print(
+            "nominate names with --name MIC:CODE:PRICE:STOP:ADV:SECTOR (repeatable).\n"
+            "This system does not choose them - it sizes and bounds the ones you bring.",
+            file=sys.stderr,
+        )
+        return 2
+
+    try:
+        candidates = _candidates(list(a.name), fetch=a.fetch, end=None)
+    except ToolError as e:
+        print(str(e), file=sys.stderr)
+        return 2
+
+    result = allocate(
+        investable,
+        candidates,
+        limits=cfg.limits,
+        risk_per_trade=Decimal(str(a.risk_per_trade)),
+        single_name_limit=Decimal(str(a.single_name)),
+    )
+    print(f"  {note}\n")
+    print(result.explain())
+    return 0
+
+
 def cmd_doctor(a) -> int:
     from core.doctor import FAIL, render, run_checks
 
@@ -1182,6 +1231,20 @@ def main(argv=None) -> int:
     al.add_argument("--alerts-db", default="data/alerts.db")
     al.add_argument("--limit", type=int, default=20)
     al.set_defaults(fn=cmd_alerts)
+
+    al2 = sub.add_parser("allocate", help="split capital across names you nominate")
+    al2.add_argument(
+        "--name",
+        action="append",
+        metavar="MIC:CODE:PRICE:STOP:ADV:SECTOR",
+        help="repeatable; leave PRICE and ADV empty with --fetch to measure them",
+    )
+    al2.add_argument("--portfolio", type=float, help="investable capital, typed")
+    al2.add_argument("--from-plan", action="store_true", help="derive it from [capital]")
+    al2.add_argument("--fetch", action="store_true", help="measure empty price/adv from the feed")
+    al2.add_argument("--risk-per-trade", type=float, default=0.0075)
+    al2.add_argument("--single-name", type=float, default=0.08)
+    al2.set_defaults(fn=cmd_allocate)
 
     cp = sub.add_parser("capital", help="how much may be invested at all, from [capital]")
     cp.set_defaults(fn=cmd_capital)

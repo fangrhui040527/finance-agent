@@ -148,3 +148,13 @@ class GradeBody(BaseModel):
 class HypothesisBody(BaseModel):
     title: str
     thesis: str
+
+
+class AllocateBody(BaseModel):
+    names: list[str] = Field(default_factory=list)
+    portfolio_value: float | None = None
+    fetch: bool = False
+    as_at: str = ""
+    single_name_limit: float = 0.08
+    risk_per_trade: float = 0.0075
+    participation: float = 0.05

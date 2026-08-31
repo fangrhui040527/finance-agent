@@ -535,6 +535,65 @@ def check_portfolio_risk(
     return f"BOOK  {len(parsed)} positions, base {base_currency}\n{_lines(out)}{DISCLAIMER}"
 
 
+def _candidates(specs: list, fetch: bool = False, end=None) -> list:
+    """`MIC:CODE:PRICE:STOP:ADV:SECTOR` -> Candidates, one parser for every surface.
+
+    With `fetch`, an empty PRICE or ADV is measured from the price feed. A stop
+    is never derived: where the stop goes is the user's risk decision and
+    inventing one would invent the risk budget with it.
+    """
+    from engines.sizing.allocate import Candidate
+    from markets.registry import get as market_get
+    from markets.registry import market_currency, mic_of
+
+    out = []
+    for raw in specs:
+        parts = str(raw).split(":")
+        if len(parts) != 6:
+            raise ToolError(
+                f"candidate {raw!r} must be MIC:CODE:PRICE:STOP:ADV:SECTOR "
+                f"(leave PRICE and ADV empty only with fetch)"
+            )
+        market, code, price_s, stop_s, adv_s, sector = parts
+        iid = f"{market}:{code}"
+        try:
+            mic = mic_of(iid)
+            adapter = market_get(mic)
+        except (ValueError, KeyError) as e:
+            raise ToolError(f"{iid}: {e}") from None
+
+        price = _positive(price_s, f"{iid} price") if price_s.strip() else None
+        adv = _positive(adv_s, f"{iid} adv") if adv_s.strip() else None
+        if (price is None or adv is None) and not fetch:
+            raise ToolError(
+                f"{iid}: price and adv are required unless the caller asks to measure them"
+            )
+        if price is None or adv is None:
+            try:
+                series = _feed().fetch(iid, end=end)
+            except PriceFeedError as e:
+                raise ToolError(f"{iid}: {e}") from None
+            bars = series.raw()
+            price = price if price is not None else Decimal(str(bars[-1].close))
+            adv = adv if adv is not None else Decimal(str(series.adv(20)))
+
+        out.append(
+            Candidate(
+                instrument_id=iid,
+                price=price,
+                stop_price=_positive(stop_s, f"{iid} stop"),
+                adv_20d=adv,
+                sector=sector or "unknown",
+                country=adapter.country,
+                currency=market_currency(mic),
+                lot_size=adapter.lot_size(iid),
+                mic=mic,
+                round_trip_cost_at=adapter.fee_schedule.round_trip,
+            )
+        )
+    return out
+
+
 def investable_capital(db: str = "") -> str:
     """How much money is allowed to be in stocks at all, from [capital].
 
@@ -565,6 +624,65 @@ def investable_capital(db: str = "") -> str:
             "The correct amount to invest today is zero - an answer, not a failure."
         )
     return f"{body}\n{notes}{tail}{DISCLAIMER}"
+
+
+def allocate_capital(
+    names: list | None = None,
+    portfolio_value: float | None = None,
+    fetch: bool = False,
+    as_at: str = "",
+    single_name_limit: float = 0.08,
+    risk_per_trade: float = 0.0075,
+    participation: float = 0.05,
+) -> str:
+    """Split investable capital across names the CALLER nominated.
+
+    This does not choose names - it answers what comes after choosing them.
+    Omit portfolio_value to derive capital from the [capital] plan through the
+    waterfall; supply it and the emergency floor, near-term goals and debt
+    hurdle are bypassed, which the output says.
+
+    Refuses rather than fabricating diversification: too few fundable names,
+    or a book that would behave as one bet, is a refusal with the reason.
+    """
+    from agents.portfolio.agents import TYPED_CAPITAL_NOTE, plan_capital
+    from core.config import load as load_config
+    from engines.sizing.allocate import allocate
+
+    cfg = load_config()
+    if portfolio_value is None:
+        waterfall, _ = plan_capital(cfg, context())
+        if waterfall is None:
+            return (
+                "NO PLAN: no [capital] block in config.toml and no portfolio_value "
+                "supplied, so there is no capital to allocate. Call investable_capital "
+                "for what to fill in." + DISCLAIMER
+            )
+        investable = waterfall.investable
+        capital_note = f"capital derived through the waterfall: {investable:,.2f}"
+    else:
+        investable = _positive(portfolio_value, "portfolio_value")
+        capital_note = TYPED_CAPITAL_NOTE
+
+    specs = [str(n) for n in (names or [])]
+    if not specs:
+        return (
+            "NO CANDIDATES: nominate the names to split capital across, as "
+            "MIC:CODE:PRICE:STOP:ADV:SECTOR. This system does not choose them - it "
+            "sizes and bounds the ones you bring." + DISCLAIMER
+        )
+
+    end = _parse_date(as_at) if as_at else None
+    candidates = _candidates(specs, fetch=fetch, end=end)
+    result = allocate(
+        investable,
+        candidates,
+        limits=cfg.limits,
+        risk_per_trade=_positive(risk_per_trade, "risk_per_trade"),
+        single_name_limit=_positive(single_name_limit, "single_name_limit"),
+        participation=_positive(participation, "participation"),
+    )
+    return f"  {capital_note}\n\n{result.explain()}{DISCLAIMER}"
 
 
 def size_position(

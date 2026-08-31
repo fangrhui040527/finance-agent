@@ -261,6 +261,34 @@ S.tool(
 )(T.investable_capital)
 
 S.tool(
+    "allocate_capital",
+    "Split investable capital across names the USER nominated, under every "
+    "concentration limit. It does not choose names - that is the question "
+    "before this one, and this system does not answer it. Omit portfolio_value "
+    "to derive capital from the [capital] plan. Refuses rather than fabricating "
+    "diversification: too few fundable names, or a book that would behave as "
+    "one bet, comes back as a refusal with the reason. The result is a CAPITAL "
+    "split, not a set of positions - each name still needs its own breakers.",
+    obj(
+        {
+            "names": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "MIC:CODE:PRICE:STOP:ADV:SECTOR; leave PRICE and ADV "
+                "empty with fetch=true to measure them",
+            },
+            "portfolio_value": _num("investable capital; omit to derive it from [capital]"),
+            "fetch": {"type": "boolean", "description": "measure empty price/adv from the feed"},
+            "as_at": _str("point-in-time bound for fetched prices (YYYY-MM-DD)"),
+            "single_name_limit": _num("fraction, default 0.08"),
+            "risk_per_trade": _num("fraction, default 0.0075"),
+            "participation": _num("fraction of ADV, default 0.05"),
+        },
+        ["names"],
+    ),
+)(T.allocate_capital)
+
+S.tool(
     "plan_question",
     "What the system would do with a question: which agents, what it would "
     "cost, and what it refuses outright. Useful before a long piece of work.",

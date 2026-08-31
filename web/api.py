@@ -291,6 +291,11 @@ def _narrative(body: S.ThesisBody) -> dict:
     return {"text": done.text, "backend": type(backend_obj).__name__, "reason": reason}
 
 
+@router.post("/allocate")
+def allocate(body: S.AllocateBody) -> S.Envelope:
+    return _run(T.allocate_capital, **body.model_dump())
+
+
 # --- portfolio -----------------------------------------------------------------
 
 
