@@ -217,6 +217,79 @@ def get_prices(instrument: str, bars: int = 30, as_at: str = "") -> str:
     return f"{head}\n{rows}{tail}"
 
 
+def _holdings_and_watchlist() -> tuple[set[str], set[str]]:
+    """What the escalation gate matches against. Broken config is not fatal."""
+    try:
+        cfg = load_config()
+    except ConfigError:
+        return set(), set()
+    return set(cfg.holdings), set(cfg.watchlist)
+
+
+def _news_adapter(source: str, query: str):
+    """One seam, so a test can stand a feed in without touching the registry."""
+    from knowledge.feeds.registry import adapter_for
+
+    return adapter_for(source, query=query) if query else adapter_for(source)
+
+
+def pull_news(source: str = "gdelt", query: str = "", hours: int = 24, limit: int = 20) -> str:
+    """What a source carried in a window, and what of it reached the review queue.
+
+    The distinction this tool exists to preserve: a BROKEN source and a QUIET
+    window are different answers. A feed that failed says so; an empty window
+    says so; neither is reported as silence, because a silent failure and a slow
+    news day are indistinguishable once they reach a narrative.
+    """
+    from knowledge.feeds.adapter import FeedError
+    from knowledge.feeds.registry import UnknownSource
+
+    if hours < 1:
+        raise ToolError(
+            "hours must be at least 1; a window that ends before it starts holds nothing"
+        )
+    if limit < 1:
+        raise ToolError("limit must be at least 1")
+
+    try:
+        feed = _news_adapter(source, query)
+    except UnknownSource as e:
+        raise ToolError(str(e)) from None
+    except TypeError:
+        raise ToolError(
+            f"source {source!r} takes no query terms; call it without `query`"
+        ) from None
+
+    holdings, watchlist = _holdings_and_watchlist()
+    since = datetime.now(UTC) - timedelta(hours=hours)
+    try:
+        records = feed.fetch(since, limit=limit)
+    except FeedError as e:
+        # Transport failure is a real answer. The model must be able to tell it
+        # apart from a quiet window, or it will report one as the other.
+        return f"NO NEWS from {source}: {e}"
+
+    articles, stats = feed.normalize(records, holdings=holdings, watchlist=watchlist)
+    head = f"{feed.name}  last {hours}h" + (f"  query {query!r}" if query else "")
+    rows = "\n".join(
+        f"  {a.published_at:%Y-%m-%d %H:%M}  {a.source_domain:<24} {a.title}"
+        for a in articles[:limit]
+    )
+    body = rows or "  (a quiet window, reported as one - not an error)"
+    tail = ""
+    if not stats.escalated:
+        tail = (
+            "\n\n  escalated 0: an article reaches the review queue only if it is at "
+            "least 34% relevant AND names something in your holdings or watchlist."
+        )
+        if not holdings and not watchlist:
+            tail += (
+                "\n  Both are EMPTY in config, so the gate is closed on every article "
+                "and a live feed is indistinguishable from a quiet day."
+            )
+    return f"{head}\n  {stats}\n{body}{tail}"
+
+
 def _parse_date(s: str) -> date:
     try:
         return date.fromisoformat(s)

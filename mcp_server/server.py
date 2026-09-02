@@ -133,6 +133,23 @@ S.tool(
 )(T.get_prices)
 
 S.tool(
+    "pull_news",
+    "What a news source carried in a window, and what of it reached the review "
+    "queue. Call this before naming a catalyst: attribution says HOW MUCH of a "
+    "move was company-specific, this is where the reason for that part comes "
+    "from. A broken feed and a quiet window are reported differently - neither "
+    "is silence.",
+    obj(
+        {
+            "source": _str("a registered source, e.g. 'gdelt'"),
+            "query": _str("search terms, e.g. 'maybank'; omit for the source default"),
+            "hours": {"type": "integer", "description": "window back from now (default 24)"},
+            "limit": {"type": "integer", "description": "most articles to return (default 20)"},
+        }
+    ),
+)(T.pull_news)
+
+S.tool(
     "why_did_it_move",
     "Decompose a price move into market, sector, style, currency and "
     "idiosyncratic components, and report the UNEXPLAINED share. Call this "

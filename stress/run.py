@@ -1143,6 +1143,10 @@ def s_mcp():
             "stop_price": 5.6,
             "adv_20d": 900000,
         },
+        # A window that ends before it starts is refused BEFORE the adapter is
+        # built, which is also what keeps this suite off the network: every
+        # other pull_news path would poll a live feed.
+        "pull_news": {"hours": 0},
         "plan_question": {"question": "why did it move"},
         "explain_concept": {},
         "log_hypothesis": {"title": "t", "thesis": "x", "db": ":memory:"},

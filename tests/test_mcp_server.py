@@ -603,3 +603,71 @@ def test_the_anchor_can_be_declined(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     _anchor_to_the_repository()
     assert Path.cwd().resolve() == tmp_path.resolve()
+
+
+# --- news: the feed that was missing from the surface -----------------------
+# The tool exists because MCP could reach prices but not news, so a model asked
+# "why did it move" could decompose the move and never look for a catalyst. The
+# tests below hold the distinction the whole ingest contract is built on: a
+# BROKEN source and a QUIET window are different answers, and neither is silence.
+def test_a_broken_news_source_is_reported_not_raised(monkeypatch):
+    from knowledge.feeds.adapter import FeedError
+
+    class Dead:
+        name = "gdelt"
+
+        def fetch(self, since, limit=20):
+            raise FeedError("gdelt unreachable: timed out")
+
+    monkeypatch.setattr(T, "_news_adapter", lambda source, query: Dead())
+    out = text(call("pull_news", source="gdelt"))
+    assert "NO NEWS" in out
+    assert "timed out" in out
+
+
+def test_a_quiet_window_is_reported_as_one(monkeypatch):
+    from knowledge.feeds.adapter import IngestStats
+
+    class Quiet:
+        name = "gdelt"
+
+        def fetch(self, since, limit=20):
+            return []
+
+        def normalize(self, records, entity_index=None, holdings=None, watchlist=None):
+            return [], IngestStats()
+
+    monkeypatch.setattr(T, "_news_adapter", lambda source, query: Quiet())
+    out = text(call("pull_news", source="gdelt"))
+    assert "quiet window" in out
+    assert "NO NEWS" not in out
+
+
+def test_an_unknown_source_names_the_ones_that_exist():
+    message = err(call("pull_news", source="bloomberg"))["message"]
+    assert "gdelt" in message
+
+
+def test_nothing_escalates_with_an_empty_watchlist(monkeypatch):
+    """The gate that made the news half look like a quiet day either way."""
+    from knowledge.feeds.adapter import IngestStats
+
+    class Feed:
+        name = "gdelt"
+
+        def fetch(self, since, limit=20):
+            return [object()]
+
+        def normalize(self, records, entity_index=None, holdings=None, watchlist=None):
+            assert holdings == set() and watchlist == set()
+            return [], IngestStats(fetched=1, kept=1, unlinked=1)
+
+    monkeypatch.setattr(T, "_news_adapter", lambda source, query: Feed())
+    monkeypatch.setattr(T, "_holdings_and_watchlist", lambda: (set(), set()))
+    out = text(call("pull_news", source="gdelt"))
+    assert "escalated 0" in out
+    assert "holdings" in out and "watchlist" in out
+
+
+def test_hours_below_one_is_refused():
+    assert "hours" in err(call("pull_news", hours=0))["message"]

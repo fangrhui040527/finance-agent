@@ -28,7 +28,7 @@ invisible.
 | Event taxonomy, base rates, catalyst attachment | complete |
 | Retrieval — hybrid, parent-child chunking, router | complete |
 | Backtest harness — walk-forward, costs, metrics, point-in-time | complete |
-| MCP server — 26 tools, protocol, selftest | complete |
+| MCP server — 27 tools, protocol, selftest | complete |
 | Teacher — 30 concepts, enforced prerequisite order | complete |
 | Reflection — grading, lesson proposal, calibration, scoring | complete |
 | Tracing — spans, HTML report, anatomy, prompts | complete |
