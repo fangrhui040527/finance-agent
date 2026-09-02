@@ -1,0 +1,126 @@
+CONTAINS VERBATIM PROMPTS AND RESPONSES. This is a debugging artefact, not an audit record - it may hold portfolio positions, instrument ids and model output. debug/ is gitignored. Read before sharing.
+====================================================================================================
+
+    1 04:49:24.560 * run_start     full-system
+    2 04:49:24.560 + span          config
+    3 04:49:24.560   # engine        config
+    5 04:49:24.561 + span          registry
+    6 04:49:24.601   # engine        registry
+    7 04:49:24.601   # engine        registry.a0_supervisor
+    8 04:49:24.601   # engine        registry.a10_thesis
+    9 04:49:24.601   # engine        registry.a11_red_team
+   10 04:49:24.601   # engine        registry.a12_portfolio_risk
+   11 04:49:24.601   # engine        registry.a13_sizing
+   12 04:49:24.601   # engine        registry.a14_teacher
+   13 04:49:24.601   # engine        registry.a15_reflection
+   14 04:49:24.601   # engine        registry.a1_fundamentals
+   15 04:49:24.601   # engine        registry.a2_valuation
+   16 04:49:24.601   # engine        registry.a3_price_technical
+   17 04:49:24.601   # engine        registry.a4_news_narrative
+   18 04:49:24.601   # engine        registry.a5_catalyst_events
+   19 04:49:24.601   # engine        registry.a6_macro_regime
+   20 04:49:24.601   # engine        registry.a7_sector_technology
+   21 04:49:24.601   # engine        registry.a8_ownership_flow
+   22 04:49:24.602   # engine        registry.a9_attribution
+   24 04:49:24.602 + span          markets
+   25 04:49:24.602   # engine        market.XHKG
+   26 04:49:24.602   # engine        market.XKLS
+   27 04:49:24.603   # engine        market.XNAS
+   28 04:49:24.603   # engine        market.XSES
+   30 04:49:24.603 + span          inference
+   31 04:49:24.604   . allowed       llm_complete   rail=tool rule=default_allow
+   32 04:49:24.604   ~ llm_call      a4_news_narrative   model_id=claude-haiku-4-5 tier=cheap input_tokens=25 output_tokens=20 cost_myr=0.0005187500 latency_ms=0.01
+                         prompt: [news_triage] demonstrate the inference seam for a4_news_narrative and record exactly what crossed it
+                           | [news_triage] demonstrate the inference seam for a4_news_narrative and record exactly what crossed it
+                         response: [claude-haiku-4-5] [news_triage] demonstrate the inference seam for a4_news_narrative and record ex
+                           | [claude-haiku-4-5] [news_triage] demonstrate the inference seam for a4_news_narrative and record ex
+   33 04:49:24.604   . allowed       llm_complete   rail=tool rule=default_allow
+   34 04:49:24.604   ~ llm_call      a10_thesis   model_id=claude-opus-5 tier=reason input_tokens=24 output_tokens=20 cost_myr=0.0025730000 latency_ms=0
+                         prompt: [thesis_synthesis] demonstrate the inference seam for a10_thesis and record exactly what crossed it
+                           | [thesis_synthesis] demonstrate the inference seam for a10_thesis and record exactly what crossed it
+                         response: [claude-opus-5] [thesis_synthesis] demonstrate the inference seam for a10_thesis and record exac
+                           | [claude-opus-5] [thesis_synthesis] demonstrate the inference seam for a10_thesis and record exac
+   35 04:49:24.604   . allowed       llm_complete   rail=tool rule=default_allow
+   36 04:49:24.604   ~ llm_call      a11_red_team   model_id=claude-opus-5 tier=reason input_tokens=23 output_tokens=20 cost_myr=0.0025522500 latency_ms=0
+                         prompt: [red_team] demonstrate the inference seam for a11_red_team and record exactly what crossed it
+                           | [red_team] demonstrate the inference seam for a11_red_team and record exactly what crossed it
+                         response: [claude-opus-5] [red_team] demonstrate the inference seam for a11_red_team and record exactly wh
+                           | [claude-opus-5] [red_team] demonstrate the inference seam for a11_red_team and record exactly wh
+   37 04:49:24.604   . allowed       llm_complete   rail=tool rule=default_allow
+   38 04:49:24.605   ~ llm_call      a15_reflection   model_id=claude-opus-5 tier=reason input_tokens=25 output_tokens=20 cost_myr=0.0025937500 latency_ms=0
+                         prompt: [reflection_deep] demonstrate the inference seam for a15_reflection and record exactly what crossed it
+                           | [reflection_deep] demonstrate the inference seam for a15_reflection and record exactly what crossed it
+                         response: [claude-opus-5] [reflection_deep] demonstrate the inference seam for a15_reflection and record e
+                           | [claude-opus-5] [reflection_deep] demonstrate the inference seam for a15_reflection and record e
+   39 04:49:24.605   ! denied        llm_complete   rail=tool rule=tool_allowlist reason=agent 'a0_supervisor' may not call 'llm_complete'
+                         -> agent 'a0_supervisor' may not call 'llm_complete'
+   40 04:49:24.605   ! refusal       a0_may_not_reason   reason=tool_allowlist denied llm_complete: agent 'a0_supervisor' may not call 'llm_complete'
+   41 04:49:24.605   # engine        ledger
+   43 04:49:24.605 @ agent         a0_supervisor   agent=a0_supervisor
+   44 04:49:24.605   . allowed       plan   rail=tool rule=default_allow
+   45 04:49:24.606   . allowed       budget   rail=tool rule=default_allow
+   46 04:49:24.606   # engine        plan
+   47 04:49:24.606   . allowed       plan   rail=tool rule=default_allow
+   48 04:49:24.607   . allowed       budget   rail=tool rule=default_allow
+   49 04:49:24.607   # engine        plan
+   50 04:49:24.607   . allowed       plan   rail=tool rule=default_allow
+   51 04:49:24.607   ! refusal       plan   reason=No instrument could be resolved from the question.
+   53 04:49:24.607 @ agent         a7_sector_technology   agent=a7_sector_technology
+   54 04:49:24.615   # engine        graph.built
+   55 04:49:24.615   . allowed       traverse   rail=tool rule=default_allow
+   56 04:49:24.615   # engine        graph.exposure
+   57 04:49:24.615   # engine        graph.exposure
+   58 04:49:24.615   ! refusal       graph.inferred_edge_not_traversed   reason=CO:RUMOUR is reachable but its only edge is INFERRED, so it cannot back an emitted claim and never enters a path
+   59 04:49:24.615   = verification  a7_sector_technology   proposed=2 kept=2 answered=True confidence=0.48
+   60 04:49:24.615   # engine        graph.answer
+   61 04:49:24.616   . allowed       traverse   rail=tool rule=default_allow
+   62 04:49:24.616   = verification  a7_sector_technology   proposed=2 kept=0 answered=False confidence=0
+                         DROPPED: no citation verified against its chunk :: Petronas Chemicals is exposed via [indirect, 2 hops, w=0.45] Strait of Hormuz closure --af
+                         DROPPED: no citation verified against its chunk :: MISC Berhad is exposed via [indirect, 2 hops, w=0.26] Strait of Hormuz closure --affects--
+   63 04:49:24.616   ! refusal       graph.uncited_path   reason=no citation verified against its chunk
+   65 04:49:24.616 @ agent         a9_attribution   agent=a9_attribution
+   66 04:49:24.619   . allowed       decompose   rail=tool rule=default_allow
+   67 04:49:24.619   # engine        attribution.market-wide fall
+   68 04:49:24.620   . allowed       decompose   rail=tool rule=default_allow
+   69 04:49:24.620   # engine        attribution.idiosyncratic jump
+   70 04:49:24.620   . allowed       decompose   rail=tool rule=default_allow
+   71 04:49:24.620   # engine        attribution.quiet day
+   73 04:49:24.620 + span          thesis_and_red_team
+   74 04:49:24.620   @ agent         a10_thesis   agent=a10_thesis
+   75 04:49:24.621     . allowed       compose   rail=tool rule=default_allow
+   76 04:49:24.621     . allowed       check_coverage   rail=tool rule=default_allow
+   77 04:49:24.621     # engine        thesis
+   79 04:49:24.621   @ agent         a11_red_team   agent=a11_red_team
+   80 04:49:24.621     . allowed       find_disconfirming   rail=tool rule=default_allow
+   81 04:49:24.621     # engine        red_team
+   84 04:49:24.621 + span          portfolio
+   85 04:49:24.621   @ agent         a12_portfolio_risk   agent=a12_portfolio_risk
+   86 04:49:24.621     . allowed       concentration_check   rail=tool rule=default_allow
+   87 04:49:24.621     # engine        concentration
+   89 04:49:24.622   @ agent         a13_sizing   agent=a13_sizing
+   90 04:49:24.622     . allowed       risk_budget_cap   rail=tool rule=default_allow
+   91 04:49:24.622     # engine        sizing.funded
+   92 04:49:24.622     . allowed       risk_budget_cap   rail=tool rule=default_allow
+   93 04:49:24.622     # engine        sizing.too small
+   96 04:49:24.622 @ agent         a14_teacher   agent=a14_teacher
+   97 04:49:24.623   . allowed       explain   rail=tool rule=default_allow
+   98 04:49:24.623   # engine        teacher.blocked
+   99 04:49:24.623   . allowed       explain   rail=tool rule=default_allow
+  100 04:49:24.623   # engine        teacher.unlocked
+  102 04:49:24.623 @ agent         a15_reflection   agent=a15_reflection
+  103 04:49:24.623   # engine        prediction.logged
+  104 04:49:24.623   ! refusal       grade_too_early   reason=demo-1 grades on 2026-09-20; grading it on 2026-08-30 would score noise and flatter the model
+  105 04:49:24.623   . allowed       propose_lesson   rail=tool rule=default_allow
+  106 04:49:24.623   # engine        lesson.one_instrument
+  107 04:49:24.623   . allowed       propose_lesson   rail=tool rule=default_allow
+  108 04:49:24.623   # engine        lesson.no_instruments
+  109 04:49:24.623   . allowed       propose_lesson   rail=tool rule=default_allow
+  110 04:49:24.623   # engine        lesson.qualifies
+  112 04:49:24.623 + span          guardrails
+  113 04:49:24.623   ! denied        place_order   rail=tool rule=no_execution reason=the system is a one-way door; it has no execution capability
+                         -> the system is a one-way door; it has no execution capability
+  114 04:49:24.623   ! refusal       guardrail.unlisted tool   reason=no_execution denied place_order: the system is a one-way door; it has no execution capability
+  115 04:49:24.623   ! denied        ingest   rail=input rule=injection_scan reason=injection marker: 'ignore previous instructions'
+                         -> injection marker: 'ignore previous instructions'
+  116 04:49:24.624   ! refusal       guardrail.injection   reason=injection_scan denied ingest: injection marker: 'ignore previous instructions'
+  118 04:49:24.624 * run_end       full-system

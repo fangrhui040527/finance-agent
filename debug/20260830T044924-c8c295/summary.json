@@ -1,0 +1,124 @@
+{
+  "run_id": "20260830T044924-c8c295",
+  "label": "full-system",
+  "started_at": "2026-08-30T04:49:24.560171+00:00",
+  "wall_ms": 64.12,
+  "events": 118,
+  "by_kind": {
+    "agent": 9,
+    "allowed": 25,
+    "denied": 3,
+    "engine": 43,
+    "llm_call": 4,
+    "refusal": 7,
+    "run_end": 1,
+    "run_start": 1,
+    "span": 7,
+    "span_end": 16,
+    "verification": 2
+  },
+  "errors": [],
+  "llm": {
+    "calls": 4,
+    "cost_myr": 0.008238,
+    "input_tokens": 97,
+    "output_tokens": 80
+  },
+  "agents_seen": [
+    "a0_supervisor",
+    "a10_thesis",
+    "a11_red_team",
+    "a12_portfolio_risk",
+    "a13_sizing",
+    "a14_teacher",
+    "a15_reflection",
+    "a1_fundamentals",
+    "a2_valuation",
+    "a3_price_technical",
+    "a4_news_narrative",
+    "a5_catalyst_events",
+    "a6_macro_regime",
+    "a7_sector_technology",
+    "a8_ownership_flow",
+    "a9_attribution"
+  ],
+  "refusals": 10,
+  "slowest": [
+    {
+      "name": "registry",
+      "kind": "span",
+      "ms": 40.83
+    },
+    {
+      "name": "a7_sector_technology",
+      "kind": "agent",
+      "ms": 8.71
+    },
+    {
+      "name": "a9_attribution",
+      "kind": "agent",
+      "ms": 4.35
+    },
+    {
+      "name": "inference",
+      "kind": "span",
+      "ms": 2.02
+    },
+    {
+      "name": "a0_supervisor",
+      "kind": "agent",
+      "ms": 1.96
+    },
+    {
+      "name": "markets",
+      "kind": "span",
+      "ms": 1.3
+    },
+    {
+      "name": "portfolio",
+      "kind": "span",
+      "ms": 1.13
+    },
+    {
+      "name": "thesis_and_red_team",
+      "kind": "span",
+      "ms": 0.86
+    },
+    {
+      "name": "a13_sizing",
+      "kind": "agent",
+      "ms": 0.76
+    },
+    {
+      "name": "config",
+      "kind": "span",
+      "ms": 0.72
+    },
+    {
+      "name": "a10_thesis",
+      "kind": "agent",
+      "ms": 0.53
+    },
+    {
+      "name": "a15_reflection",
+      "kind": "agent",
+      "ms": 0.43
+    },
+    {
+      "name": "a14_teacher",
+      "kind": "agent",
+      "ms": 0.28
+    },
+    {
+      "name": "guardrails",
+      "kind": "span",
+      "ms": 0.22
+    },
+    {
+      "name": "a11_red_team",
+      "kind": "agent",
+      "ms": 0.17
+    }
+  ],
+  "dir": "debug/20260830T044924-c8c295"
+}
