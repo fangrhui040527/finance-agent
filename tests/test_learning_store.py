@@ -2,7 +2,7 @@
 in docs/14 section 2 restarts with it."""
 
 import sqlite3
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 
 import pytest
 
@@ -192,11 +192,14 @@ def test_the_cli_refuses_to_grade_before_the_horizon(tmp_path, capsys):
 
 def test_the_cli_grades_against_the_benchmark_not_zero(tmp_path, capsys):
     path = db(tmp_path)
-    run(
-        ["log", "X", "1", "21d", "0.6", "s", "--id", "p1", "--grade-on", "2026-09-22"], path, capsys
-    )
+    # Relative to today, never a literal. `log` stamps made_at from the real clock
+    # and refuses a grade_on that is not in the future, so a hard-coded date
+    # silently becomes un-loggable the day it arrives - and the test then fails on
+    # its own SETUP, for a reason that has nothing to do with grading.
+    grade_on = (date.today() + timedelta(days=21)).isoformat()
+    run(["log", "X", "1", "21d", "0.6", "s", "--id", "p1", "--grade-on", grade_on], path, capsys)
     code, out = run(
-        ["grade", "p1", "--return", "0.031", "--benchmark", "0.048", "--today", "2026-09-22"],
+        ["grade", "p1", "--return", "0.031", "--benchmark", "0.048", "--today", grade_on],
         path,
         capsys,
     )
@@ -224,8 +227,14 @@ def test_due_lists_overdue_items(tmp_path, capsys):
     """Overdue is reached by time passing, never by backdating grade_on - the
     contract refuses that, which is why --today exists instead."""
     path = db(tmp_path)
-    run(["log", "X", "1", "5d", "0.6", "s", "--id", "p1", "--grade-on", "2026-09-01"], path, capsys)
-    _, out = run(["due", "--today", "2026-09-06"], path, capsys)
+    grade_on = date.today() + timedelta(days=5)
+    run(
+        ["log", "X", "1", "5d", "0.6", "s", "--id", "p1", "--grade-on", grade_on.isoformat()],
+        path,
+        capsys,
+    )
+    # Five days PAST the grading date, simulated rather than waited for.
+    _, out = run(["due", "--today", (grade_on + timedelta(days=5)).isoformat()], path, capsys)
     assert "5d overdue" in out
 
 
