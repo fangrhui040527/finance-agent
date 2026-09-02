@@ -235,6 +235,19 @@ def test_the_cli_exit_code_is_the_interface(tmp_path, capsys, monkeypatch):
 
     db = _ledger(tmp_path / "l.db", calls=3, cost_scale=1000)
     monkeypatch.setenv("FINPLANET_NO_DOTENV", "1")
+
+    # The ledger and the alert store were isolated; the TRACES were not, so this
+    # read the repository's own debug/ directory and the case went red the first
+    # time a real run left a methodology change there. An empty root is what
+    # "nothing tripped" was always supposed to mean.
+    import functools
+
+    from core import monitor as _m
+
+    monkeypatch.setattr(
+        _m, "check", functools.partial(_m.check, debug_root=str(tmp_path / "no-traces"))
+    )
+
     # nothing tripped -> 0
     assert (
         ask.main(
