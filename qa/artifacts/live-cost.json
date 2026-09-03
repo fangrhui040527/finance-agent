@@ -1,0 +1,266 @@
+{
+  "calls": [
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "status": 200,
+      "input_tokens": 14,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 0,
+      "output_tokens": 4,
+      "usd": "0.00003400",
+      "elapsed_ms": 872.9
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "status": 200,
+      "input_tokens": 11,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 0,
+      "output_tokens": 5,
+      "usd": "0.00003600",
+      "elapsed_ms": 801.8
+    },
+    {
+      "model": "claude-haiku-4-5",
+      "status": 401,
+      "input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 0,
+      "output_tokens": 0,
+      "usd": "0.0000",
+      "elapsed_ms": 333.7
+    },
+    {
+      "model": "claude-haiku-4-5",
+      "status": 401,
+      "input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 0,
+      "output_tokens": 0,
+      "usd": "0.0000",
+      "elapsed_ms": 354.4
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "status": 200,
+      "input_tokens": 16,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 0,
+      "output_tokens": 1,
+      "usd": "0.00002100",
+      "elapsed_ms": 866.0
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "status": 200,
+      "input_tokens": 10,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 14400,
+      "output_tokens": 5,
+      "usd": "0.01803500",
+      "elapsed_ms": 874.3
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "status": 200,
+      "input_tokens": 10,
+      "cache_read_input_tokens": 14400,
+      "cache_creation_input_tokens": 0,
+      "output_tokens": 5,
+      "usd": "0.00147500",
+      "elapsed_ms": 946.0
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "status": 200,
+      "input_tokens": 10,
+      "cache_read_input_tokens": 14400,
+      "cache_creation_input_tokens": 0,
+      "output_tokens": 5,
+      "usd": "0.00147500",
+      "elapsed_ms": 1092.5
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "status": 200,
+      "input_tokens": 10,
+      "cache_read_input_tokens": 14400,
+      "cache_creation_input_tokens": 0,
+      "output_tokens": 5,
+      "usd": "0.00147500",
+      "elapsed_ms": 848.9
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "status": 200,
+      "input_tokens": 68,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 0,
+      "output_tokens": 22,
+      "usd": "0.00017800",
+      "elapsed_ms": 1182.6
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "status": 200,
+      "input_tokens": 167,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 0,
+      "output_tokens": 124,
+      "usd": "0.00078700",
+      "elapsed_ms": 2327.1
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "status": 200,
+      "input_tokens": 152,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 0,
+      "output_tokens": 72,
+      "usd": "0.00051200",
+      "elapsed_ms": 1560.8
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "status": 200,
+      "input_tokens": 159,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 0,
+      "output_tokens": 50,
+      "usd": "0.00040900",
+      "elapsed_ms": 1168.3
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "status": 200,
+      "input_tokens": 213,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 0,
+      "output_tokens": 85,
+      "usd": "0.00063800",
+      "elapsed_ms": 1625.5
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "status": 200,
+      "input_tokens": 178,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 0,
+      "output_tokens": 59,
+      "usd": "0.00047300",
+      "elapsed_ms": 1354.3
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "status": 200,
+      "input_tokens": 141,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 0,
+      "output_tokens": 59,
+      "usd": "0.00043600",
+      "elapsed_ms": 1311.7
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "status": 200,
+      "input_tokens": 19,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 0,
+      "output_tokens": 4,
+      "usd": "0.00003900",
+      "elapsed_ms": 772.4
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "status": 200,
+      "input_tokens": 19,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 0,
+      "output_tokens": 4,
+      "usd": "0.00003900",
+      "elapsed_ms": 829.5
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "status": 200,
+      "input_tokens": 19,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 0,
+      "output_tokens": 4,
+      "usd": "0.00003900",
+      "elapsed_ms": 925.9
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "status": 200,
+      "input_tokens": 19,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 0,
+      "output_tokens": 4,
+      "usd": "0.00003900",
+      "elapsed_ms": 836.6
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "status": 200,
+      "input_tokens": 11,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 0,
+      "output_tokens": 5,
+      "usd": "0.00003600",
+      "elapsed_ms": 900.3
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "status": 200,
+      "input_tokens": 25,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 0,
+      "output_tokens": 4,
+      "usd": "0.00004500",
+      "elapsed_ms": 1129.7
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "status": 200,
+      "input_tokens": 16,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 0,
+      "output_tokens": 1,
+      "usd": "0.00002100",
+      "elapsed_ms": 695.2
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "status": 200,
+      "input_tokens": 113,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 0,
+      "output_tokens": 28,
+      "usd": "0.00025300",
+      "elapsed_ms": 945.5
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "status": 200,
+      "input_tokens": 94,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 0,
+      "output_tokens": 43,
+      "usd": "0.00030900",
+      "elapsed_ms": 1062.0
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "status": 200,
+      "input_tokens": 27,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 0,
+      "output_tokens": 14,
+      "usd": "0.00009700",
+      "elapsed_ms": 938.6
+    }
+  ],
+  "total_usd": "0.02690100",
+  "ceiling_usd": "0.48"
+}

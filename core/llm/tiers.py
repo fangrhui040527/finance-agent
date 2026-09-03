@@ -23,6 +23,37 @@ class Tier(str, Enum):
     LOCAL = "local"
 
 
+class Effort(str, Enum):
+    """How hard the model is asked to think, in Claude's own five levels.
+
+    This is `output_config.effort` on the Messages API, not a local invention:
+    the same low/medium/high/xhigh/max ladder every current Claude surface
+    exposes. It is a SEPARATE dial from the tier - the tier decides WHICH model
+    answers, the effort decides how much thinking that model spends getting
+    there - and the two move independently on purpose. Raising effort on Haiku
+    is a great deal cheaper than routing the same question to Opus, and the
+    cost table cannot tell you which is the better trade for your question.
+    """
+
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+    XHIGH = "xhigh"
+    MAX = "max"
+
+
+#: Ascending, so a surface can print the ladder in the order a person reads it.
+EFFORT_ORDER: tuple[Effort, ...] = (
+    Effort.LOW,
+    Effort.MEDIUM,
+    Effort.HIGH,
+    Effort.XHIGH,
+    Effort.MAX,
+)
+
+_EFFORT_VALUES: tuple[str, ...] = tuple(e.value for e in EFFORT_ORDER)
+
+
 class TaskClass(str, Enum):
     """What the call is FOR. Tier is derived from this, never passed directly."""
 
@@ -136,16 +167,46 @@ class Usage:
 class RequestProfile:
     """How a request is SHAPED for the model a tier resolves to.
 
-    Haiku 4.5 rejects `thinking`/`effort` with a 400; the Opus/Sonnet 5 family
-    wants adaptive thinking and an effort level, and long generations should
-    stream so they cannot die on an HTTP idle timeout. The table below is the
-    single place that knowledge lives - the backend never guesses.
+    Haiku 4.5 rejects `output_config.effort` and `thinking: {type: "adaptive"}`
+    with a 400; the Opus/Sonnet 5 family wants adaptive thinking and an effort
+    level, and long generations should stream so they cannot die on an HTTP idle
+    timeout. The table below is the single place that knowledge lives - the
+    backend never guesses.
+
+    `thinking_budget` is the Haiku-shaped dial: that model takes the older
+    `{type: "enabled", budget_tokens: N}` form instead of an effort level, so
+    the same five-level control reaches all three models without either one
+    being sent a parameter it rejects. The two thinking forms are mutually
+    exclusive by construction - sending both is a 400, and a profile that could
+    express it would be a bug waiting for a live call to find.
     """
 
     max_tokens: int
     adaptive_thinking: bool = False
     effort: str | None = None
     stream: bool = False
+    thinking_budget: int | None = None
+
+    def __post_init__(self) -> None:
+        if self.thinking_budget is not None:
+            if self.adaptive_thinking or self.effort:
+                raise ValueError(
+                    "thinking_budget is the pre-4.6 form and cannot be combined with "
+                    "adaptive thinking or an effort level; one model, one dial"
+                )
+            if self.thinking_budget < 1024:
+                raise ValueError(
+                    f"thinking budget must be at least 1024 tokens, got {self.thinking_budget}"
+                )
+            if self.thinking_budget >= self.max_tokens:
+                raise ValueError(
+                    f"thinking budget {self.thinking_budget} must be under max_tokens "
+                    f"{self.max_tokens}; the budget is spent INSIDE the output cap"
+                )
+        if self.effort is not None and self.effort not in _EFFORT_VALUES:
+            raise ValueError(
+                f"unknown effort {self.effort!r}; expected one of {', '.join(_EFFORT_VALUES)}"
+            )
 
 
 REQUEST_PROFILES: dict[Tier, RequestProfile] = {
@@ -159,28 +220,218 @@ REQUEST_PROFILES: dict[Tier, RequestProfile] = {
 }
 
 
-def cheap_capped() -> bool:
-    """FINPLANET_CHEAP=1 forces every Messages tier onto the cheapest model.
+#: What an operator may write in FINPLANET_MODEL. Both the friendly name and
+#: the exact model id resolve to the same tier, because the two get used
+#: interchangeably in practice and a system that accepts one spelling and
+#: silently ignores the other is the `MYX`/`XKLS` defect again.
+MODEL_ALIASES: dict[str, Tier] = {
+    "haiku": Tier.CHEAP,
+    "haiku-4-5": Tier.CHEAP,
+    "claude-haiku-4-5": Tier.CHEAP,
+    "cheap": Tier.CHEAP,
+    "sonnet": Tier.BALANCED,
+    "sonnet-5": Tier.BALANCED,
+    "claude-sonnet-5": Tier.BALANCED,
+    "balanced": Tier.BALANCED,
+    "opus": Tier.REASON,
+    "opus-5": Tier.REASON,
+    "claude-opus-5": Tier.REASON,
+    "reason": Tier.REASON,
+}
 
-    The development budget rule: live testing runs on Haiku, always, and the
-    cap is DISCLOSED everywhere a backend is named - never silent. Promoted
-    from qa/_support/cheap.py so a dev run cannot accidentally bill Opus.
+#: The Messages tiers. EMBED and LOCAL are not Claude models and are never
+#: pinned, capped or given an effort level.
+MESSAGES_TIERS: tuple[Tier, ...] = (Tier.REASON, Tier.BALANCED, Tier.CHEAP)
+
+#: Tiers whose model accepts `output_config.effort`. Haiku 4.5 does not - it
+#: returns a 400 - which is why CHEAP is absent here and gets a budget instead.
+EFFORT_TIERS: tuple[Tier, ...] = (Tier.REASON, Tier.BALANCED)
+
+#: Effort -> (thinking budget, output cap) for Haiku 4.5, the one model here
+#: with no effort parameter. The budget is spent INSIDE the cap, so the two
+#: move together; a table is the only honest way to hold that.
+CHEAP_EFFORT_BUDGET: dict[Effort, tuple[int, int]] = {
+    Effort.LOW: (1024, 3072),
+    Effort.MEDIUM: (2048, 4608),
+    Effort.HIGH: (4096, 8192),
+    Effort.XHIGH: (8192, 12288),
+    Effort.MAX: (16000, 20000),
+}
+
+#: The output cap an effort level needs to land in on an effort-taking model.
+#: Raising effort without raising the cap buys thinking that is then truncated:
+#: `Truncated` raises, and the spend was real.
+EFFORT_MAX_TOKENS: dict[Effort, int] = {
+    Effort.LOW: 4096,
+    Effort.MEDIUM: 8000,
+    Effort.HIGH: 16000,
+    Effort.XHIGH: 32000,
+    Effort.MAX: 64000,
+}
+
+#: At or above this cap the request streams. Not a preference: a large
+#: max_tokens on a non-streaming call can die on an HTTP idle timeout, and a
+#: plan that dies there has still been billed.
+STREAM_ABOVE_MAX_TOKENS = 16000
+
+
+class ModelSelectionError(ValueError):
+    """An unreadable FINPLANET_MODEL or FINPLANET_EFFORT. Never guessed at.
+
+    The same rule as `LLM_BACKEND`: a junk value fails at startup rather than
+    falling back to a default, because a typo that silently selects Opus is the
+    expensive direction of a mistake nobody would otherwise notice.
+    """
+
+
+def pinned_tier() -> Tier | None:
+    """The one model every Messages tier is pinned to, or None for the router.
+
+    `FINPLANET_MODEL=haiku|sonnet|opus` (or an exact model id) is the operator's
+    model selection. `FINPLANET_CHEAP=1` still means exactly
+    `FINPLANET_MODEL=haiku`; when both are set the explicit name wins, because
+    it is the more specific instruction.
     """
     import os
 
-    return os.environ.get("FINPLANET_CHEAP", "").strip() in ("1", "true", "yes")
+    raw = os.environ.get("FINPLANET_MODEL", "").strip().lower()
+    if raw:
+        try:
+            return MODEL_ALIASES[raw]
+        except KeyError:
+            raise ModelSelectionError(
+                f"unknown FINPLANET_MODEL {raw!r}; expected one of "
+                f"{', '.join(sorted(set(MODEL_ALIASES)))}"
+            ) from None
+    if os.environ.get("FINPLANET_CHEAP", "").strip() in ("1", "true", "yes"):
+        return Tier.CHEAP
+    return None
+
+
+def pin_source() -> str | None:
+    """Which variable pinned the tier, or None when nothing did.
+
+    `pinned_tier` deliberately collapses two spellings into one answer, because
+    the router does not care which one an operator wrote. The DISCLOSURE cares:
+    an operator told the pin came from FINPLANET_MODEL unsets FINPLANET_MODEL,
+    sees the run still capped to Haiku, and has been sent to the one place the
+    fault is not. Naming the wrong variable is not a smaller error than naming
+    no variable - it costs more, because it is followed.
+    """
+    import os
+
+    if os.environ.get("FINPLANET_MODEL", "").strip():
+        return "FINPLANET_MODEL"
+    if os.environ.get("FINPLANET_CHEAP", "").strip() in ("1", "true", "yes"):
+        return "FINPLANET_CHEAP"
+    return None
+
+
+def cheap_capped() -> bool:
+    """True when every Messages tier resolves to the cheapest model.
+
+    The development budget rule: live testing runs on Haiku, always, and the
+    cap is DISCLOSED everywhere a backend is named - never silent. Promoted
+    from qa/_support/cheap.py so a dev run cannot accidentally bill Opus. Now
+    also true for `FINPLANET_MODEL=haiku`, which is the same instruction said
+    the other way; a disclosure that knew only one spelling would be telling
+    the truth about the variable and lying about the run.
+    """
+    return pinned_tier() is Tier.CHEAP
+
+
+def selected_effort() -> Effort | None:
+    """`FINPLANET_EFFORT`, or None to leave each tier on its own default."""
+    import os
+
+    raw = os.environ.get("FINPLANET_EFFORT", "").strip().lower()
+    if not raw:
+        return None
+    try:
+        return Effort(raw)
+    except ValueError:
+        raise ModelSelectionError(
+            f"unknown FINPLANET_EFFORT {raw!r}; expected one of {', '.join(_EFFORT_VALUES)}"
+        ) from None
 
 
 def effective_tier(tier: Tier) -> Tier:
     """The tier that will actually be called AND billed.
 
-    Under the cheap cap, REASON and BALANCED resolve to CHEAP - model and
+    Under a pin every Messages tier resolves to the pinned one - model and
     price move together, so the ledger records what was truly spent rather
-    than what the task class would normally cost. EMBED/LOCAL are untouched.
+    than what the task class would normally cost. EMBED/LOCAL are untouched:
+    they are not Claude models and there is nothing to pin them to.
     """
-    if cheap_capped() and tier in (Tier.REASON, Tier.BALANCED):
-        return Tier.CHEAP
+    pin = pinned_tier()
+    if pin is not None and tier in MESSAGES_TIERS:
+        return pin
     return tier
+
+
+def profile_for(tier: Tier) -> RequestProfile:
+    """The request shape for a tier, after the operator's effort selection.
+
+    `REQUEST_PROFILES` stays the untouched default table - what runs when
+    nothing is selected, and what the tests pin. This is the resolved view,
+    and it is the only shape the client should send.
+
+    Three model-shaped facts live here and nowhere else:
+
+      * Opus 5 and Sonnet 5 take `output_config.effort` at all five levels.
+      * Haiku 4.5 takes no effort parameter at all. Its dial is the older
+        `thinking.budget_tokens`, so the five levels reach it in the one form
+        it accepts rather than being quietly dropped on the floor.
+      * A higher effort needs a bigger output cap to land in, and a big cap
+        needs to stream.
+    """
+    base = REQUEST_PROFILES[tier]
+    effort = selected_effort()
+    if effort is None or tier not in MESSAGES_TIERS:
+        return base
+
+    if tier is Tier.CHEAP:
+        budget, cap = CHEAP_EFFORT_BUDGET[effort]
+        return RequestProfile(
+            max_tokens=cap,
+            thinking_budget=budget,
+            stream=cap >= STREAM_ABOVE_MAX_TOKENS,
+        )
+
+    cap = max(base.max_tokens, EFFORT_MAX_TOKENS[effort])
+    return RequestProfile(
+        max_tokens=cap,
+        adaptive_thinking=True,
+        effort=effort.value,
+        stream=base.stream or cap >= STREAM_ABOVE_MAX_TOKENS,
+    )
+
+
+def selection_note() -> str:
+    """One line naming the model pin and the effort; "" when neither is set.
+
+    Every surface that names a backend appends this. A run that silently thinks
+    at `low` because a shell still has FINPLANET_EFFORT exported is
+    indistinguishable from one that thought hard - the same class of failure as
+    EchoBackend answering while looking like a model.
+    """
+    pin, effort = pinned_tier(), selected_effort()
+    parts: list[str] = []
+    if pin is not None:
+        parts.append(f"every Messages tier pinned to {MODEL_IDS[pin]} ({pin_source()})")
+    if effort is not None:
+        parts.append(f"effort {effort.value} (FINPLANET_EFFORT)")
+        if pin is None or pin is Tier.CHEAP:
+            budget = CHEAP_EFFORT_BUDGET[effort][0]
+            parts.append(
+                f"on Haiku 4.5 that is a {budget}-token thinking budget, "
+                "because it takes no effort parameter"
+            )
+    # No colons. `ask.py` labels the narrative with `reason.split(":")[0]` to cut
+    # the explanatory tail off the echo reason, so a colon in here truncates the
+    # disclosure mid-sentence - the label stops exactly where it starts saying
+    # something. Found by reading a live run's own output.
+    return " | ".join(parts)
 
 
 #: First-party rates: a cache read costs a tenth of fresh input, a five-minute

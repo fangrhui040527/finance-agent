@@ -25,8 +25,10 @@ REQUIRED_POST_HEADER = ("x-requested-with", "FinPlanet")
 
 
 def create_app() -> FastAPI:
+    from core.env import load as load_dotenv
     from core.logging import configure as configure_logging
 
+    load_dotenv()
     configure_logging()
 
     app = FastAPI(

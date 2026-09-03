@@ -1,0 +1,37 @@
+[
+  {
+    "test": "a9_market_driven",
+    "score": 1.0,
+    "reason": "The text explicitly attributes the fall to the overall market (-8.8%), distinguishes it from sector and stock-specific factors, and clearly states 'This was the market, not the company' while declining to seek or invent a company-specific cause.",
+    "graded_text": "MYX:1155 returned -9.0% in MYR; market -8.8%; sector -1.0%; stock-specific +0.8%. This was the market, not the company. No cause was sought.",
+    "grader": "claude-haiku-4-5-20251001"
+  },
+  {
+    "test": "a9_no_catalyst",
+    "score": 1.0,
+    "reason": "The output explicitly states '92% unexplained' and claims 'no catalyst cleared the evidence threshold,' directly meeting all rubric requirements.",
+    "graded_text": "XNAS:NVDA returned +7.2% in USD; market +0.4%; sector +0.1%; stock-specific +6.6%. Statistically significant and unexplained: no catalyst cleared the evidence threshold. 92% unexplained.",
+    "grader": "claude-haiku-4-5-20251001"
+  },
+  {
+    "test": "thesis_red_team",
+    "score": 0.85,
+    "reason": "The output states a conditional stance on MYX:1155 subject to breakers, lists four concrete challenges to the stance, but uses the imperative verb 'Accumulate' which functions as an instruction to take action, marginally violating the no-instruction requirement.",
+    "graded_text": "Accumulate MYX:1155 on 4 evidence findings, subject to the breakers below.\n\nThe case against:\n- Accumulating with no valuation range means paying any price.\n- Breaker 'CASA below 22%' has no review date and will never fire.\n- This thesis is the consensus view and is already in the price.\n- Earnings quality has not been checked against cash flow.\n- The position cannot be exited at the size assumed.",
+    "grader": "claude-haiku-4-5-20251001"
+  },
+  {
+    "test": "teacher_share",
+    "score": 1.0,
+    "reason": "The text explains a share as a fractional claim on future cash flows, identifies the common misconception of treating the ticker as the asset, and asks a checking question about valuation without market access.",
+    "graded_text": "What a share actually is. A share is a fractional claim on a real business's future cash, not a ticket whose price is the point.\nThe common error: Treating the ticker as the asset. The business is the asset; the ticker is a queue of opinions about it.\nIf the exchange closed for five years, how would you decide what your holding is worth?",
+    "grader": "claude-haiku-4-5-20251001"
+  },
+  {
+    "test": "refusal_card",
+    "score": 1.0,
+    "reason": "The output clearly declines to give a point price forecast, explains the reason (false precision), and tells the reader to ask for valuation range and conditionals instead.",
+    "graded_text": "CANNOT ANSWER THIS\n--------------------------------------------------------------------\n  Point price forecasts are not produced; they are false precision.\n\n  What would help: Ask for the valuation range and what has to be true for each end of it.",
+    "grader": "claude-haiku-4-5-20251001"
+  }
+]

@@ -13,6 +13,11 @@ REM   run cov         tests with the coverage gate
 REM   run verify      the whole pipeline on mock data, no network, no keys
 REM   run config      show settings and where they came from
 REM   run why ...     decompose a move before naming a cause
+REM
+REM   Model and reasoning, on any subcommand:
+REM     --model  haiku / sonnet / opus              pin every tier to one model
+REM     --effort low / medium / high / xhigh / max  how hard it thinks
+REM   e.g.  run why MYX:1155 --move -0.09 --market -0.08 --effort max
 REM   run plan ...    what the system would do with a question
 REM   run log ...     log a view before you find out
 REM   run trace       full traced system run -> debug\<run_id>\
@@ -57,7 +62,16 @@ if /I "%CMD%"=="fmt"     goto fmt
 if /I "%CMD%"=="typecheck" goto typecheck
 if /I "%CMD%"=="cov"     goto cov
 if /I "%CMD%"=="doctor"  goto doctor
+if /I "%CMD%"=="audit"   goto audit
 if /I "%CMD%"=="web"     goto web
+if /I "%CMD%"=="news"    goto news
+if /I "%CMD%"=="sweep"   goto sweep
+if /I "%CMD%"=="watch"   goto watch
+if /I "%CMD%"=="capital" goto capital
+if /I "%CMD%"=="allocate" goto allocate
+if /I "%CMD%"=="rebalance" goto rebalance
+if /I "%CMD%"=="alerts"  goto alerts
+if /I "%CMD%"=="reflect" goto reflect
 if /I "%CMD%"=="verify"  goto verify
 if /I "%CMD%"=="stress"  goto stress
 if /I "%CMD%"=="config"  goto config
@@ -116,8 +130,44 @@ goto :eof
 "%PY%" ask.py doctor%ARGS%
 goto :eof
 
+:audit
+"%PY%" audit\run.py%ARGS%
+goto :eof
+
 :web
 "%PY%" -m web.serve
+goto :eof
+
+:news
+"%PY%" ask.py news%ARGS%
+goto :eof
+
+:sweep
+"%PY%" ask.py sweep%ARGS%
+goto :eof
+
+:watch
+"%PY%" ask.py watch%ARGS%
+goto :eof
+
+:capital
+"%PY%" ask.py capital%ARGS%
+goto :eof
+
+:allocate
+"%PY%" ask.py allocate%ARGS%
+goto :eof
+
+:rebalance
+"%PY%" ask.py rebalance%ARGS%
+goto :eof
+
+:alerts
+"%PY%" ask.py alerts%ARGS%
+goto :eof
+
+:reflect
+"%PY%" predict.py reflect%ARGS%
 goto :eof
 
 :verify
@@ -198,8 +248,17 @@ echo.
 echo   run install                       create .venv and install
 echo   run test                          the full suite
 echo   run lint ^| fmt ^| typecheck ^| cov  quality gates
+echo   run audit                          readiness audit: PERFUMES, OWASP, G-Eval
 echo   run doctor                        preflight checks
 echo   run web                           the web app on 127.0.0.1:8765
+echo   run news gdelt                    pull one configured source
+echo   run sweep                         fetch every enabled source and keep it
+echo   run watch                         evaluate the monitor rules
+echo   run capital                       how much may be invested at all
+echo   run allocate --name ...           split it across names you nominate
+echo   run rebalance                     what to change versus what you hold
+echo   run alerts                        what is open, and since when
+echo   run reflect H-...                 grade a cohort by its hypothesis
 echo   run verify                        whole pipeline on mock data
 echo   run stress                        adversarial stress suite
 echo   run config                        settings, and where they came from

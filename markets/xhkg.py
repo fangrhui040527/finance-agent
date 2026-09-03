@@ -62,7 +62,9 @@ class StampDutyHK(FeeLeg):
     cost on every small trade, which is exactly where the cost floor is decided.
     """
 
-    def charge(self, consideration: Decimal) -> Decimal:
+    def charge(self, consideration: Decimal, price: Decimal | None = None) -> Decimal:
+        # `price` is accepted to keep the leg contract uniform; stamp duty is
+        # levied on consideration and never on share count.
         duty = (consideration * self.rate).quantize(Decimal("1"), rounding=ROUND_CEILING)
         return max(duty, self.minimum)
 

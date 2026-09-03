@@ -8,6 +8,7 @@ gets a refusal, every time, from code rather than from a prompt.
 
 import io
 import json
+from pathlib import Path
 
 import pytest
 
@@ -574,3 +575,99 @@ def test_a_horizon_outside_the_ladder_is_refused_not_rounded(tmp_path):
         )
     )
     assert "horizon_days must be one of" in e["message"]
+
+
+# --- the working directory an MCP client hands us ---------------------------------
+
+
+def test_the_server_anchors_itself_to_its_own_repository(tmp_path, monkeypatch):
+    """A client launches this as a subprocess and it inherits the client's cwd;
+    neither `claude mcp add` nor .mcp.json has a field to correct that. Every
+    path here is relative, so from the wrong directory the server would load
+    default settings and open a new empty ledger - and answer normally."""
+    from mcp_server.server import ROOT, _anchor_to_the_repository
+
+    assert (ROOT / "config.toml").is_file(), "ROOT must be the repo, not the package"
+
+    monkeypatch.delenv("FINPLANET_NO_CHDIR", raising=False)
+    monkeypatch.chdir(tmp_path)
+    _anchor_to_the_repository()
+    assert Path.cwd().resolve() == ROOT
+
+
+def test_the_anchor_can_be_declined(tmp_path, monkeypatch):
+    """A caller that has deliberately arranged its own layout keeps it."""
+    from mcp_server.server import _anchor_to_the_repository
+
+    monkeypatch.setenv("FINPLANET_NO_CHDIR", "1")
+    monkeypatch.chdir(tmp_path)
+    _anchor_to_the_repository()
+    assert Path.cwd().resolve() == tmp_path.resolve()
+
+
+# --- news: the feed that was missing from the surface -----------------------
+# The tool exists because MCP could reach prices but not news, so a model asked
+# "why did it move" could decompose the move and never look for a catalyst. The
+# tests below hold the distinction the whole ingest contract is built on: a
+# BROKEN source and a QUIET window are different answers, and neither is silence.
+def test_a_broken_news_source_is_reported_not_raised(monkeypatch):
+    from knowledge.feeds.adapter import FeedError
+
+    class Dead:
+        name = "gdelt"
+
+        def fetch(self, since, limit=20):
+            raise FeedError("gdelt unreachable: timed out")
+
+    monkeypatch.setattr(T, "_news_adapter", lambda source, query: Dead())
+    out = text(call("pull_news", source="gdelt"))
+    assert "NO NEWS" in out
+    assert "timed out" in out
+
+
+def test_a_quiet_window_is_reported_as_one(monkeypatch):
+    from knowledge.feeds.adapter import IngestStats
+
+    class Quiet:
+        name = "gdelt"
+
+        def fetch(self, since, limit=20):
+            return []
+
+        def normalize(self, records, entity_index=None, holdings=None, watchlist=None):
+            return [], IngestStats()
+
+    monkeypatch.setattr(T, "_news_adapter", lambda source, query: Quiet())
+    out = text(call("pull_news", source="gdelt"))
+    assert "quiet window" in out
+    assert "NO NEWS" not in out
+
+
+def test_an_unknown_source_names_the_ones_that_exist():
+    message = err(call("pull_news", source="bloomberg"))["message"]
+    assert "gdelt" in message
+
+
+def test_nothing_escalates_with_an_empty_watchlist(monkeypatch):
+    """The gate that made the news half look like a quiet day either way."""
+    from knowledge.feeds.adapter import IngestStats
+
+    class Feed:
+        name = "gdelt"
+
+        def fetch(self, since, limit=20):
+            return [object()]
+
+        def normalize(self, records, entity_index=None, holdings=None, watchlist=None):
+            assert holdings == set() and watchlist == set()
+            return [], IngestStats(fetched=1, kept=1, unlinked=1)
+
+    monkeypatch.setattr(T, "_news_adapter", lambda source, query: Feed())
+    monkeypatch.setattr(T, "_holdings_and_watchlist", lambda: (set(), set()))
+    out = text(call("pull_news", source="gdelt"))
+    assert "escalated 0" in out
+    assert "holdings" in out and "watchlist" in out
+
+
+def test_hours_below_one_is_refused():
+    assert "hours" in err(call("pull_news", hours=0))["message"]

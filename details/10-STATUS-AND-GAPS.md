@@ -21,22 +21,131 @@ invisible.
 | Attribution engine — decomposition, unexplained share, non-finite refusal | complete |
 | Risk engine — HHI, effective bets, correlation clusters, 4 concentration measures | complete |
 | Sizing — 5 caps, binding cap, lot rounding, cost floor, `NoPosition` | complete |
-| Investable-capital waterfall — emergency floor, goals, debt hurdle | complete |
+| Investable-capital waterfall — emergency floor, goals, debt hurdle | complete, **and reachable since 2026-08-30** — see the note below |
 | 11 market adapters, fee schedules, alias map | complete |
+| **Broker fee schedules** — `moomoo_my` on XNAS **and XKLS**, from the account's real card | complete, **and reachable** via `[account] broker` |
 | **MYR unit-of-account boundary** | complete |
 | Knowledge graph — schema, store, ids, 6 extractors, reproducible build | complete |
 | Event taxonomy, base rates, catalyst attachment | complete |
 | Retrieval — hybrid, parent-child chunking, router | complete |
 | Backtest harness — walk-forward, costs, metrics, point-in-time | complete |
-| MCP server — 12 tools, protocol, selftest | complete |
+| MCP server — 27 tools, protocol, selftest | complete |
 | Teacher — 30 concepts, enforced prerequisite order | complete |
 | Reflection — grading, lesson proposal, calibration, scoring | complete |
 | Tracing — spans, HTML report, anatomy, prompts | complete |
-| CLI — 10 subcommands | complete |
+| CLI — 18 subcommands | complete |
 | Fitness function — refuses a partial score | complete |
 | CI — 10 steps, offline, keyless | complete |
 
 ---
+
+### The waterfall was complete, correct, and unreachable (fixed 2026-08-30)
+
+`engines/sizing/waterfall.py` computed liquid assets → emergency floor →
+near-term goals → debt above the hurdle → cash buffer → investable, with three
+*locked* steps, property tests, and an explicit refusal to raid the floor.
+`A13Sizing.investable_capital()` wrapped it. **Nothing outside the tests called
+either.** A grep for `waterfall|investable` across `ask.py`, `mcp_server/` and
+`web/` returned one hit: the help text of a `--portfolio` flag.
+
+The row above said "complete", which was true of the engine and wrong about the
+system. The consequence was not cosmetic: `size --portfolio <number>` made the
+user type the waterfall's **output** as its **input**, so the emergency floor,
+the near-term goals and the debt hurdle were bypassed by construction on every
+real invocation — silently, while `docs/05` said "before any question about
+which stock, there is a question about how much money is allowed to be in
+stocks at all."
+
+Now: `[capital]` in `config.toml`, `ask.py capital`, `size --from-plan`, the
+`investable_capital` MCP tool and `GET /api/capital` all run the one path. A
+typed `--portfolio` still works and now says in as many words which three locks
+did not apply to it.
+
+**The lesson for this table:** a row here describes what a USER can reach, not
+what exists in `engines/`. Two other rows were audited against that standard at
+the same time — the MCP tool count and the CLI subcommand count were simply
+stale, which is a different and much smaller kind of wrong.
+
+### The venue schedule is not the account's schedule (added 2026-09-03)
+
+Every `markets/<mic>.py` answers "what does this exchange charge everyone".
+`markets/xnas.py` answers it with a ZERO-COMMISSION US retail account — a real
+account shape, and the reason its floor is 5 bps and its minimum economic
+position USD 1.00. For an account that pays commission it is simply the wrong
+schedule, and sizing against it funds US positions that cannot pay for their own
+round trip. Silently: a wrong floor is still a number.
+
+`markets/brokers.py` now carries `moomoo_my` on XNAS. It moves the minimum
+economic position from USD 1.00 to about **USD 1,511 at a USD 100 share price**,
+and because two legs are charged per SHARE that figure is a function of price,
+rising to about USD 2,620 at USD 10 a share. Two things fell out of building it:
+`ask.py size` and `ask.py allocate` (through `mcp_server/tools.py`) are wired;
+**`web/api.py`, `engines/sizing/rebalance.py` and `trace_run.py` are NOT** and
+still price on the venue's terms. That is a real half-wiring and is recorded here
+rather than described as done.
+
+Two constants in that file — the SEC fee rate and the FINRA trading-activity fee
+— are regulator pass-throughs that were NOT verified against a primary source.
+They are pinned by test so a drift is visible, and they are the reason a cost
+floor from this schedule should not be trusted to the basis point yet.
+
+### The death detector was watching the wrong thing (added 2026-09-03)
+
+`silence` counts model calls, and `ask.py sweep` makes none. So the day the
+sweep went on a daily timer, the one rule meant to catch "a scheduled job died
+quietly" could not see it — and turned on anyway it would have fired every
+morning after a run that worked, while staying silent through a sweep dead since
+Tuesday if you happened to ask a question yesterday. Wrong in both directions
+from one plausible setting.
+
+`sweep_silence` asks the same question of the record the sweep writes. Off by
+default, 30 hours in the shipped config, quiet until a source has succeeded
+once. One rule covers both a dead scheduler and a week of refused requests,
+because a failed sweep is not a successful one and both want the same look.
+
+### `[sources]` described four settings and nothing read any of them (fixed 2026-09-03)
+
+`config.toml` carried `[sources] enabled`, `gdelt_poll_minutes`, `gdelt_languages`
+and `gdelt_countries`, each with a paragraph explaining what it controlled.
+`core/config.Config` had no field for any of them and `load()` never looked. A
+grep for them across the repository returned nothing but the config file itself.
+
+So enabling a source did nothing, narrowing the languages did nothing, and the
+comment above `enabled` — "a disabled feed, or one whose key is missing, is
+skipped and says so" — described a code path with no caller. The same defect
+class as the unreachable waterfall above, and it fails the same way: silently,
+producing a system that looks configured.
+
+Now: `Config.sources` is loaded and **validated against the adapter registry**,
+the same shape as the broker check — naming a source here does not create one,
+and an enabled name with no adapter is refused at load rather than ingesting
+nothing every night.
+
+### News was fetched and thrown away (fixed 2026-09-03)
+
+`ask.py news` fetched a source, printed it, and kept nothing; `GdeltExtractor`
+could only read a fixture from disk. Nothing wrote an article anywhere. A
+scheduled nightly run would therefore have produced a month of scrollback and an
+empty disk, and the answer to "what did we see on the 3rd" would have been the
+terminal history of whichever machine ran it.
+
+`knowledge/corpus.py` is the store that was missing — append-only, deduplicated
+**across runs**, and recording every sweep including the ones that failed.
+`ask.py sweep` is the scheduled entry point. See `details/09-RUNBOOK.md`.
+
+The property that took the most care is the last one: a month of refused
+requests and a genuinely quiet month leave an identical empty articles table.
+Without the `sweeps` table, an outage reads as calm.
+
+### What this system does NOT do
+
+It does not pick stocks. There is no screen, no ranked candidate list, no
+"here are five ideas". It evaluates names **you** bring, sizes them, splits a
+budget across them, and tells you what changed against what you hold.
+`Intent.SCREEN` now refuses and says so; before 2026-08-30 it routed to two
+per-instrument agents with no instrument and ran them against nothing.
+`docs/01`'s architecture diagram still draws a `Factor library → Ranked
+candidates` box: it is marked **unbuilt** there and it is not on the roadmap.
 
 ## Not built
 

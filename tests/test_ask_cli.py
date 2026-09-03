@@ -136,3 +136,34 @@ def test_a_collinear_history_is_a_refusal_not_a_traceback(tmp_path, capsys):
     )
     assert code == 0
     assert "attribution unavailable" in out.lower()
+
+
+def test_fetch_does_not_demand_the_numbers_it_exists_to_measure(monkeypatch, capsys):
+    """--fetch measures --move and --market from the feed, so argparse must not
+    require them. It did, which made the measured path - the one the command
+    is for - unreachable without typing the numbers you were asking it to
+    measure."""
+    from datetime import date
+
+    import ask
+    from core.market.feed import PriceSeries
+    from core.market.prices import Bar
+
+    def series(instrument, end=None):
+        bars = [
+            Bar(date(2026, 8, 24 + i), 10.0, 10.5, 9.9, 10.0 + i * 0.1, 1000.0) for i in range(4)
+        ]
+        return PriceSeries(instrument, bars)
+
+    monkeypatch.setattr(ask, "_feed", lambda: type("F", (), {"fetch": staticmethod(series)})())
+    assert ask.main(["why", "MYX:1155", "--fetch", "--against", "MYX:1023", "--days", "2"]) == 0
+    out = capsys.readouterr().out
+    assert "measured" in out
+    assert "unexplained" in out
+
+
+def test_without_fetch_both_typed_legs_are_still_required(capsys):
+    import ask
+
+    assert ask.main(["why", "MYX:1155", "--move", "-0.02"]) == 2
+    assert "not a decomposition" in capsys.readouterr().err

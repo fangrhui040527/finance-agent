@@ -144,11 +144,33 @@ def test_loosening_up_to_the_bound_is_allowed_but_not_past_it(tmp_path):
         load(write(tmp_path, "[limits]\nsingle_name = 0.1501\n"))
 
 
-def test_a_local_override_wins_over_the_committed_file(tmp_path):
+def test_a_local_override_wins_over_the_committed_file(tmp_path, monkeypatch):
+    # The one test about WHICH FILE WINS must not have the winner pinned for it.
+    # The suite-wide fixture pins FINPLANET_CONFIG so no test reads an
+    # operator's real position; here the search order is the subject.
+    monkeypatch.delenv("FINPLANET_CONFIG", raising=False)
     (tmp_path / "config.toml").write_text("[limits]\nsingle_name = 0.08\n")
     (tmp_path / "config.local.toml").write_text("[limits]\nsingle_name = 0.05\n")
     assert find(tmp_path).name == "config.local.toml"
     assert load(find(tmp_path)).limits.single_name == 0.05
+
+
+def test_the_pin_beats_the_search_and_refuses_a_path_that_is_not_there(tmp_path, monkeypatch):
+    """FINPLANET_CONFIG is how a test says "the shipped file, whatever this box
+    has". It has to beat config.local.toml or it would not do that job, and it
+    has to REFUSE a missing path rather than fall back: a typo that quietly
+    loaded a different financial position would make every number downstream
+    right about the wrong file."""
+    (tmp_path / "config.toml").write_text("[limits]\nsingle_name = 0.08\n")
+    (tmp_path / "config.local.toml").write_text("[limits]\nsingle_name = 0.05\n")
+
+    monkeypatch.setenv("FINPLANET_CONFIG", str(tmp_path / "config.toml"))
+    assert find(tmp_path).name == "config.toml"
+    assert load(find(tmp_path)).limits.single_name == 0.08
+
+    monkeypatch.setenv("FINPLANET_CONFIG", str(tmp_path / "nope.toml"))
+    with pytest.raises(ConfigError, match="FINPLANET_CONFIG"):
+        find(tmp_path)
 
 
 def test_the_local_override_is_gitignored():

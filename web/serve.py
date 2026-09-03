@@ -9,8 +9,10 @@ PORT = 8765
 def main() -> int:
     import uvicorn
 
+    from core.env import load as load_dotenv
     from core.logging import configure
 
+    load_dotenv()
     configure()
     from web.app import create_app
 

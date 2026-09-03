@@ -41,7 +41,9 @@ itself and needs no client.
 from __future__ import annotations
 
 import sys
+from pathlib import Path
 
+from mcp_server import observability as O
 from mcp_server import tools as T
 from mcp_server.protocol import Server
 
@@ -67,6 +69,21 @@ Three habits that make the output trustworthy:
 3. NEVER INVENT A NUMBER A TOOL CAN GIVE YOU. If price data is absent the tool
    says NO DATA. Say so. An estimated price is indistinguishable from a real one
    once it is in the narrative, and this system is used to make money decisions.
+
+4. WHEN SOMETHING LOOKS WRONG, LOOK AT THE MACHINE. Start at scorecard: one
+   line per dimension - robustness, performance, efficiency, quality,
+   maintainability, usability, reasoning - with the evidence, or an explicit
+   CANNOT SCORE where there is none. Then open the matching report:
+   system_health (can it run at all), operating_report (what it did and cost),
+   efficiency_report (cache, tiers, wasted spend), quality_report
+   (calibration, citations, verdicts), maintainability_report (tests and docs
+   per module), reasoning_report (how turns ended, what the rails stopped),
+   recent_failures (what broke, in which run), run_anatomy (one run, and
+   whether the METHOD changed), open_alerts (what tripped unattended).
+
+   A stubbed backend or a missing database explains more odd output than any
+   amount of reasoning about the output itself. And a dimension that says
+   CANNOT SCORE has not passed - it has not been measured.
 
 Nothing here places orders, and nothing here is financial advice. Output is
 analysis with an evidence chain.
@@ -114,6 +131,23 @@ S.tool(
         ["instrument"],
     ),
 )(T.get_prices)
+
+S.tool(
+    "pull_news",
+    "What a news source carried in a window, and what of it reached the review "
+    "queue. Call this before naming a catalyst: attribution says HOW MUCH of a "
+    "move was company-specific, this is where the reason for that part comes "
+    "from. A broken feed and a quiet window are reported differently - neither "
+    "is silence.",
+    obj(
+        {
+            "source": _str("a registered source, e.g. 'gdelt'"),
+            "query": _str("search terms, e.g. 'maybank'; omit for the source default"),
+            "hours": {"type": "integer", "description": "window back from now (default 24)"},
+            "limit": {"type": "integer", "description": "most articles to return (default 20)"},
+        }
+    ),
+)(T.pull_news)
 
 S.tool(
     "why_did_it_move",
@@ -235,6 +269,76 @@ S.tool(
 )(T.size_position)
 
 S.tool(
+    "investable_capital",
+    "How much money is allowed to be in stocks AT ALL, derived from the user's "
+    "[capital] plan: liquid assets minus the emergency floor, near-term goals "
+    "and debt above the hurdle. Call this BEFORE size_position - a "
+    "portfolio_value you were handed or guessed skips all three locks, and "
+    "size_position says so when that happens.",
+    obj({"db": _str("optional ledger path (unused today, reserved)")}),
+)(T.investable_capital)
+
+S.tool(
+    "allocate_capital",
+    "Split investable capital across names the USER nominated, under every "
+    "concentration limit. It does not choose names - that is the question "
+    "before this one, and this system does not answer it. Omit portfolio_value "
+    "to derive capital from the [capital] plan. Refuses rather than fabricating "
+    "diversification: too few fundable names, or a book that would behave as "
+    "one bet, comes back as a refusal with the reason. The result is a CAPITAL "
+    "split, not a set of positions - each name still needs its own breakers.",
+    obj(
+        {
+            "names": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "MIC:CODE:PRICE:STOP:ADV:SECTOR; leave PRICE and ADV "
+                "empty with fetch=true to measure them",
+            },
+            "portfolio_value": _num("investable capital; omit to derive it from [capital]"),
+            "fetch": {"type": "boolean", "description": "measure empty price/adv from the feed"},
+            "as_at": _str("point-in-time bound for fetched prices (YYYY-MM-DD)"),
+            "single_name_limit": _num("fraction, default 0.08"),
+            "risk_per_trade": _num("fraction, default 0.0075"),
+            "participation": _num("fraction of ADV, default 0.05"),
+        },
+        ["names"],
+    ),
+)(T.allocate_capital)
+
+S.tool(
+    "rebalance_book",
+    "What to change versus what is HELD, with the round-trip cost of each "
+    "change. The book comes from account.holdings in config.toml (id, units, "
+    "avg_cost, stop, sector) - it cannot be passed in, because a book the user "
+    "never stated is not their book. Capital defaults to the book's own market "
+    "value; portfolio_value or from_plan sets it instead. Trades worth less "
+    "than their own round trip come back as 'hold' with the number, and the "
+    "shape of the book before and after is reported by the portfolio-risk "
+    "agent. Differences against a target CAPITAL split, not a set of positions.",
+    obj(
+        {
+            "names": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "extra names to consider alongside the book, as "
+                "MIC:CODE:PRICE:STOP:ADV:SECTOR",
+            },
+            "portfolio_value": _num("capital to split; omit to use the book's own value"),
+            "from_plan": {
+                "type": "boolean",
+                "description": "derive capital from the [capital] waterfall instead",
+            },
+            "fetch": {"type": "boolean", "description": "measure empty price/adv from the feed"},
+            "as_at": _str("point-in-time bound for fetched prices (YYYY-MM-DD)"),
+            "single_name_limit": _num("fraction, default 0.08"),
+            "risk_per_trade": _num("fraction, default 0.0075"),
+        },
+        [],
+    ),
+)(T.rebalance_book)
+
+S.tool(
     "plan_question",
     "What the system would do with a question: which agents, what it would "
     "cost, and what it refuses outright. Useful before a long piece of work.",
@@ -297,6 +401,148 @@ S.tool(
         ["title", "thesis"],
     ),
 )(T.log_hypothesis)
+
+# --------------------------------------------------------------------------
+# Watching the machine itself. Read-only, and none of it returns prompt text.
+# --------------------------------------------------------------------------
+
+S.tool(
+    "system_health",
+    "Preflight: what this installation can actually do right now, and what "
+    "each gap affects - config, registry, stores, model backend, spend cap, "
+    "trace retention, and (with offline=false) whether the price and news "
+    "sources are reachable. Call this FIRST when anything behaves oddly: a "
+    "missing database or a stubbed backend explains more failures than any "
+    "amount of reasoning about the output.",
+    obj(
+        {
+            "offline": {
+                "type": "boolean",
+                "description": "skip the two network probes (default true)",
+            }
+        }
+    ),
+)(O.system_health)
+
+S.tool(
+    "operating_report",
+    "Cost, latency, model mix and citation health over the last N days: how "
+    "many model calls, at what price, on which models, how slow (p50/p95), "
+    "how close to the daily budget, and how many claims were DROPPED for "
+    "want of a citation. An empty ledger is reported as 'nothing has run', "
+    "never as a clean bill of health.",
+    obj(
+        {
+            "days": {"type": "integer", "description": "window in days (default 7)"},
+            "db": _str("optional ledger path"),
+        }
+    ),
+)(O.operating_report)
+
+S.tool(
+    "recent_failures",
+    "Errors, guardrail denials and dropped claims across recent traced runs. "
+    "Reports what failed, where, and how often - error text, event name, run "
+    "id - so a bug can be located. Never returns prompt or response text: "
+    "traces hold verbatim prompts and portfolio positions, and releasing "
+    "those is the operator's decision, not a tool's.",
+    obj(
+        {
+            "runs": {"type": "integer", "description": "how many recent runs to scan (default 10)"},
+            "db": _str("optional ledger path"),
+        }
+    ),
+)(O.recent_failures)
+
+S.tool(
+    "run_anatomy",
+    "One traced run in detail: where the time went, what was denied, what "
+    "raised - and whether the METHODOLOGY changed since the run before it. "
+    "That last part answers the question a surprising run actually raises: "
+    "did the system change, or did the world? Omit run_id for the most "
+    "recent run.",
+    obj({"run_id": _str("e.g. '20260831T083520-5963bf'; omit for the latest")}),
+)(O.run_anatomy)
+
+S.tool(
+    "open_alerts",
+    "Monitor rules currently tripped, and the history of when they opened and "
+    "cleared. The other observability tools answer when asked; this reports "
+    "what a scheduled `ask.py watch` found while nobody was looking. No "
+    "history at all means no rule has been EVALUATED - not that none would fire.",
+    obj(
+        {
+            "history": {"type": "integer", "description": "how many past events (default 10)"},
+            "alerts_db": _str("optional alert store path"),
+        }
+    ),
+)(O.open_alerts)
+
+S.tool(
+    "quality_report",
+    "Is the ANALYSIS any good? Forecast calibration (Brier, stated against "
+    "realised), how many claims survived citation verification and why the "
+    "rest were dropped, the distribution of attribution verdicts, red-team "
+    "activity, and the eval-suite ratchet's health. Refuses to score "
+    "calibration below the graded-call minimum rather than reporting luck.",
+    obj(
+        {
+            "days": {"type": "integer", "description": "window (default 30)"},
+            "db": _str("ledger path"),
+        }
+    ),
+)(O.quality_report)
+
+S.tool(
+    "efficiency_report",
+    "Am I paying for what I am getting? Cost per call and per 1k output "
+    "tokens, cache HIT RATE (a zero rate across repeated calls means the "
+    "cached prefix is changing), tier discipline as a share of spend, and "
+    "WASTED spend - calls that billed and returned nothing usable because "
+    "they were refused or truncated.",
+    obj(
+        {
+            "days": {"type": "integer", "description": "window (default 7)"},
+            "db": _str("ledger path"),
+        }
+    ),
+)(O.efficiency_report)
+
+S.tool(
+    "maintainability_report",
+    "Can this be changed safely? Test and documentation edges per module "
+    "from the codebase graph, which modules have neither, and the runtime "
+    "dependency versions. Counts EDGES, not coverage - a module without a "
+    "test edge may still be covered indirectly, and the report says so "
+    "rather than implying a number it did not measure.",
+    obj({"db": _str("codebase graph path (default data/codegraph.db)")}),
+)(O.maintainability_report)
+
+S.tool(
+    "reasoning_report",
+    "How is the model behaving, and what did the user get back? How turns "
+    "ENDED (refusal, truncation, end_turn), what the guardrails had to stop "
+    "and under which rule, the answered-against-refused split with its most "
+    "common reasons, and whether any narrative carried a number the engines "
+    "never supplied. Refusal RATE is not a quality score - the design "
+    "optimises refusal PRECISION - and the report says so.",
+    obj(
+        {
+            "runs": {"type": "integer", "description": "traced runs to scan (default 20)"},
+            "db": _str("ledger path"),
+        }
+    ),
+)(O.reasoning_report)
+
+S.tool(
+    "scorecard",
+    "Every dimension in one view - robustness, performance, efficiency, "
+    "quality, maintainability, usability, reasoning - each with a verdict "
+    "and the evidence behind it, or an explicit CANNOT SCORE where the "
+    "evidence does not exist yet. Start here, then open the report for "
+    "whichever line looks wrong.",
+    obj({"db": _str("ledger path")}),
+)(O.scorecard)
 
 S.tool(
     "explain_path",
@@ -361,9 +607,42 @@ def selftest() -> int:
     return 0 if ok else 1
 
 
+#: The repository root, derived from this file rather than from the process's
+#: working directory.
+ROOT = Path(__file__).resolve().parent.parent
+
+
+def _anchor_to_the_repository() -> None:
+    """Run against this repo's own files, wherever the client started us.
+
+    An MCP client launches the server as a subprocess and inherits its own
+    working directory - and neither Claude Code's `claude mcp add` nor the
+    `.mcp.json` schema has a `cwd` field to correct it. Every path this system
+    reads is relative: `config.toml`, `data/provenance.db`, `data/graph.db`.
+    Started from anywhere else the server does not fail - it quietly loads
+    DEFAULT settings, writes a NEW empty ledger next to wherever the client
+    happened to be, and answers every question as though this were a fresh
+    installation. Silent, plausible, and wrong: the same failure shape as the
+    echo backend answering while looking like a model.
+
+    So the server anchors itself. `FINPLANET_NO_CHDIR=1` opts out, for a caller
+    that has deliberately arranged its own layout.
+    """
+    import os
+
+    if os.environ.get("FINPLANET_NO_CHDIR", "").strip() in ("1", "true", "yes"):
+        return
+    if Path.cwd().resolve() != ROOT:
+        os.chdir(ROOT)
+
+
 def main(argv=None) -> int:
+    _anchor_to_the_repository()
+
+    from core.env import load as _load_dotenv
     from core.logging import configure as _configure_logging
 
+    _load_dotenv()
     _configure_logging()
     argv = sys.argv[1:] if argv is None else argv
     if "--selftest" in argv:

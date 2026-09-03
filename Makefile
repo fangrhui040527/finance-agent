@@ -1,9 +1,16 @@
-.PHONY: install test verify stress doctor web config up down health lint fmt typecheck cov due status mcp mcp-check trace graph codegraph graph-report
+.PHONY: install test verify stress doctor audit sweep watch capital web config up down health lint fmt typecheck cov due status mcp mcp-check trace graph codegraph graph-report
 install: ; uv sync --frozen --python 3.11
 lint:    ; . .venv/bin/activate && ruff check . && ruff format --check .
 fmt:     ; . .venv/bin/activate && ruff check --fix . && ruff format .
 typecheck: ; . .venv/bin/activate && pyright
 doctor:  ; . .venv/bin/activate && python ask.py doctor
+audit:   ; . .venv/bin/activate && python audit/run.py
+audit-live: ; . .venv/bin/activate && EVAL_LIVE=1 python audit/run.py
+capital: ; . .venv/bin/activate && python ask.py capital
+allocate: ; . .venv/bin/activate && python ask.py allocate
+rebalance: ; . .venv/bin/activate && python ask.py rebalance
+sweep:   ; . .venv/bin/activate && python ask.py sweep
+watch:   ; . .venv/bin/activate && python ask.py watch
 web:     ; . .venv/bin/activate && python -m web.serve
 cov:     ; . .venv/bin/activate && python -m pytest --cov --cov-report=term-missing
 test:    ; . .venv/bin/activate && python -m pytest

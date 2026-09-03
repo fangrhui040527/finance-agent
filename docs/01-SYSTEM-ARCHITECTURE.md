@@ -122,6 +122,14 @@ flowchart TB
 
 ## 3. Agent org chart
 
+
+> **The cross-sectional screen is not built and is not planned.** It is drawn
+> here because the architecture has a place for it, not because code exists.
+> This system evaluates names the user brings; generating candidates is a
+> different product, and a ranked list carries an implicit recommendation that
+> no evidence chain here supports. `Intent.SCREEN` refuses and names the
+> boundary (`agents/supervisor.py`).
+
 ```mermaid
 flowchart TD
     Q(["Question / scheduled trigger"]) --> A0
@@ -150,9 +158,9 @@ flowchart TD
         A6["A6 Macro &amp; Regime"] --> A9
     end
 
-    subgraph SCREEN["CROSS-SECTIONAL SCREEN"]
+    subgraph SCREEN["CROSS-SECTIONAL SCREEN — NOT BUILT"]
         direction LR
-        FACT["Factor library"] --> RANK["Ranked candidates"]
+        FACT["Factor library<br/>(unbuilt)"] --> RANK["Ranked candidates<br/>(unbuilt)"]
         A6 --> RANK
     end
 

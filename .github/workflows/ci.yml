@@ -123,4 +123,17 @@ jobs:
         with:
           python-version: "3.11"
       - name: Dependency vulnerability audit
-        run: uv run --frozen pip-audit --strict --desc
+        # pip-audit scans the installed ENVIRONMENT, which includes this project.
+        # finance-agent is not published to PyPI, so it cannot be looked up, and
+        # --strict promotes "could not be audited" from a warning to a failure -
+        # which is why this job has been red on main since 2026-08-31 while every
+        # test job passed. Auditing the exported lockfile with --no-emit-project
+        # drops only the unpublishable local package.
+        #
+        # --strict is deliberately KEPT. A real dependency that cannot be audited
+        # must still fail the build; dropping --strict also goes green but
+        # silently weakens a security gate. --skip-editable looks like the fix
+        # and is not - it still exits 1, with "distribution marked as editable".
+        run: |
+          uv export --frozen --quiet --no-emit-project --no-dev -o /tmp/reqs.txt
+          uv run --frozen pip-audit --strict --desc -r /tmp/reqs.txt

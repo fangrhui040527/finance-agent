@@ -1,0 +1,15 @@
+{
+  "manifest_hash": "ecd7d4f5aaf035f0d8b980dd42a9d3e4fbfa343bbd90fb8dddeaf14da7b9228d",
+  "package_versions": {
+    "anthropic": "1.3.0",
+    "fastapi": "0.141.1",
+    "pydantic": "2.13.5",
+    "pyyaml": "6.0.3",
+    "uvicorn": "0.52.4"
+  },
+  "registry_hash": "8564ee90415d71303be78a48675e71958fac372cb651ab572f256dd8dabdd284",
+  "system_prompt_hashes": {
+    "a15_reflection": "488a6a87154938f4e2f8c1677e247f7d9022e927c83a0999d07bee46430fad7b"
+  },
+  "tools_hash": "879f92c6408421783852fe5937ae59d0c31ed8597a52a1b3acecf80b311bee71"
+}

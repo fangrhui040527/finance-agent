@@ -43,15 +43,38 @@ def health() -> S.Envelope:
 @router.get("/backend")
 def backend() -> S.Envelope:
     from core.llm.backends import backend_from_env
-    from core.llm.tiers import cheap_capped
+    from core.llm.tiers import (
+        MODEL_IDS,
+        cheap_capped,
+        effective_tier,
+        pinned_tier,
+        profile_for,
+        selected_effort,
+    )
 
     b, reason = backend_from_env()
+    effort = selected_effort()
+    pin = pinned_tier()
     return S.Envelope(
         text=reason,
         data={
             "backend": type(b).__name__,
             "is_stub": type(b).__name__ == "EchoBackend",
             "cheap_capped": cheap_capped(),
+            "pinned_model": MODEL_IDS[pin] if pin is not None else None,
+            "effort": effort.value if effort is not None else None,
+            # What each tier will ACTUALLY call and how hard it will think.
+            # A screen that showed the routing table instead would be showing
+            # the design, not the run.
+            "tiers": {
+                tier.value: {
+                    "model": MODEL_IDS[effective_tier(tier)],
+                    "effort": profile_for(effective_tier(tier)).effort,
+                    "thinking_budget": profile_for(effective_tier(tier)).thinking_budget,
+                    "max_tokens": profile_for(effective_tier(tier)).max_tokens,
+                }
+                for tier in MODEL_IDS
+            },
         },
     )
 
@@ -104,30 +127,88 @@ def doctor(offline: bool = True) -> S.Envelope:
     )
 
 
+@router.get("/capital")
+def capital() -> S.Envelope:
+    """The waterfall, or an explicit NO PLAN. Never a zero that looks like an answer."""
+    from core.config import load as load_config
+
+    cfg = load_config()
+    plan = cfg.capital
+    env = _run(T.investable_capital)
+    env.data = {
+        "stated": plan.stated,
+        "liquid_assets": str(plan.liquid_assets),
+        "essential_monthly_spend": str(plan.essential_monthly_spend),
+        "planned_monthly_contribution": str(plan.planned_monthly_contribution),
+        "emergency_months": cfg.emergency_months,
+        "debt_hurdle": str(cfg.debt_hurdle),
+        "goals": [
+            {"name": g.name, "amount": str(g.amount), "months_away": g.months_away}
+            for g in plan.goals
+        ],
+        "liabilities": [
+            {"name": x.name, "balance": str(x.balance), "annual_rate": str(x.annual_rate)}
+            for x in plan.liabilities
+        ],
+        "book": [
+            {
+                "id": h.id,
+                "units": str(h.units) if h.units is not None else None,
+                "avg_cost": str(h.avg_cost) if h.avg_cost is not None else None,
+            }
+            for h in cfg.book
+        ],
+    }
+    return env
+
+
 # --- markets -------------------------------------------------------------------
 
 
 @router.get("/markets")
 def markets() -> S.Envelope:
+    from decimal import Decimal
+
+    from core.config import load as load_cfg
     from engines.sizing.caps import cost_floor_bps, cost_floor_value
+    from markets.brokers import cost_at, prices_venue
     from markets.registry import get as market_get
     from markets.registry import supported
 
+    #: The share price the broker figures below are quoted at. A broker leg
+    #: charged PER SHARE makes the minimum position a function of price, so
+    #: there is no single number to report here - this listing has no
+    #: instrument and therefore no price of its own. Quoting one silently
+    #: would be inventing the input; naming it lets a reader check it.
+    REFERENCE_PRICE = Decimal(100)
+
+    broker = load_cfg().broker
     rows = []
     for mic in supported():
         a = market_get(mic)
-        rows.append(
-            {
-                "mic": mic,
-                "country": a.country,
-                "currency": a.currency,
-                "tier": a.tier,
-                "index": a.local_index,
-                "settlement_days": a.settlement_days,
-                "cost_floor_bps": str(cost_floor_bps(mic)),
-                "minimum_economic_position": str(cost_floor_value(a.fee_schedule.round_trip, mic)),
-            }
-        )
+        row = {
+            "mic": mic,
+            "country": a.country,
+            "currency": a.currency,
+            "tier": a.tier,
+            "index": a.local_index,
+            "settlement_days": a.settlement_days,
+            # The VENUE's own terms - what this exchange charges everyone.
+            "cost_floor_bps": str(cost_floor_bps(mic)),
+            "minimum_economic_position": str(cost_floor_value(a.fee_schedule.round_trip, mic)),
+        }
+        # ...and the account's, where the broker sets its own on this venue.
+        # Absent rather than duplicated when it does not: a broker figure equal
+        # to the venue figure reads as confirmation, when it only means nobody
+        # modelled this venue for this broker.
+        if prices_venue(broker, mic):
+            row["broker"] = broker
+            row["broker_cost_floor_bps"] = str(cost_floor_bps(mic, broker))
+            row["broker_minimum_economic_position"] = str(
+                cost_floor_value(cost_at(mic, broker, REFERENCE_PRICE), mic, broker)
+            )
+            row["broker_minimum_quoted_at_price"] = str(REFERENCE_PRICE)
+        rows.append(row)
     return _run(T.market_info, data=rows)
 
 
@@ -256,6 +337,16 @@ def _narrative(body: S.ThesisBody) -> dict:
     return {"text": done.text, "backend": type(backend_obj).__name__, "reason": reason}
 
 
+@router.post("/allocate")
+def allocate(body: S.AllocateBody) -> S.Envelope:
+    return _run(T.allocate_capital, **body.model_dump())
+
+
+@router.post("/rebalance")
+def rebalance(body: S.RebalanceBody) -> S.Envelope:
+    return _run(T.rebalance_book, **body.model_dump())
+
+
 # --- portfolio -----------------------------------------------------------------
 
 
@@ -382,6 +473,40 @@ def log_hypothesis(body: S.HypothesisBody) -> S.Envelope:
     return _run(T.log_hypothesis, title=body.title, thesis=body.thesis)
 
 
+@router.get("/alerts")
+def alerts(history: int = 20) -> S.Envelope:
+    from core.monitor import AlertLog
+
+    with AlertLog() as log:
+        open_now = log.open_rules()
+        rows = log.history(limit=history)
+    return S.Envelope(
+        text=f"{len(open_now)} open, {len(rows)} event(s) in history",
+        data={
+            "open": [
+                {
+                    "rule": rule,
+                    "severity": r["severity"],
+                    "title": r["title"],
+                    "detail": r["detail"],
+                    "since": r["at"],
+                }
+                for rule, r in sorted(open_now.items())
+            ],
+            "history": [
+                {
+                    "at": r["at"],
+                    "state": r["state"],
+                    "rule": r["rule"],
+                    "title": r["title"],
+                    "severity": r["severity"],
+                }
+                for r in rows
+            ],
+        },
+    )
+
+
 # --- traces --------------------------------------------------------------------
 
 
@@ -432,6 +557,22 @@ def trace_run(run_id: str) -> S.Envelope:
     return S.Envelope(
         text=f"{len(events)} event(s) in {safe}",
         data={"run_id": safe, "events": events, "manifest": manifest},
+    )
+
+
+@router.get("/trace/runs/{run_id}/blob/{name}")
+def trace_blob(run_id: str, name: str) -> S.Envelope:
+    """One externalised prompt/response blob, verbatim. Names are sanitised the
+    same way the tracer writes them, so traversal cannot compose a path."""
+    from pathlib import Path
+
+    safe_run = "".join(c for c in run_id if c.isalnum() or c in "-_")
+    safe_name = "".join(c for c in name if c.isalnum() or c in "-_.")
+    p = Path("debug") / safe_run / "prompts" / safe_name
+    if safe_run != run_id or safe_name != name or not p.is_file() or p.suffix != ".txt":
+        raise HTTPException(status_code=404, detail=f"no blob {name!r} in {run_id!r}")
+    return S.Envelope(
+        text=p.read_text(encoding="utf-8"), data={"run_id": safe_run, "name": safe_name}
     )
 
 

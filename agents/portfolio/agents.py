@@ -27,6 +27,7 @@ from engines.sizing.caps import (
     ImplausibleEdge,
     concentration_cap,
     cost_floor_bps,
+    cost_floor_source,
     cost_floor_value,
     kelly_cap,
     liquidity_cap,
@@ -240,6 +241,7 @@ class A13Sizing(Agent):
         mic: str | None = None,
         fx_base_per_quote: Decimal | None = None,
         fx_asof=None,
+        broker: str | None = None,
     ) -> tuple[CapSet, list[Finding]]:
         """`portfolio_value` is MYR; `adv_20d` and the fee schedule are the
         market's own currency. Those meet in a `min()`, so one of them has to
@@ -256,9 +258,27 @@ class A13Sizing(Agent):
         risk = risk_budget_cap(pv, risk_per_trade, stop_distance_frac)
         conc = concentration_cap(pv, single_name_limit)
         liq = liquidity_cap(adv_20d, participation)
-        floor = cost_floor_value(round_trip_cost_at, mic)
+        floor = cost_floor_value(round_trip_cost_at, mic, broker)
 
-        kelly, notes = None, []
+        # The liquidity cap is a LINEAR participation model. Above ~5% of ADV
+        # impact grows with the square root and linear understates it; below
+        # 0.5% fees dominate. Naming the regime keeps the cap honest about
+        # what it is and is not modelling.
+        from engines.backtest.costs import impact_model_for
+
+        regime = impact_model_for(float(participation))
+        impact_note = (
+            f"liquidity cap uses the linear participation model at "
+            f"{float(participation):.1%} of ADV"
+        )
+        if regime == "sqrt":
+            impact_note += (
+                " - ABOVE the linear regime; square-root impact says the true cost is higher"
+            )
+        elif regime == "fixed":
+            impact_note += " - below the impact floor; fees dominate at this size"
+
+        kelly, notes = None, [impact_note]
         if win_rate is not None and payoff is not None:
             self._guard_tool("kelly_cap")
             try:
@@ -299,7 +319,8 @@ class A13Sizing(Agent):
                 "caps",
                 f"binding cap is {binding.value} at {both(value, value_base)}; "
                 f"cost floor requires at least {both(floor, floor_base)} "
-                f"({cost_floor_bps(mic)} bps round trip on {mic or 'default'})",
+                f"({cost_floor_bps(mic, broker)} bps round trip on "
+                f"{cost_floor_source(mic, broker)})",
                 numbers={
                     "risk": float(risk),
                     "concentration": float(conc),
@@ -352,3 +373,37 @@ class A13Sizing(Agent):
                 caveats=list(d.notes),
             )
         ]
+
+
+def plan_capital(cfg, ctx) -> tuple:
+    """Config -> the waterfall, through A13. One path, so no surface re-derives it.
+
+    Returns (Waterfall | None, findings). None means the plan was never stated:
+    that is different from a plan whose answer is zero, and every caller has to
+    say which of the two it is.
+    """
+    from engines.sizing.waterfall import Goal as WGoal
+    from engines.sizing.waterfall import Liability as WLiability
+
+    plan = cfg.capital
+    if not plan.stated:
+        return None, []
+    a13 = A13Sizing(ctx)
+    return a13.investable_capital(
+        liquid_assets=plan.liquid_assets,
+        essential_monthly_spend=plan.essential_monthly_spend,
+        goals=[WGoal(g.name, g.amount, g.months_away) for g in plan.goals],
+        liabilities=[WLiability(x.name, x.balance, x.annual_rate) for x in plan.liabilities],
+        planned_monthly_contribution=plan.planned_monthly_contribution,
+        emergency_months=cfg.emergency_months,
+    )
+
+
+#: Printed wherever a caller supplies investable capital by hand. The three
+#: locked steps of the waterfall are exactly what a typed number skips, and a
+#: bypass nobody is told about is the same as a bypass nobody chose.
+TYPED_CAPITAL_NOTE = (
+    "capital was SUPPLIED, not derived: the emergency floor, near-term goals "
+    "and debt hurdle were not applied to it. Fill [capital] in config.toml and "
+    "use --from-plan to have them applied."
+)

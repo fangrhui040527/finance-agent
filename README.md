@@ -5,6 +5,12 @@ A multi-agent, multi-market equity research system that explains *why* a price m
 
 > **Not financial advice.** Candidacy bands, calibrated probabilities, attributions and sizing constraints with evidence chains. No recommendations, no execution.
 
+> **It does not pick stocks.** There is no screen and no ranked list of ideas.
+> You bring the names; it tells you why one moved, what the evidence says, how
+> much of it you could hold, how a budget splits across several, and what
+> changed against what you already own. Asking it to find stocks gets a refusal
+> that says this.
+
 ## Start here
 
 **New to this? Open [`docs/user-guide.html`](docs/user-guide.html) in a browser.**
@@ -69,11 +75,13 @@ make trace                   # full traced system run -> debug/<run_id>/
 make mcp-check               # MCP handshake selftest, no client needed
 make doctor                  # preflight: what this installation can actually do
 make web                     # the twelve screens on http://127.0.0.1:8765
+make sweep                   # fetch every enabled source and KEEP it -> data/corpus.db
 make graph                   # build the knowledge graph -> data/graph.db
 make graph-report            # hubs, orphans, review queue, surprising links
 make codegraph               # the repo as a graph -> data/codegraph.db
 make mcp                     # serve MCP on stdio -> docs/15-MCP-SETUP.md
 python ask.py backend                        # which model is actually answering
+python ask.py --model opus --effort max backend   # pin the model, pick the reasoning
 python ask.py why MYX:1155 --move -0.09 --market -0.08
 python ask.py why XNAS:NVDA --fetch --against XNAS:SPY --days 5
 python ask.py prices XNAS:NVDA --days 30     # live daily bars
@@ -112,7 +120,9 @@ make up                      # postgres+timescale · qdrant · neo4j · redis ·
 | P18 | T2 markets: SG HK JP UK AU IN TW KR DE | `markets/` — 11 adapters |
 | P18 | Hong Kong (XHKG), the second — per-issuer board lots, uncapped stamp | `markets/xhkg.py` |
 | Model | Anthropic Messages backend behind the one `Backend` seam | `core/llm/backends.py` |
+| Model choice | `--model haiku\|sonnet\|opus` · `--effort low..max`, disclosed on every surface | `core/llm/tiers.py` |
 | Prices | Stooq daily bars, validated at the seam | `core/market/feed.py` |
+| Corpus | what a sweep saw: append-only, deduplicated ACROSS runs, every attempt recorded | `knowledge/corpus.py` |
 | Entrypoints | `thesis` · `risk` · `size` · `learn` · `prices` · `backend` | `ask.py` |
 | MCP | 11 tools over stdio — the engines decide, your Claude narrates | `mcp_server/` |
 | Trace | Every prompt, rail decision and dropped claim; 4 reports per run | `core/trace/`, `trace_run.py` |
@@ -123,7 +133,11 @@ depends on that record. The **frontend** is designed but unimplemented: 12
 artboards in `design/`, against 273 lines of terminal rendering in `ui/render.py`.
 
 **Two live sources are wired**, both free and keyless: GDELT for news
-(`knowledge/feeds/adapter.py`) and Stooq for daily bars (`core/market/feed.py`).
+(`knowledge/feeds/adapter.py`) and Stooq for daily bars (`core/market/feed.py`). What
+they return is now **kept**: `ask.py sweep` writes to `data/corpus.db` and links
+the articles into the graph, so a scheduled run accumulates instead of printing
+and forgetting. It records failed sweeps as failures — a month of refused
+requests and a genuinely quiet month leave the same empty table otherwise.
 Filings, ownership and macro have no ingest yet — supply those numbers or the
 agents that need them report a gap. A real model backend exists at
 `core/llm/backends.py`; `python ask.py backend` says whether a model or the
