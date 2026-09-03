@@ -1,0 +1,276 @@
+"""What MY broker charges me, as distinct from what the exchange charges everyone.
+
+`markets/<mic>.py` answers the second question. Every schedule in this repository
+answers it, and `markets/xnas.py` answers it with a ZERO-COMMISSION US retail
+account: a 5 bps floor and a minimum economic position of about USD 1.00.
+
+That is a real account shape and it is not this one. A moomoo Malaysia account
+pays 0.03% plus a flat USD 0.99 per order, which is 204.9 bps round trip on a
+USD 100 position. Sized against the venue schedule the engine funds US positions
+that cannot pay for their own round trip, and it does so silently, because a
+wrong floor is still a number.
+
+The first test here is the one that matters most, and it is the same guard
+`test_fee_shape.py` opens with: adding a broker layer must move no venue.
+"""
+
+from __future__ import annotations
+
+import pathlib
+from decimal import Decimal
+
+import pytest
+
+from engines.sizing.caps import (
+    COST_FLOOR_CEILING,
+    cost_floor_bps,
+    cost_floor_unreachable,
+    cost_floor_value,
+)
+from markets.brokers import (
+    MOOMOO_MY_XNAS,
+    SEC_FEE_RATE,
+    TAF_CAP,
+    TAF_PER_SHARE,
+    known_brokers,
+    schedule_for,
+)
+from markets.registry import get, supported
+
+D = Decimal
+
+
+def bps(schedule, value: Decimal, price: Decimal) -> Decimal:
+    return schedule.round_trip_bps(value, price)
+
+
+def leg(name: str):
+    """One leg by name. `one_side` sums the sell-only legs too, so a test about
+    what ONE leg charges has to ask that leg."""
+    return next(x for x in MOOMOO_MY_XNAS.legs if x.name == name)
+
+
+# --- the regression guard ---------------------------------------------------------
+
+
+@pytest.mark.parametrize("mic", supported())
+def test_no_venue_moves_because_a_broker_exists(mic: str):
+    """`test_fee_shape.py` pins these to the cent. A broker schedule is a NEW
+    object beside them, never a mutation of one."""
+    assert schedule_for(mic) is get(mic).fee_schedule
+
+
+@pytest.mark.parametrize("mic", supported())
+def test_a_venue_schedule_still_needs_no_price(mic: str):
+    """The broker schedule demands a price. No venue may start demanding one
+    because it was added - that is the constraint test_fee_shape.py:56 sets."""
+    assert schedule_for(mic).round_trip(D(10000)) >= 0
+
+
+def test_an_unknown_broker_is_refused_rather_than_silently_ignored():
+    """Falling back to the venue schedule for a typo would size a moomoo account
+    against a zero-commission model and say nothing."""
+    with pytest.raises(KeyError, match="moomo"):
+        schedule_for("XNAS", "moomo_my")
+
+
+def test_a_broker_with_no_schedule_for_this_venue_falls_back_and_is_not_invented():
+    """moomoo MY is configured for US names. Asking it about Bursa must return
+    Bursa's own schedule, not a fabricated one."""
+    assert schedule_for("XKLS", "moomoo_my") is get("XKLS").fee_schedule
+
+
+# --- the shape of the moomoo schedule ---------------------------------------------
+
+
+def test_the_moomoo_schedule_reproduces_the_204_bps_figure():
+    """The number commit 7d5bc21 stated as the reason the shape was needed:
+    'roughly 204 bps round trip on a USD 100 position'."""
+    got = bps(MOOMOO_MY_XNAS, D(100), D(100))
+    assert got.quantize(D("0.0001")) == D("204.8946")
+
+
+def test_commission_is_waived_below_one_share():
+    whole = MOOMOO_MY_XNAS.one_side(D(100), D(100))  # 1.00 share
+    frac = MOOMOO_MY_XNAS.one_side(D(99), D(100))  # 0.99 share
+    # 0.03% of 99 would be 0.0297; the fractional order pays none of it.
+    assert whole - frac > D("0.0297")
+
+
+def test_the_platform_fee_becomes_a_capped_rate_below_one_share():
+    """0.99% of value, capped at USD 0.99 - not the flat USD 0.99."""
+    platform = leg("platform")
+    # 0.5 share of a USD 100 stock: 0.99% of 50 = 0.495, well under the cap.
+    assert platform.charge(D(50), D(100)) == D("0.495")
+    # 1.0 share of the same stock pays the flat fee instead, which is twice as
+    # much for twice the exposure - and then keeps costing 0.99 all the way up.
+    assert platform.charge(D(100), D(100)) == D("0.99")
+    assert platform.charge(D(100000), D(100)) == D("0.99")
+
+
+def test_the_ninety_nine_percent_cap_binds_only_above_a_hundred_dollar_share_price():
+    """Below one share the consideration is smaller than the share price, so
+    0.99% of it only reaches the USD 0.99 cap on a stock priced above USD 100."""
+    platform = leg("platform")
+    assert platform.charge(D(99), D(100)) == D("0.9801")  # uncapped
+    assert platform.charge(D(495), D(500)) == D("0.99")  # capped
+
+
+def test_one_whole_share_is_the_worst_size_on_a_cheap_stock():
+    """The cliff. Crossing 1 share loses the capped 0.99% platform fee and gains
+    the flat USD 0.99 PLUS commission, so cost per unit of value MORE THAN
+    DOUBLES going from 0.99 shares to 1.00. On a USD 50 stock that is 199.5 bps
+    against 403.5 bps, and nothing in the sizing output would otherwise say so.
+    """
+    just_under = bps(MOOMOO_MY_XNAS, D("49.50"), D(50))
+    exactly_one = bps(MOOMOO_MY_XNAS, D(50), D(50))
+    assert just_under.quantize(D("0.1")) == D("199.5")
+    assert exactly_one.quantize(D("0.1")) == D("403.5")
+    assert exactly_one > just_under * 2
+
+
+def test_the_regulatory_legs_are_charged_on_the_sell_only():
+    """SEC and FINRA fees are levied on sales. Charging them per side overstates
+    the floor, and an overstated floor refuses positions that would have cleared.
+    """
+    one_way = MOOMOO_MY_XNAS.one_way(D(10000), D(100))
+    sec = D(10000) * SEC_FEE_RATE
+    taf = D(100) * TAF_PER_SHARE
+    assert one_way.quantize(D("0.000001")) == (sec + taf).quantize(D("0.000001"))
+
+
+def test_the_schedule_refuses_to_be_costed_without_a_price():
+    """Two legs are per-share and the fractional rule needs a share count. A
+    value-only answer here would understate the cost, which is the direction
+    that funds a position that cannot pay its own spread."""
+    with pytest.raises(ValueError, match="price"):
+        MOOMOO_MY_XNAS.round_trip(D(1000))
+
+
+def test_the_regulatory_rates_are_pinned_because_they_were_not_verified():
+    """These two are regulator pass-throughs, revised annually, and were NOT
+    among the numbers confirmed against source for this schedule. Pinned so a
+    silent edit is impossible and a deliberate one is visible in the diff."""
+    assert SEC_FEE_RATE == D("0.0000278")
+    assert TAF_PER_SHARE == D("0.000166")
+    assert TAF_CAP == D("8.30")
+
+
+def test_moomoo_my_is_a_known_broker():
+    assert "moomoo_my" in known_brokers()
+
+
+# --- what it does to the floor ----------------------------------------------------
+
+
+def test_the_venue_floor_is_unreachable_on_this_schedule():
+    """0.03% commission is 6 bps round trip at ANY size, above the 5 bps XNAS
+    tolerance. No position satisfies it, and the bisection returns its ceiling -
+    which reads as a USD 100,000,000 position requirement rather than as the
+    impossibility it is. Naming the sentinel is what lets a caller say so."""
+    at_100 = lambda v: MOOMOO_MY_XNAS.round_trip(v, D(100))  # noqa: E731
+    floor = cost_floor_value(at_100, "XNAS")
+    assert floor == COST_FLOOR_CEILING
+    assert cost_floor_unreachable(floor)
+
+
+def test_the_broker_carries_its_own_reachable_floor():
+    assert cost_floor_bps("XNAS") == D(5)
+    assert cost_floor_bps("XNAS", "moomoo_my") == D(20)
+    at_100 = lambda v: MOOMOO_MY_XNAS.round_trip(v, D(100))  # noqa: E731
+    floor = cost_floor_value(at_100, "XNAS", "moomoo_my")
+    assert not cost_floor_unreachable(floor)
+
+
+def test_the_minimum_position_is_a_function_of_share_price():
+    """A per-share leg means there is no single minimum. A USD 10 stock buys ten
+    times the share count of a USD 100 one for the same money, and pays ten
+    times the per-share settlement fee for it."""
+    floors = {
+        p: cost_floor_value(lambda v, p=p: MOOMOO_MY_XNAS.round_trip(v, D(p)), "XNAS", "moomoo_my")
+        for p in (10, 50, 100, 250)
+    }
+    assert floors[10] > floors[50] > floors[100] > floors[250]
+    assert D(2500) < floors[10] < D(2700)
+    assert D(1450) < floors[250] < D(1550)
+
+
+def test_the_minimum_position_is_three_orders_of_magnitude_above_the_venue_model():
+    """The headline. The zero-commission model says a USD 1 position clears its
+    own costs; this account needs about USD 1,500 at a USD 100 share price."""
+    venue = cost_floor_value(get("XNAS").fee_schedule.round_trip, "XNAS")
+    broker = cost_floor_value(lambda v: MOOMOO_MY_XNAS.round_trip(v, D(100)), "XNAS", "moomoo_my")
+    assert venue < D(2)
+    assert D(1400) < broker < D(1600)
+
+
+# --- naming the thing that supplied the number ------------------------------------
+
+
+def test_the_floor_label_names_the_broker_only_when_the_broker_supplied_it():
+    """moomoo does not price Bursa, so a moomoo account sizing a Bursa name uses
+    Bursa's 60 bps. Output that still said "60 bps round trip on moomoo_my"
+    would attribute Bursa's number to an account - the same wrong-label defect
+    as claiming the broker's schedule while using the venue's."""
+    from engines.sizing.caps import cost_floor_source
+
+    assert cost_floor_source("XNAS", "moomoo_my") == "moomoo_my"
+    assert cost_floor_source("XKLS", "moomoo_my") == "XKLS"
+    assert cost_floor_source("XKLS") == "XKLS"
+    assert cost_floor_source(None) == "default"
+
+
+def test_a_moomoo_account_still_sizes_bursa_on_bursas_terms():
+    """The floor and the schedule must fall back together. One falling back
+    without the other is how a book gets sized against a mixture."""
+    assert cost_floor_bps("XKLS", "moomoo_my") == cost_floor_bps("XKLS")
+    assert schedule_for("XKLS", "moomoo_my") is get("XKLS").fee_schedule
+
+
+def test_the_alias_map_still_resolves_under_a_broker():
+    """Bursa ids say MYX. A broker lookup that missed the alias would silently
+    hand back the 30 bps default - the exact defect markets/registry.py exists
+    to prevent."""
+    assert cost_floor_bps("MYX", "moomoo_my") == cost_floor_bps("XKLS")
+    assert schedule_for("MYX", "moomoo_my") is get("XKLS").fee_schedule
+
+
+def test_ask_size_prices_a_us_name_on_the_broker_schedule(tmp_path, capsys, monkeypatch):
+    """End to end through the CLI: the note names the broker, and the floor is
+    the ~USD 1,500 one rather than the venue model's USD 1.00."""
+    import ask
+    import core.config
+
+    cfg_file = tmp_path / "config.toml"
+    cfg_file.write_text(
+        (pathlib.Path(__file__).resolve().parents[1] / "config.toml")
+        .read_text()
+        .replace(
+            'markets = ["XKLS", "XNAS"]', 'markets = ["XKLS", "XNAS"]\nbroker = "moomoo_my"', 1
+        )
+    )
+    real = core.config.load
+    monkeypatch.setattr(core.config, "load", lambda path=None: real(cfg_file))
+
+    code = ask.main(
+        [
+            "size",
+            "XNAS:NVDA",
+            "--price",
+            "100",
+            "--stop",
+            "92",
+            "--adv",
+            "5000000",
+            "--portfolio",
+            "100000",
+            "--fx",
+            "4.15",
+        ]
+    )
+    out = capsys.readouterr().out
+    assert code == 0
+    assert "moomoo_my schedule on XNAS" in out
+    assert "20 bps round trip on moomoo_my" in out
+    assert "1,510.83" in out, "the minimum economic position this account really has"
+    assert "100,000,000" not in out
