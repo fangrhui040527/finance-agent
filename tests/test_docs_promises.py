@@ -99,3 +99,29 @@ def test_the_guide_carries_the_two_numbers_a_bursa_user_hits_first():
     them, "no position" and "no allocation" read as malfunctions."""
     assert "4,705.88" in GUIDE
     assert "58,824" in GUIDE
+
+
+def test_no_documented_command_carries_a_mangled_escape():
+    r"""A Windows path was written into docs/14 through something that
+    interpreted its escapes: the \f of \finance-agent became a FORM FEED and
+    the \a of \ask.py a BELL, so the shipped Task Scheduler command read
+    `C:\path<FF>inance-agent` and `<BEL>sk.py`. Invisible in a rendered diff
+    and fatal on paste - the reader gets a task that runs nothing.
+    """
+    control = {chr(7), chr(8), chr(11), chr(12), chr(27)}
+    offenders = []
+    for path in sorted(ROOT.glob("docs/*.md")) + sorted(ROOT.glob("details/*.md")):
+        text = path.read_text(encoding="utf-8")
+        found = sorted({hex(ord(ch)) for ch in text if ch in control})
+        if found:
+            offenders.append(f"{path.relative_to(ROOT)}: {', '.join(found)}")
+    assert not offenders, "control characters in shipped documentation: " + "; ".join(offenders)
+
+
+def test_the_scheduled_command_sets_its_own_working_directory():
+    """`ask.py watch` resolves data/alerts.db relative to cwd. Scheduled from
+    the wrong directory it does not fail - it writes a second, empty alert
+    store and reports a quiet system it never looked at."""
+    runbook = (ROOT / "docs/14-OPERATIONS-RUNBOOK.md").read_text(encoding="utf-8")
+    assert "schtasks /create" in runbook
+    assert "cd /d" in runbook, "the Windows task must set its working directory"

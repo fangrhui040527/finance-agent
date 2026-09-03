@@ -306,10 +306,15 @@ whole point.
 Windows Task Scheduler, hourly:
 
 ```
-schtasks /create /tn "finplanet-watch" /sc hourly ^
-  /tr "C:\pathinance-agent\.venv\Scripts\python.exe C:\pathinance-agentsk.py watch" ^
-  /st 00:05
+schtasks /create /tn "finplanet-watch" /sc hourly /st 00:05 ^
+  /tr "cmd /c cd /d C:\path\finance-agent && .venv\Scripts\python.exe ask.py watch >> data\watch.log 2>&1"
 ```
+
+`cmd /c cd /d ...` is not optional. `schtasks` has no "Start in" flag without
+an XML definition, and `ask.py watch` resolves `data/alerts.db` relative to the
+working directory. Started elsewhere it does not fail - it creates a second,
+empty alert store beside wherever the scheduler happened to be, and reports a
+quiet system because it is reading a file nothing writes.
 
 cron, hourly:
 
