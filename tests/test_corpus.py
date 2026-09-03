@@ -367,3 +367,52 @@ def test_a_source_listed_twice_is_refused(tmp_path):
     p.write_text('[sources]\nenabled = ["gdelt", "gdelt"]\n')
     with pytest.raises(ConfigError, match="more than once"):
         load(p)
+
+
+# --- what the sweep asks the feed for ---------------------------------------------
+
+
+def test_the_query_asks_for_the_names_in_the_book():
+    """The defect the first scheduled run found. With no query the adapter falls
+    back to `domainis:reuters.com`, which returned no articles at all - the
+    sweep recorded a failure and no retry would have helped."""
+    from knowledge.graph.extractors.gdelt import watchlist_query
+
+    q = watchlist_query(["MYX:1155", "XNAS:NVDA"])
+    assert '"Maybank"' in q and '"NVIDIA"' in q
+    assert q.startswith("(") and q.endswith(")") and " OR " in q
+    assert "CIMB" not in q, "a name that is not in the book must not be asked for"
+
+
+def test_an_empty_book_asks_for_nothing_rather_than_an_empty_group():
+    """`()` is not a narrower query, it is a broken one. Returning "" leaves the
+    adapter's own default in place so the failure stays legible."""
+    from knowledge.graph.extractors.gdelt import watchlist_query
+
+    assert watchlist_query([]) == ""
+    assert watchlist_query(["MYX:0000"]) == "", "an id with no surface forms asks for nothing"
+
+
+def test_every_name_asked_for_can_also_be_linked():
+    """Ask and link must use one table. A surface form the query matches but the
+    linker does not produces an article the corpus keeps and cannot attribute."""
+    from knowledge.graph.extractors.gdelt import entity_index, watchlist_query
+
+    ids = ["MYX:1155", "MYX:5347", "XNAS:NVDA"]
+    forms = {f.strip('"') for f in watchlist_query(ids).strip("()").split(" OR ")}
+    index = entity_index()
+    assert forms, "sanity: the ids used here must have surface forms"
+    for f in forms:
+        assert index.get(f) in ids
+
+
+def test_the_shipped_config_asks_for_something_real():
+    """The regression guard for the whole defect: shipped settings must produce
+    a query, not fall through to the adapter's placeholder."""
+    import core.config as C
+    from knowledge.graph.extractors.gdelt import watchlist_query
+
+    cfg = C.load()
+    q = cfg.gdelt_query or watchlist_query(tuple(cfg.watchlist) + tuple(cfg.holdings))
+    assert q, "the shipped book must yield a GDELT query or the sweep asks for reuters.com"
+    assert "domainis:" not in q

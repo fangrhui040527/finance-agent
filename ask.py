@@ -804,7 +804,7 @@ def cmd_sweep(a) -> int:
     from knowledge.corpus import FAILED, OK, Corpus
     from knowledge.feeds.adapter import FeedError
     from knowledge.feeds.registry import UnknownSource, adapter_for
-    from knowledge.graph.extractors.gdelt import entity_index
+    from knowledge.graph.extractors.gdelt import entity_index, watchlist_query
 
     try:
         cfg = load_cfg()
@@ -838,6 +838,13 @@ def cmd_sweep(a) -> int:
                     {
                         "languages": tuple(cfg.gdelt_languages),
                         "countries": tuple(cfg.gdelt_countries),
+                        # Ask for the names in the book. Without a query the
+                        # adapter falls back to `domainis:reuters.com`, which
+                        # returned nothing at all on the first scheduled run -
+                        # and the escalation gate would have discarded almost
+                        # any broader pull anyway.
+                        "query": cfg.gdelt_query
+                        or watchlist_query(tuple(cfg.watchlist) + tuple(cfg.holdings)),
                     }
                     if name == "gdelt"
                     else {}

@@ -20,6 +20,7 @@ substring match cite itself as evidence.
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from datetime import UTC
 
 from knowledge.graph.entity_graph import Confidence, EdgeKind, NodeKind
@@ -112,6 +113,36 @@ def _index_from_aliases() -> dict[str, str]:
         for surface in surfaces or []:
             out[str(surface)] = iid
     return out
+
+
+def watchlist_query(instrument_ids: Iterable[str]) -> str:
+    """A GDELT query for the names actually being watched.
+
+    Without one, `GdeltFeed` falls back to `domainis:reuters.com` - a
+    placeholder that asks for a single publisher's output. Measured on the
+    2026-09-03 scheduled run, that returned `{}`: no articles at all, which the
+    sweep correctly recorded as a failure and which no amount of retrying would
+    have fixed.
+
+    Asking for the book's own names is also the right shape. `should_escalate`
+    keeps only articles touching a held or watched name, so pulling a global
+    firehose and discarding almost all of it spends the request budget to arrive
+    where this query starts.
+
+    Surface forms come from the SAME table `entity_index` links with. A name you
+    can ask for but cannot link produces an article the corpus stores and can
+    never attribute to anyone.
+
+    Returns "" for an empty book, which leaves the adapter's own default alone -
+    a caller with nothing to watch should not be handed an empty `()` group.
+    """
+    wanted = {str(i) for i in instrument_ids}
+    if not wanted:
+        return ""
+    forms = sorted({s for s, iid in _index_from_aliases().items() if iid in wanted})
+    if not forms:
+        return ""
+    return "(" + " OR ".join(f'"{f}"' for f in forms) + ")"
 
 
 def entity_index() -> dict[str, str]:

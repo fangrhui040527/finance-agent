@@ -241,6 +241,7 @@ class Config:
     sources: tuple[str, ...] = ()
     gdelt_languages: tuple[str, ...] = ()
     gdelt_countries: tuple[str, ...] = ()
+    gdelt_query: str = ""
     #: Floored at GDELT's own documented 15-minute minimum by the adapter.
     gdelt_poll_minutes: int = 15
     corpus_db: str = "data/corpus.db"
@@ -624,6 +625,7 @@ def load(path: str | Path | None = None) -> Config:
         sources=sources,
         gdelt_languages=_strings(data, "sources.gdelt_languages"),
         gdelt_countries=_strings(data, "sources.gdelt_countries"),
+        gdelt_query=str(_get(data, "sources.gdelt_query", "")),
         gdelt_poll_minutes=_int("sources.gdelt_poll_minutes", 15),
         corpus_db=str(_get(data, "sources.corpus_database", "data/corpus.db")),
         daemon_budget_myr=dec("budget.daemon_daily_myr", 10.0),

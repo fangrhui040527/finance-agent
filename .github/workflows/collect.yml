@@ -34,6 +34,10 @@ concurrency:
 jobs:
   sweep:
     runs-on: ubuntu-latest
+    # The default is 360 minutes. A sweep that hangs on a socket would burn six
+    # hours of a 2,000-minute monthly allowance before anyone noticed; a run
+    # that takes more than a few minutes has already failed at its job.
+    timeout-minutes: 15
     defaults:
       run:
         shell: bash

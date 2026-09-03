@@ -245,6 +245,16 @@ gdelt_languages = []
 # Source countries, ISO-style codes as GDELT spells them. Empty means worldwide.
 gdelt_countries = []
 
+# What to ASK GDELT for. Empty means "the names in holdings + watchlist", built
+# from their surface forms in knowledge/graph/data/entities.yaml - the same
+# table the linker matches on, so anything found can be attributed.
+#
+# Do not leave this empty AND the book empty. The adapter's own fallback is
+# `domainis:reuters.com`, and on the first scheduled run that returned no
+# articles at all. Set an explicit query here only to widen the net beyond the
+# book - a general term like "Bursa Malaysia" - not to narrow it.
+gdelt_query = ""
+
 [monitor]
 # What `ask.py watch` alerts on. It records only state CHANGES, so a rule that
 # stays tripped does not re-fire every run - an alert that repeats hourly is
