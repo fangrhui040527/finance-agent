@@ -181,6 +181,10 @@ def scrubbed_env(tmp_path: Path, *, key: str | None = None) -> dict:
     env["PYTHONUTF8"] = "1"
     env["PYTHONDONTWRITEBYTECODE"] = "1"
     env["FINPLANET_DEBUG_DIR"] = str(tmp_path / "debug")
+    # And the same for config: a child process started in the repo root would
+    # find an operator's `config.local.toml` and stop being the scenario under
+    # test. Deleting variables cannot help here - the file is the input.
+    env["FINPLANET_CONFIG"] = str(ROOT / "config.toml")
     return env
 
 
