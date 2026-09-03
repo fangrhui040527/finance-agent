@@ -470,7 +470,31 @@ def _limits(data: dict) -> Limits:
         raise ConfigError(f"[limits] rejected: {e}. This bound is not configurable.") from None
 
 
+#: An explicit pin, for callers that must not read whatever file happens to be
+#: on disk. `config.local.toml` is where an operator keeps a REAL financial
+#: position, and it deliberately shadows `config.toml` - which is correct for
+#: running the product and wrong for testing it. A suite that reads it is
+#: measuring the developer's box: green on a machine with no personal config
+#: and red on the machine that actually uses the tool, which is the same
+#: failure `keyless_env` exists to prevent for API keys.
+CONFIG_ENV = "FINPLANET_CONFIG"
+
+
 def find(start: Path | None = None) -> Path | None:
+    import os
+
+    pinned = os.environ.get(CONFIG_ENV, "").strip()
+    if pinned:
+        p = Path(pinned)
+        if not p.exists():
+            # Never fall back. A typo here would silently load a DIFFERENT
+            # financial position than the one asked for, and every number
+            # downstream would be right about the wrong file.
+            raise ConfigError(
+                f"{CONFIG_ENV}={pinned!r} does not exist. It pins which config "
+                f"is loaded; unset it to search {', '.join(SEARCH)} instead."
+            )
+        return p
     base = start or Path.cwd()
     for name in SEARCH:
         p = base / name

@@ -37,6 +37,23 @@ def keyless_env(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("FINPLANET_NO_DOTENV", "1")
 
 
+@pytest.fixture(autouse=True)
+def shipped_config(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Every test reads the config.toml in this repository, never the operator's.
+
+    `config.local.toml` shadows `config.toml` by design - it is where a real
+    financial position lives, and it is gitignored. That is right for running
+    the product and wrong for testing it: with one present, four tests that
+    assert behaviour "on the shipped config" read someone's actual holdings
+    instead and fail. Green on a machine that has never been configured, red on
+    the machine that actually uses the tool.
+
+    Same argument as `keyless_env` one fixture above, applied to the other file
+    a developer's box has and CI does not.
+    """
+    monkeypatch.setenv("FINPLANET_CONFIG", str(ROOT / "config.toml"))
+
+
 # --- urllib doubles -----------------------------------------------------------
 
 
