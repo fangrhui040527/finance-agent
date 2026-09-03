@@ -178,6 +178,15 @@ liabilities = [{ name = "card", balance = 8000, annual_rate = 0.17 }]
 ```
 
 ```bash
+python ask.py positions
+```
+
+What the broker says you hold, as distinct from what `config.toml` says. Needs
+OpenD running and logged in; read-only by construction (docs/19). Prints a
+`holdings = [...]` line to paste - it never writes config itself, because a
+portfolio changed with no diff is a portfolio changed with no decision.
+
+```
 python ask.py capital
 ```
 
@@ -270,7 +279,7 @@ same screen.
 
 ## `ask.py` — the CLI
 
-Ten subcommands.
+Nineteen subcommands.
 
 ### `plan` — what the system would do with a question
 
