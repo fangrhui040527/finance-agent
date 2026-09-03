@@ -1,0 +1,270 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Public+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+    :root{
+      --ground:#F6F8F7; --panel:#FFFFFF; --panel-2:#EFF2F1; --term:#12201F;
+      --ink:#15191B; --ink-2:#3A4448; --muted:#606D71;
+      --rule:#D6DBD9; --rule-2:#C2C9C6;
+      --accent:#0F5C63; --accent-soft:#DCEAEA;
+      --neg:#9E3626; --neg-soft:#F3E0DC;
+      --pos:#3B6A38; --pos-soft:#E1EBDF;
+      --warn:#8A5B12; --warn-soft:#F5E9D4;
+      --term-ink:#D6E3E1; --term-dim:#7E948F; --term-accent:#6FBFC4;
+      --term-pos:#8CBE85; --term-neg:#DB8571;
+      --shadow:0 1px 2px rgba(21,25,27,.05),0 8px 24px -16px rgba(21,25,27,.28);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--ground);color:var(--ink);
+      font-family:"Public Sans",-apple-system,BlinkMacSystemFont,sans-serif;
+      font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+    h1,h2,h3{font-family:Newsreader,Georgia,serif;font-weight:500;margin:0;line-height:1.2}
+    code,.mono{font-family:"JetBrains Mono",ui-monospace,Menlo,monospace}
+    a{color:var(--accent);text-underline-offset:3px}
+    a:hover{color:#0a4247}
+    .app{display:grid;grid-template-columns:196px minmax(0,1fr);min-height:100%}
+    .rail{background:var(--panel);border-right:1px solid var(--rule);padding:22px 0;display:flex;flex-direction:column;gap:2px}
+    .brand{padding:0 20px 20px;border-bottom:1px solid var(--rule);margin-bottom:14px}
+    .brand b{font-family:Newsreader,serif;font-size:17px;font-weight:600;display:block;letter-spacing:-.01em}
+    .brand span{font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);font-weight:600}
+    .nav{display:flex;align-items:center;gap:10px;padding:8px 20px;color:var(--ink-2);
+      font-size:13.5px;font-weight:500;cursor:pointer;border-left:2px solid transparent;text-decoration:none}
+    .nav:hover{background:var(--panel-2);color:var(--ink)}
+    .nav.on{border-left-color:var(--accent);color:var(--accent);background:var(--accent-soft);font-weight:600}
+    .nav svg{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-width:1.6;
+      stroke-linecap:round;stroke-linejoin:round}
+    .railsep{height:1px;background:var(--rule);margin:14px 20px}
+    .main{padding:26px 32px 40px;min-width:0}
+    .head{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:22px}
+    .head h1{font-size:25px;letter-spacing:-.015em}
+    .head p{margin:5px 0 0;color:var(--muted);font-size:13.5px;max-width:64ch}
+    .eyebrow{font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+      color:var(--muted);margin:0 0 9px}
+    .card{background:var(--panel);border:1px solid var(--rule);border-radius:4px;padding:18px 20px;box-shadow:var(--shadow)}
+    .grid{display:grid;gap:16px}
+    .chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;
+      padding:2px 8px;border-radius:3px;letter-spacing:.02em;text-transform:uppercase}
+    .chip.ok{background:var(--pos-soft);color:var(--pos)}
+    .chip.no{background:var(--neg-soft);color:var(--neg)}
+    .chip.wait{background:var(--warn-soft);color:var(--warn)}
+    .chip.n{background:var(--panel-2);color:var(--muted)}
+    .box{border-left:3px solid var(--rule-2);background:var(--panel-2);padding:13px 16px;border-radius:0 3px 3px 0}
+    .box.key{border-left-color:var(--accent);background:var(--accent-soft)}
+    .box.warn{border-left-color:var(--warn);background:var(--warn-soft)}
+    .box.stop{border-left-color:var(--neg);background:var(--neg-soft)}
+    .box .lbl{font-size:10.5px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;
+      display:block;margin-bottom:5px;color:var(--accent)}
+    .box.warn .lbl{color:var(--warn)} .box.stop .lbl{color:var(--neg)}
+    .box p{margin:0;font-size:13px;color:var(--ink-2)}
+    .term{background:var(--term);border-radius:4px;overflow:hidden}
+    .term-bar{display:flex;align-items:center;gap:6px;padding:8px 12px;border-bottom:1px solid #1E2E2C}
+    .term-bar i{width:8px;height:8px;border-radius:50%;background:var(--term-dim);opacity:.4}
+    .term-bar b{margin-left:8px;font-family:"JetBrains Mono",monospace;font-size:10.5px;
+      color:var(--term-dim);font-weight:500;letter-spacing:.06em;text-transform:uppercase}
+    .term pre{margin:0;padding:14px 16px;font-family:"JetBrains Mono",monospace;font-size:12px;
+      line-height:1.7;color:var(--term-ink);white-space:pre-wrap;overflow-x:auto}
+    .term .p{color:var(--term-accent);font-weight:700}
+    .term .c{color:var(--term-dim);font-style:italic}
+    .term .o{color:var(--term-dim)}
+    .term .hl{color:var(--term-ink);font-weight:700}
+    .term .g{color:var(--term-pos)} .term .r{color:var(--term-neg)}
+    table{border-collapse:collapse;width:100%;font-size:13px}
+    th{text-align:left;font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;
+      color:var(--muted);font-weight:700;padding:0 12px 8px;border-bottom:1px solid var(--rule)}
+    td{padding:9px 12px;border-bottom:1px solid var(--rule)}
+    tr:last-child td{border-bottom:0}
+    .num{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums}
+    .btn{font-family:inherit;font-size:13px;font-weight:600;padding:7px 14px;border-radius:3px;
+      border:1px solid var(--rule-2);background:var(--panel);color:var(--ink-2);cursor:pointer}
+    .btn:hover{border-color:var(--accent);color:var(--accent)}
+    .btn.on{background:var(--accent);border-color:var(--accent);color:#fff}
+    .btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+    .stat b{display:block;font-family:"JetBrains Mono",monospace;font-size:23px;
+      font-weight:500;color:var(--ink);letter-spacing:-.02em;line-height:1.15}
+    .stat span{font-size:11px;color:var(--muted);letter-spacing:.03em}
+
+  </style>
+</helmet>
+<div class="app" style="width:1280px;min-height:900px">
+<div class="rail">
+<div class="brand"><span>FinPlanet</span><b>Analyst Mind</b></div>
+<a class="nav"><svg viewBox="0 0 16 16"><path d="M8 2 2 5v6l6 3 6-3V5L8 2Z"/><path d="M8 8v6M2 5l6 3 6-3"/></svg>Ask</a>
+<a class="nav"><svg viewBox="0 0 16 16"><path d="M2 12l3.5-4 2.5 2.5L14 4"/><path d="M14 8V4h-4"/></svg>Why it moved</a>
+<a class="nav"><svg viewBox="0 0 16 16"><path d="M2 13h12"/><path d="M4 11V7M7 11V4M10 11V8M13 11V5"/></svg>Prices</a>
+<a class="nav on"><svg viewBox="0 0 16 16"><path d="M4 2h6l3 3v9H4V2Z"/><path d="M10 2v3h3M6 8h4M6 11h3"/></svg>Thesis</a>
+<a class="nav"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5"/><path d="M8 2.5v5.5l3.9 3.9"/></svg>Portfolio</a>
+<a class="nav"><svg viewBox="0 0 16 16"><path d="M2 8h12"/><path d="M5 5 2 8l3 3M11 5l3 3-3 3"/></svg>Sizing</a>
+<a class="nav"><svg viewBox="0 0 16 16"><path d="M2 8h3l2-4 2 8 2-4h3"/></svg>Predictions</a>
+<a class="nav"><svg viewBox="0 0 16 16"><circle cx="4" cy="4" r="1.8"/><circle cx="12" cy="8" r="1.8"/><circle cx="6" cy="12" r="1.8"/><path d="M5.5 5.2 10.4 7M10.6 9.2 7.3 11.1"/></svg>Trace</a>
+<div class="railsep"></div>
+<a class="nav"><svg viewBox="0 0 16 16"><path d="M2 4.5 8 2l6 2.5L8 7 2 4.5Z"/><path d="M4.5 6v4c0 1 1.7 2 3.5 2s3.5-1 3.5-2V6"/></svg>Learn</a>
+<a class="nav"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.2"/><path d="M8 1.5v2M8 12.5v2M14.5 8h-2M3.5 8h-2M12.6 3.4l-1.4 1.4M4.8 11.2l-1.4 1.4M12.6 12.6l-1.4-1.4M4.8 4.8 3.4 3.4"/></svg>Settings</a>
+</div>
+<div class="main">
+
+<div class="head">
+  <div><h1>Thesis</h1>
+  <p>A stance you cannot falsify is not a thesis. Two machine-checkable breakers, or no
+     stance is taken — and the red team runs on every one.</p></div>
+  <code style="font-size:14px;font-weight:700;color:var(--ink)">MYX:1155</code>
+</div>
+
+<div class="grid" style="grid-template-columns:minmax(0,1fr) 380px;align-items:start">
+  <div class="grid">
+    <div class="card" style="border-left:3px solid {{t.color}}">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px;flex-wrap:wrap">
+        <span class="chip {{t.cls}}">{{t.stance}}</span>
+        <span style="font-size:12.5px;color:var(--muted)">horizon 12 months</span>
+        <span style="font-size:12.5px;color:var(--muted)">·</span>
+        <span style="font-size:12.5px;color:var(--muted)">confidence <b class="num" style="color:var(--ink-2)">{{t.conf}}</b></span>
+      </div>
+      <p style="margin:0;font-size:15px;color:var(--ink);line-height:1.55">{{t.sentence}}</p>
+      <sc-if value="{{t.blocked}}" hint-placeholder-val="{{false}}">
+        <div class="box stop" style="margin-top:14px"><span class="lbl">Why no stance</span>
+        <p>{{t.blockReason}}</p></div>
+      </sc-if>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:13px">
+        <p class="eyebrow" style="margin:0">What would falsify it</p>
+        <span class="chip {{t.brCls}}">{{t.brCount}} of 2 minimum</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:9px">
+        <sc-for list="{{breakers}}" as="b" hint-placeholder-count="3">
+          <div onClick="{{ b.toggle }}" style="{{b.rowStyle}}">
+            <div style="{{b.dotStyle}}"></div>
+            <div style="flex-grow:1;min-width:0">
+              <div style="font-size:13.5px;font-weight:600;color:{{b.textColor}}">{{b.statement}}</div>
+              <code style="font-size:11.5px;color:var(--muted)">{{b.query}} → {{b.store}}</code>
+            </div>
+            <span class="chip {{b.dateCls}}" style="flex:none">{{b.date}}</span>
+          </div>
+        </sc-for>
+      </div>
+      <p style="font-size:11.5px;color:var(--muted);margin:13px 0 0">
+        Click a breaker to drop it. Each needs a query that can actually run — prose does not
+        qualify, and a breaker with no review date will never fire.</p>
+    </div>
+
+    <div class="card">
+      <p class="eyebrow">Supporting evidence</p>
+      <table><tbody>
+        <tr><td><code style="color:var(--accent);font-size:12px">a1_fundamentals</code></td>
+            <td>CASA fell to 24% from 31% over four quarters</td></tr>
+        <tr><td><code style="color:var(--accent);font-size:12px">a2_valuation</code></td>
+            <td>P/B at the 12th percentile of its own 40-quarter history</td></tr>
+        <tr><td><code style="color:var(--accent);font-size:12px">a5_catalyst_events</code></td>
+            <td>Results due in three weeks</td></tr>
+        <tr><td><code style="color:var(--accent);font-size:12px">a6_macro_regime</code></td>
+            <td>OPR on hold, curve flat</td></tr>
+      </tbody></table>
+    </div>
+  </div>
+
+  <div class="card" style="padding:0;overflow:hidden">
+    <div style="padding:15px 18px;border-bottom:1px solid var(--rule);background:var(--panel-2)">
+      <p class="eyebrow" style="margin:0 0 3px">Red team</p>
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <code style="font-size:13px;font-weight:700;color:{{rt.color}}">{{rt.verdict}}</code>
+        <span style="font-size:12px;color:var(--muted)">{{rt.n}} challenges</span>
+      </div>
+    </div>
+    <div style="padding:6px 0">
+      <sc-for list="{{challenges}}" as="c" hint-placeholder-count="6">
+        <div style="padding:11px 18px;border-bottom:1px solid var(--rule);display:flex;gap:11px;align-items:flex-start">
+          <span class="chip {{c.cls}}" style="flex:none;margin-top:1px">{{c.sev}}</span>
+          <div style="min-width:0">
+            <div style="font-size:13px;color:var(--ink-2);line-height:1.5">{{c.text}}</div>
+            <code style="font-size:11px;color:var(--muted)">{{c.kind}}</code>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="padding:13px 18px;background:var(--panel-2)">
+      <p style="font-size:11.5px;color:var(--muted);margin:0">
+        Six standing challenges are fixed in code so they cannot be tuned to pass. A red team
+        that goes silent on a live thesis is itself a finding.</p>
+    </div>
+  </div>
+</div>
+
+</div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{"$preview": {"width": 1280, "height": 900}}'>
+
+const ACC='#0F5C63', NEG='#9E3626', WARN='#8A5B12', MUT='#606D71', INK='#15191B';
+const ALL = [
+  { id:'nim', statement:'NIM falls below 2.00%', query:'nim < 0.020', store:'kb_filings',
+    date:'review 15 Nov', dateCls:'n' },
+  { id:'casa', statement:'CASA ratio falls below 22%', query:'casa_ratio < 0.22', store:'kb_filings',
+    date:'review 15 Nov', dateCls:'n' },
+  { id:'npl', statement:'Gross impaired loans exceed 2.5%', query:'gil_ratio > 0.025', store:'kb_filings',
+    date:'no date', dateCls:'wait' }
+];
+class Component extends DCLogic {
+  constructor(p){ super(p); this.state = { off: {} }; }
+  renderVals(){
+    const on = ALL.filter(b => !this.state.off[b.id]);
+    const n = on.length, ok = n >= 2;
+    const gaps = [];
+    const conf = Math.max(0.05, Math.min(0.9, 0.75 - 0.12*gaps.length - 0.02*2 - (ok?0:0.55)));
+
+    const t = ok
+      ? { stance:'accumulate', cls:'ok', color:ACC, conf:conf.toFixed(2), blocked:false, blockReason:'',
+          sentence:'Accumulate MYX:1155 on four evidence findings — a deposit-mix problem that is priced in at the 12th percentile of its own book value history, with results as the near catalyst.' }
+      : { stance:'no view', cls:'no', color:NEG, conf:'0.20', blocked:true,
+          blockReason:'Fewer than two falsifiable breakers. A stance with nothing that could prove it wrong is an opinion, and the code will not record one as a thesis.',
+          sentence:'No view on MYX:1155: the evidence does not support a stance you could be shown to be wrong about.' };
+
+    const ch = [];
+    if (!ok) ch.push({sev:'fatal', cls:'no', kind:'breakers',
+      text:'Fewer than two breakers. Nothing here could falsify the position.'});
+    ch.push({sev:'fatal', cls:'no', kind:'valuation',
+      text:'Accumulating with no valuation range means agreeing to pay any price.'});
+    if (on.some(b => b.dateCls==='wait')) ch.push({sev:'minor', cls:'wait', kind:'breaker_timing',
+      text:'A breaker with no review date will never fire — it reads as protection and provides none.'});
+    ch.push({sev:'material', cls:'wait', kind:'consensus',
+      text:'This is the consensus view on the name and is already in the price.'});
+    ch.push({sev:'material', cls:'wait', kind:'accounting',
+      text:'Earnings quality has not been checked against operating cash flow.'});
+    ch.push({sev:'material', cls:'wait', kind:'regime',
+      text:'The evidence comes from one rate regime and is assumed to hold in another.'});
+    ch.push({sev:'material', cls:'wait', kind:'liquidity',
+      text:'The position cannot be exited at the size assumed without moving the price.'});
+
+    const fatal = ch.filter(c=>c.sev==='fatal').length;
+    const mat = ch.filter(c=>c.sev==='material').length;
+    const rt = fatal ? {verdict:'thesis_rejected', color:NEG, n:ch.length}
+             : mat>=3 ? {verdict:'thesis_weakened', color:WARN, n:ch.length}
+             : {verdict:'thesis_survives', color:ACC, n:ch.length};
+
+    return {
+      t: { ...t, brCount:String(n), brCls: ok?'ok':'no' },
+      rt, challenges: ch,
+      breakers: ALL.map(b => {
+        const live = !this.state.off[b.id];
+        return { ...b, toggle: () => this.setState({ off: {...this.state.off, [b.id]: live } }),
+          textColor: live ? INK : MUT,
+          dateCls: live ? b.dateCls : 'n',
+          rowStyle: `display:flex;gap:12px;align-items:center;padding:11px 13px;cursor:pointer;
+            border:1px solid ${live?'#D6DBD9':'#EFF2F1'};border-radius:3px;
+            background:${live?'#FFFFFF':'#EFF2F1'};opacity:${live?1:0.55}`,
+          dotStyle: `width:9px;height:9px;border-radius:50%;flex:none;
+            background:${live?ACC:'#C2C9C6'}` };
+      })
+    };
+  }
+}
+
+</script>
+</body>
+</html>

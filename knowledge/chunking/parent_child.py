@@ -129,7 +129,9 @@ def chunk_document(
     return parents, children
 
 
-def chunk_news(doc_id: str, text: str, as_of: datetime, metadata: dict | None = None) -> list[Chunk]:
+def chunk_news(
+    doc_id: str, text: str, as_of: datetime, metadata: dict | None = None
+) -> list[Chunk]:
     """docs/06: whole article if under ~1k tokens. Never split a quote from its
     attribution, so short articles stay intact."""
     if count_tokens(text) < 1000:
@@ -155,10 +157,17 @@ def chunk_transcript(
     def flush() -> None:
         nonlocal buf, idx
         if buf:
-            out.append(Chunk(
-                f"{doc_id}#t{idx}", " ".join(buf), "kb_transcripts", None, None, as_of,
-                {"speaker": cur_speaker, "role": cur_role},
-            ))
+            out.append(
+                Chunk(
+                    f"{doc_id}#t{idx}",
+                    " ".join(buf),
+                    "kb_transcripts",
+                    None,
+                    None,
+                    as_of,
+                    {"speaker": cur_speaker, "role": cur_role},
+                )
+            )
             idx += 1
             buf = []
 

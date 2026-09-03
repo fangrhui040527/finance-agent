@@ -1,11 +1,16 @@
 """P4: components before narrative. The pure-beta suite is the gate."""
+
 import random
 from datetime import date
 
 import pytest
 
 from engines.attribution.decompose import (
-    Component, EstimationInputs, MIN_OBSERVATIONS, Verdict, decompose, estimate,
+    Component,
+    EstimationInputs,
+    Verdict,
+    decompose,
+    estimate,
     long_horizon_decompose,
 )
 from engines.attribution.regression import corrado_rank_z, huber_fit
@@ -76,7 +81,7 @@ def test_components_sum_back_to_the_realised_return():
 def test_shares_never_exceed_one_hundred_percent_when_components_offset():
     """docs/03 section 2.5: absolute values in the denominator."""
     fit = synthetic_fit()
-    m = decompose("X", WINDOW, 0.04, 0.01, {}, -0.03, 0.0, fit)   # market up, stock down
+    m = decompose("X", WINDOW, 0.04, 0.01, {}, -0.03, 0.0, fit)  # market up, stock down
     assert all(0.0 <= c.share_of_total <= 1.0 for c in m.components)
     assert sum(c.share_of_total for c in m.components) == pytest.approx(1.0, abs=1e-9)
 
@@ -104,7 +109,9 @@ def test_corrado_flags_an_extreme_residual():
 # --- long horizon --------------------------------------------------------
 def test_return_decomposes_into_four_multiplicative_parts():
     lh = long_horizon_decompose(0.42, 0.59, 12.0, 12.7, 0.19, 4.20, 4.55, 5)
-    rebuilt = (1 + lh.eps_growth) * (1 + lh.multiple_change) * (1 + lh.shareholder_yield) * (1 + lh.fx) - 1
+    rebuilt = (1 + lh.eps_growth) * (1 + lh.multiple_change) * (1 + lh.shareholder_yield) * (
+        1 + lh.fx
+    ) - 1
     assert lh.total_return == pytest.approx(rebuilt)
 
 
@@ -129,6 +136,7 @@ def test_zero_start_values_are_rejected_rather_than_producing_infinity():
 
 
 # --- found by stress testing (stress/run.py) --------------------------------
+
 
 @pytest.mark.parametrize("bad", [float("nan"), float("inf"), float("-inf")])
 def test_a_non_finite_return_never_reaches_a_verdict(bad):

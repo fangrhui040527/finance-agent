@@ -249,3 +249,128 @@ Tell them the three rules that are not negotiable:
   and names misconceptions. It does not replace reading.
 - **Costs are planning estimates** at RM 4.15/USD, not measured bills. The
   provenance ledger records actuals from day one — compare monthly.
+
+---
+
+## Added in the 2026-08-31 hardening pass
+
+- `python ask.py doctor [--offline]` - preflight with named impact per check;
+  CI runs it offline on every push.
+- `FINPLANET_LOG=INFO|DEBUG` - stderr logging for every entrypoint (a healthy
+  run stays silent at the default WARNING).
+- `FINPLANET_CHEAP=1` - every Messages tier resolves to the cheapest model,
+  billed at its own rate; disclosed by `ask.py backend`, the doctor, and the
+  web Overview. This is the standing rule for live testing.
+- `debug/` traces are pruned automatically (newest 20 kept, 14-day cap) -
+  retention is a privacy control, the traces hold verbatim prompts.
+- docker-compose binds loopback only and refuses to start without passwords
+  in `.env` (no more shipped defaults).
+- The web app: `make web` / `run web`, twelve screens on 127.0.0.1:8765.
+
+---
+
+## Alerting: rules that fire without being asked
+
+`ask.py watch` evaluates a small set of rules against the ledger and the
+traces, and records every state CHANGE to `data/alerts.db` (append-only, like
+every other record here). A rule that stays tripped writes nothing new - an
+alert repeating hourly is noise a person learns to ignore, which is worse
+than silence.
+
+Exit codes are the interface, so a scheduler can act without parsing text:
+
+| code | meaning |
+|---|---|
+| 0 | nothing open |
+| 1 | at least one rule is open |
+| 2 | the check itself could not run - the failure a monitor exists to catch |
+
+The rules, all thresholds in `config.toml [monitor]` and bounded in code:
+
+| rule | fires when |
+|---|---|
+| `spend_24h` | 24h spend crosses `spend_fraction` of the daily budget |
+| `latency_p95` | p95 latency over 24h exceeds `p95_latency_ms` |
+| `dropped_claims` | claims dropped for want of a citation exceed `dropped_claim_rate` |
+| `silence` | no model calls in `silence_hours`, on a ledger that HAS run before (0 = off) |
+| `sweep_silence` | no successful sweep in `sweep_silence_hours`, for a source that HAS succeeded before (0 = off) |
+| `run_errors` | the newest traced run contains an error event |
+| `methodology_changed` | the manifest hash moved between the last two runs |
+
+`silence_hours` is off by default because a personal tool is allowed to sit
+idle. **Turn it on the moment anything runs on a timer**: a job that dies
+quietly looks exactly like a quiet week, and telling those two apart is the
+whole point.
+
+### Scheduling it
+
+Windows Task Scheduler, hourly:
+
+```
+schtasks /create /tn "finplanet-watch" /sc hourly /st 00:05 ^
+  /tr "cmd /c cd /d C:\path\finance-agent && .venv\Scripts\python.exe ask.py watch >> data\watch.log 2>&1"
+```
+
+`cmd /c cd /d ...` is not optional. `schtasks` has no "Start in" flag without
+an XML definition, and `ask.py watch` resolves `data/alerts.db` relative to the
+working directory. Started elsewhere it does not fail - it creates a second,
+empty alert store beside wherever the scheduler happened to be, and reports a
+quiet system because it is reading a file nothing writes.
+
+cron, hourly:
+
+```
+5 * * * * cd /path/finance-agent && .venv/bin/python ask.py watch >> data/watch.log 2>&1
+```
+
+### The nightly sweep
+
+`ask.py watch` tells you the system is healthy. `ask.py sweep` is what gives it
+something to be healthy about: it fetches every enabled source and keeps what
+arrives, so the corpus and the graph grow while nobody is looking.
+
+Windows Task Scheduler, daily at 06:10:
+
+```
+schtasks /create /tn "finplanet-sweep" /sc daily /st 06:10 ^
+  /tr "cmd /c cd /d C:\path\finance-agent && .venv\Scripts\python.exe ask.py sweep >> data\sweep.log 2>&1"
+```
+
+cron, daily at 06:10:
+
+```
+10 6 * * * cd /path/finance-agent && .venv/bin/python ask.py sweep >> data/sweep.log 2>&1
+```
+
+`cd /d` is not optional here for the same reason it is not optional above:
+`ask.py sweep` resolves `data/corpus.db` relative to the working directory.
+Started elsewhere it does not fail — it writes a second, empty corpus beside
+wherever the scheduler happened to be, and every night's watermark is missing,
+so every night refetches the same window.
+
+**The rule that watches this is `sweep_silence`, not `silence`.** Reaching for
+`silence_hours` here is the obvious move and it is the wrong one: it counts
+MODEL calls, and `ask.py sweep` makes none. Turned on for a sweep-only schedule
+it fires every single morning after a run that worked perfectly — and it stays
+silent through a sweep that has been dead since Tuesday, as long as you asked
+the system a question yesterday. Two ways of being wrong, in opposite
+directions, from one plausible setting.
+
+`sweep_silence_hours` asks the same question of the record the sweep itself
+writes. It ships at 30 — a daily schedule plus six hours of slack, so one late
+run is not an alert and a missed day is — and it stays quiet until a source has
+succeeded once, because a corpus nobody has filled yet is a system nobody turned
+on rather than one that stopped.
+
+Leave `silence_hours` at 0 unless something SCHEDULED also calls a model.
+
+Two numbers to read afterwards, both from `ask.py sweep`'s own last line: how
+many articles the corpus holds, and how many of the sweeps failed. A failure
+count that climbs is the signal; an article count that stops climbing while the
+failure count does not is a source that has gone quiet without erroring, which
+is worth a look at the source itself.
+
+Then read it from anywhere: `ask.py alerts` on the command line, the
+`open_alerts` MCP tool in a Claude session, or `GET /api/alerts` in the web
+app. An empty history means no rule has been EVALUATED - not that none would
+fire.

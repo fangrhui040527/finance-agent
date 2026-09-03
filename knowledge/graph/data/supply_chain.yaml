@@ -1,0 +1,114 @@
+# Curated relationships. The only place a SUPPLIES / CUSTOMER_OF /
+# COMPETES_WITH / EXPOSED_TO edge comes from in the deterministic tier.
+#
+# THIS FILE IS THE SOURCE DOCUMENT, and that is deliberate rather than a
+# shortcut. An edge here is EXTRACTED because a person wrote it down and vouches
+# for it, and `note` records the basis they vouched on. The alternative - minting
+# a plausible-looking filing id the corpus cannot produce - would be a fabricated
+# citation, and path_to_citations would refuse the path anyway.
+#
+# So: every row cites `curated:supply_chain#<id>`, and the graph never claims a
+# filing said something a filing did not say.
+#
+# BEFORE YOU TRADE ON ANY OF THIS: these are seed examples chosen because they
+# are widely known, not because they were verified against a primary source in
+# this repository. Replace `note` with a real document reference as you confirm
+# each one, and delete any row you cannot stand behind. An unverified edge that
+# survives here is exactly the failure this system exists to prevent.
+#
+# HUMAN-AUTHORED. kb_supply_chain is created_by: human in agents/registry.yaml,
+# so no agent may ever write here.
+#
+# A relationship that ends is CLOSED with valid_to, never deleted - the store
+# refuses the delete, and history has to stay answerable.
+
+edges:
+  - id: maybank-cimb-compete
+    source: "MYX:1155"
+    target: "MYX:1023"
+    relation: competes_with
+    weight: 0.9
+    valid_from: 2020-01-01
+    note: >-
+      Both are universal banks listed on Bursa competing across retail,
+      commercial and Islamic banking in the same domestic market.
+
+  - id: maybank-publicbank-compete
+    source: "MYX:1155"
+    target: "MYX:1295"
+    relation: competes_with
+    weight: 0.85
+    valid_from: 2020-01-01
+    note: Domestic retail and commercial banking overlap on Bursa.
+
+  - id: misc-pchem-marine
+    source: "MYX:3816"
+    target: "MYX:5183"
+    relation: supplies
+    weight: 0.7
+    valid_from: 2020-01-01
+    note: >-
+      MISC operates the Petronas group's tanker and marine transport fleet;
+      Petronas Chemicals moves its output by sea. Both sit under the same
+      parent, which is why the link is stronger than an arms-length one.
+
+  - id: nvda-amd-compete
+    source: "XNAS:NVDA"
+    target: "XNAS:AMD"
+    relation: competes_with
+    weight: 0.9
+    valid_from: 2020-01-01
+    note: Discrete GPUs and datacentre accelerators.
+
+  - id: intc-amd-compete
+    source: "XNAS:INTC"
+    target: "XNAS:AMD"
+    relation: competes_with
+    weight: 0.9
+    valid_from: 2020-01-01
+    note: x86 server and client CPUs.
+
+  - id: avgo-nvda-compete
+    source: "XNAS:AVGO"
+    target: "XNAS:NVDA"
+    relation: competes_with
+    weight: 0.6
+    valid_from: 2020-01-01
+    note: >-
+      Custom AI accelerators against merchant GPUs. Weaker than a like-for-like
+      rivalry because the products are substitutes only for some buyers.
+
+  - id: presmetal-aluminium
+    source: "MYX:8869"
+    target: "CM:aluminium"
+    relation: exposed_to
+    weight: 0.95
+    valid_from: 2020-01-01
+    note: >-
+      Primary aluminium smelting; revenue tracks the LME aluminium price
+      almost directly.
+
+  - id: pchem-crude
+    source: "MYX:5183"
+    target: "CM:crude_oil"
+    relation: exposed_to
+    weight: 0.7
+    valid_from: 2020-01-01
+    note: Naphtha and gas feedstock costs move with crude.
+
+  - id: tenaga-coal
+    source: "MYX:5347"
+    target: "CM:coal"
+    relation: exposed_to
+    weight: 0.6
+    valid_from: 2020-01-01
+    note: >-
+      Coal-fired generation is a large share of the fuel mix; fuel cost
+      pass-through is regulated and lagged, so the exposure is real but damped.
+
+# Commodity nodes referenced above. Declared here so the extraction validates
+# standalone - an edge to an undeclared node is a schema error, not a warning.
+commodities:
+  "CM:aluminium":  Aluminium
+  "CM:crude_oil":  Crude oil
+  "CM:coal":       Thermal coal

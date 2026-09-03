@@ -162,7 +162,7 @@ class Collection:
             ranks.setdefault(c.chunk_id, {"chunk": c})["dense"] = i + 1
 
         fused: list[Hit] = []
-        for cid, r in ranks.items():
+        for _cid, r in ranks.items():
             chunk = r["chunk"]
             # Hard filters, not rerank hints (docs/02 section 3 property 2).
             if max_age is not None and chunk.as_of is not None:

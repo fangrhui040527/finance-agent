@@ -1,4 +1,5 @@
 """P1/P2: identity, calendars, price adjustment, adapter conformance."""
+
 from datetime import date, time
 from decimal import Decimal as D
 
@@ -7,15 +8,27 @@ import pytest
 from core.market.calendar import SessionCalendar, SessionWindow
 from core.market.instrument import IdentityResolver, Instrument, Status
 from core.market.prices import (
-    ActionKind, Bar, CorporateAction, FxStore, PriceSeries, base_currency_return,
+    ActionKind,
+    Bar,
+    CorporateAction,
+    FxStore,
+    PriceSeries,
+    base_currency_return,
 )
 from markets.registry import get, supported
 
 
 def mk(iid, ticker, mic="XKLS", first=date(2000, 1, 1), delisted=None, isin=None):
     return Instrument(
-        instrument_id=iid, primary_ticker=ticker, mic=mic, currency="MYR",
-        lot_size=100, name=iid, first_listed=first, delisted_at=delisted, isin=isin,
+        instrument_id=iid,
+        primary_ticker=ticker,
+        mic=mic,
+        currency="MYR",
+        lot_size=100,
+        name=iid,
+        first_listed=first,
+        delisted_at=delisted,
+        isin=isin,
         status=Status.DELISTED if delisted else Status.LISTED,
     )
 
@@ -31,8 +44,17 @@ def test_aliases_collapse_to_one_instrument():
 def test_mic_disambiguates_a_shared_ticker():
     r = IdentityResolver()
     r.register(mk("MY_X", "ABC", "XKLS"))
-    r.register(Instrument(instrument_id="US_X", primary_ticker="ABC", mic="XNAS",
-                          currency="USD", lot_size=1, name="US_X", first_listed=date(2000, 1, 1)))
+    r.register(
+        Instrument(
+            instrument_id="US_X",
+            primary_ticker="ABC",
+            mic="XNAS",
+            currency="USD",
+            lot_size=1,
+            name="US_X",
+            first_listed=date(2000, 1, 1),
+        )
+    )
     assert r.resolve("ABC", mic="XNAS").instrument_id == "US_X"
     assert r.resolve("ABC", mic="XKLS").instrument_id == "MY_X"
 
@@ -48,30 +70,33 @@ def test_universe_includes_the_dead():
 
 # --- calendars -----------------------------------------------------------
 def test_weekend_and_holiday_are_not_sessions():
-    cal = SessionCalendar((SessionWindow(time(9), time(17)),), 8,
-                          holidays=frozenset({date(2026, 5, 1)}))
-    assert cal.is_session(date(2026, 5, 4))       # Monday
-    assert not cal.is_session(date(2026, 5, 2))   # Saturday
-    assert not cal.is_session(date(2026, 5, 1))   # holiday
+    cal = SessionCalendar(
+        (SessionWindow(time(9), time(17)),), 8, holidays=frozenset({date(2026, 5, 1)})
+    )
+    assert cal.is_session(date(2026, 5, 4))  # Monday
+    assert not cal.is_session(date(2026, 5, 2))  # Saturday
+    assert not cal.is_session(date(2026, 5, 1))  # holiday
 
 
 def test_half_day_drops_the_afternoon_window():
     cal = SessionCalendar(
         (SessionWindow(time(9), time(12, 30)), SessionWindow(time(14, 30), time(17))),
-        8, half_days=frozenset({date(2026, 5, 4)}))
+        8,
+        half_days=frozenset({date(2026, 5, 4)}),
+    )
     assert len(cal.session(date(2026, 5, 4)).windows) == 1
     assert len(cal.session(date(2026, 5, 5)).windows) == 2
 
 
 def test_session_shift_skips_non_sessions():
     cal = SessionCalendar((SessionWindow(time(9), time(17)),), 8)
-    assert cal.shift(date(2026, 5, 1), 1) == date(2026, 5, 4)   # Fri -> Mon
+    assert cal.shift(date(2026, 5, 1), 1) == date(2026, 5, 4)  # Fri -> Mon
     assert cal.shift(date(2026, 5, 4), -1) == date(2026, 5, 1)
 
 
 def test_utc_alignment_uses_the_offset():
     cal = SessionCalendar((SessionWindow(time(9), time(17)),), 8)
-    assert cal.session(date(2026, 5, 4)).open_utc().hour == 1   # 09:00 UTC+8
+    assert cal.session(date(2026, 5, 4)).open_utc().hour == 1  # 09:00 UTC+8
 
 
 # --- prices --------------------------------------------------------------
@@ -146,7 +171,7 @@ def test_bursa_fee_matches_the_published_schedule():
 
 def test_bursa_brokerage_minimum_dominates_small_trades():
     fs = get("XKLS").fee_schedule
-    assert fs.round_trip_bps(D("620")) > 250     # a lot at RM 6.20 is uneconomic
+    assert fs.round_trip_bps(D("620")) > 250  # a lot at RM 6.20 is uneconomic
     assert fs.round_trip_bps(D("50000")) < 50
 
 
@@ -161,13 +186,31 @@ def test_tier_three_market_would_not_claim_a_factor_model():
 
 # --- XSES: the first T2 market, and the test of the extensibility claim -----
 
+
 def test_adding_a_market_did_not_change_any_engine_or_agent():
     """docs/01 section 10: a new market is one adapter class plus one registry
-    entry. XSES is the proof - the conformance suite above is parameterised over
-    supported(), so registering it subjected it to every conformance test with
-    no new test code at all."""
-    assert "XSES" in supported()
-    assert len(supported()) == 3
+    entry. Eleven markets are the proof - the conformance suite above is
+    parameterised over supported(), so registering each one subjected it to
+    every conformance test with no new test code at all.
+
+    The count is asserted deliberately. It is the line that fails when someone
+    adds an adapter, and failing here is how they are told to come and read what
+    the claim above actually promises."""
+    for mic in (
+        "XKLS",
+        "XNAS",
+        "XSES",
+        "XHKG",
+        "XTKS",
+        "XLON",
+        "XASX",
+        "XNSE",
+        "XTAI",
+        "XKRX",
+        "XETR",
+    ):
+        assert mic in supported()
+    assert len(supported()) == 11
 
 
 def test_singapore_charges_no_stamp_duty_unlike_bursa():
@@ -204,6 +247,7 @@ def test_every_supported_market_has_an_explicit_cost_floor():
     """A market falling back to the generic default is an accident waiting to
     be inherited by the next market added (docs/05 section 3.5)."""
     from engines.sizing.caps import COST_FLOOR_BPS_BY_MIC
+
     missing = [m for m in supported() if m not in COST_FLOOR_BPS_BY_MIC]
     assert not missing, f"markets with no explicit cost floor: {missing}"
 
@@ -214,3 +258,258 @@ def test_the_singapore_minimum_economic_position_is_about_nine_thousand():
     sg = get("XSES")
     assert sg.fee_schedule.round_trip_bps(D("9100")) <= D("30")
     assert sg.fee_schedule.round_trip_bps(D("5000")) > D("30")
+
+
+# --- XHKG: the second T2 market, and the one that inverts the intuition -----
+
+
+def test_hong_kong_is_the_most_expensive_market_here_not_the_cheapest():
+    """A developed market with uncapped both-sided stamp duty and 0.25% retail
+    brokerage costs more than Bursa at every size. Sorting markets by how
+    developed they are gets the cost ranking backwards."""
+    from engines.sizing.caps import cost_floor_bps
+
+    big = D("10000000")
+    hk = get("XHKG").fee_schedule.round_trip_bps(big)
+    my = get("XKLS").fee_schedule.round_trip_bps(big)
+    us = get("XNAS").fee_schedule.round_trip_bps(big)
+    assert us < my < hk
+    assert cost_floor_bps("XHKG") > cost_floor_bps("XKLS") > cost_floor_bps("XNAS")
+
+
+def test_hong_kong_stamp_duty_is_uncapped_unlike_bursa():
+    hk_stamp = next(l for l in get("XHKG").fee_schedule.legs if l.name == "stamp_duty")
+    my_stamp = next(l for l in get("XKLS").fee_schedule.legs if l.name == "stamp_duty")
+    assert hk_stamp.cap is None
+    assert my_stamp.cap is not None
+
+
+def test_hong_kong_stamp_duty_rounds_up_to_the_whole_dollar():
+    """0.1% of 3,000 is 3.00; of 2,600 it is 2.60 and charged as 3. Modelling it
+    as a plain rate understates cost on exactly the small trades that decide the
+    floor."""
+    stamp = next(l for l in get("XHKG").fee_schedule.legs if l.name == "stamp_duty")
+    assert stamp.charge(D("2600")) == D("3")
+    assert stamp.charge(D("3000")) == D("3")
+    assert stamp.charge(D("3001")) == D("4")
+
+
+def test_hong_kong_board_lots_vary_by_issuer_unlike_singapore():
+    hk = get("XHKG")
+    assert hk.lot_size("XHKG:0700") == 100
+    assert hk.lot_size("XHKG:0939") == 1000
+    assert get("XSES").lot_size("XSES:D05") == get("XSES").lot_size("XSES:U11")
+
+
+def test_an_unknown_hong_kong_lot_says_it_is_a_default_not_a_fact():
+    """A wrong board lot produces an order that cannot fill."""
+    hk = get("XHKG")
+    assert hk.lot_size_is_known("XHKG:0700") is True
+    assert hk.lot_size_is_known("XHKG:8888") is False
+    assert hk.lot_size("XHKG:8888") == 1000
+
+
+def test_hong_kong_codes_are_zero_padded_to_the_hkex_form():
+    hk = get("XHKG")
+    assert hk.lot_size("XHKG:700") == hk.lot_size("XHKG:0700")
+
+
+def test_hong_kong_keeps_a_lunch_break_unlike_singapore():
+    assert len(get("XHKG").calendar.windows) == 2
+    assert len(get("XSES").calendar.windows) == 1
+
+
+def test_hong_kong_dividends_reach_a_malaysian_holder_gross():
+    assert get("XHKG").withholding("dividend", "MY") == D(0)
+
+
+# --- P18: Tokyo, London, Sydney ---------------------------------------------
+
+
+def test_a_one_way_charge_is_not_doubled_on_the_round_trip():
+    """FeeLeg.per_side sat declared and unread until London arrived. Every other
+    charge here is symmetric, so round_trip doubled everything - which for UK
+    Stamp Duty Reserve Tax, a purchase-only 0.5%, overstates the round trip by
+    50 bps.
+
+    An overstated cost floor sounds conservative and is not: it refuses
+    positions that would in fact have cleared the real one.
+    """
+
+    from markets.contract import FeeLeg, FeeSchedule
+
+    both = FeeSchedule((FeeLeg("sym", D("0.001")),))
+    buy_only = FeeSchedule((FeeLeg("duty", D("0.001"), per_side=False),))
+    assert both.round_trip(D("10000")) == D("20")
+    assert buy_only.round_trip(D("10000")) == D("10")
+    # one_side is what a single trade pays, one-way legs included.
+    assert buy_only.one_side(D("10000")) == D("10")
+
+
+def test_uk_stamp_duty_is_charged_on_the_buy_and_not_the_sell():
+    lon = get("XLON")
+    duty = next(l for l in lon.fee_schedule.legs if "stamp" in l.name)
+    assert duty.per_side is False
+    naive = lon.fee_schedule.one_side(D("10000")) * 2
+    assert lon.fee_schedule.round_trip(D("10000")) < naive
+    assert naive - lon.fee_schedule.round_trip(D("10000")) == D("50")
+
+
+def test_the_uk_withholds_nothing_on_dividends():
+    """The one market of the seven where a Malaysian holder loses nothing at
+    source - XNAS takes 30%."""
+    assert get("XLON").withholding("dividend", "MY") == D(0)
+    assert get("XNAS").withholding("dividend", "MY") > D("0.25")
+
+
+def test_london_ticks_are_sub_penny_in_pounds_so_pence_input_is_obvious():
+    """LSE quotes in pence and this adapter works in pounds. A feed handing over
+    2750 for a GBP 27.50 share produces a position a hundred times too large,
+    and every number downstream stays finite and plausible. Sub-penny ticks are
+    the tell: pass pence and the ticks come back absurdly fine, not quietly
+    reasonable."""
+    lon = get("XLON")
+    assert lon.tick_size(D("27.50")) < D("0.01")
+    assert lon.tick_size(D("2750")) == D("0.01")  # the coarse top band
+
+
+def test_tokyo_ticks_are_coarse_enough_that_spread_beats_fees():
+    """A JPY 4,000 stock ticks in JPY 5 - 12.5 bps per tick, against roughly
+    0.5 bps for a USD 200 US name. The sizing engine's cost floor only sees
+    fees, so Tokyo's real minimum position is worse than its schedule implies."""
+    tks = get("XTKS")
+    tick_bps = tks.tick_size(D("4000")) / D("4000") * 10_000
+    assert tick_bps > D("10")
+    us_bps = get("XNAS").tick_size(D("200")) / D("200") * 10_000
+    assert us_bps < D("1")
+
+
+def test_tokyo_trades_in_lots_of_a_hundred_so_the_minimum_ticket_is_large():
+    tks = get("XTKS")
+    assert tks.lot_size("XTKS:7203") == 100
+    assert tks.lot_round_down(150, "XTKS:7203") == 100
+    assert tks.lot_round_down(99, "XTKS:7203") == 0
+
+
+def test_tokyo_keeps_its_lunch_break_and_closes_at_half_past_three():
+    """TSE extended the afternoon close from 15:00 to 15:30 on 5 November 2024,
+    its first change in seventy years, and kept the break."""
+    cal = get("XTKS").calendar
+    assert len(cal.windows) == 2
+    assert cal.windows[-1].end == time(15, 30)
+
+
+def test_sydney_is_the_cheapest_market_here_after_the_united_states():
+    from engines.sizing.caps import cost_floor_bps
+
+    floors = {m: cost_floor_bps(m) for m in supported()}
+    assert floors["XASX"] < floors["XKLS"]
+    assert floors["XASX"] < floors["XSES"]
+    assert floors["XNAS"] < floors["XASX"]
+
+
+def test_sydney_charges_no_stamp_duty():
+    assert not any("stamp" in l.name for l in get("XASX").fee_schedule.legs)
+
+
+def test_the_unfranked_rate_is_returned_because_franking_is_not_a_market_fact():
+    """A fully franked Australian dividend is withheld at zero; an unfranked one
+    at 15% under the treaty. Franking is a per-payment fact the market does not
+    know, so the adapter returns the conservative case."""
+    asx = get("XASX")
+    assert asx.withholding("dividend", "MY") == D("0.15")
+    assert asx.withholding("interest", "MY") == D(0)
+
+
+def test_every_registered_market_has_a_written_cost_floor():
+    """A missing entry silently inherits the 30 bps default. That is how every
+    Bursa position got sized against half its real floor."""
+    from engines.sizing.caps import COST_FLOOR_BPS_BY_MIC
+
+    missing = [m for m in supported() if m not in COST_FLOOR_BPS_BY_MIC]
+    assert not missing, f"no written cost floor for {missing}"
+
+
+def test_every_registered_market_names_its_regulator_and_index():
+    for mic in supported():
+        a = get(mic)
+        assert a.regulator.strip() and a.local_index.strip()
+        assert a.settlement_days >= 1
+        assert a.currency.isupper() and len(a.currency) == 3
+
+
+# --- P18 complete: India, Taiwan, Korea, Germany ----------------------------
+
+
+def test_taiwan_and_korea_tax_the_sell_side_only():
+    """Both levy their transaction tax on disposal. Doubling Taiwan's 0.3% would
+    put its floor 30 bps too high and refuse positions that clear the real one -
+    the same defect UK stamp duty exposed."""
+    for mic in ("XTAI", "XKRX"):
+        tax = next(l for l in get(mic).fee_schedule.legs if "transaction_tax" in l.name)
+        assert tax.per_side is False
+    tai = get("XTAI").fee_schedule
+    naive = tai.one_side(D("1000000")) * 2
+    assert naive - tai.round_trip(D("1000000")) == D("3000")  # 0.3% counted once
+
+
+def test_india_taxes_both_sides_which_is_what_makes_it_expensive():
+    """STT is 20 bps round trip before any brokerage - the only market here with
+    a full-rate transaction tax on both legs and no cap."""
+    stt = next(l for l in get("XNSE").fee_schedule.legs if l.name == "securities_transaction_tax")
+    assert stt.per_side is True
+    assert stt.rate * 2 * 10_000 == D("20.000")
+
+
+def test_india_stamp_duty_is_buy_side_only_even_though_stt_is_not():
+    """Two taxes on the same trade with different sidedness. Getting either
+    wrong is silent."""
+    duty = next(l for l in get("XNSE").fee_schedule.legs if l.name == "stamp_duty")
+    assert duty.per_side is False
+
+
+def test_germany_is_the_cheapest_european_market_because_it_taxes_no_trades():
+    de = get("XETR")
+    assert not any("tax" in l.name or "stamp" in l.name for l in de.fee_schedule.legs)
+    uk = get("XLON").fee_schedule.round_trip_bps(D("100000"))
+    assert de.fee_schedule.round_trip_bps(D("100000")) < uk
+    assert uk > D("50")
+
+
+def test_germany_withholds_the_gross_rate_because_a_reclaim_is_not_a_receipt():
+    """26.375% leaves the account on the payment date. The treaty rate is
+    reclaimed, slowly - and the number a position's return must survive is what
+    actually left, not what may come back."""
+    assert get("XETR").withholding("dividend", "MY") == D("0.26375")
+
+
+def test_taiwan_trades_in_lots_of_a_thousand_at_a_flat_rate():
+    """A TWD 500 share is a TWD 500,000 minimum ticket - roughly RM 72,000. The
+    lot, not the fee, is what puts Taiwan out of reach of a small account.
+
+    Hong Kong also uses large lots but sets them PER INSTRUMENT (0001 is 500,
+    0700 is 100), so it cannot be asserted the same way - which is the point of
+    lot_size taking an instrument id at all."""
+    assert get("XTAI").lot_size("XTAI:2330") == 1000
+    hk = get("XHKG")
+    assert hk.lot_size("XHKG:0001") != hk.lot_size("XHKG:0700")
+
+
+def test_two_markets_settle_at_t_plus_one_and_the_rest_at_t_plus_two():
+    """India moved in 2023 and the US in May 2024. Assuming a uniform T+2 across
+    a portfolio would misdate every cash projection touching either."""
+    fast = {m for m in supported() if get(m).settlement_days == 1}
+    assert fast == {"XNSE", "XNAS"}
+    assert all(get(m).settlement_days == 2 for m in supported() if m not in fast)
+
+
+def test_every_market_taxing_one_side_only_says_so_and_none_says_it_wrongly():
+    """The sweep that would have caught the London bug. A leg whose name says
+    tax or duty must have made a deliberate choice about sidedness."""
+    one_way = {(m, l.name) for m in supported() for l in get(m).fee_schedule.legs if not l.per_side}
+    assert one_way == {
+        ("XLON", "stamp_duty_reserve_tax"),
+        ("XNSE", "stamp_duty"),
+        ("XTAI", "securities_transaction_tax"),
+        ("XKRX", "securities_transaction_tax"),
+    }

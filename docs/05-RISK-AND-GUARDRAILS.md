@@ -122,6 +122,10 @@ brokerage minimum, and only falls under 30 bps above roughly RM 4m of
 consideration once the RM 1,000 caps bind. A single global floor would refuse
 every Bursa position ever taken. The floor is therefore **per-market**, set near
 1.3× each market's asymptotic cost: 60 bps for XKLS, 5 bps for XNAS.
+Those are VENUE floors. Where an account's own costs differ, the floor is the
+broker's: a `moomoo_my` account pays 6 bps of commission alone, so the 5 bps
+XNAS figure is not a starting point to nudge — it is unreachable at any size,
+and `markets/brokers.py` carries the 20 bps that account actually clears.
 
 The useful number that falls out: **the minimum economic Bursa position is about
 RM 4,700.** Below that the RM 8 minimum dominates and the round trip eats more
@@ -259,6 +263,72 @@ exactly at its threshold, 2,000 randomised decompositions keeping the unexplaine
 share inside [0, 1], and seven hostile documents — prompt injection, null bytes,
 a 200k-character body, SQL and path traversal — ingested without one linking
 itself to a traded instrument.
+
+### 3.5.3 The unit of account: four defects behind one missing word
+
+Adding ten foreign markets to a repository built for Bursa introduced eight
+currencies and no way to tell them apart. The book is MYR — that was never in
+doubt and `BASE_CURRENCY = "MYR"` had been in `core/contracts/money.py` from the
+start. What was missing is that **no number outside `Money` carried its
+currency**, so nothing could notice when two of them met.
+
+Four places where they met, none of which raised, all of which returned a
+finite, plausible, correctly-typed number:
+
+**`CapSet.binding()` took a `min()` across two currencies.** `risk`, `kelly` and
+`concentration` derive from the portfolio and are MYR. `liquidity` derives from
+local turnover and `cost_floor` from a local fee schedule — both in the market's
+own currency. `min()` compared them as bare numbers and returned whichever was
+numerically smaller regardless of unit. A thinly-traded US name with USD 300k of
+daily value gives a USD 15,000 liquidity cap; against an MYR 40,000 concentration
+cap `min` picks 15,000, and the system deploys **MYR 63,000 against a limit that
+had just computed 40,000** — a 58% overshoot, reported as compliant.
+
+**`size()` divided an MYR cap by a native price.** `units = value / price`, with
+nothing naming either side. On a USD 180 stock an MYR 40,000 cap bought 222
+shares — USD 39,960, or **MYR 167,832 of a MYR 500,000 book: a 33.6% position
+from an 8% limit**, labelled `bound by concentration`. The same arithmetic on a
+JPY name buys a thirty-eighth of the intended size, so the error is not even
+consistently in one direction; it is consistently the exchange rate.
+
+**The prospective concentration check was fed the same wrong number.**
+`new_weight = final_value / port_value` put a native numerator over an MYR
+denominator, so the last line of defence — the check that runs on the portfolio
+*after* the trade — saw a weight off by the same factor and passed the breach.
+
+**`currency` was copied from the `country` field.** In `ask.py` and in the MCP
+tool, a position typed with country `MY` carried currency `"MY"`, which is not
+`"MYR"`; `check()` counts anything that is not the base currency as foreign
+exposure, so **a book of nothing but Bursa stocks reported 100% foreign-currency
+exposure and breached the 50% limit.** A false refusal, produced by a field
+nobody was reading, in the same line that produced a false pass for anything
+genuinely foreign.
+
+**The fix is a declared boundary, not a conversion.** `CapSet` now names the one
+currency all five of its caps are in. The market's currency is read off its
+adapter (`markets.registry.market_currency`) rather than passed in, because a
+caller who can pass it can pass it wrong. Sizing happens entirely in the
+market's currency — that is where lots, ticks and fee minimums are meaningful —
+and the portfolio converts *into* it once, on the way in; only the result
+crosses back to MYR, once, on the way out. Crossing without an explicit dated
+rate raises `CurrencyMismatch` rather than assuming 1.0. Every figure a user
+sees is labelled, and a foreign one is shown alongside its MYR equivalent:
+`USD 9,523.81 = MYR 40,000.00`.
+
+**What makes this the same failure as MYX/XKLS drift** (§3.5.1) is that the
+wrong answer was reachable only because two producers of a number disagreed
+about what the number meant, and nothing in the type system could hold an
+opinion. The floor drift cost a factor of two; the currency drift costs the
+exchange rate, which for JPY is a factor of 78.
+
+`stress/run.py` now sizes an 8% slice of a MYR 500,000 book on **every**
+registered market and checks the result back in MYR. Ten of eleven land on
+RM 40,000 exactly; London refuses, because at RM 40,000 an LSE round trip is
+75 bps against a 75 bps floor — stamp duty makes an 8% slice of this book
+marginally sub-economic there. That is a true fact about the market, surfaced
+by the probe rather than asserted by it.
+
+---
 
 ---
 

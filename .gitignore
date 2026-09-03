@@ -1,9 +1,36 @@
+# Only two kinds of thing stay out of this repository now: a secret, and
+# anything git would be storing a second copy of.
+#
+# The user asked for the whole project to be backed up, so the databases,
+# the traces and the QA artefacts are all tracked. They are the system's own
+# history - what it was asked, what it answered, what it cost - and that
+# history exists on one disk otherwise.
+
+# 1. The secret. A live API key in git history is permanent even after a
+#    force-push, and this file is regenerated from the key you hold anyway.
+.env
+config.local.toml
+
+# 2. Derived from files that ARE tracked, so storing it is storing it twice.
+#    .venv is 138 MB of Windows-only binaries that uv.lock rebuilds exactly,
+#    and a Windows venv does not run on the Linux box CI uses.
 .venv/
 __pycache__/
 *.pyc
 .pytest_cache/
 *.egg-info/
-.env
-data/
-*.db
-config.local.toml
+.coverage
+htmlcov/
+node_modules/
+package-lock.json
+
+# 3. SQLite's own scratch files. The databases in data/ ARE tracked on purpose,
+#    but WAL mode writes a -wal journal and a -shm shared-memory block beside
+#    each one. They belong to whichever process currently holds the database
+#    open, are empty once it closes cleanly, and differ on every machine.
+#    Committing a stale -wal is worse than useless: it can confuse the next
+#    process that opens the file. Anything that reads a database - a test run,
+#    a sweep, `ask.py alerts` - creates them, so without this they reappear as
+#    untracked noise after every command.
+*.db-wal
+*.db-shm

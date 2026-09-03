@@ -11,7 +11,7 @@ How the system goes international, where every fact comes from, and how each kno
 | Tier | Markets | Depth | Gate to enter |
 |---|---|---|---|
 | **T1 — Deep** | US (XNAS, XNYS), Malaysia (XKLS) | Full: prices, point-in-time fundamentals, filings, transcripts, events, base rates, factor model | All eval suites pass; ≥3y of survivorship-safe history |
-| **T2 — Analytical** | Singapore (XSES), Hong Kong (XHKG), Japan (XJPX), UK (XLON), Australia (XASX), India (XNSE), Taiwan (XTAI), Korea (XKRX), Germany (XETR) | Prices, fundamentals, filings, events. Factor model per market once ≥300 instruments have 3y history | Fundamentals coverage ≥80% of index constituents |
+| **T2 — Analytical** | Singapore (XSES), Hong Kong (XHKG), Japan (XTKS — the exchange segment; XJPX is the group operator MIC and aliases to it), UK (XLON), Australia (XASX), India (XNSE), Taiwan (XTAI), Korea (XKRX), Germany (XETR) | Prices, fundamentals, filings, events. Factor model per market once ≥300 instruments have 3y history | Fundamentals coverage ≥80% of index constituents |
 | **T3 — Contextual** | Indonesia, Thailand, Vietnam, Philippines, Canada, France, Netherlands, Switzerland, Brazil, Saudi | Prices, news, macro, graph edges. **No factor model, no attribution beyond market/FX** | Price history + calendar only |
 | **T4 — Reference** | Everything else | Referenced in the graph as an entity and exposure path; never a candidate | — |
 
@@ -25,31 +25,33 @@ Adding a market is filling this in and passing conformance tests. No orchestrato
 
 ```python
 class MarketAdapter(Protocol):
-    mic: str                        # ISO 10383, e.g. "XKLS"
-    country: str                    # ISO 3166-1 alpha-2
-    currency: str                   # ISO 4217
+    mic: str  # ISO 10383, e.g. "XKLS"
+    country: str  # ISO 3166-1 alpha-2
+    currency: str  # ISO 4217
     tier: Literal[1, 2, 3, 4]
 
     # --- Trading mechanics -------------------------------------------------
-    def sessions(self, d: date) -> list[Session]: ...      # incl. lunch breaks
+    def sessions(self, d: date) -> list[Session]: ...  # incl. lunch breaks
     def holidays(self, year: int) -> list[date]: ...
     def lot_size(self, instrument_id: str) -> int: ...
     def tick_size(self, price: Decimal) -> Decimal: ...
     def settlement_days(self) -> int: ...
-    def price_limits(self) -> PriceLimit | None: ...       # limit up/down where applicable
+    def price_limits(self) -> PriceLimit | None: ...  # limit up/down where applicable
 
     # --- Costs -------------------------------------------------------------
-    def fee_schedule(self) -> FeeSchedule: ...             # commission, min, stamp,
-                                                           # clearing, levy, caps
+    def fee_schedule(self) -> FeeSchedule:
+        ...  # commission, min, stamp,
+        # clearing, levy, caps
+
     def withholding(self, income_type: str, holder_country: str) -> Decimal: ...
 
     # --- Reference ---------------------------------------------------------
-    def local_index(self) -> str: ...                      # the benchmark for attribution
-    def sector_scheme(self) -> str: ...                    # GICS / local scheme + mapping
-    def accounting_standard(self) -> str: ...              # IFRS / US GAAP / local
+    def local_index(self) -> str: ...  # the benchmark for attribution
+    def sector_scheme(self) -> str: ...  # GICS / local scheme + mapping
+    def accounting_standard(self) -> str: ...  # IFRS / US GAAP / local
 
     # --- Disclosure --------------------------------------------------------
-    def filing_calendar(self) -> FilingRules: ...          # deadlines by filer class
+    def filing_calendar(self) -> FilingRules: ...  # deadlines by filer class
     def announcement_source(self) -> SourceRef: ...
     def insider_disclosure(self) -> SourceRef | None: ...
     def short_interest(self) -> SourceRef | None: ...

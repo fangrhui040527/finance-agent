@@ -70,8 +70,7 @@ def validate(rows: list[Bar], instrument_id: str, source: str) -> None:
 
         if not (b.low <= b.high):
             raise PriceSourceError(
-                f"{source} returned {instrument_id} {b.day} with low {b.low} "
-                f"above high {b.high}"
+                f"{source} returned {instrument_id} {b.day} with low {b.low} above high {b.high}"
             )
         if not (b.low <= b.open <= b.high and b.low <= b.close <= b.high):
             raise PriceSourceError(
@@ -80,8 +79,7 @@ def validate(rows: list[Bar], instrument_id: str, source: str) -> None:
             )
         if b.volume < 0:
             raise PriceSourceError(
-                f"{source} returned {instrument_id} {b.day} with negative "
-                f"volume {b.volume}"
+                f"{source} returned {instrument_id} {b.day} with negative volume {b.volume}"
             )
 
 

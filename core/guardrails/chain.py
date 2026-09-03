@@ -7,12 +7,12 @@ them. tests/test_guardrail_chain.py asserts that structurally.
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Any, Callable
+from typing import Any
 
 from core.guardrails.policy import (
     Action,
-    Decision,
     PolicyEngine,
     PolicyResult,
     PolicyViolation,

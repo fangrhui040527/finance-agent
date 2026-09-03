@@ -1,4 +1,5 @@
 """P0: telemetry sits beside content, never inside it."""
+
 import json
 from pathlib import Path
 

@@ -61,7 +61,7 @@ MIC_TO_MARKET = {
 def to_moomoo_code(instrument_id: str) -> str:
     """MYX:1155 or XKLS:1155 -> MY.1155."""
     if "." in instrument_id and ":" not in instrument_id:
-        return instrument_id                        # already a moomoo code
+        return instrument_id  # already a moomoo code
     try:
         prefix, code = instrument_id.split(":", 1)
     except ValueError:
@@ -71,9 +71,7 @@ def to_moomoo_code(instrument_id: str) -> str:
         ) from None
     market = MIC_TO_MARKET.get(prefix.upper())
     if market is None:
-        raise ValueError(
-            f"no moomoo market for {prefix!r}. Known: {sorted(MIC_TO_MARKET)}"
-        )
+        raise ValueError(f"no moomoo market for {prefix!r}. Known: {sorted(MIC_TO_MARKET)}")
     return f"{market}.{code}"
 
 
@@ -82,8 +80,9 @@ class MoomooQuotes(PriceSource):
 
     name = "moomoo"
 
-    def __init__(self, host: str = DEFAULT_HOST, port: int = DEFAULT_PORT,
-                 context_factory=None) -> None:
+    def __init__(
+        self, host: str = DEFAULT_HOST, port: int = DEFAULT_PORT, context_factory=None
+    ) -> None:
         self.host = host
         self.port = port
         # Injectable so the tests never need moomoo-api or a live gateway.
@@ -93,8 +92,14 @@ class MoomooQuotes(PriceSource):
         if self._context_factory is not None:
             return self._context_factory(self.host, self.port)
         try:
-            # QUOTE context only. Never OpenSecTradeContext - see module docstring.
-            from moomoo import OpenQuoteContext
+            # QUOTE context only. The trade context is never imported here -
+            # see the module docstring, and tests/test_price_sources.py.
+            #
+            # The ignore is narrow on purpose: moomoo-api is an OPTIONAL runtime
+            # dependency, absent in CI and on every non-Windows box, and
+            # reportMissingImports stays true repo-wide so a genuinely
+            # misspelled import is still caught everywhere else.
+            from moomoo import OpenQuoteContext  # pyright: ignore[reportMissingImports]
         except ImportError as e:
             raise PriceSourceError(
                 "moomoo-api is not installed. `pip install moomoo-api` - note "
@@ -108,7 +113,9 @@ class MoomooQuotes(PriceSource):
         ctx = self._open()
         try:
             ret, data = ctx.request_history_kline(
-                code, start=start.isoformat(), end=end.isoformat(),
+                code,
+                start=start.isoformat(),
+                end=end.isoformat(),
             )
         except OSError as e:
             raise PriceSourceError(
@@ -119,7 +126,7 @@ class MoomooQuotes(PriceSource):
         finally:
             close = getattr(ctx, "close", None)
             if callable(close):
-                close()               # a leaked context eats quota until restart
+                close()  # a leaked context eats quota until restart
 
         if ret != 0:
             raise PriceSourceError(
@@ -137,18 +144,18 @@ def _to_bars(frame, code: str) -> list[Bar]:
     out: list[Bar] = []
     for r in rows:
         try:
-            out.append(Bar(
-                day=date.fromisoformat(str(r["time_key"])[:10]),
-                open=float(r["open"]),
-                high=float(r["high"]),
-                low=float(r["low"]),
-                close=float(r["close"]),
-                volume=float(r["volume"]),
-            ))
+            out.append(
+                Bar(
+                    day=date.fromisoformat(str(r["time_key"])[:10]),
+                    open=float(r["open"]),
+                    high=float(r["high"]),
+                    low=float(r["low"]),
+                    close=float(r["close"]),
+                    volume=float(r["volume"]),
+                )
+            )
         except (KeyError, TypeError, ValueError) as e:
             raise PriceSourceError(
-                f"moomoo returned a bar for {code} this adapter cannot read: "
-                f"{r!r}"
+                f"moomoo returned a bar for {code} this adapter cannot read: {r!r}"
             ) from e
     return out
-

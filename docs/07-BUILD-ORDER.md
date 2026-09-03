@@ -30,7 +30,7 @@ network and no keys; `pytest` runs 361 tests.
 | P15 surface | done | `ui/render.py` |
 | P17 registry and ratchet | done | `core/registry/loader.py`, `evals/` — 16 suites |
 | **P16 paper trade gate** | **waiting on elapsed time** | tooling built (`predict.py`, `agents/learning/store.py`); needs 3–6 months of graded outcomes |
-| P18 T2 market onboarding | **ready, not started** | depends on P17, which is done — one adapter class plus a registry entry per market |
+| P18 T2 market onboarding | done | `markets/` — 11 adapters, every T2 market docs/06 names |
 | P19 short-horizon classifier | blocked on P16 | needs the forward record P16 produces |
 
 **What "waiting" means here.** P16 is not unbuilt work; it is a waiting period.
@@ -44,10 +44,34 @@ Grading them early is refused on purpose (`OutcomeQueue.grade` raises), because 
 **P18 was previously listed as blocked on P16. That was wrong** — the roadmap has
 it after P17, which is done. Onboarding a T2 market needs no forward record; it
 needs one `MarketAdapter` subclass, a registry entry, and the conformance tests
-that already exist. It is the most useful thing available to work on today that
-does not require waiting.
+that already exist.
 
-**What is deliberately unwired.** `GdeltFeed._fetch_raw` raises
+The five markets the gantt named (SG, HK, JP, UK, AU) are now registered, and
+the claim held: no engine, agent or orchestrator changed. Two things did surface,
+and neither was visible before a market needed them —
+
+- `FeeLeg.per_side` was declared and never read, so `round_trip` doubled every
+  charge. UK Stamp Duty Reserve Tax is levied on purchases only, and doubling it
+  overstates the London floor by 50 bps. An overstated floor refuses positions
+  that would have cleared the real one.
+- `docs/06` named Japan `XJPX` while `core/market/feed.py` already wrote `XTKS`.
+  Both are real MICs — the group operator and the exchange segment — and it is
+  the MYX/XKLS drift again. Aliased before it could cost anything.
+
+India, Taiwan, Korea and Germany followed, completing the T2 set `docs/06`
+names. The `per_side` fix London forced paid for itself immediately: Taiwan and
+Korea both tax the **sell side only** (0.3% and 0.15%), and India levies a
+buy-side stamp duty *alongside* a both-sides STT. Four more markets would have
+been mis-costed by the doubling bug, three of them by 15–30 bps.
+
+Two premises turned out to be wrong while testing, both about markets already
+registered: Hong Kong sets board lots **per instrument** rather than a flat
+1,000, and **XNAS has been T+1 since May 2024** — so India is not the only fast
+settler and a uniform T+2 assumption would misdate cash on both.
+
+**What is now wired.** GDELT (news) and Stooq (daily bars) are both live and keyless. Filings, ownership and macro remain unwired: their adapters raise
+rather than returning empty, so a missing source can never read as a quiet
+day. Historically `GdeltFeed._fetch_raw` raised
 `NotImplementedError` rather than returning empty. Every live source is one
 subclass of `FeedAdapter`; everything downstream of the fetch is built and
 tested. The offline build cannot silently pretend to have data.

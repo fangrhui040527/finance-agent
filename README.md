@@ -5,6 +5,12 @@ A multi-agent, multi-market equity research system that explains *why* a price m
 
 > **Not financial advice.** Candidacy bands, calibrated probabilities, attributions and sizing constraints with evidence chains. No recommendations, no execution.
 
+> **It does not pick stocks.** There is no screen and no ranked list of ideas.
+> You bring the names; it tells you why one moved, what the evidence says, how
+> much of it you could hold, how a budget splits across several, and what
+> changed against what you already own. Asking it to find stocks gets a refusal
+> that says this.
+
 ## Start here
 
 **New to this? Open [`docs/user-guide.html`](docs/user-guide.html) in a browser.**
@@ -36,12 +42,24 @@ Full design detail starts at **[`docs/README.md`](docs/README.md)**.
 | [12 Code reference map](docs/12-CODE-REFERENCE-MAP.md) | Exact file:line pointers into each upstream repo, pinned to commit SHAs |
 | [13 The self-learning loop](docs/13-SELF-LEARNING-LOOP.md) | Hermes-agent studied; the assembled A15 loop and its provenance gate |
 | [14 Operations runbook](docs/14-OPERATIONS-RUNBOOK.md) | **What to do next, what to monitor, and what should make you stop** |
+| [15 MCP setup](docs/15-MCP-SETUP.md) | **Run it as an MCP server so the reasoning is your Claude session** |
+| [16 Tracing and anatomy](docs/16-TRACING-AND-ANATOMY.md) | **Every prompt, every guardrail decision, every dropped claim — `make trace`** |
+| [17 Knowledge graph](docs/17-KNOWLEDGE-GRAPH.md) | **Multi-hop exposure end to end: confidence, validity, the citation seam, the build, the review surface, and the codebase graph** |
 
 ## Status
 
-**Everything except P16 is built and tested.** 469 tests, no network and no keys
-needed to run any of it. CI runs the suite, `verify.py`, the eval ratchet and the
-no-execution grep on every push.
+**Everything except P16 is built and tested - including the twelve-screen web
+app** (`make web`, 127.0.0.1 only). 1,400+ tests, no network and no keys needed
+to run any of them. CI runs lint (ruff), types (pyright), the suite with a 92%
+coverage floor, `verify.py`, stress, the eval ratchet, preflight doctor and the
+no-execution grep on ubuntu AND windows, 3.11 and 3.12, from a committed
+uv.lock.
+
+Runtime deps: `pydantic`, `pyyaml`, plus `anthropic` (model seam; EchoBackend
+keeps everything offline) and `fastapi`/`uvicorn` (web). Engines and tests
+import none of the last three. Live model testing runs under
+`FINPLANET_CHEAP=1`, which resolves every tier to the cheapest model and says
+so on every surface.
 
 P16 is the paper-trade gate: 3–6 months of elapsed forward time, not unbuilt
 work. Its machinery exists and refuses to grade a prediction before its horizon.
@@ -52,8 +70,25 @@ P18–P19 wait on P16. **If you are picking this up, start at
 make install && make test    # full suite   (Windows: run install && run test)
 make config                  # settings, and the bounds they cannot cross
 make verify                  # end-to-end on mock data, <1s
-make stress                  # adversarial: volume, NaN, exact thresholds, concurrency
+make stress                  # adversarial: volume, NaN, thresholds, concurrency, live seams, MCP
+make trace                   # full traced system run -> debug/<run_id>/
+make mcp-check               # MCP handshake selftest, no client needed
+make doctor                  # preflight: what this installation can actually do
+make web                     # the twelve screens on http://127.0.0.1:8765
+make sweep                   # fetch every enabled source and KEEP it -> data/corpus.db
+make graph                   # build the knowledge graph -> data/graph.db
+make graph-report            # hubs, orphans, review queue, surprising links
+make codegraph               # the repo as a graph -> data/codegraph.db
+make mcp                     # serve MCP on stdio -> docs/15-MCP-SETUP.md
+python ask.py backend                        # which model is actually answering
+python ask.py --model opus --effort max backend   # pin the model, pick the reasoning
 python ask.py why MYX:1155 --move -0.09 --market -0.08
+python ask.py why XNAS:NVDA --fetch --against XNAS:SPY --days 5
+python ask.py prices XNAS:NVDA --days 30     # live daily bars
+python ask.py thesis MYX:1155 --breaker "NIM below 2%|nim < 0.02|kb_filings" ...
+python ask.py risk --position MYX:1155:0.22:bank:MY
+python ask.py size MYX:1155 --portfolio 200000 --price 6.20 --stop 5.60 --adv 900000
+python ask.py learn --syllabus
 python predict.py log MYX:1155 +1 63d 0.62 "NIM recovers"
 make due                     # predictions that have reached their horizon
 make status                  # the calibration table
@@ -64,7 +99,7 @@ make up                      # postgres+timescale · qdrant · neo4j · redis ·
 |---|---|---|
 | P0 | Tier router, guardrail chain, provenance ledger, typed answers | `core/` |
 | P1 | Instrument identity, session calendars, price adjustment, FX | `core/market/` |
-| P2 | Market adapter contract + XKLS + XNAS + XSES + conformance | `markets/` |
+| P2 | Market adapter contract + 11 markets + conformance | `markets/` |
 | P3.5 | Point-in-time `known_at` store, survivorship-safe universes | `core/market/pointintime.py` |
 | P4 | Attribution: robust regression, decomposition, long-horizon | `engines/attribution/` |
 | P5 | News corpus: five-dimension features, wire dedup, escalation gate | `knowledge/news/` |
@@ -82,15 +117,32 @@ make up                      # postgres+timescale · qdrant · neo4j · redis ·
 | P17 | Capability registry and the eval ratchet, 16 suites | `core/registry/`, `evals/` |
 | P16 tooling | Durable prediction log + CLI — the clock the gate needs | `agents/learning/store.py`, `predict.py` |
 | Entrypoint | `ask why` / `ask plan` — decomposition and routing from the shell | `ask.py` |
-| P18 | Singapore (XSES), the first T2 market | `markets/xses.py` |
+| P18 | T2 markets: SG HK JP UK AU IN TW KR DE | `markets/` — 11 adapters |
+| P18 | Hong Kong (XHKG), the second — per-issuer board lots, uncapped stamp | `markets/xhkg.py` |
+| Model | Anthropic Messages backend behind the one `Backend` seam | `core/llm/backends.py` |
+| Model choice | `--model haiku\|sonnet\|opus` · `--effort low..max`, disclosed on every surface | `core/llm/tiers.py` |
+| Prices | Stooq daily bars, validated at the seam | `core/market/feed.py` |
+| Corpus | what a sweep saw: append-only, deduplicated ACROSS runs, every attempt recorded | `knowledge/corpus.py` |
+| Entrypoints | `thesis` · `risk` · `size` · `learn` · `prices` · `backend` | `ask.py` |
+| MCP | 11 tools over stdio — the engines decide, your Claude narrates | `mcp_server/` |
+| Trace | Every prompt, rail decision and dropped claim; 4 reports per run | `core/trace/`, `trace_run.py` |
 
 **Not built:** P16's forward record — 3–6 months of elapsed time, not effort;
 its tooling is built and its clock starts with `python predict.py log`. P19
-depends on that record. P18 is started, not finished: XSES is onboarded, HK/JP/UK/AU
-are not. Live feed ingest is deliberately unwired —
-`GdeltFeed._fetch_raw` raises rather than returning empty, so the offline build
-cannot pretend to have data. Everything downstream of the adapter seam is built
-and tested. See [`docs/07-BUILD-ORDER.md`](docs/07-BUILD-ORDER.md) §0.
+depends on that record. The **frontend** is designed but unimplemented: 12
+artboards in `design/`, against 273 lines of terminal rendering in `ui/render.py`.
+
+**Two live sources are wired**, both free and keyless: GDELT for news
+(`knowledge/feeds/adapter.py`) and Stooq for daily bars (`core/market/feed.py`). What
+they return is now **kept**: `ask.py sweep` writes to `data/corpus.db` and links
+the articles into the graph, so a scheduled run accumulates instead of printing
+and forgetting. It records failed sweeps as failures — a month of refused
+requests and a genuinely quiet month leave the same empty table otherwise.
+Filings, ownership and macro have no ingest yet — supply those numbers or the
+agents that need them report a gap. A real model backend exists at
+`core/llm/backends.py`; `python ask.py backend` says whether a model or the
+deterministic stub is answering, because the two are otherwise
+indistinguishable. See [`docs/07-BUILD-ORDER.md`](docs/07-BUILD-ORDER.md) §0.
 
 ### What building it found
 
@@ -112,6 +164,25 @@ and tested. See [`docs/07-BUILD-ORDER.md`](docs/07-BUILD-ORDER.md) §0.
   challenge on every thesis forever — which is the same as never raising one.
   The registry is now load-bearing: the tool allowlist is derived from it, and a
   test fails if any class drifts.
+- **Hong Kong is the most expensive market here, not the cheapest.** Uncapped
+  both-sided stamp duty plus 0.25% retail brokerage puts HK's asymptotic
+  round-trip cost at **~72 bps**, against Bursa's 46 and XNAS's 0.6. The minimum
+  economic HK position is **~HKD 28,000**, six times Bursa's. Ranking markets by
+  how developed they are gets the cost ranking backwards.
+- **`MYX` never resolved to `XKLS`.** Every instrument id in this repo is written
+  `MYX:1155`; the adapter MIC is `XKLS`; nothing mapped between them. So
+  `cost_floor_bps("MYX")` missed its table and returned the 30 bps **default**
+  instead of Bursa's 60 — every Bursa position sized against half the real floor,
+  and nothing crashed. The same drift class as the six agent ids. One resolver in
+  `markets/registry.py` now owns it, and a test fails if any legal spelling
+  reaches a different adapter or a different floor.
+- **A cost model with no fixed minimum has no floor to find.** `cost_floor_value`
+  bisects to RM 100,000,000 when the asymptotic cost already exceeds the floor —
+  a number that reads as a position requirement rather than the impossibility it
+  is. What makes small positions uneconomic is the RM 8 *minimum*, not the rate.
+- **`Learner.mastered` accepted concepts that do not exist**, then raised a bare
+  `KeyError` from `level` on the next call — and a mis-typed prerequisite reads
+  as unmet forever, so the learner is sent back to a concept they already did.
 - **Four more from stress testing, none of which crashed.** A NaN return reached
   a verdict as `nan% unexplained`; `liquidity_cap` could go negative and so win
   `binding()` every time — a cap that inverts what it bounds; HHI could exceed
@@ -141,3 +212,10 @@ and tested. See [`docs/07-BUILD-ORDER.md`](docs/07-BUILD-ORDER.md) §0.
 | A non-finite input never reaches a verdict | `engines/attribution/decompose.py` | `test_attribution.py` |
 | No cap can go negative and win `binding()` | `engines/sizing/caps.py` | `test_risk_sizing.py` |
 | Effective bets never leaves `[1, n]` | `engines/risk/concentration.py` | `test_risk_sizing.py` |
+| A broken feed never returns an empty series | `core/market/feed.py` | `test_price_feed.py` |
+| An unmapped market raises rather than guessing a symbol | `core/market/feed.py` | `test_price_feed.py` |
+| A truncated model answer is never returned as a whole one | `core/llm/backends.py` | `test_anthropic_backend.py` |
+| A missing API key fails at construction, not mid-plan | `core/llm/backends.py` | `test_anthropic_backend.py` |
+| Model retries are bounded and classified, never unbounded | `core/llm/backends.py` | `test_anthropic_backend.py` |
+| Every legal id prefix reaches one adapter and one cost floor | `markets/registry.py` | `test_market_aliases.py` |
+| Mastery cannot be claimed for a concept that does not exist | `agents/learning/teacher.py` | `test_ask_cli_agents.py` |

@@ -4,30 +4,43 @@ These eight agents are where every claim originates. What each may NOT do is
 tested here alongside what it does, because the prohibitions in docs/02 section 5
 are the part that decays silently.
 """
+
 import random
-from datetime import date, datetime, timedelta, timezone
+from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 
 import pytest
 
 from agents.base import Agent, AgentContext
 from agents.evidence.agents import (
-    A1Fundamentals, A2Valuation, A3PriceTechnical, A4NewsNarrative,
-    A5CatalystEvents, A6MacroRegime, A7SectorTechnology, A8OwnershipFlow,
+    A1Fundamentals,
+    A2Valuation,
+    A3PriceTechnical,
+    A4NewsNarrative,
+    A5CatalystEvents,
+    A6MacroRegime,
+    A7SectorTechnology,
+    A8OwnershipFlow,
 )
 from agents.synthesis.agents import A10Thesis
 from core.guardrails.defaults import default_engine
+from core.guardrails.policy import PolicyViolation
 from core.market.pointintime import Fact, FactStore
 from core.market.prices import Bar, PriceSeries
 from core.registry.loader import load
 from engines.events.taxonomy import BaseRateTable, CapBand, Event, EventType, Observation
 from knowledge.graph.entity_graph import (
-    Edge, EdgeKind, EntityGraph, Node, NodeKind, PathRequired,
+    Confidence,
+    Edge,
+    EdgeKind,
+    EntityGraph,
+    Node,
+    NodeKind,
 )
 from knowledge.retrieval.pipeline import Router
 from markets.contract import AccountingStandard
 
-NOW = datetime(2026, 8, 25, tzinfo=timezone.utc)
+NOW = datetime(2026, 8, 25, tzinfo=UTC)
 ASOF = date(2026, 8, 25)
 
 ALLOW = {
@@ -48,6 +61,7 @@ def ctx():
 
 # -- the contract that binds all sixteen -------------------------------------
 
+
 def test_every_agent_id_matches_the_registry():
     """The registry is the single source of truth for agent identity.
 
@@ -58,9 +72,12 @@ def test_every_agent_id_matches_the_registry():
     coverage challenge on every thesis forever - which is the same as never
     raising one at all.
     """
-    import agents.evidence.agents as ev, agents.learning.reflection as rf
-    import agents.learning.teacher as te, agents.portfolio.agents as po
-    import agents.supervisor as su, agents.synthesis.agents as sy
+    import agents.evidence.agents as ev
+    import agents.learning.reflection as rf
+    import agents.learning.teacher as te
+    import agents.portfolio.agents as po
+    import agents.supervisor as su
+    import agents.synthesis.agents as sy
 
     reg = load("agents/registry.yaml")
     seen = {}
@@ -77,9 +94,12 @@ def test_every_agent_id_matches_the_registry():
 
 def test_every_agent_only_declares_tools_the_registry_grants_it():
     reg = load("agents/registry.yaml")
-    import agents.evidence.agents as ev, agents.learning.reflection as rf
-    import agents.learning.teacher as te, agents.portfolio.agents as po
-    import agents.supervisor as su, agents.synthesis.agents as sy
+    import agents.evidence.agents as ev
+    import agents.learning.reflection as rf
+    import agents.learning.teacher as te
+    import agents.portfolio.agents as po
+    import agents.supervisor as su
+    import agents.synthesis.agents as sy
 
     for mod in (ev, sy, po, rf, te, su):
         for name in dir(mod):
@@ -100,10 +120,19 @@ def test_the_thesis_agents_required_evidence_is_all_real_agents():
 
 # -- A1 fundamentals ---------------------------------------------------------
 
-def fact(concept, value, period_end=date(2026, 6, 30), known_at=date(2026, 8, 14),
-         restated=False):
-    return Fact("MYX:1155", concept, period_end, known_at, Decimal(str(value)), "MYR",
-                AccountingStandard.IFRS, "doc:q2", is_restatement=restated)
+
+def fact(concept, value, period_end=date(2026, 6, 30), known_at=date(2026, 8, 14), restated=False):
+    return Fact(
+        "MYX:1155",
+        concept,
+        period_end,
+        known_at,
+        Decimal(str(value)),
+        "MYR",
+        AccountingStandard.IFRS,
+        "doc:q2",
+        is_restatement=restated,
+    )
 
 
 def store(*facts):
@@ -134,16 +163,14 @@ def test_a_restated_figure_carries_the_restatement_caveat():
 
 
 def test_earnings_far_above_cash_flow_is_flagged():
-    a1 = A1Fundamentals(ctx(), store(fact("net_income", 500),
-                                     fact("cash_from_operations", 120)))
+    a1 = A1Fundamentals(ctx(), store(fact("net_income", 500), fact("cash_from_operations", 120)))
     out = a1.earnings_quality("MYX:1155", ASOF)
     assert "exceeds operating cash flow" in out[0].text
     assert out[0].numbers["accrual_gap"] == pytest.approx(380.0)
 
 
 def test_healthy_cash_conversion_is_not_flagged():
-    a1 = A1Fundamentals(ctx(), store(fact("net_income", 500),
-                                     fact("cash_from_operations", 610)))
+    a1 = A1Fundamentals(ctx(), store(fact("net_income", 500), fact("cash_from_operations", 610)))
     out = a1.earnings_quality("MYX:1155", ASOF)
     assert "broadly supported" in out[0].text
     assert not out[0].caveats
@@ -156,6 +183,7 @@ def test_the_quality_check_says_so_when_it_cannot_run():
 
 
 # -- A2 valuation ------------------------------------------------------------
+
 
 def test_a_bank_is_valued_on_price_to_book_and_dcf_is_ruled_out():
     a2 = A2Valuation(ctx())
@@ -199,6 +227,7 @@ def test_a_higher_price_implies_a_higher_required_growth_rate():
 
 # -- A3 price ----------------------------------------------------------------
 
+
 def series(n=60, start=10.0, seed=4):
     rng = random.Random(seed)
     bars, px, d = [], start, date(2026, 5, 1)
@@ -234,50 +263,58 @@ def test_the_blackout_is_symmetric_around_the_announcement():
 
 # -- A5 events ---------------------------------------------------------------
 
+
 def event(eid="e1", etype=EventType.EARNINGS_RESULT, day=15, doc="d1"):
-    return Event(eid, "MYX:1155", etype, datetime(2026, 8, day, tzinfo=timezone.utc),
-                 market="XKLS", cap_band=CapBand.LARGE, source_doc_id=doc)
+    return Event(
+        eid,
+        "MYX:1155",
+        etype,
+        datetime(2026, 8, day, tzinfo=UTC),
+        market="XKLS",
+        cap_band=CapBand.LARGE,
+        source_doc_id=doc,
+    )
 
 
 def table_with(n):
     t = BaseRateTable()
     rng = random.Random(2)
     for i in range(n):
-        t.observe(Observation(event(f"h{i}"), rng.gauss(0.004, 0.01),
-                              rng.gauss(0.02, 0.02), rng.gauss(0.01, 0.03)))
+        t.observe(
+            Observation(
+                event(f"h{i}"), rng.gauss(0.004, 0.01), rng.gauss(0.02, 0.02), rng.gauss(0.01, 0.03)
+            )
+        )
     return t
 
 
 def test_events_outside_the_window_are_not_returned():
     a5 = A5CatalystEvents(ctx(), [event(day=1)], BaseRateTable())
-    out = a5.run("MYX:1155", datetime(2026, 8, 10, tzinfo=timezone.utc),
-                 datetime(2026, 8, 20, tzinfo=timezone.utc))
+    out = a5.run("MYX:1155", datetime(2026, 8, 10, tzinfo=UTC), datetime(2026, 8, 20, tzinfo=UTC))
     assert out == []
 
 
 def test_an_event_is_reported_with_its_historical_base_rate():
     a5 = A5CatalystEvents(ctx(), [event()], table_with(60))
-    out = a5.run("MYX:1155", datetime(2026, 8, 1, tzinfo=timezone.utc),
-                 datetime(2026, 8, 31, tzinfo=timezone.utc))
+    out = a5.run("MYX:1155", datetime(2026, 8, 1, tzinfo=UTC), datetime(2026, 8, 31, tzinfo=UTC))
     assert "historically worth a median" in out[0].text
     assert "n=60" in out[0].text
 
 
 def test_an_unconfirmed_event_cannot_be_cited_as_a_cause():
     a5 = A5CatalystEvents(ctx(), [event(doc=None)], BaseRateTable())
-    out = a5.run("MYX:1155", datetime(2026, 8, 1, tzinfo=timezone.utc),
-                 datetime(2026, 8, 31, tzinfo=timezone.utc))
+    out = a5.run("MYX:1155", datetime(2026, 8, 1, tzinfo=UTC), datetime(2026, 8, 31, tzinfo=UTC))
     assert any("cannot be cited" in c for c in out[0].caveats)
 
 
 def test_a_thin_base_rate_admits_it_is_thin():
     a5 = A5CatalystEvents(ctx(), [event()], table_with(6))
-    out = a5.run("MYX:1155", datetime(2026, 8, 1, tzinfo=timezone.utc),
-                 datetime(2026, 8, 31, tzinfo=timezone.utc))
+    out = a5.run("MYX:1155", datetime(2026, 8, 1, tzinfo=UTC), datetime(2026, 8, 31, tzinfo=UTC))
     assert any("thin sample" in c for c in out[0].caveats)
 
 
 # -- A6 macro ----------------------------------------------------------------
+
 
 def test_a_regime_needs_enough_history_to_measure():
     out = A6MacroRegime(ctx()).run([0.001] * 10)
@@ -300,14 +337,31 @@ def test_the_regime_label_is_described_as_a_rule_not_a_forecast():
 
 # -- A7 sector ---------------------------------------------------------------
 
+GRAPH_OPENED = date(2026, 1, 1)
+
+
 def graph():
     g = EntityGraph()
-    for nid, kind, lbl in [("EV:x", NodeKind.EVENT, "Shock"),
-                           ("SEC:s", NodeKind.SECTOR, "Shipping"),
-                           ("CO:a", NodeKind.COMPANY, "Alpha")]:
+    for nid, kind, lbl in [
+        ("EV:x", NodeKind.EVENT, "Shock"),
+        ("SEC:s", NodeKind.SECTOR, "Shipping"),
+        ("CO:a", NodeKind.COMPANY, "Alpha"),
+    ]:
         g.add_node(Node(nid, kind, lbl))
-    g.add_edge(Edge("EV:x", "SEC:s", EdgeKind.AFFECTS, 1.0, "doc:1"))
-    g.add_edge(Edge("SEC:s", "CO:a", EdgeKind.CLASSIFIED_IN, 1.0, "doc:2"))
+    g.add_edge(
+        Edge("EV:x", "SEC:s", EdgeKind.AFFECTS, 1.0, "doc:1", Confidence.EXTRACTED, GRAPH_OPENED)
+    )
+    g.add_edge(
+        Edge(
+            "SEC:s",
+            "CO:a",
+            EdgeKind.CLASSIFIED_IN,
+            1.0,
+            "doc:2",
+            Confidence.EXTRACTED,
+            GRAPH_OPENED,
+        )
+    )
     return g
 
 
@@ -329,6 +383,7 @@ def test_an_unexposed_holding_produces_no_finding_at_all():
 
 # -- A8 flow -----------------------------------------------------------------
 
+
 def test_scheduled_insider_selling_is_explicitly_not_a_signal():
     out = A8OwnershipFlow(ctx()).run(0, 4, 4, 0.03, 2.0)
     insider = next(f for f in out if f.kind == "insider")
@@ -347,19 +402,29 @@ def test_cluster_buying_is_reported():
 
 
 def test_institutional_holdings_always_carry_their_reporting_lag():
-    out = A8OwnershipFlow(ctx()).run(0, 0, 0, 0.03, 2.0,
-                                     institutional_asof=date(2026, 6, 30))
+    out = A8OwnershipFlow(ctx()).run(0, 0, 0, 0.03, 2.0, institutional_asof=date(2026, 6, 30))
     own = next(f for f in out if f.kind == "ownership")
     assert "lag by 45+ days" in own.caveats[0]
 
 
 # -- the shared prohibition --------------------------------------------------
 
-@pytest.mark.parametrize("cls", [A1Fundamentals, A2Valuation, A3PriceTechnical,
-                                 A4NewsNarrative, A5CatalystEvents, A6MacroRegime,
-                                 A7SectorTechnology, A8OwnershipFlow])
+
+@pytest.mark.parametrize(
+    "cls",
+    [
+        A1Fundamentals,
+        A2Valuation,
+        A3PriceTechnical,
+        A4NewsNarrative,
+        A5CatalystEvents,
+        A6MacroRegime,
+        A7SectorTechnology,
+        A8OwnershipFlow,
+    ],
+)
 def test_no_evidence_agent_can_reach_an_execution_tool(cls):
     agent = object.__new__(cls)
     agent.ctx = ctx()
-    with pytest.raises(Exception):
+    with pytest.raises(PolicyViolation):
         agent._guard_tool("place_order")

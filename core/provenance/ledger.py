@@ -13,13 +13,13 @@ from __future__ import annotations
 import hashlib
 import json
 import sqlite3
+from collections.abc import Iterator
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from decimal import Decimal
 from pathlib import Path
-from typing import Iterator
 
-from core.llm.tiers import Tier, TaskClass, Usage, cost_usd
+from core.llm.tiers import TaskClass, Tier, Usage, cost_usd
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS llm_calls (
@@ -30,18 +30,22 @@ CREATE TABLE IF NOT EXISTS llm_calls (
     tier            TEXT    NOT NULL,
     model_id        TEXT    NOT NULL,
     prompt_hash     TEXT    NOT NULL,
+    run_id          TEXT    NOT NULL DEFAULT '',
     input_tokens    INTEGER NOT NULL,
     output_tokens   INTEGER NOT NULL,
     cached_tokens   INTEGER NOT NULL,
+    cache_write_tokens INTEGER NOT NULL DEFAULT 0,
     cost_usd        TEXT    NOT NULL,
     cost_myr        TEXT    NOT NULL,
     fx_rate         TEXT    NOT NULL,
-    fx_asof         TEXT    NOT NULL
+    fx_asof         TEXT    NOT NULL,
+    latency_ms      REAL    NOT NULL DEFAULT 0
 );
 CREATE TABLE IF NOT EXISTS claims (
     id              INTEGER PRIMARY KEY AUTOINCREMENT,
     at              TEXT    NOT NULL,
     agent           TEXT    NOT NULL,
+    run_id          TEXT    NOT NULL DEFAULT '',
     claim_text      TEXT    NOT NULL,
     citations_json  TEXT    NOT NULL,
     survived        INTEGER NOT NULL,
@@ -61,9 +65,67 @@ BEFORE DELETE ON claims
 BEGIN SELECT RAISE(ABORT, 'provenance ledger is append-only'); END;
 """
 
-# docs/08: mid-market was ~4.04 on 24 Aug 2026; 4.15 is the planning rate that
-# absorbs a Malaysian card's foreign-transaction markup on USD charges.
-DEFAULT_FX_MYR_PER_USD = Decimal("4.15")
+# Created AFTER _migrate(), because llm_calls_run indexes a column an older
+# ledger does not have yet. Running this inside SCHEMA fails on exactly the
+# databases the migration exists to rescue.
+INDEXES = """
+CREATE INDEX IF NOT EXISTS llm_calls_at ON llm_calls(at);
+CREATE INDEX IF NOT EXISTS llm_calls_run ON llm_calls(run_id);
+CREATE INDEX IF NOT EXISTS claims_at ON claims(at);
+"""
+
+#: Mid-market MYR per USD, 3 Sep 2026. THE RATE, and nothing else.
+#:
+#: It used to be 4.15, described as "the planning rate that absorbs a Malaysian
+#: CARD's foreign-transaction markup". That bundled a cost into a rate, and the
+#: wrong cost: this account converts through a BROKER, not a card. The markup it
+#: silently applied was 2.34% one way, which quietly shrank the portfolio on
+#: every US sizing decision - conservative by accident rather than by design,
+#: and invisible where it mattered.
+#:
+#: The conversion cost now has its own name below, so it can be reported instead
+#: of hidden, and corrected when it is finally measured.
+DEFAULT_FX_MYR_PER_USD = Decimal("4.055")
+
+#: What converting MYR to USD actually costs, as a fraction, ONE WAY.
+#:
+#: NOT MEASURED. moomoo advertises "0 fees" on currency exchange and publishes
+#: no spread, so the cost is inside the rate they give you and cannot be read
+#: off any page. 0.5% is the upper end of independent estimates for a broker of
+#: this kind; a card would be 2-3%, a specialist remitter 0.3%.
+#:
+#: This is the largest unverified number in the system and, on a US position,
+#: plausibly the largest single cost - a 1% round trip dwarfs the entire fee
+#: schedule, which is about 0.3%. Measure it by converting a small amount and
+#: comparing the rate received against the mid-market rate at that moment.
+DEFAULT_FX_SPREAD_PER_SIDE = Decimal("0.005")
+
+
+def _enable_wal(conn: sqlite3.Connection, path: str, timeout_ms: int) -> None:
+    """WAL, so a writing daemon and a reading session coexist.
+
+    Order and tolerance both matter, and getting either wrong is worse than not
+    setting WAL at all:
+
+      1. busy_timeout is set FIRST. Changing journal_mode needs a brief exclusive
+         lock, so the PRAGMA that makes concurrency safe is itself a concurrency
+         hazard. Without a timeout already in force it fails instantly against a
+         competing writer.
+      2. Losing the race is fine. journal_mode is a persistent property of the
+         DATABASE FILE, not of the connection - once any connection sets WAL,
+         every later one inherits it. So a failure here means someone else
+         already did it, or is doing it now.
+
+    Raising would turn a harmless race into a lost write on the one log that
+    cannot be reconstructed.
+    """
+    conn.execute(f"PRAGMA busy_timeout={timeout_ms}")
+    if path == ":memory:":
+        return  # memory databases have no journal to switch
+    try:
+        conn.execute("PRAGMA journal_mode=WAL")
+    except sqlite3.OperationalError:
+        pass
 
 
 def prompt_hash(text: str) -> str:
@@ -82,13 +144,86 @@ class CallRecord:
     cost_myr: Decimal
     fx_rate: Decimal
     at: datetime
+    run_id: str = ""
+    latency_ms: float = 0.0
 
 
 class ProvenanceLedger:
-    def __init__(self, path: Path | str = ":memory:") -> None:
-        self.conn = sqlite3.connect(str(path))
+    """Append-only, and now durable enough for two processes to share.
+
+    `run_id` groups the calls one job made. Without it the only grouping keys are
+    agent and timestamp proximity, so "what did the 03:00 sweep do" can only be
+    asked as "what happened between 03:00 and 03:05" - which stops being the same
+    question the moment two jobs overlap.
+    """
+
+    #: Long enough that a slow writer does not fail a reader; short enough that a
+    #: genuine deadlock surfaces instead of hanging the session.
+    BUSY_TIMEOUT_MS = 10_000
+
+    def __init__(self, path: Path | str = ":memory:", run_id: str = "") -> None:
+        path = str(path)
+        if path != ":memory:":
+            Path(path).parent.mkdir(parents=True, exist_ok=True)
+        self.conn = sqlite3.connect(path, timeout=self.BUSY_TIMEOUT_MS / 1000)
+        self.run_id = run_id
+        _enable_wal(self.conn, path, self.BUSY_TIMEOUT_MS)
         self.conn.executescript(SCHEMA)
+        self._migrate()
+        self.conn.executescript(INDEXES)
         self.conn.commit()
+
+    def _migrate(self) -> None:
+        """Add run_id to ledgers written before it existed.
+
+        ALTER TABLE ADD COLUMN is a schema change, not a row UPDATE, so the
+        append-only triggers do not fire. Existing rows get the column default -
+        correctly, since no run owned them and nothing timed them.
+
+        `latency_ms` was added because the number already existed and was thrown
+        away: core/llm/client.py timed every call and emitted it to the trace
+        ONLY WHEN TRACING WAS ON, so an ordinary run lost it. docs/01 section 10
+        wants p95 latency in the nightly fitness function, and it could not have
+        it from a measurement that survived only under a debug flag.
+        """
+        for table in ("llm_calls", "claims"):
+            cols = {r[1] for r in self.conn.execute(f"PRAGMA table_info({table})")}
+            if "run_id" not in cols:
+                self.conn.execute(f"ALTER TABLE {table} ADD COLUMN run_id TEXT NOT NULL DEFAULT ''")
+
+        calls = {r[1] for r in self.conn.execute("PRAGMA table_info(llm_calls)")}
+        if "latency_ms" not in calls:
+            self.conn.execute("ALTER TABLE llm_calls ADD COLUMN latency_ms REAL NOT NULL DEFAULT 0")
+        # Cache writes bill at 1.25x input and were never recorded, because the
+        # product never asked for a cache. It does now (core/llm/backends.py).
+        if "cache_write_tokens" not in calls:
+            self.conn.execute(
+                "ALTER TABLE llm_calls ADD COLUMN cache_write_tokens INTEGER NOT NULL DEFAULT 0"
+            )
+        # Exact-integer mirror of cost_myr (micro-MYR), so the windowed budget
+        # check is one SUM in SQL instead of every row ever written coming back
+        # to Python. TEXT cost_myr stays authoritative; legacy rows keep NULL
+        # here and are summed the old way - triggers forbid a backfill UPDATE,
+        # and that is the correct trade.
+        if "cost_myr_micro" not in calls:
+            self.conn.execute("ALTER TABLE llm_calls ADD COLUMN cost_myr_micro INTEGER")
+        # How the turn ENDED, and the vendor's id for it. The P4 note said both
+        # would land here and only the trace got them - so a truncation or a
+        # model refusal was invisible to anything reading the durable record,
+        # which is exactly what a quality report needs to count.
+        if "stop_reason" not in calls:
+            self.conn.execute("ALTER TABLE llm_calls ADD COLUMN stop_reason TEXT")
+        if "request_id" not in calls:
+            self.conn.execute("ALTER TABLE llm_calls ADD COLUMN request_id TEXT")
+
+    def close(self) -> None:
+        self.conn.close()
+
+    def __enter__(self) -> ProvenanceLedger:
+        return self
+
+    def __exit__(self, *exc) -> None:
+        self.close()
 
     def record_call(
         self,
@@ -100,46 +235,196 @@ class ProvenanceLedger:
         usage: Usage,
         fx_rate: Decimal = DEFAULT_FX_MYR_PER_USD,
         at: datetime | None = None,
+        run_id: str | None = None,
+        latency_ms: float = 0.0,
+        stop_reason: str = "",
+        request_id: str = "",
     ) -> CallRecord:
-        at = at or datetime.now(timezone.utc)
+        at = at or datetime.now(UTC)
+        rid = self.run_id if run_id is None else run_id
         usd = cost_usd(tier, usage)
         myr = usd * fx_rate
         ph = prompt_hash(prompt)
         self.conn.execute(
-            "INSERT INTO llm_calls (at, agent, task_class, tier, model_id, prompt_hash,"
-            " input_tokens, output_tokens, cached_tokens, cost_usd, cost_myr, fx_rate, fx_asof)"
-            " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            "INSERT INTO llm_calls (at, agent, task_class, tier, model_id, prompt_hash, run_id,"
+            " input_tokens, output_tokens, cached_tokens, cache_write_tokens, cost_usd,"
+            " cost_myr_micro, cost_myr, fx_rate, fx_asof, latency_ms, stop_reason,"
+            " request_id)"
+            " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
             (
-                at.isoformat(), agent, task_class.value, tier.value, model_id, ph,
-                usage.input_tokens, usage.output_tokens, usage.cached_input_tokens,
-                str(usd), str(myr), str(fx_rate), at.isoformat(),
+                at.isoformat(),
+                agent,
+                task_class.value,
+                tier.value,
+                model_id,
+                ph,
+                rid,
+                usage.input_tokens,
+                usage.output_tokens,
+                usage.cached_input_tokens,
+                usage.cache_write_tokens,
+                str(usd),
+                int(myr * 1_000_000),
+                str(myr),
+                str(fx_rate),
+                at.isoformat(),
+                float(latency_ms),
+                stop_reason,
+                request_id,
             ),
         )
         self.conn.commit()
-        return CallRecord(agent, task_class, tier, model_id, ph, usage, usd, myr, fx_rate, at)
+        return CallRecord(
+            agent,
+            task_class,
+            tier,
+            model_id,
+            ph,
+            usage,
+            usd,
+            myr,
+            fx_rate,
+            at,
+            rid,
+            float(latency_ms),
+        )
 
     def record_claim(
-        self, agent: str, text: str, citations: list[dict], survived: bool,
-        dropped_reason: str | None = None, at: datetime | None = None,
+        self,
+        agent: str,
+        text: str,
+        citations: list[dict],
+        survived: bool,
+        dropped_reason: str | None = None,
+        at: datetime | None = None,
+        run_id: str | None = None,
     ) -> None:
-        at = at or datetime.now(timezone.utc)
+        at = at or datetime.now(UTC)
+        rid = self.run_id if run_id is None else run_id
         self.conn.execute(
-            "INSERT INTO claims (at, agent, claim_text, citations_json, survived, dropped_reason)"
-            " VALUES (?,?,?,?,?,?)",
-            (at.isoformat(), agent, text, json.dumps(citations), int(survived), dropped_reason),
+            "INSERT INTO claims (at, agent, run_id, claim_text, citations_json, survived,"
+            " dropped_reason) VALUES (?,?,?,?,?,?,?)",
+            (
+                at.isoformat(),
+                agent,
+                rid,
+                text,
+                json.dumps(citations),
+                int(survived),
+                dropped_reason,
+            ),
         )
         self.conn.commit()
 
+    _LEGACY = "cost_myr_micro IS NULL"
+
+    def _sum(self, where: str = "", args: tuple = ()) -> Decimal:
+        """SUM(micro) in SQL for modern rows; Python-exact sum for legacy ones."""
+        clause = f" AND {where}" if where else ""
+        micro = self.conn.execute(
+            f"SELECT COALESCE(SUM(cost_myr_micro), 0) FROM llm_calls"
+            f" WHERE cost_myr_micro IS NOT NULL{clause}",
+            args,
+        ).fetchone()[0]
+        legacy = self.conn.execute(
+            f"SELECT cost_myr FROM llm_calls WHERE {self._LEGACY}{clause}", args
+        ).fetchall()
+        return Decimal(int(micro)) / 1_000_000 + sum((Decimal(r[0]) for r in legacy), Decimal(0))
+
     def total_cost_myr(self) -> Decimal:
-        row = self.conn.execute("SELECT cost_myr FROM llm_calls").fetchall()
-        return sum((Decimal(r[0]) for r in row), Decimal(0))
+        return self._sum()
 
     def cost_by_tier_myr(self) -> dict[str, Decimal]:
         out: dict[str, Decimal] = {}
-        for tier, cost in self.conn.execute("SELECT tier, cost_myr FROM llm_calls"):
-            out[tier] = out.get(tier, Decimal(0)) + Decimal(cost)
+        for (tier,) in self.conn.execute("SELECT DISTINCT tier FROM llm_calls"):
+            out[tier] = self._sum("tier = ?", (tier,))
         return out
 
-    def calls(self) -> Iterator[sqlite3.Row]:
-        self.conn.row_factory = sqlite3.Row
-        yield from self.conn.execute("SELECT * FROM llm_calls ORDER BY id")
+    # -- windowed queries ----------------------------------------------------
+
+    def cost_since(self, start: datetime) -> Decimal:
+        """Spend from `start` to now.
+
+        The reason this exists: `total_cost_myr()` is a LIFETIME sum, and
+        core/llm/client.py compared it against a field named `daily_budget_myr`.
+        That was invisible while every ledger was in-memory and per-process -
+        lifetime and today were the same number. Against a durable file it makes
+        the budget a one-way cap that permanently bricks the caller once
+        cumulative spend passes it.
+        """
+        return self._sum("at >= ?", (start.isoformat(),))
+
+    def cost_by_agent_myr(self, since: datetime | None = None) -> dict[str, Decimal]:
+        out: dict[str, Decimal] = {}
+        for (agent,) in self.conn.execute("SELECT DISTINCT agent FROM llm_calls"):
+            where, args = "agent = ?", [agent]
+            if since is not None:
+                where += " AND at >= ?"
+                args.append(since.isoformat())
+            out[agent] = self._sum(where, tuple(args))
+        return out
+
+    def _rows(self, sql: str, args: tuple = ()) -> list[sqlite3.Row]:
+        """Own cursor with its own row_factory.
+
+        `calls()` used to assign self.conn.row_factory as a side effect, and as a
+        generator it only did so on first iteration - so an interleaved read
+        elsewhere got tuples or Rows depending on iteration order. A long-lived
+        daemon interleaves constantly.
+        """
+        cur = self.conn.cursor()
+        cur.row_factory = sqlite3.Row
+        return cur.execute(sql, args).fetchall()
+
+    def calls(self, limit: int | None = None) -> Iterator[sqlite3.Row]:
+        yield from self._rows(
+            "SELECT * FROM llm_calls ORDER BY id"
+            + (f" LIMIT {int(limit)}" if limit is not None else "")
+        )
+
+    def calls_between(self, start: datetime, end: datetime) -> list[sqlite3.Row]:
+        return self._rows(
+            "SELECT * FROM llm_calls WHERE at >= ? AND at <= ? ORDER BY id",
+            (start.isoformat(), end.isoformat()),
+        )
+
+    def calls_for_run(self, run_id: str) -> list[sqlite3.Row]:
+        """Everything one job did, as a unit. This is what run_id is for."""
+        return self._rows("SELECT * FROM llm_calls WHERE run_id = ? ORDER BY id", (run_id,))
+
+    def latencies_between(self, start: datetime, end: datetime) -> list[float]:
+        """Every recorded call duration in a window, for the p95 fitness term.
+
+        Zeros are excluded: 0.0 is the column default for rows written before
+        the column existed and for callers that do not time. Counting them as
+        instant calls would make the p95 look better the more untimed history
+        the ledger holds.
+        """
+        rows = self._rows(
+            "SELECT latency_ms FROM llm_calls WHERE at >= ? AND at <= ? AND latency_ms > 0",
+            (start.isoformat(), end.isoformat()),
+        )
+        return [float(r["latency_ms"]) for r in rows]
+
+    def claims_between(self, start: datetime, end: datetime) -> list[sqlite3.Row]:
+        """Claims verified in a window, survivors and drops alike.
+
+        The table has been written since P0 and read by nothing but the
+        fitness function: a dropped claim is the system declining to say
+        something it could not support, which is the quality signal most
+        worth watching, and it was unreadable.
+        """
+        return self._rows(
+            "SELECT * FROM claims WHERE at >= ? AND at <= ? ORDER BY at",
+            (start.isoformat(), end.isoformat()),
+        )
+
+    def runs_between(self, start: datetime, end: datetime) -> list[str]:
+        return [
+            r[0]
+            for r in self.conn.execute(
+                "SELECT DISTINCT run_id FROM llm_calls WHERE at >= ? AND at <= ?"
+                " AND run_id != '' ORDER BY run_id",
+                (start.isoformat(), end.isoformat()),
+            )
+        ]

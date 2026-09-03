@@ -1,4 +1,5 @@
 """P0 DoD: no agent picks a tier; every call is guarded and logged."""
+
 from decimal import Decimal
 
 import pytest
@@ -10,7 +11,8 @@ from core.llm.tiers import TaskClass, Tier
 from core.provenance.ledger import ProvenanceLedger
 
 
-def make(budget=None, allow={"a1": {"llm_complete"}}):
+def make(budget=None, allow=None):
+    allow = {"a1": {"llm_complete"}} if allow is None else allow
     led = ProvenanceLedger()
     return InferenceClient(EchoBackend(), default_engine(allow), led, budget), led
 
@@ -24,6 +26,7 @@ def test_tier_is_derived_not_chosen():
 def test_complete_takes_no_tier_argument():
     """Structural guarantee: there is no parameter through which to override."""
     import inspect
+
     params = set(inspect.signature(InferenceClient.complete).parameters)
     assert "tier" not in params and "model" not in params and "model_id" not in params
 

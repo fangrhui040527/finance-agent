@@ -1,25 +1,31 @@
 """P7/P8: the agent seam. What an agent may NOT do is the interesting half."""
+
 import random
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 from decimal import Decimal
 
 import pytest
 
 from agents.base import AgentContext, Finding
-from agents.portfolio.agents import A12PortfolioRisk, A13Sizing, DRAWDOWN_TIERS
-from agents.supervisor import A0Supervisor, Intent, PLAYBOOK
+from agents.portfolio.agents import DRAWDOWN_TIERS, A12PortfolioRisk, A13Sizing
+from agents.supervisor import PLAYBOOK, A0Supervisor, Intent
 from agents.synthesis.agents import (
-    A9Attribution, A10Thesis, A11RedTeam, Breaker, Stance, Thesis,
+    A9Attribution,
+    A10Thesis,
+    A11RedTeam,
+    Breaker,
+    Stance,
+    Thesis,
 )
 from core.guardrails.defaults import default_engine
-from core.llm.tiers import ROUTING, Tier
+from core.guardrails.policy import PolicyViolation
 from engines.attribution.regression import huber_fit
 from engines.risk.concentration import Limits, Position
 from engines.sizing.waterfall import Goal, Liability
 from knowledge.retrieval.pipeline import Router
 
 WINDOW = (date(2026, 8, 3), date(2026, 8, 4))
-NOW = datetime(2026, 8, 25, tzinfo=timezone.utc)
+NOW = datetime(2026, 8, 25, tzinfo=UTC)
 
 ALLOW = {
     "a0_supervisor": {"plan", "budget", "route", "refuse"},
@@ -44,12 +50,21 @@ def fit(beta_mkt=1.1, beta_sec=0.5, n=250, seed=7):
 
 # -- A9 ---------------------------------------------------------------------
 
+
 def test_market_wide_selloff_produces_no_cause_hunt():
     """A 9% fall that is 93% market beta. Statistically significant, and still
     nothing to explain about the company."""
     a9 = A9Attribution(ctx())
-    out = a9.run("MYX:1155", WINDOW, realised_local=-0.090, event_market=-0.080,
-                 event_sector=-0.020, event_styles={}, fx_return=0.0, fit=fit())
+    out = a9.run(
+        "MYX:1155",
+        WINDOW,
+        realised_local=-0.090,
+        event_market=-0.080,
+        event_sector=-0.020,
+        event_styles={},
+        fx_return=0.0,
+        fit=fit(),
+    )
     head = out[0]
     assert head.kind == "decomposition"
     assert "market, not the company" in head.text
@@ -58,15 +73,31 @@ def test_market_wide_selloff_produces_no_cause_hunt():
 
 def test_an_ordinary_day_is_reported_as_ordinary():
     a9 = A9Attribution(ctx())
-    out = a9.run("XNAS:NVDA", WINDOW, realised_local=-0.055, event_market=-0.050,
-                 event_sector=-0.010, event_styles={}, fx_return=0.0, fit=fit())
+    out = a9.run(
+        "XNAS:NVDA",
+        WINDOW,
+        realised_local=-0.055,
+        event_market=-0.050,
+        event_sector=-0.010,
+        event_styles={},
+        fx_return=0.0,
+        fit=fit(),
+    )
     assert "no explanation is required" in out[0].text
 
 
 def test_a_significant_idiosyncratic_move_reports_its_unexplained_share():
     a9 = A9Attribution(ctx())
-    out = a9.run("XNAS:NVDA", WINDOW, realised_local=0.072, event_market=0.004,
-                 event_sector=0.002, event_styles={}, fx_return=0.0, fit=fit())
+    out = a9.run(
+        "XNAS:NVDA",
+        WINDOW,
+        realised_local=0.072,
+        event_market=0.004,
+        event_sector=0.002,
+        event_styles={},
+        fx_return=0.0,
+        fit=fit(),
+    )
     head = out[0]
     assert head.numbers["unexplained_share"] > 0.8
     assert "unexplained" in head.text
@@ -74,8 +105,16 @@ def test_a_significant_idiosyncratic_move_reports_its_unexplained_share():
 
 def test_narration_leads_with_the_number_not_the_verb():
     a9 = A9Attribution(ctx())
-    out = a9.run("XNAS:NVDA", WINDOW, realised_local=-0.090, event_market=-0.080,
-                 event_sector=-0.020, event_styles={}, fx_return=0.0, fit=fit())
+    out = a9.run(
+        "XNAS:NVDA",
+        WINDOW,
+        realised_local=-0.090,
+        event_market=-0.080,
+        event_sector=-0.020,
+        event_styles={},
+        fx_return=0.0,
+        fit=fit(),
+    )
     text = out[0].text
     # every component and its size is stated before any causal sentence begins
     assert text.index("market") < text.index("This was")
@@ -84,21 +123,29 @@ def test_narration_leads_with_the_number_not_the_verb():
 
 def test_long_horizon_flags_a_return_that_came_from_re_rating():
     a9 = A9Attribution(ctx())
-    out = a9.since_purchase("XNAS:NVDA", eps_start=1.0, eps_end=1.1,
-                            multiple_start=15.0, multiple_end=40.0,
-                            cumulative_shareholder_yield=0.02,
-                            fx_start=4.0, fx_end=4.2, years=3.0)
+    out = a9.since_purchase(
+        "XNAS:NVDA",
+        eps_start=1.0,
+        eps_end=1.1,
+        multiple_start=15.0,
+        multiple_end=40.0,
+        cumulative_shareholder_yield=0.02,
+        fx_start=4.0,
+        fx_end=4.2,
+        years=3.0,
+    )
     assert "multiple change" in out[0].text
     assert any("not repeatable" in c for c in out[0].caveats)
 
 
 def test_attribution_agent_cannot_use_an_unlisted_tool():
     a9 = A9Attribution(ctx())
-    with pytest.raises(Exception):
+    with pytest.raises(PolicyViolation):
         a9._guard_tool("place_order")
 
 
 # -- A10 --------------------------------------------------------------------
+
 
 def evidence(*agents):
     return [Finding(a, "fact", f"{a} said something", numbers={}) for a in agents]
@@ -109,10 +156,15 @@ FULL = ("a1_fundamentals", "a2_valuation", "a5_catalyst_events", "a6_macro_regim
 
 def two_breakers():
     return [
-        Breaker("gross margin recovers above 34%", "margin_pct > 0.34", "kb_filings",
-                date(2027, 2, 1)),
-        Breaker("net debt to EBITDA stays below 2.5x", "net_debt_ebitda < 2.5", "kb_filings",
-                date(2027, 2, 1)),
+        Breaker(
+            "gross margin recovers above 34%", "margin_pct > 0.34", "kb_filings", date(2027, 2, 1)
+        ),
+        Breaker(
+            "net debt to EBITDA stays below 2.5x",
+            "net_debt_ebitda < 2.5",
+            "kb_filings",
+            date(2027, 2, 1),
+        ),
     ]
 
 
@@ -131,8 +183,9 @@ def test_no_breakers_means_no_stance_however_good_the_evidence():
 
 def test_one_breaker_is_not_two():
     a10 = A10Thesis(ctx())
-    a10.run("MYX:1155", evidence(*FULL), proposed_stance=Stance.ACCUMULATE,
-            breakers=two_breakers()[:1])
+    a10.run(
+        "MYX:1155", evidence(*FULL), proposed_stance=Stance.ACCUMULATE, breakers=two_breakers()[:1]
+    )
     assert a10.last.stance is Stance.NO_VIEW
 
 
@@ -160,24 +213,40 @@ def test_confidence_falls_with_gaps_and_never_rises_with_findings():
 def test_unexplained_recent_move_stages_the_entry():
     a10 = A10Thesis(ctx())
     findings = evidence(*FULL) + [
-        Finding("a9_attribution", "decomposition", "moved for reasons unknown",
-                numbers={"unexplained_share": 0.92})
+        Finding(
+            "a9_attribution",
+            "decomposition",
+            "moved for reasons unknown",
+            numbers={"unexplained_share": 0.92},
+        )
     ]
-    out = a10.run("MYX:1155", findings, proposed_stance=Stance.ACCUMULATE,
-                  breakers=two_breakers())
+    out = a10.run("MYX:1155", findings, proposed_stance=Stance.ACCUMULATE, breakers=two_breakers())
     assert any("staged" in c for c in out[0].caveats)
 
 
 # -- A11 --------------------------------------------------------------------
 
-def thesis(stance=Stance.ACCUMULATE, gaps=(), breakers=None, valuation=(Decimal(4), Decimal(6)),
-           confidence=0.6, supporting=None):
+
+def thesis(
+    stance=Stance.ACCUMULATE,
+    gaps=(),
+    breakers=None,
+    valuation=(Decimal(4), Decimal(6)),
+    confidence=0.6,
+    supporting=None,
+):
     return Thesis(
-        instrument_id="MYX:1155", stance=stance, horizon_months=12,
-        in_one_sentence="x", what_must_be_true=[],
+        instrument_id="MYX:1155",
+        stance=stance,
+        horizon_months=12,
+        in_one_sentence="x",
+        what_must_be_true=[],
         breakers=list(breakers if breakers is not None else two_breakers()),
-        valuation_range=valuation, key_uncertainties=[], gaps=list(gaps),
-        supporting=list(supporting or evidence(*FULL)), confidence=confidence,
+        valuation_range=valuation,
+        key_uncertainties=[],
+        gaps=list(gaps),
+        supporting=list(supporting or evidence(*FULL)),
+        confidence=confidence,
     )
 
 
@@ -196,9 +265,23 @@ def test_three_gaps_is_fatal():
 def test_red_team_excludes_the_sources_the_bull_case_used():
     a11 = A11RedTeam(ctx())
     from core.contracts.answer import Citation, TrustTier
-    supporting = [Finding("a1_fundamentals", "fact", "x", citations=[
-        Citation(source="annual_report_2025", chunk_id="c1", quoted_span="s",
-                 trust=TrustTier.FILINGS, as_of=NOW)])]
+
+    supporting = [
+        Finding(
+            "a1_fundamentals",
+            "fact",
+            "x",
+            citations=[
+                Citation(
+                    source="annual_report_2025",
+                    chunk_id="c1",
+                    quoted_span="s",
+                    trust=TrustTier.FILINGS,
+                    as_of=NOW,
+                )
+            ],
+        )
+    ]
     a11.run(thesis(supporting=supporting))
     assert "annual_report_2025" in a11.excluded
 
@@ -216,6 +299,7 @@ def test_a_complete_thesis_still_draws_the_standing_challenges():
 
 
 # -- A0 ---------------------------------------------------------------------
+
 
 def test_supervisor_refuses_to_place_an_order():
     a0 = A0Supervisor(ctx())
@@ -258,8 +342,7 @@ def test_supervisor_may_never_retrieve():
 
 def test_a_budget_too_small_for_an_honest_answer_is_refused_not_cheapened():
     a0 = A0Supervisor(ctx())
-    p = a0.plan("should i buy nvidia", budget_myr=Decimal("0.05"),
-                instrument_ids=("XNAS:NVDA",))
+    p = a0.plan("should i buy nvidia", budget_myr=Decimal("0.05"), instrument_ids=("XNAS:NVDA",))
     assert not p.allowed
     assert "narrower question" in p.refusal.what_would_help
 
@@ -267,9 +350,11 @@ def test_a_budget_too_small_for_an_honest_answer_is_refused_not_cheapened():
 def test_a_workable_budget_trims_rather_than_refusing():
     a0 = A0Supervisor(ctx())
     full = a0.plan("should i buy nvidia", instrument_ids=("XNAS:NVDA",))
-    p = a0.plan("should i buy nvidia",
-                budget_myr=full.estimated_cost.amount * Decimal("0.7"),
-                instrument_ids=("XNAS:NVDA",))
+    p = a0.plan(
+        "should i buy nvidia",
+        budget_myr=full.estimated_cost.amount * Decimal("0.7"),
+        instrument_ids=("XNAS:NVDA",),
+    )
     assert p.allowed
     assert len(p.agents) < len(full.agents)
     # the floor survives the trim: no thesis without a red team, ever
@@ -281,13 +366,19 @@ def test_the_floor_itself_is_never_trimmed_away():
     """Trimming stops at the point where the answer would stop being honest,
     and refuses instead. docs/01 section 4.3."""
     a0 = A0Supervisor(ctx())
-    floor_only = a0.plan("should i buy nvidia", budget_myr=Decimal("1.48"),
-                         instrument_ids=("XNAS:NVDA",))
+    floor_only = a0.plan(
+        "should i buy nvidia", budget_myr=Decimal("1.48"), instrument_ids=("XNAS:NVDA",)
+    )
     assert floor_only.allowed
-    assert set(floor_only.agents) == {"a1_fundamentals", "a2_valuation",
-                                      "a10_thesis", "a11_red_team"}
-    assert not a0.plan("should i buy nvidia", budget_myr=Decimal("1.40"),
-                       instrument_ids=("XNAS:NVDA",)).allowed
+    assert set(floor_only.agents) == {
+        "a1_fundamentals",
+        "a2_valuation",
+        "a10_thesis",
+        "a11_red_team",
+    }
+    assert not a0.plan(
+        "should i buy nvidia", budget_myr=Decimal("1.40"), instrument_ids=("XNAS:NVDA",)
+    ).allowed
 
 
 def test_cost_estimate_is_in_ringgit():
@@ -299,9 +390,12 @@ def test_cost_estimate_is_in_ringgit():
 
 # -- A12 --------------------------------------------------------------------
 
+
 def banks(n=10, weight=0.09):
-    return [Position(f"BANK{i}", weight, "financials", "MY", "MYR", risk_to_stop=0.004)
-            for i in range(n)]
+    return [
+        Position(f"BANK{i}", weight, "financials", "MY", "MYR", risk_to_stop=0.004)
+        for i in range(n)
+    ]
 
 
 def test_ten_correlated_banks_pass_hhi_and_fail_effective_bets():
@@ -316,9 +410,11 @@ def test_ten_correlated_banks_pass_hhi_and_fail_effective_bets():
 
 def test_every_breach_is_reported_not_just_the_first():
     a12 = A12PortfolioRisk(ctx())
-    positions = [Position("BIG", 0.30, "financials", "MY", "MYR", risk_to_stop=0.05),
-                 Position("B", 0.30, "financials", "MY", "MYR", risk_to_stop=0.05),
-                 Position("C", 0.40, "financials", "MY", "MYR", risk_to_stop=0.05)]
+    positions = [
+        Position("BIG", 0.30, "financials", "MY", "MYR", risk_to_stop=0.05),
+        Position("B", 0.30, "financials", "MY", "MYR", risk_to_stop=0.05),
+        Position("C", 0.40, "financials", "MY", "MYR", risk_to_stop=0.05),
+    ]
     out = a12.run(positions, corr=None, limits=Limits())
     assert len([f for f in out if f.kind == "breach"]) >= 3
 
@@ -326,7 +422,7 @@ def test_every_breach_is_reported_not_just_the_first():
 def test_drawdown_tiers_are_mechanical_and_monotonic():
     a12 = A12PortfolioRisk(ctx())
     prev = 1.01
-    for dd, scalar, _ in DRAWDOWN_TIERS:
+    for dd, _scalar, _ in DRAWDOWN_TIERS:
         out = a12.drawdown_state(Decimal(str(1 - dd)) * 100, Decimal("100"))
         got = out[0].numbers["risk_scalar"]
         assert got <= prev
@@ -355,6 +451,7 @@ def test_empty_book_is_not_a_breach():
 
 # -- A13 --------------------------------------------------------------------
 
+
 def test_emergency_floor_can_leave_nothing_investable():
     a13 = A13Sizing(ctx())
     w, out = a13.investable_capital(Decimal("30000"), Decimal("5000"))
@@ -365,26 +462,34 @@ def test_emergency_floor_can_leave_nothing_investable():
 def test_near_term_goals_are_locked_before_investing():
     a13 = A13Sizing(ctx())
     w, _ = a13.investable_capital(
-        Decimal("100000"), Decimal("5000"),
-        goals=[Goal(name="deposit", amount=Decimal("40000"), months_away=12)])
+        Decimal("100000"),
+        Decimal("5000"),
+        goals=[Goal(name="deposit", amount=Decimal("40000"), months_away=12)],
+    )
     assert w.investable == Decimal("30000")
 
 
 def test_expensive_debt_is_repaid_before_equities():
     a13 = A13Sizing(ctx())
     w, _ = a13.investable_capital(
-        Decimal("100000"), Decimal("2000"),
-        liabilities=[Liability(name="card", balance=Decimal("20000"),
-                               annual_rate=Decimal("0.17"))])
+        Decimal("100000"),
+        Decimal("2000"),
+        liabilities=[Liability(name="card", balance=Decimal("20000"), annual_rate=Decimal("0.17"))],
+    )
     assert w.investable == Decimal("68000")
 
 
 def test_an_implausible_edge_is_refused_and_named():
     a13 = A13Sizing(ctx())
     caps, out = a13.caps(
-        portfolio_value=Decimal("100000"), stop_distance_frac=Decimal("0.12"),
-        adv_20d=Decimal("2000000"), round_trip_cost_at=lambda v: v * Decimal("0.005"),
-        win_rate=0.75, payoff=3.0, n_trades=200)
+        portfolio_value=Decimal("100000"),
+        stop_distance_frac=Decimal("0.12"),
+        adv_20d=Decimal("2000000"),
+        round_trip_cost_at=lambda v: v * Decimal("0.005"),
+        win_rate=0.75,
+        payoff=3.0,
+        n_trades=200,
+    )
     assert caps.kelly is None
     assert any("Kelly cap refused" in c for c in out[0].caveats)
 
@@ -392,15 +497,23 @@ def test_an_implausible_edge_is_refused_and_named():
 def test_kelly_needs_a_track_record_before_it_says_anything():
     a13 = A13Sizing(ctx())
     caps, out = a13.caps(
-        portfolio_value=Decimal("100000"), stop_distance_frac=Decimal("0.12"),
-        adv_20d=Decimal("2000000"), round_trip_cost_at=lambda v: v * Decimal("0.005"),
-        win_rate=0.54, payoff=1.5, n_trades=12)
+        portfolio_value=Decimal("100000"),
+        stop_distance_frac=Decimal("0.12"),
+        adv_20d=Decimal("2000000"),
+        round_trip_cost_at=lambda v: v * Decimal("0.005"),
+        win_rate=0.54,
+        payoff=1.5,
+        n_trades=12,
+    )
     assert caps.kelly is None
 
 
 def test_the_binding_cap_is_named_because_which_one_bound_is_the_lesson():
     a13 = A13Sizing(ctx())
     _, out = a13.caps(
-        portfolio_value=Decimal("100000"), stop_distance_frac=Decimal("0.12"),
-        adv_20d=Decimal("2000000"), round_trip_cost_at=lambda v: v * Decimal("0.005"))
+        portfolio_value=Decimal("100000"),
+        stop_distance_frac=Decimal("0.12"),
+        adv_20d=Decimal("2000000"),
+        round_trip_cost_at=lambda v: v * Decimal("0.005"),
+    )
     assert "binding cap is" in out[0].text

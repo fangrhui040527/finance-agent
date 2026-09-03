@@ -30,12 +30,12 @@ agent = Agent(
     model=OpenAIChat(id="gpt-5.2-2025-12-11"),
     tools=[YFinanceTools()],
     description="You are an investment analyst that researches stock prices, "
-                "analyst recommendations, and stock fundamentals.",
+    "analyst recommendations, and stock fundamentals.",
     instructions=[
         "Format your response using markdown and use tables to display data where possible.",
         "When comparing stocks, provide detailed analysis including price trends, "
         "fundamentals, and analyst recommendations.",
-        "Always provide actionable insights for investors."     # ← see below
+        "Always provide actionable insights for investors.",  # ← see below
     ],
 )
 ```
@@ -93,9 +93,10 @@ Verdicts: **ADOPT** = copy and adapt the code · **PATTERN** = read it, then wri
 
 ```python
 class Citation(BaseModel):
-    source: str        # document name or URL
-    chunk_id: str      # stable id returned by retrieve
-    quoted_span: str   # short VERBATIM quote from the chunk
+    source: str  # document name or URL
+    chunk_id: str  # stable id returned by retrieve
+    quoted_span: str  # short VERBATIM quote from the chunk
+
 
 class Answer(BaseModel):
     text: str

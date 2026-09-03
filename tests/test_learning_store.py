@@ -1,17 +1,24 @@
 """The prediction log has to survive a restart, or the three-to-six month clock
 in docs/14 section 2 restarts with it."""
+
 import sqlite3
-from datetime import date, datetime, timedelta, timezone
+from datetime import UTC, date, datetime, timedelta
 
 import pytest
 
 import predict
 from agents.learning.reflection import (
-    Author, Horizon, Lesson, LessonStore, Outcome, Prediction, ProvenanceMarker, Status,
+    Author,
+    Horizon,
+    Lesson,
+    Outcome,
+    Prediction,
+    ProvenanceMarker,
+    Status,
 )
 from agents.learning.store import LearningStore
 
-NOW = datetime(2026, 8, 25, tzinfo=timezone.utc)
+NOW = datetime(2026, 8, 25, tzinfo=UTC)
 
 
 def db(tmp_path):
@@ -19,18 +26,27 @@ def db(tmp_path):
 
 
 def prediction(pid="p1", instrument="MYX:1155", days=63, conf=0.62):
-    return Prediction(pid, instrument, "a10_thesis", NOW, Horizon.D63,
-                      "NIM stabilises", 1, conf,
-                      grade_on=(NOW + timedelta(days=days)).date())
+    return Prediction(
+        pid,
+        instrument,
+        "a10_thesis",
+        NOW,
+        Horizon.D63,
+        "NIM stabilises",
+        1,
+        conf,
+        grade_on=(NOW + timedelta(days=days)).date(),
+    )
 
 
 # -- persistence -------------------------------------------------------------
+
 
 def test_a_logged_prediction_survives_the_process(tmp_path):
     path = db(tmp_path)
     with LearningStore(path) as s:
         s.record(prediction())
-    with LearningStore(path) as s:          # a different connection entirely
+    with LearningStore(path) as s:  # a different connection entirely
         assert [p.prediction_id for p in s.pending()] == ["p1"]
 
 
@@ -67,6 +83,7 @@ def test_the_original_statement_and_confidence_are_preserved_verbatim(tmp_path):
 
 # -- immutability ------------------------------------------------------------
 
+
 def test_a_prediction_cannot_be_edited_after_the_fact(tmp_path):
     path = db(tmp_path)
     with LearningStore(path) as s:
@@ -102,10 +119,21 @@ def test_logging_the_same_id_twice_is_refused_with_a_reason(tmp_path):
 
 # -- lessons -----------------------------------------------------------------
 
+
 def lesson(status=Status.ACTIVE):
-    return Lesson("L1", "unexplained gaps reverse", "gap", 8, 5, 0.72, NOW,
-                  ProvenanceMarker(created_by=Author.AGENT, created_at=NOW),
-                  status=status, last_confirmed=NOW, evidence=("p1", "p2"))
+    return Lesson(
+        "L1",
+        "unexplained gaps reverse",
+        "gap",
+        8,
+        5,
+        0.72,
+        NOW,
+        ProvenanceMarker(created_by=Author.AGENT, created_at=NOW),
+        status=status,
+        last_confirmed=NOW,
+        evidence=("p1", "p2"),
+    )
 
 
 def test_lessons_round_trip_with_their_provenance(tmp_path):
@@ -130,8 +158,9 @@ def test_an_archived_lesson_is_still_there_after_a_restart(tmp_path):
 
 def test_a_human_authored_lesson_stays_read_only_across_a_restart(tmp_path):
     path = db(tmp_path)
-    human = Lesson("L2", "t", "p", 9, 5, 0.7, NOW,
-                   ProvenanceMarker(created_by=Author.HUMAN, created_at=NOW))
+    human = Lesson(
+        "L2", "t", "p", 9, 5, 0.7, NOW, ProvenanceMarker(created_by=Author.HUMAN, created_at=NOW)
+    )
     with LearningStore(path) as s:
         s.save_lesson(human)
     with LearningStore(path) as s:
@@ -139,6 +168,7 @@ def test_a_human_authored_lesson_stays_read_only_across_a_restart(tmp_path):
 
 
 # -- the CLI -----------------------------------------------------------------
+
 
 def run(args, path, capsys):
     code = predict.main(["--db", path] + args)
@@ -161,14 +191,18 @@ def test_the_cli_refuses_to_grade_before_the_horizon(tmp_path, capsys):
 
 
 def test_the_cli_grades_against_the_benchmark_not_zero(tmp_path, capsys):
-    # Relative to today on purpose: the CLI stamps made_at from the real clock,
-    # so a hardcoded grade_on is a test that passes until that date arrives.
-    grade_on = (date.today() + timedelta(days=21)).isoformat()
     path = db(tmp_path)
-    run(["log", "X", "1", "21d", "0.6", "s", "--id", "p1", "--grade-on", grade_on],
-        path, capsys)
-    code, out = run(["grade", "p1", "--return", "0.031", "--benchmark", "0.048",
-                     "--today", grade_on], path, capsys)
+    # Relative to today, never a literal. `log` stamps made_at from the real clock
+    # and refuses a grade_on that is not in the future, so a hard-coded date
+    # silently becomes un-loggable the day it arrives - and the test then fails on
+    # its own SETUP, for a reason that has nothing to do with grading.
+    grade_on = (date.today() + timedelta(days=21)).isoformat()
+    run(["log", "X", "1", "21d", "0.6", "s", "--id", "p1", "--grade-on", grade_on], path, capsys)
+    code, out = run(
+        ["grade", "p1", "--return", "0.031", "--benchmark", "0.048", "--today", grade_on],
+        path,
+        capsys,
+    )
     assert code == 0
     assert "wrong" in out, "up 3.1% against a benchmark up 4.8% is wrong"
 
@@ -191,22 +225,19 @@ def test_the_cli_shows_the_calibration_table_once_there_is_enough(tmp_path, caps
 
 def test_due_lists_overdue_items(tmp_path, capsys):
     """Overdue is reached by time passing, never by backdating grade_on - the
-    contract refuses that, which is why --today exists instead.
-
-    Both dates are relative to today for the same reason: this test hardcoded
-    2026-09-01 and began failing the day that date became the past, which is a
-    test rotting rather than a contract breaking.
-    """
+    contract refuses that, which is why --today exists instead."""
     path = db(tmp_path)
-    grade_on = date.today() + timedelta(days=1)
-    overdue_by_5 = (grade_on + timedelta(days=5)).isoformat()
-    run(["log", "X", "1", "5d", "0.6", "s", "--id", "p1",
-         "--grade-on", grade_on.isoformat()], path, capsys)
-    _, out = run(["due", "--today", overdue_by_5], path, capsys)
+    grade_on = date.today() + timedelta(days=5)
+    run(
+        ["log", "X", "1", "5d", "0.6", "s", "--id", "p1", "--grade-on", grade_on.isoformat()],
+        path,
+        capsys,
+    )
+    # Five days PAST the grading date, simulated rather than waited for.
+    _, out = run(["due", "--today", (grade_on + timedelta(days=5)).isoformat()], path, capsys)
     assert "5d overdue" in out
 
 
 def test_a_grading_date_in_the_past_cannot_be_logged_at_all(tmp_path, capsys):
     with pytest.raises(ValueError, match="not a horizon"):
-        run(["log", "X", "1", "5d", "0.6", "s", "--grade-on", "2020-01-01"],
-            db(tmp_path), capsys)
+        run(["log", "X", "1", "5d", "0.6", "s", "--grade-on", "2020-01-01"], db(tmp_path), capsys)

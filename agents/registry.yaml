@@ -7,6 +7,19 @@
 
 version: 1
 
+# llm_complete is granted to exactly four agents: the ones whose documented job
+# is a language task (a4 triages prose, a10 writes the thesis, a11 argues against
+# it, a15 judges lessons). It is NOT granted to the other twelve, and that is the
+# point of an allowlist - one that names every capability for every agent has
+# stopped being a control.
+#
+# It went missing entirely until a traced end-to-end run tried it: no agent held
+# it, so the registry-derived allowlist denied InferenceClient.complete() for
+# every registered agent. verify.py and the tests never caught it because they
+# pass hand-written allowlists with invented agent ids ({"a4": {"llm_complete"}})
+# rather than the real registry - so the seam was exercised and the grant was
+# not.
+
 agents:
   - id: a0_supervisor
     layer: orchestration
@@ -40,7 +53,7 @@ agents:
   - id: a4_news_narrative
     layer: evidence
     knowledge: [kb_news]
-    tools: [retrieve, search_news, extract_features, source_reliability]
+    tools: [retrieve, search_news, extract_features, source_reliability, llm_complete]
     tier_hint: cheap
     eval_suite: evals/a4_news_narrative.yaml
 
@@ -83,14 +96,14 @@ agents:
   - id: a10_thesis
     layer: synthesis
     knowledge: []
-    tools: [compose, check_coverage]
+    tools: [compose, check_coverage, llm_complete]
     tier_hint: reason
     eval_suite: evals/a10_thesis.yaml
 
   - id: a11_red_team
     layer: synthesis
     knowledge: [kb_failures, kb_news, kb_filings]
-    tools: [retrieve, find_disconfirming, check_crowding]
+    tools: [retrieve, find_disconfirming, check_crowding, llm_complete]
     tier_hint: reason
     eval_suite: evals/a11_red_team.yaml
 
@@ -120,7 +133,7 @@ agents:
   - id: a15_reflection
     layer: learning
     knowledge: [kb_lessons, outcomes]
-    tools: [grade_queue, propose_lesson, calibrate, curate]
+    tools: [grade_queue, propose_lesson, calibrate, curate, llm_complete]
     tier_hint: reason
     eval_suite: evals/a15_reflection.yaml
 

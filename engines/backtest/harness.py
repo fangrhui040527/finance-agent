@@ -12,7 +12,10 @@ from dataclasses import dataclass, field
 from enum import Enum
 
 from engines.backtest.metrics import (
-    Performance, deflated_sharpe, performance, probabilistic_sharpe,
+    Performance,
+    deflated_sharpe,
+    performance,
+    probabilistic_sharpe,
 )
 from engines.backtest.splitter import Fold, purged_walk_forward
 
@@ -65,10 +68,14 @@ class BacktestReport:
             return "PASS - clears all three benchmarks and the deflated Sharpe threshold"
         losses = [b.name.value for b in self.benchmarks if not b.beaten]
         if losses:
-            return (f"FAIL - does not beat {', '.join(losses)} after costs. "
-                    "If it beats none, the correct product is an index tracker plus the planner")
-        return (f"FAIL - deflated Sharpe {self.deflated_sharpe:.2f} below 0.95 after correcting "
-                f"for {self.n_trials} trials; the result is consistent with luck")
+            return (
+                f"FAIL - does not beat {', '.join(losses)} after costs. "
+                "If it beats none, the correct product is an index tracker plus the planner"
+            )
+        return (
+            f"FAIL - deflated Sharpe {self.deflated_sharpe:.2f} below 0.95 after correcting "
+            f"for {self.n_trials} trials; the result is consistent with luck"
+        )
 
     def regime_warning(self) -> str | None:
         """A model that only works in one regime should say so on its face."""
@@ -104,15 +111,18 @@ def run(
             if len(sel) >= 20:
                 by_regime[r.value] = performance(sel)
 
-    folds = purged_walk_forward(len(strategy_returns), n_folds, label_horizon,
-                                min_train=max(60, len(strategy_returns) // 5))
+    folds = purged_walk_forward(
+        len(strategy_returns), n_folds, label_horizon, min_train=max(60, len(strategy_returns) // 5)
+    )
 
     notes: list[str] = []
     if gross.sharpe > 0 and net.sharpe <= 0:
         notes.append("the edge exists gross and is entirely consumed by costs")
     if net.longest_underwater_days > 500:
-        notes.append(f"longest underwater stretch is {net.longest_underwater_days} sessions - "
-                     "that is what you would have had to live through")
+        notes.append(
+            f"longest underwater stretch is {net.longest_underwater_days} sessions - "
+            "that is what you would have had to live through"
+        )
 
     return BacktestReport(
         strategy=net,

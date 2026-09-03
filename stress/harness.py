@@ -17,11 +17,7 @@ The exit code is the FINDING count, so CI can gate on it.
 
 from __future__ import annotations
 
-import math
-import random
-import sys
 import time
-import traceback
 from dataclasses import dataclass, field
 
 
@@ -74,7 +70,7 @@ def expect_raises(label: str, exc, fn, *, why: str) -> None:
     except exc:
         held(label)
         return
-    except Exception as e:                       # wrong exception type is a note
+    except Exception as e:  # wrong exception type is a note
         note(label, f"refused, but with {type(e).__name__} not {exc.__name__}")
         return
     finding(label, f"{why} Accepted silently, returned {result!r:.120}")

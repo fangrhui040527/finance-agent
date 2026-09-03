@@ -12,6 +12,7 @@ The second is that moomoo's trade context never enters this repository. That is
 enforced by tests/test_no_execution_anywhere.py at the level of forbidden names;
 this file enforces it one step earlier, at the import.
 """
+
 from datetime import date
 from pathlib import Path
 
@@ -19,7 +20,10 @@ import pytest
 
 from core.market.prices import Bar
 from core.market.sources import (
-    PriceSource, PriceSourceError, StaticSource, validate,
+    PriceSource,
+    PriceSourceError,
+    StaticSource,
+    validate,
 )
 from markets.sources import moomoo_quotes
 from markets.sources.moomoo_quotes import MoomooQuotes, to_moomoo_code
@@ -41,13 +45,16 @@ def test_the_moomoo_source_never_imports_a_trade_context():
     """The whole safety argument for this module is what it imports. A comment
     saying so is not enforcement; reading the file is."""
     text = (ROOT / "markets" / "sources" / "moomoo_quotes.py").read_text()
-    code = "\n".join(
-        line for line in text.splitlines()
-        if not line.lstrip().startswith("#")
-    )
-    body = code.split('"""', 2)[-1]          # drop the module docstring
-    for banned in ("OpenSecTradeContext", "TrdEnv", "SecurityFirm",
-                   "unlock_trade", "accinfo_query", "acc_list"):
+    code = "\n".join(line for line in text.splitlines() if not line.lstrip().startswith("#"))
+    body = code.split('"""', 2)[-1]  # drop the module docstring
+    for banned in (
+        "OpenSecTradeContext",
+        "TrdEnv",
+        "SecurityFirm",
+        "unlock_trade",
+        "accinfo_query",
+        "acc_list",
+    ):
         assert banned not in body, (
             f"{banned} appears in the moomoo price source. That is the trade "
             "path; this module is quotes only."
@@ -55,9 +62,18 @@ def test_the_moomoo_source_never_imports_a_trade_context():
 
 
 def test_the_quote_context_is_the_only_thing_imported_from_moomoo():
+    """Exactly one import from the SDK, and it is the read-only one.
+
+    Trailing tooling comments are stripped so a `# pyright: ignore` can sit on
+    that line - what is asserted is what is IMPORTED, not how the line is
+    annotated.
+    """
     text = (ROOT / "markets" / "sources" / "moomoo_quotes.py").read_text()
-    imports = [l.strip() for l in text.splitlines()
-               if l.strip().startswith(("from moomoo", "import moomoo"))]
+    imports = [
+        line.split("#")[0].strip()
+        for line in text.splitlines()
+        if line.strip().startswith(("from moomoo", "import moomoo"))
+    ]
     assert imports == ["from moomoo import OpenQuoteContext"], imports
 
 
@@ -182,8 +198,17 @@ class _FakeCtx:
 
 
 def _rows(n=2):
-    return [{"time_key": f"2026-08-0{3 + i} 00:00:00", "open": 10.0, "high": 11.0,
-             "low": 9.5, "close": 10.5, "volume": 1000} for i in range(n)]
+    return [
+        {
+            "time_key": f"2026-08-0{3 + i} 00:00:00",
+            "open": 10.0,
+            "high": 11.0,
+            "low": 9.5,
+            "close": 10.5,
+            "volume": 1000,
+        }
+        for i in range(n)
+    ]
 
 
 def test_bars_come_back_parsed_and_validated():
@@ -211,8 +236,9 @@ def test_a_nonzero_return_code_is_a_source_error_not_empty_bars():
 
 
 def test_a_malformed_bar_is_named_rather_than_silently_dropped():
-    ctx = _FakeCtx(data=[{"time_key": "2026-08-03", "open": "x", "high": 1,
-                          "low": 1, "close": 1, "volume": 1}])
+    ctx = _FakeCtx(
+        data=[{"time_key": "2026-08-03", "open": "x", "high": 1, "low": 1, "close": 1, "volume": 1}]
+    )
     src = MoomooQuotes(context_factory=lambda h, p: ctx)
     with pytest.raises(PriceSourceError, match="cannot read"):
         src.bars("XKLS:1155", D, date(2026, 8, 10))

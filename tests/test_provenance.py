@@ -1,22 +1,30 @@
 """P0 DoD: append-only ledger, cost in both currencies, provenance markers."""
-from datetime import datetime, timezone
+
+from datetime import UTC, datetime
 from decimal import Decimal
 
 import pytest
 
 from core.contracts.provenance_marker import Author, ProvenanceMarker, is_managed
 from core.llm.tiers import TaskClass, Tier, Usage
-from core.provenance.ledger import ProvenanceLedger
+from core.provenance.ledger import DEFAULT_FX_MYR_PER_USD, ProvenanceLedger
 
 
 def test_call_is_recorded_with_both_currencies():
     led = ProvenanceLedger()
     rec = led.record_call(
-        "a10", TaskClass.THESIS_SYNTHESIS, Tier.REASON, "claude-opus-5",
-        "prompt", Usage(1_000_000, 0),
+        "a10",
+        TaskClass.THESIS_SYNTHESIS,
+        Tier.REASON,
+        "claude-opus-5",
+        "prompt",
+        Usage(1_000_000, 0),
     )
     assert rec.cost_usd == Decimal("5.00")
-    assert rec.cost_myr == Decimal("5.00") * Decimal("4.15")
+    # The constant, not a literal: the rate is a fact about the world that
+    # moves, and a test restating it becomes a second place to update. Same
+    # rule test_config.py already applies to the loader.
+    assert rec.cost_myr == Decimal("5.00") * DEFAULT_FX_MYR_PER_USD
 
 
 def test_ledger_rejects_update():
@@ -49,12 +57,12 @@ def test_dropped_claims_are_logged_too():
 
 
 def test_human_authored_is_never_agent_editable():
-    m = ProvenanceMarker(created_by=Author.HUMAN, created_at=datetime.now(timezone.utc))
+    m = ProvenanceMarker(created_by=Author.HUMAN, created_at=datetime.now(UTC))
     assert m.managed is False
 
 
 def test_agent_created_is_editable_unless_pinned():
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     assert ProvenanceMarker(created_by=Author.AGENT, created_at=now).managed is True
     assert ProvenanceMarker(created_by=Author.AGENT, created_at=now, pinned=True).managed is False
 

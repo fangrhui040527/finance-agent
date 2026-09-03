@@ -5,39 +5,17 @@ one. Every failure path raises FeedError; only an explicitly empty article list
 returns an empty list. A feed that swallowed its own errors would hand the
 system a confident "no news" on the day the news mattered most.
 """
+
 import json
 import urllib.error
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import pytest
 
 from knowledge.feeds.adapter import FeedError, GdeltFeed
+from tests.conftest import opener_for as _opener
 
-NOW = datetime(2026, 8, 27, 12, 0, tzinfo=timezone.utc)
-
-
-class _Response:
-    """Minimal stand-in for the context manager urlopen returns."""
-
-    def __init__(self, body: str):
-        self._body = body.encode()
-
-    def read(self) -> bytes:
-        return self._body
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, *exc):
-        return False
-
-
-def _opener(body: str, capture: list | None = None):
-    def open_(req, timeout=None):
-        if capture is not None:
-            capture.append(req)
-        return _Response(body)
-    return open_
+NOW = datetime(2026, 8, 27, 12, 0, tzinfo=UTC)
 
 
 def _article(url: str, title: str = "Bank posts record quarter", **kw) -> dict:
@@ -89,17 +67,27 @@ def test_a_genuinely_empty_window_is_not_an_error():
 
 
 # --- request construction -------------------------------------------------
-def test_timespan_never_drops_below_the_documented_minimum():
-    """A caller polling every minute would otherwise make the API refuse it."""
+def test_timespan_never_drops_below_what_the_api_will_accept():
+    """A caller polling every minute would otherwise make the API refuse it.
+
+    This asserted 15 minutes, which was wrong: on 2026-09-03 a sweep resuming
+    from a watermark 25 minutes old was answered "Timespan is too short." in
+    plain text, failing the whole request. The floor is now two hours - wider
+    than the real boundary on purpose, because guessing it costs a whole sweep
+    and the overlap costs nothing the corpus does not already dedupe away.
+    """
     feed = GdeltFeed()
-    assert feed._timespan(NOW - timedelta(seconds=30), now=NOW) == "15min"
-    assert feed._timespan(NOW, now=NOW) == "15min"
+    assert feed._timespan(NOW - timedelta(seconds=30), now=NOW) == "120min"
+    assert feed._timespan(NOW, now=NOW) == "120min"
+    assert feed._timespan(NOW - timedelta(minutes=25), now=NOW) == "120min"
     assert feed._timespan(NOW - timedelta(hours=2), now=NOW) == "120min"
 
 
 def test_timespan_rounds_up_so_the_window_is_never_short():
+    """Above the floor, a partial minute still widens the window rather than
+    truncating it - a window short by a second is a story missed."""
     feed = GdeltFeed()
-    assert feed._timespan(NOW - timedelta(minutes=90, seconds=1), now=NOW) == "91min"
+    assert feed._timespan(NOW - timedelta(minutes=150, seconds=1), now=NOW) == "151min"
 
 
 def test_maxrecords_is_capped_at_one_page():
@@ -135,10 +123,19 @@ def test_the_user_agent_can_carry_a_real_contact_address(monkeypatch):
 
 # --- normalisation is inherited, and still works on GDELT's shapes --------
 def test_a_non_english_article_keeps_its_language_and_country():
-    body = json.dumps({"articles": [
-        _article("https://a.my/1", "Maybank catat keuntungan rekod",
-                 language="Malay", sourcecountry="Malaysia", domain="a.my"),
-    ]})
+    body = json.dumps(
+        {
+            "articles": [
+                _article(
+                    "https://a.my/1",
+                    "Maybank catat keuntungan rekod",
+                    language="Malay",
+                    sourcecountry="Malaysia",
+                    domain="a.my",
+                ),
+            ]
+        }
+    )
     feed = GdeltFeed(opener=_opener(body))
     articles, stats = feed.normalize(feed.fetch(NOW - timedelta(hours=1)))
     assert len(articles) == 1
@@ -153,14 +150,18 @@ def test_gdelt_seendate_parses_to_an_aware_timestamp():
     body = json.dumps({"articles": [_article("https://a.my/1", seendate="20260827T113000Z")]})
     feed = GdeltFeed(opener=_opener(body))
     art = feed.normalize(feed.fetch(NOW - timedelta(hours=1)))[0][0]
-    assert art.published_at == datetime(2026, 8, 27, 11, 30, tzinfo=timezone.utc)
+    assert art.published_at == datetime(2026, 8, 27, 11, 30, tzinfo=UTC)
 
 
 def test_the_same_story_syndicated_to_two_domains_counts_once():
-    body = json.dumps({"articles": [
-        _article("https://a.com/1", "Maybank posts record quarter", domain="a.com"),
-        _article("https://b.com/9", "Maybank posts record quarter", domain="b.com"),
-    ]})
+    body = json.dumps(
+        {
+            "articles": [
+                _article("https://a.com/1", "Maybank posts record quarter", domain="a.com"),
+                _article("https://b.com/9", "Maybank posts record quarter", domain="b.com"),
+            ]
+        }
+    )
     feed = GdeltFeed(opener=_opener(body))
     articles, stats = feed.normalize(feed.fetch(NOW - timedelta(hours=1)))
     assert len(articles) == 1
