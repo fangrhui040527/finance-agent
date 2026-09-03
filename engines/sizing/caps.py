@@ -27,9 +27,18 @@ IMPLAUSIBLE_EDGE = Decimal("0.30")  # a claimed 30% edge means the model is brok
 # round-trip cost - the position must be large enough that fees are near their
 # floor, not that fees are cheap in absolute terms.
 COST_FLOOR_BPS_DEFAULT = Decimal("30")
+
+#: The upper bound of `cost_floor_value`'s bisection, and its answer when NO
+#: position satisfies the floor. It is a sentinel, not a position requirement:
+#: a schedule whose asymptotic cost already exceeds its floor can never come
+#: down, so the search converges on its own ceiling. `stress/run.py` and
+#: `qa/phase1/test_p1_invariants.py` both detect that state by inspecting this
+#: value, which is why it is a named constant and not an exception - raising
+#: here would turn two working detectors into crashes.
+COST_FLOOR_CEILING = Decimal("100000000")
 COST_FLOOR_BPS_BY_MIC: dict[str, Decimal] = {
     "XKLS": Decimal("60"),  # asymptote ~46 bps
-    "XNAS": Decimal("5"),  # asymptote ~0.6 bps
+    "XNAS": Decimal("5"),  # asymptote ~0.6 bps - ZERO-COMMISSION account; see brokers.py
     "XSES": Decimal("30"),  # asymptote ~24 bps before the SGD 600 clearing cap binds
     "XHKG": Decimal("95"),  # asymptote ~72 bps - the WORST of the seven, see below
     "XTKS": Decimal("55"),  # asymptote ~40 bps; the tick, not the fee, is the cost
@@ -69,7 +78,7 @@ COST_FLOOR_BPS_BY_MIC: dict[str, Decimal] = {
 # accident, and the next market added would inherit the accident silently.
 
 
-def cost_floor_bps(mic: str | None) -> Decimal:
+def cost_floor_bps(mic: str | None, broker: str | None = None) -> Decimal:
     """The market's floor, resolved through the alias map.
 
     Resolution is not a nicety. Instrument ids in this repo say `MYX`, the table
@@ -81,7 +90,17 @@ def cost_floor_bps(mic: str | None) -> Decimal:
         return COST_FLOOR_BPS_DEFAULT
     from markets.registry import resolve_mic
 
-    return COST_FLOOR_BPS_BY_MIC.get(resolve_mic(mic), COST_FLOOR_BPS_DEFAULT)
+    canonical = resolve_mic(mic)
+    if broker is not None:
+        from markets.brokers import BROKER_FLOOR_BPS
+
+        # A broker floor is a DIFFERENT number, not an adjustment to the venue's.
+        # moomoo MY pays 6 bps of commission before anything else, which is above
+        # the 5 bps XNAS tolerance on its own - so the venue entry is not a
+        # starting point that can be nudged, it is unreachable.
+        if (broker, canonical) in BROKER_FLOOR_BPS:
+            return BROKER_FLOOR_BPS[(broker, canonical)]
+    return COST_FLOOR_BPS_BY_MIC.get(canonical, COST_FLOOR_BPS_DEFAULT)
 
 
 class Band(str, Enum):
@@ -268,13 +287,45 @@ def liquidity_cap(adv_20d: Decimal, participation: Decimal = Decimal("0.05")) ->
     return adv_20d * participation
 
 
-def cost_floor_value(round_trip_cost_at, mic: str | None = None) -> Decimal:
+def cost_floor_source(mic: str | None, broker: str | None = None) -> str:
+    """Which table the floor actually came from, for output that names it.
+
+    A broker that does not price this venue falls through to the venue's own
+    entry, and a finding that still said "60 bps round trip on moomoo_my" would
+    be naming an account for a number Bursa supplied. The label is derived from
+    the same lookup as the number so the two cannot drift apart.
+    """
+    if broker is not None and mic is not None:
+        from markets.brokers import BROKER_FLOOR_BPS
+        from markets.registry import resolve_mic
+
+        if (broker, resolve_mic(mic)) in BROKER_FLOOR_BPS:
+            return broker
+    return mic or "default"
+
+
+def cost_floor_unreachable(floor_value: Decimal) -> bool:
+    """True when no position of any size satisfies the floor.
+
+    The bisection cannot report this in its return type - it returns a Decimal
+    either way - so the caller has to ask. `ask.py` asks before printing a
+    number that would otherwise read as "you need USD 100,000,000".
+    """
+    return floor_value >= COST_FLOOR_CEILING
+
+
+def cost_floor_value(
+    round_trip_cost_at, mic: str | None = None, broker: str | None = None
+) -> Decimal:
     """Smallest position whose round-trip cost stays within the market's floor.
 
     Bisection, because fee schedules have minimums and caps and are not smooth.
+
+    Returns COST_FLOOR_CEILING when the floor is unreachable; ask
+    `cost_floor_unreachable` rather than reading that as a position size.
     """
-    limit = cost_floor_bps(mic)
-    lo, hi = Decimal("1"), Decimal("100000000")
+    limit = cost_floor_bps(mic, broker)
+    lo, hi = Decimal("1"), COST_FLOOR_CEILING
     for _ in range(100):
         mid = (lo + hi) / 2
         bps = round_trip_cost_at(mid) / mid * Decimal(10_000)
