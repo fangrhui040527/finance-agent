@@ -122,6 +122,10 @@ brokerage minimum, and only falls under 30 bps above roughly RM 4m of
 consideration once the RM 1,000 caps bind. A single global floor would refuse
 every Bursa position ever taken. The floor is therefore **per-market**, set near
 1.3× each market's asymptotic cost: 60 bps for XKLS, 5 bps for XNAS.
+Those are VENUE floors. Where an account's own costs differ, the floor is the
+broker's: a `moomoo_my` account pays 6 bps of commission alone, so the 5 bps
+XNAS figure is not a starting point to nudge — it is unreachable at any size,
+and `markets/brokers.py` carries the 20 bps that account actually clears.
 
 The useful number that falls out: **the minimum economic Bursa position is about
 RM 4,700.** Below that the RM 8 minimum dominates and the round trip eats more

@@ -27,6 +27,7 @@ from engines.sizing.caps import (
     ImplausibleEdge,
     concentration_cap,
     cost_floor_bps,
+    cost_floor_source,
     cost_floor_value,
     kelly_cap,
     liquidity_cap,
@@ -240,6 +241,7 @@ class A13Sizing(Agent):
         mic: str | None = None,
         fx_base_per_quote: Decimal | None = None,
         fx_asof=None,
+        broker: str | None = None,
     ) -> tuple[CapSet, list[Finding]]:
         """`portfolio_value` is MYR; `adv_20d` and the fee schedule are the
         market's own currency. Those meet in a `min()`, so one of them has to
@@ -256,7 +258,7 @@ class A13Sizing(Agent):
         risk = risk_budget_cap(pv, risk_per_trade, stop_distance_frac)
         conc = concentration_cap(pv, single_name_limit)
         liq = liquidity_cap(adv_20d, participation)
-        floor = cost_floor_value(round_trip_cost_at, mic)
+        floor = cost_floor_value(round_trip_cost_at, mic, broker)
 
         # The liquidity cap is a LINEAR participation model. Above ~5% of ADV
         # impact grows with the square root and linear understates it; below
@@ -317,7 +319,8 @@ class A13Sizing(Agent):
                 "caps",
                 f"binding cap is {binding.value} at {both(value, value_base)}; "
                 f"cost floor requires at least {both(floor, floor_base)} "
-                f"({cost_floor_bps(mic)} bps round trip on {mic or 'default'})",
+                f"({cost_floor_bps(mic, broker)} bps round trip on "
+                f"{cost_floor_source(mic, broker)})",
                 numbers={
                     "risk": float(risk),
                     "concentration": float(conc),

@@ -19,6 +19,23 @@ base_currency = "MYR"
 # entry (see docs/06 appendix); listing a MIC with no adapter is refused at load.
 markets = ["XKLS", "XNAS"]
 
+# Whose fee schedule this account actually pays. Unset means the VENUE's own
+# schedule, which is what every adapter in markets/ ships - and markets/xnas.py
+# ships a ZERO-COMMISSION US account: a 5 bps floor and a USD 1.00 minimum
+# economic position. If that is not your account, sizing against it funds US
+# positions that cannot pay for their own round trip, silently, because a wrong
+# floor is still a number.
+#
+# "moomoo_my" is 0.03% commission + USD 0.99 flat per order + USD 0.003 a share,
+# with the SEC and FINRA fees on the sale only. That is 204.9 bps round trip on a
+# USD 100 position and moves the minimum economic position to about USD 1,511 at
+# a USD 100 share price - roughly RM 6,270. It is per-share, so that minimum
+# RISES as the share price falls: about USD 2,620 at USD 10 a share.
+#
+# A broker only replaces the venues it actually prices; anything else still
+# sizes on the venue's terms, and the output names which was used.
+# broker = "moomoo_my"
+
 # docs/08 planning rate: mid-market ~4.04 plus roughly 2.5% card FX markup.
 # Used for cost estimates only. Real conversions carry their own dated rate.
 fx_myr_per_usd = 4.15

@@ -44,7 +44,7 @@ from core.registry.loader import load as load_registry
 from engines.attribution.decompose import MIN_OBSERVATIONS
 from engines.attribution.regression import huber_fit
 from engines.risk.concentration import Limits, Position
-from engines.sizing.caps import cost_floor_bps, to_base
+from engines.sizing.caps import cost_floor_bps, cost_floor_unreachable, cost_floor_value, to_base
 from knowledge.retrieval.pipeline import Router
 from markets.registry import get as market_get
 from markets.registry import market_currency, mic_of
@@ -527,10 +527,48 @@ def cmd_size(a) -> int:
     # come down and returns its RM 100m ceiling. What makes small positions
     # uneconomic is the fixed MINIMUM (RM 8 on Bursa), and a model without one
     # cannot express the thing being measured.
+    # Resolved before the branch so the no-adapter path below can name it too.
+    broker = load_cfg().broker
     try:
-        schedule = market_get(mic).fee_schedule
-        round_trip_cost_at = schedule.round_trip
-        cost_note = f"{mic} fee schedule"
+        # The BROKER's schedule where the account has one, the venue's otherwise.
+        # markets/xnas.py models a zero-commission US account; sizing a moomoo
+        # account against it understates the floor by two orders of magnitude.
+        from markets.brokers import schedule_for
+
+        schedule = schedule_for(mic, broker)
+        # A broker that does not price this venue falls back to the venue's own
+        # schedule. Saying "moomoo_my schedule on XKLS" when Bursa's schedule is
+        # what was actually used is a label that reads as a fact and is not one.
+        on_broker_terms = schedule is not market_get(mic).fee_schedule
+
+        # Two of moomoo's legs are per-share and its commission waiver depends on
+        # the share count, so the schedule cannot be costed from a value alone.
+        # --price is required on this subcommand, so it is always in hand here.
+        def round_trip_cost_at(value: Decimal) -> Decimal:
+            return schedule.round_trip(value, price)
+
+        cost_note = f"{broker} schedule on {mic}" if on_broker_terms else f"{mic} fee schedule"
+
+        # The same impossibility the --cost-bps path below already guards, on the
+        # path a real account actually takes. moomoo's 0.03% commission is 6 bps
+        # round trip at ANY size, above the 5 bps XNAS floor - so the bisection
+        # in cost_floor_value never comes down and returns its ceiling, which
+        # reads as a USD 100,000,000 position requirement rather than as "this
+        # account cannot trade this venue economically at all".
+        floor_bps = cost_floor_bps(mic, broker)
+        if cost_floor_unreachable(cost_floor_value(round_trip_cost_at, mic, broker)):
+            asymptote = schedule.round_trip_bps(Decimal("100000000"), price)
+            print(f"sizing    {a.instrument}")
+            print(
+                f"  no position: on the {cost_note} a round trip costs "
+                f"{asymptote.quantize(Decimal('0.01'))} bps at ANY size, above the "
+                f"{floor_bps} bps floor for {mic}."
+            )
+            print(
+                "  No position can pay its own spread here. This is a fact about "
+                "the account, not about the size you asked for."
+            )
+            return 0
     except KeyError:
         rate = Decimal(str(a.cost_bps)) / Decimal(10_000)
         minimum = Decimal(str(a.cost_minimum))
@@ -604,6 +642,7 @@ def cmd_size(a) -> int:
         stop_distance_frac=stop_frac,
         adv_20d=Decimal(str(a.adv)),
         round_trip_cost_at=round_trip_cost_at,
+        broker=broker,
         risk_per_trade=Decimal(str(a.risk_per_trade)),
         single_name_limit=Decimal(str(a.single_name)),
         win_rate=a.win_rate,
