@@ -539,3 +539,25 @@ def test_a_clean_sweep_says_nothing_rather_than_an_empty_note():
     import ask
 
     assert ask._sweep_note([], []) == ""
+
+
+def test_the_starved_name_leads_the_next_day():
+    """`_fetch_each` stops at the deadline, so a fixed order starves the same
+    names every time. Alphabetically the tail is Maybank, Petronas Chemicals,
+    Press Metal and Tenaga - the whole Bursa side of a Malaysian book."""
+    import ask
+
+    terms = ("Apple", "Genting", "Maybank", "Tenaga")
+    seen_first = {ask._rotate(terms, day)[0] for day in range(4)}
+    assert seen_first == set(terms), "every name leads on some day"
+
+
+def test_rotation_keeps_every_name_and_the_order_within_a_run():
+    import ask
+
+    terms = ("Apple", "Genting", "Maybank", "Tenaga")
+    for day in range(9):
+        r = ask._rotate(terms, day)
+        assert sorted(r) == sorted(terms), "rotation drops nothing and invents nothing"
+        assert ask._rotate(terms, day) == r, "a run is reproducible from its date"
+    assert ask._rotate((), 3) == ()

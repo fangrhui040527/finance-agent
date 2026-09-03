@@ -794,6 +794,27 @@ def cmd_news(a) -> int:
 SWEEP_DEADLINE_SECONDS = 600
 
 
+def _rotate(terms, day: int):
+    """Start each run at a different name.
+
+    `_fetch_each` works through the list in order and stops at the deadline, so
+    a fixed order means the same names are read every day and the same names
+    are starved every day. Alphabetically that is Apple first and Tenaga last -
+    and on a Malaysian book the starved tail is Maybank, Petronas Chemicals,
+    Press Metal and Tenaga, which is precisely backwards.
+
+    Observed rather than theorised: the 09:48 sweep reached 5 names of 9 and the
+    10:06 sweep reached 3, both times the same first few.
+
+    Rotating by the day means a name skipped today leads tomorrow. Order within
+    a run stays deterministic, so a run is still reproducible from its date.
+    """
+    if not terms:
+        return terms
+    n = day % len(terms)
+    return tuple(terms[n:]) + tuple(terms[:n])
+
+
 def _sweep_note(failed, skipped) -> str:
     """What a partially-successful sweep must still say.
 
@@ -923,7 +944,7 @@ def cmd_sweep(a) -> int:
                         # immediate today, but a lambda that reads a loop
                         # variable late is a bug waiting for the day it is not.
                         lambda q, _n=name, _kw=kw: adapter_for(_n, **{**_kw, "query": q}),
-                        terms,
+                        _rotate(terms, started.toordinal()),
                         since,
                         a.limit,
                         deadline=deadline,
