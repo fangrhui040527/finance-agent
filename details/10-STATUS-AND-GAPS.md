@@ -23,7 +23,7 @@ invisible.
 | Sizing — 5 caps, binding cap, lot rounding, cost floor, `NoPosition` | complete |
 | Investable-capital waterfall — emergency floor, goals, debt hurdle | complete, **and reachable since 2026-08-30** — see the note below |
 | 11 market adapters, fee schedules, alias map | complete |
-| **Broker fee schedules** — `moomoo_my` on XNAS, per-share and per-order legs, broker-aware cost floor | complete, **and reachable** via `[account] broker` |
+| **Broker fee schedules** — `moomoo_my` on XNAS **and XKLS**, from the account's real card | complete, **and reachable** via `[account] broker` |
 | **MYR unit-of-account boundary** | complete |
 | Knowledge graph — schema, store, ids, 6 extractors, reproducible build | complete |
 | Event taxonomy, base rates, catalyst attachment | complete |

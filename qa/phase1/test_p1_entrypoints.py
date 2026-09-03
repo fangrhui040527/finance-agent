@@ -195,9 +195,12 @@ def test_risk_reports_every_breach(run_cli):
     assert "drawdown 10.0%" in out and "risk per trade cut to 75%" in out
 
 
-def test_size_on_bursa_uses_the_markets_own_schedule_and_finds_lots(run_cli):
+def test_size_on_bursa_uses_the_markets_own_schedule_and_finds_lots(run_cli, venue_only_env):
+    """The VENUE's schedule and floor. What a moomoo account pays on Bursa is a
+    different question, answered in tests/test_broker_fees.py."""
     out = ok(run_cli(["ask.py", "size", "MYX:1155", "--portfolio", "200000",
-                      "--price", "6.20", "--stop", "5.60", "--adv", "900000"]))
+                      "--price", "6.20", "--stop", "5.60", "--adv", "900000"],
+                     env_extra=venue_only_env))
     assert "XKLS fee schedule" in out
     assert "60 bps round trip on XKLS" in out
     assert re.search(r"-> [\d,]+ units", out)

@@ -5,10 +5,14 @@ A12, A13 and A14 were tested classes with no way for an operator to run them,
 and the price feed had no entrypoint at all.
 """
 
+import pathlib
+
 import pytest
 
 import ask
 from core.market.feed import StooqFeed
+
+ROOT = pathlib.Path(__file__).resolve().parent.parent
 
 CSV = """Date,Open,High,Low,Close,Volume
 2026-01-02,10.00,10.40,9.90,10.30,1000000
@@ -196,7 +200,23 @@ def test_a_non_numeric_weight_is_refused():
 
 
 # -- sizing (A13) -------------------------------------------------------------
-def test_sizing_uses_the_markets_own_fee_schedule(capsys):
+@pytest.fixture
+def venue_only_config(tmp_path, monkeypatch):
+    """A config with NO broker selected, so these two casesare about the VENUE.
+
+    config.toml ships with `broker = "moomoo_my"`, which is right for the
+    account and wrong for a test whose subject is Bursa's own schedule and
+    Bursa's own documented floor. Both numbers below are venue facts and stay
+    true; they are simply not what a moomoo account pays.
+    """
+    shipped = (ROOT / "config.toml").read_text()
+    kept = [ln for ln in shipped.splitlines() if not ln.startswith("broker =")]
+    cfg = tmp_path / "config.toml"
+    cfg.write_text("\n".join(kept))
+    monkeypatch.setenv("FINPLANET_CONFIG", str(cfg))
+
+
+def test_sizing_uses_the_markets_own_fee_schedule(capsys, venue_only_config):
     code, out = run(
         [
             "size",
@@ -217,8 +237,11 @@ def test_sizing_uses_the_markets_own_fee_schedule(capsys):
     assert "60 bps round trip on XKLS" in out, "MYX must resolve to Bursa's floor, not the default"
 
 
-def test_the_documented_minimum_bursa_position_appears(capsys):
-    """README records ~RM 4,700. A flat-bps cost model cannot produce it: fees as
+def test_the_documented_minimum_bursa_position_appears(capsys, venue_only_config):
+    """README records ~RM 4,700, which is a VENUE figure - what Bursa's own
+    schedule implies, not what a moomoo account pays (see test_broker_fees).
+
+    A flat-bps cost model cannot produce it: fees as
     a constant fraction never fall with size, so the bisection runs to its
     ceiling and reports RM 100,000,000."""
     _, out = run(
