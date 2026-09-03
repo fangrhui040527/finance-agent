@@ -158,16 +158,33 @@ def watchlist_query(instrument_ids: Iterable[str]) -> str:
     Returns "" for an empty book, which leaves the adapter's own default alone -
     a caller with nothing to watch should not be handed an empty `()` group.
     """
+    terms = watchlist_terms(instrument_ids)
+    if not terms:
+        return ""
+    return "(" + " OR ".join(f'"{t}"' for t in terms) + ")"
+
+
+def watchlist_terms(instrument_ids: Iterable[str]) -> tuple[str, ...]:
+    """One search phrase per company, in a stable order.
+
+    The sweep asks for these ONE AT A TIME. A single OR'd query sorted
+    newest-first is won by whichever name publishes most: measured on the
+    2026-09-03 09:11 sweep, nine names and 250 records produced 34 attributed
+    articles and every one was US tech - Apple alone took 20, while Maybank,
+    Tenaga, Petronas Chemicals, IHH, Press Metal and Genting got nothing at all.
+    On a Malaysian book that is the wrong 250 articles.
+
+    `watchlist_query` joins these into the combined form, so the two can never
+    disagree about which phrase names a company.
+    """
     wanted = {str(i) for i in instrument_ids}
     if not wanted:
-        return ""
+        return ()
     primary: dict[str, str] = {}
     for surface, iid in _index_from_aliases().items():
         if iid in wanted and len(surface) >= MIN_PHRASE_CHARS:
             primary.setdefault(iid, surface)
-    if not primary:
-        return ""
-    return "(" + " OR ".join(f'"{f}"' for f in sorted(primary.values())) + ")"
+    return tuple(sorted(primary.values()))
 
 
 def entity_index() -> dict[str, str]:

@@ -785,6 +785,66 @@ def cmd_news(a) -> int:
     return 0
 
 
+#: How long `cmd_sweep` will keep starting new per-company requests. One request
+#: per name at ~40s each is about six minutes for nine names, but a name whose
+#: request times out costs up to 4.5min on its own, and nine of those would run
+#: past the collect job's 15min cap - which kills the job before ANY of it is
+#: committed. Past this the sweep stops fetching, keeps what it has and records
+#: which names it never reached.
+SWEEP_DEADLINE_SECONDS = 600
+
+
+def _sweep_note(failed, skipped) -> str:
+    """What a partially-successful sweep must still say.
+
+    A sweep where one name failed is not a failed sweep - the other eight were
+    read, and marking the whole run FAILED would move no watermark and re-read
+    them tomorrow. But it is not a clean one either, and a name that fails
+    quietly every day would otherwise be indistinguishable from a name nobody
+    is writing about.
+    """
+    parts = []
+    if failed:
+        parts.append("failed: " + ", ".join(t for t, _ in failed))
+    if skipped:
+        parts.append("not reached: " + ", ".join(skipped))
+    return "; ".join(parts)
+
+
+def _fetch_each(make_feed, terms, since, limit, deadline=None, clock=None):
+    """One request per company, rather than one OR'd query for all of them.
+
+    A combined query sorted newest-first is won by whichever name publishes
+    most. Measured on the 2026-09-03 09:11 sweep: nine names, 250 records, 34
+    attributed articles, and every one of them a US tech company - Apple alone
+    took 20, while all six Bursa names got nothing. On a Malaysian book that is
+    the wrong 250 articles, and no amount of collecting for longer fixes it.
+
+    Splitting the budget per name costs one request each. Returns the combined
+    records with the names that failed and the names never reached, because a
+    sweep where Maybank quietly failed every day must not read as a sweep where
+    Maybank was quiet.
+    """
+    from knowledge.feeds.adapter import FeedError
+
+    tick = clock or (lambda: datetime.now(UTC))
+    per = max(1, limit // max(1, len(terms)))
+    records: list = []
+    failed: list[tuple[str, str]] = []
+    skipped: list[str] = []
+    for term in terms:
+        if deadline is not None and tick() >= deadline:
+            skipped.append(term)
+            continue
+        try:
+            got = make_feed(f'"{term}"').fetch(since, limit=per)
+        except FeedError as e:
+            failed.append((term, str(e)))
+            continue
+        records.extend(got)
+    return records, failed, skipped
+
+
 def cmd_sweep(a) -> int:
     """Fetch every enabled source and KEEP what arrives.
 
@@ -804,7 +864,7 @@ def cmd_sweep(a) -> int:
     from knowledge.corpus import FAILED, OK, Corpus
     from knowledge.feeds.adapter import FeedError
     from knowledge.feeds.registry import UnknownSource, adapter_for
-    from knowledge.graph.extractors.gdelt import entity_index, watchlist_query
+    from knowledge.graph.extractors.gdelt import entity_index, watchlist_query, watchlist_terms
 
     try:
         cfg = load_cfg()
@@ -823,7 +883,11 @@ def cmd_sweep(a) -> int:
 
     index = entity_index()
     holdings, watchlist = set(cfg.holdings), set(cfg.watchlist)
+    # An explicit query in config is honoured as one request; without one the
+    # book is asked for a name at a time.
+    terms = () if cfg.gdelt_query else watchlist_terms(tuple(cfg.watchlist) + tuple(cfg.holdings))
     started = datetime.now(UTC)
+    deadline = started + _td(seconds=SWEEP_DEADLINE_SECONDS)
     run_id = started.strftime("%Y%m%dT%H%M%S")
     failed = 0
 
@@ -850,7 +914,41 @@ def cmd_sweep(a) -> int:
                     else {}
                 )
                 feed = adapter_for(name, **kw)
-                records = feed.fetch(since, limit=a.limit)
+                if name == "gdelt" and terms:
+                    # One request per company. See _fetch_each: a single OR'd
+                    # query is won by whichever name publishes most, and on a
+                    # Malaysian book that meant six Bursa names got nothing.
+                    records, per_failed, per_skipped = _fetch_each(
+                        # Bound as defaults, not captured: the call is
+                        # immediate today, but a lambda that reads a loop
+                        # variable late is a bug waiting for the day it is not.
+                        lambda q, _n=name, _kw=kw: adapter_for(_n, **{**_kw, "query": q}),
+                        terms,
+                        since,
+                        a.limit,
+                        deadline=deadline,
+                    )
+                    for term, err in per_failed:
+                        print(f"  {'':<16} {term:<20} {err}", file=sys.stderr)
+                    if per_skipped:
+                        print(
+                            f"  {'':<16} not reached before the deadline: {', '.join(per_skipped)}",
+                            file=sys.stderr,
+                        )
+                    if not records and (per_failed or per_skipped):
+                        # Summarised, not concatenated: nine names refused by
+                        # the same proxy produce nine copies of one sentence,
+                        # and record_sweep keeps only the first 400 characters.
+                        first = per_failed[0][1] if per_failed else "deadline reached"
+                        raise FeedError(
+                            f"no name could be read "
+                            f"({len(per_failed)} failed, {len(per_skipped)} not reached). "
+                            f"First: {first}"
+                        )
+                    notes = _sweep_note(per_failed, per_skipped)
+                else:
+                    records = feed.fetch(since, limit=a.limit)
+                    notes = ""
             except UnknownSource as e:
                 print(f"  {name:<16} REFUSED: {e}", file=sys.stderr)
                 return 2
@@ -877,6 +975,7 @@ def cmd_sweep(a) -> int:
                 duplicates=stored.duplicates,
                 unlinked=stats.unlinked,
                 escalated=stats.escalated,
+                detail=notes,
             )
             print(f"  {name:<16} since {since:%Y-%m-%d %H:%M}  {stats}\n  {'':<16} {stored}")
 

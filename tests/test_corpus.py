@@ -451,3 +451,91 @@ def test_a_short_name_falls_back_to_a_longer_alias_not_to_nothing():
 
     q = watchlist_query(["MYX:5225"])  # aliases: "IHH", "IHH Healthcare"
     assert q == '("IHH Healthcare")'
+
+
+# --- one request per company ------------------------------------------------------
+
+
+def test_terms_and_the_combined_query_cannot_disagree():
+    from knowledge.graph.extractors.gdelt import watchlist_query, watchlist_terms
+
+    ids = ["MYX:1155", "XNAS:NVDA"]
+    terms = watchlist_terms(ids)
+    q = watchlist_query(ids)
+    assert terms == ("Maybank", "NVIDIA")
+    for t in terms:
+        assert f'"{t}"' in q
+
+
+def test_each_company_is_asked_for_separately_with_its_own_share():
+    """The defect: one OR'd query sorted newest-first is won by whichever name
+    publishes most. Nine names and 250 records produced 34 attributed articles,
+    every one US tech, Apple alone taking 20, and all six Bursa names nothing."""
+    import ask
+
+    asked = []
+
+    class _Feed:
+        def __init__(self, q):
+            self.q = q
+
+        def fetch(self, since, limit):
+            asked.append((self.q, limit))
+            return [{"id": f"{self.q}-1"}]
+
+    records, failed, skipped = ask._fetch_each(_Feed, ("Maybank", "Tenaga", "NVIDIA"), NOW, 90)
+    assert [q for q, _ in asked] == ['"Maybank"', '"Tenaga"', '"NVIDIA"']
+    assert {lim for _, lim in asked} == {30}, "the budget is split, not spent on the loudest"
+    assert len(records) == 3 and not failed and not skipped
+
+
+def test_one_name_failing_does_not_lose_the_others():
+    """A sweep where Maybank failed is not a sweep where nothing was read."""
+    import ask
+    from knowledge.feeds.adapter import FeedError
+
+    class _Feed:
+        def __init__(self, q):
+            self.q = q
+
+        def fetch(self, since, limit):
+            if "Maybank" in self.q:
+                raise FeedError("timed out")
+            return [{"id": self.q}]
+
+    records, failed, skipped = ask._fetch_each(_Feed, ("Maybank", "Tenaga"), NOW, 50)
+    assert len(records) == 1
+    assert failed == [("Maybank", "timed out")] and not skipped
+    assert "failed: Maybank" in ask._sweep_note(failed, skipped)
+
+
+def test_the_deadline_keeps_what_it_has_instead_of_being_killed_mid_run():
+    """Nine names that each time out would run past the job's cap, and a killed
+    job commits nothing at all. Stopping early keeps the names already read."""
+    import ask
+
+    class _Feed:
+        def __init__(self, q):
+            self.q = q
+
+        def fetch(self, since, limit):
+            return [{"id": self.q}]
+
+    ticks = iter([NOW, NOW + timedelta(hours=1), NOW + timedelta(hours=1)])
+    records, failed, skipped = ask._fetch_each(
+        _Feed,
+        ("Maybank", "Tenaga", "NVIDIA"),
+        NOW,
+        50,
+        deadline=NOW + timedelta(minutes=10),
+        clock=lambda: next(ticks),
+    )
+    assert len(records) == 1, "the first name was read before the deadline"
+    assert skipped == ["Tenaga", "NVIDIA"] and not failed
+    assert "not reached: Tenaga, NVIDIA" in ask._sweep_note(failed, skipped)
+
+
+def test_a_clean_sweep_says_nothing_rather_than_an_empty_note():
+    import ask
+
+    assert ask._sweep_note([], []) == ""
