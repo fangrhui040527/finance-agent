@@ -71,28 +71,108 @@ to read. Every test runs against a double.
 place to correct it is `MoomooAccountFeed._positions`, which is the only method
 that knows moomoo's column names.
 
-## 5. Using it
+## 5. Setting it up — the checklist
+
+### First, what you do NOT do
+
+- ❌ **You do not log in from the command line.** There is no `login` command
+  here and there never will be. Logging in happens in moomoo's own program.
+- ❌ **You do not put your moomoo password in `.env`, `config.toml`, or
+  anywhere in this repository.** `MoomooAccountFeed` takes no credential
+  argument and `tests/test_broker_readonly.py` fails if one is ever added.
+- ❌ **You do not give this system your trading password.** That password is
+  what unlocks order placement. Never typing it here is precisely why this
+  connection cannot trade (§3).
+
+The login lives in OpenD, on your machine, under your control. This system
+connects to OpenD, not to moomoo.
+
+### The steps
+
+**1. Enable the API on your moomoo account**
+
+In the moomoo app or on their website, find the developer / OpenAPI section and
+enable it for your account. Some markets require agreeing to separate terms.
+
+*If you cannot find it, this is the step to ask moomoo support about — it is
+their setting, not ours.*
+
+**2. Download and install OpenD**
+
+OpenD is moomoo's gateway program. It comes in two forms: a windowed version
+and a command-line one. **Take the windowed version** — it is easier to log
+into and easier to see the state of.
+
+Get it from moomoo's own developer download page. Do not install a build of it
+from anywhere else.
+
+**3. Start OpenD and log in — this is the login step**
+
+Open OpenD and sign in with your normal moomoo account. It will ask for the
+usual second factor. OpenD holds that session; nothing else needs it.
+
+Leave OpenD **running**. Close it and `ask.py positions` stops working, which
+is the correct behaviour: no gateway, no read.
+
+**4. Confirm OpenD is listening**
+
+It should be on `127.0.0.1` port `11111` — the default this code uses. `127.0.0.1`
+means "this machine only": OpenD is not reachable from the internet.
+
+If OpenD shows a different port, pass it through when you construct the feed
+rather than changing OpenD.
+
+**5. Install the optional package**
 
 ```bash
-uv add futu-api            # once
-# start OpenD and log in
-python ask.py positions              # the MY account
-python ask.py positions --market US  # the US one
+uv add futu-api
 ```
 
-Three outcomes, deliberately distinguishable:
+Not installed by default: it pulls in pandas and protobuf, and this system runs
+offline and keyless without them.
 
-| what you see | what it means |
-|---|---|
-| a list of holdings | it worked |
-| `holdings none. The account was read and holds nothing.` | the account is genuinely empty |
-| `account unavailable: ...` (exit 3) | the link failed — **not** an empty account |
+**6. Read the account**
 
-That last distinction is the point of the whole error design. An empty holdings
-list feeds every concentration measure in the system; a dead gateway that read
-as "you own nothing" would silently re-plan a portfolio around a book that does
-not exist. A broken source and a quiet one are different answers — the same rule
-`knowledge/feeds/adapter.py` sets for news.
+```bash
+python ask.py positions              # your Bursa account
+python ask.py positions --market US  # your US account
+```
+
+### What each outcome means
+
+| what you see | what it means | what to do |
+|---|---|---|
+| a list of holdings | it worked | paste the `holdings = [...]` line into `config.toml` |
+| `holdings none. The account was read and holds nothing.` | the connection worked; the account is empty | nothing — this is correct for an unfunded account |
+| `account unavailable: ... futu-api` | step 5 not done | `uv add futu-api` |
+| `account unavailable: could not reach the moomoo gateway` | OpenD is not running, not logged in, or on another port | go back to step 3 |
+| `no instrument mapping for broker market 'XX'` | your account holds a market this system has no mapping for | tell me the code and I will add it to `MARKET_PREFIXES` |
+
+### If something else goes wrong
+
+**Remember this has never run against a real gateway.** The first real run is
+the real test. If moomoo returns a column name this code does not expect, the
+one place to fix it is `MoomooAccountFeed._positions` in
+`core/broker/moomoo.py` — it is the only method that knows moomoo's own
+vocabulary. Send me the error and I will correct it.
+
+One known possibility: OpenD can be configured to require an **encrypted**
+connection, in which case the SDK needs an RSA key file
+(`SysConfig.set_init_rsa_file`). This code does not set one, so if you have
+turned that on in OpenD, either turn it off for local use or tell me and I will
+add the option.
+
+### Confidence
+
+**Verified**, read from the `futu-api` 10.10.7008 package source: the default
+address `127.0.0.1:11111`, the connection class, the methods and columns used,
+`TrdMarket.MY` and `Currency.MYR` support, and the optional RSA setting.
+
+**Not verified**, because moomoo's site is unreachable from the environment
+this was written in: where exactly OpenD is downloaded, what its screens look
+like, and whether your specific Malaysian account tier has API access enabled.
+Steps 1 and 2 are therefore a description of the shape of the task, not a
+click-by-click guide. If moomoo's actual flow differs, trust moomoo.
 
 ## 6. Limits
 
