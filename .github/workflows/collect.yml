@@ -1,0 +1,99 @@
+# The daily sweep. `ask.py sweep` pulls the enabled news sources, stores what is
+# new in data/corpus.db, links it into data/graph.db, and records the attempt -
+# success or failure - in the sweeps table.
+#
+# It runs HERE rather than on the dev machine for one reason: news expires. The
+# GDELT window is recent-only, so a day nothing collects is a day that cannot be
+# fetched later. A laptop collects nothing while it is closed; this does not.
+#
+# DAILY, not weekdays. config.toml sets sweep_silence_hours = 30 - a daily
+# schedule plus six hours of slack - so a weekday-only schedule would trip that
+# alert every Saturday by design rather than by fault.
+name: collect
+
+on:
+  schedule:
+    # 10:00 UTC = 18:00 MYT, about an hour after Bursa closes.
+    - cron: "0 10 * * *"
+  # A job you cannot fire by hand is a job you cannot recover - the same reason
+  # ci.yml carries this. Also how the first run gets proven.
+  workflow_dispatch:
+
+# The sweep COMMITS what it collected. ci.yml is contents: read; this one cannot
+# be, and it is the only workflow here that writes.
+permissions:
+  contents: write
+
+# Two sweeps at once would race on the same commit. They would not corrupt the
+# corpus - Corpus.add is INSERT OR IGNORE and the database decides - but the
+# push would conflict and one run's evidence would be lost.
+concurrency:
+  group: collect
+  cancel-in-progress: false
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.12"
+          enable-cache: true
+
+      - name: Install
+        run: uv sync --frozen
+
+      # Exit codes are the sweep's interface, so read them instead of flattening
+      # them with `|| true`:
+      #   0  every enabled source read
+      #   2  the sweep could not run at all - bad config, no adapter
+      #   3  at least one source failed; the failure IS recorded in the corpus
+      #
+      # 3 still commits. A failed sweep that leaves no trace is indistinguishable
+      # from a quiet day, which is the whole reason the sweeps table records
+      # failures. The job is still marked failed afterwards so a person looks.
+      - name: Sweep
+        id: sweep
+        run: |
+          set +e
+          uv run python ask.py sweep
+          echo "code=$?" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: What the corpus holds now
+        run: |
+          uv run python -c "
+          from knowledge.corpus import Corpus
+          with Corpus() as c:
+              print(c.counts())
+          "
+
+      - name: Commit what was collected
+        if: steps.sweep.outputs.code == '0' || steps.sweep.outputs.code == '3'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/corpus.db data/graph.db
+          # Nothing new is a normal outcome, not a failure: a quiet day, or a day
+          # every story was one the corpus already held.
+          if git diff --cached --quiet; then
+            echo "nothing new to commit"
+            exit 0
+          fi
+          # [skip ci] because this is a data commit - ci.yml runs on every branch
+          # push, and ten test jobs to validate a row of news is waste.
+          git commit -m "chore(corpus): the $(date -u +%Y-%m-%d) sweep [skip ci]"
+          git push
+
+      - name: Fail if a source failed
+        if: steps.sweep.outputs.code != '0'
+        run: |
+          echo "sweep exited ${{ steps.sweep.outputs.code }}"
+          echo "  2 = could not run (config or adapter)"
+          echo "  3 = a source failed; see the sweeps table in data/corpus.db"
+          exit 1
