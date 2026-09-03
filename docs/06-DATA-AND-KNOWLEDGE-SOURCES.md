@@ -93,7 +93,7 @@ Every external dependency, its role, its licence posture and its refresh cadence
 |---|---|---|---|---|
 | **Primary global vendor** | EOD + fundamentals + calendars across T1–T3 | Global incl. KLSE (MIC `XKLS`) | EOD + delayed intraday | Also exposes historical index components — the raw material for survivorship-safe universe snapshots |
 | **Secondary / news vendor** | Quotes, company news, earnings calendars, WebSocket | Global | Real-time | Generous free tier; fundamentals are shallow — use for quotes and calendars, not statements |
-| **ASEAN specialist** | Fallback for MY/SG/HK/JP/IN/TW/TH/VN depth | ASEAN + Asia | Real-time | Use if the primary's Bursa depth disappoints |
+| **moomoo OpenAPI** (ASEAN specialist) | Daily bars and quotes for MY/HK/US/SG. **Wired — `markets/sources/moomoo_quotes.py`** | MY, HK, US, SG | Daily bars; real-time quotes available | Local OpenD gateway, so no API key — the broker login is the credential. US LV3 free during the promo, HK LV1 free, HK LV2 paid. **QUOTES ONLY**: the SDK's trade context is never imported, enforced by `tests/test_price_sources.py` on top of the repo-wide execution grep. OpenD must be running *and manually logged in* — v10.10 removed credentials from the config file |
 | **Yahoo Finance (unofficial)** | Dev-time fallback only | Broad | — | **Never load-bearing.** No official API; endpoints break without notice |
 | **Exchange direct** | Announcements, corporate actions, suspension notices | Per market | Event | The only authoritative source for `announced_at` |
 

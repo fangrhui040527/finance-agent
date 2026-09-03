@@ -161,11 +161,14 @@ def test_the_cli_refuses_to_grade_before_the_horizon(tmp_path, capsys):
 
 
 def test_the_cli_grades_against_the_benchmark_not_zero(tmp_path, capsys):
+    # Relative to today on purpose: the CLI stamps made_at from the real clock,
+    # so a hardcoded grade_on is a test that passes until that date arrives.
+    grade_on = (date.today() + timedelta(days=21)).isoformat()
     path = db(tmp_path)
-    run(["log", "X", "1", "21d", "0.6", "s", "--id", "p1", "--grade-on", "2026-09-22"],
+    run(["log", "X", "1", "21d", "0.6", "s", "--id", "p1", "--grade-on", grade_on],
         path, capsys)
     code, out = run(["grade", "p1", "--return", "0.031", "--benchmark", "0.048",
-                     "--today", "2026-09-22"], path, capsys)
+                     "--today", grade_on], path, capsys)
     assert code == 0
     assert "wrong" in out, "up 3.1% against a benchmark up 4.8% is wrong"
 
@@ -188,11 +191,18 @@ def test_the_cli_shows_the_calibration_table_once_there_is_enough(tmp_path, caps
 
 def test_due_lists_overdue_items(tmp_path, capsys):
     """Overdue is reached by time passing, never by backdating grade_on - the
-    contract refuses that, which is why --today exists instead."""
+    contract refuses that, which is why --today exists instead.
+
+    Both dates are relative to today for the same reason: this test hardcoded
+    2026-09-01 and began failing the day that date became the past, which is a
+    test rotting rather than a contract breaking.
+    """
     path = db(tmp_path)
-    run(["log", "X", "1", "5d", "0.6", "s", "--id", "p1", "--grade-on", "2026-09-01"],
-        path, capsys)
-    _, out = run(["due", "--today", "2026-09-06"], path, capsys)
+    grade_on = date.today() + timedelta(days=1)
+    overdue_by_5 = (grade_on + timedelta(days=5)).isoformat()
+    run(["log", "X", "1", "5d", "0.6", "s", "--id", "p1",
+         "--grade-on", grade_on.isoformat()], path, capsys)
+    _, out = run(["due", "--today", overdue_by_5], path, capsys)
     assert "5d overdue" in out
 
 

@@ -104,3 +104,13 @@ gdelt_languages = []
 
 # Source countries, ISO-style codes as GDELT spells them. Empty means worldwide.
 gdelt_countries = []
+
+# moomoo OpenD, for daily bars across MY/HK/US/SG. QUOTES ONLY - this system has
+# no broker connection and the price source imports no trade context.
+#
+# The gateway must be RUNNING and LOGGED IN. Since OpenD v10.10 the credentials
+# left the config file, so login is manual after every reboot; there is no
+# unattended start. Absent gateway = the source raises, never empty bars.
+moomoo_enabled = false
+moomoo_host = "127.0.0.1"
+moomoo_port = 11111
