@@ -49,6 +49,7 @@ from engines.attribution.regression import huber_fit
 from engines.risk.concentration import Limits, Position
 from engines.sizing.caps import cost_floor_bps, cost_floor_value, to_base
 from knowledge.retrieval.pipeline import Router
+from markets.brokers import cost_at
 from markets.registry import get as market_get
 from markets.registry import known_prefixes, market_currency, mic_of, supported
 from mcp_server.protocol import ToolError
@@ -670,14 +671,6 @@ def _fx_base_per_quote(currency: str, cfg) -> tuple[Decimal | None, str]:
     return None, ""
 
 
-def _cost_at(mic: str, broker: str | None, price: Decimal):
-    """A value-only round-trip cost function for this name, at this price."""
-    from markets.brokers import schedule_for
-
-    schedule = schedule_for(mic, broker)
-    return lambda value: schedule.round_trip(value, price)
-
-
 def _candidates(specs: list, fetch: bool = False, end=None, notes: list | None = None) -> list:
     """`MIC:CODE:PRICE:STOP:ADV:SECTOR` -> Candidates, one parser for every surface.
 
@@ -747,7 +740,7 @@ def _candidates(specs: list, fetch: bool = False, end=None, notes: list | None =
                 # bound in here because a broker schedule may charge per share,
                 # and Candidate.round_trip_cost_at is a value-only callable -
                 # the price is known at this point and is not known downstream.
-                round_trip_cost_at=_cost_at(mic, cfg.broker, price),
+                round_trip_cost_at=cost_at(mic, cfg.broker, price),
             )
         )
     return out
@@ -1060,6 +1053,7 @@ def rebalance_book(
         limits=cfg.limits,
         risk_per_trade=_positive(risk_per_trade, "risk_per_trade"),
         single_name_limit=_positive(single_name_limit, "single_name_limit"),
+        broker=cfg.broker,
     )
 
     shape = ""

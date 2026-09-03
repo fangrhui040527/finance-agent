@@ -308,6 +308,25 @@ def pinned_tier() -> Tier | None:
     return None
 
 
+def pin_source() -> str | None:
+    """Which variable pinned the tier, or None when nothing did.
+
+    `pinned_tier` deliberately collapses two spellings into one answer, because
+    the router does not care which one an operator wrote. The DISCLOSURE cares:
+    an operator told the pin came from FINPLANET_MODEL unsets FINPLANET_MODEL,
+    sees the run still capped to Haiku, and has been sent to the one place the
+    fault is not. Naming the wrong variable is not a smaller error than naming
+    no variable - it costs more, because it is followed.
+    """
+    import os
+
+    if os.environ.get("FINPLANET_MODEL", "").strip():
+        return "FINPLANET_MODEL"
+    if os.environ.get("FINPLANET_CHEAP", "").strip() in ("1", "true", "yes"):
+        return "FINPLANET_CHEAP"
+    return None
+
+
 def cheap_capped() -> bool:
     """True when every Messages tier resolves to the cheapest model.
 
@@ -399,7 +418,7 @@ def selection_note() -> str:
     pin, effort = pinned_tier(), selected_effort()
     parts: list[str] = []
     if pin is not None:
-        parts.append(f"every Messages tier pinned to {MODEL_IDS[pin]} (FINPLANET_MODEL)")
+        parts.append(f"every Messages tier pinned to {MODEL_IDS[pin]} ({pin_source()})")
     if effort is not None:
         parts.append(f"effort {effort.value} (FINPLANET_EFFORT)")
         if pin is None or pin is Tier.CHEAP:

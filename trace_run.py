@@ -61,6 +61,7 @@ from engines.attribution.regression import huber_fit
 from engines.risk.concentration import Limits, Position
 from engines.sizing.caps import CurrencyMismatch, cost_floor_bps, cost_floor_value
 from knowledge.retrieval.pipeline import Router
+from markets.brokers import cost_at
 from markets.registry import get as market_get
 from markets.registry import supported
 from ui.render import decomposition_bars
@@ -491,13 +492,12 @@ def run(live: str | None = None) -> dict:
                 )
             with span("a13_sizing", kind="agent", agent="a13_sizing"):
                 a13 = A13Sizing(ctx)
-                adapter = market_get("MYX")
                 for label, pv in (("funded", Decimal(200_000)), ("too small", Decimal(5_000))):
                     caps, fs = a13.caps(
                         portfolio_value=pv,
                         stop_distance_frac=Decimal("0.0968"),
                         adv_20d=Decimal(900_000),
-                        round_trip_cost_at=adapter.fee_schedule.round_trip,
+                        round_trip_cost_at=cost_at("MYX", cfg.broker, Decimal("10.68")),
                         mic="MYX",
                     )
                     binding, value = caps.binding()
@@ -515,12 +515,11 @@ def run(live: str | None = None) -> dict:
                 # The book is MYR and this market is not. The trace should show
                 # BOTH numbers, because a cap in USD is not a fact about the
                 # book and a cap in MYR does not buy shares.
-                nas = market_get("XNAS")
                 caps, fs = a13.caps(
                     portfolio_value=Decimal(200_000),
                     stop_distance_frac=Decimal("0.0833"),
                     adv_20d=Decimal(30_000_000_000),
-                    round_trip_cost_at=nas.fee_schedule.round_trip,
+                    round_trip_cost_at=cost_at("XNAS", cfg.broker, Decimal("120.00")),
                     mic="XNAS",
                     fx_base_per_quote=Decimal("4.20"),
                 )
@@ -541,7 +540,7 @@ def run(live: str | None = None) -> dict:
                         portfolio_value=Decimal(200_000),
                         stop_distance_frac=Decimal("0.0833"),
                         adv_20d=Decimal(30_000_000_000),
-                        round_trip_cost_at=nas.fee_schedule.round_trip,
+                        round_trip_cost_at=cost_at("XNAS", cfg.broker, Decimal("120.00")),
                         mic="XNAS",
                     )
                     emit(

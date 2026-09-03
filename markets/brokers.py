@@ -127,6 +127,30 @@ def known_brokers() -> tuple[str, ...]:
     return tuple(sorted({broker for broker, _ in BROKER_SCHEDULES}))
 
 
+def prices_venue(broker: str | None, mic: str) -> bool:
+    """True when this broker sets its own terms on this venue.
+
+    The label question. A broker that does not price a venue falls through to
+    the venue's schedule, and output that still named the broker would credit
+    it for a number the exchange supplied.
+    """
+    from markets.registry import resolve_mic
+
+    return broker is not None and (broker, resolve_mic(mic)) in BROKER_SCHEDULES
+
+
+def cost_at(mic: str, broker: str | None, price: Decimal):
+    """A value-only round-trip cost function for this name, at this price.
+
+    Every sizing surface takes `round_trip_cost_at` as a callable of value
+    alone, which a per-share leg cannot answer. The price is known where a
+    candidate is built and unknown downstream, so it is bound in here rather
+    than threaded through six signatures that have no use for it.
+    """
+    schedule = schedule_for(mic, broker)
+    return lambda value: schedule.round_trip(value, price)
+
+
 def schedule_for(mic: str, broker: str | None = None) -> FeeSchedule:
     """The schedule this account actually pays on this venue.
 
