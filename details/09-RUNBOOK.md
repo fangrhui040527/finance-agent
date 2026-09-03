@@ -97,6 +97,47 @@ when something **critical** is missing. A fresh checkout reports several
 non-critical checks as unavailable and still works: "nothing configured yet" is
 a valid state, not a broken one.
 
+### `sweep` — fetch every enabled source and KEEP what arrives
+
+```bash
+python ask.py sweep                       # every source in [sources] enabled
+python ask.py sweep --source gdelt        # one source, repeatable
+python ask.py sweep --no-graph            # store only; leave the graph alone
+```
+
+`news` prints one source and forgets it, which is right for a person checking a
+feed by hand. `sweep` is the scheduled sibling and the one that makes a month of
+watching add up to something: it resumes each source from its last **successful**
+sweep, writes what it finds to `data/corpus.db`, links the articles into
+`data/graph.db`, and records the attempt either way.
+
+Three things it does that the interactive path cannot:
+
+- **Deduplicates across runs.** `FeedAdapter._seen` is a set on the instance and
+  dies with the process. A wire story still on the wire tomorrow would otherwise
+  be stored again every day it stays there, and a month of watching would report
+  a volume of news that is mostly one story counted thirty times.
+- **Records a failure as a failure.** A month of refused requests and a genuinely
+  quiet month leave the same empty articles table. The `sweeps` table is the
+  difference, and it is append-only: a failed month stays a failed month.
+- **Does not move the watermark on a failure.** Resuming from a failed sweep
+  would skip the window that was never read — which is exactly the window the
+  outage happened in.
+
+Exit codes, so a scheduler can act without parsing text:
+
+| code | meaning |
+|---|---|
+| 0 | every enabled source read |
+| 2 | the sweep could not run — bad config, no sources enabled, or a source with no adapter |
+| 3 | at least one source failed; the failure is in the `sweeps` table |
+
+The edges it adds are `INFERRED`: a substring match establishes that an article
+*mentions* a company, never that the event *affects* it, so they are traversable
+and `Edge.citable` refuses them. Nothing pruned — this build carries one
+extractor, and pruning would close every curated and sector edge the sweep did
+not happen to mention.
+
 ### `watch` — evaluate the monitor rules
 
 ```bash

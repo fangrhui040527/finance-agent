@@ -65,6 +65,7 @@ if /I "%CMD%"=="doctor"  goto doctor
 if /I "%CMD%"=="audit"   goto audit
 if /I "%CMD%"=="web"     goto web
 if /I "%CMD%"=="news"    goto news
+if /I "%CMD%"=="sweep"   goto sweep
 if /I "%CMD%"=="watch"   goto watch
 if /I "%CMD%"=="capital" goto capital
 if /I "%CMD%"=="allocate" goto allocate
@@ -139,6 +140,10 @@ goto :eof
 
 :news
 "%PY%" ask.py news%ARGS%
+goto :eof
+
+:sweep
+"%PY%" ask.py sweep%ARGS%
 goto :eof
 
 :watch
@@ -247,6 +252,7 @@ echo   run audit                          readiness audit: PERFUMES, OWASP, G-Ev
 echo   run doctor                        preflight checks
 echo   run web                           the web app on 127.0.0.1:8765
 echo   run news gdelt                    pull one configured source
+echo   run sweep                         fetch every enabled source and keep it
 echo   run watch                         evaluate the monitor rules
 echo   run capital                       how much may be invested at all
 echo   run allocate --name ...           split it across names you nominate
