@@ -29,7 +29,13 @@ FACTORIES: dict[str, Callable[..., FeedAdapter]] = {
 RSS_SOURCES: dict[str, tuple[str, str]] = {
     # name: (url, trust)
     "reuters_business": ("https://feeds.reuters.com/reuters/businessNews", "wire"),
-    "bnm_press": ("https://www.bnm.gov.my/rss/press-release", "regulator"),
+    # /rss/press-release answered 404 on the 2026-09-03 12:03 sweep - the path
+    # predates BNM's site redesign. /rss is the page that still exists; whether
+    # it serves XML or an HTML index of feeds is unverified, because this
+    # environment's egress refuses bnm.gov.my and so does WebFetch. If it is
+    # HTML, RssFeed reports "returned unparseable XML" with the first 120
+    # characters, which is enough to read the real feed link off it.
+    "bnm_press": ("https://www.bnm.gov.my/rss", "regulator"),
 }
 
 
