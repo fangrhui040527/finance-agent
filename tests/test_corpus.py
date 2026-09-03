@@ -429,3 +429,25 @@ def test_the_query_asks_for_one_form_per_company_not_all_of_them():
     q = watchlist_query(ids)
     assert q.count(" OR ") + 1 == len(ids), "one phrase per company, not one per alias"
     assert '"Maybank"' in q and '"Malayan Banking Berhad"' not in q
+
+
+def test_no_phrase_is_short_enough_for_gdelt_to_refuse():
+    """GDELT answers "The specified phrase is too short." as plain text, not
+    JSON, so one bad phrase fails the whole sweep. "IHH" and "TNB" are three
+    characters; the longer alias is used instead."""
+    import core.config as C
+    from knowledge.graph.extractors.gdelt import MIN_PHRASE_CHARS, watchlist_query
+
+    cfg = C.load()
+    q = watchlist_query(tuple(cfg.watchlist) + tuple(cfg.holdings))
+    phrases = [p for p in q.strip("()").split(" OR ")]
+    assert phrases
+    for p in phrases:
+        assert len(p.strip('"')) >= MIN_PHRASE_CHARS, f"{p} is too short for the DOC API"
+
+
+def test_a_short_name_falls_back_to_a_longer_alias_not_to_nothing():
+    from knowledge.graph.extractors.gdelt import watchlist_query
+
+    q = watchlist_query(["MYX:5225"])  # aliases: "IHH", "IHH Healthcare"
+    assert q == '("IHH Healthcare")'

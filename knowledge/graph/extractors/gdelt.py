@@ -115,6 +115,17 @@ def _index_from_aliases() -> dict[str, str]:
     return out
 
 
+#: GDELT's DOC API refuses a quoted phrase below this and answers with the plain
+#: text "The specified phrase is too short." rather than JSON - which is how the
+#: 2026-09-03 09:07 sweep failed once a 90s timeout let it answer at all. The
+#: watchlist's "IHH" and "TNB" are both three characters.
+#:
+#: A company whose every alias is shorter than this cannot be ASKED for. It is
+#: still linked normally, because `entity_index` has no such limit - the article
+#: just has to arrive under some other name first.
+MIN_PHRASE_CHARS = 5
+
+
 def watchlist_query(instrument_ids: Iterable[str]) -> str:
     """A GDELT query for the names actually being watched.
 
@@ -152,7 +163,7 @@ def watchlist_query(instrument_ids: Iterable[str]) -> str:
         return ""
     primary: dict[str, str] = {}
     for surface, iid in _index_from_aliases().items():
-        if iid in wanted:
+        if iid in wanted and len(surface) >= MIN_PHRASE_CHARS:
             primary.setdefault(iid, surface)
     if not primary:
         return ""
