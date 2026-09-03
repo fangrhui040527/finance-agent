@@ -153,18 +153,34 @@ Exit codes, so a scheduler can act without parsing text:
 
 #### The enabled sources
 
-| name | what it is | shape |
+| name | what it is | state |
 |---|---|---|
-| `gdelt` | global news index | one request **per company**, budget split, order rotated |
-| `bnm_press` | Bank Negara press releases | one request; an RSS feed is whatever the publisher publishes |
+| `gdelt` | global news index | **enabled** — one request per company, budget split, order rotated |
+| `bnm_press` | Bank Negara press releases | registered, **not enabled**: feed URL unknown |
 
-`bnm_press` was enabled on 2026-09-03 because GDELT returned nothing for any
-Bursa name. Be clear about what it is and is not: central-bank announcements —
-the OPR decision, banking statistics, policy documents — so **macro news, not
-company news.** Most of it will arrive unlinked, and the `unlinked` count says
-so. On a book of Malaysian banks and utilities that move on rate decisions it
-is worth having; it is not a Bursa company feed, which this system does not
-have yet.
+**The domestic-coverage gap is open.** GDELT has returned nothing for any Bursa
+name on every run so far, and `bnm_press` was enabled on 2026-09-03 to close
+that — then disabled the same day, because its URL could not be established:
+
+| tried | answer |
+|---|---|
+| `/rss/press-release` | HTTP 404 — the path predates BNM's site redesign |
+| `/rss` | an HTML landing page titled "RSS - Bank Negara Malaysia", with no autodiscovery tags |
+
+The feed is behind a link on that page. Reading it needs a browser this
+environment does not have, and it is a one-minute job for anyone who does: open
+<https://www.bnm.gov.my/rss>, copy the press-release feed link into
+`knowledge/feeds/registry.py`, and add `"bnm_press"` back to `[sources] enabled`.
+
+It is left disabled rather than left failing on purpose. A source that fails
+every night marks the collect job red every night, and a red job that always
+means the same dead URL trains you to stop reading it — which is the one thing
+the `sweeps` table exists to prevent.
+
+And when it does run, be clear what it is: central-bank announcements, so
+**macro news, not company news.** Most of it will arrive unlinked. On a book of
+Malaysian banks and utilities that move on rate decisions that is worth having;
+it is still not a Bursa company feed, which this system does not have.
 
 Two sources means two watermarks and two `sweeps` rows. A source that fails does
 not take the other's articles with it — which is the whole reason a second one

@@ -595,14 +595,21 @@ def test_a_sweep_where_every_name_returned_something_says_nothing():
 # --- more than one source ---------------------------------------------------------
 
 
-def test_the_shipped_config_enables_a_malaysian_source():
-    """GDELT returned nothing for any Bursa name, so the book had US coverage
-    and no domestic coverage at all. bnm_press is Bank Negara's press releases -
-    macro rather than company news, but it is Malaysian, and losing it silently
-    would put the book back where it started."""
-    import core.config as C
+def test_no_source_is_enabled_whose_url_is_known_to_be_wrong():
+    """bnm_press is registered and deliberately NOT enabled: three sweeps on
+    2026-09-03 established that its feed URL is unknown - /rss/press-release is
+    a 404 and /rss is a landing page with no autodiscovery tags.
 
-    assert "bnm_press" in C.load().sources
+    A source that fails every night marks the job red every night, and a red job
+    that always means the same dead URL trains you to stop reading it. When
+    somebody supplies the real URL, enabling it is the one-line change this test
+    is asking for.
+    """
+    import core.config as C
+    from knowledge.feeds.registry import RSS_SOURCES
+
+    assert "bnm_press" in RSS_SOURCES, "the registration is kept; only the URL is wrong"
+    assert "bnm_press" not in C.load().sources
 
 
 def test_every_enabled_source_has_an_adapter_that_builds():

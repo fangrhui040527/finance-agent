@@ -29,12 +29,22 @@ FACTORIES: dict[str, Callable[..., FeedAdapter]] = {
 RSS_SOURCES: dict[str, tuple[str, str]] = {
     # name: (url, trust)
     "reuters_business": ("https://feeds.reuters.com/reuters/businessNews", "wire"),
-    # /rss/press-release answered 404 on the 2026-09-03 12:03 sweep - the path
-    # predates BNM's site redesign. /rss is the page that still exists; whether
-    # it serves XML or an HTML index of feeds is unverified, because this
-    # environment's egress refuses bnm.gov.my and so does WebFetch. If it is
-    # HTML, RssFeed reports "returned unparseable XML" with the first 120
-    # characters, which is enough to read the real feed link off it.
+    # NOT ENABLED, and this URL is NOT the feed. Three sweeps on 2026-09-03
+    # established what is true:
+    #
+    #   /rss/press-release  -> HTTP 404; the path predates BNM's site redesign
+    #   /rss                -> an HTML landing page titled "RSS - Bank Negara
+    #                          Malaysia", carrying no autodiscovery link tags
+    #
+    # So the feed exists behind a link on that page and its URL is unknown here:
+    # this environment's egress refuses bnm.gov.my, and so does WebFetch, so the
+    # page cannot be read to find it. Anyone who can open
+    # https://www.bnm.gov.my/rss in a browser can read the link off it, put it
+    # here, and add "bnm_press" back to [sources] enabled in config.toml.
+    #
+    # Kept registered rather than deleted: the adapter, the trust tier and the
+    # name are all right, and one wrong field is not a reason to lose the other
+    # three.
     "bnm_press": ("https://www.bnm.gov.my/rss", "regulator"),
 }
 

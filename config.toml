@@ -235,7 +235,17 @@ min_graded_for_calibration = 30
 # Added 2026-09-03 after GDELT returned nothing for any Bursa name over a
 # 2-hour window. Whether that is GDELT's Malaysian coverage or the short window
 # is still open - see details/09.
-enabled = ["gdelt", "bnm_press"]
+# bnm_press is REGISTERED but not enabled, and the reason is written down in
+# knowledge/feeds/registry.py: its feed URL is not known. Three runs on
+# 2026-09-03 established that /rss/press-release is a 404 and /rss is a landing
+# page carrying no autodiscovery tags, and this environment cannot read the page
+# to find the link. Enabling it again needs one line: the real URL.
+#
+# Left disabled deliberately rather than left failing. A source that fails every
+# night marks the collect job red every night, and a red job that always means
+# the same dead URL trains you to stop reading it - which is the one thing the
+# sweeps table exists to prevent.
+enabled = ["gdelt"]
 
 # Where a sweep keeps what it saw. Append-only, deduplicated across runs, and
 # carrying a row for every sweep INCLUDING the ones that failed - a month of
