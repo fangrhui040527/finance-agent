@@ -15,7 +15,7 @@ currency**.
 | MIC | Country | Currency | Tier | Regulator | Cost floor | Minimum economic position | Settle |
 |---|---|---|---|---|---|---|---|
 | `XKLS` | MY | MYR | 1 | Securities Commission Malaysia | 60 bps | MYR 4,706 | T+2 |
-| `XNAS` | US | USD | 1 | US Securities and Exchange Commission | 5 bps | USD 1 | **T+1** |
+| `XNAS` | US | USD | 1 | US Securities and Exchange Commission | 5 bps | USD 1 | **T+1** |  <!-- venue schedule; see the broker note below -->
 | `XSES` | SG | SGD | 2 | Monetary Authority of Singapore | 30 bps | SGD 9,091 | T+2 |
 | `XHKG` | HK | HKD | 2 | Securities and Futures Commission of Hong Kong | **95 bps** | HKD 28,081 | T+2 |
 | `XTKS` | JP | JPY | 2 | Financial Services Agency of Japan | 55 bps | JPY 545,455 | T+2 |
@@ -25,6 +25,17 @@ currency**.
 | `XTAI` | TW | TWD | 2 | Financial Supervisory Commission of Taiwan | 70 bps | TWD 10,000 | T+2 |
 | `XKRX` | KR | KRW | 2 | Financial Services Commission of Korea | 55 bps | KRW 500,000 | T+2 |
 | `XETR` | DE | EUR | 2 | Bundesanstalt für Finanzdienstleistungsaufsicht | 25 bps | EUR 6,494 | T+2 |
+
+**The XNAS row is a VENUE row, and for a US account it is usually the wrong one.**
+`markets/xnas.py` models a zero-commission US retail brokerage, which is a real
+account shape and is why its floor is 5 bps and its minimum position USD 1. An
+account that pays commission is priced by `markets/brokers.py` instead: a
+`moomoo_my` account pays 204.9 bps round trip on a USD 100 position, and its
+minimum economic position is about **USD 1,511 at a USD 100 share price** — three
+orders of magnitude from the row above. Because two of its legs are charged per
+SHARE, that minimum is a function of price and rises as the share price falls
+(about USD 2,620 at USD 10 a share). Set `broker` in `[account]` and the sizing
+output names which schedule and which floor it used.
 
 ### Three entries that contradict the intuition
 

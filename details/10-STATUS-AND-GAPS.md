@@ -23,6 +23,7 @@ invisible.
 | Sizing — 5 caps, binding cap, lot rounding, cost floor, `NoPosition` | complete |
 | Investable-capital waterfall — emergency floor, goals, debt hurdle | complete, **and reachable since 2026-08-30** — see the note below |
 | 11 market adapters, fee schedules, alias map | complete |
+| **Broker fee schedules** — `moomoo_my` on XNAS, per-share and per-order legs, broker-aware cost floor | complete, **and reachable** via `[account] broker` |
 | **MYR unit-of-account boundary** | complete |
 | Knowledge graph — schema, store, ids, 6 extractors, reproducible build | complete |
 | Event taxonomy, base rates, catalyst attachment | complete |
@@ -64,6 +65,29 @@ did not apply to it.
 what exists in `engines/`. Two other rows were audited against that standard at
 the same time — the MCP tool count and the CLI subcommand count were simply
 stale, which is a different and much smaller kind of wrong.
+
+### The venue schedule is not the account's schedule (added 2026-09-03)
+
+Every `markets/<mic>.py` answers "what does this exchange charge everyone".
+`markets/xnas.py` answers it with a ZERO-COMMISSION US retail account — a real
+account shape, and the reason its floor is 5 bps and its minimum economic
+position USD 1.00. For an account that pays commission it is simply the wrong
+schedule, and sizing against it funds US positions that cannot pay for their own
+round trip. Silently: a wrong floor is still a number.
+
+`markets/brokers.py` now carries `moomoo_my` on XNAS. It moves the minimum
+economic position from USD 1.00 to about **USD 1,511 at a USD 100 share price**,
+and because two legs are charged per SHARE that figure is a function of price,
+rising to about USD 2,620 at USD 10 a share. Two things fell out of building it:
+`ask.py size` and `ask.py allocate` (through `mcp_server/tools.py`) are wired;
+**`web/api.py`, `engines/sizing/rebalance.py` and `trace_run.py` are NOT** and
+still price on the venue's terms. That is a real half-wiring and is recorded here
+rather than described as done.
+
+Two constants in that file — the SEC fee rate and the FINRA trading-activity fee
+— are regulator pass-throughs that were NOT verified against a primary source.
+They are pinned by test so a drift is visible, and they are the reason a cost
+floor from this schedule should not be trusted to the basis point yet.
 
 ### What this system does NOT do
 

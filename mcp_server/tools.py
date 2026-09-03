@@ -670,6 +670,14 @@ def _fx_base_per_quote(currency: str, cfg) -> tuple[Decimal | None, str]:
     return None, ""
 
 
+def _cost_at(mic: str, broker: str | None, price: Decimal):
+    """A value-only round-trip cost function for this name, at this price."""
+    from markets.brokers import schedule_for
+
+    schedule = schedule_for(mic, broker)
+    return lambda value: schedule.round_trip(value, price)
+
+
 def _candidates(specs: list, fetch: bool = False, end=None, notes: list | None = None) -> list:
     """`MIC:CODE:PRICE:STOP:ADV:SECTOR` -> Candidates, one parser for every surface.
 
@@ -735,7 +743,11 @@ def _candidates(specs: list, fetch: bool = False, end=None, notes: list | None =
                 lot_size=adapter.lot_size(iid),
                 mic=mic,
                 fx_base_per_quote=fx,
-                round_trip_cost_at=adapter.fee_schedule.round_trip,
+                # The BROKER's schedule where the account has one. The price is
+                # bound in here because a broker schedule may charge per share,
+                # and Candidate.round_trip_cost_at is a value-only callable -
+                # the price is known at this point and is not known downstream.
+                round_trip_cost_at=_cost_at(mic, cfg.broker, price),
             )
         )
     return out
