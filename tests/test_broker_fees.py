@@ -294,3 +294,103 @@ def test_ask_size_prices_a_us_name_on_the_broker_schedule(tmp_path, capsys, monk
     assert "35 bps round trip on moomoo_my" in out
     assert "2,430.71" in out, "the minimum economic position this account really has"
     assert "100,000,000" not in out
+
+
+# --- the cost nobody publishes ----------------------------------------------------
+
+
+def test_the_rate_is_a_rate_and_the_spread_is_a_cost():
+    """They used to be one number: 4.15, documented as mid-market plus a CARD's
+    2.5% markup. This account converts through a broker, not a card, and a cost
+    bundled into a rate shrinks the portfolio on every foreign decision without
+    naming the reason."""
+    from core.provenance.ledger import DEFAULT_FX_MYR_PER_USD, DEFAULT_FX_SPREAD_PER_SIDE
+
+    assert DEFAULT_FX_MYR_PER_USD == D("4.055"), "the mid-market rate, and nothing else"
+    assert DEFAULT_FX_SPREAD_PER_SIDE == D("0.005")
+    cfg = __import__("core.config", fromlist=["load"]).load()
+    assert cfg.fx_myr_per_usd == DEFAULT_FX_MYR_PER_USD
+    assert cfg.fx_spread_per_side == DEFAULT_FX_SPREAD_PER_SIDE
+
+
+def test_the_spread_dwarfs_the_entire_fee_schedule():
+    """The reason it is reported at all. Every commission, platform fee,
+    settlement fee, stamp duty and levy on a USD 5,000 position comes to about
+    0.3% round trip. The currency conversion, at the assumed spread, is about
+    1% - more than three times all of it."""
+    from core.provenance.ledger import DEFAULT_FX_SPREAD_PER_SIDE as spread
+
+    value = D(5000)
+    fees = MOOMOO_MY_XNAS.round_trip_bps(value, D(100))
+    fx_round_trip = ((1 + spread) / (1 - spread) - 1) * D(10_000)
+    assert fees < D(40), "the whole fee schedule, in bps"
+    assert fx_round_trip > fees * 2, "and the spread is multiples of it"
+
+
+def test_the_spread_is_reported_and_deliberately_not_in_the_floor(capsys, monkeypatch):
+    """A floor decides refusals. A refusal that turns on an unmeasured number
+    cannot be defended, so the spread is named beside the floor and kept out of
+    it until somebody measures the thing."""
+    import ask
+    import core.config
+
+    shipped = (pathlib.Path(__file__).resolve().parents[1] / "config.toml").read_text()
+    kept = [ln for ln in shipped.splitlines() if not ln.startswith("broker =")]
+    kept.insert(kept.index('markets = ["XKLS", "XNAS"]') + 1, 'broker = "moomoo_my"')
+    cfg_file = tmp = pathlib.Path("/tmp/_fx_cfg.toml")
+    tmp.write_text("\n".join(kept))
+    real = core.config.load
+    monkeypatch.setattr(core.config, "load", lambda path=None: real(cfg_file))
+
+    ask.main(
+        [
+            "size",
+            "XNAS:NVDA",
+            "--price",
+            "100",
+            "--stop",
+            "92",
+            "--adv",
+            "5000000",
+            "--portfolio",
+            "100000",
+            "--fx",
+            "4.055",
+        ]
+    )
+    out = capsys.readouterr().out
+    assert "currency" in out and "NOT measured" in out
+    assert "NOT in the cost floor" in out
+    # the floor itself is unchanged by the spread
+    assert "2,430.71" in out
+
+
+def test_a_domestic_position_says_nothing_about_currency(capsys, monkeypatch):
+    """Bursa is priced in the book's own currency. There is no conversion, so
+    there is no spread, and a line claiming one would be noise."""
+    import ask
+    import core.config
+
+    shipped = (pathlib.Path(__file__).resolve().parents[1] / "config.toml").read_text()
+    kept = [ln for ln in shipped.splitlines() if not ln.startswith("broker =")]
+    kept.insert(kept.index('markets = ["XKLS", "XNAS"]') + 1, 'broker = "moomoo_my"')
+    cfg_file = pathlib.Path("/tmp/_fx_cfg2.toml")
+    cfg_file.write_text("\n".join(kept))
+    real = core.config.load
+    monkeypatch.setattr(core.config, "load", lambda path=None: real(cfg_file))
+
+    ask.main(
+        [
+            "size",
+            "MYX:1155",
+            "--price",
+            "10.68",
+            "--stop",
+            "9.83",
+            "--adv",
+            "900000",
+            "--portfolio",
+            "100000",
+        ]
+    )
+    assert "currency  converting" not in capsys.readouterr().out

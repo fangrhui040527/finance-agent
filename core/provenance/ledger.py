@@ -74,9 +74,31 @@ CREATE INDEX IF NOT EXISTS llm_calls_run ON llm_calls(run_id);
 CREATE INDEX IF NOT EXISTS claims_at ON claims(at);
 """
 
-# docs/08: mid-market was ~4.04 on 24 Aug 2026; 4.15 is the planning rate that
-# absorbs a Malaysian card's foreign-transaction markup on USD charges.
-DEFAULT_FX_MYR_PER_USD = Decimal("4.15")
+#: Mid-market MYR per USD, 3 Sep 2026. THE RATE, and nothing else.
+#:
+#: It used to be 4.15, described as "the planning rate that absorbs a Malaysian
+#: CARD's foreign-transaction markup". That bundled a cost into a rate, and the
+#: wrong cost: this account converts through a BROKER, not a card. The markup it
+#: silently applied was 2.34% one way, which quietly shrank the portfolio on
+#: every US sizing decision - conservative by accident rather than by design,
+#: and invisible where it mattered.
+#:
+#: The conversion cost now has its own name below, so it can be reported instead
+#: of hidden, and corrected when it is finally measured.
+DEFAULT_FX_MYR_PER_USD = Decimal("4.055")
+
+#: What converting MYR to USD actually costs, as a fraction, ONE WAY.
+#:
+#: NOT MEASURED. moomoo advertises "0 fees" on currency exchange and publishes
+#: no spread, so the cost is inside the rate they give you and cannot be read
+#: off any page. 0.5% is the upper end of independent estimates for a broker of
+#: this kind; a card would be 2-3%, a specialist remitter 0.3%.
+#:
+#: This is the largest unverified number in the system and, on a US position,
+#: plausibly the largest single cost - a 1% round trip dwarfs the entire fee
+#: schedule, which is about 0.3%. Measure it by converting a small amount and
+#: comparing the rate received against the mid-market rate at that moment.
+DEFAULT_FX_SPREAD_PER_SIDE = Decimal("0.005")
 
 
 def _enable_wal(conn: sqlite3.Connection, path: str, timeout_ms: int) -> None:
