@@ -36,9 +36,30 @@ markets = ["XKLS", "XNAS"]
 # sizes on the venue's terms, and the output names which was used.
 broker = "moomoo_my"
 
-# docs/08 planning rate: mid-market ~4.04 plus roughly 2.5% card FX markup.
-# Used for cost estimates only. Real conversions carry their own dated rate.
-fx_myr_per_usd = 4.15
+# THE RATE, and nothing else: mid-market MYR per USD, 3 September 2026.
+# `ask.py fx --fetch` replaces this with Bank Negara's official dated rate.
+#
+# It used to be 4.15, which quietly bundled a 2.34% CARD markup into the rate.
+# You convert through a broker, not a card. Bundling a cost into a rate shrank
+# the portfolio on every US decision without ever naming the reason.
+fx_myr_per_usd = 4.055
+
+# What converting ringgit to dollars COSTS you, one way, as a fraction.
+#
+# NOT MEASURED, and the biggest unknown in this system. moomoo advertises
+# "0 fees" on currency exchange and publishes no spread - the cost is inside
+# the rate they hand you, and no page will tell you what it is. 0.5% is the
+# upper end of independent estimates for a broker; a card is 2-3%.
+#
+# Why it matters more than everything above it: on a US position the entire
+# fee schedule is about 0.3% round trip. A 0.5% spread each way is 1% round
+# trip - more than three times every commission, platform fee, settlement fee,
+# stamp duty and regulatory levy combined.
+#
+# TO MEASURE IT: convert a small amount in the app, note the rate you actually
+# received, and compare it with the mid-market rate at that moment. The gap,
+# divided by the mid-market rate, is this number. Then set it here.
+fx_spread_per_side = 0.005
 
 # What you actually own, and what you are considering. These are not decoration:
 # the escalation gate (knowledge/news/features.py should_escalate) only lets an

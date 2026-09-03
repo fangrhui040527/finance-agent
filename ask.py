@@ -659,6 +659,27 @@ def cmd_size(a) -> int:
     print(f"cost      {cost_note}")
     if quote != BASE_CURRENCY:
         print(f"fx        1 {quote} = {BASE_CURRENCY} {fx}")
+    # The cost nobody publishes, said out loud. A foreign position is converted
+    # in and converted back, so the spread is paid TWICE, and on this account it
+    # is larger than the whole fee schedule: about 1% round trip against roughly
+    # 0.3% of commission, platform, settlement, duty and levies combined.
+    #
+    # It is NOT folded into the cost floor. The floor decides refusals, and a
+    # refusal that turns on an unmeasured number is a refusal that cannot be
+    # defended. So it is reported beside the floor and left out of it, until
+    # somebody converts a small amount and measures the thing.
+    if quote != BASE_CURRENCY:
+        spread = load_cfg().fx_spread_per_side
+        if spread > 0:
+            rt = ((1 + spread) / (1 - spread) - 1) * Decimal(100)
+            print(
+                f"  currency  converting {BASE_CURRENCY} to {quote} and back costs about "
+                f"{rt.quantize(Decimal('0.01'))}% at an assumed {spread:.2%} spread per side"
+            )
+            print(
+                "            NOT measured and NOT in the cost floor below - moomoo "
+                "publishes no spread. See account.fx_spread_per_side in config.toml."
+            )
     for f in findings:
         print(f"  {f.text}")
         for c in f.caveats:
