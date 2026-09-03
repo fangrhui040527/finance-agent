@@ -653,3 +653,29 @@ def test_one_source_failing_does_not_stop_the_next(tmp_path, monkeypatch, capsys
         rows = {dict(s)["source"]: dict(s)["status"] for s in c.sweeps()}
         assert rows == {"gdelt": FAILED, "fixture": OK}
         assert c.counts()["articles"] == len(ROWS), "the working source still stored"
+
+
+def test_a_page_served_instead_of_a_feed_says_so():
+    """The excerpt was `text[:120]`, which on the case that actually happens -
+    a URL serving a web page - was 120 literal newlines and told the reader
+    nothing. Measured 2026-09-03 on bnm.gov.my/rss, where the first useful
+    character was on line 123."""
+    from knowledge.feeds.rss import _excerpt
+
+    page = "\n" * 130 + "<!DOCTYPE html>\n<html><head><title>RSS - Bank Negara</title>"
+    out = _excerpt(page)
+    assert "an HTML page, not a feed" in out
+    assert "Bank Negara" in out, "the title names the page, which names the problem"
+    assert "\\n" not in out
+
+
+def test_an_excerpt_of_nothing_says_nothing_rather_than_quotes():
+    from knowledge.feeds.rss import _excerpt
+
+    assert _excerpt("   \n\n \t ") == "<empty body>"
+
+
+def test_a_real_feed_is_not_mislabelled_as_a_page():
+    from knowledge.feeds.rss import _excerpt
+
+    assert "HTML page" not in _excerpt('<?xml version="1.0"?><rss><channel/></rss>')

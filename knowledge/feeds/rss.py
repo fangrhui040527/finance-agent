@@ -22,6 +22,26 @@ from knowledge.news.features import Article, FeatureExtractor
 ATOM = "{http://www.w3.org/2005/Atom}"
 
 
+def _excerpt(text: str, limit: int = 200) -> str:
+    """A useful first look at a body that would not parse.
+
+    `text[:120]` was the whole diagnostic and it is worth nothing on the case
+    that actually happens: a URL that serves a web page rather than a feed
+    begins with a long run of newlines and indentation, so the excerpt was 120
+    literal "\n" and the reader learned only that parsing failed.
+
+    Collapsing whitespace first shows the doctype and title, which names the
+    problem outright. Measured 2026-09-03 on bnm.gov.my/rss, where the useful
+    signal started at line 123.
+    """
+    collapsed = " ".join(text.split())
+    if not collapsed:
+        return "<empty body>"
+    head = collapsed[:limit]
+    looks_html = collapsed[:400].lower().lstrip().startswith(("<!doctype html", "<html"))
+    return f"{'an HTML page, not a feed: ' if looks_html else ''}{head!r}"
+
+
 class RssFeed(FeedAdapter):
     """One RSS 2.0 or Atom feed, by URL."""
 
@@ -95,7 +115,7 @@ class RssFeed(FeedAdapter):
         try:
             root = ET.fromstring(text.strip())
         except ET.ParseError as e:
-            raise FeedError(f"{self.name} returned unparseable XML ({e}): {text[:120]!r}") from e
+            raise FeedError(f"{self.name} returned unparseable XML ({e}): {_excerpt(text)}") from e
 
         items = root.findall(".//item") or root.findall(f".//{ATOM}entry")
         if since.tzinfo is None:
