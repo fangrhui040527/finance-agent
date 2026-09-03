@@ -30,6 +30,7 @@ from core.contracts.money import BASE_CURRENCY
 from engines.risk.concentration import Limits, Position
 from engines.sizing.allocate import Allocation, Candidate, allocate
 from engines.sizing.caps import cost_floor_value
+from markets.brokers import cost_at
 
 
 @dataclass(frozen=True)
@@ -133,6 +134,7 @@ def _candidate(
     adv: Decimal,
     stop: Decimal | None,
     sector: str,
+    broker: str | None = None,
 ) -> Candidate:
     mic, adapter, currency = _adapter(iid)
     return Candidate(
@@ -145,7 +147,10 @@ def _candidate(
         currency=currency,
         lot_size=adapter.lot_size(iid),
         mic=mic,
-        round_trip_cost_at=adapter.fee_schedule.round_trip,
+        # Your broker's terms where it sets them, the venue's otherwise. A
+        # rebalance quotes the cost of every change it proposes, so a schedule
+        # that is not the one you actually pay understates every one of them.
+        round_trip_cost_at=cost_at(mic, broker, price),
     )
 
 
@@ -197,6 +202,7 @@ def rebalance(
     risk_per_trade: Decimal = Decimal("0.0075"),
     single_name_limit: Decimal = Decimal("0.08"),
     participation: Decimal = Decimal("0.05"),
+    broker: str | None = None,
 ) -> Rebalance:
     """Deltas between the book as held and a target split over the same names.
 
@@ -224,7 +230,9 @@ def rebalance(
                 notes=tuple(notes),
             )
         held[h.id] = Decimal(h.units or 0)
-        meta[h.id] = _candidate(h.id, prices[h.id], advs.get(h.id, Decimal(0)), h.stop, h.sector)
+        meta[h.id] = _candidate(
+            h.id, prices[h.id], advs.get(h.id, Decimal(0)), h.stop, h.sector, broker
+        )
 
     for c in nominated:
         meta.setdefault(c.instrument_id, c)

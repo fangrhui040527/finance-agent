@@ -167,25 +167,48 @@ def capital() -> S.Envelope:
 
 @router.get("/markets")
 def markets() -> S.Envelope:
+    from decimal import Decimal
+
+    from core.config import load as load_cfg
     from engines.sizing.caps import cost_floor_bps, cost_floor_value
+    from markets.brokers import cost_at, prices_venue
     from markets.registry import get as market_get
     from markets.registry import supported
 
+    #: The share price the broker figures below are quoted at. A broker leg
+    #: charged PER SHARE makes the minimum position a function of price, so
+    #: there is no single number to report here - this listing has no
+    #: instrument and therefore no price of its own. Quoting one silently
+    #: would be inventing the input; naming it lets a reader check it.
+    REFERENCE_PRICE = Decimal(100)
+
+    broker = load_cfg().broker
     rows = []
     for mic in supported():
         a = market_get(mic)
-        rows.append(
-            {
-                "mic": mic,
-                "country": a.country,
-                "currency": a.currency,
-                "tier": a.tier,
-                "index": a.local_index,
-                "settlement_days": a.settlement_days,
-                "cost_floor_bps": str(cost_floor_bps(mic)),
-                "minimum_economic_position": str(cost_floor_value(a.fee_schedule.round_trip, mic)),
-            }
-        )
+        row = {
+            "mic": mic,
+            "country": a.country,
+            "currency": a.currency,
+            "tier": a.tier,
+            "index": a.local_index,
+            "settlement_days": a.settlement_days,
+            # The VENUE's own terms - what this exchange charges everyone.
+            "cost_floor_bps": str(cost_floor_bps(mic)),
+            "minimum_economic_position": str(cost_floor_value(a.fee_schedule.round_trip, mic)),
+        }
+        # ...and the account's, where the broker sets its own on this venue.
+        # Absent rather than duplicated when it does not: a broker figure equal
+        # to the venue figure reads as confirmation, when it only means nobody
+        # modelled this venue for this broker.
+        if prices_venue(broker, mic):
+            row["broker"] = broker
+            row["broker_cost_floor_bps"] = str(cost_floor_bps(mic, broker))
+            row["broker_minimum_economic_position"] = str(
+                cost_floor_value(cost_at(mic, broker, REFERENCE_PRICE), mic, broker)
+            )
+            row["broker_minimum_quoted_at_price"] = str(REFERENCE_PRICE)
+        rows.append(row)
     return _run(T.market_info, data=rows)
 
 
