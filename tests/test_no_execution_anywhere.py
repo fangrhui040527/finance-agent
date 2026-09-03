@@ -33,6 +33,11 @@ ALLOWED_PATHS = {
     "tests/test_observability.py",
     "tests/test_dimensions.py",  # asserts the rails are reported by rule and action
     "tests/test_no_execution_anywhere.py",
+    # Names moomoo's own instruction methods in order to assert core/broker/
+    # never calls them. Same reason as policy.py: a guard that may not say
+    # what it forbids cannot forbid it. core/broker/ itself stays clean and is
+    # caught by this scan like anything else.
+    "tests/test_broker_readonly.py",
     # The Trace screen RENDERS the refusal - a denied place_order with
     # meta='no_execution' - which is the same reason trace_run.py is here. A
     # design that showed the guardrail working without naming what it stopped
