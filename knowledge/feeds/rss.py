@@ -39,7 +39,39 @@ def _excerpt(text: str, limit: int = 200) -> str:
         return "<empty body>"
     head = collapsed[:limit]
     looks_html = collapsed[:400].lower().lstrip().startswith(("<!doctype html", "<html"))
-    return f"{'an HTML page, not a feed: ' if looks_html else ''}{head!r}"
+    if not looks_html:
+        return repr(head)
+    found = advertised_feeds(text)
+    if found:
+        # The page says where its feeds are; repeating the guess back at the
+        # reader would waste the one thing it offered.
+        return "an HTML page which advertises feeds at: " + ", ".join(found[:6])
+    return f"an HTML page, not a feed (and it advertises none): {head!r}"
+
+
+def advertised_feeds(html: str) -> list[str]:
+    """Feed URLs a page declares, via the RSS autodiscovery <link> tag.
+
+    A URL that serves a landing page instead of a feed is the ordinary way this
+    goes wrong - bnm.gov.my/rss on 2026-09-03 was exactly that - and the page
+    almost always names the real feed in its head. Reading it turns "this is
+    not a feed" into "the feed is here", which is the difference between an
+    error you act on and one you guess at.
+
+    Diagnostic only: nothing follows these automatically. A feed URL is a
+    decision about what the system ingests, and it belongs in the registry
+    where a person put it, not in a redirect chased at runtime.
+    """
+    import re
+
+    out: list[str] = []
+    for tag in re.findall(r"<link\b[^>]*>", html, flags=re.I):
+        if not re.search(r'type\s*=\s*["\']application/(rss|atom)\+xml["\']', tag, flags=re.I):
+            continue
+        href = re.search(r'href\s*=\s*["\']([^"\']+)["\']', tag, flags=re.I)
+        if href and href.group(1) not in out:
+            out.append(href.group(1))
+    return out
 
 
 class RssFeed(FeedAdapter):

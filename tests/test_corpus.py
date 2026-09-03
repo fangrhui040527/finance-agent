@@ -679,3 +679,28 @@ def test_a_real_feed_is_not_mislabelled_as_a_page():
     from knowledge.feeds.rss import _excerpt
 
     assert "HTML page" not in _excerpt('<?xml version="1.0"?><rss><channel/></rss>')
+
+
+def test_a_landing_page_is_asked_where_its_feeds_are():
+    """A URL serving a page instead of a feed is the ordinary failure, and the
+    page almost always names the real feed in its head. Reading it turns "this
+    is not a feed" into "the feed is here"."""
+    from knowledge.feeds.rss import _excerpt, advertised_feeds
+
+    page = (
+        "\n" * 130 + "<!DOCTYPE html><html><head><title>RSS</title>"
+        '<link rel="alternate" type="application/rss+xml" href="https://x.my/press.xml"/>'
+        "<link rel='alternate' type='application/atom+xml' href='/speeches.atom'>"
+        '<link rel="stylesheet" href="/style.css">'
+    )
+    assert advertised_feeds(page) == ["https://x.my/press.xml", "/speeches.atom"]
+    assert "advertises feeds at" in _excerpt(page)
+    assert "style.css" not in _excerpt(page), "a stylesheet is not a feed"
+
+
+def test_a_page_advertising_nothing_says_that_too():
+    from knowledge.feeds.rss import _excerpt, advertised_feeds
+
+    page = "<!DOCTYPE html><html><head><title>Nothing here</title></head></html>"
+    assert advertised_feeds(page) == []
+    assert "advertises none" in _excerpt(page)
