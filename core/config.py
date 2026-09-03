@@ -230,6 +230,16 @@ class Config:
     """
     provenance_db: str = "data/provenance.db"
     daemon_budget_myr: Decimal = Decimal("10.0")
+    #: Feeds a scheduled sweep reads. `[sources] enabled` described these for
+    #: months and nothing loaded it, so enabling a source did exactly nothing -
+    #: the same defect class as the unreachable waterfall in details/10, and it
+    #: fails the same way: silently, looking like a quiet world.
+    sources: tuple[str, ...] = ()
+    gdelt_languages: tuple[str, ...] = ()
+    gdelt_countries: tuple[str, ...] = ()
+    #: Floored at GDELT's own documented 15-minute minimum by the adapter.
+    gdelt_poll_minutes: int = 15
+    corpus_db: str = "data/corpus.db"
     source: str = "<defaults>"
 
     def describe(self) -> str:
@@ -300,6 +310,41 @@ def _instruments(data: dict, dotted: str) -> tuple[str, ...]:
     if dupes:
         raise ConfigError(f"{dotted} lists {sorted(dupes)} more than once")
     return tuple(out)
+
+
+def _strings(data: dict, dotted: str) -> tuple[str, ...]:
+    """A list of plain strings, refusing the single-string form.
+
+    `gdelt_languages = "eng"` is a list of three one-character languages to
+    Python and to nobody else. It would narrow the feed to nothing and report
+    a quiet world.
+    """
+    raw = _get(data, dotted, [])
+    if isinstance(raw, str):
+        raise ConfigError(f'{dotted} must be a list, not a string. Write ["{raw}"].')
+    return tuple(str(x).strip() for x in raw if str(x).strip())
+
+
+def _sources(data: dict) -> tuple[str, ...]:
+    """Feeds to sweep, each validated against an adapter that actually exists.
+
+    Same shape as the broker check below, for the same reason: naming a source
+    here does not create it. An enabled name with no adapter would ingest
+    nothing every night, and an empty corpus is indistinguishable from a world
+    in which nothing happened.
+    """
+    from knowledge.feeds.registry import UnknownSource, adapter_for
+
+    names = _strings(data, "sources.enabled")
+    for name in names:
+        try:
+            adapter_for(name)
+        except UnknownSource as e:
+            raise ConfigError(f"sources.enabled: {e}") from None
+    dupes = {n for n in names if names.count(n) > 1}
+    if dupes:
+        raise ConfigError(f"sources.enabled lists {sorted(dupes)} more than once")
+    return names
 
 
 def _capital(data: dict) -> CapitalPlan:
@@ -557,6 +602,8 @@ def load(path: str | Path | None = None) -> Config:
             raise ConfigError(f"{k} must be a number, got {type(v).__name__}")
         return float(v)
 
+    sources = _sources(data)
+
     return Config(
         base_currency=str(_get(data, "account.base_currency", "MYR")).upper(),
         markets=markets,
@@ -570,6 +617,11 @@ def load(path: str | Path | None = None) -> Config:
         holdings=_instruments(data, "account.holdings"),
         watchlist=_instruments(data, "account.watchlist"),
         provenance_db=str(_get(data, "provenance.database", "data/provenance.db")),
+        sources=sources,
+        gdelt_languages=_strings(data, "sources.gdelt_languages"),
+        gdelt_countries=_strings(data, "sources.gdelt_countries"),
+        gdelt_poll_minutes=_int("sources.gdelt_poll_minutes", 15),
+        corpus_db=str(_get(data, "sources.corpus_database", "data/corpus.db")),
         daemon_budget_myr=dec("budget.daemon_daily_myr", 10.0),
         emergency_months=_int("waterfall.emergency_months", 6),
         debt_hurdle=dec("waterfall.debt_hurdle", 0.08),

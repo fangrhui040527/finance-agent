@@ -322,6 +322,42 @@ cron, hourly:
 5 * * * * cd /path/finance-agent && .venv/bin/python ask.py watch >> data/watch.log 2>&1
 ```
 
+### The nightly sweep
+
+`ask.py watch` tells you the system is healthy. `ask.py sweep` is what gives it
+something to be healthy about: it fetches every enabled source and keeps what
+arrives, so the corpus and the graph grow while nobody is looking.
+
+Windows Task Scheduler, daily at 06:10:
+
+```
+schtasks /create /tn "finplanet-sweep" /sc daily /st 06:10 ^
+  /tr "cmd /c cd /d C:\path\finance-agent && .venv\Scripts\python.exe ask.py sweep >> data\sweep.log 2>&1"
+```
+
+cron, daily at 06:10:
+
+```
+10 6 * * * cd /path/finance-agent && .venv/bin/python ask.py sweep >> data/sweep.log 2>&1
+```
+
+`cd /d` is not optional here for the same reason it is not optional above:
+`ask.py sweep` resolves `data/corpus.db` relative to the working directory.
+Started elsewhere it does not fail — it writes a second, empty corpus beside
+wherever the scheduler happened to be, and every night's watermark is missing,
+so every night refetches the same window.
+
+**Turn on `silence_hours` the day you schedule this.** It is 0 by default
+because a personal tool is allowed to sit idle. A scheduled one is not, and a
+sweep that dies quietly looks exactly like a quiet month — which is the failure
+this whole path is built to make visible.
+
+Two numbers to read afterwards, both from `ask.py sweep`'s own last line: how
+many articles the corpus holds, and how many of the sweeps failed. A failure
+count that climbs is the signal; an article count that stops climbing while the
+failure count does not is a source that has gone quiet without erroring, which
+is worth a look at the source itself.
+
 Then read it from anywhere: `ask.py alerts` on the command line, the
 `open_alerts` MCP tool in a Claude session, or `GET /api/alerts` in the web
 app. An empty history means no rule has been EVALUATED - not that none would

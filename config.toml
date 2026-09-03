@@ -194,9 +194,20 @@ min_graded_for_calibration = 30
 # whose key is missing, is skipped and says so. It never returns an empty list
 # and lets you read that as a quiet news day.
 #
+# `ask.py sweep` reads this list. A name with no adapter is REFUSED at load -
+# naming a source here does not create it, and an enabled name that ingests
+# nothing every night is indistinguishable from a world in which nothing
+# happened. (Until 2026-09-03 nothing read this block at all; see details/10.)
+#
 # The full world register - what exists, what it costs, what it needs a key for -
 # is docs/world-sources.html.
 enabled = ["gdelt"]
+
+# Where a sweep keeps what it saw. Append-only, deduplicated across runs, and
+# carrying a row for every sweep INCLUDING the ones that failed - a month of
+# refused requests and a genuinely quiet month leave the same empty article
+# table otherwise, and only one of them means the world was quiet.
+corpus_database = "data/corpus.db"
 
 # GDELT DOC 2.0: free, no key, 100+ languages, worldwide. The API refuses a
 # window under 15 minutes, and the adapter floors it there whatever you set.
