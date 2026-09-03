@@ -37,6 +37,7 @@ invisible.
 | CLI — 19 subcommands | complete |
 | Fitness function — refuses a partial score | complete |
 | CI — 10 steps, offline, keyless | complete |
+| **Daily collector** — `collect.yml`, sweep on a timer, commits what it saw | complete, **and running**: 187 articles, 34 attributed |
 
 ---
 

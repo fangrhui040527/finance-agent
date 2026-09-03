@@ -815,7 +815,7 @@ def _rotate(terms, day: int):
     return tuple(terms[n:]) + tuple(terms[:n])
 
 
-def _sweep_note(failed, skipped) -> str:
+def _sweep_note(failed, skipped, counts=()) -> str:
     """What a partially-successful sweep must still say.
 
     A sweep where one name failed is not a failed sweep - the other eight were
@@ -825,6 +825,9 @@ def _sweep_note(failed, skipped) -> str:
     is writing about.
     """
     parts = []
+    empty = [t for t, n in counts if n == 0]
+    if empty:
+        parts.append("read but empty: " + ", ".join(empty))
     if failed:
         parts.append("failed: " + ", ".join(t for t, _ in failed))
     if skipped:
@@ -853,6 +856,7 @@ def _fetch_each(make_feed, terms, since, limit, deadline=None, clock=None):
     records: list = []
     failed: list[tuple[str, str]] = []
     skipped: list[str] = []
+    counts: list[tuple[str, int]] = []
     for term in terms:
         if deadline is not None and tick() >= deadline:
             skipped.append(term)
@@ -862,8 +866,13 @@ def _fetch_each(make_feed, terms, since, limit, deadline=None, clock=None):
         except FeedError as e:
             failed.append((term, str(e)))
             continue
+        # Counted even at zero. A name that is asked for and answered with
+        # nothing is currently as silent as a name nobody watches, and those
+        # are opposite problems: one is a quiet week, the other is a name the
+        # source does not cover and never will.
+        counts.append((term, len(got)))
         records.extend(got)
-    return records, failed, skipped
+    return records, failed, skipped, counts
 
 
 def cmd_sweep(a) -> int:
@@ -939,7 +948,7 @@ def cmd_sweep(a) -> int:
                     # One request per company. See _fetch_each: a single OR'd
                     # query is won by whichever name publishes most, and on a
                     # Malaysian book that meant six Bursa names got nothing.
-                    records, per_failed, per_skipped = _fetch_each(
+                    records, per_failed, per_skipped, per_counts = _fetch_each(
                         # Bound as defaults, not captured: the call is
                         # immediate today, but a lambda that reads a loop
                         # variable late is a bug waiting for the day it is not.
@@ -949,6 +958,8 @@ def cmd_sweep(a) -> int:
                         a.limit,
                         deadline=deadline,
                     )
+                    for term, n in per_counts:
+                        print(f"  {'':<16} {term:<20} {n} records")
                     for term, err in per_failed:
                         print(f"  {'':<16} {term:<20} {err}", file=sys.stderr)
                     if per_skipped:
@@ -966,7 +977,7 @@ def cmd_sweep(a) -> int:
                             f"({len(per_failed)} failed, {len(per_skipped)} not reached). "
                             f"First: {first}"
                         )
-                    notes = _sweep_note(per_failed, per_skipped)
+                    notes = _sweep_note(per_failed, per_skipped, per_counts)
                 else:
                     records = feed.fetch(since, limit=a.limit)
                     notes = ""

@@ -483,7 +483,9 @@ def test_each_company_is_asked_for_separately_with_its_own_share():
             asked.append((self.q, limit))
             return [{"id": f"{self.q}-1"}]
 
-    records, failed, skipped = ask._fetch_each(_Feed, ("Maybank", "Tenaga", "NVIDIA"), NOW, 90)
+    records, failed, skipped, counts = ask._fetch_each(
+        _Feed, ("Maybank", "Tenaga", "NVIDIA"), NOW, 90
+    )
     assert [q for q, _ in asked] == ['"Maybank"', '"Tenaga"', '"NVIDIA"']
     assert {lim for _, lim in asked} == {30}, "the budget is split, not spent on the loudest"
     assert len(records) == 3 and not failed and not skipped
@@ -503,7 +505,7 @@ def test_one_name_failing_does_not_lose_the_others():
                 raise FeedError("timed out")
             return [{"id": self.q}]
 
-    records, failed, skipped = ask._fetch_each(_Feed, ("Maybank", "Tenaga"), NOW, 50)
+    records, failed, skipped, counts = ask._fetch_each(_Feed, ("Maybank", "Tenaga"), NOW, 50)
     assert len(records) == 1
     assert failed == [("Maybank", "timed out")] and not skipped
     assert "failed: Maybank" in ask._sweep_note(failed, skipped)
@@ -522,7 +524,7 @@ def test_the_deadline_keeps_what_it_has_instead_of_being_killed_mid_run():
             return [{"id": self.q}]
 
     ticks = iter([NOW, NOW + timedelta(hours=1), NOW + timedelta(hours=1)])
-    records, failed, skipped = ask._fetch_each(
+    records, failed, skipped, counts = ask._fetch_each(
         _Feed,
         ("Maybank", "Tenaga", "NVIDIA"),
         NOW,
@@ -561,3 +563,30 @@ def test_rotation_keeps_every_name_and_the_order_within_a_run():
         assert sorted(r) == sorted(terms), "rotation drops nothing and invents nothing"
         assert ask._rotate(terms, day) == r, "a run is reproducible from its date"
     assert ask._rotate((), 3) == ()
+
+
+def test_a_name_answered_with_nothing_is_reported_not_silent():
+    """A name read and answered with zero articles looks identical to a name
+    nobody watches, and they are opposite problems: one is a quiet week, the
+    other is a name the source does not cover and never will. Measured
+    2026-09-03: Maybank was read successfully and produced no articles, which
+    could only be inferred from the absence of an MYX id."""
+    import ask
+
+    class _Feed:
+        def __init__(self, q):
+            self.q = q
+
+        def fetch(self, since, limit):
+            return [] if "Maybank" in self.q else [{"id": self.q}]
+
+    records, failed, skipped, counts = ask._fetch_each(_Feed, ("Maybank", "NVIDIA"), NOW, 50)
+    assert counts == [("Maybank", 0), ("NVIDIA", 1)]
+    assert not failed, "answering with nothing is not a failure"
+    assert "read but empty: Maybank" in ask._sweep_note(failed, skipped, counts)
+
+
+def test_a_sweep_where_every_name_returned_something_says_nothing():
+    import ask
+
+    assert ask._sweep_note([], [], [("Maybank", 3), ("NVIDIA", 5)]) == ""

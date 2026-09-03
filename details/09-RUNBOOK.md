@@ -123,6 +123,25 @@ Three things it does that the interactive path cannot:
 - **Does not move the watermark on a failure.** Resuming from a failed sweep
   would skip the window that was never read — which is exactly the window the
   outage happened in.
+- **Asks for one company at a time.** A single query naming every company,
+  sorted newest-first, is won by whichever name publishes most. Measured on the
+  2026-09-03 09:11 sweep: nine names and 250 records gave 34 attributed
+  articles, every one US tech, Apple alone taking 20, and all six Bursa names
+  nothing. The budget is split per name instead — nine requests where there was
+  one — and the starting name rotates daily, because the deadline below cuts the
+  tail and a fixed order starves the same names every time.
+
+A run that reads some names and not others is recorded `ok`, with the names that
+failed in the sweep's `detail`. Marking the whole sweep failed would move no
+watermark and re-read every name tomorrow; but silence would be worse, because a
+name failing quietly every day must not read as a name nobody is writing about.
+Only when **no** name can be read is the source itself failed.
+
+`SWEEP_DEADLINE_SECONDS` (10 minutes) stops the sweep starting new requests and
+records which names it never reached. A name whose request times out costs up to
+4.5 minutes on its own, and nine of those would run past the collect job's cap —
+which kills the job before **anything** is committed, losing the names that did
+succeed.
 
 Exit codes, so a scheduler can act without parsing text:
 
@@ -132,11 +151,61 @@ Exit codes, so a scheduler can act without parsing text:
 | 2 | the sweep could not run — bad config, no sources enabled, or a source with no adapter |
 | 3 | at least one source failed; the failure is in the `sweeps` table |
 
+#### What GDELT refuses, measured
+
+Four ways the DOC API says no, all found by scheduled runs on 2026-09-03 and all
+recorded in the `sweeps` table rather than guessed at. It reports errors as
+**plain text, not JSON**, and one bad phrase fails the whole request:
+
+| What comes back | Why | Where it is handled |
+|---|---|---|
+| `{}` with no `articles` key | the query matched nothing — the adapter's own fallback is `domainis:reuters.com`, which returns nothing at all | `watchlist_query` supplies the book's names |
+| `urlopen error timed out` | it answers in ~38s and the socket timeout was 30 | `GdeltFeed.TIMEOUT = 90` |
+| `The specified phrase is too short.` | a quoted phrase below its minimum — `"IHH"` and `"TNB"` are three characters | `MIN_PHRASE_CHARS`, next alias used |
+| `Timespan is too short.` | resuming from a watermark 25 minutes old | `MIN_TIMESPAN` is two hours, wider than the boundary on purpose |
+
+The last one never fires on the daily schedule, which resumes from ~24h. It
+fires on a manual run after the daily one, or a retry after a failure — both of
+which land inside the hour, and both of which are when you least want a failure.
+
+Sustained testing gets throttled: roughly thirty requests in eighty minutes took
+it from answering in ~38s, to answering with errors, to refusing the TLS
+handshake. Once a day is a different pattern entirely.
+
 The edges it adds are `INFERRED`: a substring match establishes that an article
 *mentions* a company, never that the event *affects* it, so they are traversable
 and `Edge.citable` refuses them. Nothing pruned — this build carries one
 extractor, and pruning would close every curated and sector edge the sweep did
 not happen to mention.
+
+### The daily collector — `.github/workflows/collect.yml`
+
+`sweep` was built to be scheduled and for a while nothing scheduled it. This
+workflow does, daily at 10:00 UTC (18:00 MYT, about an hour after Bursa closes),
+and can be fired by hand from the Actions tab.
+
+It runs on GitHub's runners rather than a desktop for one reason: **news
+expires.** The GDELT window is recent-only, so a day nothing collects is a day
+that cannot be fetched later, and a laptop collects nothing while it is closed.
+
+Daily, not weekdays. `sweep_silence_hours` is 30 — a daily schedule plus six
+hours of slack — so a weekday-only schedule would trip that alert every Saturday
+by design rather than by fault.
+
+Three things about it that are deliberate:
+
+- **It reads the exit codes instead of flattening them.** Exit 3 still commits,
+  because a failed sweep that leaves no trace is indistinguishable from a quiet
+  day — the whole reason the `sweeps` table exists — and then fails the job so a
+  person looks.
+- **It is the only workflow here with `contents: write`.** `ci.yml` is
+  `contents: read`. The data commit carries `[skip ci]`, because ten test jobs to
+  validate a row of news is waste.
+- **`timeout-minutes: 20`**, against a default of 360 that would burn six hours
+  of a 2,000-minute monthly allowance on one hung socket. The sweep's own
+  10-minute deadline sits inside it so the commit step is always reached.
+
+What it costs: about 150 of those 2,000 minutes a month.
 
 ### `watch` — evaluate the monitor rules
 
