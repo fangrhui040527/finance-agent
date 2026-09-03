@@ -827,8 +827,9 @@ def cmd_allocate(a) -> int:
         )
         return 2
 
+    fx_notes: list[str] = []
     try:
-        candidates = _candidates(list(a.name), fetch=a.fetch, end=None)
+        candidates = _candidates(list(a.name), fetch=a.fetch, end=None, notes=fx_notes)
     except ToolError as e:
         print(str(e), file=sys.stderr)
         return 2
@@ -840,7 +841,10 @@ def cmd_allocate(a) -> int:
         risk_per_trade=Decimal(str(a.risk_per_trade)),
         single_name_limit=Decimal(str(a.single_name)),
     )
-    print(f"  {note}\n")
+    print(f"  {note}")
+    for fx_note in fx_notes:
+        print(f"  {fx_note}")
+    print()
     print(result.explain())
     return 0
 

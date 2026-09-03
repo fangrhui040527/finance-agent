@@ -645,17 +645,47 @@ def _quoted(iid: str, close) -> Decimal:
     return (price / tick).quantize(Decimal("1"), rounding=ROUND_HALF_UP) * tick
 
 
-def _candidates(specs: list, fetch: bool = False, end=None) -> list:
+def _fx_base_per_quote(currency: str, cfg) -> tuple[Decimal | None, str]:
+    """MYR per ONE unit of `currency`, and the sentence that says where it came from.
+
+    `Candidate.fx_base_per_quote` has existed since the money contract and no
+    surface ever filled it, so with a MYR base every foreign name was excluded
+    as "priced in USD with no MYR rate supplied" - closing off the market whose
+    cost floor is cheapest to the book most likely to need it.
+
+    config.toml carries exactly one planning rate, for USD, and calls itself a
+    planning rate. Inventing the others would put a fabricated conversion under
+    a real position, so an unconfigured currency returns None here and the
+    allocator's own refusal stands unchanged.
+    """
+    if not currency or currency == BASE_CURRENCY:
+        return None, ""
+    if currency == "USD":
+        rate = cfg.fx_myr_per_usd
+        return rate, (
+            f"USD converted at {rate} {BASE_CURRENCY} per USD - config.toml "
+            f"account.fx_myr_per_usd, a planning rate carrying no as-of date. "
+            f"A real conversion carries its own dated rate."
+        )
+    return None, ""
+
+
+def _candidates(specs: list, fetch: bool = False, end=None, notes: list | None = None) -> list:
     """`MIC:CODE:PRICE:STOP:ADV:SECTOR` -> Candidates, one parser for every surface.
 
     With `fetch`, an empty PRICE or ADV is measured from the price feed. A stop
     is never derived: where the stop goes is the user's risk decision and
     inventing one would invent the risk budget with it.
+
+    `notes` collects one line per foreign currency actually used, so a reader
+    can audit the conversion rather than trust it.
     """
     from engines.sizing.allocate import Candidate
     from markets.registry import get as market_get
     from markets.registry import market_currency, mic_of
 
+    cfg = load_config()
+    seen_currencies: set[str] = set()
     out = []
     for raw in specs:
         parts = str(raw).split(":")
@@ -687,6 +717,12 @@ def _candidates(specs: list, fetch: bool = False, end=None) -> list:
             price = price if price is not None else _quoted(iid, bars[-1].close)
             adv = adv if adv is not None else Decimal(str(series.adv(20)))
 
+        currency = market_currency(mic)
+        fx, note = _fx_base_per_quote(currency, cfg)
+        if note and notes is not None and currency not in seen_currencies:
+            seen_currencies.add(currency)
+            notes.append(note)
+
         out.append(
             Candidate(
                 instrument_id=iid,
@@ -695,9 +731,10 @@ def _candidates(specs: list, fetch: bool = False, end=None) -> list:
                 adv_20d=adv,
                 sector=sector or "unknown",
                 country=adapter.country,
-                currency=market_currency(mic),
+                currency=currency,
                 lot_size=adapter.lot_size(iid),
                 mic=mic,
+                fx_base_per_quote=fx,
                 round_trip_cost_at=adapter.fee_schedule.round_trip,
             )
         )
@@ -782,7 +819,8 @@ def allocate_capital(
         )
 
     end = _parse_date(as_at) if as_at else None
-    candidates = _candidates(specs, fetch=fetch, end=end)
+    fx_notes: list[str] = []
+    candidates = _candidates(specs, fetch=fetch, end=end, notes=fx_notes)
     result = allocate(
         investable,
         candidates,
@@ -791,7 +829,8 @@ def allocate_capital(
         single_name_limit=_positive(single_name_limit, "single_name_limit"),
         participation=_positive(participation, "participation"),
     )
-    return f"  {capital_note}\n\n{result.explain()}{DISCLAIMER}"
+    fx_lines = "".join(f"\n  {n}" for n in fx_notes)
+    return f"  {capital_note}{fx_lines}\n\n{result.explain()}{DISCLAIMER}"
 
 
 def size_position(
@@ -967,7 +1006,8 @@ def rebalance_book(
         )
 
     end = _parse_date(as_at) if as_at else None
-    nominated = _candidates(specs, fetch=fetch, end=end) if specs else []
+    fx_notes: list[str] = []
+    nominated = _candidates(specs, fetch=fetch, end=end, notes=fx_notes) if specs else []
 
     prices: dict = {}
     advs: dict = {}
@@ -1018,7 +1058,8 @@ def rebalance_book(
         if result.positions_target:
             after = a12.run(list(result.positions_target), limits=cfg.limits)
             shape += f"\n  AFTER\n{_lines(after)}"
-    return f"  {capital_note}\n\n{result.explain()}{shape}{DISCLAIMER}"
+    fx_lines = "".join(f"\n  {n}" for n in fx_notes)
+    return f"  {capital_note}{fx_lines}\n\n{result.explain()}{shape}{DISCLAIMER}"
 
 
 def plan_question(

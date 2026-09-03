@@ -284,3 +284,73 @@ def test_undeployed_cash_names_the_portfolio_limit_when_that_is_the_cause():
     out of capital, and the N-x-cap arithmetic would be the wrong explanation."""
     note = " ".join(allocate(Decimal("200000"), six()).notes)
     assert "bounded by the country limit, not by capital" in note
+
+
+# --- the FX seam: a foreign name is fundable, or it says why ---------------------------
+# The engine has carried `Candidate.fx_base_per_quote` since the money contract,
+# and no surface ever set it. With a MYR base every US name was excluded as
+# "priced in USD with no MYR rate supplied" - so the market whose cost floor is
+# cheapest was the one a Malaysian book could not reach at all.
+def test_a_usd_candidate_is_funded_once_the_configured_rate_reaches_the_engine():
+    from mcp_server import tools as T
+
+    out = T.allocate_capital(
+        names=[
+            "XNAS:AAA:10.00:9.00:50000000:tech",
+            "XNAS:BBB:12.00:10.80:50000000:health",
+            "XNAS:CCC:8.00:7.20:50000000:energy",
+            "XNAS:DDD:15.00:13.50:50000000:bank",
+            "XNAS:EEE:9.00:8.10:50000000:telco",
+        ],
+        portfolio_value=200000,
+    )
+    assert "no MYR rate supplied" not in out
+    assert "ALLOCATION" in out
+
+
+def test_the_rate_and_where_it_came_from_are_on_screen():
+    """A conversion the reader cannot audit is a number they have to trust."""
+    from mcp_server import tools as T
+
+    out = T.allocate_capital(
+        names=[
+            "XNAS:AAA:10.00:9.00:50000000:tech",
+            "XNAS:BBB:12.00:10.80:50000000:health",
+            "XNAS:CCC:8.00:7.20:50000000:energy",
+            "XNAS:DDD:15.00:13.50:50000000:bank",
+            "XNAS:EEE:9.00:8.10:50000000:telco",
+        ],
+        portfolio_value=200000,
+    )
+    assert "converted at" in out
+    assert "account.fx_myr_per_usd" in out
+    assert "carrying no as-of date" in out, "an undated planning rate must say so"
+
+
+def test_a_currency_with_no_configured_rate_still_refuses_rather_than_guessing():
+    """config.toml carries one planning rate, for USD. Inventing the others
+    would put a fabricated conversion under a real position."""
+    from mcp_server import tools as T
+
+    out = T.allocate_capital(
+        names=[
+            "XTKS:7203:2000:1800:50000000:auto",
+            "XNAS:AAA:10.00:9.00:50000000:tech",
+            "XNAS:BBB:12.00:10.80:50000000:health",
+            "XNAS:CCC:8.00:7.20:50000000:energy",
+            "XNAS:DDD:15.00:13.50:50000000:bank",
+        ],
+        portfolio_value=200000,
+    )
+    assert "no MYR rate supplied" in out
+    assert "XTKS:7203" in out
+
+
+def test_a_base_currency_name_is_untouched_by_the_fx_seam():
+    from mcp_server import tools as T
+
+    out = T.allocate_capital(
+        names=[f"MYX:100{i}:10.00:9.20:20000000:{s}" for i, s in enumerate("abcde")],
+        portfolio_value=200000,
+    )
+    assert "no MYR rate supplied" not in out
