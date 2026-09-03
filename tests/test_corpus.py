@@ -6,6 +6,7 @@ path, and both are handed doubles - nothing opens a socket.
 
 from __future__ import annotations
 
+import pathlib
 import sqlite3
 from datetime import UTC, datetime, timedelta
 
@@ -290,10 +291,24 @@ def test_sweep_refuses_a_source_with_no_adapter(tmp_path, capsys):
 
 
 def test_sweep_says_so_when_the_escalation_gate_cannot_fire(tmp_path, monkeypatch, capsys):
-    """holdings and watchlist are both empty in the shipped config, so nothing
-    can ever escalate. Silence about that reads as 'nothing was important'."""
+    """With an empty book nothing can ever escalate, and silence about that
+    reads as 'nothing was important'.
+
+    Builds an empty-book config rather than reading the shipped one, which used
+    to happen to be empty. Asserting on a settings file that is meant to be
+    filled in makes the test fail on the day the feature starts working.
+    """
+    import re
+
     import ask
     from knowledge.feeds import registry
+
+    shipped = pathlib.Path("config.toml").read_text(encoding="utf-8")
+    empty = re.sub(r"^holdings = .*$", "holdings = []", shipped, count=1, flags=re.M)
+    empty = re.sub(r"^watchlist = .*$", "watchlist = []", empty, count=1, flags=re.M)
+    cfg = tmp_path / "config.toml"
+    cfg.write_text(empty, encoding="utf-8")
+    monkeypatch.setenv("FINPLANET_CONFIG", str(cfg))
 
     monkeypatch.setattr(registry, "adapter_for", lambda name, **kw: _Quiet(records=ROWS))
     ask.main(

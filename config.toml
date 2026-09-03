@@ -79,7 +79,31 @@ fx_spread_per_side = 0.005
 # Without units the name is still watched and analysed; only the book value
 # and anything that needs it (rebalancing) will say it cannot be computed.
 holdings = []
-watchlist = []
+
+# Nine names, and deliberately no more. Every one is in a DIFFERENT subsector
+# per knowledge/graph/data/sectors.yaml - no two banks, no two chipmakers - so
+# the queue is nine things to read rather than three things said nine times, and
+# the concentration measures see nine bets instead of nine correlated ones.
+#
+#   MYX:1155 Maybank / Banks             MYX:8869 Press Metal / Aluminium
+#   MYX:5347 Tenaga / Electric Utilities MYX:3182 Genting / Leisure and Gaming
+#   MYX:5183 Petronas Chem / Chemicals   XNAS:NVDA NVIDIA / Semiconductors
+#   MYX:5225 IHH / Hospitals             XNAS:AAPL Apple / Consumer Hardware
+#                                        XNAS:MSFT Microsoft / Software
+#
+# Every id is already in knowledge/graph/data/entities.yaml. That is not
+# optional: the sweep links a story to a name through that same table, so a
+# company it does not list is one the news can never be matched to. Adding a
+# name means adding its surface forms there first.
+#
+# Bursa carries the weight because it is the market that is actually affordable;
+# the US names exercise the FX and US-fee paths, and a US position needs about
+# USD 2,430 before sizing will agree to one at all.
+#
+# Kept on ONE line on purpose: tests/test_scope_and_context.py builds variant
+# configs by substituting this line, and a multi-line array leaves the tail of
+# the old value behind as broken TOML.
+watchlist = ["MYX:1155", "MYX:5347", "MYX:5183", "MYX:5225", "MYX:8869", "MYX:3182", "XNAS:NVDA", "XNAS:AAPL", "XNAS:MSFT"]
 
 
 [risk]

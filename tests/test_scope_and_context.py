@@ -141,11 +141,23 @@ def test_escalation_can_now_fire_on_a_watched_name(monkeypatch, tmp_path):
     assert not should_escalate(F(), ["MYX:9999"], ctx.holdings, ctx.watchlist)
 
 
-def test_an_empty_config_escalates_nothing_rather_than_everything():
+def test_an_empty_config_escalates_nothing_rather_than_everything(monkeypatch, tmp_path):
+    """An empty book must escalate NOTHING, not everything.
+
+    Builds its own empty config rather than reading the shipped one. It used to
+    rely on config.toml listing neither, which made it a test of a settings file
+    that is meant to change - it broke the day a watchlist was filled in, which
+    is the one day it should have kept passing.
+    """
+    import core.config as C
     from knowledge.news.features import should_escalate
     from mcp_server import tools as T
 
-    ctx = T.context()  # the shipped config lists neither
+    p = _cfg(tmp_path, holdings="[]", watchlist="[]")
+    real = C.load
+    monkeypatch.setattr(T, "load_config", lambda path=None: real(p))
+    ctx = T.context()
+    assert ctx.holdings == set() and ctx.watchlist == set()
 
     class F:
         relevance = 0.9
