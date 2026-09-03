@@ -327,7 +327,7 @@ def test_the_spread_dwarfs_the_entire_fee_schedule():
     assert fx_round_trip > fees * 2, "and the spread is multiples of it"
 
 
-def test_the_spread_is_reported_and_deliberately_not_in_the_floor(capsys, monkeypatch):
+def test_the_spread_is_reported_and_deliberately_not_in_the_floor(tmp_path, capsys, monkeypatch):
     """A floor decides refusals. A refusal that turns on an unmeasured number
     cannot be defended, so the spread is named beside the floor and kept out of
     it until somebody measures the thing."""
@@ -337,8 +337,8 @@ def test_the_spread_is_reported_and_deliberately_not_in_the_floor(capsys, monkey
     shipped = (pathlib.Path(__file__).resolve().parents[1] / "config.toml").read_text()
     kept = [ln for ln in shipped.splitlines() if not ln.startswith("broker =")]
     kept.insert(kept.index('markets = ["XKLS", "XNAS"]') + 1, 'broker = "moomoo_my"')
-    cfg_file = tmp = pathlib.Path("/tmp/_fx_cfg.toml")
-    tmp.write_text("\n".join(kept))
+    cfg_file = tmp_path / "config.toml"
+    cfg_file.write_text("\n".join(kept))
     real = core.config.load
     monkeypatch.setattr(core.config, "load", lambda path=None: real(cfg_file))
 
@@ -365,7 +365,7 @@ def test_the_spread_is_reported_and_deliberately_not_in_the_floor(capsys, monkey
     assert "2,430.71" in out
 
 
-def test_a_domestic_position_says_nothing_about_currency(capsys, monkeypatch):
+def test_a_domestic_position_says_nothing_about_currency(tmp_path, capsys, monkeypatch):
     """Bursa is priced in the book's own currency. There is no conversion, so
     there is no spread, and a line claiming one would be noise."""
     import ask
@@ -374,7 +374,7 @@ def test_a_domestic_position_says_nothing_about_currency(capsys, monkeypatch):
     shipped = (pathlib.Path(__file__).resolve().parents[1] / "config.toml").read_text()
     kept = [ln for ln in shipped.splitlines() if not ln.startswith("broker =")]
     kept.insert(kept.index('markets = ["XKLS", "XNAS"]') + 1, 'broker = "moomoo_my"')
-    cfg_file = pathlib.Path("/tmp/_fx_cfg2.toml")
+    cfg_file = tmp_path / "config.toml"
     cfg_file.write_text("\n".join(kept))
     real = core.config.load
     monkeypatch.setattr(core.config, "load", lambda path=None: real(cfg_file))
