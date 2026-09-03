@@ -27,6 +27,11 @@ ALLOWED_PATHS = {
     "verify.py",
     "trace_run.py",  # traces the refusal, by name
     "tests/test_trace.py",  # asserts that refusal is recorded
+    # recent_failures must REPORT a denial by name - same reason as
+    # trace_run.py. A monitor that could not name what it stopped would
+    # be monitoring nothing.
+    "tests/test_observability.py",
+    "tests/test_dimensions.py",  # asserts the rails are reported by rule and action
     "tests/test_no_execution_anywhere.py",
     # The Trace screen RENDERS the refusal - a denied place_order with
     # meta='no_execution' - which is the same reason trace_run.py is here. A

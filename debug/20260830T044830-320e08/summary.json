@@ -1,0 +1,123 @@
+{
+  "run_id": "20260830T044830-320e08",
+  "label": "full-system",
+  "started_at": "2026-08-30T04:48:30.578971+00:00",
+  "wall_ms": 56.43,
+  "events": 106,
+  "by_kind": {
+    "agent": 8,
+    "allowed": 23,
+    "denied": 3,
+    "engine": 39,
+    "llm_call": 4,
+    "refusal": 5,
+    "run_end": 1,
+    "run_start": 1,
+    "span": 7,
+    "span_end": 15
+  },
+  "errors": [],
+  "llm": {
+    "calls": 4,
+    "cost_myr": 0.008238,
+    "input_tokens": 97,
+    "output_tokens": 80
+  },
+  "agents_seen": [
+    "a0_supervisor",
+    "a10_thesis",
+    "a11_red_team",
+    "a12_portfolio_risk",
+    "a13_sizing",
+    "a14_teacher",
+    "a15_reflection",
+    "a1_fundamentals",
+    "a2_valuation",
+    "a3_price_technical",
+    "a4_news_narrative",
+    "a5_catalyst_events",
+    "a6_macro_regime",
+    "a7_sector_technology",
+    "a8_ownership_flow",
+    "a9_attribution"
+  ],
+  "refusals": 8,
+  "slowest": [
+    {
+      "name": "registry",
+      "kind": "span",
+      "ms": 41.99
+    },
+    {
+      "name": "a9_attribution",
+      "kind": "agent",
+      "ms": 4.4
+    },
+    {
+      "name": "inference",
+      "kind": "span",
+      "ms": 2.09
+    },
+    {
+      "name": "a0_supervisor",
+      "kind": "agent",
+      "ms": 1.96
+    },
+    {
+      "name": "markets",
+      "kind": "span",
+      "ms": 1.4
+    },
+    {
+      "name": "portfolio",
+      "kind": "span",
+      "ms": 1.16
+    },
+    {
+      "name": "a13_sizing",
+      "kind": "agent",
+      "ms": 0.74
+    },
+    {
+      "name": "config",
+      "kind": "span",
+      "ms": 0.66
+    },
+    {
+      "name": "thesis_and_red_team",
+      "kind": "span",
+      "ms": 0.53
+    },
+    {
+      "name": "a15_reflection",
+      "kind": "agent",
+      "ms": 0.44
+    },
+    {
+      "name": "a14_teacher",
+      "kind": "agent",
+      "ms": 0.28
+    },
+    {
+      "name": "a12_portfolio_risk",
+      "kind": "agent",
+      "ms": 0.27
+    },
+    {
+      "name": "guardrails",
+      "kind": "span",
+      "ms": 0.25
+    },
+    {
+      "name": "a10_thesis",
+      "kind": "agent",
+      "ms": 0.22
+    },
+    {
+      "name": "a11_red_team",
+      "kind": "agent",
+      "ms": 0.16
+    }
+  ],
+  "dir": "debug/20260830T044830-320e08"
+}

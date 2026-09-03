@@ -57,6 +57,31 @@ export async function trace(root, { api }) {
       })
       .join("\n");
     detail.append(termPane(lines, `events — ${d.run_id}`));
+
+    // Externalised prompt/response blobs, loadable verbatim.
+    const blobs = [];
+    for (const e of d.events) {
+      for (const v of Object.values(e.data || {})) {
+        if (v && typeof v === "object" && v._blob) blobs.push(v._blob.split("/").pop());
+      }
+    }
+    if (blobs.length) {
+      const box = card([el("span", { class: "eyebrow", text: `prompt blobs (${blobs.length})` })]);
+      const blobPane = el("div");
+      for (const name of blobs) {
+        const a = el("a", { href: "#/trace", text: name, class: "mono" });
+        a.style.display = "block";
+        a.addEventListener("click", async (ev) => {
+          ev.preventDefault();
+          const r = await api(`/trace/runs/${encodeURIComponent(d.run_id)}/blob/${encodeURIComponent(name)}`);
+          blobPane.replaceChildren(
+            r.ok ? termPane(r.envelope.text, name) : el("p", { class: "history", text: r.reason })
+          );
+        });
+        box.append(a);
+      }
+      detail.append(box, blobPane);
+    }
   }
 
   listBox.append(

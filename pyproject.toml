@@ -89,6 +89,8 @@ ignore = [
 # web/ (stderr logging only) - those two are simply absent from this list.
 [tool.ruff.lint.per-file-ignores]
 "ask.py" = ["T20"]
+"audit/**" = ["T20"]
+"qa/**" = ["T20"]
 "predict.py" = ["T20"]
 "verify.py" = ["T20"]
 "trace_run.py" = ["T20"]

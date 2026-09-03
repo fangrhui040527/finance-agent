@@ -49,6 +49,16 @@ class AuthError(BackendError):
     """Missing, malformed or rejected credentials. Retrying cannot help."""
 
 
+class ContextOverflow(BackendError):
+    """The prompt exceeds the model's context window.
+
+    docs/13's taxonomy: this is neither transient (retrying the same prompt
+    hits the same wall) nor a generic bad request (the caller's next move is
+    to SHRINK - trim evidence, split the question - not to fix a field). A
+    flat 400 hid that distinction.
+    """
+
+
 class Billed(BackendError):
     """The model answered - and billed - but the answer cannot be returned.
 
@@ -118,7 +128,9 @@ class AnthropicBackend:
         max_attempts: int = 3,
         client: Any | None = None,
         sleep=None,
+        jitter=None,
     ) -> None:
+        import random
         import time
 
         if max_tokens < 1:
@@ -129,6 +141,9 @@ class AnthropicBackend:
         self.max_tokens = max_tokens
         self.max_attempts = max_attempts
         self._sleep = sleep if sleep is not None else time.sleep
+        # Injectable so the backoff curve is testable without waiting for it,
+        # and so a test can pin the randomness it is asserting about.
+        self._jitter = jitter if jitter is not None else random.uniform
         self.last_request_id: str | None = None
 
         if client is not None:
@@ -137,14 +152,28 @@ class AnthropicBackend:
         key = api_key if api_key is not None else os.environ.get("ANTHROPIC_API_KEY", "")
         if not key.strip():
             raise AuthError(
-                "ANTHROPIC_API_KEY is empty or unset. Set it in .env, or pass "
-                "EchoBackend explicitly if you meant to run without a model."
+                "ANTHROPIC_API_KEY is empty or unset. Put it in .env (every "
+                "entrypoint loads that file; an exported variable wins over it), "
+                "or pass EchoBackend explicitly if you meant to run without a model."
             )
         import anthropic  # the ONE import site; lazy so echo never loads it
 
+        # An identity-linked key is scoped to a workspace and the API refuses
+        # every request that does not name one - a 400 before the model is
+        # reached, on all five effort levels, for the same reason. The header is
+        # sent when ANTHROPIC_WORKSPACE_ID is set and omitted when it is not,
+        # because a plain key rejects a workspace it does not have.
+        workspace = os.environ.get("ANTHROPIC_WORKSPACE_ID", "").strip()
+        self.workspace_id = workspace or None
+        extra: dict[str, Any] = {}
+        if workspace:
+            extra["default_headers"] = {"anthropic-workspace-id": workspace}
+
         # max_retries=0: the retry loop below owns backoff, so retry-after
         # capping and sleep injection stay testable and disclosed.
-        self._client = anthropic.Anthropic(api_key=key, max_retries=0, timeout=self.TIMEOUT)
+        self._client = anthropic.Anthropic(
+            api_key=key, max_retries=0, timeout=self.TIMEOUT, **extra
+        )
 
     # -- the seam -----------------------------------------------------------
 
@@ -168,9 +197,17 @@ class AnthropicBackend:
                 {"type": "text", "text": system, "cache_control": {"type": "ephemeral"}}
             ]
         if profile is not None:
-            # Haiku rejects thinking/effort with a 400; the profile table in
-            # tiers.py knows which model takes what. Nothing here guesses.
-            if profile.adaptive_thinking:
+            # Haiku 4.5 rejects adaptive thinking and `effort` with a 400, and
+            # takes the older budgeted form instead; the Opus/Sonnet 5 family is
+            # the other way round. `tiers.profile_for` knows which model takes
+            # what and the two forms are mutually exclusive by construction.
+            # Nothing here guesses.
+            if profile.thinking_budget is not None:
+                params["thinking"] = {
+                    "type": "enabled",
+                    "budget_tokens": profile.thinking_budget,
+                }
+            elif profile.adaptive_thinking:
                 params["thinking"] = {"type": "adaptive"}
             if profile.effort:
                 params["output_config"] = {"effort": profile.effort}
@@ -206,6 +243,32 @@ class AnthropicBackend:
                 if e.status_code in (500, 502, 503, 529):
                     last = TransientError(f"Anthropic returned {e.status_code}: {e.message}")
                     retry_after = self._retry_after(e)
+                elif e.status_code == 400 and "anthropic-workspace-id" in str(e.message).lower():
+                    # Neither transient nor a prompt problem: the credential is
+                    # incomplete. Left as a generic 400 it reads as "the request
+                    # was malformed" and sends the operator to look at the
+                    # request, which is the one place the fault is not.
+                    raise AuthError(
+                        "this API key is identity-linked and every request must name "
+                        "the workspace it acts in. Set ANTHROPIC_WORKSPACE_ID in .env "
+                        "to the workspace id from the Console URL "
+                        "(console.anthropic.com/settings/workspaces). "
+                        f"Anthropic said: {e.message}"
+                    ) from e
+                elif e.status_code == 400 and any(
+                    marker in str(e.message).lower()
+                    for marker in (
+                        "prompt is too long",
+                        "context length",
+                        "maximum context",
+                        "too many tokens",
+                    )
+                ):
+                    raise ContextOverflow(
+                        f"prompt exceeds the model's context window: {e.message}. "
+                        "Shrink the input - trim evidence or split the question; "
+                        "retrying the same prompt hits the same wall."
+                    ) from e
                 else:
                     raise BackendError(f"Anthropic returned {e.status_code}: {e.message}") from e
             except anthropic.APIConnectionError as e:  # includes APITimeoutError
@@ -215,8 +278,18 @@ class AnthropicBackend:
                 raise last
             # The server's own instruction outranks the client's guess: a 429
             # says exactly how long the token bucket needs, and retrying sooner
-            # only extends the wait. Absent or unreadable, exponential as before.
-            self._sleep(retry_after if retry_after is not None else 2.0 ** (attempt - 1))
+            # only extends the wait. That one is obeyed EXACTLY - jittering an
+            # instruction is just disobeying it by a random amount.
+            #
+            # Absent a header, the wait is exponential with jitter. Without the
+            # jitter every client that hit the same 529 backs off on the same
+            # curve and returns at the same instant, which is the collision the
+            # backoff existed to avoid - and this system has three surfaces (CLI,
+            # MCP, web) that can be talking to the same overloaded endpoint.
+            if retry_after is not None:
+                self._sleep(retry_after)
+            else:
+                self._sleep(self._jitter(0.5, 1.0) * 2.0 ** (attempt - 1))
         raise last if last is not None else BackendError("retry loop exited without a result")
 
     @staticmethod
@@ -299,11 +372,12 @@ def backend_from_env(explicit: str | None = None):
     Returns (backend, reason).
     """
     from core.llm.client import EchoBackend
-    from core.llm.tiers import cheap_capped
+    from core.llm.tiers import cheap_capped, selection_note
 
-    cap = (
-        " | FINPLANET_CHEAP=1: every tier resolves to the cheapest model" if cheap_capped() else ""
-    )
+    note = selection_note()
+    cap = f" | {note}" if note else ""
+    if cheap_capped():
+        cap += " (every Messages tier resolves to the cheapest model)"
     choice = (explicit or os.environ.get("LLM_BACKEND", "")).strip().lower()
 
     if choice in ("echo", "none", "offline"):
@@ -314,7 +388,12 @@ def backend_from_env(explicit: str | None = None):
         raise ValueError(f"unknown LLM_BACKEND {choice!r}; expected 'anthropic' or 'echo'")
 
     if os.environ.get("ANTHROPIC_API_KEY", "").strip():
-        return AnthropicBackend(), "anthropic (ANTHROPIC_API_KEY is set, official SDK)" + cap
+        workspace = os.environ.get("ANTHROPIC_WORKSPACE_ID", "").strip()
+        where = f", workspace {workspace}" if workspace else ""
+        return (
+            AnthropicBackend(),
+            f"anthropic (ANTHROPIC_API_KEY is set, official SDK{where})" + cap,
+        )
     return EchoBackend(), (
         "echo (no ANTHROPIC_API_KEY): deterministic stub, NOT a model - "
         "narrative output is placeholder text" + cap

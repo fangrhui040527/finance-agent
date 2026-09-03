@@ -35,6 +35,8 @@ from agents.learning.teacher import A14Teacher, Learner
 from agents.portfolio.agents import A12PortfolioRisk, A13Sizing
 from agents.supervisor import A0Supervisor
 from agents.synthesis.agents import A9Attribution, A10Thesis, A11RedTeam, Breaker, Stance
+from core.config import ConfigError
+from core.config import load as load_config
 from core.contracts.money import BASE_CURRENCY
 from core.guardrails.defaults import default_engine
 from core.market.feed import PriceFeedError, default_feed
@@ -42,7 +44,7 @@ from core.registry.loader import load as load_registry
 from engines.attribution.decompose import MIN_OBSERVATIONS
 from engines.attribution.regression import huber_fit
 from engines.risk.concentration import Limits, Position
-from engines.sizing.caps import cost_floor_bps, to_base
+from engines.sizing.caps import cost_floor_bps, cost_floor_unreachable, cost_floor_value, to_base
 from knowledge.retrieval.pipeline import Router
 from markets.registry import get as market_get
 from markets.registry import market_currency, mic_of
@@ -54,8 +56,23 @@ REGISTRY = "agents/registry.yaml"
 def context() -> AgentContext:
     """The allowlist comes from the registry, never a hand-written dict."""
     reg = load_registry(REGISTRY)
+    # holdings and watchlist come from config.toml. Without them
+    # `should_escalate` (knowledge/news/features.py) can never match an article
+    # to anything the user owns or is watching, so the news escalation gate was
+    # closed on every article regardless of what the file said.
+    try:
+        cfg = load_config()
+        holdings, watchlist = set(cfg.holdings), set(cfg.watchlist)
+    except ConfigError:
+        # A broken settings file must not take out every other command; the
+        # config commands report it properly.
+        holdings, watchlist = set(), set()
     return AgentContext(
-        router=Router({}), engine=default_engine(reg.allowlist()), now=datetime.now(UTC)
+        router=Router({}),
+        engine=default_engine(reg.allowlist()),
+        now=datetime.now(UTC),
+        holdings=holdings,
+        watchlist=watchlist,
     )
 
 
@@ -122,6 +139,14 @@ def cmd_plan(a) -> int:
 
 
 def cmd_why(a) -> int:
+    if not getattr(a, "fetch", False) and (a.move is None or a.market is None):
+        print(
+            "give --move AND --market, or --fetch --against <proxy> to measure both "
+            "from the price feed. One typed leg against one measured leg is a "
+            "subtraction, not a decomposition.",
+            file=sys.stderr,
+        )
+        return 2
     fit = _fit_from_csv(a.history) if a.history else _fit_synthetic(a.beta_market, a.beta_sector)
     end = date.fromisoformat(a.on) if a.on else date.today()
     window = (end - timedelta(days=a.days), end)
@@ -340,7 +365,6 @@ def _narrate(ctx, thesis, challenges) -> int:
     from decimal import Decimal
 
     from agents.synthesis.narrate import narrate_thesis
-    from core.config import load as load_config
     from core.guardrails.policy import Action, PolicyViolation, Rail
     from core.llm.backends import backend_from_env
     from core.llm.client import InferenceClient
@@ -373,6 +397,15 @@ def _narrate(ctx, thesis, challenges) -> int:
     except PolicyViolation as e:
         print(f"\nnarrative BLOCKED by the output rail: {e}")
         return 0
+    from agents.synthesis.narrate import thesis_digest, unsupported_numbers
+
+    unsupported = unsupported_numbers(done.text, thesis_digest(thesis, challenges))
+    if unsupported:
+        # Not proof of invention - a rounded restatement lands here too - but
+        # every one of these is a number the engines did not supply, and that
+        # is the list worth reading before trusting the prose.
+        print(f"\n  UNVERIFIED NUMBERS in the narrative: {', '.join(unsupported)}")
+        print("  Each appears in the prose and not in the engine output it was given.")
     print(f"\nnarrative  [{type(backend).__name__} - {reason.split(':')[0]}]")
     for line in done.text.strip().splitlines():
         print(f"  {line}")
@@ -443,8 +476,34 @@ def cmd_risk(a) -> int:
 
 # --- sizing ---------------------------------------------------------------
 def cmd_size(a) -> int:
-    a13 = A13Sizing(context())
-    portfolio = Decimal(str(a.portfolio))
+    from agents.portfolio.agents import TYPED_CAPITAL_NOTE, plan_capital
+    from core.config import load as load_cfg
+
+    ctx = context()
+    a13 = A13Sizing(ctx)
+    if getattr(a, "from_plan", False):
+        waterfall, _ = plan_capital(load_cfg(), ctx)
+        if waterfall is None:
+            print(
+                "--from-plan needs a [capital] block in config.toml. Run `ask.py capital`.",
+                file=sys.stderr,
+            )
+            return 2
+        if waterfall.investable == 0:
+            print("no position: the plan leaves nothing investable today.\n")
+            print(waterfall.explain())
+            return 0
+        portfolio = waterfall.investable
+        capital_note = f"capital DERIVED through the waterfall: {portfolio:,.2f} investable"
+    elif a.portfolio is None:
+        print(
+            "give --portfolio, or --from-plan to derive it from [capital] in config.toml.",
+            file=sys.stderr,
+        )
+        return 2
+    else:
+        portfolio = Decimal(str(a.portfolio))
+        capital_note = TYPED_CAPITAL_NOTE
     price = Decimal(str(a.price))
     stop = Decimal(str(a.stop))
     if stop >= price:
@@ -468,10 +527,48 @@ def cmd_size(a) -> int:
     # come down and returns its RM 100m ceiling. What makes small positions
     # uneconomic is the fixed MINIMUM (RM 8 on Bursa), and a model without one
     # cannot express the thing being measured.
+    # Resolved before the branch so the no-adapter path below can name it too.
+    broker = load_cfg().broker
     try:
-        schedule = market_get(mic).fee_schedule
-        round_trip_cost_at = schedule.round_trip
-        cost_note = f"{mic} fee schedule"
+        # The BROKER's schedule where the account has one, the venue's otherwise.
+        # markets/xnas.py models a zero-commission US account; sizing a moomoo
+        # account against it understates the floor by two orders of magnitude.
+        from markets.brokers import schedule_for
+
+        schedule = schedule_for(mic, broker)
+        # A broker that does not price this venue falls back to the venue's own
+        # schedule. Saying "moomoo_my schedule on XKLS" when Bursa's schedule is
+        # what was actually used is a label that reads as a fact and is not one.
+        on_broker_terms = schedule is not market_get(mic).fee_schedule
+
+        # Two of moomoo's legs are per-share and its commission waiver depends on
+        # the share count, so the schedule cannot be costed from a value alone.
+        # --price is required on this subcommand, so it is always in hand here.
+        def round_trip_cost_at(value: Decimal) -> Decimal:
+            return schedule.round_trip(value, price)
+
+        cost_note = f"{broker} schedule on {mic}" if on_broker_terms else f"{mic} fee schedule"
+
+        # The same impossibility the --cost-bps path below already guards, on the
+        # path a real account actually takes. moomoo's 0.03% commission is 6 bps
+        # round trip at ANY size, above the 5 bps XNAS floor - so the bisection
+        # in cost_floor_value never comes down and returns its ceiling, which
+        # reads as a USD 100,000,000 position requirement rather than as "this
+        # account cannot trade this venue economically at all".
+        floor_bps = cost_floor_bps(mic, broker)
+        if cost_floor_unreachable(cost_floor_value(round_trip_cost_at, mic, broker)):
+            asymptote = schedule.round_trip_bps(Decimal("100000000"), price)
+            print(f"sizing    {a.instrument}")
+            print(
+                f"  no position: on the {cost_note} a round trip costs "
+                f"{asymptote.quantize(Decimal('0.01'))} bps at ANY size, above the "
+                f"{floor_bps} bps floor for {mic}."
+            )
+            print(
+                "  No position can pay its own spread here. This is a fact about "
+                "the account, not about the size you asked for."
+            )
+            return 0
     except KeyError:
         rate = Decimal(str(a.cost_bps)) / Decimal(10_000)
         minimum = Decimal(str(a.cost_minimum))
@@ -507,11 +604,29 @@ def cmd_size(a) -> int:
     # wrong by exactly that rate, so say so rather than print a plausible number.
     quote = market_currency(mic)
     fx = Decimal(str(a.fx)) if a.fx else None
+    fx_note = ""
+    if quote != BASE_CURRENCY and fx is None and getattr(a, "fetch_fx", False):
+        from core.market.fx import BnmFxFeed, FxFeedError
+        from core.market.prices import FxStore
+
+        store = FxStore()
+        try:
+            BnmFxFeed().populate(store)
+        except FxFeedError as e:
+            print(f"no FX rate: {e}", file=sys.stderr)
+            return 3
+        hit = store.rate_asof(quote, BASE_CURRENCY, date.today())
+        if hit is None:
+            print(f"no FX rate: BNM publishes no {quote} rate", file=sys.stderr)
+            return 3
+        fx, asof = hit
+        fx_note = f"  fx 1 {quote} = {BASE_CURRENCY} {fx} (BNM middle rate, {asof})"
     if quote != BASE_CURRENCY and fx is None:
         print(f"sizing    {a.instrument}")
         print(
             f"  {mic} prices in {quote}; --portfolio is {BASE_CURRENCY}. Pass "
-            f"--fx <{BASE_CURRENCY} per {quote}> so the two can be compared."
+            f"--fx <{BASE_CURRENCY} per {quote}>, or --fetch-fx to look it up "
+            f"from BNM, so the two can be compared."
         )
         print(
             f"  Without it the position would be off by the {BASE_CURRENCY}/{quote} "
@@ -519,11 +634,15 @@ def cmd_size(a) -> int:
         )
         return 2
 
+    if fx_note:
+        print(fx_note)
+
     caps, findings = a13.caps(
         portfolio_value=portfolio,
         stop_distance_frac=stop_frac,
         adv_20d=Decimal(str(a.adv)),
         round_trip_cost_at=round_trip_cost_at,
+        broker=broker,
         risk_per_trade=Decimal(str(a.risk_per_trade)),
         single_name_limit=Decimal(str(a.single_name)),
         win_rate=a.win_rate,
@@ -532,6 +651,7 @@ def cmd_size(a) -> int:
         mic=mic,
         fx_base_per_quote=fx,
     )
+    print(f"  {capital_note}")
     print(
         f"sizing    {a.instrument}  portfolio {BASE_CURRENCY} {portfolio:,.2f}  "
         f"stop distance {stop_frac:.1%}"
@@ -539,6 +659,27 @@ def cmd_size(a) -> int:
     print(f"cost      {cost_note}")
     if quote != BASE_CURRENCY:
         print(f"fx        1 {quote} = {BASE_CURRENCY} {fx}")
+    # The cost nobody publishes, said out loud. A foreign position is converted
+    # in and converted back, so the spread is paid TWICE, and on this account it
+    # is larger than the whole fee schedule: about 1% round trip against roughly
+    # 0.3% of commission, platform, settlement, duty and levies combined.
+    #
+    # It is NOT folded into the cost floor. The floor decides refusals, and a
+    # refusal that turns on an unmeasured number is a refusal that cannot be
+    # defended. So it is reported beside the floor and left out of it, until
+    # somebody converts a small amount and measures the thing.
+    if quote != BASE_CURRENCY:
+        spread = load_cfg().fx_spread_per_side
+        if spread > 0:
+            rt = ((1 + spread) / (1 - spread) - 1) * Decimal(100)
+            print(
+                f"  currency  converting {BASE_CURRENCY} to {quote} and back costs about "
+                f"{rt.quantize(Decimal('0.01'))}% at an assumed {spread:.2%} spread per side"
+            )
+            print(
+                "            NOT measured and NOT in the cost floor below - moomoo "
+                "publishes no spread. See account.fx_spread_per_side in config.toml."
+            )
     for f in findings:
         print(f"  {f.text}")
         for c in f.caveats:
@@ -547,18 +688,31 @@ def cmd_size(a) -> int:
     binding, value = caps.binding()
     units = int(value / price) // a.lot * a.lot
     print(f"\n  binding cap {binding.value} at {quote} {value:,.2f}")
+
+    def shown(v: Decimal) -> str:
+        native_txt = f"{quote} {v:,.2f}"
+        if quote == BASE_CURRENCY:
+            return native_txt
+        return f"{native_txt} = {BASE_CURRENCY} {to_base(v, quote, fx):,.2f}"
+
+    native = Decimal(units) * price
     if units < a.lot:
         print(
             f"  -> no position: the binding cap does not fund one {a.lot}-share lot "
             f"at {quote} {price}"
         )
+    elif native < caps.cost_floor:
+        # The floor is computed and PRINTED two lines above, then was ignored
+        # here - so this command recommended positions the MCP tool refused for
+        # the same inputs. Below the minimum economic position the round trip
+        # cannot pay for itself at any edge; that is the whole point of it.
+        print(
+            f"  -> no position: {units:,} units is {shown(native)}, below the "
+            f"{shown(caps.cost_floor)} minimum economic position on {mic}. "
+            f"The round trip cannot pay for itself."
+        )
     else:
-        native = Decimal(units) * price
-        base = to_base(native, quote, fx)
-        shown = f"{quote} {native:,.2f}"
-        if quote != BASE_CURRENCY:
-            shown += f" = {BASE_CURRENCY} {base:,.2f}"
-        print(f"  -> {units:,} units ({shown}) in lots of {a.lot}")
+        print(f"  -> {units:,} units ({shown(native)}) in lots of {a.lot}")
     return 0
 
 
@@ -598,6 +752,316 @@ def cmd_learn(a) -> int:
 
 
 # --- which model is actually answering ------------------------------------
+
+
+def cmd_news(a) -> int:
+    """Pull one configured source through the registry and show what arrived.
+
+    The ingest contract on the command line: a broken source raises and exits
+    3; a quiet window prints its own emptiness rather than pretending."""
+    from datetime import timedelta as _td
+
+    from knowledge.feeds.adapter import FeedError
+    from knowledge.feeds.registry import UnknownSource, adapter_for
+
+    try:
+        feed = adapter_for(a.source)
+    except UnknownSource as e:
+        print(str(e), file=sys.stderr)
+        return 2
+    since = datetime.now(UTC) - _td(hours=a.hours)
+    try:
+        records = feed.fetch(since, limit=a.limit)
+    except FeedError as e:
+        print(f"no news: {e}", file=sys.stderr)
+        return 3
+    articles, stats = feed.normalize(records)
+    print(f"{feed.name}  since {a.hours}h ago  {stats}")
+    for art in articles[: a.limit]:
+        when = art.published_at.strftime("%Y-%m-%d %H:%M")
+        print(f"  {when}  {art.source_domain:<24} {art.title}")
+    if not articles:
+        print("  (a quiet window, reported as one - not an error)")
+    return 0
+
+
+def cmd_sweep(a) -> int:
+    """Fetch every enabled source and KEEP what arrives.
+
+    `news` prints one source and forgets it, which is right for a person
+    checking a feed by hand. This is the scheduled sibling: it resumes from the
+    last SUCCESSFUL sweep of each source, writes what it finds to the corpus,
+    links it into the graph, and records the attempt either way.
+
+    Exit codes are the interface, like `watch`: 0 every source read, 3 at least
+    one source failed, 2 the sweep itself could not run. A scheduler can act on
+    those without parsing text - and it needs to, because the failure this
+    command exists to make visible is the one that looks like a quiet world.
+    """
+    from datetime import timedelta as _td
+
+    from core.config import load as load_cfg
+    from knowledge.corpus import FAILED, OK, Corpus
+    from knowledge.feeds.adapter import FeedError
+    from knowledge.feeds.registry import UnknownSource, adapter_for
+    from knowledge.graph.extractors.gdelt import entity_index
+
+    try:
+        cfg = load_cfg()
+    except Exception as e:  # a sweep that dies on its own config is the case 2 exists for
+        print(f"sweep could not run: {type(e).__name__}: {e}", file=sys.stderr)
+        return 2
+
+    names = list(a.source) if a.source else list(cfg.sources)
+    if not names:
+        print(
+            "no sources enabled. Add one to [sources] enabled in config.toml - "
+            "the register of what exists is docs/world-sources.html.",
+            file=sys.stderr,
+        )
+        return 2
+
+    index = entity_index()
+    holdings, watchlist = set(cfg.holdings), set(cfg.watchlist)
+    started = datetime.now(UTC)
+    run_id = started.strftime("%Y%m%dT%H%M%S")
+    failed = 0
+
+    print(f"sweep {run_id}")
+    with Corpus(a.db or cfg.corpus_db) as corpus:
+        for name in names:
+            since = corpus.last_success(name) or started - _td(hours=a.hours)
+            try:
+                # GDELT is the only source today that takes a language or country
+                # filter; an RSS feed is whatever the publisher publishes.
+                kw = (
+                    {
+                        "languages": tuple(cfg.gdelt_languages),
+                        "countries": tuple(cfg.gdelt_countries),
+                    }
+                    if name == "gdelt"
+                    else {}
+                )
+                feed = adapter_for(name, **kw)
+                records = feed.fetch(since, limit=a.limit)
+            except UnknownSource as e:
+                print(f"  {name:<16} REFUSED: {e}", file=sys.stderr)
+                return 2
+            except FeedError as e:
+                # The whole point of the sweeps table. An unrecorded failure and
+                # a quiet night are the same empty corpus a month later.
+                corpus.record_sweep(run_id, name, since, FAILED, detail=str(e)[:400])
+                print(f"  {name:<16} FAILED: {e}", file=sys.stderr)
+                failed += 1
+                continue
+
+            articles, stats = feed.normalize(
+                records, entity_index=index, holdings=holdings, watchlist=watchlist
+            )
+            stored = corpus.add_all(articles, name)
+            corpus.record_sweep(
+                run_id,
+                name,
+                since,
+                OK,
+                fetched=stats.fetched,
+                kept=stats.kept,
+                stored=stored.stored,
+                duplicates=stored.duplicates,
+                unlinked=stats.unlinked,
+                escalated=stats.escalated,
+            )
+            print(f"  {name:<16} since {since:%Y-%m-%d %H:%M}  {stats}\n  {'':<16} {stored}")
+
+        fresh = corpus.articles(since=started, limit=max(a.limit, 1) * len(names))
+        if fresh and not a.no_graph:
+            print(f"  {'graph':<16} {_link_graph(fresh, a.graph_db)}")
+        counts = corpus.counts()
+
+    print(
+        f"  {'corpus':<16} {counts['articles']} articles, {counts['linked']} linked to a name, "
+        f"{counts['sweeps']} sweeps, {counts['failed_sweeps']} of them failed"
+    )
+    if not (holdings or watchlist):
+        print(
+            "  note             holdings and watchlist are both empty, so the "
+            "escalation gate\n                   cannot fire and nothing here "
+            "will ever be flagged for review."
+        )
+    return 3 if failed else 0
+
+
+def _link_graph(articles, graph_db: str) -> str:
+    """Attach this sweep's articles to the companies they name.
+
+    Deliberately NOT pruned. `prune_on` closes edges of this tier that the
+    build's own extractors did not assert, and this build carries one extractor
+    - pruning here would close every curated and sector edge in the graph
+    because a news sweep did not happen to mention them.
+    """
+    from knowledge.graph.build import build
+    from knowledge.graph.extractors.gdelt import GdeltExtractor
+    from knowledge.graph.store import GraphStore
+
+    with GraphStore(graph_db) as store:
+        before = store.counts()
+        build(store, extractors=[GdeltExtractor(articles)])
+        after = store.counts()
+    return (
+        f"+{after['nodes'] - before['nodes']} nodes  "
+        f"+{after['edges'] - before['edges']} edges  "
+        f"(INFERRED - traversable, never citable)"
+    )
+
+
+def cmd_watch(a) -> int:
+    """Evaluate the monitor rules and record what CHANGED.
+
+    Built to be scheduled. Exit codes are the interface: 0 nothing open,
+    1 something is open, 2 the check itself could not run - so a task
+    scheduler can act on it without parsing text.
+    """
+    from core.config import load as load_cfg
+    from core.monitor import check
+
+    try:
+        result = check(load_cfg(), db=a.db or "", alerts_db=a.alerts_db)
+    except Exception as e:  # a monitor that dies silently is the thing it exists to catch
+        print(f"monitor could not run: {type(e).__name__}: {e}", file=sys.stderr)
+        return 2
+    print(result.render())
+    return 1 if result.any_open else 0
+
+
+def cmd_alerts(a) -> int:
+    """What is open now, and the history of when things opened and cleared."""
+    from core.monitor import AlertLog
+
+    with AlertLog(a.alerts_db) as log:
+        open_now = log.open_rules()
+        rows = log.history(limit=a.limit)
+    if open_now:
+        print(f"{len(open_now)} open:")
+        for rule, r in sorted(open_now.items()):
+            print(f"  [{r['severity']}] {rule}: {r['title']}")
+            print(f"      open since {r['at'][:19]}")
+    else:
+        print("nothing open.")
+    if rows:
+        print("\nhistory (newest first)")
+        for r in rows:
+            print(f"  {r['at'][:19]}  {r['state']:<8} {r['rule']:<22} {r['title'][:60]}")
+    return 0
+
+
+def cmd_capital(a) -> int:
+    """How much money is allowed to be in stocks at all.
+
+    docs/05 section 2 puts this before any question about which stock. The
+    first three steps are locked: no flag in this API reduces the emergency
+    floor, funds a near-term goal out of equities, or lets equities outrank
+    debt above the hurdle.
+    """
+    from agents.portfolio.agents import plan_capital
+    from core.config import load as load_cfg
+
+    cfg = load_cfg()
+    waterfall, findings = plan_capital(cfg, context())
+    if waterfall is None:
+        print("no [capital] plan in config.toml.")
+        print(
+            "  Fill liquid_assets and essential_monthly_spend (plus any goals and\n"
+            "  liabilities) and this command derives what is investable. Until then\n"
+            "  `size` needs --portfolio, which bypasses the emergency floor, the\n"
+            "  near-term goals and the debt hurdle."
+        )
+        return 2
+    print(waterfall.explain())
+    for f in findings:
+        for c in f.caveats:
+            print(f"\n  {c}")
+    if waterfall.investable == 0:
+        print("\n  Nothing is investable today. That is an answer, not a failure.")
+    return 0
+
+
+def cmd_allocate(a) -> int:
+    """Split capital across names YOU nominate. It does not choose them."""
+    from agents.portfolio.agents import TYPED_CAPITAL_NOTE, plan_capital
+    from core.config import load as load_cfg
+    from engines.sizing.allocate import allocate
+    from mcp_server.protocol import ToolError
+    from mcp_server.tools import _candidates
+
+    cfg = load_cfg()
+    if a.from_plan:
+        waterfall, _ = plan_capital(cfg, context())
+        if waterfall is None:
+            print("--from-plan needs a [capital] block. Run `ask.py capital`.", file=sys.stderr)
+            return 2
+        investable = waterfall.investable
+        note = f"capital derived through the waterfall: {investable:,.2f}"
+    elif a.portfolio is None:
+        print("give --portfolio, or --from-plan to derive it from [capital].", file=sys.stderr)
+        return 2
+    else:
+        investable = Decimal(str(a.portfolio))
+        note = TYPED_CAPITAL_NOTE
+
+    if not a.name:
+        print(
+            "nominate names with --name MIC:CODE:PRICE:STOP:ADV:SECTOR (repeatable).\n"
+            "This system does not choose them - it sizes and bounds the ones you bring.",
+            file=sys.stderr,
+        )
+        return 2
+
+    fx_notes: list[str] = []
+    try:
+        candidates = _candidates(list(a.name), fetch=a.fetch, end=None, notes=fx_notes)
+    except ToolError as e:
+        print(str(e), file=sys.stderr)
+        return 2
+
+    result = allocate(
+        investable,
+        candidates,
+        limits=cfg.limits,
+        risk_per_trade=Decimal(str(a.risk_per_trade)),
+        single_name_limit=Decimal(str(a.single_name)),
+    )
+    print(f"  {note}")
+    for fx_note in fx_notes:
+        print(f"  {fx_note}")
+    print()
+    print(result.explain())
+    return 0
+
+
+def cmd_rebalance(a) -> int:
+    """What to change versus what you hold. The book lives in config.toml."""
+    from mcp_server.protocol import ToolError
+    from mcp_server.tools import rebalance_book
+
+    try:
+        text = rebalance_book(
+            names=list(a.name or []),
+            portfolio_value=a.portfolio,
+            from_plan=a.from_plan,
+            as_at=a.as_at or "",
+            single_name_limit=a.single_name,
+            risk_per_trade=a.risk_per_trade,
+        )
+    except ToolError as e:
+        print(str(e), file=sys.stderr)
+        return 2
+    if text.startswith("NOTHING TO REBALANCE"):
+        print(text, file=sys.stderr)
+        return 2
+    print(text)
+    return 0
+
+
 def cmd_doctor(a) -> int:
     from core.doctor import FAIL, render, run_checks
 
@@ -617,10 +1081,44 @@ def cmd_backend(a) -> int:
         return 3
     print(f"backend   {type(backend).__name__}")
     print(f"reason    {reason}")
-    from core.llm.tiers import MODEL_IDS
+    from core.llm.tiers import (
+        MESSAGES_TIERS,
+        MODEL_IDS,
+        cheap_capped,
+        effective_tier,
+        profile_for,
+        selected_effort,
+        selection_note,
+    )
 
+    # Under a pin the table must show what will ACTUALLY be called and billed.
+    # Printing the unpinned model here is how a disclosure command ends up
+    # disclosing the wrong thing. The reasoning column is the same rule applied
+    # to effort: what the request will carry, in the form that model accepts.
     for tier, model in MODEL_IDS.items():
-        print(f"  {tier.value:<9} {model}")
+        landed = effective_tier(tier)
+        shape = profile_for(landed)
+        if landed in MESSAGES_TIERS:
+            if shape.thinking_budget is not None:
+                how = f"thinking budget {shape.thinking_budget}"
+            elif shape.effort:
+                how = f"effort {shape.effort}"
+            else:
+                how = "no thinking"
+            how = f"{how}, max {shape.max_tokens}" + (", streamed" if shape.stream else "")
+        else:
+            how = "not a Messages model"
+        moved = "" if landed is tier else f"   (pinned from {model})"
+        print(f"  {tier.value:<9} {MODEL_IDS[landed]:<24} {how}{moved}")
+    note = selection_note()
+    if note:
+        print(f"  selection {note}")
+    if cheap_capped():
+        print("  every Messages tier is on the cheapest model; unset the pin to")
+        print("  spend at each tier's own rate.")
+    if selected_effort() is None:
+        print("  effort unset: each tier keeps its own default (reason high, balanced")
+        print("  medium, cheap none). --effort low|medium|high|xhigh|max overrides it.")
     return 0
 
 
@@ -792,12 +1290,43 @@ def cmd_graph(a) -> int:
 
 
 def main(argv=None) -> int:
+    from core.env import load as _load_dotenv
     from core.logging import configure as _configure_logging
 
+    _load_dotenv()
     _configure_logging()
     ap = argparse.ArgumentParser(
         prog="ask", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
+
+    # Model and effort are one selection, available to every subcommand, and
+    # they set the same environment variables an operator would export - so a
+    # flag and a shell export cannot mean two different things. The flag wins
+    # for the length of one command, which is the whole point of having it.
+    def _selection(parser, *, suppress: bool) -> None:
+        # On the subparsers the default is SUPPRESS, not None. With a plain
+        # default the subparser would write None over whatever the top-level
+        # parser had already parsed, and `ask.py --effort max why ...` would
+        # silently think at the default level - the exact silent-selection
+        # failure the disclosure line exists to prevent.
+        default = argparse.SUPPRESS if suppress else None
+        parser.add_argument(
+            "--model",
+            metavar="NAME",
+            default=default,
+            help="pin every Messages tier to one model: haiku | sonnet | opus "
+            "(or the exact model id). Default: the task class routes it.",
+        )
+        parser.add_argument(
+            "--effort",
+            metavar="LEVEL",
+            default=default,
+            help="how hard the model thinks: low | medium | high | xhigh | max. "
+            "On Haiku 4.5, which takes no effort parameter, this becomes a "
+            "thinking budget of the matching size.",
+        )
+
+    _selection(ap, suppress=False)
     sub = ap.add_subparsers(dest="cmd", required=True)
 
     pl = sub.add_parser("plan", help="what would the system do with this question")
@@ -808,8 +1337,12 @@ def main(argv=None) -> int:
 
     wy = sub.add_parser("why", help="decompose a move before naming a cause")
     wy.add_argument("instrument")
-    wy.add_argument("--move", type=float, required=True, help="realised local return, e.g. -0.09")
-    wy.add_argument("--market", type=float, required=True, help="index return over the same window")
+    # NOT required: --fetch exists to MEASURE these from the feed, and demanding
+    # them anyway made the measured path - the one this command is for -
+    # unreachable without typing the numbers you were asking it to measure.
+    # cmd_why enforces the real rule: typed, or fetched, never half of each.
+    wy.add_argument("--move", type=float, help="realised local return, e.g. -0.09")
+    wy.add_argument("--market", type=float, help="index return over the same window")
     wy.add_argument("--sector", type=float, default=0.0)
     wy.add_argument("--fx", type=float, default=0.0, help="base-currency leg")
     wy.add_argument("--currency", default="MYR")
@@ -871,8 +1404,18 @@ def main(argv=None) -> int:
 
     sz = sub.add_parser("size", help="turn a stance into lots, or into a refusal")
     sz.add_argument("instrument")
+    # Not required: --from-plan derives it from [capital] through the waterfall.
+    # A typed figure still works, and is disclosed as the bypass it is.
     sz.add_argument(
-        "--portfolio", type=float, required=True, help=f"investable capital, in {BASE_CURRENCY}"
+        "--portfolio",
+        type=float,
+        help=f"investable capital in {BASE_CURRENCY}, typed (bypasses the waterfall)",
+    )
+    sz.add_argument(
+        "--from-plan",
+        action="store_true",
+        help="derive investable capital from [capital] in config.toml, applying the "
+        "emergency floor, near-term goals and debt hurdle",
     )
     sz.add_argument(
         "--price", type=float, required=True, help="in the market's own currency, like --adv"
@@ -883,6 +1426,12 @@ def main(argv=None) -> int:
         default=0.0,
         help=f"{BASE_CURRENCY} per 1 unit of the market's currency; "
         f"required for any market that does not price in {BASE_CURRENCY}",
+    )
+    sz.add_argument(
+        "--fetch-fx",
+        action="store_true",
+        help="look the rate up from Bank Negara Malaysia (keyless, dated) "
+        "instead of typing --fx; the as-of date is printed with the answer",
     )
     sz.add_argument("--stop", type=float, required=True)
     sz.add_argument("--adv", type=float, required=True, help="20-day average daily volume")
@@ -954,11 +1503,92 @@ def main(argv=None) -> int:
     bk.add_argument("--use", choices=["anthropic", "echo"], help="force one")
     bk.set_defaults(fn=cmd_backend)
 
+    nw = sub.add_parser("news", help="pull one source through the feed registry")
+    nw.add_argument("source", help="a name from knowledge/feeds/registry.py, e.g. gdelt")
+    nw.add_argument("--hours", type=int, default=24, help="window back from now")
+    nw.add_argument("--limit", type=int, default=20)
+    nw.set_defaults(fn=cmd_news)
+
+    sw = sub.add_parser("sweep", help="fetch every enabled source and KEEP what arrives")
+    sw.add_argument(
+        "--source", action="append", help="one source; repeatable. Default: [sources] enabled"
+    )
+    sw.add_argument(
+        "--hours", type=int, default=24, help="window when a source has never been swept"
+    )
+    sw.add_argument("--limit", type=int, default=250, help="max records per source")
+    sw.add_argument("--db", default="", help="corpus database (default: [sources] corpus_database)")
+    sw.add_argument("--graph-db", default="data/graph.db", help="graph to link articles into")
+    sw.add_argument("--no-graph", action="store_true", help="store only; do not touch the graph")
+    sw.set_defaults(fn=cmd_sweep)
+
+    wt = sub.add_parser("watch", help="evaluate the monitor rules; exit 1 if anything is open")
+    wt.add_argument("--db", help="provenance ledger path")
+    wt.add_argument("--alerts-db", default="data/alerts.db")
+    wt.set_defaults(fn=cmd_watch)
+
+    al = sub.add_parser("alerts", help="what is open, and when things opened and cleared")
+    al.add_argument("--alerts-db", default="data/alerts.db")
+    al.add_argument("--limit", type=int, default=20)
+    al.set_defaults(fn=cmd_alerts)
+
+    al2 = sub.add_parser("allocate", help="split capital across names you nominate")
+    al2.add_argument(
+        "--name",
+        action="append",
+        metavar="MIC:CODE:PRICE:STOP:ADV:SECTOR",
+        help="repeatable; leave PRICE and ADV empty with --fetch to measure them",
+    )
+    al2.add_argument("--portfolio", type=float, help="investable capital, typed")
+    al2.add_argument("--from-plan", action="store_true", help="derive it from [capital]")
+    al2.add_argument("--fetch", action="store_true", help="measure empty price/adv from the feed")
+    al2.add_argument("--risk-per-trade", type=float, default=0.0075)
+    al2.add_argument("--single-name", type=float, default=0.08)
+    al2.set_defaults(fn=cmd_allocate)
+
+    rb = sub.add_parser("rebalance", help="what to change versus what you hold")
+    rb.add_argument(
+        "--name",
+        action="append",
+        metavar="MIC:CODE:PRICE:STOP:ADV:SECTOR",
+        help="extra names to consider alongside the book (repeatable)",
+    )
+    rb.add_argument("--portfolio", type=float, help="capital; default is the book's own value")
+    rb.add_argument("--from-plan", action="store_true", help="derive capital from [capital]")
+    rb.add_argument("--as-at", help="point-in-time bound for prices (YYYY-MM-DD)")
+    rb.add_argument("--risk-per-trade", type=float, default=0.0075)
+    rb.add_argument("--single-name", type=float, default=0.08)
+    rb.set_defaults(fn=cmd_rebalance)
+
+    cp = sub.add_parser("capital", help="how much may be invested at all, from [capital]")
+    cp.set_defaults(fn=cmd_capital)
+
     dr = sub.add_parser("doctor", help="preflight: what this installation can actually do")
     dr.add_argument("--offline", action="store_true", help="skip the two network probes")
     dr.set_defaults(fn=cmd_doctor)
 
+    # A global flag that only worked BEFORE the subcommand is a flag people
+    # write after it and are told does not exist. Both positions accept it.
+    for _p in sub.choices.values():
+        _selection(_p, suppress=True)
+
     a = ap.parse_args(argv)
+    # Set them before dispatch, and validate immediately: a typo that silently
+    # selected Opus would be found on the invoice, not on the screen.
+    import os
+
+    if a.model:
+        os.environ["FINPLANET_MODEL"] = a.model
+    if a.effort:
+        os.environ["FINPLANET_EFFORT"] = a.effort
+    if a.model or a.effort:
+        from core.llm.tiers import ModelSelectionError, pinned_tier, selected_effort
+
+        try:
+            pinned_tier(), selected_effort()
+        except ModelSelectionError as e:
+            print(f"{e}", file=sys.stderr)
+            return 2
     return a.fn(a)
 
 

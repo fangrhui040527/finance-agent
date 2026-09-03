@@ -1,30 +1,25 @@
+# Only two kinds of thing stay out of this repository now: a secret, and
+# anything git would be storing a second copy of.
+#
+# The user asked for the whole project to be backed up, so the databases,
+# the traces and the QA artefacts are all tracked. They are the system's own
+# history - what it was asked, what it answered, what it cost - and that
+# history exists on one disk otherwise.
+
+# 1. The secret. A live API key in git history is permanent even after a
+#    force-push, and this file is regenerated from the key you hold anyway.
+.env
+config.local.toml
+
+# 2. Derived from files that ARE tracked, so storing it is storing it twice.
+#    .venv is 138 MB of Windows-only binaries that uv.lock rebuilds exactly,
+#    and a Windows venv does not run on the Linux box CI uses.
 .venv/
 __pycache__/
 *.pyc
 .pytest_cache/
 *.egg-info/
-.env
-# Anchored to the repository root on purpose. An unanchored `data/` matches ANY
-# directory of that name at any depth, which silently excluded the three
-# human-authored yaml files under knowledge/graph/data/ - checked-in sources the
-# graph build reads, not generated output.
-/data/
-*.db
-config.local.toml
 .coverage
 htmlcov/
-
-# Traces. These hold VERBATIM prompts, model responses and whatever portfolio
-# positions were passed in - a debugging artefact, not an audit record. The
-# provenance ledger is the thing that keeps history, and it stores a prompt hash
-# rather than the prompt for exactly this reason.
-debug/
-
-# Tooling that must never enter a commit. A `npm ls` run in this directory
-# creates node_modules/ and `git add -A` sweeps it in - 368,000 lines of
-# vendored JavaScript that would live in the history forever.
 node_modules/
 package-lock.json
-
-# QA session artefacts (metered live runs write here); the suite itself is tracked.
-qa/artifacts/

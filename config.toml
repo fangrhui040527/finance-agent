@@ -19,9 +19,47 @@ base_currency = "MYR"
 # entry (see docs/06 appendix); listing a MIC with no adapter is refused at load.
 markets = ["XKLS", "XNAS"]
 
-# docs/08 planning rate: mid-market ~4.04 plus roughly 2.5% card FX markup.
-# Used for cost estimates only. Real conversions carry their own dated rate.
-fx_myr_per_usd = 4.15
+# Whose fee schedule this account actually pays. Unset means the VENUE's own
+# schedule, which is what every adapter in markets/ ships - and markets/xnas.py
+# ships a ZERO-COMMISSION US account: a 5 bps floor and a USD 1.00 minimum
+# economic position. If that is not your account, sizing against it funds US
+# positions that cannot pay for their own round trip, silently, because a wrong
+# floor is still a number.
+#
+# "moomoo_my" is 0.03% commission + USD 0.99 flat per order + USD 0.003 a share,
+# with the SEC and FINRA fees on the sale only. That is 204.9 bps round trip on a
+# USD 100 position and moves the minimum economic position to about USD 1,511 at
+# a USD 100 share price - roughly RM 6,270. It is per-share, so that minimum
+# RISES as the share price falls: about USD 2,620 at USD 10 a share.
+#
+# A broker only replaces the venues it actually prices; anything else still
+# sizes on the venue's terms, and the output names which was used.
+broker = "moomoo_my"
+
+# THE RATE, and nothing else: mid-market MYR per USD, 3 September 2026.
+# `ask.py fx --fetch` replaces this with Bank Negara's official dated rate.
+#
+# It used to be 4.15, which quietly bundled a 2.34% CARD markup into the rate.
+# You convert through a broker, not a card. Bundling a cost into a rate shrank
+# the portfolio on every US decision without ever naming the reason.
+fx_myr_per_usd = 4.055
+
+# What converting ringgit to dollars COSTS you, one way, as a fraction.
+#
+# NOT MEASURED, and the biggest unknown in this system. moomoo advertises
+# "0 fees" on currency exchange and publishes no spread - the cost is inside
+# the rate they hand you, and no page will tell you what it is. 0.5% is the
+# upper end of independent estimates for a broker; a card is 2-3%.
+#
+# Why it matters more than everything above it: on a US position the entire
+# fee schedule is about 0.3% round trip. A 0.5% spread each way is 1% round
+# trip - more than three times every commission, platform fee, settlement fee,
+# stamp duty and regulatory levy combined.
+#
+# TO MEASURE IT: convert a small amount in the app, note the rate you actually
+# received, and compare it with the mid-market rate at that moment. The gap,
+# divided by the mid-market rate, is this number. Then set it here.
+fx_spread_per_side = 0.005
 
 # What you actually own, and what you are considering. These are not decoration:
 # the escalation gate (knowledge/news/features.py should_escalate) only lets an
@@ -32,6 +70,14 @@ fx_myr_per_usd = 4.15
 # list long enough to fill a queue you stop reading is worse than no queue.
 # Ids carry their market prefix and are validated at load - a typo here does not
 # crash, it silently stops matching a name you think is being watched.
+# A holding may be a bare id, or a table carrying what you own:
+#   holdings = [{ id = "MYX:1155", units = 2000, avg_cost = 10.68, stop = 9.83, sector = "bank" }, { id = "MYX:1023", units = 2000, avg_cost = 7.96, stop = 7.32, sector = "telco" }, { id = "MYX:5296", units = 2000, avg_cost = 1.38, stop = 1.27, sector = "consumer" }, { id = "MYX:6012", units = 2000, avg_cost = 3.73, stop = 3.43, sector = "energy" }, { id = "MYX:4197", units = 2000, avg_cost = 2.60, stop = 2.39, sector = "plantation" }, { id = "MYX:1961", units = 2000, avg_cost = 4.68, stop = 4.31, sector = "reit" }]
+# `stop` and `sector` are optional and only rebalancing uses them: without a
+# stop the risk-budget cap cannot be computed for that name and the output says
+# which cap it lost; without a sector the name counts as its own sector, which
+# is how a book of six banks can look like six sectors.
+# Without units the name is still watched and analysed; only the book value
+# and anything that needs it (rebalancing) will say it cannot be computed.
 holdings = []
 watchlist = []
 
@@ -69,6 +115,35 @@ min_effective_bets = 5.0      # hard floor 3.0, whatever this says
 # not one stop filling; it is all of them filling in the same week.
 portfolio_heat = 0.06
 min_positions = 5
+
+
+[capital]
+# Your financial position. `engines/sizing/waterfall.py` turns this into
+# investable capital, in this order, and the first three steps are LOCKED:
+#
+#   liquid assets
+#     - emergency floor        (essential_monthly_spend x waterfall.emergency_months)
+#     - near-term goals        (anything <= 24 months away)
+#     - debt above the hurdle  (waterfall.debt_hurdle)
+#     - one month of planned contributions, held as cash
+#   = investable
+#
+# Leave these at zero and `ask.py size` cannot derive your capital - you would
+# have to type it with --portfolio, which BYPASSES all three locks. That is
+# supported and disclosed, never silent.
+liquid_assets = 0.0
+essential_monthly_spend = 0.0
+planned_monthly_contribution = 0.0
+
+# Money already spoken for. Inside 24 months it holds cash however good a
+# signal looks: a goal you have to sell into a drawdown to fund is not funded.
+#   goals = [{ name = "car deposit", amount = 30000, months_away = 18 }]
+goals = []
+
+# Debts. Anything above waterfall.debt_hurdle is repaid before equities.
+# Write the rate as a fraction: 0.17 is 17%.
+#   liabilities = [{ name = "credit card", balance = 4000, annual_rate = 0.17 }]
+liabilities = []
 
 
 [waterfall]
@@ -119,9 +194,20 @@ min_graded_for_calibration = 30
 # whose key is missing, is skipped and says so. It never returns an empty list
 # and lets you read that as a quiet news day.
 #
+# `ask.py sweep` reads this list. A name with no adapter is REFUSED at load -
+# naming a source here does not create it, and an enabled name that ingests
+# nothing every night is indistinguishable from a world in which nothing
+# happened. (Until 2026-09-03 nothing read this block at all; see details/10.)
+#
 # The full world register - what exists, what it costs, what it needs a key for -
 # is docs/world-sources.html.
 enabled = ["gdelt"]
+
+# Where a sweep keeps what it saw. Append-only, deduplicated across runs, and
+# carrying a row for every sweep INCLUDING the ones that failed - a month of
+# refused requests and a genuinely quiet month leave the same empty article
+# table otherwise, and only one of them means the world was quiet.
+corpus_database = "data/corpus.db"
 
 # GDELT DOC 2.0: free, no key, 100+ languages, worldwide. The API refuses a
 # window under 15 minutes, and the adapter floors it there whatever you set.
@@ -134,3 +220,29 @@ gdelt_languages = []
 
 # Source countries, ISO-style codes as GDELT spells them. Empty means worldwide.
 gdelt_countries = []
+
+[monitor]
+# What `ask.py watch` alerts on. It records only state CHANGES, so a rule that
+# stays tripped does not re-fire every run - an alert that repeats hourly is
+# noise a person learns to ignore, which is worse than silence.
+#
+# Fraction of the daily budget that opens a spend alert.
+spend_fraction = 0.8
+# p95 latency over the last 24h, in milliseconds.
+p95_latency_ms = 20000
+# Share of claims dropped for want of a citation.
+dropped_claim_rate = 0.2
+# Hours of no model calls that counts as suspicious. 0 disables it: a personal
+# tool is allowed to sit idle, but a SCHEDULED one that dies quietly looks
+# exactly like a quiet week. Set this once something runs on a timer.
+silence_hours = 0
+
+# The same question asked of the SWEEP. `ask.py sweep` makes no model calls, so
+# `silence_hours` above cannot see it: the ledger can be silent for a week while
+# the sweep runs perfectly every morning, and busy with your questions while the
+# sweep has been dead since Tuesday. 30 hours is a daily schedule plus six hours
+# of slack, so one late run is not an alert and a missed day is.
+#
+# It stays quiet until a source has succeeded ONCE. A corpus that has never been
+# filled is a system nobody has turned on, not a system that has stopped.
+sweep_silence_hours = 30

@@ -462,6 +462,40 @@ skill rather than luck.</span></span></pre></div>
         </div>
 
         <div class="cmd">
+          <div class="cmd-h"><code>ask.py capital</code> · <code>ask.py allocate</code> · <code>ask.py rebalance</code> <span class="when">start here, before any name</span></div>
+          <p><strong>Before any question about <em>which</em> stock there is a question about how much money is allowed to be in stocks at all.</strong> Fill <code>[capital]</code> in <code>config.toml</code> and <code>capital</code> answers it: liquid assets, minus an emergency floor, minus goals inside 24 months, minus debt above the hurdle. The first three deductions are <code>[locked]</code> and no flag reduces them. If they consume everything, the answer is <strong>investable 0</strong> &mdash; an answer, not a failure.</p>
+          <div class="term"><div class="term-bar"><span></span><span></span><span></span><b>ask.py capital</b></div>
+<pre><span class="p">$</span> python ask.py capital
+<span class="o">  liquid assets                          MYR 120,000.00
+  - Emergency floor (6m)     <span class="hl">[locked]</span>      MYR  27,000.00
+  - Near-term goals (&lt;=24m)  <span class="hl">[locked]</span>      MYR  30,000.00
+  - Debt above 8.0%          <span class="hl">[locked]</span>      MYR   8,000.00
+  - Cash buffer (1m)                       MYR   2,000.00
+  = investable                           <span class="hl">MYR  53,000.00</span></span></pre></div>
+          <p><code>allocate</code> then splits that across names <strong>you</strong> nominate &mdash; it does not choose them. Each name is <code>MIC:CODE:PRICE:STOP:ADV:SECTOR</code>; with <code>--fetch</code> the price and ADV are measured for you, but <strong>the stop is never derived</strong>, because where the stop goes is your risk decision and inventing one invents the risk budget with it.</p>
+          <div class="term"><div class="term-bar"><span></span><span></span><span></span><b>ask.py allocate</b></div>
+<pre><span class="p">$</span> python ask.py allocate --portfolio 500000 \
+    --name <span class="hl">MYX:1155:10.68:9.90:20000000:bank</span> \
+    --name <span class="hl">MYX:1023:6.40:5.95:18000000:telco</span> ...
+<span class="o">ALLOCATION over 6 name(s), MYR 500,000.00 investable
+  MYX:1155     3,100 units  MYR  33,108.00   6.6%  bound by <span class="hl">country</span>
+  ...
+  deployed MYR 197,785.00, cash MYR 302,215.00
+  <span class="hl">deployment is bounded by the country limit, not by capital</span></span></pre></div>
+          <p><strong>Expect cash left over, and read the note that says why.</strong> Six names at the 8% single-name cap can hold at most 48% of your capital; six <em>Malaysian</em> names stop earlier still, at the 40% country limit. The line then reports <code>country</code> as its binding cap, because that is the limit that decided the number &mdash; not the one that sized it first.</p>
+          <p><strong>There is a floor under the whole exercise on Bursa.</strong> The cheapest name that can pay for its own round trip needs <strong>MYR 4,705.88</strong> (a 60 bps cost floor), and at an 8% single-name cap that position only fits inside a portfolio of <strong>MYR 58,824 or more</strong>. Below that, every name is either over the cap or under the floor &mdash; and <code>allocate</code> refuses with both numbers rather than saying &ldquo;too small&rdquo;.</p>
+          <p><code>rebalance</code> values what you hold at live prices and reports the difference: <code>hold</code>, <code>add</code>, <code>trim</code>, <code>exit</code>, <code>open</code>, <code>stop hit</code> &mdash; each with the trade&rsquo;s round-trip cost and the limit that bound it. Three rules shape what you see. A trade worth less than its own round trip comes back as <strong>hold</strong>, with both numbers, because a rebalance smaller than its cost is a fee. A holding trading at or below its own stop <strong>leads the output</strong>, reported even when no target could be built &mdash; that is your rule, already triggered, not a data error. And weights are measured against the <em>whole</em> portfolio, cash included, which is the denominator every limit is defined over.</p>
+          <div class="term"><div class="term-bar"><span></span><span></span><span></span><b>ask.py rebalance</b></div>
+<pre><span class="p">$</span> python ask.py rebalance --portfolio 800000
+<span class="o">  <span class="hl">STOP BREACHED</span>: MYX:5296 trades at MYR 1.38 against the MYR 1.93 stop
+
+  name        action    units now    target     change      trade     cost  bound by
+  MYX:1023    add           2,000     6,700     +4,700  37,412.00   172.10  country
+  MYX:1155    hold          5,000     5,000          0       0.00     0.00  country
+  6 trade(s), MYR 257,931.00 turned over, MYR 1,186.48 in round-trip cost</span></pre></div>
+        </div>
+
+        <div class="cmd">
           <div class="cmd-h"><code>ask.py risk</code> · <code>ask.py size</code> <span class="when">before any position</span></div>
           <p><code>risk</code> reports concentration, effective bets, portfolio heat and every breach. <code>size</code> applies all five caps and the market&rsquo;s real fee schedule. <strong>No position</strong> is a frequent and correct outcome — asking again with a smaller portfolio just refuses again.</p>
           <div class="term"><div class="term-bar"><span></span><span></span><span></span><b>ask.py size</b></div>

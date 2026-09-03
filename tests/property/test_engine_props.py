@@ -152,7 +152,13 @@ def test_every_parsed_bar_is_internally_consistent(o, spread, down, close_frac, 
 
     high = o + spread
     low = max(o - down, 0.001)
-    close = low + (high - low) * close_frac
+    # Clamp into the band this generator is trying to stay inside. Without it
+    # the arithmetic itself can leave close a hair OUTSIDE it - at o=0.01,
+    # spread=0, down=1, close_frac=1 the product lands on 0.010000000000000002
+    # against a high of 0.01 - and the parser then correctly drops a bar the
+    # test believed was well formed. The subject here is the parser, not
+    # floating-point addition.
+    close = min(max(low + (high - low) * close_frac, low), high)
     csv = f"Date,Open,High,Low,Close,Volume\n2026-08-28,{o},{high},{low},{close},{vol}\n"
     bars = PriceFeed.parse(csv, "t")
     for b in bars:

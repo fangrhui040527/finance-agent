@@ -187,9 +187,82 @@ def cmd_hypothesis(a) -> int:
         return 0
 
 
+def cmd_reflect(a) -> int:
+    """Grade a cohort BY THE IDEA that links it, through A15's deterministic
+    gates - and, only when a real backend answers, a structured second opinion
+    the gates are free to ignore."""
+    from datetime import UTC as _UTC
+    from datetime import datetime as _dt
+
+    from agents.base import AgentContext
+    from agents.learning.hypotheses import HypothesisStore
+    from agents.learning.reflection import A15Reflection, LessonStore, OutcomeQueue
+    from core.guardrails.defaults import default_engine
+    from core.registry.loader import load as _load_registry
+    from knowledge.retrieval.pipeline import Router
+
+    with HypothesisStore(a.db) as hstore:
+        try:
+            view = hstore.get(a.hypothesis_id)
+        except KeyError as e:
+            print(str(e), file=sys.stderr)
+            return 2
+    with LearningStore(a.db) as store:
+        wanted = set(view.prediction_ids)
+        outcomes = [o for o in store.graded() if o.prediction_id in wanted]
+        instruments = store.instruments_for(list(wanted))
+
+    print(f"{view.hypothesis_id}  [{view.status}]  {view.title}")
+    print(f"  {view.thesis}")
+    print(f"  linked {len(view.prediction_ids)}, graded {len(outcomes)}")
+    if not outcomes:
+        print("  nothing graded yet; the clock cannot be argued with.")
+        return 0
+
+    engine = default_engine(_load_registry("agents/registry.yaml").allowlist())
+    ctx = AgentContext(router=Router({}), engine=engine, now=_dt.now(_UTC))
+    a15 = A15Reflection(ctx, OutcomeQueue(), LessonStore())
+    for f in a15.propose(view.title, outcomes, date.today(), instruments or None):
+        print(f"  [{f.kind}] {f.text}")
+        for c in f.caveats:
+            print(f"      caveat: {c}")
+
+    if a.second_opinion:
+        from decimal import Decimal as _D
+
+        from core.config import load as _load_config
+        from core.llm.backends import backend_from_env
+        from core.llm.client import EchoBackend, InferenceClient
+        from core.provenance.ledger import ProvenanceLedger
+
+        backend, reason = backend_from_env()
+        if isinstance(backend, EchoBackend):
+            print(f"  (no second opinion: {reason})")
+            return 0
+        cfg = _load_config()
+        client = InferenceClient(
+            backend,
+            engine,
+            ProvenanceLedger(cfg.provenance_db),
+            daily_budget_myr=_D(str(cfg.daily_budget_myr)),
+        )
+        parsed, done = a15.second_opinion(client, view.title, outcomes)
+        if done.refused:
+            print(f"  model refused: {done.refusal_reason}")
+        elif parsed is not None:
+            root = parsed.root
+            if root.kind == "no_lesson":
+                print(f"  model second opinion: NO LESSON - {root.reason}")
+            else:
+                print(f"  model second opinion (ADVISORY, gates still decide): {root.text}")
+    return 0
+
+
 def main(argv=None) -> int:
+    from core.env import load as _load_dotenv
     from core.logging import configure as _configure_logging
 
+    _load_dotenv()
     _configure_logging()
     ap = argparse.ArgumentParser(
         prog="predict", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
@@ -246,6 +319,15 @@ def main(argv=None) -> int:
     hls.add_argument("--only", help="filter by status")
     for p_ in (hn, hs, hl, hls):
         p_.set_defaults(fn=cmd_hypothesis)
+
+    rf = sub.add_parser("reflect", help="grade a cohort by the hypothesis that links it")
+    rf.add_argument("hypothesis_id")
+    rf.add_argument(
+        "--second-opinion",
+        action="store_true",
+        help="ask the model too (advisory; needs a real backend, spends money)",
+    )
+    rf.set_defaults(fn=cmd_reflect)
 
     a = ap.parse_args(argv)
     return a.fn(a)

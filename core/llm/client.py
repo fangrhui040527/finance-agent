@@ -20,11 +20,11 @@ from typing import Protocol
 from core.guardrails.policy import Action, PolicyEngine, Rail
 from core.llm.tiers import (
     MODEL_IDS,
-    REQUEST_PROFILES,
     TaskClass,
     Tier,
     Usage,
     effective_tier,
+    profile_for,
     route,
 )
 from core.provenance.ledger import DEFAULT_FX_MYR_PER_USD, ProvenanceLedger
@@ -107,7 +107,10 @@ class InferenceClient:
     ) -> Completion:
         tier = effective_tier(route(task))  # callers never choose this; the cheap cap may lower it
         model_id = MODEL_IDS[tier]
-        profile = REQUEST_PROFILES[tier]
+        # profile_for, not REQUEST_PROFILES: the table is the default shape and
+        # this is the shape after the operator's FINPLANET_EFFORT selection.
+        # Reading the raw table here is how an effort setting becomes decoration.
+        profile = profile_for(tier)
 
         self.engine.enforce(
             Action(
@@ -158,6 +161,7 @@ class InferenceClient:
                     elapsed,
                     text="",
                     error=str(e),
+                    stop_reason="refusal",
                 )
                 reason = str(e)
                 if e.category or e.explanation:
@@ -189,10 +193,22 @@ class InferenceClient:
                     (time.perf_counter() - t0) * 1000,
                     text="",
                     error=str(e),
+                    stop_reason=type(e).__name__.lower(),
                 )
             raise
         elapsed = (time.perf_counter() - t0) * 1000
-        rec = self._record(agent, task, tier, model_id, prompt, system, usage, elapsed, text)
+        rec = self._record(
+            agent,
+            task,
+            tier,
+            model_id,
+            prompt,
+            system,
+            usage,
+            elapsed,
+            text,
+            stop_reason="end_turn",
+        )
         return Completion(
             text,
             usage,
@@ -245,7 +261,18 @@ class InferenceClient:
         return model, completion
 
     def _record(
-        self, agent, task, tier, model_id, prompt, system, usage, elapsed, text, error=None
+        self,
+        agent,
+        task,
+        tier,
+        model_id,
+        prompt,
+        system,
+        usage,
+        elapsed,
+        text,
+        error=None,
+        stop_reason="",
     ):
         from core.trace import emit, is_tracing
 
@@ -261,6 +288,11 @@ class InferenceClient:
             # so an ordinary run - the only kind that happens in production -
             # threw away the number docs/01 section 10 asks for.
             latency_ms=elapsed,
+            # Same reasoning, same mistake, found later: how a turn ENDED and
+            # the vendor's id for it reached the trace only, so nothing reading
+            # the durable record could count a truncation or a refusal.
+            stop_reason=stop_reason,
+            request_id=getattr(self.backend, "last_request_id", None) or "",
         )
         if is_tracing():
             # The ledger keeps prompt_hash only, by design. The trace keeps the

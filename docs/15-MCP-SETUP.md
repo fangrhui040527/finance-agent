@@ -57,6 +57,16 @@ share is always on screen.
 
 Both clients need **absolute paths** and the project's own interpreter.
 
+**Working directory is handled for you.** An MCP client launches the server as a
+subprocess and it inherits the client's working directory; Claude Code's
+`claude mcp add` has no `cwd` flag to correct that. Every path this system reads
+is relative — `config.toml`, `data/provenance.db`, `data/graph.db` — so started
+elsewhere the server would not fail, it would quietly load *default* settings and
+write a *new empty* ledger beside wherever the client happened to be, answering
+every question as though this were a fresh installation. So the server anchors
+itself to its own repository at startup (`mcp_server/server.py`,
+`_anchor_to_the_repository`). `FINPLANET_NO_CHDIR=1` opts out.
+
 ### Claude Desktop
 
 `claude_desktop_config.json`
@@ -79,8 +89,17 @@ Windows: `"command": "C:\\path\\finance-agent\\.venv\\Scripts\\python.exe"`.
 ### Claude Code
 
 ```bash
-claude mcp add analyst-mind -- /ABSOLUTE/PATH/.venv/bin/python -m mcp_server.server
+claude mcp add analyst-mind --scope user -- /ABSOLUTE/PATH/.venv/bin/python -m mcp_server.server
 ```
+
+Windows, with the path spelled in full:
+
+```bash
+claude mcp add analyst-mind --scope user -- "C:/path/finance-agent/.venv/Scripts/python.exe" -m mcp_server.server
+```
+
+`--scope user` makes it available in every project; drop it for this project
+only. Confirm with `claude mcp list` — the row should say **Connected**.
 
 ### Verify before connecting
 
@@ -164,3 +183,52 @@ this repository that tells you whether any of it works.
   offers its own - never claims a version it has not implemented.
 - The web app (`make web`) exposes the same tool functions over HTTP for a
   browser; the MCP surface remains the model-facing one.
+
+---
+
+## Watching the machine itself (2026-08-31)
+
+Four read-only tools let the model that drives this system also monitor it.
+They exist because a stubbed backend or a missing database explains more odd
+output than any amount of reasoning about the output.
+
+| Tool | Answers |
+|---|---|
+| `system_health` | What can this installation do right now, and what does each gap affect? (`offline=false` also probes the price and news sources.) |
+| `operating_report` | Over N days: calls, spend, budget headroom, which MODELS actually answered, p50/p95 latency, cache hits, and the dropped-claim rate. |
+| `recent_failures` | Across recent traced runs: errors with their text, guardrail denials, refusals, and the run id to open. |
+| `run_anatomy` | One run: where the time went, what was denied - and whether the METHODOLOGY changed since the run before it. |
+| `open_alerts` | What a scheduled `ask.py watch` found while nobody was looking, and since when. |
+| `scorecard` | **Start here.** Every dimension in one line with its evidence, or an explicit CANNOT SCORE. |
+| `quality_report` | Calibration (Brier, stated vs realised), claim survival and why the rest dropped, verdict distribution, red-team activity, eval-ratchet health. |
+| `efficiency_report` | Cost per call and per 1k output, cache HIT RATE, tier discipline as a share of spend, and wasted spend. |
+| `maintainability_report` | Test and doc edges per module from the codebase graph, modules with neither, dependency versions. |
+| `reasoning_report` | How turns ENDED, what the rails stopped and under which rule, answered-vs-refused with reasons, numeric faithfulness. |
+
+Two properties hold across all of them:
+
+* **Absent evidence is reported as absent.** An empty ledger is "nothing has
+  run yet", never a clean bill of health; a failure scan states how many runs
+  it looked at, because an untraced run cannot be reported on.
+* **No prompt text is ever returned.** Traces hold verbatim prompts,
+  responses and whatever positions were passed in. These tools give the
+  error, the event and the run id; reading the text is a decision the
+  operator makes by opening `debug/<run_id>/`.
+
+### What each dimension rests on, and what it cannot say
+
+| Dimension | Evidence | Honest limit |
+|---|---|---|
+| performance | ledger latency, spend | none |
+| efficiency | ledger tokens, cache fields, stop_reason | rows written before those columns report "unrecorded" |
+| robustness | preflight checks, trace errors, guardrail denials | only traced runs can be reported on |
+| quality | graded predictions, claims table, verdict codes, eval suites | calibration refuses below the graded minimum; eval **shape**, never a pass rate nobody ran |
+| maintainability | codebase graph edges | counts EDGES, not coverage - a module without a test edge may still be covered indirectly |
+| usability | answered-vs-refused in traces | refusal RATE is not a score; the design optimises refusal PRECISION |
+| reasoning | stop_reason, rail denials, the numeric-faithfulness check | a flagged number may be a rounding, not an invention - it is a list to read, not a verdict |
+
+`run_anatomy`'s methodology check is the one worth knowing about. The
+manifest hashes the system prompts, the registry, the tool surface and the
+package versions - never the run id or the timestamp - so an equal hash means
+an equal method, and a surprising run can be attributed to the DATA rather
+than to a change nobody remembers making.

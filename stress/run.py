@@ -1143,9 +1143,33 @@ def s_mcp():
             "stop_price": 5.6,
             "adv_20d": 900000,
         },
+        # A window that ends before it starts is refused BEFORE the adapter is
+        # built, which is also what keeps this suite off the network: every
+        # other pull_news path would poll a live feed.
+        "pull_news": {"hours": 0},
         "plan_question": {"question": "why did it move"},
         "explain_concept": {},
         "log_hypothesis": {"title": "t", "thesis": "x", "db": ":memory:"},
+        # Observability tools: read-only, and each must answer on an EMPTY
+        # installation - "nothing has run yet" is the honest answer, and a
+        # monitor that crashes on a fresh machine is not a monitor.
+        "system_health": {"offline": True},
+        "operating_report": {"days": 1, "db": ":memory:"},
+        "recent_failures": {"runs": 1, "db": ":memory:"},
+        "run_anatomy": {},
+        "open_alerts": {"history": 1, "alerts_db": ":memory:"},
+        "quality_report": {"days": 1, "db": ":memory:"},
+        "efficiency_report": {"days": 1, "db": ":memory:"},
+        "maintainability_report": {"db": ":memory:"},
+        "reasoning_report": {"runs": 1, "db": ":memory:"},
+        "scorecard": {"db": ":memory:"},
+        "investable_capital": {},
+        # An allocation with no names is a refusal, which is the honest answer
+        # and the one this suite is checking the tool can still give.
+        "allocate_capital": {"names": [], "portfolio_value": 200000},
+        # An empty book is a refusal, and refusing without touching the network
+        # is the property this suite checks.
+        "rebalance_book": {},
         "log_prediction": {
             "instrument": "MYX:1155",
             "direction": 1,
@@ -1597,8 +1621,10 @@ def s_graph():
 
 
 def main() -> int:
+    from core.env import load as _load_dotenv
     from core.logging import configure as _configure_logging
 
+    _load_dotenv()
     _configure_logging()
     for fn in (
         s_volume,

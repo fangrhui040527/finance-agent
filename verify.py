@@ -23,7 +23,7 @@ from core.guardrails.chain import GuardrailChain
 from core.guardrails.defaults import default_engine
 from core.guardrails.policy import Action, PolicyViolation, Rail
 from core.llm.client import EchoBackend, InferenceClient
-from core.llm.tiers import TaskClass, Tier
+from core.llm.tiers import TaskClass, Tier, cheap_capped, effective_tier, route
 from core.provenance.ledger import ProvenanceLedger
 
 NOW = datetime.now(UTC)
@@ -39,8 +39,10 @@ def check(label: str, cond: bool, detail: str = "") -> None:
 
 
 def main() -> int:
+    from core.env import load as _load_dotenv
     from core.logging import configure as _configure_logging
 
+    _load_dotenv()
     _configure_logging()
     t0 = time.time()
     print("\nFinPlanet P0 verification (mock data only)\n")
@@ -49,13 +51,23 @@ def main() -> int:
     engine = default_engine({"a4": {"llm_complete"}, "a10": {"llm_complete", "emit"}})
     ledger = ProvenanceLedger()
     client = InferenceClient(EchoBackend(), engine, ledger, daily_budget_myr=Decimal("25"))
+    # Two different things, and conflating them made this section fail the
+    # moment FINPLANET_CHEAP was set: the ROUTING TABLE is a design invariant
+    # (a thesis is reasoning work whatever it costs), while the tier a call
+    # actually lands on - and is billed at - is what the operator's cap
+    # decides. Check both, and say when the cap is in force.
+    if cheap_capped():
+        print("   FINPLANET_CHEAP=1 in force: every Messages tier resolves to the cheapest model")
+    check("news triage -> cheap", route(TaskClass.NEWS_TRIAGE) is Tier.CHEAP)
+    check("thesis -> reason", route(TaskClass.THESIS_SYNTHESIS) is Tier.REASON)
     check(
-        "news triage -> cheap",
-        client.complete("a4", TaskClass.NEWS_TRIAGE, "headline").tier is Tier.CHEAP,
+        "a call lands on the tier it will be billed at",
+        client.complete("a10", TaskClass.THESIS_SYNTHESIS, "memo").tier
+        is effective_tier(Tier.REASON),
     )
     check(
-        "thesis -> reason",
-        client.complete("a10", TaskClass.THESIS_SYNTHESIS, "memo").tier is Tier.REASON,
+        "news triage lands where it is billed",
+        client.complete("a4", TaskClass.NEWS_TRIAGE, "headline").tier is effective_tier(Tier.CHEAP),
     )
 
     print("\n2. Guardrail chain")

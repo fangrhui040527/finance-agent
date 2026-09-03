@@ -78,3 +78,58 @@ def test_each_screen_fetches_through_the_shared_helper(name):
     so the refusal card and the POST header cannot be skipped by one screen."""
     text = (STATIC / "screens" / f"{name}.js").read_text(encoding="utf-8")
     assert "fetch(" not in text, f"{name}.js bypasses the shared api() helper"
+
+
+# --- the screens must actually parse -------------------------------------------
+
+
+@pytest.mark.parametrize("name", SCREENS)
+def test_every_screen_is_valid_javascript(name):
+    """A syntax error in a screen module fails silently: the import rejects, the
+    panel never renders, and the server keeps returning 200 for the file. The
+    Portfolio screen shipped a literal newline inside a string this way."""
+    import shutil
+    import subprocess
+
+    node = shutil.which("node")
+    if not node:
+        pytest.skip("node is not installed; the browser is the only other parser")
+    src = (STATIC / "screens" / f"{name}.js").read_bytes()
+    proc = subprocess.run(
+        [node, "--input-type=module", "--check"],
+        input=src,
+        capture_output=True,
+    )
+    assert proc.returncode == 0, proc.stderr.decode()[:400]
+
+
+# --- the capital panels reach the API they document ----------------------------
+
+
+@pytest.mark.parametrize(
+    ("path", "why"),
+    [
+        ("/capital", "how much may be invested at all"),
+        ("/allocate", "splitting that across nominated names"),
+        ("/rebalance", "what changes against the book"),
+    ],
+)
+def test_the_portfolio_screen_calls_the_money_endpoints(path, why):
+    js = (STATIC / "screens" / "portfolio.js").read_text(encoding="utf-8")
+    assert f'api("{path}"' in js, f"the Portfolio screen does not ask {path} - {why}"
+
+
+def test_the_portfolio_screen_states_that_it_does_not_choose_names():
+    """The screen is where a user is about to ask it to pick something."""
+    js = (STATIC / "screens" / "portfolio.js").read_text(encoding="utf-8")
+    assert "does not choose the names" in js
+
+
+def test_the_book_cannot_be_typed_into_the_rebalance_panel():
+    """A book the user never stated is not their book: holdings come from
+    config.toml, and the screen says so rather than offering a field."""
+    js = (STATIC / "screens" / "portfolio.js").read_text(encoding="utf-8")
+    assert "account.holdings in config.toml" in js
+    assert "holdings" not in js.split("rebalance", 1)[1].split("api(")[0].replace(
+        "account.holdings in config.toml", ""
+    )
