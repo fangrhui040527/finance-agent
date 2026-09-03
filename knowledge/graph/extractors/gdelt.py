@@ -54,6 +54,16 @@ class GdeltExtractor(Extractor):
         articles, _ = feed.normalize(feed.fetch(since), entity_index=index, **kw)
         return cls(articles)
 
+    @classmethod
+    def from_corpus(cls, corpus, since=None, limit: int = 500):
+        """The stored articles, rather than a fixture.
+
+        `from_fixture` is the offline path a test uses; this is the scheduled
+        one. It reads what a sweep already normalised and linked, so the graph
+        and the corpus cannot disagree about which company a story named.
+        """
+        return cls(corpus.articles(since=since, limit=limit))
+
     def extract(self) -> dict:
         from datetime import timedelta
 
@@ -102,3 +112,13 @@ def _index_from_aliases() -> dict[str, str]:
         for surface in surfaces or []:
             out[str(surface)] = iid
     return out
+
+
+def entity_index() -> dict[str, str]:
+    """The linker's index, for callers outside this module.
+
+    A scheduled sweep links entities before this extractor ever runs, and it
+    must use the SAME surface forms - a company linked by one and not the other
+    is in the corpus and invisible in the graph.
+    """
+    return _index_from_aliases()

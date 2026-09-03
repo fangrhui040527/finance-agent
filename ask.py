@@ -659,6 +659,27 @@ def cmd_size(a) -> int:
     print(f"cost      {cost_note}")
     if quote != BASE_CURRENCY:
         print(f"fx        1 {quote} = {BASE_CURRENCY} {fx}")
+    # The cost nobody publishes, said out loud. A foreign position is converted
+    # in and converted back, so the spread is paid TWICE, and on this account it
+    # is larger than the whole fee schedule: about 1% round trip against roughly
+    # 0.3% of commission, platform, settlement, duty and levies combined.
+    #
+    # It is NOT folded into the cost floor. The floor decides refusals, and a
+    # refusal that turns on an unmeasured number is a refusal that cannot be
+    # defended. So it is reported beside the floor and left out of it, until
+    # somebody converts a small amount and measures the thing.
+    if quote != BASE_CURRENCY:
+        spread = load_cfg().fx_spread_per_side
+        if spread > 0:
+            rt = ((1 + spread) / (1 - spread) - 1) * Decimal(100)
+            print(
+                f"  currency  converting {BASE_CURRENCY} to {quote} and back costs about "
+                f"{rt.quantize(Decimal('0.01'))}% at an assumed {spread:.2%} spread per side"
+            )
+            print(
+                "            NOT measured and NOT in the cost floor below - moomoo "
+                "publishes no spread. See account.fx_spread_per_side in config.toml."
+            )
     for f in findings:
         print(f"  {f.text}")
         for c in f.caveats:
@@ -762,6 +783,135 @@ def cmd_news(a) -> int:
     if not articles:
         print("  (a quiet window, reported as one - not an error)")
     return 0
+
+
+def cmd_sweep(a) -> int:
+    """Fetch every enabled source and KEEP what arrives.
+
+    `news` prints one source and forgets it, which is right for a person
+    checking a feed by hand. This is the scheduled sibling: it resumes from the
+    last SUCCESSFUL sweep of each source, writes what it finds to the corpus,
+    links it into the graph, and records the attempt either way.
+
+    Exit codes are the interface, like `watch`: 0 every source read, 3 at least
+    one source failed, 2 the sweep itself could not run. A scheduler can act on
+    those without parsing text - and it needs to, because the failure this
+    command exists to make visible is the one that looks like a quiet world.
+    """
+    from datetime import timedelta as _td
+
+    from core.config import load as load_cfg
+    from knowledge.corpus import FAILED, OK, Corpus
+    from knowledge.feeds.adapter import FeedError
+    from knowledge.feeds.registry import UnknownSource, adapter_for
+    from knowledge.graph.extractors.gdelt import entity_index
+
+    try:
+        cfg = load_cfg()
+    except Exception as e:  # a sweep that dies on its own config is the case 2 exists for
+        print(f"sweep could not run: {type(e).__name__}: {e}", file=sys.stderr)
+        return 2
+
+    names = list(a.source) if a.source else list(cfg.sources)
+    if not names:
+        print(
+            "no sources enabled. Add one to [sources] enabled in config.toml - "
+            "the register of what exists is docs/world-sources.html.",
+            file=sys.stderr,
+        )
+        return 2
+
+    index = entity_index()
+    holdings, watchlist = set(cfg.holdings), set(cfg.watchlist)
+    started = datetime.now(UTC)
+    run_id = started.strftime("%Y%m%dT%H%M%S")
+    failed = 0
+
+    print(f"sweep {run_id}")
+    with Corpus(a.db or cfg.corpus_db) as corpus:
+        for name in names:
+            since = corpus.last_success(name) or started - _td(hours=a.hours)
+            try:
+                # GDELT is the only source today that takes a language or country
+                # filter; an RSS feed is whatever the publisher publishes.
+                kw = (
+                    {
+                        "languages": tuple(cfg.gdelt_languages),
+                        "countries": tuple(cfg.gdelt_countries),
+                    }
+                    if name == "gdelt"
+                    else {}
+                )
+                feed = adapter_for(name, **kw)
+                records = feed.fetch(since, limit=a.limit)
+            except UnknownSource as e:
+                print(f"  {name:<16} REFUSED: {e}", file=sys.stderr)
+                return 2
+            except FeedError as e:
+                # The whole point of the sweeps table. An unrecorded failure and
+                # a quiet night are the same empty corpus a month later.
+                corpus.record_sweep(run_id, name, since, FAILED, detail=str(e)[:400])
+                print(f"  {name:<16} FAILED: {e}", file=sys.stderr)
+                failed += 1
+                continue
+
+            articles, stats = feed.normalize(
+                records, entity_index=index, holdings=holdings, watchlist=watchlist
+            )
+            stored = corpus.add_all(articles, name)
+            corpus.record_sweep(
+                run_id,
+                name,
+                since,
+                OK,
+                fetched=stats.fetched,
+                kept=stats.kept,
+                stored=stored.stored,
+                duplicates=stored.duplicates,
+                unlinked=stats.unlinked,
+                escalated=stats.escalated,
+            )
+            print(f"  {name:<16} since {since:%Y-%m-%d %H:%M}  {stats}\n  {'':<16} {stored}")
+
+        fresh = corpus.articles(since=started, limit=max(a.limit, 1) * len(names))
+        if fresh and not a.no_graph:
+            print(f"  {'graph':<16} {_link_graph(fresh, a.graph_db)}")
+        counts = corpus.counts()
+
+    print(
+        f"  {'corpus':<16} {counts['articles']} articles, {counts['linked']} linked to a name, "
+        f"{counts['sweeps']} sweeps, {counts['failed_sweeps']} of them failed"
+    )
+    if not (holdings or watchlist):
+        print(
+            "  note             holdings and watchlist are both empty, so the "
+            "escalation gate\n                   cannot fire and nothing here "
+            "will ever be flagged for review."
+        )
+    return 3 if failed else 0
+
+
+def _link_graph(articles, graph_db: str) -> str:
+    """Attach this sweep's articles to the companies they name.
+
+    Deliberately NOT pruned. `prune_on` closes edges of this tier that the
+    build's own extractors did not assert, and this build carries one extractor
+    - pruning here would close every curated and sector edge in the graph
+    because a news sweep did not happen to mention them.
+    """
+    from knowledge.graph.build import build
+    from knowledge.graph.extractors.gdelt import GdeltExtractor
+    from knowledge.graph.store import GraphStore
+
+    with GraphStore(graph_db) as store:
+        before = store.counts()
+        build(store, extractors=[GdeltExtractor(articles)])
+        after = store.counts()
+    return (
+        f"+{after['nodes'] - before['nodes']} nodes  "
+        f"+{after['edges'] - before['edges']} edges  "
+        f"(INFERRED - traversable, never citable)"
+    )
 
 
 def cmd_watch(a) -> int:
@@ -1402,6 +1552,19 @@ def main(argv=None) -> int:
     nw.add_argument("--hours", type=int, default=24, help="window back from now")
     nw.add_argument("--limit", type=int, default=20)
     nw.set_defaults(fn=cmd_news)
+
+    sw = sub.add_parser("sweep", help="fetch every enabled source and KEEP what arrives")
+    sw.add_argument(
+        "--source", action="append", help="one source; repeatable. Default: [sources] enabled"
+    )
+    sw.add_argument(
+        "--hours", type=int, default=24, help="window when a source has never been swept"
+    )
+    sw.add_argument("--limit", type=int, default=250, help="max records per source")
+    sw.add_argument("--db", default="", help="corpus database (default: [sources] corpus_database)")
+    sw.add_argument("--graph-db", default="data/graph.db", help="graph to link articles into")
+    sw.add_argument("--no-graph", action="store_true", help="store only; do not touch the graph")
+    sw.set_defaults(fn=cmd_sweep)
 
     wt = sub.add_parser("watch", help="evaluate the monitor rules; exit 1 if anything is open")
     wt.add_argument("--db", help="provenance ledger path")

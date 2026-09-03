@@ -189,6 +189,22 @@ def scrubbed_env(tmp_path: Path, *, key: str | None = None) -> dict:
 
 
 @pytest.fixture
+def venue_only_env(tmp_path):
+    """`env_extra` that selects NO broker, for cases whose subject is a VENUE.
+
+    config.toml ships with `broker = "moomoo_my"` because that is the account
+    this installation runs against. A case asserting Bursa's own schedule and
+    Bursa's own 60 bps floor is asking a different question, and must pin a
+    config that answers it.
+    """
+    shipped = (ROOT / "config.toml").read_text()
+    kept = [ln for ln in shipped.splitlines() if not ln.startswith("broker =")]
+    cfg = tmp_path / "venue_only.toml"
+    cfg.write_text("\n".join(kept))
+    return {"FINPLANET_CONFIG": str(cfg)}
+
+
+@pytest.fixture
 def run_cli(tmp_path):
     """`run_cli(["ask.py", "plan", ...])` -> CompletedProcess, keyless by default."""
 

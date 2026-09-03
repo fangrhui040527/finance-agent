@@ -24,7 +24,7 @@ invisible.
 | Investable-capital waterfall — emergency floor, goals, debt hurdle | complete, **and reachable since 2026-08-30** — see the note below |
 | 11 market adapters, fee schedules, alias map | complete |
 | **Broker account feed** — moomoo, read-only, `ask.py positions` | built, **never run against a live gateway** |
-| **Broker fee schedules** — `moomoo_my` on XNAS, per-share and per-order legs, broker-aware cost floor | complete, **and reachable** via `[account] broker` |
+| **Broker fee schedules** — `moomoo_my` on XNAS **and XKLS**, from the account's real card | complete, **and reachable** via `[account] broker` |
 | **MYR unit-of-account boundary** | complete |
 | Knowledge graph — schema, store, ids, 6 extractors, reproducible build | complete |
 | Event taxonomy, base rates, catalyst attachment | complete |
@@ -34,7 +34,7 @@ invisible.
 | Teacher — 30 concepts, enforced prerequisite order | complete |
 | Reflection — grading, lesson proposal, calibration, scoring | complete |
 | Tracing — spans, HTML report, anatomy, prompts | complete |
-| CLI — 18 subcommands | complete |
+| CLI — 19 subcommands | complete |
 | Fitness function — refuses a partial score | complete |
 | CI — 10 steps, offline, keyless | complete |
 
@@ -89,6 +89,54 @@ Two constants in that file — the SEC fee rate and the FINRA trading-activity f
 — are regulator pass-throughs that were NOT verified against a primary source.
 They are pinned by test so a drift is visible, and they are the reason a cost
 floor from this schedule should not be trusted to the basis point yet.
+
+### The death detector was watching the wrong thing (added 2026-09-03)
+
+`silence` counts model calls, and `ask.py sweep` makes none. So the day the
+sweep went on a daily timer, the one rule meant to catch "a scheduled job died
+quietly" could not see it — and turned on anyway it would have fired every
+morning after a run that worked, while staying silent through a sweep dead since
+Tuesday if you happened to ask a question yesterday. Wrong in both directions
+from one plausible setting.
+
+`sweep_silence` asks the same question of the record the sweep writes. Off by
+default, 30 hours in the shipped config, quiet until a source has succeeded
+once. One rule covers both a dead scheduler and a week of refused requests,
+because a failed sweep is not a successful one and both want the same look.
+
+### `[sources]` described four settings and nothing read any of them (fixed 2026-09-03)
+
+`config.toml` carried `[sources] enabled`, `gdelt_poll_minutes`, `gdelt_languages`
+and `gdelt_countries`, each with a paragraph explaining what it controlled.
+`core/config.Config` had no field for any of them and `load()` never looked. A
+grep for them across the repository returned nothing but the config file itself.
+
+So enabling a source did nothing, narrowing the languages did nothing, and the
+comment above `enabled` — "a disabled feed, or one whose key is missing, is
+skipped and says so" — described a code path with no caller. The same defect
+class as the unreachable waterfall above, and it fails the same way: silently,
+producing a system that looks configured.
+
+Now: `Config.sources` is loaded and **validated against the adapter registry**,
+the same shape as the broker check — naming a source here does not create one,
+and an enabled name with no adapter is refused at load rather than ingesting
+nothing every night.
+
+### News was fetched and thrown away (fixed 2026-09-03)
+
+`ask.py news` fetched a source, printed it, and kept nothing; `GdeltExtractor`
+could only read a fixture from disk. Nothing wrote an article anywhere. A
+scheduled nightly run would therefore have produced a month of scrollback and an
+empty disk, and the answer to "what did we see on the 3rd" would have been the
+terminal history of whichever machine ran it.
+
+`knowledge/corpus.py` is the store that was missing — append-only, deduplicated
+**across runs**, and recording every sweep including the ones that failed.
+`ask.py sweep` is the scheduled entry point. See `details/09-RUNBOOK.md`.
+
+The property that took the most care is the last one: a month of refused
+requests and a genuinely quiet month leave an identical empty articles table.
+Without the `sweeps` table, an outage reads as calm.
 
 ### What this system does NOT do
 

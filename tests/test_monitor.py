@@ -303,3 +303,86 @@ def test_the_thresholds_are_bounded_like_every_other_setting():
         "monitor.dropped_claim_rate",
         "monitor.silence_hours",
     } <= keys
+
+
+# --- sweep_silence: the death detector for the scheduled sweep --------------------
+#
+# `silence` watches the model ledger. `ask.py sweep` makes no model calls, so the
+# day a sweep goes on a timer the existing rule is watching the wrong thing.
+
+
+def _swept(path: Path, source: str = "gdelt", status: str = "ok", at: datetime | None = None):
+    from knowledge.corpus import Corpus
+
+    with Corpus(path) as c:
+        c.record_sweep("r", source, at or datetime.now(UTC), status, at=at)
+    return path
+
+
+def _sweep_cfg(tmp_path: Path, hours: int = 30, **over):
+    return _cfg(
+        alert_sweep_silence_hours=hours,
+        corpus_db=str(tmp_path / "corpus.db"),
+        sources=("gdelt",),
+        **over,
+    )
+
+
+def test_a_sweep_that_stopped_is_an_alert(tmp_path):
+    now = datetime(2026, 9, 10, 8, 0, tzinfo=UTC)
+    _swept(tmp_path / "corpus.db", at=now - timedelta(hours=50))
+    alerts = evaluate(_sweep_cfg(tmp_path), db=str(_ledger(tmp_path / "led.db")), now=now)
+    sweep = [a for a in alerts if a.rule == "sweep_silence"]
+    assert sweep and sweep[0].severity == ALERT
+    assert "gdelt" in sweep[0].title
+    assert "50h ago" in sweep[0].title
+
+
+def test_a_sweep_inside_the_window_is_not_an_alert(tmp_path):
+    now = datetime(2026, 9, 10, 8, 0, tzinfo=UTC)
+    _swept(tmp_path / "corpus.db", at=now - timedelta(hours=20))
+    alerts = evaluate(_sweep_cfg(tmp_path), db=str(_ledger(tmp_path / "led.db")), now=now)
+    assert not [a for a in alerts if a.rule == "sweep_silence"]
+
+
+def test_a_corpus_nobody_has_filled_yet_is_not_a_stop(tmp_path):
+    """The same discipline `silence` uses on the ledger. A system nobody turned
+    on is not a system that died, and alerting on it teaches you to ignore it."""
+    now = datetime(2026, 9, 10, 8, 0, tzinfo=UTC)
+    _swept(tmp_path / "corpus.db", status="failed", at=now - timedelta(hours=50))
+    alerts = evaluate(_sweep_cfg(tmp_path), db=str(_ledger(tmp_path / "led.db")), now=now)
+    assert not [a for a in alerts if a.rule == "sweep_silence"]
+
+
+def test_a_week_of_refused_sweeps_trips_the_same_rule(tmp_path):
+    """A failed sweep is not a successful one, so a network that has refused
+    every request since Tuesday stops producing ok rows exactly as a dead
+    scheduler does - and both want the same look from a person."""
+    now = datetime(2026, 9, 10, 8, 0, tzinfo=UTC)
+    path = tmp_path / "corpus.db"
+    _swept(path, at=now - timedelta(days=7))
+    for day in range(6):
+        _swept(path, status="failed", at=now - timedelta(days=day))
+    alerts = evaluate(_sweep_cfg(tmp_path), db=str(_ledger(tmp_path / "led.db")), now=now)
+    assert [a for a in alerts if a.rule == "sweep_silence"]
+
+
+def test_the_sweep_rule_is_off_by_default(tmp_path):
+    now = datetime(2026, 9, 10, 8, 0, tzinfo=UTC)
+    _swept(tmp_path / "corpus.db", at=now - timedelta(days=30))
+    alerts = evaluate(_sweep_cfg(tmp_path, hours=0), db=str(_ledger(tmp_path / "led.db")), now=now)
+    assert not [a for a in alerts if a.rule == "sweep_silence"]
+
+
+def test_a_missing_corpus_is_not_an_error(tmp_path):
+    """Enabled before the first sweep ever ran. It must not crash the monitor -
+    the check that dies is the failure a monitor exists to catch."""
+    now = datetime(2026, 9, 10, 8, 0, tzinfo=UTC)
+    alerts = evaluate(_sweep_cfg(tmp_path), db=str(_ledger(tmp_path / "led.db")), now=now)
+    assert not [a for a in alerts if a.rule == "sweep_silence"]
+
+
+def test_the_shipped_config_turns_the_sweep_rule_on(tmp_path):
+    """It is scheduled, so it is watched. `silence_hours` stays off because a
+    personal tool may sit idle; the sweep may not."""
+    assert load_config().alert_sweep_silence_hours == 30

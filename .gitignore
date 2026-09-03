@@ -23,3 +23,14 @@ __pycache__/
 htmlcov/
 node_modules/
 package-lock.json
+
+# 3. SQLite's own scratch files. The databases in data/ ARE tracked on purpose,
+#    but WAL mode writes a -wal journal and a -shm shared-memory block beside
+#    each one. They belong to whichever process currently holds the database
+#    open, are empty once it closes cleanly, and differ on every machine.
+#    Committing a stale -wal is worse than useless: it can confuse the next
+#    process that opens the file. Anything that reads a database - a test run,
+#    a sweep, `ask.py alerts` - creates them, so without this they reappear as
+#    untracked noise after every command.
+*.db-wal
+*.db-shm
