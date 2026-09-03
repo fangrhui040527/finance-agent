@@ -236,3 +236,13 @@ dropped_claim_rate = 0.2
 # tool is allowed to sit idle, but a SCHEDULED one that dies quietly looks
 # exactly like a quiet week. Set this once something runs on a timer.
 silence_hours = 0
+
+# The same question asked of the SWEEP. `ask.py sweep` makes no model calls, so
+# `silence_hours` above cannot see it: the ledger can be silent for a week while
+# the sweep runs perfectly every morning, and busy with your questions while the
+# sweep has been dead since Tuesday. 30 hours is a daily schedule plus six hours
+# of slack, so one late run is not an alert and a missed day is.
+#
+# It stays quiet until a source has succeeded ONCE. A corpus that has never been
+# filled is a system nobody has turned on, not a system that has stopped.
+sweep_silence_hours = 30

@@ -212,8 +212,71 @@ def evaluate(
                     )
                 )
 
+    out.extend(_sweep_rules(cfg, now))
     out.extend(_trace_rules(debug_root))
     return out
+
+
+def _sweep_rules(cfg, now: datetime) -> list[Alert]:
+    """Whether the scheduled sweep is still running, and still working.
+
+    `silence` above watches the MODEL ledger, and `ask.py sweep` makes no model
+    calls at all - it fetches, stores and links. So the moment a sweep goes on a
+    timer, the existing death detector is watching the wrong thing: the ledger
+    can be silent for a week while the sweep runs perfectly every morning, and
+    it can be busy with interactive questions while the sweep has been dead
+    since Tuesday. This rule watches the record the sweep actually writes.
+
+    ONE RULE FOR BOTH FAILURE MODES, because a failed sweep is not a successful
+    one. A sweep whose scheduler died and a sweep the network has refused for a
+    week both stop producing `ok` rows, and both want the same look from a
+    person. Splitting them would mean two alerts that can never both be right.
+
+    Quiet until a source has succeeded ONCE, the same discipline `silence` uses
+    on the ledger: a corpus that has never been filled is a system nobody has
+    turned on yet, not a system that has stopped.
+    """
+    hours = int(getattr(cfg, "alert_sweep_silence_hours", 0))
+    if hours <= 0:
+        return []
+
+    from knowledge.corpus import Corpus
+
+    path = str(getattr(cfg, "corpus_db", "data/corpus.db"))
+    if not Path(path).exists():
+        return []
+
+    cutoff = now - timedelta(hours=hours)
+    stale: list[tuple[str, datetime]] = []
+    with Corpus(path) as corpus:
+        for name in getattr(cfg, "sources", ()):
+            last = corpus.last_success(name)
+            if last is not None and last < cutoff:
+                stale.append((name, last))
+    if not stale:
+        return []
+
+    worst = min(age for _, age in stale)
+    named = ", ".join(
+        f"{n} ({(now - t).total_seconds() / 3600:.0f}h ago)" for n, t in sorted(stale)
+    )
+    return [
+        Alert(
+            rule="sweep_silence",
+            severity=ALERT,
+            title=f"no successful sweep in {hours}h: {named}",
+            detail="the sweep has succeeded before, so this is a stop, not a system "
+            "nobody turned on. A dead scheduler and a refused network look the same "
+            "from here and want the same look",
+            next_step="run `ask.py sweep` by hand - it prints the reason - then check "
+            "whatever schedules it and the network policy the feed needs",
+            evidence={
+                "silence_hours": hours,
+                "sources": [n for n, _ in sorted(stale)],
+                "oldest_success": worst.isoformat(),
+            },
+        )
+    ]
 
 
 def _trace_rules(debug_root: str) -> list[Alert]:
