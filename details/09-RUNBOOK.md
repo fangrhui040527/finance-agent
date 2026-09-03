@@ -151,6 +151,27 @@ Exit codes, so a scheduler can act without parsing text:
 | 2 | the sweep could not run — bad config, no sources enabled, or a source with no adapter |
 | 3 | at least one source failed; the failure is in the `sweeps` table |
 
+#### The enabled sources
+
+| name | what it is | shape |
+|---|---|---|
+| `gdelt` | global news index | one request **per company**, budget split, order rotated |
+| `bnm_press` | Bank Negara press releases | one request; an RSS feed is whatever the publisher publishes |
+
+`bnm_press` was enabled on 2026-09-03 because GDELT returned nothing for any
+Bursa name. Be clear about what it is and is not: central-bank announcements —
+the OPR decision, banking statistics, policy documents — so **macro news, not
+company news.** Most of it will arrive unlinked, and the `unlinked` count says
+so. On a book of Malaysian banks and utilities that move on rate decisions it
+is worth having; it is not a Bursa company feed, which this system does not
+have yet.
+
+Two sources means two watermarks and two `sweeps` rows. A source that fails does
+not take the other's articles with it — which is the whole reason a second one
+is worth enabling. Note the exit code is still 3 if **either** fails, so a flaky
+GDELT will mark the job red on a day `bnm_press` worked; the per-source rows are
+where the real story is.
+
 #### What GDELT refuses, measured
 
 Four ways the DOC API says no, all found by scheduled runs on 2026-09-03 and all

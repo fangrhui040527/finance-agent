@@ -225,7 +225,17 @@ min_graded_for_calibration = 30
 #
 # The full world register - what exists, what it costs, what it needs a key for -
 # is docs/world-sources.html.
-enabled = ["gdelt"]
+# bnm_press is Bank Negara's press releases: the OPR decision, banking
+# statistics, policy documents. It is MACRO news, not company news - it will
+# rarely name Maybank or Tenaga, so expect most of it to arrive unlinked and
+# be counted as such. That is still worth having on a book of Malaysian banks
+# and utilities, which move on rate decisions; it is not a substitute for a
+# Bursa company feed, which this system does not have yet.
+#
+# Added 2026-09-03 after GDELT returned nothing for any Bursa name over a
+# 2-hour window. Whether that is GDELT's Malaysian coverage or the short window
+# is still open - see details/09.
+enabled = ["gdelt", "bnm_press"]
 
 # Where a sweep keeps what it saw. Append-only, deduplicated across runs, and
 # carrying a row for every sweep INCLUDING the ones that failed - a month of

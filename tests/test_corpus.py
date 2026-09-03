@@ -590,3 +590,66 @@ def test_a_sweep_where_every_name_returned_something_says_nothing():
     import ask
 
     assert ask._sweep_note([], [], [("Maybank", 3), ("NVIDIA", 5)]) == ""
+
+
+# --- more than one source ---------------------------------------------------------
+
+
+def test_the_shipped_config_enables_a_malaysian_source():
+    """GDELT returned nothing for any Bursa name, so the book had US coverage
+    and no domestic coverage at all. bnm_press is Bank Negara's press releases -
+    macro rather than company news, but it is Malaysian, and losing it silently
+    would put the book back where it started."""
+    import core.config as C
+
+    assert "bnm_press" in C.load().sources
+
+
+def test_every_enabled_source_has_an_adapter_that_builds():
+    """Naming a source does not create it. An enabled name with no adapter
+    ingests nothing every night and reads as a quiet world."""
+    import core.config as C
+    from knowledge.feeds.registry import adapter_for
+
+    for name in C.load().sources:
+        assert adapter_for(name) is not None
+
+
+def test_one_source_failing_does_not_stop_the_next(tmp_path, monkeypatch, capsys):
+    """Two sources means two watermarks and two sweep rows. A source that fails
+    must not take the other one's articles with it - the whole reason bnm_press
+    is worth enabling is the days GDELT has nothing."""
+    import ask
+    from knowledge.feeds import registry
+    from knowledge.feeds.adapter import FeedError
+
+    class _Broken(_Quiet):
+        def fetch(self, since, limit=250):
+            raise FeedError("refused")
+
+    def _adapter(name, **kw):
+        # Fails on FETCH, not on construction. core.config validates every
+        # enabled source by building its adapter, so a constructor that raises
+        # makes the config itself unloadable - exit 2, a different bug entirely.
+        return _Broken(records=[]) if name == "gdelt" else _Quiet(records=ROWS)
+
+    monkeypatch.setattr(registry, "adapter_for", _adapter)
+    code = ask.main(
+        [
+            "sweep",
+            "--source",
+            "gdelt",
+            "--source",
+            "fixture",
+            "--db",
+            str(tmp_path / "c.db"),
+            "--no-graph",
+            "--hours",
+            "999999",
+        ]
+    )
+    assert code == 3, "a failed source is still reported"
+    with Corpus(tmp_path / "c.db") as c:
+        rows = {dict(s)["source"]: dict(s)["status"] for s in c.sweeps()}
+        assert rows == {"gdelt": FAILED, "fixture": OK}
+        assert c.counts()["articles"] == len(ROWS), "the working source still stored"
