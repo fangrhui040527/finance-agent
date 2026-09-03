@@ -23,7 +23,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 from pathlib import Path
 
-from core.provenance.ledger import DEFAULT_FX_MYR_PER_USD
+from core.provenance.ledger import DEFAULT_FX_MYR_PER_USD, DEFAULT_FX_SPREAD_PER_SIDE
 from engines.risk.concentration import Limits
 
 #: config.local.toml wins when present, so personal numbers stay out of git.
@@ -216,6 +216,9 @@ class Config:
     # describe() says out loud rather than leaving you to discover.
     holdings: tuple[str, ...] = ()
     watchlist: tuple[str, ...] = ()
+    fx_spread_per_side: Decimal = DEFAULT_FX_SPREAD_PER_SIDE
+    """What a currency conversion costs, one way. See the constant: unmeasured,
+    and on a US position plausibly larger than every trading fee combined."""
     broker: str | None = None
     """Whose fee schedule this account actually pays.
 
@@ -559,6 +562,7 @@ def load(path: str | Path | None = None) -> Config:
         markets=markets,
         broker=broker,
         fx_myr_per_usd=dec("account.fx_myr_per_usd", DEFAULT_FX_MYR_PER_USD),
+        fx_spread_per_side=dec("account.fx_spread_per_side", DEFAULT_FX_SPREAD_PER_SIDE),
         risk_per_trade=dec("risk.risk_per_trade", 0.0075),
         target_volatility=dec("risk.target_volatility", 0.20),
         max_participation=dec("risk.max_participation", 0.05),

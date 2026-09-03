@@ -26,16 +26,34 @@ currency**.
 | `XKRX` | KR | KRW | 2 | Financial Services Commission of Korea | 55 bps | KRW 500,000 | T+2 |
 | `XETR` | DE | EUR | 2 | Bundesanstalt für Finanzdienstleistungsaufsicht | 25 bps | EUR 6,494 | T+2 |
 
-**The XNAS row is a VENUE row, and for a US account it is usually the wrong one.**
-`markets/xnas.py` models a zero-commission US retail brokerage, which is a real
-account shape and is why its floor is 5 bps and its minimum position USD 1. An
-account that pays commission is priced by `markets/brokers.py` instead: a
-`moomoo_my` account pays 204.9 bps round trip on a USD 100 position, and its
-minimum economic position is about **USD 1,511 at a USD 100 share price** — three
-orders of magnitude from the row above. Because two of its legs are charged per
-SHARE, that minimum is a function of price and rises as the share price falls
-(about USD 2,620 at USD 10 a share). Set `broker` in `[account]` and the sizing
-output names which schedule and which floor it used.
+**These are VENUE rows, and for this account most of them are the wrong ones.**
+`markets/xnas.py` models a zero-commission US retail brokerage; `markets/xkls.py`
+models Bursa's standard retail schedule. Neither is what a moomoo Malaysia
+account pays, and `markets/brokers.py` now carries both real cards, read
+2026-09-03 from the account's own fee schedule:
+
+| | venue row | moomoo_my |
+|---|---|---|
+| XKLS minimum position | RM 4,706 (60 bps) | **RM 9,793** (40 bps) |
+| XNAS minimum position | USD 1 (5 bps) | **USD 2,431** at USD 100/share (35 bps) |
+
+The direction is counter-intuitive and worth stating: moomoo's Bursa schedule is
+CHEAPER than the venue's - RM3 flat against a RM8 minimum brokerage - and its
+minimum position is HIGHER. That is not a contradiction. The floor asks "is this
+position large enough that fees have stopped falling", relative to each
+schedule's own asymptote, and a cheaper schedule flattens sooner. In absolute
+terms a RM 3,000 Bursa trade costs 55 bps round trip through moomoo and the
+equivalent through the venue card costs more.
+
+The single largest line on every one of them is **Malaysian stamp duty**, RM1
+per RM1,000 - 10 bps a side, 20 round trip - which this Malaysian broker charges
+on US and Hong Kong trades as well as Bursa ones. It does not fall with size
+until a RM1,000,000 trade, so no floor below 20 bps is reachable on any market.
+It is also the reason the US figure moved from 204.9 to 226.6 bps on a USD 100
+position: nothing here knew about it until the real card was read.
+
+Two legs on XNAS are charged per SHARE, so its minimum is a function of price -
+about USD 2,431 at USD 100 a share and USD 7,704 at USD 10.
 
 ### Three entries that contradict the intuition
 

@@ -23,32 +23,80 @@ Two rules hold this module in place:
 
 from __future__ import annotations
 
-from decimal import Decimal
+from decimal import ROUND_CEILING, Decimal
 
 from markets.contract import FeeLeg, FeeSchedule
 
-#: US regulatory pass-throughs, levied on SALES only. Identical at every US
-#: broker - these are not moomoo's numbers, they are the SEC's and FINRA's, and
-#: both are revised annually.
+#: US regulatory pass-throughs, levied on SALES only, plus the audit-trail fee
+#: which is levied on both. These are the SEC's and FINRA's numbers, not
+#: moomoo's, and they are revised annually.
 #:
-#: NOT VERIFIED against a primary source for this schedule. SEC_FEE_RATE is the
-#: constant `markets/xnas.py` already ships and that test_fee_shape.py's XNAS
-#: baseline is pinned to; the TAF figures are the published retail rates. They
-#: are pinned by test so a silent drift cannot happen and a deliberate revision
-#: is visible in the diff. Re-check both before trusting a cost floor computed
-#: from them to the basis point.
-SEC_FEE_RATE = Decimal("0.0000278")
-TAF_PER_SHARE = Decimal("0.000166")
-TAF_CAP = Decimal("8.30")
+#: VERIFIED 2026-09-03 against the fee schedule shown in the account holder's
+#: own moomoo Universal Account. The earlier values here were wrong: SEC was
+#: 0.0000278 (now 0.0000206) and TAF was 0.000166/share capped 8.30 (now
+#: 0.000195/share, min 0.01, capped 9.79). Both were carried over from
+#: markets/xnas.py and flagged at the time as the least-certain inputs. They
+#: were.
+SEC_FEE_RATE = Decimal("0.0000206")
+SEC_FEE_MIN = Decimal("0.01")
+TAF_PER_SHARE = Decimal("0.000195")
+TAF_MIN = Decimal("0.01")
+TAF_CAP = Decimal("9.79")
+
+#: Consolidated Audit Trail, NMS stocks. Charged per share on BOTH sides, and
+#: missing from this schedule entirely until the real card was read. Tiny -
+#: about 0.03 bps at a USD 100 share price - but a leg that is absent is a
+#: different kind of wrong from a leg that is small.
+CAT_PER_SHARE_NMS = Decimal("0.000003")
+
+#: Settlement is capped at 1% of the trade, which matters exactly where a
+#: per-share fee would otherwise run away: a cheap stock bought in size.
+SETTLEMENT_PER_SHARE = Decimal("0.003")
+SETTLEMENT_CAP_RATE = Decimal("0.01")
+
+#: Malaysian stamp duty, charged by this MALAYSIAN broker on foreign trades
+#: too - it appears on the US, HK and SG cards, not only the Bursa one. RM1.00
+#: per RM1,000 or fractional part, capped RM1,000 per trade.
+#:
+#: Modelled as a flat 0.1% rate here because the PROPORTION is currency-
+#: independent: RM1 per RM1,000 is 0.1% whether the trade is priced in MYR or
+#: USD. What is NOT modelled is the round-up to the next whole ringgit
+#: (understates by at most RM1) and the RM1,000 cap (binds only above a
+#: RM1,000,000 trade). Both need the MYR value of a USD trade, which means an
+#: FX rate inside the fee layer - see docs/19 for why that is deferred.
+MY_STAMP_DUTY_RATE = Decimal("0.001")
+MY_STAMP_DUTY_PER = Decimal(1000)
+MY_STAMP_DUTY_CAP = Decimal(1000)
 
 #: Below this share count moomoo treats the order as fractional and charges a
-#: different shape entirely - see MoomooPlatform.
+#: different shape entirely: the platform fee becomes a capped rate and
+#: EVERYTHING else - commission, settlement, SEC, TAF, audit trail - is zero.
 ONE_SHARE = Decimal(1)
 MOOMOO_FRACTIONAL_RATE = Decimal("0.0099")
 MOOMOO_FRACTIONAL_CAP = Decimal("0.99")
 
+#: Bursa, from the same card. No minimum commission: the flat RM3 platform fee
+#: is what makes a small Malaysian order uneconomic, not a commission floor.
+MY_COMMISSION_RATE = Decimal("0.0003")
+MY_PLATFORM_FEE = Decimal(3)
+MY_CLEARING_RATE = Decimal("0.0003")
+MY_CLEARING_CAP = Decimal(1000)
+MY_SST_RATE = Decimal("0.08")
+
+
+def _round_up_cent(amount: Decimal) -> Decimal:
+    """moomoo rounds commission UP to the next cent, per order."""
+    return amount.quantize(Decimal("0.01"), rounding=ROUND_CEILING)
+
 
 def _shares(consideration: Decimal, price: Decimal | None, leg: str) -> Decimal:
+    """Share count, or a refusal naming the leg that needed it.
+
+    Several of moomoo's legs depend on the count and not the value, and the
+    fractional rule depends on whether the count is below one. A value-only
+    answer would understate the cost, which is the direction that funds a
+    position unable to pay its own spread.
+    """
     if price is None or price <= 0:
         raise ValueError(
             f"fee leg {leg!r} depends on the share count and cannot be costed "
@@ -57,12 +105,14 @@ def _shares(consideration: Decimal, price: Decimal | None, leg: str) -> Decimal:
     return consideration / price
 
 
-class MoomooCommission(FeeLeg):
-    """0.03% of value, waived entirely below one share.
+class FractionalFree(FeeLeg):
+    """Zero below one share.
 
-    The waiver is not generosity and not rounding: it is what makes the cost of
-    a fractional order fall almost entirely on the platform fee, and it is half
-    of why crossing one whole share is the worst size on a cheap stock.
+    moomoo's fractional card charges the platform fee and NOTHING else:
+    commission, settlement, SEC, FINRA and the audit-trail fee are all listed
+    as 0. The first version of this file charged the regulatory legs on a
+    fractional order because it reasoned from the whole-share card. The real
+    card says otherwise.
     """
 
     def charge(self, consideration: Decimal, price: Decimal | None = None) -> Decimal:
@@ -71,55 +121,149 @@ class MoomooCommission(FeeLeg):
         return super().charge(consideration, price)
 
 
-class MoomooPlatform(FeeLeg):
-    """USD 0.99 flat per order - but 0.99% of value, capped at USD 0.99, below
-    one share.
+class MoomooCommission(FractionalFree):
+    """0.03% of value, rounded UP to the next cent per order, waived below one
+    share.
 
-    The cap only binds above a USD 100 share price, because below one share the
-    consideration is smaller than the price. So on a cheap stock a fractional
-    order pays a true rate and a whole-share order pays a fixed fee, and the
-    two do not meet: at USD 50 a share, 0.99 shares costs 199.5 bps round trip
-    and 1.00 share costs 403.5. Nothing else in the schedule has a
-    discontinuity, which is exactly why this one is worth naming.
+    The rounding is not decoration: on a small order it is most of the fee. At
+    a USD 30 trade, 0.03% is 0.9 of a cent and the charge is a whole cent.
     """
 
     def charge(self, consideration: Decimal, price: Decimal | None = None) -> Decimal:
         if _shares(consideration, price, self.name) < ONE_SHARE:
-            return min(consideration * MOOMOO_FRACTIONAL_RATE, MOOMOO_FRACTIONAL_CAP)
+            return Decimal(0)
+        return _round_up_cent(consideration * self.rate)
+
+
+class MoomooPlatform(FeeLeg):
+    """USD 0.99 flat per order - but 0.99% of value, capped at USD 0.99, below
+    one share.
+
+    The only leg NOT waived on a fractional order, which is what makes the
+    discontinuity at one share so sharp: below it you pay a rate and nothing
+    else, at it you pay a flat fee plus five other legs.
+
+    The cap binds only above a USD 100 share price, because below one share the
+    consideration is smaller than the price.
+    """
+
+    def charge(self, consideration: Decimal, price: Decimal | None = None) -> Decimal:
+        if _shares(consideration, price, self.name) < ONE_SHARE:
+            return min(
+                _round_up_cent(consideration * MOOMOO_FRACTIONAL_RATE), MOOMOO_FRACTIONAL_CAP
+            )
         return super().charge(consideration, price)
 
 
-#: moomoo Malaysia, US listings. Commission and the platform fee are charged on
-#: both legs; the two regulatory fees are levied on the sale only, which
-#: `per_side=False` expresses and `FeeSchedule.round_trip` charges once.
+class MoomooSettlement(FractionalFree):
+    """USD 0.003 a share, capped at 1% of the trade.
+
+    A PROPORTIONAL cap, which `FeeLeg.cap` cannot express - that one is an
+    absolute ceiling. It binds where a per-share fee would otherwise run away:
+    a USD 2 stock pays 0.15% a side uncapped, and 1% is the stated ceiling.
+    """
+
+    def charge(self, consideration: Decimal, price: Decimal | None = None) -> Decimal:
+        shares = _shares(consideration, price, self.name)
+        if shares < ONE_SHARE:
+            return Decimal(0)
+        return min(shares * SETTLEMENT_PER_SHARE, consideration * SETTLEMENT_CAP_RATE)
+
+
+class MalaysianStampDuty(FeeLeg):
+    """RM1.00 per RM1,000 of value or fractional part, capped RM1,000.
+
+    A STEP, not a rate: RM1,001 and RM1,999 both pay RM2. On a small Bursa
+    order the step is the single largest line - RM1 on a RM100 trade is 1% -
+    and no broker choice can reduce it.
+    """
+
+    def charge(self, consideration: Decimal, price: Decimal | None = None) -> Decimal:
+        if consideration <= 0:
+            return Decimal(0)
+        units = (consideration / MY_STAMP_DUTY_PER).quantize(Decimal(1), rounding=ROUND_CEILING)
+        return min(units, MY_STAMP_DUTY_CAP)
+
+
+class MalaysianSst(FeeLeg):
+    """8% on commission + platform fee + clearing fee. NOT on stamp duty.
+
+    A tax on OTHER FEES, which no independent leg can express - FeeSchedule
+    sums each leg from the consideration alone and shows a leg nothing else.
+    So it recomputes the three it taxes from the same module constants those
+    legs are built from: one source of truth, at the cost of naming them twice.
+    """
+
+    def charge(self, consideration: Decimal, price: Decimal | None = None) -> Decimal:
+        commission = _round_up_cent(consideration * MY_COMMISSION_RATE)
+        clearing = min(consideration * MY_CLEARING_RATE, MY_CLEARING_CAP)
+        return (commission + MY_PLATFORM_FEE + clearing) * MY_SST_RATE
+
+
+#: moomoo Malaysia, US listings. The STANDARD card - the account currently has
+#: a fee-reduction promotion in effect that zeroes commission, platform and
+#: settlement, and the standard card is what it reverts to. Modelling the promo
+#: as permanent would understate the floor on the day it ends.
+#:
+#: Commission, platform, settlement and the audit-trail fee are charged on both
+#: legs; SEC and FINRA on the sale only, which `per_side=False` expresses and
+#: `round_trip` charges once.
 MOOMOO_MY_XNAS = FeeSchedule(
     (
-        MoomooCommission("commission", rate=Decimal("0.0003")),
+        MoomooCommission("commission", rate=MY_COMMISSION_RATE),
         MoomooPlatform("platform", flat=Decimal("0.99")),
-        FeeLeg("settlement", per_share=Decimal("0.003")),
-        FeeLeg("sec_fee", rate=SEC_FEE_RATE, per_side=False),
-        FeeLeg("finra_taf", per_share=TAF_PER_SHARE, cap=TAF_CAP, per_side=False),
+        MoomooSettlement("settlement"),
+        FractionalFree("cat_fee", per_share=CAT_PER_SHARE_NMS),
+        FractionalFree("sec_fee", rate=SEC_FEE_RATE, minimum=SEC_FEE_MIN, per_side=False),
+        FractionalFree(
+            "finra_taf", per_share=TAF_PER_SHARE, minimum=TAF_MIN, cap=TAF_CAP, per_side=False
+        ),
+        # Charged by this MALAYSIAN broker on US trades too - see the constant.
+        FeeLeg("my_stamp_duty", rate=MY_STAMP_DUTY_RATE),
     )
 )
+
+#: moomoo Malaysia, Bursa. Native MYR throughout, so the stamp-duty step and
+#: the SST are modelled exactly rather than approximated. No minimum
+#: commission: the flat RM3 platform fee is what makes a small order
+#: uneconomic, not a commission floor.
+MOOMOO_MY_XKLS = FeeSchedule(
+    (
+        FeeLeg("commission", rate=MY_COMMISSION_RATE),
+        FeeLeg("platform", flat=MY_PLATFORM_FEE),
+        FeeLeg("clearing", rate=MY_CLEARING_RATE, cap=MY_CLEARING_CAP),
+        MalaysianStampDuty("stamp_duty"),
+        MalaysianSst("sst"),
+    )
+)
+
 
 #: (broker, MIC) -> schedule. A broker absent from a venue here is not an error:
 #: it means the account trades that venue on the venue's own terms, and
 #: `schedule_for` falls back rather than inventing a schedule for it.
 BROKER_SCHEDULES: dict[tuple[str, str], FeeSchedule] = {
     ("moomoo_my", "XNAS"): MOOMOO_MY_XNAS,
+    ("moomoo_my", "XKLS"): MOOMOO_MY_XKLS,
 }
 
 #: (broker, MIC) -> the cost floor tolerance in bps, set the way the per-market
 #: table in engines/sizing/caps.py is: roughly 1.25x the schedule's own
 #: asymptotic round-trip cost.
 #:
-#: moomoo's asymptote is PRICE-DEPENDENT because two legs are per-share: ~6.9 bps
-#: at a USD 100 share price, ~12.3 bps at USD 10. 20 bps clears the range that
-#: matters without being so loose it stops binding. It is emphatically not the
-#: venue's 5 bps: 0.03% commission is 6 bps round trip on its own, so the XNAS
-#: entry is not a starting point to nudge - it is unreachable at any size.
+#: Both are far above the venue floors they replace, and the reason is the same
+#: for each: MALAYSIAN STAMP DUTY. This broker charges it on every market, not
+#: only Bursa, at RM1 per RM1,000 - 10 bps a side, 20 round trip, and it does
+#: not fall with size until a RM1,000,000 trade. No position a retail account
+#: takes escapes it, so no floor below 20 bps is reachable at all.
+#:
+#:   Bursa  asymptote ~33 bps in the range a retail account trades. The
+#:          "true" asymptote of 7 bps is an artefact of the clearing and stamp
+#:          caps, which bind above RM1m and are irrelevant here.
+#:   XNAS   asymptote ~27 bps at a USD 100 share price, ~32 at USD 10; two
+#:          legs are per-share so it rises as the share price falls.
 BROKER_FLOOR_BPS: dict[tuple[str, str], Decimal] = {
-    ("moomoo_my", "XNAS"): Decimal("20"),
+    ("moomoo_my", "XNAS"): Decimal("35"),
+    ("moomoo_my", "XKLS"): Decimal("40"),
 }
 
 
