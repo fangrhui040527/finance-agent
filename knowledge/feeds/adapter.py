@@ -218,7 +218,12 @@ class GdeltFeed(FeedAdapter):
     MIN_TIMESPAN = timedelta(minutes=15)
     #: One page. Paging past this is a later problem; over-asking is refused.
     MAX_RECORDS = 250
-    TIMEOUT = 30
+    # 90, not 30. Measured on the 2026-09-03 runs: the DOC API answered once in
+    # ~38s and then exceeded a 30s socket read twice. This is a slow service,
+    # not a broken one, and a timeout under its normal response time turns every
+    # sweep into a recorded failure. `with_retry` makes 3 attempts, so the worst
+    # case is ~4.5min - inside the collect job's 15min cap.
+    TIMEOUT = 90
     DEFAULT_USER_AGENT = "finplanet-analyst-mind/0.1 (personal research)"
 
     def __init__(
