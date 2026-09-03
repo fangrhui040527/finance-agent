@@ -298,3 +298,52 @@ def test_the_client_sends_the_resolved_shape_not_the_default_table(monkeypatch):
     assert sent["profile"] == profile_for(Tier.CHEAP)
     assert sent["profile"].thinking_budget == CHEAP_EFFORT_BUDGET[Effort.HIGH][0]
     assert sent["profile"].effort is None
+
+
+# --- the disclosure names the variable that actually caused the pin ----------------
+
+
+def test_the_note_names_the_variable_that_actually_pinned_the_tier(monkeypatch):
+    """`pinned_tier` collapses two spellings into one answer because the router
+    does not care which was written. The disclosure does.
+
+    Until this was fixed the note said FINPLANET_MODEL whatever the cause, so an
+    operator capped by FINPLANET_CHEAP was told to unset a variable that was not
+    set, would see the run still on Haiku, and had been sent to the one place the
+    fault is not. `cheap_capped`'s own docstring names this failure - "telling
+    the truth about the variable and lying about the run" - and the note had it.
+    """
+    from core.llm.tiers import pin_source, selection_note
+
+    monkeypatch.setenv("FINPLANET_CHEAP", "1")
+    assert pin_source() == "FINPLANET_CHEAP"
+    assert "(FINPLANET_CHEAP)" in selection_note()
+    assert "FINPLANET_MODEL" not in selection_note()
+
+    monkeypatch.delenv("FINPLANET_CHEAP")
+    monkeypatch.setenv("FINPLANET_MODEL", "haiku")
+    assert pin_source() == "FINPLANET_MODEL"
+    assert "(FINPLANET_MODEL)" in selection_note()
+    assert "FINPLANET_CHEAP" not in selection_note()
+
+
+def test_the_more_specific_spelling_is_the_one_named(monkeypatch):
+    """Both set resolves to the same tier, and FINPLANET_MODEL is the more
+    specific instruction, so it is the one that wins AND the one named. A note
+    that credited the other would send an operator to unset the variable that
+    is not deciding."""
+    from core.llm.tiers import pin_source, selection_note
+
+    monkeypatch.setenv("FINPLANET_CHEAP", "1")
+    monkeypatch.setenv("FINPLANET_MODEL", "haiku")
+    assert pin_source() == "FINPLANET_MODEL"
+    assert "(FINPLANET_MODEL)" in selection_note()
+
+
+def test_no_pin_names_nothing(monkeypatch):
+    from core.llm.tiers import pin_source, selection_note
+
+    for k in ("FINPLANET_CHEAP", "FINPLANET_MODEL", "FINPLANET_EFFORT"):
+        monkeypatch.delenv(k, raising=False)
+    assert pin_source() is None
+    assert selection_note() == ""
