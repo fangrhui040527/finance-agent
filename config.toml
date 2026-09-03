@@ -34,7 +34,7 @@ markets = ["XKLS", "XNAS"]
 #
 # A broker only replaces the venues it actually prices; anything else still
 # sizes on the venue's terms, and the output names which was used.
-# broker = "moomoo_my"
+broker = "moomoo_my"
 
 # docs/08 planning rate: mid-market ~4.04 plus roughly 2.5% card FX markup.
 # Used for cost estimates only. Real conversions carry their own dated rate.
