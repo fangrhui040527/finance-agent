@@ -133,16 +133,30 @@ def watchlist_query(instrument_ids: Iterable[str]) -> str:
     can ask for but cannot link produces an article the corpus stores and can
     never attribute to anyone.
 
+    ONE form per company, not all of them. Asking for all 21 surface forms of a
+    nine-name book timed out three times at 30s on the 2026-09-03 runner; the
+    same sweep with a one-line query had answered in under a minute. The DOC API
+    charges for query breadth, and "Malayan Banking Berhad" buys little that
+    "Maybank" does not - the two normally appear in the same article.
+
+    The form used is the FIRST listed in entities.yaml, which is the common
+    short name. Linking is unaffected: `entity_index` still matches every alias,
+    so an article found under "Maybank" is still attributed if it only spells
+    out "Malayan Banking Berhad" later.
+
     Returns "" for an empty book, which leaves the adapter's own default alone -
     a caller with nothing to watch should not be handed an empty `()` group.
     """
     wanted = {str(i) for i in instrument_ids}
     if not wanted:
         return ""
-    forms = sorted({s for s, iid in _index_from_aliases().items() if iid in wanted})
-    if not forms:
+    primary: dict[str, str] = {}
+    for surface, iid in _index_from_aliases().items():
+        if iid in wanted:
+            primary.setdefault(iid, surface)
+    if not primary:
         return ""
-    return "(" + " OR ".join(f'"{f}"' for f in forms) + ")"
+    return "(" + " OR ".join(f'"{f}"' for f in sorted(primary.values())) + ")"
 
 
 def entity_index() -> dict[str, str]:

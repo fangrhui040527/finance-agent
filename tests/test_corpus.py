@@ -416,3 +416,16 @@ def test_the_shipped_config_asks_for_something_real():
     q = cfg.gdelt_query or watchlist_query(tuple(cfg.watchlist) + tuple(cfg.holdings))
     assert q, "the shipped book must yield a GDELT query or the sweep asks for reuters.com"
     assert "domainis:" not in q
+
+
+def test_the_query_asks_for_one_form_per_company_not_all_of_them():
+    """Why: all 21 surface forms of a nine-name book timed out three times at
+    30s against the DOC API. The API charges for query breadth, and the extra
+    aliases buy little - "Malayan Banking Berhad" and "Maybank" normally appear
+    in the same article. Linking still uses every alias."""
+    from knowledge.graph.extractors.gdelt import watchlist_query
+
+    ids = ["MYX:1155", "MYX:5347", "XNAS:NVDA"]
+    q = watchlist_query(ids)
+    assert q.count(" OR ") + 1 == len(ids), "one phrase per company, not one per alias"
+    assert '"Maybank"' in q and '"Malayan Banking Berhad"' not in q
