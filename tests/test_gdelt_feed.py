@@ -67,17 +67,27 @@ def test_a_genuinely_empty_window_is_not_an_error():
 
 
 # --- request construction -------------------------------------------------
-def test_timespan_never_drops_below_the_documented_minimum():
-    """A caller polling every minute would otherwise make the API refuse it."""
+def test_timespan_never_drops_below_what_the_api_will_accept():
+    """A caller polling every minute would otherwise make the API refuse it.
+
+    This asserted 15 minutes, which was wrong: on 2026-09-03 a sweep resuming
+    from a watermark 25 minutes old was answered "Timespan is too short." in
+    plain text, failing the whole request. The floor is now two hours - wider
+    than the real boundary on purpose, because guessing it costs a whole sweep
+    and the overlap costs nothing the corpus does not already dedupe away.
+    """
     feed = GdeltFeed()
-    assert feed._timespan(NOW - timedelta(seconds=30), now=NOW) == "15min"
-    assert feed._timespan(NOW, now=NOW) == "15min"
+    assert feed._timespan(NOW - timedelta(seconds=30), now=NOW) == "120min"
+    assert feed._timespan(NOW, now=NOW) == "120min"
+    assert feed._timespan(NOW - timedelta(minutes=25), now=NOW) == "120min"
     assert feed._timespan(NOW - timedelta(hours=2), now=NOW) == "120min"
 
 
 def test_timespan_rounds_up_so_the_window_is_never_short():
+    """Above the floor, a partial minute still widens the window rather than
+    truncating it - a window short by a second is a story missed."""
     feed = GdeltFeed()
-    assert feed._timespan(NOW - timedelta(minutes=90, seconds=1), now=NOW) == "91min"
+    assert feed._timespan(NOW - timedelta(minutes=150, seconds=1), now=NOW) == "151min"
 
 
 def test_maxrecords_is_capped_at_one_page():

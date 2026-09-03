@@ -215,7 +215,17 @@ class GdeltFeed(FeedAdapter):
     DOC_API = "https://api.gdeltproject.org/api/v2/doc/doc"
 
     #: Below this the API refuses the query outright.
-    MIN_TIMESPAN = timedelta(minutes=15)
+    #: The DOC API answers "Timespan is too short." - as plain text, not JSON -
+    #: below its own minimum, and 15 minutes is under it: measured 2026-09-03,
+    #: a sweep resuming from a watermark 25 minutes old was refused outright.
+    #:
+    #: Two hours rather than the exact minimum on purpose. The boundary is not
+    #: documented and guessing it costs a whole failed sweep, while asking for a
+    #: WIDER window than needed costs nothing: the corpus dedupes on dup_hash,
+    #: so the overlap is discarded on arrival. A daily schedule never comes near
+    #: this - it resumes from ~24h - but a manual run after one, or a retry
+    #: after a failure, lands inside the hour every time.
+    MIN_TIMESPAN = timedelta(hours=2)
     #: One page. Paging past this is a later problem; over-asking is refused.
     MAX_RECORDS = 250
     # 90, not 30. Measured on the 2026-09-03 runs: the DOC API answered once in
