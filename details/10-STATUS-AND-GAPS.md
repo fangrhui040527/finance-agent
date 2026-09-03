@@ -23,6 +23,7 @@ invisible.
 | Sizing — 5 caps, binding cap, lot rounding, cost floor, `NoPosition` | complete |
 | Investable-capital waterfall — emergency floor, goals, debt hurdle | complete, **and reachable since 2026-08-30** — see the note below |
 | 11 market adapters, fee schedules, alias map | complete |
+| **Broker account feed** — moomoo, read-only, `ask.py positions` | built, **never run against a live gateway** |
 | **Broker fee schedules** — `moomoo_my` on XNAS, per-share and per-order legs, broker-aware cost floor | complete, **and reachable** via `[account] broker` |
 | **MYR unit-of-account boundary** | complete |
 | Knowledge graph — schema, store, ids, 6 extractors, reproducible build | complete |
@@ -33,7 +34,7 @@ invisible.
 | Teacher — 30 concepts, enforced prerequisite order | complete |
 | Reflection — grading, lesson proposal, calibration, scoring | complete |
 | Tracing — spans, HTML report, anatomy, prompts | complete |
-| CLI — 17 subcommands | complete |
+| CLI — 18 subcommands | complete |
 | Fitness function — refuses a partial score | complete |
 | CI — 10 steps, offline, keyless | complete |
 

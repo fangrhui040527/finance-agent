@@ -804,6 +804,50 @@ def cmd_alerts(a) -> int:
     return 0
 
 
+def cmd_positions(a) -> int:
+    """What the broker says you hold, as distinct from what config.toml says.
+
+    Deliberately does NOT write config.toml. A holdings list is an input to
+    every concentration and rebalancing figure in this system, and a command
+    that silently rewrote it would make a portfolio change with no diff and no
+    decision. This prints; you paste.
+    """
+    from core.broker.account import BrokerError
+    from core.broker.moomoo import MoomooAccountFeed
+
+    try:
+        snap = MoomooAccountFeed(market=a.market).snapshot()
+    except BrokerError as e:
+        print(f"account   unavailable: {e}", file=sys.stderr)
+        return 3
+
+    stamp = snap.as_of.strftime("%Y-%m-%d %H:%M:%SZ")
+    print(f"account   {snap.source}  as of {stamp}")
+    print(f"cash      {snap.currency} {snap.cash:,.2f}")
+    if snap.is_empty:
+        # An empty account reached us as a real answer, not as a failure - the
+        # feed raises for a broken link. Say which it was.
+        print("holdings  none. The account was read and holds nothing.")
+        return 0
+
+    print(f"holdings  {len(snap.positions)}")
+    for p in snap.positions:
+        print(
+            f"  {p.instrument_id:<14} {p.units:>10,.0f} units  "
+            f"avg {p.currency} {p.avg_cost:>9,.4f}  value {p.currency} {p.market_value:>12,.2f}"
+        )
+    print()
+    print("  To use these, paste into [account] holdings in config.toml:")
+    book = ", ".join(
+        f'{{ id = "{p.instrument_id}", units = {p.units:.0f}, avg_cost = {p.avg_cost} }}'
+        for p in snap.positions
+    )
+    print(f"    holdings = [{book}]")
+    print("  Add `stop` and `sector` per name: without a stop the risk-budget cap")
+    print("  cannot be computed, and without a sector each name counts as its own.")
+    return 0
+
+
 def cmd_capital(a) -> int:
     """How much money is allowed to be in stocks at all.
 
@@ -1396,6 +1440,15 @@ def main(argv=None) -> int:
     rb.add_argument("--risk-per-trade", type=float, default=0.0075)
     rb.add_argument("--single-name", type=float, default=0.08)
     rb.set_defaults(fn=cmd_rebalance)
+
+    ps = sub.add_parser("positions", help="what the broker says you hold (read-only)")
+    ps.add_argument(
+        "--market",
+        default="MY",
+        help="which market's account to read: MY, US, HK, SG. Needs OpenD running "
+        "and logged in on this machine; nothing here holds your password.",
+    )
+    ps.set_defaults(fn=cmd_positions)
 
     cp = sub.add_parser("capital", help="how much may be invested at all, from [capital]")
     cp.set_defaults(fn=cmd_capital)
