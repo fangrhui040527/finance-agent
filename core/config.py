@@ -216,6 +216,15 @@ class Config:
     # describe() says out loud rather than leaving you to discover.
     holdings: tuple[str, ...] = ()
     watchlist: tuple[str, ...] = ()
+    broker: str | None = None
+    """Whose fee schedule this account actually pays.
+
+    None means the venue's own schedule, which is what every market adapter
+    ships. Naming a broker replaces it for the venues that broker prices
+    differently - markets/xnas.py models a ZERO-COMMISSION US account, and an
+    account that is not that shape sized against it is funded into positions
+    that cannot pay for their own round trip.
+    """
     provenance_db: str = "data/provenance.db"
     daemon_budget_myr: Decimal = Decimal("10.0")
     source: str = "<defaults>"
@@ -225,6 +234,7 @@ class Config:
             f"config from {self.source}\n"
             f"  base currency        {self.base_currency}\n"
             f"  markets              {', '.join(self.markets)}\n"
+            f"  broker               {self.broker or 'none (venue schedules)'}\n"
             f"  risk per trade       {self.risk_per_trade:.2%}\n"
             f"  single-name cap      {self.limits.single_name:.0%}"
             f"   (hard ceiling 15%)\n"
@@ -494,6 +504,17 @@ def load(path: str | Path | None = None) -> Config:
             f"entry; listing a MIC here does not create one. Supported: {supported()}"
         )
 
+    broker = str(_get(data, "account.broker", "")).strip() or None
+    if broker is not None:
+        from markets.brokers import known_brokers
+
+        if broker not in known_brokers():
+            raise ConfigError(
+                f"unknown broker {broker!r}. A broker is one entry in "
+                f"markets/brokers.BROKER_SCHEDULES; naming one here does not "
+                f"create it. Known: {known_brokers()}"
+            )
+
     def dec(k, d):
         return Decimal(str(_get(data, k, d)))
 
@@ -512,6 +533,7 @@ def load(path: str | Path | None = None) -> Config:
     return Config(
         base_currency=str(_get(data, "account.base_currency", "MYR")).upper(),
         markets=markets,
+        broker=broker,
         fx_myr_per_usd=dec("account.fx_myr_per_usd", DEFAULT_FX_MYR_PER_USD),
         risk_per_trade=dec("risk.risk_per_trade", 0.0075),
         target_volatility=dec("risk.target_volatility", 0.20),
