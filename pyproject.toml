@@ -21,6 +21,9 @@ dependencies = [
 
 # `pip install -e ".[dev]"` keeps working; uv reads [dependency-groups] below.
 [project.optional-dependencies]
+# Reading a moomoo account (docs/19). Optional on purpose: it pulls in pandas
+# and protobuf, and this system runs offline and keyless without them.
+broker = ["futu-api>=9.0"]
 dev = [
   "pytest>=8.0",
   "pytest-cov>=5.0",
