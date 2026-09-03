@@ -293,6 +293,7 @@ The rules, all thresholds in `config.toml [monitor]` and bounded in code:
 | `latency_p95` | p95 latency over 24h exceeds `p95_latency_ms` |
 | `dropped_claims` | claims dropped for want of a citation exceed `dropped_claim_rate` |
 | `silence` | no model calls in `silence_hours`, on a ledger that HAS run before (0 = off) |
+| `sweep_silence` | no successful sweep in `sweep_silence_hours`, for a source that HAS succeeded before (0 = off) |
 | `run_errors` | the newest traced run contains an error event |
 | `methodology_changed` | the manifest hash moved between the last two runs |
 
@@ -347,10 +348,21 @@ Started elsewhere it does not fail — it writes a second, empty corpus beside
 wherever the scheduler happened to be, and every night's watermark is missing,
 so every night refetches the same window.
 
-**Turn on `silence_hours` the day you schedule this.** It is 0 by default
-because a personal tool is allowed to sit idle. A scheduled one is not, and a
-sweep that dies quietly looks exactly like a quiet month — which is the failure
-this whole path is built to make visible.
+**The rule that watches this is `sweep_silence`, not `silence`.** Reaching for
+`silence_hours` here is the obvious move and it is the wrong one: it counts
+MODEL calls, and `ask.py sweep` makes none. Turned on for a sweep-only schedule
+it fires every single morning after a run that worked perfectly — and it stays
+silent through a sweep that has been dead since Tuesday, as long as you asked
+the system a question yesterday. Two ways of being wrong, in opposite
+directions, from one plausible setting.
+
+`sweep_silence_hours` asks the same question of the record the sweep itself
+writes. It ships at 30 — a daily schedule plus six hours of slack, so one late
+run is not an alert and a missed day is — and it stays quiet until a source has
+succeeded once, because a corpus nobody has filled yet is a system nobody turned
+on rather than one that stopped.
+
+Leave `silence_hours` at 0 unless something SCHEDULED also calls a model.
 
 Two numbers to read afterwards, both from `ask.py sweep`'s own last line: how
 many articles the corpus holds, and how many of the sweeps failed. A failure

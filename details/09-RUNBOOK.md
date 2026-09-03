@@ -144,9 +144,11 @@ not happen to mention.
 python ask.py watch               # exits 1 if any alert is open
 ```
 
-Six rules over the ledger and the run log: 24-hour spend, p95 latency, dropped
-claims, silence (nothing has run when something should have), run errors, and a
-methodology change. Each alert names the number that fired it and the threshold
+Seven rules over the ledger, the corpus and the run log: 24-hour spend, p95
+latency, dropped
+claims, silence (no MODEL call when something should have run), sweep silence
+(no successful SWEEP when one was scheduled - a different question, because
+`ask.py sweep` makes no model calls), run errors, and a methodology change. Each alert names the number that fired it and the threshold
 it crossed. This is the command to put on a schedule.
 
 ### `alerts` — what is open, and what has cleared

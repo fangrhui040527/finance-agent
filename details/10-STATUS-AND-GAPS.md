@@ -89,6 +89,20 @@ Two constants in that file — the SEC fee rate and the FINRA trading-activity f
 They are pinned by test so a drift is visible, and they are the reason a cost
 floor from this schedule should not be trusted to the basis point yet.
 
+### The death detector was watching the wrong thing (added 2026-09-03)
+
+`silence` counts model calls, and `ask.py sweep` makes none. So the day the
+sweep went on a daily timer, the one rule meant to catch "a scheduled job died
+quietly" could not see it — and turned on anyway it would have fired every
+morning after a run that worked, while staying silent through a sweep dead since
+Tuesday if you happened to ask a question yesterday. Wrong in both directions
+from one plausible setting.
+
+`sweep_silence` asks the same question of the record the sweep writes. Off by
+default, 30 hours in the shipped config, quiet until a source has succeeded
+once. One rule covers both a dead scheduler and a week of refused requests,
+because a failed sweep is not a successful one and both want the same look.
+
 ### `[sources]` described four settings and nothing read any of them (fixed 2026-09-03)
 
 `config.toml` carried `[sources] enabled`, `gdelt_poll_minutes`, `gdelt_languages`

@@ -205,6 +205,10 @@ class Config:
     alert_dropped_claim_rate: Decimal = Decimal("0.2")
     #: 0 disables. A personal tool is allowed to sit idle; a scheduled one is not.
     alert_silence_hours: int = 0
+    #: The same question asked of the SWEEP rather than the model ledger, because
+    #: `ask.py sweep` makes no model calls and `alert_silence_hours` therefore
+    #: cannot see it. 0 disables. Quiet until a source has succeeded once.
+    alert_sweep_silence_hours: int = 0
     #: The financial position the waterfall turns into investable capital.
     capital: CapitalPlan = CapitalPlan()
     #: Holdings with units where the file gives them; `holdings` keeps the bare
@@ -633,6 +637,7 @@ def load(path: str | Path | None = None) -> Config:
         alert_p95_latency_ms=_float("monitor.p95_latency_ms", 20_000.0),
         alert_dropped_claim_rate=dec("monitor.dropped_claim_rate", 0.2),
         alert_silence_hours=_int("monitor.silence_hours", 0),
+        alert_sweep_silence_hours=_int("monitor.sweep_silence_hours", 0),
         capital=_capital(data),
         book=_book(data),
         source=source,
