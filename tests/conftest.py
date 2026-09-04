@@ -54,6 +54,27 @@ def shipped_config(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("FINPLANET_CONFIG", str(ROOT / "config.toml"))
 
 
+@pytest.fixture(scope="session", autouse=True)
+def shipped_config_session():
+    """The same pin, one scope up, because the fixture above cannot reach far enough.
+
+    `shipped_config` is function-scoped, so a module- or session-scoped fixture
+    is built BEFORE it applies and reads the operator's `config.local.toml`
+    anyway. `test_graph_surfaces.db` is module-scoped and does exactly that: it
+    builds a graph from the real book, while every build inside a test body
+    builds from the shipped one, and the diff between them is reported as a
+    change to the graph.
+
+    That is the precise failure the fixture above was written to stop, arriving
+    through a door it does not cover - and it only appears on a machine whose
+    watchlist is filled in, which the product instructs the operator to do.
+    """
+    mp = pytest.MonkeyPatch()
+    mp.setenv("FINPLANET_CONFIG", str(ROOT / "config.toml"))
+    yield
+    mp.undo()
+
+
 # --- urllib doubles -----------------------------------------------------------
 
 

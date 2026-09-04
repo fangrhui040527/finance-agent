@@ -25,9 +25,9 @@ of checks.
 ## The five checks
 
 ```bash
-make test         # 1,073 tests, ~15s
+make test         # 1,848 tests, ~70s
 make verify       # 14 sections, PASS/FAIL
-make stress       # 161 held, exits with the finding count
+make stress       # 158 held, exits with the finding count
 make trace        # end-to-end, writes debug/<run-id>/
 make mcp-check    # MCP handshake against itself
 make doctor       # preflight: what this installation can actually do

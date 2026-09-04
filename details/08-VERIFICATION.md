@@ -20,9 +20,9 @@ suite nobody reads the output of.
 
 ---
 
-## 1. `make test` — 1,073 tests
+## 1. `make test` — 1,848 tests
 
-43 test files, 9,478 lines. Runs in ~15 seconds.
+76 test files. Runs in about 70 seconds.
 
 | File | Covers |
 |---|---|
@@ -71,7 +71,7 @@ Sample output from §7:
 That last line is the currency defect stated in the units that matter to the
 holder. Before the fix it read RM 167,832.
 
-## 3. `make stress` — 161 held, 0 findings, 2 notes
+## 3. `make stress` — 158 held, 0 findings, 2 notes
 
 `stress/run.py`. **Adversarial, not a second happy path.** Exits with the
 finding count, so CI fails on a new one.
@@ -120,7 +120,7 @@ HELD  XLON: 8% of RM 500,000 buys nothing  -- round-trip cost is 75 bps ...
 > overshoot is one board lot, roughly RM 40, so the probe still catches
 > everything it was written for.
 
-## 4. `make trace` — 16/16 agents, 0 errors, 10 refusals
+## 4. `make trace` — 16/16 agents, 0 errors, 11 refusals
 
 `trace_run.py`. **The only end-to-end run that uses the real, registry-derived
 allowlist.** `verify.py` and the unit tests pass hand-written allowlists with

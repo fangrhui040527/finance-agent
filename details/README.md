@@ -4,6 +4,10 @@ This folder is the **as-built record**. It describes the code that exists, the
 rules it enforces, the defects found while building it, and what is still
 missing.
 
+**Refreshed 2026-09-04.** The project roughly doubled after these notes were
+first written — 169 files to 280, 1,073 tests to 1,848 — and the web frontend
+went from designed to built. Numbers below were re-measured, not carried over.
+
 It is deliberately separate from `docs/`:
 
 | Folder | What it is | Written |
@@ -33,18 +37,18 @@ Run on the commit that added this folder.
 
 | | |
 |---|---|
-| Python modules | 169 files, 29,286 lines |
-| Tests | **1,073 passing** |
+| Python modules | 280 files, 59,395 lines |
+| Tests | **1,848 passing** |
 | `verify.py` | PASS — 14 sections |
-| `stress/run.py` | **161 held, 0 findings**, 2 notes |
+| `stress/run.py` | **158 held, 0 findings**, 2 notes |
 | MCP selftest | PASS |
-| `trace_run.py` | 16/16 agents, 0 errors, 10 refusals |
-| Knowledge graph | 47 nodes, 84 edges, 84/84 citable, 0 hubs |
+| `trace_run.py` | 16/16 agents, 0 errors, 11 refusals |
+| Knowledge graph | 120 nodes, 164 edges, 86 citable, 0 hubs |
 | Registered agents | 16 |
 | Registered markets | 11 (8 currencies) |
 | Knowledge stores | 20 |
-| Runtime dependencies | **2** (`pydantic`, `pyyaml`) |
-| Network required | **none** |
+| Runtime dependencies | **5** (`pydantic`, `pyyaml`, `anthropic`, `fastapi`, `uvicorn`) |
+| Network required | **none** to run; live price and FX feeds are opt-in |
 | API keys required | **none** |
 
 ## Contents

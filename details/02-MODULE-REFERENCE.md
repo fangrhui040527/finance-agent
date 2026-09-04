@@ -2,12 +2,16 @@
 
 Every package and every module, what it owns, and the symbol worth knowing.
 
-169 Python files, 29,286 lines. Test files (43 files, 9,478 lines) are covered
-in `08-VERIFICATION.md`.
+280 Python files, 59,395 lines. Test files (76 files) are covered in
+`08-VERIFICATION.md`.
+
+**This project roughly doubled after these notes were first written.** The
+architecture below still holds; the file counts and the `web/` section are the
+parts that moved.
 
 ---
 
-## `core/` — 29 files, 3,565 lines
+## `core/` — 45 files
 
 The contracts and the cross-cutting machinery. Nothing here knows about
 equities specifically; it knows about money, provenance, guardrails and models.
@@ -85,7 +89,7 @@ silently never matching.
 
 ---
 
-## `agents/` — 14 files, 2,485 lines
+## `agents/` — 16 files
 
 | Module | Agents |
 |---|---|
@@ -103,7 +107,7 @@ See `04-AGENTS.md` for the full table.
 
 ---
 
-## `engines/` — 18 files, 2,026 lines
+## `engines/` — 22 files
 
 Pure computation. No model calls, no I/O.
 
@@ -122,7 +126,7 @@ are now checked, and the result clamped.
 
 ---
 
-## `knowledge/` — 28 files, 3,864 lines
+## `knowledge/` — 31 files
 
 | Package | Owns |
 |---|---|
@@ -138,7 +142,7 @@ and "the news source is broken", and only one of them is safe to act on.
 
 ---
 
-## `markets/` — 14 files, 1,333 lines
+## `markets/` — 17 files
 
 `contract.py` (the `MarketAdapter` ABC, `FeeSchedule`, `FeeLeg`), `registry.py`
 (the adapter map, the alias map, `resolve_mic`, `mic_of`, `market_currency`),
@@ -146,14 +150,14 @@ and 11 adapter classes. See `05-MARKETS-AND-MONEY.md`.
 
 ---
 
-## `mcp_server/` — 4 files, 1,196 lines
+## `mcp_server/` — 5 files
 
 A hand-written MCP server with no SDK dependency.
 
 | Module | Owns |
 |---|---|
 | `protocol.py` | `Server` — `initialize`, `tools/list`, `tools/call`; JSON-RPC framing |
-| `tools.py` | 12 exposed tools |
+| `tools.py` | 18 exposed tools |
 | `server.py` | stdio transport plus `--selftest`, which runs the whole handshake against itself |
 
 Exposed tools: `market_info`, `get_prices`, `why_did_it_move`, `fit_factor_model`,
@@ -165,14 +169,23 @@ keeps it that way.
 
 ---
 
-## `ui/` — 2 files, 273 lines
+## `ui/` — 2 files
 
-`render.py` — terminal rendering only. The 12 designed screens in `design/`
-are **not implemented**; see `10-STATUS-AND-GAPS.md`.
+`render.py` — terminal rendering.
+
+## `web/` — 5 files
+
+**The twelve screens are built.** `app.py`, `api.py`, `schemas.py`, `serve.py`
+and `static/`. FastAPI on loopback only — `make web` serves
+`http://127.0.0.1:8765`. POSTs require an `X-Requested-With: FinPlanet` header,
+so a cross-site form cannot drive it.
+
+When `details/` was first written this did not exist and `design/` held only
+artboards. That is no longer true.
 
 ---
 
-## `stress/` — 3 files, 1,283 lines
+## `stress/` — 3 files
 
 `run.py` — ten adversarial sections. `harness.py` — `held`, `finding`, `note`,
 `expect_raises`, `expect_no_crash`, `section`, `report`. Exits with the finding
