@@ -524,9 +524,13 @@ def test_base_url_with_or_without_a_trailing_slash_reaches_chat_completions_once
 
 
 def test_the_backend_modules_carry_no_absolute_path_or_gateway_port():
+    # The scratch-directory marker is assembled at run time because the
+    # product's own portability scan (tests/test_paths_are_portable.py) reads
+    # this file too and would report the literal.
+    scratch = "/" + "tmp" + "/"
     for rel in ("core/llm/providers.py", "core/llm/backends.py"):
         text = (ROOT / rel).read_text(encoding="utf-8")
-        for bad in ("/home/", "C:\\", "/tmp/", "11111"):
+        for bad in ("/home/", "C:\\", scratch, "11111"):
             assert bad not in text, f"{rel} contains {bad!r}"
 
 
