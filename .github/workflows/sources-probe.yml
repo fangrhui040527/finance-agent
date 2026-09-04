@@ -39,12 +39,38 @@ jobs:
       - name: Install
         run: uv sync --frozen
 
-      - name: Probe
+      # One repository secret named ALL_SECRET holding every key is accepted:
+      # .github/scripts/keys_from_blob.py finds each by label or shape, and this
+      # step masks and exports it. A secret set under its own name wins.
+      - name: Keys from ALL_SECRET, when the named secrets are not set
         env:
+          ALL_SECRET: ${{ secrets.ALL_SECRET }}
           FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
           FMP_API_KEY: ${{ secrets.FMP_API_KEY }}
           ALPHAVANTAGE_API_KEY: ${{ secrets.ALPHAVANTAGE_API_KEY }}
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: |
+          if [ -z "$ALL_SECRET" ]; then
+            echo "ALL_SECRET is not set; the named secrets are in use"
+            exit 0
+          fi
+          python3 .github/scripts/keys_from_blob.py ALL_SECRET | while IFS='=' read -r name value; do
+            if [ -n "${!name}" ]; then
+              echo "$name: set under its own name; the blob's copy is ignored"
+              continue
+            fi
+            echo "::add-mask::$value"
+            echo "$name=$value" >> "$GITHUB_ENV"
+            echo "$name: taken from ALL_SECRET"
+          done
+
+      - name: Probe
+        env:
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY || env.FINNHUB_API_KEY }}
+          FMP_API_KEY: ${{ secrets.FMP_API_KEY || env.FMP_API_KEY }}
+          ALPHAVANTAGE_API_KEY: ${{ secrets.ALPHAVANTAGE_API_KEY || env.ALPHAVANTAGE_API_KEY }}
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY || env.FRED_API_KEY }}
           SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
           GDELT_USER_AGENT: ${{ secrets.GDELT_USER_AGENT }}
         run: |
