@@ -253,6 +253,39 @@ Three things about it that are deliberate:
 
 What it costs: about 150 of those 2,000 minutes a month.
 
+### `fx` — the official rate, written down daily
+
+```bash
+python ask.py fx                  # record today's rate
+python ask.py fx --show           # what has been recorded
+python ask.py fx --currency USD,SGD
+```
+
+The command `config.toml` referred to for a while before it existed. It is here
+for one reason: `fx_spread_per_side` is the largest unmeasured number in the
+system — on a US position the whole fee schedule is about 0.3% a round trip, and
+half a percent each way of conversion cost is three times that.
+
+Measuring it used to need two figures at the same moment: the rate the broker
+gave, and the official rate right then. Needing both at once is why it never got
+measured. Recording the official rate daily removes the timing problem — convert
+whenever suits, then read the rate off the app afterwards and compare against the
+date.
+
+`data/fx.db` is a **history, not a cache.** `PriceCache` expires daily because
+bars are derived data reconstructible from the source; a rate is a fact about a
+date, BNM does not serve old rates on demand, and a day not written down is a day
+the comparison can never be made. Append-only, and `rate_on` is deliberately
+exact rather than nearest-earlier: answering with a neighbouring day's rate would
+put an unknown error into the one number it exists to measure.
+
+It runs as its **own step** in the collector, not folded into the sweep. A news
+source being throttled says nothing about whether the central bank published a
+rate, and one failing must not cost the other its day.
+
+Note this uses `api.bnm.gov.my`, BNM's OpenAPI — a different host from the
+website, and the one BNM surface that has worked throughout.
+
 ### `watch` — evaluate the monitor rules
 
 ```bash
@@ -394,7 +427,7 @@ same screen.
 
 ## `ask.py` — the CLI
 
-Nineteen subcommands.
+Twenty subcommands.
 
 ### `plan` — what the system would do with a question
 

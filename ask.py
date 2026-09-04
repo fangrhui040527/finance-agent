@@ -875,6 +875,59 @@ def _fetch_each(make_feed, terms, since, limit, deadline=None, clock=None):
     return records, failed, skipped, counts
 
 
+def cmd_fx(a) -> int:
+    """Record today's official rates, or show what has been recorded.
+
+    The command `config.toml` has referred to since before it existed. It is
+    here now for one reason: `fx_spread_per_side` is the biggest unmeasured
+    number in this system, and measuring it has needed two figures at the same
+    moment - the rate the broker gave, and the official rate right then.
+
+    Recording the official rate daily removes the timing problem. Convert
+    whenever suits, read the rate off the app afterwards, and the official rate
+    for that date is already stored to compare against.
+
+    Exit codes match `sweep`: 0 recorded, 2 could not run, 3 the source failed.
+    """
+    from core.market.fx import BnmFxFeed, FxFeedError
+    from core.market.fxlog import FxLog
+
+    with FxLog(a.db or None) as log:
+        if a.show:
+            for row in log.history(a.currency, limit=a.limit):
+                d = dict(row)
+                print(f"  {d['rate_date']}  1 {d['currency']} = MYR {d['rate']}  ({d['source']})")
+            counts = log.counts()
+            print(
+                f"  {'log':<10} {counts['rates']} rates, {counts['currencies']} currencies, "
+                f"{counts['days']} days"
+            )
+            return 0
+
+        try:
+            rows = BnmFxFeed().fetch_rates()
+        except FxFeedError as e:
+            # Same posture as a failed sweep: say so, do not write a silence
+            # that will later read as a day the rate did not move.
+            print(f"fx: {e}", file=sys.stderr)
+            return 3
+
+        # Only what the book touches. BNM publishes 30-odd currencies and this
+        # config names one or two; the rest is thirty times the rows to answer a
+        # question about USD.
+        wanted = tuple(dict.fromkeys(a.currency.upper().split(",")))
+        new, held = log.record_all(rows, only=wanted)
+        for code in wanted:
+            latest = log.history(code, limit=1)
+            if latest:
+                d = dict(latest[0])
+                print(f"  {code:<10} {d['rate_date']}  1 {code} = MYR {d['rate']}")
+            else:
+                print(f"  {code:<10} not published by the source", file=sys.stderr)
+        print(f"  {'recorded':<10} {new} new, {held} already held")
+        return 0
+
+
 def cmd_sweep(a) -> int:
     """Fetch every enabled source and KEEP what arrives.
 
@@ -1703,6 +1756,13 @@ def main(argv=None) -> int:
     sw.add_argument("--graph-db", default="data/graph.db", help="graph to link articles into")
     sw.add_argument("--no-graph", action="store_true", help="store only; do not touch the graph")
     sw.set_defaults(fn=cmd_sweep)
+
+    fx = sub.add_parser("fx", help="record the official MYR rate for the day, or show the log")
+    fx.add_argument("--currency", default="USD", help="comma-separated; default USD")
+    fx.add_argument("--show", action="store_true", help="print what is recorded and stop")
+    fx.add_argument("--limit", type=int, default=30, help="rows to show")
+    fx.add_argument("--db", default="", help="rate log path (default: data/fx.db)")
+    fx.set_defaults(fn=cmd_fx)
 
     wt = sub.add_parser("watch", help="evaluate the monitor rules; exit 1 if anything is open")
     wt.add_argument("--db", help="provenance ledger path")

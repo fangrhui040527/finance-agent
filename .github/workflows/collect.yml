@@ -71,6 +71,18 @@ jobs:
           echo "code=$?" >> "$GITHUB_OUTPUT"
           exit 0
 
+      # Its own step, not folded into the sweep. A news source being throttled
+      # says nothing about whether the central bank published a rate, and one
+      # failing must not cost the other its day - which is the whole reason the
+      # rate is recorded daily rather than caught live.
+      - name: Record the official FX rate
+        id: fx
+        run: |
+          set +e
+          uv run python ask.py fx
+          echo "code=$?" >> "$GITHUB_OUTPUT"
+          exit 0
+
       - name: What the corpus holds now
         run: |
           uv run python -c "
@@ -84,7 +96,7 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/corpus.db data/graph.db
+          git add data/corpus.db data/graph.db data/fx.db
           # Nothing new is a normal outcome, not a failure: a quiet day, or a day
           # every story was one the corpus already held.
           if git diff --cached --quiet; then
@@ -97,9 +109,9 @@ jobs:
           git push
 
       - name: Fail if a source failed
-        if: steps.sweep.outputs.code != '0'
+        if: steps.sweep.outputs.code != '0' || steps.fx.outputs.code != '0'
         run: |
-          echo "sweep exited ${{ steps.sweep.outputs.code }}"
+          echo "sweep exited ${{ steps.sweep.outputs.code }}, fx exited ${{ steps.fx.outputs.code }}"
           echo "  2 = could not run (config or adapter)"
           echo "  3 = a source failed; see the sweeps table in data/corpus.db"
           exit 1

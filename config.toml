@@ -37,7 +37,9 @@ markets = ["XKLS", "XNAS"]
 broker = "moomoo_my"
 
 # THE RATE, and nothing else: mid-market MYR per USD, 3 September 2026.
-# `ask.py fx --fetch` replaces this with Bank Negara's official dated rate.
+# `ask.py size --fetch-fx` replaces this for one run with BNM's dated rate;
+# `ask.py fx` records that rate daily into data/fx.db, which is what the spread
+# below is measured against.
 #
 # It used to be 4.15, which quietly bundled a 2.34% CARD markup into the rate.
 # You convert through a broker, not a card. Bundling a cost into a rate shrank
@@ -56,9 +58,14 @@ fx_myr_per_usd = 4.055
 # trip - more than three times every commission, platform fee, settlement fee,
 # stamp duty and regulatory levy combined.
 #
-# TO MEASURE IT: convert a small amount in the app, note the rate you actually
-# received, and compare it with the mid-market rate at that moment. The gap,
-# divided by the mid-market rate, is this number. Then set it here.
+# TO MEASURE IT, and this no longer needs catching two numbers at one moment:
+# the daily collector records BNM's official rate into data/fx.db. So convert a
+# small amount whenever suits, note the rate the app actually gave you and the
+# DATE, then:
+#
+#   python ask.py fx --show          # the official rate for that date
+#
+# The gap between the two, divided by the official rate, is this number.
 fx_spread_per_side = 0.005
 
 # What you actually own, and what you are considering. These are not decoration:

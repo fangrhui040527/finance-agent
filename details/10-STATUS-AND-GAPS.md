@@ -34,7 +34,7 @@ invisible.
 | Teacher — 30 concepts, enforced prerequisite order | complete |
 | Reflection — grading, lesson proposal, calibration, scoring | complete |
 | Tracing — spans, HTML report, anatomy, prompts | complete |
-| CLI — 19 subcommands | complete |
+| CLI — 20 subcommands | complete |
 | Fitness function — refuses a partial score | complete |
 | CI — 10 steps, offline, keyless | complete |
 | **Daily collector** — `collect.yml`, sweep on a timer, commits what it saw | complete, **and running**: 187 articles, 34 attributed |
