@@ -890,9 +890,9 @@ def cmd_fx(a) -> int:
     Exit codes match `sweep`: 0 recorded, 2 could not run, 3 the source failed.
     """
     from core.market.fx import BnmFxFeed, FxFeedError
-    from core.market.fxlog import FxLog
+    from core.market.fxlog import FX_DB, FxLog
 
-    with FxLog(a.db or None) as log:
+    with FxLog(a.db or FX_DB) as log:
         if a.show:
             for row in log.history(a.currency, limit=a.limit):
                 d = dict(row)

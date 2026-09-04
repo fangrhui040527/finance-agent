@@ -60,12 +60,21 @@ class FxLog:
 
     BUSY_TIMEOUT_MS = 10_000
 
-    def __init__(self, path: str | Path = FX_DB) -> None:
+    def __init__(self, path: str | Path | None = FX_DB) -> None:
         # Normalised to str and ":memory:" guarded, exactly as Corpus does it.
         # `Path(":memory:")` is a perfectly good relative path, so the guard is
         # the difference between an in-memory database and a file literally
         # named ":memory:" that every test then shares.
-        path = str(path)
+        #
+        # `path or FX_DB` resolves "no path given" HERE, once, rather than at
+        # each caller. It is not defensive tidying - it is the fix for a bug
+        # that reached production: `ask.py fx` passed `a.db or None`, `str(None)`
+        # is "None", and a day's rate went into a file called `None` in the
+        # working directory. Nothing failed; the row was simply written where
+        # nobody would look, and the commit that should have carried it died on
+        # the missing path instead. Every test passed because every test names
+        # a path - the only untested route was the default one production uses.
+        path = str(path or FX_DB)
         if path != ":memory:":
             Path(path).parent.mkdir(parents=True, exist_ok=True)
         self.conn = sqlite3.connect(path, timeout=self.BUSY_TIMEOUT_MS / 1000)
