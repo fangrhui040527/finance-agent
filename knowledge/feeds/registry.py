@@ -29,35 +29,29 @@ FACTORIES: dict[str, Callable[..., FeedAdapter]] = {
 RSS_SOURCES: dict[str, tuple[str, str]] = {
     # name: (url, trust)
     "reuters_business": ("https://feeds.reuters.com/reuters/businessNews", "wire"),
-    # Liferay's asset-publisher RSS endpoint, which is what /rss links to and
-    # what three guesses on 2026-09-03 failed to find (/rss/press-release is a
-    # 404; /rss is a landing page carrying no autodiscovery tags). Supplied by
-    # the operator from the page itself.
+    # Liferay's asset-publisher RSS endpoint for the CURRENT year's page.
     #
-    # ANSWERED by the 2026-09-04 01:47 sweep: status ok, fetched 0. The endpoint
-    # is real and returns well-formed RSS - no parse error, no HTTP error - but
-    # it is the 2020 ARCHIVE, so nothing in it falls inside a 24-hour window.
+    # The 2020 page's URL worked (well-formed RSS, status ok) but served the
+    # 2020 archive - fetched 0 in any recent window. Swapping the year alone
+    # 403s, because INSTANCE_<id> names the portlet PLACEMENT and each year page
+    # has its own. The 2026 page's id was read out of its HTML:
     #
-    # This is the failure mode the repo warns about most: a source that succeeds
-    # every night and ingests nothing is indistinguishable from a world where
-    # nothing happened. It is enabled and it is currently worth nothing.
+    #   id="p_p_id_com_liferay_asset_publisher_web_portlet
+    #       _AssetPublisherPortlet_INSTANCE_ZkJrPGjQLX7H_"
     #
-    # What is needed is the same URL from the CURRENT year's page. Swapping 2020
-    # for 2026 in the path is not enough and is not worth a guess: in Liferay the
-    # INSTANCE id identifies the portlet placement, and it is the portlet - not
-    # the path - that decides which items come back. The 2026 page has its own
-    # instance id. Open https://www.bnm.gov.my/press-release-2026, take the RSS
-    # link off it, and replace this whole value.
+    # so this is transcribed, not guessed. One caveat that the next sweep
+    # settles: the page's `subscribe-action` div is empty, which may mean RSS is
+    # switched off for this instance even though the resource id exists.
     "bnm_press": (
-        "https://www.bnm.gov.my/press-release-2020"
+        "https://www.bnm.gov.my/press-release-2026"
         "?p_p_id=com_liferay_asset_publisher_web_portlet_AssetPublisherPortlet"
-        "_INSTANCE_ZHckDJtILsio"
+        "_INSTANCE_ZkJrPGjQLX7H"
         "&p_p_lifecycle=2&p_p_state=normal&p_p_mode=view"
         "&p_p_resource_id=getRSS&p_p_cacheability=cacheLevelPage"
         "&_com_liferay_asset_publisher_web_portlet_AssetPublisherPortlet"
-        "_INSTANCE_ZHckDJtILsio_currentURL=%2Fpress-release-2020"
+        "_INSTANCE_ZkJrPGjQLX7H_currentURL=%2Fpress-release-2026"
         "&_com_liferay_asset_publisher_web_portlet_AssetPublisherPortlet"
-        "_INSTANCE_ZHckDJtILsio_portletAjaxable=true",
+        "_INSTANCE_ZkJrPGjQLX7H_portletAjaxable=true",
         "regulator",
     ),
 }
