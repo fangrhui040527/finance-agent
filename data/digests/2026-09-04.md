@@ -1,6 +1,6 @@
 # Digest 2026-09-04
 
-Generated 2026-09-04 16:33 UTC · slot `all` · 704 articles in the corpus, 0 observations, 2 events in the fact book.
+Generated 2026-09-04 18:20 UTC · slot `all` · 789 articles in the corpus, 0 observations, 2 events in the fact book.
 
 ## The book
 
@@ -38,18 +38,18 @@ Generated 2026-09-04 16:33 UTC · slot `all` · 704 articles in the corpus, 0 ob
 - quiet: nothing collected for this name in the window
 
 ### NVIDIA (XNAS:NVDA)
-- tone: 127 stories from 46 sources, polarity +0.09, peak intensity 0.33, uncertainty 0.08 · 86 escalated
+- tone: 149 stories from 51 sources, polarity +0.09, peak intensity 0.67, uncertainty 0.09 · 95 escalated
+- 2026-09-04 finance.yahoo.com — HP Announces New OmniBook PCs to Help Build the Next Generation of AI Experiences [q 1.00, tone +0.0] ★
 - 2026-09-04 finance.yahoo.com — Nvidia's $13 Billion Hugging Face Deal Expands Open-Source AI [q 1.00, tone +0.0] ★
 - 2026-09-04 finance.yahoo.com — Are Meta and Nvidia redefining value vs. growth stocks in the era of AI? [q 1.00, tone +1.0] ★
 - 2026-09-04 finance.yahoo.com — AI Chips Update - AI Circuit Breaker Revolutionizes Security In Autonomous Systems [q 1.00, tone +0.0] ★
 - 2026-09-04 finance.yahoo.com — NVIDIA (NVDA)’s Hugging Face Deal Tests the Next Phase of its AI Strategy [q 1.00, tone +1.0] ★
+- 2026-09-04 www.benzinga.com — Nvidia Is Backstopping AI Boom as 'Buyer of Last Resort,' Prominent Economist Tells 'Prof G' [q 0.85, tone +0.0] ★
 - 2026-09-04 247wallst.com — Intel Climbs 4%, AMD Rises 3%, NVIDIA Ticks Up as Chip Stocks Shrug Off Rising Rate Hike Odds [q 0.85, tone +0.0] ★
 - 2026-09-04 247wallst.com — Nvidia and Apple Are Both Winning in 2026 And Doing It Because Of This Contrarian AI Move [q 0.85, tone +1.0] ★
-- 2026-09-04 www.fool.com — Breakfast News: Week in Review [q 0.85, tone +0.0] ★
-- 2026-09-04 247wallst.com — If You Recognize What This Number Means Then You Are Likely An NVIDIA Bull [q 0.85, tone +0.0] ★
 
 ### Apple (XNAS:AAPL)
-- tone: 84 stories from 48 sources, polarity +0.11, peak intensity 0.33, uncertainty 0.14 · 69 escalated
+- tone: 88 stories from 49 sources, polarity +0.12, peak intensity 0.33, uncertainty 0.13 · 72 escalated
 - 2026-09-04 finance.yahoo.com — Apple's First Foldable Could Launch With a Supply Problem [q 1.00, tone +0.0] ★
 - 2026-09-04 finance.yahoo.com — Apple Poised To Unveil Folding iPhone [q 1.00, tone +0.0] ★
 - 2026-09-04 finance.yahoo.com — Smart Wearable ECG Monitors Market Size, Share & Trends Analysis, Global Forecast to 2036. Market Growth from $2.4B (2026) to $6.4B by 2036, Profiles Apple, AliveCor, iRhythm, Philips, and 12 Other Key Players [q 1.00, tone +1.0] ★
@@ -60,15 +60,15 @@ Generated 2026-09-04 16:33 UTC · slot `all` · 704 articles in the corpus, 0 ob
 - 2026-09-03 finance.yahoo.com — Stryker Launches FDA-Cleared Apple Vision Pro Surgical App [q 1.00, tone +0.0] ★
 
 ### Microsoft (XNAS:MSFT)
-- tone: 62 stories from 29 sources, polarity +0.13, peak intensity 0.33, uncertainty 0.07 · 42 escalated
+- tone: 73 stories from 33 sources, polarity +0.14, peak intensity 0.33, uncertainty 0.06 · 51 escalated
+- 2026-09-04 finance.yahoo.com — Commvault (CVLT) Triples Its Cloud Safety Net While Wall Street Cools [q 1.00, tone +1.0] ★
+- 2026-09-04 finance.yahoo.com — Western Computer Achieves the 2026/2027 Microsoft AI Business Solutions Inner Circle Award [q 1.00, tone +0.0] ★
 - 2026-09-04 finance.yahoo.com — Industry-Leading Email Signature Platform Crossware Is Now Available Through Ingram Micro's Xvantage Platform as Part of the Microsoft Marketplace Private Offers [q 1.00, tone +0.0] ★
 - 2026-09-04 finance.yahoo.com — Google Cloud Trails Azure by $4.6 Billion--But Growth Still Has Leverage [q 1.00, tone +1.0] ★
 - 2026-09-04 finance.yahoo.com — Microsoft's Cloud Gaming Push Just Picked Up a New Limit [q 1.00, tone +0.0] ★
 - 2026-09-03 finance.yahoo.com — Microsoft CEO Nadella Sells $43 Million of Stock [q 1.00, tone +0.0] ★
-- 2026-09-04 finance.yahoo.com — Microsoft CEO Makes Major $43 Million Stock Move [q 0.80, tone +0.0] ★
-- 2026-09-04 seekingalpha.com — Microsoft in spotlight as Stifel ups price target on Copilot, AI improvement (MSFT:NASDAQ) [q 0.80, tone +0.0] ★
-- 2026-09-04 www.investing.com — Stifel raises Microsoft stock price target to $530 on AI momentum [q 0.80, tone +0.0] ★
-- 2026-09-04 finance.yahoo.com — Update: Market Chatter: Nvidia Increases Equity Investments to $99 Billion [q 0.80, tone +0.0] ★
+- 2026-09-04 www.benzinga.com — Nvidia Is Backstopping AI Boom as 'Buyer of Last Resort,' Prominent Economist Tells 'Prof G' [q 0.85, tone +0.0] ★
+- 2026-09-04 finance.yahoo.com — Satya Nadella Has Delivered a More Than 10X Return for Microsoft Shareholders Since Becoming CEO in 2014, a 30% Annualized Growth Rate. Is That Pace Still Achievable From Here? [q 0.80, tone +1.0] ★
 
 ## Macro
 
@@ -80,6 +80,17 @@ Generated 2026-09-04 16:33 UTC · slot `all` · 704 articles in the corpus, 0 ob
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 18:19 | fred | ok | 0 | 0 | 0 | skipped: fred needs FRED_API_KEY, which is not set. Add it to .env or as a GitHu |
+| 18:19 | alphavantage_news | ok | 0 | 0 | 0 | skipped: alphavantage_news needs ALPHAVANTAGE_API_KEY, which is not set. Add it  |
+| 18:19 | fmp | ok | 0 | 0 | 0 | skipped: fmp needs FMP_API_KEY, which is not set. Add it to .env or as a GitHub  |
+| 18:19 | finnhub | ok | 0 | 0 | 0 | skipped: finnhub needs FINNHUB_API_KEY, which is not set. Add it to .env or as a |
+| 18:19 | dosm_cpi | ok | 36 | 0 | 0 | facts 0;  |
+| 18:19 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 18:19 | edgar | ok | 0 | 0 | 0 | facts 0;  |
+| 18:19 | fmt_business | ok | 33 | 33 | 32 |  |
+| 18:19 | yahoo_rss | ok | 28 | 28 | 23 | read but empty: Maybank, Tenaga, Petronas Chemicals, IHH, Press Metal, Genting |
+| 18:19 | google_news | ok | 18 | 16 | 14 | read but empty: Maybank, Tenaga, Petronas Chemicals, IHH, Press Metal, Genting |
+| 18:19 | gdelt | ok | 27 | 19 | 16 | read but empty: Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals; faile |
 | 16:33 | fred | ok | 0 | 0 | 0 | skipped: fred needs FRED_API_KEY, which is not set. Add it to .env or as a GitHu |
 | 16:17 | alphavantage_news | ok | 0 | 0 | 0 | skipped: alphavantage_news needs ALPHAVANTAGE_API_KEY, which is not set. Add it  |
 | 16:17 | finnhub | ok | 0 | 0 | 0 | skipped: finnhub needs FINNHUB_API_KEY, which is not set. Add it to .env or as a |

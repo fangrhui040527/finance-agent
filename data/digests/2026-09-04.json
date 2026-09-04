@@ -1,6 +1,105 @@
 {
   "collection": [
     {
+      "at": "2026-09-04T18:19:58.894000+00:00",
+      "detail": "skipped: fred needs FRED_API_KEY, which is not set. Add it to .env or as a GitHub Actions secret of the same name; until then this source is skipped.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "fred",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-04T18:19:58.893150+00:00",
+      "detail": "skipped: alphavantage_news needs ALPHAVANTAGE_API_KEY, which is not set. Add it to .env or as a GitHub Actions secret of the same name; until then this source is skipped.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "alphavantage_news",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-04T18:19:58.892275+00:00",
+      "detail": "skipped: fmp needs FMP_API_KEY, which is not set. Add it to .env or as a GitHub Actions secret of the same name; until then this source is skipped.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "fmp",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-04T18:19:58.891427+00:00",
+      "detail": "skipped: finnhub needs FINNHUB_API_KEY, which is not set. Add it to .env or as a GitHub Actions secret of the same name; until then this source is skipped.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "finnhub",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-04T18:19:58.890323+00:00",
+      "detail": "facts 0; ",
+      "fetched": 36,
+      "kept": 0,
+      "source": "dosm_cpi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-04T18:19:56.840333+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-04T18:19:54.968856+00:00",
+      "detail": "facts 0; ",
+      "fetched": 0,
+      "kept": 0,
+      "source": "edgar",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-04T18:19:54.425738+00:00",
+      "detail": "",
+      "fetched": 33,
+      "kept": 33,
+      "source": "fmt_business",
+      "status": "ok",
+      "stored": 32
+    },
+    {
+      "at": "2026-09-04T18:19:53.909835+00:00",
+      "detail": "read but empty: Maybank, Tenaga, Petronas Chemicals, IHH, Press Metal, Genting",
+      "fetched": 28,
+      "kept": 28,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 23
+    },
+    {
+      "at": "2026-09-04T18:19:51.297817+00:00",
+      "detail": "read but empty: Maybank, Tenaga, Petronas Chemicals, IHH, Press Metal, Genting",
+      "fetched": 18,
+      "kept": 16,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 14
+    },
+    {
+      "at": "2026-09-04T18:19:47.458811+00:00",
+      "detail": "read but empty: Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals; failed: IHH, NVIDIA, Apple",
+      "fetched": 27,
+      "kept": 19,
+      "source": "gdelt",
+      "status": "ok",
+      "stored": 16
+    },
+    {
       "at": "2026-09-04T16:33:15.115958+00:00",
       "detail": "skipped: fred needs FRED_API_KEY, which is not set. Add it to .env or as a GitHub Actions secret of the same name; until then this source is skipped.",
       "fetched": 0,
@@ -326,18 +425,18 @@
     }
   ],
   "counts": {
-    "articles": 704,
+    "articles": 789,
     "documents": 0,
-    "escalated": 231,
+    "escalated": 251,
     "events": 2,
     "failed_sweeps": 14,
-    "linked": 371,
+    "linked": 409,
     "observations": 0,
     "series": 2,
-    "sweeps": 54
+    "sweeps": 65
   },
   "day": "2026-09-04",
-  "generated_at": "2026-09-04 16:33 UTC",
+  "generated_at": "2026-09-04 18:20 UTC",
   "macro": [
     {
       "change": "0",
@@ -603,12 +702,23 @@
       "upcoming": []
     },
     {
-      "escalated": 86,
+      "escalated": 95,
       "events": [],
       "instrument_id": "XNAS:NVDA",
       "label": "NVIDIA",
       "snapshot": [],
       "stories": [
+        {
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/hp-announces-omnibook-pcs-help-180000897.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-04T18:00:00+00:00",
+          "quality": 1.0,
+          "title": "HP Announces New OmniBook PCs to Help Build the Next Generation of AI Experiences",
+          "uncertainty": 0.0
+        },
         {
           "doc_id": "https://finance.yahoo.com/technology/ai/articles/nvidias-13-billion-hugging-face-121800081.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
@@ -654,6 +764,17 @@
           "uncertainty": 0.17123287671232876
         },
         {
+          "doc_id": "https://www.benzinga.com/markets/prediction-markets/26/09/61635046/nvidia-ai-boom-tyler-cowen?utm_source=yahooFinance&utm_campaign=partner_feed&utm_medium=referral&.tsrc=rss",
+          "domain": "www.benzinga.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-04T16:41:38+00:00",
+          "quality": 0.85,
+          "title": "Nvidia Is Backstopping AI Boom as 'Buyer of Last Resort,' Prominent Economist Tells 'Prof G'",
+          "uncertainty": 0.21551724137931036
+        },
+        {
           "doc_id": "https://247wallst.com/investing/2026/09/04/intel-climbs-4-as-chip-stocks-shrug-off-rising-rate-hike-odds-nvidia-and-amd-move-higher/?.tsrc=rss",
           "domain": "247wallst.com",
           "escalated": true,
@@ -674,41 +795,19 @@
           "quality": 0.85,
           "title": "Nvidia and Apple Are Both Winning in 2026 And Doing It Because Of This Contrarian AI Move",
           "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://www.fool.com/investing/breakfast-news/2026/09/04/breakfast-news-week-in-review/?.tsrc=rss",
-          "domain": "www.fool.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-04T11:50:00+00:00",
-          "quality": 0.85,
-          "title": "Breakfast News: Week in Review",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://247wallst.com/investing/2026/09/04/if-you-recognize-what-this-number-means-then-you-are-likely-an-nvidia-bull/?.tsrc=rss",
-          "domain": "247wallst.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-04T11:47:13+00:00",
-          "quality": 0.85,
-          "title": "If You Recognize What This Number Means Then You Are Likely An NVIDIA Bull",
-          "uncertainty": 0.2777777777777778
         }
       ],
       "tone": {
-        "intensity_max": 0.333,
-        "n": 127,
-        "polarity_mean": 0.094,
-        "sources": 46,
-        "uncertainty_mean": 0.078
+        "intensity_max": 0.667,
+        "n": 149,
+        "polarity_mean": 0.087,
+        "sources": 51,
+        "uncertainty_mean": 0.088
       },
       "upcoming": []
     },
     {
-      "escalated": 69,
+      "escalated": 72,
       "events": [],
       "instrument_id": "XNAS:AAPL",
       "label": "Apple",
@@ -805,20 +904,42 @@
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 84,
-        "polarity_mean": 0.107,
-        "sources": 48,
-        "uncertainty_mean": 0.137
+        "n": 88,
+        "polarity_mean": 0.125,
+        "sources": 49,
+        "uncertainty_mean": 0.131
       },
       "upcoming": []
     },
     {
-      "escalated": 42,
+      "escalated": 51,
       "events": [],
       "instrument_id": "XNAS:MSFT",
       "label": "Microsoft",
       "snapshot": [],
       "stories": [
+        {
+          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/commvault-cvlt-triples-cloud-safety-173309595.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-04T17:33:09+00:00",
+          "quality": 1.0,
+          "title": "Commvault (CVLT) Triples Its Cloud Safety Net While Wall Street Cools",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/western-computer-achieves-2026-2027-170700417.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-04T17:07:00+00:00",
+          "quality": 1.0,
+          "title": "Western Computer Achieves the 2026/2027 Microsoft AI Business Solutions Inner Circle Award",
+          "uncertainty": 0.0
+        },
         {
           "doc_id": "https://finance.yahoo.com/technology/articles/industry-leading-email-signature-platform-124100181.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
@@ -864,56 +985,34 @@
           "uncertainty": 0.0
         },
         {
-          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/microsoft-ceo-makes-major-43-140439392.html?.tsrc=rss",
+          "doc_id": "https://www.benzinga.com/markets/prediction-markets/26/09/61635046/nvidia-ai-boom-tyler-cowen?utm_source=yahooFinance&utm_campaign=partner_feed&utm_medium=referral&.tsrc=rss",
+          "domain": "www.benzinga.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-04T16:41:38+00:00",
+          "quality": 0.85,
+          "title": "Nvidia Is Backstopping AI Boom as 'Buyer of Last Resort,' Prominent Economist Tells 'Prof G'",
+          "uncertainty": 0.21551724137931036
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMingFBVV95cUxNcWdwdWEyeS15X0ZWVEx2bUZ0SGxmOU9VVnZYZ2xwei11eXJpSmZfUjdyZ3pWcE5TZUczUW9vMDhVbHR6N0JYTXctS3ZEM3AzU19iOTNtbjJiUGY2YzlVYWtSMnlnanZFV0doZ0YwMklHaHZaZnBCa011b0FvOTRMVzN6UlQwNTRHZXYxX0pHemVtbzRNdEZQZDE0bndMUQ?oc=5",
           "domain": "finance.yahoo.com",
           "escalated": true,
           "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-04T14:04:39+00:00",
+          "polarity": 1.0,
+          "published_at": "2026-09-04T17:40:00+00:00",
           "quality": 0.8,
-          "title": "Microsoft CEO Makes Major $43 Million Stock Move",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMiswFBVV95cUxNWTlGWWl6YVZxRXYxc1dQMlJoMDlXMVZYNVZ5TnNhb1J3eFduOVgzWG90dGNqUXdDa3Z2OVZJbTFaVm84QjJhNm9wQlA2WHh5SmFvTDZRUURTUFQ5UUlpZ3J6M2M3bThtVjJVam1sYmtJU3VJcmQzbUlUY1VnU2NSYUl4ZnEyT2pocGMzUVg2b21XWlpKNWZ5ekFOSzZWMXFVd29LUVIzelJEQmtSZ1k2QzJaVQ?oc=5",
-          "domain": "seekingalpha.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-04T12:52:07+00:00",
-          "quality": 0.8,
-          "title": "Microsoft in spotlight as Stifel ups price target on Copilot, AI improvement (MSFT:NASDAQ)",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxNZElhejdQVTk4bFA1SDNrQk1PR2Q2VjNWWmw0clBNQTRFWUZNRy1Zd2k0T2JxRU1udUdSa21hWGdyZEZZeVR0YWlXMTZTODd5QnJXRXdfZFdfdWR3WjdSOXpTeEYtX1lEUjE1REdmY2xoS1NfTWo1eUNaZGhEcjVDR2szbjktd0dPYjh6Rm9jbWZUUk9BSnFoN0taRHFTN3NGeEw5ZWU4ZVBZWnl0T0EtVjctX084VER6LTN6ZWxKZWpDdw?oc=5",
-          "domain": "www.investing.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-04T12:05:52+00:00",
-          "quality": 0.8,
-          "title": "Stifel raises Microsoft stock price target to $530 on AI momentum",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/market-chatter-nvidia-increases-equity-102704254.html?.tsrc=rss",
-          "domain": "finance.yahoo.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-04T10:27:04+00:00",
-          "quality": 0.8,
-          "title": "Update: Market Chatter: Nvidia Increases Equity Investments to $99 Billion",
+          "title": "Satya Nadella Has Delivered a More Than 10X Return for Microsoft Shareholders Since Becoming CEO in 2014, a 30% Annualized Growth Rate. Is That Pace Still Achievable From Here?",
           "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 62,
-        "polarity_mean": 0.129,
-        "sources": 29,
-        "uncertainty_mean": 0.069
+        "n": 73,
+        "polarity_mean": 0.137,
+        "sources": 33,
+        "uncertainty_mean": 0.062
       },
       "upcoming": []
     }
