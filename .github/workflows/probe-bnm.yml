@@ -1,0 +1,97 @@
+# TEMPORARY. Deleted before this branch merges.
+#
+# The bnm_press feed URL cannot be established from a Claude session: this
+# environment's egress refuses bnm.gov.my and so does WebFetch. Three guesses
+# have already failed and been recorded in knowledge/feeds/registry.py. A
+# runner has the egress this session lacks, so it reads the page and prints
+# what is actually there rather than what anyone remembers.
+#
+# Push-triggered on this branch only: it never runs on main.
+name: probe-bnm
+
+on:
+  push:
+    branches: ["claude/caveman-ultra-iet09k"]
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: What the RSS landing page actually links to
+        run: |
+          python3 - <<'PY'
+          import re, urllib.request
+
+          UA = {"User-Agent": "Mozilla/5.0 (compatible; finplanet-probe/0.1)"}
+
+          def get(url):
+              req = urllib.request.Request(url, headers=UA)
+              with urllib.request.urlopen(req, timeout=45) as r:
+                  return r.status, r.headers.get("Content-Type", ""), r.read()
+
+          page = "https://www.bnm.gov.my/rss"
+          try:
+              status, ctype, body = get(page)
+          except Exception as e:
+              print(f"LANDING PAGE UNREACHABLE: {type(e).__name__}: {e}")
+              raise SystemExit(0)
+
+          text = body.decode("utf-8", "replace")
+          print(f"== {page}  HTTP {status}  {ctype}  {len(body)} bytes")
+
+          links = re.findall(r'href=["\']([^"\']+)["\']', text, re.I)
+          feedish = sorted({
+              l for l in links
+              if re.search(r'rss|feed|\.xml|atom', l, re.I)
+          })
+          print(f"\n== {len(feedish)} feed-shaped href(s) of {len(links)} total")
+          for l in feedish:
+              print("   ", l)
+
+          auto = re.findall(r'<link[^>]+type=["\']application/(?:rss|atom)\+xml["\'][^>]*>', text, re.I)
+          print(f"\n== {len(auto)} autodiscovery tag(s)")
+          for a in auto:
+              print("   ", a.strip())
+
+          # Anything that smells like a portlet/feed endpoint the redesign uses.
+          for pat in (r'/-/[a-z0-9\-]*rss[a-z0-9\-]*', r'/api/[a-z0-9\-/]*rss[a-z0-9\-/]*'):
+              hits = sorted(set(re.findall(pat, text, re.I)))
+              if hits:
+                  print(f"\n== pattern {pat}")
+                  for h in hits:
+                      print("   ", h)
+          PY
+
+      - name: Probe the candidate paths, and say what each answers
+        run: |
+          python3 - <<'PY'
+          import urllib.error, urllib.request
+
+          UA = {"User-Agent": "Mozilla/5.0 (compatible; finplanet-probe/0.1)"}
+          CANDIDATES = [
+              "https://www.bnm.gov.my/rss",
+              "https://www.bnm.gov.my/rss/press-release",
+              "https://www.bnm.gov.my/-/rss",
+              "https://www.bnm.gov.my/rss.xml",
+              "https://www.bnm.gov.my/feed",
+              "https://www.bnm.gov.my/index.php?ch=en_rss&pg=en_rss_latpresstmt&lang=en",
+              "https://www.bnm.gov.my/web/guest/rss",
+              "https://www.bnm.gov.my/-/press-release/rss",
+              "https://www.bnm.gov.my/press-release/rss",
+          ]
+          for url in CANDIDATES:
+              try:
+                  req = urllib.request.Request(url, headers=UA)
+                  with urllib.request.urlopen(req, timeout=30) as r:
+                      head = r.read(400).decode("utf-8", "replace").replace("\n", " ")[:160]
+                      kind = "XML FEED" if head.lstrip().startswith(("<?xml", "<rss", "<feed")) else "html/other"
+                      print(f"{r.status:>4}  {kind:<9}  {url}\n            {head}")
+              except urllib.error.HTTPError as e:
+                  print(f"{e.code:>4}  HTTPError  {url}")
+              except Exception as e:
+                  print(f"   -  {type(e).__name__}  {url}: {e}")
+          PY
