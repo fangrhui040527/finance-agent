@@ -596,19 +596,29 @@ def test_a_sweep_where_every_name_returned_something_says_nothing():
 
 
 def test_no_source_is_enabled_whose_url_is_known_to_be_wrong():
-    """bnm_press is registered and deliberately NOT enabled: three sweeps on
-    2026-09-03 established that its feed URL is unknown - /rss/press-release is
-    a 404 and /rss is a landing page with no autodiscovery tags.
+    """bnm_press is registered and deliberately NOT enabled.
 
-    A source that fails every night marks the job red every night, and a red job
-    that always means the same dead URL trains you to stop reading it. When
-    somebody supplies the real URL, enabling it is the one-line change this test
-    is asking for.
+    The reason changed on 2026-09-04 and is worth stating precisely, because the
+    old one invited a fix that would have been worse than the gap. It was "the
+    URL is unknown"; a runner has now read the page, and the URL is known.
+
+    BNM is Liferay. Its only endpoint that serves XML is the 2020 ARCHIVE -
+    newest item September 2020, and carrying no <pubDate>, so every item would
+    enter the corpus stamped with FETCH TIME. Enabling it would feed six-year-old
+    central bank releases in as today's news, indistinguishable from real ones.
+    The live press-release page serves no feed at all.
+
+    So this test no longer asks anybody for a corrected URL. It asserts that a
+    source whose only reachable feed is a stale archive stays off, and it fails
+    if someone enables it - which is the mistake worth catching, and one that
+    would look like progress on the day it was made.
     """
     import core.config as C
     from knowledge.feeds.registry import RSS_SOURCES
 
-    assert "bnm_press" in RSS_SOURCES, "the registration is kept; only the URL is wrong"
+    assert "bnm_press" in RSS_SOURCES, (
+        "the registration is kept; the adapter and trust tier are right"
+    )
     assert "bnm_press" not in C.load().sources
 
 

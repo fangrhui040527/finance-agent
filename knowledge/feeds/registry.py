@@ -29,22 +29,39 @@ FACTORIES: dict[str, Callable[..., FeedAdapter]] = {
 RSS_SOURCES: dict[str, tuple[str, str]] = {
     # name: (url, trust)
     "reuters_business": ("https://feeds.reuters.com/reuters/businessNews", "wire"),
-    # NOT ENABLED, and this URL is NOT the feed. Three sweeps on 2026-09-03
-    # established what is true:
+    # NOT ENABLED, and this URL is NOT a feed - it is the landing page, kept as
+    # the value deliberately so that enabling this line cannot quietly work.
     #
-    #   /rss/press-release  -> HTTP 404; the path predates BNM's site redesign
-    #   /rss                -> an HTML landing page titled "RSS - Bank Negara
-    #                          Malaysia", carrying no autodiscovery link tags
+    # A GitHub runner read the page on 2026-09-04 (this environment's egress and
+    # WebFetch both refuse bnm.gov.my). What it established, in four rounds:
     #
-    # So the feed exists behind a link on that page and its URL is unknown here:
-    # this environment's egress refuses bnm.gov.my, and so does WebFetch, so the
-    # page cannot be read to find it. Anyone who can open
-    # https://www.bnm.gov.my/rss in a browser can read the link off it, put it
-    # here, and add "bnm_press" back to [sources] enabled in config.toml.
+    #   bnm.gov.my is LIFERAY. Its feeds are AssetPublisher portlet URLs
+    #   carrying p_p_resource_id=getRSS and an opaque portlet INSTANCE id. That
+    #   id cannot be derived, only read off a page - which is why six guessed
+    #   paths (/rss/press-release, /-/rss, /rss.xml, /feed, /press-release/rss,
+    #   index.php?ch=en_rss) all returned 404. No amount of guessing reaches it.
     #
-    # Kept registered rather than deleted: the adapter, the trust tier and the
-    # name are all right, and one wrong field is not a reason to lose the other
-    # three.
+    #   /rss advertises three feeds and TWO OF THEM ARE BROKEN: the notices and
+    #   speeches URLs return the HTML home page, three fetches out of three.
+    #
+    #   The one that does serve XML is the 2020 ARCHIVE:
+    #     /press-release-2020?p_p_id=..._INSTANCE_ZHckDJtILsio&p_p_lifecycle=2
+    #     &p_p_state=normal&p_p_mode=view&p_p_resource_id=getRSS
+    #     &p_p_cacheability=cacheLevelPage
+    #   text/xml, 23,228 bytes, stable across three fetches - and its newest
+    #   item is from SEPTEMBER 2020. It also carries NO <pubDate>, so every item
+    #   would be stamped with fetch time: six-year-old central bank releases
+    #   entering the corpus dated today, looking exactly like current news.
+    #   Do not enable it. That is the failure this repository is built to avoid.
+    #
+    #   The LIVE page is /press-releases (plural; /press-release is a 404) and
+    #   its portlet id is ZkJrPGjQLX7H - but that id does not serve getRSS. It
+    #   returns the HTML page, three fetches out of three, on both
+    #   /press-releases and /press-release-2026.
+    #
+    # So the URL is no longer unknown. It is known, and there is no current BNM
+    # press-release feed to point at. Closing this gap needs a different source
+    # or a scraper, not a corrected line here - see details/09.
     "bnm_press": ("https://www.bnm.gov.my/rss", "regulator"),
 }
 

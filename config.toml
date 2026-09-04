@@ -236,10 +236,14 @@ min_graded_for_calibration = 30
 # 2-hour window. Whether that is GDELT's Malaysian coverage or the short window
 # is still open - see details/09.
 # bnm_press is REGISTERED but not enabled, and the reason is written down in
-# knowledge/feeds/registry.py: its feed URL is not known. Three runs on
-# 2026-09-03 established that /rss/press-release is a 404 and /rss is a landing
-# page carrying no autodiscovery tags, and this environment cannot read the page
-# to find the link. Enabling it again needs one line: the real URL.
+# knowledge/feeds/registry.py. It is no longer "the URL is unknown": a runner
+# read the page on 2026-09-04 and the URL is now known. BNM's only working RSS
+# endpoint is its 2020 ARCHIVE - newest item September 2020, and carrying no
+# <pubDate>, so every item would enter the corpus stamped with fetch time.
+# The live press-release page serves no feed at all.
+#
+# Enabling this is therefore not a one-line fix any more. It needs a different
+# source or a scraper - see details/09.
 #
 # Left disabled deliberately rather than left failing. A source that fails every
 # night marks the collect job red every night, and a red job that always means

@@ -156,26 +156,37 @@ Exit codes, so a scheduler can act without parsing text:
 | name | what it is | state |
 |---|---|---|
 | `gdelt` | global news index | **enabled** — one request per company, budget split, order rotated |
-| `bnm_press` | Bank Negara press releases | registered, **not enabled**: feed URL unknown |
+| `bnm_press` | Bank Negara press releases | registered, **not enabled**: BNM publishes no current feed |
 
 **The domestic-coverage gap is open.** GDELT has returned nothing for any Bursa
 name on every run so far, and `bnm_press` was enabled on 2026-09-03 to close
-that — then disabled the same day, because its URL could not be established:
+that — then disabled the same day, because its URL could not be established.
 
-| tried | answer |
+On 2026-09-04 a GitHub runner read the page (this environment's egress and
+WebFetch both refuse `bnm.gov.my`, so the probe ran where the network works).
+The URL is no longer unknown, and the answer is worse than a wrong URL:
+
+| endpoint | answer |
 |---|---|
-| `/rss/press-release` | HTTP 404 — the path predates BNM's site redesign |
-| `/rss` | an HTML landing page titled "RSS - Bank Negara Malaysia", with no autodiscovery tags |
+| six guessed paths (`/rss/press-release`, `/-/rss`, `/rss.xml`, `/feed`, `/press-release/rss`, `index.php?ch=en_rss`) | HTTP 404, every one |
+| `/rss` | HTML landing page, no autodiscovery, but it links three feeds |
+| its notices and speeches feeds | HTML home page, 3 fetches out of 3 — **BNM's own RSS page is mostly broken** |
+| its press-release feed | `text/xml`, stable — and it is the **2020 archive**, newest item September 2020, carrying **no `<pubDate>`** |
+| the live `/press-releases` page (portlet `ZkJrPGjQLX7H`) | serves no feed: HTML, 3 fetches out of 3 |
 
-The feed is behind a link on that page. Reading it needs a browser this
-environment does not have, and it is a one-minute job for anyone who does: open
-<https://www.bnm.gov.my/rss>, copy the press-release feed link into
-`knowledge/feeds/registry.py`, and add `"bnm_press"` back to `[sources] enabled`.
+BNM is Liferay; its feeds are AssetPublisher portlet URLs whose opaque instance
+id cannot be derived, only read off a page. That is why every guessed path
+failed and why no corrected line in `registry.py` closes this.
 
-It is left disabled rather than left failing on purpose. A source that fails
-every night marks the collect job red every night, and a red job that always
-means the same dead URL trains you to stop reading it — which is the one thing
-the `sweeps` table exists to prevent.
+**Enabling the archive would be worse than the gap.** With no `<pubDate>`, every
+item enters the corpus stamped with fetch time — six-year-old central bank
+releases arriving as today's news, indistinguishable from real ones, on a
+schedule, for as long as nobody noticed. `tests/test_corpus.py` now fails if
+`bnm_press` is enabled, for that reason rather than the old one.
+
+What actually closes the gap: a Bursa or Malaysian-wire source that publishes a
+current feed, or a scraper over BNM's live listing page. Neither is a one-line
+change, and neither is written.
 
 And when it does run, be clear what it is: central-bank announcements, so
 **macro news, not company news.** Most of it will arrive unlinked. On a book of
