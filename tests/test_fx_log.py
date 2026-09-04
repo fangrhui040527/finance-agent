@@ -208,3 +208,41 @@ def test_a_failed_fetch_writes_nothing_at_all(tmp_path, monkeypatch):
     ask.main(["fx", "--db", str(db)])
     with FxLog(db) as log:
         assert log.counts()["rates"] == 0
+
+
+# --- the default path ----------------------------------------------------------------
+
+
+def test_no_path_given_means_the_default_not_a_file_called_none(tmp_path, monkeypatch):
+    """The one route nothing covered, and the one production uses.
+
+    `ask.py fx` passed `a.db or None`; `str(None)` is "None", so a day's rate
+    went into a file named `None` in the working directory. Nothing raised - the
+    row was written, just where nobody would look - and the commit that should
+    have carried it died on the missing data/fx.db instead. Every other test
+    here names a path explicitly, which is exactly why they all passed.
+    """
+    monkeypatch.chdir(tmp_path)
+    for given in (None, ""):
+        with FxLog(given) as log:
+            log.record("USD", DAY, Decimal("4.0550"))
+    assert (tmp_path / "data" / "fx.db").exists()
+    assert not (tmp_path / "None").exists()
+    assert not (tmp_path / "").is_file()
+
+
+def test_the_cli_with_no_db_flag_writes_to_the_default(tmp_path, monkeypatch, capsys):
+    """The same property one layer up, through argparse's own default ("")."""
+    import ask
+    import core.market.fx as fx
+    from tests.conftest import opener_for
+    from tests.test_fx_rss import BNM_BODY
+
+    real = fx.BnmFxFeed
+    monkeypatch.setattr(fx, "BnmFxFeed", lambda: real(opener=opener_for(BNM_BODY)))
+    monkeypatch.chdir(tmp_path)
+    assert ask.main(["fx"]) == 0
+    capsys.readouterr()
+    assert not (tmp_path / "None").exists(), "the rate went somewhere nobody would look"
+    with FxLog(tmp_path / "data" / "fx.db") as log:
+        assert log.rate_on("USD", date(2026, 8, 29)) == Decimal("4.1520")

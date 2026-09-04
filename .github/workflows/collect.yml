@@ -96,7 +96,19 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/corpus.db data/graph.db data/fx.db
+          # Added one at a time, skipping any that is not there. `git add` on a
+          # missing path is a fatal error, and under `set -e` that aborted the
+          # whole step - so on the run that introduced data/fx.db the sweep's
+          # own articles were collected, linked, and then thrown away because a
+          # DIFFERENT file was absent. One store missing must never cost the
+          # others their day; that is the entire point of committing daily.
+          for db in data/corpus.db data/graph.db data/fx.db; do
+            if [ -f "$db" ]; then
+              git add "$db"
+            else
+              echo "no $db yet - skipping it"
+            fi
+          done
           # Nothing new is a normal outcome, not a failure: a quiet day, or a day
           # every story was one the corpus already held.
           if git diff --cached --quiet; then
