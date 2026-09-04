@@ -156,42 +156,40 @@ Exit codes, so a scheduler can act without parsing text:
 | name | what it is | state |
 |---|---|---|
 | `gdelt` | global news index | **enabled** — one request per company, budget split, order rotated |
-| `bnm_press` | Bank Negara press releases | registered, **not enabled**: BNM publishes no current feed |
+| `bnm_press` | Bank Negara press releases | registered, **not enabled**: feed URL unknown |
 
 **The domestic-coverage gap is open.** GDELT has returned nothing for any Bursa
 name on every run so far, and `bnm_press` was enabled on 2026-09-03 to close
-that — then disabled the same day, because its URL could not be established.
+that — then disabled the same day, because its URL could not be established:
 
-On 2026-09-04 a GitHub runner read the page (this environment's egress and
-WebFetch both refuse `bnm.gov.my`, so the probe ran where the network works).
-The URL is no longer unknown, and the answer is worse than a wrong URL:
-
-| endpoint | answer |
+| tried | answer |
 |---|---|
-| six guessed paths (`/rss/press-release`, `/-/rss`, `/rss.xml`, `/feed`, `/press-release/rss`, `index.php?ch=en_rss`) | HTTP 404, every one |
-| `/rss` | HTML landing page, no autodiscovery, but it links three feeds |
-| its notices and speeches feeds | HTML home page, 3 fetches out of 3 — **BNM's own RSS page is mostly broken** |
-| its press-release feed | `text/xml`, stable — and it is the **2020 archive**, newest item September 2020, carrying **no `<pubDate>`** |
-| the live `/press-releases` page (portlet `ZkJrPGjQLX7H`) | serves no feed: HTML, 3 fetches out of 3 |
+| `/rss/press-release` | HTTP 404 — the path predates BNM's site redesign |
+| `/rss` | an HTML landing page, no autodiscovery tags |
+| `/press-release-2020?…getRSS` | **works** — valid RSS, but the 2020 archive, so 0 items in any recent window |
+| `/press-release-2026?…getRSS` | HTML, not a feed |
 
-BNM is Liferay; its feeds are AssetPublisher portlet URLs whose opaque instance
-id cannot be derived, only read off a page. That is why every guessed path
-failed and why no corrected line in `registry.py` closes this.
+So the endpoint shape is right — `p_p_resource_id=getRSS` on Liferay's asset
+publisher — and the 2026 instance id was transcribed from that page's own markup
+rather than guessed. It still returns HTML, and the page's `subscribe-action`
+div is empty where a feed-enabled page carries the subscribe control: **RSS is
+switched off for the current year's portlet instance.** The 2020 instance has it
+on, which is why only the archive answers.
 
-**Enabling the archive would be worse than the gap.** With no `<pubDate>`, every
-item enters the corpus stamped with fetch time — six-year-old central bank
-releases arriving as today's news, indistinguishable from real ones, on a
-schedule, for as long as nobody noticed. `tests/test_corpus.py` now fails if
-`bnm_press` is enabled, for that reason rather than the old one.
+Remaining candidates for anyone trying again: the non-year-scoped `/pr` and
+`/press-releases-main`, each with its own instance id readable from its HTML.
+Weigh it against the return first — see below.
 
-What actually closes the gap: a Bursa or Malaysian-wire source that publishes a
-current feed, or a scraper over BNM's live listing page. Neither is a one-line
-change, and neither is written.
+It is left disabled rather than left failing on purpose. A source that fails
+every night marks the collect job red every night, and a red job that always
+means the same dead URL trains you to stop reading it — which is the one thing
+the `sweeps` table exists to prevent.
 
-And when it does run, be clear what it is: central-bank announcements, so
-**macro news, not company news.** Most of it will arrive unlinked. On a book of
-Malaysian banks and utilities that move on rate decisions that is worth having;
-it is still not a Bursa company feed, which this system does not have.
+**And be clear what it would buy.** BNM is a central bank: rate decisions,
+banking statistics, policy documents. Even working, it will not name Maybank or
+Tenaga. It was never the fix for the missing Bursa **company** coverage — that
+needs a Malaysian business news source, which this system does not have and
+which is the gap actually worth closing.
 
 Two sources means two watermarks and two `sweeps` rows. A source that fails does
 not take the other's articles with it — which is the whole reason a second one

@@ -293,6 +293,7 @@ footer b{color:var(--ink-2)}
         <table>
           <thead><tr><th>Source</th><th>Coverage</th><th>Key</th><th>Limit</th><th>Notes</th></tr></thead>
           <tbody>
+            <tr><td class="k">moomoo OpenAPI</td><td>MY, HK, US, SG — daily bars and quotes</td><td><span class="chip free">no key</span></td><td class="num">by tier</td><td><strong>Wired, quotes only.</strong> Runs against a local OpenD gateway, so there is no API key — your broker login is the credential. US LV3 free during the current promo, HK LV1 free, HK LV2 paid. The only source here with real Bursa depth. <strong>The catch:</strong> OpenD must be running <em>and manually logged in</em> — since v10.10 the credentials left the config file, so there is no unattended start.</td></tr>
             <tr><td class="k">Stooq</td><td>Global daily bars — US, Europe, Asia</td><td><span class="chip free">no key</span></td><td class="num">—</td><td>CSV over HTTP. Unglamorous and extremely reliable for end-of-day history.</td></tr>
             <tr><td class="k">Tiingo</td><td>US deep history, global coverage</td><td><span class="chip key">free key</span></td><td class="num">1,000/day</td><td>Explicit terms, attribution required, <strong>no resale</strong>. Honest about what the free tier is for.</td></tr>
             <tr><td class="k">Twelve Data</td><td>Global equities, FX, crypto</td><td><span class="chip key">free key</span></td><td class="num">800/day</td><td>Wide market coverage on the free tier.</td></tr>
@@ -440,17 +441,24 @@ footer b{color:var(--ink-2)}
       </div>
 
       <h3>Wired</h3>
-      <p><strong>GDELT 2.0</strong>, and nothing else. One source, free, keyless, worldwide. It fails loudly: a malformed response raises rather than returning an empty list, because a broken feed must never be indistinguishable from a quiet news day. An explicitly empty result — the API answered, there was nothing — is not an error and returns normally.</p>
+      <p><strong>GDELT 2.0</strong> for news — free, keyless, worldwide — and <strong>moomoo OpenAPI</strong> for daily bars across Malaysia, Hong Kong, the US and Singapore. Both fail loudly: a malformed response or an unreachable gateway raises rather than returning an empty list. A genuinely empty result — the source answered, there was nothing — is not an error and returns normally.</p>
+
+      <p>That distinction matters more for prices than for news. A short bar series does not look broken; it looks like a quiet period, and ATR, average daily value, the liquidity cap and the factor fit all compute confidently on it. A missing price announces itself. A quietly stale one does not.</p>
+
+      <div class="note hazard">
+        <span class="lbl">moomoo is a broker, and this system does not trade</span>
+        <p>The moomoo SDK ships two context classes: one reads market data, the other places orders. <strong>Only the quote context is imported</strong>, and a test reads the source file to prove it — alongside the repo-wide grep that refuses execution-adjacent code anywhere. Their own account list puts a real margin account beside the simulated ones, which is exactly the failure mode this boundary removes: there is no trade context here to mistype an account into.</p>
+      </div>
 
       <h3>Not wired</h3>
-      <p>Everything else on this page. The knowledge shelves are still empty and nothing else in the repository makes a network call. The point-in-time fact store is filled only by tests. That is a statement of fact, not an apology: the machinery downstream of ingest is built and tested, and each source above is now a known quantity rather than a research task.</p>
+      <p>Everything else on this page. The point-in-time fact store is still filled only by tests, and no filing has ever been read. That is a statement of fact, not an apology: the machinery downstream of ingest is built and tested, and each source above is now a known quantity rather than a research task.</p>
 
       <h3>Could not verify from this session</h3>
       <p>The network here blocks <code>worldmonitor.app</code> and <code>blog.gdeltproject.org</code> directly. Their figures above come from the project's own repository and from API write-ups rather than from the vendor documentation pages. Two specifics to confirm before building against them: <strong>WorldMonitor's public endpoint surface</strong> — the repository describes a REST gateway with rate limiting, but not which routes are stable — and <strong>GDELT's exact <code>maxrecords</code> ceiling</strong>, cited variously as 100 and 250. The adapter caps at 250 and pages; if the real limit is lower the API will say so and the fetch will raise rather than silently truncate.</p>
 
       <div class="note">
         <span class="lbl">The order to build in</span>
-        <p><strong>1.</strong> GDELT — done. <strong>2.</strong> Identity (GLEIF and OpenFIGI) — the prerequisite for market number three. <strong>3.</strong> SEC EDGAR — free, keyless, and the first tier-2 evidence in the system. <strong>4.</strong> Bursa announcements — the point-in-time date nobody sells. <strong>5.</strong> Web search, last, because it is the one that can quietly bypass the ladder everything else depends on.</p>
+        <p><strong>1.</strong> GDELT — done. <strong>2.</strong> moomoo quotes — done. <strong>3.</strong> Identity (GLEIF and OpenFIGI) — the prerequisite for market number three. <strong>4.</strong> SEC EDGAR — free, keyless, and the first tier-2 evidence in the system. <strong>5.</strong> Bursa announcements — the point-in-time date nobody sells. <strong>6.</strong> Web search, last, because it is the one that can quietly bypass the ladder everything else depends on.</p>
       </div>
     </section>
 

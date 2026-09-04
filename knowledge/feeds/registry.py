@@ -29,40 +29,38 @@ FACTORIES: dict[str, Callable[..., FeedAdapter]] = {
 RSS_SOURCES: dict[str, tuple[str, str]] = {
     # name: (url, trust)
     "reuters_business": ("https://feeds.reuters.com/reuters/businessNews", "wire"),
-    # NOT ENABLED, and this URL is NOT a feed - it is the landing page, kept as
-    # the value deliberately so that enabling this line cannot quietly work.
+    # REGISTERED, NOT ENABLED. Four sweeps settled this; the record, so nobody
+    # repeats it:
     #
-    # A GitHub runner read the page on 2026-09-04 (this environment's egress and
-    # WebFetch both refuse bnm.gov.my). What it established, in four rounds:
+    #   /rss/press-release              404 - path predates the site redesign
+    #   /rss                            an HTML landing page, no autodiscovery
+    #   /press-release-2020?...getRSS   WORKS - valid RSS, but the 2020 archive,
+    #                                   so 0 items in any recent window
+    #   /press-release-2026?...getRSS   HTML, not a feed
     #
-    #   bnm.gov.my is LIFERAY. Its feeds are AssetPublisher portlet URLs
-    #   carrying p_p_resource_id=getRSS and an opaque portlet INSTANCE id. That
-    #   id cannot be derived, only read off a page - which is why six guessed
-    #   paths (/rss/press-release, /-/rss, /rss.xml, /feed, /press-release/rss,
-    #   index.php?ch=en_rss) all returned 404. No amount of guessing reaches it.
+    # The endpoint SHAPE is right - `p_p_resource_id=getRSS` on Liferay's asset
+    # publisher - and the instance id below was transcribed from the 2026 page's
+    # own markup, not guessed. It still returns HTML, and the page's
+    # `subscribe-action` div is empty where a feed-enabled page carries the
+    # subscribe control: RSS is switched OFF for that portlet instance. The 2020
+    # instance has it on, which is why only the archive answers.
     #
-    #   /rss advertises three feeds and TWO OF THEM ARE BROKEN: the notices and
-    #   speeches URLs return the HTML home page, three fetches out of three.
-    #
-    #   The one that does serve XML is the 2020 ARCHIVE:
-    #     /press-release-2020?p_p_id=..._INSTANCE_ZHckDJtILsio&p_p_lifecycle=2
-    #     &p_p_state=normal&p_p_mode=view&p_p_resource_id=getRSS
-    #     &p_p_cacheability=cacheLevelPage
-    #   text/xml, 23,228 bytes, stable across three fetches - and its newest
-    #   item is from SEPTEMBER 2020. It also carries NO <pubDate>, so every item
-    #   would be stamped with fetch time: six-year-old central bank releases
-    #   entering the corpus dated today, looking exactly like current news.
-    #   Do not enable it. That is the failure this repository is built to avoid.
-    #
-    #   The LIVE page is /press-releases (plural; /press-release is a 404) and
-    #   its portlet id is ZkJrPGjQLX7H - but that id does not serve getRSS. It
-    #   returns the HTML page, three fetches out of three, on both
-    #   /press-releases and /press-release-2026.
-    #
-    # So the URL is no longer unknown. It is known, and there is no current BNM
-    # press-release feed to point at. Closing this gap needs a different source
-    # or a scraper, not a corrected line here - see details/09.
-    "bnm_press": ("https://www.bnm.gov.my/rss", "regulator"),
+    # Anyone trying again: the non-year-scoped pages /pr and /press-releases-main
+    # are the remaining candidates, each with its own instance id readable from
+    # its HTML. Weigh it first - BNM is a central bank, so even working this is
+    # macro news that will not name a Bursa company.
+    "bnm_press": (
+        "https://www.bnm.gov.my/press-release-2026"
+        "?p_p_id=com_liferay_asset_publisher_web_portlet_AssetPublisherPortlet"
+        "_INSTANCE_ZkJrPGjQLX7H"
+        "&p_p_lifecycle=2&p_p_state=normal&p_p_mode=view"
+        "&p_p_resource_id=getRSS&p_p_cacheability=cacheLevelPage"
+        "&_com_liferay_asset_publisher_web_portlet_AssetPublisherPortlet"
+        "_INSTANCE_ZkJrPGjQLX7H_currentURL=%2Fpress-release-2026"
+        "&_com_liferay_asset_publisher_web_portlet_AssetPublisherPortlet"
+        "_INSTANCE_ZkJrPGjQLX7H_portletAjaxable=true",
+        "regulator",
+    ),
 }
 
 
