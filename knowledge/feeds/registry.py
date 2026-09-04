@@ -29,23 +29,28 @@ FACTORIES: dict[str, Callable[..., FeedAdapter]] = {
 RSS_SOURCES: dict[str, tuple[str, str]] = {
     # name: (url, trust)
     "reuters_business": ("https://feeds.reuters.com/reuters/businessNews", "wire"),
-    # NOT ENABLED, and this URL is NOT the feed. Three sweeps on 2026-09-03
-    # established what is true:
+    # Liferay's asset-publisher RSS endpoint, which is what /rss links to and
+    # what three guesses on 2026-09-03 failed to find (/rss/press-release is a
+    # 404; /rss is a landing page carrying no autodiscovery tags). Supplied by
+    # the operator from the page itself.
     #
-    #   /rss/press-release  -> HTTP 404; the path predates BNM's site redesign
-    #   /rss                -> an HTML landing page titled "RSS - Bank Negara
-    #                          Malaysia", carrying no autodiscovery link tags
-    #
-    # So the feed exists behind a link on that page and its URL is unknown here:
-    # this environment's egress refuses bnm.gov.my, and so does WebFetch, so the
-    # page cannot be read to find it. Anyone who can open
-    # https://www.bnm.gov.my/rss in a browser can read the link off it, put it
-    # here, and add "bnm_press" back to [sources] enabled in config.toml.
-    #
-    # Kept registered rather than deleted: the adapter, the trust tier and the
-    # name are all right, and one wrong field is not a reason to lose the other
-    # three.
-    "bnm_press": ("https://www.bnm.gov.my/rss", "regulator"),
+    # NOTE THE YEAR. The path and the currentURL parameter both say 2020, and
+    # the INSTANCE id is that page's portlet. Whether it serves 2020 items or
+    # the latest ones is what the next sweep answers: a feed of 2020 stories
+    # fetches fine and keeps nothing, because every item falls outside the
+    # window - which shows up as fetched>0, kept=0 rather than as an error.
+    "bnm_press": (
+        "https://www.bnm.gov.my/press-release-2020"
+        "?p_p_id=com_liferay_asset_publisher_web_portlet_AssetPublisherPortlet"
+        "_INSTANCE_ZHckDJtILsio"
+        "&p_p_lifecycle=2&p_p_state=normal&p_p_mode=view"
+        "&p_p_resource_id=getRSS&p_p_cacheability=cacheLevelPage"
+        "&_com_liferay_asset_publisher_web_portlet_AssetPublisherPortlet"
+        "_INSTANCE_ZHckDJtILsio_currentURL=%2Fpress-release-2020"
+        "&_com_liferay_asset_publisher_web_portlet_AssetPublisherPortlet"
+        "_INSTANCE_ZHckDJtILsio_portletAjaxable=true",
+        "regulator",
+    ),
 }
 
 

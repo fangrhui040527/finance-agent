@@ -595,21 +595,22 @@ def test_a_sweep_where_every_name_returned_something_says_nothing():
 # --- more than one source ---------------------------------------------------------
 
 
-def test_no_source_is_enabled_whose_url_is_known_to_be_wrong():
-    """bnm_press is registered and deliberately NOT enabled: three sweeps on
-    2026-09-03 established that its feed URL is unknown - /rss/press-release is
-    a 404 and /rss is a landing page with no autodiscovery tags.
+def test_the_malaysian_source_is_enabled_and_points_at_a_feed_endpoint():
+    """Three guesses on 2026-09-03 failed to find BNM's feed - /rss/press-release
+    is a 404 and /rss is a landing page with no autodiscovery tags. The operator
+    supplied the Liferay asset-publisher endpoint from the page itself.
 
-    A source that fails every night marks the job red every night, and a red job
-    that always means the same dead URL trains you to stop reading it. When
-    somebody supplies the real URL, enabling it is the one-line change this test
-    is asking for.
+    The assertion is on the endpoint marker rather than the whole URL: the year
+    and the portlet instance will change, and a test that pins them would fail
+    on the correct URL.
     """
     import core.config as C
     from knowledge.feeds.registry import RSS_SOURCES
 
-    assert "bnm_press" in RSS_SOURCES, "the registration is kept; only the URL is wrong"
-    assert "bnm_press" not in C.load().sources
+    url, trust = RSS_SOURCES["bnm_press"]
+    assert "p_p_resource_id=getRSS" in url, "a page URL is not a feed URL"
+    assert trust == "regulator"
+    assert "bnm_press" in C.load().sources
 
 
 def test_every_enabled_source_has_an_adapter_that_builds():

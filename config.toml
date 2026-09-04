@@ -235,17 +235,15 @@ min_graded_for_calibration = 30
 # Added 2026-09-03 after GDELT returned nothing for any Bursa name over a
 # 2-hour window. Whether that is GDELT's Malaysian coverage or the short window
 # is still open - see details/09.
-# bnm_press is REGISTERED but not enabled, and the reason is written down in
-# knowledge/feeds/registry.py: its feed URL is not known. Three runs on
-# 2026-09-03 established that /rss/press-release is a 404 and /rss is a landing
-# page carrying no autodiscovery tags, and this environment cannot read the page
-# to find the link. Enabling it again needs one line: the real URL.
+# bnm_press is Bank Negara's press releases via Liferay's RSS endpoint, which
+# the operator found on the /rss page after three guesses failed. MACRO news -
+# the OPR decision, banking statistics, policy documents - not company news, so
+# most of it arrives unlinked and the `unlinked` count says so.
 #
-# Left disabled deliberately rather than left failing. A source that fails every
-# night marks the collect job red every night, and a red job that always means
-# the same dead URL trains you to stop reading it - which is the one thing the
-# sweeps table exists to prevent.
-enabled = ["gdelt"]
+# The registered URL is pinned to the 2020 page; see the note in
+# knowledge/feeds/registry.py. If a sweep reports fetched>0 with kept=0, that is
+# a feed of old items and the URL needs the current year's page, not a fix here.
+enabled = ["gdelt", "bnm_press"]
 
 # Where a sweep keeps what it saw. Append-only, deduplicated across runs, and
 # carrying a row for every sweep INCLUDING the ones that failed - a month of
