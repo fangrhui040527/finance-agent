@@ -709,3 +709,70 @@ def test_a_page_advertising_nothing_says_that_too():
     page = "<!DOCTYPE html><html><head><title>Nothing here</title></head></html>"
     assert advertised_feeds(page) == []
     assert "advertises none" in _excerpt(page)
+
+
+# --- a degraded sweep is a failure, not a success ------------------------------------
+
+
+def test_most_names_unreachable_is_a_failure():
+    """The bug this closes, from the run that exposed it: eight of nine
+    companies failed, one article was stored, and the job reported SUCCESS. The
+    failures were in the sweeps table, but a green check nobody has reason to
+    open is not a report."""
+    import ask
+
+    failed = [
+        (n, "429")
+        for n in (
+            "Apple",
+            "Genting",
+            "IHH",
+            "Microsoft",
+            "NVIDIA",
+            "PetChem",
+            "Press Metal",
+            "Tenaga",
+        )
+    ]
+    assert ask._mostly_failed(failed, [], [("Maybank", 1)]) is True
+
+
+def test_one_quiet_name_is_not_a_failure():
+    """Half, not any. GDELT refuses individual names routinely, and a check
+    that goes red most days is a check that gets ignored - which costs more
+    than the alert is worth."""
+    import ask
+
+    counts = [("Maybank", 3), ("Tenaga", 1), ("NVIDIA", 2), ("Apple", 5)]
+    assert ask._mostly_failed([("Genting", "429")], [], counts) is False
+
+
+def test_exactly_half_failing_is_not_yet_a_failure():
+    """Strictly MORE than half, so the boundary is decided rather than
+    accidental - a two-name book with one quiet name must not read as red."""
+    import ask
+
+    assert ask._mostly_failed([("A", "429")], [], [("B", 1)]) is False
+    assert ask._mostly_failed([("A", "429"), ("B", "429")], [], [("C", 1)]) is True
+
+
+def test_names_not_reached_before_the_deadline_count_as_unreachable():
+    """A name the deadline cut off is a hole in the record exactly like one
+    that was refused: no news was collected for it either way."""
+    import ask
+
+    assert ask._mostly_failed([], ["Tenaga", "NVIDIA"], [("Maybank", 1)]) is True
+
+
+def test_a_sweep_that_read_nothing_at_all_is_not_a_division_by_zero():
+    import ask
+
+    assert ask._mostly_failed([], [], []) is False
+
+
+def test_a_name_read_with_no_news_is_not_a_fault():
+    """Counts names, not articles. A name that was read and had no news is a
+    fact about the world; a name that could not be read is a hole in it."""
+    import ask
+
+    assert ask._mostly_failed([], [], [("Maybank", 0), ("Tenaga", 0)]) is False
