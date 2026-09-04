@@ -356,7 +356,27 @@ def test_alphavantage_rate_limit_answer_is_a_failure_not_a_quiet_day():
         "Information": "Thank you for using Alpha Vantage! Our standard API rate limit is 25 requests per day."
     }
     c = AlphaVantageNews(key="k", clock=CLOCK, opener=router({"alphavantage": body}))
-    with pytest.raises(SourceError, match="refused"):
+    with pytest.raises(SourceError, match="quota exhausted for today"):
+        c.collect(SINCE, ("XNAS:NVDA",))
+
+
+def test_alphavantage_rejected_key_is_named_as_such_not_as_a_quota():
+    """The quota notice also says "API key", so the order of the checks is the
+    point: a bad key must not read as a spent day, or the operator waits until
+    tomorrow for a key that will never work."""
+    body = {
+        "Information": "The **demo** API key is for demo purposes only. Please claim your free API key."
+    }
+    c = AlphaVantageNews(key="k", clock=CLOCK, opener=router({"alphavantage": body}))
+    with pytest.raises(SourceError, match="rejected the key") as exc:
+        c.collect(SINCE, ("XNAS:NVDA",))
+    assert "quota" not in str(exc.value)
+
+
+def test_alphavantage_any_other_notice_is_still_a_refusal():
+    body = {"Note": "Maintenance window; try again later."}
+    c = AlphaVantageNews(key="k", clock=CLOCK, opener=router({"alphavantage": body}))
+    with pytest.raises(SourceError, match="alphavantage refused: Maintenance"):
         c.collect(SINCE, ("XNAS:NVDA",))
 
 
