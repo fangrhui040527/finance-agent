@@ -338,8 +338,9 @@ def test_asking_for_anthropic_without_a_key_raises_rather_than_falling_back(monk
 
 
 def test_an_unknown_backend_name_is_refused(monkeypatch):
+    # "gemini" used to be the example here; it is a real provider now (docs/21).
     with pytest.raises(ValueError, match="unknown LLM_BACKEND"):
-        backend_from_env("gemini")
+        backend_from_env("grok-9000")
 
 
 def test_the_cheap_cap_is_disclosed_in_the_reason(monkeypatch):

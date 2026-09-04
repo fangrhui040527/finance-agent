@@ -239,10 +239,14 @@ class ProvenanceLedger:
         latency_ms: float = 0.0,
         stop_reason: str = "",
         request_id: str = "",
+        pricing: tuple[Decimal, Decimal] | None = None,
     ) -> CallRecord:
         at = at or datetime.now(UTC)
         rid = self.run_id if run_id is None else run_id
-        usd = cost_usd(tier, usage)
+        # The backend's own rate when it declares one (a free tier says zero),
+        # the tier's first-party rate otherwise. The tier column still says
+        # which class of work this was; the cost column says what it cost.
+        usd = cost_usd(tier, usage, pricing)
         myr = usd * fx_rate
         ph = prompt_hash(prompt)
         self.conn.execute(

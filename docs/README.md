@@ -49,6 +49,7 @@ Three things are genuinely new here:
 | **18** | [Web and SDK](18-WEB-AND-SDK.md) | The twelve-screen web app and the Python SDK seam |
 | **19** | [Broker account](19-BROKER-ACCOUNT.md) | The read-only moomoo account view: what is read, what is never imported |
 | **20** | [Feedback routine](20-FEEDBACK-ROUTINE.md) | The nightly page: `ask.py pack` measures, a Claude Routine reasons over the pack through the MCP tools, and the page becomes `kb_lessons` |
+| **21** | [Free models](21-FREE-MODELS.md) | A zero-cost first month: the reasoning stays on your Claude session, the cheap tier runs on a free open-weight provider, and the ledger records what actually answered |
 | **22** | [Paper book](22-PAPER-BOOK.md) | A USD 1,000 hypothetical ledger: caps the file cannot loosen, next-open application with real fees and FX, a passive control, the thirteen-week calibration record, and the honest answer on +10% |
 | [User guide](user-guide.html) | Install, every command, and the cadence for using it — open in a browser |
 | [Pipeline diagrams](pipeline.html) | Six diagrams tracing data from a wire story to a position size — open in a browser |
