@@ -2,9 +2,15 @@
 
 ## What this system can and cannot do
 
-- **No order placement.** There is no broker client, no execution verb, no
-  simulated fill anywhere in the repository. `tests/test_no_execution_anywhere.py`
-  greps every source file on every CI run and fails if one appears. This is a
+- **No order placement.** There is no broker client and no execution verb
+  anywhere in the repository. `tests/test_no_execution_anywhere.py` greps
+  every source file on every CI run and fails if one appears. Two things
+  simulate the *arithmetic* of a transaction and nothing else: the backtest
+  cost model (`engines/backtest/costs.py`) and the paper book
+  (`engines/paper/`, `ask.py paper`, docs/22), which applies recorded target
+  weights to a hypothetical USD ledger at the next cached open. Neither
+  imports `core/broker`, neither can send anything anywhere, and
+  `tests/test_paper_boundary.py` fails if that import appears. This is a
   structural guarantee, not a setting.
 - **The model never decides a number.** Every position size, cap, and risk
   figure is computed by tested engines. A language model is handed the result

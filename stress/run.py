@@ -1189,6 +1189,10 @@ def s_mcp():
         "fact_snapshot": {"instrument": "MYX:1155"},
         "macro_context": {},
         "news_evidence": {"instrument": "MYX:1155", "days": 1},
+        # The paper book's readers: a ledger that does not exist is NO BOOK,
+        # which is the honest answer and touches no network.
+        "paper_status": {"db": ":memory:"},
+        "paper_report": {"days": 1, "db": ":memory:"},
     }
     uncovered = [t for t in S.tools if t not in minimal]
     if uncovered:

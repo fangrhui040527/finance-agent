@@ -1041,6 +1041,142 @@ def cmd_pack(a) -> int:
     return 0
 
 
+def cmd_paper(a) -> int:
+    """The USD 1,000 paper book (docs/22): init, decide, mark, status, pack, grade.
+
+    Exit codes are the interface: 0 done, 2 refused or nothing to act on
+    (a refusal is not an error), 3 a leg could not be priced or a store could
+    not be read.
+    """
+    from dataclasses import replace
+
+    from engines.paper.book import fx_for
+    from engines.paper.store import PaperStore
+
+    try:
+        cfg = load_config()
+    except ConfigError as e:
+        print(f"paper: {e}", file=sys.stderr)
+        return 2
+    settings = cfg.paper
+    db = a.db or settings.database
+    try:
+        day = date.fromisoformat(a.date) if a.date else datetime.now(UTC).date()
+    except ValueError:
+        print("paper: --date must be YYYY-MM-DD", file=sys.stderr)
+        return 2
+    fx = fx_for(cfg, a.fx_db or None)
+
+    if a.action == "init":
+        try:
+            start = date.fromisoformat(a.start) if a.start else settings.start_date
+        except ValueError:
+            print("paper: --start must be YYYY-MM-DD", file=sys.stderr)
+            return 2
+        with PaperStore(db) as store:
+            try:
+                store.init_books(replace(settings, start_date=start), start)
+            except ValueError as e:
+                print(f"paper init refused: {e}", file=sys.stderr)
+                return 2
+        print(
+            f"opened the paper book at {db}: USD {settings.initial_cash_usd:,.2f}, start {start}, "
+            f"observe {settings.observe_weeks} weeks, ramp {settings.ramp_weeks} weeks at "
+            f"{settings.ramp_max_invested:.0%}, then {settings.max_invested:.0%} invested at most"
+        )
+        print("next: `ask.py paper mark` after each close; `ask.py paper status` before deciding")
+        return 0
+
+    store = PaperStore.open_existing(db)
+    if store is None or not store.has_books():
+        print(f"paper: NO BOOK at {db}; run `ask.py paper init` first", file=sys.stderr)
+        return 2
+
+    with store:
+        feed = default_feed()
+        if a.action == "status":
+            from engines.paper.report import status, status_json
+
+            st = status(store, cfg, feed, fx, day=day)
+            print(status_json(st) if a.json else st.render())
+            return 0
+
+        if a.action == "decide":
+            from agents.learning.store import LearningStore
+            from engines.paper.book import decide
+
+            weights: dict[str, Decimal] = {}
+            for part in [x.strip() for x in a.weights.split(",") if x.strip()]:
+                if "=" not in part:
+                    print(
+                        f"paper: --weights entries look like MYX:5183=0.20, got {part!r}",
+                        file=sys.stderr,
+                    )
+                    return 2
+                iid, raw = part.split("=", 1)
+                try:
+                    weights[iid.strip()] = Decimal(raw.strip())
+                except ArithmeticError:
+                    print(f"paper: {raw!r} is not a weight", file=sys.stderr)
+                    return 2
+            with LearningStore(a.learning_db or cfg.database) as learning:
+                res = decide(
+                    store,
+                    cfg,
+                    feed,
+                    fx,
+                    day=day,
+                    weights=weights,
+                    thesis=a.thesis,
+                    horizon=a.horizon,
+                    confidence=a.confidence,
+                    learning=learning,
+                    supersede=a.supersede,
+                    dry_run=a.dry_run,
+                )
+            print(res.render())
+            return 2 if res.refused else 0
+
+        if a.action == "mark":
+            from engines.paper.book import mark
+
+            res = mark(store, cfg, feed, fx, day=day, slot=a.slot)
+            print(res.render())
+            return res.exit_code
+
+        if a.action == "grade":
+            from agents.learning.store import LearningStore
+            from engines.paper.grade import grade_due
+
+            with LearningStore(a.learning_db or cfg.database) as learning:
+                graded = grade_due(
+                    store, cfg, feed, fx, day=day, learning=learning, dry_run=a.dry_run
+                )
+            if not graded:
+                print("nothing due: no paper prediction has reached its grading date")
+                return 0
+            head = "DRY RUN - would grade" if a.dry_run else "graded"
+            print(f"{head} {len(graded)} prediction(s) on {day}")
+            for g in graded:
+                mark_ = "correct" if g.correct else "wrong"
+                print(
+                    f"  {g.prediction_id:<40} realised {g.realised:+.2%}  control {g.benchmark:+.2%}  {mark_}  {g.note}"
+                )
+            return 0
+
+        if a.action == "pack":
+            from knowledge.paper.pack import build_paper_pack, write_paper_pack
+
+            text = build_paper_pack(cfg, day, store=store, feed=feed, fx=fx)
+            if a.write:
+                path = write_paper_pack(text, day, a.out)
+                print(f"wrote {path}", file=sys.stderr)
+            print(text)
+            return 0
+    print(f"paper: unknown action {a.action}", file=sys.stderr)
+    return 2
+
+
 def cmd_facts(a) -> int:
     """What the collector holds for one name: figures, events, documents."""
     from knowledge.facts import FactBook
@@ -1808,6 +1944,33 @@ def main(argv=None) -> int:
     pk.add_argument("--db", default="", help="corpus database")
     pk.add_argument("--facts-db", default="", help="fact book database")
     pk.set_defaults(fn=cmd_pack)
+
+    pa = sub.add_parser(
+        "paper", help="the USD 1,000 paper book: init, decide, mark, status, pack, grade"
+    )
+    pa.add_argument("action", choices=("init", "decide", "mark", "status", "pack", "grade"))
+    pa.add_argument("--db", default="", help="paper ledger (default: [paper] database)")
+    pa.add_argument("--date", default="", help="YYYY-MM-DD; default today (UTC)")
+    pa.add_argument("--start", default="", help="init: the book's start date")
+    pa.add_argument(
+        "--weights",
+        default="",
+        help='decide: "MYX:5183=0.20,XNAS:NVDA=0.22"; a held name left out is an exit',
+    )
+    pa.add_argument("--thesis", default="", help="decide: why, in a sentence or two; required")
+    pa.add_argument("--confidence", type=float, default=0.55, help="decide: in (0, 1)")
+    pa.add_argument("--horizon", type=int, default=21, help="decide: sessions until graded")
+    pa.add_argument("--supersede", action="store_true", help="decide: replace today's decision")
+    pa.add_argument("--dry-run", action="store_true", help="decide/grade: print, write nothing")
+    pa.add_argument("--learning-db", default="", help="prediction log (default: [learning])")
+    pa.add_argument("--fx-db", default="", help="rate log (default: data/fx.db)")
+    pa.add_argument(
+        "--slot", default="manual", choices=("bursa_close", "us_close", "manual", "all")
+    )
+    pa.add_argument("--json", action="store_true", help="status: print JSON")
+    pa.add_argument("--write", action="store_true", help="pack: write <date>.pack.md too")
+    pa.add_argument("--out", default="knowledge/paper", help="pack: where --write puts it")
+    pa.set_defaults(fn=cmd_paper)
 
     fc = sub.add_parser("facts", help="what the collector holds for one name")
     fc.add_argument("instrument")

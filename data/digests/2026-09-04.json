@@ -1,6 +1,69 @@
 {
   "collection": [
     {
+      "at": "2026-09-04T16:33:15.115958+00:00",
+      "detail": "skipped: fred needs FRED_API_KEY, which is not set. Add it to .env or as a GitHub Actions secret of the same name; until then this source is skipped.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "fred",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-04T16:17:44.939956+00:00",
+      "detail": "skipped: alphavantage_news needs ALPHAVANTAGE_API_KEY, which is not set. Add it to .env or as a GitHub Actions secret of the same name; until then this source is skipped.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "alphavantage_news",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-04T16:17:44.939197+00:00",
+      "detail": "skipped: finnhub needs FINNHUB_API_KEY, which is not set. Add it to .env or as a GitHub Actions secret of the same name; until then this source is skipped.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "finnhub",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-04T16:17:44.938310+00:00",
+      "detail": "facts 0; ",
+      "fetched": 0,
+      "kept": 0,
+      "source": "edgar",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-04T16:17:44.740031+00:00",
+      "detail": "",
+      "fetched": 36,
+      "kept": 36,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 31
+    },
+    {
+      "at": "2026-09-04T16:17:44.357771+00:00",
+      "detail": "",
+      "fetched": 34,
+      "kept": 30,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 26
+    },
+    {
+      "at": "2026-09-04T16:17:42.864615+00:00",
+      "detail": "no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "failed",
+      "stored": 0
+    },
+    {
       "at": "2026-09-04T13:36:47.700049+00:00",
       "detail": "facts 0; ",
       "fetched": 10,
@@ -263,18 +326,18 @@
     }
   ],
   "counts": {
-    "articles": 647,
+    "articles": 704,
     "documents": 0,
-    "escalated": 197,
+    "escalated": 231,
     "events": 2,
-    "failed_sweeps": 13,
-    "linked": 315,
+    "failed_sweeps": 14,
+    "linked": 371,
     "observations": 0,
     "series": 2,
-    "sweeps": 47
+    "sweeps": 54
   },
   "day": "2026-09-04",
-  "generated_at": "2026-09-04 13:36 UTC",
+  "generated_at": "2026-09-04 16:33 UTC",
   "macro": [
     {
       "change": "0",
@@ -540,7 +603,7 @@
       "upcoming": []
     },
     {
-      "escalated": 69,
+      "escalated": 86,
       "events": [],
       "instrument_id": "XNAS:NVDA",
       "label": "NVIDIA",
@@ -591,6 +654,28 @@
           "uncertainty": 0.17123287671232876
         },
         {
+          "doc_id": "https://247wallst.com/investing/2026/09/04/intel-climbs-4-as-chip-stocks-shrug-off-rising-rate-hike-odds-nvidia-and-amd-move-higher/?.tsrc=rss",
+          "domain": "247wallst.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-04T15:12:07+00:00",
+          "quality": 0.85,
+          "title": "Intel Climbs 4%, AMD Rises 3%, NVIDIA Ticks Up as Chip Stocks Shrug Off Rising Rate Hike Odds",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://247wallst.com/investing/2026/09/04/nvidia-and-apple-are-both-winning-in-2026-and-doing-it-because-of-this-contrarian-ai-move/?.tsrc=rss",
+          "domain": "247wallst.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-04T13:44:09+00:00",
+          "quality": 0.85,
+          "title": "Nvidia and Apple Are Both Winning in 2026 And Doing It Because Of This Contrarian AI Move",
+          "uncertainty": 0.0
+        },
+        {
           "doc_id": "https://www.fool.com/investing/breakfast-news/2026/09/04/breakfast-news-week-in-review/?.tsrc=rss",
           "domain": "www.fool.com",
           "escalated": true,
@@ -611,46 +696,35 @@
           "quality": 0.85,
           "title": "If You Recognize What This Number Means Then You Are Likely An NVIDIA Bull",
           "uncertainty": 0.2777777777777778
-        },
-        {
-          "doc_id": "https://247wallst.com/personal-finance/2026/09/03/nvidia-made-a-57-year-old-oregon-couple-rich-now-one-stock-is-the-biggest-risk-to-their-retirement/?.tsrc=rss",
-          "domain": "247wallst.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-04T00:50:44+00:00",
-          "quality": 0.85,
-          "title": "Nvidia Made a 57-Year-Old Oregon Couple Rich. Now One Stock Is the Biggest Risk to Their Retirement",
-          "uncertainty": 0.35211267605633806
-        },
-        {
-          "doc_id": "https://finance.yahoo.com/technology/ai/articles/deepseeks-huawei-order-still-leaves-122342569.html?.tsrc=rss",
-          "domain": "finance.yahoo.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-04T12:23:42+00:00",
-          "quality": 0.8,
-          "title": "DeepSeek's Huawei Order Still Leaves Nvidia Doing the Training",
-          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 95,
-        "polarity_mean": 0.084,
-        "sources": 38,
-        "uncertainty_mean": 0.069
+        "n": 127,
+        "polarity_mean": 0.094,
+        "sources": 46,
+        "uncertainty_mean": 0.078
       },
       "upcoming": []
     },
     {
-      "escalated": 59,
+      "escalated": 69,
       "events": [],
       "instrument_id": "XNAS:AAPL",
       "label": "Apple",
       "snapshot": [],
       "stories": [
+        {
+          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/apples-first-foldable-could-launch-143718764.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-04T14:37:18+00:00",
+          "quality": 1.0,
+          "title": "Apple's First Foldable Could Launch With a Supply Problem",
+          "uncertainty": 0.4166666666666667
+        },
         {
           "doc_id": "https://finance.yahoo.com/m/51df5513-c451-3ed8-b185-f35b56fbf087/apple-poised-to-unveil.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
@@ -727,30 +801,19 @@
           "quality": 1.0,
           "title": "Stryker Launches FDA-Cleared Apple Vision Pro Surgical App",
           "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://www.verdict.co.uk/apple-expands-hiring-china/?.tsrc=rss",
-          "domain": "www.verdict.co.uk",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-04T11:04:56+00:00",
-          "quality": 0.85,
-          "title": "Apple expands AI and data hiring in China, says GlobalData report",
-          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 71,
-        "polarity_mean": 0.085,
-        "sources": 45,
-        "uncertainty_mean": 0.135
+        "n": 84,
+        "polarity_mean": 0.107,
+        "sources": 48,
+        "uncertainty_mean": 0.137
       },
       "upcoming": []
     },
     {
-      "escalated": 39,
+      "escalated": 42,
       "events": [],
       "instrument_id": "XNAS:MSFT",
       "label": "Microsoft",
@@ -801,6 +864,17 @@
           "uncertainty": 0.0
         },
         {
+          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/microsoft-ceo-makes-major-43-140439392.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-04T14:04:39+00:00",
+          "quality": 0.8,
+          "title": "Microsoft CEO Makes Major $43 Million Stock Move",
+          "uncertainty": 0.0
+        },
+        {
           "doc_id": "https://news.google.com/rss/articles/CBMiswFBVV95cUxNWTlGWWl6YVZxRXYxc1dQMlJoMDlXMVZYNVZ5TnNhb1J3eFduOVgzWG90dGNqUXdDa3Z2OVZJbTFaVm84QjJhNm9wQlA2WHh5SmFvTDZRUURTUFQ5UUlpZ3J6M2M3bThtVjJVam1sYmtJU3VJcmQzbUlUY1VnU2NSYUl4ZnEyT2pocGMzUVg2b21XWlpKNWZ5ekFOSzZWMXFVd29LUVIzelJEQmtSZ1k2QzJaVQ?oc=5",
           "domain": "seekingalpha.com",
           "escalated": true,
@@ -832,25 +906,14 @@
           "quality": 0.8,
           "title": "Update: Market Chatter: Nvidia Increases Equity Investments to $99 Billion",
           "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMijgFBVV95cUxNcmFINFFweGctazNoVUpFajBaUW5kQ3JZV1poSnM2Y09VSjM5MV9BWVRzX1F5UjdxWGhNdWRYcE53UnVQVHg5UDVuOTMtNHByVUNWQTlSYWxFbGctR2xMaHhEdUU4LXgxMWR4NkRXTW4tMklxUHlxS2MtTGw5RjZnVnJPZ3EyTHlmQlVVM0hn?oc=5",
-          "domain": "seekingalpha.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-04T06:11:57+00:00",
-          "quality": 0.8,
-          "title": "Microsoft Has Proven That An ROI Is Possible (NASDAQ:MSFT)",
-          "uncertainty": 1.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 56,
-        "polarity_mean": 0.125,
-        "sources": 28,
-        "uncertainty_mean": 0.059
+        "n": 62,
+        "polarity_mean": 0.129,
+        "sources": 29,
+        "uncertainty_mean": 0.069
       },
       "upcoming": []
     }

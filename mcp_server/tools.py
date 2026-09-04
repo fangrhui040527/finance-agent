@@ -389,6 +389,32 @@ def news_evidence(instrument: str, query: str = "", days: int = 7, limit: int = 
     return "\n".join(rows) + DISCLAIMER
 
 
+def paper_status(db: str = "") -> str:
+    """The paper book's status page (docs/22): equity, positions, pending targets,
+    each cap's headroom, the fundable set at today's equity, cost drag.
+
+    A hypothetical USD ledger marked from the cached bars. Its targets were
+    recorded inside code-enforced caps; this reads the record and places
+    nothing anywhere. A book that has not been opened says NO BOOK.
+    """
+    from engines.paper.book import fx_for
+    from engines.paper.report import status as _status
+    from engines.paper.store import PaperStore
+
+    cfg = _cfg()
+    path = db or cfg.paper.database
+    store = PaperStore.open_existing(path)
+    if store is None or not store.has_books():
+        return (
+            f"NO BOOK: no paper book has been opened at {path}. `ask.py paper init` opens one "
+            "with the caps in config.toml [paper]; docs/22 explains what it is and is not."
+            + DISCLAIMER
+        )
+    with store:
+        text = _status(store, cfg, _feed(), fx_for(cfg)).render()
+    return text + DISCLAIMER
+
+
 def _parse_date(s: str) -> date:
     try:
         return date.fromisoformat(s)

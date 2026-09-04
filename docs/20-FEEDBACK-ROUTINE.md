@@ -44,6 +44,16 @@ write knowledge/feedback/<date>.md and <date>.json per the README
 uv run python ask.py watch                  (open monitor alerts go in Data quality)
 git add knowledge/feedback/<date>.md knowledge/feedback/<date>.json
 git commit; git push origin main            (or a branch + PR if main refuses)
+
+# phase 2 - the paper book (docs/22)
+FINPLANET_OFFLINE=1 uv run python ask.py paper status --json
+FINPLANET_OFFLINE=1 uv run python ask.py paper pack --date <today UTC> --write
+    -> knowledge/paper/<date>.pack.md
+read it and the last three paper pages; write knowledge/paper/<date>.md and .json
+FINPLANET_OFFLINE=1 uv run python ask.py paper decide --weights ... --thesis ... --horizon 21 --confidence ...
+    (refused by code if any cap is breached: record a smaller book or all-cash instead)
+git add knowledge/paper/<date>.md knowledge/paper/<date>.json data/paper.db data/learning.db
+git commit; git push origin main
 ```
 
 The pack is built by code and is not to be re-derived: returns come from the
@@ -107,9 +117,32 @@ Commit
    branch named claude/feedback-DAY and open a pull request titled
    "feedback: DAY" against main.
 
+Paper book (docs/22-PAPER-BOOK.md; the contract is knowledge/paper/README.md)
+7. `git pull --rebase origin main` (the collector marked the book at 21:15
+   UTC). Run `FINPLANET_OFFLINE=1 uv run python ask.py paper status --json`
+   and `... ask.py paper pack --date TODAY --write`, where TODAY is today's
+   date in UTC. Read the pack and the last three knowledge/paper/*.md pages.
+8. Write knowledge/paper/TODAY.md following knowledge/paper/TEMPLATE.md and
+   TODAY.json per the README. Every number is copied from the pack. Each
+   mistake is a falsifiable sentence naming a decision date and prediction
+   id. No advice verbs.
+9. Decide tomorrow's target book from the status page's FUNDABLE table and
+   the feedback page's evidence, inside the caps the status page prints:
+   `... ask.py paper decide --weights "MYX:5183=0.11,XNAS:NVDA=0.22"
+   --thesis "..." --horizon 21 --confidence 0.55`. A held name left out is an
+   exit; an all-cash decision is `--weights ""`. If the command is REFUSED,
+   copy its refusals into the page and record a smaller book or all-cash;
+   never soften a cap to get it accepted. In the observe weeks it is logged
+   and graded, not applied; decide anyway.
+10. `git add knowledge/paper/TODAY.md knowledge/paper/TODAY.json data/paper.db
+    data/learning.db`, commit "paper: TODAY", push to main (fallback branch
+    claude/paper-TODAY and a pull request titled "paper: TODAY").
+
 Report
-7. End with three lines: the page's path, the names whose unexplained share
-   was above 50%, and any source that failed. Nothing else.
+11. End with five lines: the feedback page's path, the names whose unexplained
+    share was above 50%, any source that failed, the paper book's equity
+    against the control, and the decision recorded (or the refusal). Nothing
+    else.
 ```
 
 ## Creating and changing the Routine
@@ -122,6 +155,9 @@ removes it. Nothing about it lives in GitHub — if it stops firing, the Actions
 side keeps collecting and the pages simply stop, which `ask.py watch`'s
 sweep-silence rule does not see. Check `knowledge/feedback/` has yesterday's
 page; that is the monitor.
+
+The paper book's half of the run, the caps and the phase calendar are in
+`docs/22-PAPER-BOOK.md`.
 
 ## What the page is not
 

@@ -83,8 +83,18 @@ server exposes `daily_digest`, `fact_snapshot`, `macro_context` and
 A nightly Claude Routine writes the *why did it move* page to
 `knowledge/feedback/`, which is indexed as `kb_lessons`.
 
+**A paper book is running** (`docs/22-PAPER-BOOK.md`): a hypothetical USD 1,000
+ledger opened 2026-09-08, marked from the cached bars at both closes by
+`collect.yml`, with target weights recorded nightly by the Routine inside
+code-enforced caps (25% per name, 20% cash floor, 8% stop, 8% drawdown halt,
+50% weekly turnover) and a passive equal-lot control beside it. It chooses
+weights among the nine names *you* listed in `[account] watchlist`; it does
+not search for names, and nothing in it can reach a broker. The thirteen-week
+record - hit rate, drawdown, cost drag, decided minus control - is the P16
+calibration evidence, not a return target.
+
 P16 is the paper-trade gate: 3–6 months of elapsed forward time, not unbuilt
-work. Its machinery exists and refuses to grade a prediction before its horizon.
+work; the paper book above is its instrument, and its review is at week 13. Its machinery exists and refuses to grade a prediction before its horizon.
 P18–P19 wait on P16. **If you are picking this up, start at
 [`docs/14-OPERATIONS-RUNBOOK.md`](docs/14-OPERATIONS-RUNBOOK.md).**
 

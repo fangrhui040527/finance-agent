@@ -162,6 +162,40 @@ pages. The nightly routine (docs/20) reasons over this file and copies its
 numbers; it never re-derives them. A name whose bars are absent is a `NO DATA`
 row, never a typed leg.
 
+### `paper` — the USD 1,000 paper book
+
+One subcommand, six actions. `docs/22-PAPER-BOOK.md` is the full account; this
+is the operator's card.
+
+```
+ask.py paper init   [--start YYYY-MM-DD]            open both books (once; append-only, no reset)
+ask.py paper status [--date D] [--json]             equity, positions, caps, the FUNDABLE table, cost drag
+ask.py paper decide --weights "MYX:5183=0.20,XNAS:NVDA=0.22" --thesis "..." [--horizon 21] [--confidence 0.55] [--dry-run] [--supersede]
+ask.py paper mark   [--slot bursa_close|us_close|manual|all]   apply pending targets at the next cached open, then mark
+ask.py paper pack   [--write] [--out knowledge/paper]          the deterministic half of the nightly paper journal
+ask.py paper grade  [--dry-run]                     grade paper predictions whose date has come, against the control
+```
+
+Exit codes: `0` done; `2` refused or nothing to do (a refusal lists every cap
+breached and writes nothing); `3` a leg could not be priced from the cache -
+the rest was still marked, and the problem is printed.
+
+Three things to know before the first decision. **The fundable table** on the
+status page is the universe: a name whose one board lot or single share costs
+more than the per-name cap is not fundable at this equity, and a weight below
+one lot is refused. **A decision is the whole target book**: a held name left
+out of `--weights` is an exit. **Nothing is priced at decision time**: targets
+apply at each market's first cached bar after the decision day, at the open
+plus slippage, with the real moomoo fee card and the recorded FX rate; the
+`us_close` mark is what the nightly routine reads. Run everything with
+`FINPLANET_OFFLINE=1` on a machine with no route to a price host; the cache
+`collect.yml` commits is the book's only source.
+
+The book lives in `data/paper.db`, append-only like every store here; `ask.py
+doctor` fails if its triggers are missing. To replay on a scratch path without
+touching the real book: `ask.py paper init --db /some/where/p.db --start
+2026-03-02`, then `mark`, `decide` and `mark` with `--date`.
+
 ### `digest` — the day's page, per name
 
 ```bash

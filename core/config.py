@@ -20,10 +20,12 @@ from __future__ import annotations
 
 import tomllib
 from dataclasses import dataclass
+from datetime import date
 from decimal import Decimal
 from pathlib import Path
 
 from core.provenance.ledger import DEFAULT_FX_MYR_PER_USD, DEFAULT_FX_SPREAD_PER_SIDE
+from engines.paper.settings import PaperSettings
 from engines.risk.concentration import Limits
 
 #: config.local.toml wins when present, so personal numbers stay out of git.
@@ -106,6 +108,51 @@ HARD_BOUNDS: tuple[tuple[str, float, float, str], ...] = (
         8_760,
         "silence detection beyond a year is not detection",
     ),
+    # The paper book (docs/22). Each of these is a ceiling or a floor the file
+    # may tighten and never loosen: the profile was agreed, and a config edit
+    # is not a re-agreement.
+    (
+        "paper.initial_cash_usd",
+        100.0,
+        100_000.0,
+        "a paper book outside USD 100-100,000 is a typo, not a decision",
+    ),
+    (
+        "paper.max_weight_per_name",
+        0.05,
+        0.25,
+        "above a quarter of the book one name is the book",
+    ),
+    (
+        "paper.min_names_when_invested",
+        2,
+        9,
+        "fewer than two names is not a book; more than the watchlist is impossible",
+    ),
+    ("paper.cash_floor", 0.20, 1.0, "the cash floor is the one number that never bends downward"),
+    (
+        "paper.stop_loss",
+        0.02,
+        0.08,
+        "a stop looser than 8% from cost is not the conservative profile",
+    ),
+    (
+        "paper.drawdown_halt",
+        0.02,
+        0.08,
+        "the halt line is the last guard; it cannot be moved past 8%",
+    ),
+    ("paper.weekly_turnover_cap", 0.0, 0.50, "above half the book a week the fees eat the quarter"),
+    ("paper.slippage_bps_xkls", 0, 100, "slippage above 100 bps is a model of a different market"),
+    ("paper.slippage_bps_xnas", 0, 100, "slippage above 100 bps is a model of a different market"),
+    (
+        "paper.observe_weeks",
+        2,
+        8,
+        "fewer than two observe weeks grades no prediction before money moves",
+    ),
+    ("paper.ramp_weeks", 0, 12, "a ramp longer than the quarter is not a ramp"),
+    ("paper.ramp_max_invested", 0.0, 0.40, "the ramp ceiling is half the full cap by agreement"),
     (
         "learning.min_graded_for_calibration",
         30,
@@ -251,6 +298,10 @@ class Config:
     #: which on GDELT means 38% of the corpus is in languages nobody on the
     #: book reads and none of which ever linked a Bursa name.
     languages: tuple[str, ...] = ()
+    #: The paper book (docs/22): a hypothetical USD ledger and its caps.
+    paper: PaperSettings = PaperSettings()
+    #: Drawdown from peak at which `ask.py watch` opens an alert on the paper book.
+    alert_paper_drawdown: Decimal = Decimal("0.08")
     source: str = "<defaults>"
 
     def describe(self) -> str:
@@ -515,6 +566,82 @@ def _get(data: dict, dotted: str, default):
     return node
 
 
+def _paper(data: dict) -> PaperSettings:
+    """The [paper] block. Unknown keys refused; the bounds already checked."""
+    section = data.get("paper", {}) or {}
+    defaults = PaperSettings()
+    known = {
+        "start_date",
+        "initial_cash_usd",
+        "database",
+        "max_weight_per_name",
+        "min_names_when_invested",
+        "cash_floor",
+        "stop_loss",
+        "drawdown_halt",
+        "weekly_turnover_cap",
+        "slippage_bps_xkls",
+        "slippage_bps_xnas",
+        "observe_weeks",
+        "ramp_weeks",
+        "ramp_max_invested",
+        "control_rebalance",
+    }
+    unknown = set(section) - known
+    if unknown:
+        raise ConfigError(
+            f"unknown [paper] keys {sorted(unknown)}. A misspelled cap here is silently "
+            "ignored, and the book runs on the default it was meant to tighten."
+        )
+
+    def num(key, default: Decimal) -> Decimal:
+        if key not in section:
+            return default
+        v = section[key]
+        if isinstance(v, bool) or not isinstance(v, (int, float, str)):
+            raise ConfigError(f"paper.{key} must be a number, got {type(v).__name__}")
+        return Decimal(str(v))
+
+    def whole(key, default: int) -> int:
+        if key not in section:
+            return default
+        v = section[key]
+        if isinstance(v, bool) or not isinstance(v, int):
+            raise ConfigError(f"paper.{key} must be a whole number, got {v!r}")
+        return int(v)
+
+    raw_start = section.get("start_date", defaults.start_date)
+    if isinstance(raw_start, date):
+        start = raw_start
+    else:
+        try:
+            start = date.fromisoformat(str(raw_start))
+        except ValueError:
+            raise ConfigError(f"paper.start_date must be YYYY-MM-DD, got {raw_start!r}") from None
+
+    cadence = str(section.get("control_rebalance", defaults.control_rebalance))
+    if cadence != "monthly":
+        raise ConfigError("paper.control_rebalance: only 'monthly' is implemented")
+
+    return PaperSettings(
+        start_date=start,
+        initial_cash_usd=num("initial_cash_usd", defaults.initial_cash_usd),
+        database=str(section.get("database", defaults.database)),
+        max_weight_per_name=num("max_weight_per_name", defaults.max_weight_per_name),
+        min_names_when_invested=whole("min_names_when_invested", defaults.min_names_when_invested),
+        cash_floor=num("cash_floor", defaults.cash_floor),
+        stop_loss=num("stop_loss", defaults.stop_loss),
+        drawdown_halt=num("drawdown_halt", defaults.drawdown_halt),
+        weekly_turnover_cap=num("weekly_turnover_cap", defaults.weekly_turnover_cap),
+        slippage_bps_xkls=whole("slippage_bps_xkls", defaults.slippage_bps_xkls),
+        slippage_bps_xnas=whole("slippage_bps_xnas", defaults.slippage_bps_xnas),
+        observe_weeks=whole("observe_weeks", defaults.observe_weeks),
+        ramp_weeks=whole("ramp_weeks", defaults.ramp_weeks),
+        ramp_max_invested=num("ramp_max_invested", defaults.ramp_max_invested),
+        control_rebalance=cadence,
+    )
+
+
 def _check_bounds(data: dict) -> None:
     for key, lo, hi, why in HARD_BOUNDS:
         value = _get(data, key, None)
@@ -666,5 +793,7 @@ def load(path: str | Path | None = None) -> Config:
         alert_sweep_silence_hours=_int("monitor.sweep_silence_hours", 0),
         capital=_capital(data),
         book=_book(data),
+        paper=_paper(data),
+        alert_paper_drawdown=dec("monitor.paper_drawdown", 0.08),
         source=source,
     )

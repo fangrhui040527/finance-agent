@@ -188,3 +188,114 @@ def registry_engine(registry):
     from core.guardrails.defaults import default_engine
 
     return default_engine(registry.allowlist())
+
+
+# --- the paper book ------------------------------------------------------------------
+#
+# A deterministic price world for the nine names and both proxies, weekdays
+# only, so the paper book's arithmetic can be asserted to the cent without the
+# cache (whose contents change every day the collector runs).
+
+PAPER_PRICES = {
+    "MYX:1155": 10.50,
+    "MYX:5347": 13.60,
+    "MYX:5183": 4.16,
+    "MYX:5225": 7.98,
+    "MYX:8869": 7.96,
+    "MYX:3182": 2.03,
+    "XNAS:NVDA": 224.0,
+    "XNAS:AAPL": 325.0,
+    "XNAS:MSFT": 497.0,
+    "MYX:0820EA": 1.82,
+    "XNAS:SPY": 765.0,
+}
+
+
+class SyntheticFeed:
+    """Bars with a tiny drift and a deterministic wobble; `shocks` adds a
+    return on one (name, day). `fetch` follows core.market.feed.PriceFeed."""
+
+    name = "synthetic"
+    source_used = "synthetic"
+
+    def __init__(self, first, last, prices=None, drift=0.0002, wobble=0.004, shocks=None):
+        import math
+        from datetime import timedelta
+
+        from core.market.prices import Bar
+
+        self.shocks = dict(shocks or {})
+        self.series: dict = {}
+        days = []
+        d = first
+        while d <= last:
+            if d.weekday() < 5:
+                days.append(d)
+            d += timedelta(days=1)
+        for iid, p0 in (prices or PAPER_PRICES).items():
+            close = float(p0)
+            k = sum(map(ord, iid))
+            bars = []
+            for i, day in enumerate(days):
+                r = drift + wobble * math.sin(i * 0.37 + k) + self.shocks.get((iid, day), 0.0)
+                open_ = close * (1 + r * 0.3)
+                close = close * (1 + r)
+                bars.append(
+                    Bar(
+                        day, open_, max(open_, close) * 1.002, min(open_, close) * 0.998, close, 1e6
+                    )
+                )
+            self.series[iid] = bars
+
+    def fetch(self, instrument_id, start=None, end=None):
+        from core.market.feed import PriceFeedError
+        from core.market.prices import PriceSeries
+
+        bars = self.series.get(instrument_id)
+        if bars is None:
+            raise PriceFeedError(f"{instrument_id}: not in the synthetic world")
+        sel = [
+            b for b in bars if (start is None or b.day >= start) and (end is None or b.day <= end)
+        ]
+        if not sel:
+            raise PriceFeedError(f"{instrument_id}: no bars in the window")
+        return PriceSeries(instrument_id, sel)
+
+
+@pytest.fixture
+def paper_env(tmp_path: Path):
+    """A config with the paper start pinned to a Monday, a synthetic feed, a
+    config-fallback FX rate of 4.0, a fresh ledger and a fresh prediction log."""
+    from dataclasses import replace
+    from datetime import date, timedelta
+    from decimal import Decimal
+    from types import SimpleNamespace
+
+    from agents.learning.store import LearningStore
+    from core.config import load
+    from engines.paper.fx import UsdMyr
+    from engines.paper.store import PaperStore
+
+    start = date(2026, 3, 2)
+    cfg = load(ROOT / "config.toml")
+    cfg = replace(
+        cfg,
+        paper=replace(cfg.paper, start_date=start, database=str(tmp_path / "paper.db")),
+        database=str(tmp_path / "learning.db"),
+    )
+    store = PaperStore(tmp_path / "paper.db")
+    store.init_books(cfg.paper, start)
+    learning = LearningStore(tmp_path / "learning.db")
+    env = SimpleNamespace(
+        cfg=cfg,
+        feed=SyntheticFeed(date(2025, 9, 1), date(2026, 7, 31)),
+        fx=UsdMyr(None, Decimal("4.0"), Decimal("0.005")),
+        store=store,
+        learning=learning,
+        start=start,
+        tmp=tmp_path,
+        week=lambda n, weekday=0: start + timedelta(days=7 * (n - 1) + weekday),
+    )
+    yield env
+    store.close()
+    learning.close()
