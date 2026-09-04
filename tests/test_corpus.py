@@ -778,3 +778,76 @@ def test_a_name_read_with_no_news_is_not_a_fault():
     import ask
 
     assert ask._mostly_failed([], [], [("Maybank", 0), ("Tenaga", 0)]) is False
+
+
+# --- rotation is per RUN, not per day ------------------------------------------------
+
+
+def test_the_days_slots_do_not_all_ask_in_the_same_order():
+    """The bug this closes, measured rather than imagined - with the old
+    behaviour asserted alongside so the difference is the test.
+
+    GDELT rate-limits a run progressively: nine sequential requests, quota gone
+    after about five, so the names that FAIL are the ones asked LAST. On
+    2026-09-04 the 13:01 sweep read positions 1-5 and failed 6, 7, 8 and 9.
+
+    The offset was `toordinal()`, so all four of the day's collection slots
+    asked in one identical order and starved one identical tail. Tenaga and
+    Petronas Chemicals failed in every run that day and looked like a problem
+    with those two companies; they were simply last in the queue, four times.
+    """
+    from datetime import UTC, datetime
+
+    from knowledge.sweep import _rotate, _rotation_offset
+
+    terms = (
+        "Apple",
+        "Genting",
+        "IHH",
+        "Maybank",
+        "Microsoft",
+        "NVIDIA",
+        "PetChem",
+        "PressMetal",
+        "Tenaga",
+    )
+    # the four real collection slots: bursa_close, us_preopen, us_close, weekly
+    slots = [
+        datetime(2026, 9, 4, h, m, tzinfo=UTC) for h, m in ((9, 20), (12, 30), (21, 15), (2, 0))
+    ]
+
+    was = {_rotate(terms, t.toordinal()) for t in slots}
+    assert len(was) == 1, "the old offset gave every slot the same order - that was the bug"
+
+    now = {_rotate(terms, _rotation_offset(t)) for t in slots}
+    assert len(now) > 1, "slots must not all share one order"
+
+
+def test_every_name_gets_an_early_position_across_a_day_of_slots():
+    """The property that matters for coverage: over a day, no name is always
+    last. Under the per-day offset, the tail was starved every single slot."""
+    from datetime import UTC, datetime, timedelta
+
+    from knowledge.sweep import _rotate, _rotation_offset
+
+    terms = tuple(f"n{i}" for i in range(9))
+    start = datetime(2026, 9, 4, 0, 0, tzinfo=UTC)
+    # the first three positions over 24 hourly slots
+    early = set()
+    for h in range(24):
+        early.update(_rotate(terms, _rotation_offset(start + timedelta(hours=h)))[:3])
+    assert early == set(terms), f"never asked early: {set(terms) - early}"
+
+
+def test_the_order_is_still_reproducible_from_the_start_time():
+    """A sweep you cannot replay is a sweep you cannot explain, so the offset
+    stays a pure function of when the run started."""
+    from datetime import UTC, datetime
+
+    from knowledge.sweep import _rotate, _rotation_offset
+
+    terms = ("a", "b", "c", "d")
+    t = datetime(2026, 9, 4, 13, 1, tzinfo=UTC)
+    assert _rotate(terms, _rotation_offset(t)) == _rotate(terms, _rotation_offset(t))
+    # stable within the bucket, so a retry seconds later replays the same order
+    assert _rotation_offset(t) == _rotation_offset(datetime(2026, 9, 4, 13, 1, 42, tzinfo=UTC))
