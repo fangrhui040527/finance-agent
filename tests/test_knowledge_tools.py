@@ -21,8 +21,14 @@ def filled(tmp_path, monkeypatch):
     """A config pointing at temporary, filled stores - so the tools read them."""
     corpus_db, facts_db = tmp_path / "c.db", tmp_path / "f.db"
     shipped = open("config.toml", encoding="utf-8").read()
-    cfg = shipped.replace('corpus_database = "data/corpus.db"', f'corpus_database = "{corpus_db}"')
-    cfg = cfg.replace('facts_database = "data/facts.db"', f'facts_database = "{facts_db}"')
+    # as_posix(): a Windows path's backslashes are escape sequences inside a
+    # TOML basic string, and sqlite reads forward slashes on every platform.
+    cfg = shipped.replace(
+        'corpus_database = "data/corpus.db"', f'corpus_database = "{corpus_db.as_posix()}"'
+    )
+    cfg = cfg.replace(
+        'facts_database = "data/facts.db"', f'facts_database = "{facts_db.as_posix()}"'
+    )
     path = tmp_path / "config.toml"
     path.write_text(cfg, encoding="utf-8")
     monkeypatch.setenv("FINPLANET_CONFIG", str(path))

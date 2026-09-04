@@ -84,6 +84,6 @@ def test_the_allowlist_has_not_rotted():
     for rel in ALLOWED_PATHS:
         path = ROOT / rel
         assert path.exists(), f"allowlisted {rel} no longer exists; remove the exemption"
-        assert FORBIDDEN.search(path.read_text()), (
+        assert FORBIDDEN.search(path.read_text(encoding="utf-8", errors="replace")), (
             f"{rel} no longer mentions a forbidden tool; it does not need an exemption"
         )

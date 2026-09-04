@@ -181,14 +181,27 @@ jobs:
           git commit -m "chore(corpus): the $(date -u +%Y-%m-%d) ${{ steps.slot.outputs.slot }} sweep [skip ci]"
           # Another slot may have pushed while this one ran; rebase our one
           # data commit onto it rather than fail the push.
-          git pull --rebase origin "${GITHUB_REF_NAME}" || true
+          # --autostash: the sweep leaves stores it did not stage (a cache file)
+          # modified in the tree, and a rebase refuses to start over them.
+          git pull --rebase --autostash origin "${GITHUB_REF_NAME}" || true
           git push
 
-      - name: Fail if a source failed
-        if: steps.sweep.outputs.code != '0' || (steps.fx.outcome != 'skipped' && steps.fx.outputs.code != '0')
+      # Exit 3 is "a source was degraded": part of the day was collected and
+      # committed, and the sweep said which names and why. That is a warning
+      # on the run, not a failed job - a job that is red every day GDELT
+      # times out on one name trains the operator to ignore red, which is
+      # the one thing this signal must never do. `ask.py watch` reads the
+      # sweeps and pulls tables for the same fact. Exit 2 (could not run) and
+      # an fx failure stay failures: nothing was collected, or the rate is
+      # missing.
+      - name: Warn if a source was degraded
+        if: steps.sweep.outputs.code == '3'
+        run: |
+          echo "::warning title=sweep degraded::a source failed or was degraded; see the sweeps table in data/corpus.db and the pulls table in data/facts.db, or the summary above"
+
+      - name: Fail if the sweep could not run
+        if: (steps.sweep.outputs.code != '0' && steps.sweep.outputs.code != '3') || (steps.fx.outcome != 'skipped' && steps.fx.outputs.code != '0')
         run: |
           echo "sweep exited ${{ steps.sweep.outputs.code }}, fx exited ${{ steps.fx.outputs.code || 'n/a' }}"
           echo "  2 = could not run (config, slot or adapter)"
-          echo "  3 = a source failed or was degraded; see the sweeps table in data/corpus.db"
-          echo "      and the pulls table in data/facts.db"
           exit 1

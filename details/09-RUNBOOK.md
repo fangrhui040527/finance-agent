@@ -324,8 +324,14 @@ Three things about it that are deliberate:
 
 - **It reads the exit codes instead of flattening them.** Exit 3 still commits,
   because a failed sweep that leaves no trace is indistinguishable from a quiet
-  day — the whole reason the `sweeps` table exists — and then fails the job so a
-  person looks.
+  day — the whole reason the `sweeps` table exists — and then annotates the run
+  with a warning naming the degraded source. It does not fail the job: GDELT
+  times out on one name most days, and a job that is red most days is a job
+  nobody reads, which is the failure the `bnm_press` note above describes.
+  Exit 2 (the sweep could not run at all) and a failed FX pull still fail it,
+  because then nothing was collected. `ask.py watch` reads the same `sweeps`
+  and `pulls` tables, so a degraded source is still reported where the
+  monitor looks.
 - **It is the only workflow here with `contents: write`.** `ci.yml` is
   `contents: read`. The data commit carries `[skip ci]`, because ten test jobs to
   validate a row of news is waste.
