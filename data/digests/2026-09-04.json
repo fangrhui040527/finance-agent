@@ -1,0 +1,598 @@
+{
+  "collection": [
+    {
+      "at": "2026-09-04T06:29:11.456355+00:00",
+      "detail": "skipped: fred needs FRED_API_KEY, which is not set. Add it to .env or as a GitHub Actions secret of the same name; until then this source is skipped.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "fred",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-04T06:29:11.455635+00:00",
+      "detail": "skipped: alphavantage_news needs ALPHAVANTAGE_API_KEY, which is not set. Add it to .env or as a GitHub Actions secret of the same name; until then this source is skipped.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "alphavantage_news",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-04T06:29:11.454915+00:00",
+      "detail": "skipped: fmp needs FMP_API_KEY, which is not set. Add it to .env or as a GitHub Actions secret of the same name; until then this source is skipped.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "fmp",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-04T06:29:11.454150+00:00",
+      "detail": "skipped: finnhub needs FINNHUB_API_KEY, which is not set. Add it to .env or as a GitHub Actions secret of the same name; until then this source is skipped.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "finnhub",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-04T06:29:11.453359+00:00",
+      "detail": "facts 36; ",
+      "fetched": 36,
+      "kept": 0,
+      "source": "dosm_cpi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-04T06:29:08.990794+00:00",
+      "detail": "facts 10; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-04T06:29:06.940777+00:00",
+      "detail": "facts 2; ",
+      "fetched": 2,
+      "kept": 0,
+      "source": "edgar",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-04T06:29:06.744362+00:00",
+      "detail": "read but empty: Maybank, Tenaga, Petronas Chemicals, IHH, Press Metal, Genting",
+      "fetched": 51,
+      "kept": 51,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 43
+    },
+    {
+      "at": "2026-09-04T06:29:04.638162+00:00",
+      "detail": "",
+      "fetched": 99,
+      "kept": 95,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 91
+    },
+    {
+      "at": "2026-09-04T06:29:01.780447+00:00",
+      "detail": "read but empty: Press Metal; failed: Tenaga, Petronas Chemicals, IHH, Genting, Apple, Microsoft",
+      "fetched": 29,
+      "kept": 19,
+      "source": "gdelt",
+      "status": "ok",
+      "stored": 19
+    },
+    {
+      "at": "2026-09-04T03:27:57.004168+00:00",
+      "detail": "failed: Apple, Genting, IHH Healthcare, Microsoft, NVIDIA, Petronas Chemicals, Press Metal, Tenaga",
+      "fetched": 1,
+      "kept": 1,
+      "source": "gdelt",
+      "status": "ok",
+      "stored": 1
+    },
+    {
+      "at": "2026-09-04T02:07:08.432521+00:00",
+      "detail": "bnm_press returned unparseable XML (not well-formed (invalid token): line 123, column 77): an HTML page, not a feed (and it advertises none): '<!DOCTYPE html> <html class=\"ltr\" dir=\" lang.dir\" lang=\"en-US\"> <head> <title>Home - Bank Negara Malaysia</title> <meta content=\"initial-scale=1.0, width=device-width\" name=\"viewport\" /> <meta content'",
+      "fetched": 0,
+      "kept": 0,
+      "source": "bnm_press",
+      "status": "failed",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-04T02:07:07.634519+00:00",
+      "detail": "failed: Apple, Genting, IHH Healthcare, Maybank, Petronas Chemicals, Press Metal, Tenaga",
+      "fetched": 54,
+      "kept": 36,
+      "source": "gdelt",
+      "status": "ok",
+      "stored": 18
+    },
+    {
+      "at": "2026-09-04T01:46:22.787437+00:00",
+      "detail": "",
+      "fetched": 0,
+      "kept": 0,
+      "source": "bnm_press",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-04T01:46:22.333306+00:00",
+      "detail": "failed: Apple, Genting, IHH Healthcare, Maybank, NVIDIA, Petronas Chemicals, Press Metal, Tenaga",
+      "fetched": 27,
+      "kept": 19,
+      "source": "gdelt",
+      "status": "ok",
+      "stored": 17
+    }
+  ],
+  "counts": {
+    "articles": 502,
+    "documents": 0,
+    "escalated": 104,
+    "events": 2,
+    "failed_sweeps": 13,
+    "linked": 202,
+    "observations": 0,
+    "series": 2,
+    "sweeps": 33
+  },
+  "day": "2026-09-04",
+  "generated_at": "2026-09-04 06:29 UTC",
+  "macro": [
+    {
+      "change": "0",
+      "obs_date": "2026-09-03",
+      "series_id": "BNM:OPR",
+      "source": "bnm_opr",
+      "title": "BNM Overnight Policy Rate, %",
+      "value": "2.75"
+    }
+  ],
+  "names": [
+    {
+      "escalated": 3,
+      "events": [],
+      "instrument_id": "MYX:1155",
+      "label": "Maybank",
+      "snapshot": [],
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE4tcGgxTHNIYnhqNkdSVmtXZE1qRHYteGRWbDdlV3k4ZUZ0S2hPTHVNU2x5TjlEcC1PcnduaXg0dThTdmctbmQ1TzV3bHZKUU1Y?oc=5",
+          "domain": "theedgemalaysia.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-04T03:21:39+00:00",
+          "quality": 0.8,
+          "title": "Corporate Malaysia could face tougher second-half, Maybank IB cautions",
+          "uncertainty": 1.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMipAFBVV95cUxNS0dhYzRFVjE1dElkYXpYb2RQOTJWZGdKNVJEUVk1NVJhQl80OC1NbmEyXzdBbkZ4X0Ridko2M2V5dk5OWGZwenNiUXl6OGh2R1JoanMtTzdtTkNPN3BKZnlIUmdxUlEzQmt6cFNMUl9LZEl5dlUxM0FzX1pMRVdtZjZfS0xxYWZtSWRZZGlYcUhpMTNWN1hnTkswN3FVaEJOT0VabQ?oc=5",
+          "domain": "www.minichart.com.sg",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-09-04T02:02:00+00:00",
+          "quality": 0.65,
+          "title": "Maybank Keeps BUY on ISOTeam, Cuts TP to S$0.09 After FY26 Miss",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMilAFBVV95cUxNVnpBOHZ4V0hhYW1VUlNHWWU1dGRqUVhxci1XeGEwaGFIQVk0UFM5QkFwaFJKcTY2TDlsYUhXWWdqMy1RalBKbk5iLUtLbUs2YWZqWHp3M2FsT2xKY2h2YWNKSGJob2lBVWNwYmFNay1Mc0ZGUmRUdmdIX01EcDlBVm5HODJydk9vWlRhZkttVXVuVGxi?oc=5",
+          "domain": "sbr.com.sg",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-03T22:35:59+00:00",
+          "quality": 0.65,
+          "title": "Maybank keeps Singtel at buy on credible FY2030 roadmap",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 3,
+        "polarity_mean": -0.333,
+        "sources": 3,
+        "uncertainty_mean": 0.333
+      },
+      "upcoming": []
+    },
+    {
+      "escalated": 0,
+      "events": [],
+      "instrument_id": "MYX:5347",
+      "label": "Tenaga",
+      "snapshot": [],
+      "stories": [],
+      "tone": {},
+      "upcoming": []
+    },
+    {
+      "escalated": 0,
+      "events": [],
+      "instrument_id": "MYX:5183",
+      "label": "Petronas Chemicals",
+      "snapshot": [],
+      "stories": [],
+      "tone": {},
+      "upcoming": []
+    },
+    {
+      "escalated": 1,
+      "events": [],
+      "instrument_id": "MYX:5225",
+      "label": "IHH",
+      "snapshot": [],
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMixAFBVV95cUxQbW8tNmNtYTZ3c2V1ZXFpWTVqTndQVlE0X3JqeUwtTklQeDdDV01QRDdfZWN3bVlVNktiNHJFbVpzc2dyZ3RvR3EzbTJDN19zd2YyVUVhLXZzRmliTG5vQlc2eHV2X3ZLaW9MTTdid0hRajZ0c0RhT1ZJSEpUVHBkd2NLck82X0NNemtwSEp6ajlCdmtMTFVaa0RhM0Y5eXFZTGVmanROdjdtU1RSWjMxYV82Q25FTEZ0N21nZ1lfb19YVE1z?oc=5",
+          "domain": "www.theedgesingapore.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-04T03:10:00+00:00",
+          "quality": 0.65,
+          "title": "IHH Healthcare\u2019s growth outlook maintained; Singapore operations poised for turnaround",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 1.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
+      "upcoming": []
+    },
+    {
+      "escalated": 0,
+      "events": [],
+      "instrument_id": "MYX:8869",
+      "label": "Press Metal",
+      "snapshot": [],
+      "stories": [],
+      "tone": {},
+      "upcoming": []
+    },
+    {
+      "escalated": 0,
+      "events": [],
+      "instrument_id": "MYX:3182",
+      "label": "Genting",
+      "snapshot": [],
+      "stories": [],
+      "tone": {},
+      "upcoming": []
+    },
+    {
+      "escalated": 34,
+      "events": [],
+      "instrument_id": "XNAS:NVDA",
+      "label": "NVIDIA",
+      "snapshot": [],
+      "stories": [
+        {
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/nvidia-nvda-hugging-face-deal-011913536.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-04T01:19:13+00:00",
+          "quality": 1.0,
+          "title": "NVIDIA (NVDA)\u2019s Hugging Face Deal Tests the Next Phase of its AI Strategy",
+          "uncertainty": 0.17123287671232876
+        },
+        {
+          "doc_id": "https://247wallst.com/personal-finance/2026/09/03/nvidia-made-a-57-year-old-oregon-couple-rich-now-one-stock-is-the-biggest-risk-to-their-retirement/?.tsrc=rss",
+          "domain": "247wallst.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-04T00:50:44+00:00",
+          "quality": 0.85,
+          "title": "Nvidia Made a 57-Year-Old Oregon Couple Rich. Now One Stock Is the Biggest Risk to Their Retirement",
+          "uncertainty": 0.35211267605633806
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMilAFBVV95cUxQTWxJS01CY1A4VlhIWXgyNFNwQ296MDQtM3VkYTFpWEhacWtVRmhvUDE2RlFPX09HNXJCXzJIbVdzaU9OMmNQOGxNQ0pWLThIUkJoMlFPekVFZm1fLWxyLVlYMlRHQzB1SFJkYTBPTEJVd3o3clBQaEtiMjJBN0M0TzlyVHNyU20wU3VSeVZJbjF5YjR3?oc=5",
+          "domain": "www.wsj.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-04T05:26:38+00:00",
+          "quality": 0.8,
+          "title": "SB Energy Files for IPO With Nvidia Backing",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "gdelt:https://finance.yahoo.com/markets/stocks/articles/nvidia-ceo-jensen-huang-says-170607027.html",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-04T04:45:00+00:00",
+          "quality": 0.8,
+          "title": "Nvidia CEO Jensen Huang Says His $3.5 Billion MediaTek Deal Is Not Circular Because They Do Their Own Business",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMicEFVX3lxTE9sR3RKMklodk8zSC15bzctTVlPMUlaU3RKUmh1NFdhRnJBbEY3SVdkbmxlTk5uTVRyTkdZYjNoYlBQbTEtLWdwQTNaQmltQ3JtS3RDTk9FRzg4MVRFQnN3RE1JVlFVMUJhVlZFd1p6OUE?oc=5",
+          "domain": "www.wsj.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-03T23:13:30+00:00",
+          "quality": 0.8,
+          "title": "Nvidia\u2019s Victory Lap, Software Rallies and Huang Rebuts Gates | Markets P.M. for August 27",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMimAFBVV95cUxNRmh6VElOdkR2VnBTMUpuenpYMEhTRTQ0azZlOUQ2YTd3TXkzOXlJRVZYOXNiM2IyY2dueEJ2Q2M5MW5oQ1ZudVI3eWI4WXUwSHlVUGthbFJPRGhHNnFXaVF1ejg4dWJRaUI5aFNuN2JDUk5mY1pIT1dnOE5VWWoyUUxGWFlvbWw0QmRJOUdDa3lWU3J3WThlOQ?oc=5",
+          "domain": "seekingalpha.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-03T23:03:33+00:00",
+          "quality": 0.8,
+          "title": "Nvidia: The Market Will Come To Its Senses Eventually (NASDAQ:NVDA)",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMirgFBVV95cUxPSktMTEFzVUpJM09CZGMxcnEtMVJHTElxMllESE9QbHdMbjl4MmQ2TjJvSjRXY1Q3RUVmNGMxQ2xIMTVtOWhnVHYyWGluNmNDektRcVloUmZfTmdWMDJyMFRrTjZHYzl6aUYyd1JYM3hQenBmeFJ1N3FleW01SF9HeFVSZ3oxMlBsS3BrcHZiblZBWTNSWDQyMzdSWGMwMnJ3NnNTbG14R3FTb1BUdGc?oc=5",
+          "domain": "www.reuters.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-03T22:24:47+00:00",
+          "quality": 0.8,
+          "title": "Nvidia bets $13 billion on open AI models with Hugging Face deal",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMitwFBVV95cUxORlJQN0xpSTljX0Zrd2hnQ3JMZWotUDFHV0RNbTRyYVFCQTBlVmtFVFpYbkY4REFNZVJVNnJiNDhRU2RRLVg5RmVsS3pJeGpoRmR3d1ZiTUVGU3lJT0NjV29VMlB1alR1YWJZZkVUTy1GWlp4VWhZUTQtaVhLaDVueGVMZUUyZ21kVG5EbkNKNWl0YS1xUmh0STBrQk5GNHV3VzJPNktEOUotVGpuSFpSVkpEUjhweGs?oc=5",
+          "domain": "www.marketwatch.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-03T21:34:00+00:00",
+          "quality": 0.8,
+          "title": "Here\u2019s what Nvidia\u2019s $13 billion Hugging Face deal means for the world of AI",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.333,
+        "n": 51,
+        "polarity_mean": 0.039,
+        "sources": 28,
+        "uncertainty_mean": 0.089
+      },
+      "upcoming": []
+    },
+    {
+      "escalated": 26,
+      "events": [],
+      "instrument_id": "XNAS:AAPL",
+      "label": "Apple",
+      "snapshot": [],
+      "stories": [
+        {
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/dan-ives-says-m-missing-220219429.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-03T22:02:19+00:00",
+          "quality": 1.0,
+          "title": "Dan Ives Says M&A Is the \u2018Missing Piece\u2019 for Apple in AI Arms Race \u2014 New CEO John Ternus Could Finally Shake Up Tim Cook\u2019s Playbook",
+          "uncertainty": 0.3676470588235294
+        },
+        {
+          "doc_id": "https://finance.yahoo.com/m/77efd63f-8b71-3de8-99c6-d2999eccae38/top-funds-sink-their-teeth.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-03T20:24:15+00:00",
+          "quality": 1.0,
+          "title": "Top Funds Sink Their Teeth Into Apple Stock. Sweet Breakout Ahead?",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/apple-aapl-faces-mixed-outlook-182923490.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-03T18:29:23+00:00",
+          "quality": 1.0,
+          "title": "Apple (AAPL) Faces Mixed Outlook Ahead of Foldable iPhone Launch",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://finance.yahoo.com/media-advertising/articles/apple-faces-2-bn-lawsuit-174755792.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-09-03T17:47:55+00:00",
+          "quality": 1.0,
+          "title": "Apple faces \u00a32 bn lawsuit in UK over app privacy feature",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://finance.yahoo.com/healthcare/articles/stryker-launches-fda-cleared-apple-173700748.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-03T17:37:00+00:00",
+          "quality": 1.0,
+          "title": "Stryker Launches FDA-Cleared Apple Vision Pro Surgical App",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://beincrypto.com/iphone-18-pro-price-memory-costs/?.tsrc=rss",
+          "domain": "beincrypto.com",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "polarity": 0.0,
+          "published_at": "2026-09-04T04:37:58+00:00",
+          "quality": 0.85,
+          "title": "Apple's Memory Costs Jump 400%, iPhone 18 Pro Price May Rise $100",
+          "uncertainty": 0.5208333333333334
+        },
+        {
+          "doc_id": "https://www.trefis.com/articles/614217/what-happens-to-qualcomm-stock-if-the-new-revenue-earns-less/2026-09-03?.tsrc=rss",
+          "domain": "www.trefis.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-03T20:43:05+00:00",
+          "quality": 0.85,
+          "title": "What Happens To Qualcomm Stock If The New Revenue Earns Less?",
+          "uncertainty": 0.1984126984126984
+        },
+        {
+          "doc_id": "https://247wallst.com/investing/2026/09/03/apple-is-late-to-ai-that-could-be-its-biggest-opportunity/?.tsrc=rss",
+          "domain": "247wallst.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-03T15:00:58+00:00",
+          "quality": 0.85,
+          "title": "Apple Is Late to AI. That Could Be Its Biggest Opportunity",
+          "uncertainty": 0.45454545454545453
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.333,
+        "n": 35,
+        "polarity_mean": 0.171,
+        "sources": 22,
+        "uncertainty_mean": 0.08
+      },
+      "upcoming": []
+    },
+    {
+      "escalated": 23,
+      "events": [],
+      "instrument_id": "XNAS:MSFT",
+      "label": "Microsoft",
+      "snapshot": [],
+      "stories": [
+        {
+          "doc_id": "https://finance.yahoo.com/m/7ff4ce56-f96f-3bf3-8230-beb40876f886/microsoft-ceo-nadella-sells.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-03T19:33:00+00:00",
+          "quality": 1.0,
+          "title": "Microsoft CEO Nadella Sells $43 Million of Stock",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMijgFBVV95cUxNcmFINFFweGctazNoVUpFajBaUW5kQ3JZV1poSnM2Y09VSjM5MV9BWVRzX1F5UjdxWGhNdWRYcE53UnVQVHg5UDVuOTMtNHByVUNWQTlSYWxFbGctR2xMaHhEdUU4LXgxMWR4NkRXTW4tMklxUHlxS2MtTGw5RjZnVnJPZ3EyTHlmQlVVM0hn?oc=5",
+          "domain": "seekingalpha.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-04T06:11:57+00:00",
+          "quality": 0.8,
+          "title": "Microsoft Has Proven That An ROI Is Possible (NASDAQ:MSFT)",
+          "uncertainty": 1.0
+        },
+        {
+          "doc_id": "https://finance.yahoo.com/technology/articles/market-chatter-crusoe-raises-over-235307430.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-03T23:53:07+00:00",
+          "quality": 0.8,
+          "title": "Market Chatter: Crusoe Raises Over $3 Billion At $30 Billion Valuation",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMikwFBVV95cUxQUVRuYkNEMWFsdUh5bDBjbTUwa3pyMVhxQWQ5WEF4SDd4M24wR2FyZzhIclVMakRvTDdnZURNQzZ1MjhRQ05WeGxneklQSV93RHRnTjZmSV83eDYtZ2stZmg4SnhrU2gwcnNoNVVKdlNaSzkydVlRenhlZGxZSTlZYzdKU0N0SGQ0N080VUd6ZFE0QTA?oc=5",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-03T20:13:00+00:00",
+          "quality": 0.8,
+          "title": "Amazon vs. Microsoft: 1 Key Metric Identifies the Superior Artificial Intelligence (AI) Cloud Stock",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMikwFBVV95cUxQelFpQjRocmkydGMyeFZjQnhBVEFfdmhkb0xMX2Jma1RJa3NvQ1RFSVpyOE5HTmtWeU9BcnN6bjh6OUhoa1VSNzMxT2VHczB6YVNTZkI2VTY3QmVfRVR4OHdNUjFaTkNNV0VjMHRLV3JMb1NqNUwwUHl5bjF4WjRQVWNsdXphMks3NFhScGRTOXNnS2M?oc=5",
+          "domain": "seekingalpha.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-03T18:20:27+00:00",
+          "quality": 0.8,
+          "title": "Microsoft putting limits on Xbox cloud gaming hours (MSFT:NASDAQ)",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMinAFBVV95cUxOYW1ZMnFmUW1rY0s5REw3UzBzdXNRbVBRVEJzQ1U2UHNuRlV0MHVXb0ZvSl9RMl9vMWhRTFU2ZUg0MGFoQ195NFJibmw4NUlCXzl5Q3lreWE5YTBWcGJ5LVQwbW92TzNRem1VU2JRczhTVFBKWGhsblFRaDl3N1NRYjBnU3dVS1E0SWpnc3dkZTlURDBQSWFHVFUxUVA?oc=5",
+          "domain": "seekingalpha.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-03T18:04:50+00:00",
+          "quality": 0.8,
+          "title": "Microsoft: Doing The Opposite Of The Market Really Paid Off Here (NASDAQ:MSFT)",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMisAFBVV95cUxNUksyMmktaEtnNlVGNUQ2SjVIb0JDWXJadEV4SGh1S0c5LWRPN1pESVlVWWt4R25hNnhFdXh1RDVLNXpreS1uems3cXhZLXR0eXJWelM3S1ZRSWlnYXg0SzRwVEF2enlSOE5xNm93eUw2RGdtUi1SUVIzT1pNRGdDR0RGMlBfa2pmOW9QQVVTRnV4ZnRZa0RxUmExSl9jV3BpcHVUTlBaRWJlTXVxb2pJTw?oc=5",
+          "domain": "www.cnbc.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-03T16:39:37+00:00",
+          "quality": 0.8,
+          "title": "Cramer says Microsoft's improved cloud transparency is a win for investors",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMif0FVX3lxTFBySmRqcFZ4YTUwQ2w0a3VqNTlpYmZXS0sxNkxFb0RBd2drcUFHMnN4clpyUHpvNVRiTXVoWWY2bnU0RnV3cG9nUGZtc3pTOW5OZC1TZEtKcHpEa3NqS0ZZaGxndlZqYXpkRUl6MkExdmM3THJpLW1xQlpCV1QxUkk?oc=5",
+          "domain": "www.barrons.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-03T15:39:00+00:00",
+          "quality": 0.8,
+          "title": "Microsoft, Amazon and 8 More Stocks Set to Win in a $26 Trillion AI Market",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.333,
+        "n": 35,
+        "polarity_mean": 0.086,
+        "sources": 19,
+        "uncertainty_mean": 0.066
+      },
+      "upcoming": []
+    }
+  ],
+  "slot": "all"
+}
