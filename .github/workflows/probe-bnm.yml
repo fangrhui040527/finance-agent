@@ -1,9 +1,9 @@
 # TEMPORARY. Deleted before this branch merges.
 #
-# Round 1 found the feeds: bnm.gov.my is Liferay, and its feeds are
-# AssetPublisher portlet resource URLs (p_p_resource_id=getRSS), which is why
-# every guessed path 404s. Round 2 confirms they return XML, and whether the
-# URL survives dropping the two ajax params.
+# Round 2 found the linked press-release feed returns real XML - and that its
+# items are from SEPTEMBER 2020. The page it hangs off is /press-release-2020,
+# an ARCHIVE. The /rss landing page links the archive, not the live feed.
+# Round 3 looks for the current listing page and the portlet id on it.
 name: probe-bnm
 
 on:
@@ -16,62 +16,51 @@ permissions:
 jobs:
   probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 6
     steps:
-      - name: Do the linked feeds actually return XML
+      - name: Find the CURRENT press-release page and its feed
         run: |
           python3 - <<'PY'
           import re, urllib.error, urllib.request
 
           UA = {"User-Agent": "Mozilla/5.0 (compatible; finplanet-probe/0.1)"}
           BASE = "https://www.bnm.gov.my"
-          PR = "com_liferay_asset_publisher_web_portlet_AssetPublisherPortlet_INSTANCE_ZHckDJtILsio"
 
-          FEEDS = {
-            "press-release FULL (as linked)":
-              f"{BASE}/press-release-2020?p_p_id={PR}&p_p_lifecycle=2&p_p_state=normal"
-              f"&p_p_mode=view&p_p_resource_id=getRSS&p_p_cacheability=cacheLevelPage"
-              f"&_{PR}_currentURL=%2Fpress-release-2020&_{PR}_portletAjaxable=true",
-            "press-release MINIMAL (ajax params dropped)":
-              f"{BASE}/press-release-2020?p_p_id={PR}&p_p_lifecycle=2&p_p_state=normal"
-              f"&p_p_mode=view&p_p_resource_id=getRSS&p_p_cacheability=cacheLevelPage",
-            "notices-announcements":
-              f"{BASE}/notices-announcements?p_p_id=com_liferay_asset_publisher_web_portlet_"
-              f"AssetPublisherPortlet_INSTANCE_XRQ5HftX94WW&p_p_lifecycle=2&p_p_state=normal"
-              f"&p_p_mode=view&p_p_resource_id=getRSS&p_p_cacheability=cacheLevelPage",
-            "speeches-interviews":
-              f"{BASE}/speeches-interviews?p_p_id=com_liferay_asset_publisher_web_portlet_"
-              f"AssetPublisherPortlet_INSTANCE_Jq1pQjJONpF7&p_p_lifecycle=2&p_p_state=normal"
-              f"&p_p_mode=view&p_p_resource_id=getRSS&p_p_cacheability=cacheLevelPage",
-          }
+          PAGES = [
+              "/press-release", "/press-releases", "/publications/press-release",
+              "/announcements", "/notices-announcements", "/press-release-2026",
+              "/press-release-2025", "/media-releases", "/news",
+          ]
 
-          for label, url in FEEDS.items():
-              print("=" * 70)
-              print(label)
-              print(url)
+          def fetch(url):
+              req = urllib.request.Request(url, headers=UA)
+              with urllib.request.urlopen(req, timeout=45) as r:
+                  return r.status, r.headers.get("Content-Type", ""), r.read()
+
+          for path in PAGES:
+              url = BASE + path
               try:
-                  req = urllib.request.Request(url, headers=UA)
-                  with urllib.request.urlopen(req, timeout=45) as r:
-                      ctype = r.headers.get("Content-Type", "")
-                      body = r.read()
+                  status, ctype, body = fetch(url)
               except urllib.error.HTTPError as e:
-                  print(f"  HTTP {e.code}")
+                  print(f"{e.code:>4}  {path}")
                   continue
               except Exception as e:
-                  print(f"  {type(e).__name__}: {e}")
+                  print(f"   -  {path}  {type(e).__name__}")
                   continue
-
               text = body.decode("utf-8", "replace")
-              is_xml = text.lstrip().startswith(("<?xml", "<rss", "<feed"))
-              items = len(re.findall(r"<item[\s>]", text, re.I)) or len(
-                  re.findall(r"<entry[\s>]", text, re.I))
-              print(f"  HTTP 200  {ctype}  {len(body)} bytes  "
-                    f"{'XML' if is_xml else 'NOT XML'}  items={items}")
-              titles = re.findall(r"<title>(.*?)</title>", text, re.S | re.I)[:4]
-              for t in titles:
-                  t = re.sub(r"<!\[CDATA\[|\]\]>", "", t).strip().replace("\n", " ")
-                  print(f"    - {t[:110]}")
-              dates = re.findall(r"<pubDate>(.*?)</pubDate>", text, re.I)[:2]
-              for d in dates:
-                  print(f"    date: {d.strip()}")
+              rss = sorted(set(re.findall(r'href="([^"]*getRSS[^"]*)"', text, re.I)))
+              ids = sorted(set(re.findall(r'AssetPublisherPortlet_INSTANCE_([A-Za-z0-9]+)', text)))
+              print(f"{status:>4}  {path:<28} {len(body):>7}b  getRSS_links={len(rss)}  portlet_ids={ids[:4]}")
+              for r_ in rss:
+                  print("        ", r_.replace("&amp;", "&")[:220])
+
+          print("\n" + "=" * 70)
+          print("Does the 2020 feed carry dates at all, and how fresh is item 1?")
+          PR = "com_liferay_asset_publisher_web_portlet_AssetPublisherPortlet_INSTANCE_ZHckDJtILsio"
+          url = (f"{BASE}/press-release-2020?p_p_id={PR}&p_p_lifecycle=2&p_p_state=normal"
+                 f"&p_p_mode=view&p_p_resource_id=getRSS&p_p_cacheability=cacheLevelPage")
+          _, _, body = fetch(url)
+          text = body.decode("utf-8", "replace")
+          first = re.search(r"<item[\s>].*?</item>", text, re.S | re.I)
+          print(first.group(0)[:900] if first else "no <item> found")
           PY
