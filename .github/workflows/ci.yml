@@ -4,18 +4,43 @@
 # happen on every push rather than only when someone runs it by hand.
 #
 # Runs on ubuntu AND windows. The dev machine is Windows; two tests failed there
-# for weeks while this file only ever ran on Linux.
+# for weeks while this file only ever ran on Linux. That coverage is kept - see
+# the matrix below for WHEN it runs.
+#
+# WHAT THIS COSTS, because it stopped being free. This is a private repository,
+# so Actions bills against a monthly allowance and windows runners bill at TWICE
+# the linux rate. On 2026-09-04 the allowance ran out mid-session and every job
+# - collect included - began failing in under ten seconds with no runner. The
+# daily sweep is not what spent it: that is about five linux minutes a day. CI
+# was, and mostly on work it had already done:
+#
+#   * `branches: ["**"]` plus `pull_request` ran the FULL matrix twice on every
+#     commit of every branch with a PR open - once for the push, once for the
+#     pull_request event, on the same SHA. Half of every run was duplicate.
+#   * windows was two thirds of the bill of each of those.
+#
+# So: pull requests get everything, because that is the gate that decides what
+# reaches main. Pushes to main get a linux smoke check - the content was already
+# tested as a PR. Branch pushes get nothing until a PR opens, which is when the
+# result would first be worth reading.
 name: ci
 
 on:
   push:
-    branches: ["**"]
+    # main only. A branch push with a PR open is already covered by the
+    # pull_request event below, and one without a PR open has no reader yet.
+    branches: [main]
   pull_request:
   # A workflow you cannot fire by hand is a workflow you cannot recover. Added
   # after a push produced no run at all - not queued, not slow, no run object -
   # with no way to retry it short of an empty commit, which is worse than the
   # missing check it would paper over.
   workflow_dispatch:
+    inputs:
+      windows:
+        description: "include the windows half of the matrix"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -29,7 +54,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        # Windows on pull requests, where it guards what reaches main, and on
+        # demand. NOT on every push to every branch, which is what it used to
+        # mean and what made a windows-only bug cost four runs to find rather
+        # than one. Dropping it here does not weaken the gate: nothing reaches
+        # main without a pull request, and the pull request runs it.
+        os: >-
+          ${{ (github.event_name == 'pull_request' || inputs.windows)
+              && fromJSON('["ubuntu-latest", "windows-latest"]')
+              || fromJSON('["ubuntu-latest"]') }}
         python: ["3.11", "3.12"]
     runs-on: ${{ matrix.os }}
     defaults:

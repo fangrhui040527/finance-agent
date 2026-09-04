@@ -815,6 +815,29 @@ def _rotate(terms, day: int):
     return tuple(terms[n:]) + tuple(terms[:n])
 
 
+def _mostly_failed(failed, skipped, counts) -> bool:
+    """True when more than half the names could not be read at all.
+
+    The sweep used to exit 0 whenever ANY name came back, which made a badly
+    degraded day indistinguishable from a good one: on 2026-09-04 eight of nine
+    companies failed, one article was stored, and the job reported success. The
+    failures were in the sweeps table, but a green check nobody has reason to
+    open is not a report.
+
+    Half, rather than any, because GDELT refuses individual names routinely. A
+    check that goes red most days is a check that gets ignored, which costs more
+    than the alert is worth - so one quiet name stays green and a collapse does
+    not.
+
+    Counts names, not articles. A name that was read and had no news is a fact
+    about the world; a name that could not be read is a hole in the record, and
+    only the second one is a fault.
+    """
+    unreachable = len(failed) + len(skipped)
+    attempted = unreachable + len(counts)
+    return attempted > 0 and unreachable * 2 > attempted
+
+
 def _sweep_note(failed, skipped, counts=()) -> str:
     """What a partially-successful sweep must still say.
 
@@ -936,10 +959,13 @@ def cmd_sweep(a) -> int:
     last SUCCESSFUL sweep of each source, writes what it finds to the corpus,
     links it into the graph, and records the attempt either way.
 
-    Exit codes are the interface, like `watch`: 0 every source read, 3 at least
-    one source failed, 2 the sweep itself could not run. A scheduler can act on
-    those without parsing text - and it needs to, because the failure this
-    command exists to make visible is the one that looks like a quiet world.
+    Exit codes are the interface, like `watch`: 0 every source read, 3 a source
+    failed OR came back badly degraded, 2 the sweep itself could not run. A
+    scheduler can act on those without parsing text - and it needs to, because
+    the failure this command exists to make visible is the one that looks like a
+    quiet world. Degraded counts as failure for the same reason: eight of nine
+    companies unreachable produces almost no news, which is the exact shape of a
+    quiet week.
     """
     from datetime import timedelta as _td
 
@@ -972,7 +998,7 @@ def cmd_sweep(a) -> int:
     started = datetime.now(UTC)
     deadline = started + _td(seconds=SWEEP_DEADLINE_SECONDS)
     run_id = started.strftime("%Y%m%dT%H%M%S")
-    failed = 0
+    failed = degraded = 0
 
     print(f"sweep {run_id}")
     with Corpus(a.db or cfg.corpus_db) as corpus:
@@ -1030,6 +1056,17 @@ def cmd_sweep(a) -> int:
                             f"({len(per_failed)} failed, {len(per_skipped)} not reached). "
                             f"First: {first}"
                         )
+                    if _mostly_failed(per_failed, per_skipped, per_counts):
+                        # Recorded OK, because articles WERE stored and the row
+                        # should say so - but the run still exits 3, so the
+                        # scheduler shows red and a person looks.
+                        degraded += 1
+                        n = len(per_failed) + len(per_skipped)
+                        print(
+                            f"  {'':<16} DEGRADED: {n} of {n + len(per_counts)} "
+                            f"names could not be read",
+                            file=sys.stderr,
+                        )
                     notes = _sweep_note(per_failed, per_skipped, per_counts)
                 else:
                     records = feed.fetch(since, limit=a.limit)
@@ -1079,7 +1116,7 @@ def cmd_sweep(a) -> int:
             "escalation gate\n                   cannot fire and nothing here "
             "will ever be flagged for review."
         )
-    return 3 if failed else 0
+    return 3 if (failed or degraded) else 0
 
 
 def _link_graph(articles, graph_db: str) -> str:
