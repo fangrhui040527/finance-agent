@@ -62,6 +62,7 @@ def run_checks(offline: bool = False) -> list[CheckResult]:
     for name, path, impact in (
         ("provenance", Path("data/provenance.db"), "cost accounting and budget checks"),
         ("learning", Path("data/learning.db"), "predictions and calibration"),
+        ("paper", Path("data/paper.db"), "the paper book's ledger (ask.py paper)"),
     ):
         if not path.exists():
             out.append(CheckResult(name, WARN, f"{path} absent (created on first write)", impact))

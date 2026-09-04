@@ -265,6 +265,9 @@ min_graded_for_calibration = 30
 # sources-probe workflow), and enable each one whose probe shows dated items.
 enabled = [
   "gdelt", "google_news", "yahoo_rss",
+  # The one Malaysian business feed that answered the probe on main (2026-09-04);
+  # thestar/edge/nst returned 404, bernama undated, bnm_press HTML. Candidates.
+  "fmt_business",
   "edgar", "bnm_opr", "dosm_cpi",
   "finnhub", "fmp", "alphavantage_news", "fred",
 ]
@@ -317,6 +320,36 @@ moomoo_enabled = false
 moomoo_host = "127.0.0.1"
 moomoo_port = 11111
 
+[paper]
+# The paper book (docs/22-PAPER-BOOK.md): a hypothetical USD ledger marked from
+# the cached bars, with target weights recorded nightly inside these caps and
+# a passive equal-lot control beside it. Nothing here can reach a broker; the
+# module has no field for one. Every cap below is a ceiling or a floor the
+# loader refuses to loosen (core/config.py HARD_BOUNDS): tighten freely.
+start_date = 2026-09-08
+initial_cash_usd = 1000
+database = "data/paper.db"
+# Conservative profile, agreed 2026-09-04.
+max_weight_per_name = 0.25
+# Applies once invested weight exceeds ramp_max_invested; below it the
+# arithmetic minimum ceil(invested / max_weight_per_name) applies.
+min_names_when_invested = 4
+cash_floor = 0.20
+# From average cost, in the name's own currency; exits at the next open.
+stop_loss = 0.08
+# From peak equity; past it no target may raise a weight.
+drawdown_halt = 0.08
+# Consideration changed over five weekdays, as a share of equity.
+weekly_turnover_cap = 0.50
+slippage_bps_xkls = 10
+slippage_bps_xnas = 5
+# Weeks 1-2 observe (logged, graded, never applied), weeks 3-6 ramp, then full.
+observe_weeks = 2
+ramp_weeks = 4
+ramp_max_invested = 0.40
+control_rebalance = "monthly"
+
+
 [monitor]
 # What `ask.py watch` alerts on. It records only state CHANGES, so a rule that
 # stays tripped does not re-fire every run - an alert that repeats hourly is
@@ -342,3 +375,8 @@ silence_hours = 0
 # It stays quiet until a source has succeeded ONCE. A corpus that has never been
 # filled is a system nobody has turned on, not a system that has stopped.
 sweep_silence_hours = 30
+
+# Drawdown from peak equity at which `ask.py watch` opens an alert on the paper
+# book. 0.08 is the halt line itself: the alert and the halt fire together, so
+# the person hears about the halt the same hour the book stops adding.
+paper_drawdown = 0.08

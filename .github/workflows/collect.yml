@@ -137,6 +137,21 @@ jobs:
           uv run python ask.py prices --book
           exit 0
 
+      # The paper book (docs/22): apply whatever was decided at the first
+      # cached bar after the decision, mark both books at today's closes, raise
+      # stops, grade the predictions whose date has come. Runs from the cache
+      # just written, so it needs no network of its own. A marking fault must
+      # never cost the sweep its commit - it is printed and the job goes on.
+      - name: Mark the paper book
+        if: steps.slot.outputs.slot == 'bursa_close' || steps.slot.outputs.slot == 'us_close' || steps.slot.outputs.slot == 'all'
+        env:
+          FINPLANET_OFFLINE: "1"
+        run: |
+          set +e
+          uv run python ask.py paper mark --slot "${{ steps.slot.outputs.slot }}"
+          uv run python ask.py paper grade
+          exit 0
+
       # The day's digest: per name, what was collected, what escalated, what
       # moved in the series. Written for the agents and for the person - and
       # for the nightly feedback routine, which reads it rather than the raw
@@ -166,7 +181,7 @@ jobs:
           # One at a time, skipping any that is not there: `git add` on a
           # missing path is fatal, and one store missing must never cost the
           # others their day.
-          for path in data/corpus.db data/graph.db data/fx.db data/facts.db data/price_cache.db data/digests; do
+          for path in data/corpus.db data/graph.db data/fx.db data/facts.db data/price_cache.db data/digests data/paper.db data/learning.db knowledge/paper; do
             if [ -e "$path" ]; then
               git add "$path"
             else

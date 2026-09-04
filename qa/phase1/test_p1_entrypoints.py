@@ -313,3 +313,16 @@ def test_predict_refuses_a_duplicate_id_and_a_bad_confidence(run_cli, tmp_path):
     assert proc.returncode != 0 and "already logged" in (proc.stderr + proc.stdout)
     proc = run_cli(["predict.py", "--db", db, "log", "MYX:1155", "1", "5d", "1.5", "x"])
     assert proc.returncode != 0 and "probability" in (proc.stderr + proc.stdout)
+
+# -- the paper book -------------------------------------------------------------
+
+def test_paper_status_is_no_book_until_init_then_answers_offline(run_cli, tmp_path):
+    db = str(tmp_path / "paper.db")
+    proc = run_cli(["ask.py", "paper", "status", "--db", db])
+    assert proc.returncode == 2 and "NO BOOK" in proc.stderr
+    ok(run_cli(["ask.py", "paper", "init", "--db", db, "--start", "2026-03-02"]))
+    out = ok(run_cli(["ask.py", "paper", "status", "--db", db, "--date", "2026-03-02"],
+                     env_extra={"FINPLANET_OFFLINE": "1"}))
+    assert "PAPER BOOK" in out and "fundable at this equity" in out
+    assert "buy" not in out.lower().replace("buy-and-hold", "") and "should" not in out.lower()
+
