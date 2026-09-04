@@ -34,11 +34,20 @@ RSS_SOURCES: dict[str, tuple[str, str]] = {
     # 404; /rss is a landing page carrying no autodiscovery tags). Supplied by
     # the operator from the page itself.
     #
-    # NOTE THE YEAR. The path and the currentURL parameter both say 2020, and
-    # the INSTANCE id is that page's portlet. Whether it serves 2020 items or
-    # the latest ones is what the next sweep answers: a feed of 2020 stories
-    # fetches fine and keeps nothing, because every item falls outside the
-    # window - which shows up as fetched>0, kept=0 rather than as an error.
+    # ANSWERED by the 2026-09-04 01:47 sweep: status ok, fetched 0. The endpoint
+    # is real and returns well-formed RSS - no parse error, no HTTP error - but
+    # it is the 2020 ARCHIVE, so nothing in it falls inside a 24-hour window.
+    #
+    # This is the failure mode the repo warns about most: a source that succeeds
+    # every night and ingests nothing is indistinguishable from a world where
+    # nothing happened. It is enabled and it is currently worth nothing.
+    #
+    # What is needed is the same URL from the CURRENT year's page. Swapping 2020
+    # for 2026 in the path is not enough and is not worth a guess: in Liferay the
+    # INSTANCE id identifies the portlet placement, and it is the portlet - not
+    # the path - that decides which items come back. The 2026 page has its own
+    # instance id. Open https://www.bnm.gov.my/press-release-2026, take the RSS
+    # link off it, and replace this whole value.
     "bnm_press": (
         "https://www.bnm.gov.my/press-release-2020"
         "?p_p_id=com_liferay_asset_publisher_web_portlet_AssetPublisherPortlet"

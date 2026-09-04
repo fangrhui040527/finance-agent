@@ -240,9 +240,12 @@ min_graded_for_calibration = 30
 # the OPR decision, banking statistics, policy documents - not company news, so
 # most of it arrives unlinked and the `unlinked` count says so.
 #
-# The registered URL is pinned to the 2020 page; see the note in
-# knowledge/feeds/registry.py. If a sweep reports fetched>0 with kept=0, that is
-# a feed of old items and the URL needs the current year's page, not a fix here.
+# CURRENTLY COLLECTS NOTHING. The 2026-09-04 01:47 sweep proved the endpoint is
+# real - status ok, well-formed RSS - and that it serves the 2020 archive, so it
+# fetches 0 items in any recent window. It needs the same link from the CURRENT
+# year's page; see knowledge/feeds/registry.py for why the year cannot just be
+# swapped. Until then this source succeeds nightly and ingests nothing, which is
+# the one failure mode this file warns about hardest.
 enabled = ["gdelt", "bnm_press"]
 
 # Where a sweep keeps what it saw. Append-only, deduplicated across runs, and
