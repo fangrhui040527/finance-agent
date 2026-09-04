@@ -149,13 +149,17 @@ per-instrument agents with no instrument and ran them against nothing.
 `docs/01`'s architecture diagram still draws a `Factor library → Ranked
 candidates` box: it is marked **unbuilt** there and it is not on the roadmap.
 
-## Not built
+## Recently built — was the largest gap, no longer is
 
-### Frontend — 12 screens designed, none implemented
+### Frontend — all 12 screens now run
 
 `design/` holds 12 `.dc.html` artboards plus the generators that produce them:
 Main, WhyItMoved, Prices, Thesis, Portfolio, Sizing, Predictions, Trace, Learn,
 WorldMonitor, Agents, Settings.
+
+These notes originally listed this as the single largest piece of unbuilt scope,
+with `ui/render.py` as the only surface. That is no longer true, and the heading
+said so for longer than the body did.
 
 **BUILT** (2026-08-31): all twelve screens run at `make web` /
 `run web` - `web/` is a FastAPI app on 127.0.0.1:8765 whose endpoints call the
@@ -165,6 +169,8 @@ tokens EXPORTED from `design/_css.txt` minus its font import so the app
 renders fully offline. Refusals are first-class cards; the portfolio book
 lives in the browser's localStorage only. `ui/render.py` remains the terminal
 surface; the artboards remain the visual specification the screens follow.
+
+## Not built
 
 ### 32 keyless feed adapters
 

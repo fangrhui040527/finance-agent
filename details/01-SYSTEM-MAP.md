@@ -72,7 +72,7 @@ Three places return a refusal rather than an answer, and all three are normal:
 3. **`size()`** raises `NoPosition` — not an error. At a given capital level,
    lot granularity or the cost floor may mean the correct size is zero.
 
-`trace_run.py` counts 10 refusals in an end-to-end run. That number going *down*
+`trace_run.py` counts 11 refusals in an end-to-end run. That number going *down*
 without a reason is a regression, not an improvement.
 
 ## Where each boundary is actually enforced
