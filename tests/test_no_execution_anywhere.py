@@ -48,6 +48,10 @@ ALLOWED_PATHS = {
     "tests/test_registry.py",
     "tests/test_agents.py",
     "tests/test_evidence_agents.py",
+    # Feeds a planted "place_order" instruction through the corpus to prove
+    # the INPUT rail refuses it on the way to an agent - by name, same reason
+    # as tests/test_guardrail_chain.py.
+    "qa/phase1/test_p1_rag_pipeline.py",
 }
 
 
@@ -80,6 +84,6 @@ def test_the_allowlist_has_not_rotted():
     for rel in ALLOWED_PATHS:
         path = ROOT / rel
         assert path.exists(), f"allowlisted {rel} no longer exists; remove the exemption"
-        assert FORBIDDEN.search(path.read_text()), (
+        assert FORBIDDEN.search(path.read_text(encoding="utf-8", errors="replace")), (
             f"{rel} no longer mentions a forbidden tool; it does not need an exemption"
         )

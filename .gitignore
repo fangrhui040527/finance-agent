@@ -34,3 +34,7 @@ package-lock.json
 #    untracked noise after every command.
 *.db-wal
 *.db-shm
+
+# 4. The nightly pack is regenerated from the stores by `ask.py pack`; the
+#    page written from it (<date>.md, <date>.json) is the record and IS tracked.
+knowledge/feedback/*.pack.md

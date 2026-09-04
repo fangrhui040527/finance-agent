@@ -48,7 +48,6 @@ from engines.attribution.decompose import MIN_OBSERVATIONS, decompose
 from engines.attribution.regression import huber_fit
 from engines.risk.concentration import Limits, Position
 from engines.sizing.caps import cost_floor_bps, cost_floor_value, to_base
-from knowledge.retrieval.pipeline import Router
 from markets.brokers import cost_at
 from markets.registry import get as market_get
 from markets.registry import known_prefixes, market_currency, mic_of, supported
@@ -71,14 +70,21 @@ def context() -> AgentContext:
     try:
         cfg = load_config()
         holdings, watchlist = set(cfg.holdings), set(cfg.watchlist)
+        corpus_db = cfg.corpus_db
     except ConfigError:
         # A broken settings file must not take out every other command; the
         # config commands report it properly.
-        holdings, watchlist = set(), set()
+        holdings, watchlist, corpus_db = set(), set(), None
+    from knowledge.retrieval.index import router_for
+
+    now = datetime.now(UTC)
     return AgentContext(
-        router=Router({}),
+        # The corpus, indexed, cached on the corpus file's identity so a tool
+        # call does not re-index a season of headlines. `Router({})` here
+        # refused every retrieval before it looked at an article.
+        router=router_for(reg, corpus_db, now=now),
         engine=default_engine(reg.allowlist()),
-        now=datetime.now(UTC),
+        now=now,
         holdings=holdings,
         watchlist=watchlist,
     )
@@ -289,6 +295,98 @@ def pull_news(source: str = "gdelt", query: str = "", hours: int = 24, limit: in
                 "and a live feed is indistinguishable from a quiet day."
             )
     return f"{head}\n  {stats}\n{body}{tail}"
+
+
+# --------------------------------------------------------------------------
+# what the collector holds: digest, facts, macro, news evidence
+# --------------------------------------------------------------------------
+
+
+def _cfg():
+    try:
+        return load_config()
+    except ConfigError as e:
+        raise ToolError(f"config.toml cannot be loaded: {e}") from None
+
+
+def daily_digest(day: str = "", write: bool = False) -> str:
+    """The day's page per name: stories by quality, tone, events, figures, macro.
+
+    Derived from the corpus and the fact book the collector fills - reading it
+    costs no request and spends no quota. `pull_news` is the live fetch; this
+    is what was already kept.
+    """
+    from knowledge.digest import build_digest, write_digest
+
+    cfg = _cfg()
+    digest = build_digest(cfg, _parse_date(day) if day else None)
+    if write:
+        write_digest(digest)
+    return digest.to_markdown()
+
+
+def fact_snapshot(instrument: str, days: int = 30) -> str:
+    """Latest figures, recent and scheduled events, documents held for one name."""
+    from knowledge.facts import FactBook
+    from knowledge.report import fact_snapshot as _snapshot
+
+    cfg = _cfg()
+    try:
+        mic_of(instrument)
+    except ValueError as e:
+        raise ToolError(str(e)) from None
+    with FactBook(cfg.facts_db) as book:
+        return _snapshot(book, instrument, days=max(1, days))
+
+
+def macro_context(series: str = "", points: int = 5) -> str:
+    """Every recorded macro series at its latest point, or one series' recent points."""
+    from knowledge.facts import FactBook
+    from knowledge.report import macro_context as _macro
+
+    cfg = _cfg()
+    with FactBook(cfg.facts_db) as book:
+        return _macro(book, series, points=max(1, points))
+
+
+def news_evidence(instrument: str, query: str = "", days: int = 7, limit: int = 6) -> str:
+    """What the corpus holds about a name, through the news agent's own gate.
+
+    Retrieval, not a live fetch: hybrid search over the collected articles,
+    the entity filter, the freshness window, the relevance grade - and a
+    refusal when nothing clears them, which is an answer. Each story carries
+    its five feature dimensions; the aggregate is a feature, never evidence.
+    """
+    from datetime import timedelta as _td
+
+    from agents.evidence.agents import A4NewsNarrative
+    from knowledge.graph.ids import display_names
+    from knowledge.graph.ids import instrument_id as canonical
+
+    try:
+        mic_of(instrument)
+    except ValueError as e:
+        raise ToolError(str(e)) from None
+    label = display_names().get(canonical(instrument) or instrument, instrument)
+    findings = A4NewsNarrative(context()).run(
+        instrument, query or label, max_age=_td(days=max(1, days)), limit=max(1, limit)
+    )
+    rows = [f"{label} ({instrument}): news evidence, last {days} days, query {query or label!r}"]
+    for f in findings:
+        rows.append(f"- {f.text}")
+        if f.numbers:
+            rows.append(
+                "    "
+                + "  ".join(
+                    f"{k} {v:+.2f}" if k == "polarity" else f"{k} {v:.2f}"
+                    for k, v in f.numbers.items()
+                )
+            )
+        for c in f.caveats:
+            rows.append(f"    caveat: {c}")
+        for c in f.citations:
+            rows.append(f"    cites {c.source}:{c.chunk_id}")
+    return "\n".join(rows) + DISCLAIMER
 
 
 def _parse_date(s: str) -> date:

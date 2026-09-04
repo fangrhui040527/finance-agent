@@ -100,10 +100,81 @@ a valid state, not a broken one.
 ### `sweep` — fetch every enabled source and KEEP what arrives
 
 ```bash
-python ask.py sweep                       # every source in [sources] enabled
-python ask.py sweep --source gdelt        # one source, repeatable
+python ask.py sweep                       # every source in [sources] enabled, every name
+python ask.py sweep --slot bursa_close    # the sources that run after Bursa closes, Bursa names
+python ask.py sweep --slot us_close       # ... after the US close, Nasdaq names
+python ask.py sweep --slot us_preopen     # macro prints, the earnings calendar, rating changes
+python ask.py sweep --slot weekly         # statements, estimates, transcripts, CPI
+python ask.py sweep --source gdelt        # one source, repeatable, whatever the slot
 python ask.py sweep --no-graph            # store only; leave the graph alone
 ```
+
+Two kinds of source, one run. A **news** source (GDELT, Google News per
+company, a Yahoo ticker feed, a Malaysian RSS) produces articles into
+`data/corpus.db`, cleaned (`knowledge/news/clean.py`), language-filtered,
+junk-dropped, entity-linked on word boundaries, feature-scored and quality-scored,
+with the escalation gate evaluated. A **structured** source (Finnhub, FMP, Alpha
+Vantage, FRED, EDGAR, BNM's OPR, DOSM's CPI) produces observations, events,
+series and documents into `data/facts.db` — append-only and vintaged, so a
+restated figure is a new row and a backtest sees what was knowable. The register
+of every source, its slot and the key it needs is `knowledge/sources/catalog.py`;
+`ask.py sources` prints it. A keyed source whose key is absent is **skipped**,
+with the variable named, and the job stays green.
+
+### `sources` — the catalogue, and one live probe of each
+
+```bash
+python ask.py sources                     # every source: kind, slots, key, enabled
+python ask.py sources --probe             # fetch each once, store nothing, say what came back
+python ask.py sources --probe --source thestar_business --source edge_malaysia
+```
+
+The probe exists because the development environment has no route to any data
+host: the first real answer from a source comes from a GitHub Actions runner
+(`.github/workflows/sources-probe.yml`). A Malaysian RSS candidate is enabled in
+`config.toml` only after its probe row shows dated items; an index page answers
+with the feed URLs it advertises.
+
+### `facts` and `macro` — reading the fact book
+
+```bash
+python ask.py facts XNAS:AAPL              # latest figure per concept, events, scheduled, documents
+python ask.py facts MYX:1155 --days 90
+python ask.py macro                        # every recorded series, latest point and 20-obs change
+python ask.py macro DGS10 --points 10      # one series' recent points, with vintages
+```
+
+Both print from `data/facts.db` and nothing else. An empty answer names the
+sources that would fill it - a blank is an empty store, not a quiet company.
+The same formatters back the `fact_snapshot` and `macro_context` MCP tools.
+
+### `pack` — the deterministic half of the nightly feedback
+
+```bash
+FINPLANET_OFFLINE=1 python ask.py pack --date 2026-09-04 --write   # knowledge/feedback/<date>.pack.md
+```
+
+Moves for every name against its market proxy from the cached bars, the
+decomposition (verdict and unexplained share; beta estimated on the 120
+sessions before the day, sector beta fixed at zero and said so), the day's
+digest, the fact book per name, the macro series, and the last three feedback
+pages. The nightly routine (docs/20) reasons over this file and copies its
+numbers; it never re-derives them. A name whose bars are absent is a `NO DATA`
+row, never a typed leg.
+
+### `digest` — the day's page, per name
+
+```bash
+python ask.py digest                      # today, to stdout
+python ask.py digest --date 2026-09-04 --write   # also data/digests/<date>.md and .json
+```
+
+One day of the corpus and the fact book as a page: per name the top stories by
+quality (syndicated copies folded), the tone (polarity, intensity, uncertainty),
+what escalated, recent and upcoming events, a snapshot of the latest figures;
+then the macro series and their changes; then the day's collection rows. Derived
+and regenerated on every run — the stores are the record, this is the reading of
+it — and what the nightly feedback routine reasons over.
 
 `news` prints one source and forgets it, which is right for a person checking a
 feed by hand. `sweep` is the scheduled sibling and the one that makes a month of
@@ -147,16 +218,27 @@ Exit codes, so a scheduler can act without parsing text:
 
 | code | meaning |
 |---|---|
-| 0 | every enabled source read |
-| 2 | the sweep could not run — bad config, no sources enabled, or a source with no adapter |
-| 3 | at least one source failed; the failure is in the `sweeps` table |
+| 0 | every enabled source read (a source without its key is skipped, not failed) |
+| 2 | the sweep could not run — bad config, unknown slot, no source runs in the slot, or a source with no adapter |
+| 3 | at least one source failed or was degraded (more than half its names unreachable); the failure is in the `sweeps` and `pulls` tables |
 
-#### The enabled sources
+#### The sources
 
-| name | what it is | state |
-|---|---|---|
-| `gdelt` | global news index | **enabled** — one request per company, budget split, order rotated |
-| `bnm_press` | Bank Negara press releases | registered, **not enabled**: feed URL unknown |
+| name | what it is | slot | state |
+|---|---|---|---|
+| `gdelt` | global news index, one request per company | bursa_close, us_close | **enabled** |
+| `google_news` | Google News search RSS per company, MY edition for Bursa names, US for Nasdaq | bursa_close, us_close | **enabled** |
+| `yahoo_rss` | Yahoo Finance ticker headlines with a summary | bursa_close, us_close | **enabled** |
+| `edgar` | SEC filings per US name (8-K, 10-Q, 10-K, 4) | us_close | **enabled** |
+| `bnm_opr` | Bank Negara's Overnight Policy Rate | bursa_close | **enabled** |
+| `dosm_cpi` | Malaysian headline CPI | weekly | **enabled** |
+| `finnhub` | US company news, insiders, calendar, surprises, recommendations, metrics | us_close | **enabled**, needs `FINNHUB_API_KEY` |
+| `fmp` | statements, estimates, targets, rating changes, transcripts | weekly, us_preopen | **enabled**, needs `FMP_API_KEY` |
+| `alphavantage_news` | articles with per-ticker sentiment, one call a day | us_close | **enabled**, needs `ALPHAVANTAGE_API_KEY` |
+| `fred` | Fed funds, yields, curve, CPI, unemployment, VIX, dollar, MYR/USD | us_preopen | **enabled**, needs `FRED_API_KEY` |
+| `thestar_business`, `edge_malaysia`, `bernama_business`, `fmt_business`, `nst_business` | Malaysian business RSS | bursa_close | registered, **not enabled** until the probe shows dated items |
+| `bursa_announcements` | Bursa company announcements | bursa_close | registered, **not enabled** until the probe shows the endpoint answers |
+| `bnm_press` | Bank Negara press releases | bursa_close | registered, **not enabled**: no live feed exists |
 
 **The domestic-coverage gap is open.** GDELT has returned nothing for any Bursa
 name on every run so far, and `bnm_press` was enabled on 2026-09-03 to close
@@ -242,8 +324,14 @@ Three things about it that are deliberate:
 
 - **It reads the exit codes instead of flattening them.** Exit 3 still commits,
   because a failed sweep that leaves no trace is indistinguishable from a quiet
-  day — the whole reason the `sweeps` table exists — and then fails the job so a
-  person looks.
+  day — the whole reason the `sweeps` table exists — and then annotates the run
+  with a warning naming the degraded source. It does not fail the job: GDELT
+  times out on one name most days, and a job that is red most days is a job
+  nobody reads, which is the failure the `bnm_press` note above describes.
+  Exit 2 (the sweep could not run at all) and a failed FX pull still fail it,
+  because then nothing was collected. `ask.py watch` reads the same `sweeps`
+  and `pulls` tables, so a degraded source is still reported where the
+  monitor looks.
 - **It is the only workflow here with `contents: write`.** `ci.yml` is
   `contents: read`. The data commit carries `[skip ci]`, because ten test jobs to
   validate a row of news is waste.

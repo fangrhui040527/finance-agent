@@ -30,14 +30,20 @@ invisible.
 | Event taxonomy, base rates, catalyst attachment | complete |
 | Retrieval — hybrid, parent-child chunking, router | complete |
 | Backtest harness — walk-forward, costs, metrics, point-in-time | complete |
-| MCP server — 27 tools, protocol, selftest | complete |
+| MCP server — 31 tools, protocol, selftest | complete |
 | Teacher — 30 concepts, enforced prerequisite order | complete |
 | Reflection — grading, lesson proposal, calibration, scoring | complete |
 | Tracing — spans, HTML report, anatomy, prompts | complete |
-| CLI — 20 subcommands | complete |
+| CLI — 25 subcommands | complete |
+| **Feedback routine** — `ask.py pack` prepares the night, a scheduled Claude session writes `knowledge/feedback/<date>.md`, indexed as `kb_lessons` | complete; docs/20 |
 | Fitness function — refuses a partial score | complete |
 | CI — 10 steps, offline, keyless | complete |
-| **Daily collector** — `collect.yml`, sweep on a timer, commits what it saw | complete, **and running**: 187 articles, 34 attributed |
+| **Collector** — `collect.yml`, four slots a day timed to each market, commits what it saw | complete, **and running** |
+| **Source catalogue** — 17 sources (news and structured), slots, keys; `ask.py sources --probe` | complete; 6 Malaysian candidates await their first probe from a runner |
+| **Corpus is indexed** — `knowledge/retrieval/index.py`, one router from the registry, `kb_news` filled from the corpus | complete (until 2026-09-04 every surface built `Router({})` and no retrieval ever read an article) |
+| **Cleaning layer** — normal form, language allowlist, junk filter, quality score, word-boundary entity linking | complete |
+| **Fact book** — `data/facts.db`: observations with `known_at`, events, vintaged series, documents; bridge to the point-in-time FactStore | complete |
+| **Digest** — `ask.py digest`, the day's page per name for the person, the agents and the feedback routine | complete |
 
 ---
 

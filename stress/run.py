@@ -1182,6 +1182,13 @@ def s_mcp():
         # A graph path the tool cannot reach: with no database it must refuse,
         # which is the honest answer and the one this suite is checking for.
         "explain_path": {"a": "Maybank", "b": "MISC", "db": ":memory:"},
+        # Collector readers: each reads the configured stores and nothing
+        # else - no fetch, no key - and must answer honestly on an empty
+        # installation ("NOTHING COLLECTED", "no news cleared the gate").
+        "daily_digest": {},
+        "fact_snapshot": {"instrument": "MYX:1155"},
+        "macro_context": {},
+        "news_evidence": {"instrument": "MYX:1155", "days": 1},
     }
     uncovered = [t for t in S.tools if t not in minimal]
     if uncovered:

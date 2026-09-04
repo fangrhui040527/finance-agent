@@ -61,6 +61,18 @@ import none of the last three. Live model testing runs under
 `FINPLANET_CHEAP=1`, which resolves every tier to the cheapest model and says
 so on every surface.
 
+**Collection is wired** (`docs/20-FEEDBACK-ROUTINE.md`, `details/09-RUNBOOK.md`):
+seventeen catalogued sources - keyless RSS and GDELT per company, SEC EDGAR,
+BNM, DOSM, and four free-key providers (Finnhub, FMP, Alpha Vantage, FRED) -
+run on four market-timed GitHub Actions slots (`.github/workflows/collect.yml`)
+into two append-only stores: `data/corpus.db` for news and `data/facts.db` for
+point-in-time figures, events, series and filings. `ask.py sweep`, `sources
+--probe`, `digest`, `facts`, `macro` and `pack` read and write them; the MCP
+server exposes `daily_digest`, `fact_snapshot`, `macro_context` and
+`news_evidence` so a Claude session reads what was collected before it reasons.
+A nightly Claude Routine writes the *why did it move* page to
+`knowledge/feedback/`, which is indexed as `kb_lessons`.
+
 P16 is the paper-trade gate: 3–6 months of elapsed forward time, not unbuilt
 work. Its machinery exists and refuses to grade a prediction before its horizon.
 P18–P19 wait on P16. **If you are picking this up, start at
