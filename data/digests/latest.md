@@ -1,6 +1,6 @@
 # Digest 2026-09-04
 
-Generated 2026-09-04 16:17 UTC · slot `all` · 704 articles in the corpus, 0 observations, 2 events in the fact book.
+Generated 2026-09-04 16:33 UTC · slot `all` · 704 articles in the corpus, 0 observations, 2 events in the fact book.
 
 ## The book
 
@@ -80,6 +80,7 @@ Generated 2026-09-04 16:17 UTC · slot `all` · 704 articles in the corpus, 0 ob
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 16:33 | fred | ok | 0 | 0 | 0 | skipped: fred needs FRED_API_KEY, which is not set. Add it to .env or as a GitHu |
 | 16:17 | alphavantage_news | ok | 0 | 0 | 0 | skipped: alphavantage_news needs ALPHAVANTAGE_API_KEY, which is not set. Add it  |
 | 16:17 | finnhub | ok | 0 | 0 | 0 | skipped: finnhub needs FINNHUB_API_KEY, which is not set. Add it to .env or as a |
 | 16:17 | edgar | ok | 0 | 0 | 0 | facts 0;  |

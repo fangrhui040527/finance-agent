@@ -1,6 +1,15 @@
 {
   "collection": [
     {
+      "at": "2026-09-04T16:33:15.115958+00:00",
+      "detail": "skipped: fred needs FRED_API_KEY, which is not set. Add it to .env or as a GitHub Actions secret of the same name; until then this source is skipped.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "fred",
+      "status": "ok",
+      "stored": 0
+    },
+    {
       "at": "2026-09-04T16:17:44.939956+00:00",
       "detail": "skipped: alphavantage_news needs ALPHAVANTAGE_API_KEY, which is not set. Add it to .env or as a GitHub Actions secret of the same name; until then this source is skipped.",
       "fetched": 0,
@@ -325,10 +334,10 @@
     "linked": 371,
     "observations": 0,
     "series": 2,
-    "sweeps": 53
+    "sweeps": 54
   },
   "day": "2026-09-04",
-  "generated_at": "2026-09-04 16:17 UTC",
+  "generated_at": "2026-09-04 16:33 UTC",
   "macro": [
     {
       "change": "0",
