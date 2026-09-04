@@ -56,6 +56,12 @@ reasoning over the numbers in conversation.
 
 Three habits that make the output trustworthy:
 
+0. READ WHAT WAS COLLECTED FIRST. daily_digest, news_evidence, fact_snapshot and
+   macro_context are the corpus and fact book the collector fills three times a
+   day: stories already cleaned, linked and scored, figures stamped with the day
+   they became knowable, events dated, macro series vintaged. They cost no
+   request. pull_news is a live fetch for what the collector has not yet seen.
+
 1. DECOMPOSE BEFORE EXPLAINING. Call why_did_it_move before offering any cause.
    Most single-day moves are market and sector; naming a company-specific reason
    for a market-wide fall is the most common analytical error there is, and the
@@ -567,6 +573,71 @@ S.tool(
     "against realised hit rate. Cannot be back-filled - only waited for.",
     obj({"db": _str("optional store path")}),
 )(T.calibration_status)
+
+# -- what the collector holds ---------------------------------------------------
+# Read these BEFORE pull_news: they are the corpus and the fact book the daily
+# collector fills, cost no request and spend no quota. pull_news is a live
+# fetch for what the collector has not yet seen.
+
+S.tool(
+    "daily_digest",
+    "The day's page: per name, the top stories by quality (syndicated copies "
+    "folded), tone, what escalated, recent and scheduled events, a snapshot of "
+    "the latest figures; then the macro series and the day's collection rows. "
+    "Read this first when asked what happened today.",
+    obj(
+        {
+            "day": _str("YYYY-MM-DD; default today (UTC)"),
+            "write": {"type": "boolean", "description": "also write data/digests/<day>.md"},
+        }
+    ),
+)(T.daily_digest)
+
+S.tool(
+    "fact_snapshot",
+    "What the collector holds for one name: the latest figure per concept "
+    "with the day it became knowable, events in the last N days, what is "
+    "scheduled in the next 60, and documents such as call transcripts. An "
+    "empty answer names the sources that would fill it.",
+    obj(
+        {
+            "instrument": _str("e.g. 'MYX:1155' or 'XNAS:NVDA'"),
+            "days": {"type": "integer", "description": "event window back from now (default 30)"},
+        },
+        ["instrument"],
+    ),
+)(T.fact_snapshot)
+
+S.tool(
+    "macro_context",
+    "Every recorded macro series at its latest point with its 20-observation "
+    "change - Fed funds, yields, the curve, BNM's OPR, MYR/USD, VIX, CPI - or "
+    "one series' recent points. Descriptive; never a forecast.",
+    obj(
+        {
+            "series": _str("a series id such as 'DGS10' or 'BNM:OPR'; empty for all"),
+            "points": {"type": "integer", "description": "recent points for one series"},
+        }
+    ),
+)(T.macro_context)
+
+S.tool(
+    "news_evidence",
+    "What the corpus holds about a name, through the news agent's own gate: "
+    "hybrid retrieval over collected articles, the entity filter, a freshness "
+    "window and a relevance grade. Each story carries five feature dimensions "
+    "(relevance, polarity, intensity, uncertainty, forwardness) and a citation. "
+    "A refusal means nothing cleared the gate - which is an answer.",
+    obj(
+        {
+            "instrument": _str("the name"),
+            "query": _str("what to look for; default the company's name"),
+            "days": {"type": "integer", "description": "freshness window (default 7)"},
+            "limit": {"type": "integer", "description": "most stories to return (default 6)"},
+        },
+        ["instrument"],
+    ),
+)(T.news_evidence)
 
 
 def selftest() -> int:

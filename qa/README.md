@@ -19,6 +19,7 @@ The MCP server is out of scope here by decision. Nothing under `qa/` drives it.
 | `test_p1_entrypoints.py` | every script as a real process: `verify.py`, `stress/run.py`, `trace_run.py`, the graph builds (twice, byte-identical), every `ask.py` subcommand, the `predict.py` round trip, and the product's own suite |
 | `test_p1_agents_registry.py` | all sixteen agents on the real allowlist; class `tools` vs registry drift; every `_guard_tool` literal is granted; no agent can place an order or borrow a tool |
 | `test_p1_invariants.py` | properties under random input: shares sum to one, bets stay in `[1, n]`, a size never exceeds its cap, append-only stores refuse edits, config bounds cannot be widened, all eleven markets are self-consistent |
+| `test_p1_rag_pipeline.py` | the retrieval pipeline on the PERFUMES axes: a swept article is retrievable by its owning agent with a verifying citation (Functionality); 429s honour Retry-After, 5xx retries, 4xx does not, a failing host opens its breaker (Reliability); Malay, Chinese and emoji text round-trips intact (Usability); an injected article body is stored as data and refused by the INPUT rail, and no source module names an execution tool (Security); indexing is linear and the router is cached (Efficiency); relative paths only (Portability); catalogue, registries and config agree, and a new RSS source is one line (Maintainability, Extensibility) |
 
 ## Phase 2 — live, on Haiku
 
@@ -45,6 +46,7 @@ answer.
 | `test_p2_product_seam_live.py` | the four granted agents complete through the real registry on Haiku; ungranted ones never reach the wire; the ledger overbills a pinned reason call by exactly 5x; the trace captures a real call; `ask.py backend` reports the real backend; the budget stops a live call; real model text meets the OUTPUT rail |
 | `test_p2_geval.py` | Haiku grades the product's narrative surfaces against rubrics (scores in `qa/artifacts/geval.json`) |
 | `test_p2_feeds_live.py` | Stooq and GDELT, keyless but networked; `ask.py prices`, `ask.py why --fetch`, `trace_run.py --live`; each skips if its host is unreachable |
+| `test_p2_sources_live.py` | every catalogued source, live: GDELT, Google News, Yahoo ticker feeds, the five Malaysian RSS candidates (an index page xfails with the feeds it advertises), EDGAR, BNM's OPR, DOSM's CPI, and - with their keys - Finnhub, FMP, Alpha Vantage, FRED. Skips per unreachable host; xfails a spent quota. Meant to run from a GitHub Actions runner |
 
 ## Artefacts
 

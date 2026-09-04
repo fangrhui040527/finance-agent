@@ -30,11 +30,12 @@ invisible.
 | Event taxonomy, base rates, catalyst attachment | complete |
 | Retrieval — hybrid, parent-child chunking, router | complete |
 | Backtest harness — walk-forward, costs, metrics, point-in-time | complete |
-| MCP server — 27 tools, protocol, selftest | complete |
+| MCP server — 31 tools, protocol, selftest | complete |
 | Teacher — 30 concepts, enforced prerequisite order | complete |
 | Reflection — grading, lesson proposal, calibration, scoring | complete |
 | Tracing — spans, HTML report, anatomy, prompts | complete |
-| CLI — 22 subcommands | complete |
+| CLI — 25 subcommands | complete |
+| **Feedback routine** — `ask.py pack` prepares the night, a scheduled Claude session writes `knowledge/feedback/<date>.md`, indexed as `kb_lessons` | complete; docs/20 |
 | Fitness function — refuses a partial score | complete |
 | CI — 10 steps, offline, keyless | complete |
 | **Collector** — `collect.yml`, four slots a day timed to each market, commits what it saw | complete, **and running** |

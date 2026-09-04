@@ -46,6 +46,9 @@ Three things are genuinely new here:
 | **15** | [MCP setup](15-MCP-SETUP.md) | Serve the system over stdio so the reasoning runs on your Claude session |
 | **16** | [Tracing and anatomy](16-TRACING-AND-ANATOMY.md) | Every prompt, rail decision and dropped claim, recorded end to end |
 | **17** | [Knowledge graph](17-KNOWLEDGE-GRAPH.md) | Multi-hop exposure end to end: confidence, validity, the citation seam, the deterministic build, the review surface, and the codebase graph |
+| **18** | [Web and SDK](18-WEB-AND-SDK.md) | The twelve-screen web app and the Python SDK seam |
+| **19** | [Broker account](19-BROKER-ACCOUNT.md) | The read-only moomoo account view: what is read, what is never imported |
+| **20** | [Feedback routine](20-FEEDBACK-ROUTINE.md) | The nightly page: `ask.py pack` measures, a Claude Routine reasons over the pack through the MCP tools, and the page becomes `kb_lessons` |
 | [User guide](user-guide.html) | Install, every command, and the cadence for using it — open in a browser |
 | [Pipeline diagrams](pipeline.html) | Six diagrams tracing data from a wire story to a position size — open in a browser |
 | [World source register](world-sources.html) | Every source knowledge can come in from, worldwide — coverage, keys, rate limits, licences — ordered by trust tier |

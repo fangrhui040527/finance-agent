@@ -135,6 +135,33 @@ host: the first real answer from a source comes from a GitHub Actions runner
 `config.toml` only after its probe row shows dated items; an index page answers
 with the feed URLs it advertises.
 
+### `facts` and `macro` — reading the fact book
+
+```bash
+python ask.py facts XNAS:AAPL              # latest figure per concept, events, scheduled, documents
+python ask.py facts MYX:1155 --days 90
+python ask.py macro                        # every recorded series, latest point and 20-obs change
+python ask.py macro DGS10 --points 10      # one series' recent points, with vintages
+```
+
+Both print from `data/facts.db` and nothing else. An empty answer names the
+sources that would fill it - a blank is an empty store, not a quiet company.
+The same formatters back the `fact_snapshot` and `macro_context` MCP tools.
+
+### `pack` — the deterministic half of the nightly feedback
+
+```bash
+FINPLANET_OFFLINE=1 python ask.py pack --date 2026-09-04 --write   # knowledge/feedback/<date>.pack.md
+```
+
+Moves for every name against its market proxy from the cached bars, the
+decomposition (verdict and unexplained share; beta estimated on the 120
+sessions before the day, sector beta fixed at zero and said so), the day's
+digest, the fact book per name, the macro series, and the last three feedback
+pages. The nightly routine (docs/20) reasons over this file and copies its
+numbers; it never re-derives them. A name whose bars are absent is a `NO DATA`
+row, never a typed leg.
+
 ### `digest` — the day's page, per name
 
 ```bash

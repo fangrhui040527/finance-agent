@@ -7,14 +7,88 @@ guards rather than described in a prompt.
 
 from __future__ import annotations
 
-from datetime import date, datetime
+import re
+from datetime import UTC, date, datetime, timedelta
 
 from agents.base import Agent, AgentContext, Finding, cite
 from core.contracts.answer import TrustTier
 from core.llm.tiers import TaskClass
 from core.market.pointintime import FactStore, assert_no_lookahead
 from core.market.prices import PriceSeries
-from engines.events.taxonomy import BaseRateTable, Event
+from engines.events.taxonomy import BaseRateTable, Event, EventType
+
+#: Stored event kinds (knowledge/facts.py) -> the taxonomy's types. A kind not
+#: here is inferred from the title by `event_type_for`, or left out.
+EVENT_KINDS: dict[str, EventType] = {
+    "earnings_result": EventType.EARNINGS_RESULT,
+    "insider_buy": EventType.INSIDER_BUY,
+    "insider_sell": EventType.INSIDER_SELL,
+    "rating_change": EventType.RATING_CHANGE,
+}
+
+#: Title patterns for the kinds that arrive untyped: filings and announcements.
+_TITLE_TYPES: tuple[tuple[re.Pattern[str], EventType], ...] = (
+    (
+        re.compile(
+            r"\b(quarterly|interim|annual|financial) (report|results?)\b|\b10-Q\b|\b10-K\b", re.I
+        ),
+        EventType.EARNINGS_RESULT,
+    ),
+    (re.compile(r"\bdividend\b", re.I), EventType.DIVIDEND_CHANGE),
+    (re.compile(r"\b(share )?buy-?back\b|\bshares? repurchase", re.I), EventType.BUYBACK),
+    (re.compile(r"\b(acqui(re|sition)|takeover|merger)\b", re.I), EventType.MA_ACQUIRER),
+    (
+        re.compile(r"\b(rights issue|placement|private placement|bond issue|sukuk)\b", re.I),
+        EventType.CAPITAL_RAISE,
+    ),
+    (re.compile(r"\b(contract|award(ed)?|tender)\b", re.I), EventType.CONTRACT_WIN),
+    (re.compile(r"\b(resign|appoint|appointment|retire)", re.I), EventType.EXECUTIVE_CHANGE),
+    (re.compile(r"\b(litigation|lawsuit|court|arbitration)\b", re.I), EventType.LITIGATION),
+    (re.compile(r"\b(suspension|halt|trading halt)\b", re.I), EventType.HALT),
+    (re.compile(r"\bguidance\b", re.I), EventType.GUIDANCE_CHANGE),
+    (re.compile(r"\bitems? 2\.02\b", re.I), EventType.EARNINGS_RESULT),  # 8-K results item
+    (re.compile(r"\bitems? 5\.02\b", re.I), EventType.EXECUTIVE_CHANGE),  # 8-K officer change
+    (re.compile(r"\bitems? 1\.01\b", re.I), EventType.CONTRACT_WIN),  # 8-K material agreement
+)
+
+
+def event_type_for(kind: str, title: str) -> EventType | None:
+    """The taxonomy type for a stored event, or None when nothing fits."""
+    if kind in EVENT_KINDS:
+        return EVENT_KINDS[kind]
+    if kind == "insider_filing":
+        return None  # a Form 4 filing without its direction; Finnhub carries the typed one
+    for pattern, kind_ in _TITLE_TYPES:
+        if pattern.search(title or ""):
+            return kind_
+    return None
+
+
+def event_from_record(rec) -> Event | None:
+    """A `knowledge.facts.EventRecord` as a taxonomy `Event`, or None."""
+    from markets.registry import mic_of
+
+    et = event_type_for(rec.kind, rec.title)
+    if et is None:
+        return None
+    try:
+        market = mic_of(rec.instrument_id)
+    except ValueError:
+        market = ""
+    effective = rec.effective_at
+    if effective is not None and effective < rec.announced_at:
+        effective = None  # a scheduled date earlier than its announcement is a vendor slip
+    return Event(
+        event_id=f"{rec.source}:{rec.event_id}",
+        instrument_id=rec.instrument_id,
+        event_type=et,
+        announced_at=rec.announced_at,
+        effective_at=effective,
+        market=market,
+        confirmed=True,
+        source_doc_id=f"{rec.source}:{rec.event_id}",
+        detail=rec.title,
+    )
 
 
 class A1Fundamentals(Agent):
@@ -28,6 +102,31 @@ class A1Fundamentals(Agent):
     def __init__(self, ctx: AgentContext, facts: FactStore) -> None:
         super().__init__(ctx)
         self.facts = facts
+
+    #: What `from_fact_book` reads for a name when the caller names nothing:
+    #: the statements FMP's collector stores, in the order an analyst reads them.
+    DEFAULT_CONCEPTS = (
+        "revenue",
+        "gross_profit",
+        "operating_income",
+        "net_income",
+        "eps_diluted",
+        "cash_from_operations",
+        "free_cash_flow",
+        "total_debt",
+        "cash",
+        "equity",
+    )
+
+    @classmethod
+    def from_fact_book(cls, ctx: AgentContext, book, instrument_ids=None, asof: date | None = None):
+        """A1 over what the collector stored, through the point-in-time bridge.
+
+        `FactBook.as_fact_store` hands over only observations with a period AND
+        a numeric value, each stamped with the day it became knowable, so the
+        look-ahead guard in `run` holds on collected data exactly as on typed.
+        """
+        return cls(ctx, book.as_fact_store(instrument_ids, asof=asof))
 
     def run(self, instrument_id: str, concepts: list[str], asof: date) -> list[Finding]:
         self._guard_tool("get_statement")
@@ -333,6 +432,56 @@ class A5CatalystEvents(Agent):
         self.events = events
         self.table = table
 
+    @classmethod
+    def from_fact_book(
+        cls,
+        ctx: AgentContext,
+        book,
+        instrument_ids=None,
+        table: BaseRateTable | None = None,
+        since: datetime | None = None,
+        until: datetime | None = None,
+    ):
+        """A5 over the events the collector stored.
+
+        Every stored event carries its source and the day it was announced, so
+        it arrives `confirmed` with a `source_doc_id` - citable, in A5's terms.
+        A kind the taxonomy has no type for (a generic Bursa announcement whose
+        title says nothing recognisable) is left out rather than mis-typed.
+        """
+        events: list[Event] = []
+        wanted = list(instrument_ids or [None])
+        for iid in wanted:
+            for rec in book.events(iid, since=since, until=until, limit=2000):
+                ev = event_from_record(rec)
+                if ev is not None:
+                    events.append(ev)
+        return cls(ctx, events, table or BaseRateTable())
+
+    def upcoming(self, instrument_id: str, now: datetime, horizon_days: int = 30) -> list[Finding]:
+        """What is scheduled: the blackout the technical agent needs to know about."""
+        self._guard_tool("blackout_check")
+        out = []
+        end = now + timedelta(days=horizon_days)
+        for e in self.events:
+            when = e.effective_at or e.announced_at
+            if e.instrument_id == instrument_id and now <= when <= end:
+                days = (when.date() - now.date()).days
+                out.append(
+                    Finding(
+                        self.agent_id,
+                        "scheduled",
+                        f"{e.event_type.value} in {days} day(s), on {when.date()}"
+                        + (f": {e.detail}" if e.detail else ""),
+                        numbers={"days_to_event": float(days)},
+                        as_of=when,
+                        caveats=["event risk dominates short-horizon signals inside this window"]
+                        if days <= 3
+                        else [],
+                    )
+                )
+        return out
+
     def run(self, instrument_id: str, t0: datetime, t1: datetime) -> list[Finding]:
         self._guard_tool("events_in_window")
         window = [
@@ -369,6 +518,74 @@ class A6MacroRegime(Agent):
     collections = ()
     tools = ("series", "regime_label", "country_stress")
     tier = TaskClass.MACRO_READ
+
+    #: The series the collector keeps and what each is, in reading order.
+    POLICY_SERIES = (
+        ("DFF", "Fed funds effective", "%"),
+        ("DGS2", "US 2y yield", "%"),
+        ("DGS10", "US 10y yield", "%"),
+        ("T10Y2Y", "US 10y-2y spread", "%"),
+        ("BNM:OPR", "BNM Overnight Policy Rate", "%"),
+        ("DEXMAUS", "MYR per USD", ""),
+        ("DTWEXBGS", "broad dollar index", ""),
+        ("VIXCLS", "VIX", ""),
+        ("BAMLH0A0HYM2", "US high-yield spread", "%"),
+        ("CPIAUCSL", "US CPI", "index"),
+        ("UNRATE", "US unemployment", "%"),
+        ("DOSM:CPI_YOY", "Malaysia CPI", "% y/y"),
+    )
+
+    def read_policy(self, book, asof: date | None = None, lookback: int = 20) -> list[Finding]:
+        """The rates and prices everything is discounted at, as last recorded.
+
+        One finding per series the fact book holds: the latest point, its date,
+        and the change over the last `lookback` points. Descriptive only - the
+        one thing this agent is forbidden to do is forecast a rate.
+        """
+        self._guard_tool("series")
+        out: list[Finding] = []
+        for sid, label, unit in self.POLICY_SERIES:
+            pts = book.series(sid, asof=asof)
+            if not pts:
+                continue
+            latest = pts[-1]
+            base = pts[-lookback - 1] if len(pts) > lookback else pts[0]
+            change = float(latest.value - base.value)
+            out.append(
+                Finding(
+                    self.agent_id,
+                    "series",
+                    f"{label} {latest.value}{unit and ' ' + unit} as of {latest.obs_date}, "
+                    f"{change:+.4g} over the last {len(pts) - pts.index(base) - 1} observations",
+                    numbers={"value": float(latest.value), "change": change},
+                    as_of=datetime(
+                        latest.obs_date.year, latest.obs_date.month, latest.obs_date.day, tzinfo=UTC
+                    ),
+                    caveats=[f"vintage knowable {latest.known_at}; {latest.source}"],
+                )
+            )
+        if not out:
+            out.append(
+                Finding(
+                    self.agent_id,
+                    "series",
+                    "no macro series recorded yet",
+                    caveats=["the fred and bnm_opr collectors fill these; check their keys"],
+                )
+            )
+        return out
+
+    def run_from_series(
+        self, book, series_id: str = "SP500", vol_window: int = 60
+    ) -> list[Finding]:
+        """The regime label, from a recorded index level series."""
+        pts = book.series(series_id)
+        closes = [float(p.value) for p in pts if p.value > 0]
+        returns = [b / a - 1.0 for a, b in zip(closes, closes[1:])]
+        out = self.run(returns, vol_window)
+        for f in out:
+            f.caveats.append(f"from {series_id}, {len(closes)} recorded levels")
+        return out
 
     def run(self, market_returns: list[float], vol_window: int = 60) -> list[Finding]:
         self._guard_tool("regime_label")
@@ -477,6 +694,45 @@ class A8OwnershipFlow(Agent):
     tier = TaskClass.FLOW_READ
 
     INSTITUTIONAL_LAG_DAYS = 45
+
+    def from_fact_book(
+        self, book, instrument_id: str, now: datetime, days: int = 90
+    ) -> list[Finding]:
+        """Insider activity from the stored Form 4 / Finnhub transactions.
+
+        Counts open-market purchases and sales in the window. Scheduled (10b5-1)
+        sales are not flagged by the sources wired today, so `scheduled_sells`
+        is zero and every sale is treated as discretionary - which is the
+        conservative direction for a signal that is mostly noise anyway. Short
+        interest is not collected yet; it is reported as unavailable rather
+        than as zero.
+        """
+        since = now - timedelta(days=days)
+        events = book.events(instrument_id, since=since, until=now, limit=1000)
+        buys = sum(1 for e in events if e.kind == "insider_buy")
+        sells = sum(1 for e in events if e.kind == "insider_sell")
+        out = self.run(buys, sells, 0, 0.0, 0.0)
+        # Short interest is not a collected series; do not let 0.0 read as a fact.
+        out = [f for f in out if f.kind != "short_interest"]
+        out.append(
+            Finding(
+                self.agent_id,
+                "short_interest",
+                "short interest not collected",
+                caveats=["no source for short interest is wired; nothing here is zero"],
+            )
+        )
+        names = sorted({str(e.payload.get("name", "")) for e in events if e.kind == "insider_buy"})
+        if names:
+            out.append(
+                Finding(
+                    self.agent_id,
+                    "insider",
+                    f"buyers in the last {days} days: {', '.join(n for n in names if n)[:200]}",
+                    numbers={"distinct_buyers": float(len([n for n in names if n]))},
+                )
+            )
+        return out
 
     def run(
         self,

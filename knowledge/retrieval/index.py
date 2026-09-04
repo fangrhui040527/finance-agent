@@ -48,6 +48,50 @@ NEWS_WINDOW_DAYS = 120
 NEWS_LICENCE = "summary"
 
 
+#: Where the nightly feedback routine writes its dated pages (knowledge/feedback/
+#: README.md is the contract). Indexed into kb_lessons.
+FEEDBACK_DIR = Path("knowledge/feedback")
+
+
+def lessons_collection(root: str | Path) -> Collection:
+    """`kb_lessons` from the routine's dated feedback pages.
+
+    Each `YYYY-MM-DD.md` is chunked on its headings (parent/child), stamped
+    with its date, and carries `licence: own` - it is this system's own
+    writing, quotable in full. Files that are not dated pages (README,
+    TEMPLATE) are skipped: a template retrieved as a lesson is a lesson
+    nobody learned.
+    """
+    import re
+
+    from knowledge.chunking.parent_child import chunk_document
+
+    col = Collection("kb_lessons")
+    root = Path(root)
+    if not root.exists():
+        return col
+    for path in sorted(root.glob("*.md")):
+        m = re.fullmatch(r"(\d{4}-\d{2}-\d{2})\.md", path.name)
+        if not m:
+            continue
+        try:
+            day = datetime.strptime(m.group(1), "%Y-%m-%d").replace(tzinfo=UTC)
+        except ValueError:
+            continue
+        text = path.read_text(encoding="utf-8", errors="replace")
+        if not text.strip():
+            continue
+        parents, children = chunk_document(
+            f"feedback:{m.group(1)}",
+            text,
+            "kb_lessons",
+            as_of=day,
+            metadata={"licence": "own", "kind": "feedback", "day": m.group(1)},
+        )
+        col.add_all(children or parents)
+    return col
+
+
 def ownership_from_registry(reg) -> dict[str, set[str]]:
     """agent id -> the knowledge stores it may read, straight from the registry."""
     return {aid: set(spec.knowledge) for aid, spec in reg.agents.items()}
@@ -113,12 +157,16 @@ def build_router(
     window: timedelta = timedelta(days=NEWS_WINDOW_DAYS),
     index: dict[str, str] | None = None,
     extra: dict[str, Collection] | None = None,
+    feedback_dir: str | Path | None = FEEDBACK_DIR,
 ) -> Router:
     """One router: registry ownership, every store registered, news filled.
 
     `corpus` is an open `knowledge.corpus.Corpus` or None. `extra` lets a
     caller hand in already-built collections (tests, or a future filings
-    index) under their store names.
+    index) under their store names. `feedback_dir` is where the nightly
+    routine writes its dated feedback; those pages fill `kb_lessons`, the one
+    store the registry lets an agent write, so the reflection agent can read
+    back what the routine concluded on earlier days.
     """
     router = Router(ownership_from_registry(reg))
     now = now or datetime.now(UTC)
@@ -131,6 +179,8 @@ def build_router(
             index = entity_index()
         articles = corpus.articles(since=now - window, limit=50_000)
         filled["kb_news"] = news_collection(articles, index)
+    if "kb_lessons" not in filled and feedback_dir is not None:
+        filled["kb_lessons"] = lessons_collection(feedback_dir)
 
     for name in sorted(reg.knowledge):
         router.register(filled.get(name) or Collection(name))

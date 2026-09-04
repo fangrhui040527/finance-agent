@@ -1016,6 +1016,62 @@ def cmd_digest(a) -> int:
     return 0
 
 
+def cmd_pack(a) -> int:
+    """The feedback pack: the deterministic half of the nightly page (docs/20).
+
+    Moves against each market's proxy from the cached bars, the decomposition,
+    the day's digest, the fact book per name, the macro series. Run with
+    FINPLANET_OFFLINE=1 where no price host is reachable. A name that cannot
+    be measured is a NO DATA row, never a typed leg; the command exits 0 when
+    the pack was written and the routine reads the rows.
+    """
+    from knowledge.pack import build_pack, write_pack
+
+    try:
+        cfg = load_config()
+    except ConfigError as e:
+        print(f"pack could not run: {e}", file=sys.stderr)
+        return 2
+    day = date.fromisoformat(a.date) if a.date else datetime.now(UTC).date() - timedelta(days=1)
+    text = build_pack(cfg, day, corpus_path=a.db or None, facts_path=a.facts_db or None)
+    if a.write:
+        path = write_pack(text, day, a.out)
+        print(f"wrote {path}", file=sys.stderr)
+    print(text)
+    return 0
+
+
+def cmd_facts(a) -> int:
+    """What the collector holds for one name: figures, events, documents."""
+    from knowledge.facts import FactBook
+    from knowledge.report import fact_snapshot
+
+    try:
+        cfg = load_config()
+        mic_of(a.instrument)
+    except (ConfigError, ValueError) as e:
+        print(f"facts: {e}", file=sys.stderr)
+        return 2
+    with FactBook(a.facts_db or cfg.facts_db) as book:
+        print(fact_snapshot(book, a.instrument, days=a.days))
+    return 0
+
+
+def cmd_macro(a) -> int:
+    """Every recorded macro series at its latest point, or one series' recent points."""
+    from knowledge.facts import FactBook
+    from knowledge.report import macro_context
+
+    try:
+        cfg = load_config()
+    except ConfigError as e:
+        print(f"macro: {e}", file=sys.stderr)
+        return 2
+    with FactBook(a.facts_db or cfg.facts_db) as book:
+        print(macro_context(book, a.series, points=a.points))
+    return 0
+
+
 def cmd_watch(a) -> int:
     """Evaluate the monitor rules and record what CHANGED.
 
@@ -1695,6 +1751,28 @@ def main(argv=None) -> int:
     dg.add_argument("--db", default="", help="corpus database")
     dg.add_argument("--facts-db", default="", help="fact book database")
     dg.set_defaults(fn=cmd_digest)
+
+    pk = sub.add_parser("pack", help="the feedback pack: the deterministic half of the night")
+    pk.add_argument("--date", default="", help="YYYY-MM-DD; default yesterday (UTC)")
+    pk.add_argument(
+        "--write", action="store_true", help="also write knowledge/feedback/<date>.pack.md"
+    )
+    pk.add_argument("--out", default="knowledge/feedback", help="where --write puts the file")
+    pk.add_argument("--db", default="", help="corpus database")
+    pk.add_argument("--facts-db", default="", help="fact book database")
+    pk.set_defaults(fn=cmd_pack)
+
+    fc = sub.add_parser("facts", help="what the collector holds for one name")
+    fc.add_argument("instrument")
+    fc.add_argument("--days", type=int, default=30, help="event window back from now")
+    fc.add_argument("--facts-db", default="", help="fact book database")
+    fc.set_defaults(fn=cmd_facts)
+
+    mc = sub.add_parser("macro", help="the recorded macro series, or one of them")
+    mc.add_argument("series", nargs="?", default="", help="e.g. DGS10 or BNM:OPR; empty for all")
+    mc.add_argument("--points", type=int, default=5, help="recent points for one series")
+    mc.add_argument("--facts-db", default="", help="fact book database")
+    mc.set_defaults(fn=cmd_macro)
 
     fx = sub.add_parser("fx", help="record the official MYR rate for the day, or show the log")
     fx.add_argument("--currency", default="USD", help="comma-separated; default USD")

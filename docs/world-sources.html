@@ -441,7 +441,9 @@ footer b{color:var(--ink-2)}
       </div>
 
       <h3>Wired</h3>
-      <p><strong>GDELT 2.0</strong> for news — free, keyless, worldwide — and <strong>moomoo OpenAPI</strong> for daily bars across Malaysia, Hong Kong, the US and Singapore. Both fail loudly: a malformed response or an unreachable gateway raises rather than returning an empty list. A genuinely empty result — the source answered, there was nothing — is not an error and returns normally.</p>
+      <p><strong>Since September 2026, the collection layer</strong> (<code>knowledge/sources/catalog.py</code>, <code>ask.py sources</code>) runs on four market-timed slots: <strong>GDELT</strong>, <strong>Google News RSS</strong> per company and edition, <strong>Yahoo Finance RSS</strong> per ticker, <strong>SEC EDGAR</strong> submissions (keyless), <strong>BNM OpenAPI</strong> OPR and <strong>DOSM</strong> CPI (keyless), and with free keys <strong>Finnhub</strong> (company news, insiders, earnings calendar and surprises, recommendations, metrics), <strong>FMP</strong> (grades, earnings dates, targets; weekly statements, estimates, transcripts on the plan that allows them), <strong>Alpha Vantage</strong> (one NEWS_SENTIMENT call a slot) and <strong>FRED</strong> (twelve series). Malaysian business RSS feeds (The Star, The Edge, Bernama, FMT, NST) and Bursa announcements are catalogued as <em>candidates</em>: they are enabled only after <code>sources-probe.yml</code> shows them answering from a runner. Every pull is recorded in the fact book with its status, so a blank is an empty store, never a quiet company.</p>
+
+      <p><strong>GDELT 2.0</strong> for news — free, keyless, worldwide — and <strong>moomoo OpenAPI</strong> for daily bars across Malaysia, Hong Kong, the US and Singapore were the first two. Both fail loudly: a malformed response or an unreachable gateway raises rather than returning an empty list. A genuinely empty result — the source answered, there was nothing — is not an error and returns normally.</p>
 
       <p>That distinction matters more for prices than for news. A short bar series does not look broken; it looks like a quiet period, and ATR, average daily value, the liquidity cap and the factor fit all compute confidently on it. A missing price announces itself. A quietly stale one does not.</p>
 
@@ -451,7 +453,7 @@ footer b{color:var(--ink-2)}
       </div>
 
       <h3>Not wired</h3>
-      <p>Everything else on this page. The point-in-time fact store is still filled only by tests, and no filing has ever been read. That is a statement of fact, not an apology: the machinery downstream of ingest is built and tested, and each source above is now a known quantity rather than a research task.</p>
+      <p>Tushare, Refinitiv, iTick, Unusual Whales, WorldMonitor, GLEIF/OpenFIGI identity and web search. The fact store is now filled by the collectors above rather than only by tests; Bursa's own announcement feed remains the one point-in-time date the system wants most and is still a guarded candidate, not a wired source.</p>
 
       <h3>Could not verify from this session</h3>
       <p>The network here blocks <code>worldmonitor.app</code> and <code>blog.gdeltproject.org</code> directly. Their figures above come from the project's own repository and from API write-ups rather than from the vendor documentation pages. Two specifics to confirm before building against them: <strong>WorldMonitor's public endpoint surface</strong> — the repository describes a REST gateway with rate limiting, but not which routes are stable — and <strong>GDELT's exact <code>maxrecords</code> ceiling</strong>, cited variously as 100 and 250. The adapter caps at 250 and pages; if the real limit is lower the API will say so and the fetch will raise rather than silently truncate.</p>
