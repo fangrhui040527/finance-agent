@@ -5,10 +5,17 @@ goes through `InferenceClient.complete()`, and the `Backend` protocol is the one
 seam a provider is allowed to sit behind. `EchoBackend` lives in that file so
 everything is testable with no keys.
 
-This file now sits on the official `anthropic` SDK (lazily imported, so the
-echo path never loads it) - typed errors and response parsing come from the
-vendor instead of being re-derived from raw JSON. Three decisions survive from
-the urllib version, on purpose, and each is pinned by tests:
+Two vendor backends live here. `AnthropicBackend` sits on the official
+`anthropic` SDK (lazily imported, so the echo path never loads it) - typed
+errors and response parsing come from the vendor instead of being re-derived
+from raw JSON. `OpenAICompatibleBackend` reaches any free-tier provider in
+`core/llm/providers.py` over stdlib urllib, because those endpoints share one
+wire format and a second SDK would be a second dependency for the same JSON.
+`SplitBackend` puts a different one of them behind each Messages tier, which is
+how "reasoning on one provider, triage on another" is expressed (docs/21).
+
+Three decisions survive from the urllib version of the Anthropic backend, on
+purpose, hold for the free-provider one too, and each is pinned by tests:
 
   * **The retry loop is OURS, not the SDK's** (`max_retries=0` on the client).
     A 429's `retry-after` is obeyed and capped at 60s - beyond that the server
@@ -28,10 +35,19 @@ repeats call after call, and a cache read bills at a tenth of fresh input.
 
 from __future__ import annotations
 
+import json
 import os
-from typing import TYPE_CHECKING, Any
+import re
+import urllib.error
+import urllib.request
+from collections.abc import Callable
+from decimal import Decimal
+from typing import TYPE_CHECKING, Any, cast
 
-from core.llm.tiers import RequestProfile, Usage
+from core.llm import providers as _providers
+from core.llm.providers import Provider
+from core.llm.tiers import MESSAGES_TIERS, MODEL_IDS, RequestProfile, Tier, Usage
+from core.net.retry import retry_after_seconds
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     import anthropic
@@ -360,18 +376,583 @@ class AnthropicBackend:
         return text, usage
 
 
+#: A 400 whose message says one of these is the prompt outrunning the window,
+#: not a malformed request. Provider wordings differ; these are the ones seen.
+_CONTEXT_MARKERS: tuple[str, ...] = (
+    "prompt is too long",
+    "context length",
+    "context_length",
+    "maximum context",
+    "too many tokens",
+    "reduce the length",
+    "exceeds the model",
+)
+
+#: Retry-worthy statuses, the same set the keyless feeds use (core/net/retry.py).
+_TRANSIENT_STATUSES = frozenset({408, 425, 429, 500, 502, 503, 504, 529})
+
+#: Reasoning models on the open-weight side (DeepSeek-R1, Qwen3, GPT-OSS
+#: through some hosts) put their chain of thought in the reply text between
+#: these tags. It is not the answer, and a JSON parser downstream would find
+#: braces inside it. A block cut off before its close tag is a model that was
+#: truncated while thinking, and nothing after the opening tag is an answer.
+_THINK_BLOCK = re.compile(r"<think>.*?</think>\s*", re.DOTALL)
+_THINK_OPEN = re.compile(r"<think>.*\Z", re.DOTALL)
+
+
+def strip_thinking(text: str) -> str:
+    """The reply with any `<think>...</think>` passage removed."""
+    if "<think>" not in text:
+        return text.strip()
+    text = _THINK_BLOCK.sub("", text)
+    text = _THINK_OPEN.sub("", text)
+    return text.strip()
+
+
+class OpenAICompatibleBackend:
+    """A free-tier provider's `chat/completions` endpoint behind the `Backend` protocol.
+
+    One class serves every provider in `core/llm/providers.py` because they
+    share the OpenAI wire format: the request is `model`, `messages` and
+    `max_tokens`; the reply is `choices[0].message.content`, `finish_reason`
+    and `usage`. Nothing provider-specific is sent - no effort level, no
+    thinking budget, no cache markers - because no free endpoint takes them by
+    Anthropic's names and an unknown parameter is a 400 on most. The output
+    cap is the one dial from the request profile that reaches the wire.
+
+    Same three rules as the Anthropic backend, same shapes: the retry loop is
+    ours and its sleep is injectable; a truncated or filtered reply raises
+    carrying its `Usage`; a missing key raises at construction. A prebuilt
+    `opener` (the urllib seam every keyless feed uses) skips the key check -
+    that is the test seam.
+
+    Calls are paced to the provider's free-tier requests-per-minute. Triage
+    arrives in bursts; a burst that trips the limit spends its retries on 429s.
+    """
+
+    DEFAULT_MAX_TOKENS = 4096
+    #: Longer than the Anthropic backend's: free hosts queue under load, and
+    #: open-weight reasoning models are slow to first token.
+    TIMEOUT = 180.0
+    #: `ask.py backend` reads this to say the effort dial does not reach here.
+    takes_effort = False
+
+    def __init__(
+        self,
+        provider: Provider,
+        api_key: str | None = None,
+        max_tokens: int = DEFAULT_MAX_TOKENS,
+        max_attempts: int = 3,
+        opener: Callable[..., Any] | None = None,
+        sleep: Callable[[float], None] | None = None,
+        jitter: Callable[[float, float], float] | None = None,
+        clock: Callable[[], float] | None = None,
+    ) -> None:
+        import random
+        import time
+
+        if max_tokens < 1:
+            raise ValueError(f"max_tokens must be positive, got {max_tokens}")
+        if max_attempts < 1:
+            raise ValueError(f"max_attempts must be at least 1, got {max_attempts}")
+        if not provider.base_url:
+            raise ValueError(
+                f"provider {provider.name!r} has no base URL; build it with "
+                "providers.from_env() so LLM_BASE_URL is read"
+            )
+
+        self.provider = provider
+        self.max_tokens = max_tokens
+        self.max_attempts = max_attempts
+        self._sleep = sleep if sleep is not None else time.sleep
+        self._jitter = jitter if jitter is not None else random.uniform
+        self._clock = clock if clock is not None else time.monotonic
+        self._last_started: float | None = None
+        self.last_request_id: str | None = None
+
+        key = api_key if api_key is not None else provider.key()
+        if opener is None and provider.key_env is not None and not (key or "").strip():
+            raise AuthError(
+                f"{provider.key_env} is empty or unset. Put it in .env (every entrypoint "
+                "loads that file; an exported variable wins over it), pick another "
+                "provider with LLM_BACKEND, or pass EchoBackend explicitly if you "
+                "meant to run without a model."
+            )
+        self._key = (key or "").strip() or None
+        self._opener = opener if opener is not None else urllib.request.urlopen
+
+    # -- what the client asks a backend ----------------------------------------
+
+    @property
+    def name(self) -> str:
+        return self.provider.name
+
+    def model_for(self, tier: Tier) -> str | None:
+        """The provider's model for a chat tier; None for EMBED and LOCAL, which
+        the client resolves from `MODEL_IDS` as before."""
+        return self.provider.models.get(tier)
+
+    def pricing_for(self, tier: Tier) -> tuple[Decimal, Decimal] | None:
+        """Zero on every tier this backend serves. The free tier bills nothing,
+        and a ledger row priced at Claude's rate for a call that cost nothing
+        would trip the budget rail on spend that never happened."""
+        if tier in self.provider.models:
+            return (Decimal(0), Decimal(0))
+        return None
+
+    # -- the seam ---------------------------------------------------------------
+
+    def complete(
+        self,
+        model_id: str,
+        prompt: str,
+        system: str | None,
+        profile: RequestProfile | None = None,
+    ) -> tuple[str, Usage]:
+        messages: list[dict[str, str]] = []
+        if system:
+            messages.append({"role": "system", "content": system})
+        messages.append({"role": "user", "content": prompt})
+        body: dict[str, Any] = {
+            "model": model_id,
+            "messages": messages,
+            "max_tokens": profile.max_tokens if profile else self.max_tokens,
+        }
+        data = self._request(body)
+        return self._parse(data)
+
+    # -- transport --------------------------------------------------------------
+
+    def _pace(self) -> None:
+        """Wait until the provider's per-minute allowance has room for one more."""
+        now = self._clock()
+        if self.provider.rpm and self._last_started is not None:
+            wait = self._last_started + 60.0 / self.provider.rpm - now
+            if wait > 0:
+                self._sleep(wait)
+                now = self._clock()
+        self._last_started = now
+
+    def _request(self, body: dict[str, Any]) -> dict[str, Any]:
+        """Bounded retry around one POST. The last failure is raised."""
+        payload = json.dumps(body).encode("utf-8")
+        headers: dict[str, str] = {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            **self.provider.extra_headers,
+        }
+        if self._key:
+            headers["Authorization"] = f"Bearer {self._key}"
+        url = f"{self.provider.base_url}/chat/completions"
+        who = self.provider.name
+
+        last: BackendError | None = None
+        for attempt in range(1, self.max_attempts + 1):
+            retry_after: float | None = None
+            req = urllib.request.Request(url, data=payload, headers=headers, method="POST")
+            self._pace()
+            try:
+                with self._opener(req, timeout=self.TIMEOUT) as resp:
+                    raw = resp.read()
+                    hdrs = getattr(resp, "headers", None)
+                    rid = None
+                    if hdrs is not None:
+                        rid = hdrs.get("x-request-id") or hdrs.get("X-Request-Id")
+                try:
+                    data = json.loads(raw.decode("utf-8"))
+                except (ValueError, UnicodeDecodeError) as e:
+                    raise BackendError(
+                        f"{who} returned a body that is not JSON: {raw[:200]!r}"
+                    ) from e
+                if not isinstance(data, dict):
+                    raise BackendError(f"{who} returned {type(data).__name__}, not an object")
+                self.last_request_id = rid or data.get("id")
+                return data
+            except urllib.error.HTTPError as e:
+                status = e.code
+                message = self._error_message(e)
+                if status in (401, 403):
+                    raise AuthError(f"{who} rejected the key ({status}): {message}") from e
+                if status in _TRANSIENT_STATUSES:
+                    last = TransientError(f"{who} returned {status}: {message}")
+                    retry_after = retry_after_seconds(e)
+                elif status == 404:
+                    raise BackendError(
+                        f"{who} has no model {body['model']!r} (404): {message}. Free "
+                        "lineups rotate; set LLM_MODEL_REASON, LLM_MODEL_BALANCED or "
+                        "LLM_MODEL_CHEAP to a model this provider serves today "
+                        "(`python ask.py backend --list` shows the defaults)"
+                    ) from e
+                elif status == 400 and any(m in message.lower() for m in _CONTEXT_MARKERS):
+                    raise ContextOverflow(
+                        f"prompt exceeds the model's context window: {message}. "
+                        "Shrink the input - trim evidence or split the question; "
+                        "retrying the same prompt hits the same wall."
+                    ) from e
+                else:
+                    raise BackendError(f"{who} returned {status}: {message}") from e
+            except OSError as e:
+                # URLError, a socket timeout, a reset mid-body, a TLS failure:
+                # every one of them is the network, not the request.
+                last = TransientError(f"{who} unreachable: {e}")
+
+            if attempt == self.max_attempts:
+                raise last
+            # Same policy as the Anthropic loop: the server's own wait is obeyed
+            # exactly; absent one, exponential backoff with jitter.
+            if retry_after is not None:
+                self._sleep(retry_after)
+            else:
+                self._sleep(self._jitter(0.5, 1.0) * 2.0 ** (attempt - 1))
+        raise last if last is not None else BackendError("retry loop exited without a result")
+
+    @staticmethod
+    def _error_message(err: urllib.error.HTTPError) -> str:
+        """The provider's own words for what went wrong, or the status line."""
+        try:
+            raw = err.read()
+        except Exception:  # pragma: no cover - a body that cannot be read
+            raw = b""
+        text = raw.decode("utf-8", "replace").strip() if raw else ""
+        if text:
+            try:
+                data = json.loads(text)
+            except ValueError:
+                return text[:300]
+            if isinstance(data, dict):
+                inner = data.get("error")
+                if isinstance(inner, dict) and inner.get("message"):
+                    return str(inner["message"])[:300]
+                if isinstance(inner, str) and inner:
+                    return inner[:300]
+                if data.get("message"):
+                    return str(data["message"])[:300]
+            return text[:300]
+        return str(getattr(err, "reason", "") or f"http {err.code}")
+
+    # -- response ---------------------------------------------------------------
+
+    def _parse(self, data: dict[str, Any]) -> tuple[str, Usage]:
+        who = self.provider.name
+        # A provider that answers 200 with an error object exists (some
+        # gateways do). It carries no choices, and it is a failure, not silence.
+        choices = data.get("choices")
+        if not choices:
+            detail = data.get("error") or data
+            raise BackendError(f"{who} returned no choices: {json.dumps(detail)[:200]}")
+        choice = choices[0] if isinstance(choices[0], dict) else {}
+        message = choice.get("message") or {}
+        content = message.get("content")
+        if isinstance(content, list):
+            text = "".join(
+                str(part.get("text", ""))
+                for part in content
+                if isinstance(part, dict) and part.get("type", "text") == "text"
+            )
+        elif content is None:
+            text = ""
+        else:
+            text = str(content)
+        text = strip_thinking(text)
+
+        raw_usage = data.get("usage")
+        if not isinstance(raw_usage, dict):
+            raise BackendError(f"{who} response carries no usage; tokens cannot be ledgered")
+        try:
+            prompt_tokens = int(raw_usage.get("prompt_tokens") or 0)
+            completion_tokens = int(raw_usage.get("completion_tokens") or 0)
+            details = raw_usage.get("prompt_tokens_details") or {}
+            cached = int(details.get("cached_tokens") or 0) if isinstance(details, dict) else 0
+        except (TypeError, ValueError) as e:
+            raise BackendError(f"{who} usage is not numeric: {raw_usage!r}") from e
+        # OpenAI-style `prompt_tokens` INCLUDES the cached part; `Usage` holds
+        # the uncached remainder, as the Anthropic API reports it. Subtract, so
+        # one ledger column means one thing whichever backend wrote the row.
+        usage = Usage(
+            input_tokens=max(prompt_tokens - cached, 0),
+            output_tokens=completion_tokens,
+            cached_input_tokens=cached,
+        )
+
+        finish = choice.get("finish_reason")
+        if finish == "length":
+            raise Truncated(
+                f"model hit max_tokens after {usage.output_tokens} output tokens; "
+                "raise max_tokens or narrow the question - a truncated answer is "
+                "never returned as a whole one",
+                usage=usage,
+            )
+        if finish == "content_filter":
+            raise Declined(
+                "model declined to answer (finish_reason=content_filter)",
+                usage=usage,
+                category="content_filter",
+                explanation=text or None,
+            )
+        if not text.strip():
+            raise BackendError(f"{who} returned no text (finish_reason={finish!r})")
+        return text, usage
+
+
+# --- reading a backend without knowing its class ---------------------------------
+
+
+def model_of(backend: Any, tier: Tier) -> str:
+    """The model id this backend will call for a tier.
+
+    A backend may implement `model_for(tier)`; one that does not (Echo,
+    Anthropic) is on the Claude table. The client resolves every model through
+    here so the ledger records what was actually called, never the table's
+    idea of it.
+    """
+    hook: Any = getattr(backend, "model_for", None)
+    if callable(hook):
+        chosen = hook(tier)
+        if chosen:
+            return str(chosen)
+    return MODEL_IDS[tier]
+
+
+def pricing_of(backend: Any, tier: Tier) -> tuple[Decimal, Decimal] | None:
+    """The (input, output) USD-per-million rates a backend declares for a tier,
+    or None to bill at the tier's first-party rate."""
+    hook: Any = getattr(backend, "pricing_for", None)
+    if callable(hook):
+        rates = hook(tier)
+        if rates is not None:
+            return cast("tuple[Decimal, Decimal]", rates)
+    return None
+
+
+def models_by_tier(backend: Any) -> dict[Tier, str]:
+    """Every tier's model on this backend: what `ask.py backend` and the web
+    surface must show instead of the routing table."""
+    return {tier: model_of(backend, tier) for tier in MODEL_IDS}
+
+
+def backend_name(backend: Any, tier: Tier | None = None) -> str:
+    """The class answering, per tier when the backend is a split."""
+    if tier is not None:
+        hook: Any = getattr(backend, "name_for", None)
+        if callable(hook):
+            return str(hook(tier))
+    return type(backend).__name__
+
+
+def effort_reaches(backend: Any, tier: Tier) -> bool:
+    """Whether FINPLANET_EFFORT is sent to the model this tier lands on."""
+    if isinstance(backend, SplitBackend):
+        backend = backend.by_tier.get(tier, backend)
+    return bool(getattr(backend, "takes_effort", True))
+
+
+class SplitBackend:
+    """One backend per Messages tier, so reasoning and triage can sit on
+    different providers - Claude for a thesis, a free model for tagging.
+
+    `complete()` receives a model id, not a tier, so dispatch is by model id:
+    every tier's model is resolved at construction and mapped to the backend
+    that serves it. Two backends serving the same id is refused, because the
+    split could not tell which one a call was for.
+    """
+
+    def __init__(self, by_tier: dict[Tier, Any]) -> None:
+        missing = [t.value for t in MESSAGES_TIERS if t not in by_tier]
+        if missing:
+            raise ValueError(f"split needs a backend for every Messages tier; missing {missing}")
+        self.by_tier: dict[Tier, Any] = dict(by_tier)
+        self._owner: dict[str, Any] = {}
+        for tier, sub in self.by_tier.items():
+            model = model_of(sub, tier)
+            prior = self._owner.get(model)
+            if prior is not None and prior is not sub:
+                raise ValueError(
+                    f"model {model!r} is served by two different backends in the split "
+                    f"({type(prior).__name__} and {type(sub).__name__}); the split could "
+                    "not tell which one a call was for"
+                )
+            self._owner[model] = sub
+        self._last: Any = None
+
+    def model_for(self, tier: Tier) -> str | None:
+        sub = self.by_tier.get(tier)
+        return model_of(sub, tier) if sub is not None else None
+
+    def pricing_for(self, tier: Tier) -> tuple[Decimal, Decimal] | None:
+        sub = self.by_tier.get(tier)
+        return pricing_of(sub, tier) if sub is not None else None
+
+    def name_for(self, tier: Tier) -> str:
+        sub = self.by_tier.get(tier)
+        return type(sub).__name__ if sub is not None else type(self).__name__
+
+    @property
+    def last_request_id(self) -> str | None:
+        return getattr(self._last, "last_request_id", None)
+
+    def complete(
+        self,
+        model_id: str,
+        prompt: str,
+        system: str | None,
+        profile: RequestProfile | None = None,
+    ) -> tuple[str, Usage]:
+        sub = self._owner.get(model_id)
+        if sub is None:
+            raise BackendError(
+                f"no backend in the split serves model {model_id!r}; it serves "
+                f"{sorted(self._owner)}"
+            )
+        self._last = sub
+        return sub.complete(model_id, prompt, system, profile=profile)
+
+
+# --- selection --------------------------------------------------------------------
+
+_SPLIT_ENV: dict[Tier, str] = {
+    Tier.REASON: "LLM_BACKEND_REASON",
+    Tier.BALANCED: "LLM_BACKEND_BALANCED",
+    Tier.CHEAP: "LLM_BACKEND_CHEAP",
+}
+
+
+def _provider_backend(name: str, how: str) -> tuple[OpenAICompatibleBackend, str]:
+    """Build a free-provider backend and the sentence that discloses it.
+
+    Colon discipline: `ask.py` labels a narrative with `reason.split(":")[0]`,
+    so everything before the first colon is the label and the URL (which has
+    one of its own) comes after it.
+    """
+    provider = _providers.from_env(name)  # ValueError names the variable to set
+    backend = OpenAICompatibleBackend(provider)  # AuthError names the key
+    m = provider.models
+    reason = (
+        f"{provider.name} ({how}, free tier): "
+        f"reason={m[Tier.REASON]} balanced={m[Tier.BALANCED]} cheap={m[Tier.CHEAP]}; "
+        f"OpenAI-compatible at {provider.base_url}; priced at zero in the ledger; "
+        f"{provider.note}"
+    )
+    return backend, reason
+
+
+def _select(choice: str) -> tuple[Any, str]:
+    """One backend for one name, or for no name at all."""
+    from core.llm.client import EchoBackend
+
+    if choice in ("echo", "none", "offline"):
+        return EchoBackend(), "echo (explicitly selected): deterministic stub, not a model"
+    if choice in ("anthropic", "claude"):
+        return AnthropicBackend(), "anthropic (explicitly selected, official SDK)"
+    if choice == "free":
+        provider = _providers.first_configured()
+        if provider is None:
+            keys = ", ".join(
+                p.key_env
+                for p in _providers.PROVIDERS
+                if p.name in _providers.AUTO_SELECTABLE and p.key_env
+            )
+            raise AuthError(
+                f"LLM_BACKEND=free, but no free provider has a key: set one of {keys} "
+                "in .env, or LLM_BACKEND=ollama for a local server"
+            )
+        return _provider_backend(
+            provider.name, f"{provider.key_env} is set, chosen by LLM_BACKEND=free"
+        )
+    if choice and _providers.is_provider_name(choice):
+        return _provider_backend(choice, "explicitly selected")
+    if choice:
+        raise ValueError(
+            f"unknown LLM_BACKEND {choice!r}; expected 'anthropic', 'echo', 'free' "
+            f"or a provider: {', '.join(_providers.names())}"
+        )
+
+    # Nothing named: the keys decide, and the reason says which one did.
+    if os.environ.get("ANTHROPIC_API_KEY", "").strip():
+        workspace = os.environ.get("ANTHROPIC_WORKSPACE_ID", "").strip()
+        where = f", workspace {workspace}" if workspace else ""
+        also = _providers.configured_names()
+        tail = (
+            f"; a free-provider key is also set ({', '.join(also)}) - "
+            f"LLM_BACKEND={also[0]} selects it instead"
+            if also
+            else ""
+        )
+        return (
+            AnthropicBackend(),
+            f"anthropic (ANTHROPIC_API_KEY is set, official SDK{where}){tail}",
+        )
+    provider = _providers.first_configured()
+    if provider is not None:
+        return _provider_backend(
+            provider.name, f"{provider.key_env} is set and ANTHROPIC_API_KEY is not"
+        )
+    return EchoBackend(), (
+        "echo (no ANTHROPIC_API_KEY and no free-provider key): deterministic stub, "
+        "NOT a model - narrative output is placeholder text"
+    )
+
+
+def _canonical(backend: Any) -> str:
+    """The name two tiers would have to agree on to share one instance."""
+    if isinstance(backend, OpenAICompatibleBackend):
+        return backend.name
+    if isinstance(backend, AnthropicBackend):
+        return "anthropic"
+    return "echo"
+
+
+def _split_from_env(base: Any, base_choice: str) -> tuple[SplitBackend, str] | None:
+    """Per-tier overrides, when any is set: LLM_BACKEND_REASON, _BALANCED, _CHEAP.
+
+    Tiers that name the same provider share one instance, so the pacing clock
+    (one per backend) sees every call to that provider - two instances would
+    each believe they had the whole per-minute allowance.
+    """
+    wanted = {tier: os.environ.get(var, "").strip().lower() for tier, var in _SPLIT_ENV.items()}
+    if not any(wanted.values()):
+        return None
+    built: dict[str, Any] = {_canonical(base): base}
+    by_tier: dict[Tier, Any] = {}
+    for tier, name in wanted.items():
+        if not name:
+            by_tier[tier] = base
+            continue
+        resolved = _providers.lookup(name)
+        key = resolved.name if resolved is not None else name
+        if key == "claude":
+            key = "anthropic"
+        if key in ("none", "offline"):
+            key = "echo"
+        if key not in built:
+            built[key], _ = _select(name)
+            # `free` resolves to whichever provider had a key; file it under
+            # that name too so a later tier saying the name shares it.
+            built.setdefault(_canonical(built[key]), built[key])
+        by_tier[tier] = built[key]
+    split = SplitBackend(by_tier)
+    parts = [
+        f"{tier.value}={backend_name(by_tier[tier])} {model_of(by_tier[tier], tier)}"
+        for tier in MESSAGES_TIERS
+    ]
+    return split, "split by tier (LLM_BACKEND_<TIER>) " + ", ".join(parts)
+
+
 def backend_from_env(explicit: str | None = None):
     """Pick a backend the way an operator expects, and SAY which was picked.
 
-    Precedence: an explicit choice, else a real backend when a key exists, else
-    the echo stand-in. The returned reason is not decoration - the difference
-    between a real answer and a deterministic stub is the single most important
-    thing to show on screen, and a system that quietly ran on EchoBackend for a
-    week would be indistinguishable from one that worked.
+    Precedence: an explicit choice, else `LLM_BACKEND`, else a real backend when
+    a key exists - Anthropic's first, then the first free provider's - else the
+    echo stand-in. With nothing explicit, `LLM_BACKEND_REASON`, `_BALANCED` and
+    `_CHEAP` may each put a different backend behind one tier, which is how the
+    thesis stays on Claude while triage runs on a free model.
+
+    The returned reason is not decoration - the difference between a real
+    answer and a deterministic stub is the single most important thing to show
+    on screen, and a system that quietly ran on EchoBackend for a week would be
+    indistinguishable from one that worked.
 
     Returns (backend, reason).
     """
-    from core.llm.client import EchoBackend
     from core.llm.tiers import cheap_capped, selection_note
 
     note = selection_note()
@@ -380,21 +961,10 @@ def backend_from_env(explicit: str | None = None):
         cap += " (every Messages tier resolves to the cheapest model)"
     choice = (explicit or os.environ.get("LLM_BACKEND", "")).strip().lower()
 
-    if choice in ("echo", "none", "offline"):
-        return EchoBackend(), "echo (explicitly selected): deterministic stub, not a model" + cap
-    if choice in ("anthropic", "claude"):
-        return AnthropicBackend(), "anthropic (explicitly selected, official SDK)" + cap
-    if choice:
-        raise ValueError(f"unknown LLM_BACKEND {choice!r}; expected 'anthropic' or 'echo'")
-
-    if os.environ.get("ANTHROPIC_API_KEY", "").strip():
-        workspace = os.environ.get("ANTHROPIC_WORKSPACE_ID", "").strip()
-        where = f", workspace {workspace}" if workspace else ""
-        return (
-            AnthropicBackend(),
-            f"anthropic (ANTHROPIC_API_KEY is set, official SDK{where})" + cap,
-        )
-    return EchoBackend(), (
-        "echo (no ANTHROPIC_API_KEY): deterministic stub, NOT a model - "
-        "narrative output is placeholder text" + cap
-    )
+    backend, reason = _select(choice)
+    if explicit is None:
+        split = _split_from_env(backend, choice)
+        if split is not None:
+            backend, extra = split
+            reason = f"{reason} | {extra}"
+    return backend, reason + cap

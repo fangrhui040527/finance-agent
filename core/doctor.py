@@ -139,17 +139,35 @@ def run_checks(offline: bool = False) -> list[CheckResult]:
             "narrative output (numbers are engine-computed either way)",
         )
     )
-    from core.llm.tiers import cheap_capped, selection_note
+    from decimal import Decimal
+
+    from core.llm.backends import pricing_of
+    from core.llm.tiers import MESSAGES_TIERS, cheap_capped, selection_note
 
     note = selection_note()
-    out.append(
-        CheckResult(
-            "spend-cap",
-            OK if cheap_capped() else WARN,
-            note or "no model pin - live calls bill at each tier's own rate",
-            "spend",
+    zero = (Decimal(0), Decimal(0))
+    if all(pricing_of(backend, tier) == zero for tier in MESSAGES_TIERS):
+        # A free provider on every Messages tier: there is no rate to cap, and
+        # warning "bills at each tier's own rate" here would send the operator
+        # to pin a model that already costs nothing (docs/21).
+        out.append(
+            CheckResult(
+                "spend-cap",
+                OK,
+                "every Messages tier priced at zero on the free provider"
+                + (f"; {note}" if note else ""),
+                "spend",
+            )
         )
-    )
+    else:
+        out.append(
+            CheckResult(
+                "spend-cap",
+                OK if cheap_capped() else WARN,
+                note or "no model pin - live calls bill at each tier's own rate",
+                "spend",
+            )
+        )
 
     # -- debug retention
     debug = Path(os.environ.get("FINPLANET_DEBUG_DIR", "debug"))

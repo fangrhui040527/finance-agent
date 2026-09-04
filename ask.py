@@ -1276,6 +1276,8 @@ def cmd_backend(a) -> int:
     """The difference between a real answer and a stub is worth one command."""
     from core.llm.backends import AuthError, backend_from_env
 
+    if getattr(a, "list", False):
+        return _print_providers()
     try:
         backend, reason = backend_from_env(a.use)
     except (AuthError, ValueError) as e:
@@ -1283,9 +1285,9 @@ def cmd_backend(a) -> int:
         return 3
     print(f"backend   {type(backend).__name__}")
     print(f"reason    {reason}")
+    from core.llm.backends import backend_name, effort_reaches, models_by_tier
     from core.llm.tiers import (
         MESSAGES_TIERS,
-        MODEL_IDS,
         cheap_capped,
         effective_tier,
         profile_for,
@@ -1297,21 +1299,30 @@ def cmd_backend(a) -> int:
     # Printing the unpinned model here is how a disclosure command ends up
     # disclosing the wrong thing. The reasoning column is the same rule applied
     # to effort: what the request will carry, in the form that model accepts.
-    for tier, model in MODEL_IDS.items():
+    # And the model column comes from the BACKEND, because on a free provider
+    # the routing table's Claude ids are not what answers.
+    models = models_by_tier(backend)
+    split = type(backend).__name__ == "SplitBackend"
+    for tier, model in models.items():
         landed = effective_tier(tier)
         shape = profile_for(landed)
         if landed in MESSAGES_TIERS:
-            if shape.thinking_budget is not None:
-                how = f"thinking budget {shape.thinking_budget}"
-            elif shape.effort:
-                how = f"effort {shape.effort}"
+            if not effort_reaches(backend, landed):
+                how = f"max {shape.max_tokens}, effort dial not sent to this provider"
             else:
-                how = "no thinking"
-            how = f"{how}, max {shape.max_tokens}" + (", streamed" if shape.stream else "")
+                if shape.thinking_budget is not None:
+                    how = f"thinking budget {shape.thinking_budget}"
+                elif shape.effort:
+                    how = f"effort {shape.effort}"
+                else:
+                    how = "no thinking"
+                how = f"{how}, max {shape.max_tokens}" + (", streamed" if shape.stream else "")
+            if split:
+                how = f"{backend_name(backend, landed)}, {how}"
         else:
             how = "not a Messages model"
         moved = "" if landed is tier else f"   (pinned from {model})"
-        print(f"  {tier.value:<9} {MODEL_IDS[landed]:<24} {how}{moved}")
+        print(f"  {tier.value:<9} {models[landed]:<24} {how}{moved}")
     note = selection_note()
     if note:
         print(f"  selection {note}")
@@ -1321,6 +1332,35 @@ def cmd_backend(a) -> int:
     if selected_effort() is None:
         print("  effort unset: each tier keeps its own default (reason high, balanced")
         print("  medium, cheap none). --effort low|medium|high|xhigh|max overrides it.")
+    return 0
+
+
+def _print_providers() -> int:
+    """The free-provider catalogue, with whether each one could answer right now."""
+    from core.llm import providers
+    from core.llm.tiers import Tier
+
+    print("free providers (docs/21; catalogued from awesome-free-models, 2026-09-03)")
+    print("  LLM_BACKEND=<name> selects one; LLM_BACKEND=free takes the first keyed one")
+    for p in providers.PROVIDERS:
+        if p.key_env is None:
+            state = "keyless"
+        elif p.key() is not None:
+            state = f"{p.key_env} set"
+        else:
+            state = f"{p.key_env} unset"
+        pace = f"{p.rpm}/min" if p.rpm else "unpaced"
+        print(f"\n  {p.name:<18} {state:<24} {pace}")
+        if p.aliases:
+            print(f"    also       {', '.join(p.aliases)}")
+        print(f"    endpoint   {p.base_url or '(LLM_BASE_URL)'}")
+        for tier in (Tier.REASON, Tier.BALANCED, Tier.CHEAP):
+            print(
+                f"    {tier.value:<10} {p.models.get(tier) or '(LLM_MODEL_' + tier.value.upper() + ')'}"
+            )
+        print(f"    note       {p.note}")
+    print("\n  per-tier model override: LLM_MODEL_REASON / _BALANCED / _CHEAP, or LLM_MODEL")
+    print("  per-tier backend override: LLM_BACKEND_REASON / _BALANCED / _CHEAP")
     return 0
 
 
@@ -1705,7 +1745,14 @@ def main(argv=None) -> int:
     gr.set_defaults(fn=cmd_graph)
 
     bk = sub.add_parser("backend", help="which model is actually answering")
-    bk.add_argument("--use", choices=["anthropic", "echo"], help="force one")
+    bk.add_argument(
+        "--use",
+        help="force one: anthropic, echo, free, or a free provider (groq, gemini, openrouter, "
+        "mistral, nvidia, ollama, openai-compatible)",
+    )
+    bk.add_argument(
+        "--list", action="store_true", help="the free-provider catalogue and which keys are set"
+    )
     bk.set_defaults(fn=cmd_backend)
 
     nw = sub.add_parser("news", help="pull one source through the feed registry")

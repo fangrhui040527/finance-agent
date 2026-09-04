@@ -440,13 +440,17 @@ CACHE_READ_MULTIPLIER = Decimal("0.1")
 CACHE_WRITE_MULTIPLIER = Decimal("1.25")
 
 
-def cost_usd(tier: Tier, usage: Usage) -> Decimal:
+def cost_usd(tier: Tier, usage: Usage, pricing: tuple[Decimal, Decimal] | None = None) -> Decimal:
     """Fresh input at the base rate, reads at a tenth, writes at a quarter over.
+
+    `pricing` is the (input, output) USD-per-million pair the BACKEND declares
+    for this call, when it is not on the first-party table: a free provider
+    passes zero. None bills at the tier's own rate, as before.
 
     Every term is clamped at zero, so the sum can never be negative whatever a
     malformed usage block says.
     """
-    in_rate, out_rate = PRICING_USD[tier]
+    in_rate, out_rate = pricing if pricing is not None else PRICING_USD[tier]
     million = Decimal(1_000_000)
     fresh = Decimal(max(usage.input_tokens, 0)) / million * in_rate
     cached = Decimal(max(usage.cached_input_tokens, 0)) / million * in_rate * CACHE_READ_MULTIPLIER

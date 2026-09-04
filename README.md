@@ -45,6 +45,7 @@ Full design detail starts at **[`docs/README.md`](docs/README.md)**.
 | [15 MCP setup](docs/15-MCP-SETUP.md) | **Run it as an MCP server so the reasoning is your Claude session** |
 | [16 Tracing and anatomy](docs/16-TRACING-AND-ANATOMY.md) | **Every prompt, every guardrail decision, every dropped claim — `make trace`** |
 | [17 Knowledge graph](docs/17-KNOWLEDGE-GRAPH.md) | **Multi-hop exposure end to end: confidence, validity, the citation seam, the build, the review surface, and the codebase graph** |
+| [21 Free models](docs/21-FREE-MODELS.md) | **A zero-cost first month: reasoning on your Claude session, triage on a free open-weight model, no Anthropic API key needed** |
 
 ## Status
 
@@ -60,6 +61,15 @@ keeps everything offline) and `fastapi`/`uvicorn` (web). Engines and tests
 import none of the last three. Live model testing runs under
 `FINPLANET_CHEAP=1`, which resolves every tier to the cheapest model and says
 so on every surface.
+
+**No Anthropic key is required to run a real model** (`docs/21-FREE-MODELS.md`).
+The reasoning runs on your Claude session over MCP; the calls this process
+makes itself - triage, tagging, dedup, the CLI narratives - go to a free-tier
+open-weight provider (Groq, Google AI Studio, OpenRouter, Mistral, NVIDIA NIM,
+or a local Ollama) through one `OpenAICompatibleBackend` on stdlib urllib.
+One key in `.env` is enough; `python ask.py backend --list` shows the
+catalogue, `python ask.py backend` says which model answers each tier, and
+`LLM_BACKEND_CHEAP=groq` keeps a thesis on Claude while triage runs free.
 
 **Collection is wired** (`docs/20-FEEDBACK-ROUTINE.md`, `details/09-RUNBOOK.md`):
 seventeen catalogued sources - keyless RSS and GDELT per company, SEC EDGAR,
@@ -93,6 +103,7 @@ make graph-report            # hubs, orphans, review queue, surprising links
 make codegraph               # the repo as a graph -> data/codegraph.db
 make mcp                     # serve MCP on stdio -> docs/15-MCP-SETUP.md
 python ask.py backend                        # which model is actually answering
+python ask.py backend --list                 # the free-provider catalogue, and which keys are set
 python ask.py --model opus --effort max backend   # pin the model, pick the reasoning
 python ask.py why MYX:1155 --move -0.09 --market -0.08
 python ask.py why XNAS:NVDA --fetch --against XNAS:SPY --days 5

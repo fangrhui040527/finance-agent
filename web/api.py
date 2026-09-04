@@ -42,9 +42,8 @@ def health() -> S.Envelope:
 
 @router.get("/backend")
 def backend() -> S.Envelope:
-    from core.llm.backends import backend_from_env
+    from core.llm.backends import backend_from_env, backend_name, effort_reaches, models_by_tier
     from core.llm.tiers import (
-        MODEL_IDS,
         cheap_capped,
         effective_tier,
         pinned_tier,
@@ -55,25 +54,36 @@ def backend() -> S.Envelope:
     b, reason = backend_from_env()
     effort = selected_effort()
     pin = pinned_tier()
+    # From the backend, not MODEL_IDS: a free provider answers with its own
+    # lineup, and a screen that showed Claude ids for it would be showing the
+    # design, not the run.
+    models = models_by_tier(b)
     return S.Envelope(
         text=reason,
         data={
             "backend": type(b).__name__,
             "is_stub": type(b).__name__ == "EchoBackend",
             "cheap_capped": cheap_capped(),
-            "pinned_model": MODEL_IDS[pin] if pin is not None else None,
+            "pinned_model": models[pin] if pin is not None else None,
             "effort": effort.value if effort is not None else None,
             # What each tier will ACTUALLY call and how hard it will think.
-            # A screen that showed the routing table instead would be showing
-            # the design, not the run.
             "tiers": {
                 tier.value: {
-                    "model": MODEL_IDS[effective_tier(tier)],
-                    "effort": profile_for(effective_tier(tier)).effort,
-                    "thinking_budget": profile_for(effective_tier(tier)).thinking_budget,
+                    "model": models[effective_tier(tier)],
+                    "backend": backend_name(b, effective_tier(tier)),
+                    "effort": (
+                        profile_for(effective_tier(tier)).effort
+                        if effort_reaches(b, effective_tier(tier))
+                        else None
+                    ),
+                    "thinking_budget": (
+                        profile_for(effective_tier(tier)).thinking_budget
+                        if effort_reaches(b, effective_tier(tier))
+                        else None
+                    ),
                     "max_tokens": profile_for(effective_tier(tier)).max_tokens,
                 }
-                for tier in MODEL_IDS
+                for tier in models
             },
         },
     )

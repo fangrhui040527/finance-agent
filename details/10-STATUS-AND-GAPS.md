@@ -44,6 +44,7 @@ invisible.
 | **Cleaning layer** — normal form, language allowlist, junk filter, quality score, word-boundary entity linking | complete |
 | **Fact book** — `data/facts.db`: observations with `known_at`, events, vintaged series, documents; bridge to the point-in-time FactStore | complete |
 | **Digest** — `ask.py digest`, the day's page per name for the person, the agents and the feedback routine | complete |
+| **Free-provider backend** — `OpenAICompatibleBackend` over six catalogued free tiers, `SplitBackend` per tier, model and price resolved through the backend into the ledger | complete; docs/21. **Never run against a live provider from this environment** (no route out); the wire format is pinned by tests, the model ids are the catalogue's and rot |
 
 ---
 
