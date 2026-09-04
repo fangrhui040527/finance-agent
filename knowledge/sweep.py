@@ -25,6 +25,7 @@ read, so a failed night is re-read tomorrow rather than skipped.
 from __future__ import annotations
 
 import sys
+import zlib
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 
@@ -46,11 +47,46 @@ DEGRADED = "degraded"
 # --- the pieces that used to live in ask.py -------------------------------------------
 
 
-def _rotate(terms, day: int):
+#: Rotation bucket, in seconds. A minute: two attempts of the same run replay
+#: in the same order, any two real collection slots differ.
+ROTATION_PERIOD_S = 60
+
+
+def _rotation_offset(now: datetime) -> int:
+    """How far to rotate the name list for a run starting at `now`.
+
+    Derived from the run's start time, NOT from the date. That distinction is
+    the whole point and it was wrong until 2026-09-04: the offset was
+    `toordinal()`, so every run on a given day queried in the identical order
+    while the docstring below claimed each RUN started somewhere new.
+
+    What that cost is measurable in the sweeps table. GDELT rate-limits a run
+    progressively - nine sequential requests, quota gone after about five - so
+    the names that fail are the ones asked LAST, not particular companies. On
+    2026-09-04 the 13:01 run read positions 1-5 and failed 6, 7, 8 and 9. With
+    four collection slots a day and a per-DAY offset, all four asked in the same
+    order and starved the same tail: Tenaga and Petronas Chemicals failed in all
+    three runs that day and looked like a problem with those two companies. They
+    were simply last in the queue, every time.
+
+    Hashed rather than used as a raw counter, because a counter ALIASES against
+    the number of names. Hourly buckets and nine names put the 12:30 and 21:15
+    slots nine hours apart - `% 9` collides - so two of the four slots would
+    still have shared an order. A hash has no such structure, so the fix does
+    not quietly depend on the schedule avoiding multiples of the list length.
+    crc32, not hash(), because hash() is salted per process and the order has to
+    be reproducible from the start time: a sweep you cannot replay is a sweep
+    you cannot explain.
+    """
+    bucket = int(now.timestamp()) // ROTATION_PERIOD_S
+    return zlib.crc32(str(bucket).encode())
+
+
+def _rotate(terms, n: int):
     """Start each run at a different name, so a deadline never starves the same tail."""
     if not terms:
         return terms
-    n = day % len(terms)
+    n = n % len(terms)
     return tuple(terms[n:]) + tuple(terms[:n])
 
 
@@ -461,7 +497,7 @@ def _news_per_instrument(
     from markets.registry import mic_of
 
     names = display_names()
-    rotated = _rotate(tuple(instruments), tick().toordinal())
+    rotated = _rotate(tuple(instruments), _rotation_offset(tick()))
     per = max(1, limit // max(1, len(rotated)))
     articles: list[Article] = []
     records_total = 0
