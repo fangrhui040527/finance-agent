@@ -235,18 +235,16 @@ min_graded_for_calibration = 30
 # Added 2026-09-03 after GDELT returned nothing for any Bursa name over a
 # 2-hour window. Whether that is GDELT's Malaysian coverage or the short window
 # is still open - see details/09.
-# bnm_press is Bank Negara's press releases via Liferay's RSS endpoint, which
-# the operator found on the /rss page after three guesses failed. MACRO news -
-# the OPR decision, banking statistics, policy documents - not company news, so
-# most of it arrives unlinked and the `unlinked` count says so.
+# bnm_press is registered and NOT enabled. Four sweeps on 2026-09-03/04 settled
+# it: the endpoint shape is right and the CURRENT year's page has RSS switched
+# off, so there is no live BNM feed to point at. The whole story is in
+# knowledge/feeds/registry.py.
 #
-# CURRENTLY COLLECTS NOTHING. The 2026-09-04 01:47 sweep proved the endpoint is
-# real - status ok, well-formed RSS - and that it serves the 2020 archive, so it
-# fetches 0 items in any recent window. It needs the same link from the CURRENT
-# year's page; see knowledge/feeds/registry.py for why the year cannot just be
-# swapped. Until then this source succeeds nightly and ingests nothing, which is
-# the one failure mode this file warns about hardest.
-enabled = ["gdelt", "bnm_press"]
+# Also worth remembering before anyone tries again: BNM is a central bank. Even
+# working, it publishes rate decisions and banking statistics - macro news that
+# will not name Maybank or Tenaga. It was never the fix for the missing Bursa
+# COMPANY coverage; that still needs a Malaysian business news source.
+enabled = ["gdelt"]
 
 # Where a sweep keeps what it saw. Append-only, deduplicated across runs, and
 # carrying a row for every sweep INCLUDING the ones that failed - a month of

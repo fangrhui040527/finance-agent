@@ -29,19 +29,26 @@ FACTORIES: dict[str, Callable[..., FeedAdapter]] = {
 RSS_SOURCES: dict[str, tuple[str, str]] = {
     # name: (url, trust)
     "reuters_business": ("https://feeds.reuters.com/reuters/businessNews", "wire"),
-    # Liferay's asset-publisher RSS endpoint for the CURRENT year's page.
+    # REGISTERED, NOT ENABLED. Four sweeps settled this; the record, so nobody
+    # repeats it:
     #
-    # The 2020 page's URL worked (well-formed RSS, status ok) but served the
-    # 2020 archive - fetched 0 in any recent window. Swapping the year alone
-    # 403s, because INSTANCE_<id> names the portlet PLACEMENT and each year page
-    # has its own. The 2026 page's id was read out of its HTML:
+    #   /rss/press-release              404 - path predates the site redesign
+    #   /rss                            an HTML landing page, no autodiscovery
+    #   /press-release-2020?...getRSS   WORKS - valid RSS, but the 2020 archive,
+    #                                   so 0 items in any recent window
+    #   /press-release-2026?...getRSS   HTML, not a feed
     #
-    #   id="p_p_id_com_liferay_asset_publisher_web_portlet
-    #       _AssetPublisherPortlet_INSTANCE_ZkJrPGjQLX7H_"
+    # The endpoint SHAPE is right - `p_p_resource_id=getRSS` on Liferay's asset
+    # publisher - and the instance id below was transcribed from the 2026 page's
+    # own markup, not guessed. It still returns HTML, and the page's
+    # `subscribe-action` div is empty where a feed-enabled page carries the
+    # subscribe control: RSS is switched OFF for that portlet instance. The 2020
+    # instance has it on, which is why only the archive answers.
     #
-    # so this is transcribed, not guessed. One caveat that the next sweep
-    # settles: the page's `subscribe-action` div is empty, which may mean RSS is
-    # switched off for this instance even though the resource id exists.
+    # Anyone trying again: the non-year-scoped pages /pr and /press-releases-main
+    # are the remaining candidates, each with its own instance id readable from
+    # its HTML. Weigh it first - BNM is a central bank, so even working this is
+    # macro news that will not name a Bursa company.
     "bnm_press": (
         "https://www.bnm.gov.my/press-release-2026"
         "?p_p_id=com_liferay_asset_publisher_web_portlet_AssetPublisherPortlet"

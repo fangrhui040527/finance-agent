@@ -165,22 +165,31 @@ that — then disabled the same day, because its URL could not be established:
 | tried | answer |
 |---|---|
 | `/rss/press-release` | HTTP 404 — the path predates BNM's site redesign |
-| `/rss` | an HTML landing page titled "RSS - Bank Negara Malaysia", with no autodiscovery tags |
+| `/rss` | an HTML landing page, no autodiscovery tags |
+| `/press-release-2020?…getRSS` | **works** — valid RSS, but the 2020 archive, so 0 items in any recent window |
+| `/press-release-2026?…getRSS` | HTML, not a feed |
 
-The feed is behind a link on that page. Reading it needs a browser this
-environment does not have, and it is a one-minute job for anyone who does: open
-<https://www.bnm.gov.my/rss>, copy the press-release feed link into
-`knowledge/feeds/registry.py`, and add `"bnm_press"` back to `[sources] enabled`.
+So the endpoint shape is right — `p_p_resource_id=getRSS` on Liferay's asset
+publisher — and the 2026 instance id was transcribed from that page's own markup
+rather than guessed. It still returns HTML, and the page's `subscribe-action`
+div is empty where a feed-enabled page carries the subscribe control: **RSS is
+switched off for the current year's portlet instance.** The 2020 instance has it
+on, which is why only the archive answers.
+
+Remaining candidates for anyone trying again: the non-year-scoped `/pr` and
+`/press-releases-main`, each with its own instance id readable from its HTML.
+Weigh it against the return first — see below.
 
 It is left disabled rather than left failing on purpose. A source that fails
 every night marks the collect job red every night, and a red job that always
 means the same dead URL trains you to stop reading it — which is the one thing
 the `sweeps` table exists to prevent.
 
-And when it does run, be clear what it is: central-bank announcements, so
-**macro news, not company news.** Most of it will arrive unlinked. On a book of
-Malaysian banks and utilities that move on rate decisions that is worth having;
-it is still not a Bursa company feed, which this system does not have.
+**And be clear what it would buy.** BNM is a central bank: rate decisions,
+banking statistics, policy documents. Even working, it will not name Maybank or
+Tenaga. It was never the fix for the missing Bursa **company** coverage — that
+needs a Malaysian business news source, which this system does not have and
+which is the gap actually worth closing.
 
 Two sources means two watermarks and two `sweeps` rows. A source that fails does
 not take the other's articles with it — which is the whole reason a second one
