@@ -1,6 +1,60 @@
 {
   "collection": [
     {
+      "at": "2026-09-04T23:03:56.750336+00:00",
+      "detail": "skipped: alphavantage_news needs ALPHAVANTAGE_API_KEY, which is not set. Add it to .env or as a GitHub Actions secret of the same name; until then this source is skipped.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "alphavantage_news",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-04T23:03:56.749779+00:00",
+      "detail": "skipped: finnhub needs FINNHUB_API_KEY, which is not set. Add it to .env or as a GitHub Actions secret of the same name; until then this source is skipped.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "finnhub",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-04T23:03:56.749186+00:00",
+      "detail": "facts 1; ",
+      "fetched": 1,
+      "kept": 0,
+      "source": "edgar",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-04T23:03:56.594437+00:00",
+      "detail": "",
+      "fetched": 44,
+      "kept": 44,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 33
+    },
+    {
+      "at": "2026-09-04T23:03:56.201125+00:00",
+      "detail": "",
+      "fetched": 42,
+      "kept": 35,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 28
+    },
+    {
+      "at": "2026-09-04T23:03:54.710265+00:00",
+      "detail": "",
+      "fetched": 249,
+      "kept": 156,
+      "source": "gdelt",
+      "status": "ok",
+      "stored": 140
+    },
+    {
       "at": "2026-09-04T18:19:58.894000+00:00",
       "detail": "skipped: fred needs FRED_API_KEY, which is not set. Add it to .env or as a GitHub Actions secret of the same name; until then this source is skipped.",
       "fetched": 0,
@@ -425,18 +479,18 @@
     }
   ],
   "counts": {
-    "articles": 789,
+    "articles": 990,
     "documents": 0,
-    "escalated": 251,
-    "events": 2,
+    "escalated": 308,
+    "events": 3,
     "failed_sweeps": 14,
-    "linked": 409,
+    "linked": 493,
     "observations": 0,
     "series": 2,
-    "sweeps": 65
+    "sweeps": 71
   },
   "day": "2026-09-04",
-  "generated_at": "2026-09-04 18:20 UTC",
+  "generated_at": "2026-09-04 23:03 UTC",
   "macro": [
     {
       "change": "0",
@@ -702,12 +756,34 @@
       "upcoming": []
     },
     {
-      "escalated": 95,
+      "escalated": 115,
       "events": [],
       "instrument_id": "XNAS:NVDA",
       "label": "NVIDIA",
       "snapshot": [],
       "stories": [
+        {
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/coatue-opened-positions-intel-cerebras-225513318.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-04T22:55:13+00:00",
+          "quality": 1.0,
+          "title": "Coatue Opened Positions in Intel and Cerebras. Is the AI Chip Trade Broadening Beyond NVIDIA?",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://finance.yahoo.com/m/252efda6-cb82-3bed-b183-1102224f76db/nvidia-is-acting-like-an.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-04T18:21:00+00:00",
+          "quality": 1.0,
+          "title": "Nvidia Is Acting Like an Underdog. OpenAI and Anthropic Should Be Worried.",
+          "uncertainty": 0.0
+        },
         {
           "doc_id": "https://finance.yahoo.com/technology/ai/articles/hp-announces-omnibook-pcs-help-180000897.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
@@ -773,46 +849,57 @@
           "quality": 0.85,
           "title": "Nvidia Is Backstopping AI Boom as 'Buyer of Last Resort,' Prominent Economist Tells 'Prof G'",
           "uncertainty": 0.21551724137931036
-        },
-        {
-          "doc_id": "https://247wallst.com/investing/2026/09/04/intel-climbs-4-as-chip-stocks-shrug-off-rising-rate-hike-odds-nvidia-and-amd-move-higher/?.tsrc=rss",
-          "domain": "247wallst.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-04T15:12:07+00:00",
-          "quality": 0.85,
-          "title": "Intel Climbs 4%, AMD Rises 3%, NVIDIA Ticks Up as Chip Stocks Shrug Off Rising Rate Hike Odds",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://247wallst.com/investing/2026/09/04/nvidia-and-apple-are-both-winning-in-2026-and-doing-it-because-of-this-contrarian-ai-move/?.tsrc=rss",
-          "domain": "247wallst.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-09-04T13:44:09+00:00",
-          "quality": 0.85,
-          "title": "Nvidia and Apple Are Both Winning in 2026 And Doing It Because Of This Contrarian AI Move",
-          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.667,
-        "n": 149,
-        "polarity_mean": 0.087,
-        "sources": 51,
-        "uncertainty_mean": 0.088
+        "n": 184,
+        "polarity_mean": 0.082,
+        "sources": 61,
+        "uncertainty_mean": 0.077
       },
       "upcoming": []
     },
     {
-      "escalated": 72,
+      "escalated": 97,
       "events": [],
       "instrument_id": "XNAS:AAPL",
       "label": "Apple",
       "snapshot": [],
       "stories": [
+        {
+          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/why-apple-aapl-dipped-more-214503780.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-04T21:45:03+00:00",
+          "quality": 1.0,
+          "title": "Why Apple (AAPL) Dipped More Than Broader Market Today",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/top-research-reports-apple-broadcom-211600532.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-04T21:16:00+00:00",
+          "quality": 1.0,
+          "title": "Top Research Reports for Apple, Broadcom & Shell",
+          "uncertainty": 0.4310344827586207
+        },
+        {
+          "doc_id": "https://finance.yahoo.com/video/apples-john-ternus-needs-own-203847038.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-04T20:38:47+00:00",
+          "quality": 1.0,
+          "title": "Apple's John Ternus needs to be his own type of CEO and 'not Tim Cook 2'",
+          "uncertainty": 0.0
+        },
         {
           "doc_id": "https://finance.yahoo.com/markets/stocks/articles/apples-first-foldable-could-launch-143718764.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
@@ -867,57 +954,57 @@
           "quality": 1.0,
           "title": "Top Funds Sink Their Teeth Into Apple Stock. Sweet Breakout Ahead?",
           "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/apple-aapl-faces-mixed-outlook-182923490.html?.tsrc=rss",
-          "domain": "finance.yahoo.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-03T18:29:23+00:00",
-          "quality": 1.0,
-          "title": "Apple (AAPL) Faces Mixed Outlook Ahead of Foldable iPhone Launch",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://finance.yahoo.com/media-advertising/articles/apple-faces-2-bn-lawsuit-174755792.html?.tsrc=rss",
-          "domain": "finance.yahoo.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": -1.0,
-          "published_at": "2026-09-03T17:47:55+00:00",
-          "quality": 1.0,
-          "title": "Apple faces \u00a32 bn lawsuit in UK over app privacy feature",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://finance.yahoo.com/healthcare/articles/stryker-launches-fda-cleared-apple-173700748.html?.tsrc=rss",
-          "domain": "finance.yahoo.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-03T17:37:00+00:00",
-          "quality": 1.0,
-          "title": "Stryker Launches FDA-Cleared Apple Vision Pro Surgical App",
-          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 88,
-        "polarity_mean": 0.125,
-        "sources": 49,
-        "uncertainty_mean": 0.131
+        "n": 117,
+        "polarity_mean": 0.103,
+        "sources": 63,
+        "uncertainty_mean": 0.135
       },
       "upcoming": []
     },
     {
-      "escalated": 51,
+      "escalated": 63,
       "events": [],
       "instrument_id": "XNAS:MSFT",
       "label": "Microsoft",
       "snapshot": [],
       "stories": [
+        {
+          "doc_id": "https://finance.yahoo.com/m/20f45949-656b-316b-ae10-8ddbf6e869ef/why-ibm%2C-microsoft-back-move.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-04T20:21:00+00:00",
+          "quality": 1.0,
+          "title": "Why IBM, Microsoft Back Move for Quantum Policy Czar",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/microsoft-drops-1-6-opens-193935631.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-04T19:39:35+00:00",
+          "quality": 1.0,
+          "title": "Microsoft Drops 1.6%, Opens Azure's $101.9 Billion Door",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://finance.yahoo.com/m/252efda6-cb82-3bed-b183-1102224f76db/nvidia-is-acting-like-an.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-04T18:21:00+00:00",
+          "quality": 1.0,
+          "title": "Nvidia Is Acting Like an Underdog. OpenAI and Anthropic Should Be Worried.",
+          "uncertainty": 0.0
+        },
         {
           "doc_id": "https://finance.yahoo.com/markets/stocks/articles/commvault-cvlt-triples-cloud-safety-173309595.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
@@ -972,47 +1059,14 @@
           "quality": 1.0,
           "title": "Microsoft's Cloud Gaming Push Just Picked Up a New Limit",
           "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://finance.yahoo.com/m/7ff4ce56-f96f-3bf3-8230-beb40876f886/microsoft-ceo-nadella-sells.html?.tsrc=rss",
-          "domain": "finance.yahoo.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-03T19:33:00+00:00",
-          "quality": 1.0,
-          "title": "Microsoft CEO Nadella Sells $43 Million of Stock",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://www.benzinga.com/markets/prediction-markets/26/09/61635046/nvidia-ai-boom-tyler-cowen?utm_source=yahooFinance&utm_campaign=partner_feed&utm_medium=referral&.tsrc=rss",
-          "domain": "www.benzinga.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-04T16:41:38+00:00",
-          "quality": 0.85,
-          "title": "Nvidia Is Backstopping AI Boom as 'Buyer of Last Resort,' Prominent Economist Tells 'Prof G'",
-          "uncertainty": 0.21551724137931036
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMingFBVV95cUxNcWdwdWEyeS15X0ZWVEx2bUZ0SGxmOU9VVnZYZ2xwei11eXJpSmZfUjdyZ3pWcE5TZUczUW9vMDhVbHR6N0JYTXctS3ZEM3AzU19iOTNtbjJiUGY2YzlVYWtSMnlnanZFV0doZ0YwMklHaHZaZnBCa011b0FvOTRMVzN6UlQwNTRHZXYxX0pHemVtbzRNdEZQZDE0bndMUQ?oc=5",
-          "domain": "finance.yahoo.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-09-04T17:40:00+00:00",
-          "quality": 0.8,
-          "title": "Satya Nadella Has Delivered a More Than 10X Return for Microsoft Shareholders Since Becoming CEO in 2014, a 30% Annualized Growth Rate. Is That Pace Still Achievable From Here?",
-          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 73,
-        "polarity_mean": 0.137,
-        "sources": 33,
-        "uncertainty_mean": 0.062
+        "n": 89,
+        "polarity_mean": 0.101,
+        "sources": 39,
+        "uncertainty_mean": 0.051
       },
       "upcoming": []
     }
