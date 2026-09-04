@@ -190,8 +190,13 @@ class LexiconExtractor:
         polarity = (pos - neg) / max(pos + neg, 1)
 
         low = text.lower()
-        mentions = sum(low.count(e.lower()) for e in entities) if entities else 0
-        relevance = min(1.0, mentions / 3.0) if entities else 0.0
+        mentions = sum(low.count(e.lower()) for e in entities if e) if entities else 0
+        # One mention clears the escalation gate; each further mention adds
+        # conviction. The old `mentions / 3` put a single-mention headline at
+        # 0.33 - one hundredth under the 0.34 gate - so a wire story that
+        # named a holding exactly once, which is how most headlines name a
+        # company, could never reach the review queue.
+        relevance = min(1.0, 0.5 + 0.25 * (mentions - 1)) if mentions else 0.0
 
         return Features(
             relevance=relevance,

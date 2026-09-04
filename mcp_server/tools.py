@@ -48,7 +48,6 @@ from engines.attribution.decompose import MIN_OBSERVATIONS, decompose
 from engines.attribution.regression import huber_fit
 from engines.risk.concentration import Limits, Position
 from engines.sizing.caps import cost_floor_bps, cost_floor_value, to_base
-from knowledge.retrieval.pipeline import Router
 from markets.brokers import cost_at
 from markets.registry import get as market_get
 from markets.registry import known_prefixes, market_currency, mic_of, supported
@@ -71,14 +70,21 @@ def context() -> AgentContext:
     try:
         cfg = load_config()
         holdings, watchlist = set(cfg.holdings), set(cfg.watchlist)
+        corpus_db = cfg.corpus_db
     except ConfigError:
         # A broken settings file must not take out every other command; the
         # config commands report it properly.
-        holdings, watchlist = set(), set()
+        holdings, watchlist, corpus_db = set(), set(), None
+    from knowledge.retrieval.index import router_for
+
+    now = datetime.now(UTC)
     return AgentContext(
-        router=Router({}),
+        # The corpus, indexed, cached on the corpus file's identity so a tool
+        # call does not re-index a season of headlines. `Router({})` here
+        # refused every retrieval before it looked at an article.
+        router=router_for(reg, corpus_db, now=now),
         engine=default_engine(reg.allowlist()),
-        now=datetime.now(UTC),
+        now=now,
         holdings=holdings,
         watchlist=watchlist,
     )

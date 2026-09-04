@@ -73,6 +73,10 @@ class BM25:
         self._chunks: list[Chunk] = []
         self._df: Counter[str] = Counter()
         self._avg_len = 0.0
+        self._total_len = 0
+
+    def __len__(self) -> int:
+        return len(self._docs)
 
     def add(self, chunk: Chunk) -> None:
         toks = tokenize(chunk.text)
@@ -80,7 +84,11 @@ class BM25:
         self._chunks.append(chunk)
         for t in set(toks):
             self._df[t] += 1
-        self._avg_len = sum(len(d) for d in self._docs) / len(self._docs)
+        # A running total, not a re-sum: the old form made indexing a corpus
+        # quadratic, which nobody noticed at 4 test chunks and everybody would
+        # have at the 10,000 articles a season of sweeps produces.
+        self._total_len += len(toks)
+        self._avg_len = self._total_len / len(self._docs)
 
     def search(self, query: str, limit: int = 20) -> list[tuple[Chunk, float]]:
         n = len(self._docs)
@@ -131,6 +139,9 @@ class Collection:
     def add_all(self, chunks: list[Chunk]) -> None:
         for c in chunks:
             self.add(c)
+
+    def __len__(self) -> int:
+        return len(self._by_id)
 
     def find_chunk(self, source: str, chunk_id: str) -> str | None:
         """The lookup post-hoc citation verification depends on."""

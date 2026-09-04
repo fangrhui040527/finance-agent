@@ -238,8 +238,12 @@ class A4NewsNarrative(Agent):
     tools = ("retrieve", "search_news", "extract_features", "source_reliability", "llm_complete")
     tier = TaskClass.NEWS_TRIAGE
 
-    def run(self, instrument_id: str, query: str, max_age=None) -> list[Finding]:
-        res = self.retrieve("kb_news", query, max_age=max_age, entity=instrument_id)
+    #: The five feature dimensions carried into a Finding's numbers, so the
+    #: synthesis layer reads intensity and uncertainty rather than a headline.
+    FEATURE_KEYS = ("relevance", "polarity", "intensity", "uncertainty", "forwardness")
+
+    def run(self, instrument_id: str, query: str, max_age=None, limit: int = 5) -> list[Finding]:
+        res = self.retrieve("kb_news", query, max_age=max_age, entity=instrument_id, limit=limit)
         if res.refused:
             return [
                 Finding(
@@ -250,13 +254,30 @@ class A4NewsNarrative(Agent):
                 )
             ]
         out = []
-        for hit in res.hits[:5]:
+        polarity: list[float] = []
+        intensity: list[float] = []
+        uncertainty: list[float] = []
+        domains: set[str] = set()
+        for hit in res.hits[:limit]:
             c = hit.chunk
+            meta = c.metadata or {}
+            features = meta.get("features") or {}
+            domain = meta.get("source_domain") or "unknown source"
+            when = c.as_of.strftime("%Y-%m-%d") if c.as_of else "undated"
+            headline = (meta.get("title") or c.text.splitlines()[0])[:200]
+            numbers = {k: float(features[k]) for k in self.FEATURE_KEYS if k in features}
+            if "polarity" in numbers:
+                polarity.append(numbers["polarity"])
+            if "intensity" in numbers:
+                intensity.append(numbers["intensity"])
+            if "uncertainty" in numbers:
+                uncertainty.append(numbers["uncertainty"])
+            domains.add(domain)
             out.append(
                 Finding(
                     self.agent_id,
                     "news",
-                    f"{c.text[:160]}",
+                    f"{when} {domain}: {headline}",
                     citations=[
                         cite(
                             "kb_news",
@@ -266,7 +287,34 @@ class A4NewsNarrative(Agent):
                             c.as_of or self.ctx.now,
                         )
                     ],
+                    numbers=numbers,
                     as_of=c.as_of,
+                    caveats=(
+                        ["a mention, not a cause: the story names the company"]
+                        if numbers.get("relevance", 1.0) < 0.75
+                        else []
+                    ),
+                )
+            )
+        if out and polarity:
+            # docs/02 A4 output contract: an aggregate beside the articles, as a
+            # FEATURE - never cited as evidence on its own.
+            n = len(polarity)
+            out.append(
+                Finding(
+                    self.agent_id,
+                    "news_aggregate",
+                    f"{n} stories from {len(domains)} sources: mean polarity "
+                    f"{sum(polarity) / n:+.2f}, peak intensity {max(intensity or [0.0]):.2f}, "
+                    f"mean uncertainty {sum(uncertainty) / max(1, len(uncertainty)):.2f}",
+                    numbers={
+                        "n": float(n),
+                        "sources": float(len(domains)),
+                        "polarity_mean": sum(polarity) / n,
+                        "intensity_max": max(intensity or [0.0]),
+                        "uncertainty_mean": sum(uncertainty) / max(1, len(uncertainty)),
+                    },
+                    caveats=["aggregate tone is a feature, not evidence; cite the stories"],
                 )
             )
         return out

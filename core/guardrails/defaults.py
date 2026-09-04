@@ -26,7 +26,13 @@ CORPUS_SLA = {
     "price_bars_intraday": timedelta(minutes=20),
     "price_bars_eod": timedelta(days=1),
     "fundamental_facts": timedelta(hours=24),
-    "kb_news": timedelta(minutes=30),
+    # The collector runs three times a day (Bursa close, US pre-open, US
+    # close), not every fifteen minutes as docs/02 imagined for a streaming
+    # GDELT. An SLA of 30 minutes on a corpus filled thrice daily marks every
+    # article stale on arrival; 12 hours is one collection interval plus
+    # slack, and 3x that (the DENY line) is a missed day, which is the fault
+    # this policy exists to surface.
+    "kb_news": timedelta(hours=12),
     "kb_filings": timedelta(hours=24),
     "macro_series": timedelta(days=1),
 }

@@ -84,9 +84,11 @@ class FeedAdapter(ABC):
     ) -> tuple[list[Article], IngestStats]:
         """Bronze -> Silver. Dedup BEFORE indexing, link entities, extract features."""
         from knowledge.news.features import should_escalate
+        from knowledge.news.linking import linker_for
 
         stats = IngestStats(fetched=len(records))
         out: list[Article] = []
+        linker = linker_for(entity_index) if entity_index else None
         for rec in records:
             art = self._to_article(rec)
             if art is None:
@@ -99,12 +101,18 @@ class FeedAdapter(ABC):
             self._seen.add(dup)
             art.dup_hash = dup
 
-            if entity_index and not art.instruments:
-                art.instruments = link_entities(art.text, entity_index)
+            if linker is not None and not art.instruments:
+                art.instruments = linker.link(art.text)
             if not art.instruments:
                 stats.unlinked += 1
 
-            art.features = self.extractor.extract(art.text, art.instruments)
+            # The extractor is handed NAMES, never ids. It counts how often the
+            # entity appears in the prose, and "XNAS:NVDA" appears in no
+            # headline ever written - so every article scored relevance 0.0,
+            # the escalation gate never opened, and 23 sweeps recorded
+            # `escalated 0` on a corpus with 76 attributed articles.
+            names = linker.names_for(art.instruments) if linker is not None else art.instruments
+            art.features = self.extractor.extract(art.text, names)
             if should_escalate(
                 art.features, art.instruments, holdings or set(), watchlist or set()
             ):
@@ -115,16 +123,16 @@ class FeedAdapter(ABC):
 
 
 def link_entities(text: str, index: dict[str, str]) -> list[str]:
-    """Surface form -> instrument_id. Longest match first so 'Maybank Islamic'
-    does not resolve as 'Maybank'."""
-    low = text.lower()
-    hits: list[str] = []
-    for surface in sorted(index, key=len, reverse=True):
-        if surface.lower() in low:
-            iid = index[surface]
-            if iid not in hits:
-                hits.append(iid)
-    return hits
+    """Surface form -> instrument_id, whole words only, longest match first.
+
+    Kept here as the name every caller imports; the rules live in
+    knowledge/news/linking.py, where each one has a test and the record of the
+    false positives that motivated it ("Intel" in "intelligence", "MISC" in
+    "miscellaneous", "Apple" in "pineapple").
+    """
+    from knowledge.news.linking import link_entities as _link
+
+    return _link(text, index)
 
 
 class FixtureFeed(FeedAdapter):
