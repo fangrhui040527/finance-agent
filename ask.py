@@ -268,6 +268,11 @@ def _window_return(instrument: str, bars_back: int, end: date | None):
 
 
 def cmd_prices(a) -> int:
+    if a.book:
+        return _prices_book(a)
+    if not a.instrument:
+        print("prices: name an instrument, or pass --book", file=sys.stderr)
+        return 2
     end = date.fromisoformat(a.on) if a.on else None
     try:
         series = _feed().fetch(a.instrument, end=end)
@@ -287,6 +292,42 @@ def cmd_prices(a) -> int:
         print(f"\nreturn over the shown window  {ret:+.2%}")
     print(f"20d ADV {series.adv(20):,.0f}   20d ATR {series.atr(20):.4f}")
     return 0
+
+
+def _prices_book(a) -> int:
+    """Warm the price cache for every name in the book and each market's proxy.
+
+    The collector runs this after each close so data/price_cache.db carries
+    the day's bars for every name the routine will ask about - the routine
+    itself runs where no price host is reachable and reads the cache with
+    FINPLANET_OFFLINE=1. Exit 3 if any name could not be fetched; the others
+    are still cached.
+    """
+    from core.market.feed import market_proxy_for
+
+    try:
+        cfg = load_config()
+    except ConfigError as e:
+        print(f"prices: {e}", file=sys.stderr)
+        return 2
+    book = list(dict.fromkeys(tuple(cfg.watchlist) + tuple(cfg.holdings)))
+    proxies = [p for p in dict.fromkeys(market_proxy_for(i) for i in book) if p]
+    failed = 0
+    feed = _feed()
+    for iid in book + proxies:
+        try:
+            series = feed.fetch(iid)
+        except PriceFeedError as e:
+            failed += 1
+            print(f"  {iid:<14} FAILED  {str(e).splitlines()[0][:120]}", file=sys.stderr)
+            continue
+        last = series.raw()[-1]
+        print(
+            f"  {iid:<14} {len(series):>5} bars  last {last.day} close {last.close:.4f}"
+            f"  via {feed.source_used}"
+        )
+    print(f"  {'cached':<14} {len(book) + len(proxies) - failed} of {len(book) + len(proxies)}")
+    return 3 if failed else 0
 
 
 # --- thesis and its red team ---------------------------------------------
@@ -791,117 +832,14 @@ def cmd_news(a) -> int:
     return 0
 
 
-#: How long `cmd_sweep` will keep starting new per-company requests. One request
-#: per name at ~40s each is about six minutes for nine names, but a name whose
-#: request times out costs up to 4.5min on its own, and nine of those would run
-#: past the collect job's 15min cap - which kills the job before ANY of it is
-#: committed. Past this the sweep stops fetching, keeps what it has and records
-#: which names it never reached.
-SWEEP_DEADLINE_SECONDS = 600
-
-
-def _rotate(terms, day: int):
-    """Start each run at a different name.
-
-    `_fetch_each` works through the list in order and stops at the deadline, so
-    a fixed order means the same names are read every day and the same names
-    are starved every day. Alphabetically that is Apple first and Tenaga last -
-    and on a Malaysian book the starved tail is Maybank, Petronas Chemicals,
-    Press Metal and Tenaga, which is precisely backwards.
-
-    Observed rather than theorised: the 09:48 sweep reached 5 names of 9 and the
-    10:06 sweep reached 3, both times the same first few.
-
-    Rotating by the day means a name skipped today leads tomorrow. Order within
-    a run stays deterministic, so a run is still reproducible from its date.
-    """
-    if not terms:
-        return terms
-    n = day % len(terms)
-    return tuple(terms[n:]) + tuple(terms[:n])
-
-
-def _mostly_failed(failed, skipped, counts) -> bool:
-    """True when more than half the names could not be read at all.
-
-    The sweep used to exit 0 whenever ANY name came back, which made a badly
-    degraded day indistinguishable from a good one: on 2026-09-04 eight of nine
-    companies failed, one article was stored, and the job reported success. The
-    failures were in the sweeps table, but a green check nobody has reason to
-    open is not a report.
-
-    Half, rather than any, because GDELT refuses individual names routinely. A
-    check that goes red most days is a check that gets ignored, which costs more
-    than the alert is worth - so one quiet name stays green and a collapse does
-    not.
-
-    Counts names, not articles. A name that was read and had no news is a fact
-    about the world; a name that could not be read is a hole in the record, and
-    only the second one is a fault.
-    """
-    unreachable = len(failed) + len(skipped)
-    attempted = unreachable + len(counts)
-    return attempted > 0 and unreachable * 2 > attempted
-
-
-def _sweep_note(failed, skipped, counts=()) -> str:
-    """What a partially-successful sweep must still say.
-
-    A sweep where one name failed is not a failed sweep - the other eight were
-    read, and marking the whole run FAILED would move no watermark and re-read
-    them tomorrow. But it is not a clean one either, and a name that fails
-    quietly every day would otherwise be indistinguishable from a name nobody
-    is writing about.
-    """
-    parts = []
-    empty = [t for t, n in counts if n == 0]
-    if empty:
-        parts.append("read but empty: " + ", ".join(empty))
-    if failed:
-        parts.append("failed: " + ", ".join(t for t, _ in failed))
-    if skipped:
-        parts.append("not reached: " + ", ".join(skipped))
-    return "; ".join(parts)
-
-
-def _fetch_each(make_feed, terms, since, limit, deadline=None, clock=None):
-    """One request per company, rather than one OR'd query for all of them.
-
-    A combined query sorted newest-first is won by whichever name publishes
-    most. Measured on the 2026-09-03 09:11 sweep: nine names, 250 records, 34
-    attributed articles, and every one of them a US tech company - Apple alone
-    took 20, while all six Bursa names got nothing. On a Malaysian book that is
-    the wrong 250 articles, and no amount of collecting for longer fixes it.
-
-    Splitting the budget per name costs one request each. Returns the combined
-    records with the names that failed and the names never reached, because a
-    sweep where Maybank quietly failed every day must not read as a sweep where
-    Maybank was quiet.
-    """
-    from knowledge.feeds.adapter import FeedError
-
-    tick = clock or (lambda: datetime.now(UTC))
-    per = max(1, limit // max(1, len(terms)))
-    records: list = []
-    failed: list[tuple[str, str]] = []
-    skipped: list[str] = []
-    counts: list[tuple[str, int]] = []
-    for term in terms:
-        if deadline is not None and tick() >= deadline:
-            skipped.append(term)
-            continue
-        try:
-            got = make_feed(f'"{term}"').fetch(since, limit=per)
-        except FeedError as e:
-            failed.append((term, str(e)))
-            continue
-        # Counted even at zero. A name that is asked for and answered with
-        # nothing is currently as silent as a name nobody watches, and those
-        # are opposite problems: one is a quiet week, the other is a name the
-        # source does not cover and never will.
-        counts.append((term, len(got)))
-        records.extend(got)
-    return records, failed, skipped, counts
+# The sweep's helpers live in knowledge/sweep.py now; re-exported (the
+# `name as name` form is the explicit re-export linters honour) so the tests
+# that pin their behaviour keep reading them from here.
+from knowledge.sweep import SWEEP_DEADLINE_SECONDS as SWEEP_DEADLINE_SECONDS  # noqa: E402
+from knowledge.sweep import _fetch_each as _fetch_each  # noqa: E402
+from knowledge.sweep import _mostly_failed as _mostly_failed  # noqa: E402
+from knowledge.sweep import _rotate as _rotate  # noqa: E402
+from knowledge.sweep import _sweep_note as _sweep_note  # noqa: E402
 
 
 def cmd_fx(a) -> int:
@@ -958,28 +896,24 @@ def cmd_fx(a) -> int:
 
 
 def cmd_sweep(a) -> int:
-    """Fetch every enabled source and KEEP what arrives.
+    """Fetch every enabled source for a slot and KEEP what arrives.
 
     `news` prints one source and forgets it, which is right for a person
-    checking a feed by hand. This is the scheduled sibling: it resumes from the
-    last SUCCESSFUL sweep of each source, writes what it finds to the corpus,
-    links it into the graph, and records the attempt either way.
+    checking a feed by hand. This is the scheduled sibling: for the slot named
+    (`bursa_close`, `us_preopen`, `us_close`, `weekly`, or `all`) it resumes
+    each enabled source from its last SUCCESSFUL read, writes articles to the
+    corpus and figures, events, series and documents to the fact book, links
+    the articles into the graph, and records the attempt either way.
 
     Exit codes are the interface, like `watch`: 0 every source read, 3 a source
     failed OR came back badly degraded, 2 the sweep itself could not run. A
     scheduler can act on those without parsing text - and it needs to, because
-    the failure this command exists to make visible is the one that looks like a
-    quiet world. Degraded counts as failure for the same reason: eight of nine
-    companies unreachable produces almost no news, which is the exact shape of a
-    quiet week.
+    the failure this command exists to make visible is the one that looks like
+    a quiet world. A source whose key is absent is SKIPPED, not failed: the row
+    names the variable, and the job stays green until someone adds it.
     """
-    from datetime import timedelta as _td
-
     from core.config import load as load_cfg
-    from knowledge.corpus import FAILED, OK, Corpus
-    from knowledge.feeds.adapter import FeedError
-    from knowledge.feeds.registry import UnknownSource, adapter_for
-    from knowledge.graph.extractors.gdelt import entity_index, watchlist_query, watchlist_terms
+    from knowledge.sweep import run_sweep
 
     try:
         cfg = load_cfg()
@@ -987,165 +921,99 @@ def cmd_sweep(a) -> int:
         print(f"sweep could not run: {type(e).__name__}: {e}", file=sys.stderr)
         return 2
 
-    names = list(a.source) if a.source else list(cfg.sources)
-    if not names:
-        print(
-            "no sources enabled. Add one to [sources] enabled in config.toml - "
-            "the register of what exists is docs/world-sources.html.",
-            file=sys.stderr,
-        )
-        return 2
-
-    index = entity_index()
-    holdings, watchlist = set(cfg.holdings), set(cfg.watchlist)
-    # An explicit query in config is honoured as one request; without one the
-    # book is asked for a name at a time.
-    terms = () if cfg.gdelt_query else watchlist_terms(tuple(cfg.watchlist) + tuple(cfg.holdings))
-    started = datetime.now(UTC)
-    deadline = started + _td(seconds=SWEEP_DEADLINE_SECONDS)
-    run_id = started.strftime("%Y%m%dT%H%M%S")
-    failed = degraded = 0
-
-    print(f"sweep {run_id}")
-    with Corpus(a.db or cfg.corpus_db) as corpus:
-        for name in names:
-            since = corpus.last_success(name) or started - _td(hours=a.hours)
-            try:
-                # GDELT is the only source today that takes a language or country
-                # filter; an RSS feed is whatever the publisher publishes.
-                kw = (
-                    {
-                        "languages": tuple(cfg.gdelt_languages),
-                        "countries": tuple(cfg.gdelt_countries),
-                        # Ask for the names in the book. Without a query the
-                        # adapter falls back to `domainis:reuters.com`, which
-                        # returned nothing at all on the first scheduled run -
-                        # and the escalation gate would have discarded almost
-                        # any broader pull anyway.
-                        "query": cfg.gdelt_query
-                        or watchlist_query(tuple(cfg.watchlist) + tuple(cfg.holdings)),
-                    }
-                    if name == "gdelt"
-                    else {}
-                )
-                feed = adapter_for(name, **kw)
-                if name == "gdelt" and terms:
-                    # One request per company. See _fetch_each: a single OR'd
-                    # query is won by whichever name publishes most, and on a
-                    # Malaysian book that meant six Bursa names got nothing.
-                    records, per_failed, per_skipped, per_counts = _fetch_each(
-                        # Bound as defaults, not captured: the call is
-                        # immediate today, but a lambda that reads a loop
-                        # variable late is a bug waiting for the day it is not.
-                        lambda q, _n=name, _kw=kw: adapter_for(_n, **{**_kw, "query": q}),
-                        _rotate(terms, started.toordinal()),
-                        since,
-                        a.limit,
-                        deadline=deadline,
-                    )
-                    for term, n in per_counts:
-                        print(f"  {'':<16} {term:<20} {n} records")
-                    for term, err in per_failed:
-                        print(f"  {'':<16} {term:<20} {err}", file=sys.stderr)
-                    if per_skipped:
-                        print(
-                            f"  {'':<16} not reached before the deadline: {', '.join(per_skipped)}",
-                            file=sys.stderr,
-                        )
-                    if not records and (per_failed or per_skipped):
-                        # Summarised, not concatenated: nine names refused by
-                        # the same proxy produce nine copies of one sentence,
-                        # and record_sweep keeps only the first 400 characters.
-                        first = per_failed[0][1] if per_failed else "deadline reached"
-                        raise FeedError(
-                            f"no name could be read "
-                            f"({len(per_failed)} failed, {len(per_skipped)} not reached). "
-                            f"First: {first}"
-                        )
-                    if _mostly_failed(per_failed, per_skipped, per_counts):
-                        # Recorded OK, because articles WERE stored and the row
-                        # should say so - but the run still exits 3, so the
-                        # scheduler shows red and a person looks.
-                        degraded += 1
-                        n = len(per_failed) + len(per_skipped)
-                        print(
-                            f"  {'':<16} DEGRADED: {n} of {n + len(per_counts)} "
-                            f"names could not be read",
-                            file=sys.stderr,
-                        )
-                    notes = _sweep_note(per_failed, per_skipped, per_counts)
-                else:
-                    records = feed.fetch(since, limit=a.limit)
-                    notes = ""
-            except UnknownSource as e:
-                print(f"  {name:<16} REFUSED: {e}", file=sys.stderr)
-                return 2
-            except FeedError as e:
-                # The whole point of the sweeps table. An unrecorded failure and
-                # a quiet night are the same empty corpus a month later.
-                corpus.record_sweep(run_id, name, since, FAILED, detail=str(e)[:400])
-                print(f"  {name:<16} FAILED: {e}", file=sys.stderr)
-                failed += 1
-                continue
-
-            articles, stats = feed.normalize(
-                records, entity_index=index, holdings=holdings, watchlist=watchlist
-            )
-            stored = corpus.add_all(articles, name)
-            corpus.record_sweep(
-                run_id,
-                name,
-                since,
-                OK,
-                fetched=stats.fetched,
-                kept=stats.kept,
-                stored=stored.stored,
-                duplicates=stored.duplicates,
-                unlinked=stats.unlinked,
-                escalated=stats.escalated,
-                detail=notes,
-            )
-            print(f"  {name:<16} since {since:%Y-%m-%d %H:%M}  {stats}\n  {'':<16} {stored}")
-
-        fresh = corpus.articles(since=started, limit=max(a.limit, 1) * len(names))
-        if fresh and not a.no_graph:
-            print(f"  {'graph':<16} {_link_graph(fresh, a.graph_db)}")
-        counts = corpus.counts()
-
-    print(
-        f"  {'corpus':<16} {counts['articles']} articles, {counts['linked']} linked to a name, "
-        f"{counts['sweeps']} sweeps, {counts['failed_sweeps']} of them failed"
+    report = run_sweep(
+        cfg,
+        a.slot,
+        sources=tuple(a.source) if a.source else None,
+        hours=a.hours,
+        limit=a.limit,
+        corpus_path=a.db or None,
+        facts_path=a.facts_db or None,
+        graph_db=a.graph_db,
+        link_graph=not a.no_graph,
+        log=lambda _msg: None,
     )
-    if not (holdings or watchlist):
+    if report.could_not_run:
+        print(f"sweep could not run: {report.could_not_run}", file=sys.stderr)
+        return 2
+    print(report.render())
+    # Failures also go to stderr, where a scheduler's log and a person's eye
+    # both look first; the full table above is the record.
+    for r in report.results:
+        if r.status in ("failed", "degraded"):
+            print(f"  {r.name:<16} {r.status.upper()}: {r.detail}", file=sys.stderr)
+    if not (cfg.holdings or cfg.watchlist):
         print(
             "  note             holdings and watchlist are both empty, so the "
             "escalation gate\n                   cannot fire and nothing here "
             "will ever be flagged for review."
         )
-    return 3 if (failed or degraded) else 0
+    return report.exit_code
 
 
-def _link_graph(articles, graph_db: str) -> str:
-    """Attach this sweep's articles to the companies they name.
+def cmd_sources(a) -> int:
+    """The source catalogue, and - with --probe - one live fetch of each.
 
-    Deliberately NOT pruned. `prune_on` closes edges of this tier that the
-    build's own extractors did not assert, and this build carries one extractor
-    - pruning here would close every curated and sector edge in the graph
-    because a news sweep did not happen to mention them.
+    `--probe` stores nothing. It exists because this repository's development
+    environment has no route to any data host: the first real answer from a
+    source comes from a GitHub Actions runner, and a table that says which
+    sources answered, with what, is what turns a registered candidate into an
+    enabled one.
     """
-    from knowledge.graph.build import build
-    from knowledge.graph.extractors.gdelt import GdeltExtractor
-    from knowledge.graph.store import GraphStore
+    from core.config import load as load_cfg
+    from knowledge.sources import catalog
+    from knowledge.sweep import probe
 
-    with GraphStore(graph_db) as store:
-        before = store.counts()
-        build(store, extractors=[GdeltExtractor(articles)])
-        after = store.counts()
-    return (
-        f"+{after['nodes'] - before['nodes']} nodes  "
-        f"+{after['edges'] - before['edges']} edges  "
-        f"(INFERRED - traversable, never citable)"
+    try:
+        cfg = load_cfg()
+    except Exception as e:
+        print(f"sources could not run: {type(e).__name__}: {e}", file=sys.stderr)
+        return 2
+    if not a.probe:
+        from knowledge.sources.base import configured_keys
+
+        print(catalog.describe(cfg.sources))
+        print()
+        for name, present in configured_keys().items():
+            print(f"  {name:<22} {'set' if present else 'NOT SET - the sources needing it skip'}")
+        return 0
+    results = probe(cfg, names=a.source or None, hours=a.hours, limit=a.limit, log=lambda _m: None)
+    print(f"{'source':<24} {'status':<8} {'time':>6}  detail")
+    for r in results:
+        print(r.line())
+    bad = [r for r in results if r.status in ("failed", "error")]
+    print(
+        f"\n{len(results)} probed: {sum(r.status == 'ok' for r in results)} ok, "
+        f"{sum(r.status == 'no-key' for r in results)} without a key, "
+        f"{sum(r.status == 'plan' for r in results)} outside the plan, {len(bad)} failed"
     )
+    return 3 if bad else 0
+
+
+def cmd_digest(a) -> int:
+    """The day's page: per name, what was collected, what escalated, what moved.
+
+    Derived from the stores and regenerated on every run - `--write` puts it in
+    data/digests/<date>.md and .json (and latest.md), which is what the nightly
+    feedback routine reads. Prints the markdown either way.
+    """
+    from core.config import load as load_cfg
+    from knowledge.digest import build_digest, write_digest
+
+    try:
+        cfg = load_cfg()
+    except Exception as e:
+        print(f"digest could not run: {type(e).__name__}: {e}", file=sys.stderr)
+        return 2
+    day = date.fromisoformat(a.date) if a.date else None
+    digest = build_digest(
+        cfg, day, slot=a.slot, corpus_path=a.db or None, facts_path=a.facts_db or None
+    )
+    if a.write:
+        md, js = write_digest(digest, a.out)
+        print(f"wrote {md} and {js}", file=sys.stderr)
+    print(digest.to_markdown())
+    return 0
 
 
 def cmd_watch(a) -> int:
@@ -1639,7 +1507,10 @@ def main(argv=None) -> int:
     wy.set_defaults(fn=cmd_why)
 
     pr = sub.add_parser("prices", help="daily bars from the live feed")
-    pr.add_argument("instrument")
+    pr.add_argument("instrument", nargs="?", default="")
+    pr.add_argument(
+        "--book", action="store_true", help="warm the cache for every book name and market proxy"
+    )
     pr.add_argument("--days", type=int, default=20, help="bars to show")
     pr.add_argument("--on", help="as-at date (YYYY-MM-DD); later bars are not returned")
     pr.set_defaults(fn=cmd_prices)
@@ -1796,9 +1667,34 @@ def main(argv=None) -> int:
     )
     sw.add_argument("--limit", type=int, default=250, help="max records per source")
     sw.add_argument("--db", default="", help="corpus database (default: [sources] corpus_database)")
+    sw.add_argument(
+        "--facts-db", default="", help="fact book database (default: [sources] facts_database)"
+    )
+    sw.add_argument(
+        "--slot",
+        default="all",
+        choices=["all", "bursa_close", "us_preopen", "us_close", "weekly"],
+        help="which moment of the day this is; decides which sources and names run",
+    )
     sw.add_argument("--graph-db", default="data/graph.db", help="graph to link articles into")
     sw.add_argument("--no-graph", action="store_true", help="store only; do not touch the graph")
     sw.set_defaults(fn=cmd_sweep)
+
+    so = sub.add_parser("sources", help="the source catalogue; --probe fetches each once")
+    so.add_argument("--probe", action="store_true", help="one live fetch per source, store nothing")
+    so.add_argument("--source", action="append", help="probe only this source; repeatable")
+    so.add_argument("--hours", type=int, default=48, help="probe window")
+    so.add_argument("--limit", type=int, default=3, help="items per probe")
+    so.set_defaults(fn=cmd_sources)
+
+    dg = sub.add_parser("digest", help="the day's page per name, from the stores")
+    dg.add_argument("--date", default="", help="YYYY-MM-DD; default today (UTC)")
+    dg.add_argument("--slot", default="all", help="label only: which run produced it")
+    dg.add_argument("--write", action="store_true", help="also write data/digests/<date>.md/.json")
+    dg.add_argument("--out", default="data/digests", help="where --write puts the files")
+    dg.add_argument("--db", default="", help="corpus database")
+    dg.add_argument("--facts-db", default="", help="fact book database")
+    dg.set_defaults(fn=cmd_digest)
 
     fx = sub.add_parser("fx", help="record the official MYR rate for the day, or show the log")
     fx.add_argument("--currency", default="USD", help="comma-separated; default USD")

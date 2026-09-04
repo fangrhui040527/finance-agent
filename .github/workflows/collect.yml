@@ -1,31 +1,56 @@
-# The daily sweep. `ask.py sweep` pulls the enabled news sources, stores what is
-# new in data/corpus.db, links it into data/graph.db, and records the attempt -
-# success or failure - in the sweeps table.
+# The collector. `ask.py sweep --slot <slot>` pulls every enabled source that
+# runs in that slot, stores articles in data/corpus.db and figures, events,
+# series and documents in data/facts.db, links articles into data/graph.db,
+# writes the day's digest, and records the attempt - success or failure - in
+# the sweeps and pulls tables.
 #
-# It runs HERE rather than on the dev machine for one reason: news expires. The
-# GDELT window is recent-only, so a day nothing collects is a day that cannot be
-# fetched later. A laptop collects nothing while it is closed; this does not.
+# It runs HERE rather than on the dev machine for one reason: news expires.
+# The GDELT window is recent-only, and free-tier quotas are per day, so a day
+# nothing collects is a day that cannot be fetched later. A laptop collects
+# nothing while it is closed; this does not. It also runs here because the
+# development environment has no route to any data host at all.
 #
-# DAILY, not weekdays. config.toml sets sweep_silence_hours = 30 - a daily
-# schedule plus six hours of slack - so a weekday-only schedule would trip that
-# alert every Saturday by design rather than by fault.
+# FOUR SLOTS, each timed to when its sources have something new
+# (knowledge/sources/catalog.py is the register):
+#
+#   bursa_close   09:20 UTC = 17:20 MYT, after Bursa's 17:00 close. Daily,
+#                 weekends included - Malaysian business press publishes on
+#                 Sunday, and a daily cadence keeps the sweep-silence monitor
+#                 (30h) honest.
+#   us_preopen    12:30 UTC = 08:30 ET, weekdays. FRED's overnight prints, the
+#                 earnings calendar, rating changes.
+#   us_close      21:15 UTC = 17:15 ET, daily. US company news, insider and
+#                 SEC filings, the day's sentiment.
+#   weekly        Sunday 02:00 UTC. Statements, estimates, transcripts, CPI.
+#
+# COST. About four to six linux minutes a run, roughly twenty runs a week -
+# some 450 minutes a month against a 3,000-minute allowance. Windows never
+# runs here; there is nothing OS-specific about fetching JSON.
 name: collect
 
 on:
   schedule:
-    # 10:00 UTC = 18:00 MYT, about an hour after Bursa closes.
-    - cron: "0 10 * * *"
-  # A job you cannot fire by hand is a job you cannot recover - the same reason
-  # ci.yml carries this. Also how the first run gets proven.
+    - cron: "20 9 * * *"     # bursa_close
+    - cron: "30 12 * * 1-5"  # us_preopen
+    - cron: "15 21 * * *"    # us_close
+    - cron: "0 2 * * 0"      # weekly
+  # A job you cannot fire by hand is a job you cannot recover - and how a new
+  # source gets its first real run.
   workflow_dispatch:
+    inputs:
+      slot:
+        description: "which moment of the day this is"
+        type: choice
+        options: [all, bursa_close, us_preopen, us_close, weekly]
+        default: all
 
-# The sweep COMMITS what it collected. ci.yml is contents: read; this one cannot
-# be, and it is the only workflow here that writes.
+# The sweep COMMITS what it collected. ci.yml is contents: read; this one
+# cannot be.
 permissions:
   contents: write
 
 # Two sweeps at once would race on the same commit. They would not corrupt the
-# corpus - Corpus.add is INSERT OR IGNORE and the database decides - but the
+# stores - every insert is INSERT OR IGNORE and the database decides - but the
 # push would conflict and one run's evidence would be lost.
 concurrency:
   group: collect
@@ -34,12 +59,9 @@ concurrency:
 jobs:
   sweep:
     runs-on: ubuntu-latest
-    # The default is 360 minutes, which would burn six hours of a 2,000-minute
-    # monthly allowance on one hung socket. 20 leaves room for nine per-company
-    # requests at ~40s each plus slow ones, while SWEEP_DEADLINE_SECONDS stops
-    # the sweep at 10 minutes so it always reaches the commit step - a job
-    # killed by this cap commits nothing at all.
-    timeout-minutes: 20
+    # SWEEP_DEADLINE_SECONDS stops new requests at 10 minutes so the run always
+    # reaches the commit step; a job killed by this cap commits nothing at all.
+    timeout-minutes: 25
     defaults:
       run:
         shell: bash
@@ -54,41 +76,86 @@ jobs:
       - name: Install
         run: uv sync --frozen
 
-      # Exit codes are the sweep's interface, so read them instead of flattening
-      # them with `|| true`:
-      #   0  every enabled source read
-      #   2  the sweep could not run at all - bad config, no adapter
-      #   3  at least one source failed; the failure IS recorded in the corpus
+      # The schedule string is the only thing that says which cron fired.
+      - name: Which slot
+        id: slot
+        run: |
+          case "${{ github.event.schedule }}" in
+            "20 9 * * *")    slot=bursa_close ;;
+            "30 12 * * 1-5") slot=us_preopen ;;
+            "15 21 * * *")   slot=us_close ;;
+            "0 2 * * 0")     slot=weekly ;;
+            *)               slot="${{ inputs.slot || 'all' }}" ;;
+          esac
+          echo "slot=$slot" >> "$GITHUB_OUTPUT"
+          echo "running slot: $slot"
+
+      # Exit codes are the sweep's interface, so read them instead of
+      # flattening them with `|| true`:
+      #   0  every enabled source read (a source without a key is SKIPPED, not failed)
+      #   2  the sweep could not run at all - bad config, unknown slot
+      #   3  at least one source failed or came back degraded; recorded in the stores
       #
       # 3 still commits. A failed sweep that leaves no trace is indistinguishable
-      # from a quiet day, which is the whole reason the sweeps table records
-      # failures. The job is still marked failed afterwards so a person looks.
+      # from a quiet day. The job is still marked failed afterwards so a person
+      # looks.
       - name: Sweep
         id: sweep
+        env:
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+          FMP_API_KEY: ${{ secrets.FMP_API_KEY }}
+          ALPHAVANTAGE_API_KEY: ${{ secrets.ALPHAVANTAGE_API_KEY }}
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
+          GDELT_USER_AGENT: ${{ secrets.GDELT_USER_AGENT }}
         run: |
           set +e
-          uv run python ask.py sweep
+          uv run python ask.py sweep --slot "${{ steps.slot.outputs.slot }}"
           echo "code=$?" >> "$GITHUB_OUTPUT"
           exit 0
 
-      # Its own step, not folded into the sweep. A news source being throttled
-      # says nothing about whether the central bank published a rate, and one
-      # failing must not cost the other its day - which is the whole reason the
-      # rate is recorded daily rather than caught live.
+      # Its own step. A news source being throttled says nothing about whether
+      # the central bank published a rate. Bursa-close and manual runs only:
+      # BNM publishes once a day, after the Kuala Lumpur session.
       - name: Record the official FX rate
         id: fx
+        if: steps.slot.outputs.slot == 'bursa_close' || steps.slot.outputs.slot == 'all'
         run: |
           set +e
           uv run python ask.py fx
           echo "code=$?" >> "$GITHUB_OUTPUT"
           exit 0
 
-      - name: What the corpus holds now
+      # The day's bars for every name and each market's proxy, into
+      # data/price_cache.db. The nightly feedback routine decomposes moves from
+      # this cache (FINPLANET_OFFLINE=1) because the session it runs in has no
+      # route to a price host. Close slots and manual runs only.
+      - name: Cache the day's prices
+        if: steps.slot.outputs.slot == 'bursa_close' || steps.slot.outputs.slot == 'us_close' || steps.slot.outputs.slot == 'all'
+        run: |
+          set +e
+          uv run python ask.py prices --book
+          exit 0
+
+      # The day's digest: per name, what was collected, what escalated, what
+      # moved in the series. Written for the agents and for the person - and
+      # for the nightly feedback routine, which reads it rather than the raw
+      # tables.
+      - name: Write the digest
+        run: |
+          set +e
+          uv run python ask.py digest --write
+          exit 0
+
+      - name: What the stores hold now
         run: |
           uv run python -c "
           from knowledge.corpus import Corpus
+          from knowledge.facts import FactBook
           with Corpus() as c:
-              print(c.counts())
+              print('corpus', c.counts())
+          with FactBook() as f:
+              print('facts ', f.counts())
           "
 
       - name: Commit what was collected
@@ -96,34 +163,32 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          # Added one at a time, skipping any that is not there. `git add` on a
-          # missing path is a fatal error, and under `set -e` that aborted the
-          # whole step - so on the run that introduced data/fx.db the sweep's
-          # own articles were collected, linked, and then thrown away because a
-          # DIFFERENT file was absent. One store missing must never cost the
-          # others their day; that is the entire point of committing daily.
-          for db in data/corpus.db data/graph.db data/fx.db; do
-            if [ -f "$db" ]; then
-              git add "$db"
+          # One at a time, skipping any that is not there: `git add` on a
+          # missing path is fatal, and one store missing must never cost the
+          # others their day.
+          for path in data/corpus.db data/graph.db data/fx.db data/facts.db data/price_cache.db data/digests; do
+            if [ -e "$path" ]; then
+              git add "$path"
             else
-              echo "no $db yet - skipping it"
+              echo "no $path yet - skipping it"
             fi
           done
-          # Nothing new is a normal outcome, not a failure: a quiet day, or a day
-          # every story was one the corpus already held.
           if git diff --cached --quiet; then
             echo "nothing new to commit"
             exit 0
           fi
-          # [skip ci] because this is a data commit - ci.yml runs on every branch
-          # push, and ten test jobs to validate a row of news is waste.
-          git commit -m "chore(corpus): the $(date -u +%Y-%m-%d) sweep [skip ci]"
+          # [skip ci]: a data commit; ten test jobs to validate a row of news is waste.
+          git commit -m "chore(corpus): the $(date -u +%Y-%m-%d) ${{ steps.slot.outputs.slot }} sweep [skip ci]"
+          # Another slot may have pushed while this one ran; rebase our one
+          # data commit onto it rather than fail the push.
+          git pull --rebase origin "${GITHUB_REF_NAME}" || true
           git push
 
       - name: Fail if a source failed
-        if: steps.sweep.outputs.code != '0' || steps.fx.outputs.code != '0'
+        if: steps.sweep.outputs.code != '0' || (steps.fx.outcome != 'skipped' && steps.fx.outputs.code != '0')
         run: |
-          echo "sweep exited ${{ steps.sweep.outputs.code }}, fx exited ${{ steps.fx.outputs.code }}"
-          echo "  2 = could not run (config or adapter)"
-          echo "  3 = a source failed; see the sweeps table in data/corpus.db"
+          echo "sweep exited ${{ steps.sweep.outputs.code }}, fx exited ${{ steps.fx.outputs.code || 'n/a' }}"
+          echo "  2 = could not run (config, slot or adapter)"
+          echo "  3 = a source failed or was degraded; see the sweeps table in data/corpus.db"
+          echo "      and the pulls table in data/facts.db"
           exit 1

@@ -1,0 +1,63 @@
+# One live fetch of every catalogued source, storing nothing.
+#
+# The repository's development environment has no route to any data host, so
+# the first real answer from a source - does the URL serve a feed, does the
+# key work, what shape does the JSON have - can only come from a runner. This
+# is that runner. Run it after adding a key or a candidate feed; enable a
+# source in config.toml only after its row here shows dated items.
+#
+# Manual only. It spends free-tier quota (Alpha Vantage allows 25 calls a
+# day) and it is a diagnostic, not a schedule.
+name: sources-probe
+
+on:
+  workflow_dispatch:
+    inputs:
+      sources:
+        description: "space-separated source names; empty probes every one"
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.12"
+          enable-cache: true
+
+      - name: Install
+        run: uv sync --frozen
+
+      - name: Probe
+        env:
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+          FMP_API_KEY: ${{ secrets.FMP_API_KEY }}
+          ALPHAVANTAGE_API_KEY: ${{ secrets.ALPHAVANTAGE_API_KEY }}
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
+          GDELT_USER_AGENT: ${{ secrets.GDELT_USER_AGENT }}
+        run: |
+          set +e
+          args=""
+          for s in ${{ inputs.sources }}; do args="$args --source $s"; done
+          uv run python ask.py sources --probe $args | tee probe.txt
+          code=$?
+          {
+            echo "## Source probe"
+            echo
+            echo '```'
+            cat probe.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit $code

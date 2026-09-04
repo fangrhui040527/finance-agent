@@ -46,12 +46,16 @@ class IngestStats:
     unlinked: int = 0
     kept: int = 0
     escalated: int = 0
+    #: Dropped by a cleaning rule before dedup: wrong language, junk, or no
+    #: title left once the HTML was stripped. Counted so a source that is
+    #: mostly filtered is visible as such rather than as a quiet one.
+    filtered: int = 0
 
     def __str__(self) -> str:
         return (
             f"fetched {self.fetched}, kept {self.kept}, "
             f"duplicates {self.duplicates}, unlinked {self.unlinked}, "
-            f"escalated {self.escalated}"
+            f"filtered {self.filtered}, escalated {self.escalated}"
         )
 
 
@@ -81,17 +85,46 @@ class FeedAdapter(ABC):
         entity_index: dict[str, str] | None = None,
         holdings: set[str] | None = None,
         watchlist: set[str] | None = None,
+        languages=None,
+        drop_junk: bool = True,
     ) -> tuple[list[Article], IngestStats]:
-        """Bronze -> Silver. Dedup BEFORE indexing, link entities, extract features."""
+        """Bronze -> Silver. Clean, filter, dedup BEFORE indexing, link, extract.
+
+        `languages` is an allowlist (GDELT names or ISO codes; empty means keep
+        every language). `drop_junk` applies knowledge/news/clean.JUNK. Both
+        are counted in `stats.filtered` rather than silently absent.
+        """
+        from knowledge.news.clean import (
+            is_junk,
+            language_allowed,
+            normalise_text,
+            quality_score,
+        )
         from knowledge.news.features import should_escalate
         from knowledge.news.linking import linker_for
 
         stats = IngestStats(fetched=len(records))
         out: list[Article] = []
         linker = linker_for(entity_index) if entity_index else None
+        allow = tuple(languages or ())
         for rec in records:
             art = self._to_article(rec)
             if art is None:
+                continue
+
+            # Clean first, so dedup, linking and features all see one normal
+            # form: "Google ' s" and "Google's" are the same story.
+            art.title = normalise_text(art.title)
+            art.body = normalise_text(art.body)
+            if not art.title:
+                stats.filtered += 1
+                continue
+            language_ok = language_allowed(art.language, allow)
+            if not language_ok:
+                stats.filtered += 1
+                continue
+            if drop_junk and is_junk(art.title, art.body, art.source_domain):
+                stats.filtered += 1
                 continue
 
             dup = near_duplicate_hash(art.text)
@@ -101,8 +134,11 @@ class FeedAdapter(ABC):
             self._seen.add(dup)
             art.dup_hash = dup
 
-            if linker is not None and not art.instruments:
-                art.instruments = linker.link(art.text)
+            if linker is not None:
+                # A source keyed by ticker (Yahoo's feed, Finnhub's company
+                # news) arrives already attributed; the linker still reads the
+                # text so a story about two names is attached to both.
+                art.instruments = list(dict.fromkeys([*art.instruments, *linker.link(art.text)]))
             if not art.instruments:
                 stats.unlinked += 1
 
@@ -113,9 +149,17 @@ class FeedAdapter(ABC):
             # `escalated 0` on a corpus with 76 attributed articles.
             names = linker.names_for(art.instruments) if linker is not None else art.instruments
             art.features = self.extractor.extract(art.text, names)
-            if should_escalate(
+            art.quality = quality_score(
+                art.title,
+                art.body,
+                art.source_domain,
+                linked=bool(art.instruments),
+                language_ok=language_ok,
+            )
+            art.escalated = should_escalate(
                 art.features, art.instruments, holdings or set(), watchlist or set()
-            ):
+            )
+            if art.escalated:
                 stats.escalated += 1
             out.append(art)
             stats.kept += 1

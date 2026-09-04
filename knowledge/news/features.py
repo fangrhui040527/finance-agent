@@ -272,7 +272,16 @@ class Article:
     themes: list[str] = field(default_factory=list)
     features: Features | None = None
     dup_hash: str | None = None
+    #: knowledge/news/clean.quality_score, set by the adapter. None means the
+    #: article predates the score (the pre-2026-09-04 corpus) - not "unknown
+    #: quality", which would be a reason to drop it.
+    quality: float | None = None
+    #: Whether the escalation gate opened for it: relevant AND naming a held or
+    #: watched instrument. Stored so a digest can say what reached the queue.
+    escalated: bool = False
 
     @property
     def text(self) -> str:
+        if not self.body or self.body == self.title:
+            return self.title
         return f"{self.title}. {self.body}"

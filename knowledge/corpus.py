@@ -143,7 +143,16 @@ class Corpus:
         self.conn.row_factory = sqlite3.Row
         _enable_wal(self.conn, path, self.BUSY_TIMEOUT_MS)
         self.conn.executescript(SCHEMA)
+        self._migrate()
         self.conn.commit()
+
+    def _migrate(self) -> None:
+        """Columns added after the first corpus shipped. ADD COLUMN only - the
+        append-only triggers forbid touching a row, and a migration that
+        rewrote rows would be exactly the edit they exist to refuse."""
+        have = {r[1] for r in self.conn.execute("PRAGMA table_info(articles)")}
+        if "quality" not in have:
+            self.conn.execute("ALTER TABLE articles ADD COLUMN quality REAL")
 
     # -- writes ---------------------------------------------------------------
 
@@ -160,8 +169,8 @@ class Corpus:
             """INSERT OR IGNORE INTO articles
                (doc_id, source, title, body, source_domain, published_at, first_seen_at,
                 language, countries_json, instruments_json, themes_json, dup_hash,
-                relevance, escalated)
-               VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+                relevance, escalated, quality)
+               VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
             (
                 art.doc_id,
                 source,
@@ -176,7 +185,8 @@ class Corpus:
                 json.dumps(list(art.themes)),
                 art.dup_hash or "",
                 getattr(features, "relevance", None),
-                0,
+                int(bool(art.escalated)),
+                art.quality,
             ),
         )
         self.conn.commit()
@@ -249,17 +259,29 @@ class Corpus:
         source: str | None = None,
         instrument: str | None = None,
         limit: int = 500,
+        min_quality: float | None = None,
+        published_since: datetime | None = None,
     ) -> list[Article]:
         """Newest first. `instrument` filters on the linked ids, so an article
-        the linker never attached to anything is not returned by it."""
+        the linker never attached to anything is not returned by it.
+
+        `min_quality` keeps rows scored at or above it AND rows with no score
+        (the corpus before scoring existed); `published_since` windows on the
+        publisher's date rather than on when the sweep first saw it."""
         sql = ["SELECT * FROM articles"]
         where, args = [], []
         if since is not None:
             where.append("first_seen_at >= ?")
             args.append(_iso(since))
+        if published_since is not None:
+            where.append("published_at >= ?")
+            args.append(_iso(published_since))
         if source is not None:
             where.append("source = ?")
             args.append(source)
+        if min_quality is not None:
+            where.append("(quality IS NULL OR quality >= ?)")
+            args.append(float(min_quality))
         if where:
             sql.append("WHERE " + " AND ".join(where))
         sql.append("ORDER BY published_at DESC, doc_id LIMIT ?")
@@ -275,6 +297,9 @@ class Corpus:
         linked = self.conn.execute(
             "SELECT COUNT(*) FROM articles WHERE instruments_json <> '[]'"
         ).fetchone()[0]
+        escalated = self.conn.execute(
+            "SELECT COUNT(*) FROM articles WHERE escalated = 1"
+        ).fetchone()[0]
         sweeps = self.conn.execute("SELECT COUNT(*) FROM sweeps").fetchone()[0]
         failed = self.conn.execute(
             "SELECT COUNT(*) FROM sweeps WHERE status = ?", (FAILED,)
@@ -282,6 +307,7 @@ class Corpus:
         return {
             "articles": articles,
             "linked": linked,
+            "escalated": escalated,
             "sweeps": sweeps,
             "failed_sweeps": failed,
         }
@@ -298,6 +324,7 @@ class Corpus:
 
     @staticmethod
     def _to_article(row: sqlite3.Row) -> Article:
+        keys = row.keys()
         return Article(
             doc_id=row["doc_id"],
             title=row["title"],
@@ -309,6 +336,8 @@ class Corpus:
             instruments=json.loads(row["instruments_json"]),
             themes=json.loads(row["themes_json"]),
             dup_hash=row["dup_hash"] or None,
+            quality=row["quality"] if "quality" in keys else None,
+            escalated=bool(row["escalated"]) if "escalated" in keys else False,
         )
 
     # -- lifecycle ------------------------------------------------------------

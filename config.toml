@@ -251,13 +251,39 @@ min_graded_for_calibration = 30
 # working, it publishes rate decisions and banking statistics - macro news that
 # will not name Maybank or Tenaga. It was never the fix for the missing Bursa
 # COMPANY coverage; that still needs a Malaysian business news source.
-enabled = ["gdelt"]
+#
+# The register of every name here, what it needs and when it runs, is
+# knowledge/sources/catalog.py (`python ask.py sources` prints it). Keyed
+# sources skip themselves, with the variable named, until the key exists:
+# FINNHUB_API_KEY, FMP_API_KEY, ALPHAVANTAGE_API_KEY, FRED_API_KEY.
+#
+# Malaysian business RSS candidates (thestar_business, edge_malaysia,
+# bernama_business, fmt_business, nst_business) and bursa_announcements are
+# registered and NOT enabled: their URLs were taken from published feed indexes
+# and this project's development environment cannot fetch them. Run
+# `python ask.py sources --probe` from a GitHub Actions runner (the
+# sources-probe workflow), and enable each one whose probe shows dated items.
+enabled = [
+  "gdelt", "google_news", "yahoo_rss",
+  "edgar", "bnm_opr", "dosm_cpi",
+  "finnhub", "fmp", "alphavantage_news", "fred",
+]
+
+# Languages an article may be in to be kept. GDELT's own names or ISO codes.
+# Measured 2026-09-04: 38% of the corpus was Korean, Turkish, Spanish and
+# twenty others, and not one of those articles linked to a Bursa name. Empty
+# keeps everything.
+languages = ["English", "Malay", "Chinese"]
 
 # Where a sweep keeps what it saw. Append-only, deduplicated across runs, and
 # carrying a row for every sweep INCLUDING the ones that failed - a month of
 # refused requests and a genuinely quiet month leave the same empty article
 # table otherwise, and only one of them means the world was quiet.
 corpus_database = "data/corpus.db"
+
+# The structured half: reported figures with the day they became knowable,
+# dated events, macro series (vintaged), transcripts. Same append-only rules.
+facts_database = "data/facts.db"
 
 # GDELT DOC 2.0: free, no key, 100+ languages, worldwide. The API refuses a
 # window under 15 minutes, and the adapter floors it there whatever you set.

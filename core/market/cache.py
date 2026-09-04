@@ -30,6 +30,20 @@ CREATE TABLE IF NOT EXISTS price_csv (
 """
 
 
+def offline() -> bool:
+    """FINPLANET_OFFLINE=1: serve the cache whatever its date, never fetch.
+
+    For a process that has no route to a price host but has a cache another
+    process filled - the nightly feedback routine reads bars the collector
+    fetched hours earlier, from a session that cannot reach Yahoo at all. The
+    served day is reported (`last_served_from`) so nothing pretends a cached
+    bar is today's.
+    """
+    import os
+
+    return os.environ.get("FINPLANET_OFFLINE", "").strip() in ("1", "true", "yes")
+
+
 class PriceCache:
     def __init__(
         self,
@@ -54,9 +68,13 @@ class PriceCache:
         if row is None:
             return None
         fetched_on, body = row
-        if fetched_on != self._today():
+        if fetched_on != self._today() and not offline():
             return None  # a new session may have printed; the cached day is over
+        self.last_served_from = fetched_on
         return body
+
+    #: The day the last `get` answered from, for a caller that wants to say so.
+    last_served_from: str | None = None
 
     def put(self, feed: str, symbol: str, body: str) -> None:
         self.conn.execute(

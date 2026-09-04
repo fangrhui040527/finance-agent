@@ -408,6 +408,28 @@ class YahooFeed(PriceFeed):
         return "\n".join(rows) + "\n"
 
 
+#: The instrument whose bars stand for "the market" when a move is decomposed
+#: (`ask.py why --against`, the MCP tool's `market_proxy`). An ETF rather than
+#: the index itself because the price feeds carry ETFs under the same symbol
+#: rules as any share, and an index symbol would need a rule of its own per
+#: source. 0820EA is the FBM KLCI ETF on Bursa; SPY tracks the S&P 500.
+MARKET_PROXIES: dict[str, str] = {
+    "XNAS": "XNAS:SPY",
+    "XNYS": "XNAS:SPY",
+    "XKLS": "MYX:0820EA",
+}
+
+
+def market_proxy_for(instrument_id: str) -> str | None:
+    """The proxy for an instrument's market, or None when none is registered."""
+    from markets.registry import mic_of
+
+    try:
+        return MARKET_PROXIES.get(mic_of(instrument_id))
+    except ValueError:
+        return None
+
+
 class ChainedFeed:
     """Sources in order of preference; the first that answers wins.
 

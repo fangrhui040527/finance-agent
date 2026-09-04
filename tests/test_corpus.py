@@ -614,10 +614,12 @@ def test_every_enabled_source_has_an_adapter_that_builds():
     """Naming a source does not create it. An enabled name with no adapter
     ingests nothing every night and reads as a quiet world."""
     import core.config as C
-    from knowledge.feeds.registry import adapter_for
+    from knowledge.feeds.registry import adapter_for, is_news_source
+    from knowledge.sources.registry import collector_for
 
     for name in C.load().sources:
-        assert adapter_for(name) is not None
+        built = adapter_for(name) if is_news_source(name) else collector_for(name)
+        assert built is not None
 
 
 def test_one_source_failing_does_not_stop_the_next(tmp_path, monkeypatch, capsys):

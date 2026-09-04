@@ -245,6 +245,12 @@ class Config:
     #: Floored at GDELT's own documented 15-minute minimum by the adapter.
     gdelt_poll_minutes: int = 15
     corpus_db: str = "data/corpus.db"
+    #: Where structured pulls - facts, events, series, documents - are kept.
+    facts_db: str = "data/facts.db"
+    #: Languages an article may be in to be kept. Empty keeps every language,
+    #: which on GDELT means 38% of the corpus is in languages nobody on the
+    #: book reads and none of which ever linked a Bursa name.
+    languages: tuple[str, ...] = ()
     source: str = "<defaults>"
 
     def describe(self) -> str:
@@ -338,13 +344,29 @@ def _sources(data: dict) -> tuple[str, ...]:
     nothing every night, and an empty corpus is indistinguishable from a world
     in which nothing happened.
     """
-    from knowledge.feeds.registry import UnknownSource, adapter_for
+    from knowledge.feeds.registry import UnknownSource, adapter_for, is_news_source
+    from knowledge.sources.catalog import CATALOG
+    from knowledge.sources.registry import UnknownCollector, collector_for, is_collector
 
     names = _strings(data, "sources.enabled")
     for name in names:
+        if name not in CATALOG:
+            raise ConfigError(
+                f"sources.enabled: no adapter registered for source {name!r} - it is not in "
+                f"the source catalogue (knowledge/sources/catalog.py). "
+                f"Known: {', '.join(sorted(CATALOG))}"
+            )
         try:
-            adapter_for(name)
-        except UnknownSource as e:
+            if is_news_source(name):
+                adapter_for(name)
+            elif is_collector(name):
+                collector_for(name)
+            else:
+                raise ConfigError(
+                    f"sources.enabled: {name!r} is catalogued but has neither a feed adapter "
+                    f"nor a collector - the catalogue entry is ahead of the code."
+                )
+        except (UnknownSource, UnknownCollector) as e:
             raise ConfigError(f"sources.enabled: {e}") from None
     dupes = {n for n in names if names.count(n) > 1}
     if dupes:
@@ -628,6 +650,8 @@ def load(path: str | Path | None = None) -> Config:
         gdelt_query=str(_get(data, "sources.gdelt_query", "")),
         gdelt_poll_minutes=_int("sources.gdelt_poll_minutes", 15),
         corpus_db=str(_get(data, "sources.corpus_database", "data/corpus.db")),
+        facts_db=str(_get(data, "sources.facts_database", "data/facts.db")),
+        languages=_strings(data, "sources.languages"),
         daemon_budget_myr=dec("budget.daemon_daily_myr", 10.0),
         emergency_months=_int("waterfall.emergency_months", 6),
         debt_hurdle=dec("waterfall.debt_hurdle", 0.08),

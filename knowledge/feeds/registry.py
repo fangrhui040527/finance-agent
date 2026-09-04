@@ -5,6 +5,18 @@ because they are free would produce a queue nobody reads. What this registry
 adds is the SEAM - enabling a source is one line of config once an entry
 exists here, and a name with no entry raises instead of silently ingesting
 nothing.
+
+Two kinds of entry:
+
+  * FACTORIES - a class per source with its own transport (GDELT's DOC API,
+    Google News search, a Yahoo ticker feed). Per-instrument ones take the
+    name or id as a keyword; called bare they build a harmless probe instance,
+    which is how config validation confirms the adapter exists.
+  * RSS_SOURCES - one line per plain RSS/Atom endpoint. The class is written;
+    a new Malaysian business feed is a URL and a trust tier.
+
+Structured (non-news) sources live in knowledge/sources/registry.py; the
+catalogue in knowledge/sources/catalog.py names both kinds.
 """
 
 from __future__ import annotations
@@ -12,6 +24,7 @@ from __future__ import annotations
 from collections.abc import Callable
 
 from knowledge.feeds.adapter import FeedAdapter, GdeltFeed
+from knowledge.feeds.company_feeds import GoogleNewsFeed, YahooTickerFeed
 from knowledge.feeds.rss import RssFeed
 
 
@@ -19,16 +32,35 @@ class UnknownSource(ValueError):
     """A configured source with no adapter. Refused, never quietly skipped."""
 
 
-#: name -> factory. RSS sources are registered by naming their URL here, so a
-#: new one is a single line - the class is already written.
+#: name -> factory. Per-instrument factories accept `query=` (google_news) or
+#: `instrument_id=` (yahoo_rss); bare, they build a probe instance.
 FACTORIES: dict[str, Callable[..., FeedAdapter]] = {
     "gdelt": GdeltFeed,
+    "google_news": GoogleNewsFeed,
+    "yahoo_rss": YahooTickerFeed,
 }
 
 #: Curated keyless RSS endpoints, each one line. Enabled via config, not here.
+#:
+#: The Malaysian entries marked CANDIDATE were registered from published
+#: feed indexes rather than a verified fetch - this environment cannot reach
+#: them. `ask.py sources --probe`, run from a GitHub Actions runner, fetches
+#: each once; an index page answers with the feeds it advertises (see
+#: rss._excerpt), which is how the right URL gets read off it. Enable a
+#: candidate only after the probe shows items with dates.
 RSS_SOURCES: dict[str, tuple[str, str]] = {
     # name: (url, trust)
     "reuters_business": ("https://feeds.reuters.com/reuters/businessNews", "wire"),
+    "thestar_business": ("https://www.thestar.com.my/rss/business/business-news", "curated_news"),
+    # CANDIDATE: The Edge publishes its feed list at /rss.html; the probe reads
+    # the advertised feed URLs off that page.
+    "edge_malaysia": ("https://theedgemalaysia.com/rss.html", "curated_news"),
+    # CANDIDATE: Bernama's feed index. Same treatment.
+    "bernama_business": ("https://www.bernama.com/en/rssfeed.php", "wire"),
+    # CANDIDATE: WordPress category feed - the conventional path.
+    "fmt_business": ("https://www.freemalaysiatoday.com/category/business/feed/", "general_news"),
+    # CANDIDATE: conventional Drupal path; the probe decides.
+    "nst_business": ("https://www.nst.com.my/business/rss", "curated_news"),
     # REGISTERED, NOT ENABLED. Four sweeps settled this; the record, so nobody
     # repeats it:
     #
@@ -71,6 +103,10 @@ RSS_SOURCES: dict[str, tuple[str, str]] = {
 }
 
 
+def is_news_source(name: str) -> bool:
+    return name in FACTORIES or name in RSS_SOURCES
+
+
 def adapter_for(name: str, **kwargs) -> FeedAdapter:
     """Build the adapter a config name refers to. Raises `UnknownSource`."""
     if name in FACTORIES:
@@ -80,8 +116,9 @@ def adapter_for(name: str, **kwargs) -> FeedAdapter:
         return RssFeed(url, name=name, trust=trust, **kwargs)
     known = sorted(list(FACTORIES) + list(RSS_SOURCES))
     raise UnknownSource(
-        f"no adapter registered for source {name!r}. Known: {', '.join(known)}. "
+        f"no adapter registered for source {name!r}. Known news sources: {', '.join(known)}. "
         f"An RSS source is one line in knowledge/feeds/registry.py; anything "
-        f"else is a FeedAdapter subclass. Enabling a name without an adapter "
+        f"else is a FeedAdapter subclass. Structured sources are listed in "
+        f"knowledge/sources/registry.py. Enabling a name without an adapter "
         f"would ingest nothing and read as a quiet news day."
     )
