@@ -1,9 +1,15 @@
 """Live GDELT ingest, tested without a network.
 
 The property under test throughout: a BROKEN feed must never look like a QUIET
-one. Every failure path raises FeedError; only an explicitly empty article list
-returns an empty list. A feed that swallowed its own errors would hand the
-system a confident "no news" on the day the news mattered most.
+one. Every failure path raises FeedError. A feed that swallowed its own errors
+would hand the system a confident "no news" on the day the news mattered most.
+
+Two shapes mean "quiet" and return an empty list: an explicitly empty article
+list, and a bare `{}`. The second was learned the hard way - it was treated as
+a failure until 2026-09-04, when four Bursa companies with no news in the window
+were recorded as broken feeds. That is the same error in the other direction,
+and just as costly: a quiet day filed as a fault teaches the system to distrust
+a source that was working.
 """
 
 import json
@@ -181,3 +187,58 @@ def test_the_feed_sits_on_the_general_news_trust_rung():
     """Not curated_news. A wire story may never outrank a filing."""
     assert GdeltFeed.trust == "general_news"
     assert GdeltFeed.cadence == timedelta(minutes=15)
+
+
+# --- quiet is not broken, and broken is not quiet --------------------------
+
+
+def test_an_empty_object_is_no_news_rather_than_a_broken_feed():
+    """GDELT answers a query that matched nothing with a bare `{}`.
+
+    Recording that as a failure is the inverse of the bug this module guards
+    against, and it happened: on 2026-09-04 Genting, IHH Healthcare, Petronas
+    Chemicals and Press Metal were all filed as broken when each had simply had
+    no English-language news in the window. Since the sweep resumes from its
+    last success the window is often a couple of hours, and a mid-cap Bursa name
+    going unmentioned for two hours is the ordinary case, not the alarming one.
+    """
+    feed = GdeltFeed(opener=_opener(json.dumps({})))
+    assert feed.fetch(NOW - timedelta(hours=1)) == []
+
+
+def test_an_explicitly_empty_article_list_is_still_quiet():
+    feed = GdeltFeed(opener=_opener(json.dumps({"articles": []})))
+    assert feed.fetch(NOW - timedelta(hours=1)) == []
+
+
+def test_any_OTHER_unexpected_object_is_still_an_error():
+    """The empty-dict allowance is deliberately narrow. A dict with keys but no
+    articles is a shape nobody has explained, and guessing at it is how a real
+    fault gets quietly counted as a quiet day."""
+    for body in ({"status": "ok"}, {"error": "rate limited"}, {"articles_": []}):
+        feed = GdeltFeed(opener=_opener(json.dumps(body)))
+        with pytest.raises(FeedError, match="no articles key"):
+            feed.fetch(NOW - timedelta(hours=1))
+
+
+def test_a_rate_limit_waits_long_enough_to_be_worth_waiting():
+    """429 is a quota, not a dropped packet. The `with_retry` default backs off
+    0.5s then 1s, which puts all three attempts inside the same throttle window
+    - three requests spent to fail exactly as the first one did."""
+    from knowledge.feeds.adapter import GdeltFeed as G
+
+    assert G.RETRY_BASE_SECONDS >= 5.0, "GDELT asks for ~1 request per 5 seconds"
+
+    waits: list[float] = []
+    calls = {"n": 0}
+
+    def _rate_limited(req, timeout=None):
+        calls["n"] += 1
+        raise urllib.error.HTTPError(req.full_url, 429, "Too Many Requests", {}, None)
+
+    feed = GdeltFeed(opener=_rate_limited, sleep=waits.append)
+    with pytest.raises(FeedError, match="429"):
+        feed.fetch(NOW - timedelta(hours=1))
+
+    assert calls["n"] == 3, "still three attempts, just spaced usefully"
+    assert waits and waits[0] >= 5.0, f"first wait was {waits[0]}s, inside the throttle window"

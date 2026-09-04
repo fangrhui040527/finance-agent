@@ -234,6 +234,14 @@ class GdeltFeed(FeedAdapter):
     # sweep into a recorded failure. `with_retry` makes 3 attempts, so the worst
     # case is ~4.5min - inside the collect job's 15min cap.
     TIMEOUT = 90
+    #: Seconds for the FIRST retry wait, doubling from there. 5, not the
+    #: `with_retry` default of 0.5, because the failure being retried here is a
+    #: quota rather than a dropped packet: on 2026-09-04 four of nine companies
+    #: came back 429, and 0.5s and 1s waits put all three attempts inside the
+    #: same throttle window. GDELT asks for roughly one request every five
+    #: seconds. Costed against the sweep's 600s deadline: nine requests already
+    #: take ~310s at ~34s each, and this adds at most ~13s per failing company.
+    RETRY_BASE_SECONDS = 5.0
     DEFAULT_USER_AGENT = "finplanet-analyst-mind/0.1 (personal research)"
 
     def __init__(
@@ -341,9 +349,15 @@ class GdeltFeed(FeedAdapter):
                 return resp.read()
 
         kwargs = {"sleep": self._sleep} if self._sleep is not None else {}
+        # base=RETRY_BASE_SECONDS, not the 0.5 default. The default produces
+        # waits of 0.5s and 1s, which is right for a dropped connection and
+        # useless against a quota: all three attempts land inside the same
+        # throttle window, so a 429 costs three requests and still fails. GDELT
+        # asks for about one request every five seconds. A Retry-After header
+        # still wins over this when the server names its own wait.
         try:
             self._breaker.before_call()
-            body = with_retry(_transport, **kwargs)
+            body = with_retry(_transport, base=self.RETRY_BASE_SECONDS, **kwargs)
         except CircuitOpen as e:
             raise FeedError(str(e)) from e
         except urllib.error.URLError as e:  # includes HTTPError after retries
@@ -362,6 +376,22 @@ class GdeltFeed(FeedAdapter):
             raise FeedError(
                 f"GDELT returned non-JSON, which is how it reports errors: {body[:200]!r}"
             ) from e
+
+        # A bare `{}` is how GDELT says "nothing matched", not how it says it
+        # broke. Treating it as a failure inverted the one distinction this
+        # whole layer exists to preserve: on 2026-09-04 four companies -
+        # Genting, IHH Healthcare, Petronas Chemicals, Press Metal - were
+        # recorded as broken feeds when they had simply had no English-language
+        # news in the window. The window is the tell: the sweep resumes from the
+        # last success, so it is often a couple of hours, and a mid-cap Bursa
+        # name having nothing said about it in two hours is the ordinary case.
+        #
+        # Narrow on purpose. ONLY an empty dict means this; any other dict
+        # missing the key is still unexplained and still an error, because
+        # guessing at a shape nobody has seen is how a real fault gets quietly
+        # counted as a quiet day.
+        if isinstance(payload, dict) and not payload:
+            return []
 
         if not isinstance(payload, dict) or "articles" not in payload:
             raise FeedError(f"GDELT response has no articles key: {str(payload)[:200]!r}")
