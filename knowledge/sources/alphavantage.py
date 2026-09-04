@@ -27,6 +27,26 @@ from knowledge.news.features import Article
 from knowledge.sources.base import Collector, Pull, SourceError, local_code, parse_datetime
 
 URL = "https://www.alphavantage.co/query"
+
+#: The vendor answers 200 with an "Information" or "Note" field for two
+#: different problems, and its quota wording also mentions the API key ("your
+#: API key ... 25 requests per day"). Quota phrasing is checked first so a
+#: spent day is not misread as a bad key, and a bad key - a configuration
+#: error, not something to wait out - is not misread as a spent day.
+_QUOTA_MARKERS = ("rate limit", "requests per day", "call frequency", "premium")
+_KEY_MARKERS = ("api key", "apikey")
+
+
+def classify_notice(text: str) -> str:
+    """What a 200-with-notice means: a spent quota, a rejected key, or neither."""
+    low = text.lower()
+    if any(m in low for m in _QUOTA_MARKERS):
+        return "quota exhausted for today"
+    if any(m in low for m in _KEY_MARKERS):
+        return "rejected the key (check ALPHAVANTAGE_API_KEY)"
+    return "refused"
+
+
 MIN_RELEVANCE = Decimal("0.2")
 
 
@@ -58,7 +78,8 @@ class AlphaVantageNews(Collector):
             raise SourceError("alphavantage: expected an object")
         for field in ("Information", "Note"):
             if payload.get(field):
-                raise SourceError(f"alphavantage refused: {str(payload[field])[:160]}")
+                notice = str(payload[field])
+                raise SourceError(f"alphavantage {classify_notice(notice)}: {notice[:160]}")
         if payload.get("Error Message"):
             raise SourceError(f"alphavantage: {str(payload['Error Message'])[:160]}")
         feed = payload.get("feed")
