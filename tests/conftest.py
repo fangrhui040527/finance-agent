@@ -30,7 +30,21 @@ ROOT = Path(__file__).resolve().parent.parent
 @pytest.fixture(autouse=True)
 def keyless_env(monkeypatch: pytest.MonkeyPatch) -> None:
     """No test sees a real key or a backend override unless it sets one."""
-    for name in ("ANTHROPIC_API_KEY", "LLM_BACKEND", "FINPLANET_CHEAP", "FINPLANET_DEBUG_DIR"):
+    from core.llm.providers import env_vars
+
+    for name in (
+        "ANTHROPIC_API_KEY",
+        "LLM_BACKEND",
+        "LLM_BACKEND_REASON",
+        "LLM_BACKEND_BALANCED",
+        "LLM_BACKEND_CHEAP",
+        "FINPLANET_CHEAP",
+        "FINPLANET_DEBUG_DIR",
+        # Every free-provider key and override (docs/21): a GROQ_API_KEY in a
+        # developer's shell would otherwise turn "no key -> echo" tests into
+        # "no key -> groq" on that one machine.
+        *env_vars(),
+    ):
         monkeypatch.delenv(name, raising=False)
     # Belt and braces: entrypoints load .env now, so deleting the variables is
     # not enough - a main() called inside a test would put them straight back.

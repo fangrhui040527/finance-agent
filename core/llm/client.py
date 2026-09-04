@@ -19,7 +19,6 @@ from typing import Protocol
 
 from core.guardrails.policy import Action, PolicyEngine, Rail
 from core.llm.tiers import (
-    MODEL_IDS,
     TaskClass,
     Tier,
     Usage,
@@ -46,7 +45,20 @@ class Completion:
 
 
 class Backend(Protocol):
-    """Implemented per provider. The only place a vendor SDK may be imported."""
+    """Implemented per provider. The only place a vendor SDK may be imported.
+
+    Two OPTIONAL hooks, read through `core.llm.backends.model_of` and
+    `pricing_of` rather than required here, so Echo and Anthropic stay on the
+    Claude table untouched:
+
+      * `model_for(tier) -> str | None`: the model this backend calls for a
+        tier. A free provider serves its own lineup, and the ledger must record
+        what was actually called, not what the routing table says Claude would
+        have been.
+      * `pricing_for(tier) -> (in, out) | None`: USD per million tokens. A free
+        tier declares zero; billing it at Haiku's rate would trip the budget
+        rail on spend that never happened.
+    """
 
     def complete(
         self, model_id: str, prompt: str, system: str | None, profile=None
@@ -105,8 +117,13 @@ class InferenceClient:
     def complete(
         self, agent: str, task: TaskClass, prompt: str, system: str | None = None
     ) -> Completion:
+        from core.llm.backends import model_of
+
         tier = effective_tier(route(task))  # callers never choose this; the cheap cap may lower it
-        model_id = MODEL_IDS[tier]
+        # Through the backend, not MODEL_IDS: a free provider answers with its
+        # own model, and the row that says "claude-haiku-4-5" for a call Llama
+        # answered is the row that makes every operating report a fiction.
+        model_id = model_of(self.backend, tier)
         # profile_for, not REQUEST_PROFILES: the table is the default shape and
         # this is the shape after the operator's FINPLANET_EFFORT selection.
         # Reading the raw table here is how an effort setting becomes decoration.
@@ -274,6 +291,7 @@ class InferenceClient:
         error=None,
         stop_reason="",
     ):
+        from core.llm.backends import backend_name, pricing_of
         from core.trace import emit, is_tracing
 
         rec = self.ledger.record_call(
@@ -284,6 +302,8 @@ class InferenceClient:
             prompt=prompt,
             usage=usage,
             fx_rate=self.fx_rate,
+            # None bills at the tier's first-party rate; a free provider says zero.
+            pricing=pricing_of(self.backend, tier),
             # Measured either way. It used to reach the trace and nowhere else,
             # so an ordinary run - the only kind that happens in production -
             # threw away the number docs/01 section 10 asks for.
@@ -305,7 +325,7 @@ class InferenceClient:
                 task_class=task.value,
                 tier=tier.value,
                 model_id=model_id,
-                backend=type(self.backend).__name__,
+                backend=backend_name(self.backend, tier),
                 system=system or "",
                 prompt=prompt,
                 response=text,
