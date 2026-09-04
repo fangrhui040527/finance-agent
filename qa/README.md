@@ -62,12 +62,14 @@ passes through `redact()` first.
 
 From the free-provider pass (2026-09-04, against PR #32 at ec8ba34; 41 of 42 held):
 
-- **Open.** `OpenAICompatibleBackend` relays a provider's error words verbatim, so a
-  gateway that echoes the `Authorization` header back in its error body puts the key
-  into the exception text, which reaches logs and the trace's error field. Pinned by
-  `test_p1_free_backend.py::test_a_provider_that_echoes_the_key_in_an_error_does_not_put_it_in_the_exception`;
-  the fix is a scrub of the key and of any `Bearer <token>` in `_request` before the
-  message is raised. Proposed on the PR; the test stays red until it lands.
+- **Fixed.** `OpenAICompatibleBackend` relayed a provider's error words verbatim, so a
+  gateway that echoes the `Authorization` header back in its error body put the key
+  into the exception text, which reaches logs and the trace's error field. The
+  backend now scrubs its own key and any `Bearer <token>` from the message before it
+  is raised (`_scrub`). Pinned twice: here by
+  `test_p1_free_backend.py::test_a_provider_that_echoes_the_key_in_an_error_does_not_put_it_in_the_exception`
+  against a real listener, and in the product suite by
+  `tests/test_openai_compatible_backend.py::test_a_provider_that_echoes_the_key_does_not_get_it_into_the_error`.
 
 Fixed after the first live pass, each pinned by `tests/test_qa_findings.py`:
 

@@ -320,6 +320,27 @@ def test_a_non_json_error_body_is_quoted_as_is():
         _backend([http_error(418, "Bad Gateway page")], max_attempts=1).complete("m", "q", None)
 
 
+def test_a_provider_that_echoes_the_key_does_not_get_it_into_the_error():
+    """Some gateways quote the offending Authorization header back in the
+    error body. The provider's words are relayed; the key is not, because the
+    message reaches logs and the trace's error field (QA finding, 2026-09-04)."""
+    key = "gsk_test_not_a_real_key_0123456789"
+    echoed = json.dumps({"error": {"message": f"invalid header Authorization: Bearer {key}"}})
+    with pytest.raises(BackendError) as exc:
+        _backend([http_error(400, echoed)], api_key=key).complete("m", "q", None)
+    text = str(exc.value)
+    assert key not in text
+    assert "invalid header Authorization: Bearer <redacted key>" in text
+
+
+def test_a_bearer_token_that_is_not_ours_is_scrubbed_too():
+    """A proxy may re-encode or rotate what it echoes; any bearer token goes."""
+    echoed = json.dumps({"error": {"message": "upstream saw Bearer sk-or-v1-abcdef0123456789"}})
+    with pytest.raises(BackendError, match=r"upstream saw Bearer <redacted>") as exc:
+        _backend([http_error(400, echoed)]).complete("m", "q", None)
+    assert "sk-or-v1" not in str(exc.value)
+
+
 def test_429_is_retried_and_retry_after_is_obeyed_exactly():
     sleeps: list = []
     b = _backend(

@@ -396,6 +396,10 @@ _TRANSIENT_STATUSES = frozenset({408, 425, 429, 500, 502, 503, 504, 529})
 #: these tags. It is not the answer, and a JSON parser downstream would find
 #: braces inside it. A block cut off before its close tag is a model that was
 #: truncated while thinking, and nothing after the opening tag is an answer.
+#: A bearer token as it appears in an Authorization header. Some gateways echo
+#: the offending header back in an error body; the product relays a provider's
+#: words, and the key must not be among them.
+_BEARER = re.compile(r"Bearer\s+[A-Za-z0-9._~+/=-]{8,}")
 _THINK_BLOCK = re.compile(r"<think>.*?</think>\s*", re.DOTALL)
 _THINK_OPEN = re.compile(r"<think>.*\Z", re.DOTALL)
 
@@ -570,7 +574,7 @@ class OpenAICompatibleBackend:
                 return data
             except urllib.error.HTTPError as e:
                 status = e.code
-                message = self._error_message(e)
+                message = self._scrub(self._error_message(e))
                 if status in (401, 403):
                     raise AuthError(f"{who} rejected the key ({status}): {message}") from e
                 if status in _TRANSIENT_STATUSES:
@@ -605,6 +609,18 @@ class OpenAICompatibleBackend:
             else:
                 self._sleep(self._jitter(0.5, 1.0) * 2.0 ** (attempt - 1))
         raise last if last is not None else BackendError("retry loop exited without a result")
+
+    def _scrub(self, text: str) -> str:
+        """The provider's words with our own key taken out.
+
+        A gateway that quotes the Authorization header back in its error body
+        exists, and the message built from it reaches logs and the trace's
+        error field. The exact key goes first, then any bearer token, in case
+        the echo is not byte-identical to what was sent.
+        """
+        if self._key and self._key in text:
+            text = text.replace(self._key, "<redacted key>")
+        return _BEARER.sub("Bearer <redacted>", text)
 
     @staticmethod
     def _error_message(err: urllib.error.HTTPError) -> str:
