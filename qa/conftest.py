@@ -66,10 +66,40 @@ def pytest_collection_modifyitems(config, items):
         if f"{os.sep}phase2{os.sep}" in path:
             item.add_marker(pytest.mark.phase2)
             item.add_marker(pytest.mark.live)
-            if skip is not None:
+            if os.path.basename(path).startswith("test_p2_free"):
+                # The free-provider half (docs/21) needs a FREE key, not an
+                # Anthropic one; it never bills the Anthropic API.
+                if not live_enabled:
+                    item.add_marker(
+                        pytest.mark.skip(reason="set QA_LIVE=1 to opt in to live calls")
+                    )
+                elif not _free_key_present():
+                    item.add_marker(
+                        pytest.mark.skip(
+                            reason="no free-provider key (GROQ_API_KEY, GEMINI_API_KEY, "
+                            "OPENROUTER_API_KEY, MISTRAL_API_KEY, NVIDIA_API_KEY) "
+                            "and no local Ollama"
+                        )
+                    )
+            elif skip is not None:
                 item.add_marker(skip)
         elif f"{os.sep}phase1{os.sep}" in path:
             item.add_marker(pytest.mark.phase1)
+
+
+def _free_key_present() -> bool:
+    """A keyed free provider is configured, or a local Ollama is listening."""
+    try:
+        from core.llm import providers
+    except ImportError:
+        return False
+    if providers.configured_names():
+        return True
+    try:
+        with socket.create_connection(("127.0.0.1", 11434), timeout=1.0):
+            return True
+    except OSError:
+        return False
 
 
 # -- cost and live transport ---------------------------------------------------

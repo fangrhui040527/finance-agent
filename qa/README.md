@@ -19,6 +19,7 @@ The MCP server is out of scope here by decision. Nothing under `qa/` drives it.
 | `test_p1_entrypoints.py` | every script as a real process: `verify.py`, `stress/run.py`, `trace_run.py`, the graph builds (twice, byte-identical), every `ask.py` subcommand, the `predict.py` round trip, and the product's own suite |
 | `test_p1_agents_registry.py` | all sixteen agents on the real allowlist; class `tools` vs registry drift; every `_guard_tool` literal is granted; no agent can place an order or borrow a tool |
 | `test_p1_invariants.py` | properties under random input: shares sum to one, bets stay in `[1, n]`, a size never exceeds its cap, append-only stores refuse edits, config bounds cannot be widened, all eleven markets are self-consistent |
+| `test_p1_free_backend.py` | the free-provider backend (docs/21) on the PERFUMES axes, against a real loopback listener that speaks the OpenAI wire format (`qa/_support/loopback.py`): a granted agent's call crosses a socket in the OpenAI shape and is ledgered under the answering model at zero cost, a split keeps the thesis off the free model, and `ask.py backend`, `/api/backend` and the doctor say so (Functionality); 429 + Retry-After, 5xx, a dropped connection, a closed port and a captive portal, a 4xx never retried, truncation and a content filter ledgered (Reliability); every refusal names its variable, Malay/Chinese/emoji round-trip, the disclosure label stays before the first colon (Usability); the key is in one header and in no output, ledger row or error - even when the provider echoes it - HTTPS presets, advice verbs meet the OUTPUT rail, an instruction in a reply is content, `.env.example` ships every key empty (Security); no socket at selection, pacing, stdlib only (Efficiency); trailing slashes (Portability); docs/21, README, index and status table agree with the catalogue (Maintainability); a new provider is one entry (Extensibility). Skips as a whole until the backend is on the checkout |
 | `test_p1_rag_pipeline.py` | the retrieval pipeline on the PERFUMES axes: a swept article is retrievable by its owning agent with a verifying citation (Functionality); 429s honour Retry-After, 5xx retries, 4xx does not, a failing host opens its breaker (Reliability); Malay, Chinese and emoji text round-trips intact (Usability); an injected article body is stored as data and refused by the INPUT rail, and no source module names an execution tool (Security); indexing is linear and the router is cached (Efficiency); relative paths only (Portability); catalogue, registries and config agree, and a new RSS source is one line (Maintainability, Extensibility) |
 
 ## Phase 2 — live, on Haiku
@@ -26,7 +27,9 @@ The MCP server is out of scope here by decision. Nothing under `qa/` drives it.
     QA_LIVE=1 python -m pytest qa/phase2 -q
 
 Needs `ANTHROPIC_API_KEY` (environment or `.env`) **and** `QA_LIVE=1`. Without
-both, every phase-2 test skips. Every Messages tier resolves to
+both, every phase-2 test skips. The one exception is `test_p2_free_backend_live.py`,
+which needs `QA_LIVE=1` and a *free-provider* key instead (or a local Ollama) and
+never touches the Anthropic API. Every Messages tier resolves to
 `claude-haiku-4-5` — model **and** billing — through the product's own
 `FINPLANET_CHEAP=1` cap (promoted into `core/llm/tiers.py` from this suite's
 old model-table pin), so a reason-tier call proves the reason-tier code path at
@@ -46,6 +49,7 @@ answer.
 | `test_p2_product_seam_live.py` | the four granted agents complete through the real registry on Haiku; ungranted ones never reach the wire; the ledger overbills a pinned reason call by exactly 5x; the trace captures a real call; `ask.py backend` reports the real backend; the budget stops a live call; real model text meets the OUTPUT rail |
 | `test_p2_geval.py` | Haiku grades the product's narrative surfaces against rubrics (scores in `qa/artifacts/geval.json`) |
 | `test_p2_feeds_live.py` | Stooq and GDELT, keyless but networked; `ask.py prices`, `ask.py why --fetch`, `trace_run.py --live`; each skips if its host is unreachable |
+| `test_p2_free_backend_live.py` | one real answer from every free provider that has a key (docs/21), on its cheap model: the text is non-empty, the ledger row carries the provider's model id at zero cost, an unknown model is refused with the variable that fixes it, and `ask.py backend` as a process names the provider without printing the key. Needs `QA_LIVE=1` and a free key (`GROQ_API_KEY`, `GEMINI_API_KEY`, `OPENROUTER_API_KEY`, `MISTRAL_API_KEY`, `NVIDIA_API_KEY`) or a local Ollama; never an Anthropic key. Writes `qa/artifacts/free-live.json`. Meant to run from `.github/workflows/free-backend-probe.yml` |
 | `test_p2_sources_live.py` | every catalogued source, live: GDELT, Google News, Yahoo ticker feeds, the five Malaysian RSS candidates (an index page xfails with the feeds it advertises), EDGAR, BNM's OPR, DOSM's CPI, and - with their keys - Finnhub, FMP, Alpha Vantage, FRED. Skips per unreachable host; xfails a spent quota. Meant to run from a GitHub Actions runner |
 
 ## Artefacts
@@ -55,6 +59,17 @@ off the model that actually answered — and `geval.json`. Anything written ther
 passes through `redact()` first.
 
 ## Findings, and where they stand
+
+From the free-provider pass (2026-09-04, against PR #32 at ec8ba34; 41 of 42 held):
+
+- **Fixed.** `OpenAICompatibleBackend` relayed a provider's error words verbatim, so a
+  gateway that echoes the `Authorization` header back in its error body put the key
+  into the exception text, which reaches logs and the trace's error field. The
+  backend now scrubs its own key and any `Bearer <token>` from the message before it
+  is raised (`_scrub`). Pinned twice: here by
+  `test_p1_free_backend.py::test_a_provider_that_echoes_the_key_in_an_error_does_not_put_it_in_the_exception`
+  against a real listener, and in the product suite by
+  `tests/test_openai_compatible_backend.py::test_a_provider_that_echoes_the_key_does_not_get_it_into_the_error`.
 
 Fixed after the first live pass, each pinned by `tests/test_qa_findings.py`:
 

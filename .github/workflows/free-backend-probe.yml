@@ -1,0 +1,81 @@
+# One real answer from every free provider that has a key, storing nothing.
+#
+# The development environment has no route to any model host, so the first
+# proof that a free tier answers - the key works, the default model id still
+# exists, the reply parses, the ledger prices it at zero - can only come from a
+# runner. This is that runner. Run it after adding a free-provider key as a
+# repository secret, and again when `ask.py` reports a 404 on a default model
+# (free lineups rotate; docs/21 section 4).
+#
+# Manual only. Two calls per keyed provider on its cheapest model; it spends a
+# few requests of a free quota and no money.
+name: free-backend-probe
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: bash
+    env:
+      GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+      NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+      FINPLANET_NO_DOTENV: "1"
+      PYTHONUTF8: "1"
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.12"
+          enable-cache: true
+
+      - name: Install
+        run: uv sync --frozen
+
+      - name: Which backend would answer, and what the catalogue holds
+        run: |
+          {
+            echo "## Backend selection"
+            echo
+            echo '```'
+            uv run python ask.py backend || true
+            echo
+            uv run python ask.py backend --list
+            echo '```'
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: One word from each keyed provider
+        env:
+          QA_LIVE: "1"
+        run: |
+          set +e
+          uv run python -m pytest qa/phase2/test_p2_free_backend_live.py \
+            -q -rs -o addopts= -p no:cacheprovider | tee live.txt
+          code=${PIPESTATUS[0]}
+          {
+            echo "## Live probe"
+            echo
+            echo '```'
+            cat live.txt
+            echo '```'
+            if [ -f qa/artifacts/free-live.json ]; then
+              echo
+              echo "### What answered"
+              echo
+              echo '```json'
+              cat qa/artifacts/free-live.json
+              echo '```'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit $code
