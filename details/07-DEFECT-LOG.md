@@ -239,6 +239,32 @@ And one that passed for the wrong reason:
 
 ---
 
+## 9. A default that was a fabrication
+
+`knowledge/feeds/rss.py` dated an item with no `<pubDate>` as `rec.fetched_at`,
+and `_parse` skipped an item only when its date was *older* than the window —
+so an undated item was never filtered out, and then arrived stamped with the
+moment it was fetched.
+
+Read as a line of code it looks like a sensible fallback. Read as a claim it
+says: *this was published now*, asserted about an item that said nothing of the
+kind. Found on 2026-09-04 probing BNM, whose 2020 press-release archive is valid
+RSS with **zero `<pubDate>` elements in 23,228 bytes**. Enabled, a nightly sweep
+would have entered six-year-old central bank releases at the NEWEST end of every
+window, on a schedule, indistinguishable from real news — and the registry note
+recording the attempt said the archive would yield "0 items in any recent
+window", which was the opposite of true for exactly this reason.
+
+Now: an undated item is dropped and counted, and a feed that dates **none** of
+its items raises rather than returning anything, because a source that places
+nothing in time cannot be windowed at all. `_to_article` keeps a guard behind
+the guard, so if the drop is ever removed the fabrication fails loudly instead
+of resuming silently.
+
+Same family as §4's currency defect and the broker's refusal to substitute zero
+for a missing figure: the bug is not the missing value, it is the plausible one
+put in its place.
+
 ## What the families have in common
 
 | Family | Shape |

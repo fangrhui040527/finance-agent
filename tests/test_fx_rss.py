@@ -156,3 +156,75 @@ def test_the_registry_builds_gdelt_and_rss_by_name():
 def test_an_unknown_source_is_refused_with_the_known_list():
     with pytest.raises(UnknownSource, match="gdelt"):
         adapter_for("bloomberg_terminal")
+
+
+# --- an undated item is not an item published now ---------------------------------
+#
+# Found probing BNM on 2026-09-04. Its 2020 archive is valid RSS carrying no
+# <pubDate> on any item, and the adapter dated undated items `rec.fetched_at`.
+# A nightly sweep would therefore have entered six-year-old central bank
+# releases at the NEWEST end of every window, indistinguishable from real news.
+
+UNDATED_BODY = """<?xml version="1.0"?>
+<rss version="2.0"><channel><title>Archive</title>
+<item><title>Monetary Developments in September 2020</title>
+  <link>https://example.org/a</link><description>Old.</description></item>
+<item><title>Reserves as at end-September 2020</title>
+  <link>https://example.org/b</link><description>Also old.</description></item>
+</channel></rss>"""
+
+MIXED_BODY = """<?xml version="1.0"?>
+<rss version="2.0"><channel><title>Mixed</title>
+<item><title>Dated</title><link>https://example.org/1</link>
+  <description>d</description><pubDate>Thu, 03 Sep 2026 08:00:00 GMT</pubDate></item>
+<item><title>Undated</title><link>https://example.org/2</link>
+  <description>u</description></item>
+</channel></rss>"""
+
+
+def test_a_feed_that_dates_nothing_is_refused_not_ingested():
+    """The whole-feed case, and the dangerous one. Refusing is right: a source
+    that places nothing in time cannot be windowed, and every item it returns
+    would arrive stamped with the moment we asked."""
+    from knowledge.feeds.adapter import FeedError
+    from knowledge.feeds.rss import RssFeed
+
+    feed = RssFeed("https://example.org/rss", name="archive", opener=opener_for(UNDATED_BODY))
+    with pytest.raises(FeedError, match="dates none of its 2 items"):
+        feed.fetch(datetime(2026, 9, 1, tzinfo=UTC))
+
+
+def test_an_undated_item_is_dropped_and_counted_not_dated_on_arrival():
+    """The partial case. The dated item survives; the undated one is dropped and
+    the count says so, rather than arriving as the freshest thing in the feed."""
+    from knowledge.feeds.rss import RssFeed
+
+    feed = RssFeed("https://example.org/rss", name="mixed", opener=opener_for(MIXED_BODY))
+    records = feed.fetch(datetime(2026, 9, 1, tzinfo=UTC))
+    assert [r.payload["title"] for r in records] == ["Dated"]
+    assert feed.undated == 1
+
+
+def test_an_undated_record_can_never_be_dated_at_the_article_boundary():
+    """The guard behind the guard: if _parse ever stops dropping them, the
+    fabrication must fail loudly rather than resume silently."""
+    from datetime import datetime as _dt
+
+    from knowledge.feeds.adapter import FeedError, RawRecord
+    from knowledge.feeds.rss import RssFeed
+
+    feed = RssFeed("https://example.org/rss", name="mixed", opener=opener_for(MIXED_BODY))
+    rec = RawRecord(
+        "mixed",
+        "https://example.org/2",
+        _dt(2026, 9, 4, tzinfo=UTC),
+        {
+            "url": "https://example.org/2",
+            "title": "Undated",
+            "body": "",
+            "domain": "example.org",
+            "published_at": None,
+        },
+    )
+    with pytest.raises(FeedError, match="undated record"):
+        feed._to_article(rec)

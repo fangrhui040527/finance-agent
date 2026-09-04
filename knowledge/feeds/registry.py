@@ -35,7 +35,14 @@ RSS_SOURCES: dict[str, tuple[str, str]] = {
     #   /rss/press-release              404 - path predates the site redesign
     #   /rss                            an HTML landing page, no autodiscovery
     #   /press-release-2020?...getRSS   WORKS - valid RSS, but the 2020 archive,
-    #                                   so 0 items in any recent window
+    #                                   AND IT DATES NOTHING: 0 <pubDate> in
+    #                                   23,228 bytes, measured twice. Not "0
+    #                                   items in a recent window" as this line
+    #                                   first said - undated items passed the
+    #                                   window filter and were dated on arrival,
+    #                                   so every one would have landed at the
+    #                                   NEWEST end of it. knowledge/feeds/rss.py
+    #                                   now refuses a feed that dates nothing.
     #   /press-release-2026?...getRSS   HTML, not a feed
     #
     # The endpoint SHAPE is right - `p_p_resource_id=getRSS` on Liferay's asset
