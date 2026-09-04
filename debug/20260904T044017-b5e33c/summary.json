@@ -1,0 +1,124 @@
+{
+  "run_id": "20260904T044017-b5e33c",
+  "label": "full-system",
+  "started_at": "2026-09-04T04:40:17.120613+00:00",
+  "wall_ms": 120.04,
+  "events": 134,
+  "by_kind": {
+    "agent": 9,
+    "allowed": 28,
+    "denied": 3,
+    "engine": 54,
+    "llm_call": 4,
+    "refusal": 8,
+    "run_end": 1,
+    "run_start": 1,
+    "span": 7,
+    "span_end": 16,
+    "verification": 3
+  },
+  "errors": [],
+  "llm": {
+    "calls": 4,
+    "cost_myr": 0.008049,
+    "input_tokens": 97,
+    "output_tokens": 80
+  },
+  "agents_seen": [
+    "a0_supervisor",
+    "a10_thesis",
+    "a11_red_team",
+    "a12_portfolio_risk",
+    "a13_sizing",
+    "a14_teacher",
+    "a15_reflection",
+    "a1_fundamentals",
+    "a2_valuation",
+    "a3_price_technical",
+    "a4_news_narrative",
+    "a5_catalyst_events",
+    "a6_macro_regime",
+    "a7_sector_technology",
+    "a8_ownership_flow",
+    "a9_attribution"
+  ],
+  "refusals": 11,
+  "slowest": [
+    {
+      "name": "registry",
+      "kind": "span",
+      "ms": 47.75
+    },
+    {
+      "name": "a7_sector_technology",
+      "kind": "agent",
+      "ms": 36.85
+    },
+    {
+      "name": "config",
+      "kind": "span",
+      "ms": 4.85
+    },
+    {
+      "name": "a9_attribution",
+      "kind": "agent",
+      "ms": 4.66
+    },
+    {
+      "name": "markets",
+      "kind": "span",
+      "ms": 4.36
+    },
+    {
+      "name": "inference",
+      "kind": "span",
+      "ms": 3.44
+    },
+    {
+      "name": "portfolio",
+      "kind": "span",
+      "ms": 3.4
+    },
+    {
+      "name": "a13_sizing",
+      "kind": "agent",
+      "ms": 3.05
+    },
+    {
+      "name": "a0_supervisor",
+      "kind": "agent",
+      "ms": 1.75
+    },
+    {
+      "name": "thesis_and_red_team",
+      "kind": "span",
+      "ms": 0.62
+    },
+    {
+      "name": "a15_reflection",
+      "kind": "agent",
+      "ms": 0.53
+    },
+    {
+      "name": "a14_teacher",
+      "kind": "agent",
+      "ms": 0.28
+    },
+    {
+      "name": "a10_thesis",
+      "kind": "agent",
+      "ms": 0.28
+    },
+    {
+      "name": "guardrails",
+      "kind": "span",
+      "ms": 0.24
+    },
+    {
+      "name": "a12_portfolio_risk",
+      "kind": "agent",
+      "ms": 0.19
+    }
+  ],
+  "dir": "debug/20260904T044017-b5e33c"
+}
