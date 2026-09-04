@@ -1,6 +1,42 @@
 {
   "collection": [
     {
+      "at": "2026-09-04T13:36:47.700049+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-04T13:36:45.544242+00:00",
+      "detail": "read but empty: IHH, Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-04T13:36:41.874004+00:00",
+      "detail": "read but empty: IHH, Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals",
+      "fetched": 0,
+      "kept": 0,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-04T13:36:40.302025+00:00",
+      "detail": "read but empty: IHH, Press Metal, Genting, Maybank, Petronas Chemicals; failed: Tenaga",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "ok",
+      "stored": 0
+    },
+    {
       "at": "2026-09-04T13:01:55.464831+00:00",
       "detail": "skipped: fred needs FRED_API_KEY, which is not set. Add it to .env or as a GitHub Actions secret of the same name; until then this source is skipped.",
       "fetched": 0,
@@ -235,10 +271,10 @@
     "linked": 315,
     "observations": 0,
     "series": 2,
-    "sweeps": 43
+    "sweeps": 47
   },
   "day": "2026-09-04",
-  "generated_at": "2026-09-04 13:01 UTC",
+  "generated_at": "2026-09-04 13:36 UTC",
   "macro": [
     {
       "change": "0",
