@@ -1,9 +1,9 @@
 # TEMPORARY. Deleted before this branch merges.
 #
-# Round 2 found the linked press-release feed returns real XML - and that its
-# items are from SEPTEMBER 2020. The page it hangs off is /press-release-2020,
-# an ARCHIVE. The /rss landing page links the archive, not the live feed.
-# Round 3 looks for the current listing page and the portlet id on it.
+# Round 3: the live page is /press-releases, portlet id ZkJrPGjQLX7H, and it
+# advertises no feed. Round 4 builds the getRSS URL for that id and fetches it
+# THREE TIMES - because the 2020 feed returned 20 items in one run and none in
+# the next, and a source that is a feed only sometimes is worse than no source.
 name: probe-bnm
 
 on:
@@ -16,51 +16,53 @@ permissions:
 jobs:
   probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 6
+    timeout-minutes: 8
     steps:
-      - name: Find the CURRENT press-release page and its feed
+      - name: Build the live feed URL, then prove it is stable
         run: |
           python3 - <<'PY'
-          import re, urllib.error, urllib.request
+          import re, time, urllib.error, urllib.request
 
           UA = {"User-Agent": "Mozilla/5.0 (compatible; finplanet-probe/0.1)"}
           BASE = "https://www.bnm.gov.my"
+          P = "com_liferay_asset_publisher_web_portlet_AssetPublisherPortlet_INSTANCE_"
 
-          PAGES = [
-              "/press-release", "/press-releases", "/publications/press-release",
-              "/announcements", "/notices-announcements", "/press-release-2026",
-              "/press-release-2025", "/media-releases", "/news",
-          ]
+          def rss_url(page, inst):
+              return (f"{BASE}{page}?p_p_id={P}{inst}&p_p_lifecycle=2&p_p_state=normal"
+                      f"&p_p_mode=view&p_p_resource_id=getRSS&p_p_cacheability=cacheLevelPage")
 
-          def fetch(url):
+          TARGETS = {
+              "LIVE /press-releases":        rss_url("/press-releases", "ZkJrPGjQLX7H"),
+              "/press-release-2026":         rss_url("/press-release-2026", "ZkJrPGjQLX7H"),
+              "2020 archive (control)":      rss_url("/press-release-2020", "ZHckDJtILsio"),
+              "/notices-announcements":      rss_url("/notices-announcements", "XRQ5HftX94WW"),
+          }
+
+          def probe(url):
               req = urllib.request.Request(url, headers=UA)
               with urllib.request.urlopen(req, timeout=45) as r:
-                  return r.status, r.headers.get("Content-Type", ""), r.read()
-
-          for path in PAGES:
-              url = BASE + path
-              try:
-                  status, ctype, body = fetch(url)
-              except urllib.error.HTTPError as e:
-                  print(f"{e.code:>4}  {path}")
-                  continue
-              except Exception as e:
-                  print(f"   -  {path}  {type(e).__name__}")
-                  continue
+                  ctype = r.headers.get("Content-Type", "")
+                  body = r.read()
               text = body.decode("utf-8", "replace")
-              rss = sorted(set(re.findall(r'href="([^"]*getRSS[^"]*)"', text, re.I)))
-              ids = sorted(set(re.findall(r'AssetPublisherPortlet_INSTANCE_([A-Za-z0-9]+)', text)))
-              print(f"{status:>4}  {path:<28} {len(body):>7}b  getRSS_links={len(rss)}  portlet_ids={ids[:4]}")
-              for r_ in rss:
-                  print("        ", r_.replace("&amp;", "&")[:220])
+              items = re.findall(r"<item[\s>](.*?)</item>", text, re.S | re.I)
+              dates = re.findall(r"<pubDate>(.*?)</pubDate>", text, re.I)
+              titles = [re.sub(r"<!\[CDATA\[|\]\]>", "", t).strip()
+                        for t in re.findall(r"<title>(.*?)</title>", text, re.S | re.I)]
+              return ctype, len(body), len(items), dates[:2], titles[1:4]
 
-          print("\n" + "=" * 70)
-          print("Does the 2020 feed carry dates at all, and how fresh is item 1?")
-          PR = "com_liferay_asset_publisher_web_portlet_AssetPublisherPortlet_INSTANCE_ZHckDJtILsio"
-          url = (f"{BASE}/press-release-2020?p_p_id={PR}&p_p_lifecycle=2&p_p_state=normal"
-                 f"&p_p_mode=view&p_p_resource_id=getRSS&p_p_cacheability=cacheLevelPage")
-          _, _, body = fetch(url)
-          text = body.decode("utf-8", "replace")
-          first = re.search(r"<item[\s>].*?</item>", text, re.S | re.I)
-          print(first.group(0)[:900] if first else "no <item> found")
+          for label, url in TARGETS.items():
+              print("=" * 70)
+              print(f"{label}\n{url}")
+              for attempt in (1, 2, 3):
+                  try:
+                      ctype, size, n, dates, titles = probe(url)
+                      print(f"  try {attempt}: {ctype:<24} {size:>7}b  items={n:<3} dates={dates}")
+                      if attempt == 1:
+                          for t in titles:
+                              print(f"           - {t[:100]}")
+                  except urllib.error.HTTPError as e:
+                      print(f"  try {attempt}: HTTP {e.code}")
+                  except Exception as e:
+                      print(f"  try {attempt}: {type(e).__name__}: {e}")
+                  time.sleep(3)
           PY
