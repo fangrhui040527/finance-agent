@@ -922,6 +922,120 @@ def reasoning_report(runs: int = 20, db: str = "", root: str = DEBUG_ROOT) -> st
 # --------------------------------------------------------------------------
 
 
+def _paper_figures(cfg, db: str = "") -> dict | None:
+    """What the paper ledger holds, or None when no book is open."""
+    from engines.paper.pricing import weekdays_between
+    from engines.paper.store import CONTROL, DECIDED, PaperStore
+
+    path = db or cfg.paper.database
+    store = PaperStore.open_existing(path)
+    if store is None:
+        return None
+    with store:
+        if not store.has_books():
+            return None
+        opened = store.opened_on()
+        marks = store.marks(DECIDED)
+        ctl = store.marks(CONTROL)
+        cost = store.cost_to_date(DECIDED)
+        pending_stops = [t for t in store.pending_targets(DECIDED) if t.reason == "stop"]
+        latest = marks[-1] if marks else None
+        initial = store.initial_cash(DECIDED)
+        today = datetime.now(UTC).date()
+        need = min(21, max(1, weekdays_between(opened or today, today))) if opened else 21
+        rets = [
+            float(b.equity_usd / a.equity_usd - 1)
+            for a, b in zip(marks, marks[1:])
+            if a.equity_usd > 0
+        ]
+        return {
+            "path": path,
+            "opened": opened,
+            "marks": len(marks),
+            "need": need,
+            "initial": initial,
+            "latest": latest,
+            "control_latest": ctl[-1] if ctl else None,
+            "returns": rets,
+            "cost": cost,
+            "pending_stops": len(pending_stops),
+        }
+
+
+def paper_report(days: int = 30, db: str = "") -> str:
+    """The paper book against its control (docs/22): equity path, return, max
+    drawdown, cost drag, the paper predictions' hit rate, halt and stop state.
+    CANNOT SCORE until enough sessions are marked - a book three days old has
+    a balance, not a track record."""
+    from agents.learning.store import LearningStore
+    from core.config import load as load_config
+    from engines.backtest.metrics import drawdown_profile
+
+    cfg = load_config()
+    fig = _paper_figures(cfg, db)
+    lines = ["PAPER BOOK", ""]
+    if fig is None:
+        lines.append("  NO BOOK: nothing has been opened (`ask.py paper init`). CANNOT SCORE.")
+        return "\n".join(lines)
+    latest, ctl = fig["latest"], fig["control_latest"]
+    lines.append(
+        f"  opened {fig['opened']} with USD {fig['initial']:,.2f}; {fig['marks']} session(s) marked"
+    )
+    if latest is None:
+        lines.append("  not yet marked. CANNOT SCORE.")
+        return "\n".join(lines)
+    ret = latest.equity_usd / fig["initial"] - 1 if fig["initial"] > 0 else Decimal(0)
+    lines.append(
+        f"  equity USD {latest.equity_usd:,.2f} ({ret:+.2%}) at the {latest.day} mark; "
+        f"drawdown {latest.drawdown:.2%}{'  HALTED' if latest.halted else ''}; "
+        f"{fig['pending_stops']} stop(s) pending"
+    )
+    if ctl is not None and fig["initial"] > 0:
+        cret = ctl.equity_usd / fig["initial"] - 1
+        lines.append(
+            f"  control USD {ctl.equity_usd:,.2f} ({cret:+.2%}); decided minus control "
+            f"{(ret - cret) * 100:+.2f} pp"
+        )
+    cost = fig["cost"]
+    lines.append(
+        f"  cost drag USD {cost.total:.2f} ({cost.pct_of_initial:.2%} of opening cash): fees "
+        f"{cost.fees_usd:.2f}, fx spread {cost.fx_spread_usd:.2f}, slippage {cost.slippage_usd:.2f}"
+    )
+    if fig["marks"] < fig["need"]:
+        lines.append(
+            f"  CANNOT SCORE: {fig['marks']} of {fig['need']} sessions marked. A balance is not a "
+            "track record; the return above is a figure, not a verdict."
+        )
+    else:
+        dd, under = drawdown_profile(fig["returns"])
+        lines.append(f"  max drawdown {dd:.2%}, longest underwater run {under} session(s)")
+    try:
+        with LearningStore(cfg.database) as learning:
+            rows = learning.db.execute(
+                "SELECT o.correct FROM predictions p JOIN outcomes o USING (prediction_id) "
+                "WHERE p.agent = 'paper' AND p.direction != 0"
+            ).fetchall()
+            pending = learning.db.execute(
+                "SELECT COUNT(*) FROM predictions p LEFT JOIN outcomes o USING (prediction_id) "
+                "WHERE p.agent = 'paper' AND o.prediction_id IS NULL"
+            ).fetchone()[0]
+    except Exception:
+        rows, pending = [], 0
+    if rows:
+        hit = sum(1 for r in rows if r[0]) / len(rows)
+        lines.append(
+            f"  predictions: {len(rows)} graded, hit rate {hit:.0%} vs the control; {pending} pending"
+        )
+    else:
+        lines.append(f"  predictions: none graded yet; {pending} pending their horizon")
+    lines.append("")
+    lines.append(
+        "  The book is a calibration instrument. Read the journal in knowledge/paper/ for what "
+        "it learned; nothing here is a recommendation."
+    )
+    return "\n".join(lines)
+
+
 def scorecard(db: str = "", root: str = DEBUG_ROOT) -> str:
     """Every dimension, one line each - and an explicit CANNOT SCORE where the
     evidence does not exist yet. A dashboard that shows green for a thing it
@@ -1061,6 +1175,33 @@ def scorecard(db: str = "", root: str = DEBUG_ROOT) -> str:
         )
     else:
         rows.append(("reasoning", "CANNOT SCORE", "no model turns with a recorded stop reason"))
+
+    try:
+        fig = _paper_figures(cfg)
+    except Exception:
+        fig = None
+    if fig is None:
+        rows.append(("paper book", "CANNOT SCORE", "no book opened - `ask.py paper init`"))
+    elif fig["latest"] is None or fig["marks"] < fig["need"]:
+        rows.append(
+            (
+                "paper book",
+                "CANNOT SCORE",
+                f"{fig['marks']} of {fig['need']} sessions marked since {fig['opened']}",
+            )
+        )
+    else:
+        latest, ctl = fig["latest"], fig["control_latest"]
+        ret = latest.equity_usd / fig["initial"] - 1
+        cret = (ctl.equity_usd / fig["initial"] - 1) if ctl is not None else Decimal(0)
+        rows.append(
+            (
+                "paper book",
+                "ahead" if ret > cret else "behind",
+                f"{ret:+.2%} vs control {cret:+.2%} over {fig['marks']} sessions; drawdown "
+                f"{latest.drawdown:.2%}{'; HALTED' if latest.halted else ''}",
+            )
+        )
 
     width = max(len(r[0]) for r in rows)
     lines = ["SCORECARD", ""]

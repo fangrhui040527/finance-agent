@@ -51,9 +51,14 @@ NEWS_LICENCE = "summary"
 #: Where the nightly feedback routine writes its dated pages (knowledge/feedback/
 #: README.md is the contract). Indexed into kb_lessons.
 FEEDBACK_DIR = Path("knowledge/feedback")
+#: The paper book's dated journal pages (knowledge/paper/README.md). Indexed
+#: into the same kb_lessons: what the book learned is a lesson of the same rank.
+PAPER_DIR = Path("knowledge/paper")
 
 
-def lessons_collection(root: str | Path) -> Collection:
+def lessons_collection(
+    root: str | Path, kind: str = "feedback", col: Collection | None = None
+) -> Collection:
     """`kb_lessons` from the routine's dated feedback pages.
 
     Each `YYYY-MM-DD.md` is chunked on its headings (parent/child), stamped
@@ -66,7 +71,7 @@ def lessons_collection(root: str | Path) -> Collection:
 
     from knowledge.chunking.parent_child import chunk_document
 
-    col = Collection("kb_lessons")
+    col = col if col is not None else Collection("kb_lessons")
     root = Path(root)
     if not root.exists():
         return col
@@ -82,11 +87,11 @@ def lessons_collection(root: str | Path) -> Collection:
         if not text.strip():
             continue
         parents, children = chunk_document(
-            f"feedback:{m.group(1)}",
+            f"{kind}:{m.group(1)}",
             text,
             "kb_lessons",
             as_of=day,
-            metadata={"licence": "own", "kind": "feedback", "day": m.group(1)},
+            metadata={"licence": "own", "kind": kind, "day": m.group(1)},
         )
         col.add_all(children or parents)
     return col
@@ -158,6 +163,7 @@ def build_router(
     index: dict[str, str] | None = None,
     extra: dict[str, Collection] | None = None,
     feedback_dir: str | Path | None = FEEDBACK_DIR,
+    paper_dir: str | Path | None = PAPER_DIR,
 ) -> Router:
     """One router: registry ownership, every store registered, news filled.
 
@@ -179,8 +185,13 @@ def build_router(
             index = entity_index()
         articles = corpus.articles(since=now - window, limit=50_000)
         filled["kb_news"] = news_collection(articles, index)
-    if "kb_lessons" not in filled and feedback_dir is not None:
-        filled["kb_lessons"] = lessons_collection(feedback_dir)
+    if "kb_lessons" not in filled and (feedback_dir is not None or paper_dir is not None):
+        col = Collection("kb_lessons")
+        if feedback_dir is not None:
+            col = lessons_collection(feedback_dir, "feedback", col)
+        if paper_dir is not None:
+            col = lessons_collection(paper_dir, "paper", col)
+        filled["kb_lessons"] = col
 
     for name in sorted(reg.knowledge):
         router.register(filled.get(name) or Collection(name))

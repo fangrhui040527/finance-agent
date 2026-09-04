@@ -91,6 +91,12 @@ Three habits that make the output trustworthy:
    amount of reasoning about the output itself. And a dimension that says
    CANNOT SCORE has not passed - it has not been measured.
 
+5. THE PAPER BOOK IS A RECORD, NOT A RECOMMENDATION. paper_status and
+   paper_report read a hypothetical USD 1,000 ledger marked from the cached
+   bars (docs/22). Its positions are targets someone recorded inside
+   code-enforced caps; its return is a calibration measurement against a
+   passive control. Nothing about it is advice, and nothing here can move it.
+
 Nothing here places orders, and nothing here is financial advice. Output is
 analysis with an evidence chain.
 """
@@ -638,6 +644,30 @@ S.tool(
         ["instrument"],
     ),
 )(T.news_evidence)
+
+# -- the paper book (docs/22): read-only ---------------------------------------------
+S.tool(
+    "paper_status",
+    "The paper book's status page: equity, cash, positions, pending targets, each "
+    "cap's value against its limit, the fundable set at today's equity (one lot per "
+    "name in USD and how many lots the 25% cap allows), turnover headroom, FX quote, "
+    "cost drag. A hypothetical USD ledger marked from cached bars; it places nothing. "
+    "NO BOOK is the answer when none has been opened.",
+    obj({"db": _str("ledger path (default: config.toml [paper] database)")}),
+)(T.paper_status)
+
+S.tool(
+    "paper_report",
+    "The paper book against its passive control: return to date, drawdown, cost "
+    "drag, the paper predictions' hit rate, halt and stop state. CANNOT SCORE until "
+    "enough sessions are marked - a balance is not a track record.",
+    obj(
+        {
+            "days": {"type": "integer", "description": "window (default 30)"},
+            "db": _str("ledger path (default: config.toml [paper] database)"),
+        }
+    ),
+)(O.paper_report)
 
 
 def selftest() -> int:

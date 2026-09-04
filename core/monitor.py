@@ -213,6 +213,7 @@ def evaluate(
                 )
 
     out.extend(_sweep_rules(cfg, now))
+    out.extend(_paper_rules(cfg, now))
     out.extend(_trace_rules(debug_root))
     return out
 
@@ -277,6 +278,77 @@ def _sweep_rules(cfg, now: datetime) -> list[Alert]:
             },
         )
     ]
+
+
+def _paper_rules(cfg, now: datetime) -> list[Alert]:
+    """The paper book (docs/22): drawdown at the halt line, a mark gone stale,
+    a cap breached by drift. Quiet until the book has been marked once - a
+    book nobody opened is not a book that stopped."""
+    settings = getattr(cfg, "paper", None)
+    path = str(getattr(settings, "database", "data/paper.db"))
+    if not Path(path).exists():
+        return []
+
+    from engines.paper.book import current_weights, settings_of
+    from engines.paper.pricing import weekdays_between
+    from engines.paper.store import DECIDED, PaperStore
+
+    out: list[Alert] = []
+    with PaperStore(path) as store:
+        if not store.has_books():
+            return []
+        m = store.latest_mark(DECIDED)
+        if m is None:
+            return []
+        caps = settings_of(cfg, store)
+        line = Decimal(str(getattr(cfg, "alert_paper_drawdown", 0) or 0))
+        if line > 0 and m.drawdown >= line:
+            out.append(
+                Alert(
+                    rule="paper_drawdown",
+                    severity=ALERT,
+                    title=f"paper book drawdown {m.drawdown:.2%} from peak USD {m.peak_usd:,.2f}",
+                    detail=f"equity USD {m.equity_usd:,.2f} at the {m.day} mark; the halt line is "
+                    f"{caps.drawdown_halt:.0%} and no target may raise a weight while it holds",
+                    next_step="`ask.py paper status` for the positions and the fundable set; "
+                    "the journal in knowledge/paper/ should say what the book learned",
+                    evidence={"drawdown": str(m.drawdown), "day": m.day.isoformat()},
+                )
+            )
+        age = weekdays_between(m.day, now.date())
+        if age > 2:
+            out.append(
+                Alert(
+                    rule="paper_stale",
+                    severity=WARN,
+                    title=f"paper book last marked {m.day}, {age} weekdays ago",
+                    detail="collect.yml marks it at the bursa_close and us_close slots; a stale "
+                    "mark means the workflow or the price cache stopped",
+                    next_step="run `ask.py paper mark --slot manual` by hand and read its problems",
+                    evidence={"last_mark": m.day.isoformat(), "weekdays": age},
+                )
+            )
+        weights = current_weights(m)
+        drifted = [k for k, w in weights.items() if w > caps.max_weight_per_name]
+        cash_share = (m.cash_usd / m.equity_usd) if m.equity_usd > 0 else Decimal(1)
+        if drifted or cash_share < caps.cash_floor:
+            what = []
+            if drifted:
+                what.append(f"{', '.join(drifted)} above {caps.max_weight_per_name:.0%}")
+            if cash_share < caps.cash_floor:
+                what.append(f"cash {cash_share:.1%} below the {caps.cash_floor:.0%} floor")
+            out.append(
+                Alert(
+                    rule="paper_cap_breach",
+                    severity=ALERT,
+                    title="paper book outside its caps by drift: " + "; ".join(what),
+                    detail="prices moved the book past a cap no decision may cross; the next "
+                    "decision must bring it back or reduce",
+                    next_step="`ask.py paper status` shows each cap's value and limit",
+                    evidence={"drifted": drifted, "cash_share": str(cash_share)},
+                )
+            )
+    return out
 
 
 def _trace_rules(debug_root: str) -> list[Alert]:
