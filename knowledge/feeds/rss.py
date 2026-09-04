@@ -82,6 +82,10 @@ class RssFeed(FeedAdapter):
     TIMEOUT = 30
     MAX_BYTES = 5_000_000  # a "feed" larger than this is not a feed
 
+    #: Items the last parse dropped for carrying no date. A feed that dates
+    #: SOME of its items is usable and lossy; one that dates none is refused.
+    undated = 0
+
     def __init__(
         self,
         url: str,
@@ -155,16 +159,32 @@ class RssFeed(FeedAdapter):
 
         out: list[RawRecord] = []
         now = datetime.now(UTC)
+        self.undated = 0
+        usable = 0
         for item in items:
             row = self._item_to_row(item)
             if row is None:
                 continue
+            usable += 1
             published = row.get("published_at")
-            if published is not None and datetime.fromisoformat(published) < since:
+            if published is None:
+                # An item with no date is not an item published NOW. Dating it
+                # `now` is the one thing this must never do - see _to_article.
+                self.undated += 1
+                continue
+            if datetime.fromisoformat(published) < since:
                 continue
             out.append(RawRecord(self.name, row["url"], now, row))
             if len(out) >= limit:
                 break
+
+        if usable and self.undated == usable:
+            raise FeedError(
+                f"{self.name} dates none of its {usable} items, so nothing here can be "
+                f"placed in time. Every item would be stamped with the moment it was "
+                f"fetched, which is how an archive enters a corpus as today's news. "
+                f"Refused rather than ingested: {_excerpt(text)}"
+            )
         return out
 
     def _item_to_row(self, item) -> dict | None:
@@ -211,10 +231,22 @@ class RssFeed(FeedAdapter):
         }
 
     def _to_article(self, rec: RawRecord) -> Article | None:
+        """An undated record never reaches here - `_parse` drops it.
+
+        It used to fall back to `rec.fetched_at`, which reads as a reasonable
+        default and is a fabrication: it asserts the item was published at the
+        moment we happened to ask. The BNM 2020 archive is the case that shows
+        the cost - valid RSS, no <pubDate> on any item, so a nightly sweep would
+        have entered six-year-old central bank releases dated today, on the
+        newest end of every window, indistinguishable from real news.
+        """
         p = rec.payload
-        published = (
-            datetime.fromisoformat(p["published_at"]) if p.get("published_at") else rec.fetched_at
-        )
+        if not p.get("published_at"):
+            raise FeedError(
+                f"{self.name} produced an undated record for {p.get('url')!r}; "
+                f"_parse must drop these rather than let them be dated on arrival"
+            )
+        published = datetime.fromisoformat(p["published_at"])
         return Article(
             doc_id=str(p["url"]),
             title=str(p["title"]),
