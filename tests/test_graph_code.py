@@ -35,7 +35,7 @@ def repo(tmp_path, files: dict[str, str]) -> Path:
         assert not name.startswith("/"), f"{name!r} must be relative to tmp_path"
         p = tmp_path / name
         p.parent.mkdir(parents=True, exist_ok=True)
-        p.write_text(body)
+        p.write_text(body, encoding="utf-8")
     return tmp_path
 
 

@@ -185,9 +185,10 @@ def test_markdown_and_json_agree_and_are_written(tmp_path):
     assert payload["names"][0]["tone"]["n"] == 2
     md_path, js_path = write_digest(d, tmp_path / "digests")
     assert (
-        md_path.read_text().startswith("# Digest") and (tmp_path / "digests" / "latest.md").exists()
+        md_path.read_text(encoding="utf-8").startswith("# Digest")
+        and (tmp_path / "digests" / "latest.md").exists()
     )
-    assert json.loads(js_path.read_text())["day"] == "2026-09-04"
+    assert json.loads(js_path.read_text(encoding="utf-8"))["day"] == "2026-09-04"
 
 
 def test_a_quiet_name_says_so_instead_of_disappearing(tmp_path):

@@ -49,9 +49,13 @@ from knowledge.sources.base import Collector, Pull, SourceError
 
 FLASH_URL = "https://flash-api.jin10.com/get_flash_list"
 #: The paths the calendar document has been served from, newest guess first.
-#: The first runner probe (2026-09-05) found the two documented ones answering
-#: 404, so the collector walks this list and the failure names every path it
-#: tried; the probe is how the list is pruned to the one that answers.
+#: The runner probes of 2026-09-05 found `cdn-rili.jin10.com` gone from DNS and
+#: `rili.jin10.com` answering 404 on every documented path, so the collector is
+#: registered but not enabled until a path answers again. The way to find one:
+#: open rili.jin10.com, copy the economics JSON request from the browser's
+#: network tab into this list, run the probe, and add the name back to
+#: `[sources] enabled`. The failure below names every host's verdict so a
+#: probe row shows the whole picture on one line.
 CALENDAR_URLS = (
     "https://cdn-rili.jin10.com/web_data/{y}/daily/{m:02d}/{d:02d}/economics.json",
     "https://cdn-rili.jin10.com/web_data/{y}/daily/{m}/{d}/economics.json",
@@ -66,6 +70,15 @@ HEADERS = {"x-app-id": "bVBF4FyRTn5NJF5n", "x-version": "1.0.0"}
 CALENDAR_HEADERS = {"Referer": "https://rili.jin10.com/", "Origin": "https://rili.jin10.com"}
 BEIJING = timezone(timedelta(hours=8))
 MACRO_PREFIX = "MACRO:"
+#: The verdict for a host whose name does not resolve; its other paths are not asked.
+DEAD_HOST = "name does not resolve"
+_DNS_SIGNS = (
+    "Name or service not known",
+    "nodename nor servname",
+    "getaddrinfo failed",
+    "No address associated with hostname",
+    "Errno 11001",
+)
 
 _TAG = re.compile(r"<[^>]+>")
 _WS = re.compile(r"\s+")
@@ -217,24 +230,62 @@ class Jin10CalendarCollector(Collector):
         return pull
 
     def _calendar(self, day) -> list:
-        tried: list[str] = []
+        """Today's document, from the first path that answers with a list.
+
+        Hosts are tried in list order. A host whose name does not resolve is
+        not asked for its other paths, and the failure groups what it saw by
+        host, so the probe's one-line row still shows every verdict.
+        """
+        seen: dict[str, list[tuple[str, str]]] = {}
+        dead: set[str] = set()
         for template in CALENDAR_URLS:
             url = template.format(y=day.year, m=day.month, d=day.day)
+            host, _, path = url.removeprefix("https://").partition("/")
+            if host in dead:
+                continue
             try:
                 payload = self.get_json(url, headers=CALENDAR_HEADERS)
             except SourceError as e:
-                tried.append(f"{url.split('.com', 1)[1]}: {str(e).rsplit(':', 1)[-1].strip()}")
+                reason = _reason(str(e))
+                if reason == DEAD_HOST:
+                    dead.add(host)
+                seen.setdefault(host, []).append((reason, "/" + path))
                 continue
             if isinstance(payload, dict):
                 payload = payload.get("data") or payload.get("list") or payload.get("economics")
             if isinstance(payload, list):
                 return payload
-            tried.append(f"{url.split('.com', 1)[1]}: no item list")
+            seen.setdefault(host, []).append(("no item list", "/" + path))
         raise SourceError(
-            "jin10_calendar: no calendar path answered for "
-            f"{day} - {' | '.join(tried)}. The document has moved; find the path the page at "
-            "rili.jin10.com loads and add it to CALENDAR_URLS."
+            f"jin10_calendar: no calendar path answered for {day} - "
+            + " | ".join(_verdict(host, tries) for host, tries in seen.items())
+            + ". The document has moved: copy the economics JSON request the page at "
+            "rili.jin10.com makes (browser network tab) into CALENDAR_URLS and re-probe."
         )
+
+
+def _reason(text: str) -> str:
+    """One short verdict from a transport error's text."""
+    if any(sign in text for sign in _DNS_SIGNS):
+        return DEAD_HOST
+    m = re.search(r"HTTP (\d{3})", text)
+    if m:
+        return f"HTTP {m.group(1)}"
+    if "non-JSON" in text:
+        return "not JSON"
+    if "timed out" in text.lower():
+        return "timed out"
+    return text.rsplit(":", 1)[-1].strip()[:60] or "failed"
+
+
+def _verdict(host: str, tries: list[tuple[str, str]]) -> str:
+    """`host: HTTP 404 at /a, /b` - one reason shared, or each path with its own."""
+    reasons = {reason for reason, _ in tries}
+    if reasons == {DEAD_HOST}:
+        return f"{host}: {DEAD_HOST}"
+    if len(reasons) == 1:
+        return f"{host}: {tries[0][0]} at " + ", ".join(path for _, path in tries)
+    return f"{host}: " + ", ".join(f"{reason} at {path}" for reason, path in tries)
 
 
 def _text(value: Decimal | None) -> str:

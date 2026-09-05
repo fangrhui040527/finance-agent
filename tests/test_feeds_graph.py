@@ -138,7 +138,7 @@ def test_a_new_source_is_a_registry_entry_not_a_pipeline_change():
 
 def test_reading_from_disk_matches_reading_inline(tmp_path):
     p = tmp_path / "news.jsonl"
-    p.write_text("\n".join(json.dumps(r) for r in rows()))
+    p.write_text("\n".join(json.dumps(r) for r in rows()), encoding="utf-8")
     disk = FixtureFeed(path=p)
     inline = FixtureFeed(records=rows())
     a, _ = disk.normalize(disk.fetch(SINCE), entity_index=INDEX)

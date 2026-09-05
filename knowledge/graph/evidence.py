@@ -65,7 +65,7 @@ class CuratedCorpus:
     def _load_supply_chain(self, path: Path) -> None:
         if not path.exists():
             return
-        raw = yaml.safe_load(path.read_text()) or {}
+        raw = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
         labels = {k: str(v) for k, v in (raw.get("commodities") or {}).items()}
         for row in raw.get("edges") or []:
             rid = row.get("id")
@@ -82,7 +82,7 @@ class CuratedCorpus:
     def _load_sectors(self, path: Path) -> None:
         if not path.exists():
             return
-        raw = yaml.safe_load(path.read_text()) or {}
+        raw = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
         parent = {
             sub: sector for sector, subs in (raw.get("sectors") or {}).items() for sub in subs or []
         }

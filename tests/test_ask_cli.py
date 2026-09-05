@@ -71,7 +71,8 @@ def test_a_real_history_file_suppresses_the_stated_beta_warning(tmp_path, capsys
         + "\n".join(
             f"{1.1 * m + 0.5 * s + rng.gauss(0, 0.004):.6f},{m:.6f},{s:.6f}"
             for m, s in ((rng.gauss(0, 0.01), rng.gauss(0, 0.008)) for _ in range(200))
-        )
+        ),
+        encoding="utf-8",
     )
     _, out = run(
         ["why", "MYX:1155", "--move", "-0.09", "--market", "-0.08", "--history", str(csv)], capsys
@@ -82,7 +83,7 @@ def test_a_real_history_file_suppresses_the_stated_beta_warning(tmp_path, capsys
 
 def test_too_little_history_refuses_to_guess(tmp_path, capsys):
     csv = tmp_path / "short.csv"
-    csv.write_text("\n".join("0.01,0.01,0.01" for _ in range(30)))
+    csv.write_text("\n".join("0.01,0.01,0.01" for _ in range(30)), encoding="utf-8")
     _, out = run(
         ["why", "X", "--move", "-0.09", "--market", "-0.08", "--history", str(csv)], capsys
     )
@@ -130,7 +131,7 @@ def test_a_collinear_history_is_a_refusal_not_a_traceback(tmp_path, capsys):
     """The engine raises on a singular design matrix, which is correct. The CLI
     must turn that into attribution_unavailable rather than a stack trace."""
     csv = tmp_path / "flat.csv"
-    csv.write_text("\n".join("0.01,0.01,0.01" for _ in range(200)))
+    csv.write_text("\n".join("0.01,0.01,0.01" for _ in range(200)), encoding="utf-8")
     code, out = run(
         ["why", "X", "--move", "-0.09", "--market", "-0.08", "--history", str(csv)], capsys
     )

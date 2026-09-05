@@ -450,7 +450,9 @@ def s_injection():
     from core.config import load
 
     tmp = Path(tempfile.mkdtemp())
-    (tmp / "evil.toml").write_text('[learning]\ndatabase = "../../../../tmp/pwned.db"\n')
+    (tmp / "evil.toml").write_text(
+        '[learning]\ndatabase = "../../../../tmp/pwned.db"\n', encoding="utf-8"
+    )
     cfg = expect_no_crash("config with a traversing database path", lambda: load(tmp / "evil.toml"))
     if cfg is not None:
         if ".." in cfg.database:

@@ -194,6 +194,8 @@ def test_digest_json_written_by_the_cli_is_what_the_tool_renders(filled, tmp_pat
         )
         == 0
     )
-    payload = json.loads((tmp_path / "d" / f"{NOW.date().isoformat()}.json").read_text())
+    payload = json.loads(
+        (tmp_path / "d" / f"{NOW.date().isoformat()}.json").read_text(encoding="utf-8")
+    )
     maybank = next(n for n in payload["names"] if n["instrument_id"] == "MYX:1155")
     assert maybank["tone"]["n"] == 2 and maybank["escalated"] == 2

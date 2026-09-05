@@ -275,7 +275,7 @@ Exit codes, so a scheduler can act without parsing text:
 | `bursa_announcements` | Bursa company announcements | bursa_close | registered, **not enabled** until the probe shows the endpoint answers |
 | `bnm_press` | Bank Negara press releases | bursa_close | registered, **not enabled**: no live feed exists |
 | `jin10_flash` | 金十数据 flash news, Chinese; one request per slot (the site's own public endpoint; no free API exists, terms are a gray zone, personal research only) | us_preopen, bursa_close, us_close | **enabled** for the first probe |
-| `jin10_calendar` | 金十 economic calendar: scheduled releases and prints as `MACRO:<country>` events | us_preopen, us_close | **enabled** for the first probe |
+| `jin10_calendar` | 金十 economic calendar: scheduled releases and prints as `MACRO:<country>` events | us_preopen, us_close | registered, **not enabled**: on the 2026-09-05 probes `cdn-rili.jin10.com` was gone from DNS and `rili.jin10.com` answered 404 on every documented path; `fred` carries the US release calendar meanwhile. To re-enable: copy the economics JSON request the page at rili.jin10.com makes (browser network tab) into `CALENDAR_URLS`, re-probe, add the name back to `enabled` |
 | `dbnomics` | the series behind MacroMicro's charts, keyless: IMF commodity prices (palm oil, aluminium, Brent, LNG), BIS policy rates and NEERs, IMF CPI for MY and CN; each id confirmed by the probe | us_preopen, weekly | **enabled** for the first probe |
 | `twse_openapi` | TWSE OpenAPI (official, keyless) for the `[sources] read_only` Taiwan names: P/E, P/B, yield, monthly revenue, close, volume | bursa_close, weekly | **enabled** for the first probe |
 | `finmind` | FinMind for the same names: 24 months of revenue, 8 quarters of statements, foreign net buying; `FINMIND_TOKEN` optional | weekly | **enabled** for the first probe |
@@ -294,8 +294,9 @@ USD 5,000 a year; its free tier has no data access), so `dbnomics` carries the s
 charts are drawn from. Goodinfo bans crawlers and 优分析 keeps its figures behind a paid
 membership; `twse_openapi` and `finmind` publish the same numbers, and the names they read
 come from `[sources] read_only` - read and cited, never traded. 金十数据 has no free API;
-`jin10_flash` and `jin10_calendar` read the public endpoints its own pages use, once per
-slot, with this repository's User-Agent, for personal research.
+`jin10_flash` reads the public endpoint its own pages use, once per slot, with this
+repository's User-Agent, for personal research; `jin10_calendar` is registered but off until
+the calendar document's new path is known (the table row says how to find it).
 
 **The domestic-coverage gap is open.** GDELT has returned nothing for any Bursa
 name on every run so far, and `bnm_press` was enabled on 2026-09-03 to close

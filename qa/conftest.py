@@ -266,10 +266,10 @@ def venue_only_env(tmp_path):
     Bursa's own 60 bps floor is asking a different question, and must pin a
     config that answers it.
     """
-    shipped = (ROOT / "config.toml").read_text()
+    shipped = (ROOT / "config.toml").read_text(encoding="utf-8")
     kept = [ln for ln in shipped.splitlines() if not ln.startswith("broker =")]
     cfg = tmp_path / "venue_only.toml"
-    cfg.write_text("\n".join(kept))
+    cfg.write_text("\n".join(kept), encoding="utf-8")
     return {"FINPLANET_CONFIG": str(cfg)}
 
 

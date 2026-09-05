@@ -333,7 +333,7 @@ def test_enabled_sources_reach_the_config(tmp_path):
     from core.config import load
 
     p = tmp_path / "c.toml"
-    p.write_text('[sources]\nenabled = ["gdelt"]\ngdelt_languages = ["eng"]\n')
+    p.write_text('[sources]\nenabled = ["gdelt"]\ngdelt_languages = ["eng"]\n', encoding="utf-8")
     cfg = load(p)
     assert cfg.sources == ("gdelt",)
     assert cfg.gdelt_languages == ("eng",)
@@ -345,7 +345,7 @@ def test_a_source_with_no_adapter_is_refused_at_load(tmp_path):
     from core.config import ConfigError, load
 
     p = tmp_path / "c.toml"
-    p.write_text('[sources]\nenabled = ["bloomberg_terminal"]\n')
+    p.write_text('[sources]\nenabled = ["bloomberg_terminal"]\n', encoding="utf-8")
     with pytest.raises(ConfigError, match="no adapter registered"):
         load(p)
 
@@ -355,7 +355,7 @@ def test_a_single_string_where_a_list_belongs_is_refused(tmp_path):
     from core.config import ConfigError, load
 
     p = tmp_path / "c.toml"
-    p.write_text('[sources]\nenabled = "gdelt"\n')
+    p.write_text('[sources]\nenabled = "gdelt"\n', encoding="utf-8")
     with pytest.raises(ConfigError, match="must be a list"):
         load(p)
 
@@ -364,7 +364,7 @@ def test_a_source_listed_twice_is_refused(tmp_path):
     from core.config import ConfigError, load
 
     p = tmp_path / "c.toml"
-    p.write_text('[sources]\nenabled = ["gdelt", "gdelt"]\n')
+    p.write_text('[sources]\nenabled = ["gdelt", "gdelt"]\n', encoding="utf-8")
     with pytest.raises(ConfigError, match="more than once"):
         load(p)
 

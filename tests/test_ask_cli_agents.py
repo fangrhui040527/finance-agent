@@ -209,10 +209,10 @@ def venue_only_config(tmp_path, monkeypatch):
     Bursa's own documented floor. Both numbers below are venue facts and stay
     true; they are simply not what a moomoo account pays.
     """
-    shipped = (ROOT / "config.toml").read_text()
+    shipped = (ROOT / "config.toml").read_text(encoding="utf-8")
     kept = [ln for ln in shipped.splitlines() if not ln.startswith("broker =")]
     cfg = tmp_path / "config.toml"
-    cfg.write_text("\n".join(kept))
+    cfg.write_text("\n".join(kept), encoding="utf-8")
     monkeypatch.setenv("FINPLANET_CONFIG", str(cfg))
 
 

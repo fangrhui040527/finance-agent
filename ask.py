@@ -84,7 +84,7 @@ def context() -> AgentContext:
 
 def _fit_from_csv(path: str):
     rows, y = [], []
-    with open(path, newline="") as fh:
+    with open(path, encoding="utf-8", newline="") as fh:
         for r in csv.reader(fh):
             if not r or r[0].lstrip().startswith("#"):
                 continue

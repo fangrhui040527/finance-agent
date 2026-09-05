@@ -203,7 +203,11 @@ class FixtureFeed(FeedAdapter):
         if self._inline:
             return self._inline
         if self._path and self._path.exists():
-            return [json.loads(l) for l in self._path.read_text().splitlines() if l.strip()]
+            return [
+                json.loads(l)
+                for l in self._path.read_text(encoding="utf-8").splitlines()
+                if l.strip()
+            ]
         return []
 
     def _fetch_raw(self, since: datetime, limit: int) -> list[RawRecord]:

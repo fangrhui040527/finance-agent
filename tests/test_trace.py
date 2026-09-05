@@ -156,7 +156,7 @@ def test_a_long_value_is_written_whole_to_prompts_and_pointed_at(tmp_path):
     ev = next(e for e in _events(t.dir) if e["kind"] == "llm_call")
     ref = ev["data"]["prompt"]
     assert ref["chars"] == 50_000 and ref["head"]
-    assert (t.dir / ref["_blob"]).read_text() == big
+    assert (t.dir / ref["_blob"]).read_text(encoding="utf-8") == big
 
 
 # --- reports ----------------------------------------------------------------
@@ -180,13 +180,13 @@ def test_every_report_is_written_and_carries_the_sensitivity_banner(tmp_path):
     for name in ("session.log", "anatomy.md", "report.html", "summary.json", "trace.jsonl"):
         assert (t.dir / name).exists(), name
     for name in ("session.log", "anatomy.md", "report.html"):
-        assert "VERBATIM" in (t.dir / name).read_text()
+        assert "VERBATIM" in (t.dir / name).read_text(encoding="utf-8")
 
-    anatomy = (t.dir / "anatomy.md").read_text()
+    anatomy = (t.dir / "anatomy.md").read_text(encoding="utf-8")
     assert "a10_thesis" in anatomy
     assert "Organs" in anatomy and "Skeleton" in anatomy
 
-    html = (t.dir / "report.html").read_text()
+    html = (t.dir / "report.html").read_text(encoding="utf-8")
     assert "<title>" in html and "prefers-color-scheme" in html
     assert "no-execution" not in html or True
 

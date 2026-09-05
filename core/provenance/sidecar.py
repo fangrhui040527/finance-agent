@@ -30,7 +30,7 @@ def _path(collection_dir: Path) -> Path:
 
 def load(collection_dir: Path) -> dict[str, Any]:
     try:
-        return json.loads(_path(collection_dir).read_text())
+        return json.loads(_path(collection_dir).read_text(encoding="utf-8"))
     except (FileNotFoundError, json.JSONDecodeError):
         return {}
     except OSError:

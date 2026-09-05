@@ -717,7 +717,7 @@ def load(path: str | Path | None = None) -> Config:
         data, source = {}, "<defaults>"
     else:
         try:
-            data = tomllib.loads(Path(p).read_text())
+            data = tomllib.loads(Path(p).read_text(encoding="utf-8"))
         except tomllib.TOMLDecodeError as e:
             raise ConfigError(f"{p} is not valid TOML: {e}") from None
         source = str(p)

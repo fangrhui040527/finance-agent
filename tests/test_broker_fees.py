@@ -264,11 +264,13 @@ def test_ask_size_prices_a_us_name_on_the_broker_schedule(tmp_path, capsys, monk
 
     # Set the key rather than insert one: config.toml ships with a broker
     # selected, and a blind insert makes a duplicate key and invalid TOML.
-    shipped = (pathlib.Path(__file__).resolve().parents[1] / "config.toml").read_text()
+    shipped = (pathlib.Path(__file__).resolve().parents[1] / "config.toml").read_text(
+        encoding="utf-8"
+    )
     kept = [ln for ln in shipped.splitlines() if not ln.startswith("broker =")]
     kept.insert(kept.index('markets = ["XKLS", "XNAS"]') + 1, 'broker = "moomoo_my"')
     cfg_file = tmp_path / "config.toml"
-    cfg_file.write_text("\n".join(kept))
+    cfg_file.write_text("\n".join(kept), encoding="utf-8")
     real = core.config.load
     monkeypatch.setattr(core.config, "load", lambda path=None: real(cfg_file))
 
@@ -334,11 +336,13 @@ def test_the_spread_is_reported_and_deliberately_not_in_the_floor(tmp_path, caps
     import ask
     import core.config
 
-    shipped = (pathlib.Path(__file__).resolve().parents[1] / "config.toml").read_text()
+    shipped = (pathlib.Path(__file__).resolve().parents[1] / "config.toml").read_text(
+        encoding="utf-8"
+    )
     kept = [ln for ln in shipped.splitlines() if not ln.startswith("broker =")]
     kept.insert(kept.index('markets = ["XKLS", "XNAS"]') + 1, 'broker = "moomoo_my"')
     cfg_file = tmp_path / "config.toml"
-    cfg_file.write_text("\n".join(kept))
+    cfg_file.write_text("\n".join(kept), encoding="utf-8")
     real = core.config.load
     monkeypatch.setattr(core.config, "load", lambda path=None: real(cfg_file))
 
@@ -371,11 +375,13 @@ def test_a_domestic_position_says_nothing_about_currency(tmp_path, capsys, monke
     import ask
     import core.config
 
-    shipped = (pathlib.Path(__file__).resolve().parents[1] / "config.toml").read_text()
+    shipped = (pathlib.Path(__file__).resolve().parents[1] / "config.toml").read_text(
+        encoding="utf-8"
+    )
     kept = [ln for ln in shipped.splitlines() if not ln.startswith("broker =")]
     kept.insert(kept.index('markets = ["XKLS", "XNAS"]') + 1, 'broker = "moomoo_my"')
     cfg_file = tmp_path / "config.toml"
-    cfg_file.write_text("\n".join(kept))
+    cfg_file.write_text("\n".join(kept), encoding="utf-8")
     real = core.config.load
     monkeypatch.setattr(core.config, "load", lambda path=None: real(cfg_file))
 

@@ -275,7 +275,10 @@ enabled = [
   # MacroMicro's charts, TWSE OpenAPI + FinMind for the Taiwan names Goodinfo
   # and 优分析 cover. Enabled for the first runner probe; what fails to answer
   # with dated rows comes off this list, as with the Malaysian feeds.
-  "jin10_flash", "jin10_calendar", "dbnomics", "twse_openapi", "finmind",
+  # jin10_calendar came off it the same day: its CDN host is gone from DNS and
+  # rili.jin10.com answers 404 on every documented path (see details/09). The
+  # fred collector carries the US release calendar meanwhile.
+  "jin10_flash", "dbnomics", "twse_openapi", "finmind",
 ]
 
 # Names the collectors read but the book never holds. TSMC is here as the

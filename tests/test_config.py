@@ -19,7 +19,7 @@ ROOT = Path(__file__).resolve().parent.parent
 
 def write(tmp_path, body):
     p = tmp_path / "config.toml"
-    p.write_text(body)
+    p.write_text(body, encoding="utf-8")
     return p
 
 
@@ -149,8 +149,8 @@ def test_a_local_override_wins_over_the_committed_file(tmp_path, monkeypatch):
     # The suite-wide fixture pins FINPLANET_CONFIG so no test reads an
     # operator's real position; here the search order is the subject.
     monkeypatch.delenv("FINPLANET_CONFIG", raising=False)
-    (tmp_path / "config.toml").write_text("[limits]\nsingle_name = 0.08\n")
-    (tmp_path / "config.local.toml").write_text("[limits]\nsingle_name = 0.05\n")
+    (tmp_path / "config.toml").write_text("[limits]\nsingle_name = 0.08\n", encoding="utf-8")
+    (tmp_path / "config.local.toml").write_text("[limits]\nsingle_name = 0.05\n", encoding="utf-8")
     assert find(tmp_path).name == "config.local.toml"
     assert load(find(tmp_path)).limits.single_name == 0.05
 
@@ -161,8 +161,8 @@ def test_the_pin_beats_the_search_and_refuses_a_path_that_is_not_there(tmp_path,
     has to REFUSE a missing path rather than fall back: a typo that quietly
     loaded a different financial position would make every number downstream
     right about the wrong file."""
-    (tmp_path / "config.toml").write_text("[limits]\nsingle_name = 0.08\n")
-    (tmp_path / "config.local.toml").write_text("[limits]\nsingle_name = 0.05\n")
+    (tmp_path / "config.toml").write_text("[limits]\nsingle_name = 0.08\n", encoding="utf-8")
+    (tmp_path / "config.local.toml").write_text("[limits]\nsingle_name = 0.05\n", encoding="utf-8")
 
     monkeypatch.setenv("FINPLANET_CONFIG", str(tmp_path / "config.toml"))
     assert find(tmp_path).name == "config.toml"
@@ -175,7 +175,7 @@ def test_the_pin_beats_the_search_and_refuses_a_path_that_is_not_there(tmp_path,
 
 def test_the_local_override_is_gitignored():
     """Personal numbers must not land in git by accident."""
-    assert "config.local.toml" in (ROOT / ".gitignore").read_text()
+    assert "config.local.toml" in (ROOT / ".gitignore").read_text(encoding="utf-8")
 
 
 # -- the bounds themselves ---------------------------------------------------
@@ -191,7 +191,7 @@ def test_the_shipped_config_sits_inside_every_hard_bound():
     """A shipped default outside its own bound would fail on first run."""
     import tomllib
 
-    data = tomllib.loads((ROOT / "config.toml").read_text())
+    data = tomllib.loads((ROOT / "config.toml").read_text(encoding="utf-8"))
     for key, lo, hi, _ in HARD_BOUNDS:
         node = data
         for part in key.split("."):
@@ -216,21 +216,21 @@ def test_the_batch_file_keeps_crlf_endings():
 
 
 def test_gitattributes_protects_the_batch_endings():
-    assert "*.bat text eol=crlf" in (ROOT / ".gitattributes").read_text()
+    assert "*.bat text eol=crlf" in (ROOT / ".gitattributes").read_text(encoding="utf-8")
 
 
 def test_the_batch_file_covers_every_make_target():
     """The two entrypoints must not drift: a Windows user running the same
     workflow should not find a command missing."""
-    make = (ROOT / "Makefile").read_text()
+    make = (ROOT / "Makefile").read_text(encoding="utf-8")
     targets = {m for m in re.findall(r"^([a-z]+):", make, re.M)} - {"lint"}
-    bat = BAT.read_text().lower()
+    bat = BAT.read_text(encoding="utf-8").lower()
     missing = [t for t in targets if f'"{t}"' not in bat]
     assert not missing, f"run.bat is missing Make targets: {missing}"
 
 
 def test_the_batch_file_exposes_the_two_clis():
-    bat = BAT.read_text()
+    bat = BAT.read_text(encoding="utf-8")
     for token in (
         "ask.py why",
         "ask.py plan",
@@ -243,7 +243,7 @@ def test_the_batch_file_exposes_the_two_clis():
 
 
 def test_the_batch_file_refuses_to_run_without_a_venv():
-    bat = BAT.read_text()
+    bat = BAT.read_text(encoding="utf-8")
     assert "No virtual environment found" in bat
     assert "run install" in bat
 
@@ -257,7 +257,7 @@ def test_the_planning_rate_has_one_python_source():
     Editing .env did nothing, which is worse than the value being wrong."""
     from core.provenance.ledger import DEFAULT_FX_MYR_PER_USD
 
-    loader = (ROOT / "core" / "config.py").read_text()
+    loader = (ROOT / "core" / "config.py").read_text(encoding="utf-8")
     assert "DEFAULT_FX_MYR_PER_USD" in loader
     assert "4.15" not in loader, "the loader must not restate the rate literal"
     assert load(ROOT / "config.toml").fx_myr_per_usd == DEFAULT_FX_MYR_PER_USD
@@ -266,7 +266,7 @@ def test_the_planning_rate_has_one_python_source():
 def test_the_env_example_holds_no_settings_that_config_toml_owns():
     """Two places to set one number is one place too many: whichever the reader
     edits, the other silently wins."""
-    env = (ROOT / ".env.example").read_text()
+    env = (ROOT / ".env.example").read_text(encoding="utf-8")
     for key in ("FX_MYR_PER_USD", "DAILY_BUDGET_MYR"):
         assert key not in env, f"{key} duplicates config.toml and is read by nothing"
 
@@ -278,9 +278,9 @@ def test_every_env_example_key_is_actually_used_somewhere():
 
     from tests._repo import iter_source_files
 
-    env = (ROOT / ".env.example").read_text()
+    env = (ROOT / ".env.example").read_text(encoding="utf-8")
     keys = re.findall(r"^([A-Z_]+)=", env, re.M)
-    compose = (ROOT / "infra" / "docker-compose.yml").read_text()
+    compose = (ROOT / "infra" / "docker-compose.yml").read_text(encoding="utf-8")
     # Compose is not the only consumer: an adapter that reads os.environ counts
     # too. Checking only compose forces a growing exemption list, and the
     # exemptions are exactly where an unread key would hide.

@@ -9,6 +9,7 @@ dated on the way in.
 from __future__ import annotations
 
 import json
+import urllib.error
 from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 
@@ -663,6 +664,28 @@ def test_jin10_calendar_falls_back_to_the_older_path_and_reports_when_neither_an
         Jin10CalendarCollector(clock=CLOCK, opener=nothing).collect(SINCE)
     assert "web_data" in str(exc.value) and "datas" in str(exc.value), "every path tried is named"
     assert seen.get("Referer") == "https://rili.jin10.com/"
+
+
+def test_jin10_calendar_retires_a_host_whose_name_does_not_resolve_and_groups_the_verdicts():
+    calls = []
+
+    def opener(req, timeout=None):
+        calls.append(req.full_url)
+        if req.full_url.startswith("https://cdn-rili."):
+            raise urllib.error.URLError("[Errno -2] Name or service not known")
+        raise http_error(404)
+
+    c = Jin10CalendarCollector(clock=CLOCK, opener=opener, sleep=lambda _s: None)
+    with pytest.raises(SourceError, match="no calendar path answered") as exc:
+        c.collect(SINCE)
+    cdn = {u for u in calls if "cdn-rili" in u}  # a set: the retry loop re-asks the same URL
+    assert len(cdn) == 1, "one DNS failure retires the host; its other paths are not asked"
+    assert len({u for u in calls if u.startswith("https://rili.")}) == 2
+    msg = str(exc.value)
+    assert "cdn-rili.jin10.com: name does not resolve" in msg
+    assert "rili.jin10.com: HTTP 404 at /datas/2026/0904/economics.json" in msg
+    assert "/web_data/2026/daily/09/04/economics.json" in msg
+    assert "network tab" in msg, "the failure says how to find the new path"
 
 
 # --- DBnomics ------------------------------------------------------------------------------

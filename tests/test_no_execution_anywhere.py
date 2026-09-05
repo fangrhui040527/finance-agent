@@ -73,7 +73,7 @@ def test_no_execution_code_in_repo():
             continue
         if rel.as_posix() in ALLOWED_PATHS:
             continue
-        if FORBIDDEN.search(path.read_text(errors="replace")):
+        if FORBIDDEN.search(path.read_text(encoding="utf-8", errors="replace")):
             offenders.append(rel.as_posix())
     assert not offenders, f"execution-adjacent code found in: {offenders}"
 
