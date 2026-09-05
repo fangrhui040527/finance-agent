@@ -25,11 +25,6 @@ jobs:
       run:
         shell: bash
     env:
-      GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-      MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
-      NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
       FINPLANET_NO_DOTENV: "1"
       PYTHONUTF8: "1"
     steps:
@@ -43,7 +38,39 @@ jobs:
       - name: Install
         run: uv sync --frozen
 
+      # One repository secret named ALL_SECRET holding every key is accepted:
+      # .github/scripts/keys_from_blob.py finds each by label or shape, and this
+      # step masks and exports it. A secret set under its own name wins.
+      - name: Keys from ALL_SECRET, when the named secrets are not set
+        env:
+          ALL_SECRET: ${{ secrets.ALL_SECRET }}
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+          FMP_API_KEY: ${{ secrets.FMP_API_KEY }}
+          ALPHAVANTAGE_API_KEY: ${{ secrets.ALPHAVANTAGE_API_KEY }}
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: |
+          if [ -z "$ALL_SECRET" ]; then
+            echo "ALL_SECRET is not set; the named secrets are in use"
+            exit 0
+          fi
+          python3 .github/scripts/keys_from_blob.py ALL_SECRET | while IFS='=' read -r name value; do
+            if [ -n "${!name}" ]; then
+              echo "$name: set under its own name; the blob's copy is ignored"
+              continue
+            fi
+            echo "::add-mask::$value"
+            echo "$name=$value" >> "$GITHUB_ENV"
+            echo "$name: taken from ALL_SECRET"
+          done
+
       - name: Which backend would answer, and what the catalogue holds
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY || env.GROQ_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
         run: |
           {
             echo "## Backend selection"
@@ -58,6 +85,11 @@ jobs:
       - name: One word from each keyed provider
         env:
           QA_LIVE: "1"
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY || env.GROQ_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
         run: |
           set +e
           uv run python -m pytest qa/phase2/test_p2_free_backend_live.py \

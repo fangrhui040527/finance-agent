@@ -270,6 +270,15 @@ Exit codes, so a scheduler can act without parsing text:
 | `fmp` | statements, estimates, targets, rating changes, transcripts | weekly, us_preopen | **enabled**, needs `FMP_API_KEY` |
 | `alphavantage_news` | articles with per-ticker sentiment, one call a day | us_close | **enabled**, needs `ALPHAVANTAGE_API_KEY` |
 | `fred` | Fed funds, yields, curve, CPI, unemployment, VIX, dollar, MYR/USD | us_preopen | **enabled**, needs `FRED_API_KEY` |
+
+Keys reach a workflow as repository secrets of exactly these names (Settings →
+Secrets and variables → Actions → Repository secrets). One secret named
+`ALL_SECRET` holding every key, in any layout, is also accepted: the first step
+of `collect.yml`, `sources-probe.yml` and `free-backend-probe.yml` runs
+`.github/scripts/keys_from_blob.py`, which recognises each key by its label or
+its shape, masks it, and exports it for the steps that follow. A secret set
+under its own name always wins over the blob's copy. `secrets-check.yml` lists
+the names a job can see, never the values, when a probe says a key is not set.
 | `thestar_business`, `edge_malaysia`, `bernama_business`, `fmt_business`, `nst_business` | Malaysian business RSS | bursa_close | registered, **not enabled** until the probe shows dated items |
 | `bursa_announcements` | Bursa company announcements | bursa_close | registered, **not enabled** until the probe shows the endpoint answers |
 | `bnm_press` | Bank Negara press releases | bursa_close | registered, **not enabled**: no live feed exists |
