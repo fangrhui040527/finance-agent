@@ -19,7 +19,7 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 
-from qa.conftest import reachable
+from qa.conftest import ROOT, reachable
 
 SINCE = datetime.now(UTC) - timedelta(hours=48)
 
@@ -31,12 +31,25 @@ def _key(name: str) -> str:
     return value
 
 
+def _enabled() -> frozenset[str]:
+    """The sources a scheduled sweep actually reads (`[sources] enabled`)."""
+    from core.config import load
+
+    return frozenset(load(ROOT / "config.toml").sources)
+
+
 @pytest.mark.network
 def test_gdelt_answers_a_bursa_name_with_dated_json(gdelt):
+    from knowledge.feeds.adapter import FeedError
     from knowledge.feeds.registry import adapter_for
 
     feed = adapter_for("gdelt", query='"Maybank"')
-    records = feed.fetch(SINCE, limit=5)
+    try:
+        records = feed.fetch(SINCE, limit=5)
+    except FeedError as e:
+        if "429" in str(e):
+            pytest.xfail(f"GDELT throttled this runner (one request per 5s per client): {e}")
+        raise
     arts, stats = feed.normalize(records)
     assert stats.fetched >= 0 and all(a.published_at.tzinfo for a in arts)
 
@@ -68,8 +81,13 @@ def test_yahoo_ticker_feed_returns_summaries_for_a_bursa_and_a_us_name():
 @pytest.mark.network
 @pytest.mark.parametrize("name", ["thestar_business", "edge_malaysia", "bernama_business", "fmt_business", "nst_business"])
 def test_each_malaysian_rss_candidate_is_a_feed_or_says_where_the_feed_is(name):
-    """A candidate either serves dated items or names the feeds it advertises;
-    both are progress. Only a silent refusal is a failure."""
+    """An ENABLED feed must serve dated items. A registered candidate that is
+    not enabled is measured, not judged: it passes the day it answers with
+    dated items (the signal to enable it) and xfails with the exact reason
+    otherwise - a 404 on the guessed path, an index page, undated items - so
+    the run's summary says what is true about each one this week without
+    turning a dead guess into a red build. Only a silent refusal by an enabled
+    feed is a failure."""
     from urllib.parse import urlparse
 
     from knowledge.feeds.adapter import FeedError
@@ -78,12 +96,21 @@ def test_each_malaysian_rss_candidate_is_a_feed_or_says_where_the_feed_is(name):
     host = urlparse(RSS_SOURCES[name][0]).netloc
     if not reachable(host):
         pytest.skip(f"{host} unreachable")
+    enabled = name in _enabled()
     try:
         records = adapter_for(name).fetch(SINCE, limit=5)
     except FeedError as e:
         if "advertises feeds at" in str(e):
             pytest.xfail(f"{name} is an index page: {e}")
+        if not enabled:
+            pytest.xfail(f"{name} is a registered candidate, not enabled: {e}")
         raise
+    dated = bool(records) and all(r.payload["published_at"] for r in records)
+    if not enabled and not dated:
+        pytest.xfail(
+            f"{name} is a registered candidate, not enabled: "
+            + ("no items in 48h" if not records else "items carry no date")
+        )
     assert all(r.payload["published_at"] for r in records)
 
 
@@ -137,24 +164,44 @@ def test_fmp_free_tier_answers_statements_and_names_what_it_excludes():
     from knowledge.sources.fmp import FmpCollector
 
     pull = FmpCollector().collect(SINCE, ("XNAS:AAPL",), slot="weekly")
-    assert any(o.concept == "revenue" for o in pull.observations), pull.notes
+    if any(o.concept == "revenue" for o in pull.observations):
+        return
+    # The free plan's boundary moves. On 2026-09-05 the income statement and
+    # the earnings calendar answered 402 ("the plan does not include it") while
+    # grades, targets and the transcript still landed. The collector's promise
+    # is that an exclusion is NAMED, with the endpoint, and the rest of the pull
+    # survives - that is what is asserted; a revenue figure is asserted only
+    # when the plan serves one.
+    named = [n for n in pull.notes if "income-statement" in n and "plan" in n.lower()]
+    if named:
+        assert pull.events or pull.observations or pull.articles, "the rest of the pull vanished"
+        pytest.xfail(f"the FMP plan excludes the income statement today: {named[0][:200]}")
+    pytest.fail(f"no revenue figure and no exclusion named for it: {pull.notes}")
 
 
 @pytest.mark.network
-def test_alphavantage_answers_once_for_all_us_names():
+def test_alphavantage_answers_once_per_us_name_with_articles_for_each():
+    """One request PER name, three of the day's twenty-five. The vendor's
+    multi-ticker filter is an AND (articles that mention every listed name at
+    once): a single request for three names returned three articles on a busy
+    Friday and none on a Saturday, which is how this was found."""
     _key("ALPHAVANTAGE_API_KEY")
     if not reachable("www.alphavantage.co"):
         pytest.skip("alphavantage unreachable")
     from knowledge.sources.alphavantage import AlphaVantageNews
     from knowledge.sources.base import SourceError
 
+    names = ("XNAS:AAPL", "XNAS:NVDA", "XNAS:MSFT")
     try:
-        pull = AlphaVantageNews().collect(SINCE, ("XNAS:AAPL", "XNAS:NVDA", "XNAS:MSFT"))
+        pull = AlphaVantageNews().collect(SINCE, names)
     except SourceError as e:
-        if "rate limit" in str(e).lower() or "refused" in str(e):
+        if "quota" in str(e).lower() or "rate limit" in str(e).lower() or "refused" in str(e):
             pytest.xfail(f"quota spent today: {e}")
         raise
-    assert pull.requests == 1 and pull.articles
+    assert pull.requests == len(names), pull.notes
+    assert pull.articles, "three of the most covered names on earth had no article in 48h"
+    linked = {i for a in pull.articles for i in a.instruments}
+    assert linked & set(names), "no article was linked to any of the names at relevance >= 0.2"
 
 
 @pytest.mark.network

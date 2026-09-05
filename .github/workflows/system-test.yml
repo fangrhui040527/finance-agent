@@ -9,7 +9,8 @@
 # defect in this code, but it is never hidden either.
 #
 # Keys reach the live parts as the named repository secrets, or from one
-# secret named ALL_SECRET (see .github/scripts/keys_from_blob.py).
+# secret named ALL_SECRET (see .github/scripts/keys_from_blob.py), and they
+# are loaded only after the core parts have run, so "keyless" is a fact.
 #
 # Manual, and weekly on Sunday at 03:30 UTC, after the weekly sweep.
 name: system-test
@@ -61,29 +62,6 @@ jobs:
           exit 0
           EOF
           chmod +x "$RESULTS/part.sh"
-
-      - name: Keys from ALL_SECRET, when the named secrets are not set
-        env:
-          ALL_SECRET: ${{ secrets.ALL_SECRET }}
-          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
-          FMP_API_KEY: ${{ secrets.FMP_API_KEY }}
-          ALPHAVANTAGE_API_KEY: ${{ secrets.ALPHAVANTAGE_API_KEY }}
-          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
-          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-        run: |
-          if [ -z "$ALL_SECRET" ]; then
-            echo "ALL_SECRET is not set; the named secrets are in use"
-            exit 0
-          fi
-          python3 .github/scripts/keys_from_blob.py ALL_SECRET | while IFS='=' read -r name value; do
-            if [ -n "${!name}" ]; then
-              echo "$name: set under its own name; the blob's copy is ignored"
-              continue
-            fi
-            echo "::add-mask::$value"
-            echo "$name=$value" >> "$GITHUB_ENV"
-            echo "$name: taken from ALL_SECRET"
-          done
 
       # ---- core: no network, no key ------------------------------------------
 
@@ -140,6 +118,36 @@ jobs:
 
       # ---- live: the world, with the keys ------------------------------------
 
+      # The keys enter the job HERE, after every core part has run. A key in
+      # the job environment earlier would reach part 9 through the process
+      # environment, and "keyless" would be a label rather than a fact (the
+      # first run of this workflow showed exactly that: GROQ_API_KEY made
+      # `ask.py backend` answer groq where the QA test expected the stub).
+      # One repository secret named ALL_SECRET holding every key is accepted:
+      # .github/scripts/keys_from_blob.py finds each by label or shape.
+      - name: Keys from ALL_SECRET, when the named secrets are not set
+        env:
+          ALL_SECRET: ${{ secrets.ALL_SECRET }}
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+          FMP_API_KEY: ${{ secrets.FMP_API_KEY }}
+          ALPHAVANTAGE_API_KEY: ${{ secrets.ALPHAVANTAGE_API_KEY }}
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: |
+          if [ -z "$ALL_SECRET" ]; then
+            echo "ALL_SECRET is not set; the named secrets are in use"
+            exit 0
+          fi
+          python3 .github/scripts/keys_from_blob.py ALL_SECRET | while IFS='=' read -r name value; do
+            if [ -n "${!name}" ]; then
+              echo "$name: set under its own name; the blob's copy is ignored"
+              continue
+            fi
+            echo "::add-mask::$value"
+            echo "$name=$value" >> "$GITHUB_ENV"
+            echo "$name: taken from ALL_SECRET"
+          done
+
       - name: "10 · doctor, with the keys and the network"
         env:
           FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY || env.FINNHUB_API_KEY }}
@@ -188,7 +196,7 @@ jobs:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY || env.GROQ_API_KEY }}
         run: >
           "$RESULTS/part.sh" 14 live "end to end: why --fetch, then thesis on the free model"
-          bash -c "uv run python ask.py backend && uv run python ask.py why XNAS:NVDA --fetch --against XNAS:SPY --days 5 && uv run python ask.py thesis XNAS:NVDA --breaker 'data-centre revenue growth below 20% year on year'"
+          bash -c "uv run python ask.py backend && uv run python ask.py why XNAS:NVDA --fetch --against XNAS:SPY --days 5 && uv run python ask.py thesis XNAS:NVDA --breaker 'data-centre revenue growth below 20% year on year|dc_revenue_yoy < 0.20|kb_filings'"
 
       # ---- verdict ------------------------------------------------------------
 
@@ -226,4 +234,5 @@ jobs:
         with:
           name: system-test-logs
           path: .system-test/*.log
+          include-hidden-files: true  # the directory is dot-prefixed
           retention-days: 14

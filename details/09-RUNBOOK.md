@@ -268,7 +268,7 @@ Exit codes, so a scheduler can act without parsing text:
 | `dosm_cpi` | Malaysian headline CPI | weekly | **enabled** |
 | `finnhub` | US company news, insiders, calendar, surprises, recommendations, metrics | us_close | **enabled**, needs `FINNHUB_API_KEY` |
 | `fmp` | statements, estimates, targets, rating changes, transcripts | weekly, us_preopen | **enabled**, needs `FMP_API_KEY` |
-| `alphavantage_news` | articles with per-ticker sentiment, one call a day | us_close | **enabled**, needs `ALPHAVANTAGE_API_KEY` |
+| `alphavantage_news` | articles with per-ticker sentiment, one call per US name a day | us_close | **enabled**, needs `ALPHAVANTAGE_API_KEY` |
 | `fred` | Fed funds, yields, curve, CPI, unemployment, VIX, dollar, MYR/USD | us_preopen | **enabled**, needs `FRED_API_KEY` |
 
 Keys reach a workflow as repository secrets of exactly these names (Settings →

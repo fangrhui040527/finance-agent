@@ -348,7 +348,22 @@ def test_alphavantage_links_only_relevant_tickers_and_aggregates_per_day():
     sent = next(o for o in pull.observations if o.concept == "av_news_sentiment")
     assert sent.instrument_id == "XNAS:NVDA" and sent.value == Decimal("0.5000")
     assert sent.period_end == date(2026, 9, 3)
-    assert c.requests == 1, "one call for every US name - the plan allows 25 a day"
+    assert c.requests == 2, "one request PER name: the vendor's multi-ticker filter is an AND"
+    assert sent.payload["articles"] == 1, "the story came back for both names and counts once"
+
+
+def test_alphavantage_keeps_the_first_names_articles_when_a_later_request_hits_the_quota():
+    quota = {"Information": "Our standard API rate limit is 25 requests per day."}
+    answers = iter([AV, quota])
+    c = AlphaVantageNews(
+        key="k",
+        clock=CLOCK,
+        opener=lambda req, timeout=None: FakeResponse(json.dumps(next(answers))),
+    )
+    pull = c.collect(SINCE, ("XNAS:AAPL", "XNAS:NVDA"))
+    assert len(pull.articles) == 1 and c.requests == 2
+    assert pull.notes and "quota exhausted for today" in pull.notes[0]
+    assert pull.notes[0].startswith("XNAS:NVDA:"), "the note names the name that went unanswered"
 
 
 def test_alphavantage_rate_limit_answer_is_a_failure_not_a_quiet_day():

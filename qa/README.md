@@ -63,6 +63,45 @@ passes through `redact()` first.
 
 ## Findings, and where they stand
 
+From the first full system test on a runner (2026-09-05, `.github/workflows/system-test.yml`
+on main at 8802d5e; 9 of 14 parts held, one of them core):
+
+- **Fixed.** Part 9, "QA phase 1, keyless", was not keyless: the runner's job environment
+  carried `GROQ_API_KEY`, `scrubbed_env` popped only the Anthropic variables, and
+  `ask.py backend` answered `OpenAICompatibleBackend` where
+  `test_p1_entrypoints.py::test_backend_reports_the_stub_when_no_key_is_present` expected
+  the stub. `qa/conftest.py` now scrubs every variable `core.llm.providers.env_vars()` names
+  (plus the backend and model switches), and the workflow loads keys only after the core
+  parts have run, so the label is a fact either way.
+- **Fixed.** Alpha Vantage's collector made one request for all the US names. The vendor's
+  `tickers=A,B,C` is an AND filter - articles that mention every listed name at once - which
+  is why the nightly pull returned three articles on a busy Friday and none on a Saturday.
+  It now makes one request per name (three of the day's twenty-five), stores a story that
+  comes back for two names once, linked to both, and keeps the earlier names' articles when a
+  later request meets the quota. Pinned in `tests/test_collectors.py`.
+- **Recorded.** FMP's free plan answered 402 for the income statement and the earnings
+  calendar ("the plan does not include it") while grades, targets and the transcript landed.
+  `test_p2_sources_live.py` now xfails with the endpoint named when no revenue figure comes
+  and asserts that the rest of the pull survived; the collector's promise was always the
+  named exclusion, not the figure.
+- **Recorded.** The four Malaysian RSS candidates that are registered but not enabled
+  (`thestar_business` 404, `edge_malaysia` and `nst_business` 404, `bernama_business`
+  undated) xfail with their reason; only an enabled feed (`fmt_business`) is held to dated
+  items. A candidate passes the day it answers with dated items, which is the signal to
+  enable it.
+- **Recorded.** GDELT answered 429 to the feeds suite straight after the sources suite (its
+  documented pace is one request per five seconds per client). The product raised, named
+  the status and opened its breaker; the test now xfails with that reason rather than
+  reporting a red for behaviour that is the promise.
+- **Fixed.** Three defects in the harness itself: the end-to-end part passed `--breaker` a
+  statement with no query or store (the CLI refuses that on purpose); the probe's model-list
+  step held inline Python that YAML re-indented into an `IndentationError` (now
+  `.github/scripts/model_ids.py`, tested); and the logs artifact skipped the dot-prefixed
+  results directory.
+- **Open until the probe answers.** Groq no longer serves `llama-3.1-8b-instant`, the
+  catalogue's cheap default; parts 13 and 14 fail with the 404 that names the variable to
+  set. The default moves to a model from the probe's live list.
+
 From the free-provider pass (2026-09-04, against PR #32 at ec8ba34; 41 of 42 held):
 
 - **Fixed.** `OpenAICompatibleBackend` relayed a provider's error words verbatim, so a

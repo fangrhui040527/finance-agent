@@ -184,15 +184,16 @@ def keyed_env(monkeypatch):
     a key, and every one of those tests drives a fake opener, so the value here
     only has to exist.
     """
+    for var in llm_env_vars():
+        monkeypatch.delenv(var, raising=False)
     monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-ant-phase1-not-a-real-key")
-    monkeypatch.delenv("LLM_BACKEND", raising=False)
     return "sk-ant-phase1-not-a-real-key"
 
 
 @pytest.fixture
 def no_key_env(monkeypatch):
-    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
-    monkeypatch.delenv("LLM_BACKEND", raising=False)
+    for var in llm_env_vars():
+        monkeypatch.delenv(var, raising=False)
 
 
 @pytest.fixture(scope="session")
@@ -204,18 +205,40 @@ def artifacts():
 
 # -- subprocess entry points ---------------------------------------------------
 
+#: Every variable that can turn a keyless run into a live one. The Anthropic
+#: key and backend switch were the whole list until the free-provider backend
+#: (docs/21) arrived; after that, a runner with GROQ_API_KEY in its job
+#: environment made `ask.py backend` answer "groq" in the part of the system
+#: test labelled keyless (2026-09-05). The catalogue's own `env_vars()` is the
+#: source of truth, so a sixth provider is scrubbed the day it is added.
+_LLM_VARS_ALWAYS = (
+    "ANTHROPIC_API_KEY", "LLM_BACKEND", "LLM_BACKEND_REASON", "LLM_BACKEND_BALANCED",
+    "LLM_BACKEND_CHEAP", "LLM_API_KEY", "LLM_BASE_URL", "LLM_MODEL", "LLM_MODEL_REASON",
+    "LLM_MODEL_BALANCED", "LLM_MODEL_CHEAP", "FINPLANET_CHEAP",
+)
+
+
+def llm_env_vars() -> tuple[str, ...]:
+    try:
+        from core.llm.providers import env_vars
+    except ImportError:  # a checkout from before the free backend
+        return _LLM_VARS_ALWAYS
+    extra = tuple(v for v in env_vars() if v not in _LLM_VARS_ALWAYS)
+    return _LLM_VARS_ALWAYS + extra
+
+
 def scrubbed_env(tmp_path: Path, *, key: str | None = None) -> dict:
     """An environment for running the product as a real process.
 
     No key unless one is passed explicitly, so a keyless run genuinely gets the
-    EchoBackend; UTF-8 forced so Windows consoles cannot fail a test on a box
-    glyph; the trace directory pointed into the test's own tmp dir so nothing a
-    QA run does lands in the repository's `debug/`.
+    EchoBackend - and no free-provider key either, or the child picks Groq and
+    the scenario silently changes; UTF-8 forced so Windows consoles cannot fail
+    a test on a box glyph; the trace directory pointed into the test's own tmp
+    dir so nothing a QA run does lands in the repository's `debug/`.
     """
     env = dict(os.environ)
-    env.pop("ANTHROPIC_API_KEY", None)
-    env.pop("LLM_BACKEND", None)
-    env.pop("FINPLANET_CHEAP", None)
+    for var in llm_env_vars():
+        env.pop(var, None)
     # The CLI loads `.env` itself now (core/env.py), so popping variables from
     # the parent is no longer enough to make a child keyless - the child would
     # read the operator's populated file and quietly stop being the scenario

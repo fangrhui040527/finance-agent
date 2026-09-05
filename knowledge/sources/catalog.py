@@ -213,8 +213,8 @@ CATALOG: dict[str, SourceSpec] = {
     "alphavantage_news": SourceSpec(
         "alphavantage_news",
         MIXED,
-        "Alpha Vantage NEWS_SENTIMENT: articles with per-ticker sentiment, one call for "
-        "the US names (25 calls/day plan)",
+        "Alpha Vantage NEWS_SENTIMENT: articles with per-ticker sentiment, one call per "
+        "US name a night (25 calls/day plan)",
         "general_news",
         ("us_close",),
         markets=("XNAS", "XNYS"),
