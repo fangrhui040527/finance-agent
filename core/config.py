@@ -267,6 +267,11 @@ class Config:
     # describe() says out loud rather than leaving you to discover.
     holdings: tuple[str, ...] = ()
     watchlist: tuple[str, ...] = ()
+    #: Names the collectors read but the book never holds: a Taiwan name as an
+    #: NVDA supply-chain read, for instance. The paper book, the pack's moves
+    #: table and every sizing engine ignore them; `ask.py facts` and the pack's
+    #: facts block show them under 'watched, not held'.
+    read_only: tuple[str, ...] = ()
     fx_spread_per_side: Decimal = DEFAULT_FX_SPREAD_PER_SIDE
     """What a currency conversion costs, one way. See the constant: unmeasured,
     and on a US position plausibly larger than every trading fee combined."""
@@ -712,7 +717,7 @@ def load(path: str | Path | None = None) -> Config:
         data, source = {}, "<defaults>"
     else:
         try:
-            data = tomllib.loads(Path(p).read_text())
+            data = tomllib.loads(Path(p).read_text(encoding="utf-8"))
         except tomllib.TOMLDecodeError as e:
             raise ConfigError(f"{p} is not valid TOML: {e}") from None
         source = str(p)
@@ -757,6 +762,16 @@ def load(path: str | Path | None = None) -> Config:
         return float(v)
 
     sources = _sources(data)
+    read_only = _instruments(data, "sources.read_only")
+    held = set(_instruments(data, "account.holdings")) | set(
+        _instruments(data, "account.watchlist")
+    )
+    overlap = sorted(set(read_only) & held)
+    if overlap:
+        raise ConfigError(
+            f"sources.read_only lists {overlap}, which the book already holds or watches; "
+            "a name is read-only or in the book, not both"
+        )
 
     return Config(
         base_currency=str(_get(data, "account.base_currency", "MYR")).upper(),
@@ -770,6 +785,7 @@ def load(path: str | Path | None = None) -> Config:
         limits=limits,
         holdings=_instruments(data, "account.holdings"),
         watchlist=_instruments(data, "account.watchlist"),
+        read_only=read_only,
         provenance_db=str(_get(data, "provenance.database", "data/provenance.db")),
         sources=sources,
         gdelt_languages=_strings(data, "sources.gdelt_languages"),

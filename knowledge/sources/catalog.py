@@ -230,6 +230,57 @@ CATALOG: dict[str, SourceSpec] = {
         key_env="FRED_API_KEY",
         docs="https://fred.stlouisfed.org/docs/api/fred/",
     ),
+    # -- 2026-09-05: the four sites the operator asked for, by their free routes ---------
+    # 金十数据 sells its data; its own pages read two public JSON endpoints. MIXED
+    # because the sweep stores a collector's articles the way it stores Alpha
+    # Vantage's; one request per slot, Chinese kept (see knowledge/sources/jin10.py).
+    "jin10_flash": SourceSpec(
+        "jin10_flash",
+        MIXED,
+        "Jin10 (金十数据) flash news, Chinese, macro and markets; one request per slot",
+        "wire",
+        ("us_preopen", "bursa_close", "us_close"),
+        docs="https://www.jin10.com/",
+    ),
+    "jin10_calendar": SourceSpec(
+        "jin10_calendar",
+        STRUCTURED,
+        "Jin10 economic calendar: scheduled releases and prints (actual vs consensus) as MACRO:<country> events",
+        "wire",
+        ("us_preopen", "us_close"),
+        docs="https://rili.jin10.com/",
+    ),
+    # MacroMicro's API starts at USD 5,000 a year; the series behind its charts
+    # are on DBnomics, keyless.
+    "dbnomics": SourceSpec(
+        "dbnomics",
+        STRUCTURED,
+        "DBnomics: IMF commodity prices (palm oil, aluminium, Brent, LNG), BIS policy rates and NEERs, IMF CPI for MY and CN",
+        "regulator",
+        ("us_preopen", "weekly"),
+        docs="https://db.nomics.world/",
+    ),
+    # Goodinfo bans crawlers and 优分析 is paywalled; the exchange and FinMind
+    # publish the same figures. MIXED so the sweep hands these the XTAI names in
+    # `[sources] read_only`; they are read and cited, never traded.
+    "twse_openapi": SourceSpec(
+        "twse_openapi",
+        MIXED,
+        "TWSE OpenAPI (official, keyless): P/E, P/B, yield, monthly revenue, close and volume for the read-only Taiwan names",
+        "regulator",
+        ("bursa_close", "weekly"),
+        markets=("XTAI",),
+        docs="https://openapi.twse.com.tw/",
+    ),
+    "finmind": SourceSpec(
+        "finmind",
+        MIXED,
+        "FinMind: 24 months of revenue, 8 quarters of statements, foreign net buying for the read-only Taiwan names (FINMIND_TOKEN optional)",
+        "general_news",
+        ("weekly",),
+        markets=("XTAI",),
+        docs="https://finmind.github.io/",
+    ),
 }
 
 

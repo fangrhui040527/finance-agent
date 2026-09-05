@@ -31,7 +31,7 @@ class CuratedExtractor(Extractor):
         self.path = Path(path)
 
     def extract(self) -> dict:
-        raw = yaml.safe_load(self.path.read_text()) or {}
+        raw = yaml.safe_load(self.path.read_text(encoding="utf-8")) or {}
         nodes: list[dict] = []
         edges: list[dict] = []
 

@@ -308,7 +308,7 @@ def test_holdings_and_watchlist_are_validated_at_load(tmp_path):
     from core.config import ConfigError, load
 
     p = tmp_path / "config.toml"
-    p.write_text('[account]\nholdings = ["1155"]\n')
+    p.write_text('[account]\nholdings = ["1155"]\n', encoding="utf-8")
     with pytest.raises(ConfigError, match="no market prefix"):
         load(p)
 
@@ -317,7 +317,7 @@ def test_a_duplicated_watchlist_entry_is_refused(tmp_path):
     from core.config import ConfigError, load
 
     p = tmp_path / "config.toml"
-    p.write_text('[account]\nwatchlist = ["MYX:1155", "MYX:1155"]\n')
+    p.write_text('[account]\nwatchlist = ["MYX:1155", "MYX:1155"]\n', encoding="utf-8")
     with pytest.raises(ConfigError, match="more than once"):
         load(p)
 
@@ -327,7 +327,9 @@ def test_valid_holdings_load_and_reach_the_gate(tmp_path):
     from knowledge.news.features import Features, should_escalate
 
     p = tmp_path / "config.toml"
-    p.write_text('[account]\nholdings = ["MYX:1155"]\nwatchlist = ["XNAS:NVDA"]\n')
+    p.write_text(
+        '[account]\nholdings = ["MYX:1155"]\nwatchlist = ["XNAS:NVDA"]\n', encoding="utf-8"
+    )
     c = load(p)
     assert c.holdings == ("MYX:1155",)
     f = Features(

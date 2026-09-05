@@ -74,7 +74,8 @@ def test_a_company_classified_under_a_subsector_no_sector_declares_is_refused(tm
     p = tmp_path / "sectors.yaml"
     p.write_text(
         "sectors:\n  Financials: [Banks]\n"
-        "companies:\n  'MYX:1155': {subsector: Wizardry, valid_from: 2020-01-01}\n"
+        "companies:\n  'MYX:1155': {subsector: Wizardry, valid_from: 2020-01-01}\n",
+        encoding="utf-8",
     )
     with pytest.raises(ValueError, match="no sector declares"):
         SectorExtractor(p).extract()
@@ -84,7 +85,8 @@ def test_a_curated_row_with_no_id_is_refused_because_it_could_not_be_cited(tmp_p
     p = tmp_path / "sc.yaml"
     p.write_text(
         "edges:\n  - source: 'MYX:1155'\n    target: 'MYX:1023'\n"
-        "    relation: competes_with\n    valid_from: 2020-01-01\n"
+        "    relation: competes_with\n    valid_from: 2020-01-01\n",
+        encoding="utf-8",
     )
     with pytest.raises(ValueError, match="cannot be cited"):
         CuratedExtractor(p).extract()
@@ -96,7 +98,7 @@ def test_a_duplicate_curated_row_id_is_refused(tmp_path):
         "  - id: dupe\n    source: 'MYX:1155'\n    target: 'MYX:1023'\n"
         "    relation: competes_with\n    valid_from: 2020-01-01\n"
     )
-    p.write_text("edges:\n" + row + row)
+    p.write_text("edges:\n" + row + row, encoding="utf-8")
     with pytest.raises(ValueError, match="duplicate row id"):
         CuratedExtractor(p).extract()
 
@@ -241,7 +243,8 @@ def test_a_fixture_feed_can_drive_the_extractor_offline(tmp_path):
                 "language": "en",
             }
         )
-        + "\n"
+        + "\n",
+        encoding="utf-8",
     )
     nodes, edges = checked(GdeltExtractor.from_fixture(p))
     assert any(n.kind is NodeKind.EVENT for n in nodes)

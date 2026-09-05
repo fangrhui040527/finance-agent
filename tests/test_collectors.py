@@ -9,6 +9,7 @@ dated on the way in.
 from __future__ import annotations
 
 import json
+import urllib.error
 from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 
@@ -19,12 +20,16 @@ from knowledge.sources.alphavantage import AlphaVantageNews
 from knowledge.sources.base import KeyMissing, SourceError, parse_date, parse_datetime
 from knowledge.sources.bnm import BnmOprCollector
 from knowledge.sources.bursa import BursaAnnouncements
+from knowledge.sources.dbnomics import DbnomicsCollector
 from knowledge.sources.dosm import DosmCpiCollector
 from knowledge.sources.edgar import EdgarFilings
+from knowledge.sources.finmind import FinMindCollector
 from knowledge.sources.finnhub import FinnhubCollector
 from knowledge.sources.fmp import FmpCollector
 from knowledge.sources.fred import FredCollector
+from knowledge.sources.jin10 import Jin10CalendarCollector, Jin10FlashCollector, beijing_to_utc
 from knowledge.sources.registry import COLLECTORS, UnknownCollector, collector_for
+from knowledge.sources.twse import TwseOpenApiCollector, number, roc_date, roc_month_end
 from tests.conftest import FakeResponse, http_error
 
 NOW = datetime(2026, 9, 4, 12, 0, tzinfo=UTC)
@@ -537,3 +542,469 @@ def test_a_pull_lands_in_the_fact_book_and_bridges_to_a1(tmp_path):
         assert fact is not None and fact.value == Decimal("23434000000")
         assert store.as_known_at("XNAS:AAPL", "net_income", date(2026, 7, 15)) is None
         assert book.documents("XNAS:AAPL", kind="transcript")
+
+
+# --- Jin10 ---------------------------------------------------------------------------------
+
+JIN10_FLASH = {
+    "status": 200,
+    "data": [
+        {
+            "id": 3001,
+            "time": "2026-09-04 21:30:05",
+            "type": 0,
+            "important": 1,
+            "tags": ["美联储", "美国"],
+            "data": {"content": "<b>美国8月非农就业人口</b> 增加 14.2万人，预期16万人。"},
+        },
+        {"id": 3002, "time": "2026-09-01 08:00:00", "type": 0, "data": {"content": "too old"}},
+        {"id": 3003, "time": "2026-09-04 09:00:00", "type": 1, "data": {"pic": "x.png"}},
+    ],
+}
+
+
+def test_beijing_time_becomes_utc():
+    when = beijing_to_utc("2026-09-04 21:30:05")
+    assert when == datetime(2026, 9, 4, 13, 30, 5, tzinfo=UTC)
+    assert beijing_to_utc("") is None and beijing_to_utc("not a time") is None
+
+
+def test_jin10_flash_keeps_recent_items_as_chinese_articles_with_tags_stripped():
+    c = Jin10FlashCollector(clock=CLOCK, opener=router({"flash-api": JIN10_FLASH}))
+    pull = c.collect(SINCE)
+    (a,) = pull.articles  # the old one is before SINCE; the picture has no text
+    assert a.doc_id == "jin10:3001" and a.language == "zh" and a.source_domain == "jin10.com"
+    assert "<b>" not in a.body and "非农" in a.body
+    assert "important" in a.themes and "美联储" in a.themes
+    assert a.published_at == datetime(2026, 9, 4, 13, 30, 5, tzinfo=UTC)
+    assert c.requests == 1 and pull.requests == 1
+
+
+def test_jin10_flash_sends_the_app_headers_and_refuses_a_non_200_status():
+    seen = {}
+
+    def opener(req, timeout=None):
+        seen.update(req.headers)
+        return FakeResponse(json.dumps({"status": 403, "message": "forbidden"}))
+
+    with pytest.raises(SourceError, match="refused"):
+        Jin10FlashCollector(clock=CLOCK, opener=opener).collect(SINCE)
+    assert seen.get("X-app-id") == "bVBF4FyRTn5NJF5n" and seen.get("X-version") == "1.0.0"
+    assert seen.get("User-agent", "").startswith("finplanet-analyst-mind/")
+
+
+def test_jin10_flash_html_is_a_failure_not_a_quiet_day():
+    c = Jin10FlashCollector(clock=CLOCK, opener=router({"flash-api": "<html>captive</html>"}))
+    with pytest.raises(SourceError, match="non-JSON"):
+        c.collect(SINCE)
+
+
+JIN10_CAL = [
+    {
+        "id": 501,
+        "country": "美国",
+        "name": "8月季调后非农就业人口(万人)",
+        "pub_time": "2026-09-04 20:30:00",
+        "actual": "14.2",
+        "consensus": "16",
+        "previous": "7.3",
+        "revised": "",
+        "star": 3,
+        "unit": "万人",
+        "time_period": "8月",
+    },
+    {
+        "id": 502,
+        "country": "欧元区",
+        "name": "第二季度GDP年率终值",
+        "pub_time": "2026-09-04 17:00:00",
+        "actual": "",
+        "consensus": "1.4",
+        "previous": "1.5",
+        "star": 2,
+    },
+    {"id": 503, "country": "日本", "name": "", "pub_time": "2026-09-04 07:30:00"},
+]
+
+
+def test_jin10_calendar_splits_scheduled_releases_from_prints_and_keeps_the_surprise():
+    c = Jin10CalendarCollector(clock=CLOCK, opener=router({"economics.json": JIN10_CAL}))
+    pull = c.collect(SINCE)
+    kinds = {e.event_id: e.kind for e in pull.events}
+    assert kinds == {"501:print": "macro_print", "502:scheduled": "macro_release"}
+    printed = next(e for e in pull.events if e.kind == "macro_print")
+    assert printed.instrument_id == "MACRO:美国"
+    assert printed.announced_at == datetime(2026, 9, 4, 12, 30, tzinfo=UTC)
+    assert printed.payload["actual"] == "14.2" and printed.payload["surprise"] == "-1.8"
+    assert "vs 16 expected" in printed.title
+    scheduled = next(e for e in pull.events if e.kind == "macro_release")
+    assert scheduled.payload["consensus"] == "1.4" and "consensus 1.4" in scheduled.title
+    assert c.requests == 1
+
+
+def test_jin10_calendar_falls_back_to_the_older_path_and_reports_when_neither_answers():
+    calls = []
+
+    def opener(req, timeout=None):
+        calls.append(req.full_url)
+        if "datas" not in req.full_url:
+            raise http_error(404)
+        return FakeResponse(json.dumps({"data": JIN10_CAL[:1]}))
+
+    pull = Jin10CalendarCollector(clock=CLOCK, opener=opener).collect(SINCE)
+    assert len(pull.events) == 1 and "/datas/2026/0904/economics.json" in calls[-1]
+
+    seen = {}
+
+    def nothing(req, timeout=None):
+        seen.update(req.headers)
+        raise http_error(404)
+
+    with pytest.raises(SourceError, match="no calendar path answered") as exc:
+        Jin10CalendarCollector(clock=CLOCK, opener=nothing).collect(SINCE)
+    assert "web_data" in str(exc.value) and "datas" in str(exc.value), "every path tried is named"
+    assert seen.get("Referer") == "https://rili.jin10.com/"
+
+
+def test_jin10_calendar_retires_a_host_whose_name_does_not_resolve_and_groups_the_verdicts():
+    calls = []
+
+    def opener(req, timeout=None):
+        calls.append(req.full_url)
+        if req.full_url.startswith("https://cdn-rili."):
+            raise urllib.error.URLError("[Errno -2] Name or service not known")
+        raise http_error(404)
+
+    c = Jin10CalendarCollector(clock=CLOCK, opener=opener, sleep=lambda _s: None)
+    with pytest.raises(SourceError, match="no calendar path answered") as exc:
+        c.collect(SINCE)
+    cdn = {u for u in calls if "cdn-rili" in u}  # a set: the retry loop re-asks the same URL
+    assert len(cdn) == 1, "one DNS failure retires the host; its other paths are not asked"
+    assert len({u for u in calls if u.startswith("https://rili.")}) == 2
+    msg = str(exc.value)
+    assert "cdn-rili.jin10.com: name does not resolve" in msg
+    assert "rili.jin10.com: HTTP 404 at /datas/2026/0904/economics.json" in msg
+    assert "/web_data/2026/daily/09/04/economics.json" in msg
+    assert "network tab" in msg, "the failure says how to find the new path"
+
+
+# --- DBnomics ------------------------------------------------------------------------------
+
+
+def _dbn_doc(provider, dataset, code, periods, values):
+    return {
+        "provider_code": provider,
+        "dataset_code": dataset,
+        "series_code": code,
+        "period": periods,
+        "value": values,
+    }
+
+
+def test_dbnomics_stores_known_series_and_names_the_ones_the_api_does_not_know():
+    series = DbnomicsCollector.__init__.__defaults__  # noqa: F841 - default list is the module's
+    from knowledge.sources.dbnomics import SERIES
+
+    two = SERIES[:2]
+    good = _dbn_doc("IMF", "PCPS", "M.W00.PPOIL.USD", ["2026-06", "2026-07"], [905.2, 921.0])
+    answers = iter(
+        [
+            {"series": {"docs": [good]}},  # the bulk call knows one of two
+            {"series": {"docs": []}},  # the retry for the other still does not
+        ]
+    )
+    c = DbnomicsCollector(
+        series=two,
+        clock=CLOCK,
+        opener=lambda req, timeout=None: FakeResponse(json.dumps(next(answers))),
+    )
+    pull = c.collect(SINCE)
+    assert {p.series_id for p in pull.series} == {"DBN:PALM_OIL_USD"}
+    assert pull.series[-1].obs_date == date(2026, 7, 1) and pull.series[-1].value == Decimal(
+        "921.0"
+    )
+    assert pull.series[-1].known_at == NOW.date() and pull.series[-1].payload["title"].startswith(
+        "Palm oil"
+    )
+    assert pull.notes == [
+        "dbnomics: no series IMF/PCPS/M.W00.PALUM.USD (check the code on db.nomics.world)"
+    ]
+    assert c.requests == 2
+
+
+def test_dbnomics_reads_quarterly_and_annual_periods_and_fails_when_nothing_answers():
+    from knowledge.sources.dbnomics import SERIES, _period_to_day
+
+    assert _period_to_day("2026-Q2") == "2026-04-01" and _period_to_day("2025") == "2025-01-01"
+    assert (
+        _period_to_day("2026-07") == "2026-07-01" and _period_to_day("2026-07-15") == "2026-07-15"
+    )
+    c = DbnomicsCollector(
+        series=SERIES[:1], clock=CLOCK, opener=router({"db.nomics": {"series": {"docs": []}}})
+    )
+    with pytest.raises(SourceError, match="none of the configured series"):
+        c.collect(SINCE)
+
+
+def test_dbnomics_relays_the_apis_own_error_message():
+    c = DbnomicsCollector(clock=CLOCK, opener=router({"db.nomics": {"message": "Bad request"}}))
+    with pytest.raises(SourceError, match="Bad request"):
+        c.collect(SINCE)
+
+
+# --- FRED release calendar -------------------------------------------------------------------
+
+
+def test_fred_adds_the_release_calendar_as_macro_events_and_survives_its_absence():
+    def opener(req, timeout=None):
+        if "releases/dates" in req.full_url:
+            return FakeResponse(
+                json.dumps(
+                    {
+                        "release_dates": [
+                            {
+                                "release_id": 10,
+                                "release_name": "Consumer Price Index",
+                                "date": "2026-09-10",
+                            },
+                            {
+                                "release_id": 50,
+                                "release_name": "Employment Situation",
+                                "date": "2026-09-01",
+                            },
+                            {
+                                "release_id": 18,
+                                "release_name": "H.15 Selected Interest Rates",
+                                "date": "2026-09-08",
+                            },
+                        ]
+                    }
+                )
+            )
+        return FakeResponse(json.dumps({"observations": [{"date": "2026-09-01", "value": "4.33"}]}))
+
+    c = FredCollector(series={"DFF": "fed funds"}, key="k", clock=CLOCK, opener=opener)
+    pull = c.collect(SINCE, slot="us_preopen")
+    (e,) = pull.events  # 09-01 is in the past relative to NOW; H.15 is not a major release
+    assert e.instrument_id == "MACRO:US" and e.kind == "macro_release"
+    assert e.event_id == "fred:10:2026-09-10" and e.title == "Consumer Price Index"
+    assert e.payload["time"] == "not published by FRED"
+    # the observations body answering the calendar call is a note, not a failure
+    c2 = FredCollector(
+        series={"DFF": "fed funds"},
+        key="k",
+        clock=CLOCK,
+        opener=router({"fred": {"observations": [{"date": "2026-09-01", "value": "4.33"}]}}),
+    )
+    pull2 = c2.collect(SINCE)
+    assert len(pull2.series) == 1 and pull2.notes == [
+        "release calendar: no release_dates list in the reply"
+    ]
+    # the us_close slot does not read the calendar at all
+    c3 = FredCollector(series={"DFF": "x"}, key="k", clock=CLOCK, opener=opener)
+    assert c3.collect(SINCE, slot="us_close").events == [] and c3.requests == 1
+
+
+# --- TWSE OpenAPI ----------------------------------------------------------------------------
+
+
+def test_roc_dates_and_twse_numbers_normalise():
+    assert roc_date("1150905") == date(2026, 9, 5) and roc_date("115/09/05") == date(2026, 9, 5)
+    assert roc_date("") is None and roc_date("2026-09-05") is None
+    assert roc_month_end("11508") == date(2026, 8, 31) and roc_month_end("11513") is None
+    assert number("1,234.5") == Decimal("1234.5") and number("－") is None and number("--") is None
+
+
+TWSE_VAL = [
+    {
+        "Date": "1150904",
+        "Code": "2330",
+        "Name": "台積電",
+        "PEratio": "24.10",
+        "DividendYield": "1.20",
+        "PBratio": "6.30",
+    },
+    {
+        "Date": "1150904",
+        "Code": "2317",
+        "Name": "鴻海",
+        "PEratio": "12.0",
+        "DividendYield": "3.0",
+        "PBratio": "1.5",
+    },
+]
+TWSE_REV = [
+    {
+        "出表日期": "1150905",
+        "資料年月": "11508",
+        "公司代號": "2330",
+        "公司名稱": "台積電",
+        "產業別": "24",
+        "營業收入-當月營收": "250,000,000",
+        "營業收入-上月營收": "240,000,000",
+        "營業收入-去年當月營收": "200,000,000",
+        "營業收入-上月比較增減(%)": "4.17",
+        "營業收入-去年同月增減(%)": "25.00",
+        "累計營業收入-當月累計營收": "1,900,000,000",
+    }
+]
+TWSE_DAY = [
+    {
+        "Date": "1150904",
+        "Code": "2330",
+        "Name": "台積電",
+        "TradeVolume": "30,123,456",
+        "ClosingPrice": "1,105.00",
+    }
+]
+
+
+def test_twse_reads_the_three_tables_for_the_read_only_names_only():
+    c = TwseOpenApiCollector(
+        clock=CLOCK,
+        opener=router({"BWIBBU_ALL": TWSE_VAL, "t187ap05_L": TWSE_REV, "STOCK_DAY_ALL": TWSE_DAY}),
+    )
+    pull = c.collect(SINCE, ("XTAI:2330", "XNAS:NVDA"))
+    by = {o.concept: o for o in pull.observations}
+    assert set(by) == {
+        "pe_ttm",
+        "pb",
+        "dividend_yield",
+        "revenue_month",
+        "revenue_yoy",
+        "revenue_mom",
+        "close",
+        "volume",
+    }
+    assert all(o.instrument_id == "XTAI:2330" for o in pull.observations)
+    assert by["revenue_month"].value == Decimal("250000000000") and by[
+        "revenue_month"
+    ].period_end == date(2026, 8, 31)
+    assert by["revenue_yoy"].value == Decimal("25.00") and by["pe_ttm"].period_end == date(
+        2026, 9, 4
+    )
+    assert by["close"].value == Decimal("1105.00") and by["close"].currency == "TWD"
+    assert c.requests == 3
+
+
+def test_twse_makes_no_request_without_a_taiwan_name_and_fails_only_when_every_table_does():
+    c = TwseOpenApiCollector(clock=CLOCK, opener=router({}))
+    assert c.collect(SINCE, ("XNAS:NVDA",)).fetched == 0 and c.requests == 0
+    partial = TwseOpenApiCollector(
+        clock=CLOCK,
+        opener=router(
+            {"BWIBBU_ALL": TWSE_VAL, "t187ap05_L": "<html>", "STOCK_DAY_ALL": http_error(500)}
+        ),
+    )
+    pull = partial.collect(SINCE, ("XTAI:2330",))
+    assert {o.concept for o in pull.observations} == {"pe_ttm", "pb", "dividend_yield"}
+    assert len(pull.notes) == 2 and any("revenue" in n for n in pull.notes)
+    dead = TwseOpenApiCollector(clock=CLOCK, opener=router({"twse": http_error(500)}))
+    with pytest.raises(SourceError, match="every TWSE table failed"):
+        dead.collect(SINCE, ("XTAI:2330",))
+
+
+# --- FinMind ---------------------------------------------------------------------------------
+
+
+def _finmind_router(seen: dict):
+    def opener(req, timeout=None):
+        seen.setdefault("auth", []).append(req.headers.get("Authorization"))
+        url = req.full_url
+        if "TaiwanStockMonthRevenue" in url:
+            body = {
+                "status": 200,
+                "data": [
+                    {
+                        "date": "2026-08-01",
+                        "stock_id": "2330",
+                        "revenue": 250000000000,
+                        "revenue_year": 2026,
+                        "revenue_month": 8,
+                    }
+                ],
+            }
+        elif "TaiwanStockFinancialStatements" in url:
+            body = {
+                "status": 200,
+                "data": [
+                    {
+                        "date": "2026-06-30",
+                        "stock_id": "2330",
+                        "type": "EPS",
+                        "value": 15.36,
+                        "origin_name": "基本每股盈餘",
+                    },
+                    {
+                        "date": "2026-06-30",
+                        "stock_id": "2330",
+                        "type": "Revenue",
+                        "value": 933000000000,
+                        "origin_name": "營業收入",
+                    },
+                    {"date": "2026-06-30", "stock_id": "2330", "type": "SomethingElse", "value": 1},
+                ],
+            }
+        elif "InstitutionalInvestors" in url:
+            body = {
+                "status": 200,
+                "data": [
+                    {
+                        "date": "2026-09-03",
+                        "stock_id": "2330",
+                        "name": "Foreign_Investor",
+                        "buy": 5000,
+                        "sell": 3000,
+                    },
+                    {
+                        "date": "2026-09-03",
+                        "stock_id": "2330",
+                        "name": "Dealer_self",
+                        "buy": 1,
+                        "sell": 2,
+                    },
+                ],
+            }
+        else:
+            raise AssertionError(url)
+        return FakeResponse(json.dumps(body))
+
+    return opener
+
+
+def test_finmind_reads_three_datasets_per_name_keyless_and_sends_the_token_when_set(monkeypatch):
+    monkeypatch.delenv("FINMIND_TOKEN", raising=False)
+    seen: dict = {}
+    c = FinMindCollector(clock=CLOCK, opener=_finmind_router(seen))
+    pull = c.collect(SINCE, ("XTAI:2330",))
+    by = {o.concept: o for o in pull.observations}
+    assert set(by) == {"revenue_month", "eps", "revenue", "foreign_net_buy"}
+    assert by["foreign_net_buy"].value == Decimal(2000) and by["eps"].period_end == date(
+        2026, 6, 30
+    )
+    assert by["eps"].known_at == NOW.date(), (
+        "a statement is knowable when fetched, not on its period end"
+    )
+    assert c.requests == 3 and seen["auth"] == [None, None, None]
+    monkeypatch.setenv("FINMIND_TOKEN", "t-not-real")
+    seen2: dict = {}
+    FinMindCollector(clock=CLOCK, opener=_finmind_router(seen2)).collect(SINCE, ("XTAI:2330",))
+    assert seen2["auth"] == ["Bearer t-not-real"] * 3
+
+
+def test_finmind_quota_answer_is_a_note_and_no_taiwan_name_means_no_request():
+    body = {"status": 402, "msg": "Your quota is exceeded"}
+    c = FinMindCollector(clock=CLOCK, opener=router({"finmindtrade": body}))
+    pull = c.collect(SINCE, ("XTAI:2330",))
+    assert pull.fetched == 0 and len(pull.notes) == 3 and all("quota" in n for n in pull.notes)
+    assert (
+        FinMindCollector(clock=CLOCK, opener=router({})).collect(SINCE, ("MYX:1155",)).fetched == 0
+    )
+
+
+def test_every_new_collector_is_registered_and_catalogued():
+    from knowledge.sources.catalog import CATALOG
+
+    for name in ("jin10_flash", "jin10_calendar", "dbnomics", "twse_openapi", "finmind"):
+        assert name in COLLECTORS and name in CATALOG, name
+        assert collector_for(name).name == name

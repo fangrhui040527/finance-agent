@@ -122,15 +122,17 @@ def test_the_pack_carries_every_section_and_writes_where_told(tmp_path):
     assert "NOTHING COLLECTED" in text and "NO MACRO SERIES" in text, "empty stores say so"
     assert "- none yet" in text
     path = write_pack(text, DAY, tmp_path / "fb")
-    assert path.name == "2026-09-04.pack.md" and path.read_text().startswith("# Feedback pack")
+    assert path.name == "2026-09-04.pack.md" and path.read_text(encoding="utf-8").startswith(
+        "# Feedback pack"
+    )
 
 
 def test_previous_pages_are_listed_newest_three_before_the_day(tmp_path):
     fb = tmp_path / "fb"
     fb.mkdir()
     for d in ("2026-08-30", "2026-09-01", "2026-09-02", "2026-09-03", "2026-09-04", "2026-09-05"):
-        (fb / f"{d}.md").write_text("# x")
-    (fb / "README.md").write_text("# not a page")
+        (fb / f"{d}.md").write_text("# x", encoding="utf-8")
+    (fb / "README.md").write_text("# not a page", encoding="utf-8")
     text = build_pack(
         Cfg(),
         DAY,

@@ -121,7 +121,7 @@ def aliases() -> dict[str, str]:
     """
     if not ENTITIES_FILE.exists():
         return {}
-    raw = yaml.safe_load(ENTITIES_FILE.read_text()) or {}
+    raw = yaml.safe_load(ENTITIES_FILE.read_text(encoding="utf-8")) or {}
     out: dict[str, str] = {}
     for iid, surfaces in (raw.get("companies") or {}).items():
         out[fold(iid)] = iid
@@ -145,7 +145,7 @@ def display_names() -> dict[str, str]:
     """
     if not ENTITIES_FILE.exists():
         return {}
-    raw = yaml.safe_load(ENTITIES_FILE.read_text()) or {}
+    raw = yaml.safe_load(ENTITIES_FILE.read_text(encoding="utf-8")) or {}
     out: dict[str, str] = {}
     for iid, surfaces in (raw.get("companies") or {}).items():
         if not surfaces:

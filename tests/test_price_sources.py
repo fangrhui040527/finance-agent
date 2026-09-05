@@ -44,7 +44,7 @@ def days(n: int) -> list[Bar]:
 def test_the_moomoo_source_never_imports_a_trade_context():
     """The whole safety argument for this module is what it imports. A comment
     saying so is not enforcement; reading the file is."""
-    text = (ROOT / "markets" / "sources" / "moomoo_quotes.py").read_text()
+    text = (ROOT / "markets" / "sources" / "moomoo_quotes.py").read_text(encoding="utf-8")
     code = "\n".join(line for line in text.splitlines() if not line.lstrip().startswith("#"))
     body = code.split('"""', 2)[-1]  # drop the module docstring
     for banned in (
@@ -68,7 +68,7 @@ def test_the_quote_context_is_the_only_thing_imported_from_moomoo():
     that line - what is asserted is what is IMPORTED, not how the line is
     annotated.
     """
-    text = (ROOT / "markets" / "sources" / "moomoo_quotes.py").read_text()
+    text = (ROOT / "markets" / "sources" / "moomoo_quotes.py").read_text(encoding="utf-8")
     imports = [
         line.split("#")[0].strip()
         for line in text.splitlines()

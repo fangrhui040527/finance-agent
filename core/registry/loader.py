@@ -111,7 +111,7 @@ class Registry:
 def load(
     path: str | Path, evals_root: str | Path | None = None, enforce_ratchet: bool = True
 ) -> Registry:
-    raw = yaml.safe_load(Path(path).read_text())
+    raw = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
     if not isinstance(raw, dict) or "version" not in raw:
         raise RegistryError(f"{path} is not a capability registry")
 
@@ -167,7 +167,7 @@ def check_suite(path: Path, agent_id: str) -> dict:
             "(docs/07 P17): a capability you cannot measure is a capability you cannot "
             "safely change later."
         )
-    suite = yaml.safe_load(path.read_text()) or {}
+    suite = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
     cases = suite.get("cases") or []
     if len(cases) < MIN_EVAL_CASES:
         raise RatchetError(

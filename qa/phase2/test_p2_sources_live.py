@@ -87,7 +87,10 @@ def test_yahoo_ticker_feed_returns_summaries_for_a_bursa_and_a_us_name():
 
 
 @pytest.mark.network
-@pytest.mark.parametrize("name", ["thestar_business", "edge_malaysia", "bernama_business", "fmt_business", "nst_business"])
+@pytest.mark.parametrize(
+    "name",
+    ["thestar_business", "edge_malaysia", "bernama_business", "fmt_business", "nst_business"],
+)
 def test_each_malaysian_rss_candidate_is_a_feed_or_says_where_the_feed_is(name):
     """An ENABLED feed must serve dated items. A registered candidate that is
     not enabled is measured, not judged: it passes the day it answers with
@@ -130,7 +133,11 @@ def test_edgar_submissions_answer_with_the_contact_user_agent():
 
     pull = EdgarFilings().collect(SINCE - timedelta(days=30), ("XNAS:AAPL",))
     assert pull.events, "no AAPL filings in 32 days is not plausible"
-    assert all(e.payload.get("url", "").startswith("https://www.sec.gov/Archives/") for e in pull.events if e.payload.get("url"))
+    assert all(
+        e.payload.get("url", "").startswith("https://www.sec.gov/Archives/")
+        for e in pull.events
+        if e.payload.get("url")
+    )
 
 
 @pytest.mark.network
@@ -221,3 +228,82 @@ def test_fred_answers_every_series_in_the_list():
 
     pull = FredCollector().collect(SINCE)
     assert {p.series_id for p in pull.series} == set(SERIES), pull.notes
+
+
+# --- 2026-09-05: the four sites, by their free routes ----------------------------------------
+
+
+@pytest.mark.network
+def test_jin10_flash_answers_with_dated_chinese_items():
+    if not reachable("flash-api.jin10.com"):
+        pytest.skip("flash-api.jin10.com unreachable")
+    from knowledge.sources.jin10 import Jin10FlashCollector
+
+    pull = Jin10FlashCollector().collect(SINCE)
+    assert pull.requests == 1
+    assert pull.articles, (
+        "Jin10 publishes hundreds of flashes a day; none in 48h means the endpoint moved"
+    )
+    assert all(a.language == "zh" and a.published_at.tzinfo for a in pull.articles)
+
+
+@pytest.mark.network
+def test_jin10_calendar_answers_with_todays_releases():
+    """Registered, not enabled (2026-09-05): the CDN host is out of DNS and
+    rili.jin10.com answers 404 on every documented path. The test stays so the
+    day a path answers again is noticed; until then it xfails naming each
+    host's verdict, which is the same line the probe prints."""
+    if not reachable("cdn-rili.jin10.com") and not reachable("rili.jin10.com"):
+        pytest.skip("jin10 calendar hosts unreachable")
+    from knowledge.sources.base import SourceError
+    from knowledge.sources.jin10 import Jin10CalendarCollector
+
+    try:
+        pull = Jin10CalendarCollector().collect(SINCE)
+    except SourceError as e:
+        if "no calendar path answered" in str(e):
+            pytest.xfail(f"the calendar document has moved: {e}")
+        raise
+    assert pull.events, "a weekday calendar with no release at all is not plausible"
+    assert all(e.instrument_id.startswith("MACRO:") for e in pull.events)
+
+
+@pytest.mark.network
+def test_dbnomics_answers_the_starter_list_and_names_what_it_does_not_know():
+    """Each id in the starter list is a best reading of the provider's codes;
+    this test is how the list is pruned. It passes when at least half answer
+    and prints the notes for the rest."""
+    if not reachable("api.db.nomics.world"):
+        pytest.skip("api.db.nomics.world unreachable")
+    from knowledge.sources.dbnomics import SERIES, DbnomicsCollector
+
+    pull = DbnomicsCollector().collect(SINCE)
+    answered = {p.series_id for p in pull.series}
+    assert len(answered) * 2 >= len(SERIES), f"answered {sorted(answered)}; notes {pull.notes}"
+    if pull.notes:
+        pytest.xfail(f"{len(pull.notes)} id(s) to fix in the starter list: {pull.notes}")
+
+
+@pytest.mark.network
+def test_twse_openapi_answers_for_tsmc():
+    if not reachable("openapi.twse.com.tw"):
+        pytest.skip("openapi.twse.com.tw unreachable")
+    from knowledge.sources.twse import TwseOpenApiCollector
+
+    pull = TwseOpenApiCollector().collect(SINCE, ("XTAI:2330",))
+    concepts = {o.concept for o in pull.observations}
+    assert {"pe_ttm", "revenue_month", "close"} <= concepts, (concepts, pull.notes)
+    assert pull.requests == 3
+
+
+@pytest.mark.network
+def test_finmind_answers_for_tsmc_keyless_or_names_its_quota():
+    if not reachable("api.finmindtrade.com"):
+        pytest.skip("api.finmindtrade.com unreachable")
+    from knowledge.sources.finmind import FinMindCollector
+
+    pull = FinMindCollector().collect(SINCE, ("XTAI:2330",))
+    if not pull.observations and pull.notes and all("quota" in n for n in pull.notes):
+        pytest.xfail(f"FinMind quota for this runner's address is spent: {pull.notes[0][:120]}")
+    concepts = {o.concept for o in pull.observations}
+    assert "revenue_month" in concepts, (concepts, pull.notes)

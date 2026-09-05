@@ -25,9 +25,12 @@ def write(tmp_path, agents, knowledge=None, suites=None):
     (tmp_path / "agents").mkdir(exist_ok=True)
     (tmp_path / "evals").mkdir(exist_ok=True)
     for name, cases in (suites or {}).items():
-        (tmp_path / "evals" / name).write_text(yaml.safe_dump({"cases": cases}))
+        (tmp_path / "evals" / name).write_text(yaml.safe_dump({"cases": cases}), encoding="utf-8")
     path = tmp_path / "agents" / "registry.yaml"
-    path.write_text(yaml.safe_dump({"version": 1, "agents": agents, "knowledge": knowledge or {}}))
+    path.write_text(
+        yaml.safe_dump({"version": 1, "agents": agents, "knowledge": knowledge or {}}),
+        encoding="utf-8",
+    )
     return path
 
 
@@ -148,7 +151,7 @@ def test_a_near_miss_failure_disqualifies_however_high_the_headline_rate(tmp_pat
         {"name": "n1", "expect": "refuse", "negative": True, "near_miss": True},
         {"name": "n2", "expect": "refuse", "negative": True},
     ]
-    (tmp_path / "s.yaml").write_text(yaml.safe_dump({"cases": cases}))
+    (tmp_path / "s.yaml").write_text(yaml.safe_dump({"cases": cases}), encoding="utf-8")
     r = run_suite(
         tmp_path / "s.yaml", "a99", lambda c: "answer" if c["expect"] == "answer" else "answer"
     )
@@ -158,13 +161,13 @@ def test_a_near_miss_failure_disqualifies_however_high_the_headline_rate(tmp_pat
 
 
 def test_a_clean_run_passes(tmp_path):
-    (tmp_path / "s.yaml").write_text(yaml.safe_dump({"cases": good_cases()}))
+    (tmp_path / "s.yaml").write_text(yaml.safe_dump({"cases": good_cases()}), encoding="utf-8")
     r = run_suite(tmp_path / "s.yaml", "a99", lambda c: c["expect"])
     assert r.ok() and r.failed == 0
 
 
 def test_a_crash_is_scored_as_a_failure_not_an_error(tmp_path):
-    (tmp_path / "s.yaml").write_text(yaml.safe_dump({"cases": good_cases()}))
+    (tmp_path / "s.yaml").write_text(yaml.safe_dump({"cases": good_cases()}), encoding="utf-8")
 
     def boom(case):
         raise RuntimeError("kaboom")

@@ -11,11 +11,15 @@ from knowledge.sources.alphavantage import AlphaVantageNews
 from knowledge.sources.base import Collector
 from knowledge.sources.bnm import BnmOprCollector
 from knowledge.sources.bursa import BursaAnnouncements
+from knowledge.sources.dbnomics import DbnomicsCollector
 from knowledge.sources.dosm import DosmCpiCollector
 from knowledge.sources.edgar import EdgarFilings
+from knowledge.sources.finmind import FinMindCollector
 from knowledge.sources.finnhub import FinnhubCollector
 from knowledge.sources.fmp import FmpCollector
 from knowledge.sources.fred import FredCollector
+from knowledge.sources.jin10 import Jin10CalendarCollector, Jin10FlashCollector
+from knowledge.sources.twse import TwseOpenApiCollector
 
 
 class UnknownCollector(ValueError):
@@ -31,6 +35,11 @@ COLLECTORS: dict[str, type[Collector]] = {
     "dosm_cpi": DosmCpiCollector,
     "edgar": EdgarFilings,
     "bursa_announcements": BursaAnnouncements,
+    "jin10_flash": Jin10FlashCollector,
+    "jin10_calendar": Jin10CalendarCollector,
+    "dbnomics": DbnomicsCollector,
+    "twse_openapi": TwseOpenApiCollector,
+    "finmind": FinMindCollector,
 }
 
 

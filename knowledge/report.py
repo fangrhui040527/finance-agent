@@ -81,8 +81,12 @@ def fact_snapshot(
 
         try:
             mic = mic_of(instrument_id)
+            # Per-name news feeds, plus any market-bound collector (the Taiwan
+            # sources name XTAI and run for the read-only names).
             covering = [
-                s.name for s in catalog.CATALOG.values() if s.per_instrument and s.covers(mic)
+                s.name
+                for s in catalog.CATALOG.values()
+                if (s.per_instrument or s.markets) and s.covers(mic)
             ]
         except ValueError:
             covering = []
@@ -126,4 +130,40 @@ def macro_context(book: FactBook, series_id: str = "", points: int = 5) -> str:
             f"    {sid:<16} {_fmt(latest.value):>12}  {latest.obs_date}  "
             f"{'+' if change >= 0 else ''}{_fmt(change)}  {title}"
         )
+    rows += macro_calendar(book)
     return "\n".join(rows)
+
+
+def macro_calendar(book: FactBook, now: datetime | None = None, days: int = 7) -> list[str]:
+    """Prints of the last day and releases of the next `days`, from the
+    `MACRO:<country>` events the Jin10 calendar and FRED's release dates leave
+    in the fact book. Empty when neither has run: nothing is invented."""
+    now = now or datetime.now(UTC)
+    out: list[str] = []
+    prints = [
+        e
+        for e in book.events(kind="macro_print", since=now - timedelta(days=1), until=now, limit=60)
+        if e.instrument_id.startswith("MACRO:")
+    ]
+    if prints:
+        out += ["", "prints, last 24h (actual vs consensus)"]
+        for e in sorted(prints, key=lambda e: e.announced_at):
+            star = e.payload.get("star")
+            out.append(
+                f"    {e.announced_at:%m-%d %H:%M}Z  {e.title}"
+                + (f"  [{'*' * int(star)}]" if isinstance(star, int) and star else "")
+            )
+    coming = [
+        e
+        for e in book.events(
+            kind="macro_release", since=now, until=now + timedelta(days=days), limit=120
+        )
+        if e.instrument_id.startswith("MACRO:")
+    ]
+    if coming:
+        out += ["", f"releases, next {days} days"]
+        for e in sorted(coming, key=lambda e: e.announced_at)[:40]:
+            when = e.announced_at
+            stamp = f"{when:%m-%d}" if e.payload.get("time") else f"{when:%m-%d %H:%M}Z"
+            out.append(f"    {stamp:<13} {e.title}  ({e.source})")
+    return out

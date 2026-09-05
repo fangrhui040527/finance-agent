@@ -245,7 +245,7 @@ def test_the_cli_separates_a_dead_link_from_an_empty_account(capsys, monkeypatch
 def test_the_cli_never_writes_config(capsys, monkeypatch):
     """A holdings list feeds every concentration figure here. Changing it must
     be a decision with a diff, not a side effect of looking."""
-    before = pathlib.Path("config.toml").read_text()
+    before = pathlib.Path("config.toml").read_text(encoding="utf-8")
     _gateway(monkeypatch, FakeContext(positions=[BURSA_ROW]))
     _run(["positions"], capsys)
-    assert pathlib.Path("config.toml").read_text() == before
+    assert pathlib.Path("config.toml").read_text(encoding="utf-8") == before

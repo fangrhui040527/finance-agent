@@ -336,7 +336,7 @@ def write_all(run_dir: Path) -> dict:
     events = load(run_dir)
     sfile = run_dir / "summary.json"
     summary = (
-        json.loads(sfile.read_text())
+        json.loads(sfile.read_text(encoding="utf-8"))
         if sfile.exists()
         else {
             "run_id": run_dir.name,
