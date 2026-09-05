@@ -1,6 +1,6 @@
 # Digest 2026-09-05
 
-Generated 2026-09-05 02:29 UTC · slot `all` · 1114 articles in the corpus, 156 observations, 3926 events in the fact book.
+Generated 2026-09-05 12:48 UTC · slot `all` · 1114 articles in the corpus, 156 observations, 3926 events in the fact book.
 
 ## The book
 
@@ -82,6 +82,11 @@ Generated 2026-09-05 02:29 UTC · slot `all` · 1114 articles in the corpus, 156
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 12:48 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 12:48 | fmt_business | ok | 0 | 0 | 0 |  |
+| 12:48 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals, IHH |
+| 12:48 | google_news | ok | 1 | 1 | 0 | read but empty: Press Metal, Maybank, Tenaga, Petronas Chemicals, IHH |
+| 12:48 | gdelt | ok | 3 | 0 | 0 | read but empty: Petronas Chemicals, Press Metal; failed: Genting, Tenaga, IHH |
 | 02:29 | fred | ok | 443 | 0 | 0 | facts 443;  |
 | 02:29 | alphavantage_news | ok | 0 | 0 | 0 | facts 0;  |
 | 02:29 | fmp | ok | 3956 | 0 | 0 | facts 3952; fmp: HTTP 402 for https://financialmodelingprep.com/stable/earnings? |

@@ -1,6 +1,51 @@
 {
   "collection": [
     {
+      "at": "2026-09-05T12:48:44.771134+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-05T12:48:43.016507+00:00",
+      "detail": "",
+      "fetched": 0,
+      "kept": 0,
+      "source": "fmt_business",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-05T12:48:42.784550+00:00",
+      "detail": "read but empty: Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals, IHH",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-05T12:48:40.588569+00:00",
+      "detail": "read but empty: Press Metal, Maybank, Tenaga, Petronas Chemicals, IHH",
+      "fetched": 1,
+      "kept": 1,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-05T12:48:39.108914+00:00",
+      "detail": "read but empty: Petronas Chemicals, Press Metal; failed: Genting, Tenaga, IHH",
+      "fetched": 3,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "ok",
+      "stored": 0
+    },
+    {
       "at": "2026-09-05T02:29:48.905334+00:00",
       "detail": "facts 443; ",
       "fetched": 443,
@@ -109,10 +154,10 @@
     "linked": 605,
     "observations": 156,
     "series": 14,
-    "sweeps": 82
+    "sweeps": 87
   },
   "day": "2026-09-05",
-  "generated_at": "2026-09-05 02:29 UTC",
+  "generated_at": "2026-09-05 12:48 UTC",
   "macro": [
     {
       "change": "-0.01",
