@@ -194,7 +194,7 @@ def test_the_keyless_default_is_still_the_stub_and_names_both_absences(run_cli):
 def test_precedence_as_a_process_anthropic_first_then_the_free_key_then_the_override(run_cli):
     free_only = ok_proc(run_cli(["ask.py", "backend"], env_extra={"GROQ_API_KEY": KEY}))
     assert "OpenAICompatibleBackend" in free_only and "groq" in free_only
-    assert "llama-3.1-8b-instant" in free_only and "effort dial not sent" in free_only
+    assert "openai/gpt-oss-20b" in free_only and "effort dial not sent" in free_only
 
     both = ok_proc(
         run_cli(["ask.py", "backend"], key="sk-ant-qa-not-real", env_extra={"GROQ_API_KEY": KEY})
@@ -224,7 +224,7 @@ def test_the_web_api_and_the_doctor_report_the_free_provider(tmp_path, monkeypat
     assert body["data"]["backend"] == "OpenAICompatibleBackend"
     assert body["data"]["is_stub"] is False
     cheap = body["data"]["tiers"]["cheap"]
-    assert cheap["model"] == "llama-3.1-8b-instant" and cheap["effort"] is None
+    assert cheap["model"] == "openai/gpt-oss-20b" and cheap["effort"] is None
     assert KEY not in json.dumps(body)
 
     doctor = ok_proc(run_cli(["ask.py", "doctor", "--offline"], env_extra={"GROQ_API_KEY": KEY}))
@@ -479,7 +479,7 @@ def test_a_paced_provider_spaces_a_burst_and_an_unpaced_one_never_waits():
         clock=lambda: 0.0,
     )
     for _ in range(3):
-        groq.complete("llama-3.1-8b-instant", "q", None)
+        groq.complete("openai/gpt-oss-20b", "q", None)
     assert sleeps == [2.0, 2.0], "30 a minute is one every two seconds"
 
     idle: list[float] = []

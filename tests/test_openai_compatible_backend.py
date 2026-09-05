@@ -443,7 +443,7 @@ def test_an_unpaced_provider_never_sleeps_between_calls():
 def test_model_for_serves_the_chat_tiers_and_nothing_else():
     b = _backend()
     assert b.model_for(Tier.REASON) == "openai/gpt-oss-120b"
-    assert b.model_for(Tier.CHEAP) == "llama-3.1-8b-instant"
+    assert b.model_for(Tier.CHEAP) == "openai/gpt-oss-20b"
     assert b.model_for(Tier.EMBED) is None
     assert b.model_for(Tier.LOCAL) is None
 
