@@ -103,7 +103,8 @@ def test_gdelt_answers_with_a_list_and_never_with_silence_on_failure(gdelt):
     assert stats.fetched == len(records) and stats.kept == len(articles)
     for a in articles:
         assert a.doc_id.startswith("gdelt:") and a.features is not None
-    assert feed._timespan(datetime.now(timezone.utc)) == "15min", "the documented floor"
+    floor = f"{int(GdeltFeed.MIN_TIMESPAN.total_seconds() // 60)}min"
+    assert feed._timespan(datetime.now(timezone.utc)) == floor, "the floor the adapter documents"
     with pytest.raises(FeedError):
         GdeltFeed(query="x", opener=lambda req, timeout=None: (_ for _ in ()).throw(OSError("down")))\
             .fetch(since, 5)
