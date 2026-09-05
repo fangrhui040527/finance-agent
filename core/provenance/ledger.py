@@ -13,6 +13,7 @@ from __future__ import annotations
 import hashlib
 import json
 import sqlite3
+import time
 from collections.abc import Iterator
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -101,6 +102,43 @@ DEFAULT_FX_MYR_PER_USD = Decimal("4.055")
 DEFAULT_FX_SPREAD_PER_SIDE = Decimal("0.005")
 
 
+def apply_schema(conn: sqlite3.Connection, *scripts: str, timeout_ms: int) -> None:
+    """Run DDL inside one immediate transaction, retrying a lock.
+
+    `CREATE ... IF NOT EXISTS` reads the schema before it writes. Under WAL a
+    statement that began as a reader cannot become a writer once another
+    connection has committed in between: SQLite answers BUSY at once and never
+    consults the busy handler, so several processes opening the same fresh
+    store together can fail with "database is locked" however long the
+    timeout is. The stress suite's eighth writer met exactly that on Windows,
+    where the window is widest. BEGIN IMMEDIATE takes the write lock first,
+    with the busy handler in force, and the whole script commits or none of
+    it does; a lock that outlasts the handler is retried with a short backoff
+    until `timeout_ms` is spent, then raised. Any other error is raised at
+    once, with no transaction left open.
+    """
+    body = "\n".join(s.strip() for s in scripts if s and s.strip())
+    deadline = time.monotonic() + timeout_ms / 1000
+    delay = 0.02
+    while True:
+        try:
+            conn.executescript(f"BEGIN IMMEDIATE;\n{body}\nCOMMIT;")
+            return
+        except sqlite3.OperationalError as e:
+            text = str(e).lower()
+            if conn.in_transaction:
+                try:
+                    conn.execute("ROLLBACK")
+                except sqlite3.OperationalError:
+                    pass
+            if "locked" not in text and "busy" not in text:
+                raise
+            if time.monotonic() >= deadline:
+                raise
+            time.sleep(delay)
+            delay = min(delay * 2, 0.5)
+
+
 def _enable_wal(conn: sqlite3.Connection, path: str, timeout_ms: int) -> None:
     """WAL, so a writing daemon and a reading session coexist.
 
@@ -168,9 +206,9 @@ class ProvenanceLedger:
         self.conn = sqlite3.connect(path, timeout=self.BUSY_TIMEOUT_MS / 1000)
         self.run_id = run_id
         _enable_wal(self.conn, path, self.BUSY_TIMEOUT_MS)
-        self.conn.executescript(SCHEMA)
+        apply_schema(self.conn, SCHEMA, timeout_ms=self.BUSY_TIMEOUT_MS)
         self._migrate()
-        self.conn.executescript(INDEXES)
+        apply_schema(self.conn, INDEXES, timeout_ms=self.BUSY_TIMEOUT_MS)
         self.conn.commit()
 
     def _migrate(self) -> None:

@@ -37,7 +37,7 @@ from datetime import UTC, date, datetime
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
-from core.provenance.ledger import _enable_wal
+from core.provenance.ledger import _enable_wal, apply_schema
 
 FACTS_DB = "data/facts.db"
 
@@ -230,9 +230,15 @@ class FactBook:
         self.conn = sqlite3.connect(path, timeout=self.BUSY_TIMEOUT_MS / 1000)
         self.conn.row_factory = sqlite3.Row
         _enable_wal(self.conn, path, self.BUSY_TIMEOUT_MS)
-        self.conn.executescript(SCHEMA)
-        for table in ("observations", "events", "series", "documents", "pulls"):
-            self.conn.executescript(_GUARDS.format(t=table))
+        apply_schema(
+            self.conn,
+            SCHEMA,
+            *(
+                _GUARDS.format(t=t)
+                for t in ("observations", "events", "series", "documents", "pulls")
+            ),
+            timeout_ms=self.BUSY_TIMEOUT_MS,
+        )
         self.conn.commit()
 
     # -- writes ---------------------------------------------------------------

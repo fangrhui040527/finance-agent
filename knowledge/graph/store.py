@@ -30,7 +30,7 @@ import sqlite3
 from datetime import date
 from pathlib import Path as FsPath
 
-from core.provenance.ledger import _enable_wal
+from core.provenance.ledger import _enable_wal, apply_schema
 from knowledge.graph.entity_graph import (
     Confidence,
     Edge,
@@ -108,8 +108,7 @@ class GraphStore:
             FsPath(path).parent.mkdir(parents=True, exist_ok=True)
         self.conn = sqlite3.connect(path, timeout=self.BUSY_TIMEOUT_MS / 1000)
         _enable_wal(self.conn, path, self.BUSY_TIMEOUT_MS)
-        self.conn.executescript(SCHEMA)
-        self.conn.executescript(INDEXES)
+        apply_schema(self.conn, SCHEMA, INDEXES, timeout_ms=self.BUSY_TIMEOUT_MS)
         self.conn.commit()
 
     # -- writes ---------------------------------------------------------------

@@ -133,7 +133,11 @@ def test_an_unknown_model_is_refused_with_the_variable_that_fixes_it(name, monke
 
 @pytest.mark.skipif(not LIVE, reason="no free-provider key set and no local Ollama")
 def test_ask_backend_as_a_process_names_the_provider_that_will_answer(run_cli):
-    passthrough = {var: os.environ[var] for var in providers.env_vars() if var in os.environ}
+    passthrough = {
+        var: os.environ[var]
+        for var in providers.env_vars()
+        if os.environ.get(var, "").strip()  # an empty variable is not a key
+    }
     proc = run_cli(["ask.py", "backend"], env_extra=passthrough)
     out = proc.stdout + proc.stderr
     assert proc.returncode == 0, out

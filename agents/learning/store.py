@@ -28,7 +28,7 @@ from agents.learning.reflection import (
     Status,
 )
 from core.contracts.provenance_marker import Author, ProvenanceMarker
-from core.provenance.ledger import _enable_wal
+from core.provenance.ledger import _enable_wal, apply_schema
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS predictions (
@@ -109,10 +109,12 @@ class LearningStore:
         # Shared helper: busy_timeout first, then WAL, tolerating a lost race.
         # See core/provenance/ledger._enable_wal for why both matter.
         _enable_wal(self.db, str(self.path), self.BUSY_TIMEOUT_MS)
-        self.db.executescript(SCHEMA)
-        self.db.executescript(
+        apply_schema(
+            self.db,
+            SCHEMA,
             "CREATE INDEX IF NOT EXISTS outcomes_graded_on ON outcomes(graded_on);"
-            "CREATE INDEX IF NOT EXISTS predictions_grade_on ON predictions(grade_on);"
+            "CREATE INDEX IF NOT EXISTS predictions_grade_on ON predictions(grade_on);",
+            timeout_ms=self.BUSY_TIMEOUT_MS,
         )
         self.db.commit()
 

@@ -391,6 +391,10 @@ _CONTEXT_MARKERS: tuple[str, ...] = (
 #: Retry-worthy statuses, the same set the keyless feeds use (core/net/retry.py).
 _TRANSIENT_STATUSES = frozenset({408, 425, 429, 500, 502, 503, 504, 529})
 
+#: What this process calls itself on the wire, matching knowledge/sources/base.py
+#: and the price feeds. A bare "Python-urllib" is refused by some edges.
+USER_AGENT = "finplanet-analyst-mind/0.1 (personal research)"
+
 #: Reasoning models on the open-weight side (DeepSeek-R1, Qwen3, GPT-OSS
 #: through some hosts) put their chain of thought in the reply text between
 #: these tags. It is not the answer, and a JSON parser downstream would find
@@ -543,6 +547,11 @@ class OpenAICompatibleBackend:
         headers: dict[str, str] = {
             "Content-Type": "application/json",
             "Accept": "application/json",
+            # The same identity every other fetcher here sends. Without it urllib
+            # announces itself as "Python-urllib", and at least one provider's
+            # edge (Groq, behind Cloudflare) answers that signature with a 403
+            # error 1010 before the key is ever looked at.
+            "User-Agent": USER_AGENT,
             **self.provider.extra_headers,
         }
         if self._key:
