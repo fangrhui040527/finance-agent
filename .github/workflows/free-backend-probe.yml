@@ -64,6 +64,45 @@ jobs:
             echo "$name: taken from ALL_SECRET"
           done
 
+      # Free lineups rotate: a default model id in the catalogue can retire
+      # between one week and the next, and the backend then answers 404 with
+      # the variable to set. This step prints the ids each keyed provider
+      # serves today, nothing else, so the fix is a lookup rather than a guess.
+      - name: Models each keyed provider serves today
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY || env.GROQ_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+        run: |
+          list() {  # list <provider> <models url> <key>
+            [ -z "$3" ] && return 0
+            echo "### $1"
+            echo '```'
+            curl -sS --max-time 20 \
+              -H "Authorization: Bearer $3" \
+              -H "User-Agent: finplanet-analyst-mind/0.1 (personal research)" \
+              "$2" | python3 -c 'import json,sys
+            try:
+                d = json.load(sys.stdin)
+            except Exception as e:
+                print(f"(not JSON: {e})"); sys.exit(0)
+            rows = d.get("data") or d.get("models") or []
+            ids = sorted(str(r.get("id") or r.get("name") or "") for r in rows if isinstance(r, dict))
+            print("\n".join(i for i in ids if i) or "(no ids in the reply)")' | head -80
+            echo '```'
+          }
+          {
+            echo "## Models served today"
+            echo
+            list groq       "https://api.groq.com/openai/v1/models"        "$GROQ_API_KEY"
+            list openrouter "https://openrouter.ai/api/v1/models"          "$OPENROUTER_API_KEY"
+            list mistral    "https://api.mistral.ai/v1/models"             "$MISTRAL_API_KEY"
+            list nvidia     "https://integrate.api.nvidia.com/v1/models"   "$NVIDIA_API_KEY"
+            list gemini     "https://generativelanguage.googleapis.com/v1beta/openai/models" "$GEMINI_API_KEY"
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+
       - name: Which backend would answer, and what the catalogue holds
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY || env.GROQ_API_KEY }}
