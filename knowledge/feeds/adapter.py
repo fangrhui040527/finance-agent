@@ -256,9 +256,10 @@ class GdeltFeed(FeedAdapter):
          rather than JSON ("your query was too short"), so a decode failure is
          a real failure and is reported as one. An explicitly empty article
          list is NOT a failure - it is a quiet window, and returns [].
-      2. timespan is floored at the documented 15-minute minimum. Asking for
-         less returns an error, and a caller polling on a fast loop would
-         otherwise turn its own impatience into an outage.
+      2. timespan is floored at MIN_TIMESPAN (two hours). The API's own
+         minimum is above 15 minutes and undocumented; asking for less returns
+         an error, and a caller polling on a fast loop would otherwise turn its
+         own impatience into an outage.
     """
 
     name = "gdelt"

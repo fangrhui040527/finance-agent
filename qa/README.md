@@ -98,6 +98,13 @@ on main at 8802d5e; 9 of 14 parts held, one of them core):
   step held inline Python that YAML re-indented into an `IndentationError` (now
   `.github/scripts/model_ids.py`, tested); and the logs artifact skipped the dot-prefixed
   results directory.
+- **Run 2 (main at f48df89, 09:32 UTC): 12 of 14 held**, every core part among them; the
+  keyless part was keyless, Groq answered on `openai/gpt-oss-20b`, the end-to-end thesis ran
+  to its red team. The two live parts that failed did so on one test each: Yahoo's ticker RSS
+  returned no items for Maybank (empty for every Bursa name in every collector sweep; now an
+  xfail naming the source, with `region=MY` as the untried lever), and the GDELT test asserted
+  a 15-minute timespan floor the adapter had raised to two hours on 2026-09-03 (the assertion
+  now reads `MIN_TIMESPAN`; the adapter's docstring said 15 minutes too, and is corrected).
 - **Fixed.** Groq no longer serves `llama-3.1-8b-instant`, the catalogue's cheap default;
   parts 13 and 14 failed with the 404 that names the variable to set. The probe's live list
   (2026-09-05) carried no Llama chat model at all - GPT-OSS 120b/20b, Qwen3.6/3.8 27b, the
