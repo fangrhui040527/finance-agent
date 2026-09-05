@@ -1,0 +1,51 @@
+{
+  "day": "2026-09-05",
+  "written_at": "2026-09-05T09:36:00Z",
+  "phase": "pre",
+  "week": 0,
+  "equity_usd": 1000.0,
+  "cash_usd": 1000.0,
+  "control_equity_usd": 1000.0,
+  "peak_usd": 1000.0,
+  "drawdown": 0.0,
+  "max_drawdown": 0.0,
+  "halted": false,
+  "marks": 2,
+  "fx_myr_per_usd": 4.0383,
+  "fx_source": "bnm",
+  "fx_date": "2026-09-04",
+  "cost_to_date_usd": 0.0,
+  "positions": [],
+  "changes": [],
+  "caps": [
+    {"cap": "largest name", "value": "0.00%", "limit": "25%", "breached": false},
+    {"cap": "invested", "value": "0.00%", "limit": "0%", "breached": false},
+    {"cap": "cash floor", "value": "100.00%", "limit": "20%", "breached": false},
+    {"cap": "names held", "value": "0", "limit": "0", "breached": false},
+    {"cap": "drawdown from peak", "value": "0.00%", "limit": "8% halts entries", "breached": false}
+  ],
+  "fundable": [
+    {"instrument_id": "MYX:5183", "lot_usd": 105.74, "lot_weight": 0.106, "max_lots": 2, "round_trip": 0.0212},
+    {"instrument_id": "MYX:5225", "lot_usd": 196.87, "lot_weight": 0.197, "max_lots": 1, "round_trip": 0.012},
+    {"instrument_id": "MYX:8869", "lot_usd": 198.35, "lot_weight": 0.198, "max_lots": 1, "round_trip": 0.0119},
+    {"instrument_id": "MYX:3182", "lot_usd": 50.52, "lot_weight": 0.051, "max_lots": 4, "round_trip": 0.0429},
+    {"instrument_id": "XNAS:NVDA", "lot_usd": 230.36, "lot_weight": 0.23, "max_lots": 1, "round_trip": 0.0113}
+  ],
+  "attribution": {},
+  "decision": {
+    "recorded": false,
+    "weights": {"MYX:5183": 0.10, "XNAS:NVDA": 0.23},
+    "thesis": "Observe-week rehearsal: the two names whose one lot fits under the 25% cap at USD 1,000 with the lowest round trip among the fundable set; recorded to be graded, not applied.",
+    "horizon_days": 21,
+    "confidence": 0.55,
+    "refusals": [
+      "[start] the book opens on 2026-09-08; nothing is recorded before it",
+      "[lot] MYX:5183: 10.00% is below one lot (USD 105.74 = 10.6% of equity)",
+      "[lot] XNAS:NVDA: 23.00% is below one lot (USD 230.36 = 23.0% of equity)"
+    ]
+  },
+  "mistakes": [],
+  "lessons": [
+    "A target weight has a floor as well as a cap: one lot's share of equity at the last close, which moves with price and FX every session; a weight copied from the previous day's fundable table is refused on a day the close rose"
+  ]
+}
