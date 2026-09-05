@@ -29,6 +29,29 @@ RELEASES_URL = "https://api.stlouisfed.org/fred/releases/dates"
 #: How far ahead the release calendar is read. Two weeks covers every
 #: weekly page's "what to watch" without a second request.
 RELEASE_HORIZON = timedelta(days=14)
+#: FRED lists every release it carries - 371 dates in a fortnight on the first
+#: probe, most of them daily rate tables. Only the ones a book moves on are
+#: kept, matched on the release name so a renumbered id cannot silence one.
+MAJOR_RELEASES: tuple[str, ...] = (
+    "Employment Situation",
+    "Consumer Price Index",
+    "Producer Price Index",
+    "Gross Domestic Product",
+    "Personal Income and Outlays",
+    "Advance Monthly Sales for Retail",
+    "Industrial Production",
+    "New Residential Construction",
+    "Unemployment Insurance Weekly Claims",
+    "Job Openings and Labor Turnover",
+    "FOMC",
+    "Federal Open Market Committee",
+    "Consumer Sentiment",
+    "Employment Cost Index",
+    "Productivity and Costs",
+    "International Trade in Goods and Services",
+    "Import and Export Price",
+    "Consumer Credit",
+)
 
 SERIES: dict[str, str] = {
     "DFF": "Federal funds effective rate, %",
@@ -143,6 +166,8 @@ class FredCollector(Collector):
             day = parse_date(r.get("date"))
             name = str(r.get("release_name") or "").strip()
             if day is None or not name or day < today:
+                continue
+            if not any(m.lower() in name.lower() for m in MAJOR_RELEASES):
                 continue
             pull.events.append(
                 EventRecord(

@@ -48,13 +48,22 @@ from knowledge.news.features import Article
 from knowledge.sources.base import Collector, Pull, SourceError
 
 FLASH_URL = "https://flash-api.jin10.com/get_flash_list"
-#: The two paths the calendar has lived at; the newer CDN first.
+#: The paths the calendar document has been served from, newest guess first.
+#: The first runner probe (2026-09-05) found the two documented ones answering
+#: 404, so the collector walks this list and the failure names every path it
+#: tried; the probe is how the list is pruned to the one that answers.
 CALENDAR_URLS = (
     "https://cdn-rili.jin10.com/web_data/{y}/daily/{m:02d}/{d:02d}/economics.json",
+    "https://cdn-rili.jin10.com/web_data/{y}/daily/{m}/{d}/economics.json",
+    "https://cdn-rili.jin10.com/web_data/{y}/{m:02d}{d:02d}/economics.json",
+    "https://cdn-rili.jin10.com/datas/{y}/{m:02d}{d:02d}/economics.json",
     "https://rili.jin10.com/datas/{y}/{m:02d}{d:02d}/economics.json",
+    "https://rili.jin10.com/web_data/{y}/daily/{m:02d}/{d:02d}/economics.json",
 )
 #: The app id Jin10's own pages send. Public in the page source; not a secret.
 HEADERS = {"x-app-id": "bVBF4FyRTn5NJF5n", "x-version": "1.0.0"}
+#: The calendar CDN serves its pages; a bare fetch may be refused.
+CALENDAR_HEADERS = {"Referer": "https://rili.jin10.com/", "Origin": "https://rili.jin10.com"}
 BEIJING = timezone(timedelta(hours=8))
 MACRO_PREFIX = "MACRO:"
 
@@ -208,20 +217,24 @@ class Jin10CalendarCollector(Collector):
         return pull
 
     def _calendar(self, day) -> list:
-        last: SourceError | None = None
+        tried: list[str] = []
         for template in CALENDAR_URLS:
             url = template.format(y=day.year, m=day.month, d=day.day)
             try:
-                payload = self.get_json(url)
+                payload = self.get_json(url, headers=CALENDAR_HEADERS)
             except SourceError as e:
-                last = e
+                tried.append(f"{url.split('.com', 1)[1]}: {str(e).rsplit(':', 1)[-1].strip()}")
                 continue
             if isinstance(payload, dict):
                 payload = payload.get("data") or payload.get("list") or payload.get("economics")
             if isinstance(payload, list):
                 return payload
-            last = SourceError(f"jin10_calendar: no item list at {url}")
-        raise last or SourceError("jin10_calendar: no calendar path answered")
+            tried.append(f"{url.split('.com', 1)[1]}: no item list")
+        raise SourceError(
+            "jin10_calendar: no calendar path answered for "
+            f"{day} - {' | '.join(tried)}. The document has moved; find the path the page at "
+            "rili.jin10.com loads and add it to CALENDAR_URLS."
+        )
 
 
 def _text(value: Decimal | None) -> str:

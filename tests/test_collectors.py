@@ -646,18 +646,23 @@ def test_jin10_calendar_falls_back_to_the_older_path_and_reports_when_neither_an
 
     def opener(req, timeout=None):
         calls.append(req.full_url)
-        if "cdn-rili" in req.full_url:
+        if "datas" not in req.full_url:
             raise http_error(404)
         return FakeResponse(json.dumps({"data": JIN10_CAL[:1]}))
 
     pull = Jin10CalendarCollector(clock=CLOCK, opener=opener).collect(SINCE)
-    assert len(pull.events) == 1 and "rili.jin10.com/datas" in calls[1]
+    assert len(pull.events) == 1 and "/datas/2026/0904/economics.json" in calls[-1]
+
+    seen = {}
 
     def nothing(req, timeout=None):
+        seen.update(req.headers)
         raise http_error(404)
 
-    with pytest.raises(SourceError, match="jin10_calendar"):
+    with pytest.raises(SourceError, match="no calendar path answered") as exc:
         Jin10CalendarCollector(clock=CLOCK, opener=nothing).collect(SINCE)
+    assert "web_data" in str(exc.value) and "datas" in str(exc.value), "every path tried is named"
+    assert seen.get("Referer") == "https://rili.jin10.com/"
 
 
 # --- DBnomics ------------------------------------------------------------------------------
@@ -744,6 +749,11 @@ def test_fred_adds_the_release_calendar_as_macro_events_and_survives_its_absence
                                 "release_name": "Employment Situation",
                                 "date": "2026-09-01",
                             },
+                            {
+                                "release_id": 18,
+                                "release_name": "H.15 Selected Interest Rates",
+                                "date": "2026-09-08",
+                            },
                         ]
                     }
                 )
@@ -752,7 +762,7 @@ def test_fred_adds_the_release_calendar_as_macro_events_and_survives_its_absence
 
     c = FredCollector(series={"DFF": "fed funds"}, key="k", clock=CLOCK, opener=opener)
     pull = c.collect(SINCE, slot="us_preopen")
-    (e,) = pull.events  # the 09-01 date is in the past relative to NOW
+    (e,) = pull.events  # 09-01 is in the past relative to NOW; H.15 is not a major release
     assert e.instrument_id == "MACRO:US" and e.kind == "macro_release"
     assert e.event_id == "fred:10:2026-09-10" and e.title == "Consumer Price Index"
     assert e.payload["time"] == "not published by FRED"
