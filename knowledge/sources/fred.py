@@ -19,12 +19,16 @@ it as zero.
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
-from knowledge.facts import SeriesPoint, as_decimal
+from knowledge.facts import EventRecord, SeriesPoint, as_decimal
 from knowledge.sources.base import Collector, Pull, SourceError, parse_date
 
 URL = "https://api.stlouisfed.org/fred/series/observations"
+RELEASES_URL = "https://api.stlouisfed.org/fred/releases/dates"
+#: How far ahead the release calendar is read. Two weeks covers every
+#: weekly page's "what to watch" without a second request.
+RELEASE_HORIZON = timedelta(days=14)
 
 SERIES: dict[str, str] = {
     "DFF": "Federal funds effective rate, %",
@@ -99,5 +103,60 @@ class FredCollector(Collector):
         if failures and len(failures) == len(self.series):
             raise SourceError("every series failed. First: " + failures[0])
         pull.notes.extend(failures)
+        if slot in ("us_preopen", "weekly", "all"):
+            self._release_dates(pull, key)
         pull.requests = self.requests
         return pull
+
+    def _release_dates(self, pull: Pull, key: str) -> None:
+        """The next two weeks of US release dates, as `macro_release` events.
+
+        FRED's release calendar is the official, keyless-in-spirit answer to
+        "what prints this week": every BLS, BEA and Fed release it carries, with
+        the date it is scheduled. FRED does not publish the time of day, and
+        this adapter says so in the payload rather than inventing 08:30 ET.
+        A calendar failure is a note; the series above are the pull.
+        """
+        today = self.today()
+        try:
+            payload = self.get_json(
+                RELEASES_URL,
+                {
+                    "api_key": key,
+                    "file_type": "json",
+                    "realtime_start": today.isoformat(),
+                    "realtime_end": (today + RELEASE_HORIZON).isoformat(),
+                    "include_release_dates_with_no_data": "true",
+                    "sort_order": "asc",
+                },
+            )
+        except SourceError as e:
+            pull.notes.append(f"release calendar: {e}")
+            return
+        rows = payload.get("release_dates") if isinstance(payload, dict) else None
+        if not isinstance(rows, list):
+            pull.notes.append("release calendar: no release_dates list in the reply")
+            return
+        for r in rows:
+            if not isinstance(r, dict):
+                continue
+            day = parse_date(r.get("date"))
+            name = str(r.get("release_name") or "").strip()
+            if day is None or not name or day < today:
+                continue
+            pull.events.append(
+                EventRecord(
+                    source=self.name,
+                    event_id=f"fred:{r.get('release_id')}:{day}",
+                    instrument_id="MACRO:US",
+                    kind="macro_release",
+                    announced_at=datetime(day.year, day.month, day.day, tzinfo=UTC),
+                    title=name,
+                    payload={
+                        "country": "US",
+                        "indicator": name,
+                        "release_id": r.get("release_id"),
+                        "time": "not published by FRED",
+                    },
+                )
+            )

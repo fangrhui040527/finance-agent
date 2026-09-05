@@ -72,7 +72,7 @@ catalogue, `python ask.py backend` says which model answers each tier, and
 `LLM_BACKEND_CHEAP=groq` keeps a thesis on Claude while triage runs free.
 
 **Collection is wired** (`docs/20-FEEDBACK-ROUTINE.md`, `details/09-RUNBOOK.md`):
-seventeen catalogued sources - keyless RSS and GDELT per company, SEC EDGAR,
+twenty-two catalogued sources - keyless RSS and GDELT per company, SEC EDGAR,
 BNM, DOSM, and four free-key providers (Finnhub, FMP, Alpha Vantage, FRED) -
 run on four market-timed GitHub Actions slots (`.github/workflows/collect.yml`)
 into two append-only stores: `data/corpus.db` for news and `data/facts.db` for

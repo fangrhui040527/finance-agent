@@ -270,7 +270,19 @@ enabled = [
   "fmt_business",
   "edgar", "bnm_opr", "dosm_cpi",
   "finnhub", "fmp", "alphavantage_news", "fred",
+  # 2026-09-05, the four sites asked for by their free routes (details/09):
+  # Jin10's public flash and calendar endpoints, DBnomics for the series behind
+  # MacroMicro's charts, TWSE OpenAPI + FinMind for the Taiwan names Goodinfo
+  # and 优分析 cover. Enabled for the first runner probe; what fails to answer
+  # with dated rows comes off this list, as with the Malaysian feeds.
+  "jin10_flash", "jin10_calendar", "dbnomics", "twse_openapi", "finmind",
 ]
+
+# Names the collectors read but the book never holds. TSMC is here as the
+# NVDA supply-chain read (monthly revenue, P/E, foreign flows); moomoo MY does
+# not trade Taiwan and the paper book never sees these ids. Must not repeat a
+# holding or watchlist name.
+read_only = ["XTAI:2330"]
 
 # Languages an article may be in to be kept. GDELT's own names or ISO codes.
 # Measured 2026-09-04: 38% of the corpus was Korean, Turkish, Spanish and

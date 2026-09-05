@@ -318,7 +318,14 @@ def run_sweep(
 
     index = entity_index if entity_index is not None else _entity_index()
     holdings, watchlist = set(cfg.holdings), set(cfg.watchlist)
-    book = tuple(dict.fromkeys(tuple(cfg.watchlist) + tuple(cfg.holdings)))
+    # Read-only names ride along for the structured sources whose market they
+    # are on; the news slots never include their market, so they cost nothing
+    # there, and the escalation gate still keys on holdings and watchlist.
+    book = tuple(
+        dict.fromkeys(
+            tuple(cfg.watchlist) + tuple(cfg.holdings) + tuple(getattr(cfg, "read_only", ()))
+        )
+    )
     languages = tuple(getattr(cfg, "languages", ()) or ())
     deadline = started + timedelta(seconds=SWEEP_DEADLINE_SECONDS)
     fresh: list[Article] = []
@@ -765,9 +772,16 @@ def probe(
     tick = clock or (lambda: datetime.now(UTC))
     emit = log or (lambda msg: print(msg, file=sys.stderr))
     since = tick() - timedelta(hours=hours)
-    book = tuple(dict.fromkeys(tuple(cfg.watchlist) + tuple(cfg.holdings)))
+    book = tuple(
+        dict.fromkeys(
+            tuple(cfg.watchlist) + tuple(cfg.holdings) + tuple(getattr(cfg, "read_only", ()))
+        )
+    )
     us = tuple(i for i in book if _mic_in(i, ("XNAS", "XNYS")))
     my = tuple(i for i in book if _mic_in(i, ("XKLS",)))
+    # A Taiwan source with no read-only name configured is still probed against
+    # TSMC, so the probe says whether the endpoint answers at all.
+    tw = tuple(i for i in book if _mic_in(i, ("XTAI",))) or ("XTAI:2330",)
     out: list[ProbeResult] = []
     for name in names or list(catalog.CATALOG):
         spec = catalog.CATALOG.get(name)
@@ -792,7 +806,12 @@ def probe(
                 out.append(ProbeResult(name, "ok", detail))
             else:
                 collector = collector_for(name)
-                instruments = us if "XNAS" in spec.markets else my if "XKLS" in spec.markets else ()
+                if "XTAI" in spec.markets:
+                    instruments = tw
+                else:
+                    instruments = (
+                        us if "XNAS" in spec.markets else my if "XKLS" in spec.markets else ()
+                    )
                 pull = collector.collect(since, instruments[:2], "all")
                 detail = f"{pull} in {pull.requests} request(s)"
                 if pull.notes:

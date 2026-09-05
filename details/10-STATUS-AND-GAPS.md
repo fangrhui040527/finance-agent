@@ -40,7 +40,7 @@ invisible.
 | Fitness function — refuses a partial score | complete |
 | CI — 10 steps, offline, keyless | complete |
 | **Collector** — `collect.yml`, four slots a day timed to each market, commits what it saw | complete, **and running** |
-| **Source catalogue** — 17 sources (news and structured), slots, keys; `ask.py sources --probe` | complete; 6 Malaysian candidates await their first probe from a runner |
+| **Source catalogue** — 22 sources (news and structured), slots, keys; `ask.py sources --probe` | complete; 6 Malaysian candidates await their first probe from a runner |
 | **Corpus is indexed** — `knowledge/retrieval/index.py`, one router from the registry, `kb_news` filled from the corpus | complete (until 2026-09-04 every surface built `Router({})` and no retrieval ever read an article) |
 | **Cleaning layer** — normal form, language allowlist, junk filter, quality score, word-boundary entity linking | complete |
 | **Fact book** — `data/facts.db`: observations with `known_at`, events, vintaged series, documents; bridge to the point-in-time FactStore | complete |

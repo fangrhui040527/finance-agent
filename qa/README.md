@@ -63,6 +63,14 @@ passes through `redact()` first.
 
 ## Findings, and where they stand
 
+Sources added 2026-09-05 for the four sites the operator asked for, each by its free route
+(MacroMicro → `dbnomics`; Goodinfo and 优分析 → `twse_openapi` + `finmind` on the
+`[sources] read_only` names; 金十数据 → `jin10_flash` + `jin10_calendar`). Five live tests in
+`test_p2_sources_live.py` cover them; the DBnomics one is written to prune the starter list
+(it xfails naming every id the API does not know), and the FinMind one xfails on a spent
+per-address quota. The development sandbox cannot reach any of the hosts, so the first
+figures come from `sources-probe.yml` on a runner, as for every source before them.
+
 From the first full system test on a runner (2026-09-05, `.github/workflows/system-test.yml`
 on main at 8802d5e; 9 of 14 parts held, one of them core):
 

@@ -222,6 +222,14 @@ def build_pack(
             out.append(fact_snapshot(book, iid, now=now, days=7))
             out.append("```")
             out.append("")
+        read_only: tuple[str, ...] = tuple(getattr(cfg, "read_only", None) or ())
+        if read_only:
+            out += ["### Watched, not held (read-only names; never in the book)", ""]
+            for iid in read_only:
+                out.append("```")
+                out.append(fact_snapshot(book, iid, now=now, days=7))
+                out.append("```")
+                out.append("")
         out += ["## Macro", "", "```", macro_context(book), "```", ""]
 
     if previous_dir is not None:

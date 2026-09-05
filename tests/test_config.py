@@ -310,3 +310,25 @@ def test_no_package_contains_only_an_init_file():
         if len(siblings) == 1:
             empty.append(pkg.relative_to(ROOT).as_posix())
     assert not empty, f"packages with nothing in them: {empty}"
+
+
+# -- read-only names ---------------------------------------------------------
+
+
+def test_read_only_names_load_and_never_overlap_the_book(tmp_path):
+    cfg = load(ROOT / "config.toml")
+    assert "XTAI:2330" in cfg.read_only
+    assert not set(cfg.read_only) & (set(cfg.watchlist) | set(cfg.holdings))
+    text = (ROOT / "config.toml").read_text(encoding="utf-8")
+    bad = tmp_path / "bad.toml"
+    bad.write_text(
+        text.replace('read_only = ["XTAI:2330"]', 'read_only = ["XNAS:NVDA"]'), encoding="utf-8"
+    )
+    with pytest.raises(ConfigError, match="read_only"):
+        load(bad)
+    typo = tmp_path / "typo.toml"
+    typo.write_text(
+        text.replace('read_only = ["XTAI:2330"]', 'read_only = ["2330"]'), encoding="utf-8"
+    )
+    with pytest.raises(ConfigError, match="market prefix"):
+        load(typo)

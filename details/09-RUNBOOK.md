@@ -271,6 +271,15 @@ Exit codes, so a scheduler can act without parsing text:
 | `alphavantage_news` | articles with per-ticker sentiment, one call per US name a day | us_close | **enabled**, needs `ALPHAVANTAGE_API_KEY` |
 | `fred` | Fed funds, yields, curve, CPI, unemployment, VIX, dollar, MYR/USD | us_preopen | **enabled**, needs `FRED_API_KEY` |
 
+| `thestar_business`, `edge_malaysia`, `bernama_business`, `fmt_business`, `nst_business` | Malaysian business RSS | bursa_close | registered, **not enabled** until the probe shows dated items |
+| `bursa_announcements` | Bursa company announcements | bursa_close | registered, **not enabled** until the probe shows the endpoint answers |
+| `bnm_press` | Bank Negara press releases | bursa_close | registered, **not enabled**: no live feed exists |
+| `jin10_flash` | 金十数据 flash news, Chinese; one request per slot (the site's own public endpoint; no free API exists, terms are a gray zone, personal research only) | us_preopen, bursa_close, us_close | **enabled** for the first probe |
+| `jin10_calendar` | 金十 economic calendar: scheduled releases and prints as `MACRO:<country>` events | us_preopen, us_close | **enabled** for the first probe |
+| `dbnomics` | the series behind MacroMicro's charts, keyless: IMF commodity prices (palm oil, aluminium, Brent, LNG), BIS policy rates and NEERs, IMF CPI for MY and CN; each id confirmed by the probe | us_preopen, weekly | **enabled** for the first probe |
+| `twse_openapi` | TWSE OpenAPI (official, keyless) for the `[sources] read_only` Taiwan names: P/E, P/B, yield, monthly revenue, close, volume | bursa_close, weekly | **enabled** for the first probe |
+| `finmind` | FinMind for the same names: 24 months of revenue, 8 quarters of statements, foreign net buying; `FINMIND_TOKEN` optional | weekly | **enabled** for the first probe |
+
 Keys reach a workflow as repository secrets of exactly these names (Settings →
 Secrets and variables → Actions → Repository secrets). One secret named
 `ALL_SECRET` holding every key, in any layout, is also accepted: the first step
@@ -279,9 +288,14 @@ of `collect.yml`, `sources-probe.yml` and `free-backend-probe.yml` runs
 its shape, masks it, and exports it for the steps that follow. A secret set
 under its own name always wins over the blob's copy. `secrets-check.yml` lists
 the names a job can see, never the values, when a probe says a key is not set.
-| `thestar_business`, `edge_malaysia`, `bernama_business`, `fmt_business`, `nst_business` | Malaysian business RSS | bursa_close | registered, **not enabled** until the probe shows dated items |
-| `bursa_announcements` | Bursa company announcements | bursa_close | registered, **not enabled** until the probe shows the endpoint answers |
-| `bnm_press` | Bank Negara press releases | bursa_close | registered, **not enabled**: no live feed exists |
+
+**Four sites, their free routes (2026-09-05).** MacroMicro's API is paid only (from
+USD 5,000 a year; its free tier has no data access), so `dbnomics` carries the series its
+charts are drawn from. Goodinfo bans crawlers and 优分析 keeps its figures behind a paid
+membership; `twse_openapi` and `finmind` publish the same numbers, and the names they read
+come from `[sources] read_only` - read and cited, never traded. 金十数据 has no free API;
+`jin10_flash` and `jin10_calendar` read the public endpoints its own pages use, once per
+slot, with this repository's User-Agent, for personal research.
 
 **The domestic-coverage gap is open.** GDELT has returned nothing for any Bursa
 name on every run so far, and `bnm_press` was enabled on 2026-09-03 to close

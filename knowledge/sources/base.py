@@ -52,6 +52,8 @@ PROVIDER_KEYS: tuple[str, ...] = (
     "ALPHAVANTAGE_API_KEY",
     "FRED_API_KEY",
     "SEC_USER_AGENT",
+    # Optional: FinMind answers 300 requests an hour without it and 600 with.
+    "FINMIND_TOKEN",
 )
 
 
