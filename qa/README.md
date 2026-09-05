@@ -27,9 +27,12 @@ The MCP server is out of scope here by decision. Nothing under `qa/` drives it.
     QA_LIVE=1 python -m pytest qa/phase2 -q
 
 Needs `ANTHROPIC_API_KEY` (environment or `.env`) **and** `QA_LIVE=1`. Without
-both, every phase-2 test skips. The one exception is `test_p2_free_backend_live.py`,
-which needs `QA_LIVE=1` and a *free-provider* key instead (or a local Ollama) and
-never touches the Anthropic API. Every Messages tier resolves to
+both, every model-calling phase-2 test skips. Two kinds of file are exceptions and
+never touch the Anthropic API: the network-only suites (`test_p2_sources_live.py`,
+`test_p2_feeds_live.py`) opt in on `QA_LIVE=1` alone, each vendor's test needing
+that vendor's own key; and `test_p2_free_backend_live.py` needs `QA_LIVE=1` and a
+*free-provider* key (or a local Ollama). `.github/workflows/system-test.yml` runs
+every part, offline and live, from a runner. Every Messages tier resolves to
 `claude-haiku-4-5` — model **and** billing — through the product's own
 `FINPLANET_CHEAP=1` cap (promoted into `core/llm/tiers.py` from this suite's
 old model-table pin), so a reason-tier call proves the reason-tier code path at

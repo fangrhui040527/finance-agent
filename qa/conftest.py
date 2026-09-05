@@ -49,6 +49,12 @@ def pytest_configure(config):
     config.addinivalue_line("markers", "slow: takes more than a few seconds")
 
 
+#: Phase-2 files that call no model: the public feeds and the keyed data
+#: vendors. They need the internet and, per vendor, that vendor's key; they
+#: never need an Anthropic key, so they must not be gated on one.
+NETWORK_ONLY = frozenset({"test_p2_sources_live.py", "test_p2_feeds_live.py"})
+
+
 def pytest_collection_modifyitems(config, items):
     """Tag by directory, and skip the live half unless it was asked for."""
     live_enabled = os.environ.get("QA_LIVE", "").strip() not in ("", "0", "false", "no")
@@ -66,7 +72,17 @@ def pytest_collection_modifyitems(config, items):
         if f"{os.sep}phase2{os.sep}" in path:
             item.add_marker(pytest.mark.phase2)
             item.add_marker(pytest.mark.live)
-            if os.path.basename(path).startswith("test_p2_free"):
+            base = os.path.basename(path)
+            if base in NETWORK_ONLY:
+                # Public feeds and keyed data vendors: no model is called, so
+                # QA_LIVE alone opts in. A vendor key that is missing is that
+                # vendor's test's business, not a reason to skip the file.
+                item.add_marker(pytest.mark.network)
+                if not live_enabled:
+                    item.add_marker(
+                        pytest.mark.skip(reason="set QA_LIVE=1 to opt in to live calls")
+                    )
+            elif base.startswith("test_p2_free"):
                 # The free-provider half (docs/21) needs a FREE key, not an
                 # Anthropic one; it never bills the Anthropic API.
                 if not live_enabled:

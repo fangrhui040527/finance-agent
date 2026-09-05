@@ -1,0 +1,229 @@
+# The full system test, part by part, on a runner that can reach the world.
+#
+# The development environment behind this repository has no route to any data
+# or model host, so the offline parts can run there and here, and the live
+# parts can only run here. Every part runs whatever the previous one did; the
+# summary carries each part's verdict, its duration and, for a failed part,
+# the tail of its log. The job fails on a failed CORE part. A LIVE part that
+# failed is reported and does not fail the job: a vendor outage is not a
+# defect in this code, but it is never hidden either.
+#
+# Keys reach the live parts as the named repository secrets, or from one
+# secret named ALL_SECRET (see .github/scripts/keys_from_blob.py).
+#
+# Manual, and weekly on Sunday at 03:30 UTC, after the weekly sweep.
+name: system-test
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "30 3 * * 0"
+
+permissions:
+  contents: read
+
+jobs:
+  full:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    defaults:
+      run:
+        shell: bash
+    env:
+      FINPLANET_NO_DOTENV: "1"
+      PYTHONUTF8: "1"
+      RESULTS: ${{ github.workspace }}/.system-test
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.12"
+          enable-cache: true
+
+      - name: Install
+        run: |
+          uv sync --frozen
+          mkdir -p "$RESULTS"
+          # part <n> <core|live> <name> <command...>: run it, record it, never
+          # fail the step - the verdict at the end reads the record.
+          cat > "$RESULTS/part.sh" <<'EOF'
+          #!/usr/bin/env bash
+          n=$1; kind=$2; name=$3; shift 3
+          t0=$SECONDS
+          "$@" > "$RESULTS/$n.log" 2>&1
+          code=$?
+          printf '%s\t%s\t%s\t%s\t%s\n' "$n" "$kind" "$name" "$code" "$((SECONDS - t0))" >> "$RESULTS/results.tsv"
+          tail -n 40 "$RESULTS/$n.log"
+          if [ "$code" -ne 0 ]; then
+            echo "::warning title=part $n failed::$name exited $code"
+          fi
+          exit 0
+          EOF
+          chmod +x "$RESULTS/part.sh"
+
+      - name: Keys from ALL_SECRET, when the named secrets are not set
+        env:
+          ALL_SECRET: ${{ secrets.ALL_SECRET }}
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+          FMP_API_KEY: ${{ secrets.FMP_API_KEY }}
+          ALPHAVANTAGE_API_KEY: ${{ secrets.ALPHAVANTAGE_API_KEY }}
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: |
+          if [ -z "$ALL_SECRET" ]; then
+            echo "ALL_SECRET is not set; the named secrets are in use"
+            exit 0
+          fi
+          python3 .github/scripts/keys_from_blob.py ALL_SECRET | while IFS='=' read -r name value; do
+            if [ -n "${!name}" ]; then
+              echo "$name: set under its own name; the blob's copy is ignored"
+              continue
+            fi
+            echo "::add-mask::$value"
+            echo "$name=$value" >> "$GITHUB_ENV"
+            echo "$name: taken from ALL_SECRET"
+          done
+
+      # ---- core: no network, no key ------------------------------------------
+
+      - name: "1 · lint, format, types"
+        run: >
+          "$RESULTS/part.sh" 1 core "lint, format, types"
+          bash -c "uv run ruff check . && uv run ruff format --check . && uv run pyright"
+
+      - name: "2 · unit suite with the coverage gate"
+        run: >
+          "$RESULTS/part.sh" 2 core "unit suite, coverage gate"
+          uv run python -m pytest -q --cov --cov-report=term -p no:cacheprovider
+
+      - name: "3 · verify.py, the P0 pipeline on mock data"
+        run: >
+          "$RESULTS/part.sh" 3 core "verify.py: P0 pipeline on mock data"
+          uv run python verify.py
+
+      - name: "4 · stress scenarios"
+        run: >
+          "$RESULTS/part.sh" 4 core "stress scenarios"
+          uv run python stress/run.py
+
+      - name: "5 · MCP server self-test"
+        run: >
+          "$RESULTS/part.sh" 5 core "MCP server self-test"
+          uv run python -m mcp_server.server --selftest
+
+      - name: "6 · trace run, every agent, offline"
+        env:
+          FINPLANET_OFFLINE: "1"
+        run: >
+          "$RESULTS/part.sh" 6 core "trace run: every stage, offline"
+          uv run python trace_run.py
+
+      - name: "7 · the paper book on the committed ledger"
+        env:
+          FINPLANET_OFFLINE: "1"
+        run: >
+          "$RESULTS/part.sh" 7 core "paper book: status and today's pack"
+          bash -c "uv run python ask.py paper status && uv run python ask.py paper pack --date $(date -u +%F)"
+
+      - name: "8 · the stores as the agents read them"
+        env:
+          FINPLANET_OFFLINE: "1"
+        run: >
+          "$RESULTS/part.sh" 8 core "digest, facts, macro from the committed stores"
+          bash -c "uv run python ask.py digest --date $(date -u +%F) && uv run python ask.py facts XNAS:NVDA && uv run python ask.py macro"
+
+      - name: "9 · QA phase 1: RAG, entry points, registries, seams, free backend"
+        run: >
+          "$RESULTS/part.sh" 9 core "QA phase 1, keyless"
+          uv run python -m pytest qa/phase1 -q -o addopts= -p no:cacheprovider
+
+      # ---- live: the world, with the keys ------------------------------------
+
+      - name: "10 · doctor, with the keys and the network"
+        env:
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY || env.FINNHUB_API_KEY }}
+          FMP_API_KEY: ${{ secrets.FMP_API_KEY || env.FMP_API_KEY }}
+          ALPHAVANTAGE_API_KEY: ${{ secrets.ALPHAVANTAGE_API_KEY || env.ALPHAVANTAGE_API_KEY }}
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY || env.FRED_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY || env.GROQ_API_KEY }}
+        run: >
+          "$RESULTS/part.sh" 10 live "doctor: what this installation can do"
+          uv run python ask.py doctor
+
+      - name: "11 · every source, live (QA phase 2)"
+        env:
+          QA_LIVE: "1"
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY || env.FINNHUB_API_KEY }}
+          FMP_API_KEY: ${{ secrets.FMP_API_KEY || env.FMP_API_KEY }}
+          ALPHAVANTAGE_API_KEY: ${{ secrets.ALPHAVANTAGE_API_KEY || env.ALPHAVANTAGE_API_KEY }}
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY || env.FRED_API_KEY }}
+          SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
+          GDELT_USER_AGENT: ${{ secrets.GDELT_USER_AGENT }}
+        run: >
+          "$RESULTS/part.sh" 11 live "QA phase 2: every source live"
+          uv run python -m pytest qa/phase2/test_p2_sources_live.py -q -rs -o addopts= -p no:cacheprovider
+
+      - name: "12 · price feeds, live (QA phase 2)"
+        env:
+          QA_LIVE: "1"
+        run: >
+          "$RESULTS/part.sh" 12 live "QA phase 2: price feeds live"
+          uv run python -m pytest qa/phase2/test_p2_feeds_live.py -q -rs -o addopts= -p no:cacheprovider
+
+      - name: "13 · the free model, live (QA phase 2)"
+        env:
+          QA_LIVE: "1"
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY || env.GROQ_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+        run: >
+          "$RESULTS/part.sh" 13 live "QA phase 2: free provider, one word each"
+          uv run python -m pytest qa/phase2/test_p2_free_backend_live.py -q -rs -o addopts= -p no:cacheprovider
+
+      - name: "14 · end to end: a move decomposed on the live feed, a thesis on the free model"
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY || env.GROQ_API_KEY }}
+        run: >
+          "$RESULTS/part.sh" 14 live "end to end: why --fetch, then thesis on the free model"
+          bash -c "uv run python ask.py backend && uv run python ask.py why XNAS:NVDA --fetch --against XNAS:SPY --days 5 && uv run python ask.py thesis XNAS:NVDA --breaker 'data-centre revenue growth below 20% year on year'"
+
+      # ---- verdict ------------------------------------------------------------
+
+      - name: Verdict
+        if: always()
+        run: |
+          {
+            echo "## Full system test · $(date -u +'%Y-%m-%d %H:%M UTC') · ${GITHUB_SHA::7}"
+            echo
+            echo "| # | part | kind | result | time |"
+            echo "|---|---|---|---|---|"
+            while IFS=$'\t' read -r n kind name code secs; do
+              if [ "$code" = "0" ]; then r="pass"; else r="**FAIL** ($code)"; fi
+              echo "| $n | $name | $kind | $r | ${secs}s |"
+            done < "$RESULTS/results.tsv"
+            echo
+            for f in $(awk -F'\t' '$4 != 0 {print $1}' "$RESULTS/results.tsv"); do
+              echo "<details><summary>part $f: last 60 lines</summary>"
+              echo
+              echo '```'
+              tail -n 60 "$RESULTS/$f.log"
+              echo '```'
+              echo "</details>"
+              echo
+            done
+            core_failed=$(awk -F'\t' '$2 == "core" && $4 != 0' "$RESULTS/results.tsv" | wc -l)
+            live_failed=$(awk -F'\t' '$2 == "live" && $4 != 0' "$RESULTS/results.tsv" | wc -l)
+            echo "Core parts failed: $core_failed. Live parts failed: $live_failed (reported, not fatal)."
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+          test "$(awk -F'\t' '$2 == "core" && $4 != 0' "$RESULTS/results.tsv" | wc -l)" -eq 0
+
+      - name: Keep every part's log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: system-test-logs
+          path: .system-test/*.log
+          retention-days: 14

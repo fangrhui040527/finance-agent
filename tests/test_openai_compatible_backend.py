@@ -128,6 +128,18 @@ def test_request_goes_to_chat_completions_with_a_bearer_key():
     assert req.get_header("Content-type") == "application/json"
 
 
+def test_the_request_announces_this_process_not_python_urllib():
+    """Groq's edge (Cloudflare) answers urllib's default User-Agent with a 403
+    error 1010 before the key is looked at; the live probe found it. The
+    backend sends the same identity every other fetcher in the repository
+    sends."""
+    calls: list = []
+    _backend([reply()], capture=calls, api_key="gsk_test").complete("m", "q", None)
+    ua = calls[0].get_header("User-agent")
+    assert ua is not None and ua.startswith("finplanet-analyst-mind/")
+    assert "urllib" not in ua.lower()
+
+
 def test_request_body_is_model_messages_and_the_output_cap_only():
     calls: list = []
     profile = RequestProfile(max_tokens=777, adaptive_thinking=True, effort="high", stream=True)
