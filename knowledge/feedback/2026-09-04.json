@@ -1,0 +1,34 @@
+{
+  "day": "2026-09-04",
+  "written_at": "2026-09-05T09:33:00Z",
+  "market": {
+    "regime": "neutral",
+    "notes": [
+      "MYX:0820EA 1d +0.00% (last cached session 2026-09-03), 5d -2.41%; XNAS:SPY 1d -0.39%, 5d +0.11%",
+      "VIXCLS 14.32 (-0.88, 2026-09-03); BAMLH0A0HYM2 2.65 (-0.01); SP500 7718.60 (-29.11, 2026-09-04); DGS10 4.77; DGS2 4.34; T10Y2Y 0.41; BNM:OPR 2.75 held",
+      "all nine names decompose as not_significant; no company story is warranted on the day"
+    ]
+  },
+  "names": [
+    {"instrument_id": "MYX:1155", "move": {"return_1d": -0.0019, "market_1d": 0.0, "return_5d": -0.0038, "market_5d": -0.0241, "unexplained_share": 1.0, "sigma": 0.12, "verdict": "not_significant", "measured_to": "2026-09-03"}, "causes": [], "open_questions": [], "watch": []},
+    {"instrument_id": "MYX:5347", "move": {"return_1d": 0.0029, "market_1d": 0.0, "return_5d": -0.0434, "market_5d": -0.0241, "unexplained_share": 1.0, "sigma": 0.39, "verdict": "not_significant", "measured_to": "2026-09-03"}, "causes": [], "open_questions": ["is the 5d -4.34% vs -2.41% the results print the roundup headline refers to; no primary figure collected (since 2026-09-04)"], "watch": []},
+    {"instrument_id": "MYX:5183", "move": {"return_1d": 0.0, "market_1d": 0.0, "return_5d": 0.0211, "market_5d": -0.0241, "unexplained_share": 1.0, "sigma": 0.04, "verdict": "not_significant", "measured_to": "2026-09-03"}, "causes": [], "open_questions": [], "watch": []},
+    {"instrument_id": "MYX:5225", "move": {"return_1d": -0.0111, "market_1d": 0.0, "return_5d": -0.0196, "market_5d": -0.0241, "unexplained_share": 1.0, "sigma": 0.92, "verdict": "not_significant", "measured_to": "2026-09-03"}, "causes": [], "open_questions": [], "watch": []},
+    {"instrument_id": "MYX:8869", "move": {"return_1d": 0.0025, "market_1d": 0.0, "return_5d": -0.005, "market_5d": -0.0241, "unexplained_share": 1.0, "sigma": 0.08, "verdict": "not_significant", "measured_to": "2026-09-03"}, "causes": [], "open_questions": [], "watch": []},
+    {"instrument_id": "MYX:3182", "move": {"return_1d": 0.0099, "market_1d": 0.0, "return_5d": -0.0377, "market_5d": -0.0241, "unexplained_share": 1.0, "sigma": 0.68, "verdict": "not_significant", "measured_to": "2026-09-03"}, "causes": [], "open_questions": [], "watch": []},
+    {"instrument_id": "XNAS:NVDA", "move": {"return_1d": 0.0084, "market_1d": -0.0039, "return_5d": 0.0589, "market_5d": 0.0011, "unexplained_share": 0.71, "sigma": 0.82, "verdict": "not_significant", "measured_to": "2026-09-04"},
+     "causes": [{"claim": "5d move only, not the day: the Hugging Face transaction", "evidence": ["digest 2026-09-04 finance.yahoo.com: Nvidia's $13 Billion Hugging Face Deal Expands Open-Source AI", "fmp:rating_change Rosenblatt maintain Buy 2026-09-04", "fmp:rating_change Needham maintain Buy 2026-09-04"], "chain": ["Hugging Face transaction", "unknown: no collected evidence reaches further; no filing on record after the 2026-09-02 8-K"], "confidence": 0.3, "confirm": "an 8-K or release in the fact book dated the announcement; 5-session idiosyncratic share above 50%", "refute": "SPY and semiconductor names moving together over the same five sessions"}],
+     "open_questions": ["does the fact book pick up a filing for the Hugging Face transaction (since 2026-09-04)"], "watch": []},
+    {"instrument_id": "XNAS:AAPL", "move": {"return_1d": -0.0251, "market_1d": -0.0039, "return_5d": 0.0008, "market_5d": 0.0011, "unexplained_share": 0.91, "sigma": 1.47, "verdict": "not_significant", "measured_to": "2026-09-04"}, "causes": [], "open_questions": [], "watch": [{"when": "2026-10-28", "what": "earnings_result"}]},
+    {"instrument_id": "XNAS:MSFT", "move": {"return_1d": -0.0204, "market_1d": -0.0039, "return_5d": -0.0269, "market_5d": 0.0011, "unexplained_share": 0.83, "sigma": 0.74, "verdict": "not_significant", "measured_to": "2026-09-04"}, "causes": [], "open_questions": [], "watch": [{"when": "2026-10-27", "what": "earnings_result"}]}
+  ],
+  "data_quality": {
+    "failed": ["gdelt 16:17 UTC: no name could be read (HTTP error)", "bnm_press 02:07 UTC: unparseable XML"],
+    "degraded": ["gdelt: named Bursa and US names failed in every other sweep", "yahoo_rss and google_news: read but empty for all six Bursa names at 13:36 and 18:19 UTC", "fact book: NOTHING COLLECTED for all six Bursa names", "MYX:0820EA: the 2026-09-04 bar was not cached at pack time; Bursa moves are to 2026-09-03", "finnhub NVDA earnings rows stamped knowable 2026-09-30, after this page; not used"],
+    "skipped": ["finnhub: FINNHUB_API_KEY not set on the day", "fmp: FMP_API_KEY not set on the day", "alphavantage_news: ALPHAVANTAGE_API_KEY not set on the day", "fred: FRED_API_KEY not set on the day"]
+  },
+  "lessons": [
+    "Story count is not a move signal: the most-covered Bursa name moved 0.12 sigma and the two quiet names 0.04 and 0.68; falsified if story count and |idiosyncratic sigma| show rank correlation over the next ten pages",
+    "A headline naming a percentage move dates a session; check it against the pack's session before attaching it"
+  ]
+}
