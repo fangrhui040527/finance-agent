@@ -1230,6 +1230,122 @@ def explain_concept(concept: str = "", mastered: list | None = None) -> str:
     return _lines(a14.run(concept, learner))
 
 
+METHOD_OWNERS = {
+    "kb_craft": "a14_teacher",
+    "kb_method_valuation": "a2_valuation",
+    "kb_method_technical": "a3_price_technical",
+    "kb_method_risk": "a12_portfolio_risk",
+    "kb_failures": "a11_red_team",
+}
+
+
+def method_note(
+    collection: str,
+    query: str = "",
+    concept: str = "",
+    archetype: str = "",
+    pattern: str = "",
+    limit: int = 4,
+) -> str:
+    """Read the curated method notes: the five human-written stores, cited.
+
+    Retrieval runs as the store's OWNING agent through the shared router, so
+    ownership is enforced rather than bypassed. `concept` selects kb_craft
+    notes by curriculum key, `archetype` selects valuation notes by sector
+    archetype, `pattern` selects failure cases by structural tag; `query` is
+    free text. Every hit is quoted verbatim with its chunk id, and every
+    reference carries its licence - a link-only reference is a link.
+    """
+    from agents.base import quote_span
+    from knowledge.retrieval.method import COLLECTIONS, PATTERN_TAGS
+    from knowledge.retrieval.pipeline import CollectionScopeError
+    from knowledge.retrieval.pipeline import retrieve as _retrieve
+
+    if collection not in METHOD_OWNERS:
+        raise ToolError(
+            f"unknown method collection {collection!r}; one of {', '.join(COLLECTIONS)}"
+        )
+    q = query.strip()
+    if concept:
+        from agents.learning.teacher import BY_KEY
+
+        c = BY_KEY.get(concept)
+        if c is None:
+            raise ToolError(f"{concept!r} is not a curriculum concept")
+        q = f"{c.title}. {c.one_line}"
+    elif archetype:
+        from agents.evidence.agents import A2Valuation
+
+        method, _ = A2Valuation.ARCHETYPE_METHODS.get(archetype, ("EV/EBIT vs history", set()))
+        q = f"{archetype} {method} valuation method"
+    elif pattern:
+        if pattern not in PATTERN_TAGS:
+            raise ToolError(
+                f"{pattern!r} is not a failure pattern; one of {', '.join(sorted(PATTERN_TAGS))}"
+            )
+        q = f"{pattern} {pattern.replace('_', ' ')}"
+    if not q:
+        raise ToolError("give a query, or a concept, archetype or pattern to select notes by")
+    ctx = context()
+    try:
+        res = _retrieve(
+            METHOD_OWNERS[collection],
+            collection,
+            q,
+            ctx.router,
+            now=ctx.now,
+            limit=max(limit * 3, 8),
+        )
+    except (KeyError, CollectionScopeError) as e:
+        raise ToolError(f"{collection} is not registered on this router: {e}") from None
+    rows = [f"{collection}: method notes for {q!r}"]
+    seen: set[str] = set()
+    shown = 0
+    for h in res.hits:
+        meta = h.chunk.metadata
+        slug = str(meta.get("slug") or meta.get("row") or h.chunk.chunk_id)
+        if slug in seen:
+            continue
+        if concept and concept not in (meta.get("concepts") or ()):
+            continue
+        if archetype and archetype not in (meta.get("archetypes") or ()):
+            continue
+        if pattern and pattern not in (meta.get("patterns") or ()):
+            continue
+        seen.add(slug)
+        shown += 1
+        title = meta.get("title") or slug
+        rows.append(
+            f"- {title} (as of {meta.get('as_of', '?')}, licence {meta.get('licence', '?')})"
+        )
+        if h.chunk.section:
+            rows.append(f"    section: {h.chunk.section}")
+        rows.append(f'    "{quote_span(h.chunk.text, 240)}"')
+        rows.append(f"    cites {collection}:{h.chunk.chunk_id}")
+        case = meta.get("case")
+        if isinstance(case, dict):
+            rows.append(
+                f"    case: {case.get('name')} ({case.get('country')} {case.get('year')}) - "
+                f"{case.get('outcome')}; patterns {', '.join(meta.get('patterns') or ())}"
+            )
+        for r in meta.get("refs") or []:
+            if r.get("licence") == "link_only":
+                rows.append(
+                    f"    ref: {r.get('title')} - {r.get('url')} (link only; the text is not reproduced)"
+                )
+            else:
+                rows.append(f"    ref: {r.get('title')} - {r.get('url')} ({r.get('licence')})")
+        if shown >= max(1, limit):
+            break
+    if shown == 0:
+        rows.append(
+            f"NO NOTE in {collection} matches. The store holds "
+            f"{len(ctx.router.get(METHOD_OWNERS[collection], collection))} chunks; "
+            "a note that is not there is not there, and nothing is generated in its place."
+        )
+    return "\n".join(rows) + DISCLAIMER
+
+
 def log_hypothesis(
     title: str,
     thesis: str,

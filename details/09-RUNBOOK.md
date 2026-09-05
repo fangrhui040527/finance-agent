@@ -663,6 +663,21 @@ python ask.py learn kelly --mastered share --mastered compounding
 Asking for a concept whose prerequisites you have not recorded **exits
 non-zero** and names what has to come first.
 
+### `method` — the curated method notes, cited
+
+```bash
+python ask.py method kb_craft --concept cash_flow            # the note the teacher cites for a concept
+python ask.py method kb_method_valuation --archetype bank     # the valuation method for an archetype
+python ask.py method kb_failures --pattern accruals_divergence  # failure cases by structural pattern
+python ask.py method kb_method_risk portfolio heat stops      # free text
+```
+
+The five human-written stores (`knowledge/method/`, contract in its README)
+read through the owning agent's router scope. Each hit is quoted verbatim
+with its chunk id and its references' licences; a link-only reference is a
+link. **Exits 1** when no note matches (silence is not a lesson) and **2** for
+an unknown collection, concept or pattern. Same text as the MCP `method_note`.
+
 ### `fitness` — can the system score itself yet?
 
 ```bash
@@ -718,9 +733,14 @@ make mcp        # stdio transport
 make mcp-check  # selftest
 ```
 
-Twelve tools: `market_info`, `get_prices`, `why_did_it_move`, `fit_factor_model`,
-`compose_thesis`, `check_portfolio_risk`, `size_position`, `plan_question`,
-`explain_concept`, `log_prediction`, `calibration_status`, `explain_path`.
+Thirty-four tools; `details/10-STATUS-AND-GAPS.md` keeps the count and
+`tests/test_docs_promises.py` pins it. The analytical ones: `market_info`,
+`get_prices`, `why_did_it_move`, `fit_factor_model`, `compose_thesis`,
+`check_portfolio_risk`, `size_position`, `plan_question`, `explain_concept`,
+`method_note`, `log_prediction`, `calibration_status`, `explain_path`, the
+fact-book readers (`daily_digest`, `fact_snapshot`, `macro_context`,
+`news_evidence`), the paper book (`paper_status`, `paper_report`) and the
+observability reports.
 
 Client setup is in `docs/15-MCP-SETUP.md`.
 

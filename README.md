@@ -231,6 +231,7 @@ indistinguishable. See [`docs/07-BUILD-ORDER.md`](docs/07-BUILD-ORDER.md) §0.
 | No order-placement code exists anywhere in the repo | `core/guardrails/policy.py` + repo grep | `test_no_execution_anywhere.py` |
 | All five rails run on every request; no bypass path | `core/guardrails/chain.py` | `test_guardrail_chain.py` |
 | A claim without a verified verbatim citation is dropped individually | `core/contracts/answer.py` | `test_answer_contract.py` |
+| Curated method notes are own-licensed, ASCII, advice-free, and a link-only reference is never quoted | `knowledge/retrieval/method.py` | `test_method_notes.py` |
 | The ledger is append-only — UPDATE and DELETE abort | `core/provenance/ledger.py` | `test_provenance.py` |
 | Human-authored knowledge is never agent-editable | `core/contracts/provenance_marker.py` | `test_provenance.py` |
 | Budget exhaustion raises; it never downgrades silently | `core/llm/client.py` | `test_inference_client.py` |

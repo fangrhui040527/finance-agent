@@ -1,0 +1,99 @@
+# The cost-of-capital table: Damodaran's published premiums and betas, transcribed with their date.
+#
+# Every number here is a fact published by Aswath Damodaran (NYU Stern) and is free to use
+# with attribution; the figures below carry their update and are indexed as citable chunks
+# in kb_method_valuation so a finding can quote the exact premium it used. A null value
+# means NOT TRANSCRIBED YET: the loader skips it and the engines report the input as missing
+# rather than reading it as zero. The July 2026 update is the source; the country table
+# refreshes each January and July, so the table flags itself stale after stale_after_days.
+#
+# What is filled in came from the July 2026 update notes (mature-market and US premiums,
+# the implied premium, the equity volatility multiplier). The per-country and per-industry
+# rows need a person with the pages open (pages.stern.nyu.edu is not reachable from the
+# development sandbox): copy each row's figures and keep the row label.
+source: "Damodaran Online (NYU Stern): Country Default Spreads and Risk Premiums, July 2026; Betas by Sector (US), January 2026; Ratings, Interest Coverage Ratios and Default Spread, January 2026"
+source_urls:
+  - "https://pages.stern.nyu.edu/~adamodar/New_Home_Page/datafile/ctryprem.html"
+  - "https://pages.stern.nyu.edu/~adamodar/New_Home_Page/datafile/Betas.html"
+  - "https://pages.stern.nyu.edu/~adamodar/New_Home_Page/datafile/ratings.html"
+licence: attributed
+as_of: 2026-07-01
+stale_after_days: 400
+
+# Equity risk premiums (decimal fractions).
+mature_market_erp: 0.0417
+implied_erp:
+  US: 0.0445          # the US ERP used in the July 2026 country table
+  SP500_implied: 0.0442   # implied ERP of the S&P 500 at the update, before the Aa1 spread adjustment
+equity_volatility_multiplier: 1.5545   # country risk premium = sovereign default spread x this
+
+# Country rows: country risk premium (crp) and total equity risk premium (erp) as decimals.
+# rating is the Moody's sovereign rating the spread was read from.
+country:
+  US: {name: United States, rating: Aaa, default_spread: 0.0, crp: 0.0, erp: 0.0445}
+  MY: {name: Malaysia, rating: A3, default_spread: null, crp: null, erp: null}
+  TW: {name: Taiwan, rating: Aa3, default_spread: null, crp: null, erp: null}
+  CN: {name: China, rating: A1, default_spread: null, crp: null, erp: null}
+  SG: {name: Singapore, rating: Aaa, default_spread: 0.0, crp: 0.0, erp: 0.0417}
+  JP: {name: Japan, rating: A1, default_spread: null, crp: null, erp: null}
+
+# Industry betas (US, January 2026): unlevered beta and the average levered beta.
+industry_betas:
+  "Bank (Money Center)": {unlevered: null, levered: null}
+  "Semiconductor": {unlevered: null, levered: null}
+  "Software (System & Application)": {unlevered: null, levered: null}
+  "Computers/Peripherals": {unlevered: null, levered: null}
+  "Utility (General)": {unlevered: null, levered: null}
+  "Chemical (Diversified)": {unlevered: null, levered: null}
+  "Metals & Mining": {unlevered: null, levered: null}
+  "Hospitals/Healthcare Facilities": {unlevered: null, levered: null}
+  "Hotel/Gaming": {unlevered: null, levered: null}
+  "Total Market": {unlevered: null, levered: null}
+
+# Which industry row an archetype borrows its beta from when no vendor beta is stored.
+archetype_industry:
+  bank: "Bank (Money Center)"
+  semis: "Semiconductor"
+  software: "Software (System & Application)"
+  hardware: "Computers/Peripherals"
+  utility: "Utility (General)"
+  chemicals: "Chemical (Diversified)"
+  cyclical: "Metals & Mining"
+  hospital: "Hospitals/Healthcare Facilities"
+  gaming: "Hotel/Gaming"
+  holding: "Total Market"
+
+# Synthetic rating ladder for large firms (market cap above USD 5 billion): interest cover
+# above min_cover maps to the rating; spread is the default spread over the risk-free rate.
+# The coverage thresholds are the long-standing ladder; the spreads change each January.
+synthetic_rating_spreads:
+  - {min_cover: 8.50, rating: AAA, spread: null}
+  - {min_cover: 6.50, rating: AA, spread: null}
+  - {min_cover: 5.50, rating: A+, spread: null}
+  - {min_cover: 4.25, rating: A, spread: null}
+  - {min_cover: 3.00, rating: A-, spread: null}
+  - {min_cover: 2.50, rating: BBB, spread: null}
+  - {min_cover: 2.25, rating: BB+, spread: null}
+  - {min_cover: 2.00, rating: BB, spread: null}
+  - {min_cover: 1.75, rating: B+, spread: null}
+  - {min_cover: 1.50, rating: B, spread: null}
+  - {min_cover: 1.25, rating: B-, spread: null}
+  - {min_cover: 0.80, rating: CCC, spread: null}
+  - {min_cover: 0.65, rating: CC, spread: null}
+  - {min_cover: 0.20, rating: C, spread: null}
+  - {min_cover: -1000.0, rating: D, spread: null}
+
+# Statutory corporate tax rates by market (used when the statements give no effective rate).
+statutory_tax:
+  XKLS: 0.24
+  XNAS: 0.21
+  XNYS: 0.21
+  XTAI: 0.20
+
+# Long-run nominal growth ceilings for terminal growth, by economy. These are this system's
+# own stated assumptions, not Damodaran's: roughly trend real growth plus the inflation target.
+long_run_nominal_growth:
+  US: 0.040
+  MY: 0.050
+  TW: 0.035
+  CN: 0.045

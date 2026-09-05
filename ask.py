@@ -798,6 +798,31 @@ def cmd_learn(a) -> int:
     return 0
 
 
+def cmd_method(a) -> int:
+    """The curated method notes, through the same tool the MCP surface serves.
+
+    Exit 2 for an unknown collection, concept or pattern; exit 1 when the
+    store holds no matching note, because a script that reads silence as a
+    lesson has learned nothing.
+    """
+    from mcp_server.tools import ToolError, method_note
+
+    try:
+        text = method_note(
+            a.collection,
+            query=" ".join(a.query or []),
+            concept=a.concept or "",
+            archetype=a.archetype or "",
+            pattern=a.pattern or "",
+            limit=a.limit,
+        )
+    except ToolError as e:
+        print(str(e), file=sys.stderr)
+        return 2
+    print(text)
+    return 1 if "\nNO NOTE in " in text else 0
+
+
 # --- which model is actually answering ------------------------------------
 
 
@@ -1842,6 +1867,20 @@ def main(argv=None) -> int:
     ln.add_argument("--mastered", action="append", help="repeatable")
     ln.add_argument("--syllabus", action="store_true")
     ln.set_defaults(fn=cmd_learn)
+
+    mt = sub.add_parser(
+        "method", help="the curated method notes, cited (kb_craft, kb_method_*, kb_failures)"
+    )
+    mt.add_argument(
+        "collection",
+        help="kb_craft | kb_method_valuation | kb_method_technical | kb_method_risk | kb_failures",
+    )
+    mt.add_argument("query", nargs="*", help="free text")
+    mt.add_argument("--concept", help="curriculum key, e.g. cash_flow")
+    mt.add_argument("--archetype", help="sector archetype, e.g. bank")
+    mt.add_argument("--pattern", help="failure pattern, e.g. accruals_divergence")
+    mt.add_argument("--limit", type=int, default=4)
+    mt.set_defaults(fn=cmd_method)
 
     ft = sub.add_parser("fitness", help="can the system score itself yet?")
     ft.add_argument("--days", type=int, default=30, help="window (default 30)")

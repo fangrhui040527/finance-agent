@@ -10,8 +10,9 @@ from __future__ import annotations
 import re
 from datetime import UTC, date, datetime, timedelta
 
-from agents.base import Agent, AgentContext, Finding, cite
+from agents.base import Agent, AgentContext, Finding, cite, quote_span
 from core.contracts.answer import TrustTier
+from core.guardrails.policy import PolicyViolation
 from core.llm.tiers import TaskClass
 from core.market.pointintime import FactStore, assert_no_lookahead
 from core.market.prices import PriceSeries
@@ -267,6 +268,52 @@ class A2Valuation(Agent):
                 caveats=["this is what the price implies, not an estimate of value"],
             )
         ]
+
+    def method_note(self, archetype: str, limit: int = 2) -> list[Finding]:
+        """The valuation method note for this archetype, cited from kb_method_valuation.
+
+        Retrieval is on the method label and the hits are filtered on the
+        note's own `archetypes`, so a bank note is never quoted for a software
+        name (docs/06 section 5.6). Nothing when the store is empty.
+        """
+        method, _ = self.ARCHETYPE_METHODS.get(archetype, ("EV/EBIT vs history", set()))
+        try:
+            res = self.retrieve(
+                "kb_method_valuation", f"{archetype} {method} valuation method", limit=6
+            )
+        except (KeyError, PermissionError, PolicyViolation):
+            return []
+        out: list[Finding] = []
+        seen: set[str] = set()
+        for h in res.hits:
+            meta = h.chunk.metadata
+            slug = meta.get("slug")
+            if meta.get("kind") != "method_note" or slug in seen:
+                continue
+            if archetype not in (meta.get("archetypes") or ()):
+                continue
+            seen.add(str(slug))
+            span = quote_span(h.chunk.text)
+            out.append(
+                Finding(
+                    self.agent_id,
+                    "method",
+                    f"{meta.get('title')}: {span}",
+                    citations=[
+                        cite(
+                            "kb_method_valuation",
+                            h.chunk.chunk_id,
+                            span,
+                            TrustTier.METHOD_KB,
+                            h.chunk.as_of or self.ctx.now,
+                        )
+                    ],
+                    caveats=[f"method note {slug}, as of {meta.get('as_of')}"],
+                )
+            )
+            if len(out) >= limit:
+                break
+        return out
 
 
 class A3PriceTechnical(Agent):

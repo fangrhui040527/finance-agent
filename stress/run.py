@@ -1151,6 +1151,9 @@ def s_mcp():
         "pull_news": {"hours": 0},
         "plan_question": {"question": "why did it move"},
         "explain_concept": {},
+        # The curated notes: a read of a human-written store, cited; on a
+        # checkout without notes the honest answer is NO NOTE, not a crash.
+        "method_note": {"collection": "kb_failures", "pattern": "accruals_divergence"},
         "log_hypothesis": {"title": "t", "thesis": "x", "db": ":memory:"},
         # Observability tools: read-only, and each must answer on an EMPTY
         # installation - "nothing has run yet" is the honest answer, and a

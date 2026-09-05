@@ -35,6 +35,7 @@ from pathlib import Path
 from knowledge.chunking.parent_child import Chunk, chunk_news
 from knowledge.news.features import Article, LexiconExtractor
 from knowledge.retrieval.hybrid import Collection
+from knowledge.retrieval.method import METHOD_DIR, method_collections, method_stamp
 from knowledge.retrieval.pipeline import Router
 
 #: How far back the news collection reaches. Retrieval is for "what has been
@@ -164,6 +165,7 @@ def build_router(
     extra: dict[str, Collection] | None = None,
     feedback_dir: str | Path | None = FEEDBACK_DIR,
     paper_dir: str | Path | None = PAPER_DIR,
+    method_dir: str | Path | None = METHOD_DIR,
 ) -> Router:
     """One router: registry ownership, every store registered, news filled.
 
@@ -172,7 +174,10 @@ def build_router(
     index) under their store names. `feedback_dir` is where the nightly
     routine writes its dated feedback; those pages fill `kb_lessons`, the one
     store the registry lets an agent write, so the reflection agent can read
-    back what the routine concluded on earlier days.
+    back what the routine concluded on earlier days. `method_dir` holds the
+    curated notes that fill the five human-written stores (kb_craft,
+    kb_method_*, kb_failures); None leaves them empty, which is what a test
+    that wants to prove "no evidence" asks for.
     """
     router = Router(ownership_from_registry(reg))
     now = now or datetime.now(UTC)
@@ -192,6 +197,9 @@ def build_router(
         if paper_dir is not None:
             col = lessons_collection(paper_dir, "paper", col)
         filled["kb_lessons"] = col
+    if method_dir is not None:
+        for name, col in method_collections(method_dir).items():
+            filled.setdefault(name, col)
 
     for name in sorted(reg.knowledge):
         router.register(filled.get(name) or Collection(name))
@@ -219,15 +227,18 @@ def router_for(reg, corpus_path: str | Path | None, now: datetime | None = None)
 
     The MCP server calls `context()` on every tool call, and re-indexing a
     season of headlines per call would make each answer pay for the whole
-    corpus. The cache key is the corpus file's identity, so a sweep that lands
-    while the server is up is picked up on the next call, and a test that
-    hands a fresh temporary corpus never sees another test's index.
+    corpus. The cache key is the corpus file's identity plus the method notes'
+    identity, so a sweep that lands while the server is up, or a note edited
+    while it is up, is picked up on the next call, and a test that hands a
+    fresh temporary corpus never sees another test's index.
     """
     from knowledge.corpus import Corpus
 
     if corpus_path is None:
         return build_router(reg, None, now=now)
-    key = _corpus_stamp(str(corpus_path))
+    # The notes are part of the key: an edited method note must be visible on
+    # the next call, not after the next sweep happens to change the corpus.
+    key = (_corpus_stamp(str(corpus_path)), method_stamp())
     hit = _CACHE.get(key)
     if hit is not None:
         return hit

@@ -17,6 +17,10 @@ cases:
   - name: link_only_source_not_quoted
     concept: kelly
     expect: further_reading
+  - name: craft_note_is_cited
+    concept: cash_flow
+    known: [share, income_statement]
+    expect: note
   # -- negatives -----------------------------------------------------------
   - name: blocks_kelly_before_expected_value
     concept: kelly
@@ -26,5 +30,11 @@ cases:
     near_miss: true
   - name: unknown_concept
     concept: crypto_moon_math
+    expect: refuse
+    negative: true
+  - name: no_note_when_store_is_empty
+    concept: cash_flow
+    known: [share, income_statement]
+    router: empty
     expect: refuse
     negative: true

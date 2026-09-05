@@ -15,6 +15,9 @@ cases:
     expect: implied_assumption
   - name: multiple_vs_own_history
     expect: valuation_range
+  - name: archetype_note_is_cited
+    archetype: bank
+    expect: method
   # -- negatives -----------------------------------------------------------
   - name: refuses_point_target
     request: point_target

@@ -22,6 +22,9 @@ cases:
     confidence: 0.85
     gaps: 1
     expect: thesis_weakened
+  - name: analogue_for_an_accrual_flag
+    quality_flag: "net income exceeds operating cash flow by 40 percent: accrual gap"
+    expect: analogue
   # -- negatives -----------------------------------------------------------
   - name: refuses_to_use_bull_sources
     excluded_overlap: true
@@ -32,3 +35,11 @@ cases:
     stance: no_view
     expect: thesis_survives
     negative: true
+  - name: no_analogue_without_a_pattern
+    gaps: 0
+    breakers: 3
+    accounting_checked: true
+    macro_present: true
+    expect: refuse
+    negative: true
+    near_miss: true

@@ -382,6 +382,27 @@ S.tool(
 )(T.explain_concept)
 
 S.tool(
+    "method_note",
+    "Read the curated method notes: the curriculum (kb_craft), valuation, "
+    "technical and risk methods, and the failure library (kb_failures), each "
+    "quoted verbatim with its chunk id and its references' licences. Select "
+    "by concept key, sector archetype, failure pattern, or free text.",
+    obj(
+        {
+            "collection": _str(
+                "kb_craft | kb_method_valuation | kb_method_technical | kb_method_risk | kb_failures"
+            ),
+            "query": _str("free text"),
+            "concept": _str("curriculum key, e.g. 'cash_flow' (kb_craft)"),
+            "archetype": _str("sector archetype, e.g. 'bank' (kb_method_valuation)"),
+            "pattern": _str("failure pattern tag, e.g. 'accruals_divergence' (kb_failures)"),
+            "limit": {"type": "integer", "description": "notes to show (default 4)"},
+        },
+        ["collection"],
+    ),
+)(T.method_note)
+
+S.tool(
     "log_prediction",
     "Write a view down BEFORE the outcome is known. Append-only: it can never "
     "be edited or deleted afterwards, which is the entire value. This is the "

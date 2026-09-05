@@ -18,7 +18,10 @@ Everything lands in `debug/<run_id>/`:
     prompts/       every prompt and response in full
     summary.json   counts, timings, cost
 
-The trace holds VERBATIM prompts. debug/ is gitignored for that reason.
+The trace holds VERBATIM prompts. debug/ is TRACKED on purpose (.gitignore
+explains: the operator asked for the whole project, traces included, to be
+backed up), so a bundle written here with a real model's prompts is history
+the next commit carries. Run against a real backend only when that is wanted.
 """
 
 from __future__ import annotations
