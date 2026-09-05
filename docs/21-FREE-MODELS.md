@@ -63,10 +63,10 @@ python ask.py backend
 
 ```
 backend   OpenAICompatibleBackend
-reason    groq (GROQ_API_KEY is set and ANTHROPIC_API_KEY is not, free tier): reason=openai/gpt-oss-120b balanced=llama-3.3-70b-versatile cheap=llama-3.1-8b-instant; ...
+reason    groq (GROQ_API_KEY is set and ANTHROPIC_API_KEY is not, free tier): reason=openai/gpt-oss-120b balanced=openai/gpt-oss-20b cheap=openai/gpt-oss-20b; ...
   reason    openai/gpt-oss-120b      max 16000, effort dial not sent to this provider
-  balanced  llama-3.3-70b-versatile  max 8000, effort dial not sent to this provider
-  cheap     llama-3.1-8b-instant     max 1024, effort dial not sent to this provider
+  balanced  openai/gpt-oss-20b       max 8000, effort dial not sent to this provider
+  cheap     openai/gpt-oss-20b       max 1024, effort dial not sent to this provider
 ```
 
 Selection precedence, the same rule as before with one more rung:
@@ -92,7 +92,7 @@ a backend that stops on day 31 is the EchoBackend problem with a delay.
 
 | `LLM_BACKEND` | Key | Free tier (as catalogued) | Default models (reason / balanced / cheap) |
 |---|---|---|---|
-| `groq` | `GROQ_API_KEY` | no card; Llama 3.x/4, Qwen, GPT-OSS; ~30 req/min and a per-model daily cap | `openai/gpt-oss-120b` / `llama-3.3-70b-versatile` / `llama-3.1-8b-instant` |
+| `groq` | `GROQ_API_KEY` | no card; GPT-OSS 120b/20b, Qwen3 27b, Compound (the Llama chat models left the lineup in 2026-09); ~30 req/min and a per-model daily cap | `openai/gpt-oss-120b` / `openai/gpt-oss-20b` / `openai/gpt-oss-20b` |
 | `gemini` (`google`) | `GEMINI_API_KEY` | Google AI Studio; no card; Flash and Flash-Lite, rate-limited per model and per day | `gemini-flash-latest` / `gemini-flash-latest` / `gemini-flash-lite-latest` |
 | `openrouter` | `OPENROUTER_API_KEY` | `:free` models; 20 req/min, ~50/day (200 once the account has ever held $10); a balance must exist, may be $0 | `deepseek/deepseek-r1:free` / `meta-llama/llama-3.3-70b-instruct:free` / `meta-llama/llama-3.2-3b-instruct:free` |
 | `mistral` | `MISTRAL_API_KEY` | 1 req/s, 500K tok/min, 1B tok/month; phone verification and data-use opt-in | `mistral-large-latest` / `mistral-medium-latest` / `mistral-small-latest` |
@@ -107,11 +107,14 @@ Workers AI, Hugging Face Inference Providers, SambaNova (20 req/min, 200K
 tokens/day while its credit lasts), OrcaRouter (`orcarouter/free`), Kimi.
 
 **Model ids rot.** OpenRouter's free set in particular changes month to
-month. A 404 from a provider names the variable to set:
+month, and Groq retired every Llama chat model between 2026-09-03 and
+2026-09-05 (`llama-3.1-8b-instant` answered 404 two days after it was
+catalogued). `.github/workflows/free-backend-probe.yml` prints the ids each
+keyed provider serves today; a 404 from a provider names the variable to set:
 
 ```
-LLM_MODEL_CHEAP=qwen/qwen3-32b          # one tier
-LLM_MODEL=llama-3.3-70b-versatile       # every tier
+LLM_MODEL_CHEAP=qwen/qwen3.8-27b        # one tier
+LLM_MODEL=openai/gpt-oss-120b           # every tier
 ```
 
 ## 5. What changes on a free provider, and what does not
@@ -121,7 +124,7 @@ LLM_MODEL=llama-3.3-70b-versatile       # every tier
 - The routing table. A task class still lands on its tier; the tier lands on
   the provider's model for it. Callers still cannot pick a tier or a model.
 - The guardrail chain, the budget rail, the ledger. Every call is enforced,
-  every call is recorded — under the model that answered (`llama-3.1-8b-instant`,
+  every call is recorded — under the model that answered (`openai/gpt-oss-20b`,
   not `claude-haiku-4-5`), at the price it cost, which is zero. `operating_report`
   shows the models actually called.
 - Refusal semantics. `finish_reason=content_filter` is a `Declined` carrying
@@ -179,7 +182,7 @@ LLM_BACKEND_CHEAP=groq      # reason and balanced stay on Claude
 backend   SplitBackend
   reason    claude-opus-5            AnthropicBackend, effort high, max 16000, streamed
   balanced  claude-sonnet-5          AnthropicBackend, effort medium, max 8000
-  cheap     llama-3.1-8b-instant     OpenAICompatibleBackend, max 1024, effort dial not sent to this provider
+  cheap     openai/gpt-oss-20b       OpenAICompatibleBackend, max 1024, effort dial not sent to this provider
 ```
 
 Each tier's calls land on their own backend and their own price. Two tiers

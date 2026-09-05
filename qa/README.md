@@ -98,9 +98,11 @@ on main at 8802d5e; 9 of 14 parts held, one of them core):
   step held inline Python that YAML re-indented into an `IndentationError` (now
   `.github/scripts/model_ids.py`, tested); and the logs artifact skipped the dot-prefixed
   results directory.
-- **Open until the probe answers.** Groq no longer serves `llama-3.1-8b-instant`, the
-  catalogue's cheap default; parts 13 and 14 fail with the 404 that names the variable to
-  set. The default moves to a model from the probe's live list.
+- **Fixed.** Groq no longer serves `llama-3.1-8b-instant`, the catalogue's cheap default;
+  parts 13 and 14 failed with the 404 that names the variable to set. The probe's live list
+  (2026-09-05) carried no Llama chat model at all - GPT-OSS 120b/20b, Qwen3.6/3.8 27b, the
+  Compound agents, Whisper, Allam and two prompt-guard classifiers - so balanced and cheap
+  now default to `openai/gpt-oss-20b` and reason stays on `openai/gpt-oss-120b`.
 
 From the free-provider pass (2026-09-04, against PR #32 at ec8ba34; 41 of 42 held):
 

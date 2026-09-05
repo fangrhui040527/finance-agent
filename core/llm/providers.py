@@ -89,15 +89,22 @@ PROVIDERS: tuple[Provider, ...] = (
         name="groq",
         base_url="https://api.groq.com/openai/v1",
         key_env="GROQ_API_KEY",
+        # Read off the live /models list on 2026-09-05 (the free-backend-probe
+        # workflow prints it): the Llama chat models had left the lineup, and
+        # llama-3.1-8b-instant answered 404. GPT-OSS is what remains that is a
+        # plain chat model with its reasoning kept out of the content field;
+        # Qwen3 puts its thinking in the reply unless asked not to, and
+        # groq/compound is an agent, not a model.
         models={
             Tier.REASON: "openai/gpt-oss-120b",
-            Tier.BALANCED: "llama-3.3-70b-versatile",
-            Tier.CHEAP: "llama-3.1-8b-instant",
+            Tier.BALANCED: "openai/gpt-oss-20b",
+            Tier.CHEAP: "openai/gpt-oss-20b",
         },
         rpm=30,
         note=(
-            "free tier, no card: Llama 3.x/4, Qwen, GPT-OSS; about 30 requests a "
-            "minute and a per-model daily cap (console.groq.com/settings/limits)"
+            "free tier, no card: GPT-OSS 120b/20b, Qwen3 27b, Compound (the Llama "
+            "chat models left the lineup in 2026-09); about 30 requests a minute "
+            "and a per-model daily cap (console.groq.com/settings/limits)"
         ),
     ),
     Provider(

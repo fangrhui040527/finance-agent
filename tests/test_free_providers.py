@@ -124,14 +124,14 @@ def test_configured_means_keyless_or_key_present(monkeypatch):
 def test_from_env_returns_the_preset_when_nothing_is_overridden():
     p = providers.from_env("groq")
     assert p.base_url == "https://api.groq.com/openai/v1"
-    assert p.models[Tier.CHEAP] == "llama-3.1-8b-instant"
+    assert p.models[Tier.CHEAP] == "openai/gpt-oss-20b"
 
 
 def test_a_per_tier_model_override_outranks_the_default(monkeypatch):
     monkeypatch.setenv("LLM_MODEL_CHEAP", "qwen/qwen3-32b")
     p = providers.from_env("groq")
     assert p.models[Tier.CHEAP] == "qwen/qwen3-32b"
-    assert p.models[Tier.BALANCED] == "llama-3.3-70b-versatile"
+    assert p.models[Tier.BALANCED] == "openai/gpt-oss-20b"
 
 
 def test_llm_model_pins_every_tier_and_a_per_tier_override_still_wins(monkeypatch):
@@ -191,7 +191,7 @@ def test_naming_a_provider_with_its_key_builds_the_free_backend_and_says_so(monk
     backend, reason = backend_from_env("groq")
     assert isinstance(backend, OpenAICompatibleBackend) and backend.name == "groq"
     assert reason.startswith("groq (explicitly selected, free tier):")
-    assert "llama-3.1-8b-instant" in reason and "priced at zero" in reason
+    assert "openai/gpt-oss-20b" in reason and "priced at zero" in reason
     # ask.py labels a narrative with reason.split(":")[0]; the URL's own colon
     # must come after the first one, or the label ends mid-word.
     assert reason.split(":")[0] == "groq (explicitly selected, free tier)"
@@ -275,10 +275,10 @@ def test_a_cheap_override_puts_the_free_model_behind_triage_and_leaves_the_thesi
     models = models_by_tier(backend)
     assert models[Tier.REASON] == "claude-opus-5"
     assert models[Tier.BALANCED] == "claude-sonnet-5"
-    assert models[Tier.CHEAP] == "llama-3.1-8b-instant"
+    assert models[Tier.CHEAP] == "openai/gpt-oss-20b"
     assert models[Tier.EMBED] == MODEL_IDS[Tier.EMBED]
     assert (
-        "split by tier" in reason and "cheap=OpenAICompatibleBackend llama-3.1-8b-instant" in reason
+        "split by tier" in reason and "cheap=OpenAICompatibleBackend openai/gpt-oss-20b" in reason
     )
     assert backend_name(backend, Tier.CHEAP) == "OpenAICompatibleBackend"
     assert backend_name(backend, Tier.REASON) == "AnthropicBackend"
@@ -362,7 +362,7 @@ def test_split_dispatches_by_model_id_and_refuses_a_stranger():
     free = OpenAICompatibleBackend(groq, opener=scripted_opener([reply("from groq")]))
     echo = EchoBackend()
     split = SplitBackend({Tier.REASON: echo, Tier.BALANCED: echo, Tier.CHEAP: free})
-    text, _ = split.complete("llama-3.1-8b-instant", "q", None)
+    text, _ = split.complete("openai/gpt-oss-20b", "q", None)
     assert text == "from groq" and split.last_request_id == "chatcmpl-1"
     text, _ = split.complete("claude-opus-5", "q", None)
     assert text.startswith("[claude-opus-5]")
@@ -383,10 +383,10 @@ def test_a_free_call_is_ledgered_under_its_own_model_at_zero_cost():
     free = OpenAICompatibleBackend(providers.from_env("groq"), opener=scripted_opener([reply()]))
     client, led = _client(free)
     done = client.complete("a4", TaskClass.NEWS_TRIAGE, "tag this")
-    assert done.model_id == "llama-3.1-8b-instant" and done.tier is Tier.CHEAP
+    assert done.model_id == "openai/gpt-oss-20b" and done.tier is Tier.CHEAP
     assert done.cost_myr == Decimal(0)
     row = next(led.calls())
-    assert row["model_id"] == "llama-3.1-8b-instant" and row["tier"] == "cheap"
+    assert row["model_id"] == "openai/gpt-oss-20b" and row["tier"] == "cheap"
     assert Decimal(row["cost_myr"]) == Decimal(0) and row["input_tokens"] == 10
     assert done.request_id == "chatcmpl-1"
 
@@ -406,10 +406,10 @@ def test_under_the_split_each_tier_lands_on_its_own_backend_and_price():
     client, led = _client(SplitBackend({Tier.REASON: echo, Tier.BALANCED: echo, Tier.CHEAP: free}))
     triage = client.complete("a4", TaskClass.NEWS_TRIAGE, "tag this")
     thesis = client.complete("a4", TaskClass.THESIS_SYNTHESIS, "x" * 400)
-    assert triage.model_id == "llama-3.1-8b-instant" and triage.cost_myr == 0
+    assert triage.model_id == "openai/gpt-oss-20b" and triage.cost_myr == 0
     assert thesis.model_id == "claude-opus-5" and thesis.cost_myr > 0
     rows = list(led.calls())
-    assert [r["model_id"] for r in rows] == ["llama-3.1-8b-instant", "claude-opus-5"]
+    assert [r["model_id"] for r in rows] == ["openai/gpt-oss-20b", "claude-opus-5"]
 
 
 def test_structured_output_survives_a_thinking_model():
@@ -428,7 +428,7 @@ def test_structured_output_survives_a_thinking_model():
     client, _ = _client(free)
     parsed, done = client.complete_structured("a4", TaskClass.CATEGORY_CLASSIFY, "classify", Tag)
     assert parsed is not None and parsed.category == "earnings" and parsed.relevance == 0.8
-    assert done.model_id == "llama-3.1-8b-instant"
+    assert done.model_id == "openai/gpt-oss-20b"
 
 
 def test_model_of_and_pricing_of_fall_back_to_the_claude_table():
@@ -454,7 +454,7 @@ def test_ask_backend_shows_the_free_models_and_that_effort_does_not_reach_them(c
     code, out = _run(["backend"], capsys)
     assert code == 0
     assert "OpenAICompatibleBackend" in out and "claude-haiku-4-5" not in out
-    assert "llama-3.1-8b-instant" in out and "effort dial not sent" in out
+    assert "openai/gpt-oss-20b" in out and "effort dial not sent" in out
 
 
 def test_ask_backend_shows_which_backend_answers_each_tier_under_a_split(capsys, monkeypatch):
@@ -463,7 +463,7 @@ def test_ask_backend_shows_which_backend_answers_each_tier_under_a_split(capsys,
     monkeypatch.setenv("LLM_BACKEND_CHEAP", "groq")
     code, out = _run(["backend"], capsys)
     assert code == 0 and "SplitBackend" in out
-    assert "claude-opus-5" in out and "llama-3.1-8b-instant" in out
+    assert "claude-opus-5" in out and "openai/gpt-oss-20b" in out
     assert "OpenAICompatibleBackend, max 1024" in out
 
 
@@ -493,9 +493,7 @@ def test_web_backend_reports_the_free_models_per_tier(tmp_path, monkeypatch):
     assert body["data"]["is_stub"] is False
     assert body["data"]["backend"] == "OpenAICompatibleBackend"
     cheap = body["data"]["tiers"]["cheap"]
-    assert (
-        cheap["model"] == "llama-3.1-8b-instant" and cheap["backend"] == "OpenAICompatibleBackend"
-    )
+    assert cheap["model"] == "openai/gpt-oss-20b" and cheap["backend"] == "OpenAICompatibleBackend"
     assert cheap["effort"] is None and cheap["max_tokens"] == 1024
     assert body["data"]["tiers"]["embed"]["model"] == MODEL_IDS[Tier.EMBED]
 
