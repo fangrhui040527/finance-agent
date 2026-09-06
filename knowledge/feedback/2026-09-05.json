@@ -1,0 +1,119 @@
+{
+  "day": "2026-09-05",
+  "written_at": "2026-09-06T06:32:00Z",
+  "market": {
+    "regime": "neutral",
+    "notes": [
+      "The day was not measured: the collector's us_close sweep and everything after 12:48 UTC on 2026-09-05 did not run (GitHub Actions minutes cap from 15:54 UTC), so the last cached sessions are unchanged from the 2026-09-04 page: Bursa 2026-09-03, US 2026-09-04.",
+      "MYX:0820EA 1d +0.00%, 5d -2.41% to 2026-09-03; XNAS:SPY 1d -0.39%, 5d +0.11% to 2026-09-04 (pack, same figures as 2026-09-04).",
+      "VIXCLS 14.32 (-0.88, 2026-09-03); BAMLH0A0HYM2 2.65 (-0.01); SP500 7,718.60 (-29.11, 2026-09-04); DGS10 4.77 (-0.02); DGS2 4.34 (-0.05); T10Y2Y 0.41; BNM:OPR 2.75; DEXMAUS 4.02 (2026-08-28): every macro row is the same print as the previous page.",
+      "All nine decompositions not_significant, unchanged; this page re-reads the same sessions with one more day of stories and snapshots."
+    ]
+  },
+  "names": [
+    {
+      "instrument_id": "MYX:1155",
+      "move": {"return_1d": -0.0019, "market_1d": 0.0, "unexplained_share": 1.0, "return_5d": -0.0038, "market_5d": -0.0241, "sigma": 0.12, "verdict": "not_significant", "last_session": "2026-09-03", "remeasured": false},
+      "causes": [],
+      "open_questions": [],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:5347",
+      "move": {"return_1d": 0.0029, "market_1d": 0.0, "unexplained_share": 1.0, "return_5d": -0.0434, "market_5d": -0.0241, "sigma": 0.39, "verdict": "not_significant", "last_session": "2026-09-03", "remeasured": false},
+      "causes": [],
+      "open_questions": ["Is the 5d -4.34% (vs -2.41% proxy) the results print the 2026-09-04 roundup headline referred to? No primary figure collected (since 2026-09-04)."],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:5183",
+      "move": {"return_1d": 0.0, "market_1d": 0.0, "unexplained_share": 1.0, "return_5d": 0.0211, "market_5d": -0.0241, "sigma": 0.04, "verdict": "not_significant", "last_session": "2026-09-03", "remeasured": false},
+      "causes": [],
+      "open_questions": [],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:5225",
+      "move": {"return_1d": -0.0111, "market_1d": 0.0, "unexplained_share": 1.0, "return_5d": -0.0196, "market_5d": -0.0241, "sigma": 0.92, "verdict": "not_significant", "last_session": "2026-09-03", "remeasured": false},
+      "causes": [],
+      "open_questions": [],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:8869",
+      "move": {"return_1d": 0.0025, "market_1d": 0.0, "unexplained_share": 1.0, "return_5d": -0.005, "market_5d": -0.0241, "sigma": 0.08, "verdict": "not_significant", "last_session": "2026-09-03", "remeasured": false},
+      "causes": [],
+      "open_questions": [],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:3182",
+      "move": {"return_1d": 0.0099, "market_1d": 0.0, "unexplained_share": 1.0, "return_5d": -0.0377, "market_5d": -0.0241, "sigma": 0.68, "verdict": "not_significant", "last_session": "2026-09-03", "remeasured": false},
+      "causes": [],
+      "open_questions": [],
+      "watch": []
+    },
+    {
+      "instrument_id": "XNAS:NVDA",
+      "move": {"return_1d": 0.0084, "market_1d": -0.0039, "unexplained_share": 0.71, "return_5d": 0.0589, "market_5d": 0.0011, "sigma": 0.82, "verdict": "not_significant", "last_session": "2026-09-04", "remeasured": false},
+      "causes": [
+        {
+          "claim": "Candidate for the 5d move only, carried from 2026-09-04: the Hugging Face transaction",
+          "evidence": ["digest 2026-09-04 finance.yahoo.com: Nvidia's $13 Billion Hugging Face Deal Expands Open-Source AI"],
+          "chain": ["Hugging Face transaction reported 2026-09-04", "unknown: no collected evidence reaches further; no filing or release in the fact book (last 8-K 2026-09-02, items 8.01)"],
+          "confidence": 0.3,
+          "confirm": "an 8-K or press release dated the announcement in the fact book, and the idiosyncratic share above 50% once a 5-session window is decomposed",
+          "refute": "SPY and the semiconductor names moving together over the same five sessions"
+        }
+      ],
+      "open_questions": [
+        "Does the fact book pick up a filing or release for the Hugging Face transaction, and does a 5-session decomposition keep the idiosyncratic share above 50%? (since 2026-09-04)",
+        "Finnhub earnings rows for NVDA carry a knowable date in the future (2026-09-30); which field is being read as the report date? (since 2026-09-04)"
+      ],
+      "watch": []
+    },
+    {
+      "instrument_id": "XNAS:AAPL",
+      "move": {"return_1d": -0.0251, "market_1d": -0.0039, "unexplained_share": 0.91, "return_5d": 0.0008, "market_5d": 0.0011, "sigma": 1.47, "verdict": "not_significant", "last_session": "2026-09-04", "remeasured": false},
+      "causes": [],
+      "open_questions": [],
+      "watch": [{"when": "2026-10-28", "what": "earnings_result", "title": "Q4 2026 results after the close (finnhub)"}]
+    },
+    {
+      "instrument_id": "XNAS:MSFT",
+      "move": {"return_1d": -0.0204, "market_1d": -0.0039, "unexplained_share": 0.83, "return_5d": -0.0269, "market_5d": 0.0011, "sigma": 0.74, "verdict": "not_significant", "last_session": "2026-09-04", "remeasured": false},
+      "causes": [],
+      "open_questions": [],
+      "watch": [{"when": "2026-10-27", "what": "earnings_result", "title": "Q1 2027 results (finnhub)"}]
+    }
+  ],
+  "data_quality": {
+    "failed": [
+      "collector: no sweep after 12:48 UTC (GitHub Actions minutes cap from 15:54 UTC); us_close, the paper-book mark and the Routine's scheduled fire did not run",
+      "gdelt: Genting, Tenaga, IHH at 12:48 UTC; Tenaga, Petronas Chemicals, IHH, Genting, NVIDIA at 02:29 UTC"
+    ],
+    "degraded": [
+      "yahoo_rss: read but empty for all six Bursa names in both sweeps",
+      "google_news: read but empty for the Bursa names in both sweeps",
+      "gdelt: read but empty for Petronas Chemicals and Press Metal",
+      "fmp: HTTP 402 on the earnings endpoint (plan boundary)",
+      "price cache: no bar for Bursa 2026-09-04 and 2026-09-05 or US 2026-09-05"
+    ],
+    "skipped": [],
+    "notes": [
+      "The fact book holds NOTHING COLLECTED for all six Bursa names and for XTAI:2330.",
+      "NVDA earnings rows stamped knowable 2026-09-30 are not used."
+    ]
+  },
+  "open_questions_carried": [
+    "Tenaga: is the 5d -4.34% (vs -2.41% proxy) the results print the roundup headline referred to? (since 2026-09-04)",
+    "NVIDIA: filing or release for the Hugging Face transaction; 5-session idiosyncratic share above 50%? (since 2026-09-04)",
+    "Finnhub earnings rows for NVDA carry a knowable date in the future; which field is read as the report date? (since 2026-09-04)",
+    "The six Bursa names have no fact-book coverage; which of bursa_announcements or a keyed Bursa source is the shortest path? (since 2026-09-04)",
+    "When the Actions cap lifts, does the first collect sweep back-fill the missing bars for 2026-09-04 and 2026-09-05, or does the cache carry a gap the decomposition must be told about? (since 2026-09-05)"
+  ],
+  "lessons": [
+    "A pack whose last-session dates equal the previous page's is a stalled cache, not a flat day: on such a page the 1d and 5d figures are identical to the page before; if they ever differ, the reading is wrong.",
+    "A headline's stated move disagreed with the pack's measured move for the same name and session on three of three occasions today; treat a stated percentage as a claim about a different window or price basis until the session is matched."
+  ]
+}
