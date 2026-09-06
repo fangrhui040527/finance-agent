@@ -34,6 +34,12 @@ from pathlib import Path
 from core.provenance.ledger import _enable_wal
 
 WARN = "warn"
+
+#: Where the nightly feedback pages live. Read at CALL time, and overridable
+#: per call through `evaluate(feedback_root=...)`, for the reason that file's
+#: docstring gives: a test that cannot point it somewhere of its own reads the
+#: repository's own tracked pages, whose questions age.
+FEEDBACK_DIR = "knowledge/feedback"
 ALERT = "alert"
 
 SCHEMA = """
@@ -132,9 +138,16 @@ class AlertLog:
 
 
 def evaluate(
-    cfg, db: str = "", debug_root: str = "debug", now: datetime | None = None
+    cfg,
+    db: str = "",
+    debug_root: str = "debug",
+    now: datetime | None = None,
+    feedback_root: str = "",
 ) -> list[Alert]:
-    """Every rule, against the ledger and the traces. Pure: writes nothing."""
+    """Every rule, against the ledger, the traces and the nightly pages. Pure:
+    writes nothing. `debug_root` and `feedback_root` are parameters rather than
+    settings for the same reason: a test that cannot point them somewhere of
+    its own reads the repository's own tracked directories, which age."""
     from core.provenance.ledger import ProvenanceLedger
 
     now = now or datetime.now(UTC)
@@ -214,6 +227,7 @@ def evaluate(
 
     out.extend(_sweep_rules(cfg, now))
     out.extend(_series_rules(cfg, now))
+    out.extend(_question_rules(now, feedback_root))
     out.extend(_paper_rules(cfg, now))
     out.extend(_trace_rules(debug_root))
     return out
@@ -339,6 +353,58 @@ def _series_rules(cfg, now: datetime) -> list[Alert]:
                     {"series_id": sid, "newest": newest, "age_days": age, "limit_days": limit}
                     for age, limit, sid, newest in stale
                 ],
+            },
+        )
+    ]
+
+
+#: How long an open question may stand on the nightly pages before it is a
+#: finding rather than a question. Three weeks: long enough that a slow answer
+#: - a quarterly filing, a source that publishes monthly - is not an alert, and
+#: short enough that "the six Bursa names have no fact-book coverage" cannot be
+#: carried forward for a season without anyone deciding anything.
+OPEN_QUESTION_DAYS = 21
+
+
+def _question_rules(now: datetime, directory: str = "") -> list[Alert]:
+    """A question the nightly pages have carried for longer than they should.
+
+    The pages ask the right questions and then carry them, correctly, with the
+    date first asked. What nothing did was notice how long one had stood: a
+    question three weeks old and one asked last night were the same prose in
+    the same list. An old one is usually not a hard question - it is a source
+    that was never wired, and it belongs in front of a person.
+    """
+    from knowledge.feedback_questions import open_questions
+
+    directory = directory or FEEDBACK_DIR
+    if not Path(directory).is_dir():
+        return []
+    old = [q for q in open_questions(directory) if q.age_days > OPEN_QUESTION_DAYS]
+    if not old:
+        return []
+    worst = old[0]
+    return [
+        Alert(
+            rule="open_question_stale",
+            severity=WARN,
+            title=f"{len(old)} question(s) carried over {OPEN_QUESTION_DAYS} days; "
+            f"oldest {worst.age_days}d: {worst.text[:110]}",
+            detail="the nightly pages carry an open question forward with the date it "
+            "was first asked. One still open after three weeks is rarely a hard "
+            "question - it is usually a source nobody wired",
+            next_step="`ask.py pack --questions` lists them oldest first; answer it, "
+            "or write on tonight's page why it cannot be answered and stop carrying it",
+            evidence={
+                "questions": [
+                    {
+                        "text": q.text,
+                        "first_asked": q.first_asked.isoformat(),
+                        "age_days": q.age_days,
+                        "nights": q.nights,
+                    }
+                    for q in old[:10]
+                ]
             },
         )
     ]
@@ -504,13 +570,17 @@ def check(
     alerts_db: str = "data/alerts.db",
     debug_root: str = "debug",
     now: datetime | None = None,
+    feedback_root: str = "",
 ) -> CheckResult:
     """Evaluate, diff against the last known state, and append only the changes."""
     from core.config import load as load_config
 
     cfg = cfg or load_config()
     now = now or datetime.now(UTC)
-    firing = {a.rule: a for a in evaluate(cfg, db=db, debug_root=debug_root, now=now)}
+    firing = {
+        a.rule: a
+        for a in evaluate(cfg, db=db, debug_root=debug_root, now=now, feedback_root=feedback_root)
+    }
 
     opened: list[Alert] = []
     still: list[Alert] = []

@@ -1167,8 +1167,19 @@ def cmd_pack(a) -> int:
     FINPLANET_OFFLINE=1 where no price host is reachable. A name that cannot
     be measured is a NO DATA row, never a typed leg; the command exits 0 when
     the pack was written and the routine reads the rows.
+
+    `--questions` reads the pages instead of building one: every open question
+    the nightly pages carry, with how long it has stood. A question the
+    collection cannot answer is a finding about the collection, and until now
+    nothing in the code read them at all.
     """
     from knowledge.pack import build_pack, write_pack
+
+    if getattr(a, "questions", False):
+        from knowledge.feedback_questions import render as render_questions
+
+        print(render_questions(a.out))
+        return 0
 
     try:
         cfg = load_config()
@@ -2157,6 +2168,11 @@ def main(argv=None) -> int:
         "--write", action="store_true", help="also write knowledge/feedback/<date>.pack.md"
     )
     pk.add_argument("--out", default="knowledge/feedback", help="where --write puts the file")
+    pk.add_argument(
+        "--questions",
+        action="store_true",
+        help="the open questions the pages carry, oldest first; builds no pack",
+    )
     pk.add_argument("--db", default="", help="corpus database")
     pk.add_argument("--facts-db", default="", help="fact book database")
     pk.set_defaults(fn=cmd_pack)

@@ -295,6 +295,7 @@ The rules, all thresholds in `config.toml [monitor]` and bounded in code:
 | `silence` | no model calls in `silence_hours`, on a ledger that HAS run before (0 = off) |
 | `sweep_silence` | no successful sweep in `sweep_silence_hours`, for a source that HAS succeeded before (0 = off) |
 | `series_stale` | a macro series' newest observation is past the cadence declared for it in `knowledge/sources/freshness.py` |
+| `open_question_stale` | a question the nightly pages carry has stood for more than 21 days |
 | `run_errors` | the newest traced run contains an error event |
 | `methodology_changed` | the manifest hash moved between the last two runs |
 
@@ -307,6 +308,17 @@ monthly, or a policy rate's meeting schedule - is declared in
 `knowledge/sources/freshness.py`; a series with no entry there is not judged,
 and `ask.py macro` marks each row with its age so a stale figure is labelled
 where it is read, not only where it is alerted.
+
+`open_question_stale` reads the pages the nightly routine writes. Each carries
+its open questions forward with the date first asked - and until 2026-09-06
+nothing in the code read them, so a question that had stood for a fortnight was
+the same prose in the same list as one asked yesterday. `ask.py pack
+--questions` lists them oldest first, with how many nights each has been
+carried, and flags any asked under a name that the page forgot to carry. A
+question still open after three weeks is rarely a hard question: it is usually
+a source nobody wired. Answer it, or write on tonight's page why it cannot be
+answered and stop carrying it - a question is open exactly while the writer
+keeps carrying it.
 
 `silence_hours` is off by default because a personal tool is allowed to sit
 idle. **Turn it on the moment anything runs on a timer**: a job that dies

@@ -38,6 +38,17 @@ def _cfg(**over):
     return replace(load_config(), **over)
 
 
+#: The nightly pages are tracked too, and their questions age. Every case that
+#: is not about them sees a directory that does not exist; the ones that are
+#: pass `feedback_root` explicitly, which wins over this.
+NO_PAGES = "tests/no-such-feedback"
+
+
+@pytest.fixture(autouse=True)
+def _no_real_pages(monkeypatch):
+    monkeypatch.setattr("core.monitor.FEEDBACK_DIR", NO_PAGES)
+
+
 def _ledger(path: Path, calls: int = 3, latency: float = 100.0, cost_scale: int = 100):
     led = ProvenanceLedger(path)
     for _ in range(calls):
@@ -389,6 +400,62 @@ def test_the_sweep_rule_is_off_by_default(tmp_path):
     _swept(tmp_path / "corpus.db", at=now - timedelta(days=30))
     alerts = evaluate(_sweep_cfg(tmp_path, hours=0), db=str(_ledger(tmp_path / "led.db")), now=now)
     assert not [a for a in alerts if a.rule == "sweep_silence"]
+
+
+# --- questions the pages have carried too long ------------------------------------------------
+
+
+def _pages(directory: Path, days_old: int) -> Path:
+    """One page carrying a question first asked `days_old` days before it."""
+    import json as _json
+    from datetime import date as _date
+
+    directory.mkdir(parents=True, exist_ok=True)
+    day = _date(2026, 9, 25)
+    asked = day - timedelta(days=days_old)
+    (directory / f"{day}.json").write_text(
+        _json.dumps(
+            {
+                "day": str(day),
+                "open_questions_carried": [
+                    f"The six Bursa names have no fact-book coverage (since {asked})"
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    return directory
+
+
+def test_a_question_carried_past_three_weeks_is_a_finding_not_a_question(tmp_path):
+    """The pages ask the right questions and carry them correctly. What nothing
+    noticed was how long one had stood - and an old one is rarely a hard
+    question, it is a source nobody wired."""
+    now = datetime(2026, 9, 25, 8, 0, tzinfo=UTC)
+    root = _pages(tmp_path / "pages", days_old=30)
+    alerts = evaluate(
+        _cfg(), db=str(_ledger(tmp_path / "led.db")), now=now, feedback_root=str(root)
+    )
+    (q,) = [a for a in alerts if a.rule == "open_question_stale"]
+    assert "30d" in q.title and "Bursa" in q.title
+    assert q.evidence["questions"][0]["age_days"] == 30
+
+
+def test_a_question_asked_last_week_is_just_a_question(tmp_path):
+    now = datetime(2026, 9, 25, 8, 0, tzinfo=UTC)
+    root = _pages(tmp_path / "pages", days_old=7)
+    alerts = evaluate(
+        _cfg(), db=str(_ledger(tmp_path / "led.db")), now=now, feedback_root=str(root)
+    )
+    assert not [a for a in alerts if a.rule == "open_question_stale"]
+
+
+def test_no_pages_directory_is_not_an_error(tmp_path):
+    now = datetime(2026, 9, 25, 8, 0, tzinfo=UTC)
+    alerts = evaluate(
+        _cfg(), db=str(_ledger(tmp_path / "led.db")), now=now, feedback_root=str(tmp_path / "none")
+    )
+    assert not [a for a in alerts if a.rule == "open_question_stale"]
 
 
 # --- series staleness ------------------------------------------------------------------------
