@@ -290,7 +290,7 @@ def _name_digest(iid, articles: list[Article], facts, now, linker, extractor, to
             "intensity_max": round(max(f.intensity for _, f in scored), 3),
             "uncertainty_mean": round(sum(f.uncertainty for _, f in scored) / len(scored), 3),
         }
-    for e in facts.events(iid, since=now - timedelta(days=2), until=now, limit=20):
+    for e in facts.events(iid, since=now - timedelta(days=2), until=now, limit=20, opinions=2):
         nd.events.append(_event(e))
     for e in facts.events(iid, since=now, until=now + UPCOMING, limit=10):
         nd.upcoming.append(_event(e))

@@ -133,6 +133,62 @@ def test_events_are_windowed_on_the_effective_date_when_there_is_one(book):
     assert book.events("XNAS:AAPL", until=NOW) == []
 
 
+def test_a_limit_is_not_spent_on_brokers_restating_their_opinion(book):
+    """NVIDIA's 30-day page on 2026-09-06: 28 rows of "Rosenblatt maintain Buy"
+    and 2 rows of what the company actually did. Ratings arrive by the dozen
+    and an 8-K arrives once, so any read with a limit shows the brokers and
+    loses the record."""
+    filed = EventRecord(
+        "edgar", "8k", "XNAS:NVDA", "filing", NOW - timedelta(days=20), "8-K: items 8.01"
+    )
+    book.add_events(
+        [filed]
+        + [
+            EventRecord(
+                "fmp",
+                f"grade-{i}",
+                "XNAS:NVDA",
+                "rating_reiteration",
+                NOW - timedelta(days=i),
+                f"House {i} maintain Buy",
+            )
+            for i in range(1, 15)
+        ]
+    )
+    uncapped = book.events("XNAS:NVDA", limit=5)
+    assert filed not in uncapped, "the case this exists for"
+
+    capped = book.events("XNAS:NVDA", limit=5, opinions=2)
+    assert filed in capped
+    assert sum(1 for e in capped if e.kind == "rating_reiteration") == 2
+    # Still newest first, as the store promises.
+    assert [e.announced_at for e in capped] == sorted(
+        (e.announced_at for e in capped), reverse=True
+    )
+
+
+def test_opinions_zero_leaves_only_what_the_company_did(book):
+    book.add_events(
+        [
+            EventRecord("edgar", "8k", "XNAS:NVDA", "filing", NOW, "8-K"),
+            EventRecord("fmp", "g", "XNAS:NVDA", "rating_change", NOW, "House upgrade Buy"),
+        ]
+    )
+    assert [e.kind for e in book.events("XNAS:NVDA", opinions=0)] == ["filing"]
+
+
+def test_the_store_itself_still_keeps_every_opinion(book):
+    """The cap is a READER's policy. Nothing a source said is dropped - that
+    would be the store deciding what the record is."""
+    book.add_events(
+        [
+            EventRecord("fmp", f"g{i}", "XNAS:NVDA", "rating_reiteration", NOW, f"House {i}")
+            for i in range(6)
+        ]
+    )
+    assert len(book.events("XNAS:NVDA")) == 6
+
+
 # --- pulls --------------------------------------------------------------------------
 
 

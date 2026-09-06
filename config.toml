@@ -263,6 +263,22 @@ min_graded_for_calibration = 30
 # and this project's development environment cannot fetch them. Run
 # `python ask.py sources --probe` from a GitHub Actions runner (the
 # sources-probe workflow), and enable each one whose probe shows dated items.
+#
+# PROBED TWICE FROM A RUNNER, 2026-09-04 and 2026-09-06, same answers both times:
+#
+#   thestar_business      404   the registered path no longer exists
+#   edge_malaysia         404   ditto
+#   nst_business          404   ditto
+#   bernama_business      10 items, none dated - refused rather than ingested,
+#                               because every one would enter the corpus stamped
+#                               with the moment it was fetched
+#   bnm_press             an HTML page advertising no feed
+#   bursa_announcements   403 on every name, first request (knowledge/sources/bursa.py)
+#
+# A 404 now costs one extra request to the site root and the error names the
+# feeds that page advertises, so the next probe can say where these went rather
+# than only that they are gone. Until one of them answers with dated items, the
+# Malaysian half of this book is covered by google_news and fmt_business alone.
 enabled = [
   "gdelt", "google_news", "yahoo_rss",
   # The one Malaysian business feed that answered the probe on main (2026-09-04);

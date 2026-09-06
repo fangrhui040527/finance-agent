@@ -715,7 +715,9 @@ class A5CatalystEvents(Agent):
         events: list[Event] = []
         wanted = list(instrument_ids or [None])
         for iid in wanted:
-            for rec in book.events(iid, since=since, until=until, limit=2000):
+            # A5 types events against a taxonomy that has no place for a
+            # broker's opinion; capping here keeps the 2000 for the record.
+            for rec in book.events(iid, since=since, until=until, limit=2000, opinions=5):
                 ev = event_from_record(rec)
                 if ev is not None:
                     events.append(ev)
@@ -1031,7 +1033,9 @@ class A8OwnershipFlow(Agent):
         than as zero.
         """
         since = now - timedelta(days=days)
-        events = book.events(instrument_id, since=since, until=now, limit=1000)
+        # `opinions=0`: this counts insider transactions, so a limit spent on
+        # broker ratings is a limit spent on nothing it reads.
+        events = book.events(instrument_id, since=since, until=now, limit=1000, opinions=0)
         buys = sum(1 for e in events if e.kind == "insider_buy")
         sells = sum(1 for e in events if e.kind == "insider_sell")
         out = self.run(buys, sells, 0, 0.0, 0.0)

@@ -8,6 +8,21 @@ which is why this source is registered and NOT enabled: the catalogue rule is
 that an enabled source that ingests nothing every night is indistinguishable
 from a quiet market.
 
+PROBED FROM A RUNNER AND REFUSED, so nobody spends the afternoon again:
+
+  2026-09-06  HTTP 403 for every one of the six Bursa names, on the first
+              request, with the browser headers below already in place. Not a
+              rate limit and not a shape problem - the endpoint declines an
+              unattended client outright.
+
+That leaves this book with NO free route to Bursa filings, which is why the six
+Malaysian names hold zero events while the three US names hold a filing record
+from EDGAR. Getting past a 403 of this kind means impersonating a browser
+session, and this project does not do that: the exchange is entitled to decide
+who reads its endpoint. The paid routes (EODHD Fundamentals, or Bursa's own
+licensed feed) are the honest way in; the adapter stays here, correct and off,
+for the day one of them is bought or the endpoint reopens.
+
 The parser is deliberately lenient about field names (`ann_date`/`date`,
 `title`/`ann_title`, `id`/`ann_id`) and strict about the result: a response
 with no recognisable rows raises with the first row's keys in the message,

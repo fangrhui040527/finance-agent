@@ -45,6 +45,17 @@ OK = "ok"
 FAILED = "failed"
 SKIPPED = "skipped"  # no key, or the plan does not include the endpoint
 
+#: Event kinds that record a THIRD PARTY'S VIEW of a company rather than
+#: something the company did, said or scheduled.
+#:
+#: They arrive at a completely different rate from the corporate record. On
+#: 2026-09-06 the fact book held 3,917 rating rows against 10 filings, insider
+#: trades and results combined, and NVIDIA's 30-day page was 28 rows of
+#: "Rosenblatt maintain Buy" with the 8-K and the Form 4 at the bottom - a
+#: reader with a limit sees the brokers and loses the company. `FactBook.events`
+#: takes an `opinions` cap for exactly this; the store itself keeps everything.
+OPINION_KINDS = frozenset({"rating_change", "rating_reiteration", "price_target"})
+
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS observations (
     source         TEXT NOT NULL,
@@ -418,7 +429,28 @@ class FactBook:
         since: datetime | None = None,
         until: datetime | None = None,
         limit: int = 500,
+        opinions: int | None = None,
     ) -> list[EventRecord]:
+        """Events newest first. `opinions` caps how many third-party views come
+        back, so a limit cannot spend itself on them.
+
+        Why the cap exists: on 2026-09-06 NVIDIA's 30-day page was 28 rows of
+        "Rosenblatt maintain Buy" and 2 rows of what the company actually did.
+        Broker reiterations arrive by the dozen and the 8-K arrives once, so
+        any read with a limit shows the opinions and loses the record. Left off
+        by default - a caller reading the whole history wants the whole history
+        - and set by the readers that truncate.
+        """
+        if opinions is not None:
+            # Fetch wide, then keep every record event and the newest few
+            # opinions. Done here rather than in SQL so the ordering the store
+            # promises is the ordering the caller gets back.
+            wide = self.events(instrument_id, kind, since, until, limit=max(limit * 20, 500))
+            record = [e for e in wide if e.kind not in OPINION_KINDS]
+            views = [e for e in wide if e.kind in OPINION_KINDS][: max(0, opinions)]
+            keep = (record + views)[: max(1, limit)]
+            keep.sort(key=lambda e: e.effective_at or e.announced_at, reverse=True)
+            return keep
         sql, where, args = ["SELECT * FROM events"], [], []
         if instrument_id is not None:
             where.append("instrument_id = ?")

@@ -117,12 +117,22 @@ class FmpCollector(Collector):
             house = str(r.get("gradingCompany") or "an analyst")
             action = str(r.get("action") or "").lower()
             new, old = r.get("newGrade"), r.get("previousGrade")
+            # A REITERATION IS NOT A CHANGE. This endpoint returns every time a
+            # broker republishes the opinion it already held, and those are the
+            # overwhelming majority: of the 3,917 rows in the fact book on
+            # 2026-09-06, NVIDIA's last 30 days were 28 "maintain Buy" against
+            # 2 things the company itself did. Both are kept - the store never
+            # drops what a source said - but under kinds that mean different
+            # things, so a reader asking what happened is not handed a list of
+            # people restating their position.
+            changed = action in ("upgrade", "downgrade", "initialise", "initialize", "initiate")
+            changed = changed or bool(new and old and str(new) != str(old))
             pull.events.append(
                 EventRecord(
                     source=self.name,
                     event_id=f"{symbol}:grade:{when}:{house}",
                     instrument_id=iid,
-                    kind="rating_change",
+                    kind="rating_change" if changed else "rating_reiteration",
                     announced_at=datetime(when.year, when.month, when.day, tzinfo=UTC),
                     title=f"{house} {action or 'rates'} {new or ''}"
                     + (f" (from {old})" if old and old != new else ""),

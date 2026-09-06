@@ -288,6 +288,44 @@ def test_fmp_weekly_pull_carries_statements_estimates_targets_grades_and_the_tra
     assert doc.published_at == datetime(2026, 7, 31, 17, 0, tzinfo=UTC)
 
 
+def test_fmp_separates_a_change_of_mind_from_a_broker_restating_one():
+    """A reiteration is not an event: nothing happened. This endpoint returns
+    every republication, and they are the overwhelming majority - 3,917 rows in
+    the fact book on 2026-09-06 against 10 filings, insider trades and results
+    combined. Both are kept, under kinds that mean different things."""
+    grades = [
+        {
+            "date": "2026-09-03",
+            "gradingCompany": "Morgan Stanley",
+            "previousGrade": "Equal Weight",
+            "newGrade": "Overweight",
+            "action": "upgrade",
+        },
+        {
+            "date": "2026-09-03",
+            "gradingCompany": "Rosenblatt",
+            "previousGrade": "Buy",
+            "newGrade": "Buy",
+            "action": "maintain",
+        },
+        {  # a maintain whose grade moved anyway is still a change
+            "date": "2026-09-03",
+            "gradingCompany": "Needham",
+            "previousGrade": "Hold",
+            "newGrade": "Buy",
+            "action": "maintain",
+        },
+    ]
+    c = FmpCollector(key="k", clock=CLOCK, opener=router({**FMP, "grades?": grades}))
+    pull = c.collect(SINCE, ("XNAS:AAPL",), slot="weekly")
+    by_house = {e.payload["house"]: e.kind for e in pull.events if "house" in e.payload}
+    assert by_house == {
+        "Morgan Stanley": "rating_change",
+        "Rosenblatt": "rating_reiteration",
+        "Needham": "rating_change",
+    }
+
+
 def test_fmp_preopen_pull_is_the_cheap_daily_subset():
     c = FmpCollector(key="k", clock=CLOCK, opener=router(FMP))
     pull = c.collect(SINCE, ("XNAS:AAPL",), slot="us_preopen")
@@ -458,11 +496,15 @@ def test_dosm_takes_overall_rows_and_names_a_schema_change():
 
 def test_dosm_asks_for_the_newest_rows_and_keeps_them_whatever_order_they_arrive_in():
     """The catalogue answered a bare limit with 1980; the request says otherwise."""
-    open_ = router({"data-catalogue": [
-        {"date": "1980-01-01", "division": "overall", "index": 40.0},
-        {"date": "2026-07-01", "division": "overall", "index": 134.1},
-        {"date": "2026-06-01", "division": "overall", "index": 133.8},
-    ]})
+    open_ = router(
+        {
+            "data-catalogue": [
+                {"date": "1980-01-01", "division": "overall", "index": 40.0},
+                {"date": "2026-07-01", "division": "overall", "index": 134.1},
+                {"date": "2026-06-01", "division": "overall", "index": 133.8},
+            ]
+        }
+    )
     pull = DosmCpiCollector(clock=CLOCK, opener=open_).collect(SINCE)
     asked = open_.calls[0]
     assert "sort=-date" in asked and "date_start=2022" in asked

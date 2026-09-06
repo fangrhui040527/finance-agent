@@ -49,7 +49,12 @@ def fact_snapshot(
                 f"  (knowable {o.known_at}, {o.source})"
             )
 
-    recent = book.events(instrument_id, since=now - timedelta(days=days), until=now, limit=50)
+    # `opinions=3`: a broker reiterating its rating arrives by the dozen and an
+    # 8-K arrives once. Uncapped, NVIDIA's 30-day page on 2026-09-06 was 28 rows
+    # of "maintain Buy" and 2 rows of what the company did.
+    recent = book.events(
+        instrument_id, since=now - timedelta(days=days), until=now, limit=50, opinions=3
+    )
     if recent:
         lines.append("")
         lines.append(f"  events, last {days} days")
