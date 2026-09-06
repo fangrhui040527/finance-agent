@@ -1,11 +1,14 @@
 # Digest 2026-09-06
 
-Generated 2026-09-06 12:48 UTC · slot `all` · 1114 articles in the corpus, 4436 observations, 3927 events in the fact book.
+Generated 2026-09-06 12:57 UTC · slot `all` · 1129 articles in the corpus, 4436 observations, 3927 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- quiet: nothing collected for this name in the window
+- tone: 3 stories from 3 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 3 escalated
+- 2026-09-06 businesstimes.com.sg — Maybank provides over S$590,000 to 3,000 beneficiaries through Kindness Market initiative [q 0.80, tone +0.0] ★
+- 2026-09-05 www.thestar.com.my — Golf: Maybank lifts golf tourism [q 0.80, tone +0.0] ★
+- 2026-09-05 wtma.com — Maybank Highway at Main Road closed after early morning multi - vehicle crash Friday [q 0.65, tone +0.0] ★
 
 ### Tenaga (MYX:5347)
 - quiet: nothing collected for this name in the window
@@ -53,6 +56,14 @@ Generated 2026-09-06 12:48 UTC · slot `all` · 1114 articles in the corpus, 443
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 12:57 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd needs EODHD_API_KEY (optional); skipped until it is set |
+| 12:57 | twse_openapi | ok | 8 | 0 | 0 | facts 0;  |
+| 12:57 | jin10_flash | ok | 19 | 5 | 4 | facts 0;  |
+| 12:57 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 12:57 | fmt_business | ok | 4 | 4 | 4 |  |
+| 12:57 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Tenaga, Petronas Chemicals, IHH, Press Metal, Genting, Maybank |
+| 12:57 | google_news | ok | 8 | 8 | 4 |  |
+| 12:57 | gdelt | ok | 3 | 3 | 3 | read but empty: Petronas Chemicals, Press Metal, Genting, Tenaga; failed: IHH |
 | 12:48 | sec_xbrl | ok | 4188 | 0 | 0 | facts 4188;  |
 | 12:48 | finmind | ok | 76 | 0 | 0 | facts 76;  |
 | 12:48 | twse_openapi | ok | 8 | 0 | 0 | facts 8;  |

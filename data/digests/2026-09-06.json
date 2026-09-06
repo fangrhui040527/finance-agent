@@ -1,6 +1,78 @@
 {
   "collection": [
     {
+      "at": "2026-09-06T12:57:40.117884+00:00",
+      "detail": "skipped: eodhd needs EODHD_API_KEY (optional); skipped until it is set",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-06T12:57:40.116977+00:00",
+      "detail": "facts 0; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-06T12:57:35.419719+00:00",
+      "detail": "facts 0; ",
+      "fetched": 19,
+      "kept": 5,
+      "source": "jin10_flash",
+      "status": "ok",
+      "stored": 4
+    },
+    {
+      "at": "2026-09-06T12:57:34.176561+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-06T12:57:31.985559+00:00",
+      "detail": "",
+      "fetched": 4,
+      "kept": 4,
+      "source": "fmt_business",
+      "status": "ok",
+      "stored": 4
+    },
+    {
+      "at": "2026-09-06T12:57:31.852869+00:00",
+      "detail": "read but empty: Tenaga, Petronas Chemicals, IHH, Press Metal, Genting, Maybank",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-06T12:57:29.704212+00:00",
+      "detail": "",
+      "fetched": 8,
+      "kept": 8,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 4
+    },
+    {
+      "at": "2026-09-06T12:57:28.197738+00:00",
+      "detail": "read but empty: Petronas Chemicals, Press Metal, Genting, Tenaga; failed: IHH",
+      "fetched": 3,
+      "kept": 3,
+      "source": "gdelt",
+      "status": "ok",
+      "stored": 3
+    },
+    {
       "at": "2026-09-06T12:48:22.017625+00:00",
       "detail": "facts 4188; ",
       "fetched": 4188,
@@ -56,18 +128,18 @@
     }
   ],
   "counts": {
-    "articles": 1114,
+    "articles": 1129,
     "documents": 0,
-    "escalated": 358,
+    "escalated": 361,
     "events": 3927,
     "failed_sweeps": 14,
-    "linked": 605,
+    "linked": 609,
     "observations": 4436,
     "series": 29,
-    "sweeps": 93
+    "sweeps": 101
   },
   "day": "2026-09-06",
-  "generated_at": "2026-09-06 12:48 UTC",
+  "generated_at": "2026-09-06 12:57 UTC",
   "macro": [
     {
       "change": "-0.01",
@@ -176,13 +248,53 @@
   ],
   "names": [
     {
-      "escalated": 0,
+      "escalated": 3,
       "events": [],
       "instrument_id": "MYX:1155",
       "label": "Maybank",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "gdelt:https://www.businesstimes.com.sg/lifestyle/maybank-provides-over-s590000-3000-beneficiaries-through-kindness-market-initiative",
+          "domain": "businesstimes.com.sg",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-06T11:15:00+00:00",
+          "quality": 0.8,
+          "title": "Maybank provides over S$590,000 to 3,000 beneficiaries through Kindness Market initiative",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMigAFBVV95cUxPRXpoRllFVjhBakl0amlDWnVieDR4bUdhU3NxLUZUUFY5SzRzQTVvWkRobExlSGhLUlhON3VyRENJbTU0S1E0YWRidWI1YWhoQ3Q1MllmR0sxYzdGZE5ocDBGLWFIR19BdUxadU1RX1B1RG95cVRHa0Y2TmhValJsXw?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-05T23:20:14+00:00",
+          "quality": 0.8,
+          "title": "Golf: Maybank lifts golf tourism",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "gdelt:https://www.wtma.com/2026/09/04/maybank-highway-at-main-road-closed-after-early-morning-multi-vehicle-crash-friday/",
+          "domain": "wtma.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-05T21:15:00+00:00",
+          "quality": 0.65,
+          "title": "Maybank Highway at Main Road closed after early morning multi - vehicle crash Friday",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 3,
+        "polarity_mean": 0.0,
+        "sources": 3,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
