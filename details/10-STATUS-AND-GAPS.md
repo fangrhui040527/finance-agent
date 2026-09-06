@@ -294,8 +294,10 @@ China and Japan country rows, every industry beta and every synthetic-rating
 spread are `null` because the source pages were not reachable from the
 sandbox. Each null shows up on the surface as "not transcribed", never as a
 zero. Transcribing them is a person with the July 2026 pages open, one row at
-a time, keeping the row label. The Malaysian and Taiwanese 10-year yield ids
-added to `dbnomics.SERIES` are unverified until the runner probe answers.
+a time, keeping the row label. The Malaysian 10-year yield id in
+`dbnomics.SERIES` answered on the 2026-09-06 probe; Taiwan is not in the IMF
+tables, so no free id exists and Taiwanese names use the US ten-year with the
+approximation stated.
 
 ### `holdings` and `watchlist`
 

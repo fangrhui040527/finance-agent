@@ -50,7 +50,9 @@ COUNTRY_OF_MIC = {
 RISK_FREE_SERIES = {
     "US": ("DGS10",),
     "MY": ("DBN:GOVT_YIELD_MY", "DGS10"),
-    "TW": ("DBN:GOVT_YIELD_TW", "DGS10"),
+    # No free upstream carries a Taiwanese government yield (Taiwan is outside
+    # the IMF tables); DGS10 stands in and the caveat says so.
+    "TW": ("DGS10",),
 }
 
 
