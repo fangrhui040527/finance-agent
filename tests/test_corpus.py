@@ -156,6 +156,49 @@ def test_a_failed_month_and_a_quiet_month_are_different_records(corpus):
 # --- reads ------------------------------------------------------------------------
 
 
+# --- what a per-name source actually delivered ------------------------------------------------
+
+
+def test_fetched_for_is_provenance_and_never_becomes_an_attribution(corpus):
+    """The article says who fetched it, not what it is about.
+
+    GDELT is asked one PHRASE per company and answers from a full-text index
+    this corpus never sees: 457 of the 575 GDELT articles collected to
+    2026-09-06 named no book company at all. Recording the query keeps that
+    measurable; asserting the company would put a brothel sale in Apple's
+    evidence.
+    """
+    arts, _ = articles()
+    for a in arts:
+        a.fetched_for = "MYX:1155"
+    corpus.add_all(arts, source="gdelt")
+    back = corpus.articles(limit=10)
+    assert {a.fetched_for for a in back} == {"MYX:1155"}
+    # The CIMB story was fetched under Maybank's query and is still CIMB's.
+    cimb = next(a for a in back if "CIMB" in a.title)
+    assert cimb.instruments == ["MYX:1023"] and cimb.fetched_for == "MYX:1155"
+
+
+def test_coverage_reports_the_share_that_named_the_company_worst_first(corpus):
+    """ "575 collected" and "118 about the book" are different numbers, and only
+    the first was ever visible."""
+    (hit, miss), _ = articles()
+    hit.fetched_for = miss.fetched_for = "MYX:1155"
+    corpus.add_all([hit], source="yahoo_rss")
+    corpus.add_all([miss], source="gdelt")
+
+    rows = corpus.coverage()
+    assert rows == [("gdelt", "MYX:1155", 1, 0), ("yahoo_rss", "MYX:1155", 1, 1)]
+
+
+def test_coverage_is_silent_about_rows_collected_before_the_column_existed(corpus):
+    """The corpus is append-only, so those rows cannot be filled in later. They
+    are left out rather than counted as misses, which would be a made-up
+    figure about a source nobody measured."""
+    corpus.add_all(articles()[0], source="gdelt")  # no fetched_for
+    assert corpus.coverage() == []
+
+
 def test_an_article_survives_the_round_trip_intact(corpus):
     arts, _ = articles()
     corpus.add(arts[0], "fixture", seen_at=NOW)
@@ -703,6 +746,70 @@ def test_a_landing_page_is_asked_where_its_feeds_are():
     assert advertised_feeds(page) == ["https://x.my/press.xml", "/speeches.atom"]
     assert "advertises feeds at" in _excerpt(page)
     assert "style.css" not in _excerpt(page), "a stylesheet is not a feed"
+
+
+def test_a_404_asks_the_site_where_its_feeds_went():
+    """The Star, The Edge and the NST all answered 404 to the registered paths
+    on 2026-09-04 and again on 2026-09-06, and the probe could report nothing
+    but "404": the autodiscovery reader only ever saw a body, and a 404 has
+    none. From an environment that cannot browse, that left six Malaysian
+    business feeds dead with no way to find where they went."""
+    from knowledge.feeds.rss import RssFeed
+    from tests.conftest import FakeResponse, http_error
+
+    root_page = (
+        "<!DOCTYPE html><html><head>"
+        '<link rel="alternate" type="application/rss+xml" href="https://www.thestar.com.my/rss/News/Business"/>'
+        "</head></html>"
+    )
+    seen: list[str] = []
+
+    def open_(req, timeout=None):
+        seen.append(req.full_url)
+        if req.full_url.endswith("/rss/business/business-news"):
+            raise http_error(404)
+        return FakeResponse(root_page)
+
+    feed = RssFeed(
+        "https://www.thestar.com.my/rss/business/business-news",
+        name="thestar_business",
+        opener=open_,
+        sleep=lambda _s: None,
+    )
+    with pytest.raises(FeedError, match="advertises feeds at"):
+        feed.fetch(NOW - timedelta(days=2))
+    assert seen[-1] == "https://www.thestar.com.my/", "the site root, once, not a crawl"
+
+
+def test_only_a_wrong_path_is_worth_a_second_request():
+    """A 403 or a 500 is not a moved feed, and the diagnostic must not turn one
+    failed request into two on every outage."""
+    from knowledge.feeds.rss import RssFeed
+    from tests.conftest import http_error
+
+    seen: list[str] = []
+
+    def open_(req, timeout=None):
+        seen.append(req.full_url)
+        raise http_error(403)
+
+    feed = RssFeed("https://x.my/feed", name="x", opener=open_, sleep=lambda _s: None)
+    with pytest.raises(FeedError, match="403"):
+        feed.fetch(NOW - timedelta(days=2))
+    assert all(u == "https://x.my/feed" for u in seen), "no second URL was tried"
+
+
+def test_the_discovery_request_can_never_become_the_failure():
+    """If the root is unreachable too, the reader still gets the 404."""
+    from knowledge.feeds.rss import RssFeed
+    from tests.conftest import http_error
+
+    def open_(req, timeout=None):
+        raise http_error(404) if req.full_url.endswith("/feed") else OSError("root is down")
+
+    feed = RssFeed("https://x.my/feed", name="x", opener=open_, sleep=lambda _s: None)
+    with pytest.raises(FeedError, match="404"):
+        feed.fetch(NOW - timedelta(days=2))
 
 
 def test_a_page_advertising_nothing_says_that_too():

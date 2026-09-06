@@ -375,6 +375,53 @@ on rather than one that stopped.
 
 Leave `silence_hours` at 0 unless something SCHEDULED also calls a model.
 
+### Is a source covering the name it is asked for?
+
+An article count is not coverage. A per-name source is asked for one company at
+a time, and what comes back may be about that company or about nothing in
+particular - and only the first number was ever visible. Measured on this
+corpus on 2026-09-06: GDELT had returned 575 articles across nine companies and
+457 of them named no book company at all. "575 collected" and "118 about the
+book" are different facts, and the sweep row said only the first.
+
+Every article now records the instrument that FETCHED it - provenance, not
+attribution: GDELT is asked a phrase and answers from a full-text index this
+corpus never sees, so a story it returned for "Apple" may be about a brothel
+sale, and calling that Apple's evidence would be the fetch talking. Only a
+source keyed by TICKER (Yahoo's per-symbol feed) may also assert the name.
+
+```
+ask.py sources --coverage           # every source/name pair, worst share first
+ask.py sources --coverage --days 7  # just the last week
+```
+
+Each sweep row also carries `named the company: N of M` with the three worst
+names. A source whose share stays near zero for a name is not covering it, and
+that is a reason to drop the name from that source rather than to read its
+volume as coverage.
+
+### When a registered feed URL rots
+
+A 404 from a news feed used to be reported as "404" and nothing else: the
+autodiscovery reader only ever saw a body, and a 404 has none. On 2026-09-04
+and again on 2026-09-06 The Star, The Edge and the New Straits Times all
+answered 404 to the paths in `knowledge/feeds/registry.py`, which left the six
+Malaysian business feeds this book most needs dead with no way, from an
+environment that cannot browse, to find where they had gone.
+
+A 404 or 410 now costs one extra request to the SITE ROOT, and the error names
+whatever feeds that page advertises:
+
+```
+thestar_business fetch failed: HTTP Error 404: Not Found - but
+https://www.thestar.com.my/ advertises feeds at: https://www.thestar.com.my/rss/News/Business
+```
+
+Nothing follows the discovered URL automatically. A feed URL is a decision
+about what the system ingests and belongs in the registry where a person put
+it; the probe reports, a person edits, and only then does a candidate become
+enabled.
+
 Two numbers to read afterwards, both from `ask.py sweep`'s own last line: how
 many articles the corpus holds, and how many of the sweeps failed. A failure
 count that climbs is the signal; an article count that stops climbing while the

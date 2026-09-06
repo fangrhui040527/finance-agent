@@ -1055,6 +1055,43 @@ def cmd_sweep(a) -> int:
     return report.exit_code
 
 
+def _sources_coverage(cfg, days: int) -> int:
+    """What each per-name source delivered ABOUT the name it was asked for.
+
+    A source that returns a hundred articles for Tenaga and mentions Tenaga in
+    four is not covering Tenaga, and "100 collected" says the opposite. Only
+    rows collected since the corpus started recording which query fetched them
+    can be counted; a corpus with none says so rather than printing zeroes.
+    """
+    from knowledge.corpus import Corpus
+    from knowledge.graph.ids import display_names
+
+    names = display_names()
+    with Corpus(cfg.corpus_db) as corpus:
+        rows = corpus.coverage(days=days)
+    if not rows:
+        print(
+            "NO COVERAGE RECORDED. Articles carry the name they were fetched for only "
+            "from 2026-09-06; run a sweep and ask again."
+        )
+        return 0
+    print(
+        f"what each per-name source delivered about the name it was asked for"
+        f"{f', last {days} days' if days else ''}"
+    )
+    print(f"\n{'source':<18} {'asked for':<24} {'kept':>6} {'named it':>9} {'share':>7}")
+    for source, iid, kept, named in rows:
+        label = str(names.get(iid, iid))
+        print(f"{source:<18} {label[:22]:<24} {kept:>6} {named:>9} {named / kept:>6.0%}")
+    kept_all = sum(r[2] for r in rows)
+    named_all = sum(r[3] for r in rows)
+    print(
+        f"\n{len(rows)} source/name pairs: {named_all} of {kept_all} kept articles "
+        f"named the company they were fetched for ({named_all / kept_all:.0%})"
+    )
+    return 0
+
+
 def cmd_sources(a) -> int:
     """The source catalogue, and - with --probe - one live fetch of each.
 
@@ -1073,6 +1110,8 @@ def cmd_sources(a) -> int:
     except Exception as e:
         print(f"sources could not run: {type(e).__name__}: {e}", file=sys.stderr)
         return 2
+    if getattr(a, "coverage", False):
+        return _sources_coverage(cfg, a.days)
     if not a.probe:
         from knowledge.sources.base import configured_keys
 
@@ -2095,6 +2134,12 @@ def main(argv=None) -> int:
     so.add_argument("--source", action="append", help="probe only this source; repeatable")
     so.add_argument("--hours", type=int, default=48, help="probe window")
     so.add_argument("--limit", type=int, default=3, help="items per probe")
+    so.add_argument(
+        "--coverage",
+        action="store_true",
+        help="what each per-name source delivered about the name it was asked for",
+    )
+    so.add_argument("--days", type=int, default=0, help="--coverage window; 0 is everything")
     so.set_defaults(fn=cmd_sources)
 
     dg = sub.add_parser("digest", help="the day's page per name, from the stores")

@@ -136,12 +136,55 @@ class RssFeed(FeedAdapter):
             raise FeedError(str(e)) from e
         except (urllib.error.URLError, OSError) as e:
             self._breaker.record_failure(e)
-            raise FeedError(f"{self.name} fetch failed: {e}") from e
+            raise FeedError(f"{self.name} fetch failed: {e}{self._where_the_feed_moved(e)}") from e
         self._breaker.record_success()
 
         if isinstance(body, bytes):
             body = body.decode("utf-8", errors="replace")
         return self._parse(body, since, limit)
+
+    def _where_the_feed_moved(self, error) -> str:
+        """On a 404, ask the SITE where its feeds are, and say so in the error.
+
+        A registered feed URL rots. The Star, The Edge and the New Straits
+        Times all answered 404 to the paths in the registry on 2026-09-04 and
+        again on 2026-09-06, and the probe could report nothing but "404" -
+        the autodiscovery reader below only ever saw a body, and a 404 has
+        none. So the six Malaysian business feeds this book most needs stayed
+        dead with no way to find where they went, from an environment that
+        cannot browse.
+
+        One extra request, only for a status that means "wrong path" (404 or
+        410), only for the site root. Diagnostic: nothing follows the result
+        automatically, for the reason `advertised_feeds` gives - a feed URL is
+        a decision about what the system ingests and belongs in the registry
+        where a person put it.
+        """
+        import urllib.error
+        import urllib.request
+        from urllib.parse import urlsplit
+
+        if not isinstance(error, urllib.error.HTTPError) or error.code not in (404, 410):
+            return ""
+        parts = urlsplit(self.url)
+        root = f"{parts.scheme}://{parts.netloc}/"
+        if root == self.url:
+            return ""
+        opener = self._opener or urllib.request.urlopen
+        req = urllib.request.Request(
+            root, headers={"User-Agent": "finplanet-analyst-mind/0.1 (personal research)"}
+        )
+        try:
+            with opener(req, timeout=self.TIMEOUT) as resp:
+                page = resp.read(self.MAX_BYTES)
+        except Exception:  # the diagnostic must never become the failure
+            return ""
+        if isinstance(page, bytes):
+            page = page.decode("utf-8", errors="replace")
+        found = advertised_feeds(page)
+        if not found:
+            return f" - and {root} advertises no feed of its own"
+        return f" - but {root} advertises feeds at: " + ", ".join(found[:6])
 
     # -- parsing -------------------------------------------------------------
 
