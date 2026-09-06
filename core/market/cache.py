@@ -8,6 +8,16 @@ boundary - a daily bar cannot change until a new session prints.
 SQLite so the CLI, the MCP server and the web app share it across processes.
 The cache is NOT append-only on purpose: it is derived data, reconstructible
 from the source, and holding stale rows would be the dishonest choice.
+
+WHAT IT REFUSES TO HOLD. A feed that answers 403 answers with a page, not with
+bars, and until 2026-09-06 that page was cached like any other body: all 27
+Stooq rows in this repository's cache held the same 796 bytes of HTML. Nothing
+downstream was fooled - the CSV parser rejects it and the price read refuses -
+but the cache then reported a hit for a symbol it could not price, so the next
+process skipped the fetch that might have worked and every one of them looked
+like a quota-saving success. `looks_like_bars` is the gate: a body that is not
+a CSV of bars is neither stored nor served, and a poisoned row already in the
+file is dropped the first time it is read.
 """
 
 from __future__ import annotations
@@ -28,6 +38,22 @@ CREATE TABLE IF NOT EXISTS price_csv (
     PRIMARY KEY (feed, symbol)
 );
 """
+
+
+def looks_like_bars(body: str) -> bool:
+    """Whether a body is a CSV of daily bars rather than an error page.
+
+    Deliberately shallow: an HTML document, a plain-text refusal ("No data"),
+    an empty body or a header with nothing under it. Anything that parses as
+    rows is left to the parser, which has the column rules.
+    """
+    text = (body or "").strip()
+    if not text:
+        return False
+    if text[:1] == "<" or "<html" in text[:200].lower():
+        return False
+    lines = text.splitlines()
+    return len(lines) >= 2 and lines[0].count(",") >= 4
 
 
 def offline() -> bool:
@@ -68,6 +94,13 @@ class PriceCache:
         if row is None:
             return None
         fetched_on, body = row
+        if not looks_like_bars(body):
+            # An error page cached under a symbol's name. Drop it rather than
+            # report a hit: a hit here stops the caller from trying the fetch
+            # that would have worked.
+            self.conn.execute("DELETE FROM price_csv WHERE feed = ? AND symbol = ?", (feed, symbol))
+            self.conn.commit()
+            return None
         if fetched_on != self._today() and not offline():
             return None  # a new session may have printed; the cached day is over
         self.last_served_from = fetched_on
@@ -77,6 +110,8 @@ class PriceCache:
     last_served_from: str | None = None
 
     def put(self, feed: str, symbol: str, body: str) -> None:
+        if not looks_like_bars(body):
+            return  # an error page is not a cache hit; let the next process try
         self.conn.execute(
             "INSERT INTO price_csv (feed, symbol, fetched_on, body) VALUES (?,?,?,?)"
             " ON CONFLICT(feed, symbol) DO UPDATE SET fetched_on=excluded.fetched_on,"
@@ -84,6 +119,14 @@ class PriceCache:
             (feed, symbol, self._today(), body),
         )
         self.conn.commit()
+
+    def prune_unusable(self) -> int:
+        """Drop every cached body that is not a CSV of bars. Returns the count."""
+        rows = self.conn.execute("SELECT feed, symbol, body FROM price_csv").fetchall()
+        bad = [(f, s) for f, s, b in rows if not looks_like_bars(b)]
+        self.conn.executemany("DELETE FROM price_csv WHERE feed = ? AND symbol = ?", bad)
+        self.conn.commit()
+        return len(bad)
 
     def close(self) -> None:
         self.conn.close()

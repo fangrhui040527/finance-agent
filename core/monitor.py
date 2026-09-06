@@ -213,6 +213,7 @@ def evaluate(
                 )
 
     out.extend(_sweep_rules(cfg, now))
+    out.extend(_series_rules(cfg, now))
     out.extend(_paper_rules(cfg, now))
     out.extend(_trace_rules(debug_root))
     return out
@@ -275,6 +276,69 @@ def _sweep_rules(cfg, now: datetime) -> list[Alert]:
                 "silence_hours": hours,
                 "sources": [n for n, _ in sorted(stale)],
                 "oldest_success": worst.isoformat(),
+            },
+        )
+    ]
+
+
+def _series_rules(cfg, now: datetime) -> list[Alert]:
+    """A macro series whose newest point is past its own publication cadence.
+
+    The sweep can succeed every night on a source whose upstream stopped
+    publishing a year ago: the request answers, the rows are stored, and the
+    fact book's "latest" quietly ages. That is what happened to sixteen
+    DBnomics series and to Malaysian CPI, which read 1982 while the sweeps
+    beside it reported `ok`. `sweep_silence` cannot see it - the sweep is not
+    silent - so the age of the data, not the health of the fetch, is what this
+    rule reads.
+
+    One alert for all of them, worst first: fifteen separate alerts about the
+    same dead upstream is fifteen alerts nobody finishes reading. Series with
+    no declared cadence in knowledge/sources/freshness.py are not judged.
+    """
+    from knowledge.facts import FactBook
+    from knowledge.sources.freshness import age_days, max_age_days
+
+    path = str(getattr(cfg, "facts_db", "data/facts.db"))
+    if not Path(path).exists():
+        return []
+
+    today = now.date()
+    stale: list[tuple[int, int, str, str]] = []  # age, limit, series_id, obs_date
+    with FactBook(path) as book:
+        for sid in book.series_ids():
+            limit = max_age_days(sid)
+            if limit is None:
+                continue
+            pts = book.series(sid)
+            if not pts:
+                continue
+            newest = pts[-1].obs_date
+            age = age_days(newest, today)
+            if age > limit:
+                stale.append((age, limit, sid, newest.isoformat()))
+    if not stale:
+        return []
+
+    stale.sort(reverse=True)
+    named = ", ".join(f"{sid} ({age}d, limit {limit})" for age, limit, sid, _ in stale[:6])
+    more = f" and {len(stale) - 6} more" if len(stale) > 6 else ""
+    return [
+        Alert(
+            rule="series_stale",
+            severity=ALERT,
+            title=f"{len(stale)} macro series past their cadence: {named}{more}",
+            detail="the sweep may be succeeding on every one of these - a stopped upstream "
+            "and a healthy fetch look identical from the sweep table. Any reading that "
+            "treats these as current is reading a figure from another year",
+            next_step="check the upstream for each id (DBnomics and the IMF/BIS datasets "
+            "behind it, or DOSM), then either point the adapter at a live series or take "
+            "the id out of its SERIES table; `ask.py macro` marks each row STALE meanwhile",
+            evidence={
+                "stale": [
+                    {"series_id": sid, "newest": newest, "age_days": age, "limit_days": limit}
+                    for age, limit, sid, newest in stale
+                ],
             },
         )
     ]

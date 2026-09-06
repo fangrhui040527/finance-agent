@@ -456,6 +456,46 @@ def test_dosm_takes_overall_rows_and_names_a_schema_change():
         )
 
 
+def test_dosm_asks_for_the_newest_rows_and_keeps_them_whatever_order_they_arrive_in():
+    """The catalogue answered a bare limit with 1980; the request says otherwise."""
+    open_ = router({"data-catalogue": [
+        {"date": "1980-01-01", "division": "overall", "index": 40.0},
+        {"date": "2026-07-01", "division": "overall", "index": 134.1},
+        {"date": "2026-06-01", "division": "overall", "index": 133.8},
+    ]})
+    pull = DosmCpiCollector(clock=CLOCK, opener=open_).collect(SINCE)
+    asked = open_.calls[0]
+    assert "sort=-date" in asked and "date_start=2022" in asked
+    assert f"limit={DosmCpiCollector.FULL_SERIES_LIMIT}" in asked
+    # Ascending, descending or shuffled, the newest row is the one stored first.
+    heads = [p for p in pull.series if p.series_id == "DOSM:CPI_HEADLINE"]
+    assert [p.obs_date.isoformat() for p in heads][:2] == ["2026-07-01", "2026-06-01"]
+
+
+def test_dosm_refuses_a_series_that_stops_before_the_freshness_limit():
+    """The 2026-09-06 defect, as a test: 1982 must never be stored as current."""
+    stale = [{"date": f"1982-{m:02d}-01", "division": "overall", "index": 48.7} for m in (11, 12)]
+    with pytest.raises(SourceError, match="newest row is 1982-12-01"):
+        DosmCpiCollector(clock=CLOCK, opener=router({"data-catalogue": stale})).collect(SINCE)
+
+
+def test_dosm_asks_again_without_the_extra_parameters_when_the_host_rejects_them():
+    """An unknown query parameter must not cost the source its whole reading."""
+    calls: list[str] = []
+
+    def open_(req, timeout=None):
+        calls.append(req.full_url)
+        if "sort=" in req.full_url:
+            raise http_error(400)
+        return FakeResponse(
+            json.dumps([{"date": "2026-07-01", "division": "overall", "index": 134.1}])
+        )
+
+    pull = DosmCpiCollector(clock=CLOCK, opener=open_).collect(SINCE)
+    assert len(calls) == 2 and "sort=" not in calls[1]
+    assert [p.value for p in pull.series] == [Decimal("134.1")]
+
+
 # --- EDGAR, Bursa ----------------------------------------------------------------------------
 
 EDGAR = {

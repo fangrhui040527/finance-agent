@@ -294,8 +294,19 @@ The rules, all thresholds in `config.toml [monitor]` and bounded in code:
 | `dropped_claims` | claims dropped for want of a citation exceed `dropped_claim_rate` |
 | `silence` | no model calls in `silence_hours`, on a ledger that HAS run before (0 = off) |
 | `sweep_silence` | no successful sweep in `sweep_silence_hours`, for a source that HAS succeeded before (0 = off) |
+| `series_stale` | a macro series' newest observation is past the cadence declared for it in `knowledge/sources/freshness.py` |
 | `run_errors` | the newest traced run contains an error event |
 | `methodology_changed` | the manifest hash moved between the last two runs |
+
+`series_stale` reads the AGE OF THE DATA, not the health of the fetch, and it
+exists because the two came apart: on 2026-09-06 sixteen DBnomics series were
+432 to 493 days old and Malaysian CPI read 1982, while every sweep beside them
+reported `ok`. A stopped upstream and a working one are identical in the sweep
+table. The cadence per series - daily, weekly for the Fed's H.10 release,
+monthly, or a policy rate's meeting schedule - is declared in
+`knowledge/sources/freshness.py`; a series with no entry there is not judged,
+and `ask.py macro` marks each row with its age so a stale figure is labelled
+where it is read, not only where it is alerted.
 
 `silence_hours` is off by default because a personal tool is allowed to sit
 idle. **Turn it on the moment anything runs on a timer**: a job that dies
