@@ -1,0 +1,224 @@
+{
+  "day": "2026-09-06",
+  "written_at": "2026-09-06T22:40:00Z",
+  "market": {
+    "regime": "neutral",
+    "notes": [
+      "2026-09-06 is a Saturday: neither market held a session. The page measures the newest cached sessions, 2026-09-04 for both markets.",
+      "MYX:0820EA 1d +0.27%, 5d -1.88% to 2026-09-04 - one new Bursa session against the previous page, which read to 2026-09-03.",
+      "XNAS:SPY 1d -0.39%, 5d +0.11% to 2026-09-04 - identical to the previous page; no new US session reached the cache.",
+      "VIXCLS 14.32 (2026-09-03); BAMLH0A0HYM2 2.65 (2026-09-03); DGS10 4.77 (2026-09-03); DGS2 4.34; T10Y2Y 0.41 (2026-09-04); BNM:OPR 2.75 (2026-09-03); DEXMAUS 4.02 (2026-08-28). No fresh print since the previous page.",
+      "All nine decompositions not_significant."
+    ]
+  },
+  "names": [
+    {
+      "instrument_id": "MYX:1155",
+      "move": {
+        "return_1d": -0.0019,
+        "market_1d": 0.0027,
+        "unexplained_share": 0.83,
+        "return_5d": -0.0112,
+        "market_5d": -0.0188,
+        "sigma": 0.16,
+        "verdict": "not_significant",
+        "last_session": "2026-09-04",
+        "remeasured": true
+      },
+      "causes": [],
+      "open_questions": [
+        "Three stories collected, none about the bank; one (wtma.com, 'Maybank Highway at Main Road closed after early morning multi-vehicle crash Friday') is a false positive on a South Carolina place name and was escalated. Does it survive re-linking tomorrow? (since 2026-09-06)"
+      ],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:5347",
+      "move": {
+        "return_1d": -0.0044,
+        "market_1d": 0.0027,
+        "unexplained_share": 0.92,
+        "return_5d": -0.0368,
+        "market_5d": -0.0188,
+        "sigma": 0.61,
+        "verdict": "not_significant",
+        "last_session": "2026-09-04",
+        "remeasured": true
+      },
+      "causes": [],
+      "open_questions": [
+        "Is the 5d -3.68% (vs -1.88% proxy) the results print the 2026-09-04 roundup headline referred to? No primary figure collected. (since 2026-09-04)"
+      ],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:5183",
+      "move": {
+        "return_1d": -0.0206,
+        "market_1d": 0.0027,
+        "unexplained_share": 0.86,
+        "return_5d": 0.0047,
+        "market_5d": -0.0188,
+        "sigma": 0.47,
+        "verdict": "not_significant",
+        "last_session": "2026-09-04",
+        "remeasured": true
+      },
+      "causes": [],
+      "open_questions": [
+        "Beta against the proxy is -1.08 on 120 sessions; the market leg is less trustworthy than the residual. (since 2026-09-06)"
+      ],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:5225",
+      "move": {
+        "return_1d": -0.005,
+        "market_1d": 0.0027,
+        "unexplained_share": 0.9,
+        "return_5d": -0.0364,
+        "market_5d": -0.0188,
+        "sigma": 0.42,
+        "verdict": "not_significant",
+        "last_session": "2026-09-04",
+        "remeasured": true
+      },
+      "causes": [],
+      "open_questions": [
+        "gdelt failed for this name in the 12:57 sweep, so 'quiet' is one source short. (since 2026-09-06)"
+      ],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:8869",
+      "move": {
+        "return_1d": 0.005,
+        "market_1d": 0.0027,
+        "unexplained_share": 0.8,
+        "return_5d": 0.0013,
+        "market_5d": -0.0188,
+        "sigma": 0.17,
+        "verdict": "not_significant",
+        "last_session": "2026-09-04",
+        "remeasured": true
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:3182",
+      "move": {
+        "return_1d": 0.0,
+        "market_1d": 0.0027,
+        "unexplained_share": 0.9,
+        "return_5d": -0.0097,
+        "market_5d": -0.0188,
+        "sigma": 0.11,
+        "verdict": "not_significant",
+        "last_session": "2026-09-04",
+        "remeasured": true
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": []
+    },
+    {
+      "instrument_id": "XNAS:NVDA",
+      "move": {
+        "return_1d": 0.0084,
+        "market_1d": -0.0039,
+        "unexplained_share": 0.71,
+        "return_5d": 0.0589,
+        "market_5d": 0.0011,
+        "sigma": 0.82,
+        "verdict": "not_significant",
+        "last_session": "2026-09-04",
+        "remeasured": false
+      },
+      "causes": [],
+      "open_questions": [
+        "Does the fact book pick up a filing or release for the Hugging Face transaction, and does a 5-session decomposition keep the idiosyncratic share above 50%? (since 2026-09-04)",
+        "Finnhub earnings rows for NVDA carry a knowable date in the future (2026-09-30); which field is being read as the report date? (since 2026-09-04)"
+      ],
+      "watch": []
+    },
+    {
+      "instrument_id": "XNAS:AAPL",
+      "move": {
+        "return_1d": -0.0251,
+        "market_1d": -0.0039,
+        "unexplained_share": 0.91,
+        "return_5d": 0.0008,
+        "market_5d": 0.0011,
+        "sigma": 1.47,
+        "verdict": "not_significant",
+        "last_session": "2026-09-04",
+        "remeasured": false
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [
+        {
+          "when": "2026-10-28",
+          "what": "earnings_result",
+          "title": "Q4 2026 results after the close (finnhub)"
+        }
+      ]
+    },
+    {
+      "instrument_id": "XNAS:MSFT",
+      "move": {
+        "return_1d": -0.0204,
+        "market_1d": -0.0039,
+        "unexplained_share": 0.83,
+        "return_5d": -0.0269,
+        "market_5d": 0.0011,
+        "sigma": 0.74,
+        "verdict": "not_significant",
+        "last_session": "2026-09-04",
+        "remeasured": false
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [
+        {
+          "when": "2026-10-27",
+          "what": "earnings_result",
+          "title": "Q1 2027 results (finnhub)"
+        }
+      ]
+    }
+  ],
+  "data_quality": {
+    "failed": [
+      "gdelt: IHH (12:57 sweep)"
+    ],
+    "degraded": [
+      "yahoo_rss: read but empty for all six Bursa names",
+      "gdelt: read but empty for Petronas Chemicals, Press Metal, Genting, Tenaga",
+      "fmp: HTTP 402 on the earnings endpoint (plan boundary)",
+      "no successful sweep in 44h for alphavantage_news, edgar, finnhub, fred (ALERT sweep_silence): the us_close slot has not completed since 2026-09-04",
+      "price cache re-fetched 2026-09-06 but its newest bar is 2026-09-04: Friday 2026-09-05 is missing for both markets"
+    ],
+    "skipped": [
+      "eodhd: needs EODHD_API_KEY, unset"
+    ],
+    "notes": [
+      "The fact book holds NOTHING COLLECTED for all six Bursa names.",
+      "dosm_cpi fetched 36 rows and stored 0 (duplicates of the 1980-1982 block); the newest-rows fix is in PR #45 and not on main, so DOSM:CPI_HEADLINE is absent from this pack's macro table.",
+      "The Bursa leg is one genuinely new session; the US leg repeats the previous page and must not be read as a second day of evidence."
+    ]
+  },
+  "open_questions_carried": [
+    "Tenaga: is the 5d -3.68% (vs -1.88% proxy) the results print the roundup headline referred to? (since 2026-09-04)",
+    "NVIDIA: filing or release for the Hugging Face transaction; 5-session idiosyncratic share above 50%? (since 2026-09-04)",
+    "Finnhub earnings rows for NVDA carry a knowable date in the future; which field is read as the report date? (since 2026-09-04)",
+    "The six Bursa names have no fact-book coverage; which of bursa_announcements or a keyed Bursa source is the shortest path? ANSWERED 2026-09-06: bursa_announcements returns HTTP 403 for every name and all five Malaysian RSS candidates are 404 or undated, so the shortest path is a keyed source. Carried one more night so the answer shows on two pages; drop tomorrow. (since 2026-09-04)",
+    "When the Actions cap lifts, does the first collect sweep back-fill the missing bars? PARTLY ANSWERED: the cap lifted and the sweep did not back-fill; the cache was re-fetched 2026-09-06 and still ends 2026-09-04. Open: does the missing Friday arrive late or never? (since 2026-09-05)",
+    "Why does a Saturday fetch of Yahoo daily bars return nothing later than Thursday for either market? (since 2026-09-06)"
+  ],
+  "lessons": [
+    "A name matched inside a PLACE name is a false positive the escalation gate cannot catch, because the gate only asks whether a watched instrument was named: 'Maybank Highway at Main Road closed after a crash' reached the queue as a Maybank story. Falsifiable: requiring the match to sit beside a company-shaped token (Berhad, Bhd, Group, the ticker) or refusing one followed by a road or place noun would drop this article, leaving two stories for this name rather than three.",
+    "A fetch timestamp is not a data date. The price cache recorded fetched_on 2026-09-06 while its newest bar stayed 2026-09-04, so a freshness check written against fetch time would call this cache current. Falsifiable: a staleness rule reading the newest observation date flags it today; one reading the fetch date does not."
+  ]
+}
