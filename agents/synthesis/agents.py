@@ -355,8 +355,15 @@ class A10Thesis(Agent):
         ]
 
     def coverage_gaps(self, findings: list[Finding]) -> list[str]:
+        """Which required agents said nothing usable.
+
+        A finding whose kind ends in ``unavailable`` (``unavailable``,
+        ``valuation_unavailable``) is an agent reporting that it could not
+        answer; it does not count as coverage, or a refusal would read as
+        evidence.
+        """
         self._guard_tool("check_coverage")
-        seen = {f.agent for f in findings if f.kind != "unavailable"}
+        seen = {f.agent for f in findings if not f.kind.endswith("unavailable")}
         return [a for a in self.REQUIRED_EVIDENCE if a not in seen]
 
     @staticmethod
@@ -424,6 +431,12 @@ class A11RedTeam(Agent):
         ("placement", "capital_raise_treadmill"),
         ("rights issue", "capital_raise_treadmill"),
         ("duration", "duration_mismatch"),
+        # ratio- and score-shaped flags from the workup and the ratio sheet
+        ("net_debt", "covenant_cliff"),
+        ("interest_cover", "covenant_cliff"),
+        ("receivables_run", "receivables_run"),
+        ("receivables grew", "receivables_run"),
+        ("beneish", "fabricated_sales"),
     )
     FLAG_KINDS = ("quality_flag", "ratio", "sanity", "quality", "flag")
 

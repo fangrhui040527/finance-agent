@@ -249,3 +249,13 @@ def test_a_scored_but_rejected_candidate_is_never_rendered_as_the_cause():
     if exp.candidates:
         assert "BELOW THRESHOLD" in out
         assert "scored and rejected" in out
+
+
+def test_analogues_render_between_the_case_against_and_the_uncertainties():
+    out = memo(
+        challenges=["too crowded"],
+        analogues=["Enron (US 2001): accruals_divergence - bankruptcy"],
+    )
+    assert "ANALOGUES  (what this resembles, not what will happen)" in out
+    assert out.index("THE CASE AGAINST") < out.index("ANALOGUES") < out.index("KEY UNCERTAINTIES")
+    assert "ANALOGUES" not in memo()

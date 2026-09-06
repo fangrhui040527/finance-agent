@@ -512,6 +512,7 @@ def why_did_it_move(
         fx_return=fx_return,
         fit=fit,
         base_currency=currency,
+        peers=graph_peers(instrument, window[1]),
     )
 
     provenance = (
@@ -600,12 +601,62 @@ def fit_factor_model(returns_csv: str) -> str:
 # --------------------------------------------------------------------------
 
 
+def derived_valuation(
+    instrument: str, as_at: str = "", archetype: str = "", ctx: AgentContext | None = None
+):
+    """The valuation range the engines derive for a thesis, and the findings behind it.
+
+    Returns ``(range_or_None, findings)``. The range is the scenario DCF's bear
+    to bull equity value from the stored record; when nothing is stored, or the
+    sanity checks refuse, there is no range and the findings say why. A thesis
+    may carry a range that the engine derived or none at all - never one typed
+    in by the model.
+    """
+    from agents.evidence.agents import A2Valuation
+    from engines.fundamentals.ratios import Statements
+    from engines.valuation.cost_of_capital import country_of, load_table
+    from knowledge.facts import FactBook
+
+    mic = _instrument_mic(instrument)
+    asof = _asof(as_at)
+    cfg = load_config()
+    try:
+        currency = market_get(mic).currency
+    except (KeyError, ValueError, AttributeError):
+        currency = ""
+    a2 = A2Valuation(ctx or context())
+    with FactBook(cfg.facts_db) as book:
+        store = book.as_fact_store([instrument], asof)
+        statements = Statements.from_store(store, instrument, asof)
+        if statements.flow("revenue")[0] is None:
+            return None, [
+                Finding(
+                    a2.agent_id,
+                    "valuation_unavailable",
+                    f"no statements stored for {instrument} as of {asof}: no range can be "
+                    f"derived. Sources that would fill them: {_statement_sources(instrument)}",
+                    caveats=["a thesis without a derived range cannot accumulate"],
+                )
+            ]
+        coc, coc_findings = a2.cost_of_capital(
+            instrument, book, load_table(), asof, archetype or None, statements
+        )
+        vr, range_findings = a2.scenario_range(
+            statements, coc, load_table(), country_of(instrument), currency
+        )
+    rng = vr.range if vr is not None else None
+    return rng, [*coc_findings, *range_findings]
+
+
 def compose_thesis(
     instrument: str,
     evidence: list | None = None,
     breakers: list | None = None,
     stance: str = "hold",
     horizon_months: int = 12,
+    derive_valuation: bool = False,
+    as_at: str = "",
+    archetype: str = "",
 ) -> str:
     """Assemble findings into a stance, then attack it.
 
@@ -615,6 +666,10 @@ def compose_thesis(
     A breaker needs an executable query. One without is a wish, and is refused
     here rather than defaulted in - the check is the only thing that makes a
     breaker a breaker.
+
+    derive_valuation runs the cost of capital and the scenario DCF on the stored
+    record and hands the thesis the engine's bear-to-bull range (or its refusal);
+    the model never supplies a range of its own.
     """
     ctx = context()
     try:
@@ -647,13 +702,34 @@ def compose_thesis(
         except ValueError as e:
             raise ToolError(str(e)) from None
 
+    valuation_range = None
+    derived_line = ""
+    if derive_valuation:
+        valuation_range, derived = derived_valuation(instrument, as_at, archetype, ctx)
+        findings.extend(derived)
+        if valuation_range is not None:
+            lo, hi = valuation_range
+            derived_line = (
+                f"  valuation range, derived by the engine: {lo:,.0f} to {hi:,.0f} "
+                f"(a range, not a target)\n"
+            )
+        else:
+            derived_line = f"  valuation range: none derived - {derived[-1].text}\n"
+
     a10 = A10Thesis(ctx)
     out = a10.run(
-        instrument, findings, horizon_months=horizon_months, proposed_stance=st, breakers=brks
+        instrument,
+        findings,
+        horizon_months=horizon_months,
+        valuation_range=valuation_range,
+        proposed_stance=st,
+        breakers=brks,
     )
     thesis = a10.last
 
-    challenges = A11RedTeam(ctx).run(thesis)
+    red = A11RedTeam(ctx).run(thesis)
+    challenges = [f for f in red if f.kind != "analogue"]
+    analogues = [f for f in red if f.kind == "analogue"]
     ranked = sorted(challenges, key=lambda f: -f.numbers.get("severity_rank", 0))
     attack = (
         "\n".join(
@@ -661,10 +737,16 @@ def compose_thesis(
         )
         or "  (silent, which on a live thesis is itself a finding)"
     )
+    resembles = ""
+    if analogues:
+        resembles = "\n\nANALOGUES  (what this resembles, not what will happen)\n" + "\n".join(
+            f"  - {a.text}\n      cites {cite_label(c)}" for a in analogues for c in a.citations[:1]
+        )
 
     return (
         f"THESIS  {instrument}  horizon {horizon_months}m\n"
         f"{_lines(out)}\n"
+        f"{derived_line}"
         f"  actionable: {'yes' if thesis.is_actionable() else 'NO'}\n"
         f"  stance asked for: {st.value}   stance reached: {thesis.stance.value}\n\n"
         f"WHAT WOULD FALSIFY IT\n"
@@ -672,7 +754,7 @@ def compose_thesis(
             "\n".join(f"  - {b.statement}  [{b.query} against {b.store}]" for b in thesis.breakers)
             or "  (none - so no stance may be taken)"
         )
-        + f"\n\nRED TEAM\n{attack}{DISCLAIMER}"
+        + f"\n\nRED TEAM\n{attack}{resembles}{DISCLAIMER}"
     )
 
 
@@ -1387,6 +1469,105 @@ def valuation_range(
                 rows.append("")
                 rows.append(f.text)
     return "\n".join(rows) + DISCLAIMER
+
+
+def cite_label(c) -> str:
+    """``source:chunk_id`` once: method-note chunk ids already carry their collection."""
+    from engines.analysis.workup import cite_label as _label
+
+    return _label(c)
+
+
+def _open_graph():
+    """The built entity graph and its evidence lookup, or (None, None) without one."""
+    from pathlib import Path as _P
+
+    from knowledge.graph.build import DEFAULT_DB
+    from knowledge.graph.evidence import CuratedCorpus
+    from knowledge.graph.store import GraphStore
+
+    if not _P(DEFAULT_DB).exists():
+        return None, None
+    with GraphStore(DEFAULT_DB) as store:
+        g = store.load()
+    return g, CuratedCorpus().citation
+
+
+def graph_peers(instrument: str, asof: date) -> set[str]:
+    """The peer ids the graph supports on a date; empty without a graph.
+
+    Feeds `specificity` in the catalyst scorer: a peer's event scores 0.6 where
+    an unrelated name's scores 0.1. Nothing is guessed from sector labels.
+    """
+    from knowledge.graph.peers import peers_of
+
+    g, _ = _open_graph()
+    if g is None:
+        return set()
+    try:
+        return peers_of(g, instrument, asof).ids
+    except ValueError:
+        return set()
+
+
+def peer_set(instrument: str, as_at: str = "", same_market: bool = True) -> str:
+    """Who the entity graph says the peers are on a date, with the edge document
+    behind each one. A stated rivalry and a shared sub-sector are labelled apart.
+    """
+    from agents.evidence.agents import A7SectorTechnology
+    from knowledge.graph.build import DEFAULT_DB
+
+    _instrument_mic(instrument)
+    asof = _asof(as_at)
+    g, evidence = _open_graph()
+    if g is None:
+        return (
+            f"REFUSED: no graph at {DEFAULT_DB}. Build it with `make graph` (offline, no keys). "
+            f"Naming peers without one would mean guessing." + DISCLAIMER
+        )
+    findings = A7SectorTechnology(context(), g, evidence).peers(instrument, asof, same_market)
+    rows = [findings[0].text]
+    rows += [f"    note: {c}" for c in findings[0].caveats]
+    for f in findings[1:]:
+        rows.append(f"  - {f.text}")
+        for c in f.citations:
+            rows.append(f"        cites {cite_label(c)}")
+        for c in f.caveats:
+            if c.startswith("evidence unavailable") or c.startswith("shared"):
+                rows.append(f"        {c}")
+    return "\n".join(rows) + DISCLAIMER
+
+
+def analyst_workup(instrument: str, as_at: str = "", archetype: str = "") -> str:
+    """The twelve-step workup of docs/04 section 2 over the stored record: identity,
+    the two gates, history, capital allocation, competitive position, industry,
+    forward drivers, valuation, return decomposition and suggested breakers. Every
+    step says done, partial, unavailable, manual or not applicable, and an
+    unavailable step names the collector that would change it. Not a stance.
+    """
+    from engines.analysis.workup import run_workup, workup_text
+    from knowledge.facts import FactBook
+
+    mic = _instrument_mic(instrument)
+    asof = _asof(as_at)
+    cfg = load_config()
+    try:
+        currency = market_get(mic).currency
+    except (KeyError, ValueError, AttributeError):
+        currency = ""
+    g, evidence = _open_graph()
+    with FactBook(cfg.facts_db) as book:
+        w = run_workup(
+            instrument,
+            book,
+            context(),
+            asof=asof,
+            graph=g,
+            evidence=evidence,
+            archetype=archetype or None,
+            currency=currency,
+        )
+    return workup_text(w) + DISCLAIMER
 
 
 METHOD_OWNERS = {

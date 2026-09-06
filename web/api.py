@@ -291,6 +291,9 @@ def thesis(body: S.ThesisBody) -> S.Envelope:
         breakers=[b.model_dump() for b in body.breakers],
         stance=body.stance,
         horizon_months=body.horizon_months,
+        derive_valuation=body.derive_valuation,
+        as_at=body.as_at,
+        archetype=body.archetype,
     )
     if body.narrate and env.refusal is None:
         env.data = {"narrative": _narrative(body)}

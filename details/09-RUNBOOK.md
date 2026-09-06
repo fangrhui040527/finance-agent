@@ -680,6 +680,49 @@ with its chunk id and its references' licences; a link-only reference is a
 link. **Exits 1** when no note matches (silence is not a lesson) and **2** for
 an unknown collection, concept or pattern. Same text as the MCP `method_note`.
 
+### `workup` — the twelve steps over the stored record
+
+```bash
+python ask.py workup XNAS:AAPL --archetype software
+python ask.py workup MYX:1155 --archetype bank
+python ask.py workup XNAS:NVDA --as-at 2026-06-30
+```
+
+The twelve steps of docs/04 §2, in order, over what the fact book holds as of
+the date. Every step is printed with one of five statuses: `done`, `partial`,
+`unavailable` (with the collector that would fill it), `manual` (the business
+model, the comprehensibility gate and the cycle stage are yours to write) or
+`not_applicable`. The earnings-quality gate reports `clean`, `flag` or
+`unavailable`; a flag runs the red team's failure-analogue search on the
+pattern the flag implies. Step 12 suggests two to four breakers, each an SQL
+query against the facts store with a review date. A workup is not a stance:
+compose one with `ask.py thesis` and let the red team at it. Exit 2 on an
+unknown market or a bad date.
+
+```bash
+python ask.py graph --peers MYX:1155
+python ask.py graph --peers XNAS:NVDA --asof 2026-06-30
+```
+
+Who the graph says the peers are: a stated rivalry (`competes_with`, with its
+curated row quoted) and shared sub-sector siblings, labelled apart because the
+second is two hops of classification and reads as speculative. Peers in another
+market are listed as excluded. These peers feed `why` (a peer's event scores
+0.6 on specificity, an unrelated name's 0.1) and the comparables in `valuation`
+and `workup`.
+
+```bash
+python ask.py thesis XNAS:AAPL --derive-valuation --archetype software \
+    --breaker "gross margin below 40%|gross_margin < 0.40|facts" \
+    --breaker "revenue growth below 3% for two quarters|revenue_yoy < 0.03|facts"
+```
+
+`--derive-valuation` runs the cost of capital and the scenario DCF on the
+stored record and hands the thesis the engine's bear-to-bull range, or its
+refusal, before the red team reads it. The model never types a range. The red
+team's failure analogues print under their own heading, labelled as
+resemblances, never forecasts.
+
 ### `ratios` and `valuation` — the analyst arithmetic on the stored lines
 
 ```bash
@@ -753,7 +796,7 @@ make mcp        # stdio transport
 make mcp-check  # selftest
 ```
 
-Thirty-seven tools; `details/10-STATUS-AND-GAPS.md` keeps the count and
+Thirty-nine tools; `details/10-STATUS-AND-GAPS.md` keeps the count and
 `tests/test_docs_promises.py` pins it. The analytical ones: `market_info`,
 `get_prices`, `why_did_it_move`, `fit_factor_model`, `compose_thesis`,
 `check_portfolio_risk`, `size_position`, `plan_question`, `explain_concept`,

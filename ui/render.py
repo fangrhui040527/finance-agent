@@ -163,8 +163,14 @@ def thesis_memo(
     gaps: list[str],
     challenges: list[str],
     confidence: float,
+    analogues: list[str] | None = None,
 ) -> str:
-    """docs/04 section 8. The gaps section is above the conclusion on purpose."""
+    """docs/04 section 8. The gaps section is above the conclusion on purpose.
+
+    `analogues` are the red team's failure-library matches: what this resembles,
+    printed after the case against and before the uncertainties, each one
+    labelled as a resemblance and never as a forecast.
+    """
     lines = [
         f"THESIS  {instrument_id}   stance: {stance}   confidence {confidence:.0%}",
         "=" * 68,
@@ -196,6 +202,10 @@ def thesis_memo(
     if challenges:
         lines += ["THE CASE AGAINST"]
         lines += [f"  - {c}" for c in challenges]
+        lines.append("")
+    if analogues:
+        lines += ["ANALOGUES  (what this resembles, not what will happen)"]
+        lines += [f"  - {a}" for a in analogues]
         lines.append("")
     if uncertainties:
         lines += ["KEY UNCERTAINTIES"]

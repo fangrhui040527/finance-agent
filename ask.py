@@ -189,6 +189,8 @@ def cmd_why(a) -> int:
             f"{a.market:+.2%} over {first_day} to {last_day}\n"
         )
 
+    from mcp_server.tools import graph_peers
+
     a9 = A9Attribution(context())
     findings = a9.run(
         a.instrument,
@@ -200,6 +202,7 @@ def cmd_why(a) -> int:
         fx_return=a.fx,
         fit=fit,
         base_currency=a.currency,
+        peers=graph_peers(a.instrument, window[1]),
     )
     head = findings[0]
 
@@ -365,16 +368,38 @@ def cmd_thesis(a) -> int:
         Finding(agent, "supplied", text) for agent, text in _parse_evidence(a.evidence or [])
     ]
 
+    valuation_range = None
+    if getattr(a, "derive_valuation", False):
+        from mcp_server.tools import ToolError, derived_valuation
+
+        try:
+            valuation_range, derived = derived_valuation(
+                a.instrument, a.as_at or "", a.archetype or "", ctx
+            )
+        except ToolError as e:
+            print(str(e), file=sys.stderr)
+            return 2
+        findings.extend(derived)
+
     a10 = A10Thesis(ctx)
     out = a10.run(
         a.instrument,
         findings,
         horizon_months=a.horizon,
+        valuation_range=valuation_range,
         proposed_stance=Stance(a.stance),
         breakers=breakers,
     )
 
     print(f"thesis    {a.instrument}   horizon {a.horizon}m")
+    if getattr(a, "derive_valuation", False):
+        if valuation_range is not None:
+            lo, hi = valuation_range
+            print(
+                f"  valuation range, derived by the engine: {lo:,.0f} to {hi:,.0f} (a range, not a target)"
+            )
+        else:
+            print(f"  valuation range: none derived - {findings[-1].text}")
     for f in out:
         print(f"  {f.text}")
         print(
@@ -392,12 +417,22 @@ def cmd_thesis(a) -> int:
             print(f"    - {b.statement}   [{b.query} against {b.store}]")
 
     print("\nred team")
-    challenges = A11RedTeam(ctx).run(thesis)
+    red = A11RedTeam(ctx).run(thesis)
+    challenges = [f for f in red if f.kind != "analogue"]
     if not challenges:
         print("  (silent - which on a live thesis is itself a finding)")
     for c in sorted(challenges, key=lambda f: -f.numbers.get("severity_rank", 0)):
         kind = c.caveats[0].split(": ")[-1] if c.caveats else "?"
         print(f"  [{kind}] {c.text}")
+    analogues = [f for f in red if f.kind == "analogue"]
+    if analogues:
+        print("\nanalogues (what this resembles, not what will happen)")
+        for f in analogues:
+            print(f"  - {f.text}")
+            for c in f.citations[:1]:
+                from mcp_server.tools import cite_label
+
+                print(f"      cites {cite_label(c)}")
 
     if getattr(a, "narrate", False):
         code = _narrate(ctx, thesis, challenges)
@@ -834,6 +869,19 @@ def cmd_ratios(a) -> int:
         return 2
     print(text)
     return 1 if text.startswith("NO STATEMENTS STORED") else 0
+
+
+def cmd_workup(a) -> int:
+    """The twelve steps of docs/04 section 2, each honest about what the record answered."""
+    from mcp_server.tools import ToolError, analyst_workup
+
+    try:
+        text = analyst_workup(a.instrument, as_at=a.as_at or "", archetype=a.archetype or "")
+    except ToolError as e:
+        print(str(e), file=sys.stderr)
+        return 2
+    print(text)
+    return 0
 
 
 def cmd_valuation(a) -> int:
@@ -1677,6 +1725,21 @@ def cmd_graph(a) -> int:
         other.close()
         return 0
 
+    if getattr(a, "peers", None):
+        from knowledge.graph.peers import peers_of
+
+        target = resolve(a.peers)
+        if g.node(target) is None:
+            return reject(a.peers, target)
+        ps = peers_of(g, a.peers, asof)
+        print(ps.text())
+        corpus = CuratedCorpus()
+        for p in ps.peers:
+            for doc in p.evidence:
+                c = corpus.citation(doc)
+                print(f"      [{doc}] {c.quoted_span if c else 'evidence unavailable'}")
+        return 0
+
     if a.impact:
         start = resolve(a.impact)
         if g.node(start) is None:
@@ -1824,6 +1887,13 @@ def main(argv=None) -> int:
     )
     th.add_argument("--stance", default="hold", choices=[s.value for s in Stance])
     th.add_argument("--horizon", type=int, default=12, help="months")
+    th.add_argument(
+        "--derive-valuation",
+        action="store_true",
+        help="derive the bear-to-bull range from the stored record via the engines",
+    )
+    th.add_argument("--as-at", help="YYYY-MM-DD for the derived range; default today")
+    th.add_argument("--archetype", help="sector archetype for the derived range, e.g. bank")
     th.set_defaults(fn=cmd_thesis)
 
     rk = sub.add_parser("risk", help="concentration, heat and drawdown state of a book")
@@ -1933,6 +2003,14 @@ def main(argv=None) -> int:
     vl.add_argument("--coc-only", action="store_true", help="only the cost of capital")
     vl.set_defaults(fn=cmd_valuation)
 
+    wk = sub.add_parser(
+        "workup", help="the 12-step analyst workup over the stored record; a workup, not a stance"
+    )
+    wk.add_argument("instrument")
+    wk.add_argument("--as-at", help="YYYY-MM-DD; default today")
+    wk.add_argument("--archetype", help="sector archetype, e.g. bank, software")
+    wk.set_defaults(fn=cmd_workup)
+
     ft = sub.add_parser("fitness", help="can the system score itself yet?")
     ft.add_argument("--days", type=int, default=30, help="window (default 30)")
     ft.add_argument("--db", help="ledger path (default from config)")
@@ -1946,6 +2024,9 @@ def main(argv=None) -> int:
         help="strongest citable path between two entities",
     )
     gr.add_argument("--impact", metavar="NODE", help="what this event or commodity reaches")
+    gr.add_argument(
+        "--peers", metavar="INSTRUMENT", help="who the graph says the peers are, with evidence"
+    )
     gr.add_argument("--holding", action="append", help="limit --impact to these; repeatable")
     gr.add_argument(
         "--untested",

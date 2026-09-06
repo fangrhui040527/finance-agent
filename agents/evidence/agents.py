@@ -947,6 +947,66 @@ class A7SectorTechnology(Agent):
             )
         return out
 
+    def peers(
+        self, instrument_id: str, asof: date | None = None, same_market: bool = True
+    ) -> list[Finding]:
+        """Who the graph says the peers are on a date, each with its edge document.
+
+        A stated rivalry (``competes_with``) and a shared sub-sector are kept
+        apart and labelled: the second is two hops of classification and reads
+        as speculative by the graph's own decay. Nothing is inferred from names.
+        """
+        from knowledge.graph.peers import peers_of
+
+        self._guard_tool("peers")
+        if self.graph is None:
+            return [
+                Finding(
+                    self.agent_id,
+                    "peer_set",
+                    "no graph is loaded",
+                    caveats=["peers unavailable: build the graph with `make graph`"],
+                )
+            ]
+        on = asof or self.ctx.now.date()
+        ps = peers_of(self.graph, instrument_id, on, same_market=same_market)
+        head = Finding(
+            self.agent_id,
+            "peer_set",
+            ps.text().splitlines()[0],
+            numbers={
+                "direct": float(len(ps.direct)),
+                "same_subsector": float(len(ps.same_subsector)),
+                "excluded": float(len(ps.excluded)),
+            },
+            caveats=[ps.note] if ps.note else [],
+        )
+        out = [head]
+        for p in ps.peers:
+            citations = []
+            caveats = [f"{p.strength} link"]
+            if p.relation == "same_subsector":
+                caveats.append("shared classification only: not a stated rivalry")
+            if self.evidence is not None:
+                for doc in p.evidence:
+                    c = self.evidence(doc)
+                    if c is None:
+                        caveats.append(f"evidence unavailable: {doc}")
+                    else:
+                        citations.append(c)
+            out.append(
+                Finding(
+                    self.agent_id,
+                    "peer",
+                    p.describe(),
+                    citations=citations,
+                    numbers={"weight": p.weight},
+                    caveats=caveats,
+                    all_citations_required=True,
+                )
+            )
+        return out
+
 
 class A8OwnershipFlow(Agent):
     """Who is buying and selling. Routine insider selling is not a signal."""

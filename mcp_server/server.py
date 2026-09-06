@@ -223,6 +223,12 @@ S.tool(
             },
             "stance": _str("accumulate | hold | trim | exit | no_view"),
             "horizon_months": {"type": "integer"},
+            "derive_valuation": {
+                "type": "boolean",
+                "description": "derive the bear-to-bull range from the stored record through the engines; the model never types one (default false)",
+            },
+            "as_at": _str("YYYY-MM-DD for the derived range; default today"),
+            "archetype": _str("sector archetype for the derived range, e.g. bank"),
         },
         ["instrument"],
     ),
@@ -432,6 +438,43 @@ S.tool(
         ["instrument"],
     ),
 )(T.valuation_range)
+
+S.tool(
+    "peer_set",
+    "Who the entity graph says a company's peers are on a date, each with the "
+    "edge document behind it. A stated rivalry (competes_with) and a shared "
+    "sub-sector are labelled apart; the second is two hops of classification and "
+    "reads as speculative. Refused without a built graph. Not financial advice.",
+    obj(
+        {
+            "instrument": _str("e.g. 'MYX:1155'"),
+            "as_at": _str("YYYY-MM-DD; default today"),
+            "same_market": {
+                "type": "boolean",
+                "description": "keep peers in the same market (default true)",
+            },
+        },
+        ["instrument"],
+    ),
+)(T.peer_set)
+
+S.tool(
+    "analyst_workup",
+    "The twelve-step workup of docs/04 section 2 over the stored record: identity, "
+    "the comprehensibility and earnings-quality gates, history, capital allocation, "
+    "competitive position, industry and peers, forward drivers, the valuation range, "
+    "return decomposition and suggested breakers. Each step says done, partial, "
+    "unavailable, manual or not applicable and names the collector that would fill "
+    "a gap. A workup, not a stance. Not financial advice.",
+    obj(
+        {
+            "instrument": _str("e.g. 'XNAS:AAPL'"),
+            "as_at": _str("YYYY-MM-DD; default today"),
+            "archetype": _str("sector archetype, e.g. bank, software"),
+        },
+        ["instrument"],
+    ),
+)(T.analyst_workup)
 
 S.tool(
     "method_note",

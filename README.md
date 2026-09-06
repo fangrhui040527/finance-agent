@@ -235,6 +235,9 @@ indistinguishable. See [`docs/07-BUILD-ORDER.md`](docs/07-BUILD-ORDER.md) §0.
 | A valuation is emitted as a bear-to-bull range or refused, never as a point | `engines/valuation/dcf.py` | `test_dcf.py` |
 | Terminal growth above the risk-free rate is refused, not discounted | `engines/valuation/sanity.py` | `test_dcf.py` |
 | A quality score with missing inputs says n of N, never a number | `engines/fundamentals/quality.py` | `test_quality.py` |
+| A workup always has twelve steps, each with an honest status, and is never a stance | `engines/analysis/workup.py` | `test_workup.py` |
+| A peer is a live, citable graph edge, never a guess from a sector label | `knowledge/graph/peers.py` | `test_graph_peers.py` |
+| A thesis carries a valuation range the engine derived, or none; the model never types one | `mcp_server/tools.py` | `test_workup.py` |
 | The ledger is append-only — UPDATE and DELETE abort | `core/provenance/ledger.py` | `test_provenance.py` |
 | Human-authored knowledge is never agent-editable | `core/contracts/provenance_marker.py` | `test_provenance.py` |
 | Budget exhaustion raises; it never downgrades silently | `core/llm/client.py` | `test_inference_client.py` |

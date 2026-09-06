@@ -50,6 +50,8 @@ MINIMAL: dict[str, dict] = {
     "ratio_sheet": {"instrument": "MYX:1155"},
     "cost_of_capital": {"instrument": "MYX:1155", "archetype": "bank"},
     "valuation_range": {"instrument": "MYX:1155", "archetype": "bank"},
+    "analyst_workup": {"instrument": "MYX:1155", "archetype": "bank"},
+    "peer_set": {"instrument": "MYX:1155"},
     "log_prediction": {
         "instrument": "MYX:1155",
         "direction": 1,

@@ -1159,6 +1159,8 @@ def s_mcp():
         "ratio_sheet": {"instrument": "MYX:1155"},
         "cost_of_capital": {"instrument": "MYX:1155"},
         "valuation_range": {"instrument": "MYX:1155"},
+        "analyst_workup": {"instrument": "MYX:1155"},
+        "peer_set": {"instrument": "MYX:1155"},
         "log_hypothesis": {"title": "t", "thesis": "x", "db": ":memory:"},
         # Observability tools: read-only, and each must answer on an EMPTY
         # installation - "nothing has run yet" is the honest answer, and a

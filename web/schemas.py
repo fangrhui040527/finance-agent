@@ -85,6 +85,9 @@ class ThesisBody(BaseModel):
     stance: str = "hold"
     horizon_months: int = Field(default=12, ge=1, le=120)
     narrate: bool = False
+    derive_valuation: bool = False
+    as_at: str = ""
+    archetype: str = ""
 
 
 class PositionItem(BaseModel):
