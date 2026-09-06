@@ -17,7 +17,9 @@ from datetime import date
 from decimal import Decimal
 from enum import Enum
 
-from agents.base import Agent, Finding
+from agents.base import Agent, Finding, cite, quote_span
+from core.contracts.answer import TrustTier
+from core.guardrails.policy import PolicyViolation
 from core.llm.tiers import TaskClass
 from engines.attribution.decompose import (
     Component,
@@ -353,8 +355,15 @@ class A10Thesis(Agent):
         ]
 
     def coverage_gaps(self, findings: list[Finding]) -> list[str]:
+        """Which required agents said nothing usable.
+
+        A finding whose kind ends in ``unavailable`` (``unavailable``,
+        ``valuation_unavailable``) is an agent reporting that it could not
+        answer; it does not count as coverage, or a refusal would read as
+        evidence.
+        """
         self._guard_tool("check_coverage")
-        seen = {f.agent for f in findings if f.kind != "unavailable"}
+        seen = {f.agent for f in findings if not f.kind.endswith("unavailable")}
         return [a for a in self.REQUIRED_EVIDENCE if a not in seen]
 
     @staticmethod
@@ -403,6 +412,34 @@ class A11RedTeam(Agent):
         ("liquidity", "The position cannot be exited at the size assumed."),
     )
 
+    #: docs/06 section 5.4: the red team retrieves failure cases on the STRUCTURAL
+    #: pattern a thesis's own findings imply, never on the company. A phrase in a
+    #: quality or ratio finding maps to a tag in knowledge/method/kb_failures.
+    PATTERN_FOR_FLAG: tuple[tuple[str, str], ...] = (
+        ("accrual", "accruals_divergence"),
+        ("cash flow", "accruals_divergence"),
+        ("receivable", "receivables_run"),
+        ("leverage", "covenant_cliff"),
+        ("net debt", "covenant_cliff"),
+        ("covenant", "covenant_cliff"),
+        ("going concern", "going_concern_language"),
+        ("auditor", "auditor_change"),
+        ("related party", "related_party_dependence"),
+        ("acquisition", "serial_acquirer"),
+        ("concentration", "single_customer_concentration"),
+        ("peak", "peak_cycle_margin_extrapolated"),
+        ("placement", "capital_raise_treadmill"),
+        ("rights issue", "capital_raise_treadmill"),
+        ("duration", "duration_mismatch"),
+        # ratio- and score-shaped flags from the workup and the ratio sheet
+        ("net_debt", "covenant_cliff"),
+        ("interest_cover", "covenant_cliff"),
+        ("receivables_run", "receivables_run"),
+        ("receivables grew", "receivables_run"),
+        ("beneish", "fabricated_sales"),
+    )
+    FLAG_KINDS = ("quality_flag", "ratio", "sanity", "quality", "flag")
+
     def run(self, thesis: Thesis, excluded_sources: set[str] | None = None) -> list[Finding]:
         self._guard_tool("find_disconfirming")
         excluded = excluded_sources or {c.source for f in thesis.supporting for c in f.citations}
@@ -413,7 +450,7 @@ class A11RedTeam(Agent):
             if self._applies(kind, thesis):
                 challenges.append(Challenge(kind, statement, "material"))
 
-        return [
+        out = [
             Finding(
                 self.agent_id,
                 "challenge",
@@ -425,6 +462,75 @@ class A11RedTeam(Agent):
             )
             for c in challenges
         ]
+        out.extend(self.analogues(thesis))
+        return out
+
+    def patterns_for(self, thesis: Thesis) -> set[str]:
+        """The failure-pattern tags a thesis's own flags imply."""
+        tags: set[str] = set()
+        for f in thesis.supporting:
+            if f.kind not in self.FLAG_KINDS:
+                continue
+            text = f.text.lower()
+            for needle, tag in self.PATTERN_FOR_FLAG:
+                if needle in text:
+                    tags.add(tag)
+        return tags
+
+    def analogues(
+        self, thesis: Thesis, patterns: set[str] | None = None, limit: int = 3
+    ) -> list[Finding]:
+        """What this situation resembles, from the failure library, by pattern.
+
+        An analogue is not a prediction and does not move the verdict: it is
+        the pre-mortem's raw material, cited so the reader can open the case.
+        Nothing when no flag implies a pattern, or the store is empty.
+        """
+        tags = set(patterns) if patterns is not None else self.patterns_for(thesis)
+        if not tags:
+            return []
+        words = " ".join(t.replace("_", " ") for t in sorted(tags))
+        try:
+            res = self.retrieve("kb_failures", f"{' '.join(sorted(tags))} {words}", limit=8)
+        except (KeyError, PermissionError, PolicyViolation):
+            return []
+        out: list[Finding] = []
+        seen: set[str] = set()
+        for h in res.hits:
+            meta = h.chunk.metadata
+            slug = str(meta.get("slug"))
+            matched = sorted(tags & set(meta.get("patterns") or ()))
+            if not matched or slug in seen:
+                continue
+            seen.add(slug)
+            case = meta.get("case") or {}
+            span = quote_span(h.chunk.text)
+            out.append(
+                Finding(
+                    self.agent_id,
+                    "analogue",
+                    f"{case.get('name', slug)} ({case.get('country', '?')} {case.get('year', '?')}): "
+                    f"{', '.join(matched)} - {case.get('outcome', '')}",
+                    citations=[
+                        cite(
+                            "kb_failures",
+                            h.chunk.chunk_id,
+                            span,
+                            TrustTier.METHOD_KB,
+                            h.chunk.as_of or self.ctx.now,
+                        )
+                    ],
+                    numbers={"patterns_matched": float(len(matched))},
+                    caveats=[
+                        "an analogue, not a prediction: the pattern resembles, the outcome "
+                        "does not follow",
+                        f"case note {slug}",
+                    ],
+                )
+            )
+            if len(out) >= limit:
+                break
+        return out
 
     def structural_challenges(self, thesis: Thesis):
         if thesis.gaps:

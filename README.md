@@ -231,6 +231,13 @@ indistinguishable. See [`docs/07-BUILD-ORDER.md`](docs/07-BUILD-ORDER.md) §0.
 | No order-placement code exists anywhere in the repo | `core/guardrails/policy.py` + repo grep | `test_no_execution_anywhere.py` |
 | All five rails run on every request; no bypass path | `core/guardrails/chain.py` | `test_guardrail_chain.py` |
 | A claim without a verified verbatim citation is dropped individually | `core/contracts/answer.py` | `test_answer_contract.py` |
+| Curated method notes are own-licensed, ASCII, advice-free, and a link-only reference is never quoted | `knowledge/retrieval/method.py` | `test_method_notes.py` |
+| A valuation is emitted as a bear-to-bull range or refused, never as a point | `engines/valuation/dcf.py` | `test_dcf.py` |
+| Terminal growth above the risk-free rate is refused, not discounted | `engines/valuation/sanity.py` | `test_dcf.py` |
+| A quality score with missing inputs says n of N, never a number | `engines/fundamentals/quality.py` | `test_quality.py` |
+| A workup always has twelve steps, each with an honest status, and is never a stance | `engines/analysis/workup.py` | `test_workup.py` |
+| A peer is a live, citable graph edge, never a guess from a sector label | `knowledge/graph/peers.py` | `test_graph_peers.py` |
+| A thesis carries a valuation range the engine derived, or none; the model never types one | `mcp_server/tools.py` | `test_workup.py` |
 | The ledger is append-only — UPDATE and DELETE abort | `core/provenance/ledger.py` | `test_provenance.py` |
 | Human-authored knowledge is never agent-editable | `core/contracts/provenance_marker.py` | `test_provenance.py` |
 | Budget exhaustion raises; it never downgrades silently | `core/llm/client.py` | `test_inference_client.py` |

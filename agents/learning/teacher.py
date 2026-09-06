@@ -15,10 +15,12 @@ Two design rules make that real:
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from enum import Enum
 
-from agents.base import Agent, Finding
+from agents.base import Agent, Finding, cite, quote_span
+from core.contracts.answer import TrustTier
+from core.guardrails.policy import PolicyViolation
 from core.llm.tiers import TaskClass
 
 
@@ -309,6 +311,60 @@ CURRICULUM: tuple[Concept, ...] = (
     ),
 )
 
+#: The kb_craft note that teaches each concept: knowledge/method/kb_craft/<slug>.md.
+#: Static on purpose - the teacher must not read the filesystem at import - and
+#: pinned by a test that opens every note and checks its `concepts` names the key.
+NOTE_SOURCES: dict[str, str] = {
+    "share": "share-and-counterparty",
+    "market_maker": "share-and-counterparty",
+    "compounding": "compounding-and-drawdown-arithmetic",
+    "income_statement": "reading-the-income-statement",
+    "cash_flow": "cash-flow-outranks-earnings",
+    "balance_sheet": "balance-sheet-and-maturity",
+    "restatement": "restatements-and-known-at",
+    "intrinsic_value": "value-as-discounted-cash",
+    "multiples": "value-as-discounted-cash",
+    "reverse_dcf": "reverse-dcf-and-ranges",
+    "range_not_point": "reverse-dcf-and-ranges",
+    "liquidity": "liquidity-volatility-and-noise",
+    "volatility": "liquidity-volatility-and-noise",
+    "trend_vs_noise": "liquidity-volatility-and-noise",
+    "factor_decomposition": "decompose-before-you-explain",
+    "base_rate": "decompose-before-you-explain",
+    "catalyst_quality": "decompose-before-you-explain",
+    "no_catalyst": "decompose-before-you-explain",
+    "expected_value": "expected-value-sizing-kelly-ruin",
+    "position_sizing": "expected-value-sizing-kelly-ruin",
+    "kelly": "expected-value-sizing-kelly-ruin",
+    "ruin": "expected-value-sizing-kelly-ruin",
+    "correlation": "correlation-effective-bets-heat-currency",
+    "effective_bets": "correlation-effective-bets-heat-currency",
+    "portfolio_heat": "correlation-effective-bets-heat-currency",
+    "currency": "correlation-effective-bets-heat-currency",
+    "journal": "journal-breakers-calibration-updating",
+    "breakers": "journal-breakers-calibration-updating",
+    "calibration": "journal-breakers-calibration-updating",
+    "changing_mind": "journal-breakers-calibration-updating",
+}
+
+
+def note_source(key: str) -> tuple[str, str, Licence] | None:
+    """The (title, path, licence) source tuple for a concept's own method note."""
+    slug = NOTE_SOURCES.get(key)
+    if slug is None:
+        return None
+    return (f"Method note ({slug})", f"knowledge/method/kb_craft/{slug}.md", Licence.OPEN)
+
+
+def _with_note_sources(concepts: tuple[Concept, ...]) -> tuple[Concept, ...]:
+    out = []
+    for c in concepts:
+        src = note_source(c.key)
+        out.append(c if src is None or src in c.sources else replace(c, sources=(src, *c.sources)))
+    return tuple(out)
+
+
+CURRICULUM = _with_note_sources(CURRICULUM)
 BY_KEY: dict[str, Concept] = {c.key: c for c in CURRICULUM}
 
 
@@ -422,6 +478,7 @@ class A14Teacher(Agent):
                     caveats=["answer this before the concept counts as known"],
                 )
             )
+        out.extend(self._cited_notes(c))
         for title, url, lic in c.sources:
             if lic is Licence.LINK_ONLY:
                 out.append(
@@ -434,6 +491,44 @@ class A14Teacher(Agent):
                 )
             else:
                 out.append(Finding(self.agent_id, "further_reading", f"{title} - {url}"))
+        return out
+
+    def _cited_notes(self, c: Concept, limit: int = 2) -> list[Finding]:
+        """The concept's method note, retrieved from kb_craft and cited verbatim.
+
+        Nothing when the store is empty or unreachable: a lesson without a
+        note is still a lesson, and the teacher must answer with `Router({})`
+        the way every test builds it.
+        """
+        try:
+            res = self.retrieve("kb_craft", f"{c.title}. {c.one_line}", limit=max(limit, 4))
+        except (KeyError, PermissionError, PolicyViolation):
+            return []
+        out: list[Finding] = []
+        for h in res.hits:
+            meta = h.chunk.metadata
+            if c.key not in (meta.get("concepts") or ()):
+                continue
+            span = quote_span(h.chunk.text)
+            out.append(
+                Finding(
+                    self.agent_id,
+                    "note",
+                    f"{meta.get('title')}: {span}",
+                    citations=[
+                        cite(
+                            "kb_craft",
+                            h.chunk.chunk_id,
+                            span,
+                            TrustTier.METHOD_KB,
+                            h.chunk.as_of or self.ctx.now,
+                        )
+                    ],
+                    caveats=[f"method note {meta.get('slug')}, as of {meta.get('as_of')}"],
+                )
+            )
+            if len(out) >= limit:
+                break
         return out
 
     def next_concept(self, learner: Learner) -> Finding:

@@ -307,3 +307,47 @@ def test_finmind_answers_for_tsmc_keyless_or_names_its_quota():
         pytest.xfail(f"FinMind quota for this runner's address is spent: {pull.notes[0][:120]}")
     concepts = {o.concept for o in pull.observations}
     assert "revenue_month" in concepts, (concepts, pull.notes)
+
+
+# --- 2026-09-06: statement lines for the analyst engines --------------------------------
+
+
+@pytest.mark.network
+def test_sec_xbrl_company_facts_carry_filed_dates_for_aapl():
+    if not reachable("data.sec.gov"):
+        pytest.skip("data.sec.gov unreachable")
+    from knowledge.sources.sec_xbrl import SecCompanyFacts
+
+    pull = SecCompanyFacts().collect(SINCE, ("XNAS:AAPL",))
+    assert pull.requests == 1
+    concepts = {o.concept for o in pull.observations}
+    assert {
+        "revenue",
+        "revenue_fy",
+        "net_income",
+        "cash_from_operations",
+        "total_assets",
+    } <= concepts, sorted(concepts)
+    assert all(o.period_end is None or o.known_at >= o.period_end for o in pull.observations)
+    assert any(o.payload.get("derived") for o in pull.observations if o.concept == "revenue"), (
+        "Q4 is derived from FY"
+    )
+
+
+@pytest.mark.network
+def test_eodhd_answers_one_us_name_or_names_its_plan():
+    """With a key: statements for one US name, or the plan's boundary named. Without
+    one: the collector skips itself, which is the documented behaviour."""
+    if not reachable("eodhd.com"):
+        pytest.skip("eodhd.com unreachable")
+    from knowledge.sources.base import KeyMissing
+    from knowledge.sources.eodhd import EodhdFundamentals
+
+    if not os.environ.get("EODHD_API_KEY", "").strip():
+        with pytest.raises(KeyMissing):
+            EodhdFundamentals().collect(SINCE, ("XNAS:AAPL",))
+        pytest.xfail("EODHD_API_KEY is not set; the collector skips itself as documented")
+    pull = EodhdFundamentals().collect(SINCE, ("XNAS:AAPL",))
+    if not pull.observations:
+        pytest.xfail(f"EODHD answered without statements: {pull.notes}")
+    assert {"revenue", "total_assets"} <= {o.concept for o in pull.observations}

@@ -155,3 +155,5 @@ Still true, stated rather than hidden:
 - Stooq-specific live tests xfail while its browser wall is up.
 - The Kelly/quality caveats in `details/10-STATUS-AND-GAPS.md` are unchanged —
   they are blocked on time and human work, not code.
+
+2026-09-06: two live tests added for the statement collectors (`sec_xbrl` company facts for AAPL with filed dates; `eodhd` one US name or its plan note as an xfail).

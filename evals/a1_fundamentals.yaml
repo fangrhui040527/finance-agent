@@ -19,6 +19,12 @@ cases:
     expect: quality_flag
   - name: dupont_decomposes_roe
     expect: line_item
+  - name: ratio_sheet_names_what_it_lacks
+    statements: partial
+    expect: ratio_sheet
+  - name: piotroski_reports_j_of_k_signals
+    statements: two_years_partial
+    expect: quality
   # -- negatives -----------------------------------------------------------
   - name: not_yet_public_at_asof
     concept: net_income
@@ -32,3 +38,8 @@ cases:
     available: false
     expect: refuse
     negative: true
+  - name: beneish_refused_below_eight_indices
+    statements: two_years_partial
+    expect: refuse
+    negative: true
+    near_miss: true

@@ -270,6 +270,8 @@ L8  Craft of trading         order types · slippage · liquidity · execution
 
 Seeding is cheap and disproportionately valuable — it can start in Phase 1 as a static markdown folder and only needs a vector store once it outgrows one.
 
+**Built (2026-09-06).** `knowledge/method/kb_craft/` holds 13 own-written notes (Tier C, `licence: own`, references marked `attributed` or `link_only`) covering all 30 concepts in `agents/learning/teacher.py`; `Concept.sources` points at the note, the teacher retrieves and cites it, and `knowledge/retrieval/method.py` loads the folder into the shared router. The contract is `knowledge/method/README.md`.
+
 ### 5.4 `kb_failures` — the blowup library
 
 The antidote to survivorship bias in the *qualitative* corpus, mirroring what `universe_snapshot` does for the quantitative one.
@@ -287,6 +289,8 @@ Retrieval is similarity on the **structural pattern**, not the company or sector
 
 Target 200 cases by Phase 6, ~800 chunks. Growth of 10–20 cases per quarter thereafter, including — especially — the system's own failures.
 
+**Built (2026-09-06).** 13 cases in `knowledge/method/kb_failures/` (five Malaysian: Transmile, Megan Media, Serba Dinamik, Sapura Energy, London Biscuits; eight global: Enron, Wirecard, Luckin, Valeant, SVB, Archegos, Evergrande, Nikola), each tagged from a pinned vocabulary of the twelve patterns above plus `duration_mismatch`, `hidden_leverage`, `fabricated_sales` (`knowledge/retrieval/method.py::PATTERN_TAGS`). A11 maps a thesis's own quality and ratio flags to patterns and retrieves analogues on the pattern, labelled as analogues and never moving the verdict.
+
 ### 5.5 `event_base_rates` — self-built, no vendor
 
 Fully specified in `03-WHY-IT-MOVED.md` §6. Built once from survivorship-safe history, extended quarterly. This is the knowledge base that makes attribution credible and it exists nowhere else.
@@ -297,8 +301,8 @@ Fully specified in `03-WHY-IT-MOVED.md` §6. Built once from survivorship-safe h
 |---|---|
 | `kb_transcripts` | Speaker-turn chunks merged to ~600 tokens, never across speakers. Metadata: company, quarter, speaker, role, timestamp, `is_qna` |
 | `kb_sector` | Tier A + Tier C primers, ~500 tok concept chunks, tagged to sector node and value-chain position |
-| `kb_method_valuation` | Concept chunks with `sector_applicability` — bank methods never retrieved for software |
-| `kb_method_technical` | Indicator/pattern definitions, each with its **measured base rate** as structured metadata; `unvalidated` flag where n < 30 |
+| `kb_method_valuation` | Concept chunks with `sector_applicability` — bank methods never retrieved for software. **Built:** 13 notes in `knowledge/method/kb_method_valuation/` carry `archetypes:`; A2 filters hits on it; the dated cost-of-capital table (`knowledge/method/data/cost_of_capital.yaml`) is indexed row by row as citable chunks |
+| `kb_method_technical` | Indicator/pattern definitions, each with its **measured base rate** as structured metadata; `unvalidated` flag where n < 30. **Built:** 6 notes, every one still `base_rate: {n: 0, unvalidated: true}` until measured on this system's own bars |
 | `kb_lessons` | Written by A14 on every resolved decision. Tagged with decision type, error class, concept exercised |
 
 ---

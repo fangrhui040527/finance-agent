@@ -223,6 +223,12 @@ S.tool(
             },
             "stance": _str("accumulate | hold | trim | exit | no_view"),
             "horizon_months": {"type": "integer"},
+            "derive_valuation": {
+                "type": "boolean",
+                "description": "derive the bear-to-bull range from the stored record through the engines; the model never types one (default false)",
+            },
+            "as_at": _str("YYYY-MM-DD for the derived range; default today"),
+            "archetype": _str("sector archetype for the derived range, e.g. bank"),
         },
         ["instrument"],
     ),
@@ -380,6 +386,116 @@ S.tool(
         }
     ),
 )(T.explain_concept)
+
+S.tool(
+    "ratio_sheet",
+    "Margins, returns, leverage, liquidity, growth and accruals, plus the "
+    "earnings-quality scores (accruals, Beneish M, Piotroski F, Altman Z), from "
+    "the stored statement lines as of a date. Every missing input is named with "
+    "the collector that would fill it; a name with nothing stored says so.",
+    obj(
+        {"instrument": _str("e.g. 'XNAS:AAPL'"), "as_at": _str("YYYY-MM-DD; default today")},
+        ["instrument"],
+    ),
+)(T.ratio_sheet)
+
+S.tool(
+    "cost_of_capital",
+    "The discount rate, built: risk-free from the stored yield series, premiums "
+    "from the dated Damodaran table (cited), beta from the vendor figure or the "
+    "industry, cost of debt from interest cover, weights from market value. "
+    "Every input labelled, every gap named.",
+    obj(
+        {
+            "instrument": _str("e.g. 'XNAS:AAPL'"),
+            "as_at": _str("YYYY-MM-DD; default today"),
+            "archetype": _str(
+                "bank | utility | cyclical | software | semis | chemicals | hospital | gaming | holding"
+            ),
+        },
+        ["instrument"],
+    ),
+)(T.cost_of_capital)
+
+S.tool(
+    "valuation_range",
+    "A bear-to-bull scenario DCF from the stored record: each end a stated set of "
+    "assumptions, terminal share reported, refused when fewer than two scenarios "
+    "survive the sanity checks (terminal growth above the risk-free rate, margins "
+    "above history, and the rest). Never a point target. Name peers to add the "
+    "multiple's three contexts.",
+    obj(
+        {
+            "instrument": _str("e.g. 'XNAS:AAPL'"),
+            "as_at": _str("YYYY-MM-DD; default today"),
+            "archetype": _str("sector archetype, for the industry beta and the method"),
+            "peers": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "peer instrument ids",
+            },
+        },
+        ["instrument"],
+    ),
+)(T.valuation_range)
+
+S.tool(
+    "peer_set",
+    "Who the entity graph says a company's peers are on a date, each with the "
+    "edge document behind it. A stated rivalry (competes_with) and a shared "
+    "sub-sector are labelled apart; the second is two hops of classification and "
+    "reads as speculative. Refused without a built graph. Not financial advice.",
+    obj(
+        {
+            "instrument": _str("e.g. 'MYX:1155'"),
+            "as_at": _str("YYYY-MM-DD; default today"),
+            "same_market": {
+                "type": "boolean",
+                "description": "keep peers in the same market (default true)",
+            },
+        },
+        ["instrument"],
+    ),
+)(T.peer_set)
+
+S.tool(
+    "analyst_workup",
+    "The twelve-step workup of docs/04 section 2 over the stored record: identity, "
+    "the comprehensibility and earnings-quality gates, history, capital allocation, "
+    "competitive position, industry and peers, forward drivers, the valuation range, "
+    "return decomposition and suggested breakers. Each step says done, partial, "
+    "unavailable, manual or not applicable and names the collector that would fill "
+    "a gap. A workup, not a stance. Not financial advice.",
+    obj(
+        {
+            "instrument": _str("e.g. 'XNAS:AAPL'"),
+            "as_at": _str("YYYY-MM-DD; default today"),
+            "archetype": _str("sector archetype, e.g. bank, software"),
+        },
+        ["instrument"],
+    ),
+)(T.analyst_workup)
+
+S.tool(
+    "method_note",
+    "Read the curated method notes: the curriculum (kb_craft), valuation, "
+    "technical and risk methods, and the failure library (kb_failures), each "
+    "quoted verbatim with its chunk id and its references' licences. Select "
+    "by concept key, sector archetype, failure pattern, or free text.",
+    obj(
+        {
+            "collection": _str(
+                "kb_craft | kb_method_valuation | kb_method_technical | kb_method_risk | kb_failures"
+            ),
+            "query": _str("free text"),
+            "concept": _str("curriculum key, e.g. 'cash_flow' (kb_craft)"),
+            "archetype": _str("sector archetype, e.g. 'bank' (kb_method_valuation)"),
+            "pattern": _str("failure pattern tag, e.g. 'accruals_divergence' (kb_failures)"),
+            "limit": {"type": "integer", "description": "notes to show (default 4)"},
+        },
+        ["collection"],
+    ),
+)(T.method_note)
 
 S.tool(
     "log_prediction",

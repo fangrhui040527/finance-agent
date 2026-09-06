@@ -1008,3 +1008,267 @@ def test_every_new_collector_is_registered_and_catalogued():
     for name in ("jin10_flash", "jin10_calendar", "dbnomics", "twse_openapi", "finmind"):
         assert name in COLLECTORS and name in CATALOG, name
         assert collector_for(name).name == name
+
+
+# --- SEC XBRL company facts ------------------------------------------------------------
+
+from knowledge.sources.eodhd import EodhdFundamentals, symbol_for  # noqa: E402
+from knowledge.sources.sec_xbrl import SecCompanyFacts  # noqa: E402
+
+
+def _usd(items):
+    return {"units": {"USD": items}}
+
+
+def _fact(start, end, val, filed, form, fy=None, fp=None):
+    d = {
+        "end": end,
+        "val": val,
+        "filed": filed,
+        "form": form,
+        "fy": fy,
+        "fp": fp,
+        "accn": f"acc-{filed}",
+    }
+    if start:
+        d["start"] = start
+    return d
+
+
+COMPANY_FACTS = {
+    "cik": 320193,
+    "facts": {
+        "dei": {
+            "EntityCommonStockSharesOutstanding": {
+                "units": {
+                    "shares": [
+                        _fact(None, "2026-01-16", 15000000000, "2026-01-30", "10-Q", 2026, "Q1")
+                    ]
+                }
+            }
+        },
+        "us-gaap": {
+            "RevenueFromContractWithCustomerExcludingAssessedTax": _usd(
+                [
+                    _fact("2024-01-01", "2024-12-31", 900, "2025-02-01", "10-K", 2024, "FY"),
+                    _fact("2025-01-01", "2025-03-31", 240, "2025-05-01", "10-Q", 2025, "Q1"),
+                    _fact("2025-04-01", "2025-06-30", 250, "2025-08-01", "10-Q", 2025, "Q2"),
+                    _fact(
+                        "2025-01-01", "2025-06-30", 490, "2025-08-01", "10-Q", 2025, "Q2"
+                    ),  # six-month YTD: dropped
+                    _fact("2025-07-01", "2025-09-30", 255, "2025-11-01", "10-Q", 2025, "Q3"),
+                    _fact("2025-01-01", "2025-12-31", 1000, "2026-02-01", "10-K", 2025, "FY"),
+                    _fact(
+                        "2025-01-01", "2025-03-31", 240, "2026-02-01", "10-K", 2025, "Q1"
+                    ),  # re-reported: earliest wins
+                    _fact(
+                        "2024-01-01", "2024-12-31", 905, "2026-02-01", "10-K", 2025, "FY"
+                    ),  # restated: a second row
+                    _fact(
+                        "2010-01-01", "2010-12-31", 100, "2011-02-01", "10-K", 2010, "FY"
+                    ),  # beyond the lookback
+                ]
+            ),
+            "Revenues": _usd(
+                [_fact("2023-01-01", "2023-12-31", 800, "2024-02-01", "10-K", 2023, "FY")]
+            ),
+            "Assets": _usd(
+                [
+                    _fact(None, "2025-12-31", 2000, "2026-02-01", "10-K", 2025, "FY"),
+                    _fact(None, "2024-12-31", 1800, "2025-02-01", "10-K", 2024, "FY"),
+                ]
+            ),
+            "NetIncomeLoss": _usd(
+                [_fact("2025-01-01", "2025-12-31", 150, "2026-02-01", "10-K", 2025, "FY")]
+            ),
+            "SomethingElse": _usd([_fact(None, "2025-12-31", 1, "2026-02-01", "10-K")]),
+        },
+    },
+}
+
+
+def test_sec_company_facts_stamp_filing_dates_split_quarters_from_years_and_derive_q4():
+    open_ = router({"companyfacts/CIK0000320193.json": COMPANY_FACTS})
+    c = SecCompanyFacts(clock=lambda: datetime(2026, 3, 1, tzinfo=UTC), opener=open_)
+    pull = c.collect(SINCE, ("XNAS:AAPL", "XNAS:ZZZZ", "MYX:1155"))
+    assert pull.requests == 1
+    assert any("XNAS:ZZZZ: no CIK" in n for n in pull.notes) and not any(
+        "MYX" in n for n in pull.notes
+    )
+    by = {}
+    for o in pull.observations:
+        by.setdefault((o.concept, o.period_end), []).append(o)
+    q1 = by[("revenue", date(2025, 3, 31))]
+    assert len(q1) == 1 and q1[0].known_at == date(2025, 5, 1), (
+        "the earliest filing of a figure is its known-at"
+    )
+    assert q1[0].payload["form"] == "10-Q" and q1[0].currency == "USD"
+    fy25 = by[("revenue_fy", date(2025, 12, 31))]
+    assert fy25[0].value == Decimal(1000) and fy25[0].known_at == date(2026, 2, 1)
+    q4 = by[("revenue", date(2025, 12, 31))]
+    assert q4[0].value == Decimal(255) and q4[0].payload.get("derived") == "FY - Q1..Q3"
+    assert q4[0].known_at == date(2026, 2, 1), (
+        "a derived quarter is knowable when the year is filed"
+    )
+    fy24 = sorted(by[("revenue_fy", date(2024, 12, 31))], key=lambda o: o.known_at)
+    assert [o.value for o in fy24] == [Decimal(900), Decimal(905)], (
+        "a restatement is a second row, not an overwrite"
+    )
+    assert ("revenue", date(2025, 6, 30)) in by and all(
+        o.value == Decimal(250) for o in by[("revenue", date(2025, 6, 30))]
+    ), "the six-month figure is not a quarter"
+    assert ("revenue_fy", date(2023, 12, 31)) in by, "a period only the older tag carries is kept"
+    assert ("revenue_fy", date(2010, 12, 31)) not in by, "beyond the lookback"
+    assert by[("total_assets", date(2025, 12, 31))][0].value == Decimal(2000)
+    assert by[("shares_outstanding", date(2026, 1, 16))][0].unit == "shares"
+    assert all(o.known_at >= (o.period_end or o.known_at) for o in pull.observations)
+
+
+def test_sec_company_facts_names_the_user_agent_on_403_and_fails_only_when_every_name_does():
+    forbidden = router({"companyfacts": http_error(403)})
+    with pytest.raises(SourceError, match="SEC_USER_AGENT"):
+        SecCompanyFacts(clock=CLOCK, opener=forbidden).collect(SINCE, ("XNAS:AAPL",))
+    dead = router({"companyfacts": http_error(500)})
+    with pytest.raises(SourceError, match="every name failed"):
+        SecCompanyFacts(clock=CLOCK, opener=dead, sleep=lambda _s: None).collect(
+            SINCE, ("XNAS:AAPL",)
+        )
+    assert (
+        SecCompanyFacts(clock=CLOCK, opener=router({})).collect(SINCE, ("MYX:1155",)).requests == 0
+    )
+
+
+# --- EODHD -------------------------------------------------------------------------------
+
+EODHD_PAYLOAD = {
+    "Financials": {
+        "Income_Statement": {
+            "currency_symbol": "USD",
+            "quarterly": {
+                "2025-12-31": {
+                    "date": "2025-12-31",
+                    "filing_date": "2026-02-15",
+                    "totalRevenue": "255",
+                    "netIncome": "39",
+                },
+                "2025-09-30": {
+                    "date": "2025-09-30",
+                    "filing_date": None,
+                    "totalRevenue": "255",
+                    "netIncome": "39",
+                },
+            },
+            "yearly": {
+                "2025-12-31": {
+                    "date": "2025-12-31",
+                    "filing_date": "2026-02-15",
+                    "totalRevenue": "1000",
+                    "netIncome": "150",
+                }
+            },
+        },
+        "Balance_Sheet": {
+            "currency_symbol": "USD",
+            "quarterly": {
+                "2025-12-31": {
+                    "date": "2025-12-31",
+                    "filing_date": "2026-02-15",
+                    "totalAssets": "2000",
+                    "netReceivables": "150",
+                }
+            },
+            "yearly": {
+                "2025-12-31": {
+                    "date": "2025-12-31",
+                    "filing_date": "2026-02-15",
+                    "totalAssets": "2000",
+                }
+            },
+        },
+        "Cash_Flow": {
+            "currency_symbol": "USD",
+            "quarterly": {
+                "2025-12-31": {
+                    "date": "2025-12-31",
+                    "filing_date": "2026-02-15",
+                    "totalCashFromOperatingActivities": "50",
+                    "capitalExpenditures": "-13",
+                }
+            },
+            "yearly": {},
+        },
+    }
+}
+
+
+def test_eodhd_skips_without_its_key_and_names_the_variable():
+    with pytest.raises(KeyMissing, match="EODHD_API_KEY"):
+        EodhdFundamentals(clock=CLOCK, opener=router({})).collect(SINCE, ("XNAS:AAPL",))
+
+
+def test_eodhd_rotates_two_names_a_day_and_defers_the_rest():
+    names = ("XNAS:AAPL", "XNAS:MSFT", "XNAS:NVDA", "MYX:1155")
+    asked, deferred = EodhdFundamentals.rotation(names, date(2026, 9, 6), "us_close")
+    assert len(asked) == 2 and len(deferred) == 2 and set(asked) | set(deferred) == set(names)
+    assert EodhdFundamentals.rotation(names, date(2026, 9, 6), "us_close") == (asked, deferred), (
+        "deterministic"
+    )
+    next_day, _ = EodhdFundamentals.rotation(names, date(2026, 9, 7), "us_close")
+    assert next_day != asked, "the next day asks for different names"
+    assert (
+        symbol_for("MYX:1155") == "1155.KLSE"
+        and symbol_for("XNAS:NVDA") == "NVDA.US"
+        and symbol_for("XLON:VOD") is None
+    )
+
+
+def test_eodhd_maps_statements_to_the_shared_keys_and_stamps_filing_dates():
+    open_ = router({"fundamentals/AAPL.US": EODHD_PAYLOAD})
+    c = EodhdFundamentals(
+        clock=lambda: datetime(2026, 3, 1, tzinfo=UTC), opener=open_, key="tok.12345678"
+    )
+    pull = c.collect(SINCE, ("XNAS:AAPL",))
+    assert (
+        pull.requests == 1
+        and "api_token=tok.12345678" in open_.calls[0]
+        and "filter=Financials" in open_.calls[0]
+    )
+    by = {(o.concept, o.period_end): o for o in pull.observations}
+    assert by[("revenue", date(2025, 12, 31))].value == Decimal(255)
+    assert by[("revenue", date(2025, 12, 31))].known_at == date(2026, 2, 15)
+    assert by[("revenue", date(2025, 9, 30))].known_at == date(2026, 3, 1), (
+        "no filing date: the fetch day, never the period end"
+    )
+    assert by[("revenue_fy", date(2025, 12, 31))].value == Decimal(1000)
+    assert (
+        by[("total_assets", date(2025, 12, 31))].value == Decimal(2000)
+        and by[("total_assets", date(2025, 12, 31))].currency == "USD"
+    )
+    assert by[("capex", date(2025, 12, 31))].value == Decimal(-13), (
+        "signs as reported; the ratio layer takes the absolute value"
+    )
+    assert ("total_assets_fy", date(2025, 12, 31)) not in by, (
+        "instants are not duplicated under _fy"
+    )
+
+
+def test_eodhd_reports_the_plan_boundary_by_market_and_never_retries_a_limit():
+    open_ = router(
+        {"1155.KLSE": http_error(403), "AAPL.US": {"message": "Daily API limit exceeded"}}
+    )
+    c = EodhdFundamentals(clock=CLOCK, opener=open_, key="tok.12345678")
+    pull = c.collect(SINCE, ("MYX:1155", "XNAS:AAPL"))
+    assert any(
+        n == "MYX:1155: EODHD free plan: US only; the Fundamentals plan covers KLSE"
+        for n in pull.notes
+    )
+    assert any("limit" in n.lower() for n in pull.notes) and pull.requests == 2
+    assert not pull.observations
+
+
+def test_the_statement_collectors_are_registered_and_catalogued():
+    from knowledge.sources.catalog import CATALOG
+
+    assert COLLECTORS["sec_xbrl"] is SecCompanyFacts and COLLECTORS["eodhd"] is EodhdFundamentals
+    assert CATALOG["sec_xbrl"].markets == ("XNAS", "XNYS") and CATALOG["sec_xbrl"].keyless
+    assert "XKLS" in CATALOG["eodhd"].markets

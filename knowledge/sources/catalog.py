@@ -281,6 +281,27 @@ CATALOG: dict[str, SourceSpec] = {
         markets=("XTAI",),
         docs="https://finmind.github.io/",
     ),
+    # -- statement lines for the analyst engines (2026-09-06) ------------------------
+    "sec_xbrl": SourceSpec(
+        "sec_xbrl",
+        STRUCTURED,
+        "SEC XBRL company facts: every reported line item with its filing date, per US name; one request per name a week",
+        "regulator",
+        ("weekly",),
+        per_instrument=True,
+        markets=("XNAS", "XNYS"),
+        docs="https://www.sec.gov/search-filings/edgar-application-programming-interfaces",
+    ),
+    "eodhd": SourceSpec(
+        "eodhd",
+        STRUCTURED,
+        "EODHD fundamentals (EODHD_API_KEY optional): quarterly and annual statements; 2 names a day on the free plan, US only until the Fundamentals plan",
+        "vendor",
+        ("bursa_close", "us_close"),
+        per_instrument=True,
+        markets=("XKLS", "XNAS", "XNYS", "XTAI"),
+        docs="https://eodhd.com/financial-apis/stock-etfs-fundamental-data-feeds",
+    ),
 }
 
 

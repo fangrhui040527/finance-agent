@@ -512,6 +512,7 @@ def why_did_it_move(
         fx_return=fx_return,
         fit=fit,
         base_currency=currency,
+        peers=graph_peers(instrument, window[1]),
     )
 
     provenance = (
@@ -600,12 +601,62 @@ def fit_factor_model(returns_csv: str) -> str:
 # --------------------------------------------------------------------------
 
 
+def derived_valuation(
+    instrument: str, as_at: str = "", archetype: str = "", ctx: AgentContext | None = None
+):
+    """The valuation range the engines derive for a thesis, and the findings behind it.
+
+    Returns ``(range_or_None, findings)``. The range is the scenario DCF's bear
+    to bull equity value from the stored record; when nothing is stored, or the
+    sanity checks refuse, there is no range and the findings say why. A thesis
+    may carry a range that the engine derived or none at all - never one typed
+    in by the model.
+    """
+    from agents.evidence.agents import A2Valuation
+    from engines.fundamentals.ratios import Statements
+    from engines.valuation.cost_of_capital import country_of, load_table
+    from knowledge.facts import FactBook
+
+    mic = _instrument_mic(instrument)
+    asof = _asof(as_at)
+    cfg = load_config()
+    try:
+        currency = market_get(mic).currency
+    except (KeyError, ValueError, AttributeError):
+        currency = ""
+    a2 = A2Valuation(ctx or context())
+    with FactBook(cfg.facts_db) as book:
+        store = book.as_fact_store([instrument], asof)
+        statements = Statements.from_store(store, instrument, asof)
+        if statements.flow("revenue")[0] is None:
+            return None, [
+                Finding(
+                    a2.agent_id,
+                    "valuation_unavailable",
+                    f"no statements stored for {instrument} as of {asof}: no range can be "
+                    f"derived. Sources that would fill them: {_statement_sources(instrument)}",
+                    caveats=["a thesis without a derived range cannot accumulate"],
+                )
+            ]
+        coc, coc_findings = a2.cost_of_capital(
+            instrument, book, load_table(), asof, archetype or None, statements
+        )
+        vr, range_findings = a2.scenario_range(
+            statements, coc, load_table(), country_of(instrument), currency
+        )
+    rng = vr.range if vr is not None else None
+    return rng, [*coc_findings, *range_findings]
+
+
 def compose_thesis(
     instrument: str,
     evidence: list | None = None,
     breakers: list | None = None,
     stance: str = "hold",
     horizon_months: int = 12,
+    derive_valuation: bool = False,
+    as_at: str = "",
+    archetype: str = "",
 ) -> str:
     """Assemble findings into a stance, then attack it.
 
@@ -615,6 +666,10 @@ def compose_thesis(
     A breaker needs an executable query. One without is a wish, and is refused
     here rather than defaulted in - the check is the only thing that makes a
     breaker a breaker.
+
+    derive_valuation runs the cost of capital and the scenario DCF on the stored
+    record and hands the thesis the engine's bear-to-bull range (or its refusal);
+    the model never supplies a range of its own.
     """
     ctx = context()
     try:
@@ -647,13 +702,34 @@ def compose_thesis(
         except ValueError as e:
             raise ToolError(str(e)) from None
 
+    valuation_range = None
+    derived_line = ""
+    if derive_valuation:
+        valuation_range, derived = derived_valuation(instrument, as_at, archetype, ctx)
+        findings.extend(derived)
+        if valuation_range is not None:
+            lo, hi = valuation_range
+            derived_line = (
+                f"  valuation range, derived by the engine: {lo:,.0f} to {hi:,.0f} "
+                f"(a range, not a target)\n"
+            )
+        else:
+            derived_line = f"  valuation range: none derived - {derived[-1].text}\n"
+
     a10 = A10Thesis(ctx)
     out = a10.run(
-        instrument, findings, horizon_months=horizon_months, proposed_stance=st, breakers=brks
+        instrument,
+        findings,
+        horizon_months=horizon_months,
+        valuation_range=valuation_range,
+        proposed_stance=st,
+        breakers=brks,
     )
     thesis = a10.last
 
-    challenges = A11RedTeam(ctx).run(thesis)
+    red = A11RedTeam(ctx).run(thesis)
+    challenges = [f for f in red if f.kind != "analogue"]
+    analogues = [f for f in red if f.kind == "analogue"]
     ranked = sorted(challenges, key=lambda f: -f.numbers.get("severity_rank", 0))
     attack = (
         "\n".join(
@@ -661,10 +737,16 @@ def compose_thesis(
         )
         or "  (silent, which on a live thesis is itself a finding)"
     )
+    resembles = ""
+    if analogues:
+        resembles = "\n\nANALOGUES  (what this resembles, not what will happen)\n" + "\n".join(
+            f"  - {a.text}\n      cites {cite_label(c)}" for a in analogues for c in a.citations[:1]
+        )
 
     return (
         f"THESIS  {instrument}  horizon {horizon_months}m\n"
         f"{_lines(out)}\n"
+        f"{derived_line}"
         f"  actionable: {'yes' if thesis.is_actionable() else 'NO'}\n"
         f"  stance asked for: {st.value}   stance reached: {thesis.stance.value}\n\n"
         f"WHAT WOULD FALSIFY IT\n"
@@ -672,7 +754,7 @@ def compose_thesis(
             "\n".join(f"  - {b.statement}  [{b.query} against {b.store}]" for b in thesis.breakers)
             or "  (none - so no stance may be taken)"
         )
-        + f"\n\nRED TEAM\n{attack}{DISCLAIMER}"
+        + f"\n\nRED TEAM\n{attack}{resembles}{DISCLAIMER}"
     )
 
 
@@ -1228,6 +1310,380 @@ def explain_concept(concept: str = "", mastered: list | None = None) -> str:
     if not concept:
         return a14.next_concept(learner).text
     return _lines(a14.run(concept, learner))
+
+
+def _asof(as_at: str) -> date:
+    if not as_at:
+        return datetime.now(UTC).date()
+    try:
+        return date.fromisoformat(as_at)
+    except ValueError:
+        raise ToolError(f"as_at must be YYYY-MM-DD, got {as_at!r}") from None
+
+
+def _instrument_mic(instrument: str) -> str:
+    """The market an analyst tool is asked about, or a ToolError naming the problem.
+
+    `mic_of` passes an unknown prefix through unchanged so its callers can name
+    it; a tool must refuse it instead of answering "nothing stored" for a market
+    this system does not know.
+    """
+    try:
+        mic = mic_of(instrument)
+    except ValueError as e:
+        raise ToolError(str(e)) from None
+    if mic not in supported():
+        raise ToolError(
+            f"{instrument!r}: market {mic!r} is not supported; known markets: "
+            + ", ".join(supported())
+        )
+    return mic
+
+
+def _statement_sources(instrument: str) -> str:
+    mic = _instrument_mic(instrument)
+    if mic in ("XNAS", "XNYS"):
+        return "sec_xbrl (keyless, weekly), fmp, eodhd (EODHD_API_KEY)"
+    if mic == "XKLS":
+        return "eodhd on its Fundamentals plan (the free plan is US only); no free source carries Bursa statements"
+    if mic == "XTAI":
+        return "finmind, twse_openapi (partial lines), eodhd on its Fundamentals plan"
+    return "no statement source is catalogued for this market"
+
+
+def ratio_sheet(instrument: str, as_at: str = "") -> str:
+    """Margins, returns, leverage, liquidity, growth and accruals from the stored
+    statement lines, point-in-time as of `as_at`, with every missing input named.
+
+    Read through the fundamentals agent's own store; a name with nothing stored
+    says NO STATEMENTS STORED and which collector would change that.
+    """
+    from agents.evidence.agents import A1Fundamentals
+    from knowledge.facts import FactBook
+
+    _instrument_mic(instrument)
+    asof = _asof(as_at)
+    cfg = load_config()
+    with FactBook(cfg.facts_db) as book:
+        a1 = A1Fundamentals.from_fact_book(context(), book, [instrument], asof)
+        findings = a1.ratio_sheet(instrument, asof)
+        scores = a1.quality_scores(instrument, asof)
+    head = findings[0]
+    if head.numbers.get("computable", 0) == 0:
+        return (
+            f"NO STATEMENTS STORED for {instrument} as of {asof}: 0 of {int(head.numbers.get('total', 0))} "
+            f"ratios computable. Sources that would fill them: {_statement_sources(instrument)}."
+            + DISCLAIMER
+        )
+    rows = [head.text]
+    for f in findings[1:]:
+        rows.append(f"- {f.text}")
+        for c in f.caveats:
+            rows.append(f"    {c}")
+    rows.append("earnings quality:")
+    for f in scores:
+        rows.append(f"- {f.text}")
+        for c in f.caveats:
+            rows.append(f"    {c}")
+    for c in head.caveats:
+        rows.append(f"gap: {c}")
+    return "\n".join(rows) + DISCLAIMER
+
+
+def cost_of_capital(instrument: str, as_at: str = "", archetype: str = "") -> str:
+    """The discount rate built from stored inputs and the dated Damodaran table,
+    every input labelled with its source and every gap named. Never a picked number.
+    """
+    from agents.evidence.agents import A2Valuation
+    from engines.fundamentals.ratios import Statements
+    from engines.valuation.cost_of_capital import load_table
+    from knowledge.facts import FactBook
+
+    _instrument_mic(instrument)
+    asof = _asof(as_at)
+    cfg = load_config()
+    table = load_table()
+    with FactBook(cfg.facts_db) as book:
+        store = book.as_fact_store([instrument], asof)
+        statements = Statements.from_store(store, instrument, asof)
+        _, findings = A2Valuation(context()).cost_of_capital(
+            instrument, book, table, asof, archetype or None, statements
+        )
+    rows = [findings[0].text]
+    for c in findings[0].citations:
+        rows.append(f"    cites {c.source}:{c.chunk_id}")
+    return "\n".join(rows) + DISCLAIMER
+
+
+def valuation_range(
+    instrument: str, as_at: str = "", archetype: str = "", peers: list | None = None
+) -> str:
+    """A bear-to-bull scenario DCF from the stored record, each end a stated set of
+    assumptions, refused when fewer than two scenarios survive the sanity checks;
+    plus the multiple in its three contexts when peers are named. Never a point target.
+    """
+    from agents.evidence.agents import A2Valuation
+    from engines.fundamentals.ratios import Statements
+    from engines.valuation.cost_of_capital import country_of, load_table
+    from knowledge.facts import FactBook
+
+    mic = _instrument_mic(instrument)
+    asof = _asof(as_at)
+    cfg = load_config()
+    table = load_table()
+    try:
+        currency = market_get(mic).currency
+    except (KeyError, ValueError, AttributeError):
+        currency = ""
+    with FactBook(cfg.facts_db) as book:
+        store = book.as_fact_store([instrument], asof)
+        statements = Statements.from_store(store, instrument, asof)
+        a2 = A2Valuation(context())
+        if statements.flow("revenue")[0] is None:
+            return (
+                f"NO STATEMENTS STORED for {instrument} as of {asof}: nothing to project. "
+                f"Sources that would fill them: {_statement_sources(instrument)}." + DISCLAIMER
+            )
+        coc, coc_findings = a2.cost_of_capital(
+            instrument, book, table, asof, archetype or None, statements
+        )
+        _, range_findings = a2.scenario_range(
+            statements, coc, table, country_of(instrument), currency
+        )
+        rows = [range_findings[0].text, "", coc_findings[0].text]
+        for c in coc_findings[0].citations:
+            rows.append(f"    cites {c.source}:{c.chunk_id}")
+        if peers:
+            rate, _ = coc.discount
+            eps = book.latest(instrument, "eps_ttm", asof=asof)
+            for f in a2.peer_multiples(
+                book,
+                instrument,
+                set(peers),
+                "pe_ttm",
+                asof,
+                None,
+                eps.value if eps and eps.value else None,
+                rate,
+            ):
+                rows.append("")
+                rows.append(f.text)
+    return "\n".join(rows) + DISCLAIMER
+
+
+def cite_label(c) -> str:
+    """``source:chunk_id`` once: method-note chunk ids already carry their collection."""
+    from engines.analysis.workup import cite_label as _label
+
+    return _label(c)
+
+
+def _open_graph():
+    """The built entity graph and its evidence lookup, or (None, None) without one."""
+    from pathlib import Path as _P
+
+    from knowledge.graph.build import DEFAULT_DB
+    from knowledge.graph.evidence import CuratedCorpus
+    from knowledge.graph.store import GraphStore
+
+    if not _P(DEFAULT_DB).exists():
+        return None, None
+    with GraphStore(DEFAULT_DB) as store:
+        g = store.load()
+    return g, CuratedCorpus().citation
+
+
+def graph_peers(instrument: str, asof: date) -> set[str]:
+    """The peer ids the graph supports on a date; empty without a graph.
+
+    Feeds `specificity` in the catalyst scorer: a peer's event scores 0.6 where
+    an unrelated name's scores 0.1. Nothing is guessed from sector labels.
+    """
+    from knowledge.graph.peers import peers_of
+
+    g, _ = _open_graph()
+    if g is None:
+        return set()
+    try:
+        return peers_of(g, instrument, asof).ids
+    except ValueError:
+        return set()
+
+
+def peer_set(instrument: str, as_at: str = "", same_market: bool = True) -> str:
+    """Who the entity graph says the peers are on a date, with the edge document
+    behind each one. A stated rivalry and a shared sub-sector are labelled apart.
+    """
+    from agents.evidence.agents import A7SectorTechnology
+    from knowledge.graph.build import DEFAULT_DB
+
+    _instrument_mic(instrument)
+    asof = _asof(as_at)
+    g, evidence = _open_graph()
+    if g is None:
+        return (
+            f"REFUSED: no graph at {DEFAULT_DB}. Build it with `make graph` (offline, no keys). "
+            f"Naming peers without one would mean guessing." + DISCLAIMER
+        )
+    findings = A7SectorTechnology(context(), g, evidence).peers(instrument, asof, same_market)
+    rows = [findings[0].text]
+    rows += [f"    note: {c}" for c in findings[0].caveats]
+    for f in findings[1:]:
+        rows.append(f"  - {f.text}")
+        for c in f.citations:
+            rows.append(f"        cites {cite_label(c)}")
+        for c in f.caveats:
+            if c.startswith("evidence unavailable") or c.startswith("shared"):
+                rows.append(f"        {c}")
+    return "\n".join(rows) + DISCLAIMER
+
+
+def analyst_workup(instrument: str, as_at: str = "", archetype: str = "") -> str:
+    """The twelve-step workup of docs/04 section 2 over the stored record: identity,
+    the two gates, history, capital allocation, competitive position, industry,
+    forward drivers, valuation, return decomposition and suggested breakers. Every
+    step says done, partial, unavailable, manual or not applicable, and an
+    unavailable step names the collector that would change it. Not a stance.
+    """
+    from engines.analysis.workup import run_workup, workup_text
+    from knowledge.facts import FactBook
+
+    mic = _instrument_mic(instrument)
+    asof = _asof(as_at)
+    cfg = load_config()
+    try:
+        currency = market_get(mic).currency
+    except (KeyError, ValueError, AttributeError):
+        currency = ""
+    g, evidence = _open_graph()
+    with FactBook(cfg.facts_db) as book:
+        w = run_workup(
+            instrument,
+            book,
+            context(),
+            asof=asof,
+            graph=g,
+            evidence=evidence,
+            archetype=archetype or None,
+            currency=currency,
+        )
+    return workup_text(w) + DISCLAIMER
+
+
+METHOD_OWNERS = {
+    "kb_craft": "a14_teacher",
+    "kb_method_valuation": "a2_valuation",
+    "kb_method_technical": "a3_price_technical",
+    "kb_method_risk": "a12_portfolio_risk",
+    "kb_failures": "a11_red_team",
+}
+
+
+def method_note(
+    collection: str,
+    query: str = "",
+    concept: str = "",
+    archetype: str = "",
+    pattern: str = "",
+    limit: int = 4,
+) -> str:
+    """Read the curated method notes: the five human-written stores, cited.
+
+    Retrieval runs as the store's OWNING agent through the shared router, so
+    ownership is enforced rather than bypassed. `concept` selects kb_craft
+    notes by curriculum key, `archetype` selects valuation notes by sector
+    archetype, `pattern` selects failure cases by structural tag; `query` is
+    free text. Every hit is quoted verbatim with its chunk id, and every
+    reference carries its licence - a link-only reference is a link.
+    """
+    from agents.base import quote_span
+    from knowledge.retrieval.method import COLLECTIONS, PATTERN_TAGS
+    from knowledge.retrieval.pipeline import CollectionScopeError
+    from knowledge.retrieval.pipeline import retrieve as _retrieve
+
+    if collection not in METHOD_OWNERS:
+        raise ToolError(
+            f"unknown method collection {collection!r}; one of {', '.join(COLLECTIONS)}"
+        )
+    q = query.strip()
+    if concept:
+        from agents.learning.teacher import BY_KEY
+
+        c = BY_KEY.get(concept)
+        if c is None:
+            raise ToolError(f"{concept!r} is not a curriculum concept")
+        q = f"{c.title}. {c.one_line}"
+    elif archetype:
+        from agents.evidence.agents import A2Valuation
+
+        method, _ = A2Valuation.ARCHETYPE_METHODS.get(archetype, ("EV/EBIT vs history", set()))
+        q = f"{archetype} {method} valuation method"
+    elif pattern:
+        if pattern not in PATTERN_TAGS:
+            raise ToolError(
+                f"{pattern!r} is not a failure pattern; one of {', '.join(sorted(PATTERN_TAGS))}"
+            )
+        q = f"{pattern} {pattern.replace('_', ' ')}"
+    if not q:
+        raise ToolError("give a query, or a concept, archetype or pattern to select notes by")
+    ctx = context()
+    try:
+        res = _retrieve(
+            METHOD_OWNERS[collection],
+            collection,
+            q,
+            ctx.router,
+            now=ctx.now,
+            limit=max(limit * 3, 8),
+        )
+    except (KeyError, CollectionScopeError) as e:
+        raise ToolError(f"{collection} is not registered on this router: {e}") from None
+    rows = [f"{collection}: method notes for {q!r}"]
+    seen: set[str] = set()
+    shown = 0
+    for h in res.hits:
+        meta = h.chunk.metadata
+        slug = str(meta.get("slug") or meta.get("row") or h.chunk.chunk_id)
+        if slug in seen:
+            continue
+        if concept and concept not in (meta.get("concepts") or ()):
+            continue
+        if archetype and archetype not in (meta.get("archetypes") or ()):
+            continue
+        if pattern and pattern not in (meta.get("patterns") or ()):
+            continue
+        seen.add(slug)
+        shown += 1
+        title = meta.get("title") or slug
+        rows.append(
+            f"- {title} (as of {meta.get('as_of', '?')}, licence {meta.get('licence', '?')})"
+        )
+        if h.chunk.section:
+            rows.append(f"    section: {h.chunk.section}")
+        rows.append(f'    "{quote_span(h.chunk.text, 240)}"')
+        rows.append(f"    cites {collection}:{h.chunk.chunk_id}")
+        case = meta.get("case")
+        if isinstance(case, dict):
+            rows.append(
+                f"    case: {case.get('name')} ({case.get('country')} {case.get('year')}) - "
+                f"{case.get('outcome')}; patterns {', '.join(meta.get('patterns') or ())}"
+            )
+        for r in meta.get("refs") or []:
+            if r.get("licence") == "link_only":
+                rows.append(
+                    f"    ref: {r.get('title')} - {r.get('url')} (link only; the text is not reproduced)"
+                )
+            else:
+                rows.append(f"    ref: {r.get('title')} - {r.get('url')} ({r.get('licence')})")
+        if shown >= max(1, limit):
+            break
+    if shown == 0:
+        rows.append(
+            f"NO NOTE in {collection} matches. The store holds "
+            f"{len(ctx.router.get(METHOD_OWNERS[collection], collection))} chunks; "
+            "a note that is not there is not there, and nothing is generated in its place."
+        )
+    return "\n".join(rows) + DISCLAIMER
 
 
 def log_hypothesis(

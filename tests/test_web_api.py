@@ -198,3 +198,29 @@ def test_the_server_binds_loopback_only():
 def test_trace_run_ids_are_sanitised(client):
     resp = client.get("/api/trace/runs/..%2f..%2fetc")
     assert resp.status_code == 404
+
+
+def test_thesis_derive_flag_keeps_parity_with_the_tool(client):
+    args = {
+        "instrument": "MYX:1155",
+        "breakers": [
+            {"statement": "NIM under 2.0", "query": "nim<2.0", "store": "facts"},
+            {"statement": "CASA under 22", "query": "casa<22", "store": "facts"},
+        ],
+        "stance": "accumulate",
+        "derive_valuation": True,
+        "as_at": "2026-03-01",
+        "archetype": "bank",
+    }
+    body = client.post("/api/thesis", json=args, headers=POST_HEADERS).json()
+    assert "valuation range" in body["text"]
+    assert body["text"] == T.compose_thesis(
+        "MYX:1155",
+        evidence=[],
+        breakers=args["breakers"],
+        stance="accumulate",
+        horizon_months=12,
+        derive_valuation=True,
+        as_at="2026-03-01",
+        archetype="bank",
+    )

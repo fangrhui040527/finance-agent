@@ -16,6 +16,11 @@ cases:
     unexplained_share: 0.85
     breakers: 2
     expect: hold
+  - name: derived_range_comes_from_the_engine
+    agents_present: [a1_fundamentals, a2_valuation, a5_catalyst_events, a6_macro_regime]
+    breakers: 3
+    valuation: derived
+    expect: accumulate
   # -- negatives -----------------------------------------------------------
   - name: no_breakers_no_stance
     agents_present: [a1_fundamentals, a2_valuation, a5_catalyst_events, a6_macro_regime]
@@ -33,3 +38,10 @@ cases:
     breakers: 1
     expect: no_view
     negative: true
+  - name: refused_range_cannot_accumulate
+    agents_present: [a1_fundamentals, a2_valuation, a5_catalyst_events, a6_macro_regime]
+    breakers: 3
+    valuation: refused
+    expect: no_view
+    negative: true
+    near_miss: true

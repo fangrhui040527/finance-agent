@@ -263,7 +263,7 @@ The system is done when all of the following are simultaneously true on a live d
 |---|---|---|
 | 1 | components before narrative, `unexplained_share` reported | met — `engines/attribution/`, `ui/render.py` |
 | 2 | five-year log-additive decomposition | met — `long_horizon_decompose` |
-| 3 | 12-step workup with gates | met — `agents/evidence/agents.py` |
+| 3 | 12-step workup with gates | met — `engines/analysis/workup.py` (2026-09-06; before that the agents existed but nothing ran the twelve steps in order) |
 | 4 | every claim cited or dropped | met — `verify_answer`, per-claim drop |
 | 5 | binding cap named, no cap breachable | met — `SizingDecision.__post_init__` raises |
 | 6 | live reliability curve and Brier kill switch | **machinery met, curve needs P16** |

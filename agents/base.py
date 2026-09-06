@@ -144,3 +144,15 @@ class Agent(ABC):
 
 def cite(source: str, chunk_id: str, span: str, trust: TrustTier, as_of: datetime) -> Citation:
     return Citation(source=source, chunk_id=chunk_id, quoted_span=span, trust=trust, as_of=as_of)
+
+
+def quote_span(text: str, limit: int = 160) -> str:
+    """The first sentence of a chunk, bounded, as the span a citation quotes.
+
+    `verify_claim` needs the span verbatim inside the chunk (whitespace
+    normalised); a sentence boundary keeps the quote readable in a memo.
+    """
+    t = " ".join(text.split())
+    cut = t.find(". ")
+    span = t[: cut + 1] if 0 < cut < limit else t[:limit]
+    return span if len(span) >= 8 else t[:limit]

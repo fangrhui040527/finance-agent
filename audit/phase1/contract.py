@@ -46,6 +46,12 @@ MINIMAL: dict[str, dict] = {
     "rebalance_book": {},
     "plan_question": {"question": "why did maybank fall"},
     "explain_concept": {"concept": "expected value"},
+    "method_note": {"collection": "kb_craft", "concept": "cash_flow"},
+    "ratio_sheet": {"instrument": "MYX:1155"},
+    "cost_of_capital": {"instrument": "MYX:1155", "archetype": "bank"},
+    "valuation_range": {"instrument": "MYX:1155", "archetype": "bank"},
+    "analyst_workup": {"instrument": "MYX:1155", "archetype": "bank"},
+    "peer_set": {"instrument": "MYX:1155"},
     "log_prediction": {
         "instrument": "MYX:1155",
         "direction": 1,

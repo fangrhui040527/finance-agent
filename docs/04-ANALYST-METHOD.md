@@ -50,6 +50,8 @@ flowchart TD
     G3 -->|yes| SIZE["<b>A13 SIZING</b> · five caps"]
 ```
 
+**Run it (2026-09-06).** `engines/analysis/workup.py` runs the twelve steps over the fact book as of a date (`ask.py workup`, MCP `analyst_workup`). Steps 2, 3 and the cycle-stage half of 8 are `manual` by design: the arithmetic cannot state a business model or judge comprehensibility, and pretending otherwise would score what was never checked. Step 4's flag calls A11's failure analogues; step 8's peers come from the entity graph; step 10 is the slice-2 range or its refusal; step 12 suggests executable breakers. `ask.py thesis --derive-valuation` hands A10 the engine's range.
+
 ### Why the gates come first
 
 Steps 3 and 4 kill most candidates, cheaply. A company whose revenue driver cannot be stated in one sentence cannot have a checkable thesis, and a company whose net income is drifting away from its operating cash flow does not need a valuation — it needs a red-team analogue search. Running a full DCF on a business with deteriorating earnings quality is how sophisticated-looking analysis produces confident losses.
@@ -115,6 +117,8 @@ What the company has *told you* it intends to do, and whether it did it:
 - Language drift in guidance across quarters — A10's `guidance_language_delta` over `kb_transcripts`, which reads the Q&A separately from the prepared remarks because the two behave differently.
 
 ---
+
+**Run it (2026-09-06).** The arithmetic in sections 3 and 4 is code: `engines/fundamentals/ratios.py` and `quality.py` (`ask.py ratios`), `engines/valuation/cost_of_capital.py`, `dcf.py`, `sanity.py`, `comps.py` (`ask.py valuation`). Every figure is point-in-time from the fact book and names the input it lacks.
 
 ## 4. Valuation method selection (step 10)
 

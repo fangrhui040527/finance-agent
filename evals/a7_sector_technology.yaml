@@ -15,6 +15,9 @@ cases:
     expect: sector_state
   - name: capex_cycle_position
     expect: sector_state
+  - name: peer_set_from_a_stated_rivalry
+    peers: competes_with
+    expect: peers
   # -- negatives -----------------------------------------------------------
   - name: no_path_no_claim
     hops: 0
@@ -23,6 +26,16 @@ cases:
     near_miss: true
   - name: uncitable_edge_excluded
     edge_citable: false
+    expect: refuse
+    negative: true
+    near_miss: true
+  - name: no_graph_gives_no_peer_set
+    peers: none
+    graph: absent
+    expect: refuse
+    negative: true
+  - name: shared_subsector_is_not_a_stated_rivalry
+    peers: same_subsector
     expect: refuse
     negative: true
     near_miss: true
