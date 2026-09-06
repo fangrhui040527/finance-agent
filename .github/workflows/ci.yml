@@ -23,6 +23,20 @@
 # reaches main. Pushes to main get a linux smoke check - the content was already
 # tested as a PR. Branch pushes get nothing until a PR opens, which is when the
 # result would first be worth reading.
+#
+# Second round, 2026-09-06, after the allowance ran out again on the 6th of the
+# month (286 runs; both Actions budgets stood at $0 so every job died in two
+# seconds). Two more spenders, measured from that month:
+#
+#   * every nightly `feedback:` and `paper:` push to main ran the linux matrix,
+#     about 12 minutes a night, 700 a month, though no test reads those files.
+#     The paths below skip them; docs stay in, because tests/test_docs_promises.py
+#     pins the runbook and the status page.
+#   * windows ran on both python versions per pull-request update, and windows
+#     bills double. It now runs once, on 3.12; linux keeps both versions, and the
+#     codec and path bugs windows exists to catch do not depend on the minor.
+#
+# Roughly 1,300 minutes a month less on that pattern, inside the 3,000 included.
 name: ci
 
 on:
@@ -30,7 +44,17 @@ on:
     # main only. A branch push with a PR open is already covered by the
     # pull_request event below, and one without a PR open has no reader yet.
     branches: [main]
+    paths-ignore:
+      - "data/**"
+      - "debug/**"
+      - "knowledge/feedback/20*"
+      - "knowledge/paper/20*"
   pull_request:
+    paths-ignore:
+      - "data/**"
+      - "debug/**"
+      - "knowledge/feedback/20*"
+      - "knowledge/paper/20*"
   # A workflow you cannot fire by hand is a workflow you cannot recover. Added
   # after a push produced no run at all - not queued, not slow, no run object -
   # with no way to retry it short of an empty commit, which is worse than the
@@ -64,6 +88,11 @@ jobs:
               && fromJSON('["ubuntu-latest", "windows-latest"]')
               || fromJSON('["ubuntu-latest"]') }}
         python: ["3.11", "3.12"]
+        # Windows once per update. Its job is the platform (codecs, paths, the
+        # sqlite build), not the python minor; linux still runs both minors.
+        exclude:
+          - os: windows-latest
+            python: "3.11"
     runs-on: ${{ matrix.os }}
     defaults:
       run:
