@@ -1775,6 +1775,42 @@ def cmd_graph(a) -> int:
         other.close()
         return 0
 
+    if getattr(a, "coverage", False):
+        # A name with no peer is a name the comps half of a valuation and the
+        # workup's competitive step cannot speak about, and until 2026-09-06
+        # seven of the nine were in that state with nothing saying so.
+        from core.config import load as load_cfg
+        from knowledge.graph.peers import peers_of
+
+        cfg = load_cfg()
+        book = tuple(dict.fromkeys(tuple(cfg.holdings) + tuple(cfg.watchlist)))
+        print(f"peer coverage as of {asof}\n")
+        print(f"{'name':<26} {'stated':>6} {'sub-sector':>11} {'verified':>9}  sub-sector")
+        bare: list[str] = []
+        for iid in book:
+            node = resolve(iid)
+            label = f"{iid} {g.label(node) or ''}".strip()[:24]
+            if g.node(node) is None:
+                bare.append(iid)
+                print(f"{label:<26} {'-':>6} {'-':>11} {'-':>9}  not in the graph")
+                continue
+            ps = peers_of(g, iid, asof)
+            checked = sum(1 for p in ps.direct if p.verified)
+            if not ps.peers:
+                bare.append(iid)
+            print(
+                f"{label:<26} {len(ps.direct):>6} {len(ps.same_subsector):>11} "
+                f"{checked:>9}  {ps.subsector or '-'}"
+            )
+        print(
+            f"\n{len(book) - len(bare)} of {len(book)} names have a peer. A stated peer is a "
+            "competes_with edge somebody wrote down; verified means a primary document says "
+            "so, not the curated list."
+        )
+        if bare:
+            print("no peer at all: " + ", ".join(bare))
+        return 0
+
     if getattr(a, "peers", None):
         from knowledge.graph.peers import peers_of
 
@@ -2076,6 +2112,11 @@ def main(argv=None) -> int:
     gr.add_argument("--impact", metavar="NODE", help="what this event or commodity reaches")
     gr.add_argument(
         "--peers", metavar="INSTRUMENT", help="who the graph says the peers are, with evidence"
+    )
+    gr.add_argument(
+        "--coverage",
+        action="store_true",
+        help="how many peers each name in the book has, and how many are verified",
     )
     gr.add_argument("--holding", action="append", help="limit --impact to these; repeatable")
     gr.add_argument(

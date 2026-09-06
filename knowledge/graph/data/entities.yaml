@@ -33,6 +33,26 @@ companies:
     - Tenaga
     - Tenaga Nasional
     - TNB
+  # --- added 2026-09-06 so the book's names have peers to be compared against.
+  # Seven of nine had none, which left peer_set and the workup's competitive
+  # step empty for them. Every code below is written from general knowledge and
+  # NOT checked against the exchange from this environment; see the warning at
+  # the top of this file, and check each against Bursa before trading on
+  # anything derived from it.
+  "MYX:6742":
+    - YTL Power
+    - YTL Power International
+  "MYX:5264":
+    - Malakoff
+    - Malakoff Corporation
+  "MYX:5284":
+    - Lotte Chemical Titan
+    - LOTTE Chemical Titan
+  "MYX:5878":
+    - KPJ
+    - KPJ Healthcare
+  "MYX:4715":
+    - Genting Malaysia
   "MYX:5183":
     - Petronas Chemicals
     - PCHEM
@@ -71,6 +91,9 @@ companies:
     - Microsoft Corporation
   "XNAS:AVGO":
     - Broadcom
+  "XNAS:GOOGL":
+    - Alphabet
+    - Google
   "XNAS:AMZN":
     - Amazon
     - Amazon.com

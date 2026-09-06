@@ -12,9 +12,19 @@
 #
 # BEFORE YOU TRADE ON ANY OF THIS: these are seed examples chosen because they
 # are widely known, not because they were verified against a primary source in
-# this repository. Replace `note` with a real document reference as you confirm
-# each one, and delete any row you cannot stand behind. An unverified edge that
-# survives here is exactly the failure this system exists to prevent.
+# this repository. Delete any row you cannot stand behind. An unverified edge
+# that survives here is exactly the failure this system exists to prevent.
+#
+# HOW TO VERIFY A ROW. Add `verified:` naming the primary document that states
+# the relationship - a filing accession, an annual-report section, a regulator's
+# register:
+#
+#   verified: "edgar:0000320193-25-000106#item1-competition"
+#
+# The edge then cites THAT document instead of this file, so every reader - the
+# peer set, the workup's competitive step, path_to_citations - stops saying
+# "a person wrote this down" and starts saying what the document says. A row
+# without it still works and is still citable; it simply reads as what it is.
 #
 # HUMAN-AUTHORED. kb_supply_chain is created_by: human in agents/registry.yaml,
 # so no agent may ever write here.
@@ -77,6 +87,103 @@ edges:
     note: >-
       Custom AI accelerators against merchant GPUs. Weaker than a like-for-like
       rivalry because the products are substitutes only for some buyers.
+
+  # --- 2026-09-06: peers for the seven book names that had none ------------------
+  #
+  # `ask.py graph --peers` returned nothing for Tenaga, Petronas Chemicals, IHH,
+  # Press Metal, Genting, Apple and Microsoft, which left `peer_set`, the
+  # workup's competitive step and the comps half of `ask.py valuation` empty for
+  # seven of the nine names in the book. Each row below is a rivalry that is
+  # widely stated and that a person can check in an hour; none is verified
+  # against a primary document in this repository yet, so each carries no
+  # `verified:` and reads as curated.
+  #
+  # Press Metal is deliberately absent: no other primary aluminium smelter is
+  # listed on Bursa, and an invented peer is worse than the honest refusal
+  # `peers_of` already prints. Its `exposed_to` aluminium edge below carries
+  # what can be said about it.
+
+  - id: tenaga-ytlpower-compete
+    source: "MYX:5347"
+    target: "MYX:6742"
+    relation: competes_with
+    weight: 0.7
+    valid_from: 2020-01-01
+    note: >-
+      Both generate and sell power in Malaysia; YTL Power is an independent
+      power producer selling into the same grid Tenaga operates. Weaker than a
+      like-for-like rivalry because Tenaga also owns the transmission network,
+      which YTL Power does not compete for.
+
+  - id: tenaga-malakoff-compete
+    source: "MYX:5347"
+    target: "MYX:5264"
+    relation: competes_with
+    weight: 0.7
+    valid_from: 2020-01-01
+    note: >-
+      Malakoff is Malaysia's largest independent power producer, bidding for the
+      same generation capacity Tenaga's own plants supply.
+
+  - id: pchem-lotte-compete
+    source: "MYX:5183"
+    target: "MYX:5284"
+    relation: competes_with
+    weight: 0.8
+    valid_from: 2020-01-01
+    note: >-
+      The two listed Malaysian olefins and polymers producers, selling
+      overlapping petrochemical grades out of the same region.
+
+  - id: ihh-kpj-compete
+    source: "MYX:5225"
+    target: "MYX:5878"
+    relation: competes_with
+    weight: 0.85
+    valid_from: 2020-01-01
+    note: >-
+      The two listed Malaysian private hospital groups, competing for the same
+      patients, consultants and insurance panels.
+
+  - id: genting-gentingmalaysia-compete
+    source: "MYX:3182"
+    target: "MYX:4715"
+    relation: competes_with
+    weight: 0.5
+    valid_from: 2020-01-01
+    note: >-
+      Same group and same leisure and gaming subsector, listed separately.
+      Deliberately weaker than an arms-length rivalry: Genting Berhad is the
+      parent, so the two move together at least as much as they compete. Read
+      it as the closest listed comparable rather than as a rival.
+
+  - id: aapl-googl-compete
+    source: "XNAS:AAPL"
+    target: "XNAS:GOOGL"
+    relation: competes_with
+    weight: 0.7
+    valid_from: 2020-01-01
+    note: >-
+      Mobile platforms, app distribution, search defaults and consumer services.
+      Not a hardware rivalry: Apple's PC and handset rivals (Dell, HP, Samsung,
+      Xiaomi) are listed on other exchanges, and `peers_of` keeps other-market
+      names out of comparables, so they would not appear as peers anyway.
+
+  - id: msft-googl-compete
+    source: "XNAS:MSFT"
+    target: "XNAS:GOOGL"
+    relation: competes_with
+    weight: 0.8
+    valid_from: 2020-01-01
+    note: Public cloud, productivity suites, browsers and search advertising.
+
+  - id: msft-amzn-compete
+    source: "XNAS:MSFT"
+    target: "XNAS:AMZN"
+    relation: competes_with
+    weight: 0.8
+    valid_from: 2020-01-01
+    note: Azure against AWS; the two largest public cloud platforms.
 
   - id: presmetal-aluminium
     source: "MYX:8869"

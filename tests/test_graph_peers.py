@@ -170,3 +170,54 @@ def test_a7_peers_are_cited_from_the_curated_rows_and_refuse_without_a_graph(tmp
     assert all(c.source == "kb_supply_chain" or c.source for f in peers for c in f.citations)
     none = A7SectorTechnology(_ctx(), None).peers("MYX:1155", ASOF)
     assert none[0].text == "no graph is loaded" and "make graph" in none[0].caveats[0]
+
+
+# -- a checked edge must not read like a guess -------------------------------------------------
+
+
+def test_a_curated_peer_says_it_is_curated_and_a_documented_one_does_not():
+    """A person writing a rivalry down and a filing stating it are both citable
+    and they are not the same claim. Until 2026-09-06 they printed identically,
+    so every peer in the book read as though a document backed it."""
+    g = small()
+    g.add_edge(
+        Edge(
+            "CO:XKLS:1155",
+            "CO:XKLS:5347",
+            EdgeKind.COMPETES_WITH,
+            0.9,
+            "edgar:0001234567-25-000001#item1-competition",
+            Confidence.EXTRACTED,
+            OPENED,
+        )
+    )
+    by_id = {p.instrument_id: p for p in peers_of(g, "MYX:1155", ASOF).direct}
+    curated, documented = by_id["MYX:1023"], by_id["MYX:5347"]
+
+    assert not curated.verified
+    assert "curated not verified" in curated.describe()
+
+    assert documented.verified
+    assert "curated not verified" not in documented.describe()
+
+
+def test_every_name_in_the_book_that_can_have_a_peer_has_one(tmp_path):
+    """Seven of the nine had none on 2026-09-06, which left `peer_set`, the
+    workup's competitive step and the comps half of a valuation empty for them,
+    with nothing anywhere saying so.
+
+    Press Metal is the honest exception: no other primary aluminium smelter is
+    listed on Bursa, and an invented peer is worse than the refusal `peers_of`
+    already prints.
+    """
+    from core.config import load as load_config
+
+    cfg = load_config()
+    # Built from the checked-in yaml, not from data/graph.db: the question is
+    # what the FILES say, and a stale build would answer for them.
+    with GraphStore(tmp_path / "g.db") as store:
+        build(store)
+        g = store.load()
+    book = tuple(dict.fromkeys(tuple(cfg.holdings) + tuple(cfg.watchlist)))
+    bare = [iid for iid in book if not peers_of(g, iid, ASOF).peers]
+    assert bare == ["MYX:8869"], f"names with no peer: {bare}"

@@ -224,6 +224,34 @@ imports the graph and each is testable against its own source alone:
 | `market_registry` | `markets/registry.py` + the adapters | Company `OPERATES_IN` Country, `REGULATED_BY` Regulator | `EXTRACTED` |
 | `gdelt` | news articles, entity-linked | Event `AFFECTS` Company | **`INFERRED`** |
 
+**A curated row and a filing are both citable and are not the same claim.** A
+row in `data/supply_chain.yaml` is a person's own knowledge written down and
+vouched for; it cites `curated:supply_chain#<id>`, which is what it is. Add
+`verified:` naming the primary document that states the relationship and the
+edge cites THAT instead:
+
+```yaml
+  - id: aapl-googl-compete
+    source: "XNAS:AAPL"
+    target: "XNAS:GOOGL"
+    relation: competes_with
+    verified: "edgar:0000320193-25-000106#item1-competition"
+```
+
+`peers_of` reads the citation and labels a curated peer "curated not verified",
+so a seed guess stops printing the way a checked fact does. Confidence is
+untouched either way — downgrading a curated row would make it uncitable and
+drop it from every peer set, which is the opposite of the point.
+
+**Peer coverage is a thing to check.** On 2026-09-06, seven of the nine names
+in the book had no peer at all, which silently emptied `peer_set`, the workup's
+competitive step and the comps half of a valuation for them. `ask.py graph
+--coverage` prints one row per name — stated peers, sub-sector siblings, how
+many are verified — so a name at zero is visible without being asked about one
+at a time. A name may legitimately sit at zero (Press Metal: no other primary
+aluminium smelter is listed on Bursa), and an invented peer is worse than the
+refusal `peers_of` already prints.
+
 **The book contributes nodes and no edges.** Owning two companies is a fact
 about you, not a relationship between them; an edge would let a traversal
 connect them through your account.

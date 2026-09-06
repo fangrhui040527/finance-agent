@@ -29,6 +29,33 @@ def cli(db, *args, capsys):
     return code, out.out, out.err
 
 
+# -- peer coverage ------------------------------------------------------------
+
+
+def test_coverage_names_the_one_company_with_no_peer(db, capsys):
+    """Seven of the nine had none on 2026-09-06 and nothing said so. Press Metal
+    is the honest exception: no other primary aluminium smelter is on Bursa."""
+    code, out, _ = cli(db, "--coverage", capsys=capsys)
+    assert code == 0
+    assert "8 of 9 names have a peer" in out
+    assert "no peer at all: MYX:8869" in out
+    assert "Maybank" in out and "Electric Utilities" in out
+
+
+def test_coverage_counts_verified_peers_separately(db, capsys):
+    """Every row in the checked-in file is curated, so the verified column is
+    zero everywhere - and says so rather than implying a document backs them."""
+    import re
+
+    _, out, _ = cli(db, "--coverage", capsys=capsys)
+    assert "verified" in out
+    # stated / sub-sector / verified, in that order, before the sub-sector name.
+    rows = re.findall(r"^(?:MYX|XNAS):\S+.*?\s(\d+)\s+(\d+)\s+(\d+)\s\s", out, re.M)
+    assert len(rows) == 9
+    assert sum(int(v) for _, _, v in rows) == 0
+    assert sum(int(d) for d, _, _ in rows) > 0, "some name has a stated peer"
+
+
 # -- paths --------------------------------------------------------------------
 
 
