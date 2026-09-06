@@ -224,7 +224,7 @@ def test_router_for_rebuilds_when_a_note_changes(registry, tmp_path, monkeypatch
 def test_cost_of_capital_rows_are_citable_and_nulls_are_skipped():
     chunks = cost_of_capital_chunks(COC_TABLE)
     ids = {c.chunk_id for c in chunks}
-    assert "kb_method_valuation:cost_of_capital#erp" in ids
+    assert "cost_of_capital#erp" in ids
     erp = next(c for c in chunks if c.chunk_id.endswith("#erp"))
     assert "4.17%" in erp.text and erp.metadata["licence"] == "attributed"
     assert not any(c.chunk_id.endswith("country:MY") for c in chunks), (

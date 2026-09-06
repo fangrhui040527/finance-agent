@@ -18,6 +18,12 @@ cases:
   - name: archetype_note_is_cited
     archetype: bank
     expect: method
+  - name: scenario_range_is_bear_to_bull
+    statements: five_years
+    expect: valuation_range
+  - name: cost_of_capital_labels_every_input
+    archetype: software
+    expect: cost_of_capital
   # -- negatives -----------------------------------------------------------
   - name: refuses_point_target
     request: point_target
@@ -33,3 +39,9 @@ cases:
     peers: 1
     expect: refuse
     negative: true
+  - name: terminal_growth_above_rf_refused
+    terminal_growth: 0.08
+    rf: 0.042
+    expect: refuse
+    negative: true
+    near_miss: true

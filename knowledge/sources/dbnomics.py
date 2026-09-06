@@ -62,6 +62,14 @@ SERIES: tuple[DbnSeries, ...] = (
     DbnSeries("DBN:NEER_MY", "BIS", "WS_EER", "M.N.B.MY", "MYR nominal effective exchange rate"),
     DbnSeries("DBN:NEER_US", "BIS", "WS_EER", "M.N.B.US", "USD nominal effective exchange rate"),
     DbnSeries("DBN:NEER_CN", "BIS", "WS_EER", "M.N.B.CN", "CNY nominal effective exchange rate"),
+    # Risk-free rates for the cost of capital (engines/valuation/cost_of_capital.py):
+    # a name earning ringgit should not be discounted off a US Treasury alone.
+    DbnSeries(
+        "DBN:GOVT_YIELD_MY", "IMF", "IFS", "M.MY.FIGB_PA", "Malaysia government bond yield, % p.a."
+    ),
+    DbnSeries(
+        "DBN:GOVT_YIELD_TW", "IMF", "IFS", "M.TW.FIGB_PA", "Taiwan government bond yield, % p.a."
+    ),
 )
 
 #: How many observations to keep per series on a pull. Two years of monthly

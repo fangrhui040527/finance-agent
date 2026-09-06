@@ -1154,6 +1154,11 @@ def s_mcp():
         # The curated notes: a read of a human-written store, cited; on a
         # checkout without notes the honest answer is NO NOTE, not a crash.
         "method_note": {"collection": "kb_failures", "pattern": "accruals_divergence"},
+        # The analyst engines on a name with no statements stored: the honest
+        # answer is NO STATEMENTS STORED with the source that would change it.
+        "ratio_sheet": {"instrument": "MYX:1155"},
+        "cost_of_capital": {"instrument": "MYX:1155"},
+        "valuation_range": {"instrument": "MYX:1155"},
         "log_hypothesis": {"title": "t", "thesis": "x", "db": ":memory:"},
         # Observability tools: read-only, and each must answer on an EMPTY
         # installation - "nothing has run yet" is the honest answer, and a

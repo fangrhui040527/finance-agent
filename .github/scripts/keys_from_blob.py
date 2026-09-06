@@ -9,7 +9,7 @@ key it recognises, for the calling step to mask and export.
 
 Two ways to recognise a key, in this order:
 
-1. A label on the same line ("finnhub", "fmp", "alpha vantage", "fred",
+1. A label on the same line ("finnhub", "fmp", "alpha vantage", "fred", "eodhd",
    "groq", in any case, with or without "api"/"key"/"="), followed by a token.
    This is how a `.env` file looks and how a message that says
    "finhub api = ..." looks.
@@ -35,6 +35,7 @@ LABELS: tuple[tuple[str, re.Pattern[str]], ...] = (
     ("ALPHAVANTAGE_API_KEY", re.compile(r"alpha\s*_?vantage|\balpha\b|\bav\b", re.I)),
     ("FRED_API_KEY", re.compile(r"\bfred\b", re.I)),
     ("GROQ_API_KEY", re.compile(r"\bgroq\b", re.I)),
+    ("EODHD_API_KEY", re.compile(r"\beod\s*hd\b|\beodhd\b|eod\s*historical", re.I)),
 )
 
 SHAPES: tuple[tuple[str, re.Pattern[str]], ...] = (
@@ -43,6 +44,8 @@ SHAPES: tuple[tuple[str, re.Pattern[str]], ...] = (
     ("FMP_API_KEY", re.compile(r"^(?=.*[A-Z])[A-Za-z0-9]{32}$")),
     ("FINNHUB_API_KEY", re.compile(r"^[a-z0-9]{40}$")),
     ("ALPHAVANTAGE_API_KEY", re.compile(r"^[A-Z0-9]{16}$")),
+    # EODHD tokens end in a dot and a short suffix (e.g. ".12345678"); labelled use is the safe path.
+    ("EODHD_API_KEY", re.compile(r"^[0-9]{6,}\.[0-9a-f]{8}$")),
 )
 
 TOKEN = re.compile(r"[A-Za-z0-9_\-]{16,}")

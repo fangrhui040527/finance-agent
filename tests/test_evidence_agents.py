@@ -44,8 +44,21 @@ NOW = datetime(2026, 8, 25, tzinfo=UTC)
 ASOF = date(2026, 8, 25)
 
 ALLOW = {
-    "a1_fundamentals": {"get_statement", "dupont", "accrual_ratio", "restatement_diff"},
-    "a2_valuation": {"multiple_vs_history", "reverse_dcf", "peer_multiples"},
+    "a1_fundamentals": {
+        "get_statement",
+        "dupont",
+        "accrual_ratio",
+        "restatement_diff",
+        "ratio_sheet",
+        "quality_scores",
+    },
+    "a2_valuation": {
+        "multiple_vs_history",
+        "reverse_dcf",
+        "peer_multiples",
+        "cost_of_capital",
+        "scenario_range",
+    },
     "a3_price_technical": {"ohlcv", "atr", "drawdown", "base_rate"},
     "a4_news_narrative": {"retrieve", "search_news", "extract_features"},
     "a5_catalyst_events": {"events_in_window", "base_rate", "blackout_check"},

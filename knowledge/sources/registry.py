@@ -14,11 +14,13 @@ from knowledge.sources.bursa import BursaAnnouncements
 from knowledge.sources.dbnomics import DbnomicsCollector
 from knowledge.sources.dosm import DosmCpiCollector
 from knowledge.sources.edgar import EdgarFilings
+from knowledge.sources.eodhd import EodhdFundamentals
 from knowledge.sources.finmind import FinMindCollector
 from knowledge.sources.finnhub import FinnhubCollector
 from knowledge.sources.fmp import FmpCollector
 from knowledge.sources.fred import FredCollector
 from knowledge.sources.jin10 import Jin10CalendarCollector, Jin10FlashCollector
+from knowledge.sources.sec_xbrl import SecCompanyFacts
 from knowledge.sources.twse import TwseOpenApiCollector
 
 
@@ -40,6 +42,8 @@ COLLECTORS: dict[str, type[Collector]] = {
     "dbnomics": DbnomicsCollector,
     "twse_openapi": TwseOpenApiCollector,
     "finmind": FinMindCollector,
+    "sec_xbrl": SecCompanyFacts,
+    "eodhd": EodhdFundamentals,
 }
 
 

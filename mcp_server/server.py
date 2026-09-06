@@ -382,6 +382,58 @@ S.tool(
 )(T.explain_concept)
 
 S.tool(
+    "ratio_sheet",
+    "Margins, returns, leverage, liquidity, growth and accruals, plus the "
+    "earnings-quality scores (accruals, Beneish M, Piotroski F, Altman Z), from "
+    "the stored statement lines as of a date. Every missing input is named with "
+    "the collector that would fill it; a name with nothing stored says so.",
+    obj(
+        {"instrument": _str("e.g. 'XNAS:AAPL'"), "as_at": _str("YYYY-MM-DD; default today")},
+        ["instrument"],
+    ),
+)(T.ratio_sheet)
+
+S.tool(
+    "cost_of_capital",
+    "The discount rate, built: risk-free from the stored yield series, premiums "
+    "from the dated Damodaran table (cited), beta from the vendor figure or the "
+    "industry, cost of debt from interest cover, weights from market value. "
+    "Every input labelled, every gap named.",
+    obj(
+        {
+            "instrument": _str("e.g. 'XNAS:AAPL'"),
+            "as_at": _str("YYYY-MM-DD; default today"),
+            "archetype": _str(
+                "bank | utility | cyclical | software | semis | chemicals | hospital | gaming | holding"
+            ),
+        },
+        ["instrument"],
+    ),
+)(T.cost_of_capital)
+
+S.tool(
+    "valuation_range",
+    "A bear-to-bull scenario DCF from the stored record: each end a stated set of "
+    "assumptions, terminal share reported, refused when fewer than two scenarios "
+    "survive the sanity checks (terminal growth above the risk-free rate, margins "
+    "above history, and the rest). Never a point target. Name peers to add the "
+    "multiple's three contexts.",
+    obj(
+        {
+            "instrument": _str("e.g. 'XNAS:AAPL'"),
+            "as_at": _str("YYYY-MM-DD; default today"),
+            "archetype": _str("sector archetype, for the industry beta and the method"),
+            "peers": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "peer instrument ids",
+            },
+        },
+        ["instrument"],
+    ),
+)(T.valuation_range)
+
+S.tool(
     "method_note",
     "Read the curated method notes: the curriculum (kb_craft), valuation, "
     "technical and risk methods, and the failure library (kb_failures), each "

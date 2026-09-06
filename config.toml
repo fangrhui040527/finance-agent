@@ -279,6 +279,10 @@ enabled = [
   # rili.jin10.com answers 404 on every documented path (see details/09). The
   # fred collector carries the US release calendar meanwhile.
   "jin10_flash", "dbnomics", "twse_openapi", "finmind",
+  # Statement lines for the analyst engines (2026-09-06): the SEC's own XBRL
+  # facts for the US names, keyless; EODHD behind an optional key, two names a
+  # day on its free plan and US only until the Fundamentals plan.
+  "sec_xbrl", "eodhd",
 ]
 
 # Names the collectors read but the book never holds. TSMC is here as the

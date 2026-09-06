@@ -32,14 +32,14 @@ agents:
   - id: a1_fundamentals
     layer: evidence
     knowledge: [kb_filings]
-    tools: [retrieve, get_statement, dupont, accrual_ratio, restatement_diff]
+    tools: [retrieve, get_statement, dupont, accrual_ratio, restatement_diff, ratio_sheet, quality_scores]
     tier_hint: balanced
     eval_suite: evals/a1_fundamentals.yaml
 
   - id: a2_valuation
     layer: evidence
     knowledge: [kb_method_valuation]
-    tools: [retrieve, multiple_vs_history, reverse_dcf, peer_multiples]
+    tools: [retrieve, multiple_vs_history, reverse_dcf, peer_multiples, cost_of_capital, scenario_range]
     tier_hint: balanced
     eval_suite: evals/a2_valuation.yaml
 

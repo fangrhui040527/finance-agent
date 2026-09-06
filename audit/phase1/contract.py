@@ -47,6 +47,9 @@ MINIMAL: dict[str, dict] = {
     "plan_question": {"question": "why did maybank fall"},
     "explain_concept": {"concept": "expected value"},
     "method_note": {"collection": "kb_craft", "concept": "cash_flow"},
+    "ratio_sheet": {"instrument": "MYX:1155"},
+    "cost_of_capital": {"instrument": "MYX:1155", "archetype": "bank"},
+    "valuation_range": {"instrument": "MYX:1155", "archetype": "bank"},
     "log_prediction": {
         "instrument": "MYX:1155",
         "direction": 1,

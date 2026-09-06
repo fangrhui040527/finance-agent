@@ -132,6 +132,7 @@ jobs:
           FMP_API_KEY: ${{ secrets.FMP_API_KEY }}
           ALPHAVANTAGE_API_KEY: ${{ secrets.ALPHAVANTAGE_API_KEY }}
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          EODHD_API_KEY: ${{ secrets.EODHD_API_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
         run: |
           if [ -z "$ALL_SECRET" ]; then
@@ -154,6 +155,7 @@ jobs:
           FMP_API_KEY: ${{ secrets.FMP_API_KEY || env.FMP_API_KEY }}
           ALPHAVANTAGE_API_KEY: ${{ secrets.ALPHAVANTAGE_API_KEY || env.ALPHAVANTAGE_API_KEY }}
           FRED_API_KEY: ${{ secrets.FRED_API_KEY || env.FRED_API_KEY }}
+          EODHD_API_KEY: ${{ secrets.EODHD_API_KEY || env.EODHD_API_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY || env.GROQ_API_KEY }}
         run: >
           "$RESULTS/part.sh" 10 live "doctor: what this installation can do"
@@ -166,6 +168,7 @@ jobs:
           FMP_API_KEY: ${{ secrets.FMP_API_KEY || env.FMP_API_KEY }}
           ALPHAVANTAGE_API_KEY: ${{ secrets.ALPHAVANTAGE_API_KEY || env.ALPHAVANTAGE_API_KEY }}
           FRED_API_KEY: ${{ secrets.FRED_API_KEY || env.FRED_API_KEY }}
+          EODHD_API_KEY: ${{ secrets.EODHD_API_KEY || env.EODHD_API_KEY }}
           SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
           GDELT_USER_AGENT: ${{ secrets.GDELT_USER_AGENT }}
         run: >

@@ -54,6 +54,8 @@ PROVIDER_KEYS: tuple[str, ...] = (
     "SEC_USER_AGENT",
     # Optional: FinMind answers 300 requests an hour without it and 600 with.
     "FINMIND_TOKEN",
+    # Optional: EODHD statements, 2 names a day on the free plan; the collector skips without it.
+    "EODHD_API_KEY",
 )
 
 

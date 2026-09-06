@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import re
 from datetime import UTC, date, datetime, timedelta
+from decimal import Decimal
 
 from agents.base import Agent, AgentContext, Finding, cite, quote_span
 from core.contracts.answer import TrustTier
@@ -97,7 +98,15 @@ class A1Fundamentals(Agent):
 
     agent_id = "a1_fundamentals"
     collections = ("kb_filings",)
-    tools = ("retrieve", "get_statement", "dupont", "accrual_ratio", "restatement_diff")
+    tools = (
+        "retrieve",
+        "get_statement",
+        "dupont",
+        "accrual_ratio",
+        "restatement_diff",
+        "ratio_sheet",
+        "quality_scores",
+    )
     tier = TaskClass.FUNDAMENTALS_READ
 
     def __init__(self, ctx: AgentContext, facts: FactStore) -> None:
@@ -158,6 +167,84 @@ class A1Fundamentals(Agent):
             )
         return out
 
+    def ratio_sheet(
+        self, instrument_id: str, asof: date, tax_rate: Decimal | None = None
+    ) -> list[Finding]:
+        """The ratio sheet from stored lines: each ratio a finding carrying its inputs' trail.
+
+        Point-in-time through the same store `run` reads; a ratio whose input is
+        not stored is not emitted as a number, and the head finding says how many
+        were computable and which collector would fill the rest.
+        """
+        self._guard_tool("ratio_sheet")
+        from engines.fundamentals.ratios import ratio_sheet as _sheet
+
+        sheet = _sheet(self.facts, instrument_id, asof, tax_rate)
+        head = Finding(
+            self.agent_id,
+            "ratio_sheet",
+            f"{instrument_id}: {sheet.computable} of {sheet.total} ratios computable from what is "
+            f"stored as of {asof}",
+            numbers={"computable": float(sheet.computable), "total": float(sheet.total)},
+            as_of=datetime(asof.year, asof.month, asof.day, tzinfo=UTC),
+            caveats=[
+                f"{c} would be filled by {', '.join(w)}" for c, w in sorted(sheet.fillers.items())
+            ],
+        )
+        out = [head]
+        for r in sheet.ratios.values():
+            if not r.computable or r.value is None:
+                continue
+            out.append(
+                Finding(
+                    self.agent_id,
+                    "ratio",
+                    r.text(),
+                    numbers={r.name: float(r.value)},
+                    caveats=[f"sources {', '.join(r.sources)}; known {r.known_at}"],
+                )
+            )
+        return out
+
+    def quality_scores(
+        self,
+        instrument_id: str,
+        asof: date,
+        market_cap: Decimal | None = None,
+        archetype: str | None = None,
+    ) -> list[Finding]:
+        """Accruals, Beneish M, Piotroski F and Altman Z, each honest about its inputs.
+
+        A flagged score is a `quality_flag` finding, which is what the red team's
+        accounting challenge and its failure-pattern analogues read.
+        """
+        self._guard_tool("quality_scores")
+        from engines.fundamentals.quality import quality_report
+        from engines.fundamentals.ratios import Statements
+
+        s = Statements.from_store(self.facts, instrument_id, asof)
+        out: list[Finding] = []
+        for sc in quality_report(s, market_cap, archetype):
+            kind = "quality_flag" if sc.verdict.startswith("flag") else "quality"
+            caveats = list(sc.caveats)
+            if sc.missing:
+                caveats.insert(
+                    0,
+                    f"{sc.computable} of {sc.needed} inputs computable; missing {', '.join(sc.missing)}",
+                )
+            if sc.sources:
+                caveats.append(f"sources {', '.join(sc.sources)}")
+            out.append(
+                Finding(
+                    self.agent_id,
+                    kind,
+                    f"{sc.name}: {sc.verdict}",
+                    numbers={sc.name: float(sc.value)} if sc.value is not None else {},
+                    caveats=caveats,
+                )
+            )
+        return out
+
     def earnings_quality(self, instrument_id: str, asof: date) -> list[Finding]:
         """The cheapest fraud detector that exists: net income vs operating cash flow."""
         ni = self.facts.as_known_at(instrument_id, "net_income", asof)
@@ -195,7 +282,14 @@ class A2Valuation(Agent):
 
     agent_id = "a2_valuation"
     collections = ("kb_method_valuation",)
-    tools = ("retrieve", "multiple_vs_history", "reverse_dcf", "peer_multiples")
+    tools = (
+        "retrieve",
+        "multiple_vs_history",
+        "reverse_dcf",
+        "peer_multiples",
+        "cost_of_capital",
+        "scenario_range",
+    )
     tier = TaskClass.VALUATION_COMMENT
 
     ARCHETYPE_METHODS = {
@@ -266,6 +360,128 @@ class A2Valuation(Agent):
                 f"earnings growth for {years} years at a {discount:.0%} discount rate",
                 numbers={"implied_growth": hi},
                 caveats=["this is what the price implies, not an estimate of value"],
+            )
+        ]
+
+    def cost_of_capital(
+        self,
+        instrument_id: str,
+        book,
+        table,
+        asof: date,
+        archetype: str | None = None,
+        statements=None,
+    ):
+        """The discount rate, built and labelled; the table's rows cited verbatim."""
+        self._guard_tool("cost_of_capital")
+        from engines.valuation.cost_of_capital import cost_of_capital_text, derive
+
+        coc = derive(instrument_id, book, table, asof, archetype, statements)
+        citations = []
+        col = None
+        try:
+            col = self.ctx.router.get(self.agent_id, "kb_method_valuation")
+        except (KeyError, PermissionError):
+            col = None
+        if col is not None:
+            for chunk_id in coc.citations:
+                text = col.find_chunk("kb_method_valuation", chunk_id)
+                if text:
+                    citations.append(
+                        cite(
+                            "kb_method_valuation",
+                            chunk_id,
+                            quote_span(text, 120),
+                            TrustTier.METHOD_KB,
+                            datetime(
+                                table.as_of.year, table.as_of.month, table.as_of.day, tzinfo=UTC
+                            ),
+                        )
+                    )
+        rate, which = coc.discount
+        finding = Finding(
+            self.agent_id,
+            "cost_of_capital",
+            cost_of_capital_text(coc),
+            numbers={
+                k: float(v)
+                for k, v in (
+                    ("rf", coc.rf),
+                    ("beta", coc.beta),
+                    ("erp", coc.erp),
+                    ("ke", coc.ke),
+                    ("kd", coc.kd),
+                    ("wacc", coc.wacc),
+                )
+                if v is not None
+            },
+            citations=citations,
+            caveats=[f"discount rate for a DCF: {which}", *coc.caveats],
+        )
+        return coc, [finding]
+
+    def scenario_range(self, statements, coc, table, country: str, currency: str = ""):
+        """Bear, base and bull from the record, through the sanity checks, as a range."""
+        self._guard_tool("scenario_range")
+        from engines.valuation.dcf import default_scenarios, scenario_range, valuation_text
+
+        scenarios, reasons = default_scenarios(statements, coc, table, country)
+        if reasons:
+            return None, [
+                Finding(
+                    self.agent_id,
+                    "valuation_unavailable",
+                    f"{statements.instrument_id}: no scenario DCF - " + "; ".join(reasons),
+                    caveats=[
+                        "a range needs two annual margins, a revenue growth rate and a discount rate"
+                    ],
+                )
+            ]
+        vr = scenario_range(statements, coc, scenarios, table, country, currency)
+        kind = "valuation_refused" if vr.refused else "valuation_range"
+        numbers = {}
+        if vr.low is not None and vr.high is not None:
+            numbers = {"low": float(vr.low), "high": float(vr.high)}
+            if vr.base is not None:
+                numbers["base"] = float(vr.base)
+        return vr, [
+            Finding(
+                self.agent_id,
+                kind,
+                valuation_text(vr, scenarios),
+                numbers=numbers,
+                caveats=["a range, not a target", *vr.caveats],
+            )
+        ]
+
+    def peer_multiples(
+        self,
+        book,
+        instrument_id: str,
+        peers: set[str],
+        concept: str,
+        asof: date,
+        price: Decimal | None = None,
+        earnings: Decimal | None = None,
+        discount: Decimal | None = None,
+    ) -> list[Finding]:
+        """The multiple in its three contexts: own history, peers, growth required."""
+        self._guard_tool("peer_multiples")
+        from engines.valuation.comps import three_contexts
+
+        tc = three_contexts(book, instrument_id, peers, concept, asof, price, earnings, discount)
+        numbers = {}
+        if tc.current is not None:
+            numbers["current"] = float(tc.current)
+        if tc.history_percentile is not None:
+            numbers["percentile"] = float(tc.history_percentile)
+        if tc.peer_band is not None:
+            numbers["peer_median"] = float(tc.peer_band.median)
+        if tc.implied_growth is not None:
+            numbers["implied_growth"] = float(tc.implied_growth)
+        return [
+            Finding(
+                self.agent_id, "valuation", tc.text(), numbers=numbers, caveats=list(tc.caveats)
             )
         ]
 

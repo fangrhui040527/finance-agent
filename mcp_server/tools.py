@@ -1230,6 +1230,165 @@ def explain_concept(concept: str = "", mastered: list | None = None) -> str:
     return _lines(a14.run(concept, learner))
 
 
+def _asof(as_at: str) -> date:
+    if not as_at:
+        return datetime.now(UTC).date()
+    try:
+        return date.fromisoformat(as_at)
+    except ValueError:
+        raise ToolError(f"as_at must be YYYY-MM-DD, got {as_at!r}") from None
+
+
+def _instrument_mic(instrument: str) -> str:
+    """The market an analyst tool is asked about, or a ToolError naming the problem.
+
+    `mic_of` passes an unknown prefix through unchanged so its callers can name
+    it; a tool must refuse it instead of answering "nothing stored" for a market
+    this system does not know.
+    """
+    try:
+        mic = mic_of(instrument)
+    except ValueError as e:
+        raise ToolError(str(e)) from None
+    if mic not in supported():
+        raise ToolError(
+            f"{instrument!r}: market {mic!r} is not supported; known markets: "
+            + ", ".join(supported())
+        )
+    return mic
+
+
+def _statement_sources(instrument: str) -> str:
+    mic = _instrument_mic(instrument)
+    if mic in ("XNAS", "XNYS"):
+        return "sec_xbrl (keyless, weekly), fmp, eodhd (EODHD_API_KEY)"
+    if mic == "XKLS":
+        return "eodhd on its Fundamentals plan (the free plan is US only); no free source carries Bursa statements"
+    if mic == "XTAI":
+        return "finmind, twse_openapi (partial lines), eodhd on its Fundamentals plan"
+    return "no statement source is catalogued for this market"
+
+
+def ratio_sheet(instrument: str, as_at: str = "") -> str:
+    """Margins, returns, leverage, liquidity, growth and accruals from the stored
+    statement lines, point-in-time as of `as_at`, with every missing input named.
+
+    Read through the fundamentals agent's own store; a name with nothing stored
+    says NO STATEMENTS STORED and which collector would change that.
+    """
+    from agents.evidence.agents import A1Fundamentals
+    from knowledge.facts import FactBook
+
+    _instrument_mic(instrument)
+    asof = _asof(as_at)
+    cfg = load_config()
+    with FactBook(cfg.facts_db) as book:
+        a1 = A1Fundamentals.from_fact_book(context(), book, [instrument], asof)
+        findings = a1.ratio_sheet(instrument, asof)
+        scores = a1.quality_scores(instrument, asof)
+    head = findings[0]
+    if head.numbers.get("computable", 0) == 0:
+        return (
+            f"NO STATEMENTS STORED for {instrument} as of {asof}: 0 of {int(head.numbers.get('total', 0))} "
+            f"ratios computable. Sources that would fill them: {_statement_sources(instrument)}."
+            + DISCLAIMER
+        )
+    rows = [head.text]
+    for f in findings[1:]:
+        rows.append(f"- {f.text}")
+        for c in f.caveats:
+            rows.append(f"    {c}")
+    rows.append("earnings quality:")
+    for f in scores:
+        rows.append(f"- {f.text}")
+        for c in f.caveats:
+            rows.append(f"    {c}")
+    for c in head.caveats:
+        rows.append(f"gap: {c}")
+    return "\n".join(rows) + DISCLAIMER
+
+
+def cost_of_capital(instrument: str, as_at: str = "", archetype: str = "") -> str:
+    """The discount rate built from stored inputs and the dated Damodaran table,
+    every input labelled with its source and every gap named. Never a picked number.
+    """
+    from agents.evidence.agents import A2Valuation
+    from engines.fundamentals.ratios import Statements
+    from engines.valuation.cost_of_capital import load_table
+    from knowledge.facts import FactBook
+
+    _instrument_mic(instrument)
+    asof = _asof(as_at)
+    cfg = load_config()
+    table = load_table()
+    with FactBook(cfg.facts_db) as book:
+        store = book.as_fact_store([instrument], asof)
+        statements = Statements.from_store(store, instrument, asof)
+        _, findings = A2Valuation(context()).cost_of_capital(
+            instrument, book, table, asof, archetype or None, statements
+        )
+    rows = [findings[0].text]
+    for c in findings[0].citations:
+        rows.append(f"    cites {c.source}:{c.chunk_id}")
+    return "\n".join(rows) + DISCLAIMER
+
+
+def valuation_range(
+    instrument: str, as_at: str = "", archetype: str = "", peers: list | None = None
+) -> str:
+    """A bear-to-bull scenario DCF from the stored record, each end a stated set of
+    assumptions, refused when fewer than two scenarios survive the sanity checks;
+    plus the multiple in its three contexts when peers are named. Never a point target.
+    """
+    from agents.evidence.agents import A2Valuation
+    from engines.fundamentals.ratios import Statements
+    from engines.valuation.cost_of_capital import country_of, load_table
+    from knowledge.facts import FactBook
+
+    mic = _instrument_mic(instrument)
+    asof = _asof(as_at)
+    cfg = load_config()
+    table = load_table()
+    try:
+        currency = market_get(mic).currency
+    except (KeyError, ValueError, AttributeError):
+        currency = ""
+    with FactBook(cfg.facts_db) as book:
+        store = book.as_fact_store([instrument], asof)
+        statements = Statements.from_store(store, instrument, asof)
+        a2 = A2Valuation(context())
+        if statements.flow("revenue")[0] is None:
+            return (
+                f"NO STATEMENTS STORED for {instrument} as of {asof}: nothing to project. "
+                f"Sources that would fill them: {_statement_sources(instrument)}." + DISCLAIMER
+            )
+        coc, coc_findings = a2.cost_of_capital(
+            instrument, book, table, asof, archetype or None, statements
+        )
+        _, range_findings = a2.scenario_range(
+            statements, coc, table, country_of(instrument), currency
+        )
+        rows = [range_findings[0].text, "", coc_findings[0].text]
+        for c in coc_findings[0].citations:
+            rows.append(f"    cites {c.source}:{c.chunk_id}")
+        if peers:
+            rate, _ = coc.discount
+            eps = book.latest(instrument, "eps_ttm", asof=asof)
+            for f in a2.peer_multiples(
+                book,
+                instrument,
+                set(peers),
+                "pe_ttm",
+                asof,
+                None,
+                eps.value if eps and eps.value else None,
+                rate,
+            ):
+                rows.append("")
+                rows.append(f.text)
+    return "\n".join(rows) + DISCLAIMER
+
+
 METHOD_OWNERS = {
     "kb_craft": "a14_teacher",
     "kb_method_valuation": "a2_valuation",

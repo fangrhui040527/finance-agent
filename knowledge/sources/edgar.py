@@ -55,16 +55,23 @@ FORMS = {
 }
 
 
+def sec_headers() -> dict[str, str]:
+    """The headers every SEC request carries: a descriptive User-Agent with a
+    contact address (SEC_USER_AGENT, else GDELT_USER_AGENT, else the project
+    default), which data.sec.gov requires or answers 403."""
+    ua = (
+        os.environ.get("SEC_USER_AGENT", "").strip()
+        or os.environ.get("GDELT_USER_AGENT", "").strip()
+    )
+    return {"User-Agent": ua or USER_AGENT, "Accept": "application/json"}
+
+
 class EdgarFilings(Collector):
     name = "edgar"
     key_env = None
 
     def _headers(self) -> dict[str, str]:
-        ua = (
-            os.environ.get("SEC_USER_AGENT", "").strip()
-            or os.environ.get("GDELT_USER_AGENT", "").strip()
-        )
-        return {"User-Agent": ua or USER_AGENT, "Accept": "application/json"}
+        return sec_headers()
 
     def collect(
         self, since: datetime, instruments: tuple[str, ...] = (), slot: str = "all"

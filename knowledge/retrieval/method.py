@@ -290,7 +290,7 @@ def cost_of_capital_chunks(path: str | Path = COC_TABLE) -> list[Chunk]:
         meta = {**base, "row": row, "title": f"Cost of capital: {row}", **(extra or {})}
         out.append(
             Chunk(
-                f"kb_method_valuation:cost_of_capital#{row}",
+                f"cost_of_capital#{row}",
                 text,
                 "kb_method_valuation",
                 None,

@@ -30,12 +30,14 @@ invisible.
 | Event taxonomy, base rates, catalyst attachment | complete |
 | Retrieval — hybrid, parent-child chunking, router | complete |
 | Backtest harness — walk-forward, costs, metrics, point-in-time | complete |
-| MCP server — 34 tools, protocol, selftest | complete |
+| MCP server — 37 tools, protocol, selftest | complete |
 | Teacher — 30 concepts, enforced prerequisite order | complete |
+| **Analyst engines** — `engines/fundamentals/` (22 point-in-time ratios; accruals, Beneish M, Piotroski F, Altman Z, each saying n of N inputs) and `engines/valuation/` (cost of capital from stored inputs and the dated table, bear/base/bull DCF with the terminal share reported and fatal sanity checks, peer comps in three contexts); reachable as `ask.py ratios` / `ask.py valuation` and MCP `ratio_sheet`, `cost_of_capital`, `valuation_range`; a name with no statements says NO STATEMENTS STORED and which source would change that | complete (added 2026-09-06); Bursa names have no free statement source, so for the six they answer honestly with nothing until EODHD's Fundamentals plan |
+| **Statement collectors** — `sec_xbrl` (SEC XBRL company facts, keyless, filing-date stamped, Q4 derived from FY, restatements kept as rows) and `eodhd` (optional `EODHD_API_KEY`, two names a day on the free plan, US only until the Fundamentals plan) | built, catalogued and enabled; **first runner probe pending** on the Actions cap |
 | **Method collections filled** — `knowledge/method/`: 52 own-written notes in the five human stores (`kb_craft` 13 covering all 30 concepts, `kb_method_valuation` 13, `kb_method_technical` 6, `kb_method_risk` 7, `kb_failures` 13 cases with pattern tags) plus the dated cost-of-capital table; loaded by `knowledge/retrieval/method.py` on every surface; the teacher cites its note, the valuation agent its archetype's method, the red team retrieves failure analogues by pattern; `ask.py method`, MCP `method_note` | complete (added 2026-09-06; until then every one of the five stores was registered empty and no agent cited a method) |
 | Reflection — grading, lesson proposal, calibration, scoring | complete |
 | Tracing — spans, HTML report, anatomy, prompts | complete |
-| CLI — 27 subcommands | complete |
+| CLI — 29 subcommands | complete |
 | Paper book — `engines/paper/`, `ask.py paper`, `data/paper.db`, marked by `collect.yml`, decided by the Routine, journal in `knowledge/paper/` (docs/22) | complete; the record accrues from 2026-09-08 |
 | **Feedback routine** — `ask.py pack` prepares the night, a scheduled Claude session writes `knowledge/feedback/<date>.md`, indexed as `kb_lessons` | complete; docs/20 |
 | Fitness function — refuses a partial score | complete |
@@ -273,6 +275,25 @@ actually caused each one.
 
 Needs a labelled set of questions that *should* have been refused, and ones that
 should not.
+
+### Bursa statements and the cost-of-capital table
+
+The analyst engines run on whatever statement lines the fact book holds. For
+the three Nasdaq names `sec_xbrl` fills them without a key once the runner can
+start it. For the six Bursa names **no free source carries the statements**:
+`eodhd` answers them only on its paid Fundamentals plan, so `ask.py ratios
+MYX:1155` says NO STATEMENTS STORED until the operator either subscribes or
+supplies the lines another way. Registering the free EODHD plan and adding
+`EODHD_API_KEY` covers two US names a day, nothing on Bursa.
+
+`knowledge/method/data/cost_of_capital.yaml` carries the two Damodaran premiums
+that were readable from here (mature-market and US); the Malaysia, Taiwan,
+China and Japan country rows, every industry beta and every synthetic-rating
+spread are `null` because the source pages were not reachable from the
+sandbox. Each null shows up on the surface as "not transcribed", never as a
+zero. Transcribing them is a person with the July 2026 pages open, one row at
+a time, keeping the row label. The Malaysian and Taiwanese 10-year yield ids
+added to `dbnomics.SERIES` are unverified until the runner probe answers.
 
 ### `holdings` and `watchlist`
 

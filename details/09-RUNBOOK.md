@@ -279,6 +279,8 @@ Exit codes, so a scheduler can act without parsing text:
 | `dbnomics` | the series behind MacroMicro's charts, keyless: IMF commodity prices (palm oil, aluminium, Brent, LNG), BIS policy rates and NEERs, IMF CPI for MY and CN; each id confirmed by the probe | us_preopen, weekly | **enabled** for the first probe |
 | `twse_openapi` | TWSE OpenAPI (official, keyless) for the `[sources] read_only` Taiwan names: P/E, P/B, yield, monthly revenue, close, volume | bursa_close, weekly | **enabled** for the first probe |
 | `finmind` | FinMind for the same names: 24 months of revenue, 8 quarters of statements, foreign net buying; `FINMIND_TOKEN` optional | weekly | **enabled** for the first probe |
+| `sec_xbrl` | SEC XBRL company facts for the US names: every reported line with its filing date, Q4 derived from FY, restatements kept; feeds the ratio and quality engines | weekly | **enabled**; first probe pending (Actions cap) |
+| `eodhd` | EODHD fundamentals, `EODHD_API_KEY` optional: quarterly and annual statements; 2 names a day on the free plan, US only until the Fundamentals plan (which covers KLSE) | bursa_close, us_close | **enabled**; skipped until the key is set |
 
 Keys reach a workflow as repository secrets of exactly these names (Settings →
 Secrets and variables → Actions → Repository secrets). One secret named
@@ -678,6 +680,24 @@ with its chunk id and its references' licences; a link-only reference is a
 link. **Exits 1** when no note matches (silence is not a lesson) and **2** for
 an unknown collection, concept or pattern. Same text as the MCP `method_note`.
 
+### `ratios` and `valuation` — the analyst arithmetic on the stored lines
+
+```bash
+python ask.py ratios XNAS:AAPL                         # 22 ratios + accruals, Beneish, Piotroski, Altman
+python ask.py ratios MYX:1155                          # a Bursa name today: NO STATEMENTS STORED, and which source would fill them
+python ask.py valuation XNAS:AAPL --archetype software # cost of capital, then bear/base/bull DCF as a range
+python ask.py valuation XNAS:NVDA --coc-only           # the discount rate alone, every input labelled
+python ask.py valuation XNAS:AAPL --peer XNAS:MSFT --peer XNAS:GOOGL   # adds the P/E in its three contexts
+```
+
+Point-in-time: `--as-at YYYY-MM-DD` reads only what was filed by that date.
+A ratio whose input is not stored is not a number; the head line says n of N
+and the collector that would fill the gap. The DCF is a range or a refusal:
+a scenario whose terminal growth exceeds the risk-free rate, or whose
+discount rate is below risk-free plus half the premium, is dropped and named.
+**Exits 1** on NO STATEMENTS STORED or a refused range. Same text as the MCP
+tools `ratio_sheet`, `cost_of_capital` and `valuation_range`.
+
 ### `fitness` — can the system score itself yet?
 
 ```bash
@@ -733,7 +753,7 @@ make mcp        # stdio transport
 make mcp-check  # selftest
 ```
 
-Thirty-four tools; `details/10-STATUS-AND-GAPS.md` keeps the count and
+Thirty-seven tools; `details/10-STATUS-AND-GAPS.md` keeps the count and
 `tests/test_docs_promises.py` pins it. The analytical ones: `market_info`,
 `get_prices`, `why_did_it_move`, `fit_factor_model`, `compose_thesis`,
 `check_portfolio_risk`, `size_position`, `plan_question`, `explain_concept`,

@@ -116,6 +116,8 @@ What the company has *told you* it intends to do, and whether it did it:
 
 ---
 
+**Run it (2026-09-06).** The arithmetic in sections 3 and 4 is code: `engines/fundamentals/ratios.py` and `quality.py` (`ask.py ratios`), `engines/valuation/cost_of_capital.py`, `dcf.py`, `sanity.py`, `comps.py` (`ask.py valuation`). Every figure is point-in-time from the fact book and names the input it lacks.
+
 ## 4. Valuation method selection (step 10)
 
 Wrong method, confident number, wrong answer. A2 selects by sector archetype and refuses methods that do not apply.

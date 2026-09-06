@@ -823,6 +823,37 @@ def cmd_method(a) -> int:
     return 1 if "\nNO NOTE in " in text else 0
 
 
+def cmd_ratios(a) -> int:
+    """The ratio sheet and the earnings-quality scores, from the stored lines."""
+    from mcp_server.tools import ToolError, ratio_sheet
+
+    try:
+        text = ratio_sheet(a.instrument, as_at=a.as_at or "")
+    except ToolError as e:
+        print(str(e), file=sys.stderr)
+        return 2
+    print(text)
+    return 1 if text.startswith("NO STATEMENTS STORED") else 0
+
+
+def cmd_valuation(a) -> int:
+    """Cost of capital, then the bear-to-bull scenario DCF; a refusal is an answer."""
+    from mcp_server.tools import ToolError, cost_of_capital, valuation_range
+
+    try:
+        if a.coc_only:
+            text = cost_of_capital(a.instrument, as_at=a.as_at or "", archetype=a.archetype or "")
+        else:
+            text = valuation_range(
+                a.instrument, as_at=a.as_at or "", archetype=a.archetype or "", peers=a.peer or None
+            )
+    except ToolError as e:
+        print(str(e), file=sys.stderr)
+        return 2
+    print(text)
+    return 1 if text.startswith("NO STATEMENTS STORED") or "REFUSED:" in text else 0
+
+
 # --- which model is actually answering ------------------------------------
 
 
@@ -1881,6 +1912,26 @@ def main(argv=None) -> int:
     mt.add_argument("--pattern", help="failure pattern, e.g. accruals_divergence")
     mt.add_argument("--limit", type=int, default=4)
     mt.set_defaults(fn=cmd_method)
+
+    rs = sub.add_parser(
+        "ratios", help="ratio sheet and earnings-quality scores from the stored statement lines"
+    )
+    rs.add_argument("instrument")
+    rs.add_argument("--as-at", help="YYYY-MM-DD; default today")
+    rs.set_defaults(fn=cmd_ratios)
+
+    vl = sub.add_parser(
+        "valuation", help="cost of capital and a bear-to-bull scenario DCF; never a point target"
+    )
+    vl.add_argument("instrument")
+    vl.add_argument("--as-at", help="YYYY-MM-DD; default today")
+    vl.add_argument(
+        "--archetype",
+        help="bank | utility | cyclical | software | semis | chemicals | hospital | gaming | holding",
+    )
+    vl.add_argument("--peer", action="append", help="peer instrument id; repeatable")
+    vl.add_argument("--coc-only", action="store_true", help="only the cost of capital")
+    vl.set_defaults(fn=cmd_valuation)
 
     ft = sub.add_parser("fitness", help="can the system score itself yet?")
     ft.add_argument("--days", type=int, default=30, help="window (default 30)")
