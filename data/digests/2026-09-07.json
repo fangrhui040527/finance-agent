@@ -1,6 +1,33 @@
 {
   "collection": [
     {
+      "at": "2026-09-07T17:52:45.945739+00:00",
+      "detail": "facts 0; ",
+      "fetched": 450,
+      "kept": 0,
+      "source": "dbnomics",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-07T17:52:44.192567+00:00",
+      "detail": "facts 0; ",
+      "fetched": 17,
+      "kept": 9,
+      "source": "jin10_flash",
+      "status": "ok",
+      "stored": 7
+    },
+    {
+      "at": "2026-09-07T17:52:43.105259+00:00",
+      "detail": "facts 28; ",
+      "fetched": 451,
+      "kept": 0,
+      "source": "fred",
+      "status": "ok",
+      "stored": 0
+    },
+    {
       "at": "2026-09-07T15:08:33.768846+00:00",
       "detail": "facts 0; MYX:8869: deferred by the 2-a-day credit budget; next in rotation; MYX:3182: deferred by the 2-a-day credit budget; next in rotation; MYX:1155: deferred by the 2-a-day credit budget; next in rotation; MYX:5347: deferred by the 2-a-day credit budget; next in rotation; MYX:5183: EODHD free plan: US only; the Fundamentals plan covers KLSE; MYX:5225: EODHD free plan: US only; the Fundamentals",
       "fetched": 0,
@@ -128,18 +155,18 @@
     }
   ],
   "counts": {
-    "articles": 1397,
+    "articles": 1404,
     "documents": 0,
     "escalated": 455,
-    "events": 3927,
+    "events": 3954,
     "failed_sweeps": 15,
     "linked": 825,
     "observations": 4452,
     "series": 29,
-    "sweeps": 123
+    "sweeps": 126
   },
   "day": "2026-09-07",
-  "generated_at": "2026-09-07 17:16 UTC",
+  "generated_at": "2026-09-07 17:52 UTC",
   "macro": [
     {
       "change": "-0.01",
@@ -214,12 +241,12 @@
       "value": "118.75"
     },
     {
-      "change": "366.23",
-      "obs_date": "2026-09-03",
+      "change": "-77.07",
+      "obs_date": "2026-09-04",
       "series_id": "NASDAQCOM",
       "source": "fred",
       "title": "NASDAQ Composite, index level",
-      "value": "26,584.06"
+      "value": "26,506.99"
     },
     {
       "change": "-29.11",

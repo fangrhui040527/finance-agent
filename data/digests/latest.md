@@ -1,6 +1,6 @@
 # Digest 2026-09-07
 
-Generated 2026-09-07 17:16 UTC · slot `all` · 1397 articles in the corpus, 4452 observations, 3927 events in the fact book.
+Generated 2026-09-07 17:52 UTC · slot `all` · 1404 articles in the corpus, 4452 observations, 3954 events in the fact book.
 
 ## The book
 
@@ -81,7 +81,7 @@ Generated 2026-09-07 17:16 UTC · slot `all` · 1397 articles in the corpus, 445
 | 2-year Treasury yield, % | 4.34 | 2026-09-03 | -0.05 | fred |
 | Malaysia CPI headline, index 2010=100 | 137.10 | 2026-07-01 | +0 | dosm_cpi |
 | Broad US dollar index | 118.75 | 2026-08-28 | +0.3896 | fred |
-| NASDAQ Composite, index level | 26,584.06 | 2026-09-03 | +366.23 | fred |
+| NASDAQ Composite, index level | 26,506.99 | 2026-09-04 | -77.07 | fred |
 | S&P 500, index level | 7,718.60 | 2026-09-04 | -29.11 | fred |
 | 10y minus 2y Treasury spread, % | 0.41 | 2026-09-04 | -0.02 | fred |
 | US unemployment rate, % | 4.10 | 2026-08-01 | +0 | fred |
@@ -91,6 +91,9 @@ Generated 2026-09-07 17:16 UTC · slot `all` · 1397 articles in the corpus, 445
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 17:52 | dbnomics | ok | 450 | 0 | 0 | facts 0;  |
+| 17:52 | jin10_flash | ok | 17 | 9 | 7 | facts 0;  |
+| 17:52 | fred | ok | 451 | 0 | 0 | facts 28;  |
 | 15:08 | eodhd | ok | 0 | 0 | 0 | facts 0; MYX:8869: deferred by the 2-a-day credit budget; next in rotation; MYX: |
 | 15:08 | twse_openapi | ok | 8 | 0 | 0 | facts 0;  |
 | 15:08 | jin10_flash | ok | 19 | 9 | 7 | facts 0;  |
