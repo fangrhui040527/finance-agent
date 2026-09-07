@@ -1,6 +1,6 @@
 # Digest 2026-09-07
 
-Generated 2026-09-07 22:38 UTC · slot `all` · 1649 articles in the corpus, 4456 observations, 3954 events in the fact book.
+Generated 2026-09-07 23:31 UTC · slot `all` · 1673 articles in the corpus, 4456 observations, 3954 events in the fact book.
 
 ## The book
 
@@ -36,7 +36,7 @@ Generated 2026-09-07 22:38 UTC · slot `all` · 1649 articles in the corpus, 445
 - 2026-09-07 theedgemalaysia.com — Fitch downgrades Genting's rating over high debt levels amid heavy spending [q 0.80, tone +0.0]
 
 ### NVIDIA (XNAS:NVDA)
-- tone: 146 stories from 33 sources, polarity +0.15, peak intensity 0.67, uncertainty 0.13 · 24 escalated
+- tone: 148 stories from 33 sources, polarity +0.14, peak intensity 0.67, uncertainty 0.14 · 24 escalated
 - 2026-09-07 finance.yahoo.com — Tencent Slips 1% While Its AI-Chip Bet Attacks Nvidia's China Moat [q 1.00, tone +1.0] ★
 - 2026-09-07 finance.yahoo.com — Broadcom’s AI Forecast Suggests Hyperscalers Want More Than Just Nvidia GPUs [q 1.00, tone +0.0] ★
 - 2026-09-07 finance.yahoo.com — Jim Cramer Wants Nvidia to Buy Back $500 Billion. Can Apple’s Playbook Work? [q 1.00, tone +1.0] ★
@@ -48,7 +48,7 @@ Generated 2026-09-07 22:38 UTC · slot `all` · 1649 articles in the corpus, 445
 - snapshot: P/E (ttm) 28.78 (finnhub, 2026-09-06) · P/B 28.81 (finnhub, 2026-09-05) · EPS (ttm) 7.91 (finnhub, 2026-09-05) · dividend yield 0.03 (finnhub, 2026-09-05) · beta 2.22 (finnhub, 2026-09-06) · 52w high 236.54 (finnhub, 2026-09-05) · 52w low 164.07 (finnhub, 2026-09-05) · target (consensus) 345.21 (fmp, 2026-09-05) · analysts: buy 41 (finnhub, 2026-09-05) · analysts: hold 3 (finnhub, 2026-09-05) · analysts: sell 1 (finnhub, 2026-09-05) · vendor sentiment 0.10 (alphavantage_news, 2026-09-07) · revenue (last quarter) 96.22bn (sec_xbrl, 2026-08-26) · net income (last quarter) 59.69bn (sec_xbrl, 2026-08-26) · last EPS surprise % 3.82 (finnhub, 2026-09-30)
 
 ### Apple (XNAS:AAPL)
-- tone: 55 stories from 26 sources, polarity +0.06, peak intensity 0.33, uncertainty 0.18 · 12 escalated
+- tone: 57 stories from 27 sources, polarity +0.05, peak intensity 0.33, uncertainty 0.17 · 12 escalated
 - 2026-09-07 finance.yahoo.com — Jim Cramer Wants Nvidia to Buy Back $500 Billion. Can Apple’s Playbook Work? [q 1.00, tone +1.0] ★
 - 2026-09-06 finance.yahoo.com — Inflation, Apple, Adobe, Oracle, Macy’s, and More to Watch This Week [q 1.00, tone +0.0] ★
 - 2026-09-07 New York Post — Apple's first foldable iPhone is set to debut Wednesday -- and all eyes are on new CEO John Ternus [q 0.85, tone +0.0] ★
@@ -60,15 +60,15 @@ Generated 2026-09-07 22:38 UTC · slot `all` · 1649 articles in the corpus, 445
 - snapshot: P/E (ttm) 36.22 (finnhub, 2026-09-06) · P/B 50.98 (finnhub, 2026-09-05) · EPS (ttm) 8.72 (finnhub, 2026-09-05) · dividend yield 0.51 (finnhub, 2026-09-05) · beta 1.10 (finnhub, 2026-09-06) · 52w high 344.57 (finnhub, 2026-09-05) · 52w low 225.95 (finnhub, 2026-09-05) · target (consensus) 341.31 (fmp, 2026-09-05) · analysts: buy 22 (finnhub, 2026-09-05) · analysts: hold 15 (finnhub, 2026-09-05) · analysts: sell 3 (finnhub, 2026-09-05) · vendor sentiment 0.23 (alphavantage_news, 2026-09-07) · revenue (last quarter) 109.42bn (sec_xbrl, 2026-07-31) · net income (last quarter) 29.79bn (sec_xbrl, 2026-07-31) · last EPS surprise % -0.89 (finnhub, 2026-09-05)
 
 ### Microsoft (XNAS:MSFT)
-- tone: 25 stories from 9 sources, polarity +0.12, peak intensity 0.33, uncertainty 0.17 · 7 escalated
+- tone: 28 stories from 12 sources, polarity +0.11, peak intensity 0.33, uncertainty 0.15 · 9 escalated
 - 2026-09-07 247wallst.com — Microsoft Is Close to a New All-Time High. This Number Will Determine If It Keeps Climbing [q 0.85, tone +1.0] ★
 - 2026-09-07 Yahoo — Microsoft Stock Is Building a Trillion-Dollar AI Opportunity. Is $600 Next? [q 0.85, tone +0.0] ★
 - 2026-09-07 Benzinga — Industry Comparison: Evaluating Microsoft Against Competitors In Software Industry [q 0.85, tone +0.0] ★
 - 2026-09-07 Yahoo — Microsoft (MSFT)’s Outlook and OpenAI’s ChatGPT Work Both Broke the Same Day [q 0.85, tone +0.0] ★
 - 2026-09-07 finance.yahoo.com — Microsoft Has a $1,000 Problem With Its Next Xbox [q 0.80, tone +0.0] ★
+- 2026-09-07 lenovo.com — Windows 11 Update | Free Upgrade PCs to Microsoft Windows 11 OS [q 0.65, tone +1.0] ★
+- 2026-09-07 makeuseof.com — I replaced Word, Excel, PowerPoint, and Outlook with free apps, and I dont miss Microsoft 365 [q 0.65, tone -1.0] ★
 - 2026-09-07 pluang.com — Microsoft nears record high; free cash flow wil... [q 0.65, tone +1.0] ★
-- 2026-09-06 www.equiti.com — Microsoft Stock Technical Outlook: Is $550 the Next Target? [q 0.65, tone +0.0] ★
-- 2026-09-06 finance.yahoo.com — Can Nvidia (NVDA) Prove it Doesn’t Live or Die by a Handful of Hyperscalers? [q 1.00, tone +0.0]
 - snapshot: P/E (ttm) 27.74 (finnhub, 2026-09-06) · P/B 6.26 (finnhub, 2026-09-05) · EPS (ttm) 17.95 (finnhub, 2026-09-05) · dividend yield 0.79 (finnhub, 2026-09-05) · beta 1.06 (finnhub, 2026-09-06) · 52w high 553.72 (finnhub, 2026-09-05) · 52w low 349.20 (finnhub, 2026-09-05) · target (consensus) 553.39 (fmp, 2026-09-05) · analysts: buy 41 (finnhub, 2026-09-05) · analysts: hold 5 (finnhub, 2026-09-05) · analysts: sell 0 (finnhub, 2026-09-05) · revenue (last quarter) 90.01bn (sec_xbrl, 2026-07-29) · net income (last quarter) 35.77bn (sec_xbrl, 2026-07-29) · last EPS surprise % 9.53 (finnhub, 2026-09-05)
 
 ## Macro
@@ -94,6 +94,14 @@ Generated 2026-09-07 22:38 UTC · slot `all` · 1649 articles in the corpus, 445
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 23:31 | eodhd | ok | 0 | 0 | 0 | facts 0; XNAS:MSFT: deferred by the 2-a-day credit budget; next in rotation; XNA |
+| 23:31 | jin10_flash | ok | 15 | 6 | 4 | facts 0;  |
+| 23:31 | alphavantage_news | ok | 0 | 0 | 0 | facts 0; XNAS:MSFT: alphavantage quota exhausted for today: Thank you for using  |
+| 23:31 | finnhub | ok | 0 | 0 | 0 | facts 0;  |
+| 23:31 | edgar | ok | 0 | 0 | 0 | facts 0;  |
+| 23:31 | yahoo_rss | ok | 2 | 2 | 2 | read but empty: Apple, Microsoft; named the company: 2 of 2 (lowest: NVIDIA 2/2) |
+| 23:31 | google_news | ok | 1 | 1 | 1 | read but empty: NVIDIA, Microsoft; named the company: 1 of 1 (lowest: Apple 1/1) |
+| 23:31 | gdelt | ok | 29 | 21 | 17 | failed: NVIDIA, Apple; named the company: 3 of 21 (lowest: Microsoft 3/21) |
 | 22:38 | eodhd | ok | 0 | 0 | 0 | facts 0; XNAS:MSFT: deferred by the 2-a-day credit budget; next in rotation; XNA |
 | 22:38 | jin10_flash | ok | 19 | 9 | 7 | facts 0;  |
 | 22:38 | alphavantage_news | ok | 3 | 3 | 2 | facts 4; XNAS:MSFT: alphavantage quota exhausted for today: Thank you for using  |

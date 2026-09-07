@@ -1,6 +1,78 @@
 {
   "collection": [
     {
+      "at": "2026-09-07T23:31:41.726345+00:00",
+      "detail": "facts 0; XNAS:MSFT: deferred by the 2-a-day credit budget; next in rotation; XNAS:NVDA: outside the plan or over today's credits; XNAS:AAPL: outside the plan or over today's credits",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-07T23:31:41.239384+00:00",
+      "detail": "facts 0; ",
+      "fetched": 15,
+      "kept": 6,
+      "source": "jin10_flash",
+      "status": "ok",
+      "stored": 4
+    },
+    {
+      "at": "2026-09-07T23:31:39.864887+00:00",
+      "detail": "facts 0; XNAS:MSFT: alphavantage quota exhausted for today: Thank you for using Alpha Vantage! Please consider spreading out your free API requests more sparingly (1 request per second). You may subscribe to any of the p; XNAS:NVDA: alphavantage quota exhausted for today: Thank you for using Alpha Vantage! Please consider spreading out your free API requests more sparingly (1 request per second). ",
+      "fetched": 0,
+      "kept": 0,
+      "source": "alphavantage_news",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-07T23:31:39.577726+00:00",
+      "detail": "facts 0; ",
+      "fetched": 0,
+      "kept": 0,
+      "source": "finnhub",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-07T23:31:38.319391+00:00",
+      "detail": "facts 0; ",
+      "fetched": 0,
+      "kept": 0,
+      "source": "edgar",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-07T23:31:38.214426+00:00",
+      "detail": "read but empty: Apple, Microsoft; named the company: 2 of 2 (lowest: NVIDIA 2/2)",
+      "fetched": 2,
+      "kept": 2,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 2
+    },
+    {
+      "at": "2026-09-07T23:31:37.851237+00:00",
+      "detail": "read but empty: NVIDIA, Microsoft; named the company: 1 of 1 (lowest: Apple 1/1)",
+      "fetched": 1,
+      "kept": 1,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 1
+    },
+    {
+      "at": "2026-09-07T23:31:36.526264+00:00",
+      "detail": "failed: NVIDIA, Apple; named the company: 3 of 21 (lowest: Microsoft 3/21)",
+      "fetched": 29,
+      "kept": 21,
+      "source": "gdelt",
+      "status": "ok",
+      "stored": 17
+    },
+    {
       "at": "2026-09-07T22:38:27.874103+00:00",
       "detail": "facts 0; XNAS:MSFT: deferred by the 2-a-day credit budget; next in rotation; XNAS:NVDA: outside the plan or over today's credits; XNAS:AAPL: outside the plan or over today's credits",
       "fetched": 0,
@@ -227,18 +299,18 @@
     }
   ],
   "counts": {
-    "articles": 1649,
+    "articles": 1673,
     "documents": 0,
-    "escalated": 488,
+    "escalated": 490,
     "events": 3954,
     "failed_sweeps": 15,
-    "linked": 1006,
+    "linked": 1013,
     "observations": 4456,
     "series": 29,
-    "sweeps": 134
+    "sweeps": 142
   },
   "day": "2026-09-07",
-  "generated_at": "2026-09-07 22:38 UTC",
+  "generated_at": "2026-09-07 23:31 UTC",
   "macro": [
     {
       "change": "-0.01",
@@ -797,10 +869,10 @@
       ],
       "tone": {
         "intensity_max": 0.667,
-        "n": 146,
-        "polarity_mean": 0.153,
+        "n": 148,
+        "polarity_mean": 0.144,
         "sources": 33,
-        "uncertainty_mean": 0.133
+        "uncertainty_mean": 0.138
       },
       "upcoming": []
     },
@@ -1023,15 +1095,15 @@
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 55,
-        "polarity_mean": 0.055,
-        "sources": 26,
-        "uncertainty_mean": 0.18
+        "n": 57,
+        "polarity_mean": 0.053,
+        "sources": 27,
+        "uncertainty_mean": 0.174
       },
       "upcoming": []
     },
     {
-      "escalated": 7,
+      "escalated": 9,
       "events": [],
       "instrument_id": "XNAS:MSFT",
       "label": "Microsoft",
@@ -1206,6 +1278,28 @@
           "uncertainty": 0.0
         },
         {
+          "doc_id": "gdelt:https://www.lenovo.com/us/en/d/windows-11-upgrade/",
+          "domain": "lenovo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-07T23:00:00+00:00",
+          "quality": 0.65,
+          "title": "Windows 11 Update | Free Upgrade PCs to Microsoft Windows 11 OS",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "gdelt:https://www.makeuseof.com/free-microsoft-365-alternatives-word-excel-powerpoint-outlook/",
+          "domain": "makeuseof.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-09-07T22:15:00+00:00",
+          "quality": 0.65,
+          "title": "I replaced Word, Excel, PowerPoint, and Outlook with free apps, and I dont miss Microsoft 365",
+          "uncertainty": 0.0
+        },
+        {
           "doc_id": "https://news.google.com/rss/articles/CBMikAFBVV95cUxPTkV4R2o2MjJydFRjbkVIVnNXSTN2WG04SHM3dGdvY29IMDUyOFNJMXYwVHE4alZ5WDRaVUpkMm9TcWZYSXZpXy1wenljaExEWG9vV1NvaWJZUGQ2ak1TT1ctbDYyUlphd1JFVmpVeEF4WHRLWE10MmJCZ0NRMzFpaTRjY2hMUHp3ZjRRUEZyaFI?oc=5",
           "domain": "pluang.com",
           "escalated": true,
@@ -1215,36 +1309,14 @@
           "quality": 0.65,
           "title": "Microsoft nears record high; free cash flow wil...",
           "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMipAFBVV95cUxNc0Y2Q2pkaklIX3FuaUhQaHRaakxjQTkxRnJBT3ZvUHQwb3paMXdBQW5iVmVZM1dOV1VTSWpxRnlqYVRyaF8xWmhQOHBmOUVqMGxZYUVYREVBZ3plYjBrVzhIcENZUW1XNE1fVnBuTlJKQ2sweDJTSy1fNzYwbmY2Q3lRZWdnRHpqNHQzYjdKS0s0N29kajlIUEJMNlZhMXlCSDRWcA?oc=5",
-          "domain": "www.equiti.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-06T14:44:17+00:00",
-          "quality": 0.65,
-          "title": "Microsoft Stock Technical Outlook: Is $550 the Next Target?",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/nvidia-nvda-prove-doesn-t-202105317.html?.tsrc=rss",
-          "domain": "finance.yahoo.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-06T20:21:05+00:00",
-          "quality": 1.0,
-          "title": "Can Nvidia (NVDA) Prove it Doesn\u2019t Live or Die by a Handful of Hyperscalers?",
-          "uncertainty": 0.17605633802816903
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 25,
-        "polarity_mean": 0.12,
-        "sources": 9,
-        "uncertainty_mean": 0.169
+        "n": 28,
+        "polarity_mean": 0.107,
+        "sources": 12,
+        "uncertainty_mean": 0.151
       },
       "upcoming": []
     }
