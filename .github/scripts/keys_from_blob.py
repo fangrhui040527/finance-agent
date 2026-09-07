@@ -16,8 +16,19 @@ Two ways to recognise a key, in this order:
 2. The token's shape, for tokens no label claimed: `gsk_` + 40 or more
    characters is Groq; 32 lowercase hex characters is FRED; 32 mixed
    alphanumerics is FMP; 40 lowercase alphanumerics is Finnhub; 16 uppercase
-   alphanumerics is Alpha Vantage. A shape that fits two names, or a name
-   that two tokens fit, is left unassigned rather than guessed.
+   alphanumerics is Alpha Vantage; hex, a dot, then hex is EODHD. A shape that
+   fits two names, or a name that two tokens fit, is left unassigned rather
+   than guessed.
+
+WHY THE TOKEN PATTERN CARRIES A DOT. It did not, and that made the EODHD rows
+in both tables below unreachable code: an EODHD key is hex, a dot, then a short
+hex suffix, and a pattern of `[A-Za-z0-9_-]{16,}` splits it at the dot into two
+fragments that are each under the sixteen-character floor. Nothing was ever
+extracted, so neither the label rule nor the shape rule was ever consulted, and
+an operator who pasted a correctly labelled EODHD key into ALL_SECRET was told
+"recognised nothing" with no hint as to why. Found on 2026-09-07 by feeding the
+parser a key of that shape - which no test had ever done, because every test
+token was one the old pattern could already match.
 
 Nothing is printed for a name it is not sure about, and no value is ever
 written to stderr: the summary there names the names.
@@ -44,11 +55,20 @@ SHAPES: tuple[tuple[str, re.Pattern[str]], ...] = (
     ("FMP_API_KEY", re.compile(r"^(?=.*[A-Z])[A-Za-z0-9]{32}$")),
     ("FINNHUB_API_KEY", re.compile(r"^[a-z0-9]{40}$")),
     ("ALPHAVANTAGE_API_KEY", re.compile(r"^[A-Z0-9]{16}$")),
-    # EODHD tokens end in a dot and a short suffix (e.g. ".12345678"); labelled use is the safe path.
-    ("EODHD_API_KEY", re.compile(r"^[0-9]{6,}\.[0-9a-f]{8}$")),
+    # EODHD: hex, a dot, then a short hex suffix. The first version of this
+    # demanded DIGITS before the dot and a suffix of exactly eight; real keys
+    # carry letters in both halves, so it matched nothing even once the token
+    # survived tokenisation.
+    ("EODHD_API_KEY", re.compile(r"^[0-9a-fA-F]{10,}\.[0-9a-fA-F]{6,}$")),
 )
 
-TOKEN = re.compile(r"[A-Za-z0-9_\-]{16,}")
+#: What counts as a token worth examining. Two alternatives, because vendors
+#: do not agree on the shape of a key: the long unbroken run most of them use,
+#: and the dotted `<hex>.<hex>` EODHD form. The dotted alternative is kept
+#: deliberately narrow - ten or more hex characters before the dot, six or more
+#: after - so that a hostname on the same line ("eodhd.com", "finnhub.com")
+#: cannot be mistaken for a key.
+TOKEN = re.compile(r"[A-Za-z0-9_\-]{16,}|[0-9a-fA-F]{10,}\.[0-9a-fA-F]{6,}")
 NAMES = tuple(name for name, _ in LABELS)
 
 
