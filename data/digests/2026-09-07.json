@@ -1,0 +1,885 @@
+{
+  "collection": [
+    {
+      "at": "2026-09-07T08:50:14.159702+00:00",
+      "detail": "facts 0; ",
+      "fetched": 4188,
+      "kept": 0,
+      "source": "sec_xbrl",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-07T08:50:13.371417+00:00",
+      "detail": "facts 1; ",
+      "fetched": 76,
+      "kept": 0,
+      "source": "finmind",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-07T08:50:11.661278+00:00",
+      "detail": "facts 0; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-07T08:49:19.816838+00:00",
+      "detail": "facts 0; ",
+      "fetched": 450,
+      "kept": 0,
+      "source": "dbnomics",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-07T08:49:16.768767+00:00",
+      "detail": "facts 0; fmp: HTTP 402 for https://financialmodelingprep.com/stable/earnings?symbol=NVDA&limit=12&apikey=*** - the plan does not include it; fmp: HTTP 402 for https://financialmodelingprep.com/stable/income-statement?symbol=NVDA&period=quarter&limit=8&apikey=*** - the plan does not include it; fmp: HTTP 402 for https://financialmodelingprep.com/stable/earnings?symbol=AAPL&limit=12&apikey=*** - the",
+      "fetched": 3957,
+      "kept": 0,
+      "source": "fmp",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-07T08:49:15.548596+00:00",
+      "detail": "facts 36; ",
+      "fetched": 36,
+      "kept": 0,
+      "source": "dosm_cpi",
+      "status": "ok",
+      "stored": 0
+    }
+  ],
+  "counts": {
+    "articles": 1342,
+    "documents": 0,
+    "escalated": 451,
+    "events": 3927,
+    "failed_sweeps": 15,
+    "linked": 810,
+    "observations": 4452,
+    "series": 29,
+    "sweeps": 115
+  },
+  "day": "2026-09-07",
+  "generated_at": "2026-09-07 08:50 UTC",
+  "macro": [
+    {
+      "change": "-0.01",
+      "obs_date": "2026-09-03",
+      "series_id": "BAMLH0A0HYM2",
+      "source": "fred",
+      "title": "ICE BofA US high-yield option-adjusted spread, %",
+      "value": "2.65"
+    },
+    {
+      "change": "0",
+      "obs_date": "2026-09-03",
+      "series_id": "BNM:OPR",
+      "source": "bnm_opr",
+      "title": "BNM Overnight Policy Rate, %",
+      "value": "2.75"
+    },
+    {
+      "change": null,
+      "obs_date": "2026-07-01",
+      "series_id": "CPIAUCSL",
+      "source": "fred",
+      "title": "US CPI, all items, index 1982-84=100",
+      "value": "332.81"
+    },
+    {
+      "change": "-0.0097",
+      "obs_date": "2026-08-28",
+      "series_id": "DEXMAUS",
+      "source": "fred",
+      "title": "Malaysian ringgit per US dollar",
+      "value": "4.02"
+    },
+    {
+      "change": "0",
+      "obs_date": "2026-09-03",
+      "series_id": "DFF",
+      "source": "fred",
+      "title": "Federal funds effective rate, %",
+      "value": "3.63"
+    },
+    {
+      "change": "-0.02",
+      "obs_date": "2026-09-03",
+      "series_id": "DGS10",
+      "source": "fred",
+      "title": "10-year Treasury yield, %",
+      "value": "4.77"
+    },
+    {
+      "change": "-0.05",
+      "obs_date": "2026-09-03",
+      "series_id": "DGS2",
+      "source": "fred",
+      "title": "2-year Treasury yield, %",
+      "value": "4.34"
+    },
+    {
+      "change": "0",
+      "obs_date": "2026-07-01",
+      "series_id": "DOSM:CPI_HEADLINE",
+      "source": "dosm_cpi",
+      "title": "Malaysia CPI headline, index 2010=100",
+      "value": "137.10"
+    },
+    {
+      "change": "0.3896",
+      "obs_date": "2026-08-28",
+      "series_id": "DTWEXBGS",
+      "source": "fred",
+      "title": "Broad US dollar index",
+      "value": "118.75"
+    },
+    {
+      "change": "366.23",
+      "obs_date": "2026-09-03",
+      "series_id": "NASDAQCOM",
+      "source": "fred",
+      "title": "NASDAQ Composite, index level",
+      "value": "26,584.06"
+    },
+    {
+      "change": "-29.11",
+      "obs_date": "2026-09-04",
+      "series_id": "SP500",
+      "source": "fred",
+      "title": "S&P 500, index level",
+      "value": "7,718.60"
+    },
+    {
+      "change": "-0.02",
+      "obs_date": "2026-09-04",
+      "series_id": "T10Y2Y",
+      "source": "fred",
+      "title": "10y minus 2y Treasury spread, %",
+      "value": "0.41"
+    },
+    {
+      "change": "0",
+      "obs_date": "2026-08-01",
+      "series_id": "UNRATE",
+      "source": "fred",
+      "title": "US unemployment rate, %",
+      "value": "4.10"
+    },
+    {
+      "change": "-0.88",
+      "obs_date": "2026-09-03",
+      "series_id": "VIXCLS",
+      "source": "fred",
+      "title": "CBOE VIX, index",
+      "value": "14.32"
+    }
+  ],
+  "names": [
+    {
+      "escalated": 0,
+      "events": [],
+      "instrument_id": "MYX:1155",
+      "label": "Maybank",
+      "snapshot": [],
+      "stories": [],
+      "tone": {},
+      "upcoming": []
+    },
+    {
+      "escalated": 0,
+      "events": [],
+      "instrument_id": "MYX:5347",
+      "label": "Tenaga",
+      "snapshot": [],
+      "stories": [],
+      "tone": {},
+      "upcoming": []
+    },
+    {
+      "escalated": 0,
+      "events": [],
+      "instrument_id": "MYX:5183",
+      "label": "Petronas Chemicals",
+      "snapshot": [],
+      "stories": [],
+      "tone": {},
+      "upcoming": []
+    },
+    {
+      "escalated": 0,
+      "events": [],
+      "instrument_id": "MYX:5225",
+      "label": "IHH",
+      "snapshot": [],
+      "stories": [],
+      "tone": {},
+      "upcoming": []
+    },
+    {
+      "escalated": 0,
+      "events": [],
+      "instrument_id": "MYX:8869",
+      "label": "Press Metal",
+      "snapshot": [],
+      "stories": [],
+      "tone": {},
+      "upcoming": []
+    },
+    {
+      "escalated": 0,
+      "events": [],
+      "instrument_id": "MYX:3182",
+      "label": "Genting",
+      "snapshot": [],
+      "stories": [],
+      "tone": {},
+      "upcoming": []
+    },
+    {
+      "escalated": 29,
+      "events": [],
+      "instrument_id": "XNAS:NVDA",
+      "label": "NVIDIA",
+      "snapshot": [
+        {
+          "concept": "pe_ttm",
+          "known_at": "2026-09-06",
+          "label": "P/E (ttm)",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "28.78"
+        },
+        {
+          "concept": "pb",
+          "known_at": "2026-09-05",
+          "label": "P/B",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "28.81"
+        },
+        {
+          "concept": "eps_ttm",
+          "known_at": "2026-09-05",
+          "label": "EPS (ttm)",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "7.91"
+        },
+        {
+          "concept": "dividend_yield",
+          "known_at": "2026-09-05",
+          "label": "dividend yield",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "0.03"
+        },
+        {
+          "concept": "beta",
+          "known_at": "2026-09-06",
+          "label": "beta",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "2.22"
+        },
+        {
+          "concept": "high_52w",
+          "known_at": "2026-09-05",
+          "label": "52w high",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "236.54"
+        },
+        {
+          "concept": "low_52w",
+          "known_at": "2026-09-05",
+          "label": "52w low",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "164.07"
+        },
+        {
+          "concept": "price_target_consensus",
+          "known_at": "2026-09-05",
+          "label": "target (consensus)",
+          "period_end": null,
+          "source": "fmp",
+          "value": "345.21"
+        },
+        {
+          "concept": "analyst_buy",
+          "known_at": "2026-09-05",
+          "label": "analysts: buy",
+          "period_end": "2026-09-01",
+          "source": "finnhub",
+          "value": "41"
+        },
+        {
+          "concept": "analyst_hold",
+          "known_at": "2026-09-05",
+          "label": "analysts: hold",
+          "period_end": "2026-09-01",
+          "source": "finnhub",
+          "value": "3"
+        },
+        {
+          "concept": "analyst_sell",
+          "known_at": "2026-09-05",
+          "label": "analysts: sell",
+          "period_end": "2026-09-01",
+          "source": "finnhub",
+          "value": "1"
+        },
+        {
+          "concept": "av_news_sentiment",
+          "known_at": "2026-09-06",
+          "label": "vendor sentiment",
+          "period_end": "2026-09-05",
+          "source": "alphavantage_news",
+          "value": "-0.41"
+        },
+        {
+          "concept": "revenue",
+          "known_at": "2026-08-26",
+          "label": "revenue (last quarter)",
+          "period_end": "2026-07-26",
+          "source": "sec_xbrl",
+          "value": "96.22bn"
+        },
+        {
+          "concept": "net_income",
+          "known_at": "2026-08-26",
+          "label": "net income (last quarter)",
+          "period_end": "2026-07-26",
+          "source": "sec_xbrl",
+          "value": "59.69bn"
+        },
+        {
+          "concept": "eps_surprise_pct",
+          "known_at": "2026-09-30",
+          "label": "last EPS surprise %",
+          "period_end": "2026-09-30",
+          "source": "finnhub",
+          "value": "3.82"
+        }
+      ],
+      "stories": [
+        {
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/musk-moves-spacex-spcx-orbital-204103387.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-06T20:41:03+00:00",
+          "quality": 1.0,
+          "title": "Musk Moves Up SpaceX (SPCX)\u2019s Orbital Data Center Timeline, Again",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/nvidia-nvda-prove-doesn-t-202105317.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-06T20:21:05+00:00",
+          "quality": 1.0,
+          "title": "Can Nvidia (NVDA) Prove it Doesn\u2019t Live or Die by a Handful of Hyperscalers?",
+          "uncertainty": 0.17605633802816903
+        },
+        {
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/nvidia-nvda-20-billion-groq-190737433.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-06T19:07:37+00:00",
+          "quality": 1.0,
+          "title": "NVIDIA (NVDA)\u2019s $20 Billion Groq Bet Goes Live This Year With New AI Racks",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://beincrypto.com/jensen-huang-agi-nvidia-astra-chips/?.tsrc=rss",
+          "domain": "beincrypto.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-06T21:39:37+00:00",
+          "quality": 0.85,
+          "title": "Nvidia CEO Jensen Huang Says AGI Has Arrived With OpenAI's GPT-6 Astra",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMimAFBVV95cUxQa2NVbTgxd01uU3JxNVRGQUV0bl9wbVY1UHhlVllsMUViT0VJRzZUa3ozQ3NLOC1rMEhCXzhOUU5nUUxsaE12SjBPTXk0aHdycEx2bHFlSzBaMHJrU0pFVlJZcmtJV2FBeGVDYmlxanZqN0E3UjRMZGg5VkJjcE5uUVlLelA5MnQzYVNMSnFXUnJlZDFSdl9sMg?oc=5",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-06T22:31:47+00:00",
+          "quality": 0.8,
+          "title": "Nvidia (NVDA)\u2019s First-Ever Year-Ahead Forecast Puts It on a Path to Pass Apple and Alphabet",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://finance.yahoo.com/m/d5001ca0-1c20-3379-83c3-ddca4526f9c2/dow-jones-futures-fall-with.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-06T22:31:15+00:00",
+          "quality": 0.8,
+          "title": "Dow Jones Futures Fall With Iran, Apple, Inflation In Focus; Nvidia, Micron, Sandisk Flash Buy Signals",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMinwFBVV95cUxPaHRVYjVwaFhqckFnUVJPNHkwYnRKNDBrZ3N2cVNmUzFwMDd3dTcwLV9vZ0J3RTNHVmhqS2VOY0FGQjlnaC1XVzVXU0tYaENSRGJFNTAxd0dIYlVvTUdYRzZVeExHNXZHWWtwT3JudlJua1V5dHVjbld1dEVrQkdnTlpvV1k0RDdmdnE2V0tveHZDaFlPZWR3eGZlOGpVbTg?oc=5",
+          "domain": "seekingalpha.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-06T14:50:00+00:00",
+          "quality": 0.8,
+          "title": "Nvidia: 70% Growth Guidance Makes This A Strong Buy (NASDAQ:NVDA)",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiygFBVV95cUxQVU5qandGdlMyaUg2N0l4S0REeGNVR182RmhSSnJkYVNxV0NxeGRzakhyV180ZGdZZ3VrQm9jbktneWJwYlJiMHJ0T29VTmIyTC1vLTl4cWV5Y3AxNVdDOV95LTJKQkpCaUlRU2VCdWVsMThGdVdTMmJGUTNmSjZOZzBGR2k1UmtFVzE0aG5Ka1ZQaFJMbXB5OUIydXFfck1zVWpZenh0a1NWSXhPcUlDNlhBak9qR2VlRDdBbHpjZ3FkcWZkLVpZN0d3?oc=5",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-06T13:26:55+00:00",
+          "quality": 0.8,
+          "title": "Why Nvidia wants Hugging Face to keep helping its rivals: Chart of the Day",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.667,
+        "n": 40,
+        "polarity_mean": 0.125,
+        "sources": 17,
+        "uncertainty_mean": 0.205
+      },
+      "upcoming": []
+    },
+    {
+      "escalated": 17,
+      "events": [],
+      "instrument_id": "XNAS:AAPL",
+      "label": "Apple",
+      "snapshot": [
+        {
+          "concept": "pe_ttm",
+          "known_at": "2026-09-06",
+          "label": "P/E (ttm)",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "36.22"
+        },
+        {
+          "concept": "pb",
+          "known_at": "2026-09-05",
+          "label": "P/B",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "50.98"
+        },
+        {
+          "concept": "eps_ttm",
+          "known_at": "2026-09-05",
+          "label": "EPS (ttm)",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "8.72"
+        },
+        {
+          "concept": "dividend_yield",
+          "known_at": "2026-09-05",
+          "label": "dividend yield",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "0.51"
+        },
+        {
+          "concept": "beta",
+          "known_at": "2026-09-06",
+          "label": "beta",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "1.10"
+        },
+        {
+          "concept": "high_52w",
+          "known_at": "2026-09-05",
+          "label": "52w high",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "344.57"
+        },
+        {
+          "concept": "low_52w",
+          "known_at": "2026-09-05",
+          "label": "52w low",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "225.95"
+        },
+        {
+          "concept": "price_target_consensus",
+          "known_at": "2026-09-05",
+          "label": "target (consensus)",
+          "period_end": null,
+          "source": "fmp",
+          "value": "341.31"
+        },
+        {
+          "concept": "analyst_buy",
+          "known_at": "2026-09-05",
+          "label": "analysts: buy",
+          "period_end": "2026-09-01",
+          "source": "finnhub",
+          "value": "22"
+        },
+        {
+          "concept": "analyst_hold",
+          "known_at": "2026-09-05",
+          "label": "analysts: hold",
+          "period_end": "2026-09-01",
+          "source": "finnhub",
+          "value": "15"
+        },
+        {
+          "concept": "analyst_sell",
+          "known_at": "2026-09-05",
+          "label": "analysts: sell",
+          "period_end": "2026-09-01",
+          "source": "finnhub",
+          "value": "3"
+        },
+        {
+          "concept": "av_news_sentiment",
+          "known_at": "2026-09-06",
+          "label": "vendor sentiment",
+          "period_end": "2026-09-06",
+          "source": "alphavantage_news",
+          "value": "0.34"
+        },
+        {
+          "concept": "revenue",
+          "known_at": "2026-07-31",
+          "label": "revenue (last quarter)",
+          "period_end": "2026-06-27",
+          "source": "sec_xbrl",
+          "value": "109.42bn"
+        },
+        {
+          "concept": "net_income",
+          "known_at": "2026-07-31",
+          "label": "net income (last quarter)",
+          "period_end": "2026-06-27",
+          "source": "sec_xbrl",
+          "value": "29.79bn"
+        },
+        {
+          "concept": "eps_surprise_pct",
+          "known_at": "2026-09-05",
+          "label": "last EPS surprise %",
+          "period_end": "2026-06-30",
+          "source": "finnhub",
+          "value": "-0.89"
+        }
+      ],
+      "stories": [
+        {
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/apple-aapl-mac-mini-studio-201609665.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-06T20:16:09+00:00",
+          "quality": 1.0,
+          "title": "Apple (AAPL)\u2019s New Mac Mini and Studio Bet Big on On-Device AI",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://finance.yahoo.com/m/736d38bc-4861-37a5-bebd-9353ee16aa26/inflation%2C-apple%2C-adobe%2C.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-06T18:00:00+00:00",
+          "quality": 1.0,
+          "title": "Inflation, Apple, Adobe, Oracle, Macy\u2019s, and More to Watch This Week",
+          "uncertainty": 0.25510204081632654
+        },
+        {
+          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/keybanc-warns-apple-iphone-18-173545777.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-06T17:35:45+00:00",
+          "quality": 1.0,
+          "title": "KeyBanc warns Apple\u2019s iPhone 18 launch may be a negative catalyst for shares",
+          "uncertainty": 0.5434782608695652
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMimAFBVV95cUxQa2NVbTgxd01uU3JxNVRGQUV0bl9wbVY1UHhlVllsMUViT0VJRzZUa3ozQ3NLOC1rMEhCXzhOUU5nUUxsaE12SjBPTXk0aHdycEx2bHFlSzBaMHJrU0pFVlJZcmtJV2FBeGVDYmlxanZqN0E3UjRMZGg5VkJjcE5uUVlLelA5MnQzYVNMSnFXUnJlZDFSdl9sMg?oc=5",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-06T22:31:47+00:00",
+          "quality": 0.8,
+          "title": "Nvidia (NVDA)\u2019s First-Ever Year-Ahead Forecast Puts It on a Path to Pass Apple and Alphabet",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://finance.yahoo.com/m/d5001ca0-1c20-3379-83c3-ddca4526f9c2/dow-jones-futures-fall-with.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-06T22:31:15+00:00",
+          "quality": 0.8,
+          "title": "Dow Jones Futures Fall With Iran, Apple, Inflation In Focus; Nvidia, Micron, Sandisk Flash Buy Signals",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMilAFBVV95cUxNcW9BT3d1eWhRSUU4Z2xzQlBHQmF2MHRSNVdSc1Q5aHNqM182OXg5R1d6LTl5QjZ5Mng3ck4tQzlOcnFZMVVLLXpHQlRmSFpPcTlhbzZUQThDZE9ocWZyc08xZU9wdjdreFRrWFY3RklyTzZwTXBfTTNKdDhjZFVncndINThFeUNJeEh0VW1ITHhmSzhy?oc=5",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-06T22:12:25+00:00",
+          "quality": 0.8,
+          "title": "Apple (AAPL) Sets iPhone Launch Event. The First Under New CEO John Ternus",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiowFBVV95cUxPSlNDVnpjMEg4LVVRWGthQzVuVndKQ01uOFRYVU1Lb1NHYmpSb2dxN2NzZnl0SFQwUnZQSGdxdllVSjY3cmlCaUtLU01rbVBZVWVWZzNUZGFzQ1RfaXZPclJfaTVkSlhIeGdEVXI2Um0zbjNVQVQ4WTdtNGd6S21sQTE2ZlZQczVjekFZejZSUktyRlljeFQ2MXVQOFpEMWNuSzFV?oc=5",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-06T13:00:02+00:00",
+          "quality": 0.8,
+          "title": "Apple Stock: September Surprise Could Be Bigger Than a New iPhone",
+          "uncertainty": 1.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMipgFBVV95cUxPU0xRMFVmWmF4X0M2MHM5bU9OLTg1NzVsUkxNZkxFdDhfQURobXFSYkMwa0JjOEF4dUFpTnFvVzVIYzJPTGFXZVRzVFF2NVlzUmI2NzdGWkdIWkd4dlJUVHlaN29qeXhodlBna2hyVHpWV1ZzSHBsZ0ZJaFI3OWlialZnUVBYZ3EwcG15X2pSTzZmdVRRZ2pQUjNOck9TNWRTaW5IYmpB?oc=5",
+          "domain": "ts2.tech",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-06T21:52:08+00:00",
+          "quality": 0.65,
+          "title": "Apple Event Preview: Foldable Output Was Only a Few Hundred Units a Day, Report Says",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 18,
+        "polarity_mean": 0.0,
+        "sources": 11,
+        "uncertainty_mean": 0.264
+      },
+      "upcoming": []
+    },
+    {
+      "escalated": 3,
+      "events": [],
+      "instrument_id": "XNAS:MSFT",
+      "label": "Microsoft",
+      "snapshot": [
+        {
+          "concept": "pe_ttm",
+          "known_at": "2026-09-06",
+          "label": "P/E (ttm)",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "27.74"
+        },
+        {
+          "concept": "pb",
+          "known_at": "2026-09-05",
+          "label": "P/B",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "6.26"
+        },
+        {
+          "concept": "eps_ttm",
+          "known_at": "2026-09-05",
+          "label": "EPS (ttm)",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "17.95"
+        },
+        {
+          "concept": "dividend_yield",
+          "known_at": "2026-09-05",
+          "label": "dividend yield",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "0.79"
+        },
+        {
+          "concept": "beta",
+          "known_at": "2026-09-06",
+          "label": "beta",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "1.06"
+        },
+        {
+          "concept": "high_52w",
+          "known_at": "2026-09-05",
+          "label": "52w high",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "553.72"
+        },
+        {
+          "concept": "low_52w",
+          "known_at": "2026-09-05",
+          "label": "52w low",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "349.20"
+        },
+        {
+          "concept": "price_target_consensus",
+          "known_at": "2026-09-05",
+          "label": "target (consensus)",
+          "period_end": null,
+          "source": "fmp",
+          "value": "553.39"
+        },
+        {
+          "concept": "analyst_buy",
+          "known_at": "2026-09-05",
+          "label": "analysts: buy",
+          "period_end": "2026-09-01",
+          "source": "finnhub",
+          "value": "41"
+        },
+        {
+          "concept": "analyst_hold",
+          "known_at": "2026-09-05",
+          "label": "analysts: hold",
+          "period_end": "2026-09-01",
+          "source": "finnhub",
+          "value": "5"
+        },
+        {
+          "concept": "analyst_sell",
+          "known_at": "2026-09-05",
+          "label": "analysts: sell",
+          "period_end": "2026-09-01",
+          "source": "finnhub",
+          "value": "0"
+        },
+        {
+          "concept": "revenue",
+          "known_at": "2026-07-29",
+          "label": "revenue (last quarter)",
+          "period_end": "2026-06-30",
+          "source": "sec_xbrl",
+          "value": "90.01bn"
+        },
+        {
+          "concept": "net_income",
+          "known_at": "2026-07-29",
+          "label": "net income (last quarter)",
+          "period_end": "2026-06-30",
+          "source": "sec_xbrl",
+          "value": "35.77bn"
+        },
+        {
+          "concept": "eps_surprise_pct",
+          "known_at": "2026-09-05",
+          "label": "last EPS surprise %",
+          "period_end": "2026-06-30",
+          "source": "finnhub",
+          "value": "9.53"
+        }
+      ],
+      "stories": [
+        {
+          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/nvidia-nvda-prove-doesn-t-202105317.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-06T20:21:05+00:00",
+          "quality": 1.0,
+          "title": "Can Nvidia (NVDA) Prove it Doesn\u2019t Live or Die by a Handful of Hyperscalers?",
+          "uncertainty": 0.17605633802816903
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxONDRlOVlKMkFXaEVTdE9LTnpRX1ZCdGJOS1dHX3F0c2dnNWhzajBQY1hYWXlsTmdocU9fNW55M25tYlEzQmNMVjVhMHQtUC00dGJOVU01SVU1UUpLMlEtQlVSRno4c1lRZVF1dE81RjQyeElXQlBjSVhiRlNkY1RObmVKVUQ2SThoUGdwN2R3TGtnbEhhQUR1eDJBSnhuUGlHTUZBTFRGRDlTZ9IBrwFBVV95cUxPMjdWYU9sWlYwUGtsLW5KSHZWeTkzREVSZzREYlAxS1FRU0Z6T2toVjZYQWExZUg1VzYya2dfajI4UGhTSVN6ZFEtRmRfZWhwVElzVnZoa3VXYkFLUzNuWjZmUkp5M2Q2b0wydVZXMWJYOWJFalpHUWtKS3RXQjBMRzJGV0IwdER5WWlxVnJjdVlrZ0R0RTlNN2RVN3IxOVlFb1pDZXVWOFlFTmJZSmZB?oc=5",
+          "domain": "simplywall.st",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-06T21:28:29+00:00",
+          "quality": 0.65,
+          "title": "Microsoft And 2 Other AI Stocks To Own",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMipAFBVV95cUxNc0Y2Q2pkaklIX3FuaUhQaHRaakxjQTkxRnJBT3ZvUHQwb3paMXdBQW5iVmVZM1dOV1VTSWpxRnlqYVRyaF8xWmhQOHBmOUVqMGxZYUVYREVBZ3plYjBrVzhIcENZUW1XNE1fVnBuTlJKQ2sweDJTSy1fNzYwbmY2Q3lRZWdnRHpqNHQzYjdKS0s0N29kajlIUEJMNlZhMXlCSDRWcA?oc=5",
+          "domain": "www.equiti.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-06T14:44:17+00:00",
+          "quality": 0.65,
+          "title": "Microsoft Stock Technical Outlook: Is $550 the Next Target?",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://247wallst.com/personal-finance/2026/09/06/the-inheritance-that-went-backward-they-gave-mom-the-stock-theyd-someday-inherit-and-eighteen-months-later-it-came-back-with-thirty-years-of-capital-gains-wiped-off-the-books/?.tsrc=rss",
+          "domain": "247wallst.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-06T19:41:51+00:00",
+          "quality": 0.7,
+          "title": "The Inheritance That Went Backward: They Gave Mom the Stock They\u2019d Someday Inherit and Eighteen Months Later It Came Back With Thirty Years of Capital Gains Wiped Off the Books",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://www.barchart.com/story/news/4467835/1-momentum-signal-suggests-the-software-apocalypse-is-over-dont-rush-to-buy-just-yet?.tsrc=rss",
+          "domain": "www.barchart.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-06T14:30:03+00:00",
+          "quality": 0.7,
+          "title": "1 Momentum Signal Suggests the Software Apocalypse Is Over. Don\u2019t Rush to Buy Just Yet.",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 5,
+        "polarity_mean": 0.0,
+        "sources": 5,
+        "uncertainty_mean": 0.035
+      },
+      "upcoming": []
+    }
+  ],
+  "slot": "all"
+}
