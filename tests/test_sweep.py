@@ -333,6 +333,72 @@ def test_every_name_failing_is_a_failed_row(stores):
     )
 
 
+def test_a_per_name_source_records_which_name_fetched_each_article_without_claiming_it(stores):
+    """Provenance, not attribution.
+
+    GDELT is asked one PHRASE per company and answers from a full-text index
+    the corpus never sees: 457 of the 575 GDELT articles collected to
+    2026-09-06 named no book company at all. The name that DID the fetching is
+    worth recording; asserting it would put a story about nothing in that
+    company's evidence.
+    """
+    corpus_db, facts_db = stores
+    adapters = RecordingAdapters(
+        {
+            "google_news": [
+                row(1, "Nvidia beats", _for="NVIDIA"),
+                row(2, "Chip demand broadly firm", _for="NVIDIA"),  # names nobody
+            ]
+        }
+    )
+    report = run_sweep(
+        Cfg(),
+        "all",
+        corpus_path=corpus_db,
+        facts_path=facts_db,
+        link_graph=False,
+        adapter_for=adapters,
+        entity_index=INDEX,
+        clock=lambda: NOW,
+        log=lambda m: None,
+    )
+    assert report.exit_code == 0
+    with Corpus(corpus_db) as c:
+        stored = {a.title: a for a in c.articles(limit=10)}
+        assert all(a.fetched_for == "XNAS:NVDA" for a in stored.values())
+        assert stored["Nvidia beats"].instruments == ["XNAS:NVDA"]
+        assert stored["Chip demand broadly firm"].instruments == []  # not claimed
+        assert c.coverage() == [("google_news", "XNAS:NVDA", 2, 1)]
+
+
+def test_the_sweep_row_says_how_many_articles_named_the_company(stores):
+    """ "96 collected" and "4 about the company" are different numbers, and only
+    the first was ever recorded."""
+    corpus_db, facts_db = stores
+    adapters = RecordingAdapters(
+        {
+            "google_news": [
+                row(1, "Nvidia beats", _for="NVIDIA"),
+                row(2, "Rain in Perak", _for="Maybank"),
+            ]
+        }
+    )
+    report = run_sweep(
+        Cfg(),
+        "all",
+        corpus_path=corpus_db,
+        facts_path=facts_db,
+        link_graph=False,
+        adapter_for=adapters,
+        entity_index=INDEX,
+        clock=lambda: NOW,
+        log=lambda m: None,
+    )
+    (r,) = report.results
+    assert "named the company: 1 of 2" in r.detail
+    assert "Maybank 0/1" in r.detail
+
+
 # --- structured pulls land in both stores, and their articles in the corpus -----------------
 
 

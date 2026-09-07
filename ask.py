@@ -1055,6 +1055,43 @@ def cmd_sweep(a) -> int:
     return report.exit_code
 
 
+def _sources_coverage(cfg, days: int) -> int:
+    """What each per-name source delivered ABOUT the name it was asked for.
+
+    A source that returns a hundred articles for Tenaga and mentions Tenaga in
+    four is not covering Tenaga, and "100 collected" says the opposite. Only
+    rows collected since the corpus started recording which query fetched them
+    can be counted; a corpus with none says so rather than printing zeroes.
+    """
+    from knowledge.corpus import Corpus
+    from knowledge.graph.ids import display_names
+
+    names = display_names()
+    with Corpus(cfg.corpus_db) as corpus:
+        rows = corpus.coverage(days=days)
+    if not rows:
+        print(
+            "NO COVERAGE RECORDED. Articles carry the name they were fetched for only "
+            "from 2026-09-06; run a sweep and ask again."
+        )
+        return 0
+    print(
+        f"what each per-name source delivered about the name it was asked for"
+        f"{f', last {days} days' if days else ''}"
+    )
+    print(f"\n{'source':<18} {'asked for':<24} {'kept':>6} {'named it':>9} {'share':>7}")
+    for source, iid, kept, named in rows:
+        label = str(names.get(iid, iid))
+        print(f"{source:<18} {label[:22]:<24} {kept:>6} {named:>9} {named / kept:>6.0%}")
+    kept_all = sum(r[2] for r in rows)
+    named_all = sum(r[3] for r in rows)
+    print(
+        f"\n{len(rows)} source/name pairs: {named_all} of {kept_all} kept articles "
+        f"named the company they were fetched for ({named_all / kept_all:.0%})"
+    )
+    return 0
+
+
 def cmd_sources(a) -> int:
     """The source catalogue, and - with --probe - one live fetch of each.
 
@@ -1073,6 +1110,8 @@ def cmd_sources(a) -> int:
     except Exception as e:
         print(f"sources could not run: {type(e).__name__}: {e}", file=sys.stderr)
         return 2
+    if getattr(a, "coverage", False):
+        return _sources_coverage(cfg, a.days)
     if not a.probe:
         from knowledge.sources.base import configured_keys
 
@@ -1128,8 +1167,19 @@ def cmd_pack(a) -> int:
     FINPLANET_OFFLINE=1 where no price host is reachable. A name that cannot
     be measured is a NO DATA row, never a typed leg; the command exits 0 when
     the pack was written and the routine reads the rows.
+
+    `--questions` reads the pages instead of building one: every open question
+    the nightly pages carry, with how long it has stood. A question the
+    collection cannot answer is a finding about the collection, and until now
+    nothing in the code read them at all.
     """
     from knowledge.pack import build_pack, write_pack
+
+    if getattr(a, "questions", False):
+        from knowledge.feedback_questions import render as render_questions
+
+        print(render_questions(a.out))
+        return 0
 
     try:
         cfg = load_config()
@@ -1725,6 +1775,42 @@ def cmd_graph(a) -> int:
         other.close()
         return 0
 
+    if getattr(a, "coverage", False):
+        # A name with no peer is a name the comps half of a valuation and the
+        # workup's competitive step cannot speak about, and until 2026-09-06
+        # seven of the nine were in that state with nothing saying so.
+        from core.config import load as load_cfg
+        from knowledge.graph.peers import peers_of
+
+        cfg = load_cfg()
+        book = tuple(dict.fromkeys(tuple(cfg.holdings) + tuple(cfg.watchlist)))
+        print(f"peer coverage as of {asof}\n")
+        print(f"{'name':<26} {'stated':>6} {'sub-sector':>11} {'verified':>9}  sub-sector")
+        bare: list[str] = []
+        for iid in book:
+            node = resolve(iid)
+            label = f"{iid} {g.label(node) or ''}".strip()[:24]
+            if g.node(node) is None:
+                bare.append(iid)
+                print(f"{label:<26} {'-':>6} {'-':>11} {'-':>9}  not in the graph")
+                continue
+            ps = peers_of(g, iid, asof)
+            checked = sum(1 for p in ps.direct if p.verified)
+            if not ps.peers:
+                bare.append(iid)
+            print(
+                f"{label:<26} {len(ps.direct):>6} {len(ps.same_subsector):>11} "
+                f"{checked:>9}  {ps.subsector or '-'}"
+            )
+        print(
+            f"\n{len(book) - len(bare)} of {len(book)} names have a peer. A stated peer is a "
+            "competes_with edge somebody wrote down; verified means a primary document says "
+            "so, not the curated list."
+        )
+        if bare:
+            print("no peer at all: " + ", ".join(bare))
+        return 0
+
     if getattr(a, "peers", None):
         from knowledge.graph.peers import peers_of
 
@@ -2027,6 +2113,11 @@ def main(argv=None) -> int:
     gr.add_argument(
         "--peers", metavar="INSTRUMENT", help="who the graph says the peers are, with evidence"
     )
+    gr.add_argument(
+        "--coverage",
+        action="store_true",
+        help="how many peers each name in the book has, and how many are verified",
+    )
     gr.add_argument("--holding", action="append", help="limit --impact to these; repeatable")
     gr.add_argument(
         "--untested",
@@ -2095,6 +2186,12 @@ def main(argv=None) -> int:
     so.add_argument("--source", action="append", help="probe only this source; repeatable")
     so.add_argument("--hours", type=int, default=48, help="probe window")
     so.add_argument("--limit", type=int, default=3, help="items per probe")
+    so.add_argument(
+        "--coverage",
+        action="store_true",
+        help="what each per-name source delivered about the name it was asked for",
+    )
+    so.add_argument("--days", type=int, default=0, help="--coverage window; 0 is everything")
     so.set_defaults(fn=cmd_sources)
 
     dg = sub.add_parser("digest", help="the day's page per name, from the stores")
@@ -2112,6 +2209,11 @@ def main(argv=None) -> int:
         "--write", action="store_true", help="also write knowledge/feedback/<date>.pack.md"
     )
     pk.add_argument("--out", default="knowledge/feedback", help="where --write puts the file")
+    pk.add_argument(
+        "--questions",
+        action="store_true",
+        help="the open questions the pages carry, oldest first; builds no pack",
+    )
     pk.add_argument("--db", default="", help="corpus database")
     pk.add_argument("--facts-db", default="", help="fact book database")
     pk.set_defaults(fn=cmd_pack)

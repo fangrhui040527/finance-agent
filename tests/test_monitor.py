@@ -24,7 +24,29 @@ from core.provenance.ledger import ProvenanceLedger
 
 
 def _cfg(**over):
+    """The real settings, with the repository's own data stores taken away.
+
+    Same lesson as the debug_root isolation below, learned twice more on
+    2026-09-06: data/corpus.db and data/facts.db are TRACKED, and they age. A
+    corpus whose last successful sweep is 31 hours old trips `sweep_silence`,
+    and a fact book carrying a series a year stale trips `series_stale` - from
+    outside the case, on a clock nobody set. Each rule's own tests point at a
+    store they built; every other test here sees none.
+    """
+    over.setdefault("corpus_db", "tests/no-such-corpus.db")
+    over.setdefault("facts_db", "tests/no-such-facts.db")
     return replace(load_config(), **over)
+
+
+#: The nightly pages are tracked too, and their questions age. Every case that
+#: is not about them sees a directory that does not exist; the ones that are
+#: pass `feedback_root` explicitly, which wins over this.
+NO_PAGES = "tests/no-such-feedback"
+
+
+@pytest.fixture(autouse=True)
+def _no_real_pages(monkeypatch):
+    monkeypatch.setattr("core.monitor.FEEDBACK_DIR", NO_PAGES)
 
 
 def _ledger(path: Path, calls: int = 3, latency: float = 100.0, cost_scale: int = 100):
@@ -240,12 +262,18 @@ def test_the_cli_exit_code_is_the_interface(tmp_path, capsys, monkeypatch):
     # read the repository's own debug/ directory and the case went red the first
     # time a real run left a methodology change there. An empty root is what
     # "nothing tripped" was always supposed to mean.
-    import functools
-
     from core import monitor as _m
 
+    # ...and the same for the tracked data stores, which age: cmd_watch loads
+    # the real config, so the settings have to be replaced here rather than
+    # passed in.
+    _real_check = _m.check
     monkeypatch.setattr(
-        _m, "check", functools.partial(_m.check, debug_root=str(tmp_path / "no-traces"))
+        _m,
+        "check",
+        lambda cfg=None, **kw: _real_check(
+            _cfg(), **{**kw, "debug_root": str(tmp_path / "no-traces")}
+        ),
     )
 
     # nothing tripped -> 0
@@ -372,6 +400,143 @@ def test_the_sweep_rule_is_off_by_default(tmp_path):
     _swept(tmp_path / "corpus.db", at=now - timedelta(days=30))
     alerts = evaluate(_sweep_cfg(tmp_path, hours=0), db=str(_ledger(tmp_path / "led.db")), now=now)
     assert not [a for a in alerts if a.rule == "sweep_silence"]
+
+
+# --- questions the pages have carried too long ------------------------------------------------
+
+
+def _pages(directory: Path, days_old: int) -> Path:
+    """One page carrying a question first asked `days_old` days before it."""
+    import json as _json
+    from datetime import date as _date
+
+    directory.mkdir(parents=True, exist_ok=True)
+    day = _date(2026, 9, 25)
+    asked = day - timedelta(days=days_old)
+    (directory / f"{day}.json").write_text(
+        _json.dumps(
+            {
+                "day": str(day),
+                "open_questions_carried": [
+                    f"The six Bursa names have no fact-book coverage (since {asked})"
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    return directory
+
+
+def test_a_question_carried_past_three_weeks_is_a_finding_not_a_question(tmp_path):
+    """The pages ask the right questions and carry them correctly. What nothing
+    noticed was how long one had stood - and an old one is rarely a hard
+    question, it is a source nobody wired."""
+    now = datetime(2026, 9, 25, 8, 0, tzinfo=UTC)
+    root = _pages(tmp_path / "pages", days_old=30)
+    alerts = evaluate(
+        _cfg(), db=str(_ledger(tmp_path / "led.db")), now=now, feedback_root=str(root)
+    )
+    (q,) = [a for a in alerts if a.rule == "open_question_stale"]
+    assert "30d" in q.title and "Bursa" in q.title
+    assert q.evidence["questions"][0]["age_days"] == 30
+
+
+def test_a_question_asked_last_week_is_just_a_question(tmp_path):
+    now = datetime(2026, 9, 25, 8, 0, tzinfo=UTC)
+    root = _pages(tmp_path / "pages", days_old=7)
+    alerts = evaluate(
+        _cfg(), db=str(_ledger(tmp_path / "led.db")), now=now, feedback_root=str(root)
+    )
+    assert not [a for a in alerts if a.rule == "open_question_stale"]
+
+
+def test_no_pages_directory_is_not_an_error(tmp_path):
+    now = datetime(2026, 9, 25, 8, 0, tzinfo=UTC)
+    alerts = evaluate(
+        _cfg(), db=str(_ledger(tmp_path / "led.db")), now=now, feedback_root=str(tmp_path / "none")
+    )
+    assert not [a for a in alerts if a.rule == "open_question_stale"]
+
+
+# --- series staleness ------------------------------------------------------------------------
+
+
+def _facts_with_series(path: Path, rows: list[tuple[str, str]]):
+    """A fact book holding one point per (series_id, obs_date)."""
+    from datetime import date as _date
+
+    from knowledge.facts import FactBook, SeriesPoint
+
+    with FactBook(str(path)) as book:
+        book.add_series(
+            [
+                SeriesPoint(
+                    "t",
+                    sid,
+                    _date.fromisoformat(day),
+                    Decimal("1"),
+                    known_at=_date.fromisoformat(day),
+                )
+                for sid, day in rows
+            ]
+        )
+    return path
+
+
+def _series_cfg(tmp_path, **over):
+    return _cfg(
+        alert_silence_hours=0,
+        alert_sweep_silence_hours=0,
+        facts_db=str(tmp_path / "facts.db"),
+        **over,
+    )
+
+
+def test_a_series_past_its_cadence_is_an_alert_and_names_the_worst_first(tmp_path):
+    """The 2026-09-06 finding: sixteen series 432-493 days old, and Malaysian
+    CPI reading 1982, while every sweep beside them reported ok. sweep_silence
+    cannot see this - the sweep is not silent."""
+    now = datetime(2026, 9, 6, 8, 0, tzinfo=UTC)
+    _facts_with_series(
+        tmp_path / "facts.db",
+        [
+            ("DOSM:CPI_HEADLINE", "1982-12-01"),
+            ("DBN:NEER_MY", "2025-05-01"),
+            ("DGS10", "2026-09-03"),
+        ],
+    )
+    alerts = evaluate(_series_cfg(tmp_path), db=str(_ledger(tmp_path / "led.db")), now=now)
+    stale = [a for a in alerts if a.rule == "series_stale"]
+    assert stale and stale[0].severity == ALERT
+    assert stale[0].title.startswith("2 macro series past their cadence: DOSM:CPI_HEADLINE")
+    ids = [row["series_id"] for row in stale[0].evidence["stale"]]
+    assert ids == ["DOSM:CPI_HEADLINE", "DBN:NEER_MY"]  # DGS10, three days old, is not named
+
+
+def test_a_series_inside_its_cadence_is_quiet(tmp_path):
+    now = datetime(2026, 9, 6, 8, 0, tzinfo=UTC)
+    _facts_with_series(
+        tmp_path / "facts.db",
+        [("DGS10", "2026-09-03"), ("CPIAUCSL", "2026-07-01"), ("BNM:OPR", "2026-07-10")],
+    )
+    alerts = evaluate(_series_cfg(tmp_path), db=str(_ledger(tmp_path / "led.db")), now=now)
+    assert not [a for a in alerts if a.rule == "series_stale"]
+
+
+def test_a_series_with_no_declared_cadence_is_not_judged(tmp_path):
+    """Guessing a limit from a prefix produces confident alerts about a rhythm
+    nobody checked. An unknown id is added to freshness.py deliberately or not
+    at all."""
+    now = datetime(2026, 9, 6, 8, 0, tzinfo=UTC)
+    _facts_with_series(tmp_path / "facts.db", [("SOMETHING:NEW", "2019-01-01")])
+    alerts = evaluate(_series_cfg(tmp_path), db=str(_ledger(tmp_path / "led.db")), now=now)
+    assert not [a for a in alerts if a.rule == "series_stale"]
+
+
+def test_a_missing_fact_book_is_not_an_error(tmp_path):
+    now = datetime(2026, 9, 6, 8, 0, tzinfo=UTC)
+    alerts = evaluate(_series_cfg(tmp_path), db=str(_ledger(tmp_path / "led.db")), now=now)
+    assert not [a for a in alerts if a.rule == "series_stale"]
 
 
 def test_a_missing_corpus_is_not_an_error(tmp_path):

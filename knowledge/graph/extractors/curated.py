@@ -6,6 +6,13 @@ deterministic tier, and the only file a person is expected to edit by hand.
 kb_supply_chain is created_by: human in agents/registry.yaml, so no agent may
 ever write here. Deterministic extraction does not violate that: it is a build
 step run by a person, not an agent action.
+
+A row may name the primary document that states the relationship, in
+`verified:`. The edge then cites THAT document rather than this file, which is
+the whole difference between "a person wrote this down" and "a filing says so";
+`knowledge/graph/peers.py` reads the citation and says which it is. Without it
+the row still builds and is still citable - the file itself is the source
+document, honestly declared - it simply reads as curated.
 """
 
 from __future__ import annotations
@@ -54,8 +61,15 @@ class CuratedExtractor(Extractor):
                 n for n in (_implied(row["source"]), _implied(row["target"])) if n is not None
             ]
             kind = EdgeKind(row["relation"])
+            verified = str(row.get("verified") or "").strip()
+            if verified.startswith(f"{DOC}#"):
+                raise ValueError(
+                    f"{self.path.name}: row {rid!r} names this file as its own verification. "
+                    f"`verified:` is for the PRIMARY document that states the relationship; "
+                    f"pointing it back here would make a row verify itself."
+                )
             common: dict[str, Any] = dict(
-                doc=f"{DOC}#{rid}",
+                doc=verified or f"{DOC}#{rid}",
                 confidence=Confidence.EXTRACTED,
                 weight=float(row.get("weight", 1.0)),
                 valid_from=_as_date(row["valid_from"]),

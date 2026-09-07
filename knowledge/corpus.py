@@ -38,7 +38,7 @@ from __future__ import annotations
 import json
 import sqlite3
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 from core.provenance.ledger import _enable_wal
@@ -153,6 +153,39 @@ class Corpus:
         have = {r[1] for r in self.conn.execute("PRAGMA table_info(articles)")}
         if "quality" not in have:
             self.conn.execute("ALTER TABLE articles ADD COLUMN quality REAL")
+        if "fetched_for" not in have:
+            self.conn.execute(
+                "ALTER TABLE articles ADD COLUMN fetched_for TEXT NOT NULL DEFAULT ''"
+            )
+
+    # -- reads about the corpus itself ----------------------------------------
+
+    def coverage(self, days: int = 0) -> list[tuple[str, str, int, int]]:
+        """(source, instrument fetched for, kept, named) rows, worst share first.
+
+        What a per-name source actually delivered ABOUT the name it was asked
+        for. The article count alone cannot say: on the corpus of 2026-09-06,
+        GDELT had returned 575 articles across nine companies and 457 of them
+        named no book company at all - a number invisible in "575 collected".
+        Rows carry a `fetched_for`, so only what was collected after the column
+        existed appears here; older rows are silent rather than counted as
+        misses.
+        """
+        where = "WHERE fetched_for <> ''"
+        args: list = []
+        if days > 0:
+            where += " AND first_seen_at >= ?"
+            args.append(_iso(datetime.now(UTC) - timedelta(days=days)))
+        rows = self.conn.execute(
+            f"""SELECT source, fetched_for, count(*) AS kept,
+                       sum(instruments_json LIKE '%' || '"' || fetched_for || '"' || '%') AS named
+                  FROM articles {where}
+                 GROUP BY source, fetched_for""",
+            args,
+        ).fetchall()
+        out = [(r["source"], r["fetched_for"], int(r["kept"]), int(r["named"] or 0)) for r in rows]
+        out.sort(key=lambda r: (r[3] / r[2] if r[2] else 1.0, r[0], r[1]))
+        return out
 
     # -- writes ---------------------------------------------------------------
 
@@ -169,8 +202,8 @@ class Corpus:
             """INSERT OR IGNORE INTO articles
                (doc_id, source, title, body, source_domain, published_at, first_seen_at,
                 language, countries_json, instruments_json, themes_json, dup_hash,
-                relevance, escalated, quality)
-               VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+                relevance, escalated, quality, fetched_for)
+               VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
             (
                 art.doc_id,
                 source,
@@ -187,6 +220,7 @@ class Corpus:
                 getattr(features, "relevance", None),
                 int(bool(art.escalated)),
                 art.quality,
+                art.fetched_for or "",
             ),
         )
         self.conn.commit()
@@ -337,6 +371,7 @@ class Corpus:
             themes=json.loads(row["themes_json"]),
             dup_hash=row["dup_hash"] or None,
             quality=row["quality"] if "quality" in keys else None,
+            fetched_for=row["fetched_for"] if "fetched_for" in keys else "",
             escalated=bool(row["escalated"]) if "escalated" in keys else False,
         )
 

@@ -49,7 +49,12 @@ def fact_snapshot(
                 f"  (knowable {o.known_at}, {o.source})"
             )
 
-    recent = book.events(instrument_id, since=now - timedelta(days=days), until=now, limit=50)
+    # `opinions=3`: a broker reiterating its rating arrives by the dozen and an
+    # 8-K arrives once. Uncapped, NVIDIA's 30-day page on 2026-09-06 was 28 rows
+    # of "maintain Buy" and 2 rows of what the company did.
+    recent = book.events(
+        instrument_id, since=now - timedelta(days=days), until=now, limit=50, opinions=3
+    )
     if recent:
         lines.append("")
         lines.append(f"  events, last {days} days")
@@ -99,14 +104,26 @@ def fact_snapshot(
     return "\n".join(lines)
 
 
-def macro_context(book: FactBook, series_id: str = "", points: int = 5) -> str:
-    """Every recorded series at its latest point; or one series' last `points`."""
+def macro_context(
+    book: FactBook, series_id: str = "", points: int = 5, now: datetime | None = None
+) -> str:
+    """Every recorded series at its latest point; or one series' last `points`.
+
+    Every row carries the age of its newest observation, and a series past the
+    cadence declared in knowledge/sources/freshness.py is marked STALE there.
+    Without it a policy rate fifteen months old prints in the same column, in
+    the same shape, as a Treasury yield from Thursday.
+    """
+    from knowledge.sources.freshness import age_label
+
+    now = now or datetime.now(UTC)
+    today = now.date()
     if series_id:
         pts = book.series(series_id)
         if not pts:
             return f"NO SERIES {series_id!r} recorded. Recorded: {', '.join(book.series_ids()) or 'none'}"
         title = (pts[-1].payload or {}).get("title", series_id)
-        rows = [f"{series_id}  {title}"]
+        rows = [f"{series_id}  {title}  [newest {age_label(series_id, pts[-1].obs_date, today)}]"]
         for p in pts[-max(1, points) :]:
             rows.append(
                 f"    {p.obs_date}  {_fmt(p.value):>12}   (vintage {p.known_at}, {p.source})"
@@ -119,7 +136,7 @@ def macro_context(book: FactBook, series_id: str = "", points: int = 5) -> str:
             "NO MACRO SERIES recorded yet. The fred (FRED_API_KEY), bnm_opr and dosm_cpi "
             "collectors fill them; `ask.py sources` shows their state."
         )
-    rows = ["macro series, latest point and change over the last 20 observations"]
+    rows = ["macro series, latest point, its age and the change over the last 20 observations"]
     for sid in ids:
         pts = book.series(sid)
         latest = pts[-1]
@@ -128,9 +145,10 @@ def macro_context(book: FactBook, series_id: str = "", points: int = 5) -> str:
         title = (latest.payload or {}).get("title", "")
         rows.append(
             f"    {sid:<16} {_fmt(latest.value):>12}  {latest.obs_date}  "
+            f"{age_label(sid, latest.obs_date, today):<19} "
             f"{'+' if change >= 0 else ''}{_fmt(change)}  {title}"
         )
-    rows += macro_calendar(book)
+    rows += macro_calendar(book, now)
     return "\n".join(rows)
 
 

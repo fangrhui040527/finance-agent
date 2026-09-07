@@ -294,8 +294,31 @@ The rules, all thresholds in `config.toml [monitor]` and bounded in code:
 | `dropped_claims` | claims dropped for want of a citation exceed `dropped_claim_rate` |
 | `silence` | no model calls in `silence_hours`, on a ledger that HAS run before (0 = off) |
 | `sweep_silence` | no successful sweep in `sweep_silence_hours`, for a source that HAS succeeded before (0 = off) |
+| `series_stale` | a macro series' newest observation is past the cadence declared for it in `knowledge/sources/freshness.py` |
+| `open_question_stale` | a question the nightly pages carry has stood for more than 21 days |
 | `run_errors` | the newest traced run contains an error event |
 | `methodology_changed` | the manifest hash moved between the last two runs |
+
+`series_stale` reads the AGE OF THE DATA, not the health of the fetch, and it
+exists because the two came apart: on 2026-09-06 sixteen DBnomics series were
+432 to 493 days old and Malaysian CPI read 1982, while every sweep beside them
+reported `ok`. A stopped upstream and a working one are identical in the sweep
+table. The cadence per series - daily, weekly for the Fed's H.10 release,
+monthly, or a policy rate's meeting schedule - is declared in
+`knowledge/sources/freshness.py`; a series with no entry there is not judged,
+and `ask.py macro` marks each row with its age so a stale figure is labelled
+where it is read, not only where it is alerted.
+
+`open_question_stale` reads the pages the nightly routine writes. Each carries
+its open questions forward with the date first asked - and until 2026-09-06
+nothing in the code read them, so a question that had stood for a fortnight was
+the same prose in the same list as one asked yesterday. `ask.py pack
+--questions` lists them oldest first, with how many nights each has been
+carried, and flags any asked under a name that the page forgot to carry. A
+question still open after three weeks is rarely a hard question: it is usually
+a source nobody wired. Answer it, or write on tonight's page why it cannot be
+answered and stop carrying it - a question is open exactly while the writer
+keeps carrying it.
 
 `silence_hours` is off by default because a personal tool is allowed to sit
 idle. **Turn it on the moment anything runs on a timer**: a job that dies
@@ -363,6 +386,53 @@ succeeded once, because a corpus nobody has filled yet is a system nobody turned
 on rather than one that stopped.
 
 Leave `silence_hours` at 0 unless something SCHEDULED also calls a model.
+
+### Is a source covering the name it is asked for?
+
+An article count is not coverage. A per-name source is asked for one company at
+a time, and what comes back may be about that company or about nothing in
+particular - and only the first number was ever visible. Measured on this
+corpus on 2026-09-06: GDELT had returned 575 articles across nine companies and
+457 of them named no book company at all. "575 collected" and "118 about the
+book" are different facts, and the sweep row said only the first.
+
+Every article now records the instrument that FETCHED it - provenance, not
+attribution: GDELT is asked a phrase and answers from a full-text index this
+corpus never sees, so a story it returned for "Apple" may be about a brothel
+sale, and calling that Apple's evidence would be the fetch talking. Only a
+source keyed by TICKER (Yahoo's per-symbol feed) may also assert the name.
+
+```
+ask.py sources --coverage           # every source/name pair, worst share first
+ask.py sources --coverage --days 7  # just the last week
+```
+
+Each sweep row also carries `named the company: N of M` with the three worst
+names. A source whose share stays near zero for a name is not covering it, and
+that is a reason to drop the name from that source rather than to read its
+volume as coverage.
+
+### When a registered feed URL rots
+
+A 404 from a news feed used to be reported as "404" and nothing else: the
+autodiscovery reader only ever saw a body, and a 404 has none. On 2026-09-04
+and again on 2026-09-06 The Star, The Edge and the New Straits Times all
+answered 404 to the paths in `knowledge/feeds/registry.py`, which left the six
+Malaysian business feeds this book most needs dead with no way, from an
+environment that cannot browse, to find where they had gone.
+
+A 404 or 410 now costs one extra request to the SITE ROOT, and the error names
+whatever feeds that page advertises:
+
+```
+thestar_business fetch failed: HTTP Error 404: Not Found - but
+https://www.thestar.com.my/ advertises feeds at: https://www.thestar.com.my/rss/News/Business
+```
+
+Nothing follows the discovered URL automatically. A feed URL is a decision
+about what the system ingests and belongs in the registry where a person put
+it; the probe reports, a person edits, and only then does a candidate become
+enabled.
 
 Two numbers to read afterwards, both from `ask.py sweep`'s own last line: how
 many articles the corpus holds, and how many of the sweeps failed. A failure

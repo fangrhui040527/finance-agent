@@ -11,18 +11,24 @@ from core.provenance.ledger import ProvenanceLedger
 
 # --- price cache ---------------------------------------------------------------
 
+# Real bars, not a placeholder: the cache refuses to hold a body that is not a
+# CSV of bars, because for a month it held nothing else - all 27 Stooq rows in
+# the repository's cache were the same 403 page.
+BODY = "Date,Open,High,Low,Close,Volume\n2026-08-28,10,11,9,10.5,1000\n"
+OLDER = "Date,Open,High,Low,Close,Volume\n2026-08-27,10,11,9,10.4,900\n"
+
 
 def test_cache_hit_within_the_same_day(tmp_path):
     c = PriceCache(tmp_path / "cache.db", today=lambda: "2026-08-31")
     assert c.get("stooq", "nvda.us") is None
-    c.put("stooq", "nvda.us", "csv-body")
-    assert c.get("stooq", "nvda.us") == "csv-body"
+    c.put("stooq", "nvda.us", BODY)
+    assert c.get("stooq", "nvda.us") == BODY
 
 
 def test_cache_expires_at_the_day_boundary(tmp_path):
     day = {"d": "2026-08-31"}
     c = PriceCache(tmp_path / "cache.db", today=lambda: day["d"])
-    c.put("stooq", "nvda.us", "old-session")
+    c.put("stooq", "nvda.us", OLDER)
     day["d"] = "2026-09-01"
     assert c.get("stooq", "nvda.us") is None  # a new session may have printed
 

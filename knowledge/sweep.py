@@ -511,6 +511,7 @@ def _news_per_instrument(
     failed: list[tuple[str, str]] = []
     skipped: list[str] = []
     counts: list[tuple[str, int]] = []
+    linked_counts: list[tuple[str, int, int]] = []
 
     for iid in rotated:
         label: str = str(names.get(canonical(iid) or iid) or iid)
@@ -551,7 +552,19 @@ def _news_per_instrument(
             for a in arts:  # keyed by ticker: attributed even when the headline omits the name
                 if iid not in a.instruments:
                     a.instruments.insert(0, iid)
+        # PROVENANCE, NOT ATTRIBUTION. Every per-name source is asked for one
+        # company, so record which; only a source keyed by TICKER (above) may
+        # also assert it. GDELT is asked a PHRASE and answers from a full-text
+        # index this corpus never sees, and 457 of the 575 GDELT articles
+        # collected to 2026-09-06 named no book company at all - attributing
+        # those to the name that fetched them would put a brothel sale in
+        # Apple's evidence. Recorded instead, so the share is measurable
+        # (`ask.py sources --coverage`) rather than guessed at.
+        for a in arts:
+            a.fetched_for = iid
+        linked = sum(1 for a in arts if iid in a.instruments)
         counts.append((label, len(records)))
+        linked_counts.append((label, linked, len(arts)))
         records_total += len(records)
         articles.extend(arts)
 
@@ -564,7 +577,25 @@ def _news_per_instrument(
     if degraded:
         n = len(failed) + len(skipped)
         emit(f"  {'':<20} DEGRADED: {n} of {n + len(counts)} names could not be read")
-    return records_total, articles, _sweep_note(failed, skipped, counts), degraded
+    note = _sweep_note(failed, skipped, counts)
+    hit = _linked_note(linked_counts)
+    return records_total, articles, "; ".join(x for x in (note, hit) if x), degraded
+
+
+def _linked_note(linked_counts: list[tuple[str, int, int]]) -> str:
+    """`named the company: 12 of 96` - the source's precision on this run.
+
+    A per-name source that returns a hundred articles and mentions the company
+    in four is not covering that company, and the article count alone cannot
+    say so. Recorded in the sweeps table so the trend survives the run.
+    """
+    kept = sum(total for _, _, total in linked_counts)
+    if not kept:
+        return ""
+    named = sum(n for _, n, _ in linked_counts)
+    worst = sorted((n / t if t else 1.0, label, n, t) for label, n, t in linked_counts if t)[:3]
+    detail = ", ".join(f"{label} {n}/{t}" for _, label, n, t in worst)
+    return f"named the company: {named} of {kept}" + (f" (lowest: {detail})" if detail else "")
 
 
 def _feed_for(

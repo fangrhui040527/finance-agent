@@ -57,9 +57,45 @@ def test_the_checked_in_supply_chain_validates():
 
 
 def test_every_curated_edge_cites_the_row_it_came_from():
-    """A row's id is what its citation points at, so a reader can find it."""
+    """A row's id is what its citation points at, so a reader can find it.
+
+    Unless the row names a primary document in `verified:`, in which case the
+    edge cites THAT - which is the whole difference between "a person wrote
+    this down" and "a filing says so".
+    """
     _, edges = checked(CuratedExtractor())
-    assert all(e.source_doc_id.startswith("curated:supply_chain#") for e in edges)
+    assert all(e.source_doc_id and e.source_doc_id.strip() for e in edges)
+    unverified = [e for e in edges if e.source_doc_id.startswith("curated:supply_chain#")]
+    assert unverified, "the checked-in file is curated; some row must still cite it"
+
+
+def test_a_verified_row_cites_the_document_instead_of_the_curated_list(tmp_path):
+    """Until 2026-09-06 a checked edge and a seed guess read identically."""
+    p = tmp_path / "sc.yaml"
+    p.write_text(
+        "edges:\n  - id: aapl-googl\n    source: 'XNAS:AAPL'\n    target: 'XNAS:GOOGL'\n"
+        "    relation: competes_with\n    valid_from: 2020-01-01\n"
+        "    verified: 'edgar:0000320193-25-000106#item1-competition'\n",
+        encoding="utf-8",
+    )
+    _, edges = checked(CuratedExtractor(p))
+    assert edges and all(
+        e.source_doc_id == "edgar:0000320193-25-000106#item1-competition" for e in edges
+    )
+    assert all(e.citable for e in edges), "naming the real document does not weaken the edge"
+
+
+def test_a_row_cannot_verify_itself(tmp_path):
+    """Pointing `verified:` back at this file would launder a seed into a check."""
+    p = tmp_path / "sc.yaml"
+    p.write_text(
+        "edges:\n  - id: circular\n    source: 'MYX:1155'\n    target: 'MYX:1023'\n"
+        "    relation: competes_with\n    valid_from: 2020-01-01\n"
+        "    verified: 'curated:supply_chain#circular'\n",
+        encoding="utf-8",
+    )
+    with pytest.raises(ValueError, match="verify itself"):
+        CuratedExtractor(p).extract()
 
 
 def test_the_classification_spine_reaches_a_sector_from_every_company():

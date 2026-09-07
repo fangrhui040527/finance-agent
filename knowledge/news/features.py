@@ -279,6 +279,14 @@ class Article:
     #: Whether the escalation gate opened for it: relevant AND naming a held or
     #: watched instrument. Stored so a digest can say what reached the queue.
     escalated: bool = False
+    #: The instrument this article was FETCHED FOR, when a per-name source went
+    #: looking. Provenance, never attribution: GDELT is asked one phrase per
+    #: company and answers with whatever its full-text index matched, so 457 of
+    #: the 575 GDELT articles collected to 2026-09-06 named no book company at
+    #: all. Recording the query is what makes that measurable per source per
+    #: name; asserting the company would put "Bunny Ranch Brothel Empire Up for
+    #: Sale" in Apple's evidence, which is the fetch talking, not the article.
+    fetched_for: str = ""
 
     @property
     def text(self) -> str:

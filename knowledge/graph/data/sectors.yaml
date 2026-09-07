@@ -31,16 +31,22 @@ companies:
   "MYX:1023":  {subsector: Banks,                valid_from: 2020-01-01}
   "MYX:1295":  {subsector: Banks,                valid_from: 2020-01-01}
   "MYX:5347":  {subsector: Electric Utilities,   valid_from: 2020-01-01}
+  "MYX:6742":  {subsector: Electric Utilities,   valid_from: 2020-01-01}
+  "MYX:5264":  {subsector: Electric Utilities,   valid_from: 2020-01-01}
   "MYX:5183":  {subsector: Chemicals,            valid_from: 2020-01-01}
+  "MYX:5284":  {subsector: Chemicals,            valid_from: 2020-01-01}
   "MYX:3816":  {subsector: Marine Transport,     valid_from: 2020-01-01}
   "MYX:4197":  {subsector: Conglomerates,        valid_from: 2020-01-01}
   "MYX:5225":  {subsector: Hospitals,            valid_from: 2020-01-01}
+  "MYX:5878":  {subsector: Hospitals,            valid_from: 2020-01-01}
   "MYX:8869":  {subsector: Aluminium,            valid_from: 2020-01-01}
   "MYX:3182":  {subsector: Leisure and Gaming,   valid_from: 2020-01-01}
+  "MYX:4715":  {subsector: Leisure and Gaming,   valid_from: 2020-01-01}
   "XNAS:NVDA": {subsector: Semiconductors,       valid_from: 2020-01-01}
   "XNAS:AMD":  {subsector: Semiconductors,       valid_from: 2020-01-01}
   "XNAS:INTC": {subsector: Semiconductors,       valid_from: 2020-01-01}
   "XNAS:AVGO": {subsector: Semiconductors,       valid_from: 2020-01-01}
   "XNAS:AAPL": {subsector: Consumer Hardware,    valid_from: 2020-01-01}
   "XNAS:MSFT": {subsector: Software,             valid_from: 2020-01-01}
+  "XNAS:GOOGL": {subsector: Software,            valid_from: 2020-01-01}
   "XNAS:AMZN": {subsector: Online Retail,        valid_from: 2020-01-01}

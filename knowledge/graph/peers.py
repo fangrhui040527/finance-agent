@@ -2,8 +2,11 @@
 
 Two readings, kept apart because they are not equally strong:
 
-- a **direct** peer is the other end of a live, citable ``competes_with`` edge
-  (a human wrote the row and vouches for it: ``curated:supply_chain#<id>``);
+- a **direct** peer is the other end of a live, citable ``competes_with`` edge.
+  The citation says how strong that is: ``curated:supply_chain#<id>`` means a
+  person wrote the row down and vouches for it, anything else is the primary
+  document that states the relationship. Both are citable; only one has been
+  checked, and until 2026-09-06 they read identically;
 - a **same-subsector** peer shares a ``classified_in`` sub-sector. That is two
   hops through the classification spine, and the graph's own per-hop decay
   makes it read as speculative - a shared label is not a stated rivalry.
@@ -74,8 +77,20 @@ class Peer:
     evidence: tuple[str, ...]
     market: str  # MIC
 
+    @property
+    def verified(self) -> bool:
+        """Whether a PRIMARY document, rather than the curated list, states this.
+
+        A curated row is a person's own knowledge written down and vouched for;
+        that is worth having and it is not the same as a filing saying so. The
+        two were indistinguishable in every reading until this told them apart.
+        """
+        return bool(self.evidence) and not all(e.startswith("curated:") for e in self.evidence)
+
     def describe(self) -> str:
         via = "stated rivalry" if self.relation == "competes_with" else "shared sub-sector only"
+        if self.relation == "competes_with" and not self.verified:
+            via += ", curated not verified"
         return (
             f"{self.label} ({self.instrument_id}): {self.relation}, weight {self.weight:.2f}, "
             f"{self.strength} ({via})"
