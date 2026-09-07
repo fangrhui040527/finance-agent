@@ -1,0 +1,68 @@
+{
+  "day": "2026-09-07",
+  "written_at": "2026-09-07T22:58:00Z",
+  "phase": "pre",
+  "week": 0,
+  "book": {
+    "equity_usd": 1000.00,
+    "cash_usd": 1000.00,
+    "peak_usd": 1000.00,
+    "drawdown": 0.0,
+    "max_drawdown": 0.0,
+    "return_to_date": 0.0,
+    "halted": false,
+    "marks": 4,
+    "cost_to_date_usd": 0.0,
+    "fx_myr_per_usd": 4.046,
+    "fx_source": "bnm",
+    "fx_as_of": "2026-09-07"
+  },
+  "control": {"equity_usd": 1000.00, "return_to_date": 0.0},
+  "positions": [],
+  "changes": [
+    "decided book: no change",
+    "control book: no change",
+    "the us_close mark exists because the routine dispatched collect.yml run 39 at 22:35:36 UTC after the 21:15 cron did not run; the run's mark step produced today's mark at 22:38",
+    "Bursa closes advanced to the 2026-09-07 session; the three Nasdaq closes are 2026-09-04's, carried forward because US markets were shut for Labor Day"
+  ],
+  "decision": {
+    "recorded": false,
+    "attempts": [
+      {
+        "weights": "MYX:5183=0.10,MYX:3182=0.05,XNAS:NVDA=0.20",
+        "horizon_days": 21,
+        "confidence": 0.55,
+        "result": "REFUSED",
+        "refusals": [
+          "[start] the book opens on 2026-09-08; nothing is recorded before it",
+          "[lot] MYX:5183: 10.00% is below one lot (USD 106.28 = 10.6% of equity)",
+          "[lot] MYX:3182: 5.00% is below one lot (USD 50.67 = 5.1% of equity)",
+          "[lot] XNAS:NVDA: 20.00% is below one lot (USD 230.36 = 23.0% of equity)"
+        ]
+      },
+      {
+        "weights": "",
+        "horizon_days": 21,
+        "confidence": 0.55,
+        "result": "REFUSED",
+        "refusals": ["[start] the book opens on 2026-09-08; nothing is recorded before it"]
+      }
+    ],
+    "note": "Nothing recorded. The start rule refuses every decision before 2026-09-08, all-cash included, so no smaller book exists to fall back to and no cap was loosened. The all-cash attempt isolates the rules: it removed the three [lot] breaches and left [start] alone."
+  },
+  "predictions": [],
+  "mistakes": [
+    {
+      "claim": "The first weight set asked for three positions each sized below one lot and all three were refused.",
+      "decision_date": "2026-09-07",
+      "prediction_id": null,
+      "evidence": ["MYX:5183 asked 10.00% against lot_weight 10.6%", "MYX:3182 asked 5.00% against 5.1%", "XNAS:NVDA asked 20.00% against 23.0%"],
+      "falsifiable": "On any future decision a weight below the printed lot_weight for that instrument is refused with a [lot] reason; if one is ever accepted, this reading of the rule is wrong."
+    }
+  ],
+  "fundable_note": "At USD 1,000 equity five of nine names admit a lot: MYX:5183 up to 2, MYX:3182 up to 4, MYX:5225 up to 1, MYX:8869 up to 1, XNAS:NVDA up to 1. Not fundable: MYX:1155 (26.1%), MYX:5347 (34.2%), XNAS:AAPL (32.0%), XNAS:MSFT (50.0%).",
+  "lessons": [
+    "A weight is not a number chosen freely; at a small book it is quantised by the lot.",
+    "The cheapest lot is not the cheapest position: MYX:3182 has the smallest lot (USD 50.67) and the largest round trip (4.27%)."
+  ]
+}
