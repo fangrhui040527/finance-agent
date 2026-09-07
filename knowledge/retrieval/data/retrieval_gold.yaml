@@ -1,0 +1,220 @@
+# Labelled retrieval questions - the gold set `knowledge/retrieval/evaluate.py` scores against.
+#
+# created_by: human (written 2026-09-07, drawn from data/corpus.db as it stood
+# that day; the labels were picked by reading the candidate articles, not by
+# running the retriever, so the set does not reward the thing it measures).
+#
+# Two families, on purpose:
+#
+#   semantic  the question is deliberately worded in DIFFERENT words from the
+#             article that answers it - "bendable handset" for "foldable
+#             iPhone", "insider" for "substantial shareholder". Exact-token
+#             search cannot answer these. This is the family a vector leg
+#             exists for, and the family that says whether it works.
+#   lexical   a ticker, a product name, a filed figure. BM25 must own these,
+#             and a change that improves the semantic family at their expense
+#             has not improved search - it has moved the failure.
+#
+# `relevant` is EVERY article verified to answer the question. It is not every
+# article that could: a corpus of 1,342 headlines has more, and an unlabelled
+# hit scores as a miss. Read the recall figures as a floor, and the comparison
+# between legs as the finding.
+#
+# Titles are recorded beside each id so a label that ages out of the corpus can
+# be named rather than silently lowering the score.
+questions:
+- query: which chip company depends too much on a small number of giant cloud buyers
+  kind: semantic
+  note: the article says 'hyperscalers' and 'customer concentration'; the question says neither
+  relevant:
+  - doc_id: https://finance.yahoo.com/markets/stocks/articles/nvidia-nvda-prove-doesn-t-202105317.html?.tsrc=rss
+    title: Can Nvidia (NVDA) Prove it Doesn’t Live or Die by a Handful of Hyperscalers?
+- query: how many bendable handsets can Apple actually build right now
+  kind: semantic
+  note: '''bendable'' for ''foldable'', ''build'' for ''output'''
+  relevant:
+  - doc_id: https://finance.yahoo.com/markets/stocks/articles/market-chatter-apple-apos-foldable-115705069.html?.tsrc=rss
+    title: 'Market Chatter: Apple''s Foldable iPhone Production Limited to Few Hundred Units Daily'
+  - doc_id: https://news.google.com/rss/articles/CBMiqgFBVV95cUxPSWlteVlOemZLVU04b2pxRmp3NEdxXzlpWFZPajBnVmMzeWExQ3JJVnBkRmVKbFhwZlZMQUNSMEdvTFUxUDZkcFFXQ0tZRHVWLVJTeGdSQzNvRTV3OFF3ZGZxTXFRYng0eVV5Sy1uQnpCNDRmQ2RCcGNoMmxSZ2tUSWhJYmV1T3N3ZmJCLWMzMXM4MzNldGpYWV9OaVZMcFMwUlFVNHpRZkRtZw?oc=5
+    title: 'Market Chatter: Apple''s Foldable iPhone Production Limited to Few Hundred Units Daily'
+  - doc_id: https://finance.yahoo.com/markets/stocks/articles/apples-first-foldable-could-launch-143718764.html?.tsrc=rss
+    title: Apple's First Foldable Could Launch With a Supply Problem
+  - doc_id: https://news.google.com/rss/articles/CBMipgFBVV95cUxPU0xRMFVmWmF4X0M2MHM5bU9OLTg1NzVsUkxNZkxFdDhfQURobXFSYkMwa0JjOEF4dUFpTnFvVzVIYzJPTGFXZVRzVFF2NVlzUmI2NzdGWkdIWkd4dlJUVHlaN29qeXhodlBna2hyVHpWV1ZzSHBsZ0ZJaFI3OWlialZnUVBYZ3EwcG15X2pSTzZmdVRRZ2pQUjNOck9TNWRTaW5IYmpB?oc=5
+    title: 'Apple Event Preview: Foldable Output Was Only a Few Hundred Units a Day, Report Says'
+- query: a broker turned cautious on Apple just before the launch
+  kind: semantic
+  note: '''broker'' for ''KeyBanc'', ''cautious'' for ''negative catalyst'' and ''Underweight'''
+  relevant:
+  - doc_id: https://news.google.com/rss/articles/CBMizAFBVV95cUxPQVNxZi1nTTQtdTBVT1Zlam9JUlhNZUNXYkhsN1Y3ZFMwRDIwLWdER1VFUC1WaktsMFZ5Tk1TcERyaVZhMHZFZ0kzekxRa1E3RHUtRUFKb1dQUUpnX1NBRWZiQXp1M0RuN2xRZFNmMnlWSnFoTDZVdVZKSkxuVmxab3FSbWVtYUItUTVOeGk1VGtEWExyU2JXbGUwY3lYQVJsTXFWUDVwaG9rLXJtYTFqcnZka2tEM1N2UUYzal9ZUEFqSmUwZms0ckRTNEg?oc=5
+    title: KeyBanc reiterates Apple stock Underweight rating ahead of iPhone event By Investing.com
+  - doc_id: https://news.google.com/rss/articles/CBMizAFBVV95cUxOc292Tjdfc190dUVhc0hPc3BnVEowUkczYmc0TFBHc3k3MkRsNVpIcHRZMHlzSmgwWjRpb0tqQlF0OTU4clNOMG05UTVvaUNlREF5X2pXM1BxdlRGazRtcng5cnY4eUFXeks0RUZXWlJ2YS1EZk90Zm9YLXVJeUhEeDBOWmJ6TTByZHl3dU5HMFBuaXBCeXFnWkJ2cV9jVjdsNzF4YlBiQ2l3bE9wWDFScHpILTFfbTY5QjBGSWRIa2hmOV9ERTA2Rmt6Yl8?oc=5
+    title: KeyBanc warns Apple’s iPhone 18 launch may be a negative catalyst for shares
+  - doc_id: https://finance.yahoo.com/markets/stocks/articles/keybanc-warns-apple-iphone-18-173545777.html?.tsrc=rss
+    title: KeyBanc warns Apple’s iPhone 18 launch may be a negative catalyst for shares
+- query: desktop machines built to run models on the device itself
+  kind: semantic
+  note: '''desktop machines'' for ''Mac Mini and Mac Studio'', ''on the device'' for ''on-device'''
+  relevant:
+  - doc_id: https://news.google.com/rss/articles/CBMilAFBVV95cUxNcWVWZ003a29GWENqR3MwSS03a0FFS2dIY0Ztdk5jN2lCckg2c3BLY3I2a2YwX2tOY01GN3ZXQjhtVy1IMEhfMWtoM0FHYzdURDdQVHpINGtSaXJkWENtQnVtVlUxblBjTUpNaGtLSmRRcDlVSzVLZ0hYMUZXUDlyOGQ0VVU4M28xNG1oQVhBVERmWThi?oc=5
+    title: Apple (AAPL)’s New Mac Mini and Studio Bet Big on On-Device AI
+  - doc_id: https://finance.yahoo.com/technology/ai/articles/apple-aapl-mac-mini-studio-201609665.html?.tsrc=rss
+    title: Apple (AAPL)’s New Mac Mini and Studio Bet Big on On-Device AI
+- query: Nvidia's twenty billion inference-chip bet reaches customers
+  kind: semantic
+  note: '''inference-chip'' for ''Groq'''
+  relevant:
+  - doc_id: https://news.google.com/rss/articles/CBMiggFBVV95cUxOWnR5a2pJRHdiWXhNM0dmcXJHUEVLNWJpT2V0OUItaDh6a0UtemgtSnVURUJkd3haMGNjMHpxZnBwdGhnX0pudWxzZFB2VnhxNm5ZWEpMR1FtWDk3T0dYa0IzVlBuekdmRGxuQ051UUFjUTR1VEFDM1BwRF9QbkdoSXVB?oc=5
+    title: NVIDIA (NVDA)’s $20 Billion Groq Bet Goes Live This Year With New AI Racks
+  - doc_id: https://finance.yahoo.com/technology/ai/articles/nvidia-nvda-20-billion-groq-190737433.html?.tsrc=rss
+    title: NVIDIA (NVDA)’s $20 Billion Groq Bet Goes Live This Year With New AI Racks
+- query: which Malaysian utility posted a fall in earnings
+  kind: semantic
+  note: '''utility'' for ''Tenaga'', ''fall in earnings'' for ''Profit Drops'''
+  relevant:
+  - doc_id: https://news.google.com/rss/articles/CBMi0AFBVV95cUxQWG1ZTGxreU5yU3BoRkZLS3V0RUZZUHBFRGlyQ0VRS2MyVlBUNHFleWdNRWpETk5sQThfM0FBUnFUSzVQd0h1b082b1RYZktkM3NEcW5wOUhRNUVneEVoUEYwd3JtT3RQZTFyc29mdVhhenctRnU3M1dvMkQ3M3A3eWZOUHVWeV9XRk40V1ZtUTBFUE1HWUxkcndDNzFCVG9wcUtldlRTWkdFQ2xWU3lqQVBKTkN4UVFFVExXd0Z5TVJKMUdCWkxRQmJQbEdzWHdy?oc=5
+    title: 'Corporate Malaysia Roundup: Tenaga Profit Drops, Press Metal Shines, and Time dotCom Declares
+      Special Dividend'
+- query: an aluminium producer rose on a better outlook for the metal
+  kind: semantic
+  note: the query never says 'Press Metal'
+  relevant:
+  - doc_id: https://news.google.com/rss/articles/CBMirgFBVV95cUxQSXZRX20talp4bVV3dTZRekE3VjYydnFzZzNmaWlqc1RLamF6aFNuTVl3eFhJY3pUS2JpcTVYamxlWVFfZTVlYnZBQmlnT3d3VlRrTVNKTVpZeS1aYmdqOC01M29VS0hiX256NGltZmFuVEU2SEpqQ01XYVFDNW9qVFZhTGV1Ul9xSXYxaEcyU1VTbzd3RTlDY1hjd1FNV0N3S1I3SnEyblNiZXdiT0E?oc=5
+    title: 'Stock Today: Press Metal Rises 0.75% On Positive Aluminium Outlook'
+- query: an insider at a hospital group increased his own holding
+  kind: semantic
+  note: '''hospital group'' for ''IHH Healthcare'', ''insider'' for ''Director''/''Substantial Shareholder'''
+  relevant:
+  - doc_id: https://news.google.com/rss/articles/CBMi5AFBVV95cUxOWkcyOTZLaUNTNmUxQ1UzYW5aZjYyYjBWLTdMeVd4ZUJwUnd5SjlOZWxuZ3JMMG5WRmNVZ19BYVBLcVgwYzM1SHhyZG5BOWo0WjllbDRNa1pOZkJtU0JwdVF6NlN5WWxLUjRlSFhGMDBPUlhuYk81NFZSR0h6WThoWndxcndfYXJleDZiR2l1MHY3YWx6dmQ0bFk2eFZXbEV2WGhuVklFc3I4b09iZlhCU1hSZEgtNHRXa2wyc29XNm9YSmVnZnZkMkNtWV9JclRqMms3SlA2aVZYcmVyTVZlYWM4bjE?oc=5
+    title: IHH Healthcare’s Substantial Shareholder Mehmet Ali Aydinlar Increases Stake via Market Acquisition
+  - doc_id: https://news.google.com/rss/articles/CBMitgFBVV95cUxPWEg5TVZIeEFhLTVkdXZMaG9YTjZEV1BySjdLUDdaaVM1RzRXZlkzbWhSTDVxa3FpblBJTXBRdG0xSWthY2lRckE0Q0J1MWtBTUhDVHB6RnpadTNvalVhNUtjM0R4Tk5mZ29YSlQ0aEVDazNsOFZFRmdnanlFWTFoU1NYRjJUdUlZWlpaQkJCSW4yWGZxcU1rNWFad3JQRnpRc1pFNXNTOEM3V2VXa0d4VDc3MmdrUQ?oc=5
+    title: Substantial Shareholder Boosts Indirect Stake in IHH Healthcare
+  - doc_id: https://news.google.com/rss/articles/CBMiuAFBVV95cUxNMExlSEVNT25YQng2SnRST213aUhIbXVVazJRV29Pc2N1UVZNa1N4UmVpWUtiZmxhaVVfNVB2UUtmVDh5T19wUU41Um9MQVF0WlZPUkdJbE5kRmZtcFJaQWp6aEtQY041cXVpRjByek42UVBQb1J4OHZNcHNNc18wYmVWZTIyeXgwNG5RZl8tQkVVOG1jaE1ZSTV0aVdFWTF6Sks1Tk5HUmFZeDVOeWotYU56R21QMS04?oc=5
+    title: SZA Increases Substantial Shareholding in IHH Healthcare to 5.666%
+  - doc_id: https://news.google.com/rss/articles/CBMiqwFBVV95cUxOenRPVDN5QjdCNzNwWlRjTkpmTlJfX1NQN3NreUUzRGN0TUZqVzgtTkY4MVV3UHhUMlExcDZGNU1FVnNtb2pidGVfLVY1Y3NQRkJBQVVqQ180NThCZHp3d1BLV28wdExEQ1ZlRWpuVFB0VXdOVUY5amRCalFjc2p3WFRxNC1tY0gxcFJoV3AzZmI0OERFRk40bGJaWUlCVTBHRExsbXhNUWtZMlU?oc=5
+    title: IHH Healthcare Director Increases Indirect Shareholding
+  - doc_id: https://news.google.com/rss/articles/CBMiuAFBVV95cUxPQmptMjFYUjhzdUtDRWVKSy1pMnFWcGRNbjBRdmFlV3pzQU1MamdSRE14V2poT1M0dTJkT05IVVNkSDU1UzgzMDBTTzF1MldVcXZJeXdkbXVtMnQxZ1daaVdMSmN6cFd1NXRiVFBMV0ljN3RPaWFYc1RYbjVhczVwR3RBU2xvNU1aM19MRC1KaFJCVGpIVzNXalZ5YUVBNWZpakgzdzVJakZkU2Vxb2ROeXluU294WTda?oc=5
+    title: IHH Director Mehmet Ali Aydinlar Boosts Stake with Share Purchase
+- query: job cuts coming at a large software company
+  kind: semantic
+  note: '''job cuts'' for ''layoffs'''
+  relevant:
+  - doc_id: gdelt:https://www.freepressjournal.in/tech/big-tech-layoffs-ex-google-meta-microsoft-employees-on-job-hunts-thousands-of-applications-starting-over
+    title: 'Big Tech Layoffs : Ex - Google , Meta , Microsoft Employees On Job Hunts , Thousands Of Applications
+      & Starting Over'
+  - doc_id: gdelt:https://www.indiatimes.com/trending/techs-dream-jobs-lost-their-shine-ex-google-meta-microsoft-workers-reveal-why-layoffs-changed-their-careers-and-identity/articleshow/133713206.html
+    title: Tech dream jobs lost their shine ? Ex - Google , Meta , Microsoft workers reveal why layoffs
+      changed their careers and identity
+  - doc_id: https://news.google.com/rss/articles/CBMi4AFBVV95cUxPWXlYNXpOMTFteXlTcElkZ3dGb1hiRzZPMWVmaXctRkt1TVZPQ2xGanNzekFrTHRweUNlR0NMNUk0WmtiUXduWVEtWi0yQkZSeHhZZk45LUU0YVN2a283bWlzTjV4cnVGQ1NBN09FRnluMUFUaWJkVGVCM3BWTUQyWXAxNWVmR2hxR0RoY3ZrTnNXbVNNLV9adGpkeE5YeFFhV0MyNUJQcnNCMGt5bFdfUDBMZ0x1Nm0wUFpOSzRnV2JhRFp1VEQ2TlZLRUZZazRTek9KVi04aVNVNDBLQS0wUg?oc=5
+    title: Microsoft Layoffs Coming Next Week? MSFT Stock Climbs Overnight, Retail Stays Bullish
+- query: a chip designer sued over the material used to train its models
+  kind: semantic
+  note: '''material used to train'' for ''copyright'''
+  relevant:
+  - doc_id: https://news.google.com/rss/articles/CBMizwFBVV95cUxNNDdjOWlub3hsUWdxSjBaYW16RE0zVFpMU2dXZ1RfQWJXS0lnSHRlU3BUUFhSV0dxbUZtbGZtUW82UnRpb0UtVnMzOEZ5RmpZdExfQzlwdm9ZbzVqVUZ4WlJmd0tVZWxwRHVCdFhDM3R6a1FqV3Rnc2FnQmVmZVdUZXI2WmI3MHVqa1VhQUc1Skw5bENDaFc2V1FkUGh5UlZOUFlPU2EzWXpyTm8xTlgyWEkyTDVQa0xadVk0ckxuazJnVzk5ZFcxdHVFX1RwX2vSAc8BQVVfeXFMTTQ3Yzlpbm94bFFncUowWmFtekRNM1RaTFNnV2dUX0FiV0tJZ0h0ZVNwVFBYUldHcW1GbWxmbVFvNlJ0aW9FLVZzMzhGeUZqWXRMX0M5cHZvWW81alVGeFpSZndLVWVscER1QnRYQzN0emtRald0Z3NhZ0JlZmVXVGVyNlpiNzB1amtVYUFHNUpMOWxDQ2hXNldRZFBoeVJWTlBZT1NhM1l6ck5vMU5YMlhJMkw1UGtMWnVZNHJMbmsyZ1c5OWRXMXR1RV9UcF9r?oc=5
+    title: NVIDIA (NVDA) Faces Key Legal Milestones In Copyright Lawsuit
+- query: regulators stopped short of breaking up an advertising business
+  kind: semantic
+  note: '''stopped short of breaking up'' for ''escapes ad tech breakup'''
+  relevant:
+  - doc_id: gdelt:https://news.tuoitre.vn/google-escapes-ad-tech-breakup-in-third-big-tech-antitrust-loss-for-us-103260903120007909.htm
+    title: Google escapes ad tech breakup in third Big Tech antitrust loss for US
+- query: what a bendable iPhone might add to Apple's revenue
+  kind: semantic
+  note: '''add to revenue'' for ''could generate $14 billion'''
+  relevant:
+  - doc_id: finnhub:141520260
+    title: Morgan Stanley estimates Apple foldable iPhone could generate $14 billion in December-quarter
+      revenue
+  - doc_id: alphavantage:https://finance.yahoo.com/markets/stocks/articles/morgan-stanley-estimates-apple-foldable-131000560.html
+    title: Morgan Stanley estimates Apple foldable iPhone could generate $14 billion in December-quarter
+      revenue
+- query: Berkshire's terms for supplying the big cloud operators
+  kind: semantic
+  note: '''supplying'' for ''serve'', ''big cloud operators'' for ''hyperscalers'''
+  relevant:
+  - doc_id: finnhub:141560709
+    title: Greg Abel Says Berkshire Will Serve the Hyperscalers Only If Its Other Customers Don't Pay
+      for It
+- query: which Malaysian shares carry the heaviest bets against them
+  kind: semantic
+  note: '''bets against them'' for ''short interest'''
+  relevant:
+  - doc_id: https://news.google.com/rss/articles/CBMiwgFBVV95cUxPOEx2WTZHWXZGeGNod2pZcWpENDNfLXliOThHVTJ0NzdsUEpoSEtRb3pjVWxLRG9sbkxSV3pjWTRQc2I1cENqT0IzTFhILTc4dEVaVThlRDk4d0liN2E1YU1GemlOOWRTalBtb01fNkc1a3BQMWNuSnZ0a3h6aG9IOVJMUVZTTU53NlI2YlJQMGNRaFR3Qk5mRUVaSHdPVFAyTWZ1dUdIdmRkWUczbzBsTzF4R2xIWWtkVXFmOVRjUlNNQQ?oc=5
+    title: 'Bursa Short Interest Weekly (Sep 4th): RHB Bank, Greatech Technology, United Plantations,
+      CIMB'
+- query: Apple is paying far more for memory than it used to
+  kind: semantic
+  note: '''paying far more'' for ''costs quadrupled'''
+  relevant:
+  - doc_id: https://news.google.com/rss/articles/CBMiZ0FVX3lxTE1DOTcteXczOEU2cWxFS3ptQ3hVNE5tR3NsWi1JUUV6cUNSSzNvQzl1cEZhOTl3LU55TnRfbjFackFRM3JGUGhkUXlkZTQ2ZWllem9MVFBQWUI0eGM1R2piQWVNWmZrZGc?oc=5
+    title: Apple's Memory Costs Jump 400%, iPhone 18 Pro Price May Rise $100
+  - doc_id: https://beincrypto.com/iphone-18-pro-price-memory-costs/?.tsrc=rss
+    title: Apple's Memory Costs Jump 400%, iPhone 18 Pro Price May Rise $100
+  - doc_id: https://finance.yahoo.com/markets/stocks/articles/apples-memory-costs-quadrupled-ternus-144050706.html?.tsrc=rss
+    title: Apple's Memory Costs Quadrupled and Ternus Sets the Price
+- query: Musk brought forward the date for satellites carrying Nvidia chips
+  kind: semantic
+  note: '''satellites'' for ''orbital data center'''
+  relevant:
+  - doc_id: https://finance.yahoo.com/technology/ai/articles/musk-moves-spacex-spcx-orbital-204103387.html?.tsrc=rss
+    title: Musk Moves Up SpaceX (SPCX)’s Orbital Data Center Timeline, Again
+- query: Groq 3 LPX rack
+  kind: lexical
+  note: product name, exact tokens
+  relevant:
+  - doc_id: https://finance.yahoo.com/technology/ai/articles/nvidia-nvda-20-billion-groq-190737433.html?.tsrc=rss
+    title: NVIDIA (NVDA)’s $20 Billion Groq Bet Goes Live This Year With New AI Racks
+- query: 1155.MY
+  kind: lexical
+  note: Bursa ticker in the Malaysian local form
+  relevant:
+  - doc_id: https://news.google.com/rss/articles/CBMiowFBVV95cUxOb0RoQ0N4OUJ5ZUtNS1pZaFl2UHNTWjNra2ZleTdaSXM4VTJvUVdXeXBkdVAyTjZVUl9lZVY4ejNwclllbGI3azlZbDJRN2Vvc1FIcWF2MkV5eU4yYlFzd1pwZFZiZzhHLVRGT05JSjZtRDhLRXRQTVpxLWUxdDhTRjl2cWJzWE5oZDNYTkdTdUZFaUhKVUV2eE1MMFotY0dTM2xF?oc=5
+    title: '$MAYBANK (1155.MY)$ OMG!!! My fam got rm188 here wowww😆sharing luck here hope you guys got
+      the top tier rewards 🍀[Share Link: MY 2026 Mid-Autumn Festival]'
+- query: M6 chip 2-nanometer
+  kind: lexical
+  note: exact spec tokens
+  relevant:
+  - doc_id: https://finance.yahoo.com/technology/ai/articles/apple-aapl-mac-mini-studio-201609665.html?.tsrc=rss
+    title: Apple (AAPL)’s New Mac Mini and Studio Bet Big on On-Device AI
+- query: SPCX
+  kind: lexical
+  note: a ticker that appears nowhere else
+  relevant:
+  - doc_id: https://stocktwits.com/news-articles/markets/equity/s-and-p-500-dow-end-best-day-in-a-month/cZsufnBRJvu?.tsrc=rss
+    title: S&P 500, Dow End Best Day In A Month On Calmer Yields As Rate Hike Bets Wane — SPCX, VSXY,
+      NVDA, TSLA In Focus
+  - doc_id: https://finance.yahoo.com/technology/ai/articles/musk-moves-spacex-spcx-orbital-204103387.html?.tsrc=rss
+    title: Musk Moves Up SpaceX (SPCX)’s Orbital Data Center Timeline, Again
+  - doc_id: https://www.fool.com/investing/2026/09/06/should-you-forget-spacex-spcx-stock/?.tsrc=rss
+    title: Should You Forget SpaceX (SPCX) Stock?
+- query: KeyBanc Underweight rating Apple
+  kind: lexical
+  note: broker plus rating word
+  relevant:
+  - doc_id: https://news.google.com/rss/articles/CBMizAFBVV95cUxPQVNxZi1nTTQtdTBVT1Zlam9JUlhNZUNXYkhsN1Y3ZFMwRDIwLWdER1VFUC1WaktsMFZ5Tk1TcERyaVZhMHZFZ0kzekxRa1E3RHUtRUFKb1dQUUpnX1NBRWZiQXp1M0RuN2xRZFNmMnlWSnFoTDZVdVZKSkxuVmxab3FSbWVtYUItUTVOeGk1VGtEWExyU2JXbGUwY3lYQVJsTXFWUDVwaG9rLXJtYTFqcnZka2tEM1N2UUYzal9ZUEFqSmUwZms0ckRTNEg?oc=5
+    title: KeyBanc reiterates Apple stock Underweight rating ahead of iPhone event By Investing.com
+- query: 5.666%
+  kind: lexical
+  note: an exact filed figure
+  relevant:
+  - doc_id: https://news.google.com/rss/articles/CBMiuAFBVV95cUxNMExlSEVNT25YQng2SnRST213aUhIbXVVazJRV29Pc2N1UVZNa1N4UmVpWUtiZmxhaVVfNVB2UUtmVDh5T19wUU41Um9MQVF0WlZPUkdJbE5kRmZtcFJaQWp6aEtQY041cXVpRjByek42UVBQb1J4OHZNcHNNc18wYmVWZTIyeXgwNG5RZl8tQkVVOG1jaE1ZSTV0aVdFWTF6Sks1Tk5HUmFZeDVOeWotYU56R21QMS04?oc=5
+    title: SZA Increases Substantial Shareholding in IHH Healthcare to 5.666%
+- query: Falcon Guardian Agentic Identity Provider
+  kind: lexical
+  note: product names
+  relevant:
+  - doc_id: finnhub:141556692
+    title: CrowdStrike (CRWD) Unveiled A Broad AI Security Platform Push
+- query: Nebius Vera Rubin
+  kind: lexical
+  note: three proper nouns in one sentence
+  relevant:
+  - doc_id: https://news.google.com/rss/articles/CBMilwFBVV95cUxQSER0NnNwSktLZ2t4RGNGRDlQRlg5UUF5LUtOUExVMFVfVnd1RGZwVklOWVd3Ukp4UzAzeExlSTMtYVRYSkJvVnpnYnJXaWMtLWl1NzVhMmJBbHdWLUViR25hQndMakktRmNPR3dCZkxCTy1NeHExRzAxRl9pbjVCWDF1VHZiNHZZZ0hDcWNIYXRfUmh4Z3Uw?oc=5
+    title: 'CoreWeave vs. Nebius: Which AI Infrastructure Stock Is the Better Buy?'
+  - doc_id: https://www.fool.com/investing/2026/09/04/coreweave-vs-nebius-which-ai-infrastructure-stock/?.tsrc=rss
+    title: 'CoreWeave vs. Nebius: Which AI Infrastructure Stock Is the Better Buy?'
+  - doc_id: https://finance.yahoo.com/technology/ai/articles/nebius-groups-mega-ai-deals-144600564.html?.tsrc=rss
+    title: Will Nebius Group's Mega AI Deals Power Its 2027 Growth Story?
+  - doc_id: https://finance.yahoo.com/technology/ai/articles/nvidia-nvda-20-billion-groq-190737433.html?.tsrc=rss
+    title: NVIDIA (NVDA)’s $20 Billion Groq Bet Goes Live This Year With New AI Racks

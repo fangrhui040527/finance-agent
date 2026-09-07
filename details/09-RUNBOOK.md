@@ -741,6 +741,115 @@ discount rate is below risk-free plus half the premium, is dropped and named.
 **Exits 1** on NO STATEMENTS STORED or a refused range. Same text as the MCP
 tools `ratio_sheet`, `cost_of_capital` and `valuation_range`.
 
+### `backtest` — would it have worked, and was it worth running?
+
+```bash
+# a candidate rule over the cached bars, one currency at a time
+FINPLANET_OFFLINE=1 python ask.py backtest --rule momentum_12_1 \
+    --instrument XNAS:NVDA --instrument XNAS:AAPL --instrument XNAS:MSFT
+
+# the paper book's own record, once it has one
+python ask.py backtest --live
+
+# what has already been tried on this data
+python ask.py backtest --trials
+```
+
+`engines/backtest/harness.py` calls itself "the gate. Nothing reaches a user
+before it clears this" — and until 2026-09-07 nothing ever reached it, because
+no code in this repository built the return series it scores.
+`engines/backtest/book.py` is that plumbing.
+
+**A rule passes only if it beats all three benchmarks after costs** — the local
+index (`0820EA.KL` for Bursa, `SPY` for Nasdaq), an equal-weight version of the
+same names, and buy-and-hold on those names — **and** clears a deflated Sharpe
+of 0.95. Beat none of them and the harness says the correct product is an index
+tracker; it is written to be able to say that.
+
+Four things it will not do:
+
+- **It will not let a rule see the future.** `weights(prices, t)` is handed the
+  index of the day being decided and paid `returns[t + 1]`. Look-ahead is
+  prevented by the shape of the call, not by remembering.
+- **It will not blend currencies.** A joint MYR/USD return series needs a daily
+  exchange rate over the whole window and this system holds weeks of BNM rates,
+  not years. A mixed book is refused, and the refusal prints the two commands to
+  run instead.
+- **It will not give a verdict on thin history.** Under 252 shared sessions it
+  raises and says how many more it needs. `--live` therefore refuses today: the
+  paper book has three marked sessions.
+- **It will not let you choose your own multiple-testing correction.**
+  `n_trials` is read from `data/trials.db`, an append-only ledger of every rule
+  ever run on that universe and window. Try twenty rules and report the winner
+  and the deflation knows there were twenty. The ledger's triggers refuse UPDATE
+  and DELETE for the obvious reason.
+
+`FINPLANET_OFFLINE=1` serves the price cache whatever day it was fetched, which
+is what a backtest wants — the last bar being a day old is irrelevant to fifteen
+years of history, and re-fetching every name to learn that is quota spent for
+nothing.
+
+The same gate is MCP tool `backtest_gate`, so the model reaches it through the
+tools rather than reasoning about returns in conversation — which is the whole
+posture of this surface.
+
+Measured on the shipped cache (five years, 2021-09 to 2026-09), all three
+reference rules **FAIL** on both sleeves. On the US names, momentum beat the
+equal-weight universe and SPY and still lost to simply holding all three
+(+55.5% against +66.4% CAGR, with a deeper drawdown). That is the gate working.
+
+### `retrieval` — is the search any good?
+
+```bash
+python ask.py retrieval                        # the shipped vectors
+python ask.py retrieval --embedder hashing     # the pre-2026-09-07 baseline
+python ask.py retrieval --depth 20             # a more generous idea of "found"
+```
+
+Runs `knowledge/retrieval/data/retrieval_gold.yaml` — 24 questions, each pinned
+to the articles in `data/corpus.db` verified to answer it — down all four
+retrieval legs separately, and prints recall at 1, 5 and 10 plus MRR for each.
+
+Two things to read first. **Dense lift** is the number of questions where the
+vector leg found a relevant article BM25's own top ten did not; on the hashing
+projection this system shipped with it was **zero out of twenty-four**, which is
+what a vector leg that is really a second lexical search looks like. And the
+**semantic** block is where a change is judged: the lexical block is questions
+made of tickers and product names, which BM25 has always answered perfectly and
+which a change must not break.
+
+Recall is a floor. Only articles verified to answer each question are labelled,
+so an unlabelled hit scores as a miss; the comparison between legs is the
+finding, not the absolute number.
+
+Run it before and after any change to the embedder, the fusion or the reranker.
+Both of the obvious improvements tried on 2026-09-07 — a reranker that also
+weighed meaning, and expanding the question with its nearest corpus terms — were
+measured, found worse, and are recorded as rejected in the docstrings of
+`hybrid.rerank` and `pipeline.default_rewrite`.
+
+#### The vectors behind the search
+
+Three backends sit behind one seam (`knowledge/retrieval/embedding.py`):
+
+| backend | needs | what it knows |
+|---|---|---|
+| `DistributionalEmbedder` | nothing — **the default** | which words keep company with which, **in this corpus** |
+| `HashingEmbedder` | nothing | nothing; a token's hash bucket. The pre-2026-09-07 default, kept as the baseline |
+| `ApiEmbedder` | `EMBEDDING_API_KEY` | general language, including words this corpus has never contained |
+
+The keyless default has one honest limit, and `ask.py doctor` now names it: it
+can only relate words it has SEEN. A question about a "bendable" phone when
+every article says "foldable" gets no help, because "bendable" appears nowhere
+in the corpus and the corpus is its only teacher. Three of the sixteen semantic
+gold questions fail for exactly this reason and no offline change fixes them.
+
+Setting `EMBEDDING_API_KEY` promotes the seam to a real model — and starts
+spending. `EMBEDDING_API_URL` and `EMBEDDING_MODEL` override the endpoint and
+model (anything speaking the OpenAI `/v1/embeddings` shape). Vectors are cached
+in `data/embeddings.db` keyed by model and text, so re-indexing an unchanged
+season of headlines every night costs one request the first time and none after.
+
 ### `fitness` — can the system score itself yet?
 
 ```bash

@@ -6,56 +6,78 @@ half semantic ("margin compression risk") and half exact-token ("MYR", "Q3 FY25"
 rank fusion beats either alone, and a cross-encoder rerank adds meaningfully on
 hard sets.
 
-The embedding backend here is a deterministic hashing projection so the whole
-stack is testable with no network and no keys. Swap it for a real embedder at the
-EmbeddingBackend seam; nothing else changes.
+The embedding backends live in `knowledge/retrieval/embedding.py` behind the
+`EmbeddingBackend` seam below. The default learns its vectors from the corpus
+it is indexing; a key promotes it to a real model. `knowledge/retrieval/
+evaluate.py` is what says whether any of that helps, and its numbers are the
+only reason to prefer one backend over another.
 """
 
 from __future__ import annotations
 
-import hashlib
 import math
-import re
 from collections import Counter
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Protocol
 
 from knowledge.chunking.parent_child import Chunk
+from knowledge.retrieval.embedding import HashingEmbedder, default_embedder, tokenize
 
-TOKEN = re.compile(r"[a-z0-9][a-z0-9.\-]*", re.IGNORECASE)
+__all__ = [
+    "BM25",
+    "RRF_K",
+    "Collection",
+    "EmbeddingBackend",
+    "HashingEmbedder",
+    "Hit",
+    "cosine",
+    "expand_to_parents",
+    "rerank",
+    "tokenize",
+]
+
 RRF_K = 60
 
 
-def tokenize(text: str) -> list[str]:
-    """Keeps dots and hyphens so `0011.KL` and `Q3-FY25` survive as one token."""
-    return [t.lower() for t in TOKEN.findall(text)]
-
-
 class EmbeddingBackend(Protocol):
+    """What a `Collection` needs from a source of vectors.
+
+    `fit` is optional and deliberately absent from the protocol: a backend that
+    learns from the corpus declares it, one that does not never sees the call.
+    `Collection` checks for it rather than requiring it, so a three-line test
+    embedder stays three lines.
+    """
+
     dimensions: int
 
     def embed(self, text: str) -> list[float]: ...
 
 
-class HashingEmbedder:
-    """Deterministic, offline, dependency-free. Good enough for exact-ish recall
-    and for testing the plumbing; not a substitute for a real embedder."""
-
-    def __init__(self, dimensions: int = 256) -> None:
-        self.dimensions = dimensions
-
-    def embed(self, text: str) -> list[float]:
-        vec = [0.0] * self.dimensions
-        for tok in tokenize(text):
-            h = int(hashlib.md5(tok.encode()).hexdigest(), 16)
-            vec[h % self.dimensions] += 1.0 if (h >> 8) & 1 else -1.0
-        norm = math.sqrt(sum(v * v for v in vec)) or 1.0
-        return [v / norm for v in vec]
+#: Dimensions kept per stored document vector. A vector's mass concentrates in
+#: a few dimensions and the rest is noise being multiplied over the whole
+#: collection on every question: dropping it left recall at ten and the semantic
+#: family unchanged on the gold set, moved MRR by 0.006 - a fraction of one
+#: question's rank, well inside the noise of a 24-question set - and made the
+#: dense scan almost four times faster. At the 15,000 chunks a season of sweeps
+#: puts in the retrieval window that is the difference between 290ms and 77ms
+#: per question, which is the difference between a tool call that feels
+#: instant and one that does not.
+DOC_NONZEROS = 96
 
 
 def cosine(a: list[float], b: list[float]) -> float:
     return sum(x * y for x, y in zip(a, b))
+
+
+def _sparse(vec: list[float], keep: int = DOC_NONZEROS) -> list[tuple[int, float]]:
+    """The `keep` largest components of a unit vector, renormalised."""
+    if keep >= len(vec):
+        return list(enumerate(vec))
+    top = sorted(range(len(vec)), key=lambda i: -abs(vec[i]))[:keep]
+    top.sort()
+    norm = math.sqrt(sum(vec[i] * vec[i] for i in top)) or 1.0
+    return [(i, vec[i] / norm) for i in top]
 
 
 @dataclass(frozen=True)
@@ -122,9 +144,10 @@ class Collection:
 
     def __init__(self, name: str, embedder: EmbeddingBackend | None = None) -> None:
         self.name = name
-        self.embedder = embedder or HashingEmbedder()
+        self.embedder = embedder if embedder is not None else default_embedder()
         self.bm25 = BM25()
-        self._vectors: list[tuple[Chunk, list[float]]] = []
+        self._order: list[Chunk] = []
+        self._vectors: list[tuple[Chunk, list[tuple[int, float]]]] | None = None
         self._by_id: dict[str, Chunk] = {}
 
     def add(self, chunk: Chunk) -> None:
@@ -133,8 +156,9 @@ class Collection:
                 f"chunk belongs to corpus {chunk.corpus!r}, not collection {self.name!r}"
             )
         self.bm25.add(chunk)
-        self._vectors.append((chunk, self.embedder.embed(chunk.text)))
+        self._order.append(chunk)
         self._by_id[chunk.chunk_id] = chunk
+        self._vectors = None  # a new document changes what the old ones mean
 
     def add_all(self, chunks: list[Chunk]) -> None:
         for c in chunks:
@@ -148,9 +172,26 @@ class Collection:
         c = self._by_id.get(chunk_id)
         return c.text if c else None
 
+    def _index_dense(self) -> list[tuple[Chunk, list[tuple[int, float]]]]:
+        """Vectors, built on first use and rebuilt whenever a document arrives.
+
+        Deferred on purpose, for two reasons. An embedder that learns from the
+        corpus cannot embed the first document until it has seen the last one,
+        so an eager `add` would have had to fit on a corpus of one. And
+        `build_router` registers twenty collections of which a given question
+        queries one - embedding the other nineteen was work nobody asked for.
+        """
+        if self._vectors is None:
+            fit = getattr(self.embedder, "fit", None)
+            if callable(fit):
+                fit([c.text for c in self._order])
+            self._vectors = [(c, _sparse(self.embedder.embed(c.text))) for c in self._order]
+        return self._vectors
+
     def dense(self, query: str, limit: int = 20) -> list[tuple[Chunk, float]]:
+        vectors = self._index_dense()
         qv = self.embedder.embed(query)
-        scored = [(c, cosine(qv, v)) for c, v in self._vectors]
+        scored = [(c, sum(qv[i] * x for i, x in v)) for c, v in vectors]
         scored.sort(key=lambda x: -x[1])
         return [(c, s) for c, s in scored[:limit] if s > 0]
 
@@ -195,10 +236,25 @@ class Collection:
 
 
 def rerank(query: str, hits: list[Hit], top_k: int | None = None) -> list[Hit]:
-    """Stand-in cross-encoder: lexical overlap plus exact-phrase bonus.
+    """Local reranker: lexical overlap plus an exact-phrase bonus.
 
     docs/08 section 7: run the reranker locally. A hosted reranker at this scale
     buys nothing a local cross-encoder does not.
+
+    A richer version was built and MEASURED AWAY, which is worth recording so
+    nobody rebuilds it. Blending in the query-to-document cosine and the
+    fusion's own RRF score looked obviously better - the stage runs last, so it
+    decides the order a reader sees, and scoring a paraphrased question on word
+    overlap alone scores it on roughly nothing. On
+    `knowledge/retrieval/data/retrieval_gold.yaml` it was worse at every weight
+    tried, monotonically: MRR 0.495 at zero semantic weight, 0.478 at 0.3, 0.474
+    at 0.6, 0.466 at 2.5, with the fusion term making no difference at any
+    setting. The reason is double counting - these hits are the FUSED list, so
+    the dense signal has already been spent selecting them, and spending it
+    again on their order adds its noise without adding its information.
+
+    The lesson generalises past this function: the place to spend a semantic
+    signal is where candidates are chosen, not where the chosen ones are sorted.
     """
     q = set(tokenize(query))
     ql = query.lower()

@@ -1666,6 +1666,140 @@ def cmd_fitness(a) -> int:
     return 0
 
 
+def cmd_retrieval(a) -> int:
+    """Score the search itself against the labelled questions.
+
+    The one number every other quality claim rested on and none of them had:
+    given a question, does retrieval put an article that answers it in front of
+    the reader. Run it before and after any change to the embedder, the fusion
+    or the reranker - a change to search that nobody measured is a change
+    nobody can defend.
+    """
+    from knowledge.retrieval.evaluate import GOLD, report_for
+
+    embedder = None
+    if a.embedder == "hashing":
+        from knowledge.retrieval.embedding import HashingEmbedder
+
+        embedder = HashingEmbedder()
+    elif a.embedder == "distributional":
+        from knowledge.retrieval.embedding import DistributionalEmbedder
+
+        embedder = DistributionalEmbedder()
+
+    report = report_for(a.corpus, a.gold or GOLD, a.depth, embedder)
+    if not report.cases:
+        print(f"no labelled questions at {a.gold or GOLD}", file=sys.stderr)
+        return 2
+    print(report.summary())
+    print()
+    print(
+        "recall is a FLOOR: only articles verified to answer each question are "
+        "labelled, so an unlabelled hit counts as a miss. The comparison between "
+        "legs is what the set is for."
+    )
+    return 0
+
+
+def cmd_backtest(a) -> int:
+    """Put a rule, or the paper book itself, through the gate.
+
+    docs/05 section 9: beat the local index, an equal-weight version of the same
+    universe, and buy-and-hold on the current portfolio - all AFTER costs - and
+    survive the correction for how many rules were tried. A rule that beats none
+    of them has not found an edge; it has found that an index tracker was the
+    right answer, and this is built to be able to say so.
+    """
+    from core.config import load as load_cfg
+    from core.market.feed import default_feed
+    from engines.backtest.book import (
+        RULES,
+        MixedCurrency,
+        NotEnoughHistory,
+        gate,
+        live,
+        sleeves,
+    )
+    from engines.backtest.trials import DEFAULT_PATH, TrialLedger
+
+    if a.trials:
+        with TrialLedger(a.ledger or str(DEFAULT_PATH)) as led:
+            rows = led.history(limit=a.limit)
+            if not rows:
+                print("no backtest has been run yet; the ledger is empty")
+                return 0
+            print(f"{'ran':11} {'rule':20} {'sessions':>8} {'Sharpe':>7} {'CAGR':>8}  window")
+            for t in rows:
+                print(
+                    f"{t.ran_at:%Y-%m-%d}  {t.rule:20} {t.sessions:8} {t.net_sharpe:7.2f} "
+                    f"{t.net_cagr:8.2%}  {t.start_day}..{t.end_day}"
+                )
+            print(
+                "\nEvery row here raises the bar for the next one: the deflated Sharpe "
+                "corrects for how many rules were tried on the same window."
+            )
+        return 0
+
+    cfg = load_cfg()
+    feed = default_feed()
+    # The nine names the book may hold. A read-only name (TSMC) is excluded by
+    # construction: a gate asking whether THIS portfolio was worth running
+    # cannot include a position the portfolio is not allowed to take.
+    names = a.instrument or [i for i in cfg.watchlist if i not in set(cfg.read_only)]
+
+    try:
+        if a.live:
+            from engines.paper.store import PaperStore
+
+            with PaperStore(a.paper_db or cfg.paper.database) as store:
+                report = live(store, feed, names)
+        else:
+            report = gate(
+                feed,
+                names,
+                a.rule,
+                start=date.fromisoformat(a.start) if a.start else None,
+                end=date.fromisoformat(a.end) if a.end else None,
+                ledger_path=a.ledger or str(DEFAULT_PATH),
+            )
+    except MixedCurrency as e:
+        print(f"{e}", file=sys.stderr)
+        print("", file=sys.stderr)
+        for ccy, sleeve in sleeves(names).items():
+            flags = " ".join(f"--instrument {i}" for i in sleeve)
+            print(f"  python ask.py backtest --rule {a.rule} {flags}   # {ccy}", file=sys.stderr)
+        return 2
+    except NotEnoughHistory as e:
+        print(f"NO VERDICT. {e}")
+        return 0
+    except KeyError:
+        print(f"unknown rule {a.rule!r}; known: {', '.join(sorted(RULES))}", file=sys.stderr)
+        return 2
+
+    print(f"BACKTEST  {'the paper book' if a.live else a.rule}  {', '.join(names)}")
+    print(f"  {report.verdict()}")
+    print()
+    print(f"  strategy   {report.strategy.summary()}")
+    print(f"  gross Sharpe {report.gross_sharpe:.2f}  turnover {report.turnover:.1f}x")
+    print()
+    for b in report.benchmarks:
+        mark = "BEATEN" if b.beaten else "not beaten"
+        print(f"  {b.name.value:24} {b.performance.summary()}")
+        print(f"  {'':24} excess CAGR {b.excess_cagr:+.2%}  -> {mark}")
+    print()
+    print(
+        f"  deflated Sharpe {report.deflated_sharpe:.2f} (needs 0.95), "
+        f"probabilistic {report.probabilistic_sharpe:.2f}, corrected for "
+        f"{report.n_trials} rule(s) tried on this window"
+    )
+    warning = report.regime_warning()
+    if warning:
+        print(f"  {warning}")
+    for note in report.notes:
+        print(f"  - {note}")
+    return 0
+
+
 # ---------------------------------------------------------------- graph
 def _graph(db: str | None):
     """Load the built graph, or explain how to build it. Never guesses."""
@@ -2096,6 +2230,32 @@ def main(argv=None) -> int:
     wk.add_argument("--as-at", help="YYYY-MM-DD; default today")
     wk.add_argument("--archetype", help="sector archetype, e.g. bank, software")
     wk.set_defaults(fn=cmd_workup)
+
+    bt = sub.add_parser("backtest", help="put a rule, or the paper book, through the gate")
+    bt.add_argument("--rule", default="equal_weight", help="which rule to test")
+    bt.add_argument(
+        "--instrument", action="append", help="a name to include (repeatable; default the book)"
+    )
+    bt.add_argument("--start", help="earliest day (YYYY-MM-DD)")
+    bt.add_argument("--end", help="latest day (YYYY-MM-DD)")
+    bt.add_argument("--live", action="store_true", help="score the paper book's own record")
+    bt.add_argument("--paper-db", default="", help="paper book path (default from config)")
+    bt.add_argument("--ledger", default="", help="trial ledger path (default data/trials.db)")
+    bt.add_argument("--trials", action="store_true", help="what has been tried, and when")
+    bt.add_argument("--limit", type=int, default=20, help="--trials: how many rows")
+    bt.set_defaults(fn=cmd_backtest)
+
+    rt = sub.add_parser("retrieval", help="score the search against the labelled questions")
+    rt.add_argument("--corpus", default="data/corpus.db", help="corpus to search")
+    rt.add_argument("--gold", help="labelled questions (default the shipped set)")
+    rt.add_argument("--depth", type=int, default=10, help="how deep each leg may look")
+    rt.add_argument(
+        "--embedder",
+        choices=("default", "distributional", "hashing"),
+        default="default",
+        help="which vectors to score; 'hashing' is the pre-2026-09-07 baseline",
+    )
+    rt.set_defaults(fn=cmd_retrieval)
 
     ft = sub.add_parser("fitness", help="can the system score itself yet?")
     ft.add_argument("--days", type=int, default=30, help="window (default 30)")

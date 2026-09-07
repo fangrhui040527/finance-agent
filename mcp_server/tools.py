@@ -415,6 +415,74 @@ def paper_status(db: str = "") -> str:
     return text + DISCLAIMER
 
 
+def backtest_gate(
+    rule: str = "equal_weight",
+    instruments: list[str] | None = None,
+    start: str = "",
+    end: str = "",
+) -> str:
+    """Put a weighting rule through the gate: does it beat the three benchmarks
+    after costs, and does it survive the correction for how many rules were tried.
+
+    docs/05 section 9. A rule PASSES only if it beats the local index, an
+    equal-weight version of the same names, and buy-and-hold on those names -
+    all after real fees, spread and slippage - and clears a deflated Sharpe of
+    0.95. Beating none of them means the correct product is an index tracker.
+
+    Three refusals are answers, not failures. A universe spanning two currencies
+    is refused because a joint return series needs an exchange rate this system
+    does not hold over the window. A window under 252 shared sessions is refused
+    because a deflated Sharpe on a short series looks like an answer and is not.
+    An unknown rule is named rather than guessed.
+
+    `n_trials` is read from an append-only ledger of every rule ever run on this
+    universe and window; it cannot be passed in, because the whole value of the
+    correction is that it knows how many attempts came before this one.
+    """
+    from engines.backtest.book import RULES, MixedCurrency, NotEnoughHistory, gate
+    from engines.backtest.trials import DEFAULT_PATH
+
+    if rule not in RULES:
+        raise ToolError(f"unknown rule {rule!r}; known: {', '.join(sorted(RULES))}")
+    cfg = _cfg()
+    names = list(instruments or [i for i in cfg.watchlist if i not in set(cfg.read_only)])
+    try:
+        report = gate(
+            _feed(),
+            names,
+            rule,
+            start=_parse_date(start) if start else None,
+            end=_parse_date(end) if end else None,
+            ledger_path=str(DEFAULT_PATH),
+        )
+    except MixedCurrency as e:
+        return f"REFUSED: {e}" + DISCLAIMER
+    except NotEnoughHistory as e:
+        return f"NO VERDICT: {e}" + DISCLAIMER
+
+    rows = [f"BACKTEST {rule} over {', '.join(names)}", f"  {report.verdict()}", ""]
+    rows.append(f"  strategy    {report.strategy.summary()}")
+    rows.append(f"  gross Sharpe {report.gross_sharpe:.2f}  turnover {report.turnover:.1f}x")
+    rows.append("")
+    for b in report.benchmarks:
+        rows.append(f"  {b.name.value:24} {b.performance.summary()}")
+        rows.append(
+            f"  {'':24} excess CAGR {b.excess_cagr:+.2%} -> "
+            + ("BEATEN" if b.beaten else "not beaten")
+        )
+    rows.append("")
+    rows.append(
+        f"  deflated Sharpe {report.deflated_sharpe:.2f} (needs 0.95), corrected for "
+        f"{report.n_trials} rule(s) tried on this window"
+    )
+    warning = report.regime_warning()
+    if warning:
+        rows.append(f"  {warning}")
+    for note in report.notes:
+        rows.append(f"  - {note}")
+    return "\n".join(rows) + DISCLAIMER
+
+
 def _parse_date(s: str) -> date:
     try:
         return date.fromisoformat(s)

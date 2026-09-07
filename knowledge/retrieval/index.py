@@ -142,11 +142,13 @@ def news_chunks(art: Article, extractor: LexiconExtractor | None = None, names=N
     return chunk_news(art.doc_id, text, as_of, meta)
 
 
-def news_collection(articles: list[Article], index: dict[str, str] | None = None) -> Collection:
+def news_collection(
+    articles: list[Article], index: dict[str, str] | None = None, embedder=None
+) -> Collection:
     """`kb_news`, built from stored articles."""
     from knowledge.news.linking import linker_for
 
-    col = Collection("kb_news")
+    col = Collection("kb_news", embedder)
     extractor = LexiconExtractor()
     linker = linker_for(index) if index else None
     for art in articles:

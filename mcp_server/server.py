@@ -785,6 +785,30 @@ S.tool(
     ),
 )(O.paper_report)
 
+# -- the gate (docs/05 section 9): read-only, and mostly a refusal ---------------------
+S.tool(
+    "backtest_gate",
+    "Put a weighting rule through the gate: beat the local index, an equal-weight "
+    "version of the same names AND buy-and-hold on them, all after real costs, and "
+    "clear a deflated Sharpe of 0.95. Beating none means an index tracker was the "
+    "right answer. Refuses a two-currency universe (no exchange-rate history), a "
+    "window under 252 sessions (the number would look like an answer and not be "
+    "one), and an unknown rule. The multiple-testing correction is read from an "
+    "append-only ledger of every rule tried on this window and cannot be supplied.",
+    obj(
+        {
+            "rule": _str("equal_weight | momentum_12_1 | inverse_volatility"),
+            "instruments": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "names to test; default the book, one currency at a time",
+            },
+            "start": _str("earliest day, YYYY-MM-DD"),
+            "end": _str("latest day, YYYY-MM-DD"),
+        }
+    ),
+)(T.backtest_gate)
+
 
 def selftest() -> int:
     """Full handshake against ourselves. No client, no network, no keys."""
