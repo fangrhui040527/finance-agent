@@ -18,6 +18,7 @@ from datetime import date, datetime
 from decimal import Decimal
 
 from agents.base import Finding
+from core.guardrails.publish import PUBLICATION_NOTICE
 from engines.attribution.decompose import Component, MoveExplanation, Verdict
 
 BAR_WIDTH = 28
@@ -211,7 +212,7 @@ def thesis_memo(
         lines += ["KEY UNCERTAINTIES"]
         lines += [f"  - {u}" for u in uncertainties]
         lines.append("")
-    lines.append("This is analysis, not advice, and this system cannot place orders.")
+    lines.append(PUBLICATION_NOTICE)
     return "\n".join(lines)
 
 
@@ -279,6 +280,11 @@ def daily_brief(
             "That is the most common correct state and it is shown as one.",
             "",
         ]
+    # The memo has always signed itself and the brief never did, which is the
+    # asymmetry the publication rail exists to notice: a brief is read on more
+    # days than a memo is, and it is the one that names moves and watchlist
+    # scores without a thesis around them to give them context.
+    lines.append(PUBLICATION_NOTICE)
     return "\n".join(lines)
 
 

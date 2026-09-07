@@ -439,6 +439,23 @@ def selection_note() -> str:
 CACHE_READ_MULTIPLIER = Decimal("0.1")
 CACHE_WRITE_MULTIPLIER = Decimal("1.25")
 
+#: A prompt shorter than the model's minimum cacheable prefix is not cached,
+#: and nothing says so: the request succeeds, the `cache_control` marker is
+#: accepted, and the usage block simply comes back with zeroes. The minimum is
+#: model-dependent and published in the 512-4096 token range, so the two ends
+#: are what can be asserted without naming a model:
+#:
+#:   below CACHE_MIN_FLOOR    - not cacheable on ANY model. Certain.
+#:   between floor and ceiling - may be below THIS model's minimum. Check it
+#:                               before hunting for an unstable prefix.
+#:   above CACHE_MIN_CEILING  - longer than every published minimum, so a zero
+#:                               hit rate is a real caching fault.
+#:
+#: The threshold applies per call, not to the sum, so it is the LARGEST single
+#: input that decides which band a run falls into.
+CACHE_MIN_FLOOR = 512
+CACHE_MIN_CEILING = 4096
+
 
 def cost_usd(tier: Tier, usage: Usage, pricing: tuple[Decimal, Decimal] | None = None) -> Decimal:
     """Fresh input at the base rate, reads at a tenth, writes at a quarter over.

@@ -218,7 +218,7 @@ One 2–4 vCPU / 8 GB instance runs the whole stack for one market with a 1-year
 | **Rule + local-model filter before any LLM call** on news | ~80% of article volume never reaches an API | A4 escalation ladder |
 | **Self-host rather than manage** | ~85% of infra · **RM 30,000/yr at T2 scale** | §5.3 |
 | **Batch API for non-latency-sensitive work** | 50% on that slice | Overnight jobs |
-| **Prompt caching on stable prefixes** | ~35% of input cost on repeated-prefix calls | Keep volatile content after the last cache breakpoint |
+| **Prompt caching on stable prefixes** | ~35% of input cost on repeated-prefix calls — **but only above the minimum cacheable prefix**, which is model-dependent and published between 512 and 4,096 tokens. This system's prompts run 183–438 tokens, so its cache hit rate is 0% and always was; nothing is misconfigured. `efficiency_report` says which of the two causes it is rather than assuming the prefix is unstable. | Keep volatile content after the last cache breakpoint |
 | **Local reranker and local FinBERT** | 100% of what a hosted equivalent would cost | App host |
 | **Embedding cache by content hash** | Never re-embed unchanged text | Ingest |
 | **Context compression before long-context calls** | 20–40% on the largest calls | Before A10/A11 |

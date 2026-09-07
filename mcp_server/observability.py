@@ -634,6 +634,50 @@ def _eval_suite_health() -> list[str]:
 # --------------------------------------------------------------------------
 
 
+def _why_nothing_cached(calls) -> list[str]:
+    """A zero hit rate has two causes and they need opposite fixes.
+
+    The report used to name only one of them - "the prefix is changing between
+    calls" - and say it unconditionally. On this system's own ledger that was
+    wrong and expensively so: the four recorded calls carry 183, 392, 392 and
+    438 input tokens, every one of them shorter than the shortest published
+    minimum cacheable prefix, so nothing could have been cached whatever the
+    prefix did. Someone reading that line would have gone looking for a varying
+    timestamp that does not exist.
+
+    The size test comes first because it is the one that can be settled from
+    the ledger alone. Prefix instability is only worth naming once the prompts
+    are long enough for caching to have been possible at all.
+    """
+    from core.llm.tiers import CACHE_MIN_CEILING, CACHE_MIN_FLOOR
+
+    biggest = max((int(r["input_tokens"] or 0) for r in calls), default=0)
+    if biggest < CACHE_MIN_FLOOR:
+        return [
+            f"NOTHING is being cached, and nothing could be: the largest single "
+            f"prompt was {biggest:,} tokens, under the {CACHE_MIN_FLOOR:,}-token floor "
+            f"below which no model caches at all.",
+            "the cache_control marker is accepted and silently does nothing at this "
+            "size - this is not a bug to hunt, it is a prompt too short to be worth "
+            "caching. Longer system prompts, or nothing.",
+        ]
+    if biggest < CACHE_MIN_CEILING:
+        return [
+            f"NOTHING is being cached. The largest single prompt was {biggest:,} "
+            f"tokens, inside the {CACHE_MIN_FLOOR:,}-{CACHE_MIN_CEILING:,} band where the "
+            f"minimum is model-dependent.",
+            "check this model's minimum cacheable length before looking for an "
+            "unstable prefix - a prompt under it is not cached and says nothing.",
+        ]
+    return [
+        f"NOTHING is being cached. At {biggest:,} tokens the prompts clear every "
+        f"published minimum, so the size explanation is ruled out.",
+        "the system prompt carries a cache_control block, so a zero hit rate "
+        "across repeated calls means the prefix is changing between them - a "
+        "timestamp or a varying tool set.",
+    ]
+
+
 def efficiency_report(days: int = 7, db: str = "") -> str:
     """Cost per answer, cache effectiveness, tier discipline, wasted spend."""
     now = datetime.now(UTC)
@@ -679,11 +723,7 @@ def efficiency_report(days: int = 7, db: str = "") -> str:
         )
         lines.append(f"    {writes:,} written at 1.25x; reads bill at 0.1x")
         if reads == 0:
-            lines.append(
-                "    NOTHING is being cached. The system prompt carries a cache_control "
-                "block, so a zero hit rate across repeated calls means the prefix is "
-                "changing between them - a timestamp or a varying tool set."
-            )
+            lines += [f"    {ln}" for ln in _why_nothing_cached(calls)]
     else:
         lines.append("    no input tokens recorded")
 

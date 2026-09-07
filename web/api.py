@@ -339,15 +339,22 @@ def _narrative(body: S.ThesisBody) -> dict:
             "reason": done.refusal_reason,
             "backend": type(backend_obj).__name__,
         }
+    from core.guardrails.publish import publish, sign
+
+    text = sign(done.text)
     try:
         ctx.engine.enforce(
             Action(
                 name="narrate", rail=Rail.OUTPUT, agent="a10_thesis", payload={"text": done.text}
             )
         )
+        # The HTTP caller gets the signed block, not the bare prose. A JSON
+        # field is copied and pasted more readily than a terminal line, so the
+        # notice has to be inside the string rather than beside it.
+        publish(ctx.engine, "a10_thesis", "narrate", text)
     except PolicyViolation as e:
         return {"blocked": True, "reason": str(e), "backend": type(backend_obj).__name__}
-    return {"text": done.text, "backend": type(backend_obj).__name__, "reason": reason}
+    return {"text": text, "backend": type(backend_obj).__name__, "reason": reason}
 
 
 @router.post("/allocate")
