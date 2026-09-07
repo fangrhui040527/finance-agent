@@ -1,6 +1,78 @@
 {
   "collection": [
     {
+      "at": "2026-09-07T15:08:33.768846+00:00",
+      "detail": "facts 0; MYX:8869: deferred by the 2-a-day credit budget; next in rotation; MYX:3182: deferred by the 2-a-day credit budget; next in rotation; MYX:1155: deferred by the 2-a-day credit budget; next in rotation; MYX:5347: deferred by the 2-a-day credit budget; next in rotation; MYX:5183: EODHD free plan: US only; the Fundamentals plan covers KLSE; MYX:5225: EODHD free plan: US only; the Fundamentals",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-07T15:08:33.483825+00:00",
+      "detail": "facts 0; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-07T15:08:28.987230+00:00",
+      "detail": "facts 0; ",
+      "fetched": 19,
+      "kept": 9,
+      "source": "jin10_flash",
+      "status": "ok",
+      "stored": 7
+    },
+    {
+      "at": "2026-09-07T15:08:28.087292+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-07T15:08:26.540869+00:00",
+      "detail": "",
+      "fetched": 24,
+      "kept": 23,
+      "source": "fmt_business",
+      "status": "ok",
+      "stored": 23
+    },
+    {
+      "at": "2026-09-07T15:08:26.325769+00:00",
+      "detail": "read but empty: Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals, IHH",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-07T15:08:25.231623+00:00",
+      "detail": "read but empty: Press Metal, Petronas Chemicals; named the company: 14 of 21 (lowest: Tenaga 0/4, Maybank 5/8, Genting 4/4)",
+      "fetched": 23,
+      "kept": 21,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 18
+    },
+    {
+      "at": "2026-09-07T15:08:23.939568+00:00",
+      "detail": "read but empty: IHH; failed: Petronas Chemicals, Press Metal, Genting; named the company: 0 of 7 (lowest: Maybank 0/3, Tenaga 0/4)",
+      "fetched": 7,
+      "kept": 7,
+      "source": "gdelt",
+      "status": "ok",
+      "stored": 7
+    },
+    {
       "at": "2026-09-07T08:50:14.159702+00:00",
       "detail": "facts 0; ",
       "fetched": 4188,
@@ -56,18 +128,18 @@
     }
   ],
   "counts": {
-    "articles": 1342,
+    "articles": 1397,
     "documents": 0,
-    "escalated": 451,
+    "escalated": 455,
     "events": 3927,
     "failed_sweeps": 15,
-    "linked": 810,
+    "linked": 825,
     "observations": 4452,
     "series": 29,
-    "sweeps": 115
+    "sweeps": 123
   },
   "day": "2026-09-07",
-  "generated_at": "2026-09-07 08:50 UTC",
+  "generated_at": "2026-09-07 15:08 UTC",
   "macro": [
     {
       "change": "-0.01",
@@ -189,8 +261,70 @@
       "instrument_id": "MYX:1155",
       "label": "Maybank",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMisgFBVV95cUxQTlhOclZZYXdVZ1FxbHp3eTlDQVgyUlhsNV95cXRxT1dOcnptZHZxTEgtQ05hU2ZkaHR3MG9lemRSOEVHYzBPOHppV3FlLTZLTGlaTFdCQkd3bzFxUmgxV2oyY3pBRlg4c0pCdVZ6Q0MxOG1JejZDSkdySm9iT1gxX2RnNGlfSDB5MTdteVg5emFLeHJjWWd5b2I3WWJVa0M1eG5XczRkWnd3VWp0cU1YeFRB?oc=5",
+          "domain": "themalaysianreserve.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-07T14:30:06+00:00",
+          "quality": 0.8,
+          "title": "Maybank bags three top honours at inaugural Bursa Malaysia IR Awards",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiUEFVX3lxTFBWbElkbHl2dlE3VUhLVFZnYms5SS1iVFRYTE1nYk81NFRpOFUyemIzWExVdDZpNFVTMnpEYzdXVUIwZzhYVi03NFhLY2pwR283?oc=5",
+          "domain": "theedgemalaysia.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-07T12:17:29+00:00",
+          "quality": 0.8,
+          "title": "Maybank emerges as top winner at inaugural Bursa Malaysia IR Awards 2026",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxOVUpQdHFaRVd2bWVMeGdKWWdhaklMclN3Sy0wbDBoOU1GZE16eGoyWmVqMVpOdHhub2U5Tjlpc0o0QTl3REZxRWZGWFpfcUx5aURzdjBNNG1ZczY1SWhIT044TEpVck05ME5NdWZwVEhQdjU4RExjQm1waFZ1VjNMcXZ4dkNZNHlWMDV3aTdZV0pHNG1td1VDR00yRFVBUEZJMGszaUs0Qk9ZZ3lQLS01LS1PSzd6V182SkVoVEFlcmhDUzgwdk1wUA?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-07T11:56:00+00:00",
+          "quality": 0.8,
+          "title": "Maybank among top winners at inaugural Bursa Malaysia IR Awards 2026",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxOcEZjbWpldmxzWnF5QmNkeHYwVXRXTDBYM0xzekF6YXpOcEVLZWNvZWdtZUxjVGc0eEw3VHhzSzQtVWFpVS14aVBQMGhlclctTm93aU5BNmFlYm9JenA4TnFnOGJqRUpjRXZvZEdvYXRPLTRYckpqck5sSnJaMWhKVU9mMGQzWEtuVWtXbWxIcVMxOEtyejFTUDBxSzF2TXlURFItU2toZm83QQ?oc=5",
+          "domain": "www.moomoo.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-07T07:11:21+00:00",
+          "quality": 0.65,
+          "title": "Foreigners Dump Banks While Locals Gobble Up Maybank",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMieEFVX3lxTE5SVDlkamM2R3BERzllSklkdWZVMDZ3WFVpWjlIcTdpcXdJLWJLOE9GUTA5MGlfUkJxbVZSV2h0aWt4SlVlVEhGTENRcHdDU1pxb0ctRXNjV3BSYzFmazZyMElzWUhNb2VQRHliLWtDQUdDQW1mWTdieA?oc=5",
+          "domain": "www.moomoo.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-07T06:35:09+00:00",
+          "quality": 0.65,
+          "title": "$MAYBANK (1155.MY)$",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 5,
+        "polarity_mean": 0.0,
+        "sources": 4,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -214,13 +348,64 @@
       "upcoming": []
     },
     {
-      "escalated": 0,
+      "escalated": 3,
       "events": [],
       "instrument_id": "MYX:5225",
       "label": "IHH",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxQWm9QN3laMWNuWXlobG5tQnlTVTFVbjN6WXBlc3lJakRaSHdlZ1AtWWU0TkM2UElTOGJyT1JrMEpNRDNUV1pYaE11T18yZFI3SjRpNmRYa0t3amQ1dmxMTEwtQTlUUzNzZXlUVE9Wd3dQcWpubUd3UVF4dThYeFhXX3ZMSWR4WGExRnRtUjNUT1p3VjhkNUhJVVBWQWYwT0l6SXMzakdqdF9zdFNtLUhMMXI1RzR2YUhJV3FoUG44anRnQQ?oc=5",
+          "domain": "www.businesstoday.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-07T03:13:40+00:00",
+          "quality": 0.8,
+          "title": "Stock Today: IHH Healthcare Rises 0.13% As Investors Weigh Fortis Expansion Plans",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiUEFVX3lxTFBfX1ZiS2ZzUm8zWmxtZkpSQVNGSUZVS2lZcmk2bzZ4bjFHeVJpOUFXZnhKNGpLXzFMZ2RBNkdpcE5mcTQtdk9LYXdMbVlKRXAt?oc=5",
+          "domain": "theedgemalaysia.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-07T02:31:18+00:00",
+          "quality": 0.8,
+          "title": "Forensic audit order adds hurdle to IHH\u2019s majority-control plans for Fortis \u2014 BIMB Securities",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMixgFBVV95cUxPbVpZd0twMVRQakh6S0pic0dTbjFUbm1MOEplbGw2eTQ3YnZWVHVnVy1SOGNVRXBxNGoxeEJlU0YzSnk5a3NaQXQzd3FIaDQ5Z3hyeTZyR3pSbDVBTDJLSDdYUkJKckVFekVlWXNsZGNiLVBPYm5vTTF5bFNKUFVqZTcwZy1HeG92cWlCTjF6SS1mWDlaZTAzV3hPdFNuRnhldVNtUDNSTGdJcEplSXVqdjM3ay1uaENQOVZHcVBpZERXWV8wUUE?oc=5",
+          "domain": "www.businesstoday.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-07T02:24:27+00:00",
+          "quality": 0.8,
+          "title": "IHH Plans To Raise Fortis Stake To 51% By 2030, Sees RM5.8 Billion Capital Injection",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMitAFBVV95cUxNX2pIS0dDTnMxd0dsaVFYemc4MFg0a2ZhZ3VmUWU5WXFpQ3IzS0t6ZWR0cjJBNlRLTW9FYWJWeDlBOUIzT25veDBNbkFGQTRRTEE0dzlVRm9QU0tEdnk3ZC1mTkI4eV9QZGpmUGNRaXNCV21QTGVVQ0xZVnRyWml5TGlpNkdKN3dxZExKVXF0VVFGcWs4MUhZZmdRTlJBOHJCU3pNNXlZU0dUQ0Z4Q1RJQ1lleF8?oc=5",
+          "domain": "www.nst.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-07T08:14:39+00:00",
+          "quality": 0.8,
+          "title": "Delhi court order seen as limited impact on IHH Healthcare",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 4,
+        "polarity_mean": 0.25,
+        "sources": 3,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -234,17 +419,68 @@
       "upcoming": []
     },
     {
-      "escalated": 0,
+      "escalated": 1,
       "events": [],
       "instrument_id": "MYX:3182",
       "label": "Genting",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMitAFBVV95cUxPbWRlY2hFbUtKNFhhdlV4S25jaENMV2k0MmRtbWFkYXV3UWFsemxNaS1lMkFRMUM1TksyZXVHMVBEeFY0MHNSbjNBS3YtZ3Noa3h4cGtwTnJobUVkaFVUZnI4ZklRZFM0YTlCLUF4My01NDNEQUY0a0NkazN1Vk00cVNENGF4b0U4ZUdTc1FLY3VlcWRfMjlKUFVMdlNjSXR1TGNURlAtQkxBMVVOWldJTTJpdGU?oc=5",
+          "domain": "themalaysianreserve.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-07T10:41:15+00:00",
+          "quality": 0.8,
+          "title": "Fitch downgrades Genting to BBB- on high leverage, heavy expansion capex",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMimgFBVV95cUxPWUxBNzl6U0pmMGdMYzVXVU9TTl9iMmhTTmdHX2JYaE42X0NfbERjVC1WVXdGek5xczF5d0M3ZHZCUnhOQnVuYTBKYl9Kak83OWxqbEtHTHNJVHFwRXNIY2ZYYmhZUld1bGZSYURqZjJmb05mLUw3UTdFSDZrRXg5c0NGN19mdzk2MmJxSTFQUlZYdUFQVmY4dDFn?oc=5",
+          "domain": "www.nst.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-07T13:01:21+00:00",
+          "quality": 0.8,
+          "title": "Fitch downgrades Genting ratings",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiswFBVV95cUxPZGhmU2QyaFhQVGN2b1hvdTQ5QWxKVGxycm5jUF8zM1FhUUV1QXIxYllLYnIxcjVVbEZpYlRIU0YyYVByV3R3MEEzTGJNU2V4OEVMYnhqZkRwdkNubVdWVzU4UEQxa05XdGRLbjBpang2YXZyVXotXzk2QnZXVWxSUWkzNjhpbHJqemVsRC1RelU5NG00UnZ6Sl9Nd3BpeENzV2RKOVROSHhKbHdtSEtkTnZPMA?oc=5",
+          "domain": "www.businesstoday.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-07T10:57:02+00:00",
+          "quality": 0.8,
+          "title": "Fitch Downgrades Genting Berhad To \u2018BBB-\u2018, Resorts World Las Vegas To \u2018BB+\u2019",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE9DeDk2QlNHV0xsaWJZdXFjd3JoYVh3Q1NzdkM2RHFEcmpFZFdqSXd6VkJyakp2VFZnWk9MU29pS2ZRTU9PdmdMZm9UalBGX25r?oc=5",
+          "domain": "theedgemalaysia.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-07T10:17:40+00:00",
+          "quality": 0.8,
+          "title": "Fitch downgrades Genting's rating over high debt levels amid heavy spending",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 4,
+        "polarity_mean": 0.25,
+        "sources": 4,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
-      "escalated": 29,
+      "escalated": 10,
       "events": [],
       "instrument_id": "XNAS:NVDA",
       "label": "NVIDIA",
@@ -383,17 +619,6 @@
           "uncertainty": 0.0
         },
         {
-          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/nvidia-nvda-prove-doesn-t-202105317.html?.tsrc=rss",
-          "domain": "finance.yahoo.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-06T20:21:05+00:00",
-          "quality": 1.0,
-          "title": "Can Nvidia (NVDA) Prove it Doesn\u2019t Live or Die by a Handful of Hyperscalers?",
-          "uncertainty": 0.17605633802816903
-        },
-        {
           "doc_id": "https://finance.yahoo.com/technology/ai/articles/nvidia-nvda-20-billion-groq-190737433.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
           "escalated": true,
@@ -402,17 +627,6 @@
           "published_at": "2026-09-06T19:07:37+00:00",
           "quality": 1.0,
           "title": "NVIDIA (NVDA)\u2019s $20 Billion Groq Bet Goes Live This Year With New AI Racks",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://beincrypto.com/jensen-huang-agi-nvidia-astra-chips/?.tsrc=rss",
-          "domain": "beincrypto.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-06T21:39:37+00:00",
-          "quality": 0.85,
-          "title": "Nvidia CEO Jensen Huang Says AGI Has Arrived With OpenAI's GPT-6 Astra",
           "uncertainty": 0.0
         },
         {
@@ -427,17 +641,6 @@
           "uncertainty": 0.0
         },
         {
-          "doc_id": "https://finance.yahoo.com/m/d5001ca0-1c20-3379-83c3-ddca4526f9c2/dow-jones-futures-fall-with.html?.tsrc=rss",
-          "domain": "finance.yahoo.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-06T22:31:15+00:00",
-          "quality": 0.8,
-          "title": "Dow Jones Futures Fall With Iran, Apple, Inflation In Focus; Nvidia, Micron, Sandisk Flash Buy Signals",
-          "uncertainty": 0.0
-        },
-        {
           "doc_id": "https://news.google.com/rss/articles/CBMinwFBVV95cUxPaHRVYjVwaFhqckFnUVJPNHkwYnRKNDBrZ3N2cVNmUzFwMDd3dTcwLV9vZ0J3RTNHVmhqS2VOY0FGQjlnaC1XVzVXU0tYaENSRGJFNTAxd0dIYlVvTUdYRzZVeExHNXZHWWtwT3JudlJua1V5dHVjbld1dEVrQkdnTlpvV1k0RDdmdnE2V0tveHZDaFlPZWR3eGZlOGpVbTg?oc=5",
           "domain": "seekingalpha.com",
           "escalated": true,
@@ -449,28 +652,61 @@
           "uncertainty": 0.0
         },
         {
-          "doc_id": "https://news.google.com/rss/articles/CBMiygFBVV95cUxQVU5qandGdlMyaUg2N0l4S0REeGNVR182RmhSSnJkYVNxV0NxeGRzakhyV180ZGdZZ3VrQm9jbktneWJwYlJiMHJ0T29VTmIyTC1vLTl4cWV5Y3AxNVdDOV95LTJKQkpCaUlRU2VCdWVsMThGdVdTMmJGUTNmSjZOZzBGR2k1UmtFVzE0aG5Ka1ZQaFJMbXB5OUIydXFfck1zVWpZenh0a1NWSXhPcUlDNlhBak9qR2VlRDdBbHpjZ3FkcWZkLVpZN0d3?oc=5",
-          "domain": "finance.yahoo.com",
+          "doc_id": "https://news.google.com/rss/articles/CBMizwFBVV95cUxNNDdjOWlub3hsUWdxSjBaYW16RE0zVFpMU2dXZ1RfQWJXS0lnSHRlU3BUUFhSV0dxbUZtbGZtUW82UnRpb0UtVnMzOEZ5RmpZdExfQzlwdm9ZbzVqVUZ4WlJmd0tVZWxwRHVCdFhDM3R6a1FqV3Rnc2FnQmVmZVdUZXI2WmI3MHVqa1VhQUc1Skw5bENDaFc2V1FkUGh5UlZOUFlPU2EzWXpyTm8xTlgyWEkyTDVQa0xadVk0ckxuazJnVzk5ZFcxdHVFX1RwX2vSAc8BQVVfeXFMTTQ3Yzlpbm94bFFncUowWmFtekRNM1RaTFNnV2dUX0FiV0tJZ0h0ZVNwVFBYUldHcW1GbWxmbVFvNlJ0aW9FLVZzMzhGeUZqWXRMX0M5cHZvWW81alVGeFpSZndLVWVscER1QnRYQzN0emtRald0Z3NhZ0JlZmVXVGVyNlpiNzB1amtVYUFHNUpMOWxDQ2hXNldRZFBoeVJWTlBZT1NhM1l6ck5vMU5YMlhJMkw1UGtMWnVZNHJMbmsyZ1c5OWRXMXR1RV9UcF9r?oc=5",
+          "domain": "simplywall.st",
           "escalated": true,
           "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-06T13:26:55+00:00",
-          "quality": 0.8,
-          "title": "Why Nvidia wants Hugging Face to keep helping its rivals: Chart of the Day",
+          "polarity": -1.0,
+          "published_at": "2026-09-06T21:28:31+00:00",
+          "quality": 0.65,
+          "title": "NVIDIA (NVDA) Faces Key Legal Milestones In Copyright Lawsuit",
           "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMidkFVX3lxTE5JcFhUMnJvczVwVEk4TXVRc01fOWdTVTlIeDZpZ01pcWxwSTloVlpWTFdSMjhVT0VHUHVhQjNQTktjd1ppRVlVQXRKZXJURzZLQXlMc0M2Z19ZOTZ1YS01UTlVbUgwN0lZNkd2OWM2SUFFQVlQSFE?oc=5",
+          "domain": "finance.biggo.com",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "polarity": 1.0,
+          "published_at": "2026-09-06T18:16:00+00:00",
+          "quality": 0.65,
+          "title": "Nvidia's Net Income Could Top $850 Billion by 2029, Eclipsing Aramco's Record",
+          "uncertainty": 1.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMi1wFBVV95cUxOVEdJbk80dkpHcFZJaW5aUW9ONF9PV0M4Qi1QTEZhSDV0b1lZSDQ3dmVyN01YY3JpeEs4MU9WQmtNUGMza2xpS3VWSFdTeUxaNFBnbEFFaElsYnZtdERfQ3g2QmRxSkMwMHpmOXZFdC1rVUxlLWNxbkJzZ25JRTlyX0FzNE5lMFpPckw1QzlxTW1pZlFIaFIzd1p4dHlYVlBHbzlIWUJJWFZDRl8xOHctZVBmSUNraDlNc0IxUUdVSWdPbFRTY0t6b1NlN1IyMGZuSlVyNDZaWQ?oc=5",
+          "domain": "www.benzinga.com",
+          "escalated": true,
+          "intensity": 0.6666666666666666,
+          "polarity": 1.0,
+          "published_at": "2026-09-06T16:54:40+00:00",
+          "quality": 0.65,
+          "title": "Jensen Huang's Net Worth Up $36 Billion as Nvidia Stock Eyes Surge to Record High",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMihgFBVV95cUxQS0paT0JoLWhoOV9WNjMxX2FTMldMc3pxU2taTTgySEM4cXRrS2ZMb2t5YVVQNUhoUDNFejRWZG1qM3BZSmR6eWtROC1aRzEtZFR0NGU1SUJ1blVVcGJMeVRXRlNoSjBDdHRWSHJaeU9nZ2t3RWd5Z2YwakNRNFFzbDJhNG1vUQ?oc=5",
+          "domain": "pluang.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-06T16:45:04+00:00",
+          "quality": 0.65,
+          "title": "Nvidia could earn $851B in annual profit by 202...",
+          "uncertainty": 1.0
         }
       ],
       "tone": {
         "intensity_max": 0.667,
-        "n": 40,
-        "polarity_mean": 0.125,
-        "sources": 17,
-        "uncertainty_mean": 0.205
+        "n": 41,
+        "polarity_mean": 0.122,
+        "sources": 18,
+        "uncertainty_mean": 0.2
       },
       "upcoming": []
     },
     {
-      "escalated": 17,
+      "escalated": 2,
       "events": [],
       "instrument_id": "XNAS:AAPL",
       "label": "Apple",
@@ -598,17 +834,6 @@
       ],
       "stories": [
         {
-          "doc_id": "https://finance.yahoo.com/technology/ai/articles/apple-aapl-mac-mini-studio-201609665.html?.tsrc=rss",
-          "domain": "finance.yahoo.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-06T20:16:09+00:00",
-          "quality": 1.0,
-          "title": "Apple (AAPL)\u2019s New Mac Mini and Studio Bet Big on On-Device AI",
-          "uncertainty": 0.0
-        },
-        {
           "doc_id": "https://finance.yahoo.com/m/736d38bc-4861-37a5-bebd-9353ee16aa26/inflation%2C-apple%2C-adobe%2C.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
           "escalated": true,
@@ -618,17 +843,6 @@
           "quality": 1.0,
           "title": "Inflation, Apple, Adobe, Oracle, Macy\u2019s, and More to Watch This Week",
           "uncertainty": 0.25510204081632654
-        },
-        {
-          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/keybanc-warns-apple-iphone-18-173545777.html?.tsrc=rss",
-          "domain": "finance.yahoo.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-06T17:35:45+00:00",
-          "quality": 1.0,
-          "title": "KeyBanc warns Apple\u2019s iPhone 18 launch may be a negative catalyst for shares",
-          "uncertainty": 0.5434782608695652
         },
         {
           "doc_id": "https://news.google.com/rss/articles/CBMimAFBVV95cUxQa2NVbTgxd01uU3JxNVRGQUV0bl9wbVY1UHhlVllsMUViT0VJRzZUa3ozQ3NLOC1rMEhCXzhOUU5nUUxsaE12SjBPTXk0aHdycEx2bHFlSzBaMHJrU0pFVlJZcmtJV2FBeGVDYmlxanZqN0E3UjRMZGg5VkJjcE5uUVlLelA5MnQzYVNMSnFXUnJlZDFSdl9sMg?oc=5",
@@ -642,9 +856,53 @@
           "uncertainty": 0.0
         },
         {
+          "doc_id": "https://www.freemalaysiatoday.com/category/business/2026/09/07/huawei-launches-new-foldable-smartphone-xiaomi-and-apple-set-to-follow",
+          "domain": "www.freemalaysiatoday.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-07T10:30:00+00:00",
+          "quality": 1.0,
+          "title": "Huawei launches new foldable smartphone, Xiaomi and Apple set to follow",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/apple-aapl-mac-mini-studio-201609665.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-06T20:16:09+00:00",
+          "quality": 1.0,
+          "title": "Apple (AAPL)\u2019s New Mac Mini and Studio Bet Big on On-Device AI",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/keybanc-warns-apple-iphone-18-173545777.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-06T17:35:45+00:00",
+          "quality": 1.0,
+          "title": "KeyBanc warns Apple\u2019s iPhone 18 launch may be a negative catalyst for shares",
+          "uncertainty": 0.5434782608695652
+        },
+        {
+          "doc_id": "https://finance.yahoo.com/technology/articles/phil-schiller-app-store-exit-214106418.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-06T21:41:06+00:00",
+          "quality": 0.85,
+          "title": "Phil Schiller\u2019s App Store exit reportedly driven by wariness over future plans",
+          "uncertainty": 0.0
+        },
+        {
           "doc_id": "https://finance.yahoo.com/m/d5001ca0-1c20-3379-83c3-ddca4526f9c2/dow-jones-futures-fall-with.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
-          "escalated": true,
+          "escalated": false,
           "intensity": 0.0,
           "polarity": 0.0,
           "published_at": "2026-09-06T22:31:15+00:00",
@@ -655,48 +913,26 @@
         {
           "doc_id": "https://news.google.com/rss/articles/CBMilAFBVV95cUxNcW9BT3d1eWhRSUU4Z2xzQlBHQmF2MHRSNVdSc1Q5aHNqM182OXg5R1d6LTl5QjZ5Mng3ck4tQzlOcnFZMVVLLXpHQlRmSFpPcTlhbzZUQThDZE9ocWZyc08xZU9wdjdreFRrWFY3RklyTzZwTXBfTTNKdDhjZFVncndINThFeUNJeEh0VW1ITHhmSzhy?oc=5",
           "domain": "finance.yahoo.com",
-          "escalated": true,
+          "escalated": false,
           "intensity": 0.0,
           "polarity": 0.0,
           "published_at": "2026-09-06T22:12:25+00:00",
           "quality": 0.8,
           "title": "Apple (AAPL) Sets iPhone Launch Event. The First Under New CEO John Ternus",
           "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMiowFBVV95cUxPSlNDVnpjMEg4LVVRWGthQzVuVndKQ01uOFRYVU1Lb1NHYmpSb2dxN2NzZnl0SFQwUnZQSGdxdllVSjY3cmlCaUtLU01rbVBZVWVWZzNUZGFzQ1RfaXZPclJfaTVkSlhIeGdEVXI2Um0zbjNVQVQ4WTdtNGd6S21sQTE2ZlZQczVjekFZejZSUktyRlljeFQ2MXVQOFpEMWNuSzFV?oc=5",
-          "domain": "finance.yahoo.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-06T13:00:02+00:00",
-          "quality": 0.8,
-          "title": "Apple Stock: September Surprise Could Be Bigger Than a New iPhone",
-          "uncertainty": 1.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMipgFBVV95cUxPU0xRMFVmWmF4X0M2MHM5bU9OLTg1NzVsUkxNZkxFdDhfQURobXFSYkMwa0JjOEF4dUFpTnFvVzVIYzJPTGFXZVRzVFF2NVlzUmI2NzdGWkdIWkd4dlJUVHlaN29qeXhodlBna2hyVHpWV1ZzSHBsZ0ZJaFI3OWlialZnUVBYZ3EwcG15X2pSTzZmdVRRZ2pQUjNOck9TNWRTaW5IYmpB?oc=5",
-          "domain": "ts2.tech",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-06T21:52:08+00:00",
-          "quality": 0.65,
-          "title": "Apple Event Preview: Foldable Output Was Only a Few Hundred Units a Day, Report Says",
-          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.0,
-        "n": 18,
+        "n": 19,
         "polarity_mean": 0.0,
-        "sources": 11,
-        "uncertainty_mean": 0.264
+        "sources": 12,
+        "uncertainty_mean": 0.251
       },
       "upcoming": []
     },
     {
-      "escalated": 3,
+      "escalated": 1,
       "events": [],
       "instrument_id": "XNAS:MSFT",
       "label": "Microsoft",
@@ -816,28 +1052,6 @@
       ],
       "stories": [
         {
-          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/nvidia-nvda-prove-doesn-t-202105317.html?.tsrc=rss",
-          "domain": "finance.yahoo.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-06T20:21:05+00:00",
-          "quality": 1.0,
-          "title": "Can Nvidia (NVDA) Prove it Doesn\u2019t Live or Die by a Handful of Hyperscalers?",
-          "uncertainty": 0.17605633802816903
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxONDRlOVlKMkFXaEVTdE9LTnpRX1ZCdGJOS1dHX3F0c2dnNWhzajBQY1hYWXlsTmdocU9fNW55M25tYlEzQmNMVjVhMHQtUC00dGJOVU01SVU1UUpLMlEtQlVSRno4c1lRZVF1dE81RjQyeElXQlBjSVhiRlNkY1RObmVKVUQ2SThoUGdwN2R3TGtnbEhhQUR1eDJBSnhuUGlHTUZBTFRGRDlTZ9IBrwFBVV95cUxPMjdWYU9sWlYwUGtsLW5KSHZWeTkzREVSZzREYlAxS1FRU0Z6T2toVjZYQWExZUg1VzYya2dfajI4UGhTSVN6ZFEtRmRfZWhwVElzVnZoa3VXYkFLUzNuWjZmUkp5M2Q2b0wydVZXMWJYOWJFalpHUWtKS3RXQjBMRzJGV0IwdER5WWlxVnJjdVlrZ0R0RTlNN2RVN3IxOVlFb1pDZXVWOFlFTmJZSmZB?oc=5",
-          "domain": "simplywall.st",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-06T21:28:29+00:00",
-          "quality": 0.65,
-          "title": "Microsoft And 2 Other AI Stocks To Own",
-          "uncertainty": 0.0
-        },
-        {
           "doc_id": "https://news.google.com/rss/articles/CBMipAFBVV95cUxNc0Y2Q2pkaklIX3FuaUhQaHRaakxjQTkxRnJBT3ZvUHQwb3paMXdBQW5iVmVZM1dOV1VTSWpxRnlqYVRyaF8xWmhQOHBmOUVqMGxZYUVYREVBZ3plYjBrVzhIcENZUW1XNE1fVnBuTlJKQ2sweDJTSy1fNzYwbmY2Q3lRZWdnRHpqNHQzYjdKS0s0N29kajlIUEJMNlZhMXlCSDRWcA?oc=5",
           "domain": "www.equiti.com",
           "escalated": true,
@@ -847,6 +1061,17 @@
           "quality": 0.65,
           "title": "Microsoft Stock Technical Outlook: Is $550 the Next Target?",
           "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/nvidia-nvda-prove-doesn-t-202105317.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-06T20:21:05+00:00",
+          "quality": 1.0,
+          "title": "Can Nvidia (NVDA) Prove it Doesn\u2019t Live or Die by a Handful of Hyperscalers?",
+          "uncertainty": 0.17605633802816903
         },
         {
           "doc_id": "https://247wallst.com/personal-finance/2026/09/06/the-inheritance-that-went-backward-they-gave-mom-the-stock-theyd-someday-inherit-and-eighteen-months-later-it-came-back-with-thirty-years-of-capital-gains-wiped-off-the-books/?.tsrc=rss",
@@ -868,6 +1093,17 @@
           "published_at": "2026-09-06T14:30:03+00:00",
           "quality": 0.7,
           "title": "1 Momentum Signal Suggests the Software Apocalypse Is Over. Don\u2019t Rush to Buy Just Yet.",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxONDRlOVlKMkFXaEVTdE9LTnpRX1ZCdGJOS1dHX3F0c2dnNWhzajBQY1hYWXlsTmdocU9fNW55M25tYlEzQmNMVjVhMHQtUC00dGJOVU01SVU1UUpLMlEtQlVSRno4c1lRZVF1dE81RjQyeElXQlBjSVhiRlNkY1RObmVKVUQ2SThoUGdwN2R3TGtnbEhhQUR1eDJBSnhuUGlHTUZBTFRGRDlTZ9IBrwFBVV95cUxPMjdWYU9sWlYwUGtsLW5KSHZWeTkzREVSZzREYlAxS1FRU0Z6T2toVjZYQWExZUg1VzYya2dfajI4UGhTSVN6ZFEtRmRfZWhwVElzVnZoa3VXYkFLUzNuWjZmUkp5M2Q2b0wydVZXMWJYOWJFalpHUWtKS3RXQjBMRzJGV0IwdER5WWlxVnJjdVlrZ0R0RTlNN2RVN3IxOVlFb1pDZXVWOFlFTmJZSmZB?oc=5",
+          "domain": "simplywall.st",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-06T21:28:29+00:00",
+          "quality": 0.65,
+          "title": "Microsoft And 2 Other AI Stocks To Own",
           "uncertainty": 0.0
         }
       ],
