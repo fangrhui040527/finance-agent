@@ -381,6 +381,51 @@ def slots_due(start: datetime, end: datetime) -> dict[str, int]:
     return {s: n for s, n in due.items() if n}
 
 
+def slots_outstanding(corpus_path: str, now: datetime) -> tuple[list[str], str]:
+    """Which of TODAY's slots are still owed, for a catch-up to fire.
+
+    Deliberately a DIFFERENT question from `slots_missed`. That rule judges
+    whole finished days, because a day still in progress cannot be short of
+    anything - a slot that has not come round yet is not a slot missed. This one
+    asks what is outstanding while the day is still running, which is the only
+    moment a replacement run is worth firing: news expires, and a collection
+    recovered the same evening is worth most of one that happened on time.
+
+    Returns the slot names and, when the answer is empty for a reason worth
+    printing, why. Three ways it says nothing:
+
+      * a `--slot all` run has already happened today and covered everything;
+      * the store has never recorded a slot AND something ran today, so the run
+        cannot be attributed and firing again would be guessing;
+      * there is genuinely nothing owed.
+
+    A store that has never recorded a slot and saw NO run today does report the
+    day's slots: "I cannot tell you which one" and "nothing ran at all" are
+    different answers, and only the second is silence worth acting on.
+    """
+    day_start = datetime(now.year, now.month, now.day, tzinfo=UTC)
+    due = [s for s, weekdays in SLOT_WEEKDAYS.items() if day_start.weekday() in weekdays]
+    if not Path(corpus_path).exists():
+        return [], f"no corpus at {corpus_path}"
+
+    from knowledge.corpus import Corpus
+
+    with Corpus(corpus_path) as corpus:
+        ran = corpus.slot_runs(day_start, now)
+        total = corpus.run_count(day_start, now)
+        ever = corpus.first_slot_row()
+
+    if ran.get("all"):
+        return [], "a run covering every slot has already happened today"
+    outstanding = [s for s in due if not ran.get(s)]
+    if outstanding and ever is None and total:
+        return [], (
+            f"{total} run(s) today, none recording which slot - nothing to attribute. "
+            "the next sweep on a build that records slots settles this"
+        )
+    return outstanding, ""
+
+
 def _slot_rules(cfg, now: datetime) -> list[Alert]:
     """Whether the collector fired as often as its own cron says it should.
 

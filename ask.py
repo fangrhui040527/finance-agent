@@ -1025,6 +1025,24 @@ def cmd_sweep(a) -> int:
         print(f"sweep could not run: {type(e).__name__}: {e}", file=sys.stderr)
         return 2
 
+    if getattr(a, "due", False):
+        # What is still owed TODAY, one slot per line, for a catch-up to act on:
+        #   for s in $(ask.py sweep --due); do ask.py sweep --slot "$s"; done
+        # Nothing printed is a good day. The reason for an empty answer goes to
+        # stderr so a shell loop reads only the slots while a person still sees
+        # why - "everything ran" and "I cannot tell what ran" are different, and
+        # a catch-up that could not tell them apart would fire blind every night.
+        from datetime import UTC, datetime
+
+        from core.monitor import slots_outstanding
+
+        outstanding, why = slots_outstanding(str(cfg.corpus_db), datetime.now(UTC))
+        for slot in outstanding:
+            print(slot)
+        if why:
+            print(why, file=sys.stderr)
+        return 0
+
     report = run_sweep(
         cfg,
         a.slot,
@@ -2336,6 +2354,11 @@ def main(argv=None) -> int:
         default="all",
         choices=["all", "bursa_close", "us_preopen", "us_close", "weekly"],
         help="which moment of the day this is; decides which sources and names run",
+    )
+    sw.add_argument(
+        "--due",
+        action="store_true",
+        help="print the slots still owed today, one per line, and collect nothing",
     )
     sw.add_argument("--graph-db", default="data/graph.db", help="graph to link articles into")
     sw.add_argument("--no-graph", action="store_true", help="store only; do not touch the graph")
