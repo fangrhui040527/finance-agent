@@ -741,6 +741,59 @@ discount rate is below risk-free plus half the premium, is dropped and named.
 **Exits 1** on NO STATEMENTS STORED or a refused range. Same text as the MCP
 tools `ratio_sheet`, `cost_of_capital` and `valuation_range`.
 
+### `backtest` — would it have worked, and was it worth running?
+
+```bash
+# a candidate rule over the cached bars, one currency at a time
+FINPLANET_OFFLINE=1 python ask.py backtest --rule momentum_12_1 \
+    --instrument XNAS:NVDA --instrument XNAS:AAPL --instrument XNAS:MSFT
+
+# the paper book's own record, once it has one
+python ask.py backtest --live
+
+# what has already been tried on this data
+python ask.py backtest --trials
+```
+
+`engines/backtest/harness.py` calls itself "the gate. Nothing reaches a user
+before it clears this" — and until 2026-09-07 nothing ever reached it, because
+no code in this repository built the return series it scores.
+`engines/backtest/book.py` is that plumbing.
+
+**A rule passes only if it beats all three benchmarks after costs** — the local
+index (`0820EA.KL` for Bursa, `SPY` for Nasdaq), an equal-weight version of the
+same names, and buy-and-hold on those names — **and** clears a deflated Sharpe
+of 0.95. Beat none of them and the harness says the correct product is an index
+tracker; it is written to be able to say that.
+
+Four things it will not do:
+
+- **It will not let a rule see the future.** `weights(prices, t)` is handed the
+  index of the day being decided and paid `returns[t + 1]`. Look-ahead is
+  prevented by the shape of the call, not by remembering.
+- **It will not blend currencies.** A joint MYR/USD return series needs a daily
+  exchange rate over the whole window and this system holds weeks of BNM rates,
+  not years. A mixed book is refused, and the refusal prints the two commands to
+  run instead.
+- **It will not give a verdict on thin history.** Under 252 shared sessions it
+  raises and says how many more it needs. `--live` therefore refuses today: the
+  paper book has three marked sessions.
+- **It will not let you choose your own multiple-testing correction.**
+  `n_trials` is read from `data/trials.db`, an append-only ledger of every rule
+  ever run on that universe and window. Try twenty rules and report the winner
+  and the deflation knows there were twenty. The ledger's triggers refuse UPDATE
+  and DELETE for the obvious reason.
+
+`FINPLANET_OFFLINE=1` serves the price cache whatever day it was fetched, which
+is what a backtest wants — the last bar being a day old is irrelevant to fifteen
+years of history, and re-fetching every name to learn that is quota spent for
+nothing.
+
+Measured on the shipped cache (five years, 2021-09 to 2026-09), all three
+reference rules **FAIL** on both sleeves. On the US names, momentum beat the
+equal-weight universe and SPY and still lost to simply holding all three
+(+55.5% against +66.4% CAGR, with a deeper drawdown). That is the gate working.
+
 ### `retrieval` — is the search any good?
 
 ```bash
