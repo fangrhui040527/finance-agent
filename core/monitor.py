@@ -229,8 +229,57 @@ def evaluate(
     out.extend(_series_rules(cfg, now))
     out.extend(_question_rules(now, feedback_root))
     out.extend(_paper_rules(cfg, now))
-    out.extend(_trace_rules(debug_root))
+    out.extend(_trace_rules(debug_root, now))
     return out
+
+
+#: The longest gap each collection slot can legitimately leave between two
+#: firings, from the cron in `.github/workflows/collect.yml`. A source is only
+#: silent if it has missed its OWN cadence: `bursa_close` and `us_close` run
+#: every day, `us_preopen` only on weekdays - so a Friday-to-Monday gap of three
+#: days is the schedule working - and `weekly` fires once on a Sunday.
+SLOT_MAX_GAP_HOURS: dict[str, int] = {
+    "bursa_close": 24,
+    "us_close": 24,
+    "us_preopen": 72,
+    "weekly": 168,
+}
+
+#: What `alert_sweep_silence_hours` has always meant: the allowance for a source
+#: that runs DAILY. Everything less frequent is that number plus the extra time
+#: its own slot leaves, so the configured grace carries through unchanged.
+DAILY_SLOT_HOURS = 24
+
+
+def sweep_allowance_hours(name: str, configured: int) -> int:
+    """How long this source may be silent before that means something is wrong.
+
+    A single threshold across every source was wrong in a way that guaranteed
+    false alarms on a fixed schedule. `fred` runs at `us_preopen`, weekdays
+    only, so every Saturday, Sunday and Monday morning it was over a 30-hour
+    line by simply not being a weekday - the alert fired on 2026-09-07 saying
+    "no successful sweep in 30h: fred (54h ago)" while the collector was
+    running perfectly. Three sources are worse: `dosm_cpi`, `finmind` and
+    `sec_xbrl` run only on the weekly slot, so a 30-hour rule calls them dead
+    six days out of every seven.
+
+    An alert that is guaranteed to be wrong on a timetable is worse than no
+    alert, because it teaches the person reading the list to skim past a real
+    one. The slots each source runs in are already in the catalogue; this reads
+    them rather than asking an operator to keep a second list in step.
+    """
+    try:
+        from knowledge.sources.catalog import CATALOG
+
+        slots = CATALOG[name].slots
+    except (ImportError, KeyError):
+        return configured
+    gaps = [SLOT_MAX_GAP_HOURS[s] for s in slots if s in SLOT_MAX_GAP_HOURS]
+    if not gaps:
+        return configured
+    # The most frequent slot sets the expectation: a source in both a daily and
+    # a weekly slot should still report every day.
+    return configured + (min(gaps) - DAILY_SLOT_HOURS)
 
 
 def _sweep_rules(cfg, now: datetime) -> list[Alert]:
@@ -262,25 +311,28 @@ def _sweep_rules(cfg, now: datetime) -> list[Alert]:
     if not Path(path).exists():
         return []
 
-    cutoff = now - timedelta(hours=hours)
-    stale: list[tuple[str, datetime]] = []
+    stale: list[tuple[str, datetime, int]] = []
     with Corpus(path) as corpus:
         for name in getattr(cfg, "sources", ()):
             last = corpus.last_success(name)
-            if last is not None and last < cutoff:
-                stale.append((name, last))
+            if last is None:
+                continue
+            allowance = sweep_allowance_hours(name, hours)
+            if last < now - timedelta(hours=allowance):
+                stale.append((name, last, allowance))
     if not stale:
         return []
 
-    worst = min(age for _, age in stale)
+    worst = min(age for _, age, _ in stale)
     named = ", ".join(
-        f"{n} ({(now - t).total_seconds() / 3600:.0f}h ago)" for n, t in sorted(stale)
+        f"{n} ({(now - t).total_seconds() / 3600:.0f}h ago, allowed {a}h)"
+        for n, t, a in sorted(stale)
     )
     return [
         Alert(
             rule="sweep_silence",
             severity=ALERT,
-            title=f"no successful sweep in {hours}h: {named}",
+            title=f"past its own cadence: {named}",
             detail="the sweep has succeeded before, so this is a stop, not a system "
             "nobody turned on. A dead scheduler and a refused network look the same "
             "from here and want the same look",
@@ -288,7 +340,8 @@ def _sweep_rules(cfg, now: datetime) -> list[Alert]:
             "whatever schedules it and the network policy the feed needs",
             evidence={
                 "silence_hours": hours,
-                "sources": [n for n, _ in sorted(stale)],
+                "sources": [n for n, _, _ in sorted(stale)],
+                "allowances": {n: a for n, _, a in sorted(stale)},
                 "oldest_success": worst.isoformat(),
             },
         )
@@ -481,7 +534,27 @@ def _paper_rules(cfg, now: datetime) -> list[Alert]:
     return out
 
 
-def _trace_rules(debug_root: str) -> list[Alert]:
+#: How recent the newest traced run must be for a method change between it and
+#: the one before to still be news. `methodology_changed` is a TRANSITION alert:
+#: it means something about the system moved, which is worth a look on the day
+#: and worth nothing a week later. It compares the two newest runs in `debug/`,
+#: so once tracing stops it compares the same pair forever and can never clear
+#: itself - which is how "the method changed between 20260904T054544-e3b02a and
+#: 20260904T061546-eefefe" (a tool being added, entirely expected after a
+#: deploy) was still sitting open three days later. An alert that cannot resolve
+#: trains the person reading the list to skim past a real one.
+METHOD_CHANGE_WINDOW_DAYS = 3
+
+
+def _run_started(name: str) -> datetime | None:
+    """The timestamp in a run id, e.g. `20260904T054544-e3b02a`."""
+    try:
+        return datetime.strptime(name.split("-")[0], "%Y%m%dT%H%M%S").replace(tzinfo=UTC)
+    except (ValueError, IndexError):
+        return None
+
+
+def _trace_rules(debug_root: str, now: datetime | None = None) -> list[Alert]:
     """Errors in the newest run, and whether the methodology moved under us."""
     from mcp_server.observability import _events, _manifest, _runs
 
@@ -505,7 +578,12 @@ def _trace_rules(debug_root: str) -> list[Alert]:
             )
         )
 
-    mine = _manifest(newest)
+    started = _run_started(newest.name)
+    fresh = started is None or (now or datetime.now(UTC)) - started <= timedelta(
+        days=METHOD_CHANGE_WINDOW_DAYS
+    )
+
+    mine = _manifest(newest) if fresh else None
     if mine:
         prev = next((r for r in runs[1:] if _manifest(r)), None)
         if prev is not None:

@@ -276,7 +276,7 @@ Exit codes, so a scheduler can act without parsing text:
 | `bnm_press` | Bank Negara press releases | bursa_close | registered, **not enabled**: no live feed exists |
 | `jin10_flash` | 金十数据 flash news, Chinese; one request per slot (the site's own public endpoint; no free API exists, terms are a gray zone, personal research only) | us_preopen, bursa_close, us_close | **enabled** for the first probe |
 | `jin10_calendar` | 金十 economic calendar: scheduled releases and prints as `MACRO:<country>` events | us_preopen, us_close | registered, **not enabled**: on the 2026-09-05 probes `cdn-rili.jin10.com` was gone from DNS and `rili.jin10.com` answered 404 on every documented path; `fred` carries the US release calendar meanwhile. To re-enable: copy the economics JSON request the page at rili.jin10.com makes (browser network tab) into `CALENDAR_URLS`, re-probe, add the name back to `enabled` |
-| `dbnomics` | the series behind MacroMicro's charts, keyless: IMF commodity prices (palm oil, aluminium, Brent, LNG), BIS policy rates and NEERs, IMF CPI for MY and CN; each id confirmed by the probe | us_preopen, weekly | **enabled** for the first probe |
+| `dbnomics` | the series behind MacroMicro's charts, keyless: IMF commodity prices (palm oil, aluminium, Brent, LNG), BIS policy rates and NEERs, IMF CPI for MY and CN; each id confirmed by the probe | us_preopen, weekly | **enabled**; answers, but its data is old — see below |
 | `twse_openapi` | TWSE OpenAPI (official, keyless) for the `[sources] read_only` Taiwan names: P/E, P/B, yield, monthly revenue, close, volume | bursa_close, weekly | **enabled** for the first probe |
 | `finmind` | FinMind for the same names: 24 months of revenue, 8 quarters of statements, foreign net buying; `FINMIND_TOKEN` optional | weekly | **enabled** for the first probe |
 | `sec_xbrl` | SEC XBRL company facts for the US names: every reported line with its filing date, Q4 derived from FY, restatements kept; feeds the ratio and quality engines | weekly | **enabled**; first probe pending (Actions cap) |
@@ -797,6 +797,29 @@ Measured on the shipped cache (five years, 2021-09 to 2026-09), all three
 reference rules **FAIL** on both sleeves. On the US names, momentum beat the
 equal-weight universe and SPY and still lost to simply holding all three
 (+55.5% against +66.4% CAGR, with a deeper drawdown). That is the gate working.
+
+#### The fifteen DBnomics series that read stale
+
+`ask.py macro` marks fifteen `DBN:` series 463–494 days past their cadence, and
+the `series_stale` alert has carried them since the rule was written. Two things
+were settled on 2026-09-07 and are worth not re-investigating:
+
+- **The collector is not the DOSM bug.** It takes `periods[-N:]` — the newest
+  observations, not the first. That defect was specific to `dosm_cpi`.
+- **The endpoint is healthy.** A runner probe answered
+  `dbnomics ok 1.8s — 450 series points in 1 request`. The ids resolve and the
+  request shape is right.
+
+So the data at DBnomics genuinely ends in mid-2025. What is *not* settled is
+whether that is the publisher's own lag — IMF IFS and BIS aggregates can run a
+year behind — or whether these particular series ids have been superseded
+upstream while still answering with their last values.
+
+**Do not close this by raising the cadence limits.** That would silence a
+correct alert and lose the distinction between "we have not fetched" and "the
+publisher has not published". The cheap way to settle it is to open each id at
+db.nomics.world and read its last update date; the ids are in
+`knowledge/sources/dbnomics.py`.
 
 ### `retrieval` — is the search any good?
 

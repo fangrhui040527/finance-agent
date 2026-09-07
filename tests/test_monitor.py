@@ -191,9 +191,37 @@ def test_a_changed_method_between_runs_opens_an_alert(tmp_path):
     _run(root, "20260831T100000-bbbbbb", [{"kind": "span", "name": "x"}], b)
     empty = tmp_path / "e.db"
     ProvenanceLedger(empty).close()
-    alerts = evaluate(_cfg(), db=str(empty), debug_root=str(root))
+    # An explicit clock, one day after the newest run. Without it this test read
+    # the wall clock and would pass or fail depending on how long after the
+    # fixture dates it happened to be run - the same fragility that made three
+    # monitor tests go red on main when the tracked corpus aged.
+    day_after = datetime(2026, 8, 31, 12, 0, tzinfo=UTC)
+    alerts = evaluate(_cfg(), db=str(empty), debug_root=str(root), now=day_after)
     meth = [x for x in alerts if x.rule == "methodology_changed"]
     assert meth and "system prompt changed" in meth[0].detail
+
+
+def test_a_method_change_nobody_has_run_since_stops_being_news(tmp_path):
+    """`methodology_changed` is a TRANSITION alert. It compares the two newest
+    traced runs, so once tracing stops it compares the same pair forever and can
+    never clear - which is how a tool being added on 4 September, entirely
+    expected after a deploy, was still sitting open three days later."""
+    root = tmp_path / "debug"
+    a = {
+        "manifest_hash": "a" * 64,
+        "system_prompt_hashes": {"a15": "1"},
+        "registry_hash": "r",
+        "tools_hash": "t",
+        "package_versions": {},
+    }
+    b = dict(a, manifest_hash="b" * 64, system_prompt_hashes={"a15": "2"})
+    _run(root, "20260830T100000-aaaaaa", [{"kind": "span", "name": "x"}], a)
+    _run(root, "20260831T100000-bbbbbb", [{"kind": "span", "name": "x"}], b)
+    empty = tmp_path / "e.db"
+    ProvenanceLedger(empty).close()
+    weeks_later = datetime(2026, 9, 14, 12, 0, tzinfo=UTC)
+    alerts = evaluate(_cfg(), db=str(empty), debug_root=str(root), now=weeks_later)
+    assert not [x for x in alerts if x.rule == "methodology_changed"]
 
 
 # --- the state machine --------------------------------------------------------------
@@ -347,11 +375,11 @@ def _swept(path: Path, source: str = "gdelt", status: str = "ok", at: datetime |
     return path
 
 
-def _sweep_cfg(tmp_path: Path, hours: int = 30, **over):
+def _sweep_cfg(tmp_path: Path, hours: int = 30, sources: tuple[str, ...] = ("gdelt",), **over):
     return _cfg(
         alert_sweep_silence_hours=hours,
         corpus_db=str(tmp_path / "corpus.db"),
-        sources=("gdelt",),
+        sources=sources,
         **over,
     )
 
@@ -551,3 +579,73 @@ def test_the_shipped_config_turns_the_sweep_rule_on(tmp_path):
     """It is scheduled, so it is watched. `silence_hours` stays off because a
     personal tool may sit idle; the sweep may not."""
     assert load_config().alert_sweep_silence_hours == 30
+
+
+# --- a rule that is wrong on a timetable is worse than no rule -------------------
+
+
+def test_a_daily_source_keeps_the_configured_allowance():
+    """No behaviour change for the sources the rule was written against."""
+    from core.monitor import sweep_allowance_hours
+
+    for daily in ("gdelt", "google_news", "edgar", "finnhub"):
+        assert sweep_allowance_hours(daily, 30) == 30
+
+
+def test_a_weekday_only_source_is_given_the_weekend():
+    """`fred` runs at us_preopen, weekdays. Friday to Monday is three days, so a
+    30-hour line made it 'silent' every Saturday, Sunday and Monday morning
+    while the collector was running perfectly."""
+    from core.monitor import sweep_allowance_hours
+
+    assert sweep_allowance_hours("fred", 30) == 78
+    assert sweep_allowance_hours("dbnomics", 30) == 78
+
+
+def test_a_weekly_source_is_given_its_week():
+    """dosm_cpi, sec_xbrl and finmind fire once on a Sunday. A 30-hour rule
+    calls them dead six days out of every seven."""
+    from core.monitor import sweep_allowance_hours
+
+    for weekly in ("dosm_cpi", "sec_xbrl", "finmind"):
+        assert sweep_allowance_hours(weekly, 30) == 174
+
+
+def test_the_most_frequent_slot_sets_the_expectation():
+    """A source in both a daily and a weekly slot should still report daily."""
+    from core.monitor import sweep_allowance_hours
+
+    assert sweep_allowance_hours("twse_openapi", 30) == 30  # bursa_close + weekly
+    assert sweep_allowance_hours("eodhd", 30) == 30  # bursa_close + us_close
+
+
+def test_a_source_the_catalogue_does_not_know_falls_back():
+    from core.monitor import sweep_allowance_hours
+
+    assert sweep_allowance_hours("not_a_real_source", 30) == 30
+
+
+def test_a_weekday_source_silent_over_one_weekend_is_not_an_alert(tmp_path):
+    """The exact 2026-09-07 false alarm, pinned: Friday's us_preopen run to
+    Monday morning is 68 hours, over the old flat 30-hour line, and the
+    collector was working perfectly the whole time."""
+    friday = datetime(2026, 9, 4, 12, 30, tzinfo=UTC)
+    monday = datetime(2026, 9, 7, 8, 38, tzinfo=UTC)
+    _swept(tmp_path / "corpus.db", source="fred", at=friday)
+    cfg = _sweep_cfg(tmp_path, sources=("fred",))
+    assert (monday - friday).total_seconds() / 3600 > 30, "the old rule would have fired"
+    alerts = evaluate(cfg, db=str(_ledger(tmp_path / "led.db")), now=monday)
+    assert not [a for a in alerts if a.rule == "sweep_silence"]
+
+
+def test_a_weekday_source_silent_past_its_own_cadence_still_alerts(tmp_path):
+    """The rule must not have been softened into uselessness."""
+    now = datetime(2026, 9, 7, 8, 38, tzinfo=UTC)
+    _swept(tmp_path / "corpus.db", source="fred", at=now - timedelta(hours=90))
+    cfg = _sweep_cfg(tmp_path, sources=("fred",))
+    fired = [
+        a
+        for a in evaluate(cfg, db=str(_ledger(tmp_path / "led.db")), now=now)
+        if a.rule == "sweep_silence"
+    ]
+    assert fired and "allowed 78h" in fired[0].title
