@@ -157,6 +157,9 @@ class Corpus:
             self.conn.execute(
                 "ALTER TABLE articles ADD COLUMN fetched_for TEXT NOT NULL DEFAULT ''"
             )
+        sweeps = {r[1] for r in self.conn.execute("PRAGMA table_info(sweeps)")}
+        if "slot" not in sweeps:
+            self.conn.execute("ALTER TABLE sweeps ADD COLUMN slot TEXT NOT NULL DEFAULT ''")
 
     # -- reads about the corpus itself ----------------------------------------
 
@@ -243,6 +246,7 @@ class Corpus:
         status: str,
         *,
         at: datetime | None = None,
+        slot: str = "",
         fetched: int = 0,
         kept: int = 0,
         stored: int = 0,
@@ -255,15 +259,16 @@ class Corpus:
         that could not run. The row IS the difference between those two."""
         self.conn.execute(
             """INSERT INTO sweeps
-               (run_id, at, source, since, status, fetched, kept, stored,
+               (run_id, at, source, since, status, slot, fetched, kept, stored,
                 duplicates, unlinked, escalated, detail)
-               VALUES (?,?,?,?,?,?,?,?,?,?,?,?)""",
+               VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)""",
             (
                 run_id,
                 _iso(at or datetime.now(UTC)),
                 source,
                 _iso(since),
                 status,
+                slot,
                 fetched,
                 kept,
                 stored,
@@ -285,6 +290,39 @@ class Corpus:
             "SELECT MAX(at) AS at FROM sweeps WHERE source = ? AND status = ?",
             (source, OK),
         ).fetchone()
+        return _dt(row["at"]) if row and row["at"] else None
+
+    def slot_runs(self, since: datetime, until: datetime) -> dict[str, int]:
+        """How many distinct sweep RUNS each slot had over [since, until).
+
+        Counting runs, not rows: one sweep writes a row per source, and the
+        question this answers is "did the collector fire", not "how many
+        sources answered". Rows written before the slot column existed carry
+        '' and are not counted - the corpus is append-only, so the honest
+        reading is that their slot is unknown, never that they were a slot
+        that ran.
+
+        BOTH ENDS ARE BOUNDED because the caller compares this against a count
+        of days. Left open, a half-day at either edge counts firings against
+        days that were never owed, or owes days whose firings fall outside -
+        and on a five-day window that arithmetic reported a shortfall of one on
+        every daily slot for a collector that had missed nothing at all.
+        """
+        rows = self.conn.execute(
+            """SELECT slot, COUNT(DISTINCT run_id) AS runs FROM sweeps
+                WHERE at >= ? AND at < ? AND slot <> '' GROUP BY slot""",
+            (_iso(since), _iso(until)),
+        ).fetchall()
+        return {r["slot"]: int(r["runs"]) for r in rows}
+
+    def first_slot_row(self) -> datetime | None:
+        """When the sweeps table first recorded a slot at all.
+
+        Before this moment nothing can be said about which slots ran, so a rule
+        that counts missed slots must not count the silence in front of it as
+        misses. Returns None while no row carries a slot.
+        """
+        row = self.conn.execute("SELECT MIN(at) AS at FROM sweeps WHERE slot <> ''").fetchone()
         return _dt(row["at"]) if row and row["at"] else None
 
     def articles(

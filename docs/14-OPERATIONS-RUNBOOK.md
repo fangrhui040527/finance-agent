@@ -294,6 +294,7 @@ The rules, all thresholds in `config.toml [monitor]` and bounded in code:
 | `dropped_claims` | claims dropped for want of a citation exceed `dropped_claim_rate` |
 | `silence` | no model calls in `silence_hours`, on a ledger that HAS run before (0 = off) |
 | `sweep_silence` | no successful sweep in `sweep_silence_hours`, for a source that HAS succeeded before (0 = off) |
+| `slots_missed` | the collector fired fewer times than its own cron owes over `slot_window_days` whole days (0 = off) |
 | `series_stale` | a macro series' newest observation is past the cadence declared for it in `knowledge/sources/freshness.py` |
 | `open_question_stale` | a question the nightly pages carry has stood for more than 21 days |
 | `run_errors` | the newest traced run contains an error event |
@@ -386,6 +387,50 @@ succeeded once, because a corpus nobody has filled yet is a system nobody turned
 on rather than one that stopped.
 
 Leave `silence_hours` at 0 unless something SCHEDULED also calls a model.
+
+**And `sweep_silence` cannot see a collector that is merely unreliable.** It
+reads the newest success per source, so ANY run resets it for every source at
+once — including one you fire by hand. On 2026-09-07 both the 09:20 and 12:30
+slots produced no run at all, a manual sweep at 08:50 had already reset the
+clock, and `ask.py watch` was clean: a day that lost two of its three
+collections read as perfectly healthy.
+
+`slots_missed` counts instead of timing. The cron owes a known number of firings
+— `bursa_close` and `us_close` daily, `us_preopen` Mon–Fri, `weekly` on Sunday —
+and the sweeps table now records which slot each run was, so the gap between owed
+and arrived is the alert.
+
+**The total is the signal, not any one slot.** This failure spreads itself thin:
+a bad day loses one firing from each of three different slots, so a per-slot
+threshold sees three ones and reports nothing. Summed, that day is three missing
+collections out of four owed. Per-slot counts still appear in the alert, because
+they say which part of the day is being dropped, and each slot is capped at what
+it was owed so three `bursa_close` runs cannot pay for a `us_close` that never
+fired. Four rules keep it honest:
+
+* **Whole UTC days, both ends.** Anchored to the clock instead of midnight, a
+  five-day check reported one missing firing on every daily slot for a collector
+  that had missed nothing: the oldest day's runs fell before the start while the
+  day itself was still owed. Today is excluded — a slot that has not come round
+  yet is not a slot missed.
+* **A shortfall of one is not a finding.** A 21:15 run delayed three hours lands
+  on the next UTC day; `SLOT_SHORTFALL_MIN` is 2 so that is never read as a
+  fault.
+* **It judges only days the store can answer for.** Rows written before the slot
+  column existed carry `''`, and the corpus is append-only, so the window starts
+  at the first recorded slot rather than counting that history as misses.
+
+* **A run by hand saves the data, not the schedule.** `--slot all` collects every
+  source, so nothing is lost, and the alert says so — but it is never counted as
+  a scheduled firing. A person firing the collector every morning because the
+  timer stopped is the fault being reported; letting the repair silence the
+  alarm is how it stays broken.
+
+Two shapes of failure look different in the run history and want different
+fixes: a run **created and never given a machine**
+(seconds long, no log) is the Actions minutes cap; **no run at all** is GitHub
+dropping the schedule under load. News is the only loss that cannot be
+recovered — the wire feeds serve a recent window only.
 
 ### Is a source covering the name it is asked for?
 

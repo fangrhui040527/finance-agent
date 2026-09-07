@@ -43,3 +43,4 @@ knowledge/paper/*.pack.md
 # The paid embedding cache: vectors for text, rebuildable from the API and
 # meaningless without the key. Not a store the system reasons over.
 data/embeddings.db
+does-not-exist.db

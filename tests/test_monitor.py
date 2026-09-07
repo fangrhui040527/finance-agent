@@ -649,3 +649,213 @@ def test_a_weekday_source_silent_past_its_own_cadence_still_alerts(tmp_path):
         if a.rule == "sweep_silence"
     ]
     assert fired and "allowed 78h" in fired[0].title
+
+
+# --- missed slots ---------------------------------------------------------------
+# The blind spot this rule exists to close, from the live system on 2026-09-07:
+# the 09:20 and 12:30 collections produced no run at all, a manual run at 08:50
+# had already reset every source's clock, and `ask.py watch` was clean.
+
+
+def _ran(path: Path, slot: str, at: datetime, run_id: str | None = None):
+    from knowledge.corpus import Corpus
+
+    with Corpus(path) as c:
+        c.record_sweep(run_id or f"{slot}-{at.isoformat()}", "gdelt", at, "ok", at=at, slot=slot)
+    return path
+
+
+def _slot_cfg(tmp_path: Path, days: int = 3, **over):
+    return _cfg(
+        alert_slot_window_days=days,
+        alert_sweep_silence_hours=30,
+        corpus_db=str(tmp_path / "corpus.db"),
+        sources=("gdelt",),
+        **over,
+    )
+
+
+def _full_days(path: Path, now: datetime, days: int, skip: set[str] | None = None):
+    """Every firing the cron owes over the window, minus what `skip` names."""
+    from core.monitor import SLOT_WEEKDAYS
+
+    skip = skip or set()
+    for back in range(1, days + 1):
+        day = now - timedelta(days=back)
+        for slot, weekdays in SLOT_WEEKDAYS.items():
+            if day.weekday() in weekdays and slot not in skip:
+                _ran(path, slot, day.replace(hour=9, minute=20))
+    return path
+
+
+def test_a_collector_that_fires_on_time_is_quiet(tmp_path):
+    now = datetime(2026, 9, 10, 14, 0, tzinfo=UTC)  # a Thursday
+    _full_days(tmp_path / "corpus.db", now, 3)
+    alerts = evaluate(_slot_cfg(tmp_path), db=str(_ledger(tmp_path / "led.db")), now=now)
+    assert not [a for a in alerts if a.rule == "slots_missed"]
+
+
+def test_a_slot_that_stops_firing_opens_an_alert(tmp_path):
+    now = datetime(2026, 9, 10, 14, 0, tzinfo=UTC)
+    _full_days(tmp_path / "corpus.db", now, 3, skip={"bursa_close"})
+    alerts = evaluate(_slot_cfg(tmp_path), db=str(_ledger(tmp_path / "led.db")), now=now)
+    missed = [a for a in alerts if a.rule == "slots_missed"]
+    assert missed and missed[0].severity == ALERT
+    # two whole days, not three: the oldest day's history starts mid-morning and
+    # a part-day is never owed a full day's firings
+    assert "bursa_close 0 of 2" in missed[0].title
+    assert missed[0].evidence["missed"] == 2
+    assert missed[0].evidence["arrived"]["bursa_close"] == 0
+    assert missed[0].evidence["window_days"] == 2
+
+
+def test_the_blind_spot_sweep_silence_cannot_see(tmp_path):
+    """The 2026-09-07 shape exactly: slots go missing, a run fired by hand keeps
+    every source's clock fresh, and the old rule reports nothing wrong."""
+    now = datetime(2026, 9, 10, 14, 0, tzinfo=UTC)
+    path = tmp_path / "corpus.db"
+    _full_days(path, now, 3, skip={"bursa_close", "us_preopen"})
+    _ran(path, "all", now - timedelta(days=1, hours=6))  # the manual sweep
+
+    alerts = evaluate(_slot_cfg(tmp_path), db=str(_ledger(tmp_path / "led.db")), now=now)
+    assert not [a for a in alerts if a.rule == "sweep_silence"], (
+        "the manual run resets sweep_silence - that is the blind spot, not a bug in it"
+    )
+    missed = [a for a in alerts if a.rule == "slots_missed"]
+    assert missed, "the counting rule must see what the timing rule cannot"
+    assert missed[0].evidence["missed"] == 4  # two days x two dropped slots
+    assert missed[0].evidence["manual_runs"] == 1
+    assert "by hand collected the data anyway" in missed[0].title
+
+
+def test_a_sweep_by_hand_saves_the_data_but_not_the_schedule(tmp_path):
+    """The repair must not silence the alarm. A person firing the collector every
+    morning because the timer stopped is the fault being reported, not its
+    absence - and the alert says the data was collected so nobody re-fetches."""
+    now = datetime(2026, 9, 10, 14, 0, tzinfo=UTC)
+    path = tmp_path / "corpus.db"
+    _full_days(path, now, 3, skip={"bursa_close", "us_preopen", "us_close", "weekly"})
+    for back in (1, 2, 3):
+        _ran(path, "all", now - timedelta(days=back, hours=4))
+
+    alerts = evaluate(_slot_cfg(tmp_path), db=str(_ledger(tmp_path / "led.db")), now=now)
+    missed = [a for a in alerts if a.rule == "slots_missed"]
+    assert missed, "every scheduled firing was replaced by a person; that is the finding"
+    assert missed[0].evidence["manual_runs"] >= 2
+
+
+def test_one_late_run_crossing_midnight_is_not_an_alert(tmp_path):
+    """A 21:15 slot delayed three hours lands on the next UTC day. Counting by
+    whole days would show yesterday short and today long; the shortfall floor is
+    what stops that from being reported as a fault."""
+    now = datetime(2026, 9, 10, 14, 0, tzinfo=UTC)
+    _full_days(tmp_path / "corpus.db", now, 3, skip={"us_close"})
+    path = tmp_path / "corpus.db"
+    for back in (1, 2):  # two of the us_close runs arrived, one did not
+        _ran(path, "us_close", now - timedelta(days=back, hours=-3))
+    alerts = evaluate(_slot_cfg(tmp_path), db=str(_ledger(tmp_path / "led.db")), now=now)
+    assert not [a for a in alerts if a.rule == "slots_missed"]
+
+
+def test_a_weekday_only_slot_is_not_owed_on_the_weekend(tmp_path):
+    """us_preopen runs Mon-Fri. A window ending on a Monday owes it two firings,
+    not four, and a rule that cannot count that fires every single Monday."""
+    from core.monitor import slots_due
+
+    monday = datetime(2026, 9, 14, 14, 0, tzinfo=UTC)
+    assert monday.weekday() == 0
+    due = slots_due(monday - timedelta(days=4), monday)
+    assert due["us_preopen"] == 2 and due["bursa_close"] == 4
+    assert due["weekly"] == 1  # exactly one Sunday in the window
+
+    _full_days(tmp_path / "corpus.db", monday, 4)
+    alerts = evaluate(_slot_cfg(tmp_path, days=4), db=str(_ledger(tmp_path / "led.db")), now=monday)
+    assert not [a for a in alerts if a.rule == "slots_missed"]
+
+
+def test_history_recorded_before_slots_existed_is_never_read_as_a_miss(tmp_path):
+    """The corpus is append-only, so rows written before the slot column carry
+    ''. Counting them as misses would raise an alert about a period nobody can
+    now investigate."""
+    now = datetime(2026, 9, 10, 14, 0, tzinfo=UTC)
+    path = tmp_path / "corpus.db"
+    _swept(path, at=now - timedelta(days=3))  # no slot recorded
+    _swept(path, at=now - timedelta(days=2))
+    alerts = evaluate(_slot_cfg(tmp_path), db=str(_ledger(tmp_path / "led.db")), now=now)
+    assert not [a for a in alerts if a.rule == "slots_missed"]
+
+    # and the moment slots start being recorded, the window starts there too
+    _full_days(path, now, 1)
+    alerts = evaluate(_slot_cfg(tmp_path), db=str(_ledger(tmp_path / "led.db")), now=now)
+    assert not [a for a in alerts if a.rule == "slots_missed"]
+
+
+def test_an_extra_run_of_one_slot_does_not_pay_for_another(tmp_path):
+    """Capped per slot. Three bursa_close runs in a day must not hide a us_close
+    that never fired - they collect different sources at different hours."""
+    now = datetime(2026, 9, 10, 14, 0, tzinfo=UTC)
+    path = tmp_path / "corpus.db"
+    _full_days(path, now, 3, skip={"us_close"})
+    for extra in range(4):
+        _ran(path, "bursa_close", now - timedelta(days=1, hours=extra))
+    alerts = evaluate(_slot_cfg(tmp_path), db=str(_ledger(tmp_path / "led.db")), now=now)
+    missed = [a for a in alerts if a.rule == "slots_missed"]
+    assert missed and missed[0].evidence["arrived"]["us_close"] == 0
+
+
+def test_the_slot_rule_is_off_by_default(tmp_path):
+    now = datetime(2026, 9, 10, 14, 0, tzinfo=UTC)
+    _full_days(tmp_path / "corpus.db", now, 3, skip={"bursa_close", "us_close"})
+    alerts = evaluate(_slot_cfg(tmp_path, days=0), db=str(_ledger(tmp_path / "led.db")), now=now)
+    assert not [a for a in alerts if a.rule == "slots_missed"]
+
+
+def test_the_shipped_config_turns_it_on(tmp_path):
+    """A rule nobody enables is a rule that does not exist."""
+    assert load_config().alert_slot_window_days >= 3
+
+
+def test_the_sweep_records_which_slot_it_was(tmp_path):
+    """The rule can only count what the collector writes down."""
+    from knowledge.corpus import Corpus
+
+    now = datetime(2026, 9, 10, 9, 20, tzinfo=UTC)
+    path = tmp_path / "corpus.db"
+    _ran(path, "bursa_close", now)
+    with Corpus(path) as c:
+        assert c.slot_runs(now - timedelta(days=1), now + timedelta(days=1)) == {"bursa_close": 1}
+        assert c.first_slot_row() == now
+
+
+def test_a_collector_that_missed_nothing_never_reports_a_shortfall(tmp_path):
+    """The arithmetic bug this rule was born with, and the reason it is counted
+    over whole days: with the window anchored to the clock instead of midnight,
+    a five-day check on a collector that had missed NOTHING reported one missing
+    firing on every daily slot, because the oldest day's runs fell before the
+    start while the day itself was still owed."""
+    from core.monitor import slots_due
+    from knowledge.corpus import Corpus
+
+    now = datetime(2026, 9, 10, 14, 0, tzinfo=UTC)
+    path = tmp_path / "corpus.db"
+    _full_days(path, now, 5)
+
+    end = datetime(now.year, now.month, now.day, tzinfo=UTC)
+    with Corpus(path) as c:
+        ran = c.slot_runs(end - timedelta(days=5), end)
+    due = slots_due(end - timedelta(days=5), end)
+    assert ran == due, "every firing the cron owed is in the store; the counts must agree"
+
+    for window in (2, 3, 5, 7):
+        alerts = evaluate(
+            _slot_cfg(tmp_path, days=window), db=str(_ledger(tmp_path / "led.db")), now=now
+        )
+        assert not [a for a in alerts if a.rule == "slots_missed"], f"false alarm at {window}d"
+
+
+def test_today_is_not_owed_its_slots_yet(tmp_path):
+    """A check at lunchtime must not report the evening collection as missed."""
+    now = datetime(2026, 9, 10, 12, 0, tzinfo=UTC)
+    _full_days(tmp_path / "corpus.db", now, 3)
+    alerts = evaluate(_slot_cfg(tmp_path), db=str(_ledger(tmp_path / "led.db")), now=now)
+    assert not [a for a in alerts if a.rule == "slots_missed"]

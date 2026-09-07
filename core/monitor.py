@@ -227,6 +227,7 @@ def evaluate(
 
     out.extend(_sweep_rules(cfg, now))
     out.extend(_series_rules(cfg, now))
+    out.extend(_slot_rules(cfg, now))
     out.extend(_question_rules(now, feedback_root))
     out.extend(_paper_rules(cfg, now))
     out.extend(_trace_rules(debug_root, now))
@@ -343,6 +344,142 @@ def _sweep_rules(cfg, now: datetime) -> list[Alert]:
                 "sources": [n for n, _, _ in sorted(stale)],
                 "allowances": {n: a for n, _, a in sorted(stale)},
                 "oldest_success": worst.isoformat(),
+            },
+        )
+    ]
+
+
+#: Which slots the cron in `.github/workflows/collect.yml` owes on a given
+#: weekday, 0 = Monday. `us_preopen` runs `1-5` (Mon-Fri) and `weekly` fires on
+#: Sunday; the other two run every day. Kept beside SLOT_MAX_GAP_HOURS because
+#: they read the same cron and must not drift apart.
+SLOT_WEEKDAYS: dict[str, frozenset[int]] = {
+    "bursa_close": frozenset(range(7)),
+    "us_preopen": frozenset(range(5)),
+    "us_close": frozenset(range(7)),
+    "weekly": frozenset({6}),
+}
+
+#: A run may land in the next UTC day and still be the previous day's slot -
+#: 21:15 delayed by three hours is 00:15 tomorrow - so one firing short across
+#: the whole window is lateness, not loss. Two is a fault.
+SLOT_SHORTFALL_MIN = 2
+
+
+def slots_due(start: datetime, end: datetime) -> dict[str, int]:
+    """How many firings the cron owes each slot over [start, end).
+
+    Counted by whole UTC days, the same unit the cron is written in.
+    """
+    due: dict[str, int] = dict.fromkeys(SLOT_WEEKDAYS, 0)
+    day = start.date()
+    while day < end.date():
+        for slot, weekdays in SLOT_WEEKDAYS.items():
+            if day.weekday() in weekdays:
+                due[slot] += 1
+        day += timedelta(days=1)
+    return {s: n for s, n in due.items() if n}
+
+
+def _slot_rules(cfg, now: datetime) -> list[Alert]:
+    """Whether the collector fired as often as its own cron says it should.
+
+    `sweep_silence` above watches for a collector that has STOPPED, and it is
+    the wrong instrument for a collector that is merely unreliable. It reads
+    the newest success per source against an allowance, so ANY run - including
+    one fired by hand - resets it for every source at once. On 2026-09-07 the
+    scheduled 09:20 and 12:30 slots both produced no run at all, a manual run
+    at 08:50 had already reset the clock, and the alert list was clean. A day
+    that lost two of its three collections read as perfectly healthy.
+
+    So this rule counts instead of timing: the cron owes a known number of
+    firings over the window, and the sweeps table records what arrived.
+
+    THE TOTAL IS THE SIGNAL, not any one slot. The failure this exists to catch
+    spreads itself thin - a bad day loses one firing from each of three
+    different slots, so a per-slot threshold sees three ones and reports
+    nothing. Summed, that day is three missing collections out of four owed,
+    which is the number worth waking someone for. Per-slot counts still go in
+    the title, because they say WHICH part of the day is being dropped.
+
+    A MANUAL RUN DOES NOT COUNT AS A SCHEDULED ONE. `--slot all` collects every
+    source, so the data is not lost - and it is named in the alert for exactly
+    that reason. But it took a person noticing, which is the thing being
+    reported: a scheduler papered over by hand every morning is still broken,
+    and letting the repair silence the alarm is how it stays broken.
+
+    WHY THIS MATTERS MORE THAN A LATE RUN. News expires. GDELT and the wire
+    feeds serve a recent window only and the free tiers are per-day, so a slot
+    that never fires is a few hours of headlines that cannot be fetched later
+    at any price. Prices, filings and macro series are all re-fetchable; the
+    corpus is not.
+
+    Quiet over any part of the window that predates the first recorded slot:
+    rows written before the slot column existed carry none, and counting them
+    as misses would raise an alert about a period nobody can now investigate.
+    """
+    days = int(getattr(cfg, "alert_slot_window_days", 0))
+    if days <= 0:
+        return []
+
+    from knowledge.corpus import Corpus
+
+    path = str(getattr(cfg, "corpus_db", "data/corpus.db"))
+    if not Path(path).exists():
+        return []
+
+    # WHOLE UTC DAYS, both ends, because the comparison is against a count of
+    # days the cron owes. `end` is midnight this morning: today is still in
+    # progress, and a slot that has not come round yet is not a slot missed.
+    end = datetime(now.year, now.month, now.day, tzinfo=UTC)
+    start = end - timedelta(days=days)
+    with Corpus(path) as corpus:
+        first = corpus.first_slot_row()
+        if first is None:
+            return []
+        # Only judge days this store can answer for. Round up to the next
+        # midnight so a partial first day is never owed a full day's firings.
+        if first > start:
+            start = datetime(first.year, first.month, first.day, tzinfo=UTC) + timedelta(days=1)
+        if end - start < timedelta(days=1):
+            return []
+        ran = corpus.slot_runs(start, end)
+
+    due = slots_due(start, end)
+    manual = ran.get("all", 0)
+    # Capped per slot: a slot that fired twice in a day does not pay for
+    # another slot that never fired at all.
+    arrived = {slot: min(ran.get(slot, 0), n) for slot, n in due.items()}
+    short = sum(due.values()) - sum(arrived.values())
+    if short < SLOT_SHORTFALL_MIN:
+        return []
+
+    window = (end - start).days
+    named = ", ".join(f"{slot} {arrived[slot]} of {due[slot]}" for slot in sorted(due))
+    hand = f"; {manual} run(s) by hand collected the data anyway" if manual else ""
+    return [
+        Alert(
+            rule="slots_missed",
+            severity=ALERT,
+            title=f"the collector missed {short} of {sum(due.values())} scheduled "
+            f"runs in {window}d: {named}{hand}",
+            detail="the cron owes a fixed number of firings and the sweeps table says how "
+            "many arrived. sweep_silence cannot see this - one run by hand resets it "
+            "for every source - so a day that loses two of its three collections reads "
+            "as healthy there. A manual sweep saves the data but not the schedule, so "
+            "it is named here rather than counted. News is the loss that cannot be "
+            "recovered: the wire feeds serve a recent window only",
+            next_step="check the runner's own history - a run created but never given a "
+            "machine is out of minutes, no run at all is a dropped schedule - then "
+            "`ask.py sweep --slot <name>` fills what is still fetchable",
+            evidence={
+                "window_days": window,
+                "since": start.isoformat(),
+                "until": end.isoformat(),
+                "due": due,
+                "arrived": arrived,
+                "missed": short,
+                "manual_runs": manual,
             },
         )
     ]
