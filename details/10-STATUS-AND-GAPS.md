@@ -30,7 +30,7 @@ invisible.
 | Event taxonomy, base rates, catalyst attachment | complete |
 | Retrieval — hybrid, parent-child chunking, router | complete |
 | Backtest harness — walk-forward, costs, metrics, point-in-time | complete |
-| MCP server — 39 tools, protocol, selftest | complete |
+| MCP server — 40 tools, protocol, selftest | complete |
 | **CI budget** — private repository on GitHub Pro: 3,000 included Actions minutes a month, Windows billed double. `ci.yml` runs the full matrix only on pull requests (Windows once, on 3.12), a Linux check on pushes to main, and nothing for pushes that touch only `data/`, `debug/` or the dated journal pages; superseded runs are cancelled. The allowance ran out on 6 September 2026 (286 runs) and every job died in two seconds until the account and repository Actions budgets were set to USD 10; at this month's pattern the trims save about 1,300 minutes | complete |
 | Teacher — 30 concepts, enforced prerequisite order | complete |
 | **Analyst engines** — `engines/fundamentals/` (22 point-in-time ratios; accruals, Beneish M, Piotroski F, Altman Z, each saying n of N inputs) and `engines/valuation/` (cost of capital from stored inputs and the dated table, bear/base/bull DCF with the terminal share reported and fatal sanity checks, peer comps in three contexts); reachable as `ask.py ratios` / `ask.py valuation` and MCP `ratio_sheet`, `cost_of_capital`, `valuation_range`; a name with no statements says NO STATEMENTS STORED and which source would change that | complete (added 2026-09-06); Bursa names have no free statement source, so for the six they answer honestly with nothing until EODHD's Fundamentals plan |

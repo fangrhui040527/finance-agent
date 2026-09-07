@@ -1205,6 +1205,16 @@ def s_mcp():
         # which is the honest answer and touches no network.
         "paper_status": {"db": ":memory:"},
         "paper_report": {"days": 1, "db": ":memory:"},
+        # The gate, asked for a window that cannot exist. It must answer NO
+        # VERDICT rather than reach a price host: a backtest that quietly
+        # fetches is a backtest that can be run into a rate limit by a model
+        # asking the same question twice.
+        "backtest_gate": {
+            "rule": "equal_weight",
+            "instruments": ["XNAS:NVDA"],
+            "start": "2099-01-01",
+            "end": "2099-12-31",
+        },
     }
     uncovered = [t for t in S.tools if t not in minimal]
     if uncovered:

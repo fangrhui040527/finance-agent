@@ -789,6 +789,10 @@ is what a backtest wants — the last bar being a day old is irrelevant to fifte
 years of history, and re-fetching every name to learn that is quota spent for
 nothing.
 
+The same gate is MCP tool `backtest_gate`, so the model reaches it through the
+tools rather than reasoning about returns in conversation — which is the whole
+posture of this surface.
+
 Measured on the shipped cache (five years, 2021-09 to 2026-09), all three
 reference rules **FAIL** on both sleeves. On the US names, momentum beat the
 equal-weight universe and SPY and still lost to simply holding all three
