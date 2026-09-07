@@ -112,7 +112,22 @@ def grade(
 
 
 def default_rewrite(query: str, attempt: int) -> str:
-    """Stand-in for the cheap-tier rewriter: widen, then strip qualifiers."""
+    """Stand-in for the cheap-tier rewriter: widen, then strip qualifiers.
+
+    Still a stand-in, and still the weakest stage in this pipeline: it truncates
+    a question rather than rephrasing it, which is not what a rewriter does.
+
+    The obvious offline replacement was tried and MEASURED AWAY. Expanding the
+    question with its nearest terms from the fitted embedder lifted BM25's own
+    recall at ten from 58.3% to 62.5% on the gold set - and cost the pipeline's
+    final MRR at every setting: 0.495 unexpanded, 0.466 at two added terms,
+    0.457 at four, 0.421 at eight, and at sixteen it took recall DOWN. A corpus
+    of a few thousand headlines is too small to learn reliable neighbours: the
+    expansions it offered ran "folding-screen" for a question about bendable
+    phones, which is exactly right, beside "omah" and "capsule", which are
+    noise, and BM25 cannot tell the two apart. A real rewriter here is a
+    cheap-tier model call, not a bigger corpus trick.
+    """
     if attempt == 1:
         return " ".join(w for w in query.split() if len(w) > 2)
     return " ".join(query.split()[:4])

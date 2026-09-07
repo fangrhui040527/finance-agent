@@ -127,6 +127,33 @@ def run_checks(offline: bool = False) -> list[CheckResult]:
             )
         )
 
+    # -- retrieval vectors
+    #
+    # Named here because the two backends behave differently in a way no error
+    # message would ever surface: the keyless one only relates words it has seen
+    # in THIS corpus, so a question phrased in outside vocabulary reaches
+    # nothing and looks exactly like a corpus with no answer in it.
+    from knowledge.retrieval.embedding import EMBED_KEY_ENV, default_embedder
+
+    embedder = default_embedder()
+    keyed = os.environ.get(EMBED_KEY_ENV, "").strip()
+    out.append(
+        CheckResult(
+            "embedder",
+            OK,
+            (
+                f"{type(embedder).__name__}"
+                + (
+                    ""
+                    if keyed
+                    else f"; no {EMBED_KEY_ENV}, so vectors are learned from the corpus and "
+                    "a question in words the corpus has never used reaches nothing"
+                )
+            ),
+            "how well search answers a question phrased in its own words",
+        )
+    )
+
     # -- model backend
     from core.llm.backends import backend_from_env
 

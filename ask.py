@@ -1666,6 +1666,41 @@ def cmd_fitness(a) -> int:
     return 0
 
 
+def cmd_retrieval(a) -> int:
+    """Score the search itself against the labelled questions.
+
+    The one number every other quality claim rested on and none of them had:
+    given a question, does retrieval put an article that answers it in front of
+    the reader. Run it before and after any change to the embedder, the fusion
+    or the reranker - a change to search that nobody measured is a change
+    nobody can defend.
+    """
+    from knowledge.retrieval.evaluate import GOLD, report_for
+
+    embedder = None
+    if a.embedder == "hashing":
+        from knowledge.retrieval.embedding import HashingEmbedder
+
+        embedder = HashingEmbedder()
+    elif a.embedder == "distributional":
+        from knowledge.retrieval.embedding import DistributionalEmbedder
+
+        embedder = DistributionalEmbedder()
+
+    report = report_for(a.corpus, a.gold or GOLD, a.depth, embedder)
+    if not report.cases:
+        print(f"no labelled questions at {a.gold or GOLD}", file=sys.stderr)
+        return 2
+    print(report.summary())
+    print()
+    print(
+        "recall is a FLOOR: only articles verified to answer each question are "
+        "labelled, so an unlabelled hit counts as a miss. The comparison between "
+        "legs is what the set is for."
+    )
+    return 0
+
+
 # ---------------------------------------------------------------- graph
 def _graph(db: str | None):
     """Load the built graph, or explain how to build it. Never guesses."""
@@ -2096,6 +2131,18 @@ def main(argv=None) -> int:
     wk.add_argument("--as-at", help="YYYY-MM-DD; default today")
     wk.add_argument("--archetype", help="sector archetype, e.g. bank, software")
     wk.set_defaults(fn=cmd_workup)
+
+    rt = sub.add_parser("retrieval", help="score the search against the labelled questions")
+    rt.add_argument("--corpus", default="data/corpus.db", help="corpus to search")
+    rt.add_argument("--gold", help="labelled questions (default the shipped set)")
+    rt.add_argument("--depth", type=int, default=10, help="how deep each leg may look")
+    rt.add_argument(
+        "--embedder",
+        choices=("default", "distributional", "hashing"),
+        default="default",
+        help="which vectors to score; 'hashing' is the pre-2026-09-07 baseline",
+    )
+    rt.set_defaults(fn=cmd_retrieval)
 
     ft = sub.add_parser("fitness", help="can the system score itself yet?")
     ft.add_argument("--days", type=int, default=30, help="window (default 30)")

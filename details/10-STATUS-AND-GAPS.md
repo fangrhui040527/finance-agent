@@ -39,7 +39,7 @@ invisible.
 | **Method collections filled** — `knowledge/method/`: 52 own-written notes in the five human stores (`kb_craft` 13 covering all 30 concepts, `kb_method_valuation` 13, `kb_method_technical` 6, `kb_method_risk` 7, `kb_failures` 13 cases with pattern tags) plus the dated cost-of-capital table; loaded by `knowledge/retrieval/method.py` on every surface; the teacher cites its note, the valuation agent its archetype's method, the red team retrieves failure analogues by pattern; `ask.py method`, MCP `method_note` | complete (added 2026-09-06; until then every one of the five stores was registered empty and no agent cited a method) |
 | Reflection — grading, lesson proposal, calibration, scoring | complete |
 | Tracing — spans, HTML report, anatomy, prompts | complete |
-| CLI — 30 subcommands | complete |
+| CLI — 31 subcommands | complete |
 | Paper book — `engines/paper/`, `ask.py paper`, `data/paper.db`, marked by `collect.yml`, decided by the Routine, journal in `knowledge/paper/` (docs/22) | complete; the record accrues from 2026-09-08 |
 | **Feedback routine** — `ask.py pack` prepares the night, a scheduled Claude session writes `knowledge/feedback/<date>.md`, indexed as `kb_lessons` | complete; docs/20 |
 | Fitness function — refuses a partial score | complete |

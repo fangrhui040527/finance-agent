@@ -741,6 +741,58 @@ discount rate is below risk-free plus half the premium, is dropped and named.
 **Exits 1** on NO STATEMENTS STORED or a refused range. Same text as the MCP
 tools `ratio_sheet`, `cost_of_capital` and `valuation_range`.
 
+### `retrieval` — is the search any good?
+
+```bash
+python ask.py retrieval                        # the shipped vectors
+python ask.py retrieval --embedder hashing     # the pre-2026-09-07 baseline
+python ask.py retrieval --depth 20             # a more generous idea of "found"
+```
+
+Runs `knowledge/retrieval/data/retrieval_gold.yaml` — 24 questions, each pinned
+to the articles in `data/corpus.db` verified to answer it — down all four
+retrieval legs separately, and prints recall at 1, 5 and 10 plus MRR for each.
+
+Two things to read first. **Dense lift** is the number of questions where the
+vector leg found a relevant article BM25's own top ten did not; on the hashing
+projection this system shipped with it was **zero out of twenty-four**, which is
+what a vector leg that is really a second lexical search looks like. And the
+**semantic** block is where a change is judged: the lexical block is questions
+made of tickers and product names, which BM25 has always answered perfectly and
+which a change must not break.
+
+Recall is a floor. Only articles verified to answer each question are labelled,
+so an unlabelled hit scores as a miss; the comparison between legs is the
+finding, not the absolute number.
+
+Run it before and after any change to the embedder, the fusion or the reranker.
+Both of the obvious improvements tried on 2026-09-07 — a reranker that also
+weighed meaning, and expanding the question with its nearest corpus terms — were
+measured, found worse, and are recorded as rejected in the docstrings of
+`hybrid.rerank` and `pipeline.default_rewrite`.
+
+#### The vectors behind the search
+
+Three backends sit behind one seam (`knowledge/retrieval/embedding.py`):
+
+| backend | needs | what it knows |
+|---|---|---|
+| `DistributionalEmbedder` | nothing — **the default** | which words keep company with which, **in this corpus** |
+| `HashingEmbedder` | nothing | nothing; a token's hash bucket. The pre-2026-09-07 default, kept as the baseline |
+| `ApiEmbedder` | `EMBEDDING_API_KEY` | general language, including words this corpus has never contained |
+
+The keyless default has one honest limit, and `ask.py doctor` now names it: it
+can only relate words it has SEEN. A question about a "bendable" phone when
+every article says "foldable" gets no help, because "bendable" appears nowhere
+in the corpus and the corpus is its only teacher. Three of the sixteen semantic
+gold questions fail for exactly this reason and no offline change fixes them.
+
+Setting `EMBEDDING_API_KEY` promotes the seam to a real model — and starts
+spending. `EMBEDDING_API_URL` and `EMBEDDING_MODEL` override the endpoint and
+model (anything speaking the OpenAI `/v1/embeddings` shape). Vectors are cached
+in `data/embeddings.db` keyed by model and text, so re-indexing an unchanged
+season of headlines every night costs one request the first time and none after.
+
 ### `fitness` — can the system score itself yet?
 
 ```bash

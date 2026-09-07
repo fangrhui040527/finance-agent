@@ -39,3 +39,7 @@ package-lock.json
 #    page written from it (<date>.md, <date>.json) is the record and IS tracked.
 knowledge/feedback/*.pack.md
 knowledge/paper/*.pack.md
+
+# The paid embedding cache: vectors for text, rebuildable from the API and
+# meaningless without the key. Not a store the system reasons over.
+data/embeddings.db
