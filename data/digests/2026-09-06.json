@@ -1,6 +1,78 @@
 {
   "collection": [
     {
+      "at": "2026-09-06T22:55:38.784969+00:00",
+      "detail": "skipped: eodhd needs EODHD_API_KEY (optional); skipped until it is set",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-06T22:55:38.784290+00:00",
+      "detail": "facts 0; ",
+      "fetched": 16,
+      "kept": 6,
+      "source": "jin10_flash",
+      "status": "ok",
+      "stored": 5
+    },
+    {
+      "at": "2026-09-06T22:55:38.090953+00:00",
+      "detail": "facts 6; XNAS:MSFT: alphavantage quota exhausted for today: Thank you for using Alpha Vantage! Please consider spreading out your free API requests more sparingly (1 request per second). You may subscribe to any of the p; XNAS:NVDA: alphavantage quota exhausted for today: Thank you for using Alpha Vantage! Please consider spreading out your free API requests more sparingly (1 request per second). ",
+      "fetched": 10,
+      "kept": 10,
+      "source": "alphavantage_news",
+      "status": "ok",
+      "stored": 9
+    },
+    {
+      "at": "2026-09-06T22:55:37.572251+00:00",
+      "detail": "facts 9; ",
+      "fetched": 133,
+      "kept": 123,
+      "source": "finnhub",
+      "status": "ok",
+      "stored": 122
+    },
+    {
+      "at": "2026-09-06T22:55:34.503278+00:00",
+      "detail": "facts 0; ",
+      "fetched": 0,
+      "kept": 0,
+      "source": "edgar",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-06T22:55:34.251478+00:00",
+      "detail": "",
+      "fetched": 34,
+      "kept": 34,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 28
+    },
+    {
+      "at": "2026-09-06T22:55:33.939598+00:00",
+      "detail": "",
+      "fetched": 57,
+      "kept": 51,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 49
+    },
+    {
+      "at": "2026-09-06T22:55:32.619630+00:00",
+      "detail": "no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "failed",
+      "stored": 0
+    },
+    {
       "at": "2026-09-06T12:57:40.117884+00:00",
       "detail": "skipped: eodhd needs EODHD_API_KEY (optional); skipped until it is set",
       "fetched": 0,
@@ -128,18 +200,18 @@
     }
   ],
   "counts": {
-    "articles": 1129,
+    "articles": 1342,
     "documents": 0,
-    "escalated": 361,
+    "escalated": 451,
     "events": 3927,
-    "failed_sweeps": 14,
-    "linked": 609,
-    "observations": 4436,
+    "failed_sweeps": 15,
+    "linked": 810,
+    "observations": 4451,
     "series": 29,
-    "sweeps": 101
+    "sweeps": 109
   },
   "day": "2026-09-06",
-  "generated_at": "2026-09-06 12:57 UTC",
+  "generated_at": "2026-09-06 22:55 UTC",
   "macro": [
     {
       "change": "-0.01",
@@ -348,18 +420,18 @@
       "upcoming": []
     },
     {
-      "escalated": 0,
+      "escalated": 47,
       "events": [],
       "instrument_id": "XNAS:NVDA",
       "label": "NVIDIA",
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-09-05",
+          "known_at": "2026-09-06",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "28.04"
+          "value": "28.78"
         },
         {
           "concept": "pb",
@@ -387,7 +459,7 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-09-05",
+          "known_at": "2026-09-06",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
@@ -442,6 +514,14 @@
           "value": "1"
         },
         {
+          "concept": "av_news_sentiment",
+          "known_at": "2026-09-06",
+          "label": "vendor sentiment",
+          "period_end": "2026-09-05",
+          "source": "alphavantage_news",
+          "value": "-0.41"
+        },
+        {
           "concept": "revenue",
           "known_at": "2026-08-26",
           "label": "revenue (last quarter)",
@@ -466,23 +546,118 @@
           "value": "3.82"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/musk-moves-spacex-spcx-orbital-204103387.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-06T20:41:03+00:00",
+          "quality": 1.0,
+          "title": "Musk Moves Up SpaceX (SPCX)\u2019s Orbital Data Center Timeline, Again",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/nvidia-nvda-prove-doesn-t-202105317.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-06T20:21:05+00:00",
+          "quality": 1.0,
+          "title": "Can Nvidia (NVDA) Prove it Doesn\u2019t Live or Die by a Handful of Hyperscalers?",
+          "uncertainty": 0.17605633802816903
+        },
+        {
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/nvidia-nvda-20-billion-groq-190737433.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-06T19:07:37+00:00",
+          "quality": 1.0,
+          "title": "NVIDIA (NVDA)\u2019s $20 Billion Groq Bet Goes Live This Year With New AI Racks",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://beincrypto.com/jensen-huang-agi-nvidia-astra-chips/?.tsrc=rss",
+          "domain": "beincrypto.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-06T21:39:37+00:00",
+          "quality": 0.85,
+          "title": "Nvidia CEO Jensen Huang Says AGI Has Arrived With OpenAI's GPT-6 Astra",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:141591435",
+          "domain": "SeekingAlpha",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "polarity": 1.0,
+          "published_at": "2026-09-06T10:50:00+00:00",
+          "quality": 0.85,
+          "title": "Nvidia: 70% Growth Guidance Makes This A Strong Buy",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:141590639",
+          "domain": "SeekingAlpha",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-06T08:30:00+00:00",
+          "quality": 0.85,
+          "title": "What I Found By Analyzing How Seeking Alpha Analysts Rated The Mag 7",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:141586679",
+          "domain": "SeekingAlpha",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-06T06:34:22+00:00",
+          "quality": 0.85,
+          "title": "Nvidia's $279 Billion Bet Changes Everything",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:141556692",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-06T00:14:30+00:00",
+          "quality": 0.85,
+          "title": "CrowdStrike (CRWD) Unveiled A Broad AI Security Platform Push",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.667,
+        "n": 109,
+        "polarity_mean": 0.205,
+        "sources": 21,
+        "uncertainty_mean": 0.167
+      },
       "upcoming": []
     },
     {
-      "escalated": 0,
+      "escalated": 27,
       "events": [],
       "instrument_id": "XNAS:AAPL",
       "label": "Apple",
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-09-05",
+          "known_at": "2026-09-06",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "37.32"
+          "value": "36.22"
         },
         {
           "concept": "pb",
@@ -510,7 +685,7 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-09-05",
+          "known_at": "2026-09-06",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
@@ -565,6 +740,14 @@
           "value": "3"
         },
         {
+          "concept": "av_news_sentiment",
+          "known_at": "2026-09-06",
+          "label": "vendor sentiment",
+          "period_end": "2026-09-06",
+          "source": "alphavantage_news",
+          "value": "0.34"
+        },
+        {
           "concept": "revenue",
           "known_at": "2026-07-31",
           "label": "revenue (last quarter)",
@@ -589,23 +772,118 @@
           "value": "-0.89"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/apple-aapl-mac-mini-studio-201609665.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-06T20:16:09+00:00",
+          "quality": 1.0,
+          "title": "Apple (AAPL)\u2019s New Mac Mini and Studio Bet Big on On-Device AI",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://finance.yahoo.com/m/736d38bc-4861-37a5-bebd-9353ee16aa26/inflation%2C-apple%2C-adobe%2C.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-06T18:00:00+00:00",
+          "quality": 1.0,
+          "title": "Inflation, Apple, Adobe, Oracle, Macy\u2019s, and More to Watch This Week",
+          "uncertainty": 0.25510204081632654
+        },
+        {
+          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/keybanc-warns-apple-iphone-18-173545777.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-06T17:35:45+00:00",
+          "quality": 1.0,
+          "title": "KeyBanc warns Apple\u2019s iPhone 18 launch may be a negative catalyst for shares",
+          "uncertainty": 0.5434782608695652
+        },
+        {
+          "doc_id": "alphavantage:https://www.investopedia.com/what-to-expect-in-markets-this-week-fresh-inflation-data-apple-fall-launch-event-and-oracle-earnings-12100794",
+          "domain": "Investopedia",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-06T10:39:37+00:00",
+          "quality": 0.85,
+          "title": "What to Expect in Markets This Week: Fresh Inflation Data; Apple\u2019s Fall Launch Event and Oracle Earnings",
+          "uncertainty": 0.25252525252525254
+        },
+        {
+          "doc_id": "alphavantage:https://www.ndtv.com/world-news/what-to-expect-at-september-9-apple-event-foldable-iphone-iphone-18-pro-watch-12008801",
+          "domain": "NDTV",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-06T08:48:04+00:00",
+          "quality": 0.85,
+          "title": "What To Expect At September 9 Apple Event: Foldable iPhone, iPhone 18 Pro",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:141590639",
+          "domain": "SeekingAlpha",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-06T08:30:00+00:00",
+          "quality": 0.85,
+          "title": "What I Found By Analyzing How Seeking Alpha Analysts Rated The Mag 7",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "alphavantage:https://eletric-vehicles.com/nio/firefly/nios-firefly-brand-reaches-80000-deliveries-in-less-than-500-days/",
+          "domain": "Electric Vehicles",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-05T20:23:10+00:00",
+          "quality": 0.85,
+          "title": "Nio\u2019s Firefly Brand Reaches 80,000 Deliveries in Less Than 500 Days",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "alphavantage:https://creators.yahoo.com/lifestyle/story/you-cant-eat-ai-cheesecake-factory-stock-is-soaring-past-all-of-big-tech-213108781.html",
+          "domain": "Yahoo Creators",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "polarity": 0.0,
+          "published_at": "2026-09-05T18:16:00+00:00",
+          "quality": 0.85,
+          "title": "If you need some good news, just know that Cheesecake Factory stock is up 122% \u2014 beating big tech, big time",
+          "uncertainty": 0.125
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.333,
+        "n": 28,
+        "polarity_mean": 0.0,
+        "sources": 18,
+        "uncertainty_mean": 0.214
+      },
       "upcoming": []
     },
     {
-      "escalated": 0,
+      "escalated": 4,
       "events": [],
       "instrument_id": "XNAS:MSFT",
       "label": "Microsoft",
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-09-05",
+          "known_at": "2026-09-06",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "27.58"
+          "value": "27.74"
         },
         {
           "concept": "pb",
@@ -633,7 +911,7 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-09-05",
+          "known_at": "2026-09-06",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
@@ -712,8 +990,103 @@
           "value": "9.53"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/nvidia-nvda-prove-doesn-t-202105317.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-06T20:21:05+00:00",
+          "quality": 1.0,
+          "title": "Can Nvidia (NVDA) Prove it Doesn\u2019t Live or Die by a Handful of Hyperscalers?",
+          "uncertainty": 0.17605633802816903
+        },
+        {
+          "doc_id": "alphavantage:https://creators.yahoo.com/lifestyle/story/you-cant-eat-ai-cheesecake-factory-stock-is-soaring-past-all-of-big-tech-213108781.html",
+          "domain": "Yahoo Creators",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "polarity": 0.0,
+          "published_at": "2026-09-05T18:16:00+00:00",
+          "quality": 0.85,
+          "title": "If you need some good news, just know that Cheesecake Factory stock is up 122% \u2014 beating big tech, big time",
+          "uncertainty": 0.125
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxONDRlOVlKMkFXaEVTdE9LTnpRX1ZCdGJOS1dHX3F0c2dnNWhzajBQY1hYWXlsTmdocU9fNW55M25tYlEzQmNMVjVhMHQtUC00dGJOVU01SVU1UUpLMlEtQlVSRno4c1lRZVF1dE81RjQyeElXQlBjSVhiRlNkY1RObmVKVUQ2SThoUGdwN2R3TGtnbEhhQUR1eDJBSnhuUGlHTUZBTFRGRDlTZ9IBrwFBVV95cUxPMjdWYU9sWlYwUGtsLW5KSHZWeTkzREVSZzREYlAxS1FRU0Z6T2toVjZYQWExZUg1VzYya2dfajI4UGhTSVN6ZFEtRmRfZWhwVElzVnZoa3VXYkFLUzNuWjZmUkp5M2Q2b0wydVZXMWJYOWJFalpHUWtKS3RXQjBMRzJGV0IwdER5WWlxVnJjdVlrZ0R0RTlNN2RVN3IxOVlFb1pDZXVWOFlFTmJZSmZB?oc=5",
+          "domain": "simplywall.st",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-06T21:28:29+00:00",
+          "quality": 0.65,
+          "title": "Microsoft And 2 Other AI Stocks To Own",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMipAFBVV95cUxNc0Y2Q2pkaklIX3FuaUhQaHRaakxjQTkxRnJBT3ZvUHQwb3paMXdBQW5iVmVZM1dOV1VTSWpxRnlqYVRyaF8xWmhQOHBmOUVqMGxZYUVYREVBZ3plYjBrVzhIcENZUW1XNE1fVnBuTlJKQ2sweDJTSy1fNzYwbmY2Q3lRZWdnRHpqNHQzYjdKS0s0N29kajlIUEJMNlZhMXlCSDRWcA?oc=5",
+          "domain": "www.equiti.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-06T14:44:17+00:00",
+          "quality": 0.65,
+          "title": "Microsoft Stock Technical Outlook: Is $550 the Next Target?",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:141546867",
+          "domain": "Yahoo",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-05T20:14:14+00:00",
+          "quality": 0.85,
+          "title": "3 Great Quality Stocks To Own In September 2026",
+          "uncertainty": 0.1506024096385542
+        },
+        {
+          "doc_id": "https://247wallst.com/personal-finance/2026/09/06/the-inheritance-that-went-backward-they-gave-mom-the-stock-theyd-someday-inherit-and-eighteen-months-later-it-came-back-with-thirty-years-of-capital-gains-wiped-off-the-books/?.tsrc=rss",
+          "domain": "247wallst.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-06T19:41:51+00:00",
+          "quality": 0.7,
+          "title": "The Inheritance That Went Backward: They Gave Mom the Stock They\u2019d Someday Inherit and Eighteen Months Later It Came Back With Thirty Years of Capital Gains Wiped Off the Books",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://www.barchart.com/story/news/4467835/1-momentum-signal-suggests-the-software-apocalypse-is-over-dont-rush-to-buy-just-yet?.tsrc=rss",
+          "domain": "www.barchart.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-06T14:30:03+00:00",
+          "quality": 0.7,
+          "title": "1 Momentum Signal Suggests the Software Apocalypse Is Over. Don\u2019t Rush to Buy Just Yet.",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:141547893",
+          "domain": "Benzinga",
+          "escalated": false,
+          "intensity": 0.3333333333333333,
+          "polarity": 1.0,
+          "published_at": "2026-09-05T16:40:05+00:00",
+          "quality": 0.65,
+          "title": "Michael Dell\u2019s Net Worth Up $110 Billion So Far 2026: Why the Surge May Continue",
+          "uncertainty": 0.3787878787878788
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.333,
+        "n": 8,
+        "polarity_mean": 0.25,
+        "sources": 8,
+        "uncertainty_mean": 0.104
+      },
       "upcoming": []
     }
   ],
