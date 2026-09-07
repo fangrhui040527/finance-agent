@@ -420,7 +420,7 @@ def _run_news(
             if not instruments:
                 result.status = SKIPPED
                 result.detail = f"no name in the book trades in slot {slot!r}"
-                corpus.record_sweep(run_id, spec.name, since, OK, detail=result.detail)
+                corpus.record_sweep(run_id, spec.name, since, OK, slot=slot, detail=result.detail)
                 return result, []
             records, articles, notes, degraded = _news_per_instrument(
                 spec,
@@ -452,7 +452,7 @@ def _run_news(
                 languages=languages,
             )
     except FeedError as e:
-        corpus.record_sweep(run_id, spec.name, since, FAILED, detail=str(e)[:400])
+        corpus.record_sweep(run_id, spec.name, since, FAILED, slot=slot, detail=str(e)[:400])
         result.status = FAILED
         result.detail = str(e)
         return result, []
@@ -470,6 +470,7 @@ def _run_news(
         spec.name,
         since,
         OK,
+        slot=slot,
         fetched=result.fetched,
         kept=result.kept,
         stored=stored.stored,
@@ -682,7 +683,9 @@ def _run_structured(
         result.status = SKIPPED
         result.detail = str(e)
         facts.record_pull(run_id, spec.name, SKIPPED, detail=result.detail)
-        corpus.record_sweep(run_id, spec.name, since, OK, detail=f"skipped: {result.detail[:300]}")
+        corpus.record_sweep(
+            run_id, spec.name, since, OK, slot=slot, detail=f"skipped: {result.detail[:300]}"
+        )
         return result, []
     except PlanExcluded as e:
         result.status = SKIPPED
@@ -693,7 +696,7 @@ def _run_structured(
         result.status = FAILED
         result.detail = str(e)
         facts.record_pull(run_id, spec.name, FAILED, detail=result.detail)
-        corpus.record_sweep(run_id, spec.name, since, FAILED, detail=result.detail[:400])
+        corpus.record_sweep(run_id, spec.name, since, FAILED, slot=slot, detail=result.detail[:400])
         return result, []
 
     stored = 0
@@ -734,6 +737,7 @@ def _run_structured(
         spec.name,
         since,
         OK,
+        slot=slot,
         fetched=result.fetched,
         kept=result.kept,
         stored=result.stored,

@@ -256,6 +256,10 @@ class Config:
     #: `ask.py sweep` makes no model calls and `alert_silence_hours` therefore
     #: cannot see it. 0 disables. Quiet until a source has succeeded once.
     alert_sweep_silence_hours: int = 0
+    #: Days of collector history `slots_missed` counts over. `sweep_silence`
+    #: asks whether the collector STOPPED; this asks whether it fired as often
+    #: as its own cron says it should, which one manual run cannot mask.
+    alert_slot_window_days: int = 0
     #: The financial position the waterfall turns into investable capital.
     capital: CapitalPlan = CapitalPlan()
     #: Holdings with units where the file gives them; `holdings` keeps the bare
@@ -807,6 +811,7 @@ def load(path: str | Path | None = None) -> Config:
         alert_dropped_claim_rate=dec("monitor.dropped_claim_rate", 0.2),
         alert_silence_hours=_int("monitor.silence_hours", 0),
         alert_sweep_silence_hours=_int("monitor.sweep_silence_hours", 0),
+        alert_slot_window_days=_int("monitor.slot_window_days", 0),
         capital=_capital(data),
         book=_book(data),
         paper=_paper(data),

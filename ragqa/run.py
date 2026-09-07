@@ -173,6 +173,14 @@ def retrieval(rep: Report, corpus_db: str) -> None:
     if not load_gold():
         rep.add(phase, "gold set present", SKIP, f"no labelled questions at {GOLD}")
         return
+    # THIS AUDIT READS; IT DOES NOT BUILD. `report_for` opens a Corpus, and
+    # opening one creates it - so measuring against a path with no corpus left
+    # an empty database wherever it was pointed, and one of those reached the
+    # repository root as a tracked file. Every other phase already guards on
+    # the store existing; this one did not.
+    if not Path(corpus_db).exists():
+        rep.add(phase, "corpus present", SKIP, f"no corpus at {corpus_db}")
+        return
     r = report_for(corpus_db)
     rr = r.legs["reranked"]
     sem = r.by_kind.get("semantic", {}).get("fused")
