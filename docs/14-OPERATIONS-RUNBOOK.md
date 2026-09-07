@@ -390,10 +390,17 @@ Leave `silence_hours` at 0 unless something SCHEDULED also calls a model.
 
 **And `sweep_silence` cannot see a collector that is merely unreliable.** It
 reads the newest success per source, so ANY run resets it for every source at
-once — including one you fire by hand. On 2026-09-07 both the 09:20 and 12:30
-slots produced no run at all, a manual sweep at 08:50 had already reset the
-clock, and `ask.py watch` was clean: a day that lost two of its three
-collections read as perfectly healthy.
+once — including one you fire by hand. On 2026-09-07, checked at 14:20 UTC,
+neither the 09:20 nor the 12:30 slot had produced a run, a manual sweep at 08:50
+had already reset the clock, and `ask.py watch` was clean: a day that had lost
+two of its three collections read as perfectly healthy.
+
+The 09:20 slot did arrive — at 15:03, **five hours and forty-three minutes
+late**. That is the point rather than a reprieve: while you are waiting, lateness
+on that scale is indistinguishable from loss, and the wire feeds serve a recent
+window whether or not the runner eventually turns up. It is also why this rule
+counts by whole days — a slot delayed most of a day still lands on the day it
+was owed, so a late collection is not reported as a missing one.
 
 `slots_missed` counts instead of timing. The cron owes a known number of firings
 — `bursa_close` and `us_close` daily, `us_preopen` Mon–Fri, `weekly` on Sunday —

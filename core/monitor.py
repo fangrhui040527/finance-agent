@@ -387,10 +387,19 @@ def _slot_rules(cfg, now: datetime) -> list[Alert]:
     `sweep_silence` above watches for a collector that has STOPPED, and it is
     the wrong instrument for a collector that is merely unreliable. It reads
     the newest success per source against an allowance, so ANY run - including
-    one fired by hand - resets it for every source at once. On 2026-09-07 the
-    scheduled 09:20 and 12:30 slots both produced no run at all, a manual run
-    at 08:50 had already reset the clock, and the alert list was clean. A day
-    that lost two of its three collections read as perfectly healthy.
+    one fired by hand - resets it for every source at once.
+
+    2026-09-07 is the case it was built from. At 14:20 UTC neither the 09:20 nor
+    the 12:30 slot had produced a run, a sweep fired by hand at 08:50 had already
+    moved every source's newest success, and the alert list was clean: a day that
+    had so far lost two of its three collections read as perfectly healthy. The
+    09:20 slot did eventually arrive - at 15:03, five hours and forty-three
+    minutes late - which is the point rather than a reprieve. Lateness on that
+    scale is indistinguishable from loss while you are waiting, and a rule that
+    can only see a stopped collector cannot tell you either way.
+
+    Counting by whole days is what makes a late run count as the day's run: a
+    slot delayed most of a day still lands on the day it was owed.
 
     So this rule counts instead of timing: the cron owes a known number of
     firings over the window, and the sweeps table records what arrived.

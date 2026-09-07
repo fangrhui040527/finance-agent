@@ -653,8 +653,10 @@ def test_a_weekday_source_silent_past_its_own_cadence_still_alerts(tmp_path):
 
 # --- missed slots ---------------------------------------------------------------
 # The blind spot this rule exists to close, from the live system on 2026-09-07:
-# the 09:20 and 12:30 collections produced no run at all, a manual run at 08:50
-# had already reset every source's clock, and `ask.py watch` was clean.
+# at 14:20 UTC neither the 09:20 nor the 12:30 collection had produced a run, a
+# manual run at 08:50 had already reset every source's clock, and `ask.py watch`
+# was clean. The 09:20 slot turned up at 15:03, 5h43m late - counting by whole
+# days is what lets a run that late still count as the day's run.
 
 
 def _ran(path: Path, slot: str, at: datetime, run_id: str | None = None):

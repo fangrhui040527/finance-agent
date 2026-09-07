@@ -416,9 +416,11 @@ sweep_silence_hours = 30
 # `sweep_silence_hours` above asks whether the collector STOPPED. It cannot see
 # a collector that is merely unreliable, because it reads the newest success per
 # source - so any run at all, including one fired by hand, resets it for every
-# source at once. On 2026-09-07 both the 09:20 and 12:30 slots produced no run,
-# a manual run at 08:50 had already reset the clock, and the alert list was
-# clean: a day that lost two of its three collections read as healthy.
+# source at once. On 2026-09-07, checked at 14:20 UTC, neither the 09:20 nor the
+# 12:30 slot had produced a run, a manual sweep at 08:50 had already reset the
+# clock, and the alert list was clean: a day that had lost two of its three
+# collections read as healthy. (The 09:20 slot arrived at 15:03, five hours and
+# forty-three minutes late - which is the point, not a reprieve.)
 #
 # This counts instead. The cron owes a known number of firings over the window;
 # the sweeps table says how many arrived. The TOTAL is what trips it, not any one
