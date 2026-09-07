@@ -33,6 +33,35 @@ that is what the model is for. Two constraints shaped where it runs:
 The routine therefore sees both closes of the calendar day it writes about,
 and its page is on `main` before Bursa opens.
 
+### It also dispatches the collections the cron dropped
+
+The four `collect.yml` rows above are GitHub cron, and on this repository GitHub
+cron delivers roughly half of what it owes: measured 2026-09-03 to 09-07, nine
+scheduled runs where about fourteen were due, every one late — from 14 minutes
+to **5h43m** — and two created without ever being given a machine. `slots_missed`
+(docs/14) reports that the morning after, which is the right shape for an alert
+and the wrong shape for a repair.
+
+So the routine is also the collector's fallback scheduler, because it runs on a
+scheduler that has not missed a firing. **Before** it writes anything it asks
+`ask.py sweep --due` what the day is still short of and dispatches `collect.yml`
+for exactly those slots, then pulls again so the page sees whatever landed.
+
+Three properties, and each of them is load-bearing:
+
+* **The cron stays primary.** A catch-up that fired unconditionally would double
+  every collection and spend the Actions minutes that may be causing this.
+* **It dispatches, it does not collect.** The routine's session has no route to
+  any data host; the runner does.
+* **It never guesses.** When the store holds runs that do not record which slot
+  they were, `--due` says so and names nothing, because a catch-up that could
+  not tell "already ran" from "cannot tell" would double-collect every night
+  forever.
+
+Same-day recovery is most of the value: **news is the only thing that expires.**
+Prices, filings and macro series are re-fetchable tomorrow; a wire feed serves a
+recent window and nothing brings back the hours it has rolled past.
+
 ## What one run does
 
 ```
@@ -80,7 +109,19 @@ plainly where it stops.
 Setup
 1. Clone the repository if it is not present; otherwise fetch. Check out
    main. Run `uv sync --frozen` (Python 3.11 or 3.12).
-2. DAY = yesterday's date in UTC (the collector's day). Run
+
+Catch up the collection FIRST, because news expires
+2. Run `uv run python ask.py sweep --due`. It prints the slots still owed
+   today, one per line, and collects nothing. An empty list is a good day.
+   A reason on stderr ("nothing to attribute", "no corpus") is also a stop:
+   it is refusing to guess, and guessing would double-collect every night.
+   For each slot it names, dispatch `collect.yml` on GitHub with that slot
+   as the input — do NOT sweep in this session, which has no route to any
+   data host. Never dispatch `all` as a shortcut. Then pull again so the
+   page sees whatever landed, and record in Data quality which slots you
+   dispatched and whether they arrived in time.
+
+3. DAY = yesterday's date in UTC (the collector's day). Run
    `FINPLANET_OFFLINE=1 uv run python ask.py pack --date DAY --write`.
    It writes knowledge/feedback/DAY.pack.md. If it exits non-zero, read its
    stderr, fix nothing, and write a page whose Data quality section says
