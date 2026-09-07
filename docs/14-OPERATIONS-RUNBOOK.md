@@ -433,6 +433,46 @@ fired. Four rules keep it honest:
   timer stopped is the fault being reported; letting the repair silence the
   alarm is how it stays broken.
 
+### The catch-up: the Routine dispatches what the cron dropped
+
+`slots_missed` reports the failure the morning after. `ask.py sweep --due` is
+the other half — it asks what is still owed **today**, while a replacement run
+is still worth firing:
+
+```
+$ ask.py sweep --due
+us_preopen
+us_close
+```
+
+One slot per line on stdout, reasons on stderr, exit 0 always, and it collects
+nothing. That is the contract a loop depends on:
+
+```
+for slot in $(ask.py sweep --due); do ask.py sweep --slot "$slot"; done
+```
+
+It is a **different question** from `slots_missed`, which judges whole finished
+days — a slot that has not come round yet is not a slot missed, but it is very
+much still owed. Three ways it declines to name anything: a `--slot all` run has
+already covered the day; the store has never recorded a slot *and* something ran
+today, so the run cannot be attributed and firing again would be guessing; or
+nothing is owed. A store that has recorded no slot and saw **no** run today does
+report the day's schedule — "I cannot tell which one ran" and "nothing ran at
+all" are different answers, and only the second is worth acting on.
+
+**The nightly Routine fires this at 22:30 UTC**, after the last slot of the day.
+That is deliberate: the Routine runs on a scheduler that has never missed a
+firing, while GitHub's cron on this repository has delivered somewhere near half
+of what it owes. The cron stays primary — a catch-up that ran unconditionally
+would double every collection and spend the Actions minutes that may be causing
+the problem — and the Routine only dispatches `collect.yml` for the slots the
+day is actually short of.
+
+Same-day recovery is most of the value: **news is the only thing that expires.**
+Prices, filings and macro series are re-fetchable tomorrow; a wire feed serves a
+recent window and nothing brings back the hours it has rolled past.
+
 Two shapes of failure look different in the run history and want different
 fixes: a run **created and never given a machine**
 (seconds long, no log) is the Actions minutes cap; **no run at all** is GitHub

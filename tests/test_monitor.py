@@ -861,3 +861,95 @@ def test_today_is_not_owed_its_slots_yet(tmp_path):
     _full_days(tmp_path / "corpus.db", now, 3)
     alerts = evaluate(_slot_cfg(tmp_path), db=str(_ledger(tmp_path / "led.db")), now=now)
     assert not [a for a in alerts if a.rule == "slots_missed"]
+
+
+# --- what is still owed today, for a catch-up to fire --------------------------
+
+
+def _outstanding(tmp_path: Path, now: datetime):
+    from core.monitor import slots_outstanding
+
+    return slots_outstanding(str(tmp_path / "corpus.db"), now)
+
+
+def test_a_day_with_nothing_collected_owes_its_whole_schedule(tmp_path):
+    from core.monitor import SLOT_WEEKDAYS
+
+    now = datetime(2026, 9, 10, 14, 0, tzinfo=UTC)  # a Thursday
+    _full_days(tmp_path / "corpus.db", now, 2)  # yesterday and the day before only
+    due, why = _outstanding(tmp_path, now)
+    assert why == ""
+    assert set(due) == {s for s, wd in SLOT_WEEKDAYS.items() if now.weekday() in wd}
+    assert "weekly" not in due, "Thursday owes no weekly sweep"
+
+
+def test_a_slot_that_already_ran_today_is_not_owed_again(tmp_path):
+    now = datetime(2026, 9, 10, 14, 0, tzinfo=UTC)
+    path = tmp_path / "corpus.db"
+    _ran(path, "bursa_close", now - timedelta(hours=4))
+    due, _ = _outstanding(tmp_path, now)
+    assert "bursa_close" not in due and "us_preopen" in due
+
+
+def test_a_slot_that_arrives_hours_late_still_counts_as_today(tmp_path):
+    """2026-09-07: the 09:20 collection turned up at 15:03. A catch-up that
+    fired anyway would have paid twice for the same articles."""
+    now = datetime(2026, 9, 10, 16, 0, tzinfo=UTC)
+    path = tmp_path / "corpus.db"
+    _ran(path, "bursa_close", now.replace(hour=15, minute=3))  # 5h43m late
+    due, _ = _outstanding(tmp_path, now)
+    assert "bursa_close" not in due
+
+
+def test_a_sweep_of_everything_settles_the_whole_day(tmp_path):
+    now = datetime(2026, 9, 10, 14, 0, tzinfo=UTC)
+    _ran(tmp_path / "corpus.db", "all", now - timedelta(hours=2))
+    due, why = _outstanding(tmp_path, now)
+    assert due == [] and "every slot" in why
+
+
+def test_it_refuses_to_guess_when_runs_carry_no_slot(tmp_path):
+    """The state on the day the slot column shipped: runs happened, none of them
+    said which slot they were. Firing a catch-up here would collect a second
+    time for a slot that already ran, every night, forever."""
+    now = datetime(2026, 9, 10, 14, 0, tzinfo=UTC)
+    _swept(tmp_path / "corpus.db", at=now - timedelta(hours=3))
+    due, why = _outstanding(tmp_path, now)
+    assert due == []
+    assert "nothing to attribute" in why
+
+
+def test_but_a_silent_day_is_still_reported_when_no_slot_was_ever_recorded(tmp_path):
+    """ "I cannot tell you which one ran" and "nothing ran at all" are different
+    answers, and only the second is worth acting on."""
+    now = datetime(2026, 9, 10, 14, 0, tzinfo=UTC)
+    _swept(tmp_path / "corpus.db", at=now - timedelta(days=2))  # old, no slot
+    due, why = _outstanding(tmp_path, now)
+    assert due and why == ""
+
+
+def test_no_corpus_at_all_owes_nothing_and_says_why(tmp_path):
+    due, why = _outstanding(tmp_path, datetime(2026, 9, 10, 14, 0, tzinfo=UTC))
+    assert due == [] and "no corpus" in why
+
+
+def test_the_cli_prints_one_slot_per_line_and_collects_nothing(tmp_path, monkeypatch, capsys):
+    """The contract a shell loop depends on: slots on stdout, reasons on stderr,
+    exit 0, and nothing collected.
+
+    Driven against the real clock rather than a frozen one - the command reads
+    today from the wall clock, and `bursa_close` is the slot the cron owes every
+    day of the week, so recording it now is a stable assertion whatever day the
+    suite runs on."""
+    import ask
+    import core.config as C
+
+    path = tmp_path / "corpus.db"
+    _ran(path, "bursa_close", datetime.now(UTC) - timedelta(minutes=5))
+    real = load_config()
+    monkeypatch.setattr(C, "load", lambda *a, **k: replace(real, corpus_db=str(path)))
+
+    assert ask.main(["sweep", "--due"]) == 0
+    out = capsys.readouterr()
+    assert "bursa_close" not in out.out.split(), "the slot that already ran is not owed again"
+    assert all(line in {"us_preopen", "us_close", "weekly"} for line in out.out.split())

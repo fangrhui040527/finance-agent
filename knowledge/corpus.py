@@ -315,6 +315,19 @@ class Corpus:
         ).fetchall()
         return {r["slot"]: int(r["runs"]) for r in rows}
 
+    def run_count(self, since: datetime, until: datetime) -> int:
+        """Distinct sweep runs over [since, until), whatever slot they carried.
+
+        The companion to `slot_runs`: it answers "did the collector run at all",
+        which is the only thing that can be asked of history written before the
+        slot column existed.
+        """
+        row = self.conn.execute(
+            "SELECT COUNT(DISTINCT run_id) AS runs FROM sweeps WHERE at >= ? AND at < ?",
+            (_iso(since), _iso(until)),
+        ).fetchone()
+        return int(row["runs"]) if row else 0
+
     def first_slot_row(self) -> datetime | None:
         """When the sweeps table first recorded a slot at all.
 
