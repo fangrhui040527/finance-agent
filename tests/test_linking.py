@@ -158,3 +158,76 @@ def test_relevance_grows_with_mentions_and_is_zero_without_one():
     one = ex.extract("Maybank posted a profit", ["Maybank"]).relevance
     two = ex.extract("Maybank said Maybank Islamic grew", ["Maybank"]).relevance
     assert 0.34 <= one < two <= 1.0
+
+
+# --- a place named after a company is not the company -------------------------------
+
+
+def test_a_road_named_after_a_bank_is_not_the_bank():
+    """In the corpus on 2026-09-07: "Maybank Highway at Main Road closed after
+    early morning multi-vehicle crash" was linked to MYX:1155 and escalated to
+    the review queue as Maybank news."""
+    assert link_entities("Maybank Highway at Main Road closed after a crash", INDEX) == []
+    assert link_entities("Apple Street repaving begins Monday", INDEX) == []
+
+
+def test_the_company_still_links_when_the_road_word_is_not_next_to_it():
+    assert link_entities("Maybank said the Highway toll concession was refinanced", INDEX) == [
+        "MYX:1155"
+    ]
+    assert link_entities("Maybank branch on Main Road reopened", INDEX) == ["MYX:1155"]
+
+
+def test_a_lowercase_road_word_is_ordinary_english_not_a_place_name():
+    """The rule is case-sensitive on purpose: "Nvidia roadmap" and "Maybank
+    street lending" are the company, "Maybank Highway" is tarmac."""
+    assert link_entities("Nvidia road map for the next generation", INDEX) == ["XNAS:NVDA"]
+
+
+def test_the_thoroughfare_list_excludes_what_companies_name_after_themselves():
+    from knowledge.news.linking import THOROUGHFARE
+
+    for owned in ("Park", "Tower", "Plaza", "Centre", "Stadium", "Arena", "Bridge"):
+        assert owned not in THOROUGHFARE
+    assert link_entities("Apple Park welcomed developers this week", INDEX) == ["XNAS:AAPL"]
+
+
+# --- the escalation gate needs materiality, not just a mention ----------------------
+
+
+def _f(text: str):
+    return LexiconExtractor().extract(text, ["Maybank"])
+
+
+def test_naming_a_holding_is_not_by_itself_a_reason_to_spend_a_model_call():
+    """The gate used to read `relevance >= 0.34 AND a watched name is present`,
+    and relevance IS the mention count - so the two conditions were the same
+    condition and 65% of linked articles escalated. These four are real corpus
+    headlines; none reports anything about the bank."""
+    held = {"MYX:1155"}
+    for headline in (
+        "Maybank provides over S$590,000 to 3,000 beneficiaries through its programme",
+        "Golf: Maybank lifts golf tourism",
+        "Maybank Singapore simplifies auto financing with an all-in-one service",
+        "$MAYBANK (1155.MY)$ OMG!!! My fam got rm188 here wowww sharing",
+    ):
+        f = _f(headline)
+        assert f.relevance >= 0.34, "the name is there; that is the point"
+        assert not should_escalate(f, ["MYX:1155"], held, set()), headline
+
+
+def test_a_story_that_reports_something_financial_still_escalates():
+    held = {"MYX:1155"}
+    for headline in (
+        "Maybank keeps BUY on ISOTeam but cuts target price after an FY26 miss",
+        "Maybank profit rose on wider margins",
+        "Maybank shares plunged after the guidance was withdrawn",
+        "Maybank outlook: management expects loan growth next year",
+    ):
+        assert should_escalate(_f(headline), ["MYX:1155"], held, set()), headline
+
+
+def test_the_gate_still_needs_the_name_to_be_one_you_hold_or_watch():
+    f = _f("Maybank profit rose on wider margins")
+    assert not should_escalate(f, ["MYX:1155"], set(), set())
+    assert should_escalate(f, ["MYX:1155"], set(), {"MYX:1155"})

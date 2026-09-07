@@ -215,7 +215,9 @@ def build_digest(
         for iid in book:
             forms = {iid, canonical(iid) or iid}
             mine = [a for a in articles if forms & set(a.instruments)]
-            digest.names.append(_name_digest(iid, mine, facts, now, linker, extractor, top_n))
+            digest.names.append(
+                _name_digest(iid, mine, facts, now, linker, extractor, top_n, set(book))
+            )
         digest.macro = _macro(facts, day)
         digest.collection = [
             {
@@ -242,7 +244,20 @@ def build_digest(
     return digest
 
 
-def _name_digest(iid, articles: list[Article], facts, now, linker, extractor, top_n) -> NameDigest:
+def _name_digest(
+    iid, articles: list[Article], facts, now, linker, extractor, top_n, book: set[str]
+) -> NameDigest:
+    """The star and the escalated count come from RE-RUNNING the gate here, not
+    from the stored `escalated` column.
+
+    The corpus is append-only by trigger, so that column is a record of the rule
+    in force the day each article arrived - correct as history, and wrong as a
+    reading list once the rule changes. On 2026-09-07 the gate stopped treating
+    "the company is named" as materiality; a digest still reading the column
+    would have gone on starring the charity cheque and the golf tournament.
+    """
+    from knowledge.news.features import should_escalate
+
     seen: set[str] = set()
     scored = []
     for a in articles:
@@ -253,10 +268,10 @@ def _name_digest(iid, articles: list[Article], facts, now, linker, extractor, to
         feats = a.features or extractor.extract(
             a.text, linker.names_for(a.instruments) or a.instruments
         )
-        scored.append((a, feats))
+        scored.append((a, feats, should_escalate(feats, a.instruments, book, set())))
     scored.sort(
         key=lambda af: (
-            not af[0].escalated,
+            not af[2],
             -(af[0].quality or 0.0),
             -af[0].published_at.timestamp(),
         )
@@ -264,8 +279,8 @@ def _name_digest(iid, articles: list[Article], facts, now, linker, extractor, to
     from knowledge.news.clean import normalise_text
 
     nd = NameDigest(instrument_id=iid, label=_label(iid))
-    nd.escalated = sum(1 for a, _ in scored if a.escalated)
-    for a, f in scored[:top_n]:
+    nd.escalated = sum(1 for _a, _f, e in scored if e)
+    for a, f, escalated in scored[:top_n]:
         nd.stories.append(
             {
                 "doc_id": a.doc_id,
@@ -278,17 +293,17 @@ def _name_digest(iid, articles: list[Article], facts, now, linker, extractor, to
                 "polarity": f.polarity,
                 "intensity": f.intensity,
                 "uncertainty": f.uncertainty,
-                "escalated": bool(a.escalated),
+                "escalated": escalated,
             }
         )
     if scored:
-        pols = [f.polarity for _, f in scored]
+        pols = [f.polarity for _a, f, _e in scored]
         nd.tone = {
             "n": len(scored),
-            "sources": len({a.source_domain for a, _ in scored}),
+            "sources": len({a.source_domain for a, _f, _e in scored}),
             "polarity_mean": round(sum(pols) / len(pols), 3),
-            "intensity_max": round(max(f.intensity for _, f in scored), 3),
-            "uncertainty_mean": round(sum(f.uncertainty for _, f in scored) / len(scored), 3),
+            "intensity_max": round(max(f.intensity for _a, f, _e in scored), 3),
+            "uncertainty_mean": round(sum(f.uncertainty for _a, f, _e in scored) / len(scored), 3),
         }
     for e in facts.events(iid, since=now - timedelta(days=2), until=now, limit=20, opinions=2):
         nd.events.append(_event(e))

@@ -98,6 +98,7 @@ ignore = [
 "verify.py" = ["T20"]
 "trace_run.py" = ["T20"]
 "stress/**" = ["T20"]
+"ragqa/**" = ["T20"]
 "tests/**" = ["T20"]
 "design/**" = ["T20"]
 "core/**" = ["T20"]

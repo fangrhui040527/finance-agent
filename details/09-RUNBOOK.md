@@ -821,6 +821,38 @@ publisher has not published". The cheap way to settle it is to open each id at
 db.nomics.world and read its last update date; the ids are in
 `knowledge/sources/dbnomics.py`.
 
+### `python -m ragqa.run` — does the retrieval and cleaning half work?
+
+```bash
+FINPLANET_OFFLINE=1 python -m ragqa.run
+FINPLANET_OFFLINE=1 python -m ragqa.run --json      # for a dashboard
+```
+
+`audit/` asks whether the system is fit to ship. `stress/` tries to break it.
+This asks the narrower question neither does: **does the retrieval and cleaning
+half actually work**, measured against the real corpus rather than fixtures.
+
+Four phases, on the shape of the two-phase LLM QA guide:
+
+| phase | what it asks |
+|---|---|
+| **Phase 1 keyless** | can the whole path run with no key and no network, and does it refuse honestly |
+| **Retrieval** | context recall against the labelled gold set — the guide's G-Eval metric with real numbers |
+| **Cleaning** | what the pipeline did to the corpus it holds: linked, escalated, deduped |
+| **OWASP** | LLM01 direct *and indirect* injection, LLM02 output, LLM08 agency |
+
+Two rules keep the readiness percentage honest, and both are pinned by tests in
+`tests/test_ragqa.py`. **A check it cannot compute is not a pass** — faithfulness
+and answer relevancy need a model to judge, so with a stub backend they report
+NOT MEASURABLE and leave the denominator rather than scoring themselves. And
+**a finding lowers the score**; nothing is quietly dropped.
+
+The rail scan deserves its own note, because it got this wrong first. It looks
+for an `Action` being *constructed* on a rail, and skips `core/guardrails/`
+itself: a rule's own `rails = (Rail.RETRIEVAL, ...)` line declares what it would
+guard given the chance, not that anything calls it. Counting the declaration hid
+the finding the check exists to make.
+
 ### `retrieval` — is the search any good?
 
 ```bash

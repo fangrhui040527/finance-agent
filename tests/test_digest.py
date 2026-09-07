@@ -225,3 +225,49 @@ def test_the_cli_prints_and_writes(tmp_path, capsys):
     assert code == 0
     assert (tmp_path / "out" / "2026-09-04.md").exists()
     assert "# Digest 2026-09-04" in capsys.readouterr().out
+
+
+def test_the_digest_stars_by_the_gate_in_force_today_not_the_one_at_ingest(tmp_path):
+    """The corpus is append-only, so `articles.escalated` records the rule that
+    was live the day each story arrived. A reading list must apply today's rule
+    or a gate change never reaches the page."""
+    from datetime import UTC, datetime
+
+    from knowledge.corpus import Corpus
+    from knowledge.digest import build_digest
+    from knowledge.news.features import Article, LexiconExtractor
+
+    now = datetime(2026, 9, 7, 12, 0, tzinfo=UTC)
+    ex = LexiconExtractor()
+    path = tmp_path / "corpus.db"
+    with Corpus(path) as c:
+        for doc_id, title in (
+            ("a", "Maybank provides S$590,000 to beneficiaries through its programme"),
+            ("b", "Maybank profit rose on wider margins"),
+        ):
+            art = Article(
+                doc_id=doc_id,
+                title=title,
+                body="",
+                source_domain="example.com",
+                published_at=now,
+                instruments=["MYX:1155"],
+                quality=1.0,
+                # stored TRUE for both, which is what the old gate did
+                escalated=True,
+            )
+            art.features = ex.extract(art.text, ["Maybank"])
+            c.add(art, source="fixture", seen_at=now)
+
+    class _Cfg:
+        watchlist = ("MYX:1155",)
+        holdings = ()
+        corpus_db = str(path)
+        facts_db = str(tmp_path / "facts.db")
+
+    d = build_digest(_Cfg(), now=now, corpus_path=str(path), facts_path=str(tmp_path / "facts.db"))
+    name = next(n for n in d.names if n.instrument_id == "MYX:1155")
+    assert len(name.stories) == 2, "both stories are still shown"
+    assert name.escalated == 1, "only the one reporting something financial is starred"
+    starred = [s["title"] for s in name.stories if s["escalated"]]
+    assert starred == ["Maybank profit rose on wider margins"]

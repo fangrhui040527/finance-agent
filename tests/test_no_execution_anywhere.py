@@ -33,6 +33,10 @@ ALLOWED_PATHS = {
     "tests/test_observability.py",
     "tests/test_dimensions.py",  # asserts the rails are reported by rule and action
     "tests/test_no_execution_anywhere.py",
+    # The RAG audit asserts that the destructive tool is DENIED, which it can
+    # only do by naming it - the same reason policy.py and verify.py are here.
+    # A check that may not say what it is checking for cannot check for it.
+    "ragqa/run.py",
     # Names moomoo's own instruction methods in order to assert core/broker/
     # never calls them. Same reason as policy.py: a guard that may not say
     # what it forbids cannot forbid it. core/broker/ itself stays clean and is

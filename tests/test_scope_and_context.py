@@ -125,7 +125,7 @@ def test_escalation_can_now_fire_on_a_watched_name(monkeypatch, tmp_path):
     """The gate this was blocking: an article about a watched name must reach
     the model, and one about an unrelated name must not."""
     import core.config as C
-    from knowledge.news.features import should_escalate
+    from knowledge.news.features import LexiconExtractor, should_escalate
     from mcp_server import tools as T
 
     p = _cfg(tmp_path, holdings='["MYX:1155"]', watchlist='["XNAS:NVDA"]')
@@ -133,12 +133,14 @@ def test_escalation_can_now_fire_on_a_watched_name(monkeypatch, tmp_path):
     monkeypatch.setattr(T, "load_config", lambda path=None: real(p))
     ctx = T.context()
 
-    class F:
-        relevance = 0.9
+    # A real extraction, not a stub with one attribute on it: the gate reads
+    # more of the feature vector than relevance now, and a stub that answers
+    # only the question the test happens to know about stops testing the gate.
+    f = LexiconExtractor().extract("Nvidia profit rose sharply on data-centre demand", ["Nvidia"])
 
-    assert should_escalate(F(), ["XNAS:NVDA"], ctx.holdings, ctx.watchlist)
-    assert should_escalate(F(), ["MYX:1155"], ctx.holdings, ctx.watchlist)
-    assert not should_escalate(F(), ["MYX:9999"], ctx.holdings, ctx.watchlist)
+    assert should_escalate(f, ["XNAS:NVDA"], ctx.holdings, ctx.watchlist)
+    assert should_escalate(f, ["MYX:1155"], ctx.holdings, ctx.watchlist)
+    assert not should_escalate(f, ["MYX:9999"], ctx.holdings, ctx.watchlist)
 
 
 def test_an_empty_config_escalates_nothing_rather_than_everything(monkeypatch, tmp_path):
@@ -150,7 +152,7 @@ def test_an_empty_config_escalates_nothing_rather_than_everything(monkeypatch, t
     is the one day it should have kept passing.
     """
     import core.config as C
-    from knowledge.news.features import should_escalate
+    from knowledge.news.features import LexiconExtractor, should_escalate
     from mcp_server import tools as T
 
     p = _cfg(tmp_path, holdings="[]", watchlist="[]")
@@ -159,7 +161,5 @@ def test_an_empty_config_escalates_nothing_rather_than_everything(monkeypatch, t
     ctx = T.context()
     assert ctx.holdings == set() and ctx.watchlist == set()
 
-    class F:
-        relevance = 0.9
-
-    assert not should_escalate(F(), ["MYX:1155"], ctx.holdings, ctx.watchlist)
+    f = LexiconExtractor().extract("Maybank profit rose on wider margins", ["Maybank"])
+    assert not should_escalate(f, ["MYX:1155"], ctx.holdings, ctx.watchlist)
