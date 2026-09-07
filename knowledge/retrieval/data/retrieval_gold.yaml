@@ -15,10 +15,22 @@
 #             and a change that improves the semantic family at their expense
 #             has not improved search - it has moved the failure.
 #
-# `relevant` is EVERY article verified to answer the question. It is not every
-# article that could: a corpus of 1,342 headlines has more, and an unlabelled
-# hit scores as a miss. Read the recall figures as a floor, and the comparison
-# between legs as the finding.
+# `relevant` means something different in each family, and conflating them is
+# what broke this set once already.
+#
+#   semantic  EVERY article verified to answer the question, and not every
+#             article that could: the corpus has more, an unlabelled hit scores
+#             as a miss, so read recall as a FLOOR and the comparison between
+#             legs as the finding.
+#   lexical   EVERY document carrying the query's tokens, without exception.
+#             The criterion is containment, so each one is a correct retrieval
+#             and ranking any of them first is correct. Label a subset and the
+#             score turns on an arbitrary tie-break: on 2026-09-07 a second post
+#             carrying `1155.MY` arrived, scored identically to the labelled
+#             one, took rank 1, and dropped lexical MRR from 1.000 to 0.938 with
+#             nothing about the search having changed. `ask.py retrieval` now
+#             names an unlabelled document that carries every token of a lexical
+#             question, so the next one is a line of output and not a mystery.
 #
 # Titles are recorded beside each id so a label that ages out of the corpus can
 # be named rather than silently lowering the score.
@@ -166,8 +178,21 @@ questions:
     title: NVIDIA (NVDA)’s $20 Billion Groq Bet Goes Live This Year With New AI Racks
 - query: 1155.MY
   kind: lexical
-  note: Bursa ticker in the Malaysian local form
+  note: >-
+    Bursa ticker in the Malaysian local form. BOTH documents carrying the token
+    are labelled, and that is the rule for a lexical question rather than a
+    convenience: the criterion is containment of the exact token, so every
+    document containing it is a correct retrieval and ranking any of them first
+    is correct. Labelling only one made the score turn on an arbitrary
+    tie-break - on 2026-09-07 a second, near-identical post arrived, scored
+    1.2500 exactly as the labelled one did, took rank 1, and dropped lexical MRR
+    from 1.000 to 0.938 with nothing about the search having changed.
+    These are meme posts, which is not a flaw in the label: they are the only
+    documents in the corpus carrying this ticker string, and the question is
+    testing exact-token retrieval, not article quality.
   relevant:
+  - doc_id: https://news.google.com/rss/articles/CBMieEFVX3lxTE5SVDlkamM2R3BERzllSklkdWZVMDZ3WFVpWjlIcTdpcXdJLWJLOE9GUTA5MGlfUkJxbVZSV2h0aWt4SlVlVEhGTENRcHdDU1pxb0ctRXNjV3BSYzFmazZyMElzWUhNb2VQRHliLWtDQUdDQW1mWTdieA?oc=5
+    title: '$MAYBANK (1155.MY)$'
   - doc_id: https://news.google.com/rss/articles/CBMiowFBVV95cUxOb0RoQ0N4OUJ5ZUtNS1pZaFl2UHNTWjNra2ZleTdaSXM4VTJvUVdXeXBkdVAyTjZVUl9lZVY4ejNwclllbGI3azlZbDJRN2Vvc1FIcWF2MkV5eU4yYlFzd1pwZFZiZzhHLVRGT05JSjZtRDhLRXRQTVpxLWUxdDhTRjl2cWJzWE5oZDNYTkdTdUZFaUhKVUV2eE1MMFotY0dTM2xF?oc=5
     title: '$MAYBANK (1155.MY)$ OMG!!! My fam got rm188 here wowww😆sharing luck here hope you guys got
       the top tier rewards 🍀[Share Link: MY 2026 Mid-Autumn Festival]'

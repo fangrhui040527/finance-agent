@@ -33,7 +33,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from knowledge.chunking.parent_child import Chunk
-from knowledge.retrieval.hybrid import Collection, Hit, rerank
+from knowledge.retrieval.hybrid import Collection, Hit, rerank, tokenize
 
 #: The labelled questions. Human-written, dated, and pinned to doc ids.
 GOLD = Path(__file__).parent / "data" / "retrieval_gold.yaml"
@@ -111,6 +111,12 @@ class Report:
     dense_lift_cases: list[str] = field(default_factory=list)
     by_kind: dict[str, dict[str, LegScore]] = field(default_factory=dict)
     missing_labels: list[str] = field(default_factory=list)
+    #: The MIRROR of missing_labels, and it exists because the two failures are
+    #: indistinguishable in a score. A label that ages out lowers recall; a
+    #: document that arrives and answers a question nobody labelled lowers MRR,
+    #: by taking a rank the labelled one held. Neither is the search getting
+    #: worse, and both look exactly like it.
+    unlabelled_matches: list[str] = field(default_factory=list)
     cases: int = 0
     corpus_size: int = 0
 
@@ -151,6 +157,15 @@ class Report:
         if self.dense_lift_cases:
             for q in self.dense_lift_cases[:5]:
                 out.append(f"    + {q}")
+        if self.unlabelled_matches:
+            out.append("")
+            out.append(
+                f"{len(self.unlabelled_matches)} document(s) carry every token of a LEXICAL "
+                "question and are not labelled - they can take a rank from the labelled "
+                "one and lower MRR with nothing about the search having changed:"
+            )
+            for m in self.unlabelled_matches[:8]:
+                out.append(f"    + {m}")
         if self.missing_labels:
             out.append("")
             out.append(
@@ -200,6 +215,43 @@ def run_case(collection: Collection, case: Case, depth: int = DEPTH) -> dict[str
     }
 
 
+def unlabelled_lexical_matches(collection: Collection, case: Case) -> list[str]:
+    """Corpus documents carrying EVERY token of a lexical question, unlabelled.
+
+    For a lexical question the ground truth is containment: the query is a
+    ticker, a filed figure, a product name, so any document holding all of its
+    tokens is a correct retrieval and ranking any of them first is correct.
+    Labelling only some of them makes the score turn on an arbitrary tie-break.
+
+    That is not a hypothetical. On 2026-09-07 a second post carrying `1155.MY`
+    arrived, scored 1.2500 exactly as the labelled one did, took rank 1 on the
+    tie, and dropped lexical MRR from 1.000 to 0.938 - a FAIL on the check whose
+    whole job is to catch a change that traded away exact-token search, with
+    nothing about the search having changed.
+
+    Deliberately one-directional: it reports documents that MATCH and are not
+    labelled, never labels that do not match. A human may judge an article
+    relevant without it carrying every token verbatim, and four of the labels on
+    `Nebius Vera Rubin` are exactly that.
+
+    Semantic questions are not checked at all. There the wording is chosen to
+    differ from the article on purpose, so token containment says nothing.
+    """
+    if case.kind != "lexical":
+        return []
+    want = set(tokenize(case.query))
+    if not want:
+        return []
+    labelled = set(case.relevant)
+    out = []
+    for toks, chunk in zip(collection.bm25._docs, collection.bm25._chunks, strict=True):
+        if want <= set(toks) and chunk.chunk_id not in labelled:
+            if chunk.metadata.get("doc_id") in labelled:
+                continue
+            out.append(f"{case.query!r}: {chunk.text[:70]}")
+    return out
+
+
 def evaluate(collection: Collection, cases: list[Case], depth: int = DEPTH) -> Report:
     report = Report(
         legs={leg: LegScore(leg) for leg in LEGS},
@@ -212,6 +264,7 @@ def evaluate(collection: Collection, cases: list[Case], depth: int = DEPTH) -> R
             for doc, title in zip(case.relevant, case.titles or case.relevant):
                 if doc not in indexed:
                     report.missing_labels.append(f"{doc[:60]} ({title[:50]})")
+        report.unlabelled_matches.extend(unlabelled_lexical_matches(collection, case))
         got = run_case(collection, case, depth)
         kind = report.by_kind.setdefault(case.kind, {leg: LegScore(leg) for leg in LEGS})
         for leg in LEGS:

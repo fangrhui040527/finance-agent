@@ -279,3 +279,84 @@ def test_the_vector_leg_earns_its_place():
     )
     assert report.legs["fused"].recall_at_10 >= report.legs["bm25"].recall_at_10
     assert report.legs["reranked"].recall_at_10 >= report.legs["bm25"].recall_at_10
+
+
+# --- the gold set drifting under a growing corpus -------------------------------
+# Two failures that are indistinguishable in a score and are opposite problems:
+# a labelled document AGES OUT (recall falls) and an unlabelled document ARRIVES
+# and answers a question (MRR falls, because it takes a rank the labelled one
+# held). Neither is the search getting worse. `missing_labels` names the first;
+# these pin the second.
+
+
+def _lexical_corpus() -> Collection:
+    col = Collection("kb_news")
+    col.add(Chunk("labelled", "$MAYBANK (1155.MY)$ my fam got rm188 here", "kb_news", as_of=NOW))
+    col.add(Chunk("newcomer", "$MAYBANK (1155.MY)$", "kb_news", as_of=NOW))
+    col.add(Chunk("unrelated", "Tenaga profit drops on higher fuel costs", "kb_news", as_of=NOW))
+    return col
+
+
+def test_an_unlabelled_document_carrying_every_token_is_named(tmp_path):
+    """The 2026-09-07 case: a second post carrying the ticker arrived, scored
+    identically to the labelled one, took rank 1 on the tie, and dropped lexical
+    MRR from 1.000 to 0.938 with nothing about the search having changed."""
+    from knowledge.retrieval.evaluate import unlabelled_lexical_matches
+
+    case = Case(query="1155.MY", relevant=("labelled",), kind="lexical")
+    found = unlabelled_lexical_matches(_lexical_corpus(), case)
+    assert len(found) == 1 and "newcomer" not in found[0]
+    assert "1155.MY" in found[0]
+
+
+def test_a_complete_lexical_label_reports_nothing(tmp_path):
+    from knowledge.retrieval.evaluate import unlabelled_lexical_matches
+
+    case = Case(query="1155.MY", relevant=("labelled", "newcomer"), kind="lexical")
+    assert unlabelled_lexical_matches(_lexical_corpus(), case) == []
+
+
+def test_a_label_broader_than_the_tokens_is_not_a_complaint(tmp_path):
+    """One-directional on purpose. A human may judge an article relevant without
+    it carrying every token verbatim - four of the `Nebius Vera Rubin` labels are
+    exactly that - and demanding labels be minimal would fight the gold set."""
+    from knowledge.retrieval.evaluate import unlabelled_lexical_matches
+
+    case = Case(query="1155.MY", relevant=("labelled", "newcomer", "unrelated"), kind="lexical")
+    assert unlabelled_lexical_matches(_lexical_corpus(), case) == []
+
+
+def test_semantic_questions_are_never_token_checked(tmp_path):
+    """There the wording is chosen to DIFFER from the article on purpose, so
+    token containment says nothing about whether a label is missing."""
+    from knowledge.retrieval.evaluate import unlabelled_lexical_matches
+
+    case = Case(query="1155.MY", relevant=("labelled",), kind="semantic")
+    assert unlabelled_lexical_matches(_lexical_corpus(), case) == []
+
+
+def test_every_lexical_label_in_the_shipped_gold_set_is_complete():
+    """The guard that keeps this from rotting again. If a collection sweep adds
+    a document carrying a lexical question's tokens, this fails and names it -
+    rather than the exact-token MRR quietly slipping and reading as a search
+    regression."""
+    from knowledge.corpus import Corpus
+    from knowledge.graph.extractors.gdelt import entity_index
+    from knowledge.retrieval.evaluate import unlabelled_lexical_matches
+    from knowledge.retrieval.index import news_collection
+
+    if not Path("data/corpus.db").exists():
+        pytest.skip("no corpus in this checkout")
+    with Corpus("data/corpus.db") as corpus:
+        articles = corpus.articles(limit=100_000)
+    if not articles:
+        pytest.skip("corpus is empty")
+    col = news_collection(articles, entity_index())
+
+    gaps = [m for case in load_gold() for m in unlabelled_lexical_matches(col, case)]
+    assert not gaps, (
+        "a document carries every token of a lexical question and is not labelled.\n"
+        "For a lexical question the criterion is containment, so it is a correct\n"
+        "retrieval and belongs in `relevant`. Add it to "
+        "knowledge/retrieval/data/retrieval_gold.yaml:\n  " + "\n  ".join(gaps)
+    )
