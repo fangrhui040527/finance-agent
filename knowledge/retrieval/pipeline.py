@@ -62,6 +62,11 @@ class RetrievalResult:
     web_used: WebTrigger | None = None
     refused: bool = False
     trace: list[str] = field(default_factory=list)
+    #: chunk_id -> which rule dropped it and why, from the retrieval rail.
+    #: Empty on every ordinary query; non-empty is the record that a collected
+    #: document tried to talk to the model. Never silently discarded - a
+    #: quarantine nobody can count is indistinguishable from no attack.
+    quarantined: dict[str, str] = field(default_factory=dict)
 
 
 class CollectionScopeError(PermissionError):
@@ -131,6 +136,83 @@ def default_rewrite(query: str, attempt: int) -> str:
     if attempt == 1:
         return " ".join(w for w in query.split() if len(w) > 2)
     return " ".join(query.split()[:4])
+
+
+def quarantine(engine, agent: str, corpus: str, result: RetrievalResult) -> RetrievalResult:
+    """The RETRIEVAL rail, applied to what actually came back.
+
+    docs/05 section 8 lists five rails; until this function existed the
+    retrieval one was constructed nowhere outside its own tests. That is the
+    OWASP LLM01 indirect vector: a poisoned sentence inside a collected article
+    reaches the model's context having passed no scan at all, because the input
+    rail only ever saw the person's question.
+
+    DROP AND COUNT, never refuse the query. An article is not a request, and a
+    rail that failed the whole retrieval on one bad chunk would hand any wire
+    service a denial of service against every question about a company: publish
+    one poisoned story, and the name goes dark. So the poisoned chunk is removed
+    from the evidence and named in `quarantined`; the rest of the answer stands.
+    Only when the scan empties the hit list does the result become a refusal -
+    there is then no evidence left to answer from.
+
+    `engine` is anything with `.evaluate(Action) -> PolicyResult`; the decision
+    is read, not enforced, because enforcement here raises and raising is the
+    denial of service.
+    """
+    from core.guardrails.policy import Action, Decision, Rail
+
+    if not (result.hits or result.context):
+        return result
+
+    verdicts: dict[str, str] = {}
+
+    def clean(chunk: Chunk) -> bool:
+        if chunk.chunk_id not in verdicts:
+            got = engine.evaluate(
+                Action(
+                    name="retrieve",
+                    rail=Rail.RETRIEVAL,
+                    agent=agent,
+                    # Deliberately no `as_of`: the staleness rule reads that key
+                    # off any rail, and kb_news is a 12-hour SLA over a corpus
+                    # of months, so passing it would quarantine the archive as
+                    # an injection finding.
+                    payload={"corpus": corpus, "chunk_id": chunk.chunk_id, "text": chunk.text},
+                )
+            )
+            verdicts[chunk.chunk_id] = (
+                f"{got.policy_name}: {got.reason}" if got.decision is Decision.DENY else ""
+            )
+        return not verdicts[chunk.chunk_id]
+
+    hits = [h for h in result.hits if clean(h.chunk)]
+    context = [c for c in result.context if clean(c)]
+    dropped = {cid: why for cid, why in verdicts.items() if why}
+    if not dropped:
+        return result
+
+    trace = [*result.trace, f"retrieval rail quarantined {len(dropped)} chunk(s)"]
+    if hits:
+        # Re-grade DOWN only. Calling grade() again would re-decide freshness
+        # without the max_age this call was made under, which could turn a WEAK
+        # result PASS on the strength of having lost a chunk.
+        was = result.grade
+        report = GradeReport(
+            Grade.WEAK if len(hits) < SUFFICIENCY_MIN_HITS else was.grade,
+            max(h.score for h in hits),
+            was.fresh,
+            len(hits),
+            "quarantine left a single supporting chunk"
+            if len(hits) < SUFFICIENCY_MIN_HITS
+            else was.reason,
+        )
+        return RetrievalResult(
+            hits, context, report, result.rewrites, result.web_used, False, trace, dropped
+        )
+    report = GradeReport(
+        Grade.INSUFFICIENT, 0.0, True, 0, "every retrieved chunk was quarantined at the rail"
+    )
+    return RetrievalResult([], [], report, result.rewrites, result.web_used, True, trace, dropped)
 
 
 def retrieve(

@@ -269,6 +269,13 @@ class RateLimitPolicy(PolicyRule):
         self.store = store
 
     def evaluate(self, action: Action) -> PolicyResult | None:
+        # The daily budget counts TOOL CALLS. This rail check is not decoration:
+        # the retrieval rail scans one action per retrieved chunk, so without it
+        # a single six-hit query spent seven of the day's allowance instead of
+        # one, and the shared store is keyed on `self.rails[0]` anyway - the
+        # rule has always meant the tool rail and now says so.
+        if action.rail is not Rail.TOOL:
+            return None
         if self.store is not None:
             n = self.store.count_and_add(self.rails[0].value, self.window)
             if n >= self.max_calls:

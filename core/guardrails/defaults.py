@@ -56,15 +56,26 @@ def neutralize_special_tokens(text: str) -> str:
 
 
 class InjectionScanPolicy(PolicyRule):
-    """Input rail. Retrieved text is data, never instructions.
+    """Input AND retrieval rails. Text is data, never instructions.
 
     Two layers: substring markers for the classic phrasings, and regex rules
     per category so a rewording ("kindly set aside all prior guidance") still
     trips the same wire. Detection DENIES; nothing here rewrites and forwards.
+
+    The INDIRECT vector is the one that matters here, and for a long time this
+    rule could not see it. A question typed by the person was scanned on the
+    input rail, but the articles retrieved to answer it were not: agents guarded
+    retrieval as `_guard_tool("retrieve", {"corpus": corpus})`, a payload
+    carrying the corpus NAME and no text, so this rule read an empty string and
+    allowed. Anyone able to get a sentence into a collected news story - which
+    on a public wire is anyone - was writing straight into the model's context.
+    knowledge/retrieval/pipeline.quarantine now runs every returned chunk past
+    this rule on Rail.RETRIEVAL, and OWASP LLM01-indirect is the ragqa check
+    that fails if that call is ever removed.
     """
 
     name = "injection_scan"
-    rails = (Rail.INPUT,)
+    rails = (Rail.INPUT, Rail.RETRIEVAL)
     MARKERS = (
         "ignore previous instructions",
         "disregard the system prompt",

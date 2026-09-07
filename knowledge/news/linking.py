@@ -25,6 +25,10 @@ The rule set here is small and deliberate, and every branch has a test:
     phrase, case-insensitively: "Malayan Banking Berhad", "Apple Inc", "Nvidia
     Corporation".
 
+  * **No ASCII alias matches when a thoroughfare word follows it** - see
+    THOROUGHFARE. "Maybank Highway" is a road in Charleston, and the story about
+    it closing was linked to Malayan Banking and escalated as bank news.
+
 A word boundary here is "not preceded or followed by an ASCII letter or
 digit", which is stricter than `\\b`: it keeps "Apple's" and "Maybank," while
 refusing "pineapple" and "Amdocs".
@@ -46,6 +50,33 @@ _NON_ASCII = re.compile(r"[^\x00-\x7F]")
 ACRONYM_MAX_CHARS = 4
 INFLECTION_MAX_CHARS = 2
 
+#: A company's name followed by one of these is a PLACE named after it, not the
+#: company: "Maybank Highway at Main Road closed after early morning multi-
+#: vehicle crash" was linked to MYX:1155 and escalated to the review queue as
+#: Maybank news. Matched case-SENSITIVELY even inside the case-insensitive
+#: patterns, because these are proper-name components: "Maybank Highway" is a
+#: road, "interchange fees" is banking.
+#:
+#: The list is thoroughfares ONLY, and the exclusions are the point. "Park",
+#: "Tower", "Plaza", "Centre", "Stadium" and "Arena" are things a company names
+#: after ITSELF - Apple Park, Maybank Tower - so a story about one usually IS
+#: about the company. "Drive", "Lane", "Bridge" and "Interchange" are ordinary
+#: English or product vocabulary ("NVLink Bridge") and would cost real mentions.
+#: Measured over all 1,342 collected articles: one alias is followed by any of
+#: the words above, and it is the road closure. Nothing legitimate is lost.
+THOROUGHFARE = (
+    "Highway",
+    "Freeway",
+    "Expressway",
+    "Parkway",
+    "Boulevard",
+    "Avenue",
+    "Street",
+    "Road",
+    "Roundabout",
+)
+_NOT_A_PLACE = rf"(?!\s+(?-i:(?:{'|'.join(THOROUGHFARE)}))(?!{_ASCII_WORD}))"
+
 
 def alias_pattern(surface: str) -> re.Pattern[str]:
     """The compiled matcher for one alias, per the rules in the module doc."""
@@ -56,7 +87,7 @@ def alias_pattern(surface: str) -> re.Pattern[str]:
     if _NON_ASCII.search(surface):
         return re.compile(escaped, re.IGNORECASE)
 
-    bounded = rf"(?<!{_ASCII_WORD}){{}}(?!{_ASCII_WORD})"
+    bounded = rf"(?<!{_ASCII_WORD}){{}}(?!{_ASCII_WORD}){_NOT_A_PLACE}"
     is_one_word = " " not in surface
     if is_one_word and surface.isupper() and len(surface) <= ACRONYM_MAX_CHARS:
         return re.compile(bounded.format(escaped))  # case-sensitive acronym

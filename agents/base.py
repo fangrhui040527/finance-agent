@@ -94,10 +94,18 @@ class Agent(ABC):
 
     def retrieve(self, corpus: str, query: str, **kw):
         from core.trace import emit, is_tracing
+        from knowledge.retrieval.pipeline import quarantine
         from knowledge.retrieval.pipeline import retrieve as _retrieve
 
+        # Two rails, and they are not the same rail. The TOOL one asks whether
+        # this agent may read this corpus at all; the RETRIEVAL one reads what
+        # came back. Guarding only the first is what let a poisoned article
+        # through - the payload there carries the corpus NAME, so the injection
+        # scan was handed an empty string on every retrieval this system ever
+        # made.
         self._guard_tool("retrieve", {"corpus": corpus})
         result = _retrieve(self.agent_id, corpus, query, self.ctx.router, now=self.ctx.now, **kw)
+        result = quarantine(self.ctx.engine, self.agent_id, corpus, result)
         if is_tracing():
             emit(
                 "retrieval",
@@ -107,6 +115,7 @@ class Agent(ABC):
                 query=query,
                 n_hits=len(getattr(result, "hits", []) or []),
                 n_context=len(getattr(result, "context", []) or []),
+                quarantined=getattr(result, "quarantined", {}) or {},
                 grade=getattr(getattr(result, "grade", None), "grade", None)
                 and result.grade.grade.value,
                 relevance=getattr(getattr(result, "grade", None), "relevance", None),

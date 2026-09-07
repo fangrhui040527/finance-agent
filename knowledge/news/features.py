@@ -210,18 +210,53 @@ class LexiconExtractor:
         )
 
 
+#: One mention of a watched name clears this; see LexiconExtractor.extract.
+RELEVANCE_FLOOR = 0.34
+
+
 def should_escalate(
     features: Features, entities: list[str], holdings: set[str], watchlist: set[str]
 ) -> bool:
     """The escalation gate. An LLM call only for articles that matter.
 
     docs/02 A4: local model first, LLM only for articles attached to a holding
-    or a live candidate.
+    or a live candidate - which docs/08 section 7 sizes at roughly one article
+    in five reaching a paid model.
+
+    THREE CONDITIONS, and for a long time there were effectively one. The gate
+    used to read `relevance >= 0.34 AND a watched name is in entities`, but
+    relevance is a mention COUNT: any article naming the company once scores
+    0.50, so the first condition was true exactly when the second was. Measured
+    on the corpus at 2026-09-07, that gate passed 513 of the 791 articles linked
+    to a name in the book - 65%, and 8 of 8 for Maybank, 8 of 8 for Tenaga. A
+    gate that rejects nothing is not a gate; it is an LLM bill.
+
+    The third condition is MATERIALITY: the article must say something financial
+    about the company, not merely name it. Sponsorships, branch openings, golf
+    tournaments and traffic reports name a bank without reporting anything about
+    it. Requiring one of the three lexicon-bearing dimensions to be non-zero -
+    polarity (POSITIVE or NEGATIVE fired), intensity (INTENSE), forwardness
+    (FORWARD) - takes the same 791 articles to 134, or 17%, which is the
+    documented design target. Per name: Maybank 8 -> 1, Tenaga 8 -> 1, Nvidia
+    226 -> 68. The one Maybank story that survives is a broker note with a price
+    target cut; the seven dropped are the charity cheque, the golf, the car-loan
+    product launch, the meme post and the road closure.
+
+    UNCERTAINTY is deliberately not a materiality signal even though it is a
+    lexicon dimension: its words are "may", "could", "if", "expects" - ordinary
+    English that fires on almost any prose, so including it re-opens the gate it
+    is meant to close.
+
+    KNOWN COST, measured rather than assumed: an article where POSITIVE and
+    NEGATIVE fire exactly equally has polarity 0, and if nothing else fires it
+    is dropped despite being material. That is 1 article of the 791.
     """
-    if features.relevance < 0.34:
-        return False
     touched = set(entities)
-    return bool(touched & holdings) or bool(touched & watchlist)
+    if not (touched & holdings) and not (touched & watchlist):
+        return False
+    if features.relevance < RELEVANCE_FLOOR:
+        return False
+    return features.polarity != 0.0 or features.intensity > 0.0 or features.forwardness > 0.0
 
 
 def near_duplicate_hash(text: str, shingle: int = 6) -> str:

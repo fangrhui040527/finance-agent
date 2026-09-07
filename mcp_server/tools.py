@@ -1666,7 +1666,7 @@ def method_note(
     """
     from agents.base import quote_span
     from knowledge.retrieval.method import COLLECTIONS, PATTERN_TAGS
-    from knowledge.retrieval.pipeline import CollectionScopeError
+    from knowledge.retrieval.pipeline import CollectionScopeError, quarantine
     from knowledge.retrieval.pipeline import retrieve as _retrieve
 
     if collection not in METHOD_OWNERS:
@@ -1706,6 +1706,11 @@ def method_note(
         )
     except (KeyError, CollectionScopeError) as e:
         raise ToolError(f"{collection} is not registered on this router: {e}") from None
+    # This path calls the pipeline directly rather than through Agent.retrieve,
+    # so it needs the retrieval rail applied here or it is the second unguarded
+    # door. The method stores are human-written, so a quarantine here would mean
+    # a curated note contains an injection marker - worth seeing, not hiding.
+    res = quarantine(ctx.engine, METHOD_OWNERS[collection], collection, res)
     rows = [f"{collection}: method notes for {q!r}"]
     seen: set[str] = set()
     shown = 0

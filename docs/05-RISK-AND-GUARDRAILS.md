@@ -462,7 +462,7 @@ Every request passes through the same five rails. There is no debug path, no adm
 flowchart TD
     IN["Request"] --> R1
     R1["<b>Input rail</b><br/>· tenant scope check<br/>· prompt-injection scan<br/>· scope classification (in/out of domain)<br/>· PII detection"] --> R2
-    R2["<b>Retrieval rail</b><br/>· tenant filter — personal data never leaves its boundary<br/>· licence filter — link_only bodies unreachable<br/>· freshness filter by corpus SLA<br/>· collection scoping — agent sees only its own KB"] --> R3
+    R2["<b>Retrieval rail</b><br/>· tenant filter — personal data never leaves its boundary<br/>· licence filter — link_only bodies unreachable<br/>· freshness filter by corpus SLA<br/>· collection scoping — agent sees only its own KB<br/>· injection scan on the retrieved text itself"] --> R3
     R3["<b>Tool rail</b><br/>· allow-list per agent<br/>· web queries stripped of holdings, amounts, goals<br/>· rate + cost budget per call<br/>· NO EXECUTION TOOL EXISTS"] --> R4
     R4["<b>Output rail</b><br/>· every claim → chunk_id, else dropped<br/>· numeric cross-check vs source of record<br/>· advice-language classifier: no buy/sell verbs<br/>· as_of present and within SLA<br/>· cap-breach check on any sizing object"] --> R5
     R5["<b>Publication rail</b><br/>· provenance rows appended<br/>· disclaimer block attached<br/>· cost + tokens logged"] --> OUT["Response"]
@@ -472,6 +472,14 @@ flowchart TD
     R3 -->|fail| REF
     R4 -->|fail| REF
 ```
+
+**The retrieval rail scans what came back, not only what went in.** The input rail
+sees the person's question; the indirect injection (OWASP LLM01) arrives inside a
+*collected article*, written by anyone able to publish on a wire the collector
+reads. `knowledge/retrieval/pipeline.quarantine` runs every returned chunk past
+the same injection rule and DROPS the offenders, naming them in
+`RetrievalResult.quarantined` — it never fails the query, because a rail that
+did would let one hostile story silence every question about a company.
 
 ### 8.1 The non-negotiables
 
