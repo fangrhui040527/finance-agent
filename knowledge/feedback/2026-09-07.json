@@ -1,0 +1,119 @@
+{
+  "day": "2026-09-07",
+  "written_at": "2026-09-07T22:52:00Z",
+  "market": {
+    "regime": "neutral",
+    "notes": [
+      "Bursa held a session; US markets closed for Labor Day, so the three Nasdaq names repeat the 2026-09-04 bar and measure nothing new.",
+      "MYX:0820EA returned +0.00% on the day, so every Bursa name's market component is 0.00% and its unexplained share is 100% by arithmetic.",
+      "Every macro row is the same print as the previous three pages: VIXCLS 14.32, BAMLH0A0HYM2 2.65, DGS10 4.77, DGS2 4.34, T10Y2Y 0.41, DFF 3.63, BNM:OPR 2.75 held."
+    ]
+  },
+  "names": [
+    {
+      "instrument_id": "MYX:1155",
+      "move": {"return_1d": 0.0019, "market_1d": 0.0000, "unexplained_share": 1.00},
+      "causes": [],
+      "open_questions": ["A moomoo post asserts foreign selling of banks against local buying of Maybank with no figure; the fact book holds no ownership or flow series for this name."],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:5347",
+      "move": {"return_1d": 0.0162, "market_1d": 0.0000, "unexplained_share": 1.00},
+      "causes": [
+        {
+          "claim": "unknown: no collected evidence reaches further",
+          "evidence": [],
+          "chain": ["significant idiosyncratic move, verdict no_identified_catalyst", "nothing collected for this name in the window", "yahoo_rss empty, google_news empty, gdelt failed for three Bursa names at 15:08"],
+          "confidence": 0.0,
+          "confirm": "a Bursa announcement, tariff or capacity item, or broker note dated 2026-09-07 in tomorrow's collection, with the idiosyncratic share holding above 50% on a 2-session window",
+          "refute": "the move reversing on 2026-09-08, making it a one-session liquidity artefact"
+        }
+      ],
+      "open_questions": ["Is the 5d -2.12% the results print the 2026-09-04 roundup headline referred to? No primary figure has ever been collected (since 2026-09-04)."],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:5183",
+      "move": {"return_1d": 0.0070, "market_1d": 0.0000, "unexplained_share": 1.00},
+      "causes": [],
+      "open_questions": ["PCHEM and PetChem return zero mentions across all 1,404 articles; the gap is collection, not linking."],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:5225",
+      "move": {"return_1d": -0.0063, "market_1d": 0.0000, "unexplained_share": 1.00},
+      "causes": [
+        {
+          "claim": "the Delhi forensic-audit order against the Fortis majority-control plan, offered for the 5d -4.24% only, not for the day's move",
+          "evidence": ["digest:2026-09-07:theedgemalaysia.com:forensic-audit-order-adds-hurdle", "digest:2026-09-07:nst.com.my:delhi-court-order-limited-impact", "digest:2026-09-07:businesstoday.com.my:ihh-plans-fortis-51-percent"],
+          "chain": ["court-ordered forensic audit is a condition-precedent risk on a stated stake purchase", "IHH has stated it intends 51% of Fortis by 2030 with an RM5.8bn capital injection", "unknown: no collected evidence reaches further; no filing, announcement or figure for IHH exists in the fact book"],
+          "confidence": 0.35,
+          "confirm": "a Bursa announcement or IHH release describing the Fortis transaction in the fact book, and the 5d gap persisting to a 10-session window",
+          "refute": "the gap closing over the next two sessions, or Malaysian healthcare peers moving the same way"
+        }
+      ],
+      "open_questions": ["A headline states IHH rose 0.13% on the session the pack measures at -0.63%; the stated move is about a different window or price basis."],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:8869",
+      "move": {"return_1d": -0.0037, "market_1d": 0.0000, "unexplained_share": 1.00},
+      "causes": [],
+      "open_questions": [],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:3182",
+      "move": {"return_1d": 0.0049, "market_1d": 0.0000, "unexplained_share": 1.00},
+      "causes": [],
+      "open_questions": ["Fitch downgraded Genting to BBB- and Resorts World Las Vegas to BB+ on 2026-09-07, carried by four Malaysian outlets. The move was 0.39 sigma, so no company story is warranted and the downgrade is NOT offered as its cause. rating_change is a supported event class but no source producing it covers Bursa, so the action exists as prose and nowhere as a dated fact."],
+      "watch": []
+    },
+    {
+      "instrument_id": "XNAS:NVDA",
+      "move": {"return_1d": 0.0084, "market_1d": -0.0039, "unexplained_share": 0.71},
+      "causes": [
+        {
+          "claim": "the Hugging Face transaction, offered for the 5d +5.89% only; unchanged and unconfirmed on a fourth page",
+          "evidence": ["digest:2026-09-04:finance.yahoo.com:hugging-face-deal"],
+          "chain": ["unknown: no collected evidence reaches further; no filing or release in the fact book"],
+          "confidence": 0.30,
+          "confirm": "an 8-K or press release for the transaction in the fact book, and the idiosyncratic share holding above 50% on a 5-session decomposition",
+          "refute": "SPY and the semiconductor names moving together over the same five sessions"
+        }
+      ],
+      "open_questions": ["Finnhub earnings rows carry a knowable date in the future (last EPS surprise 3.82, knowable 2026-09-30); which field is being read as the report date? (since 2026-09-04)"],
+      "watch": []
+    },
+    {
+      "instrument_id": "XNAS:AAPL",
+      "move": {"return_1d": -0.0251, "market_1d": -0.0039, "unexplained_share": 0.91},
+      "causes": [],
+      "open_questions": ["The 2026-09-09 product launch event is named by four independent sources and is not an event row; no enabled source produces a product_event class."],
+      "watch": [{"when": "2026-10-28", "what": "earnings_result"}]
+    },
+    {
+      "instrument_id": "XNAS:MSFT",
+      "move": {"return_1d": -0.0204, "market_1d": -0.0039, "unexplained_share": 0.83},
+      "causes": [],
+      "open_questions": [],
+      "watch": [{"when": "2026-10-27", "what": "earnings_result"}]
+    }
+  ],
+  "data_quality": {
+    "failed": ["gdelt: Petronas Chemicals, Press Metal, Genting at 15:08; Microsoft, Apple at 22:38"],
+    "degraded": ["yahoo_rss: read but empty for all six Bursa names at 15:08 (41 items returned for the three US names at 22:38)", "google_news: read but empty for Press Metal and Petronas Chemicals", "alphavantage_news: quota exhausted for XNAS:MSFT"],
+    "skipped": ["eodhd: EODHD_API_KEY not set"],
+    "slots_dispatched": ["us_close"],
+    "slots_named_but_not_dispatched": ["bursa_close"],
+    "slots_note": "sweep --due named bursa_close and us_close at 22:36 UTC. us_close was dispatched (run 39, workflow_dispatch, 22:35:36 UTC) and landed at 22:38 with 8 sources and 245 articles stored. bursa_close was named but not dispatched: it ran as scheduled run 37 at 15:03:51 UTC (8 sources, 55 stored) on the build predating the slot column, so it left no slot to attribute. Dispatching it would have double-collected a slot already served. One-off transition artefact; every run from 17:52 UTC records its slot.",
+    "schedule_lateness": "bursa_close due 09:20 ran 15:03:51 (5h43m late); us_preopen due 12:30 ran 17:51:58 (5h21m late); us_close due 21:15 had not run at 22:35 and was served by the catch-up. All completed runs succeeded - this is lateness, not the Actions-minutes failure of 2026-09-05.",
+    "monitor_open": ["15 macro series past their cadence: DBN:NEER_US 494d (limit 70), DBN:GOVT_YIELD_MY 494d (limit 70), DBN:POLICY_RATE_US 463d (limit 100), and 12 more"]
+  },
+  "lessons": [
+    "A market proxy that returns exactly +0.00% makes every component's unexplained share 100% by arithmetic, not by discovery; read the sigma, not the share.",
+    "An event's importance and its price impact are different measurements, and the page must report the first even when the second is absent.",
+    "A schedule can be failing while every one of its runs succeeds; only a rule counting owed-against-arrived firings sees it."
+  ]
+}
