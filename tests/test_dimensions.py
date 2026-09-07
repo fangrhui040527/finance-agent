@@ -87,6 +87,39 @@ def test_efficiency_computes_cache_hit_rate_and_names_a_zero(tmp_path):
     out = O.efficiency_report(days=7, db=str(db))
     assert "hit rate 0%" in out
     assert "NOTHING is being cached" in out
+
+
+def test_a_zero_hit_rate_on_short_prompts_blames_the_length_not_the_prefix(tmp_path):
+    """The exact shape of this system's own ledger, and the reason for the fix.
+
+    Four calls at 183-438 tokens, all under the floor. The report used to say
+    "the prefix is changing between them" unconditionally, which would have
+    sent someone hunting a varying timestamp that does not exist. A prompt this
+    short is not cached by any model and the API does not say so.
+    """
+    db = _ledger(tmp_path / "l.db", [{"in": n, "cache_read": 0} for n in (183, 392, 392, 438)])
+    out = O.efficiency_report(days=7, db=str(db))
+    assert "nothing could be" in out
+    assert "438 tokens" in out, "names the largest call, because the minimum is per call"
+    assert "512-token floor" in out
+    assert "the prefix is changing" not in out
+
+
+def test_a_prompt_inside_the_model_dependent_band_says_check_the_minimum(tmp_path):
+    db = _ledger(tmp_path / "l.db", [{"in": 2000, "cache_read": 0} for _ in range(3)])
+    out = O.efficiency_report(days=7, db=str(db))
+    assert "model-dependent" in out
+    assert "before looking for an" in out
+    assert "the prefix is changing" not in out
+
+
+def test_long_prompts_that_never_cache_still_get_the_prefix_diagnosis(tmp_path):
+    """The original message was not wrong, only unconditional. Above every
+    published minimum the size explanation IS ruled out, and then an unstable
+    prefix is exactly what a zero hit rate means."""
+    db = _ledger(tmp_path / "l.db", [{"in": 9000, "cache_read": 0} for _ in range(3)])
+    out = O.efficiency_report(days=7, db=str(db))
+    assert "clear every" in out
     assert "the prefix is changing" in out
 
 

@@ -25,6 +25,8 @@ from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
 
+from core.guardrails.policy import PolicyEngine
+from core.guardrails.publish import PUBLICATION_NOTICE
 from knowledge.corpus import Corpus
 from knowledge.facts import FactBook
 from knowledge.news.features import Article, LexiconExtractor
@@ -89,7 +91,16 @@ class Digest:
     counts: dict = field(default_factory=dict)
 
     def to_json(self) -> str:
-        return json.dumps(asdict(self), indent=2, sort_keys=True, default=str)
+        # The notice travels with the JSON too. The markdown is what a person
+        # opens, but the JSON is what the feedback routine reads and what any
+        # other consumer of this directory would parse, and a machine-readable
+        # digest that omits what it is not is the same omission.
+        return json.dumps(
+            {**asdict(self), "notice": PUBLICATION_NOTICE},
+            indent=2,
+            sort_keys=True,
+            default=str,
+        )
 
     def to_markdown(self) -> str:
         out = [f"# Digest {self.day}", ""]
@@ -163,6 +174,12 @@ class Digest:
                     f"{c['kept']} | {c['stored']} | {c['detail'][:80]} |"
                 )
             out.append("")
+        # This file is committed and pushed. A reader who lands on it from a
+        # search engine sees company names, tone scores and starred
+        # escalations, and nothing saying what the page is - which is exactly
+        # the reading it must not invite. `write_digest` refuses to write a
+        # digest whose text does not end here.
+        out += ["---", "", PUBLICATION_NOTICE]
         return "\n".join(out)
 
 
@@ -371,13 +388,33 @@ def _macro(facts, day: date) -> list[dict]:
     return out
 
 
-def write_digest(digest: Digest, root: str | Path = DIGEST_DIR) -> tuple[Path, Path]:
+def write_digest(
+    digest: Digest, root: str | Path = DIGEST_DIR, *, engine: PolicyEngine | None = None
+) -> tuple[Path, Path]:
+    """Render, run the publication rail, then write. In that order.
+
+    The rail runs BEFORE the first byte is written. A digest that fails it
+    leaves no file behind at all, rather than a signed `latest.md` beside an
+    unsigned dated copy - the collector commits the whole directory, so a
+    partial write is a partial publication.
+
+    `engine` defaults to the standard rule set rather than being required.
+    Callers that have one (the CLI, the MCP tool) pass theirs; the default is
+    there so that adding this gate cannot be sidestepped by a caller that
+    simply has no engine to hand.
+    """
+    from core.guardrails.defaults import default_engine
+    from core.guardrails.publish import publish
+
+    body = digest.to_markdown()
+    publish(engine or default_engine(), "collector", "digest", body)
+
     root = Path(root)
     root.mkdir(parents=True, exist_ok=True)
     md = root / f"{digest.day}.md"
     js = root / f"{digest.day}.json"
-    md.write_text(digest.to_markdown() + "\n", encoding="utf-8")
+    md.write_text(body + "\n", encoding="utf-8")
     js.write_text(digest.to_json() + "\n", encoding="utf-8")
     latest = root / "latest.md"
-    latest.write_text(digest.to_markdown() + "\n", encoding="utf-8")
+    latest.write_text(body + "\n", encoding="utf-8")
     return md, js

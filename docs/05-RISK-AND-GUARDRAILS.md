@@ -481,6 +481,25 @@ the same injection rule and DROPS the offenders, naming them in
 `RetrievalResult.quarantined` — it never fails the query, because a rail that
 did would let one hostile story silence every question about a company.
 
+**The publication rail has one door, and it reads the text.** `core/guardrails/publish.publish`
+is the only thing that constructs a `Rail.PUBLICATION` action, and every surface that
+reaches a person goes through it: `knowledge/digest.write_digest` (the file the collector
+commits and pushes), `ask.py` (the terminal), `web/api.py` (the HTTP response) and
+`mcp_server.tools.daily_digest` (the model's copy of that same page).
+`DisclaimerPolicy` searches the finished string for the standing notice rather than
+consulting a `disclaimer` boolean the caller sets — a flag is a check the caller passes
+by asserting it has passed. Composition and checking sit in different modules on purpose:
+the renderers sign their own output, the door refuses anything unsigned, so an edit that
+drops a renderer's last line fails at the door instead of shipping.
+
+Two things this closed. The rail had been declared since P0 and **never constructed** —
+`rails_covered()` reported five of five because it asks whether a *rule* claims a rail,
+not whether anything hands it an action. `tests/test_publication_rail.py` now parses the
+production tree for `Action(..., Rail.X, ...)` and names any rail with no constructor.
+And `journal/digest/latest.md`, the one output that is literally published — committed,
+pushed, readable by anyone — carried company names, tone scores and starred escalations
+with nothing saying what the page was not.
+
 ### 8.1 The non-negotiables
 
 1. **No execution.** There is no order-placement tool in the codebase. Not disabled, not feature-flagged, not behind a permission — absent. The system is a one-way door: it emits a decision object; a human acts in a broker app.

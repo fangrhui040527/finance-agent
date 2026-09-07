@@ -1,6 +1,6 @@
 # Digest 2026-09-07
 
-Generated 2026-09-07 15:08 UTC · slot `all` · 1397 articles in the corpus, 4452 observations, 3927 events in the fact book.
+Generated 2026-09-07 17:16 UTC · slot `all` · 1397 articles in the corpus, 4452 observations, 3927 events in the fact book.
 
 ## The book
 
@@ -106,3 +106,6 @@ Generated 2026-09-07 15:08 UTC · slot `all` · 1397 articles in the corpus, 445
 | 08:49 | fmp | ok | 3957 | 0 | 0 | facts 0; fmp: HTTP 402 for https://financialmodelingprep.com/stable/earnings?sym |
 | 08:49 | dosm_cpi | ok | 36 | 0 | 0 | facts 36;  |
 
+---
+
+This is analysis, not advice, and this system cannot place orders.

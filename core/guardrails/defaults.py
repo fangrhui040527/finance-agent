@@ -118,13 +118,38 @@ class InjectionScanPolicy(PolicyRule):
 
 
 class DisclaimerPolicy(PolicyRule):
-    """Publication rail. docs/05: every output ships a provenance block."""
+    """Publication rail. docs/05: every output ships a provenance block.
+
+    The rule reads the TEXT when there is text to read. It used to consult a
+    `disclaimer` boolean the caller set, which is a check a caller passes by
+    asserting it has passed - the flag and the notice could disagree and only
+    the flag was consulted. Now the finished string is searched for the notice
+    it is supposed to end with, so a renderer that drops its last line is
+    caught at the door however the flag is set.
+
+    The flag survives for the one case with no text: the structural chain test
+    that walks every rail with an empty payload. There, and only there, is
+    there nothing to read.
+    """
 
     name = "disclaimer"
     rails = (Rail.PUBLICATION,)
 
     def evaluate(self, action: Action) -> PolicyResult | None:
-        if action.rail is Rail.PUBLICATION and not action.payload.get("disclaimer"):
+        if action.rail is not Rail.PUBLICATION:
+            return None
+        text = action.payload.get("text")
+        if text is not None:
+            from core.guardrails.publish import carries_notice
+
+            if carries_notice(str(text)):
+                return None
+            return PolicyResult(
+                Decision.DENY,
+                self.name,
+                "published text does not carry the standing notice",
+            )
+        if not action.payload.get("disclaimer"):
             return PolicyResult(
                 Decision.DENY, self.name, "output must carry a provenance and disclaimer block"
             )

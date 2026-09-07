@@ -419,21 +419,33 @@ def owasp(rep: Report) -> None:
 
     # Which rails production actually ENFORCES, as opposed to which exist.
     #
-    # The scan looks for an Action being CONSTRUCTED on a rail, and skips
-    # core/guardrails/ itself: a rule's `rails = (Rail.RETRIEVAL, ...)` line is
-    # a declaration of what it would guard given the chance, not evidence that
-    # anything calls it. Counting the declaration was this check's own first
-    # bug, and it hid the finding it exists to make.
+    # The scan looks for an Action being CONSTRUCTED on a rail, and skips the
+    # three modules that DECLARE the rails: a rule's `rails = (Rail.RETRIEVAL,
+    # ...)` line is a statement of what it would guard given the chance, not
+    # evidence that anything calls it. Counting the declaration was this
+    # check's own first bug, and it hid the finding it exists to make.
+    #
+    # The skip used to be the whole of core/guardrails/, which was right while
+    # that package held nothing but rules. It no longer does: publish.py is the
+    # publication rail's single door, a constructor and not a declaration, and
+    # skipping it by directory would have gone on reporting the rail unenforced
+    # after it was wired. Naming the three files says what is actually being
+    # excluded and why.
     import re as _re
 
     root = Path(__file__).resolve().parents[1]
+    declaring = {
+        "core/guardrails/policy.py",
+        "core/guardrails/defaults.py",
+        "core/guardrails/chain.py",
+    }
     construction = _re.compile(r"Action\(\s*[^)]*?Rail\.([A-Z]+)", _re.S)
     callers: dict[str, list[str]] = {}
     for path in sorted(root.rglob("*.py")):
         rel = path.relative_to(root).as_posix()
         if any(rel.startswith(p) for p in (".venv", "tests/", "qa/", "stress/", "ragqa/")):
             continue
-        if rel.startswith("core/guardrails/"):
+        if rel in declaring:
             continue
         for name in construction.findall(path.read_text(encoding="utf-8", errors="replace")):
             callers.setdefault(name.lower(), []).append(rel)

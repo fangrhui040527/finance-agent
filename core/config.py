@@ -714,6 +714,40 @@ def find(start: Path | None = None) -> Path | None:
     return None
 
 
+def _store_path(raw: object) -> str:
+    """Confine a relative store path to the project tree.
+
+    `stress/run.py` note, carried since the suite was written: a config saying
+    `database = "../../../../tmp/pwned.db"` had that string stored verbatim and
+    a database opened wherever it pointed. Low risk on a single-operator tool -
+    they own the file either way - but a path that walks out of the project is
+    never what a config file meant, and normalising it costs nothing.
+
+    Two rules, and the split is what keeps this from being a nuisance:
+
+      * an ABSOLUTE path is honoured exactly. An operator who writes
+        `/var/lib/finplanet/corpus.db` means that file, and tests that point at
+        a temporary directory rely on it.
+      * a RELATIVE path has its `..` and `.` segments dropped, so it stays
+        under the working tree. `../../../../tmp/pwned.db` becomes
+        `tmp/pwned.db`; `data/corpus.db`, which is every real path in this
+        repository, is returned untouched.
+
+    Dropping the segments rather than raising is deliberate: `load` must not
+    start failing on a config it used to accept, and there is a legitimate
+    reading of the escaping path (a sibling checkout) that an error message
+    could not distinguish from a typo.
+    """
+    import ntpath
+    import posixpath
+
+    text = str(raw)
+    if posixpath.isabs(text) or ntpath.isabs(text) or ntpath.splitdrive(text)[0]:
+        return text
+    parts = [seg for seg in text.replace("\\", "/").split("/") if seg not in ("", ".", "..")]
+    return "/".join(parts) if parts else text
+
+
 def load(path: str | Path | None = None) -> Config:
     """Load settings. Absent file means documented defaults, never zero limits."""
     p = Path(path) if path else find()
@@ -790,21 +824,21 @@ def load(path: str | Path | None = None) -> Config:
         holdings=_instruments(data, "account.holdings"),
         watchlist=_instruments(data, "account.watchlist"),
         read_only=read_only,
-        provenance_db=str(_get(data, "provenance.database", "data/provenance.db")),
+        provenance_db=_store_path(_get(data, "provenance.database", "data/provenance.db")),
         sources=sources,
         gdelt_languages=_strings(data, "sources.gdelt_languages"),
         gdelt_countries=_strings(data, "sources.gdelt_countries"),
         gdelt_query=str(_get(data, "sources.gdelt_query", "")),
         gdelt_poll_minutes=_int("sources.gdelt_poll_minutes", 15),
-        corpus_db=str(_get(data, "sources.corpus_database", "data/corpus.db")),
-        facts_db=str(_get(data, "sources.facts_database", "data/facts.db")),
+        corpus_db=_store_path(_get(data, "sources.corpus_database", "data/corpus.db")),
+        facts_db=_store_path(_get(data, "sources.facts_database", "data/facts.db")),
         languages=_strings(data, "sources.languages"),
         daemon_budget_myr=dec("budget.daemon_daily_myr", 10.0),
         emergency_months=_int("waterfall.emergency_months", 6),
         debt_hurdle=dec("waterfall.debt_hurdle", 0.08),
         daily_budget_myr=dec("budget.daily_myr", 25.0),
         per_question_budget_myr=dec("budget.per_question_myr", 5.0),
-        database=str(_get(data, "learning.database", "data/learning.db")),
+        database=_store_path(_get(data, "learning.database", "data/learning.db")),
         min_graded_for_calibration=_int("learning.min_graded_for_calibration", 30),
         alert_spend_fraction=dec("monitor.spend_fraction", 0.8),
         alert_p95_latency_ms=_float("monitor.p95_latency_ms", 20_000.0),

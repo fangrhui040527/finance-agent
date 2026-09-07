@@ -448,6 +448,7 @@ def _narrate(ctx, thesis, challenges) -> int:
 
     from agents.synthesis.narrate import narrate_thesis
     from core.guardrails.policy import Action, PolicyViolation, Rail
+    from core.guardrails.publish import publish, sign
     from core.llm.backends import backend_from_env
     from core.llm.client import InferenceClient
     from core.provenance.ledger import ProvenanceLedger
@@ -488,10 +489,17 @@ def _narrate(ctx, thesis, challenges) -> int:
         # is the list worth reading before trusting the prose.
         print(f"\n  UNVERIFIED NUMBERS in the narrative: {', '.join(unsupported)}")
         print("  Each appears in the prose and not in the engine output it was given.")
+    # Two rails, and the second is not the first. OUTPUT read the model's words
+    # for advice language; PUBLICATION reads the block that is about to reach a
+    # person and refuses it if it does not say what it is.
+    try:
+        publish(ctx.engine, "a10_thesis", "narrate", sign(done.text))
+    except PolicyViolation as e:
+        print(f"\nnarrative BLOCKED by the publication rail: {e}")
+        return 0
     print(f"\nnarrative  [{type(backend).__name__} - {reason.split(':')[0]}]")
-    for line in done.text.strip().splitlines():
+    for line in sign(done.text).strip().splitlines():
         print(f"  {line}")
-    print("\n  This is analysis, not advice, and this system cannot place orders.")
     return 0
 
 

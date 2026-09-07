@@ -332,3 +332,42 @@ def test_read_only_names_load_and_never_overlap_the_book(tmp_path):
     )
     with pytest.raises(ConfigError, match="market prefix"):
         load(typo)
+
+
+# -- store paths -------------------------------------------------------------
+
+
+def test_a_relative_store_path_cannot_walk_out_of_the_project(tmp_path):
+    """`stress/run.py`'s standing note. A config that names a database four
+    levels above the checkout opened it there; the string was stored exactly as
+    written and nothing normalised it."""
+    evil = tmp_path / "evil.toml"
+    evil.write_text(
+        '[learning]\ndatabase = "../../../../tmp/pwned.db"\n'
+        '[sources]\ncorpus_database = "../../elsewhere/corpus.db"\n',
+        encoding="utf-8",
+    )
+    cfg = load(evil)
+    assert cfg.database == "tmp/pwned.db"
+    assert cfg.corpus_db == "elsewhere/corpus.db"
+    assert ".." not in cfg.database and ".." not in cfg.corpus_db
+
+
+def test_an_ordinary_relative_path_is_returned_untouched(tmp_path):
+    """Every real path in this repository is of this shape. Confinement that
+    rewrote them would be a migration, not a fix."""
+    plain = tmp_path / "plain.toml"
+    plain.write_text('[learning]\ndatabase = "data/learning.db"\n', encoding="utf-8")
+    assert load(plain).database == "data/learning.db"
+
+
+def test_an_absolute_path_is_honoured_exactly(tmp_path):
+    """An operator who writes an absolute path means it, and the test suite
+    itself points these at temporary directories."""
+    target = tmp_path / "somewhere" / "l.db"
+    absolute = tmp_path / "abs.toml"
+    absolute.write_text(
+        f'[learning]\ndatabase = "{target.as_posix()}"\n',
+        encoding="utf-8",
+    )
+    assert load(absolute).database == target.as_posix()

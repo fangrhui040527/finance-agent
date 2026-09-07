@@ -139,7 +139,7 @@
     "sweeps": 123
   },
   "day": "2026-09-07",
-  "generated_at": "2026-09-07 15:08 UTC",
+  "generated_at": "2026-09-07 17:16 UTC",
   "macro": [
     {
       "change": "-0.01",
@@ -1117,5 +1117,6 @@
       "upcoming": []
     }
   ],
+  "notice": "This is analysis, not advice, and this system cannot place orders.",
   "slot": "all"
 }

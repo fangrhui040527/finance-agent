@@ -316,13 +316,21 @@ def daily_digest(day: str = "", write: bool = False) -> str:
     costs no request and spends no quota. `pull_news` is the live fetch; this
     is what was already kept.
     """
+    from core.guardrails.defaults import default_engine
+    from core.guardrails.publish import publish
     from knowledge.digest import build_digest, write_digest
 
     cfg = _cfg()
     digest = build_digest(cfg, _parse_date(day) if day else None)
     if write:
         write_digest(digest)
-    return digest.to_markdown()
+    # The digest has two exits - the file the collector commits and this
+    # return value - and the rail belongs on both. `write_digest` gates the
+    # first; without this the model could be handed a page the file was
+    # refused for.
+    body = digest.to_markdown()
+    publish(default_engine(), "collector", "digest", body)
+    return body
 
 
 def fact_snapshot(instrument: str, days: int = 30) -> str:
