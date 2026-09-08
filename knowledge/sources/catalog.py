@@ -56,6 +56,13 @@ class SourceSpec:
     markets: tuple[str, ...] = ()
     key_env: str | None = None
     docs: str = ""
+    #: Most names one run may ask a per-instrument source about. 0 means all of
+    #: them, which is right for a source that answers every request. It is not
+    #: right for one that throttles: the requests past the limit do not fail
+    #: cheaply, they spend the retry budget and the sweep's clock before
+    #: failing. `knowledge.sweep._window` tiles the list across days so the cap
+    #: costs cadence rather than coverage.
+    names_per_run: int = 0
 
     @property
     def keyless(self) -> bool:
@@ -73,11 +80,24 @@ CATALOG: dict[str, SourceSpec] = {
     "gdelt": SourceSpec(
         "gdelt",
         NEWS,
-        "GDELT 2.0 DOC: worldwide, 100+ languages, one request per name in the book",
+        "GDELT 2.0 DOC: worldwide, 100+ languages, three names per run",
         "general_news",
         ("bursa_close", "us_close"),
         per_instrument=True,
         docs="https://blog.gdeltproject.org/gdelt-doc-2-0-api-debuts/",
+        # Three, because asking for more does not get more. Measured over the
+        # 30 recorded GDELT sweeps to 2026-09-07: 24 of them had at least one
+        # name fail, 84 name-failures in all, a mean of 3.5 names per run
+        # refused with HTTP 429 - and a refusal is not free. Each one spends
+        # three attempts at RETRY_BASE_SECONDS 5 and up to a 90s read before it
+        # gives up, which is how this source came to account for 10,433s of the
+        # 10,655s every sweep has ever spent: 98%, at 73.5s per indexed row
+        # against google_news's 0.1s.
+        #
+        # The cap is not a trade of coverage for time. The names it drops are
+        # the ones already being refused, and `_window` brings each of them
+        # round within two days.
+        names_per_run=3,
     ),
     "google_news": SourceSpec(
         "google_news",

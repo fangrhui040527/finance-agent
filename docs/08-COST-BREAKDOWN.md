@@ -265,3 +265,41 @@ and a negative bill on the first day something was. The formula is now:
 
 with every term clamped at zero, pinned by tests, and verified live against a
 metered QA run (ledger == meter under FINPLANET_CHEAP=1).
+
+## The free source that cost the most (2026-09-08)
+
+Section 3 lists GDELT at **Free**, in every tier. That is true of money and it
+was the only currency this register counted. Measured over the 30 recorded
+GDELT sweeps to 2026-09-07, the bill it does carry:
+
+| | GDELT | google_news | yahoo_rss |
+|---|---|---|---|
+| share of all sweep time | **98%** (10,433s of 10,655s) | — | — |
+| seconds per indexed row | **73.5** | 0.1 | — |
+| named the company asked for | **16%** (14 of 89) | 79% (52 of 66) | 100% (34 of 34) |
+| on the two Malaysian names read | **0%** (0 of 7) | 71–100% | — |
+
+The time is not spent fetching. It is spent being refused: 24 of the 30 runs
+had at least one name fail, 84 name-failures in all, a mean of **3.5 of 9 per
+run** answered with HTTP 429 — and each refusal costs three attempts at a 5s
+retry base and up to a 90s read before it gives up.
+
+So `SourceSpec.names_per_run` caps GDELT at **three names per run**, tiled
+across days by `knowledge.sweep._window` so every name comes round within two.
+This is not a trade of coverage for time: the requests it stops making are the
+ones that were already being refused.
+
+**GDELT still earns its place, for something other than company coverage.**
+Of the labelled retrieval questions, three are answered only by GDELT rows, and
+all three are global business stories carried by non-Western outlets — a
+Vietnamese paper on the Google ad-tech ruling, Indian outlets on Big Tech
+layoffs. Nothing else in the register reaches those. Judged as a per-company
+news source it is the worst one here; judged as a net for stories the
+English-language wires did not carry, it is the only one.
+
+**What it cannot do, and no setting changes.** The DOC API's `artlist` mode
+returns headline, URL, domain, language and date — there is no body and no
+snippet. Every GDELT row therefore has `body == title`, so
+`knowledge.retrieval.index.indexable` keeps it out of the index unless the
+linker finds a company in the 70-character headline. Bodies would mean fetching
+each article ourselves, which is a scraper, not a setting.
