@@ -34,6 +34,27 @@
 #
 # Titles are recorded beside each id so a label that ages out of the corpus can
 # be named rather than silently lowering the score.
+#
+# A label can now be unreachable for two DIFFERENT reasons, and `ask.py
+# retrieval` reports them separately because the fixes are opposite:
+#
+#   missing       gone from data/corpus.db. The corpus moved; re-collect, or
+#                 relabel against what is there now.
+#   unindexable   still in the corpus, kept out of the INDEX by `indexable()` -
+#                 a headline-only row naming no instrument. Re-collecting it
+#                 changes nothing. Only the filter or the label can move.
+#
+# The second category did not exist until the index filter shipped, and the
+# report went on calling it the first - which sends a reader to the corpus to
+# look for a row the corpus still has.
+#
+# KNOWN UNANSWERABLE, and deliberately kept rather than deleted: 'regulators
+# stopped short of breaking up an advertising business'. Every one of the four
+# articles this corpus holds on that story is a GDELT headline-only row naming
+# no instrument, so all four are filtered and the question has no reachable
+# answer. Deleting it would raise the score by hiding a real coverage gap: this
+# system cannot retrieve that story at all. It stays, named on every run, until
+# GDELT carries bodies or another source covers the story.
 questions:
 - query: which chip company depends too much on a small number of giant cloud buyers
   kind: semantic

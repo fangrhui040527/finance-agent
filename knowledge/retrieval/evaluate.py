@@ -117,8 +117,26 @@ class Report:
     #: by taking a rank the labelled one held. Neither is the search getting
     #: worse, and both look exactly like it.
     unlabelled_matches: list[str] = field(default_factory=list)
+    #: Labels still IN `data/corpus.db` that `indexable()` keeps out of the
+    #: index. A different failure from `missing_labels` and a different fix:
+    #: the document is right there, so re-collecting it changes nothing and
+    #: only the filter or the label can move. Split out because the two were
+    #: reported as one until the index filter shipped, and the merged message
+    #: named the wrong cause - it sent you looking in the corpus for a row the
+    #: corpus still had.
+    unindexable_labels: list[str] = field(default_factory=list)
+    #: Questions where NOT ONE labelled document can be retrieved. These score
+    #: zero on every leg and every metric no matter how good the search is, so
+    #: they are not evidence about retrieval - they are evidence about the
+    #: corpus. Named rather than silently averaged in.
+    unanswerable: list[str] = field(default_factory=list)
     cases: int = 0
     corpus_size: int = 0
+
+    @property
+    def answerable(self) -> int:
+        """Cases with at least one reachable label. The honest denominator."""
+        return self.cases - len(self.unanswerable)
 
     @property
     def best_leg(self) -> str:
@@ -170,10 +188,38 @@ class Report:
             out.append("")
             out.append(
                 f"{len(self.missing_labels)} labelled documents are no longer in the corpus "
-                "- the score below is against a shrunken gold set:"
+                "- the score above is against a shrunken gold set:"
             )
             for m in self.missing_labels[:8]:
                 out.append(f"    ? {m}")
+        if self.unindexable_labels:
+            out.append("")
+            out.append(
+                f"{len(self.unindexable_labels)} labelled documents are IN the corpus but "
+                "kept out of the index by `indexable()` - headline-only rows naming no "
+                "instrument. Re-collecting them changes nothing; the filter or the label "
+                "has to move:"
+            )
+            for m in self.unindexable_labels[:8]:
+                out.append(f"    ! {m}")
+        if self.unanswerable:
+            out.append("")
+            out.append(
+                f"{len(self.unanswerable)} question(s) have NO reachable labelled answer. "
+                "They score zero on every leg however good the search is, so they measure "
+                "the corpus, not retrieval:"
+            )
+            for q in self.unanswerable:
+                out.append(f"    x {q}")
+            best = self.legs[self.best_leg]
+            answerable = self.answerable
+            got = best.hit_at_10 / answerable if answerable else 0.0
+            out.append("")
+            out.append(
+                f"  over the {answerable} answerable questions, {self.best_leg} reaches "
+                f"{got:.1%} r@10 (headline above is {best.recall_at_10:.1%} over all "
+                f"{self.cases}). Both are correct; they answer different questions."
+            )
         return "\n".join(out)
 
 
@@ -252,7 +298,18 @@ def unlabelled_lexical_matches(collection: Collection, case: Case) -> list[str]:
     return out
 
 
-def evaluate(collection: Collection, cases: list[Case], depth: int = DEPTH) -> Report:
+def evaluate(
+    collection: Collection,
+    cases: list[Case],
+    depth: int = DEPTH,
+    corpus_ids: set[str] | None = None,
+) -> Report:
+    """Score every leg over every case.
+
+    `corpus_ids` is what makes an unreachable label diagnosable. Without it a
+    label that is missing and a label that is filtered are the same symptom -
+    "not in the index" - with opposite fixes, and the report has to guess.
+    """
     report = Report(
         legs={leg: LegScore(leg) for leg in LEGS},
         cases=len(cases),
@@ -261,9 +318,20 @@ def evaluate(collection: Collection, cases: list[Case], depth: int = DEPTH) -> R
     indexed = set(collection._by_id) or None
     for case in cases:
         if indexed is not None:
+            reachable = 0
             for doc, title in zip(case.relevant, case.titles or case.relevant):
-                if doc not in indexed:
-                    report.missing_labels.append(f"{doc[:60]} ({title[:50]})")
+                if doc in indexed:
+                    reachable += 1
+                    continue
+                where = f"{doc[:60]} ({title[:50]})"
+                # Present in the corpus means the filter dropped it; absent
+                # means the corpus itself moved. Only the second is drift.
+                if corpus_ids is not None and doc in corpus_ids:
+                    report.unindexable_labels.append(where)
+                else:
+                    report.missing_labels.append(where)
+            if case.relevant and not reachable:
+                report.unanswerable.append(case.query)
         report.unlabelled_matches.extend(unlabelled_lexical_matches(collection, case))
         got = run_case(collection, case, depth)
         kind = report.by_kind.setdefault(case.kind, {leg: LegScore(leg) for leg in LEGS})
@@ -319,4 +387,4 @@ def report_for(
     with Corpus(corpus_path) as corpus:
         articles = corpus.articles(limit=100_000)
     col = news_collection(articles, entity_index(), embedder=embedder)
-    return evaluate(col, cases, depth)
+    return evaluate(col, cases, depth, corpus_ids={a.doc_id for a in articles})

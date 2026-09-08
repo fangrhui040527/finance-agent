@@ -250,3 +250,78 @@ def test_the_collection_actually_drops_them():
     titles = {c.metadata.get("title") for c in col._order}
     assert "Nvidia lifts its forecast" in titles
     assert "A Honda ZR-V family road test" not in titles
+
+
+# --- an unreachable label has two causes, and they have opposite fixes -------
+#
+# Before the index filter shipped, "in the corpus" and "in the index" named the
+# same set, so one message covered both. `indexable()` split them and the
+# message went on saying "no longer in the corpus" about rows the corpus still
+# held - pointing at re-collection, which cannot fix a filtered row.
+
+
+def _eval_with(labels, *, corpus_ids=None, articles=None):
+    from knowledge.retrieval.evaluate import Case, evaluate
+    from knowledge.retrieval.index import news_collection
+
+    arts = articles if articles is not None else [_art("Nvidia lifts", "", ("XNAS:NVDA",))]
+    col = news_collection(arts)
+    case = Case(query="q", relevant=tuple(labels), titles=tuple(labels))
+    return evaluate(col, [case], corpus_ids=corpus_ids)
+
+
+def test_a_label_the_filter_dropped_is_named_as_filtered_not_as_missing():
+    dropped = _art("A Honda ZR-V road test", "A Honda ZR-V road test")
+    kept = _art("Nvidia lifts", "", ("XNAS:NVDA",))
+    r = _eval_with(
+        [dropped.doc_id],
+        corpus_ids={dropped.doc_id, kept.doc_id},
+        articles=[kept, dropped],
+    )
+    assert r.unindexable_labels, "a filtered label must be reported"
+    assert not r.missing_labels, "it is still in the corpus - re-collecting fixes nothing"
+
+
+def test_a_label_that_left_the_corpus_is_named_as_missing():
+    r = _eval_with(["gone:1"], corpus_ids={"t:Nvidia lifts"})
+    assert r.missing_labels
+    assert not r.unindexable_labels
+
+
+def test_without_the_corpus_ids_every_unreachable_label_reads_as_missing():
+    """The pre-existing behaviour, kept: callers that cannot supply the corpus
+    get the old single bucket rather than a silently wrong new one."""
+    r = _eval_with(["gone:1"], corpus_ids=None)
+    assert r.missing_labels
+    assert not r.unindexable_labels
+
+
+def test_a_question_with_no_reachable_label_is_named_not_silently_scored():
+    """It scores zero on every leg however good the search is. Averaged in
+    without a word, it reads as the search failing."""
+    r = _eval_with(["gone:1", "gone:2"], corpus_ids=set())
+    assert r.unanswerable == ["q"]
+    assert r.answerable == 0
+
+
+def test_one_reachable_label_is_enough_to_keep_a_question_answerable():
+    kept = _art("Nvidia lifts", "", ("XNAS:NVDA",))
+    r = _eval_with([kept.doc_id, "gone:1"], corpus_ids={kept.doc_id}, articles=[kept])
+    assert not r.unanswerable
+    assert r.answerable == 1
+
+
+def test_the_summary_separates_the_two_causes_and_the_two_denominators():
+    # A kept article too: with nothing indexed at all the diagnosis is skipped
+    # by design, and "over 0 indexed chunks" is already the louder signal.
+    dropped = _art("A Honda ZR-V road test", "A Honda ZR-V road test")
+    kept = _art("Nvidia lifts", "", ("XNAS:NVDA",))
+    r = _eval_with(
+        [dropped.doc_id],
+        corpus_ids={dropped.doc_id, kept.doc_id},
+        articles=[kept, dropped],
+    )
+    text = r.summary()
+    assert "kept out of the index by `indexable()`" in text
+    assert "no longer in the corpus" not in text
+    assert "answerable" in text
