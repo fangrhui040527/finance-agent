@@ -113,10 +113,28 @@ class EodhdFundamentals(Collector):
 
     @staticmethod
     def rotation(
-        instruments: tuple[str, ...], today: date, slot: str
+        instruments: tuple[str, ...], today: date, slot: str, *, plan_markets=FREE_PLAN_MARKETS
     ) -> tuple[list[str], list[str]]:
-        """The names this run asks for, and the ones deferred to a later turn."""
-        names = [i for i in instruments if symbol_for(i)]
+        """The names this run asks for, and the ones deferred to a later turn.
+
+        ONLY NAMES THE PLAN CAN SERVE ENTER THE ROTATION. This is the whole
+        finding: the free plan is US-only, and rotating over the book as a whole
+        spent every weekday slot on symbols guaranteed to be refused. On
+        2026-09-07, with a valid key in place, the day's three slots asked for
+        `1155.KLSE`, `5347.KLSE`, `5183.KLSE`, `5225.KLSE`, `8869.KLSE` and
+        `3182.KLSE` - six refusals - and the three US names the plan DOES cover
+        came up only in `weekly`, which fires on Sundays. The account's own
+        dashboard read "0 of 20 API calls, most recent usage: never".
+
+        A name outside the plan is not deferred either. Deferred means "next in
+        rotation", and a Bursa name on the free plan is never next; it needs a
+        paid plan, and saying so once is more use than saying "later" every day.
+
+        `plan_markets` is a parameter so a paid plan is one config change rather
+        than an edit here: widen it and the Bursa names join the rotation.
+        """
+        eligible = [i for i in instruments if symbol_for(i) and market_of(i) in plan_markets]
+        names = eligible or [i for i in instruments if symbol_for(i)]
         if len(names) <= MAX_NAMES_PER_RUN:
             return names, []
         slot_ix = SLOT_ORDER.index(slot) if slot in SLOT_ORDER else 0
@@ -136,6 +154,18 @@ class EodhdFundamentals(Collector):
         for iid in deferred:
             pull.notes.append(
                 f"{iid}: deferred by the {MAX_NAMES_PER_RUN}-a-day credit budget; next in rotation"
+            )
+        # Named once per run, not once per name: six identical lines saying the
+        # same thing about the same plan is a wall, not a message.
+        outside = [
+            i
+            for i in instruments
+            if symbol_for(i) and market_of(i) not in FREE_PLAN_MARKETS and i not in asked
+        ]
+        if outside:
+            pull.notes.append(
+                f"outside the free plan (US only), so not asked for: {', '.join(outside)}. "
+                f"The EODHD Fundamentals plan covers KLSE and TW."
             )
         failures: list[str] = []
         for iid in asked:
