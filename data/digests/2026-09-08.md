@@ -1,6 +1,6 @@
 # Digest 2026-09-08
 
-Generated 2026-09-08 22:38 UTC · slot `all` · 2084 articles in the corpus, 4465 observations, 3968 events in the fact book.
+Generated 2026-09-08 23:23 UTC · slot `all` · 2084 articles in the corpus, 4465 observations, 3968 events in the fact book.
 
 ## The book
 
