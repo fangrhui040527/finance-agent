@@ -1,0 +1,112 @@
+# Does a real embedding model beat the corpus-fitted one? Measured, on a runner.
+#
+# This exists because the question could not be asked anywhere else. The
+# development environment has no route to any embedding host - openrouter.ai
+# answers `CONNECT tunnel failed, 403` through the sandbox proxy - so the one
+# comparison that decides whether a paid embedder is worth having can only be
+# made here.
+#
+# It scores the SAME 24 labelled questions over the SAME committed corpus with
+# three different vector backends, so the only variable is the embedder. Read
+# the three tables against each other; the absolute numbers are a floor (only
+# articles verified to answer a question are labelled) and the comparison is
+# what the set is for.
+#
+# Manual only. It spends one embedding request per batch of 64 chunks - about
+# 18 requests for the shipped corpus - and writes nothing to any store.
+name: embedding-probe
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: bash
+    env:
+      FINPLANET_NO_DOTENV: "1"
+      PYTHONUTF8: "1"
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.12"
+          enable-cache: true
+
+      - name: Install
+        run: uv sync --frozen
+
+      # One repository secret named ALL_SECRET holding every key is accepted:
+      # .github/scripts/keys_from_blob.py finds each by label or shape, and this
+      # step masks and exports it. A secret set under its own name wins.
+      - name: Keys from ALL_SECRET, when the named secrets are not set
+        env:
+          ALL_SECRET: ${{ secrets.ALL_SECRET }}
+          EMBEDDING_API_KEY: ${{ secrets.EMBEDDING_API_KEY }}
+        run: |
+          if [ -z "$ALL_SECRET" ]; then
+            echo "ALL_SECRET is not set; the named secrets are in use"
+            exit 0
+          fi
+          python3 .github/scripts/keys_from_blob.py ALL_SECRET | while IFS='=' read -r name value; do
+            if [ -n "${!name}" ]; then
+              echo "$name: set under its own name; the blob's copy is ignored"
+              continue
+            fi
+            echo "::add-mask::$value"
+            echo "$name=$value" >> "$GITHUB_ENV"
+            echo "$name: taken from ALL_SECRET"
+          done
+
+      # Before spending a corpus's worth of requests, prove ONE call works.
+      # OpenRouter answers HTTP 200 with an EMPTY data array for a model that
+      # cannot serve the requested encoding, so "it did not error" is not the
+      # same as "it returned a vector" - this asserts a vector came back and
+      # says how wide it is.
+      - name: One embedding, before spending a corpus of them
+        env:
+          EMBEDDING_API_KEY: ${{ secrets.EMBEDDING_API_KEY || env.EMBEDDING_API_KEY }}
+          EMBEDDING_API_URL: ${{ vars.EMBEDDING_API_URL || 'https://openrouter.ai/api/v1/embeddings' }}
+          EMBEDDING_MODEL: ${{ vars.EMBEDDING_MODEL || 'nvidia/nemotron-3-embed-1b:free' }}
+        run: |
+          if [ -z "$EMBEDDING_API_KEY" ]; then
+            echo "::warning::EMBEDDING_API_KEY is not set; nothing to probe"
+            exit 0
+          fi
+          uv run --frozen python - <<'PY'
+          from knowledge.retrieval.embedding import ApiEmbedder
+
+          emb = ApiEmbedder(cache_path=None)
+          vec = emb.embed("Maybank net interest margin")
+          print(f"  {emb.describe()}")
+          print(f"  returned a {len(vec)}-dimension vector")
+          assert len(vec) > 8, "an empty or degenerate vector is a failed probe"
+          PY
+
+      - name: Score the same questions with each embedder
+        env:
+          EMBEDDING_API_KEY: ${{ secrets.EMBEDDING_API_KEY || env.EMBEDDING_API_KEY }}
+          EMBEDDING_API_URL: ${{ vars.EMBEDDING_API_URL || 'https://openrouter.ai/api/v1/embeddings' }}
+          EMBEDDING_MODEL: ${{ vars.EMBEDDING_MODEL || 'nvidia/nemotron-3-embed-1b:free' }}
+        run: |
+          {
+            echo "## Retrieval, the same 24 questions over the same corpus"
+            for e in hashing default api; do
+              echo ""
+              echo "### --embedder $e"
+              echo '```'
+              if [ "$e" = "api" ] && [ -z "$EMBEDDING_API_KEY" ]; then
+                echo "skipped: EMBEDDING_API_KEY is not set"
+              else
+                uv run --frozen python ask.py retrieval --embedder "$e" 2>&1 | head -40
+              fi
+              echo '```'
+            done
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -1721,6 +1721,19 @@ def cmd_retrieval(a) -> int:
         from knowledge.retrieval.embedding import DistributionalEmbedder
 
         embedder = DistributionalEmbedder()
+    elif a.embedder == "api":
+        # The one comparison this command existed to make and could not: the
+        # corpus-fitted vectors against a real model. `ApiEmbedder` has been at
+        # this seam since it was written, and nothing could select it, so the
+        # question "would a paid embedder beat what we have" was unanswerable
+        # by the very tool built to answer it.
+        from knowledge.retrieval.embedding import ApiEmbedder, EmbeddingError
+
+        try:
+            embedder = ApiEmbedder()
+        except EmbeddingError as e:
+            print(f"cannot score the api embedder: {e}", file=sys.stderr)
+            return 2
 
     report = report_for(a.corpus, a.gold or GOLD, a.depth, embedder)
     if not report.cases:
@@ -2286,9 +2299,10 @@ def main(argv=None) -> int:
     rt.add_argument("--depth", type=int, default=10, help="how deep each leg may look")
     rt.add_argument(
         "--embedder",
-        choices=("default", "distributional", "hashing"),
+        choices=("default", "distributional", "hashing", "api"),
         default="default",
-        help="which vectors to score; 'hashing' is the pre-2026-09-07 baseline",
+        help="which vectors to score; 'hashing' is the pre-2026-09-07 baseline, "
+        "'api' needs EMBEDDING_API_KEY and spends real requests",
     )
     rt.set_defaults(fn=cmd_retrieval)
 
