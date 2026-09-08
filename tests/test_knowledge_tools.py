@@ -13,7 +13,14 @@ from knowledge.facts import EventRecord, FactBook, Observation, SeriesPoint
 from knowledge.feeds.adapter import FixtureFeed
 from knowledge.report import fact_snapshot, macro_context
 
-NOW = datetime(2026, 9, 4, 22, 0, tzinfo=UTC)
+#: Anchored to the real clock, not frozen. `news_evidence` takes no as-of and
+#: asks the corpus for the last N DAYS from now, so a fixture pinned to a
+#: literal date passes only while that date is inside the window and then
+#: starts failing on a calendar day nobody touched. This one did: written
+#: against 2026-09-04 with `days=3`, it went red of its own accord on
+#: 2026-09-08. A test whose result depends on when it is run is not measuring
+#: what it claims to.
+NOW = datetime.now(UTC).replace(microsecond=0)
 
 
 @pytest.fixture

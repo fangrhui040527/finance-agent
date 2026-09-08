@@ -215,12 +215,21 @@ class SweepReport:
     facts_counts: dict = field(default_factory=dict)
     graph: str = ""
     could_not_run: str = ""
+    already_ran: str = ""
 
     @property
     def exit_code(self) -> int:
-        """0 every source read; 3 a source failed or degraded; 2 could not run."""
+        """0 every source read; 3 a source failed or degraded; 2 could not run.
+
+        A slot that already ran today exits 0, not 2. It is a no-op, not a
+        fault: the day's collection happened, and a scheduler that treated the
+        second arrival as a failure would raise an alarm about a schedule that
+        worked.
+        """
         if self.could_not_run:
             return 2
+        if self.already_ran:
+            return 0
         if any(r.status in (FAILED, DEGRADED) for r in self.results):
             return 3
         return 0
@@ -250,6 +259,59 @@ class SweepReport:
 # --- the run ------------------------------------------------------------------------------
 
 
+def _already_ran_today(corpus_path: str, slot: str, started: datetime) -> str:
+    """Has this slot already collected today? Returns the reason to skip, or "".
+
+    THE RACE THIS CLOSES. Two things fire this collector for the same slot: the
+    GitHub cron it is scheduled on, and the nightly Routine's catch-up when the
+    cron looks like it has not arrived. On 2026-09-07 both ran `us_close` - the
+    catch-up at 22:38 after the 21:15 cron was 78 minutes absent, and the cron
+    itself at 23:31, 2h17m late. Two full sweeps, 370 requests, for one slot.
+
+    The catch-up cannot avoid this by waiting longer. This repository's cron has
+    been observed between 14 minutes and 5h43m late, so a grace window wide
+    enough to be safe would push every catch-up past the Routine's own fire and
+    into the next day - and news collected tomorrow is not news. The dispatcher
+    genuinely cannot tell "dropped" from "very late" at the moment it must
+    decide.
+
+    So the guard belongs HERE, at the collector, where the question is settled
+    rather than predicted: whoever arrives first collects, and the second
+    arrival - cron or catch-up, in either order - is a no-op costing seconds
+    instead of a sweep. It is also the only place that stays correct if a third
+    thing ever dispatches this workflow.
+
+    Three deliberate exemptions, each an explicit act by a person:
+
+      * `slot="all"`, the recovery hammer: it is dispatched by hand to re-collect
+        a day, and refusing it would take away the tool for fixing exactly the
+        kind of gap this file exists to notice;
+      * named `--source` arguments, which are a targeted run, not the schedule;
+      * `--force`.
+
+    A day with no `slot` recorded at all is NOT treated as "already ran". The
+    column was added on 2026-09-07 and older rows carry an empty string; reading
+    those as a prior run would make the guard silently refuse every slot on any
+    store written before that build.
+    """
+    from pathlib import Path as _Path
+
+    if not _Path(corpus_path).exists():
+        return ""
+    day_start = datetime(started.year, started.month, started.day, tzinfo=UTC)
+    with Corpus(corpus_path) as corpus:
+        ran = corpus.slot_runs(day_start, started)
+    n = ran.get(slot, 0)
+    if not n:
+        return ""
+    return (
+        f"already collected today: {n} run(s) recorded for slot {slot!r} since "
+        f"{day_start:%Y-%m-%d} 00:00 UTC. Skipped rather than collected twice - "
+        f"the cron and the catch-up can both fire for one slot. "
+        f"Use --force, --slot all, or name a --source to run anyway."
+    )
+
+
 def run_sweep(
     cfg,
     slot: str = "all",
@@ -266,8 +328,14 @@ def run_sweep(
     collector_for=None,
     entity_index=None,
     log=None,
+    force: bool = False,
 ) -> SweepReport:
-    """Run every enabled source for `slot`. Never raises for a source failure."""
+    """Run every enabled source for `slot`. Never raises for a source failure.
+
+    A named slot collects AT MOST ONCE PER UTC DAY. `force` is the operator's
+    override; see `_already_ran_today` for why the guard exists and why it is
+    here rather than in the thing that dispatches.
+    """
     from knowledge.feeds.registry import adapter_for as _adapter_for
     from knowledge.graph.extractors.gdelt import entity_index as _entity_index
     from knowledge.sources.registry import collector_for as _collector_for
@@ -284,6 +352,14 @@ def run_sweep(
     if slot not in catalog.SLOTS:
         report.could_not_run = f"unknown slot {slot!r}; known: {', '.join(catalog.SLOTS)}"
         return report
+
+    if not force and not sources and slot != "all":
+        prior = _already_ran_today(corpus_path or cfg.corpus_db, slot, started)
+        if prior:
+            report.already_ran = prior
+            emit(f"sweep {run_id}  slot {slot}: {prior}")
+            return report
+
     enabled = tuple(sources) if sources else tuple(cfg.sources)
     specs: list[SourceSpec] = []
     if sources:
@@ -420,7 +496,9 @@ def _run_news(
             if not instruments:
                 result.status = SKIPPED
                 result.detail = f"no name in the book trades in slot {slot!r}"
-                corpus.record_sweep(run_id, spec.name, since, OK, slot=slot, detail=result.detail)
+                corpus.record_sweep(
+                    run_id, spec.name, since, OK, at=tick(), slot=slot, detail=result.detail
+                )
                 return result, []
             records, articles, notes, degraded = _news_per_instrument(
                 spec,
@@ -452,7 +530,9 @@ def _run_news(
                 languages=languages,
             )
     except FeedError as e:
-        corpus.record_sweep(run_id, spec.name, since, FAILED, slot=slot, detail=str(e)[:400])
+        corpus.record_sweep(
+            run_id, spec.name, since, FAILED, at=tick(), slot=slot, detail=str(e)[:400]
+        )
         result.status = FAILED
         result.detail = str(e)
         return result, []
@@ -470,6 +550,7 @@ def _run_news(
         spec.name,
         since,
         OK,
+        at=tick(),
         slot=slot,
         fetched=result.fetched,
         kept=result.kept,
@@ -684,7 +765,13 @@ def _run_structured(
         result.detail = str(e)
         facts.record_pull(run_id, spec.name, SKIPPED, detail=result.detail)
         corpus.record_sweep(
-            run_id, spec.name, since, OK, slot=slot, detail=f"skipped: {result.detail[:300]}"
+            run_id,
+            spec.name,
+            since,
+            OK,
+            at=tick(),
+            slot=slot,
+            detail=f"skipped: {result.detail[:300]}",
         )
         return result, []
     except PlanExcluded as e:
@@ -696,7 +783,9 @@ def _run_structured(
         result.status = FAILED
         result.detail = str(e)
         facts.record_pull(run_id, spec.name, FAILED, detail=result.detail)
-        corpus.record_sweep(run_id, spec.name, since, FAILED, slot=slot, detail=result.detail[:400])
+        corpus.record_sweep(
+            run_id, spec.name, since, FAILED, at=tick(), slot=slot, detail=result.detail[:400]
+        )
         return result, []
 
     stored = 0
@@ -737,6 +826,7 @@ def _run_structured(
         spec.name,
         since,
         OK,
+        at=tick(),
         slot=slot,
         fetched=result.fetched,
         kept=result.kept,

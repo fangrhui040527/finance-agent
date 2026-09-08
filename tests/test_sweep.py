@@ -526,3 +526,87 @@ def test_probe_reports_every_source_and_never_raises(monkeypatch):
     assert by["fred"] == "no-key" and by["finnhub"] == "no-key"
     assert by["gdelt"] == "failed" and by["edgar"] == "failed"
     assert all(s in ("ok", "no-key", "plan", "failed", "error") for s in by.values())
+
+
+# --- one slot, one collection a day -------------------------------------------------
+
+
+def _sweep(corpus_db, facts_db, slot="bursa_close", *, at=NOW, **kw):
+    return run_sweep(
+        Cfg(),
+        slot,
+        corpus_path=corpus_db,
+        facts_path=facts_db,
+        link_graph=False,
+        adapter_for=RecordingAdapters(
+            {"google_news": [row(1, "Maybank posts record quarter", _for="Maybank")]}
+        ),
+        entity_index=INDEX,
+        clock=lambda: at,
+        log=lambda m: None,
+        **kw,
+    )
+
+
+def test_the_second_run_of_a_slot_on_the_same_day_collects_nothing(stores):
+    """The 2026-09-07 race, in one test.
+
+    The Routine's catch-up dispatched `us_close` at 22:38 because the 21:15 cron
+    was 78 minutes absent; the cron then arrived at 23:31 and swept the same slot
+    again. Two full sweeps for one slot. Whoever gets there first now wins.
+    """
+    corpus_db, facts_db = stores
+    first = _sweep(corpus_db, facts_db)
+    assert first.exit_code == 0 and not first.already_ran
+    assert first.results and first.results[0].stored == 1
+
+    second = _sweep(corpus_db, facts_db, at=NOW + timedelta(hours=1))
+    assert second.already_ran, "the second arrival must be a no-op"
+    assert "already collected today" in second.already_ran
+    assert second.results == [], "no source is contacted at all"
+
+    with Corpus(corpus_db) as c:
+        assert c.counts()["articles"] == 1, "and it stores nothing a second time"
+
+
+def test_a_skipped_slot_exits_zero_because_it_is_not_a_failure(stores):
+    """Exit 2 would tell a scheduler the collection broke on the day it worked."""
+    corpus_db, facts_db = stores
+    _sweep(corpus_db, facts_db)
+    assert _sweep(corpus_db, facts_db, at=NOW + timedelta(hours=1)).exit_code == 0
+
+
+def test_the_guard_is_per_slot_not_per_day(stores):
+    """A day owes three slots. One having run must not silence the other two."""
+    corpus_db, facts_db = stores
+    _sweep(corpus_db, facts_db, slot="bursa_close")
+    other = _sweep(corpus_db, facts_db, slot="us_close", at=NOW + timedelta(hours=1))
+    assert not other.already_ran
+
+
+def test_tomorrow_is_a_new_day(stores):
+    corpus_db, facts_db = stores
+    _sweep(corpus_db, facts_db)
+    assert not _sweep(corpus_db, facts_db, at=NOW + timedelta(days=1)).already_ran
+
+
+def test_force_and_slot_all_and_a_named_source_all_run_anyway(stores):
+    """Three deliberate acts by a person; the guard is for the schedule."""
+    corpus_db, facts_db = stores
+    _sweep(corpus_db, facts_db)
+    later = NOW + timedelta(hours=1)
+    assert not _sweep(corpus_db, facts_db, at=later, force=True).already_ran
+    assert not _sweep(corpus_db, facts_db, slot="all", at=later).already_ran
+    assert not _sweep(corpus_db, facts_db, at=later, sources=("google_news",)).already_ran
+
+
+def test_a_store_that_never_recorded_a_slot_is_not_read_as_having_run(stores):
+    """The `slot` column landed on 2026-09-07 and older rows carry "". Reading
+    those as a prior run would refuse every slot on any store written before
+    that build - which is every store that has collected anything at all."""
+    corpus_db, facts_db = stores
+    with Corpus(corpus_db) as c:
+        c.record_sweep(
+            "old-run", "google_news", NOW - timedelta(days=1), "ok", at=NOW - timedelta(hours=2)
+        )
+    assert not _sweep(corpus_db, facts_db).already_ran
