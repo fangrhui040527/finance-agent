@@ -528,6 +528,44 @@ names. A source whose share stays near zero for a name is not covering it, and
 that is a reason to drop the name from that source rather than to read its
 volume as coverage.
 
+#### And a headline naming nobody is not indexed at all
+
+Measured 2026-09-08, and the diagnosis above needed one correction. GDELT's DOC
+API answers in `artlist` mode: a headline, a URL, metadata, and **no article
+text**. All 667 GDELT rows in the corpus have `body == title`, about 73
+characters each. So GDELT's precision was never the defect and cannot be judged
+from this store — it matched the company deep inside a page the corpus does not
+hold. The defect is that **a headline was being stored and counted as an
+article**.
+
+Such a row is unusable in both directions: it cannot be retrieved for a name it
+does not mention, and it cannot be cited for a claim it does not make. What it
+can do is take one of the ten places in every result list. 539 of them — **32%
+of the corpus** — were doing exactly that, and the search had been getting
+worse as the collector worked:
+
+```
+                        1,397 chunks     1,673 chunks     filtered
+  recall@10                 66.7%            58.3%          66.7%
+  plain-English             50.0%            37.5%          50.0%
+```
+
+`knowledge/retrieval/index.indexable` drops a row that has **no text beyond a
+headline AND no linked company**. Two exclusions are deliberate: a headline that
+*does* name a company stays (Google News returns no body at all and 88% of its
+rows are linked — a headline is a real, citable claim), and a row with a real
+body that names nothing stays (121 of them, still able to answer a macro or
+sector question). The rule is not "thin" and not "unlinked"; it is the one
+combination that provably answers nothing.
+
+Cost, counted rather than waved away: one labelled answer — an article about
+Google escaping an ad-tech breakup — is dropped, because it names nothing in the
+book and so could not have been evidence for it either. The label is kept and the
+loss is inside the numbers above.
+
+The corpus still **stores** these rows; it is append-only and a record of what
+the collector saw. Only the index refuses them.
+
 ### When a registered feed URL rots
 
 A 404 from a news feed used to be reported as "404" and nothing else: the
