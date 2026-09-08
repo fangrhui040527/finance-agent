@@ -1,0 +1,39 @@
+# Why the macro series stopped in mid-2025, asked of the API that serves them.
+#
+# The one open monitor rule is fifteen stale DBnomics series. They are NOT a
+# fetch failure: every one carried a current `fetched_at` and a newest
+# observation between 2025-05 and 2025-07 - the request succeeded and returned
+# old data. The development environment has no route to db.nomics.world, so
+# only a runner can say whether our codes were retired, the datasets froze, or
+# the API is fresh and the collector is at fault.
+#
+# Read-only, keyless, and stores nothing. Manual: it is a diagnostic, not a
+# schedule, and re-running it daily would answer the same question.
+name: dbnomics-probe
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.12"
+          enable-cache: true
+
+      - name: Install
+        run: uv sync --frozen
+
+      - name: Probe every configured series
+        run: uv run python .github/scripts/dbnomics_probe.py
