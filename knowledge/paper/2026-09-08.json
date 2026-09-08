@@ -47,13 +47,13 @@
     "note": "no positions held; nothing to attribute"
   },
   "decision": {
-    "recorded": true,
+    "recorded": false,
     "weights": {},
     "horizon_days": 21,
     "confidence": 0.55,
     "thesis": "All-cash. Nothing in tonight's evidence supports a name: all nine returned not_significant, so the decomposition declines to separate a company story from noise on any of them, and no cause is claimed on the 2026-09-07 feedback page. Independently, six of the nine carry mis-dated prices - the Bursa proxy MYX:0820EA printed a blank 2026-09-07 row and the decomposition fell back to 2026-09-04 - so a target book weighted on those closes would be weighted on the wrong session.",
     "refusals": [],
-    "note": "first decision the start rule did not refuse; the start date is 2026-09-08. Logged and graded, not applied (observe phase)."
+    "note": "the command ran without refusal (the start date is 2026-09-08, so the start rule no longer applies) but wrote NOTHING: paper.db targets 0 rows, learning.db predictions 0 rows, neither database changed in git. An all-cash book is zero targets, so there is no row to write and therefore no record that a decision was taken. The CLI prints 'this is logged and will be graded'; on this input it is not logged and cannot be graded."
   },
   "fundable": {
     "up_to_lots": {
@@ -77,6 +77,10 @@
   "mistakes": [],
   "lessons": [
     "a book weighted on closes whose session is in doubt inherits that doubt at full size; the cheapest response to a dating fault is to hold nothing until it is settled",
-    "a high round-trip cost is a hurdle the thesis must clear before the position starts, not a friction to net off at the end"
+    "a high round-trip cost is a hurdle the thesis must clear before the position starts, not a friction to net off at the end",
+    "a CLI that reports what it intended rather than what it wrote will be believed; check the store, not the message"
+  ],
+  "open_questions": [
+    "an all-cash decision leaves no row in either store, so the observe phase cannot grade it. Should all-cash write a zero-weight target, or is holding nothing correctly not a prediction? (since 2026-09-08)"
   ]
 }
