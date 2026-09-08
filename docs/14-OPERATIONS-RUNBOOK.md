@@ -653,3 +653,33 @@ Then read it from anywhere: `ask.py alerts` on the command line, the
 `open_alerts` MCP tool in a Claude session, or `GET /api/alerts` in the web
 app. An empty history means no rule has been EVALUATED - not that none would
 fire.
+
+## Reading a capped sweep row (2026-09-08)
+
+GDELT asks about three names a run, not the whole book. A sweep row for it now
+ends with, for example:
+
+```
+read but empty: IHH; deferred to a later run: Genting, Press Metal, Petronas Chemicals
+```
+
+Those two clauses are different facts and the distinction is the reason the
+note exists:
+
+* **read but empty** — the name was asked about and the world had nothing.
+  That is information.
+* **deferred to a later run** — the name was not asked about. It is not a gap
+  in coverage unless it repeats: `_window` advances by three each day, so a
+  six-name list is fully covered every two days and a nine-name list every
+  three.
+
+**When to worry.** The same name appearing under *deferred* on every run for
+more than the cycle length means the rotation has stopped advancing — check
+that the clock passed to `run_sweep` is real and not pinned. A name under
+*failed* repeatedly is the ordinary GDELT 429 and is what the cap exists to
+reduce; if it persists across a whole cycle for every name, GDELT is refusing
+the whole book and `ask.py sources --probe gdelt` from a runner will say so.
+
+**Do not raise the cap to "catch up".** The refusals scale with requests per
+run, so a higher cap collects less, not more. That was the state before it:
+nine names asked, a mean of 3.5 refused.

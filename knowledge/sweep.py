@@ -90,6 +90,40 @@ def _rotate(terms, n: int):
     return tuple(terms[n:]) + tuple(terms[:n])
 
 
+def _window(terms, cap: int, now: datetime):
+    """The `cap` names this run asks about, tiling the list across days.
+
+    A DIFFERENT job from `_rotate`, and the difference is why this exists.
+    `_rotate` reorders a list that will be consumed WHOLE - its offset is
+    hashed from the run time precisely so consecutive runs do not line up.
+    Take a window of that same hashed order and the property inverts: hashing
+    makes windows overlap at random, and a name can go days without ever
+    landing inside one. Simulated over 14 days with nine names and a cap of
+    three, the worst day covered THREE of the nine - six companies collected
+    nothing, and nothing said so.
+
+    So a window advances by exactly `cap` per DAY, which tiles: every name is
+    asked about at least once every `ceil(len(terms) / cap)` days, with no
+    overlap inside a cycle. The cadence is the price, and it is stated rather
+    than discovered - `_deferred_note` names who is waiting on any given run.
+    """
+    if not terms or cap <= 0 or cap >= len(terms):
+        return tuple(terms)
+    start = (now.date().toordinal() * cap) % len(terms)
+    return _rotate(tuple(terms), start)[:cap]
+
+
+def _deferred_note(asked, everyone) -> str:
+    """`deferred to a later run: Genting, IHH` - a capped run is never silent.
+
+    A name absent from a run's output must be distinguishable from a name that
+    was asked and had no news; those are opposite facts and they look identical
+    in a count of articles.
+    """
+    rest = [n for n in everyone if n not in set(asked)]
+    return f"deferred to a later run: {', '.join(rest)}" if rest else ""
+
+
 def _mostly_failed(failed, skipped, counts) -> bool:
     """True when more than half the names could not be read at all.
 
@@ -587,6 +621,14 @@ def _news_per_instrument(
 
     names = display_names()
     rotated = _rotate(tuple(instruments), _rotation_offset(tick()))
+    # A throttled source asks about a tiling subset; everything else asks about
+    # all of them. Applied after `_rotate` so an uncapped source is untouched.
+    asked = _window(rotated, spec.names_per_run, tick())
+    deferred = _deferred_note(
+        [str(names.get(canonical(i) or i) or i) for i in asked],
+        [str(names.get(canonical(i) or i) or i) for i in rotated],
+    )
+    rotated = asked
     per = max(1, limit // max(1, len(rotated)))
     articles: list[Article] = []
     records_total = 0
@@ -661,7 +703,7 @@ def _news_per_instrument(
         emit(f"  {'':<20} DEGRADED: {n} of {n + len(counts)} names could not be read")
     note = _sweep_note(failed, skipped, counts)
     hit = _linked_note(linked_counts)
-    return records_total, articles, "; ".join(x for x in (note, hit) if x), degraded
+    return records_total, articles, "; ".join(x for x in (note, hit, deferred) if x), degraded
 
 
 def _linked_note(linked_counts: list[tuple[str, int, int]]) -> str:

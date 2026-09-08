@@ -610,3 +610,185 @@ def test_a_store_that_never_recorded_a_slot_is_not_read_as_having_run(stores):
             "old-run", "google_news", NOW - timedelta(days=1), "ok", at=NOW - timedelta(hours=2)
         )
     assert not _sweep(corpus_db, facts_db).already_ran
+
+
+# --- a throttled source asks about fewer names, and never silently ----------
+#
+# GDELT refuses a mean of 3.5 of the nine names per run with HTTP 429, and a
+# refusal costs three attempts and up to a 90s read before it gives up. That
+# is how one source came to hold 98% of all sweep time. Capping the run drops
+# the requests that were already failing - but only if the cap TILES, and the
+# rotation this sweep already had does not.
+
+
+def test_no_cap_asks_about_every_name():
+    from knowledge.sweep import _window
+
+    names = tuple(f"N{i}" for i in range(9))
+    assert _window(names, 0, NOW) == names
+    assert _window(names, 9, NOW) == names
+    assert _window(names, 20, NOW) == names
+
+
+def test_a_cap_takes_exactly_that_many():
+    from knowledge.sweep import _window
+
+    names = tuple(f"N{i}" for i in range(9))
+    assert len(_window(names, 3, NOW)) == 3
+
+
+def test_a_rerun_on_the_same_day_asks_about_the_same_names():
+    """The catch-up dispatches a slot again. Asking a different three would
+    make a re-run a second sample rather than a repeat of the one that was
+    missed."""
+    from datetime import timedelta
+
+    from knowledge.sweep import _window
+
+    names = tuple(f"N{i}" for i in range(9))
+    morning = _window(names, 3, NOW)
+    evening = _window(names, 3, NOW + timedelta(hours=11))
+    assert morning == evening
+
+
+@pytest.mark.parametrize("total", [3, 4, 5, 6, 9, 10])
+def test_every_name_comes_round_within_one_cycle(total):
+    """The guarantee the cap is sold on. Without it a capped run is not a
+    slower collector, it is a collector that silently never sees some names."""
+    from datetime import timedelta
+
+    from knowledge.sweep import _window
+
+    cap = 3
+    names = tuple(f"N{i}" for i in range(total))
+    cycle = -(-total // cap)
+    for start in range(40):
+        seen: set[str] = set()
+        for d in range(cycle):
+            seen.update(_window(names, cap, NOW + timedelta(days=start + d)))
+        assert seen == set(names), f"day {start}: only {sorted(seen)}"
+
+
+def test_the_hashed_rotation_is_NOT_a_substitute_for_the_window():
+    """Why `_window` exists at all, pinned so it is not 'simplified' away.
+
+    `_rotation_offset` is hashed from the run time on purpose - right for a
+    list that gets consumed whole, because consecutive runs must not line up.
+    Take a WINDOW of that order and the same property starves names at random:
+    simulated over 14 days with nine names and a cap of three, the worst day
+    reached three of the nine.
+    """
+    from datetime import timedelta
+
+    from knowledge.sweep import _rotate, _rotation_offset
+
+    names = tuple(f"N{i}" for i in range(9))
+    worst = len(names)
+    for d in range(14):
+        day = NOW + timedelta(days=d)
+        seen: set[str] = set()
+        for hour in (9, 21):  # gdelt's two slots
+            t = day.replace(hour=hour, minute=20)
+            seen.update(_rotate(names, _rotation_offset(t))[:3])
+        worst = min(worst, len(seen))
+    assert worst < len(names), (
+        "the hashed rotation now tiles; if that is deliberate, _window can go - "
+        "but check it holds for every list size first"
+    )
+
+
+def test_a_deferred_name_is_named_rather_than_looking_like_a_quiet_day():
+    """An article count cannot tell 'not asked' from 'asked, no news'. They are
+    opposite facts about the world."""
+    from knowledge.sweep import _deferred_note
+
+    note = _deferred_note(["Maybank", "Tenaga"], ["Maybank", "Tenaga", "Genting", "IHH"])
+    assert "deferred to a later run" in note
+    assert "Genting" in note and "IHH" in note
+    assert "Maybank" not in note
+
+
+def test_nothing_deferred_says_nothing():
+    from knowledge.sweep import _deferred_note
+
+    assert _deferred_note(["A", "B"], ["A", "B"]) == ""
+
+
+def test_only_the_throttled_source_carries_a_cap():
+    """A cap on a source that answers every request would cost coverage for
+    nothing. google_news returns 79% on-topic at 0.1s a row; it is not the
+    problem and must not inherit the fix."""
+    from knowledge.sources.catalog import CATALOG
+
+    assert CATALOG["gdelt"].names_per_run == 3
+    assert CATALOG["google_news"].names_per_run == 0
+    assert CATALOG["yahoo_rss"].names_per_run == 0
+
+
+BOOK_MY = ("MYX:1155", "MYX:5347", "MYX:5183", "MYX:5225", "MYX:8869", "MYX:3182")
+
+
+def test_a_capped_source_makes_three_requests_for_a_six_name_book(stores):
+    """End to end: the cap reaches the adapter, not just the helper.
+
+    Six Malaysian names, three requests. The three that do not go out are the
+    ones GDELT was refusing anyway - 84 name-failures over 30 recorded runs,
+    every one paid for with three attempts and up to a 90s read.
+    """
+    corpus_db, facts_db = stores
+    adapters = RecordingAdapters({"gdelt": []})
+    report = run_sweep(
+        Cfg(sources=("gdelt",), watchlist=BOOK_MY),
+        "bursa_close",
+        corpus_path=corpus_db,
+        facts_path=facts_db,
+        link_graph=False,
+        adapter_for=adapters,
+        entity_index=INDEX,
+        clock=lambda: NOW,
+        log=lambda m: None,
+    )
+    gdelt_calls = [kw for name, kw in adapters.calls if name == "gdelt"]
+    assert len(gdelt_calls) == 3, [kw.get("query") for kw in gdelt_calls]
+    assert report.exit_code == 0
+
+
+def test_the_names_not_asked_about_are_named_in_the_sweep_row(stores):
+    """Otherwise a deferred name and a name with no news are the same row."""
+    corpus_db, facts_db = stores
+    adapters = RecordingAdapters({"gdelt": []})
+    run_sweep(
+        Cfg(sources=("gdelt",), watchlist=BOOK_MY),
+        "bursa_close",
+        corpus_path=corpus_db,
+        facts_path=facts_db,
+        link_graph=False,
+        adapter_for=adapters,
+        entity_index=INDEX,
+        clock=lambda: NOW,
+        log=lambda m: None,
+    )
+    with Corpus(corpus_db) as c:
+        (sweep,) = c.sweeps()
+    assert "deferred to a later run" in (sweep["detail"] or "")
+
+
+def test_an_uncapped_source_still_asks_about_every_name(stores):
+    """The cap is GDELT's, and must not leak onto a source that answers."""
+    corpus_db, facts_db = stores
+    adapters = RecordingAdapters({"google_news": []})
+    run_sweep(
+        Cfg(sources=("google_news",), watchlist=BOOK_MY),
+        "bursa_close",
+        corpus_path=corpus_db,
+        facts_path=facts_db,
+        link_graph=False,
+        adapter_for=adapters,
+        entity_index=INDEX,
+        clock=lambda: NOW,
+        log=lambda m: None,
+    )
+    assert len([1 for name, _ in adapters.calls if name == "google_news"]) == len(BOOK_MY)
+    with Corpus(corpus_db) as c:
+        (sweep,) = c.sweeps()
+    assert "deferred" not in (sweep["detail"] or "")
