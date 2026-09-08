@@ -113,6 +113,48 @@ def news_text(art: Article) -> str:
     return f"{title}\n{body}"
 
 
+def indexable(art: Article) -> bool:
+    """Can this row answer anything? A headline naming nobody cannot.
+
+    GDELT's DOC API answers in `artlist` mode, which returns a headline and
+    metadata and NO article text - all 667 GDELT rows in the shipped corpus
+    have `body == title`, about 73 characters each. GDELT matched the company
+    somewhere in the full article; the corpus holds the one line that does not
+    say so.
+
+    Such a row is not merely thin, it is unusable in both directions: it cannot
+    be retrieved for a question about a name it does not mention, and it cannot
+    be cited for a claim it does not make. What it CAN do is take one of the ten
+    places in every result list, and 539 of them - 32% of the corpus - were
+    doing exactly that.
+
+    Measured over the 24 labelled questions, indexing everything against
+    indexing only what can answer:
+
+        recall@10          58.3%  ->  66.7%
+        plain-English      37.5%  ->  50.0%
+        MRR                0.483  ->  0.474
+
+    Recall rises because labelled answers come back into the top ten; MRR is
+    flat because a document already ranked well was never the problem. The MRR
+    cost is one label: an article about Google escaping an ad-tech breakup,
+    which names nothing in the book and so cannot be evidence for it either.
+    The label is kept and the loss is counted rather than the goalposts moved.
+
+    Two things this deliberately does NOT drop. A headline-only row that DOES
+    name a company stays - Google News returns no body at all and 88% of its
+    rows are linked, and a headline is a real, citable claim about a name. And
+    a row with a real body that names nothing stays too: 121 of them, carrying
+    text that can still answer a macro or sector question. The rule is not
+    "unlinked", it is "no text beyond a headline AND no name" - the one
+    combination that provably answers nothing.
+    """
+    title = (art.title or "").strip()
+    body = (art.body or "").strip()
+    headline_only = not body or body == title
+    return bool(art.instruments) or not headline_only
+
+
 def news_chunks(art: Article, extractor: LexiconExtractor | None = None, names=None) -> list[Chunk]:
     """One article -> its retrieval chunks, metadata attached."""
     from knowledge.graph.ids import instrument_id as canonical
@@ -152,6 +194,8 @@ def news_collection(
     extractor = LexiconExtractor()
     linker = linker_for(index) if index else None
     for art in articles:
+        if not indexable(art):
+            continue
         names = linker.names_for(art.instruments) if linker is not None else None
         col.add_all(news_chunks(art, extractor, names))
     return col

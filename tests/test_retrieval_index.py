@@ -20,6 +20,7 @@ from knowledge.retrieval.hybrid import Collection
 from knowledge.retrieval.index import (
     build_router,
     describe,
+    indexable,
     news_chunks,
     news_text,
     ownership_from_registry,
@@ -192,3 +193,60 @@ def test_the_surfaces_build_a_router_with_the_registry_ownership():
         assert "kb_news" in ctx.router.ownership["a4_news_narrative"]
         # The store exists whether or not the shipped corpus has anything in it.
         ctx.router.get("a4_news_narrative", "kb_news")
+
+
+# --- a headline naming nobody answers nothing -------------------------------------
+
+
+def _art(title, body, instruments=()):
+    from knowledge.news.features import Article
+
+    return Article(
+        doc_id=f"t:{title[:20]}",
+        title=title,
+        body=body,
+        source_domain="example.com",
+        published_at=NOW,
+        language="English",
+        countries=(),
+        instruments=tuple(instruments),
+        themes=(),
+    )
+
+
+def test_a_headline_naming_nobody_is_not_indexed():
+    """GDELT answers in artlist mode: a headline, no article text. All 667 of
+    its rows in the shipped corpus have body == title, ~73 characters. It
+    matched the company deep in a page we do not hold, so the row can neither
+    be retrieved for the name nor cited for a claim - it can only take one of
+    the ten places in a result list, and 539 of them were."""
+    assert not indexable(
+        _art("Nobody likes data centers and chips", "Nobody likes data centers and chips")
+    )
+
+
+def test_a_headline_that_DOES_name_a_company_is_kept():
+    """Google News returns no body at all and 88% of its rows are linked. A
+    headline is a real, citable claim about a name; the rule is not 'thin'."""
+    assert indexable(_art("Nvidia lifts its forecast", "", ("XNAS:NVDA",)))
+    assert indexable(_art("Nvidia lifts its forecast", "Nvidia lifts its forecast", ("XNAS:NVDA",)))
+
+
+def test_a_real_body_that_names_nobody_is_kept():
+    """121 rows in the shipped corpus. Text that names no holding can still
+    answer a macro or sector question; only the headline-only ones provably
+    answer nothing."""
+    assert indexable(_art("Fed holds rates", "The committee voted nine to two to hold."))
+
+
+def test_the_collection_actually_drops_them():
+    from knowledge.retrieval.index import news_collection
+
+    arts = [
+        _art("Nvidia lifts its forecast", "", ("XNAS:NVDA",)),
+        _art("A Honda ZR-V family road test", "A Honda ZR-V family road test"),
+    ]
+    col = news_collection(arts)
+    titles = {c.metadata.get("title") for c in col._order}
+    assert "Nvidia lifts its forecast" in titles
+    assert "A Honda ZR-V family road test" not in titles
