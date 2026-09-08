@@ -1,6 +1,6 @@
 # Digest 2026-09-08
 
-Generated 2026-09-08 13:42 UTC · slot `all` · 1708 articles in the corpus, 4461 observations, 3954 events in the fact book.
+Generated 2026-09-08 16:49 UTC · slot `all` · 1717 articles in the corpus, 4461 observations, 3955 events in the fact book.
 
 ## The book
 
@@ -78,7 +78,7 @@ Generated 2026-09-08 13:42 UTC · slot `all` · 1708 articles in the corpus, 446
 
 | series | latest | as of | change | source |
 |---|---|---|---|---|
-| ICE BofA US high-yield option-adjusted spread, % | 2.65 | 2026-09-03 | -0.01 | fred |
+| ICE BofA US high-yield option-adjusted spread, % | 2.68 | 2026-09-07 | +0 | fred |
 | BNM Overnight Policy Rate, % | 2.75 | 2026-09-03 | +0 | bnm_opr |
 | US CPI, all items, index 1982-84=100 | 332.81 | 2026-07-01 |  | fred |
 | Malaysian ringgit per US dollar | 4.02 | 2026-08-28 | -0.0097 | fred |
@@ -91,12 +91,15 @@ Generated 2026-09-08 13:42 UTC · slot `all` · 1708 articles in the corpus, 446
 | S&P 500, index level | 7,718.60 | 2026-09-04 | -29.11 | fred |
 | 10y minus 2y Treasury spread, % | 0.41 | 2026-09-04 | -0.02 | fred |
 | US unemployment rate, % | 4.10 | 2026-08-01 | +0 | fred |
-| CBOE VIX, index | 14.32 | 2026-09-03 | -0.88 | fred |
+| CBOE VIX, index | 15.30 | 2026-09-07 | +0.77 | fred |
 
 ## Collection
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 16:49 | dbnomics | ok | 450 | 0 | 0 | facts 0;  |
+| 16:48 | jin10_flash | ok | 19 | 10 | 9 | facts 0;  |
+| 16:48 | fred | ok | 445 | 0 | 0 | facts 5;  |
 | 13:42 | eodhd | ok | 0 | 0 | 0 | facts 0; MYX:1155: deferred by the 2-a-day credit budget; next in rotation; MYX: |
 | 13:42 | twse_openapi | ok | 8 | 0 | 0 | facts 5;  |
 | 13:41 | jin10_flash | ok | 19 | 4 | 3 | facts 0;  |
