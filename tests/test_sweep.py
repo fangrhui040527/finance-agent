@@ -792,3 +792,40 @@ def test_an_uncapped_source_still_asks_about_every_name(stores):
     with Corpus(corpus_db) as c:
         (sweep,) = c.sweeps()
     assert "deferred" not in (sweep["detail"] or "")
+
+
+def test_google_news_is_asked_for_every_name_the_company_is_printed_under(stores):
+    """End to end: the alias reaches the adapter, not just the helper.
+
+    Petronas Chemicals collected zero articles for a week because the sweep
+    asked for the display name alone. The linker had "PCHEM" the whole time.
+    """
+    corpus_db, facts_db = stores
+    adapters = RecordingAdapters({"google_news": []})
+    run_sweep(
+        Cfg(sources=("google_news",), watchlist=("MYX:5183", "MYX:5347")),
+        "bursa_close",
+        corpus_path=corpus_db,
+        facts_path=facts_db,
+        link_graph=False,
+        adapter_for=adapters,
+        entity_index=INDEX,
+        clock=lambda: NOW,
+        log=lambda m: None,
+    )
+    queries = [kw.get("query", "") for name, kw in adapters.calls if name == "google_news"]
+    joined = " | ".join(queries)
+    assert '"PCHEM"' in joined, joined
+    assert '"TNB"' in joined, joined
+
+
+def test_a_name_with_no_alias_row_still_gets_asked_for():
+    """The fallback matters: an instrument absent from entities.yaml must not
+    silently stop being collected. `search_names()` has no row for it, so the
+    query falls back to the label the sweep already resolved."""
+    from knowledge.feeds.company_feeds import finance_query
+    from knowledge.graph.ids import search_names
+
+    assert search_names().get("XKLS:9999") is None
+    names = search_names().get("XKLS:9999") or ("Nobody Bhd",)
+    assert '"Nobody Bhd"' in finance_query(names)

@@ -435,6 +435,23 @@ sweep_silence_hours = 30
 # 0 turns the rule off.
 slot_window_days = 3
 
+# Days over which every name in the book must have collected SOMETHING.
+#
+# The two rules above watch the COLLECTOR; this watches the BOOK. Both were
+# green every day for a week while Petronas Chemicals held zero articles out of
+# 1,673: it was searched only as "Petronas Chemicals" and never as "PCHEM", the
+# form the Malaysian press prints, so every run succeeded and collected nothing
+# about it. A per-name defect inside a working sweep is invisible to a rule that
+# asks whether the sweep ran.
+#
+# It compares rather than thresholds: a name with no news is only evidence when
+# OTHER names have news. If the whole book is empty the collector is down, which
+# is sweep_silence's alert, and firing both would be two alerts about one fault.
+#
+# 14 days, because a Bursa mid-cap can genuinely have a quiet fortnight and a
+# quiet month is not credible.
+name_coverage_days = 14
+
 # Drawdown from peak equity at which `ask.py watch` opens an alert on the paper
 # book. 0.08 is the halt line itself: the alert and the halt fire together, so
 # the person hears about the halt the same hour the book stops adding.

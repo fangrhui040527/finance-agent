@@ -102,3 +102,87 @@ def test_yahoo_ticker_feed_refuses_an_unmappable_instrument():
 
     with pytest.raises(SymbolUnmappable):
         YahooTickerFeed("NOPE")
+
+
+# --- a company is asked for by every name it is printed under ---------------
+#
+# Petronas Chemicals collected ZERO articles across 1,673 in the corpus while
+# five other Bursa names collected 1 to 12. The alias table had held "PCHEM"
+# all along - the linker reads every alias - but the QUERY used only the
+# display name. The corpus could recognise a name it never asked for.
+
+
+def test_one_name_is_still_one_quoted_phrase():
+    """The old shape, unchanged: no stray parentheses around a single name."""
+    q = finance_query("Maybank")
+    assert q.startswith('"Maybank" (stock OR ')
+
+
+def test_several_names_are_ORed_inside_their_own_group():
+    """Without the inner parentheses the OR would swallow the finance clause
+    and the query would match any article containing the word 'stock'."""
+    q = finance_query(["Petronas Chemicals", "PCHEM"])
+    assert q.startswith('("Petronas Chemicals" OR "PCHEM") (stock OR ')
+
+
+def test_the_book_name_that_collected_nothing_is_now_asked_for_by_its_ticker():
+    """The regression, named. PCHEM is what the Malaysian press prints."""
+    from knowledge.graph.ids import instrument_id, search_names
+
+    names = search_names()[instrument_id("MYX:5183") or "MYX:5183"]
+    q = finance_query(names)
+    assert '"PCHEM"' in q
+    assert '"Petronas Chemicals"' in q
+
+
+def test_the_gdelt_phrase_floor_is_not_applied_here():
+    """MIN_PHRASE_CHARS = 5 exists because GDELT's DOC API refuses a shorter
+    quoted phrase with a plain-text error. It is one API's constraint, not a
+    judgement about precision - and Google News has no such limit. Applied
+    here it would drop "TNB", which is what Tenaga Nasional is called."""
+    from knowledge.graph.ids import instrument_id, search_names
+
+    names = search_names()[instrument_id("MYX:5347") or "MYX:5347"]
+    q = finance_query(names)
+    assert '"TNB"' in q, "the three-character form the press actually uses"
+
+
+def test_the_number_of_names_is_bounded():
+    """Google News is asked over a GET; an unbounded query gets truncated
+    somewhere nobody chose."""
+    from knowledge.feeds.company_feeds import FINANCE_TERMS, MAX_NAMES
+
+    q = finance_query([f"Name{i}" for i in range(12)])
+    assert q.count(" OR ") == (MAX_NAMES - 1) + (len(FINANCE_TERMS) - 1)
+    assert '"Name0"' in q and f'"Name{MAX_NAMES}"' not in q
+
+
+def test_repeats_and_blanks_do_not_reach_the_query():
+    q = finance_query(["Maybank", "Maybank", "", "  ", "Malayan Banking"])
+    assert q.startswith('("Maybank" OR "Malayan Banking") (')
+
+
+def test_no_name_at_all_is_refused_rather_than_searched_for_nothing():
+    """An empty phrase would return the whole finance clause - every article
+    mentioning 'stock' - attributed to one company."""
+    with pytest.raises(ValueError):
+        finance_query([])
+
+
+def test_search_names_is_keyed_canonically_like_display_names():
+    """entities.yaml writes MYX:1155 and ids resolve to XKLS:1155; keying on
+    the raw form is a lookup that silently never matches."""
+    from knowledge.graph.ids import search_names
+
+    assert "XKLS:1155" in search_names()
+    assert search_names()["XKLS:1155"][0] == "Maybank"
+
+
+def test_search_names_carries_more_than_display_names_does():
+    """The whole point: the two answer different questions."""
+    from knowledge.graph.ids import display_names, search_names
+
+    iid = "XKLS:5183"
+    assert display_names()[iid] == "Petronas Chemicals"
+    assert len(search_names()[iid]) > 1
+    assert display_names()[iid] == search_names()[iid][0]

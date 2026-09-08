@@ -228,6 +228,7 @@ def evaluate(
     out.extend(_sweep_rules(cfg, now))
     out.extend(_series_rules(cfg, now))
     out.extend(_slot_rules(cfg, now))
+    out.extend(_name_coverage_rules(cfg, now))
     out.extend(_question_rules(now, feedback_root))
     out.extend(_paper_rules(cfg, now))
     out.extend(_trace_rules(debug_root, now))
@@ -535,6 +536,64 @@ def _slot_rules(cfg, now: datetime) -> list[Alert]:
                 "missed": short,
                 "manual_runs": manual,
             },
+        )
+    ]
+
+
+def _name_coverage_rules(cfg, now: datetime) -> list[Alert]:
+    """A name in the book that collected nothing while its neighbours did.
+
+    The gap the other collector rules cannot see. `sweep_silence` asks whether
+    the collector stopped; `slots_missed` asks whether it fired. Both were
+    green every day for a week while Petronas Chemicals held ZERO articles out
+    of 1,673 - it was searched only as "Petronas Chemicals" and never as
+    "PCHEM", the form the Malaysian press prints, so every run succeeded and
+    collected nothing about it. A per-name defect inside a working sweep.
+
+    QUIET UNLESS SOMEONE ELSE SUCCEEDED. A name with no news is only evidence
+    of a defect when other names have news: if the whole book is empty the
+    collector is down, which is `sweep_silence`'s alert and not this one, and
+    firing both would be two alerts about one fault. The comparison is the
+    rule.
+    """
+    days = int(getattr(cfg, "alert_name_coverage_days", 0))
+    if days <= 0:
+        return []
+
+    from knowledge.corpus import Corpus
+
+    path = str(getattr(cfg, "corpus_db", "data/corpus.db"))
+    if not Path(path).exists():
+        return []
+
+    book = tuple(getattr(cfg, "holdings", ())) + tuple(getattr(cfg, "watchlist", ()))
+    names = [str(getattr(h, "id", h)) for h in book]
+    if len(names) < 2:
+        return []  # nothing to compare against
+
+    since = now - timedelta(days=days)
+    with Corpus(path) as corpus:
+        counts = {n: corpus.count_for_instrument(n, since=since) for n in dict.fromkeys(names)}
+
+    empty = sorted(n for n, c in counts.items() if c == 0)
+    covered = [n for n, c in counts.items() if c > 0]
+    if not empty or not covered:
+        return []
+
+    return [
+        Alert(
+            rule="name_coverage",
+            severity=WARN,
+            title=f"{len(empty)} of {len(counts)} book names collected nothing in {days}d: "
+            + ", ".join(empty),
+            detail=f"{len(covered)} other names did collect, so the sweep is running - this "
+            "is one name going quiet inside a working collector, which is what a wrong "
+            "search phrase looks like",
+            next_step="check knowledge/graph/data/entities.yaml - the query asks for every "
+            "alias listed there, so a missing short form (the ticker, the initials) is a "
+            "name the press uses and the collector never searches. Then "
+            "`ask.py sources --coverage` for what each source returned",
+            evidence={"empty": ",".join(empty), "days": str(days)},
         )
     ]
 
