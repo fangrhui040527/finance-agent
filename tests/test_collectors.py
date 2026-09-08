@@ -1289,9 +1289,10 @@ def test_eodhd_skips_without_its_key_and_names_the_variable():
 
 
 def test_eodhd_rotates_two_names_a_day_and_defers_the_rest():
-    names = ("XNAS:AAPL", "XNAS:MSFT", "XNAS:NVDA", "MYX:1155")
+    names = ("XNAS:AAPL", "XNAS:MSFT", "XNAS:NVDA", "XNYS:JPM", "MYX:1155")
     asked, deferred = EodhdFundamentals.rotation(names, date(2026, 9, 6), "us_close")
-    assert len(asked) == 2 and len(deferred) == 2 and set(asked) | set(deferred) == set(names)
+    assert len(asked) == 2 and len(deferred) == 2, "two asked, the rest of the ELIGIBLE deferred"
+    assert set(asked) | set(deferred) == {"XNAS:AAPL", "XNAS:MSFT", "XNAS:NVDA", "XNYS:JPM"}
     assert EodhdFundamentals.rotation(names, date(2026, 9, 6), "us_close") == (asked, deferred), (
         "deterministic"
     )
@@ -1302,6 +1303,56 @@ def test_eodhd_rotates_two_names_a_day_and_defers_the_rest():
         and symbol_for("XNAS:NVDA") == "NVDA.US"
         and symbol_for("XLON:VOD") is None
     )
+
+
+def test_the_rotation_only_asks_for_names_the_plan_can_serve():
+    """The bug the account's own dashboard reported: 0 calls, ever.
+
+    The free plan is US-only. Rotating over the whole book spent all three
+    weekday slots on Bursa symbols that can only be refused, and reached the
+    three US names the plan DOES cover only in `weekly`, which fires on Sundays.
+    """
+    book = (
+        "MYX:1155",
+        "MYX:5347",
+        "MYX:5183",
+        "MYX:5225",
+        "MYX:8869",
+        "MYX:3182",
+        "XNAS:NVDA",
+        "XNAS:AAPL",
+        "XNAS:MSFT",
+        "XTAI:2330",
+    )
+    for slot in ("bursa_close", "us_preopen", "us_close", "weekly", "all"):
+        asked, deferred = EodhdFundamentals.rotation(book, date(2026, 9, 7), slot)
+        assert asked, f"{slot} asks for nothing"
+        assert all(a.startswith("XNAS:") for a in asked), (
+            f"{slot} asked for a name outside the free plan: {asked}"
+        )
+        assert not any(d.startswith("MYX:") or d.startswith("XTAI:") for d in deferred), (
+            "a name the plan cannot serve is not 'next in rotation' - it needs a paid plan"
+        )
+
+
+def test_widening_the_plan_brings_the_bursa_names_back():
+    """The paid plan is a parameter, not an edit here."""
+    book = ("MYX:1155", "MYX:5347", "MYX:8869", "XNAS:NVDA", "XNAS:AAPL")
+    paid = {"XNAS", "XNYS", "XKLS", "XTAI"}
+    asked, deferred = EodhdFundamentals.rotation(
+        book, date(2026, 9, 7), "bursa_close", plan_markets=paid
+    )
+    assert set(asked) | set(deferred) == set(book)
+    assert any(a.startswith("MYX:") for a in asked)
+
+
+def test_a_book_with_no_covered_name_still_asks_rather_than_going_silent():
+    """Falling back to the whole book matters: an empty ask would make the
+    source report `ok` having done nothing, which is the shape of a healthy
+    collector and the substance of a dead one."""
+    book = ("MYX:1155", "MYX:5347", "MYX:8869")
+    asked, _ = EodhdFundamentals.rotation(book, date(2026, 9, 7), "bursa_close")
+    assert asked, "no eligible name must not mean no request and no message"
 
 
 def test_eodhd_maps_statements_to_the_shared_keys_and_stamps_filing_dates():
@@ -1334,18 +1385,29 @@ def test_eodhd_maps_statements_to_the_shared_keys_and_stamps_filing_dates():
     )
 
 
-def test_eodhd_reports_the_plan_boundary_by_market_and_never_retries_a_limit():
-    open_ = router(
-        {"1155.KLSE": http_error(403), "AAPL.US": {"message": "Daily API limit exceeded"}}
-    )
+def test_eodhd_names_the_plan_boundary_without_spending_a_request_on_it():
+    """The Bursa name is not requested at all now, so the boundary is reported
+    BEFORE the call rather than by reading a 403 back from one."""
+    open_ = router({"AAPL.US": {"message": "Daily API limit exceeded"}})
     c = EodhdFundamentals(clock=CLOCK, opener=open_, key="tok.12345678")
     pull = c.collect(SINCE, ("MYX:1155", "XNAS:AAPL"))
     assert any(
-        n == "MYX:1155: EODHD free plan: US only; the Fundamentals plan covers KLSE"
-        for n in pull.notes
+        "outside the free plan (US only), so not asked for: MYX:1155" in n for n in pull.notes
     )
-    assert any("limit" in n.lower() for n in pull.notes) and pull.requests == 2
+    assert any("Fundamentals plan covers KLSE" in n for n in pull.notes)
+    assert pull.requests == 1, "one request, for the one name the plan can serve"
+    assert any("limit" in n.lower() for n in pull.notes)
     assert not pull.observations
+
+
+def test_eodhd_still_reads_a_refusal_on_a_name_it_did_ask_for():
+    """A covered name can still be refused - over credits, endpoint off - and
+    that path must keep working now that the KLSE names never reach it."""
+    open_ = router({"AAPL.US": http_error(403)})
+    c = EodhdFundamentals(clock=CLOCK, opener=open_, key="tok.12345678")
+    pull = c.collect(SINCE, ("XNAS:AAPL",))
+    assert any("outside the plan or over today's credits" in n for n in pull.notes)
+    assert pull.requests == 1 and not pull.observations
 
 
 def test_the_statement_collectors_are_registered_and_catalogued():

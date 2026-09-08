@@ -464,10 +464,34 @@ all" are different answers, and only the second is worth acting on.
 **The nightly Routine fires this at 22:30 UTC**, after the last slot of the day.
 That is deliberate: the Routine runs on a scheduler that has never missed a
 firing, while GitHub's cron on this repository has delivered somewhere near half
-of what it owes. The cron stays primary — a catch-up that ran unconditionally
-would double every collection and spend the Actions minutes that may be causing
-the problem — and the Routine only dispatches `collect.yml` for the slots the
-day is actually short of.
+of what it owes. The cron stays primary, and the Routine only dispatches
+`collect.yml` for the slots the day is actually short of.
+
+#### One slot, one collection a day
+
+`--due` cannot tell a **dropped** cron from a **very late** one. On 2026-09-07 it
+called `us_close` owed at 22:36, 78 minutes past due; the catch-up collected it
+at 22:38; and the cron itself then arrived at **23:31, 2h17m late** and swept the
+same slot again. Two full sweeps, 370 requests, for one slot.
+
+Waiting longer does not fix it. This repository's cron has been observed between
+14 minutes and 5h43m late, so a grace window wide enough to be safe would push
+every catch-up past the Routine's own fire and into the next day — and news
+collected tomorrow is not news. The dispatcher genuinely cannot know, at the
+moment it must decide, which of the two it is looking at.
+
+So the guard is at the **collector**, where the question is settled rather than
+predicted: `run_sweep` refuses a named slot that already has a run recorded for
+the current UTC day. Whoever arrives first collects; the second arrival — cron or
+catch-up, in either order — exits **0** in seconds having contacted nothing. Exit
+0 and not 2, because a slot that already ran is a no-op, not a fault, and a
+scheduler told otherwise would raise an alarm about a day that worked.
+
+Three ways past it, each an explicit act by a person: `--slot all` (the recovery
+hammer, never guarded), a named `--source`, or `--force`. And a store whose rows
+carry no `slot` at all is **not** read as having run — that column landed on
+2026-09-07, and treating older rows as prior runs would refuse every slot on any
+store written before that build.
 
 Same-day recovery is most of the value: **news is the only thing that expires.**
 Prices, filings and macro series are re-fetchable tomorrow; a wire feed serves a

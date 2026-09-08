@@ -49,8 +49,13 @@ for exactly those slots, then pulls again so the page sees whatever landed.
 
 Three properties, and each of them is load-bearing:
 
-* **The cron stays primary.** A catch-up that fired unconditionally would double
-  every collection and spend the Actions minutes that may be causing this.
+* **The cron stays primary,** and it cannot be double-collected. `--due` cannot
+  tell a dropped cron from a very late one — on 2026-09-07 the catch-up collected
+  `us_close` at 22:38 and the cron arrived at 23:31 and collected it again — so
+  the guard sits at the collector instead of the dispatcher: a named slot runs at
+  most once per UTC day, whoever gets there first, and the second arrival exits 0
+  having contacted nothing. `--force`, `--slot all` and a named `--source` are the
+  ways past it. See docs/14 §"One slot, one collection a day".
 * **It dispatches, it does not collect.** The routine's session has no route to
   any data host; the runner does.
 * **It never guesses.** When the store holds runs that do not record which slot

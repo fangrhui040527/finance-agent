@@ -1062,10 +1062,19 @@ def cmd_sweep(a) -> int:
         graph_db=a.graph_db,
         link_graph=not a.no_graph,
         log=lambda _msg: None,
+        force=getattr(a, "force", False),
     )
     if report.could_not_run:
         print(f"sweep could not run: {report.could_not_run}", file=sys.stderr)
         return 2
+    if report.already_ran:
+        # Exit 0 and say so on stdout. The workflow's later steps still run:
+        # marking the paper book and writing the digest are cheap, read the
+        # stores rather than the network, and are worth doing on the day's
+        # newest data whichever run got there first.
+        print(f"sweep {report.run_id}  slot {report.slot}")
+        print(f"  {'skipped':<20} {report.already_ran}")
+        return 0
     print(report.render())
     # Failures also go to stderr, where a scheduler's log and a person's eye
     # both look first; the full table above is the record.
@@ -2370,6 +2379,12 @@ def main(argv=None) -> int:
     )
     sw.add_argument("--graph-db", default="data/graph.db", help="graph to link articles into")
     sw.add_argument("--no-graph", action="store_true", help="store only; do not touch the graph")
+    sw.add_argument(
+        "--force",
+        action="store_true",
+        help="collect even if this slot already ran today (the cron and the catch-up "
+        "can both fire for one slot; the second is skipped unless you say otherwise)",
+    )
     sw.set_defaults(fn=cmd_sweep)
 
     so = sub.add_parser("sources", help="the source catalogue; --probe fetches each once")
