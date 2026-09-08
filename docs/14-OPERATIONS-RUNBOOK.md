@@ -566,6 +566,61 @@ loss is inside the numbers above.
 The corpus still **stores** these rows; it is append-only and a record of what
 the collector saw. Only the index refuses them.
 
+### Measuring a real embedding model against the one that ships
+
+The default `DistributionalEmbedder` is fitted on the corpus's own word company,
+so it only relates words it has SEEN. That is precisely why the plain-English
+half of the labelled set fails: ask about a "bendable" phone when every article
+says "foldable" and it reaches nothing. Whether a real model fixes that is a
+measurement, and until 2026-09-08 it was an unrunnable one — `ApiEmbedder` had
+been at the seam since it was written and `--embedder` offered only
+`default`, `distributional` and `hashing`. The comparison the command exists to
+make could not be selected.
+
+```
+ask.py retrieval --embedder api      # needs EMBEDDING_API_KEY; spends requests
+```
+
+It **refuses** without a key rather than falling back to the default and
+reporting the default's score under the API's name.
+
+**The measurement has to run on a runner.** This development environment has no
+route to any embedding host — `openrouter.ai` answers `CONNECT tunnel failed,
+403` through the sandbox proxy — so `.github/workflows/embedding-probe.yml`
+exists to make it on a machine that can. It scores the same 24 questions over
+the same committed corpus with `hashing`, `default` and `api` in turn, so the
+embedder is the only variable, and prints all three tables to the run summary.
+
+It probes ONE embedding before spending a corpus of them. That is not caution
+for its own sake: OpenRouter answers **HTTP 200 with an empty `data` array** for
+a model that cannot serve the requested encoding, so "it did not error" is not
+the same as "it returned a vector". The step asserts a vector came back and says
+how wide it is.
+
+#### The provider is three environment variables
+
+`EMBEDDING_API_KEY`, `EMBEDDING_API_URL`, `EMBEDDING_MODEL`. The client POSTs
+`{"model", "input"}` and reads `data[].embedding`, which is the OpenAI schema
+every candidate speaks, so switching provider needs no code. Three free routes,
+assessed 2026-09-08:
+
+| route | model | terms |
+|---|---|---|
+| **OpenRouter** *(wired)* | `nvidia/nemotron-3-embed-1b:free` | zero cost per token; low daily rate limit on free models |
+| Cloudflare Workers AI | BGE family | 10,000 Neurons/day, no credit card; URL carries the account id |
+| Hugging Face router | any served embedding model | OpenAI-compatible, but $0.10/month of credits rather than a free model |
+
+**The trap, and why this client is safe from it.** The OpenAI SDK sends
+`encoding_format=base64` by default, and OpenRouter returns 200-with-nothing for
+a model that cannot serve it — a silent, invisible failure that fills an index
+with zero vectors. This client is raw `urllib`, never sets the field, and RAISES
+when the response holds fewer vectors than it asked for. Both halves are pinned
+by test.
+
+Vectors cache in `data/embeddings.db` by *(model, text)*, so the first index is
+the only expensive one and switching model never reads back the old model's
+vectors.
+
 ### When a registered feed URL rots
 
 A 404 from a news feed used to be reported as "404" and nothing else: the

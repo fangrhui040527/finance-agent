@@ -204,6 +204,74 @@ def test_the_default_backend_stays_keyless(monkeypatch):
     assert isinstance(default_embedder(), DistributionalEmbedder)
 
 
+def _fake_response(body: dict):
+    """Stand in for urlopen, so the trap below is tested without a network."""
+    import io
+    import json
+    from contextlib import contextmanager
+
+    @contextmanager
+    def opener(req, timeout=0):  # noqa: ARG001
+        yield io.BytesIO(json.dumps(body).encode())
+
+    return opener
+
+
+def test_the_request_never_asks_for_base64(monkeypatch):
+    """The trap that silently empties an index.
+
+    OpenRouter answers HTTP 200 with an EMPTY data array for a model that
+    cannot serve the requested encoding, and the OpenAI SDK sends
+    `encoding_format=base64` by default - so an SDK client gets a successful
+    response, no vectors, and no error. This client is raw urllib and must
+    never send the field at all.
+    """
+    import json
+
+    from knowledge.retrieval.embedding import ApiEmbedder
+
+    monkeypatch.setenv("EMBEDDING_API_KEY", "sk-or-v1-" + "0" * 64)
+    sent = {}
+
+    def capture(req, timeout=0):  # noqa: ARG001
+        sent["body"] = json.loads(req.data.decode())
+        return _fake_response({"data": [{"index": 0, "embedding": [1.0, 0.0]}]})(req, timeout)
+
+    import urllib.request
+
+    monkeypatch.setattr(urllib.request, "urlopen", capture)
+    ApiEmbedder(cache_path=None).embed("Maybank fee income")
+    assert "encoding_format" not in sent["body"]
+    assert sent["body"]["input"] == ["Maybank fee income"]
+
+
+def test_an_empty_data_array_raises_rather_than_returning_zeros(monkeypatch):
+    """The same trap from the other side. If the provider ever does answer 200
+    with nothing, the index must not quietly fill with degenerate vectors."""
+    import urllib.request
+
+    from knowledge.retrieval.embedding import ApiEmbedder
+
+    monkeypatch.setenv("EMBEDDING_API_KEY", "sk-or-v1-" + "0" * 64)
+    monkeypatch.setattr(urllib.request, "urlopen", _fake_response({"data": []}))
+    with pytest.raises(EmbeddingError, match="refusing to guess"):
+        ApiEmbedder(cache_path=None).embed("Maybank fee income")
+
+
+def test_the_provider_is_three_environment_variables_and_no_code(monkeypatch):
+    """Cloudflare, Hugging Face and OpenRouter are all OpenAI-schema, so
+    switching between them must never need an edit here."""
+    from knowledge.retrieval.embedding import ApiEmbedder
+
+    monkeypatch.setenv("EMBEDDING_API_KEY", "k")
+    monkeypatch.setenv("EMBEDDING_API_URL", "https://router.huggingface.io/v1/embeddings")
+    monkeypatch.setenv("EMBEDDING_MODEL", "BAAI/bge-m3")
+    e = ApiEmbedder(cache_path=None)
+    assert e.url == "https://router.huggingface.io/v1/embeddings"
+    assert e.model == "BAAI/bge-m3"
+    assert "BAAI/bge-m3" in e.describe()
+
+
 def test_the_vector_cache_round_trips(tmp_path: Path):
     cache = _VectorCache(str(tmp_path / "vectors.db"))
     assert cache.get("m1", "hello") is None
@@ -360,3 +428,21 @@ def test_every_lexical_label_in_the_shipped_gold_set_is_complete():
         "retrieval and belongs in `relevant`. Add it to "
         "knowledge/retrieval/data/retrieval_gold.yaml:\n  " + "\n  ".join(gaps)
     )
+
+
+def test_the_cli_can_select_the_api_embedder_and_refuses_without_a_key(monkeypatch, capsys):
+    """The gap that made this whole question unanswerable.
+
+    `ApiEmbedder` had sat at the seam since it was written and `--embedder`
+    offered only default/distributional/hashing, so the one comparison the
+    command exists to make - corpus-fitted vectors against a real model - could
+    not be selected. It refuses cleanly without a key rather than falling back
+    to the default and reporting the default's score under the API's name.
+    """
+    import ask
+
+    monkeypatch.delenv("EMBEDDING_API_KEY", raising=False)
+    monkeypatch.setenv("FINPLANET_NO_DOTENV", "1")
+    assert ask.main(["retrieval", "--embedder", "api"]) == 2
+    err = capsys.readouterr().err
+    assert "EMBEDDING_API_KEY" in err and "cannot score the api embedder" in err

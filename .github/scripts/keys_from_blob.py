@@ -47,6 +47,10 @@ LABELS: tuple[tuple[str, re.Pattern[str]], ...] = (
     ("FRED_API_KEY", re.compile(r"\bfred\b", re.I)),
     ("GROQ_API_KEY", re.compile(r"\bgroq\b", re.I)),
     ("EODHD_API_KEY", re.compile(r"\beod\s*hd\b|\beodhd\b|eod\s*historical", re.I)),
+    # The retrieval embedder. Labelled by the provider people actually name in
+    # a pasted blob, not by the variable, because nobody writes
+    # "EMBEDDING_API_KEY" beside the key they just copied.
+    ("EMBEDDING_API_KEY", re.compile(r"open\s*router|\bembed(ding)?\b|nemotron", re.I)),
 )
 
 SHAPES: tuple[tuple[str, re.Pattern[str]], ...] = (
@@ -60,6 +64,9 @@ SHAPES: tuple[tuple[str, re.Pattern[str]], ...] = (
     # carry letters in both halves, so it matched nothing even once the token
     # survived tokenisation.
     ("EODHD_API_KEY", re.compile(r"^[0-9a-fA-F]{10,}\.[0-9a-fA-F]{6,}$")),
+    # OpenRouter prefixes every key `sk-or-v1-` and follows it with 64 hex
+    # characters. Distinctive enough to recognise unlabelled.
+    ("EMBEDDING_API_KEY", re.compile(r"^sk-or-v1-[0-9a-f]{64}$")),
 )
 
 #: What counts as a token worth examining. Two alternatives, because vendors
