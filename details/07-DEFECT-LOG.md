@@ -265,6 +265,63 @@ Same family as §4's currency defect and the broker's refusal to substitute zero
 for a missing figure: the bug is not the missing value, it is the plausible one
 put in its place.
 
+## 10. A decision that was taken and left no record
+
+`ask.py paper decide` on an all-cash night wrote NOTHING. No name raised and no
+name held is zero target rows, so the book kept no row saying a decision had
+been taken at all — while the command printed *"observe phase: this is logged
+and will be graded"* over an empty write. Found on 2026-09-08, the paper book's
+first night, by checking the stores against the page that claimed the decision
+was recorded: `paper.db` targets 0, `learning.db` predictions 0, neither file
+changed in git.
+
+Magnitude: the observe phase exists to grade decisions, and **every all-cash
+night in it was unfalsifiable**. Not one wrong number — the absence of any.
+Worse than a wrong number, because a book with no losing record is exactly the
+shape of a flattering one.
+
+The question underneath it is whether holding nothing is a prediction at all.
+It is: *nothing in the fundable universe beats cash over the horizon*, and the
+control book is the counterfactual that settles it. So an all-cash night now
+writes one row (`CASH`, reason `all_cash`, resolved on the spot so no market is
+ever asked to price it) and one prediction graded against the control instead of
+against a price — right exactly when the control lost ground over the same days.
+
+## 11. A price cache that served half a session as a whole one
+
+The cache expires at the UTC day boundary, on the stated reasoning that *"a
+daily bar cannot change until a new session prints"*. That is false for a body
+fetched **during** a session. On 2026-09-08 `XNAS:SPY` was fetched mid-session
+and Yahoo answered with an in-progress row whose open (772.01) was carried over
+from the previous day and sat **above its own high** (769.70). The bar parser
+was right to drop it. The cache then reported a hit for the rest of that UTC
+day, so the 22:37 `us_close` sweep — which would have got the finished bar —
+never refetched.
+
+Magnitude: the US market proxy silently ended on **2026-09-04** while the three
+US names it was measuring had printed 2026-09-08. Every US decomposition on the
+2026-09-08 pack is two sessions stale, and nothing in the pack said so. Same
+shape as the Bursa proxy blank row on the 2026-09-07 page (`knowledge/feedback/2026-09-07.md`),
+reached by a different route: there the proxy did not print, here it printed and
+was fetched too early.
+
+Fix, in two places because the fault has two halves:
+
+* **The cache** refuses to serve a body that carries a dated ROW its own parser
+  will not accept as a BAR (`core/market/cache.is_mid_session`). That is what an
+  in-progress session looks like on the wire, and the next process fetches
+  again. A body that simply ends on the last session it saw still hits, so a
+  quiet market costs no quota.
+* **The pack** compares each name's last printed session against the last one it
+  shares with its proxy, and marks the row `MIS-DATED` with the day it is really
+  about (`knowledge/pack.Move.mis_dated`). A fallback to an earlier session is
+  not a fault — markets close — but a *silent* one is, and the two cases have
+  different cures.
+
+Still not caught: an in-progress row that happens to be self-consistent parses
+as a bar and is read as that session's close. Recorded here because nothing in
+the system can currently see it.
+
 ## What the families have in common
 
 | Family | Shape |
@@ -274,9 +331,11 @@ put in its place.
 | unit confusion | two numbers meet with nothing naming their units |
 | declared-not-read | a field exists, is documented, and no code path reads it |
 | docstring-as-spec | the comment promises a guarantee the code does not implement |
+| no-record | the decision is taken, nothing is written, and the log reads as if it were never asked |
+| stale-but-fresh | derived data is dated by when it was fetched rather than by what it contains |
 
-Four of the five are invisible to a type checker and to a test that only
-exercises the happy path. All five are visible to a test that asks *what would
+Six of the seven are invisible to a type checker and to a test that only
+exercises the happy path. All seven are visible to a test that asks *what would
 the wrong answer look like, and would I be able to tell?*
 
 That question is what `stress/run.py` is.

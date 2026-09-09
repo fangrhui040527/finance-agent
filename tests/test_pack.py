@@ -170,3 +170,37 @@ def test_the_cli_writes_the_pack_and_exits_zero_even_when_prices_are_unreachable
     assert code == 0
     out = capsys.readouterr().out
     assert out.count("NO DATA") >= 2 and (tmp_path / "fb" / "2026-09-04.pack.md").exists()
+
+
+@dataclass
+class GappyFeed(FakeFeed):
+    """A feed where the PROXY skips a session the name printed.
+
+    0820EA is a thinly traded ETF and did not print on 2026-09-07. The six Bursa
+    names then reported Friday's move on a page dated Monday, two of them
+    sign-flipped, and nothing in the pack said so.
+    """
+
+    blank: tuple = ()
+
+    def fetch(self, iid, start=None, end=None):
+        s = super().fetch(iid, start=start, end=end)
+        if iid in self.blank:
+            s = PriceSeries(iid, [b for b in s.raw() if b.day != DAY])
+        return s
+
+
+def test_a_proxy_that_did_not_print_makes_the_row_mis_dated_and_says_so():
+    m = measure(GappyFeed(blank=("MYX:0820EA",)), "MYX:1155", "Maybank", DAY)
+    assert not m.error
+    assert m.last_day == DAY - timedelta(days=1) and m.own_last == DAY  # the session before
+    assert m.mis_dated and "MIS-DATED" in m.dating and "MYX:0820EA" in m.dating
+    assert "MIS-DATED" in m.row()
+
+
+def test_a_market_that_was_simply_shut_is_correctly_dated_not_flagged():
+    """Both legs quiet is a holiday, not a fault; only a silent fallback is."""
+    m = measure(GappyFeed(blank=("MYX:0820EA", "MYX:1155")), "MYX:1155", "Maybank", DAY)
+    assert not m.error and not m.mis_dated
+    assert m.last_day == DAY - timedelta(days=1) and "correctly dated" in m.dating
+    assert "MIS-DATED" not in m.row()

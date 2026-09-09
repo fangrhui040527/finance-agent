@@ -206,3 +206,52 @@ def test_gdelt_pages_by_time_slice_and_dedupes(monkeypatch):
     urls = [r.payload.get("url") for r in out]
     assert urls.count("https://x/dup") == 1  # deduped across slices
     assert "startdatetime" in pages[0] and "enddatetime" in pages[0]
+
+
+# --- a body fetched mid-session is not that session ------------------------------
+
+MID_SESSION = (
+    "Date,Open,High,Low,Close,Volume\n"
+    "2026-09-04,772.01,772.87,769.00,770.19,34015600\n"
+    "2026-09-08,772.01,769.70,767.26,767.29,2948758\n"  # open above its own high
+)
+FINISHED = (
+    "Date,Open,High,Low,Close,Volume\n"
+    "2026-09-04,772.01,772.87,769.00,770.19,34015600\n"
+    "2026-09-08,770.50,773.10,767.26,772.90,41000000\n"
+)
+
+
+def test_a_body_whose_last_row_is_not_a_bar_is_not_a_cache_hit(tmp_path):
+    """XNAS:SPY, 2026-09-08: fetched mid-session, the in-progress row dropped by
+    the parser, and then served all day - so the US proxy measured to 2026-09-04
+    while the names it was measuring had printed 2026-09-08."""
+    from core.market.cache import PriceCache
+
+    c = PriceCache(tmp_path / "cache.db", today=lambda: "2026-09-08")
+    c.put("yahoo", "spy", MID_SESSION)
+    assert c.get("yahoo", "spy") is None  # miss: fetch again, the session is not over
+    c.put("yahoo", "spy", FINISHED)
+    assert c.get("yahoo", "spy") == FINISHED  # and once it is, the cache goes quiet
+
+
+def test_a_body_that_simply_ends_on_the_last_session_still_hits(tmp_path):
+    """A quiet market is not a partial fetch: Friday's body read on Monday is
+    complete, and refetching it every read is the quota burn the cache exists
+    to prevent."""
+    from core.market.cache import PriceCache
+
+    c = PriceCache(tmp_path / "cache.db", today=lambda: "2026-09-07")
+    c.put("yahoo", "spy", FINISHED.replace("2026-09-08", "2026-09-07"))
+    assert c.get("yahoo", "spy") is not None
+
+
+def test_offline_still_serves_what_it_has(tmp_path, monkeypatch):
+    """The feedback routine has no route to a price host. It gets the stale body
+    and reports the day it came from; it does not get nothing."""
+    from core.market.cache import PriceCache
+
+    c = PriceCache(tmp_path / "cache.db", today=lambda: "2026-09-08")
+    c.put("yahoo", "spy", MID_SESSION)
+    monkeypatch.setenv("FINPLANET_OFFLINE", "1")
+    assert c.get("yahoo", "spy") == MID_SESSION and c.last_served_from == "2026-09-08"

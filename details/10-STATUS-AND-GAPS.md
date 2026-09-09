@@ -40,7 +40,7 @@ invisible.
 | Reflection — grading, lesson proposal, calibration, scoring | complete |
 | Tracing — spans, HTML report, anatomy, prompts | complete |
 | CLI — 32 subcommands | complete |
-| Paper book — `engines/paper/`, `ask.py paper`, `data/paper.db`, marked by `collect.yml`, decided by the Routine, journal in `knowledge/paper/` (docs/22) | complete; the record accrues from 2026-09-08 |
+| Paper book — `engines/paper/`, `ask.py paper`, `data/paper.db`, marked by `collect.yml`, decided by the Routine, journal in `knowledge/paper/` (docs/22) | complete; the record accrues from 2026-09-08. **An all-cash night now writes a row and a prediction** (added 2026-09-09): until then it wrote nothing, so the book's first night left no evidence that a decision had been taken — see `details/07` §10 |
 | **Feedback routine** — `ask.py pack` prepares the night, a scheduled Claude session writes `knowledge/feedback/<date>.md`, indexed as `kb_lessons` | complete; docs/20 |
 | Fitness function — refuses a partial score | complete |
 | CI — 10 steps, offline, keyless | complete |
@@ -103,6 +103,28 @@ Two constants in that file — the SEC fee rate and the FINRA trading-activity f
 — are regulator pass-throughs that were NOT verified against a primary source.
 They are pinned by test so a drift is visible, and they are the reason a cost
 floor from this schedule should not be trusted to the basis point yet.
+
+### A cache dated by when it was fetched, not by what it held (added 2026-09-09)
+
+`data/price_cache.db` expires at the UTC day boundary because "a daily bar
+cannot change until a new session prints". A body fetched DURING a session
+breaks that: on 2026-09-08 `XNAS:SPY` came back with an in-progress row whose
+open sat above its own high, the bar parser dropped it as corrupt (correctly),
+and the cache then served that body for the rest of the day — so the `us_close`
+sweep, which would have got the finished bar, never refetched. The US market
+proxy ended on 2026-09-04 while the three US names it was measuring had printed
+2026-09-08, and no surface said so.
+
+Two fixes, because the fault has two halves. `core/market/cache.is_mid_session`
+makes a body that carries a dated row its own parser rejects a cache MISS. And
+`knowledge/pack.Move.mis_dated` marks any row whose name printed a session its
+proxy did not, naming the day the figures are really about — the same label that
+would have caught the Bursa blank row on the 2026-09-07 page. A fallback to an
+earlier session is not a fault; a silent one is.
+
+An in-progress row that happens to be self-consistent still parses as a bar and
+is still read as that session's close. Nothing sees that yet; `details/07` §11
+carries it.
 
 ### The death detector was watching the wrong thing (added 2026-09-03)
 
