@@ -234,6 +234,9 @@ questions:
     title: Musk Moves Up SpaceX (SPCX)’s Orbital Data Center Timeline, Again
   - doc_id: https://www.fool.com/investing/2026/09/06/should-you-forget-spacex-spcx-stock/?.tsrc=rss
     title: Should You Forget SpaceX (SPCX) Stock?
+  - doc_id: finnhub:141970797
+    title: SpaceX, Nvidia Lead Schwab Buys As Software Rally Spurs Profit-Taking – Trading Gauge Posts
+      First Dip Since April
 - query: KeyBanc Underweight rating Apple
   kind: lexical
   note: broker plus rating word

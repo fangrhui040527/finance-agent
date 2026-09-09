@@ -1,0 +1,103 @@
+{
+  "day": "2026-09-09",
+  "written_at": "2026-09-09T22:44:00Z",
+  "phase": "observe",
+  "equity_usd": 1000.0,
+  "cash_usd": 1000.0,
+  "control_equity_usd": 1000.0,
+  "drawdown": 0.0,
+  "halted": false,
+  "positions": [],
+  "changes": [],
+  "caps": [
+    {
+      "cap": "largest name",
+      "value": "0.00%",
+      "limit": "25%",
+      "breached": false
+    },
+    {
+      "cap": "invested",
+      "value": "0.00%",
+      "limit": "0%",
+      "breached": false
+    },
+    {
+      "cap": "cash floor",
+      "value": "100.00%",
+      "limit": "20%",
+      "breached": false
+    },
+    {
+      "cap": "names held",
+      "value": "0",
+      "limit": "0",
+      "breached": false
+    },
+    {
+      "cap": "drawdown from peak",
+      "value": "0.00%",
+      "limit": "8% halts entries",
+      "breached": false
+    }
+  ],
+  "attribution": {
+    "market": 0.0,
+    "idiosyncratic": 0.0,
+    "note": "no positions held"
+  },
+  "decision": {
+    "recorded": false,
+    "weights": {},
+    "horizon_days": 21,
+    "confidence": 0.55,
+    "thesis": "All-cash, second night. The Bursa half cannot be sized on evidence: the 2026-09-08 page carries the 2026-09-07 session for all six names (proxy MYX:0820EA has a blank 09-08 row), four of six sign-flipped. The one significant move (Tenaga, no catalyst matched) is flagged on the wrong day, and the Genting downgrades cannot be joined to the -1.95% session. On the US side all three are correctly dated, fell more than their market, and none is significant.",
+    "refusals": [],
+    "note": "the command ran without refusal and again wrote NOTHING: paper.db targets 0 rows, learning.db predictions 0 rows, neither database modified. SECOND consecutive night. The observe phase runs to 2026-09-21 and has so far graded nothing."
+  },
+  "fundable": {
+    "up_to_lots": {
+      "MYX:5183": 2,
+      "MYX:3182": 5,
+      "MYX:5225": 1,
+      "MYX:8869": 1,
+      "XNAS:NVDA": 1
+    },
+    "not_fundable_at_this_equity": [
+      "MYX:1155",
+      "MYX:5347",
+      "XNAS:AAPL",
+      "XNAS:MSFT"
+    ],
+    "highest_round_trip": {
+      "instrument_id": "MYX:3182",
+      "round_trip": 0.0452,
+      "note": "up from 0.0435 yesterday as the price fell"
+    }
+  },
+  "not_held_that_moved": [
+    {
+      "instrument_id": "MYX:5183",
+      "session": "2026-09-08",
+      "move": 0.0395,
+      "was_fundable_lots": 2,
+      "why_not_held": "zero articles collected on any day (PR #60 open) and the visible price was a session stale"
+    },
+    {
+      "instrument_id": "MYX:3182",
+      "session": "2026-09-08",
+      "move": -0.0195,
+      "was_fundable_lots": 5,
+      "why_not_held": "two rating downgrades collected but the move on the page was the wrong session"
+    }
+  ],
+  "mistakes": [],
+  "open_questions": [
+    "an all-cash decision writes no row to either store; two consecutive observe nights have produced nothing gradeable (since 2026-09-08)"
+  ],
+  "lessons": [
+    "a decision to hold nothing is still a decision, and a system that records only non-empty decisions cannot grade its own caution",
+    "when evidence is unusable rather than absent the honest position is the same, but the two must not read alike afterwards or a fixable data fault gets filed as a quiet market",
+    "a falling share price raises the round-trip hurdle on a fixed-lot market: the ticket shrinks, the per-share and minimum costs do not"
+  ]
+}
