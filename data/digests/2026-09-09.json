@@ -1,6 +1,78 @@
 {
   "collection": [
     {
+      "at": "2026-09-09T22:38:18.793810+00:00",
+      "detail": "facts 0; XNAS:NVDA: deferred by the 2-a-day credit budget; next in rotation; XNAS:AAPL: outside the plan or over today's credits; XNAS:MSFT: outside the plan or over today's credits",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-09T22:38:18.294007+00:00",
+      "detail": "facts 0; ",
+      "fetched": 18,
+      "kept": 8,
+      "source": "jin10_flash",
+      "status": "ok",
+      "stored": 4
+    },
+    {
+      "at": "2026-09-09T22:38:17.046648+00:00",
+      "detail": "facts 6; XNAS:MSFT: alphavantage quota exhausted for today: Thank you for using Alpha Vantage! Please consider spreading out your free API requests more sparingly (1 request per second). You may subscribe to any of the p; XNAS:NVDA: alphavantage quota exhausted for today: Thank you for using Alpha Vantage! Please consider spreading out your free API requests more sparingly (1 request per second). ",
+      "fetched": 17,
+      "kept": 17,
+      "source": "alphavantage_news",
+      "status": "ok",
+      "stored": 17
+    },
+    {
+      "at": "2026-09-09T22:38:16.613217+00:00",
+      "detail": "facts 0; ",
+      "fetched": 357,
+      "kept": 316,
+      "source": "finnhub",
+      "status": "ok",
+      "stored": 267
+    },
+    {
+      "at": "2026-09-09T22:38:14.174896+00:00",
+      "detail": "facts 0; ",
+      "fetched": 13,
+      "kept": 0,
+      "source": "edgar",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-09T22:38:14.058345+00:00",
+      "detail": "named the company: 57 of 57 (lowest: Apple 18/18, Microsoft 19/19, NVIDIA 20/20)",
+      "fetched": 57,
+      "kept": 57,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 49
+    },
+    {
+      "at": "2026-09-09T22:38:13.634790+00:00",
+      "detail": "named the company: 102 of 114 (lowest: NVIDIA 24/31, Microsoft 13/15, Apple 65/68)",
+      "fetched": 124,
+      "kept": 114,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 109
+    },
+    {
+      "at": "2026-09-09T22:38:11.949574+00:00",
+      "detail": "failed: NVIDIA; named the company: 33 of 93 (lowest: Microsoft 10/53, Apple 23/40)",
+      "fetched": 166,
+      "kept": 93,
+      "source": "gdelt",
+      "status": "ok",
+      "stored": 89
+    },
+    {
       "at": "2026-09-09T16:51:08.993864+00:00",
       "detail": "facts 0; ",
       "fetched": 450,
@@ -101,18 +173,18 @@
     }
   ],
   "counts": {
-    "articles": 2136,
+    "articles": 2671,
     "documents": 0,
-    "escalated": 555,
+    "escalated": 668,
     "events": 3969,
     "failed_sweeps": 16,
-    "linked": 1343,
-    "observations": 4465,
+    "linked": 1814,
+    "observations": 4471,
     "series": 29,
-    "sweeps": 172
+    "sweeps": 180
   },
   "day": "2026-09-09",
-  "generated_at": "2026-09-09 16:51 UTC",
+  "generated_at": "2026-09-09 22:38 UTC",
   "macro": [
     {
       "change": "-0.01",
@@ -471,7 +543,7 @@
       "upcoming": []
     },
     {
-      "escalated": 12,
+      "escalated": 43,
       "events": [],
       "instrument_id": "XNAS:NVDA",
       "label": "NVIDIA",
@@ -599,105 +671,105 @@
       ],
       "stories": [
         {
-          "doc_id": "finnhub:141953661",
+          "doc_id": "finnhub:142028537",
           "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-09-08T19:00:00+00:00",
+          "published_at": "2026-09-09T18:30:53+00:00",
           "quality": 0.85,
-          "title": "James Altucher: Elon Musk's Next Move Could Eclipse Everything He's Ever Built, and It May Be His Last",
-          "uncertainty": 0.6443298969072165
+          "title": "Could IREN Become the Next Nvidia-Backed AI Winner?",
+          "uncertainty": 0.26595744680851063
         },
         {
-          "doc_id": "finnhub:141952505",
+          "doc_id": "finnhub:142027244",
           "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": -1.0,
-          "published_at": "2026-09-08T17:49:57+00:00",
-          "quality": 0.85,
-          "title": "Does Michael Burry Have It Wrong? Nvidia Chips Retain Value, Data Shows",
-          "uncertainty": 0.2232142857142857
-        },
-        {
-          "doc_id": "finnhub:141952506",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-08T17:08:24+00:00",
-          "quality": 0.85,
-          "title": "GinsGlobal: ITEK up 13% YTD as AI, cybersecurity and defence tech drive rotation",
-          "uncertainty": 0.08196721311475409
-        },
-        {
-          "doc_id": "finnhub:141953357",
-          "domain": "Benzinga",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": -1.0,
-          "published_at": "2026-09-08T13:08:31+00:00",
-          "quality": 0.85,
-          "title": "Intel Jumps 10% as Analyst Says Musk\u2019s Terafab Could Give Foundry Much-Needed Scale",
-          "uncertainty": 0.7142857142857142
-        },
-        {
-          "doc_id": "finnhub:141952023",
-          "domain": "SeekingAlpha",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 1.0,
-          "published_at": "2026-09-08T12:41:06+00:00",
+          "published_at": "2026-09-09T17:10:37+00:00",
           "quality": 0.85,
-          "title": "Nvidia's Earnings Staircase Keeps The Momentum Rolling",
+          "title": "Top Chip Analyst: Memory Prices Won\u2019t Ease \u2018For Years\u2019 and Even Apple Can\u2019t Dodge It",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "https://news.google.com/rss/articles/CBMilgFBVV95cUxOU2hMa1hYdlhfQVRlRVVGNHc5TjB3RnhXVlB5M0dHUndYNmZiVTJxOXF6WFNfRlI0SHNSX2FLY2M3czJIRjRreW5DQ09TLVFDOGRDMnNkUHp2bEYyWGFVb2prQ0lGWTU1UHJWYlBGUDBhbS1STVdaWm50Y3UyQlg2YmFJaUdFR0d2Y1J0eV85VENGOF9jdnc?oc=5",
-          "domain": "seekingalpha.com",
+          "doc_id": "finnhub:142025791",
+          "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-09-08T18:53:50+00:00",
-          "quality": 0.8,
-          "title": "Nvidia And Broadcom: Why The AI Mania Will Continue",
+          "published_at": "2026-09-09T15:51:44+00:00",
+          "quality": 0.85,
+          "title": "Because Broadcom Monetizes Alphabet, Meta, and OpenAI at Scale I Buy Again and Again",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "https://news.google.com/rss/articles/CBMilAFBVV95cUxQSHNtTWVEN3d2ZlVfQml4MzRCRTlNbkFRTVRQZS1YWTE4Yjl4SGJRSFNMZ1BkTVZYbnpLVnBTMWRqdVZKR1g3Z2dnT2VoLU9ONUxmS2dQUGlpNHhtMXRGNnJZN1BDWEozNTBZNGN5ODY3aWYwdll6VDExQlZFOXJ1Rnh6WWdvSnFqQzQwaGRUTVFBTUdM?oc=5",
-          "domain": "www.kucoin.com",
+          "doc_id": "finnhub:142025801",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-09-09T15:40:36+00:00",
+          "quality": 0.85,
+          "title": "Broadcom Stock Slipped While Its Revenue Schedule Got Longer",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142025803",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-09T14:45:21+00:00",
+          "quality": 0.85,
+          "title": "AMD Rises 3% as CFO Lifts AI Chip Market Forecast Toward $3 Trillion; Intel Ticks Up",
+          "uncertainty": 0.2604166666666667
+        },
+        {
+          "doc_id": "finnhub:142024638",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-09T13:35:00+00:00",
+          "quality": 0.85,
+          "title": "Amazon Plans to Spend More Than $200 Billion on AI. Is That a Smart Move?",
+          "uncertainty": 0.390625
+        },
+        {
+          "doc_id": "finnhub:142029099",
+          "domain": "Benzinga",
           "escalated": true,
           "intensity": 0.3333333333333333,
           "polarity": 1.0,
-          "published_at": "2026-09-08T20:52:42+00:00",
-          "quality": 0.65,
-          "title": "Nvidia Stock Near Record High as AI Bubble Index Hits 57",
+          "published_at": "2026-09-09T13:24:50+00:00",
+          "quality": 0.85,
+          "title": "Oil Surge and Carry Trade Weigh On Stocks; Apple Bets Big On $2K Foldable iPhone",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "https://news.google.com/rss/articles/CBMiigFBVV95cUxNSGpfZ1ZkbXhXbjJoS3NxRzNYVjJDS0R1dFRiVzFfbXh2RnB5d09NZmx2SU95Y1ZfbHo3NUJUa3pDRGhXeXFhS2g2MW9KS0NkMkwzVXpBa0FyMFRnN1d3WmFOY3hqRkJvYzNYQnNDZXFnZmNNekJDaVZzeUxTVFVuLVpmSWVxbzJFRnc?oc=5",
-          "domain": "pluang.com",
+          "doc_id": "finnhub:142024635",
+          "domain": "Yahoo",
           "escalated": true,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-09-08T19:05:56+00:00",
-          "quality": 0.65,
-          "title": "Nvidia and Broadcom lead AI growth with strong earnings and bullish outlook amid rising hyperscaler spending.",
-          "uncertainty": 0.0
+          "intensity": 0.3333333333333333,
+          "polarity": 0.0,
+          "published_at": "2026-09-09T13:00:46+00:00",
+          "quality": 0.85,
+          "title": "Prediction: Intel Stock Will Double on This Date",
+          "uncertainty": 0.2604166666666667
         }
       ],
       "tone": {
-        "intensity_max": 0.333,
-        "n": 117,
-        "polarity_mean": 0.145,
-        "sources": 29,
-        "uncertainty_mean": 0.079
+        "intensity_max": 0.667,
+        "n": 316,
+        "polarity_mean": 0.12,
+        "sources": 37,
+        "uncertainty_mean": 0.133
       },
       "upcoming": []
     },
     {
-      "escalated": 28,
+      "escalated": 91,
       "events": [],
       "instrument_id": "XNAS:AAPL",
       "label": "Apple",
@@ -792,9 +864,9 @@
         },
         {
           "concept": "av_news_sentiment",
-          "known_at": "2026-09-08",
+          "known_at": "2026-09-09",
           "label": "vendor sentiment",
-          "period_end": "2026-09-08",
+          "period_end": "2026-09-09",
           "source": "alphavantage_news",
           "value": "0.21"
         },
@@ -824,6 +896,28 @@
         }
       ],
       "stories": [
+        {
+          "doc_id": "https://finance.yahoo.com/technology/articles/xfinity-mobile-comcast-business-mobile-221300106.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-09T22:13:00+00:00",
+          "quality": 1.0,
+          "title": "Xfinity Mobile, Comcast Business Mobile to Offer iPhone Duo, iPhone 18 Pro, and iPhone 18 Pro Max",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://finance.yahoo.com/video/apple-unveils-first-foldable-phone-203500616.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-09T20:35:00+00:00",
+          "quality": 1.0,
+          "title": "Apple Unveils Its First Foldable Phone - The iPhone Duo",
+          "uncertainty": 0.0
+        },
         {
           "doc_id": "https://finance.yahoo.com/video/apple-unveil-first-foldable-phone-192926335.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
@@ -858,72 +952,50 @@
           "uncertainty": 0.30864197530864196
         },
         {
-          "doc_id": "alphavantage:https://www.usatoday.com/story/tech/2026/09/08/apple-big-event-time-watch/91567245007/",
-          "domain": "USA Today",
+          "doc_id": "finnhub:142029717",
+          "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-09-08T22:08:06+00:00",
+          "published_at": "2026-09-09T20:18:50+00:00",
           "quality": 0.85,
-          "title": "Apple's big event is tomorrow. See time, how to watch",
-          "uncertainty": 0.4807692307692307
-        },
-        {
-          "doc_id": "https://www.cbsnews.com/news/apple-event-foldable-iphone-john-ternus/?.tsrc=rss",
-          "domain": "www.cbsnews.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-08T20:25:52+00:00",
-          "quality": 0.85,
-          "title": "Apple event expected to debut foldable iPhone and new CEO John Ternus",
-          "uncertainty": 0.390625
-        },
-        {
-          "doc_id": "alphavantage:https://www.inc.com/kit-eaton/the-biggest-iphone-release-since-2007-everything-leaked-ahead-of-apples-historic-event/91402221",
-          "domain": "Inc.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-08T19:19:06+00:00",
-          "quality": 0.85,
-          "title": "The Biggest iPhone Release Since 2007: Everything Leaked Ahead of Apple\u2019s Historic Event",
-          "uncertainty": 0.4934210526315789
-        },
-        {
-          "doc_id": "https://www.trefis.com/articles/614509/will-direct-tpu-sales-re-rate-google-stock/2026-09-08?.tsrc=rss",
-          "domain": "www.trefis.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-09-08T19:15:28+00:00",
-          "quality": 0.85,
-          "title": "Will Direct TPU Sales Re-Rate Google Stock?",
+          "title": "Former Apple CEO Sculley 'Excited' About iPhone Duo",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "https://www.proactiveinvestors.com/companies/news/1098237/apple-expected-to-unveil-first-foldable-iphone-as-new-ceo-ternus-takes-stage-1098237.html?.tsrc=rss",
-          "domain": "www.proactiveinvestors.com",
+          "doc_id": "finnhub:142029718",
+          "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-09-08T16:19:00+00:00",
+          "published_at": "2026-09-09T20:01:00+00:00",
           "quality": 0.85,
-          "title": "Apple expected to unveil first foldable iPhone as new CEO Ternus takes stage",
-          "uncertainty": 0.20161290322580647
+          "title": "Apple Health app Users to be Able to Order Labs from Quest Diagnostics",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142028565",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-09T19:33:28+00:00",
+          "quality": 0.85,
+          "title": "5 Takeaways From Today's Apple Event",
+          "uncertainty": 0.20833333333333334
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 64,
-        "polarity_mean": 0.125,
-        "sources": 39,
-        "uncertainty_mean": 0.178
+        "n": 257,
+        "polarity_mean": 0.093,
+        "sources": 108,
+        "uncertainty_mean": 0.095
       },
       "upcoming": []
     },
     {
-      "escalated": 4,
+      "escalated": 21,
       "events": [],
       "instrument_id": "XNAS:MSFT",
       "label": "Microsoft",
@@ -1017,6 +1089,14 @@
           "value": "0"
         },
         {
+          "concept": "av_news_sentiment",
+          "known_at": "2026-09-09",
+          "label": "vendor sentiment",
+          "period_end": "2026-09-09",
+          "source": "alphavantage_news",
+          "value": "0.04"
+        },
+        {
           "concept": "revenue",
           "known_at": "2026-07-29",
           "label": "revenue (last quarter)",
@@ -1043,100 +1123,100 @@
       ],
       "stories": [
         {
-          "doc_id": "https://247wallst.com/investing/2026/09/08/alphabet-stock-is-pulling-back-from-its-high-heres-why-id-buy-the-dip/?.tsrc=rss",
-          "domain": "247wallst.com",
+          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/alphabets-roic-strong-googl-stock-155700730.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 1.0,
-          "published_at": "2026-09-08T14:30:15+00:00",
-          "quality": 0.85,
-          "title": "Alphabet Stock Is Pulling Back From Its High. Here\u2019s Why I\u2019d Buy the Dip.",
+          "published_at": "2026-09-09T15:57:00+00:00",
+          "quality": 1.0,
+          "title": "Alphabet's ROIC Is Strong, but Is GOOGL Stock a Buy Now?",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:141949827",
+          "doc_id": "https://www.trefis.com/articles/614712/can-microsoft-stock-keep-earning-like-this/2026-09-09?.tsrc=rss",
+          "domain": "www.trefis.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-09T19:54:39+00:00",
+          "quality": 0.85,
+          "title": "Can Microsoft Stock Keep Earning Like This?",
+          "uncertainty": 0.3787878787878788
+        },
+        {
+          "doc_id": "https://www.marketbeat.com/instant-alerts/event-microsoft-cfo-touts-ai-stack-azure-efficiency-and-agent-growth-at-goldman-conference-2026-09-09/?utm_source=yahoofinance&utm_medium=yahoofinance&.tsrc=rss",
+          "domain": "www.marketbeat.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-09T18:02:38+00:00",
+          "quality": 0.85,
+          "title": "Microsoft CFO Touts AI Stack, Azure Efficiency and Agent Growth at Goldman Conference",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142028462",
+          "domain": "Benzinga",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-09T15:11:39+00:00",
+          "quality": 0.85,
+          "title": "Nvidia and Meta Are Hungry for HBM. SK Hynix Is on the Menu \u2014 These ETFs Could Cash In",
+          "uncertainty": 0.2976190476190476
+        },
+        {
+          "doc_id": "finnhub:142025821",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-09T14:30:09+00:00",
+          "quality": 0.85,
+          "title": "Prediction: This Could Be the Next AI Stock to Join the $5 Trillion Club",
+          "uncertainty": 0.5102040816326531
+        },
+        {
+          "doc_id": "finnhub:142024660",
           "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 1.0,
-          "published_at": "2026-09-08T12:30:00+00:00",
+          "published_at": "2026-09-09T13:31:50+00:00",
           "quality": 0.85,
-          "title": "Cloverleaf Joins Michigan Responsible Growth Pledge",
-          "uncertainty": 0.0
+          "title": "Look Very Hard at Microsoft and Alphabet as Rate Hike Fears Roil Markets",
+          "uncertainty": 0.20161290322580647
         },
         {
-          "doc_id": "https://news.google.com/rss/articles/CBMiowFBVV95cUxOX2NVNWJVQmdoQU9OTVd4S3FMcS1oM3RxcGtKLUtyNmxwa3NQc1FFM2lic21sTW0yQkFFU19DaFgtVWlCTTBFV0xOODFRZTl0eElKM19uN3BLSks5NnVmWU9RWGhfWnc0d0VzRVM3dTFnaXgzdHJjMF8wcEs3NV9QQlZWUUpFMm56V0ZBRzZlQWhRaGtyQlRweUR3VDdPSGVPZ2o00gGjAUFVX3lxTE5fY1U1YlVCZ2hBT05NV3hLcUxxLWgzdHFwa0otS3I2bHBrc1BzUUUzaWJzbWxNbTJCQUVTX0NoWC1VaUJNMEVXTE44MVFlOXR4SUozX243cEtKSzk2dWZZT1FYaF9adzR3RXNFUzd1MWdpeDN0cmMwXzBwSzc1X1BCVlZRSkUybnpXRkFHNmVBaFFoa3JCVHB5RHdUN09IZU9najQ?oc=5",
-          "domain": "news.alphastreet.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-09-08T18:32:26+00:00",
-          "quality": 0.65,
-          "title": "Microsoft (MSFT): Azure AI Growth Rate and Enterprise Copilot Monetization",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMilgFBVV95cUxOREhlQ1dnZndVcjJScFdnbkpUNEdBTHJyeTd0RGxxd21fRGdoSzBfVXNRZjlMajRyVjhIeDc0LUVfUllCaUk3RTYwTldCZWl0aHprNHlHcXN1N3dOS2xUZkhaUDlCMHF4X3R3N1pZcjV1dHJUSmFMNFZVQmw3MEd3cG1Mc3NGUUdwT3duS1dDUFJxMzNtSnc?oc=5",
-          "domain": "tradersunion.com",
+          "doc_id": "finnhub:142024662",
+          "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-09-08T14:46:32+00:00",
-          "quality": 0.65,
-          "title": "Why is Microsoft stock down today? Outlook and Exchange Online outage, key support levels to watch",
+          "published_at": "2026-09-09T13:00:00+00:00",
+          "quality": 0.85,
+          "title": "Progress Data Platform Summit 2026 Brings Together Data and AI Leaders",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "https://finance.yahoo.com/m/ba676cf3-b345-3df4-903d-76ac2652ef4c/google-cloud-boss-makes-bold.html?.tsrc=rss",
-          "domain": "finance.yahoo.com",
-          "escalated": false,
+          "doc_id": "finnhub:142026288",
+          "domain": "Benzinga",
+          "escalated": true,
           "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-09-08T19:30:27+00:00",
-          "quality": 1.0,
-          "title": "Google Cloud Boss Makes Bold Claim About AI Chip Business",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://finance.yahoo.com/technology/ai/articles/goldmans-ai-office-adds-just-213259052.html?.tsrc=rss",
-          "domain": "finance.yahoo.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-09-08T21:32:59+00:00",
+          "published_at": "2026-09-09T05:58:23+00:00",
           "quality": 0.85,
-          "title": "Goldman's New AI Office Adds Just 1% to Its Engineering Army",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/servicenow-jumps-25-3-months-183700784.html?.tsrc=rss",
-          "domain": "finance.yahoo.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-09-08T18:37:00+00:00",
-          "quality": 0.85,
-          "title": "ServiceNow Jumps 25% in 3 Months: Buy, Sell or Hold the Stock?",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://finance.yahoo.com/video/investors-really-see-oracle-earnings-150710768.html?.tsrc=rss",
-          "domain": "finance.yahoo.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-08T15:07:10+00:00",
-          "quality": 0.85,
-          "title": "What investors 'really' need to see from Oracle earnings this week",
+          "title": "Insights Into Microsoft's Performance Versus Peers In Software Sector",
           "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.667,
-        "n": 40,
-        "polarity_mean": 0.2,
-        "sources": 17,
-        "uncertainty_mean": 0.017
+        "n": 100,
+        "polarity_mean": 0.247,
+        "sources": 37,
+        "uncertainty_mean": 0.042
       },
       "upcoming": []
     }
