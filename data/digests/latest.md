@@ -1,6 +1,6 @@
 # Digest 2026-09-09
 
-Generated 2026-09-09 13:47 UTC · slot `all` · 2131 articles in the corpus, 4465 observations, 3968 events in the fact book.
+Generated 2026-09-09 16:51 UTC · slot `all` · 2136 articles in the corpus, 4465 observations, 3969 events in the fact book.
 
 ## The book
 
@@ -76,25 +76,28 @@ Generated 2026-09-09 13:47 UTC · slot `all` · 2131 articles in the corpus, 446
 
 | series | latest | as of | change | source |
 |---|---|---|---|---|
-| ICE BofA US high-yield option-adjusted spread, % | 2.68 | 2026-09-07 | +0 | fred |
+| ICE BofA US high-yield option-adjusted spread, % | 2.67 | 2026-09-08 | -0.01 | fred |
 | BNM Overnight Policy Rate, % | 2.75 | 2026-09-03 | +0 | bnm_opr |
 | US CPI, all items, index 1982-84=100 | 332.81 | 2026-07-01 |  | fred |
-| Malaysian ringgit per US dollar | 4.02 | 2026-08-28 | -0.0097 | fred |
-| Federal funds effective rate, % | 3.63 | 2026-09-03 | +0 | fred |
-| 10-year Treasury yield, % | 4.77 | 2026-09-03 | -0.02 | fred |
-| 2-year Treasury yield, % | 4.34 | 2026-09-03 | -0.05 | fred |
+| Malaysian ringgit per US dollar | 4.04 | 2026-09-04 | +0.0021 | fred |
+| Federal funds effective rate, % | 3.63 | 2026-09-07 | +0 | fred |
+| 10-year Treasury yield, % | 4.78 | 2026-09-04 | +0.01 | fred |
+| 2-year Treasury yield, % | 4.37 | 2026-09-04 | +0.03 | fred |
 | Malaysia CPI headline, index 2010=100 | 137.10 | 2026-07-01 | +0 | dosm_cpi |
-| Broad US dollar index | 118.75 | 2026-08-28 | +0.3896 | fred |
-| NASDAQ Composite, index level | 26,506.99 | 2026-09-04 | -77.07 | fred |
-| S&P 500, index level | 7,718.60 | 2026-09-04 | -29.11 | fred |
-| 10y minus 2y Treasury spread, % | 0.41 | 2026-09-04 | -0.02 | fred |
+| Broad US dollar index | 118.07 | 2026-09-04 | -0.0538 | fred |
+| NASDAQ Composite, index level | 26,421.41 | 2026-09-08 | -85.58 | fred |
+| S&P 500, index level | 7,673.52 | 2026-09-08 | -45.08 | fred |
+| 10y minus 2y Treasury spread, % | 0.41 | 2026-09-08 | +0 | fred |
 | US unemployment rate, % | 4.10 | 2026-08-01 | +0 | fred |
-| CBOE VIX, index | 15.30 | 2026-09-07 | +0.77 | fred |
+| CBOE VIX, index | 15.72 | 2026-09-08 | +0.42 | fred |
 
 ## Collection
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 16:51 | dbnomics | ok | 450 | 0 | 0 | facts 0;  |
+| 16:51 | jin10_flash | ok | 15 | 8 | 5 | facts 0;  |
+| 16:51 | fred | ok | 455 | 0 | 0 | facts 22;  |
 | 13:47 | eodhd | ok | 0 | 0 | 0 | facts 0; MYX:5183: deferred by the 2-a-day credit budget; next in rotation; MYX: |
 | 13:47 | twse_openapi | failed | 0 | 0 | 0 | every TWSE table failed. First: valuation: twse_openapi returned non-JSON: '<htm |
 | 13:47 | jin10_flash | ok | 17 | 4 | 3 | facts 0;  |
