@@ -1,0 +1,236 @@
+{
+  "day": "2026-09-08",
+  "written_at": "2026-09-09T22:42:00Z",
+  "market": {
+    "regime": "neutral",
+    "notes": [
+      "XNAS:SPY -0.55%; all three US names fell more, none significant",
+      "the six Bursa figures are the 2026-09-07 session; four of six sign-flipped against the real 09-08",
+      "no cause is claimed for any name"
+    ]
+  },
+  "names": [
+    {
+      "instrument_id": "MYX:1155",
+      "move": {
+        "return_1d": 0.0019,
+        "market_1d": 0.0,
+        "unexplained_share": 1.0,
+        "sigma": 0.25,
+        "verdict": "not_significant",
+        "measured_to": "2026-09-07",
+        "actual_2026_09_08": -0.0038
+      },
+      "causes": [],
+      "open_questions": [
+        "a material approval against a -0.38% session is a pairing to test once sessions line up (since 2026-09-09)"
+      ],
+      "watch": [
+        {
+          "when": "2026-09-08",
+          "what": "BNM nod for RM4.83bn Etiqa buyout",
+          "evidence": [
+            "https://news.google.com/rss/articles/CBMiUEFVX3lxTFBMclVyOGRqOTJldlM2VUlib3FGSXJtYzVrcWdPRzd2OWRVYVZKTzlxNkNjR0M0eExTQ19sNk4yX2tDdGRtZ3JsVjNwQWxoMGE1?oc=5"
+          ]
+        },
+        {
+          "when": "2026-09-08",
+          "what": "SPA with Ageas Insurance",
+          "evidence": [
+            "https://news.google.com/rss/articles/CBMivwFBVV95cUxNMDFhdEplcW5LZG9ocUlnWXkyM1lfQ1JuVmk4bGRHSnlFY2ZGVmVQUGlrNGUwc1BOSmNHRTg0MVhpUjA1LU5ka25mYmZXNEFOTHlIQzdBODFJdWZpaGdHdVQ4cjhSYTlIemJpMVh2VmsxSGhFM1VfMWlLUjlONTVFOEJUcUlCNGhWWGVwN0lQbkZscm9WUHprb1I1bEhSZ2RZVG83MllpOWlJaWQ2Nk9zdTR2ZGZQc3JWWTkwa0I4cw?oc=5"
+          ]
+        }
+      ],
+      "note": "the 1d figure is the 2026-09-07 session, not 2026-09-08: MYX:0820EA has a blank 2026-09-08 row; BNM approval and a signed SPA for a RM4.83bn Etiqa buyout are dated 09-08, a day apart from this figure"
+    },
+    {
+      "instrument_id": "MYX:5347",
+      "move": {
+        "return_1d": 0.0162,
+        "market_1d": 0.0,
+        "unexplained_share": 1.0,
+        "sigma": null,
+        "verdict": "no_identified_catalyst",
+        "measured_to": "2026-09-07",
+        "actual_2026_09_08": 0.0043
+      },
+      "causes": [],
+      "open_questions": [
+        "the one name warranting a hunt is flagged on the wrong session; the hunt waits on the fix (since 2026-09-09)"
+      ],
+      "watch": [],
+      "note": "the 1d figure is the 2026-09-07 session, not 2026-09-08: MYX:0820EA has a blank 2026-09-08 row; the ONLY significant idiosyncratic move in the book, and it is flagged for the wrong day. The one story collected is a broker pick list - a mention, not a cause"
+    },
+    {
+      "instrument_id": "MYX:5183",
+      "move": {
+        "return_1d": 0.007,
+        "market_1d": 0.0,
+        "unexplained_share": 1.0,
+        "sigma": 0.16,
+        "verdict": "not_significant",
+        "measured_to": "2026-09-07",
+        "actual_2026_09_08": 0.0395
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [],
+      "note": "the 1d figure is the 2026-09-07 session, not 2026-09-08: MYX:0820EA has a blank 2026-09-08 row; traded +3.95% on 09-08, the largest single-name move in the book that day. Still zero articles collected on any day - PR #60 (open) is the fix"
+    },
+    {
+      "instrument_id": "MYX:5225",
+      "move": {
+        "return_1d": -0.0063,
+        "market_1d": 0.0,
+        "unexplained_share": 1.0,
+        "sigma": null,
+        "verdict": "not_significant",
+        "measured_to": "2026-09-07",
+        "actual_2026_09_08": -0.0076
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [],
+      "note": "the 1d figure is the 2026-09-07 session, not 2026-09-08: MYX:0820EA has a blank 2026-09-08 row"
+    },
+    {
+      "instrument_id": "MYX:8869",
+      "move": {
+        "return_1d": -0.0037,
+        "market_1d": 0.0,
+        "unexplained_share": 1.0,
+        "sigma": null,
+        "verdict": "not_significant",
+        "measured_to": "2026-09-07",
+        "actual_2026_09_08": -0.005
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [],
+      "note": "the 1d figure is the 2026-09-07 session, not 2026-09-08: MYX:0820EA has a blank 2026-09-08 row"
+    },
+    {
+      "instrument_id": "MYX:3182",
+      "move": {
+        "return_1d": 0.0049,
+        "market_1d": 0.0,
+        "unexplained_share": 1.0,
+        "sigma": null,
+        "verdict": "not_significant",
+        "measured_to": "2026-09-07",
+        "actual_2026_09_08": -0.0195
+      },
+      "causes": [],
+      "open_questions": [
+        "does the -1.95% survive as significant once the dating fault is fixed? (since 2026-09-09)"
+      ],
+      "watch": [
+        {
+          "when": "2026-09-08",
+          "what": "Fitch downgrades Genting Malaysia to BBB-",
+          "evidence": [
+            "https://news.google.com/rss/articles/CBMixwFBVV95cUxQQlhmYlZxcUhhRXBxRXVxTTl3QmVMWGwxX1RPbU5SQVhFMi0zazhaMW5iQ2NFdzFQUXRyd1RVbEQ2SGozbWZOTWRrYXRVYTZVeXZDVUF6c3d1Q2pTbFB6Wk0ydE1ya2VKWmw0STJXN1hEVUx3aE5STndoUGtVZThaTURMS3RPZ0JJQV9FNjdWdzJTZjNZNWNXekt2MFpaS0FkS0c0bVdMVzRya0JSdGhPcVdjb3J6T2t4QjdqRUVsRGYyQzl0V0RJ?oc=5"
+          ]
+        },
+        {
+          "when": "2026-09-08",
+          "what": "S&P 'fallen angel' risk on Genting Bhd",
+          "evidence": [
+            "https://news.google.com/rss/articles/CBMi1wFBVV95cUxOQnJKdmVXMnJFNGw0R3VldU5hczVlWGM4M2g5YnVEQ191b1AyZE5haENiam54X0ZzY2VuYXUwOFNtTkVUNTlKRzlFMTlfR3FORHRhM253aDdURW93QVo3N3ozbUFONkxCQXJWYnFOUlBSM1E0dUszMmNVd2lPSkxMcmJOZlBKd05BQWhILVZZckpmOFdDS3ozZWQwWG55X0VqZnE5N052RS0yUjlMVWZaY0NFODR0VWlaRllmR3dOMG5UUG4ta3VnQjA2a2RJUW9GRS1IVzBGRQ?oc=5"
+          ]
+        }
+      ],
+      "note": "the 1d figure is the 2026-09-07 session, not 2026-09-08: MYX:0820EA has a blank 2026-09-08 row; traded -1.95% on 09-08. Fitch cut Genting Malaysia to BBB- on 09-08, a day after cutting Genting Berhad, and S&P flagged 'fallen angel' risk. Strongest candidate cause this book has produced, and unusable until the session is right"
+    },
+    {
+      "instrument_id": "XNAS:NVDA",
+      "move": {
+        "return_1d": -0.0201,
+        "market_1d": -0.0055,
+        "unexplained_share": 0.51,
+        "sigma": 0.5,
+        "verdict": "not_significant",
+        "measured_to": "2026-09-08"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [],
+      "note": "correctly anchored on 2026-09-08; lowest unexplained share in the book (beta 1.70)"
+    },
+    {
+      "instrument_id": "XNAS:AAPL",
+      "move": {
+        "return_1d": -0.0117,
+        "market_1d": -0.0055,
+        "unexplained_share": 0.74,
+        "sigma": 0.59,
+        "verdict": "not_significant",
+        "measured_to": "2026-09-08"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [
+        {
+          "when": "2026-09-09",
+          "what": "product event, first foldable phone"
+        }
+      ],
+      "note": "correctly anchored on 2026-09-08; 42 escalated stories previewing the 2026-09-09 event"
+    },
+    {
+      "instrument_id": "XNAS:MSFT",
+      "move": {
+        "return_1d": -0.0115,
+        "market_1d": -0.0055,
+        "unexplained_share": 0.56,
+        "sigma": 0.27,
+        "verdict": "not_significant",
+        "measured_to": "2026-09-08"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [],
+      "note": "correctly anchored on 2026-09-08"
+    }
+  ],
+  "data_quality": {
+    "failed": [],
+    "degraded": [
+      "gdelt: Apple and NVIDIA refused; named the company 1 of 53",
+      "alphavantage_news: XNAS:MSFT hit the daily quota",
+      "eodhd: XNAS:AAPL and MYX:1155 deferred by the 2-a-day credit budget",
+      "yahoo_rss: read but empty for five of six Bursa names",
+      "google_news: read but empty for Petronas Chemicals and IHH"
+    ],
+    "skipped": [],
+    "finding": "the Bursa dating fault recurred and the second night rules out the first night's explanation. MYX:0820EA had no 2026-09-07 close on the 09-08 fetch and HAS one on the 09-09 fetch, while 2026-09-08 went the other way: the cached history is not stable between fetches. Mechanism unknown. Consequence identical both nights - every Bursa name has a valid 09-08 close, the proxy does not, and all six fall back one session. Four of six sign-flipped.",
+    "slots_dispatched": [
+      {
+        "slot": "us_close",
+        "at": "2026-09-09T22:35:24Z",
+        "note": "the 21:15 UTC cron did not fire for the second consecutive night"
+      }
+    ],
+    "cron_lateness": [
+      {
+        "slot": "bursa_close",
+        "cron": "09:20",
+        "arrived": "16:50"
+      },
+      {
+        "slot": "us_preopen",
+        "cron": "12:30",
+        "arrived": "16:48"
+      }
+    ],
+    "open_alerts": [
+      "NEW sweep_silence: twse_openapi 33h since last success, allowed 30h - one skipped bursa_close",
+      "series_stale: 15 macro series past their cadence"
+    ]
+  },
+  "lessons": [
+    "a cache whose history changes between fetches cannot be reasoned about from one read; the fetch date belongs beside the figure",
+    "the cost of a silent fallback scales with how much news the day carried - the same fault cost nothing on a quiet day and buried a downgrade, a RM4.83bn approval and a +3.95% move on a busy one",
+    "a defect that self-heals a day later is the hardest to notice and the easiest to keep shipping, because every retrospective check finds the data correct"
+  ]
+}
