@@ -1,6 +1,6 @@
 # Digest 2026-09-10
 
-Generated 2026-09-10 13:39 UTC · slot `all` · 2717 articles in the corpus, 4476 observations, 3969 events in the fact book.
+Generated 2026-09-10 16:37 UTC · slot `all` · 2723 articles in the corpus, 4476 observations, 3972 events in the fact book.
 
 ## The book
 
@@ -71,25 +71,28 @@ Generated 2026-09-10 13:39 UTC · slot `all` · 2717 articles in the corpus, 447
 
 | series | latest | as of | change | source |
 |---|---|---|---|---|
-| ICE BofA US high-yield option-adjusted spread, % | 2.67 | 2026-09-08 | -0.01 | fred |
+| ICE BofA US high-yield option-adjusted spread, % | 2.71 | 2026-09-09 | +0.04 | fred |
 | BNM Overnight Policy Rate, % | 2.75 | 2026-09-03 | +0 | bnm_opr |
 | US CPI, all items, index 1982-84=100 | 332.81 | 2026-07-01 |  | fred |
 | Malaysian ringgit per US dollar | 4.04 | 2026-09-04 | +0.0021 | fred |
-| Federal funds effective rate, % | 3.63 | 2026-09-07 | +0 | fred |
-| 10-year Treasury yield, % | 4.78 | 2026-09-04 | +0.01 | fred |
-| 2-year Treasury yield, % | 4.37 | 2026-09-04 | +0.03 | fred |
+| Federal funds effective rate, % | 3.63 | 2026-09-08 | +0 | fred |
+| 10-year Treasury yield, % | 4.80 | 2026-09-08 | +0.02 | fred |
+| 2-year Treasury yield, % | 4.39 | 2026-09-08 | +0.02 | fred |
 | Malaysia CPI headline, index 2010=100 | 137.10 | 2026-07-01 | +0 | dosm_cpi |
 | Broad US dollar index | 118.07 | 2026-09-04 | -0.0538 | fred |
-| NASDAQ Composite, index level | 26,421.41 | 2026-09-08 | -85.58 | fred |
-| S&P 500, index level | 7,673.52 | 2026-09-08 | -45.08 | fred |
-| 10y minus 2y Treasury spread, % | 0.41 | 2026-09-08 | +0 | fred |
+| NASDAQ Composite, index level | 26,253.34 | 2026-09-09 | -168.07 | fred |
+| S&P 500, index level | 7,636.36 | 2026-09-09 | -37.16 | fred |
+| 10y minus 2y Treasury spread, % | 0.40 | 2026-09-09 | -0.01 | fred |
 | US unemployment rate, % | 4.10 | 2026-08-01 | +0 | fred |
-| CBOE VIX, index | 15.72 | 2026-09-08 | +0.42 | fred |
+| CBOE VIX, index | 16.46 | 2026-09-09 | +0.74 | fred |
 
 ## Collection
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 16:37 | dbnomics | ok | 450 | 0 | 0 | facts 0;  |
+| 16:37 | jin10_flash | ok | 19 | 8 | 6 | facts 0;  |
+| 16:37 | fred | ok | 464 | 0 | 0 | facts 11;  |
 | 13:39 | eodhd | ok | 0 | 0 | 0 | facts 0; MYX:8869: deferred by the 2-a-day credit budget; next in rotation; MYX: |
 | 13:39 | twse_openapi | ok | 8 | 0 | 0 | facts 5;  |
 | 13:39 | jin10_flash | ok | 18 | 7 | 6 | facts 0;  |
