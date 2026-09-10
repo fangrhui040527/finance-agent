@@ -296,6 +296,7 @@ The rules, all thresholds in `config.toml [monitor]` and bounded in code:
 | `sweep_silence` | no successful sweep in `sweep_silence_hours`, for a source that HAS succeeded before (0 = off) |
 | `slots_missed` | the collector fired fewer times than its own cron owes over `slot_window_days` whole days (0 = off) |
 | `series_stale` | a macro series' newest observation is past the cadence declared for it in `knowledge/sources/freshness.py` |
+| `series_resumed` | a series recorded as ENDED in that same file has printed past the period its upstream stopped at |
 | `open_question_stale` | a question the nightly pages carry has stood for more than 21 days |
 | `run_errors` | the newest traced run contains an error event |
 | `methodology_changed` | the manifest hash moved between the last two runs |
@@ -309,6 +310,17 @@ monthly, or a policy rate's meeting schedule - is declared in
 `knowledge/sources/freshness.py`; a series with no entry there is not judged,
 and `ask.py macro` marks each row with its age so a stale figure is labelled
 where it is read, not only where it is alerted.
+
+A series whose upstream has **stopped** is a different fact from a late one, and
+`series_stale` does not report it. The 2026-09-06 probe found the datasets
+behind fifteen DBnomics ids frozen with no live sibling code to move to; that
+verdict lives in `freshness.ENDED`, the rows read `466d ENDED 2025-06`, and
+`ask.py macro` names each stopped upstream under the table. An alert that
+reopens nightly with the next step "buy macro data somewhere else" is not a
+change worth reporting, so the marking is what carries it. `series_resumed` is
+the check that keeps the marking honest: it fires when one of those ids prints
+again, and asks for the `ENDED` entry to be deleted so the cadence rule takes it
+back. That is why the collector still fetches all fifteen frozen series.
 
 `open_question_stale` reads the pages the nightly routine writes. Each carries
 its open questions forward with the date first asked - and until 2026-09-06

@@ -120,6 +120,63 @@ def test_macro_context_names_its_collectors_when_empty(tmp_path):
         assert "NO SERIES 'DGS10'" in macro_context(book, "DGS10")
 
 
+def test_a_stopped_upstream_is_named_under_the_table_not_only_in_the_row(tmp_path):
+    """The row label has three words for it. A reader deciding whether to use a
+    fourteen-month-old palm oil price needs the rest on the same screen: which
+    dataset stopped, when, and that no fetch will bring it back."""
+    with FactBook(tmp_path / "f.db") as book:
+        book.add_series(
+            [
+                SeriesPoint(
+                    "dbnomics",
+                    "DBN:PALM_OIL_USD",
+                    date(2025, 6, 1),
+                    Decimal("934"),
+                    known_at=date(2026, 9, 6),
+                    payload={"title": "Palm oil"},
+                ),
+                SeriesPoint(
+                    "dbnomics",
+                    "DBN:BRENT_USD",
+                    date(2025, 6, 1),
+                    Decimal("69"),
+                    known_at=date(2026, 9, 6),
+                    payload={"title": "Brent"},
+                ),
+                SeriesPoint(
+                    "fred",
+                    "DGS10",
+                    date(2026, 9, 8),
+                    Decimal("4.78"),
+                    known_at=date(2026, 9, 8),
+                    payload={"title": "10-year"},
+                ),
+            ]
+        )
+        text = macro_context(book, now=datetime(2026, 9, 10, tzinfo=UTC))
+    assert "466d ENDED 2025-06" in text
+    # Grouped by dataset: two ids, one upstream, one line.
+    assert (
+        "IMF/PCPS stopped at 2025-06 (FROZEN, probed 2026-09-06): DBN:BRENT_USD, DBN:PALM_OIL_USD"
+        in text
+    )
+    assert "2 of these are the last thing a STOPPED upstream published" in text
+    assert "DGS10" in text and "STALE" not in text
+
+
+def test_a_book_of_live_series_prints_no_stopped_upstream_block(tmp_path):
+    with FactBook(tmp_path / "f.db") as book:
+        book.add_series(
+            [
+                SeriesPoint(
+                    "fred", "DGS10", date(2026, 9, 8), Decimal("4.78"), known_at=date(2026, 9, 8)
+                )
+            ]
+        )
+        text = macro_context(book, now=datetime(2026, 9, 10, tzinfo=UTC))
+    assert "STOPPED" not in text and "ENDED" not in text
+
+
 # --- the MCP tools ------------------------------------------------------------------------
 
 

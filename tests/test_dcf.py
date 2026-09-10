@@ -167,6 +167,35 @@ def test_derive_says_what_a_malaysian_name_lacks_instead_of_guessing(book, table
     assert c.tax_rate == Decimal("0.24") and "statutory" in c.tax_source
 
 
+def test_a_malaysian_yield_from_a_stopped_upstream_is_used_and_said_out_loud(tmp_path, table):
+    """DBN:GOVT_YIELD_MY is the ringgit risk-free rate and its upstream stopped
+    at 2025-05. Dropping it would silently change the discount rate on every
+    Malaysian name; presenting it undated would let a sixteen-month-old rate
+    read as today's. So it is used, and every WACC built on it carries the
+    reason it cannot be taken for current."""
+    b = FactBook(tmp_path / "my.db")
+    try:
+        b.add_series(
+            [
+                SeriesPoint(
+                    "dbnomics",
+                    "DBN:GOVT_YIELD_MY",
+                    date(2025, 5, 1),
+                    Decimal("3.19"),
+                    known_at=date(2026, 9, 6),
+                )
+            ]
+        )
+        c = derive("MYX:1155", b, table, date(2026, 9, 10), "bank", None)
+    finally:
+        b.close()
+    assert c.rf == Decimal("0.0319"), "the stored yield still sets the rate"
+    assert "ENDED" in c.rf_source and "IMF/IFS stopped publishing at 2025-05" in c.rf_source
+    assert "497 days old" in c.rf_source
+    assert any("rests on a stopped series" in cv for cv in c.caveats)
+    assert "risk-free rate" not in c.missing, "the rate is present, only old"
+
+
 def test_derive_borrows_the_industry_beta_and_cites_its_row(tmp_path, table):
     book = make_book(tmp_path / "no-beta.db", with_beta=False)
     try:

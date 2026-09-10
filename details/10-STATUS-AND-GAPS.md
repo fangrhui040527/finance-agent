@@ -321,6 +321,27 @@ a time, keeping the row label. The Malaysian 10-year yield id in
 tables, so no free id exists and Taiwanese names use the US ten-year with the
 approximation stated.
 
+### The macro series that have stopped
+
+All fifteen DBnomics ids are **ended upstream**, confirmed by the 2026-09-06
+runner probe: IMF/PCPS and BIS/WS_CBPOL stop at 2025-06, BIS/WS_EER and IMF/IFS
+at 2025-05, IMF/CPI at 2025-07, with every sibling code inside each dataset
+stopping at the same period. The codes are right; the datasets stopped being
+ingested, so there is nothing to re-point at.
+
+They are marked rather than deleted (`knowledge/sources/freshness.ENDED`). Every
+macro row reads `466d ENDED 2025-06`, `ask.py macro` prints which upstream
+stopped and when under the table, the monitor no longer opens a nightly alert
+about them, and a WACC on a Malaysian name says out loud that its risk-free rate
+comes from a stopped series. The collector keeps fetching them so the
+`series_resumed` rule can contradict the verdict if any of them restarts.
+
+**The open decision is where to buy macro data.** Commodity prices, policy rates
+and effective exchange rates are inputs a book of a petrochemical, an aluminium
+smelter and five Malaysian names actually moves on, and right now the newest
+reading of any of them is from mid-2025. FRED covers the US side and is live;
+nothing free that has been found covers the rest.
+
 ### `holdings` and `watchlist`
 
 Both empty in `config.toml`. Until they are filled, the escalation gate never

@@ -523,13 +523,16 @@ def _series_cfg(tmp_path, **over):
 def test_a_series_past_its_cadence_is_an_alert_and_names_the_worst_first(tmp_path):
     """The 2026-09-06 finding: sixteen series 432-493 days old, and Malaysian
     CPI reading 1982, while every sweep beside them reported ok. sweep_silence
-    cannot see this - the sweep is not silent."""
+    cannot see this - the sweep is not silent.
+
+    Both series here are LATE, not stopped: the DBnomics ids this rule first
+    fired on now carry a probe verdict and are covered by the two tests below."""
     now = datetime(2026, 9, 6, 8, 0, tzinfo=UTC)
     _facts_with_series(
         tmp_path / "facts.db",
         [
             ("DOSM:CPI_HEADLINE", "1982-12-01"),
-            ("DBN:NEER_MY", "2025-05-01"),
+            ("CPIAUCSL", "2025-05-01"),
             ("DGS10", "2026-09-03"),
         ],
     )
@@ -538,7 +541,7 @@ def test_a_series_past_its_cadence_is_an_alert_and_names_the_worst_first(tmp_pat
     assert stale and stale[0].severity == ALERT
     assert stale[0].title.startswith("2 macro series past their cadence: DOSM:CPI_HEADLINE")
     ids = [row["series_id"] for row in stale[0].evidence["stale"]]
-    assert ids == ["DOSM:CPI_HEADLINE", "DBN:NEER_MY"]  # DGS10, three days old, is not named
+    assert ids == ["DOSM:CPI_HEADLINE", "CPIAUCSL"]  # DGS10, three days old, is not named
 
 
 def test_a_series_inside_its_cadence_is_quiet(tmp_path):
@@ -559,6 +562,49 @@ def test_a_series_with_no_declared_cadence_is_not_judged(tmp_path):
     _facts_with_series(tmp_path / "facts.db", [("SOMETHING:NEW", "2019-01-01")])
     alerts = evaluate(_series_cfg(tmp_path), db=str(_ledger(tmp_path / "led.db")), now=now)
     assert not [a for a in alerts if a.rule == "series_stale"]
+
+
+def test_a_series_whose_upstream_stopped_is_not_a_nightly_alert(tmp_path):
+    """The 2026-09-06 probe found the datasets behind fifteen DBnomics ids
+    frozen, with no live sibling code to move to. An alert that reopens every
+    night with the next step "re-source your macro data" is not a change worth
+    reporting; freshness.ENDED records the verdict and the macro table prints
+    it, and this rule stays quiet."""
+    now = datetime(2026, 9, 10, 8, 0, tzinfo=UTC)
+    _facts_with_series(
+        tmp_path / "facts.db",
+        [("DBN:POLICY_RATE_MY", "2025-06-01"), ("DBN:NEER_MY", "2025-05-01")],
+    )
+    alerts = evaluate(_series_cfg(tmp_path), db=str(_ledger(tmp_path / "led.db")), now=now)
+    assert not [a for a in alerts if a.rule in ("series_stale", "series_resumed")]
+
+
+def test_a_series_marked_ended_that_prints_again_is_an_alert_to_unmark_it(tmp_path):
+    """The check that keeps the marking honest. Calling a live series dead
+    would hide a moving number behind the word ENDED, so an observation past
+    the recorded last period asks for the entry to be deleted."""
+    now = datetime(2026, 9, 10, 8, 0, tzinfo=UTC)
+    _facts_with_series(tmp_path / "facts.db", [("DBN:CPI_MY", "2026-08-01")])
+    alerts = evaluate(_series_cfg(tmp_path), db=str(_ledger(tmp_path / "led.db")), now=now)
+    resumed = [a for a in alerts if a.rule == "series_resumed"]
+    assert len(resumed) == 1
+    assert "DBN:CPI_MY (now 2026-08-01, ended 2025-07-01)" in resumed[0].title
+    assert "freshness.ENDED" in resumed[0].next_step
+    assert resumed[0].evidence["resumed"][0]["ended_at"] == "2025-07-01"
+    # And it is not also reported as stale: one finding, not two.
+    assert not [a for a in alerts if a.rule == "series_stale"]
+
+
+def test_an_ended_series_does_not_silence_a_live_one_beside_it(tmp_path):
+    now = datetime(2026, 9, 10, 8, 0, tzinfo=UTC)
+    _facts_with_series(
+        tmp_path / "facts.db",
+        [("DBN:BRENT_USD", "2025-06-01"), ("DOSM:CPI_HEADLINE", "1982-12-01")],
+    )
+    alerts = evaluate(_series_cfg(tmp_path), db=str(_ledger(tmp_path / "led.db")), now=now)
+    stale = [a for a in alerts if a.rule == "series_stale"]
+    assert len(stale) == 1
+    assert stale[0].title.startswith("1 macro series past their cadence: DOSM:CPI_HEADLINE")
 
 
 def test_a_missing_fact_book_is_not_an_error(tmp_path):

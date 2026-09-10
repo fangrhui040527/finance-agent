@@ -798,28 +798,34 @@ reference rules **FAIL** on both sleeves. On the US names, momentum beat the
 equal-weight universe and SPY and still lost to simply holding all three
 (+55.5% against +66.4% CAGR, with a deeper drawdown). That is the gate working.
 
-#### The fifteen DBnomics series that read stale
+#### The fifteen DBnomics series — settled: the upstreams stopped
 
-`ask.py macro` marks fifteen `DBN:` series 463–494 days past their cadence, and
-the `series_stale` alert has carried them since the rule was written. Two things
-were settled on 2026-09-07 and are worth not re-investigating:
+Settled on 2026-09-06 by `.github/workflows/dbnomics-probe.yml`, which reads the
+API directly. **Do not re-investigate this.**
 
 - **The collector is not the DOSM bug.** It takes `periods[-N:]` — the newest
   observations, not the first. That defect was specific to `dosm_cpi`.
-- **The endpoint is healthy.** A runner probe answered
+- **The endpoint is healthy.** The probe answered
   `dbnomics ok 1.8s — 450 series points in 1 request`. The ids resolve and the
   request shape is right.
+- **The datasets are FROZEN.** IMF/PCPS and BIS/WS_CBPOL stop at **2025-06**,
+  BIS/WS_EER and IMF/IFS at **2025-05**, IMF/CPI at **2025-07** — and every
+  sibling code inside each dataset stops at the same period, so our codes were
+  never the problem and there is nothing to re-point at.
 
-So the data at DBnomics genuinely ends in mid-2025. What is *not* settled is
-whether that is the publisher's own lag — IMF IFS and BIS aggregates can run a
-year behind — or whether these particular series ids have been superseded
-upstream while still answering with their last values.
+The verdict is recorded in `knowledge/sources/freshness.ENDED`. From it: each
+macro row reads `466d ENDED 2025-06` rather than an age, `ask.py macro` prints
+the stopped upstreams under the table, `series_stale` no longer judges them, and
+a Malaysian WACC says its risk-free rate rests on a stopped series. The
+collector still fetches all fifteen: one request covers the list, and
+`series_resumed` opens a WARN if any of them prints past its recorded last
+period, which is the only thing that can prove the marking wrong.
 
-**Do not close this by raising the cadence limits.** That would silence a
-correct alert and lose the distinction between "we have not fetched" and "the
-publisher has not published". The cheap way to settle it is to open each id at
-db.nomics.world and read its last update date; the ids are in
-`knowledge/sources/dbnomics.py`.
+**Do not close this by raising the cadence limits**, and do not delete the ids.
+Raising a limit silences a correct rule; deleting the ids leaves nothing able to
+notice a restart. What remains open is a purchasing decision, not a bug: where
+to source commodity prices, policy rates and effective exchange rates now that
+the free aggregation of them has stopped.
 
 ### `python -m ragqa.run` — does the retrieval and cleaning half work?
 

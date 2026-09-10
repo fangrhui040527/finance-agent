@@ -322,6 +322,51 @@ Still not caught: an in-progress row that happens to be self-consistent parses
 as a bar and is read as that session's close. Recorded here because nothing in
 the system can currently see it.
 
+## 12. Fifteen macro series that were stale in a way nobody could fix
+
+The `series_stale` rule fired every night on the same fifteen DBnomics ids —
+palm oil, aluminium, Brent, Asian LNG, five policy rates, two CPIs, three
+effective exchange rates and the Malaysian government yield — each 436 to 497
+days old with a *current* `fetched_at` beside it. The rule was right to fire and
+its next step ("point the adapter at a live series, or take the id out") was
+unanswerable from here: the development environment has no route to
+db.nomics.world, so nothing could tell a retired code from a stopped dataset.
+
+`.github/workflows/dbnomics-probe.yml` asked the API on 2026-09-06. Verdict on
+all fifteen: **FROZEN**. Our codes are correct; the datasets behind them stopped
+being ingested — IMF/PCPS and BIS/WS_CBPOL at **2025-06**, BIS/WS_EER and
+IMF/IFS at **2025-05**, IMF/CPI at **2025-07** — and every sibling code inside
+each dataset stops at the same period (siblings outside our list answered HTTP
+400). There is no live code to move to. Re-sourcing is a decision about where to
+buy macro data, not a bug to fix in the collector.
+
+Two defects, then, and only the first one is DBnomics':
+
+* **The surfaces could not say "ended".** They had one word, STALE, for two
+  different facts: *the next print is late* and *there is no next print*. A
+  reader holding a 466-day-old Malaysian policy rate needs to know which. Worse,
+  `engines/valuation/cost_of_capital.py` discounts every Malaysian name off
+  `DBN:GOVT_YIELD_MY` — so a stopped series was setting the ringgit risk-free
+  rate in a live WACC, dated but unqualified.
+* **The monitor could not close a finding nobody could act on.** An alert that
+  reopens nightly with an impossible next step trains a reader to skim the list,
+  which costs the alerts beside it.
+
+Fix: `knowledge/sources/freshness.ENDED` records the probe's verdict once — last
+period, upstream, verdict, the day it was probed. From it: the macro row reads
+`466d ENDED 2025-06` instead of an age; `macro_context` prints the reason under
+the table, grouped by dataset (five upstreams, not fifteen lines); the WACC's
+`rf_source` names the stopped series and the caveat says the rate rests on it;
+and `series_stale` stops judging them.
+
+What keeps that honest is that **the collector still fetches all fifteen**. One
+request covers the whole list, so the cost is a request the sweep was making
+anyway, and if any of them prints past its recorded last period the new
+`series_resumed` rule opens a WARN asking for the `ENDED` entry to be deleted.
+Deleting the ids instead would have left nothing able to notice a restart — the
+marking would have been unfalsifiable, which is the failure mode of every
+"known issue" list that outlives the issue.
+
 ## What the families have in common
 
 | Family | Shape |
@@ -333,9 +378,10 @@ the system can currently see it.
 | docstring-as-spec | the comment promises a guarantee the code does not implement |
 | no-record | the decision is taken, nothing is written, and the log reads as if it were never asked |
 | stale-but-fresh | derived data is dated by when it was fetched rather than by what it contains |
+| one-word-two-facts | a label collapses two conditions that ask the reader for different things |
 
-Six of the seven are invisible to a type checker and to a test that only
-exercises the happy path. All seven are visible to a test that asks *what would
+Seven of the eight are invisible to a type checker and to a test that only
+exercises the happy path. All eight are visible to a test that asks *what would
 the wrong answer look like, and would I be able to tell?*
 
 That question is what `stress/run.py` is.

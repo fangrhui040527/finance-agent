@@ -113,8 +113,14 @@ def macro_context(
     cadence declared in knowledge/sources/freshness.py is marked STALE there.
     Without it a policy rate fifteen months old prints in the same column, in
     the same shape, as a Treasury yield from Thursday.
+
+    A series whose upstream has STOPPED reads ENDED with the last period it
+    published, and the reason prints under the table. STALE and ENDED ask a
+    reader for different things: STALE says the next print is late, ENDED says
+    there is no next print, and a reader deciding whether to use a figure needs
+    to know which one they are holding.
     """
-    from knowledge.sources.freshness import age_label
+    from knowledge.sources.freshness import age_label, ended_note
 
     now = now or datetime.now(UTC)
     today = now.date()
@@ -124,6 +130,8 @@ def macro_context(
             return f"NO SERIES {series_id!r} recorded. Recorded: {', '.join(book.series_ids()) or 'none'}"
         title = (pts[-1].payload or {}).get("title", series_id)
         rows = [f"{series_id}  {title}  [newest {age_label(series_id, pts[-1].obs_date, today)}]"]
+        if note := ended_note(series_id, pts[-1].obs_date):
+            rows.append(f"  {note}")
         for p in pts[-max(1, points) :]:
             rows.append(
                 f"    {p.obs_date}  {_fmt(p.value):>12}   (vintage {p.known_at}, {p.source})"
@@ -148,8 +156,44 @@ def macro_context(
             f"{age_label(sid, latest.obs_date, today):<19} "
             f"{'+' if change >= 0 else ''}{_fmt(change)}  {title}"
         )
+    rows += _ended_block(ids, book)
     rows += macro_calendar(book, now)
     return "\n".join(rows)
+
+
+def _ended_block(ids: list[str], book: FactBook) -> list[str]:
+    """The reason under the table: which upstreams stopped, and when.
+
+    The row label can only carry three words. This says the rest once - the
+    dataset behind each id and the day the probe read it - so that "why is palm
+    oil fourteen months old" is answered on the same screen as the number,
+    rather than in a defect log nobody has open.
+    """
+    from knowledge.sources.freshness import ended, has_resumed
+
+    by_upstream: dict[tuple[str, str, str], list[str]] = {}
+    dead = 0
+    for sid in ids:
+        e = ended(sid)
+        pts = book.series(sid) if e is not None else []
+        if e is None or not pts or has_resumed(sid, pts[-1].obs_date):
+            continue
+        dead += 1
+        key = (e.upstream, f"{e.last_period:%Y-%m}", f"{e.verdict}, probed {e.checked_on}")
+        by_upstream.setdefault(key, []).append(sid)
+    if not dead:
+        return []
+    # Grouped by dataset, because that is the shape of the fact: five upstreams
+    # stopped, not fifteen series. Fifteen near-identical lines under a table
+    # read as a wall and get skipped, which would undo the point of printing it.
+    out = [
+        "",
+        f"{dead} of these are the last thing a STOPPED upstream published, not a current "
+        f"reading. No fetch will refresh them and there is no live code to move to:",
+    ]
+    for (upstream, last, how), sids in sorted(by_upstream.items()):
+        out.append(f"    {upstream} stopped at {last} ({how}): {', '.join(sorted(sids))}")
+    return out
 
 
 def macro_calendar(book: FactBook, now: datetime | None = None, days: int = 7) -> list[str]:

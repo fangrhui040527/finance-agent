@@ -221,11 +221,30 @@ def country_of(instrument_id: str) -> str:
 
 
 def _risk_free(book, country: str, asof: date) -> tuple[Decimal | None, str]:
+    """The sovereign yield to discount at, and the label that qualifies it.
+
+    The label is the whole point. A Malaysian name is discounted off
+    DBN:GOVT_YIELD_MY, whose upstream stopped in 2025-05 (see
+    knowledge/sources/freshness.py ENDED): the figure is still the best stored
+    reading of the ringgit risk-free rate and still what the arithmetic uses,
+    but a rate sixteen months old is an assumption, not an observation, and
+    every WACC built on it says so rather than printing a date the reader has
+    to age themselves.
+    """
+    from knowledge.sources.freshness import ended, has_resumed
+
     for sid in RISK_FREE_SERIES.get(country, ("DGS10",)):
         points = book.series(sid, asof=asof, limit=1)
         if points:
             p = points[-1]
-            note = "" if sid == "DGS10" or country == "US" else ""
+            dead = ended(sid)
+            note = (
+                f" (that series ENDED: {dead.upstream} stopped publishing at "
+                f"{dead.last_period:%Y-%m}, so this rate is {(asof - p.obs_date).days} days "
+                f"old and will not refresh)"
+                if dead is not None and not has_resumed(sid, p.obs_date)
+                else ""
+            )
             approx = (
                 ""
                 if country == "US" or not sid.startswith("DGS")
@@ -258,6 +277,10 @@ def derive(
     rf, rf_source = _risk_free(book, country, asof)
     if rf is None:
         missing.append("risk-free rate")
+    elif "ENDED" in rf_source:
+        # A caveat, not a `missing`: the rate is there and the WACC is still
+        # computable off it. What a reader must not do is take it for current.
+        caveats.append(f"the risk-free rate rests on a stopped series - {rf_source}")
 
     row = table.country.get(country) or {}
     erp = _dec(row.get("erp"))

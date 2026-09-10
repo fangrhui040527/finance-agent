@@ -20,6 +20,23 @@ CONFIRMED BY THE FIRST RUNNER PROBE, not assumed: a series DBnomics does not
 know comes back as a note naming the id, never as a silent zero, and the list
 is pruned from what the probe says. `known_at` is the fetch day - DBnomics
 gives periods, not vintages, so the conservative stamp is the honest one.
+
+ALL FIFTEEN ARE FROZEN UPSTREAM, AND THEY ARE STILL FETCHED. The 2026-09-06
+probe (.github/workflows/dbnomics-probe.yml) answered the question these ids
+had been raising for a year: the codes are right and the DATASETS stopped -
+IMF/PCPS and BIS/WS_CBPOL at 2025-06, BIS/WS_EER and IMF/IFS at 2025-05,
+IMF/CPI at 2025-07 - with every sibling code stopping at the same period, so
+there is nothing to re-point at. That verdict is recorded once, in
+knowledge/sources/freshness.py ENDED, which is what makes `ask.py macro` print
+`466d ENDED 2025-06` instead of an age, puts the reason under the table, and
+keeps the monitor from opening a nightly alert whose only next step is "buy
+macro data somewhere else".
+
+The fetch stays because the verdict has to be falsifiable. One request covers
+the whole list, so the cost is a request a sweep was making anyway, and if any
+of these prints past its recorded last period the monitor's `series_resumed`
+rule says so and asks for the ENDED entry to be deleted. Deleting the ids
+instead would leave nothing to notice a restart with.
 """
 
 from __future__ import annotations
