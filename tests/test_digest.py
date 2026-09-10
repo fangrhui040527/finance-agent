@@ -7,6 +7,8 @@ from dataclasses import dataclass
 from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 
+import pytest
+
 from knowledge.corpus import Corpus
 from knowledge.digest import build_digest, write_digest
 from knowledge.facts import EventRecord, FactBook, Observation, SeriesPoint
@@ -271,3 +273,99 @@ def test_the_digest_stars_by_the_gate_in_force_today_not_the_one_at_ingest(tmp_p
     assert name.escalated == 1, "only the one reporting something financial is starred"
     starred = [s["title"] for s in name.stories if s["escalated"]]
     assert starred == ["Maybank profit rose on wider margins"]
+
+
+# --- a second arrival on the same slot must leave the directory alone -------------
+#
+# Two things dispatch the collector for one slot - the cron and the nightly
+# Routine's catch-up - and `_already_ran_today` makes the second a no-op that
+# collects nothing. It was not a no-op here. The digest was re-rendered with a
+# later `Generated` line over identical figures, the workflow saw three changed
+# files and pushed them: the 2026-09-08 23:23 commit is `2084 articles` to
+# `2084 articles`, `4465 observations` to `4465 observations`.
+#
+# `git log data/digests` is the cheapest record of when collection actually
+# moved. A timestamp advancing over unchanged data makes that record lie.
+
+
+@pytest.fixture
+def one_days_stores(tmp_path):
+    """Seeded ONCE. `seed` appends a sweep row per call, so seeding again would
+    make the second digest genuinely different and prove nothing."""
+    return seed(tmp_path)
+
+
+def _render(stores, minute: str, slot: str = "all"):
+    corpus_db, facts_db = stores
+    when = datetime.fromisoformat(f"2026-09-04T{minute}:00+00:00")
+    d = build_digest(Cfg(), NOW.date(), corpus_path=corpus_db, facts_path=facts_db, now=when)
+    d.slot = slot
+    return d
+
+
+def test_a_re_render_that_only_moves_the_clock_writes_nothing(tmp_path, one_days_stores):
+    root = tmp_path / "digests"
+    md = write_digest(_render(one_days_stores, "22:38"), root)[0]
+    before = md.read_text(encoding="utf-8")
+    stamp = md.stat().st_mtime_ns
+
+    write_digest(_render(one_days_stores, "23:23"), root)
+
+    assert md.read_text(encoding="utf-8") == before, "the timestamp moved over identical figures"
+    assert md.stat().st_mtime_ns == stamp, "the file was rewritten with identical bytes"
+
+
+def test_a_changed_figure_is_still_written(tmp_path, one_days_stores):
+    """The guard must not be able to freeze a digest. Only the clock is ignored."""
+    root = tmp_path / "digests"
+    md = write_digest(_render(one_days_stores, "22:38"), root)[0]
+    before = md.read_text(encoding="utf-8")
+
+    d2 = _render(one_days_stores, "23:23")
+    d2.counts = {**d2.counts, "articles": int(d2.counts.get("articles", 0)) + 1}
+    write_digest(d2, root)
+
+    after = md.read_text(encoding="utf-8")
+    assert after != before
+    assert f"{int(d2.counts['articles'])} articles in the corpus" in after
+
+
+def test_a_different_slot_over_the_same_figures_is_a_fact_and_is_written(tmp_path, one_days_stores):
+    """The slot shares that line with the timestamp and is NOT ignored: which
+    run last wrote the day's digest is a fact about the collection, and a
+    re-render at a later minute is not."""
+    root = tmp_path / "digests"
+    md = write_digest(_render(one_days_stores, "13:42", slot="bursa_close"), root)[0]
+    before = md.read_text(encoding="utf-8")
+
+    write_digest(_render(one_days_stores, "22:38", slot="us_close"), root)
+
+    after = md.read_text(encoding="utf-8")
+    assert after != before and "slot `us_close`" in after
+
+
+def test_a_skipped_write_still_repairs_a_missing_latest(tmp_path, one_days_stores):
+    """The pointer must not be left behind by a write that did not happen."""
+    root = tmp_path / "digests"
+    write_digest(_render(one_days_stores, "22:38"), root)
+    (root / "latest.md").unlink()
+
+    write_digest(_render(one_days_stores, "23:23"), root)
+
+    assert (root / "latest.md").read_text(encoding="utf-8").startswith("# Digest 2026-09-04")
+
+
+def test_the_publication_rail_still_runs_on_a_skipped_write(tmp_path, one_days_stores, monkeypatch):
+    """A digest is checked before it is compared. Waving one through for being
+    similar to a digest that already passed would be a gate with a hole in it."""
+    import core.guardrails.publish as P
+
+    root = tmp_path / "digests"
+    write_digest(_render(one_days_stores, "22:38"), root)
+
+    seen: list[str] = []
+    real = P.publish
+    monkeypatch.setattr(P, "publish", lambda *a, **k: (seen.append("checked"), real(*a, **k))[1])
+
+    write_digest(_render(one_days_stores, "23:23"), root)
+    assert seen, "the rail was skipped along with the write"

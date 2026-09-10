@@ -48,6 +48,14 @@ FACTORIES: dict[str, Callable[..., FeedAdapter]] = {
 #: each once; an index page answers with the feeds it advertises (see
 #: rss._excerpt), which is how the right URL gets read off it. Enable a
 #: candidate only after the probe shows items with dates.
+#:
+#: THE URLS BELOW ARE ONE GUESS EACH, and four of the five are disabled on the
+#: strength of one 404 apiece from 2026-09-04. That is the largest single
+#: constraint on Bursa coverage - 62 articles against the US names' 1,968 -
+#: and it is a guess, not a finding. `.github/workflows/bursa-feeds-probe.yml`
+#: settles it from a runner: it reads the RSS autodiscovery tags off each
+#: publisher's own pages, tries the conventional paths beside them, and reports
+#: which URL serves items WITH DATES. Replace a URL here with what it names.
 RSS_SOURCES: dict[str, tuple[str, str]] = {
     # name: (url, trust)
     "reuters_business": ("https://feeds.reuters.com/reuters/businessNews", "wire"),

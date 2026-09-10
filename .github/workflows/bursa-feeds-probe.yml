@@ -1,0 +1,49 @@
+# Where the Malaysian outlets actually publish their feeds, asked of the sites.
+#
+# The book is six Bursa names and three Nasdaq names; the corpus is 1,968
+# articles linked to the three US names and 62 to all six Malaysian ones. Four
+# of the five registered Malaysian outlets are DISABLED - thestar, edge and nst
+# answered 404 on 2026-09-04 and bernama dated nothing - so one outlet covers
+# the half of the book the whole system is named for.
+#
+# A 404 on one guessed path is not proof a publisher has no feed. This asks the
+# publishers: it reads the RSS autodiscovery tags off their own pages, tries the
+# conventional paths beside them, and reports which URLs return items WITH
+# DATES, which is the property the collector's time window needs.
+#
+# The development environment has no route to any Malaysian host, so this can
+# only be answered from a runner. Read-only, keyless, stores nothing. Manual:
+# the answer changes when a publisher redesigns, not hourly.
+name: bursa-feeds-probe
+
+on:
+  workflow_dispatch:
+    inputs:
+      outlets:
+        description: "space-separated outlet names; empty probes every one"
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.12"
+          enable-cache: true
+
+      - name: Install
+        run: uv sync --frozen
+
+      - name: Probe every registered Malaysian outlet
+        run: uv run python .github/scripts/bursa_feeds_probe.py ${{ inputs.outlets }}

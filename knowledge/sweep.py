@@ -614,7 +614,6 @@ def _news_per_instrument(
 ):
     """One request per name; every name's records normalised by its own feed."""
     from knowledge.feeds.company_feeds import EDITION_FOR_MIC, finance_query
-    from knowledge.graph.extractors.gdelt import watchlist_terms
     from knowledge.graph.ids import display_names
     from knowledge.graph.ids import instrument_id as canonical
     from markets.registry import mic_of
@@ -651,7 +650,6 @@ def _news_per_instrument(
                 adapter_for,
                 EDITION_FOR_MIC,
                 finance_query,
-                watchlist_terms,
                 mic_of,
             )
         except ValueError as e:  # no edition, no symbol: this name cannot be asked for here
@@ -722,17 +720,23 @@ def _linked_note(linked_counts: list[tuple[str, int, int]]) -> str:
     return f"named the company: {named} of {kept}" + (f" (lowest: {detail})" if detail else "")
 
 
-def _feed_for(
-    spec, cfg, iid, label, adapter_for, edition_for_mic, finance_query, watchlist_terms, mic_of
-):
+def _feed_for(spec, cfg, iid, label, adapter_for, edition_for_mic, finance_query, mic_of):
     """The per-name adapter for a per-instrument news source, or None to skip."""
     if spec.name == "gdelt":
-        terms = watchlist_terms((iid,))
-        if not terms:
+        from knowledge.graph.extractors.gdelt import search_query
+
+        # EVERY name this company is printed under, not just the first alias.
+        # One company at a time, so its own forms cost query width and no extra
+        # request - which is why the breadth argument that caps the COMBINED
+        # query at one phrase per company does not apply here. Asking for the
+        # first alias alone is why Petronas Chemicals was searched as "Petronas
+        # Chemicals" and never as "PCHEM".
+        query = search_query(iid)
+        if not query:
             return None  # every alias is too short for the DOC API; linked when found elsewhere
         return adapter_for(
             "gdelt",
-            query=f'"{terms[0]}"',
+            query=query,
             languages=tuple(cfg.gdelt_languages),
             countries=tuple(cfg.gdelt_countries),
         )

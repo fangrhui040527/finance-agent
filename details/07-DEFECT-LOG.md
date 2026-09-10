@@ -367,6 +367,75 @@ Deleting the ids instead would have left nothing able to notice a restart — th
 marking would have been unfalsifiable, which is the failure mode of every
 "known issue" list that outlives the issue.
 
+## 13. A company the corpus could recognise and never asked for
+
+`MYX:5183` (Petronas Chemicals) holds **zero** articles out of 2,671. Its five
+Bursa neighbours hold 1 to 25; the three Nasdaq names hold 1,968 between them.
+
+Not a linker fault. `entity_index` has carried `PCHEM` — the form the Malaysian
+press actually prints — since the alias table was written, so an article naming
+PCHEM would have been attributed correctly the moment it arrived. None arrived,
+because the per-name GDELT path asked for `terms[0]`: the FIRST alias in
+entities.yaml, and only that one.
+
+    query=f'"{terms[0]}"'      ->   "Petronas Chemicals"
+
+So the corpus could recognise a name it never asked for. The same defect in the
+Google News path is fixed in [#60](https://github.com/fangrhui040527/finance-agent/pull/60);
+this is the other half of it.
+
+The reason the one-alias rule existed at all is real and is preserved.
+`watchlist_query` — the COMBINED query, every company in one request — is capped
+at one phrase per company because 21 phrases across nine companies timed out
+three times at 30s on the 2026-09-03 runner, and because the DOC API charges for
+query breadth. But the per-name path asks about **one company at a time**: its
+own two or three forms cost query width and no extra request, so the cap that
+protects the combined query has nothing to do there. `search_terms` /
+`search_query` answer the per-name question and `watchlist_terms` still answers
+the combined one; a test asserts the two do not merge.
+
+What is NOT relaxed is `MIN_PHRASE_CHARS`. GDELT refuses a quoted phrase under
+five characters with a plain-text error that fails the whole request, so `TNB`
+and `IHH` still cannot be asked for here however much the press uses them — an
+API's constraint, not a judgement, which is why the Google News path applies no
+such floor.
+
+Still open, and larger than this fix: four of the five registered Malaysian
+outlets are DISABLED on one 404 each from 2026-09-04.
+`.github/workflows/bursa-feeds-probe.yml` reads the RSS autodiscovery tags off
+the publishers' own pages and reports which URLs serve items **with dates** —
+because a 404 on one guessed path is not evidence a publisher has no feed, and
+nothing in this environment can reach a Malaysian host to tell the difference.
+
+## 14. A no-op run that still committed
+
+`_already_ran_today` (§ the doubled slot) makes the second collector arrival on
+a slot a no-op: the cron and the nightly catch-up both fire, whoever is first
+collects, the second costs seconds instead of 370 requests. It was not a no-op
+in one place. The digest was re-rendered with a later `Generated` line over
+identical figures, so three files changed and the workflow pushed them:
+
+    -Generated 2026-09-08 22:38 UTC · slot `all` · 2084 articles, 4465 observations, 3968 events
+    +Generated 2026-09-08 23:23 UTC · slot `all` · 2084 articles, 4465 observations, 3968 events
+
+That is the whole content of commit `c8f3ede`, and of `8387e38` the night
+before. The cost is not the bytes. `git log data/digests` is the cheapest record
+anyone has of when the collection actually moved, and a timestamp that advances
+over unchanged data makes that record lie.
+
+`write_digest` now compares the render against the file with only the timestamp
+masked, and writes nothing when that is the only difference. The slot and the
+three counts share that line and ARE compared: a different slot writing the same
+figures is a fact about the collection; a re-render at a later minute is not.
+The publication rail still runs before the comparison — a digest is checked
+before it is compared, never waved through for resembling one that passed.
+
+Not changed, deliberately: the second arrival still fetches prices and marks the
+paper book. §11 is the reason — the first arrival can land mid-session and cache
+a partial bar, so the later run is the one that gets the finished close. And the
+duplicate `marks` rows it leaves are read correctly: `marks()` and `latest_mark`
+both take the last row per day, so the equity series never double-counts.
+
 ## What the families have in common
 
 | Family | Shape |
@@ -379,9 +448,11 @@ marking would have been unfalsifiable, which is the failure mode of every
 | no-record | the decision is taken, nothing is written, and the log reads as if it were never asked |
 | stale-but-fresh | derived data is dated by when it was fetched rather than by what it contains |
 | one-word-two-facts | a label collapses two conditions that ask the reader for different things |
+| ask-vs-recognise | the system can identify something it never requests, so it never arrives |
+| no-op-that-writes | a run that decided to do nothing still leaves a trace, and the trace reads as work |
 
-Seven of the eight are invisible to a type checker and to a test that only
-exercises the happy path. All eight are visible to a test that asks *what would
+Nine of the ten are invisible to a type checker and to a test that only
+exercises the happy path. All ten are visible to a test that asks *what would
 the wrong answer look like, and would I be able to tell?*
 
 That question is what `stress/run.py` is.

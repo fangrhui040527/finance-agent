@@ -792,3 +792,52 @@ def test_an_uncapped_source_still_asks_about_every_name(stores):
     with Corpus(corpus_db) as c:
         (sweep,) = c.sweeps()
     assert "deferred" not in (sweep["detail"] or "")
+
+
+def test_gdelt_is_asked_for_every_name_the_company_is_printed_under(stores):
+    """End to end: the alias reaches the adapter, not only the helper.
+
+    The per-name path sent `terms[0]` alone, so Petronas Chemicals was asked
+    for as "Petronas Chemicals" and never as "PCHEM". The linker has had
+    "PCHEM" the whole time - this corpus could recognise a name it never asked
+    for, which is what zero articles out of 2,671 looked like from outside.
+    """
+    corpus_db, facts_db = stores
+    adapters = RecordingAdapters({"gdelt": []})
+    run_sweep(
+        Cfg(sources=("gdelt",), watchlist=("MYX:5183", "MYX:1155")),
+        "bursa_close",
+        corpus_path=corpus_db,
+        facts_path=facts_db,
+        link_graph=False,
+        adapter_for=adapters,
+        entity_index=INDEX,
+        clock=lambda: NOW,
+        log=lambda m: None,
+    )
+    queries = [kw.get("query", "") for name, kw in adapters.calls if name == "gdelt"]
+    joined = " | ".join(queries)
+    assert '"PCHEM"' in joined, joined
+    assert '"Maybank"' in joined, joined
+    # One request per company still: the aliases widen the query, they do not
+    # multiply the requests, which is what the three-names-per-run cap counts.
+    assert len(queries) == 2, queries
+
+
+def test_a_gdelt_name_with_no_askable_alias_is_skipped_not_sent(stores):
+    """A phrase under five characters is refused by the DOC API as plain text,
+    costing three retries and up to a 90s read. The name is skipped instead."""
+    corpus_db, facts_db = stores
+    adapters = RecordingAdapters({"gdelt": []})
+    run_sweep(
+        Cfg(sources=("gdelt",), watchlist=("MYX:9999",)),
+        "bursa_close",
+        corpus_path=corpus_db,
+        facts_path=facts_db,
+        link_graph=False,
+        adapter_for=adapters,
+        entity_index=INDEX,
+        clock=lambda: NOW,
+        log=lambda m: None,
+    )
+    assert not [kw for name, kw in adapters.calls if name == "gdelt"]

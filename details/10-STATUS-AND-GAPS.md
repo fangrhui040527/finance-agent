@@ -321,6 +321,35 @@ a time, keeping the row label. The Malaysian 10-year yield id in
 tables, so no free id exists and Taiwanese names use the US ten-year with the
 approximation stated.
 
+### Bursa coverage: the half of the book the corpus barely holds
+
+The book is six Bursa names and three Nasdaq names. The corpus is 1,968
+articles linked to the three US names and **62 to all six Malaysian ones**;
+`MYX:5183` (Petronas Chemicals) held **zero, all time**, and 857 of 2,671
+articles (32%) link to no instrument at all.
+
+Three causes, at different stages of fix:
+
+1. **The query asked for one name.** Both per-name sources took the first alias
+   in entities.yaml, so PCHEM and TNB — the forms the Malaysian press prints —
+   were never searched, though the linker has always known them. Google News:
+   fixed in [#60](https://github.com/fangrhui040527/finance-agent/pull/60).
+   GDELT: fixed here (`gdelt.search_query`). `TNB` and `IHH` remain unaskable on
+   GDELT alone, whose API refuses a phrase under five characters.
+2. **Four of the five Malaysian outlets are disabled.** thestar, edge and nst
+   answered 404 on 2026-09-04 and bernama dated nothing, so `fmt_business`
+   carries the whole Malaysian press by itself. One 404 on one guessed path is
+   not proof a publisher has no feed, and nothing here can reach a Malaysian
+   host to say otherwise. `.github/workflows/bursa-feeds-probe.yml` asks the
+   publishers directly — autodiscovery tags off their own pages, conventional
+   paths beside them, and a verdict per URL on whether its items carry DATES.
+   **This is the largest single lever on Bursa coverage and it is not yet
+   pulled: run the probe and enable whatever answers.**
+3. **GDELT reaches three names a run.** By design (`names_per_run=3`), because
+   84 name-failures over 30 sweeps were HTTP 429 and a refusal costs three
+   retries and up to a 90s read. Not a defect; it does mean each Bursa name
+   comes round every second or third run.
+
 ### The macro series that have stopped
 
 All fifteen DBnomics ids are **ended upstream**, confirmed by the 2026-09-06
