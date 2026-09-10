@@ -225,7 +225,14 @@ questions:
     title: Apple (AAPL)’s New Mac Mini and Studio Bet Big on On-Device AI
 - query: SPCX
   kind: lexical
-  note: a ticker that appears nowhere else
+  note: >-
+    A ticker whose whole corpus is labelled, not a sample. The note used to read
+    "appears nowhere else"; the 2026-09-09 us_close sweep collected a fourth
+    document carrying the token and the completeness guard named it, which is
+    what that guard is for. For a lexical question the criterion is containment,
+    so a new document carrying the token is a correct retrieval and belongs here
+    - leaving it out would have shown up as a search regression in the exact-token
+    MRR rather than as corpus growth.
   relevant:
   - doc_id: https://stocktwits.com/news-articles/markets/equity/s-and-p-500-dow-end-best-day-in-a-month/cZsufnBRJvu?.tsrc=rss
     title: S&P 500, Dow End Best Day In A Month On Calmer Yields As Rate Hike Bets Wane — SPCX, VSXY,
@@ -235,8 +242,8 @@ questions:
   - doc_id: https://www.fool.com/investing/2026/09/06/should-you-forget-spacex-spcx-stock/?.tsrc=rss
     title: Should You Forget SpaceX (SPCX) Stock?
   - doc_id: finnhub:141970797
-    title: SpaceX, Nvidia Lead Schwab Buys As Software Rally Spurs Profit-Taking – Trading Gauge Posts
-      First Dip Since April
+    title: SpaceX, Nvidia Lead Schwab Buys As Software Rally Spurs Profit-Taking –
+      Trading Gauge Posts First Dip Since April
 - query: KeyBanc Underweight rating Apple
   kind: lexical
   note: broker plus rating word

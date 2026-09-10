@@ -1,0 +1,302 @@
+{
+ "day": "2026-09-09",
+ "written_at": "2026-09-10T22:46:00Z",
+ "market": {
+  "regime": "neutral",
+  "notes": [
+   "SP500 7636.36 (-37.16); NASDAQCOM 26253.34 (-168.07); VIXCLS 16.46 (+0.74); BAMLH0A0HYM2 2.71 (+0.04)",
+   "XNAS:SPY -0.46% 1d, +0.08% 5d; all three Nasdaq names dated correctly to 2026-09-09",
+   "MYX:0820EA has NO close for 2026-09-09; there is no Malaysian market return on this page's day"
+  ]
+ },
+ "names": [
+  {
+   "instrument_id": "MYX:1155",
+   "move": {
+    "return_1d": -0.0038,
+    "market_1d": -0.011,
+    "unexplained_share": 0.61,
+    "sigma": 0.18,
+    "verdict": "not_significant",
+    "measured_to": "2026-09-08",
+    "actual_2026_09_09": -0.0076,
+    "decomposable_2026_09_09": false,
+    "why_not": "MYX:0820EA has no close for 2026-09-09"
+   },
+   "causes": [],
+   "open_questions": [],
+   "watch": []
+  },
+  {
+   "instrument_id": "MYX:5347",
+   "move": {
+    "return_1d": 0.0043,
+    "market_1d": -0.011,
+    "unexplained_share": 0.78,
+    "sigma": 0.76,
+    "verdict": "not_significant",
+    "measured_to": "2026-09-08",
+    "actual_2026_09_09": -0.0115,
+    "decomposable_2026_09_09": false,
+    "why_not": "MYX:0820EA has no close for 2026-09-09"
+   },
+   "causes": [
+    {
+     "claim": "interim single-tier dividend declared for FY2026, payable 2026-10-16",
+     "evidence": [
+      "https://news.google.com/rss/articles/CBMi6AFBVV95cUxOek1ULTI2dFl"
+     ],
+     "chain": [
+      "dividend declared",
+      "unknown: no collected evidence reaches further"
+     ],
+     "confidence": 0.1,
+     "confirm": "an ex-dividend date on or near 2026-09-09 in the fact book",
+     "refute": "sector peers fell as much on the session",
+     "note": "sign is wrong for the fall; offered only as the one collected item on the name, no causal claim made"
+    }
+   ],
+   "open_questions": [
+    "is the 5d move the results print the 2026-09-04 roundup headline referred to? (since 2026-09-04)"
+   ],
+   "watch": []
+  },
+  {
+   "instrument_id": "MYX:5183",
+   "move": {
+    "return_1d": 0.0395,
+    "market_1d": -0.011,
+    "unexplained_share": 0.71,
+    "sigma": 0.7,
+    "verdict": "not_significant",
+    "measured_to": "2026-09-08",
+    "actual_2026_09_09": 0.0179,
+    "decomposable_2026_09_09": false,
+    "why_not": "MYX:0820EA has no close for 2026-09-09",
+    "beta": -1.02,
+    "corpus_articles_all_time": 0,
+    "return_0907_to_0910": 0.1288
+   },
+   "causes": [],
+   "open_questions": [
+    "0 articles ever collected for MYX:5183 while the name is +12.8% over 09-07..09-10; the alias-widening fix is green and unmerged in PR #60 (since 2026-09-08)"
+   ],
+   "watch": []
+  },
+  {
+   "instrument_id": "MYX:5225",
+   "move": {
+    "return_1d": -0.0076,
+    "market_1d": -0.011,
+    "unexplained_share": 0.73,
+    "sigma": 0.44,
+    "verdict": "not_significant",
+    "measured_to": "2026-09-08",
+    "actual_2026_09_09": 0.0102,
+    "decomposable_2026_09_09": false,
+    "why_not": "MYX:0820EA has no close for 2026-09-09"
+   },
+   "causes": [],
+   "open_questions": [],
+   "watch": []
+  },
+  {
+   "instrument_id": "MYX:8869",
+   "move": {
+    "return_1d": -0.005,
+    "market_1d": -0.011,
+    "unexplained_share": 0.45,
+    "sigma": 0.13,
+    "verdict": "not_significant",
+    "measured_to": "2026-09-08",
+    "actual_2026_09_09": 0.005,
+    "decomposable_2026_09_09": false,
+    "why_not": "MYX:0820EA has no close for 2026-09-09",
+    "corpus_articles_all_time": 4
+   },
+   "causes": [],
+   "open_questions": [
+    "DBN:ALUMINIUM_USD, the series that would frame this name, is 466 days stale (since 2026-09-05)"
+   ],
+   "watch": []
+  },
+  {
+   "instrument_id": "MYX:3182",
+   "move": {
+    "return_1d": -0.0195,
+    "market_1d": -0.011,
+    "unexplained_share": 0.95,
+    "sigma": 0.9,
+    "verdict": "not_significant",
+    "measured_to": "2026-09-08",
+    "actual_2026_09_09": -0.0398,
+    "decomposable_2026_09_09": false,
+    "why_not": "MYX:0820EA has no close for 2026-09-09"
+   },
+   "causes": [
+    {
+     "claim": "S&P flagged Genting Bhd at risk of becoming a 'fallen angel' on expansion costs and subdued operating performance",
+     "evidence": [
+      "https://news.google.com/rss/articles/CBMi1wFBVV95cUxOQnJKdmVXMnJ",
+      "https://news.google.com/rss/articles/CBMiowFBVV95cUxObkxxa2tObEw"
+     ],
+     "chain": [
+      "fallen-angel risk flagged",
+      "expansion capital spending against subdued operating performance",
+      "unknown: no collected evidence reaches Genting's filings or the agencies' primary reports"
+     ],
+     "confidence": 0.35,
+     "confirm": "a Bursa announcement or agency primary release dated 2026-09-08/09, plus a proxy close for 09-09 showing the market did not fall similarly",
+     "refute": "the Malaysian market fell about 4% on 2026-09-09",
+     "note": "recorded as a pairing, not concluded: the session it would explain cannot be decomposed"
+    },
+    {
+     "claim": "Fitch forecast soft 2026 earnings for Resorts World Genting",
+     "evidence": [
+      "https://news.google.com/rss/articles/CBMilAFBVV95cUxOSE1JOEpiQl9"
+     ],
+     "chain": [
+      "soft 2026 earnings forecast",
+      "unknown: no primary Fitch release collected"
+     ],
+     "confidence": 0.3,
+     "confirm": "the Fitch release itself in the fact book",
+     "refute": "Genting Malaysia and Genting Bhd move apart on the session"
+    }
+   ],
+   "open_questions": [
+    "does the move survive as significant once the proxy is fixed? (since 2026-09-09)"
+   ],
+   "watch": [
+    {
+     "when": "2026-09-10",
+     "what": "+2.07% retrace to 1.9700; a one-day round trip argues liquidity, a sustained level argues re-rating"
+    }
+   ]
+  },
+  {
+   "instrument_id": "XNAS:NVDA",
+   "move": {
+    "return_1d": -0.0091,
+    "market_1d": -0.0046,
+    "unexplained_share": 0.03,
+    "sigma": 0.01,
+    "verdict": "not_significant",
+    "measured_to": "2026-09-09",
+    "beta": 1.7
+   },
+   "causes": [],
+   "open_questions": [
+    "filing or release for the Hugging Face transaction; 5-session idiosyncratic share above 50%? (since 2026-09-04)",
+    "Finnhub earnings rows for NVDA carry a knowable date in the future; which field is read as the report date? (since 2026-09-04)"
+   ],
+   "watch": []
+  },
+  {
+   "instrument_id": "XNAS:AAPL",
+   "move": {
+    "return_1d": -0.0028,
+    "market_1d": -0.0046,
+    "unexplained_share": 0.33,
+    "sigma": 0.09,
+    "verdict": "not_significant",
+    "measured_to": "2026-09-09",
+    "note": "first foldable iPhone unveiled 09-08/09-09, evidence finnhub:141952358, 258 stories from 108 sources, 91 escalated; idiosyncratic component 0.15pp"
+   },
+   "causes": [],
+   "open_questions": [],
+   "watch": []
+  },
+  {
+   "instrument_id": "XNAS:MSFT",
+   "move": {
+    "return_1d": -0.0047,
+    "market_1d": -0.0046,
+    "unexplained_share": 0.02,
+    "sigma": 0.0,
+    "verdict": "not_significant",
+    "measured_to": "2026-09-09"
+   },
+   "causes": [],
+   "open_questions": [],
+   "watch": []
+  }
+ ],
+ "data_quality": {
+  "failed": [
+   "twse_openapi: every table, non-JSON HTML response (watched list only, no book name affected)"
+  ],
+  "degraded": [
+   "gdelt: 2 of 3 names refused at 13:47 (Genting, Tenaga) and 2 of 3 at the 09-10 13:39 run (Press Metal, Maybank)",
+   "alphavantage_news: daily quota exhausted at 22:38",
+   "eodhd: every name deferred by the 2-a-day credit budget"
+  ],
+  "skipped": [],
+  "monitor_open": [
+   "fmp past cadence (86h, allowed 78h)",
+   "17 macro series past cadence, 12 of them DBnomics rows 436-497 days old"
+  ],
+  "findings": [
+   {
+    "name": "bursa_dating_fault",
+    "status": "mechanism found",
+    "detail": "MYX:0820EA, the FBM KLCI ETF used as the Malaysian market proxy (core/market/feed.py:419), has a median 2,800 shares/day over the last 60 sessions against Maybank's 11,027,500 (3,937x) and no trades at all on 164 of 1,231 sessions (13.3%). knowledge/pack.py:112 intersects name and proxy sessions and :120 takes the last; a blank proxy close silently shifts the whole Bursa half one session back.",
+    "instability": {
+     "2026-09-08": {
+      "fetched_2026-09-09": null,
+      "fetched_2026-09-10": 1.805
+     },
+     "2026-09-09": {
+      "fetched_2026-09-09": 1.82,
+      "fetched_2026-09-10": null
+     }
+    },
+    "cost_on_this_page": "six Bursa names on the wrong session; three of six have the wrong sign for 2026-09-09 (Tenaga, IHH, Press Metal); Petronas Chemicals is mis-sized not flipped (+3.95% reported, +1.79% actual); Genting -3.98% reported as -1.95% and not attributable",
+    "remedy_proposed": "^KLSE, the index itself, rather than an ETF tracking it",
+    "remedy_tested": false,
+    "remedy_untested_because": "Yahoo returns 403 through the sandbox proxy for every symbol, including ones that work on the runner",
+    "corrected_after_publication": "first published as 'four of six ... (Tenaga, PCHEM, IHH, Press Metal)'. PCHEM is positive on both sessions and does not flip. Three names flip."
+   },
+   {
+    "name": "gdelt_cap_premise",
+    "status": "open question answered: no",
+    "pre_cap": {
+     "asked": 234,
+     "refused": 87,
+     "rate": 0.37,
+     "runs_with_a_failure": 26
+    },
+    "post_cap": {
+     "asked": 15,
+     "refused": 9,
+     "rate": 0.6,
+     "runs": 5
+    },
+    "detail": "the refusal rate did not fall; on this sample it rose. 15 requests is too small to call the difference significant but is decisively inconsistent with a per-run quota that nine requests exhausted. PR #59 justified a correct change with an incorrect mechanism.",
+    "second_finding": "the cap only ever binds bursa_close: _window returns the whole list when cap >= len(terms), and us_close sweeps only the three Nasdaq names. Petronas Chemicals was deferred on two of the three capped runs while collecting nothing from Google News either."
+   },
+   {
+    "name": "us_close_cron",
+    "status": "correction to the 2026-09-07, 2026-09-08 and 2026-09-09 pages",
+    "detail": "the cron was never missing. All 11 scheduled runs in the record fired, late: bursa_close +4h16m..+5h43m, us_preopen +4h07m..+5h21m, us_close +1h59m..+2h16m. The routine fires at 22:34 UTC, inside the us_close delay window every night, so sweep --due reports it due and the catch-up dispatches a duplicate (runs 39, 43, 47, 51).",
+    "action_still_correct": "it is a pull-forward, not a catch-up: it puts today's US closes in the book about 40 minutes before the delayed cron, and the paper decision is taken in between. Cost: one extra ~3-minute run a night.",
+    "consequence": "the missed_slot monitor rule (task #50) is measuring GitHub's scheduling delay, not missed slots."
+   }
+  ]
+ },
+ "lessons": [
+  "A proxy must be at least as liquid as the things it explains; liquidity is a precondition for a benchmark, not a quality of it, and nothing in this system checked it before using one.",
+  "A change can be right and its justification wrong, and the justification is what the next person inherits.",
+  "'It did not run' and 'it has not run yet' are different findings, and a check that fires inside the delay window cannot tell them apart.",
+  "Marking a cause unknown is honest; it is not a substitute for looking again the next night."
+ ],
+ "corrections": [
+  {
+   "at": "2026-09-10T23:15:00Z",
+   "what": "the sign-flip count in the Bursa dating fault section",
+   "was": "four of six (Tenaga, PCHEM, IHH, Press Metal)",
+   "is": "three of six (Tenaga, IHH, Press Metal)",
+   "why": "Petronas Chemicals is +3.95% on the reported session and +1.79% on the real one - mis-sized, not sign-flipped"
+  }
+ ]
+}
