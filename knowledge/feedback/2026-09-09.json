@@ -251,10 +251,11 @@
       "fetched_2026-09-10": null
      }
     },
-    "cost_on_this_page": "six Bursa names on the wrong session; four of six have the wrong sign for 2026-09-09 (Tenaga, PCHEM, IHH, Press Metal); Genting -3.98% reported as -1.95% and not attributable",
+    "cost_on_this_page": "six Bursa names on the wrong session; three of six have the wrong sign for 2026-09-09 (Tenaga, IHH, Press Metal); Petronas Chemicals is mis-sized not flipped (+3.95% reported, +1.79% actual); Genting -3.98% reported as -1.95% and not attributable",
     "remedy_proposed": "^KLSE, the index itself, rather than an ETF tracking it",
     "remedy_tested": false,
-    "remedy_untested_because": "Yahoo returns 403 through the sandbox proxy for every symbol, including ones that work on the runner"
+    "remedy_untested_because": "Yahoo returns 403 through the sandbox proxy for every symbol, including ones that work on the runner",
+    "corrected_after_publication": "first published as 'four of six ... (Tenaga, PCHEM, IHH, Press Metal)'. PCHEM is positive on both sessions and does not flip. Three names flip."
    },
    {
     "name": "gdelt_cap_premise",
@@ -288,5 +289,14 @@
   "A change can be right and its justification wrong, and the justification is what the next person inherits.",
   "'It did not run' and 'it has not run yet' are different findings, and a check that fires inside the delay window cannot tell them apart.",
   "Marking a cause unknown is honest; it is not a substitute for looking again the next night."
+ ],
+ "corrections": [
+  {
+   "at": "2026-09-10T23:15:00Z",
+   "what": "the sign-flip count in the Bursa dating fault section",
+   "was": "four of six (Tenaga, PCHEM, IHH, Press Metal)",
+   "is": "three of six (Tenaga, IHH, Press Metal)",
+   "why": "Petronas Chemicals is +3.95% on the reported session and +1.79% on the real one - mis-sized, not sign-flipped"
+  }
  ]
 }
