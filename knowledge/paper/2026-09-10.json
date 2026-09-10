@@ -1,0 +1,199 @@
+{
+ "day": "2026-09-10",
+ "written_at": "2026-09-10T22:52:00Z",
+ "phase": "observe",
+ "equity_usd": 1000.0,
+ "cash_usd": 1000.0,
+ "control_equity_usd": 1000.0,
+ "drawdown": 0.0,
+ "halted": false,
+ "positions": [],
+ "changes": [],
+ "caps": [
+  {
+   "cap": "largest_name",
+   "value": "0.00%",
+   "limit": "25%",
+   "breached": false
+  },
+  {
+   "cap": "invested",
+   "value": "0.00%",
+   "limit": "0%",
+   "breached": false
+  },
+  {
+   "cap": "cash_floor",
+   "value": "100.00%",
+   "limit": "20%",
+   "breached": false
+  },
+  {
+   "cap": "names_held",
+   "value": "0",
+   "limit": "0",
+   "breached": false
+  },
+  {
+   "cap": "drawdown_from_peak",
+   "value": "0.00%",
+   "limit": "8%",
+   "breached": false
+  },
+  {
+   "cap": "turnover_5_weekdays_usd",
+   "value": "0.00",
+   "limit": "500.00",
+   "breached": false
+  }
+ ],
+ "attribution": null,
+ "attribution_note": "no positions held; nothing to attribute",
+ "fx": {
+  "myr_per_usd": 4.066,
+  "source": "bnm",
+  "asof": "2026-09-10",
+  "basis": "mid"
+ },
+ "decision": {
+  "recorded": true,
+  "weights": {},
+  "targets_written": 0,
+  "predictions_logged": 0,
+  "thesis": "All cash. The book's largest and most sustained move, Petronas Chemicals +12.8% over four sessions, has zero collected evidence of any kind - ask.py facts returns NOTHING COLLECTED - so there is no thesis to write, only a price. The name with the most evidence, Genting, has evidence that argues against holding it: fallen-angel risk from S&P, soft 2026 earnings from Fitch. Every other name is not_significant on the decomposition, and the six Bursa names cannot be decomposed for 2026-09-09 at all because the market proxy did not trade.",
+  "refusals": [],
+  "cli_output": "recorded 0 target(s) for 2026-09-10 (week 1, observe: decisions are logged and graded, never applied), sized against equity USD 1,000.00 / observe phase: this is logged and will be graded; it is not applied"
+ },
+ "fundable": [
+  {
+   "instrument_id": "MYX:1155",
+   "lot": 100,
+   "close": "10.4600",
+   "ccy": "MYR",
+   "usd": 257.26,
+   "weight": 0.257,
+   "round_trip": 0.0113,
+   "lots": 0
+  },
+  {
+   "instrument_id": "MYX:5347",
+   "lot": 100,
+   "close": "13.7200",
+   "ccy": "MYR",
+   "usd": 337.43,
+   "weight": 0.337,
+   "round_trip": 0.0089,
+   "lots": 0
+  },
+  {
+   "instrument_id": "MYX:5183",
+   "lot": 100,
+   "close": "4.8200",
+   "ccy": "MYR",
+   "usd": 118.54,
+   "weight": 0.119,
+   "round_trip": 0.0189,
+   "lots": 2
+  },
+  {
+   "instrument_id": "MYX:5225",
+   "lot": 100,
+   "close": "7.8900",
+   "ccy": "MYR",
+   "usd": 194.05,
+   "weight": 0.194,
+   "round_trip": 0.012,
+   "lots": 1
+  },
+  {
+   "instrument_id": "MYX:8869",
+   "lot": 100,
+   "close": "7.8900",
+   "ccy": "MYR",
+   "usd": 194.05,
+   "weight": 0.194,
+   "round_trip": 0.012,
+   "lots": 1
+  },
+  {
+   "instrument_id": "MYX:3182",
+   "lot": 100,
+   "close": "1.9700",
+   "ccy": "MYR",
+   "usd": 48.45,
+   "weight": 0.048,
+   "round_trip": 0.0443,
+   "lots": 5
+  },
+  {
+   "instrument_id": "XNAS:NVDA",
+   "lot": 1,
+   "close": "218.7700",
+   "ccy": "USD",
+   "usd": 218.77,
+   "weight": 0.219,
+   "round_trip": 0.0118,
+   "lots": 1
+  },
+  {
+   "instrument_id": "XNAS:AAPL",
+   "lot": 1,
+   "close": "321.3900",
+   "ccy": "USD",
+   "usd": 321.39,
+   "weight": 0.321,
+   "round_trip": 0.0089,
+   "lots": 0
+  },
+  {
+   "instrument_id": "XNAS:MSFT",
+   "lot": 1,
+   "close": "487.5000",
+   "ccy": "USD",
+   "usd": 487.5,
+   "weight": 0.488,
+   "round_trip": 0.0067,
+   "lots": 0
+  }
+ ],
+ "findings": [
+  {
+   "name": "all_cash_writes_nothing",
+   "status": "re-measured; previous framing corrected",
+   "detail": "the observe phase logs and grades non-cash targets; it only declines to apply them. A dry run of MYX:5183=0.12 would have written 1 target and logged prediction paper-2026-09-10-myx5183-21d-e215 grading 2026-10-10. So the empty ledger after three observe nights is entirely due to all-cash writing no row, not to the phase.",
+   "probe_11pct": "REFUSED: [lot] MYX:5183: 11.00% is below one lot (USD 118.54 = 11.9% of equity)",
+   "stores_after_tonight": {
+    "paper.targets": 0,
+    "paper.applications": 0,
+    "paper.position_changes": 0,
+    "learning.predictions": 0,
+    "databases_modified": false
+   },
+   "corrects": [
+    "knowledge/paper/2026-09-08.md",
+    "knowledge/paper/2026-09-09.md"
+   ]
+  },
+  {
+   "name": "petronas_chemicals_zero_evidence",
+   "detail": "MYX:5183 is +12.8% over 2026-09-07..2026-09-10 (4.2700 -> 4.8200), +5.93% today on 9,040,300 shares against a 60-session median of 5,973,500, is fundable at 2 lots, and ask.py facts returns NOTHING COLLECTED. 0 articles in the corpus, ever.",
+   "not_held_because": "no thesis, only a price",
+   "fix": "PR #60, green and unmerged"
+  },
+  {
+   "name": "genting_evidence_points_away",
+   "detail": "S&P fallen-angel flag (09-08, 09-09), Fitch soft 2026 earnings (09-08), a third outlet on downgrade risk (09-09). Long-only book, so coherent negative evidence produces no position.",
+   "round_trip": 0.0443,
+   "round_trip_previous": 0.0452
+  }
+ ],
+ "mistakes": [
+  "The 2026-09-08 and 2026-09-09 pages framed the empty ledger as a property of the observe phase. It is not: a dry run tonight showed a non-cash target would be recorded and would log a gradeable prediction. The cause is all-cash writing no row.",
+  "Carried three nights: ask.py paper decide prints 'this is logged and will be graded' on an input where nothing is logged and nothing can be graded."
+ ],
+ "lessons": [
+  "A phase that logs but does not apply still needs something to log; a book that only ever decides nothing cannot be told apart from a book that is broken.",
+  "Price without evidence is not a thesis, however large the move; the book's best performer is also the one name with an empty store, and those facts are related through the collector, not the company.",
+  "When an instrument's behaviour is attributed to a rule, check the rule."
+ ]
+}
