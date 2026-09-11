@@ -1,0 +1,1220 @@
+{
+  "collection": [
+    {
+      "at": "2026-09-11T13:37:45.392092+00:00",
+      "detail": "facts 0; MYX:1155: deferred by the 2-a-day credit budget; next in rotation; MYX:5347: deferred by the 2-a-day credit budget; next in rotation; MYX:5183: deferred by the 2-a-day credit budget; next in rotation; MYX:5225: deferred by the 2-a-day credit budget; next in rotation; outside the free plan (US only), so not asked for: MYX:1155, MYX:5347, MYX:5183, MYX:5225. The EODHD Fundamentals plan cove",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-11T13:37:45.304374+00:00",
+      "detail": "facts 5; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-11T13:37:29.307345+00:00",
+      "detail": "facts 0; ",
+      "fetched": 18,
+      "kept": 10,
+      "source": "jin10_flash",
+      "status": "ok",
+      "stored": 7
+    },
+    {
+      "at": "2026-09-11T13:37:28.239642+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-11T13:37:26.668094+00:00",
+      "detail": "",
+      "fetched": 50,
+      "kept": 50,
+      "source": "nst_business",
+      "status": "ok",
+      "stored": 50
+    },
+    {
+      "at": "2026-09-11T13:37:26.525960+00:00",
+      "detail": "",
+      "fetched": 50,
+      "kept": 50,
+      "source": "fmt_business",
+      "status": "ok",
+      "stored": 50
+    },
+    {
+      "at": "2026-09-11T13:37:26.410779+00:00",
+      "detail": "read but empty: Tenaga, Petronas Chemicals, IHH, Press Metal, Genting; named the company: 1 of 1 (lowest: Maybank 1/1)",
+      "fetched": 1,
+      "kept": 1,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 1
+    },
+    {
+      "at": "2026-09-11T13:37:25.076660+00:00",
+      "detail": "named the company: 26 of 55 (lowest: Press Metal 0/3, Tenaga 2/10, Genting 1/2)",
+      "fetched": 57,
+      "kept": 55,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 47
+    },
+    {
+      "at": "2026-09-11T13:37:23.282495+00:00",
+      "detail": "failed: Tenaga, Petronas Chemicals; named the company: 0 of 1 (lowest: IHH 0/1); deferred to a later run: Press Metal, Genting, Maybank",
+      "fetched": 1,
+      "kept": 1,
+      "source": "gdelt",
+      "status": "ok",
+      "stored": 1
+    }
+  ],
+  "counts": {
+    "articles": 3374,
+    "documents": 0,
+    "escalated": 784,
+    "events": 3974,
+    "failed_sweeps": 16,
+    "linked": 2300,
+    "observations": 4499,
+    "series": 29,
+    "sweeps": 208
+  },
+  "day": "2026-09-11",
+  "generated_at": "2026-09-11 13:37 UTC",
+  "macro": [
+    {
+      "change": "0.04",
+      "obs_date": "2026-09-09",
+      "series_id": "BAMLH0A0HYM2",
+      "source": "fred",
+      "title": "ICE BofA US high-yield option-adjusted spread, %",
+      "value": "2.71"
+    },
+    {
+      "change": "0",
+      "obs_date": "2026-09-03",
+      "series_id": "BNM:OPR",
+      "source": "bnm_opr",
+      "title": "BNM Overnight Policy Rate, %",
+      "value": "2.75"
+    },
+    {
+      "change": null,
+      "obs_date": "2026-07-01",
+      "series_id": "CPIAUCSL",
+      "source": "fred",
+      "title": "US CPI, all items, index 1982-84=100",
+      "value": "332.81"
+    },
+    {
+      "change": "0.0021",
+      "obs_date": "2026-09-04",
+      "series_id": "DEXMAUS",
+      "source": "fred",
+      "title": "Malaysian ringgit per US dollar",
+      "value": "4.04"
+    },
+    {
+      "change": "0",
+      "obs_date": "2026-09-08",
+      "series_id": "DFF",
+      "source": "fred",
+      "title": "Federal funds effective rate, %",
+      "value": "3.63"
+    },
+    {
+      "change": "0.02",
+      "obs_date": "2026-09-08",
+      "series_id": "DGS10",
+      "source": "fred",
+      "title": "10-year Treasury yield, %",
+      "value": "4.80"
+    },
+    {
+      "change": "0.02",
+      "obs_date": "2026-09-08",
+      "series_id": "DGS2",
+      "source": "fred",
+      "title": "2-year Treasury yield, %",
+      "value": "4.39"
+    },
+    {
+      "change": "0",
+      "obs_date": "2026-07-01",
+      "series_id": "DOSM:CPI_HEADLINE",
+      "source": "dosm_cpi",
+      "title": "Malaysia CPI headline, index 2010=100",
+      "value": "137.10"
+    },
+    {
+      "change": "-0.0538",
+      "obs_date": "2026-09-04",
+      "series_id": "DTWEXBGS",
+      "source": "fred",
+      "title": "Broad US dollar index",
+      "value": "118.07"
+    },
+    {
+      "change": "-168.07",
+      "obs_date": "2026-09-09",
+      "series_id": "NASDAQCOM",
+      "source": "fred",
+      "title": "NASDAQ Composite, index level",
+      "value": "26,253.34"
+    },
+    {
+      "change": "-37.16",
+      "obs_date": "2026-09-09",
+      "series_id": "SP500",
+      "source": "fred",
+      "title": "S&P 500, index level",
+      "value": "7,636.36"
+    },
+    {
+      "change": "-0.01",
+      "obs_date": "2026-09-09",
+      "series_id": "T10Y2Y",
+      "source": "fred",
+      "title": "10y minus 2y Treasury spread, %",
+      "value": "0.40"
+    },
+    {
+      "change": "0",
+      "obs_date": "2026-08-01",
+      "series_id": "UNRATE",
+      "source": "fred",
+      "title": "US unemployment rate, %",
+      "value": "4.10"
+    },
+    {
+      "change": "0.74",
+      "obs_date": "2026-09-09",
+      "series_id": "VIXCLS",
+      "source": "fred",
+      "title": "CBOE VIX, index",
+      "value": "16.46"
+    }
+  ],
+  "names": [
+    {
+      "escalated": 0,
+      "events": [],
+      "instrument_id": "MYX:1155",
+      "label": "Maybank",
+      "snapshot": [],
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE5kaEFlNk1IWkFoaEwxd1BxZm9hZHY3TW1CMlZTNFFlWGl6UElOZGh2cXVDVG9OZThRMVNOZ2IzS3lVQnFxMDBBWHhlNmo1Rm00?oc=5",
+          "domain": "theedgemalaysia.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-11T07:30:33+00:00",
+          "quality": 0.8,
+          "title": "Public Bank, Maybank, Hektar REIT, Cuscapi, Heitech Padu, Excel Force MSC, Theta Edge, Favelle Favco, TRC Synergy, QES",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiUEFVX3lxTFA0ODZfemE5d2NDSW9wSGkzandVdldwSHRMcDVwVUxTaW5XQzZJU3FHYUpUVV85aVZ6d2o4bGFfLWR1UFNEWl9YNXpDQmJTZ25O?oc=5",
+          "domain": "theedgemalaysia.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-11T06:09:12+00:00",
+          "quality": 0.8,
+          "title": "Maybank fully acquires Etiqa\u2019s holding company",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxNdzZXbFI4WDBqU041dlhxS3pZQkVGY3VWZmtKbmhUa19RUTFla01PMGZnXzRyZ3hKRXE3M01wX1haUGRwaVd4X0RQcGxhd3F4aFJvNzQ4TE03MThjSlFwRUxVOXppY3B4X1FRNnlETjF3MDRXLUlnOUhSeWluNl9CbGVMQkc5a3NGbm5wNUJpTFZ5VzFndF9NQk8yNjkxMFluN0h5MlVQaXdGTnlLOUlYMmdqZldHeW43ZlhTRUJJYWcwd1NEMEI0Nw?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-11T05:31:00+00:00",
+          "quality": 0.8,
+          "title": "Maybank completes acquisition of remaining interest in Maybank Ageas",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMinAFBVV95cUxQc3Y0d0pRZDRrY0hqb1RwcnUzc2huYUZaeFlWOUJ1VjRaTGVHRW5ydWtlaDdORGtjNnRYSDg4ZzRkZWJqMlpCdW5JclVYQXZxaUZjTzRhcHpyT2pQT1J3OVlpTWQ2c1M4RmRHbThndmp0RFRvT19iT1VRb1I5VGloeWhrVTVndVdkaXh4NmNMbjNNVDRhRmprWW9fUG4?oc=5",
+          "domain": "www.nst.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-11T05:25:04+00:00",
+          "quality": 0.8,
+          "title": "Maybank completes Maybank Ageas buyout",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiygFBVV95cUxPMDRSNVZUVTFsd1NhYlZMRms4d1NVM2tGSVNrQ1FiQjFzLXhQakpiNVNQdlJWS0NzdXE2bm8tZ1h0cE9wLU4xZDY1aW96dGt4UWRSQVN0amo4TmNiVjFkX1pCWFNzM3JiTXNOaVA2VG54aGNyZEU4N1dBSEM4RkNZbnROVDQyS185RllPMGFGdHRIaTJNNzFyaUh3d1pwbnd1OXJWaXN3aHZwWVlmV3NUamhXa0FTSjl6LWYxRFZVSHFfVUZkQzJUYXlR?oc=5",
+          "domain": "technode.global",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-11T08:17:49+00:00",
+          "quality": 0.65,
+          "title": "Belgium's insurer Ageas completes \u20ac1.1B sale of Maybank insurance stake, exiting 25-year venture",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMivgFBVV95cUxNd2k0c0x5MzRVNzdHZnBlcXBuQlpvaDRHVzVFMUtRTXlpOFVfSi1fMHJrZ3l3SVdDelBxX1d6UV95Rk9DLTRjVEQ2dTg1NUFjWnRBVHBVd0phM2ZyekI3WHJqdmJtUExKRUJDYk1CbU1VN0hyOVVmaEpsTjBBSTBLbHFMdElENk1kbmV4TldUTlExNkZzeS1ROThud1pUWkprNHV3YzVVNk1nazBoS19NRzJQQ2pfLUtVbmVBbFdn?oc=5",
+          "domain": "www.tipranks.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-11T05:54:33+00:00",
+          "quality": 0.65,
+          "title": "Ageas unlocks EUR 1.1 billion by exiting Maybank Ageas Holdings stake",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMitwFBVV95cUxPb0dKUDkzNUxQVjBiVjkzOTl1WW84cWQ5eTlyZ0c3ZEp1aDloQk9OYmRwSkpLaktXcEk5NTVWby0zNWxFd3o1anlxbFhXODdkaExQS1c4MF9rUGJjN3lwemJkcHNISTlJRm1VMUJ4VXhLVDBPcVo5OHlqTk1KUGtKTGR6SFFxQkdKT1lPV2s2VThwck0wZ0FHUWN2SEZsNHdGcnhCbjl1eFV4eUs5eEJFU3lEYWJvTUE?oc=5",
+          "domain": "fintechnews.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-11T05:44:57+00:00",
+          "quality": 0.65,
+          "title": "Public Bank, Maybank and CIMB Among Eight Malaysian Banks on Forbes\u2019 Global List",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMivgFBVV95cUxNNHFfY2otajg4TUxUU3FEMEcyXzhtSHBHZGRGazIyb0R1aXVxNDJRMDNEZFI4aDk5Tkh0SEVTb1RMTWx3eXBqVVhKOVhPMEVyQmtxTzd0d012VUlqaExhZkx4dU5lWkRPb3ZKWTUwTmNUbUthNDQ3SU9WakgyX0ZDUlhjM0VGcEd4SlZtOVFLTHpGODVkYnlVSW90Z292ZVp0eGxZeHNZVmQ2a2JfWnBEUVRZdjBJdnNyd0s4Y0tn?oc=5",
+          "domain": "www.marketscreener.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-11T05:26:12+00:00",
+          "quality": 0.65,
+          "title": "Malayan Banking Closes 31% Stake in Maybank Ageas for MYR4.83 Billion",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 11,
+        "polarity_mean": 0.0,
+        "sources": 9,
+        "uncertainty_mean": 0.0
+      },
+      "upcoming": []
+    },
+    {
+      "escalated": 0,
+      "events": [],
+      "instrument_id": "MYX:5347",
+      "label": "Tenaga",
+      "snapshot": [],
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMid0FVX3lxTFBIcUtPS1ZvbHU5TU5wZVFPenhHZnQ2MlNlTjRNd1diMzNYbkdzakEyNHhDX0wwZTFTYXNSN1F6MEdGVzdNekRXSkNHU25aS21HUkZ5N0VoNWNaWE84UUJ0ZkE1VzRpU2NHcGRkSnZnd3k3d1N6Y2gw?oc=5",
+          "domain": "www.moomoo.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-11T05:21:53+00:00",
+          "quality": 0.65,
+          "title": "$TENAGA (5347.MY)$",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiWkFVX3lxTE14LTlKd29SNFBKN2M5S2VuNUxPUGQ3aE5PQkFqWlBGZDZKR3h2anFGY3dhakxJR1hSS3hUb3J1c3U0LVI4d3B4ZVF0T3ZEN2xyWTZzbW9tQVdzUQ?oc=5",
+          "domain": "www.bernamabiz.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-11T01:48:20+00:00",
+          "quality": 0.65,
+          "title": "Workforce With Right Capabilities And Skills Vital In Powering Malaysia\u2019s Energy Transition - TNB Official",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 2,
+        "polarity_mean": 0.0,
+        "sources": 2,
+        "uncertainty_mean": 0.0
+      },
+      "upcoming": []
+    },
+    {
+      "escalated": 0,
+      "events": [],
+      "instrument_id": "MYX:5183",
+      "label": "Petronas Chemicals",
+      "snapshot": [],
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMidkFVX3lxTE52M1NKcEI3dkRBcFBjTVhQT3ozc1I0MGZuMWl3Y0htVVFVWXpmQm9fNGtUclV4eFZTS0VQQUN0dDVzUThUWTFnYzJINU9sV2FqV1JZLWRGNjU0Z2lBZHd2eXhtZHZPYm5kRGNFZVA5ZHYzbDJzb1E?oc=5",
+          "domain": "www.moomoo.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-11T04:13:06+00:00",
+          "quality": 0.65,
+          "title": "$PCHEM (5183.MY)$",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMinwFBVV95cUxNWVo0Q2JUd0FfUDFyZ0FkMU91M0hKejJtc0kzcnhQQjMyeVBlRUNDV3VwNEV4UnctWmlEckFZYVZRYS1FelA2ekNQaHJnVjBITnpLN0hVUm1WNFFJS2czYnNpWjRGVTRJUmlWQUE3TERaMWZXcHNzeUtGOGtodmNOcWI2OTBMOWg2OXhPeS1ubFZySFBuTkV1bHozOXFHaDQ?oc=5",
+          "domain": "www.moomoo.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-11T02:09:41+00:00",
+          "quality": 0.65,
+          "title": "$PCHEM (5183.MY)$ OMG!!! My mom got FREE RM188 here wowww, some of the users got RM88 and RM100 too today\ud83d\ude06sharing luck here hope you guys get the top tier rewards \ud83c\udf40[Share Link: MY 2026 Mid-Autumn Festival]",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 2,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
+      "upcoming": []
+    },
+    {
+      "escalated": 2,
+      "events": [],
+      "instrument_id": "MYX:5225",
+      "label": "IHH",
+      "snapshot": [],
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE5GZmJ3ZG1GN0N5TndoTG04ZC1obWg0SDhabldFeVA1LTVjZnJZQmVCWVNQQi1ZUTBTWldSZmN2MnNqV0dCLUdjc2VEWnA3YlJR?oc=5",
+          "domain": "theedgemalaysia.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-09-11T11:15:38+00:00",
+          "quality": 0.8,
+          "title": "IHH maintains it suffered losses from Fortis deal delays after \u00a5200 bil claim rejected",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxPZ3N0bFJzZnlHVjdVQTdnNGVpV0h2eWQ2OFozTXlFbXlxVWhOU2xKeEl4Y0hJS2trcmVTVlNOamh5Z0RlMTMyOVlnZHJZTC1mcFBYcE1iMXV3RmtRaHl0NmU4ZEJ5TlIwMS1Od0g5Z3RyLWxySUg1cHBfMW9wNENHbFozT20tUmstZ0RhN05yZFJfTmZqVjFBSmZKakF4MVhpc1k3X21vN2NxeUF1eVN1aHFNYXlGdWh2dDdxbE1wZ3FXVEQxbE5FdQ?oc=5",
+          "domain": "www.nst.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-09-11T10:49:11+00:00",
+          "quality": 0.8,
+          "title": "IHH maintains claim on Fortis losses, respects court decision",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMizAFBVV95cUxOcW8zbWZZQThGVXh0Q0xWV2RITi1jOU9qTjEySlFKTVlCenphUEF3cXFKaDNiZWZ4UVdQVHZFdWI5R2kwUkIwTjFHZGFpYk5kNF9PZ3FKVE5PUkluUzNldkZNcG03VHlJcTZmYnRna3RqbjNZOXc5VG9YZDdTQm4tWndpdU9UdXkwLVlPZU5pX01JQmhHcVdYYjRSZzUxY3BCMDZTVDBFVlZTM3BTRTJabjllb1o0TWNDOV9VbHRWUEgtbFh6Ylo3V2FjdDU?oc=5",
+          "domain": "themalaysianreserve.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-11T10:57:10+00:00",
+          "quality": 0.8,
+          "title": "IHH unit disagrees with Tokyo court ruling over Fortis dispute, evaluating legal remedies",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxObERHM3lCUHgyX3drWGE2ajE5cUo2QVpNT3JqM3JOT0RQcUplaWtzRU9tczZPTXBLM2Y5YUNEYl9NaWZHazl6blc4M3NzZVdvbGZnb2VQMWVBY3lpRUM3cXhIUlVQRjBWMmJxRGRIMDVpMU83Rm0yZXR2Q28xUWVmVXk4TUprdEZsMWtieFhSZVRzdmphcTZ2SUJYNFJLT0c4TEp0WDhQQzZ1WW5tS3ZzNC1EaGdybE4yYzVQb2NOeEk1dw?oc=5",
+          "domain": "www.businesstoday.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-11T10:08:56+00:00",
+          "quality": 0.8,
+          "title": "IHH Healthcare Unit, NTK Disagrees With Tokyo Court Ruling, Weighs Further Action",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMirwJBVV95cUxQTk1RRXpYQkgtSnhmUlh4RHptV2RvdVZ6eFQ2bFB3aGhWM0x6MExROF93MHFpbGJGU05hbkxPTFg5bVNpRkhJRXB2V1pxX2pFU2IwUkFZMzg2WV9lSVkyZFpUNVRoc0ZDc1BTbjk3aFNJTldtVDRhQ183b29DUjhUZExWdnRnUlpBQWhLMlRpOU4wNnQxV3JXTUpEZ2ZsMFRJRUN4RE16UVN2UHU3VUpmcUc5TkZ1cmY1ZVRENGdBb0NEaE13bGJUOFB6emVITEtudktYM3pleU95bEtBWDQySnR5NDRBMGFkUC1oVTZza0pDVVdnX1piU2MxbGZTOFpHa1J4VnFCaEdCenNMTzkxSlM2aklKdnZxc21WOE5OWHZod2R4QUNhMmJxbWpxQlk?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-11T00:21:00+00:00",
+          "quality": 0.8,
+          "title": "Trading ideas: Paragon Globe, HE, AME Elite, New Hoong Fatt, IHH, Gamuda, Parkson, Cape EMS, LSH Capital, Country Heights, Techna-X, Alam Maritim, Bermaz Auto",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMitwFBVV95cUxNdlEta0thYXA5Y2pkV1VvYlA2c01fZ1diN3dVZUVrTTNHWHFZN0pGdWJfSGFnby01MExvTGNEdERydHdxWkpTZ295Ty1tMXJBZzAycGxVNlFaQVFyaXgzLXUtWVQzY1kzNHAyQUU2VkFZR3BlU05PdF9WUHVMX1RHcldFUHo4eGZkOGFtVEtTLVl4QVJjWEExc0Ria19wdC1LNTF0TlRWWE5vcjZHc05tMjJBWTZCcUk?oc=5",
+          "domain": "www.nst.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-10T12:41:12+00:00",
+          "quality": 0.8,
+          "title": "IHH Healthcare unit loses RM5.7bil claim against Japan's pharmaceutical giant",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMi0AFBVV95cUxOVXFvQ1N3bjNDYWwzcExxT0N2MzVFZUpRa1FDbFE2SlFIVXQ4LTJKZUxVYmJHTGxtalRPR2lGOEhSNUZma1dFbmJUTnVEOWkteGhWX1VEaEw2STdocTlYYjcwZmVFRmhjS3p2Z3ZPbnZ4U2lyTWRmdVVFQ2gwN3dFMXpaUzhZWTRpUFJyZTUwWmRnbkV4dU9Ra05uZzlzUHhmTVVhcGRpeG1OR1Q2dTlZbjFWeHRiZVZWM2ZYQVoxZ2lrNW5pM1d4b3p1dmhlOUJG?oc=5",
+          "domain": "www.tipranks.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-11T08:03:15+00:00",
+          "quality": 0.65,
+          "title": "Fortis, IHH Update Markets as Tokyo Court Dismisses NTK Claim Against Daiichi Sankyo",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMizgFBVV95cUxOVUJ0TUlpaEJDMXpMWThiOEJRci15aWJmU0o4TFRZZE83eFBtaEU1TE1BWDEzaUpFbnBSekFDX3JtemdtLWJIZUd6MUFGcjRQUUFPVVVULUN5VjRnOTVuX1dhaFpaVy1rbXFrczhjUF9GSFdETVZXcHBicWRHbU9WM1BxZ0hRRDRMZWEzZWdjRnFfMXByMHhzTFIwZUt1djZWR2hWUUpJUUgtQ2lxRUs4WkN6RlB4NG9fdFEtMUhURkdhSDdyQy1KVVVmN1BFZw?oc=5",
+          "domain": "www.whalesbook.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-11T06:21:50+00:00",
+          "quality": 0.65,
+          "title": "Tokyo Court \u0a26\u0a3e \u0a35\u0a71\u0a21\u0a3e \u0a2b\u0a48\u0a38\u0a32\u0a3e: IHH Healthcare \u0a26\u0a47 **$1.25 \u0a2c\u0a3f\u0a32\u0a40\u0a05\u0a28** \u0a26\u0a47 \u0a26\u0a3e\u0a05\u0a35\u0a47 \u0a28\u0a42\u0a70 \u0a15\u0a40\u0a24\u0a3e \u0a16\u0a3e\u0a30\u0a1c",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 12,
+        "polarity_mean": -0.167,
+        "sources": 10,
+        "uncertainty_mean": 0.0
+      },
+      "upcoming": []
+    },
+    {
+      "escalated": 0,
+      "events": [],
+      "instrument_id": "MYX:8869",
+      "label": "Press Metal",
+      "snapshot": [],
+      "stories": [],
+      "tone": {},
+      "upcoming": []
+    },
+    {
+      "escalated": 1,
+      "events": [],
+      "instrument_id": "MYX:3182",
+      "label": "Genting",
+      "snapshot": [],
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMixwFBVV95cUxNcXZnOGlvTmZ4aDhqTlZIVDE2aUF0OGNacUFhREowOWQ0Uld0bWJIZ2UwWVRUcVhEYVVSb3Y1Uy03VEE1bnZNS2tUSUItTEtFOXhFbkFIZXdqMnk5bTlxU1BiYnVFcnROR1V0XzVxTDktSzVuZ0tla3J2YkZHeTlSY2pSRlRFRGVTRHpFUEQ2UTdGd3dJVGhtTXUweTNsb0J0T1lVaFh4czZVRjh1UldJRk13eDZ3M0ZWd2ljYWNTVkl5S3VtVkxz?oc=5",
+          "domain": "www.therakyatpost.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-11T04:40:11+00:00",
+          "quality": 0.65,
+          "title": "More Brands, More Space? Genting Highlands Premium Outlets Has Big Plans For 2027 - TRP",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
+      "upcoming": []
+    },
+    {
+      "escalated": 36,
+      "events": [],
+      "instrument_id": "XNAS:NVDA",
+      "label": "NVIDIA",
+      "snapshot": [
+        {
+          "concept": "pe_ttm",
+          "known_at": "2026-09-10",
+          "label": "P/E (ttm)",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "28.07"
+        },
+        {
+          "concept": "pb",
+          "known_at": "2026-09-05",
+          "label": "P/B",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "28.81"
+        },
+        {
+          "concept": "eps_ttm",
+          "known_at": "2026-09-05",
+          "label": "EPS (ttm)",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "7.91"
+        },
+        {
+          "concept": "dividend_yield",
+          "known_at": "2026-09-05",
+          "label": "dividend yield",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "0.03"
+        },
+        {
+          "concept": "beta",
+          "known_at": "2026-09-10",
+          "label": "beta",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "2.22"
+        },
+        {
+          "concept": "high_52w",
+          "known_at": "2026-09-05",
+          "label": "52w high",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "236.54"
+        },
+        {
+          "concept": "low_52w",
+          "known_at": "2026-09-10",
+          "label": "52w low",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "164.27"
+        },
+        {
+          "concept": "price_target_consensus",
+          "known_at": "2026-09-05",
+          "label": "target (consensus)",
+          "period_end": null,
+          "source": "fmp",
+          "value": "345.21"
+        },
+        {
+          "concept": "analyst_buy",
+          "known_at": "2026-09-05",
+          "label": "analysts: buy",
+          "period_end": "2026-09-01",
+          "source": "finnhub",
+          "value": "41"
+        },
+        {
+          "concept": "analyst_hold",
+          "known_at": "2026-09-05",
+          "label": "analysts: hold",
+          "period_end": "2026-09-01",
+          "source": "finnhub",
+          "value": "3"
+        },
+        {
+          "concept": "analyst_sell",
+          "known_at": "2026-09-05",
+          "label": "analysts: sell",
+          "period_end": "2026-09-01",
+          "source": "finnhub",
+          "value": "1"
+        },
+        {
+          "concept": "av_news_sentiment",
+          "known_at": "2026-09-10",
+          "label": "vendor sentiment",
+          "period_end": "2026-09-10",
+          "source": "alphavantage_news",
+          "value": "0.03"
+        },
+        {
+          "concept": "revenue",
+          "known_at": "2026-08-26",
+          "label": "revenue (last quarter)",
+          "period_end": "2026-07-26",
+          "source": "sec_xbrl",
+          "value": "96.22bn"
+        },
+        {
+          "concept": "net_income",
+          "known_at": "2026-08-26",
+          "label": "net income (last quarter)",
+          "period_end": "2026-07-26",
+          "source": "sec_xbrl",
+          "value": "59.69bn"
+        },
+        {
+          "concept": "eps_surprise_pct",
+          "known_at": "2026-09-30",
+          "label": "last EPS surprise %",
+          "period_end": "2026-09-30",
+          "source": "finnhub",
+          "value": "3.82"
+        }
+      ],
+      "stories": [
+        {
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/jensen-huang-explains-why-nvidia-215159365.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-10T21:51:59+00:00",
+          "quality": 1.0,
+          "title": "Jensen Huang explains why Nvidia will grow an astounding 70% next year",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/nvidia-stock-edges-higher-microsoft-213655977.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-10T21:36:55+00:00",
+          "quality": 1.0,
+          "title": "Nvidia stock edges higher on Microsoft data center expansion report",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://www.fool.com/investing/2026/09/10/nvidia-96-billion-revenue-stock-buy/?.tsrc=rss",
+          "domain": "www.fool.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-10T20:59:00+00:00",
+          "quality": 0.85,
+          "title": "Nvidia Has $96 Billion in Quarterly Revenue. Here's Why the Stock Is Still a Buy.",
+          "uncertainty": 0.7575757575757576
+        },
+        {
+          "doc_id": "finnhub:142064666",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "polarity": 0.0,
+          "published_at": "2026-09-10T18:59:22+00:00",
+          "quality": 0.85,
+          "title": "Why Intel Stock Slumped Today",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142064670",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "polarity": 0.0,
+          "published_at": "2026-09-10T18:51:34+00:00",
+          "quality": 0.85,
+          "title": "Google Just Made a Massive AI Bet Wall Street May Be Missing",
+          "uncertainty": 0.4310344827586207
+        },
+        {
+          "doc_id": "finnhub:142064660",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-10T18:49:33+00:00",
+          "quality": 0.85,
+          "title": "Nvidia Drops Over 2% as Australia Targets a 125% AI-Capacity Jump",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142061635",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "polarity": 0.0,
+          "published_at": "2026-09-10T15:30:32+00:00",
+          "quality": 0.85,
+          "title": "Prediction: Broadcom Could Become One of the World\u2019s Most Valuable Tech Companies",
+          "uncertainty": 0.5
+        },
+        {
+          "doc_id": "alphavantage:https://www.benzinga.com/trading-ideas/long-ideas/26/09/61716878/forget-the-magnificent-seven-stocks-gary-black-says-this-tech-giant-is-cheaper",
+          "domain": "Benzinga",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-10T15:13:10+00:00",
+          "quality": 0.85,
+          "title": "Forget the Magnificent Seven Stocks, Gary Black Says This Tech Giant Is Cheaper",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.667,
+        "n": 133,
+        "polarity_mean": 0.105,
+        "sources": 32,
+        "uncertainty_mean": 0.097
+      },
+      "upcoming": []
+    },
+    {
+      "escalated": 21,
+      "events": [],
+      "instrument_id": "XNAS:AAPL",
+      "label": "Apple",
+      "snapshot": [
+        {
+          "concept": "pe_ttm",
+          "known_at": "2026-09-10",
+          "label": "P/E (ttm)",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "35.38"
+        },
+        {
+          "concept": "pb",
+          "known_at": "2026-09-05",
+          "label": "P/B",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "50.98"
+        },
+        {
+          "concept": "eps_ttm",
+          "known_at": "2026-09-05",
+          "label": "EPS (ttm)",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "8.72"
+        },
+        {
+          "concept": "dividend_yield",
+          "known_at": "2026-09-05",
+          "label": "dividend yield",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "0.51"
+        },
+        {
+          "concept": "beta",
+          "known_at": "2026-09-10",
+          "label": "beta",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "1.10"
+        },
+        {
+          "concept": "high_52w",
+          "known_at": "2026-09-05",
+          "label": "52w high",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "344.57"
+        },
+        {
+          "concept": "low_52w",
+          "known_at": "2026-09-05",
+          "label": "52w low",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "225.95"
+        },
+        {
+          "concept": "price_target_consensus",
+          "known_at": "2026-09-05",
+          "label": "target (consensus)",
+          "period_end": null,
+          "source": "fmp",
+          "value": "341.31"
+        },
+        {
+          "concept": "analyst_buy",
+          "known_at": "2026-09-05",
+          "label": "analysts: buy",
+          "period_end": "2026-09-01",
+          "source": "finnhub",
+          "value": "22"
+        },
+        {
+          "concept": "analyst_hold",
+          "known_at": "2026-09-05",
+          "label": "analysts: hold",
+          "period_end": "2026-09-01",
+          "source": "finnhub",
+          "value": "15"
+        },
+        {
+          "concept": "analyst_sell",
+          "known_at": "2026-09-05",
+          "label": "analysts: sell",
+          "period_end": "2026-09-01",
+          "source": "finnhub",
+          "value": "3"
+        },
+        {
+          "concept": "av_news_sentiment",
+          "known_at": "2026-09-10",
+          "label": "vendor sentiment",
+          "period_end": "2026-09-10",
+          "source": "alphavantage_news",
+          "value": "0.14"
+        },
+        {
+          "concept": "revenue",
+          "known_at": "2026-07-31",
+          "label": "revenue (last quarter)",
+          "period_end": "2026-06-27",
+          "source": "sec_xbrl",
+          "value": "109.42bn"
+        },
+        {
+          "concept": "net_income",
+          "known_at": "2026-07-31",
+          "label": "net income (last quarter)",
+          "period_end": "2026-06-27",
+          "source": "sec_xbrl",
+          "value": "29.79bn"
+        },
+        {
+          "concept": "eps_surprise_pct",
+          "known_at": "2026-09-05",
+          "label": "last EPS surprise %",
+          "period_end": "2026-06-30",
+          "source": "finnhub",
+          "value": "-0.89"
+        }
+      ],
+      "stories": [
+        {
+          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/wall-street-analysts-predict-apple-213000192.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-10T21:30:00+00:00",
+          "quality": 1.0,
+          "title": "Wall Street analysts predict Apple iPhone Duo will be a top seller, despite being heavy and costing up to $3,200",
+          "uncertainty": 0.4807692307692307
+        },
+        {
+          "doc_id": "https://finance.yahoo.com/technology/articles/rogers-offer-iphone-duo-iphone-193000163.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-10T19:30:00+00:00",
+          "quality": 1.0,
+          "title": "Rogers to Offer iPhone Duo, iPhone 18 Pro, iPhone 18 Pro Max, Apple Watch Series 12, and Apple Watch Ultra 4",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://finance.yahoo.com/video/why-hardware-attract-buyers-apples-192906871.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-10T19:29:06+00:00",
+          "quality": 1.0,
+          "title": "Why hardware will attract buyers to Apple's new lineup over AI features",
+          "uncertainty": 0.21186440677966104
+        },
+        {
+          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/apples-foldable-iphone-fuel-next-164900181.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-10T16:49:00+00:00",
+          "quality": 1.0,
+          "title": "Can Apple's Foldable iPhone Fuel the Next Growth Cycle for the Stock?",
+          "uncertainty": 0.390625
+        },
+        {
+          "doc_id": "alphavantage:https://www.inc.com/kit-eaton/the-apple-watch-got-a-massive-ai-upgrade-and-the-controversy-could-get-it-banned-at-the-office/91403791",
+          "domain": "Inc.com",
+          "escalated": true,
+          "intensity": 0.6666666666666666,
+          "polarity": 1.0,
+          "published_at": "2026-09-10T18:45:47+00:00",
+          "quality": 0.85,
+          "title": "The Apple Watch Got a Massive AI Upgrade\u2014and the Controversy Could Get It Banned at the Office",
+          "uncertainty": 0.487012987012987
+        },
+        {
+          "doc_id": "finnhub:142063209",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-10T16:16:00+00:00",
+          "quality": 0.85,
+          "title": "Apple Is Betting That Big Screens Can Outshine AI",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142061655",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-10T15:20:56+00:00",
+          "quality": 0.85,
+          "title": "Apple dips its toe into AI, but will AI companies compete in hardware?",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142064400",
+          "domain": "SeekingAlpha",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-10T15:20:39+00:00",
+          "quality": 0.85,
+          "title": "Apple: All The Exciting Products And Services Pressuring Margins",
+          "uncertainty": 0.390625
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.667,
+        "n": 76,
+        "polarity_mean": 0.065,
+        "sources": 36,
+        "uncertainty_mean": 0.087
+      },
+      "upcoming": []
+    },
+    {
+      "escalated": 14,
+      "events": [],
+      "instrument_id": "XNAS:MSFT",
+      "label": "Microsoft",
+      "snapshot": [
+        {
+          "concept": "pe_ttm",
+          "known_at": "2026-09-10",
+          "label": "P/E (ttm)",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "27.36"
+        },
+        {
+          "concept": "pb",
+          "known_at": "2026-09-05",
+          "label": "P/B",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "6.26"
+        },
+        {
+          "concept": "eps_ttm",
+          "known_at": "2026-09-05",
+          "label": "EPS (ttm)",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "17.95"
+        },
+        {
+          "concept": "dividend_yield",
+          "known_at": "2026-09-05",
+          "label": "dividend yield",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "0.79"
+        },
+        {
+          "concept": "beta",
+          "known_at": "2026-09-10",
+          "label": "beta",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "1.06"
+        },
+        {
+          "concept": "high_52w",
+          "known_at": "2026-09-05",
+          "label": "52w high",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "553.72"
+        },
+        {
+          "concept": "low_52w",
+          "known_at": "2026-09-05",
+          "label": "52w low",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "349.20"
+        },
+        {
+          "concept": "price_target_consensus",
+          "known_at": "2026-09-05",
+          "label": "target (consensus)",
+          "period_end": null,
+          "source": "fmp",
+          "value": "553.39"
+        },
+        {
+          "concept": "analyst_buy",
+          "known_at": "2026-09-05",
+          "label": "analysts: buy",
+          "period_end": "2026-09-01",
+          "source": "finnhub",
+          "value": "41"
+        },
+        {
+          "concept": "analyst_hold",
+          "known_at": "2026-09-05",
+          "label": "analysts: hold",
+          "period_end": "2026-09-01",
+          "source": "finnhub",
+          "value": "5"
+        },
+        {
+          "concept": "analyst_sell",
+          "known_at": "2026-09-05",
+          "label": "analysts: sell",
+          "period_end": "2026-09-01",
+          "source": "finnhub",
+          "value": "0"
+        },
+        {
+          "concept": "av_news_sentiment",
+          "known_at": "2026-09-10",
+          "label": "vendor sentiment",
+          "period_end": "2026-09-10",
+          "source": "alphavantage_news",
+          "value": "0.12"
+        },
+        {
+          "concept": "revenue",
+          "known_at": "2026-07-29",
+          "label": "revenue (last quarter)",
+          "period_end": "2026-06-30",
+          "source": "sec_xbrl",
+          "value": "90.01bn"
+        },
+        {
+          "concept": "net_income",
+          "known_at": "2026-07-29",
+          "label": "net income (last quarter)",
+          "period_end": "2026-06-30",
+          "source": "sec_xbrl",
+          "value": "35.77bn"
+        },
+        {
+          "concept": "eps_surprise_pct",
+          "known_at": "2026-09-05",
+          "label": "last EPS surprise %",
+          "period_end": "2026-06-30",
+          "source": "finnhub",
+          "value": "9.53"
+        }
+      ],
+      "stories": [
+        {
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/jensen-huang-explains-why-nvidia-215159365.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-10T21:51:59+00:00",
+          "quality": 1.0,
+          "title": "Jensen Huang explains why Nvidia will grow an astounding 70% next year",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/nvidia-stock-edges-higher-microsoft-213655977.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-10T21:36:55+00:00",
+          "quality": 1.0,
+          "title": "Nvidia stock edges higher on Microsoft data center expansion report",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/adbe-rides-acrobat-ai-expansion-171600435.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-10T17:16:00+00:00",
+          "quality": 1.0,
+          "title": "ADBE Rides on Acrobat AI Expansion: Can it Outpace MSFT & GOOGL?",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/apples-foldable-iphone-fuel-next-164900181.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-10T16:49:00+00:00",
+          "quality": 1.0,
+          "title": "Can Apple's Foldable iPhone Fuel the Next Growth Cycle for the Stock?",
+          "uncertainty": 0.390625
+        },
+        {
+          "doc_id": "https://www.trefis.com/articles/614679/is-the-ai-capex-surge-a-threat-to-amazon-stock/2026-09-10?.tsrc=rss",
+          "domain": "www.trefis.com",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "polarity": 1.0,
+          "published_at": "2026-09-10T18:06:44+00:00",
+          "quality": 0.85,
+          "title": "Is The AI Capex Surge A Threat To Amazon Stock?",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://247wallst.com/investing/2026/09/10/google-is-buying-half-a-nuclear-plants-output-through-2049-cheap-power-just-became-the-real-ai-moat/?.tsrc=rss",
+          "domain": "247wallst.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-10T17:47:44+00:00",
+          "quality": 0.85,
+          "title": "Google Is Buying Half a Nuclear Plant\u2019s Output Through 2049. Cheap Power Just Became the Real AI Moat.",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142061671",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-10T15:00:00+00:00",
+          "quality": 0.85,
+          "title": "Can MSFT Stock Rally on the Back of Dynamics 365 Business Applications?",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142060675",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-10T12:48:05+00:00",
+          "quality": 0.85,
+          "title": "Microsoft Remains Down Over 12 Months: A Wall Street Bull Expects 75% Gains to Materialize Soon",
+          "uncertainty": 0.20491803278688525
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.333,
+        "n": 48,
+        "polarity_mean": 0.375,
+        "sources": 15,
+        "uncertainty_mean": 0.063
+      },
+      "upcoming": []
+    }
+  ],
+  "notice": "This is analysis, not advice, and this system cannot place orders.",
+  "slot": "all"
+}
