@@ -1024,3 +1024,55 @@ def test_the_order_is_still_reproducible_from_the_start_time():
     assert _rotate(terms, _rotation_offset(t)) == _rotate(terms, _rotation_offset(t))
     # stable within the bucket, so a retry seconds later replays the same order
     assert _rotation_offset(t) == _rotation_offset(datetime(2026, 9, 4, 13, 1, 42, tzinfo=UTC))
+
+
+def test_a_thinly_covered_name_is_not_hidden_behind_newer_articles(corpus):
+    """`limit` bounds the MATCHING rows, not the rows scanned before matching.
+
+    This is the shape the real corpus had on 2026-09-11. Bursa names are rare
+    in a corpus dominated by US wire copy - Tenaga held 3 articles against
+    NVDA's 1,188 - and a filter applied after the LIMIT asks "of the newest N
+    articles overall, which are Tenaga's". Below a name's articles fall outside
+    that window the answer is none, and the store reads as empty for exactly
+    the names whose coverage is already thinnest.
+    """
+    rows = [
+        {
+            "id": "old",
+            "title": "Maybank posts a higher net interest margin",
+            "body": "Malayan Banking Berhad said NIM rose in the quarter.",
+            "published_at": "2026-08-27T08:00:00+00:00",
+            "domain": "thestar.com.my",
+        }
+    ] + [
+        {
+            "id": f"new{i}",
+            # Distinct headlines on purpose: the normalizer drops a repeat of
+            # one it has already seen, and five copies of one story would
+            # collapse to a single row and never fill the window.
+            "title": f"CIMB opens its {word} office",
+            "body": f"CIMB announced a {word} branch this morning.",
+            "published_at": f"2026-09-0{i}T09:00:00+00:00",
+            "domain": "theedge.com.my",
+        }
+        for i, word in enumerate(("Ipoh", "Penang", "Johor", "Kuching", "Melaka"), start=1)
+    ]
+    arts, _ = articles(rows=rows)
+    corpus.add_all(arts, "fixture")
+
+    # The five newest all name CIMB; Maybank's single article is the oldest.
+    found = corpus.articles(instrument="MYX:1155", limit=3)
+    assert [a.instruments for a in found] == [["MYX:1155"]]
+
+
+def test_an_instrument_filter_matches_the_whole_id_not_a_prefix(corpus):
+    """The id is matched between its own JSON quotes.
+
+    `instruments_json` is a JSON list in a text column, so the filter reads it
+    with LIKE. A bare LIKE on MYX:115 would be satisfied by MYX:1155, which
+    would quietly attribute one company's news to another.
+    """
+    arts, _ = articles()
+    corpus.add_all(arts, "fixture")
+    assert corpus.articles(instrument="MYX:115") == []
+    assert corpus.articles(instrument="MYX:1155") != []

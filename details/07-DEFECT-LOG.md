@@ -501,6 +501,58 @@ Note what this does NOT change: fmp still returns **HTTP 402** on its earnings
 endpoint (3,957 fetched, 0 kept) whenever it does run. Whether the free tier
 earns its requests is a purchasing question, recorded here and left open.
 
+## 16. A filter that ran after the limit, and hid the thinnest names best
+
+`Corpus.articles()` takes a `limit` and an `instrument`. It applied the limit in
+SQL and the instrument filter in Python, afterwards. So the question it actually
+answered was not *"the newest `limit` articles about this company"* but *"of the
+newest `limit` articles about ANYTHING, which mention this company"*.
+
+With a corpus that is 97% US wire copy, that is a different question with a
+different answer. Measured on the 2026-09-11 corpus at the default limit of 500:
+
+| instrument | held | returned |
+|---|---|---|
+| MYX:5347 Tenaga | 3 | **0** |
+| MYX:8869 Press Metal | 4 | **0** |
+| MYX:1023 CIMB | 1 | **0** |
+| MYX:1295 Public Bank | 2 | **0** |
+| MYX:1155 Maybank | 28 | **1** |
+| MYX:3182 Genting | 17 | 1 |
+| XNAS:NVDA | 1,188 | 230 |
+
+Six of the nine Bursa names held articles and returned none of them. The error
+is not uniform - it is worst exactly where coverage is thinnest, because a name
+with few articles is the one whose articles fall outside a recency window. A
+reader would have seen `NOTHING COLLECTED` and concluded the collector had a
+gap, when the collector had the story and the reader could not ask for it.
+
+The fix is one clause moved into SQL, matching the id between its own JSON
+quotes so `MYX:115` cannot be answered by `MYX:1155`.
+
+**Latent, not live.** No production caller passed `instrument=` when this was
+found - the retrieval index reads the corpus unfiltered and was never affected.
+It is recorded because the API was wrong for anyone who used it next, and
+because the failure mode is silent: an empty list is indistinguishable from an
+empty store.
+
+**What this was NOT.** Two things were checked first and cleared, so nobody
+re-investigates them:
+
+  * **GDELT's 23% link rate is not a linking defect.** 210 articles were fetched
+    for a named instrument and stored with no link to it, which looked like
+    discarded provenance. Reading them settles it: they are titles like *"Xiaomi
+    SkyNomad N70 Pro"* and *"Copper Just Soared to an All-Time High"*, returned
+    against a query for NVDA. The linker is right to decline them, and linking
+    on fetch provenance would have injected ~200 false attributions into the
+    evidence the paper book reasons from. GDELT is a broad feed; the open
+    question is its VALUE, not its correctness — and that question cannot be
+    answered yet, because `gdelt.search_query` only landed 2026-09-10 05:50 and
+    the post-fix sample is one day.
+  * **457 of the 947 unlinked articles are historical.** GDELT ran untargeted
+    until 2026-09-06 and per-instrument from 2026-09-07. The unlinked mass is
+    debris from a regime that has already been replaced, not a live fault.
+
 ## What the families have in common
 
 | Family | Shape |
@@ -516,9 +568,12 @@ earns its requests is a purchasing question, recorded here and left open.
 | ask-vs-recognise | the system can identify something it never requests, so it never arrives |
 | no-op-that-writes | a run that decided to do nothing still leaves a trace, and the trace reads as work |
 | two-spellings-of-one-state | the same outcome is recorded two ways, and one of them the watching rule cannot read |
+| limit-before-filter | a bound is applied before the predicate, so the rarest rows are the ones that vanish |
 
-Ten of the eleven are invisible to a type checker and to a test that only
-exercises the happy path. All eleven are visible to a test that asks *what would
-the wrong answer look like, and would I be able to tell?*
+Eleven of the twelve are invisible to a type checker and to a test that only
+exercises the happy path - and the twelfth is invisible to a test whose fixture
+is smaller than the limit it is testing, which is why the corpus tests missed it
+for as long as they had two articles in them. All twelve are visible to a test
+that asks *what would the wrong answer look like, and would I be able to tell?*
 
 That question is what `stress/run.py` is.

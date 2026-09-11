@@ -350,6 +350,10 @@ class Corpus:
         """Newest first. `instrument` filters on the linked ids, so an article
         the linker never attached to anything is not returned by it.
 
+        `limit` bounds the rows MATCHING every filter, including `instrument` -
+        not the rows scanned before it. The difference is the whole story for a
+        thinly covered name: see the note beside the clause below.
+
         `min_quality` keeps rows scored at or above it AND rows with no score
         (the corpus before scoring existed); `published_since` windows on the
         publisher's date rather than on when the sweep first saw it."""
@@ -367,6 +371,22 @@ class Corpus:
         if min_quality is not None:
             where.append("(quality IS NULL OR quality >= ?)")
             args.append(float(min_quality))
+        if instrument is not None:
+            # This belongs in SQL, not after the fetch. LIMIT applies to the
+            # rows the DATABASE returns, so filtering in Python afterwards
+            # windows on "the newest `limit` articles overall" and then asks
+            # which of those match - which makes a rare name invisible behind
+            # whatever else is newer. Measured on the 2026-09-11 corpus, with
+            # the default limit of 500: six of the nine Bursa names held
+            # articles and returned none of them, Tenaga at 3 and Press Metal
+            # at 4 showing zero, while NVDA's 1,188 showed 230. The scarcer the
+            # name, the more completely it disappeared - the opposite of what a
+            # thin-coverage book needs.
+            #
+            # The id must match WHOLE, between its own JSON quotes: a bare LIKE
+            # on MYX:518 would be satisfied by MYX:5183.
+            where.append("instruments_json LIKE '%\"' || ? || '\"%'")
+            args.append(instrument)
         if where:
             sql.append("WHERE " + " AND ".join(where))
         sql.append("ORDER BY published_at DESC, doc_id LIMIT ?")
@@ -374,6 +394,9 @@ class Corpus:
         rows = self.conn.execute(" ".join(sql), args).fetchall()
         out = [self._to_article(r) for r in rows]
         if instrument is not None:
+            # The SQL above already selected on the id; this re-checks it
+            # exactly. LIKE treats `_` and `%` as wildcards, so an id carrying
+            # either would over-match there and is caught here.
             out = [a for a in out if instrument in a.instruments]
         return out
 
