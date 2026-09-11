@@ -350,6 +350,37 @@ Three causes, at different stages of fix:
    retries and up to a 90s read. Not a defect; it does mean each Bursa name
    comes round every second or third run.
 
+### eodhd and alphavantage, settled on 2026-09-11
+
+The open question was whether to register or upgrade these two. Measured over
+every run they have made, it answers itself:
+
+| source | runs | fetched | kept | stored |
+|---|---|---|---|---|
+| `eodhd` | 11 (9 with a key) | **0** | **0** | **0** |
+| `alphavantage_news` | 12 | 58 | 58 | 55 |
+| `fmp` | 6 | 11,870 | **0** | **0** |
+
+**eodhd has never returned a single row.** Not once, on any name, on any run.
+Every line reads the same way:
+
+    MYX:8869: deferred by the 2-a-day credit budget; next in rotation;
+    XNAS:NVDA: outside the plan or over today's credits
+
+"Outside the plan" is the free tier declining the request outright; the
+credit budget defers the rest. So there is nothing to upgrade TOWARD from here
+without paying, and nothing being lost while it sits: a source that makes no
+request costs no quota. It is noise in the sweep detail line and nothing else.
+
+**alphavantage_news does earn its place**, narrowly - 55 rows stored, and it
+reaches its daily quota on every run, which is what a free tier working as
+intended looks like.
+
+Decision: **no registration, no upgrade, no config change.** Neither source is
+worth money at this book's size, and neither is costing anything. Revisit only
+if the Bursa coverage problem is solved by other means and US depth becomes the
+binding constraint - which it is not today, by a factor of thirty.
+
 ### The price cache: what is settled and what is not
 
 The "cached history is unstable between fetches" question is **closed** (see
