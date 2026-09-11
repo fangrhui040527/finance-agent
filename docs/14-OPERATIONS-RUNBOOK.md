@@ -695,3 +695,36 @@ the whole book and `ask.py sources --probe gdelt` from a runner will say so.
 **Do not raise the cap to "catch up".** The refusals scale with requests per
 run, so a higher cap collects less, not more. That was the state before it:
 nine names asked, a mean of 3.5 refused.
+
+## `name_coverage`: one name going quiet inside a working collector (2026-09-08)
+
+The two collector rules watch the COLLECTOR. This one watches the BOOK.
+
+`sweep_silence` asks whether the collector stopped. `slots_missed` asks whether
+it fired as often as its cron says. Both were green every day for a week while
+**Petronas Chemicals held zero articles out of 1,673** — it was searched only as
+"Petronas Chemicals" and never as "PCHEM", the form the Malaysian press prints,
+so every run succeeded and collected nothing about it. A per-name defect inside
+a successful sweep is invisible to a rule that asks whether the sweep ran.
+
+**It compares rather than thresholds.** A name with no news is only evidence
+when OTHER names have news. If the whole book is empty the collector is down,
+which is `sweep_silence`'s alert — firing both would be two alerts about one
+fault, so this rule stays quiet unless something else succeeded.
+
+**When it opens**, the cause is usually a name the press uses and the collector
+does not search. Work it in this order:
+
+1. `knowledge/graph/data/entities.yaml` — is the short form there? The ticker,
+   the initials, the name a headline would actually print. Every alias listed
+   is searched (the first four); a missing one is a collection gap now, not
+   just a linking one.
+2. `ask.py sources --coverage` — what each source returned for that name, and
+   what share of it named the company. A source returning rows that never name
+   the company is a different fault from a source returning nothing.
+3. Only then consider that the name may genuinely have had a quiet fortnight.
+   `name_coverage_days = 14` is set so that is credible and a quiet month is
+   not.
+
+**Do not silence it by shortening the window.** The window is what makes a
+genuine quiet spell distinguishable from a broken query.

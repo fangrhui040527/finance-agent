@@ -377,6 +377,19 @@ class Corpus:
             out = [a for a in out if instrument in a.instruments]
         return out
 
+    def count_for_instrument(self, instrument_id: str, since: datetime | None = None) -> int:
+        """Articles LINKED to one company, optionally since a date.
+
+        Matches on the quoted id inside `instruments_json` so `MYX:518` cannot
+        match `MYX:5183`, which a bare LIKE would.
+        """
+        sql = "SELECT COUNT(*) FROM articles WHERE instruments_json LIKE ?"
+        args: list = [f'%"{instrument_id}"%']
+        if since is not None:
+            sql += " AND first_seen_at >= ?"
+            args.append(_iso(since))
+        return int(self.conn.execute(sql, args).fetchone()[0])
+
     def counts(self) -> dict[str, int]:
         articles = self.conn.execute("SELECT COUNT(*) FROM articles").fetchone()[0]
         linked = self.conn.execute(

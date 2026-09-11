@@ -260,6 +260,13 @@ class Config:
     #: asks whether the collector STOPPED; this asks whether it fired as often
     #: as its own cron says it should, which one manual run cannot mask.
     alert_slot_window_days: int = 0
+    #: Days over which every name in the book must have collected SOMETHING.
+    #: `sweep_silence` asks whether the collector stopped and `slots_missed`
+    #: whether it fired; neither can see one name inside a working sweep going
+    #: quiet. Petronas Chemicals held zero articles for a week while the sweep
+    #: reported `ok` every run, because it was searched only as "Petronas
+    #: Chemicals" and never as "PCHEM". 0 disables.
+    alert_name_coverage_days: int = 0
     #: The financial position the waterfall turns into investable capital.
     capital: CapitalPlan = CapitalPlan()
     #: Holdings with units where the file gives them; `holdings` keeps the bare
@@ -846,6 +853,7 @@ def load(path: str | Path | None = None) -> Config:
         alert_silence_hours=_int("monitor.silence_hours", 0),
         alert_sweep_silence_hours=_int("monitor.sweep_silence_hours", 0),
         alert_slot_window_days=_int("monitor.slot_window_days", 0),
+        alert_name_coverage_days=_int("monitor.name_coverage_days", 0),
         capital=_capital(data),
         book=_book(data),
         paper=_paper(data),

@@ -154,6 +154,32 @@ def display_names() -> dict[str, str]:
     return out
 
 
+@lru_cache(maxsize=1)
+def search_names() -> dict[str, tuple[str, ...]]:
+    """Instrument id -> EVERY name it is written about under.
+
+    `display_names` answers "what do I call this company"; this answers "what
+    might a headline call it", and the difference is a coverage gap that ran
+    for a week. A per-name source was asked for the display name alone, so
+    Petronas Chemicals was searched as "Petronas Chemicals" and never as
+    "PCHEM" - the form the Malaysian press actually prints. The linker has
+    always known both, because `aliases()` reads the whole list: the corpus
+    could RECOGNISE a name it never ASKED for.
+
+    Keyed canonically, like `display_names`, for the same reason: entities.yaml
+    writes `MYX:1155` and ids resolve to `XKLS:1155`.
+    """
+    if not ENTITIES_FILE.exists():
+        return {}
+    raw = yaml.safe_load(ENTITIES_FILE.read_text(encoding="utf-8")) or {}
+    out: dict[str, tuple[str, ...]] = {}
+    for iid, surfaces in (raw.get("companies") or {}).items():
+        names = tuple(dict.fromkeys(str(s) for s in (surfaces or []) if str(s).strip()))
+        if names:
+            out[instrument_id(str(iid)) or str(iid)] = names
+    return out
+
+
 def instrument_id(raw: str) -> str | None:
     """The canonical `MIC:CODE` for anything naming a company, or None.
 

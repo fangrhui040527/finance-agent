@@ -25,6 +25,7 @@ and per-item cleanup.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from datetime import timedelta
 from urllib.parse import urlencode, urlparse
 
@@ -51,9 +52,35 @@ EDITION_FOR_MIC = {"XKLS": "MY", "XSES": "SG", "XLON": "GB", "XNAS": "US", "XNYS
 FINANCE_TERMS = ("stock", "shares", "earnings", "profit", "revenue", "Bursa", "Nasdaq", "market")
 
 
-def finance_query(name: str, extra_terms=FINANCE_TERMS) -> str:
-    """`"Maybank" (stock OR shares OR earnings ...)` - Google's own operators."""
-    return f'"{name}" (' + " OR ".join(extra_terms) + ")"
+#: How many of a company's names one query may carry. Four covers every name in
+#: the book with room to spare, and bounds the URL: Google News is asked over a
+#: GET, and a company with a dozen recorded surface forms would otherwise build
+#: a query long enough to be truncated somewhere unhelpful.
+MAX_NAMES = 4
+
+
+def finance_query(name: str | Sequence[str], extra_terms=FINANCE_TERMS) -> str:
+    """`("Maybank" OR "Malayan Banking") (stock OR shares ...)` - Google's operators.
+
+    Takes EVERY name the company is written about under, not just the one a
+    person would call it. Asking for the display name alone is why Petronas
+    Chemicals collected nothing for a week: the Malaysian press prints "PCHEM",
+    the alias table has had "PCHEM" all along, and the query never used it.
+
+    Note what is NOT applied here: `gdelt.MIN_PHRASE_CHARS`. That floor exists
+    because GDELT's DOC API refuses a quoted phrase under five characters with
+    a plain-text error - it is one API's constraint, not a judgement about
+    precision, and Google News has no such limit. Under it "TNB" could never be
+    asked for, and TNB is what Tenaga Nasional is called.
+    """
+    names = [name] if isinstance(name, str) else list(name)
+    names = [n for n in dict.fromkeys(names) if str(n).strip()][:MAX_NAMES]
+    if not names:
+        raise ValueError("finance_query needs at least one name")
+    phrase = " OR ".join(f'"{n}"' for n in names)
+    if len(names) > 1:
+        phrase = f"({phrase})"
+    return f"{phrase} (" + " OR ".join(extra_terms) + ")"
 
 
 class GoogleNewsFeed(RssFeed):

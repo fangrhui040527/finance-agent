@@ -9,6 +9,24 @@
 # knowledge/feeds/adapter.link_entities already takes, so this one checked-in
 # file can serve both rather than two lists drifting apart.
 #
+# THESE NAMES ARE NOW SEARCHED FOR, not only recognised. Every alias here goes
+# into the Google News query for that company (`knowledge.graph.ids.search_names`
+# -> `company_feeds.finance_query`, first four). Until 2026-09-08 only the FIRST
+# was, and the gap cost a whole name: Petronas Chemicals was searched as
+# "Petronas Chemicals" and never as "PCHEM", which is what the Malaysian press
+# prints, and it collected ZERO articles out of 1,673 while five other Bursa
+# names collected one to twelve. This table had held "PCHEM" the entire time -
+# the corpus could recognise a name it never asked for.
+#
+# So a missing short form is now a collection gap, not just a linking one. When
+# you add a company, add the form a HEADLINE uses - the ticker, the initials -
+# and not only its registered name. `ask.py watch` opens `name_coverage` when a
+# book name collects nothing while its neighbours do, which is what this defect
+# looked like from outside.
+#
+# Order matters twice over: the FIRST entry is the display name, and only the
+# first four are searched.
+#
 # HUMAN-AUTHORED. kb_sector and kb_supply_chain are created_by: human in
 # agents/registry.yaml, so no agent may write here - only a person.
 #

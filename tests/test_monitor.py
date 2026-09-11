@@ -1009,3 +1009,118 @@ def test_the_cli_prints_one_slot_per_line_and_collects_nothing(tmp_path, monkeyp
     out = capsys.readouterr()
     assert "bursa_close" not in out.out.split(), "the slot that already ran is not owed again"
     assert all(line in {"us_preopen", "us_close", "weekly"} for line in out.out.split())
+
+
+# --- one name going quiet inside a working collector -------------------------
+#
+# Petronas Chemicals held zero articles out of 1,673 for a week. Every sweep
+# reported `ok`, so `sweep_silence` was quiet; every slot fired, so
+# `slots_missed` was quiet. It was searched only as "Petronas Chemicals" and
+# never as "PCHEM". Neither collector rule can see inside a successful run.
+
+
+def _corpus_with_links(path: Path, by_instrument: dict[str, int], when: str = "2026-09-06"):
+    """A corpus where each named instrument has that many linked articles."""
+    from knowledge.corpus import Corpus
+    from knowledge.news.features import Article
+
+    with Corpus(str(path)) as c:
+        n = 0
+        for iid, count in by_instrument.items():
+            for _ in range(count):
+                n += 1
+                c.add(
+                    Article(
+                        doc_id=f"d{n}",
+                        title=f"story {n}",
+                        body=f"a body about {iid} long enough to index",
+                        source_domain="example.com",
+                        published_at=datetime.fromisoformat(f"{when}T08:00:00+00:00"),
+                        language="English",
+                        countries=(),
+                        instruments=(iid,),
+                        themes=(),
+                    ),
+                    source="google_news",
+                    seen_at=datetime.fromisoformat(f"{when}T08:00:00+00:00"),
+                )
+    return path
+
+
+def _coverage_cfg(tmp_path, watchlist, days=14):
+    return _cfg(
+        corpus_db=str(tmp_path / "corpus.db"),
+        watchlist=tuple(watchlist),
+        holdings=(),
+        alert_name_coverage_days=days,
+        alert_sweep_silence_hours=0,
+        alert_slot_window_days=0,
+    )
+
+
+NOWC = datetime(2026, 9, 8, 8, 0, tzinfo=UTC)
+BOOK = ("MYX:1155", "MYX:5347", "MYX:5183")
+
+
+def test_a_name_with_nothing_while_others_collect_is_named(tmp_path):
+    _corpus_with_links(tmp_path / "corpus.db", {"MYX:1155": 4, "MYX:5347": 2})
+    alerts = evaluate(_coverage_cfg(tmp_path, BOOK), db=str(_ledger(tmp_path / "led.db")), now=NOWC)
+    hit = [a for a in alerts if a.rule == "name_coverage"]
+    assert hit, [a.rule for a in alerts]
+    assert "MYX:5183" in hit[0].title
+    assert "1 of 3" in hit[0].title
+    assert "entities.yaml" in hit[0].next_step
+
+
+def test_an_entirely_empty_book_is_left_to_the_sweep_rule(tmp_path):
+    """Two alerts about one fault is one alert too many. If nothing collected,
+    the collector is down - that is sweep_silence's finding, not this one."""
+    _corpus_with_links(tmp_path / "corpus.db", {})
+    alerts = evaluate(_coverage_cfg(tmp_path, BOOK), db=str(_ledger(tmp_path / "led.db")), now=NOWC)
+    assert not [a for a in alerts if a.rule == "name_coverage"]
+
+
+def test_a_fully_covered_book_is_quiet(tmp_path):
+    _corpus_with_links(tmp_path / "corpus.db", {"MYX:1155": 1, "MYX:5347": 1, "MYX:5183": 1})
+    alerts = evaluate(_coverage_cfg(tmp_path, BOOK), db=str(_ledger(tmp_path / "led.db")), now=NOWC)
+    assert not [a for a in alerts if a.rule == "name_coverage"]
+
+
+def test_zero_days_disables_the_rule(tmp_path):
+    _corpus_with_links(tmp_path / "corpus.db", {"MYX:1155": 4})
+    alerts = evaluate(
+        _coverage_cfg(tmp_path, BOOK, days=0), db=str(_ledger(tmp_path / "led.db")), now=NOWC
+    )
+    assert not [a for a in alerts if a.rule == "name_coverage"]
+
+
+def test_articles_older_than_the_window_do_not_count_as_coverage(tmp_path):
+    """The window is the rule: a name last written about in March is not
+    covered today, and a rule reading all-time counts would never fire."""
+    _corpus_with_links(tmp_path / "corpus.db", {"MYX:1155": 3}, when="2026-09-06")
+    _corpus_with_links(tmp_path / "corpus.db", {"MYX:5347": 3}, when="2026-03-01")
+    alerts = evaluate(
+        _coverage_cfg(tmp_path, ("MYX:1155", "MYX:5347")),
+        db=str(_ledger(tmp_path / "led.db")),
+        now=NOWC,
+    )
+    hit = [a for a in alerts if a.rule == "name_coverage"]
+    assert hit and "MYX:5347" in hit[0].title
+
+
+def test_a_one_name_book_has_nothing_to_compare_against(tmp_path):
+    _corpus_with_links(tmp_path / "corpus.db", {})
+    alerts = evaluate(
+        _coverage_cfg(tmp_path, ("MYX:1155",)), db=str(_ledger(tmp_path / "led.db")), now=NOWC
+    )
+    assert not [a for a in alerts if a.rule == "name_coverage"]
+
+
+def test_an_id_that_is_a_prefix_of_another_is_not_counted_as_coverage(tmp_path):
+    """`MYX:518` must not be satisfied by `MYX:5183`, which a bare LIKE does."""
+    from knowledge.corpus import Corpus
+
+    _corpus_with_links(tmp_path / "corpus.db", {"MYX:5183": 2})
+    with Corpus(str(tmp_path / "corpus.db")) as c:
+        assert c.count_for_instrument("MYX:5183") == 2
+        assert c.count_for_instrument("MYX:518") == 0

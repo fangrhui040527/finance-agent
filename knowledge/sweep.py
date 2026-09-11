@@ -741,11 +741,18 @@ def _feed_for(spec, cfg, iid, label, adapter_for, edition_for_mic, finance_query
             countries=tuple(cfg.gdelt_countries),
         )
     if spec.name == "google_news":
+        from knowledge.graph.ids import instrument_id as _canonical
+        from knowledge.graph.ids import search_names
+
         mic = mic_of(iid)
         edition = edition_for_mic.get(mic)
         if edition is None:
             raise ValueError(f"no Google News edition for market {mic}")
-        return adapter_for("google_news", query=finance_query(label), edition=edition)
+        # Every name the company is written about under, not only the one we
+        # print. The alias table has always held them and only the linker read
+        # it, so this corpus could recognise "PCHEM" and never asked for it.
+        names = search_names().get(_canonical(iid) or iid) or (label,)
+        return adapter_for("google_news", query=finance_query(names), edition=edition)
     if spec.name == "yahoo_rss":
         from core.market.feed import SymbolUnmappable
 
