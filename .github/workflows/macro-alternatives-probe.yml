@@ -1,0 +1,73 @@
+# Is the dead macro data reachable free through something already wired up?
+#
+# Fifteen DBnomics series froze upstream in mid-2025. Four of them matter to
+# this book, and one sets a number the valuations use: DBN:GOVT_YIELD_MY is the
+# ringgit risk-free rate that every Bursa name is discounted off, and it is 498
+# days old.
+#
+# The question this answers is narrow on purpose. Not "where can macro data be
+# bought" - that is a purchasing decision and stays with a person - but "is the
+# same number already reachable through a provider this repository already has
+# a key and a collector for". FRED is that provider, and a FRED series is a
+# one-line change: an id in fred.SERIES and a cadence in freshness.MAX_AGE_DAYS.
+#
+# The discriminator is the PUBLISHER, not the provider. A FRED series sourced
+# from IMF PCPS will be exactly as frozen as DBnomics was; one sourced from the
+# EIA or a central bank will not. Both kinds are probed so the report tells them
+# apart instead of assuming.
+#
+# The development environment has no route to any of these hosts, so only a
+# runner can answer. Read-only, stores nothing, manual: the answer changes when
+# a publisher stops, not hourly.
+name: macro-alternatives-probe
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.12"
+          enable-cache: true
+
+      - name: Install
+        run: uv sync --frozen
+
+      # One repository secret named ALL_SECRET holding every key is accepted:
+      # .github/scripts/keys_from_blob.py finds each by label or shape. A secret
+      # set under its own name wins.
+      - name: Keys from ALL_SECRET, when the named secrets are not set
+        env:
+          ALL_SECRET: ${{ secrets.ALL_SECRET }}
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: |
+          if [ -z "$ALL_SECRET" ]; then
+            echo "ALL_SECRET is not set; the named secrets are in use"
+            exit 0
+          fi
+          python3 .github/scripts/keys_from_blob.py ALL_SECRET | while IFS='=' read -r name value; do
+            if [ -n "${!name}" ]; then
+              echo "$name: set under its own name; the blob's copy is ignored"
+              continue
+            fi
+            echo "::add-mask::$value"
+            echo "$name=$value" >> "$GITHUB_ENV"
+            echo "$name: taken from ALL_SECRET"
+          done
+
+      - name: Probe the candidates
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY || env.FRED_API_KEY }}
+        run: uv run python .github/scripts/macro_alternatives_probe.py
