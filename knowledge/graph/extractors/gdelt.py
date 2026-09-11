@@ -187,6 +187,59 @@ def watchlist_terms(instrument_ids: Iterable[str]) -> tuple[str, ...]:
     return tuple(sorted(primary.values()))
 
 
+#: How many of ONE company's names a per-name query may carry. Three, because
+#: the breadth that timed out was 21 phrases across nine companies in a single
+#: query; one company's own two or three forms is a different size of question,
+#: and the cap keeps it that way if someone adds a dozen aliases to a row.
+MAX_TERMS_PER_NAME = 3
+
+
+def search_terms(instrument_id: str) -> tuple[str, ...]:
+    """Every name ONE company can be asked for by, longest-lived first.
+
+    `watchlist_terms` answers "one phrase per company" for the combined query,
+    where breadth is charged across the whole book. This answers "every phrase
+    for this company", for the per-name path, where it is not: the sweep asks
+    one company at a time, so its aliases cost query width and no extra
+    request.
+
+    The distinction matters because the two were conflated. The per-name path
+    asked for `terms[0]` alone - the first alias in entities.yaml - so Petronas
+    Chemicals was asked for as "Petronas Chemicals" and never as "PCHEM", the
+    form the Malaysian press prints. `entity_index` has held "PCHEM" all along:
+    this corpus could recognise a name it never asked for.
+
+    Note what is NOT relaxed: MIN_PHRASE_CHARS. GDELT's DOC API refuses a
+    quoted phrase under five characters with a plain-text error, so "TNB" and
+    "IHH" still cannot be asked for here however much the press uses them. That
+    is the API's constraint, not a judgement, and it is why the Google News
+    path applies no such floor.
+
+    Returns () when every alias is too short - the caller skips the name rather
+    than sending a query that will be refused.
+    """
+    aliases = [
+        surface
+        for surface, iid in _index_from_aliases().items()
+        if iid == str(instrument_id) and len(surface) >= MIN_PHRASE_CHARS
+    ]
+    return tuple(dict.fromkeys(aliases))[:MAX_TERMS_PER_NAME]
+
+
+def search_query(instrument_id: str) -> str:
+    """`("Petronas Chemicals" OR "PCHEM")`, or "" when the name cannot be asked.
+
+    Parenthesised even for a single phrase would be noise, so one term stays a
+    bare phrase - the shape every recorded GDELT sweep has used.
+    """
+    terms = search_terms(instrument_id)
+    if not terms:
+        return ""
+    if len(terms) == 1:
+        return f'"{terms[0]}"'
+    return "(" + " OR ".join(f'"{t}"' for t in terms) + ")"
+
+
 def entity_index() -> dict[str, str]:
     """The linker's index, for callers outside this module.
 

@@ -271,11 +271,14 @@ CATALOG: dict[str, SourceSpec] = {
         docs="https://rili.jin10.com/",
     ),
     # MacroMicro's API starts at USD 5,000 a year; the series behind its charts
-    # are on DBnomics, keyless.
+    # are on DBnomics, keyless. All fifteen of ours are ENDED upstream (the
+    # 2026-09-06 probe: the datasets froze in mid-2025, our codes are right, no
+    # sibling code is live). Still enabled, because the fetch is one request and
+    # it is what would notice a restart - see knowledge/sources/freshness.ENDED.
     "dbnomics": SourceSpec(
         "dbnomics",
         STRUCTURED,
-        "DBnomics: IMF commodity prices (palm oil, aluminium, Brent, LNG), BIS policy rates and NEERs, IMF CPI for MY and CN",
+        "DBnomics: IMF commodity prices (palm oil, aluminium, Brent, LNG), BIS policy rates and NEERs, IMF CPI for MY and CN - ALL ENDED UPSTREAM mid-2025, kept to catch a restart",
         "regulator",
         ("us_preopen", "weekly"),
         docs="https://db.nomics.world/",

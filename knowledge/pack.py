@@ -59,14 +59,38 @@ class Move:
     served_from: str = ""
     error: str = ""
     components: dict[str, float] = field(default_factory=dict)
+    asked_for: date | None = None
+    own_last: date | None = None
+    dating: str = ""
+
+    @property
+    def mis_dated(self) -> bool:
+        """The name printed a session this measurement does not include.
+
+        Not the same as a quiet market. If neither the name nor its proxy has a
+        bar for the day asked for, the last common session IS the last session
+        and the figure is correctly dated. If the NAME printed and the pair has
+        no common bar for it, the proxy is the reason and the figure belongs to
+        an earlier day than the page it appears on - which is how the six Bursa
+        names on the 2026-09-07 page came to report Friday's move, two of them
+        sign-flipped.
+        """
+        return bool(
+            self.asked_for
+            and self.last_day
+            and self.own_last
+            and self.last_day < self.own_last <= self.asked_for
+        )
 
     def row(self) -> str:
         if self.error:
             return f"| {self.label} ({self.instrument_id}) | NO DATA | | | | {self.error[:90]} |"
+        flag = f" **MIS-DATED: this is the {self.last_day} session**" if self.mis_dated else ""
         return (
             f"| {self.label} ({self.instrument_id}) | {self.r1:+.2%} | {self.m1:+.2%} | "
             f"{self.r5:+.2%} | {self.m5:+.2%} | {self.verdict}"
             + (f", {self.unexplained:.0%} unexplained" if self.unexplained is not None else "")
+            + flag
             + " |"
         )
 
@@ -118,7 +142,10 @@ def measure(feed, instrument_id: str, label: str, day: date, base_currency: str 
     ri = [b / a - 1.0 for a, b in zip(ci, ci[1:])]
     rm = [b / a - 1.0 for a, b in zip(cm, cm[1:])]
     move.last_day = common[-1]
+    move.asked_for = day
+    move.own_last = max(closes_i) if closes_i else None
     move.sessions = len(common)
+    move.dating = _dating_note(move, own_days=set(closes_i), mkt_days=set(closes_m))
     move.r1, move.m1 = ri[-1], rm[-1]
     move.r5, move.m5 = ci[-1] / ci[-6] - 1.0, cm[-1] / cm[-6] - 1.0
 
@@ -146,6 +173,30 @@ def measure(feed, instrument_id: str, label: str, day: date, base_currency: str 
     move.beta = fit.coefficients[1] if fit is not None else None
     move.components = {c.component.value: c.contribution for c in exp.components}
     return move
+
+
+def _dating_note(move: Move, *, own_days: set[date], mkt_days: set[date]) -> str:
+    """Say, in one line, which day this measurement is really about and why.
+
+    A fallback to an earlier session is not itself a fault - markets close. The
+    fault is a SILENT fallback, and the two cases have different cures: a quiet
+    market needs nothing, a proxy that did not print needs a different proxy or
+    a stated refusal. They are told apart here so the page cannot confuse them.
+    """
+    asked, last = move.asked_for, move.last_day
+    if asked is None or last is None or last >= asked:
+        return ""
+    missed = sorted(d for d in own_days - mkt_days if last < d <= asked)
+    if missed:
+        return (
+            f"MIS-DATED: {move.instrument_id} printed {', '.join(d.isoformat() for d in missed)} "
+            f"but the proxy {move.proxy} did not, so every figure in this row is the "
+            f"{last} session, not {asked}"
+        )
+    return (
+        f"no session for {move.instrument_id} or {move.proxy} after {last}; the figures are "
+        f"correctly dated to the last session on or before {asked}"
+    )
 
 
 def build_pack(
@@ -206,8 +257,20 @@ def build_pack(
                 else f" {m.estimation}."
             )
             + (f" Components: {comps}." if comps else "")
+            + (f" {m.dating}." if m.dating else "")
         )
     out.append("")
+
+    stale = [m for m in moves if m.mis_dated]
+    if stale:
+        out += [
+            f"**{len(stale)} of {len(moves)} rows are MIS-DATED.** The name printed a session "
+            f"its market proxy did not, so the decomposition fell back to the last session "
+            f"they share. Read these as that day's move, and do not date them {day}:",
+            "",
+        ]
+        out += [f"- {m.dating}" for m in stale]
+        out.append("")
 
     digest = build_digest(
         cfg, day, slot="pack", corpus_path=corpus_path, facts_path=facts_path, now=now

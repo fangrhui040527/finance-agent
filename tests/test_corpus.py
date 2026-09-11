@@ -496,6 +496,72 @@ def test_a_short_name_falls_back_to_a_longer_alias_not_to_nothing():
     assert q == '("IHH Healthcare")'
 
 
+# --- a company is asked for by EVERY name it is printed under ----------------------
+#
+# The per-name path asked for `terms[0]` alone, so Petronas Chemicals was
+# searched as "Petronas Chemicals" and never as "PCHEM" - the form the Malaysian
+# press prints - and it holds zero articles out of 2,671 while the three US
+# names hold 1,968. `entity_index` has had "PCHEM" all along: this corpus could
+# recognise a name it never asked for.
+
+
+def test_the_bursa_name_with_no_coverage_is_now_asked_for_by_its_ticker():
+    from knowledge.graph.extractors.gdelt import search_query
+
+    q = search_query("MYX:5183")
+    assert '"PCHEM"' in q and '"Petronas Chemicals"' in q
+    assert q.startswith("(") and q.endswith(")")
+
+
+def test_one_usable_alias_stays_a_bare_phrase():
+    """IHH is three characters, so only "IHH Healthcare" can be asked for.
+    A one-term group would be parentheses around nothing."""
+    from knowledge.graph.extractors.gdelt import search_query
+
+    assert search_query("MYX:5225") == '"IHH Healthcare"'
+
+
+def test_the_doc_apis_phrase_floor_still_applies_to_every_term():
+    """The floor is the API's, not a judgement: GDELT answers "The specified
+    phrase is too short." as plain text and fails the whole request. Widening
+    the query must not smuggle a three-character alias into it."""
+    from knowledge.graph.extractors.gdelt import MIN_PHRASE_CHARS, search_terms
+
+    for iid in ("MYX:5347", "MYX:5225", "MYX:5183", "MYX:1155"):
+        for term in search_terms(iid):
+            assert len(term) >= MIN_PHRASE_CHARS, f"{term} would be refused"
+    assert "TNB" not in search_terms("MYX:5347")
+
+
+def test_a_company_whose_every_alias_is_too_short_is_not_asked_at_all():
+    """Returning "" is what lets the sweep skip the name instead of sending a
+    query the API refuses, which costs three retries and up to a 90s read."""
+    from knowledge.graph.extractors.gdelt import search_query, search_terms
+
+    assert search_terms("MYX:9999") == ()
+    assert search_query("MYX:9999") == ""
+
+
+def test_the_number_of_terms_per_company_is_bounded():
+    """The breadth that timed out was 21 phrases across nine companies. One
+    company's own forms are a different size of question, and stay that way."""
+    from knowledge.graph.extractors.gdelt import MAX_TERMS_PER_NAME, search_terms
+
+    for iid in ("MYX:1155", "MYX:5183", "XNAS:NVDA"):
+        assert len(search_terms(iid)) <= MAX_TERMS_PER_NAME
+
+
+def test_the_combined_query_is_still_one_phrase_per_company():
+    """The two paths answer different questions and must not be merged. Breadth
+    is charged across the whole book in `watchlist_query` - 21 phrases timed it
+    out three times - and not in a per-name request."""
+    from knowledge.graph.extractors.gdelt import search_terms, watchlist_terms
+
+    ids = ["MYX:1155", "MYX:5183"]
+    assert watchlist_terms(ids) == ("Maybank", "Petronas Chemicals")
+    assert len(search_terms("MYX:1155")) > 1
+
+
 # --- one request per company ------------------------------------------------------
 
 

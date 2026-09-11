@@ -40,7 +40,7 @@ invisible.
 | Reflection — grading, lesson proposal, calibration, scoring | complete |
 | Tracing — spans, HTML report, anatomy, prompts | complete |
 | CLI — 32 subcommands | complete |
-| Paper book — `engines/paper/`, `ask.py paper`, `data/paper.db`, marked by `collect.yml`, decided by the Routine, journal in `knowledge/paper/` (docs/22) | complete; the record accrues from 2026-09-08 |
+| Paper book — `engines/paper/`, `ask.py paper`, `data/paper.db`, marked by `collect.yml`, decided by the Routine, journal in `knowledge/paper/` (docs/22) | complete; the record accrues from 2026-09-08. **An all-cash night now writes a row and a prediction** (added 2026-09-09): until then it wrote nothing, so the book's first night left no evidence that a decision had been taken — see `details/07` §10 |
 | **Feedback routine** — `ask.py pack` prepares the night, a scheduled Claude session writes `knowledge/feedback/<date>.md`, indexed as `kb_lessons` | complete; docs/20 |
 | Fitness function — refuses a partial score | complete |
 | CI — 10 steps, offline, keyless | complete |
@@ -103,6 +103,28 @@ Two constants in that file — the SEC fee rate and the FINRA trading-activity f
 — are regulator pass-throughs that were NOT verified against a primary source.
 They are pinned by test so a drift is visible, and they are the reason a cost
 floor from this schedule should not be trusted to the basis point yet.
+
+### A cache dated by when it was fetched, not by what it held (added 2026-09-09)
+
+`data/price_cache.db` expires at the UTC day boundary because "a daily bar
+cannot change until a new session prints". A body fetched DURING a session
+breaks that: on 2026-09-08 `XNAS:SPY` came back with an in-progress row whose
+open sat above its own high, the bar parser dropped it as corrupt (correctly),
+and the cache then served that body for the rest of the day — so the `us_close`
+sweep, which would have got the finished bar, never refetched. The US market
+proxy ended on 2026-09-04 while the three US names it was measuring had printed
+2026-09-08, and no surface said so.
+
+Two fixes, because the fault has two halves. `core/market/cache.is_mid_session`
+makes a body that carries a dated row its own parser rejects a cache MISS. And
+`knowledge/pack.Move.mis_dated` marks any row whose name printed a session its
+proxy did not, naming the day the figures are really about — the same label that
+would have caught the Bursa blank row on the 2026-09-07 page. A fallback to an
+earlier session is not a fault; a silent one is.
+
+An in-progress row that happens to be self-consistent still parses as a bar and
+is still read as that session's close. Nothing sees that yet; `details/07` §11
+carries it.
 
 ### The death detector was watching the wrong thing (added 2026-09-03)
 
@@ -298,6 +320,104 @@ a time, keeping the row label. The Malaysian 10-year yield id in
 `dbnomics.SERIES` answered on the 2026-09-06 probe; Taiwan is not in the IMF
 tables, so no free id exists and Taiwanese names use the US ten-year with the
 approximation stated.
+
+### Bursa coverage: the half of the book the corpus barely holds
+
+The book is six Bursa names and three Nasdaq names. The corpus is 1,968
+articles linked to the three US names and **62 to all six Malaysian ones**;
+`MYX:5183` (Petronas Chemicals) held **zero, all time**, and 857 of 2,671
+articles (32%) link to no instrument at all.
+
+Three causes, at different stages of fix:
+
+1. **The query asked for one name.** Both per-name sources took the first alias
+   in entities.yaml, so PCHEM and TNB — the forms the Malaysian press prints —
+   were never searched, though the linker has always known them. Google News:
+   fixed in [#60](https://github.com/fangrhui040527/finance-agent/pull/60).
+   GDELT: fixed here (`gdelt.search_query`). `TNB` and `IHH` remain unaskable on
+   GDELT alone, whose API refuses a phrase under five characters.
+2. **Four of the five Malaysian outlets are disabled.** thestar, edge and nst
+   answered 404 on 2026-09-04 and bernama dated nothing, so `fmt_business`
+   carries the whole Malaysian press by itself. One 404 on one guessed path is
+   not proof a publisher has no feed, and nothing here can reach a Malaysian
+   host to say otherwise. `.github/workflows/bursa-feeds-probe.yml` asks the
+   publishers directly — autodiscovery tags off their own pages, conventional
+   paths beside them, and a verdict per URL on whether its items carry DATES.
+   **This is the largest single lever on Bursa coverage and it is not yet
+   pulled: run the probe and enable whatever answers.**
+3. **GDELT reaches three names a run.** By design (`names_per_run=3`), because
+   84 name-failures over 30 sweeps were HTTP 429 and a refusal costs three
+   retries and up to a 90s read. Not a defect; it does mean each Bursa name
+   comes round every second or third run.
+
+### eodhd and alphavantage, settled on 2026-09-11
+
+The open question was whether to register or upgrade these two. Measured over
+every run they have made, it answers itself:
+
+| source | runs | fetched | kept | stored |
+|---|---|---|---|---|
+| `eodhd` | 11 (9 with a key) | **0** | **0** | **0** |
+| `alphavantage_news` | 12 | 58 | 58 | 55 |
+| `fmp` | 6 | 11,870 | **0** | **0** |
+
+**eodhd has never returned a single row.** Not once, on any name, on any run.
+Every line reads the same way:
+
+    MYX:8869: deferred by the 2-a-day credit budget; next in rotation;
+    XNAS:NVDA: outside the plan or over today's credits
+
+"Outside the plan" is the free tier declining the request outright; the
+credit budget defers the rest. So there is nothing to upgrade TOWARD from here
+without paying, and nothing being lost while it sits: a source that makes no
+request costs no quota. It is noise in the sweep detail line and nothing else.
+
+**alphavantage_news does earn its place**, narrowly - 55 rows stored, and it
+reaches its daily quota on every run, which is what a free tier working as
+intended looks like.
+
+Decision: **no registration, no upgrade, no config change.** Neither source is
+worth money at this book's size, and neither is costing anything. Revisit only
+if the Bursa coverage problem is solved by other means and US depth becomes the
+binding constraint - which it is not today, by a factor of thirty.
+
+### The price cache: what is settled and what is not
+
+The "cached history is unstable between fetches" question is **closed** (see
+`details/07` §11). It was a US market holiday read across two market calendars,
+not instability. Two real things came out of settling it:
+
+* the mid-session capture **recurred on 2026-09-10** for `SPY` while the fix was
+  unmerged - the gate returns True on that body, so the fix is confirmed against
+  a case it was not written from;
+* a dated row with **empty fields** (`2026-09-09,,,,,` on the Bursa proxy) is a
+  third shape. Dropped by the parser, flagged downstream by `Move.mis_dated`,
+  and deliberately NOT a cache miss - the hole is permanent and refetching it
+  only spends quota.
+
+Still open, and recorded rather than hidden: an in-progress row that happens to
+be self-consistent parses as a bar and is read as that session's close.
+
+### The macro series that have stopped
+
+All fifteen DBnomics ids are **ended upstream**, confirmed by the 2026-09-06
+runner probe: IMF/PCPS and BIS/WS_CBPOL stop at 2025-06, BIS/WS_EER and IMF/IFS
+at 2025-05, IMF/CPI at 2025-07, with every sibling code inside each dataset
+stopping at the same period. The codes are right; the datasets stopped being
+ingested, so there is nothing to re-point at.
+
+They are marked rather than deleted (`knowledge/sources/freshness.ENDED`). Every
+macro row reads `466d ENDED 2025-06`, `ask.py macro` prints which upstream
+stopped and when under the table, the monitor no longer opens a nightly alert
+about them, and a WACC on a Malaysian name says out loud that its risk-free rate
+comes from a stopped series. The collector keeps fetching them so the
+`series_resumed` rule can contradict the verdict if any of them restarts.
+
+**The open decision is where to buy macro data.** Commodity prices, policy rates
+and effective exchange rates are inputs a book of a petrochemical, an aluminium
+smelter and five Malaysian names actually moves on, and right now the newest
+reading of any of them is from mid-2025. FRED covers the US side and is live;
+nothing free that has been found covers the rest.
 
 ### `holdings` and `watchlist`
 

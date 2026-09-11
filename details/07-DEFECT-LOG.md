@@ -265,6 +265,242 @@ Same family as §4's currency defect and the broker's refusal to substitute zero
 for a missing figure: the bug is not the missing value, it is the plausible one
 put in its place.
 
+## 10. A decision that was taken and left no record
+
+`ask.py paper decide` on an all-cash night wrote NOTHING. No name raised and no
+name held is zero target rows, so the book kept no row saying a decision had
+been taken at all — while the command printed *"observe phase: this is logged
+and will be graded"* over an empty write. Found on 2026-09-08, the paper book's
+first night, by checking the stores against the page that claimed the decision
+was recorded: `paper.db` targets 0, `learning.db` predictions 0, neither file
+changed in git.
+
+Magnitude: the observe phase exists to grade decisions, and **every all-cash
+night in it was unfalsifiable**. Not one wrong number — the absence of any.
+Worse than a wrong number, because a book with no losing record is exactly the
+shape of a flattering one.
+
+The question underneath it is whether holding nothing is a prediction at all.
+It is: *nothing in the fundable universe beats cash over the horizon*, and the
+control book is the counterfactual that settles it. So an all-cash night now
+writes one row (`CASH`, reason `all_cash`, resolved on the spot so no market is
+ever asked to price it) and one prediction graded against the control instead of
+against a price — right exactly when the control lost ground over the same days.
+
+## 11. A price cache that served half a session as a whole one
+
+The cache expires at the UTC day boundary, on the stated reasoning that *"a
+daily bar cannot change until a new session prints"*. That is false for a body
+fetched **during** a session. On 2026-09-08 `XNAS:SPY` was fetched mid-session
+and Yahoo answered with an in-progress row whose open (772.01) was carried over
+from the previous day and sat **above its own high** (769.70). The bar parser
+was right to drop it. The cache then reported a hit for the rest of that UTC
+day, so the 22:37 `us_close` sweep — which would have got the finished bar —
+never refetched.
+
+Magnitude: the US market proxy silently ended on **2026-09-04** while the three
+US names it was measuring had printed 2026-09-08. Every US decomposition on the
+2026-09-08 pack is two sessions stale, and nothing in the pack said so. Same
+shape as the Bursa proxy blank row on the 2026-09-07 page (`knowledge/feedback/2026-09-07.md`),
+reached by a different route: there the proxy did not print, here it printed and
+was fetched too early.
+
+Fix, in two places because the fault has two halves:
+
+* **The cache** refuses to serve a body that carries a dated ROW its own parser
+  will not accept as a BAR (`core/market/cache.is_mid_session`). That is what an
+  in-progress session looks like on the wire, and the next process fetches
+  again. A body that simply ends on the last session it saw still hits, so a
+  quiet market costs no quota.
+* **The pack** compares each name's last printed session against the last one it
+  shares with its proxy, and marks the row `MIS-DATED` with the day it is really
+  about (`knowledge/pack.Move.mis_dated`). A fallback to an earlier session is
+  not a fault — markets close — but a *silent* one is, and the two cases have
+  different cures.
+
+Still not caught: an in-progress row that happens to be self-consistent parses
+as a bar and is read as that session's close. Recorded here because nothing in
+the system can currently see it.
+
+### The "unstable cached history", settled on 2026-09-11
+
+An open question carried since 2026-09-08 said the cached price HISTORY changed
+between fetches - 2026-09-07 present in one, absent in the next - with the
+mechanism unknown. Read against the shipped cache, it is three different things
+and only one of them is a defect:
+
+| symbol | tail | verdict |
+|---|---|---|
+| `SPY` | 09-04, **09-08**, 09-09, 09-10 | 2026-09-07 was **Labor Day**. Not a gap. |
+| `1155.KL` | 09-04, **09-07**, 09-08, 09-09, 09-10 | Bursa was open. Not a gap. |
+| `0820EA.KL` | 09-08, `2026-09-09,,,,,`, 09-10 | a dated row with NO VALUES |
+
+So the history was never unstable. One fetch read a Bursa symbol and the next a
+US one, across two market calendars, on a week where the US had a holiday
+Malaysia did not. **The question is closed.**
+
+What the reading did turn up is real, and it is two things:
+
+* **The mid-session defect recurred on 2026-09-10**, after §11 was written and
+  while the fix was still unmerged. `SPY` came back `open 764.08 > high 758.55`,
+  volume 3.59m against 32.77m the session before, and its open was carried
+  verbatim from 09-09. `is_mid_session` returns True on that exact body, which
+  is the fix confirmed against a case it was not written from.
+* **A dated row with empty fields** is a THIRD shape, distinct from a missing
+  row and from an inverted one. The parser drops it, correctly, leaving a
+  permanent hole at 09-09 in the proxy's history while the names it measures
+  have a bar for that day - which `pack.Move.mis_dated` is what flags. It must
+  NOT be made a cache miss: no amount of refetching fills a session the upstream
+  never recorded, so a miss there spends the day's quota to change nothing. A
+  test pins both halves.
+
+## 12. Fifteen macro series that were stale in a way nobody could fix
+
+The `series_stale` rule fired every night on the same fifteen DBnomics ids —
+palm oil, aluminium, Brent, Asian LNG, five policy rates, two CPIs, three
+effective exchange rates and the Malaysian government yield — each 436 to 497
+days old with a *current* `fetched_at` beside it. The rule was right to fire and
+its next step ("point the adapter at a live series, or take the id out") was
+unanswerable from here: the development environment has no route to
+db.nomics.world, so nothing could tell a retired code from a stopped dataset.
+
+`.github/workflows/dbnomics-probe.yml` asked the API on 2026-09-06. Verdict on
+all fifteen: **FROZEN**. Our codes are correct; the datasets behind them stopped
+being ingested — IMF/PCPS and BIS/WS_CBPOL at **2025-06**, BIS/WS_EER and
+IMF/IFS at **2025-05**, IMF/CPI at **2025-07** — and every sibling code inside
+each dataset stops at the same period (siblings outside our list answered HTTP
+400). There is no live code to move to. Re-sourcing is a decision about where to
+buy macro data, not a bug to fix in the collector.
+
+Two defects, then, and only the first one is DBnomics':
+
+* **The surfaces could not say "ended".** They had one word, STALE, for two
+  different facts: *the next print is late* and *there is no next print*. A
+  reader holding a 466-day-old Malaysian policy rate needs to know which. Worse,
+  `engines/valuation/cost_of_capital.py` discounts every Malaysian name off
+  `DBN:GOVT_YIELD_MY` — so a stopped series was setting the ringgit risk-free
+  rate in a live WACC, dated but unqualified.
+* **The monitor could not close a finding nobody could act on.** An alert that
+  reopens nightly with an impossible next step trains a reader to skim the list,
+  which costs the alerts beside it.
+
+Fix: `knowledge/sources/freshness.ENDED` records the probe's verdict once — last
+period, upstream, verdict, the day it was probed. From it: the macro row reads
+`466d ENDED 2025-06` instead of an age; `macro_context` prints the reason under
+the table, grouped by dataset (five upstreams, not fifteen lines); the WACC's
+`rf_source` names the stopped series and the caveat says the rate rests on it;
+and `series_stale` stops judging them.
+
+What keeps that honest is that **the collector still fetches all fifteen**. One
+request covers the whole list, so the cost is a request the sweep was making
+anyway, and if any of them prints past its recorded last period the new
+`series_resumed` rule opens a WARN asking for the `ENDED` entry to be deleted.
+Deleting the ids instead would have left nothing able to notice a restart — the
+marking would have been unfalsifiable, which is the failure mode of every
+"known issue" list that outlives the issue.
+
+## 13. A company the corpus could recognise and never asked for
+
+`MYX:5183` (Petronas Chemicals) holds **zero** articles out of 2,671. Its five
+Bursa neighbours hold 1 to 25; the three Nasdaq names hold 1,968 between them.
+
+Not a linker fault. `entity_index` has carried `PCHEM` — the form the Malaysian
+press actually prints — since the alias table was written, so an article naming
+PCHEM would have been attributed correctly the moment it arrived. None arrived,
+because the per-name GDELT path asked for `terms[0]`: the FIRST alias in
+entities.yaml, and only that one.
+
+    query=f'"{terms[0]}"'      ->   "Petronas Chemicals"
+
+So the corpus could recognise a name it never asked for. The same defect in the
+Google News path is fixed in [#60](https://github.com/fangrhui040527/finance-agent/pull/60);
+this is the other half of it.
+
+The reason the one-alias rule existed at all is real and is preserved.
+`watchlist_query` — the COMBINED query, every company in one request — is capped
+at one phrase per company because 21 phrases across nine companies timed out
+three times at 30s on the 2026-09-03 runner, and because the DOC API charges for
+query breadth. But the per-name path asks about **one company at a time**: its
+own two or three forms cost query width and no extra request, so the cap that
+protects the combined query has nothing to do there. `search_terms` /
+`search_query` answer the per-name question and `watchlist_terms` still answers
+the combined one; a test asserts the two do not merge.
+
+What is NOT relaxed is `MIN_PHRASE_CHARS`. GDELT refuses a quoted phrase under
+five characters with a plain-text error that fails the whole request, so `TNB`
+and `IHH` still cannot be asked for here however much the press uses them — an
+API's constraint, not a judgement, which is why the Google News path applies no
+such floor.
+
+Still open, and larger than this fix: four of the five registered Malaysian
+outlets are DISABLED on one 404 each from 2026-09-04.
+`.github/workflows/bursa-feeds-probe.yml` reads the RSS autodiscovery tags off
+the publishers' own pages and reports which URLs serve items **with dates** —
+because a 404 on one guessed path is not evidence a publisher has no feed, and
+nothing in this environment can reach a Malaysian host to tell the difference.
+
+## 14. A no-op run that still committed
+
+`_already_ran_today` (§ the doubled slot) makes the second collector arrival on
+a slot a no-op: the cron and the nightly catch-up both fire, whoever is first
+collects, the second costs seconds instead of 370 requests. It was not a no-op
+in one place. The digest was re-rendered with a later `Generated` line over
+identical figures, so three files changed and the workflow pushed them:
+
+    -Generated 2026-09-08 22:38 UTC · slot `all` · 2084 articles, 4465 observations, 3968 events
+    +Generated 2026-09-08 23:23 UTC · slot `all` · 2084 articles, 4465 observations, 3968 events
+
+That is the whole content of commit `c8f3ede`, and of `8387e38` the night
+before. The cost is not the bytes. `git log data/digests` is the cheapest record
+anyone has of when the collection actually moved, and a timestamp that advances
+over unchanged data makes that record lie.
+
+`write_digest` now compares the render against the file with only the timestamp
+masked, and writes nothing when that is the only difference. The slot and the
+three counts share that line and ARE compared: a different slot writing the same
+figures is a fact about the collection; a re-render at a later minute is not.
+The publication rail still runs before the comparison — a digest is checked
+before it is compared, never waved through for resembling one that passed.
+
+Not changed, deliberately: the second arrival still fetches prices and marks the
+paper book. §11 is the reason — the first arrival can land mid-session and cache
+a partial bar, so the later run is the one that gets the finished close. And the
+duplicate `marks` rows it leaves are read correctly: `marks()` and `latest_mark`
+both take the last row per day, so the equity series never double-counts.
+
+## 15. A skip that was invisible to the rule that watches for silence
+
+On 2026-09-11 `sweep_silence` opened on **fmp**: *"past its own cadence: fmp (90h
+ago, allowed 78h)"*. The collector had dispatched fmp on time every weekday.
+
+fmp is per-instrument, and `us_preopen` is a macro slot that carries no
+per-instrument work, so the right thing happened: it was skipped, with a reason.
+
+    facts.db  pulls   2026-09-10T16:37  fmp  skipped  no name in the book trades in slot 'us_preopen'
+                      2026-09-09T16:50  fmp  skipped  ...
+                      2026-09-08T16:48  fmp  skipped  ...
+    corpus.db sweeps  2026-09-07T08:49  fmp  ok       <- nothing after this
+
+`sweep_silence` reads `corpus.last_success` and nothing else. The skip was
+written to the PULLS table and not the SWEEPS table, so a source being
+dispatched on schedule read as a source that had stopped, and on the fourth day
+the monitor said so.
+
+The inconsistency was visible in the same function. The `KeyMissing` branch
+eight lines below has always written BOTH rows, which is why the 2026-09-04
+"fmp needs FMP_API_KEY" skip appears in both tables while the 09-08 one appears
+in neither-but-pulls. Two skips, two spellings, one of them invisible to the
+rule that exists to notice absence.
+
+A skip is a dispatch that had nothing to do. That is precisely what the silence
+rule needs to see - it asks whether the collector STOPPED, not whether the
+source returned rows - so the no-instruments skip now records a sweep the same
+way, with the reason in the detail.
+
+Note what this does NOT change: fmp still returns **HTTP 402** on its earnings
+endpoint (3,957 fetched, 0 kept) whenever it does run. Whether the free tier
+earns its requests is a purchasing question, recorded here and left open.
+
 ## What the families have in common
 
 | Family | Shape |
@@ -274,9 +510,15 @@ put in its place.
 | unit confusion | two numbers meet with nothing naming their units |
 | declared-not-read | a field exists, is documented, and no code path reads it |
 | docstring-as-spec | the comment promises a guarantee the code does not implement |
+| no-record | the decision is taken, nothing is written, and the log reads as if it were never asked |
+| stale-but-fresh | derived data is dated by when it was fetched rather than by what it contains |
+| one-word-two-facts | a label collapses two conditions that ask the reader for different things |
+| ask-vs-recognise | the system can identify something it never requests, so it never arrives |
+| no-op-that-writes | a run that decided to do nothing still leaves a trace, and the trace reads as work |
+| two-spellings-of-one-state | the same outcome is recorded two ways, and one of them the watching rule cannot read |
 
-Four of the five are invisible to a type checker and to a test that only
-exercises the happy path. All five are visible to a test that asks *what would
+Ten of the eleven are invisible to a type checker and to a test that only
+exercises the happy path. All eleven are visible to a test that asks *what would
 the wrong answer look like, and would I be able to tell?*
 
 That question is what `stress/run.py` is.

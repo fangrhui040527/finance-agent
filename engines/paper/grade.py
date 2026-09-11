@@ -17,7 +17,7 @@ from decimal import Decimal
 from core.market.feed import PriceFeedError
 from engines.paper.fx import UsdMyr
 from engines.paper.pricing import currency_of, last_close
-from engines.paper.store import CONTROL, PaperStore
+from engines.paper.store import CASH, CONTROL, DECIDED, PaperStore
 
 
 @dataclass(frozen=True)
@@ -40,8 +40,13 @@ def grade_due(
     queue = learning.load_queue()
     for p in due:
         iid = p.instrument_id
-        ccy = currency_of(iid)
         t = store.target_by_prediction(p.prediction_id)
+        if iid == CASH:
+            graded = _grade_all_cash(store, p, day=day, learning=learning, dry_run=dry_run)
+            if graded is not None:
+                out.append(graded)
+            continue
+        ccy = currency_of(iid)
         change = store.change_for_target(t.target_id) if t and t.target_id is not None else None
         notes: list[str] = []
         try:
@@ -84,6 +89,34 @@ def grade_due(
             learning.record_outcome(o)
         out.append(Graded(p.prediction_id, iid, realised, benchmark, o.correct, o.note))
     return out
+
+
+def _grade_all_cash(store: PaperStore, p, *, day: date, learning, dry_run: bool) -> Graded | None:
+    """An all-cash night, settled by the two books rather than by a price.
+
+    There is no instrument to price - that is the whole content of the claim -
+    so realised is the deciding book's own return over the window and benchmark
+    is the control's. Holding nothing was right exactly when the control lost
+    ground over the same days.
+    """
+    decided = p.context.get("decided_on")
+    ref_day = date.fromisoformat(decided) if decided else p.made_at.date()
+    notes: list[str] = ["all-cash; graded on the book against the control, not on a price"]
+    windows: dict[str, tuple[Decimal, Decimal]] = {}
+    for book in (DECIDED, CONTROL):
+        m_ref = store.latest_mark(book, on_or_before=ref_day)
+        m_now = store.latest_mark(book, on_or_before=day)
+        if m_ref is None or m_now is None or m_ref.equity_usd <= 0:
+            # Unmarked is not zero: leave it pending rather than score a window
+            # the book cannot see.
+            return None
+        windows[book] = (m_ref.equity_usd, m_now.equity_usd)
+    realised = float(windows[DECIDED][1] / windows[DECIDED][0] - 1)
+    benchmark = float(windows[CONTROL][1] / windows[CONTROL][0] - 1)
+    o = learning.load_queue().grade(p.prediction_id, day, realised, benchmark, "; ".join(notes))
+    if not dry_run:
+        learning.record_outcome(o)
+    return Graded(p.prediction_id, CASH, realised, benchmark, o.correct, o.note)
 
 
 def realised_vs_control(store: PaperStore, since: date | None = None) -> dict[str, Decimal]:

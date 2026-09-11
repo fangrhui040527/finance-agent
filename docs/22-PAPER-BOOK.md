@@ -136,6 +136,23 @@ Two writers share `data/paper.db` through git in disjoint windows; the
 Routine pulls before it decides and pushes after. `decide` refuses a second
 decision for the same day, so a retried run is safe.
 
+### An all-cash night is a decision
+
+Holding nothing writes one target row — instrument `CASH`, reason `all_cash`,
+weight zero, resolved the moment it is written so no market is ever asked to
+price it — and one prediction. Until 2026-09-09 it wrote nothing at all, and
+the book could not tell a night decided all-cash from a night nobody asked
+about; `decide` still printed "this is logged and will be graded" over the
+empty write. The first night of the book, 2026-09-08, was such a night.
+
+It is graded like any other prediction, against the control rather than
+against a price: realised is the deciding book's own return over the horizon,
+benchmark is the control's over the same days, and holding nothing was right
+exactly when the control lost ground. That is the claim an all-cash night
+makes — *nothing in the fundable universe beats cash over the horizon* — and
+it is the only one it makes. A second decision the same day still needs
+`--supersede`.
+
 ## 9. Reading the status page and the pack
 
 The status page is the decider's whole view: equity, cash, peak, drawdown and
