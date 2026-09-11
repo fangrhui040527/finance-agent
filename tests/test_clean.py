@@ -81,6 +81,43 @@ def test_junk_is_recognised_and_low_value_is_scored_not_dropped():
     assert not is_low_value("Nvidia beats on data-centre demand")
 
 
+def test_a_cashtag_post_is_dropped_but_the_publisher_is_not():
+    """`$MAYBANK (1155.MY)$` is a forum tag, not a headline.
+
+    Google News carries moomoo.com's social posts as if they were reporting.
+    They arrive with an empty body and nothing to report - the corpus held
+    `$PCHEM (5183.MY)$` as an entire article, and three variants of a giveaway
+    scam. Dropping them is not the same as dropping the publisher: 11 of
+    moomoo's 19 articles were real syndicated journalism, one of them the
+    Bursa story this book is short of.
+    """
+    assert is_junk("$MAYBANK (1155.MY)$")
+    assert is_junk("$MAYBANK (1155.MY)$ Keep it up")
+    assert is_junk("$PCHEM (5183.MY)$ OMG!!! My mom got FREE RM188 here wowww")
+    # One post can tag several names at once.
+    assert is_junk("$KPJ (5878.MY)$ $SUNMED (5555.MY)$ $IHH (5225.MY)$ Today KPJ up +3.45%")
+
+    # Same publisher, real reporting - kept.
+    assert not is_junk("Foreigners Dump Banks While Locals Gobble Up Maybank")
+    assert not is_junk("NVIDIA(NVDA.US) Director Sells US$235.64 Million in Common Stock")
+
+
+def test_a_headline_quoting_a_dollar_amount_is_not_a_cashtag():
+    """The pattern is anchored at the start of the title on purpose.
+
+    Money in a headline is ordinary; measured across the 3,374-article corpus
+    the anchored form matched the 8 cashtag posts and none of the real
+    headlines carrying a figure.
+    """
+    for title in (
+        "Tokyo Court Rejects IHH Subsidiary's $1.25 Billion Claim",
+        "Nvidia to buy Hugging Face for nearly $13 billion in big bet on open AI models",
+        "Got $1,000? An Investment in Micron Could Be Worth This Much by 2027",
+        "Taiwan to announce at least US$20bn in US chip investments: Lutnick",
+    ):
+        assert not is_junk(title), title
+
+
 def test_quality_rewards_a_summary_a_link_and_an_edited_source():
     bare = quality_score("Nvidia beats", "", "randomblog.example", linked=False)
     linked = quality_score("Nvidia beats estimates", "", "randomblog.example", linked=True)

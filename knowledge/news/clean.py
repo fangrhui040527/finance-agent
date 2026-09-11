@@ -133,6 +133,30 @@ JUNK = re.compile(
     re.IGNORECASE,
 )
 
+#: A retail brokerage's social feed, syndicated into a news search as if it
+#: were reporting. `$MAYBANK (1155.MY)$` is the cashtag a poster tags a comment
+#: with, and Google News carries moomoo.com posts under it.
+#:
+#: These arrive with an EMPTY BODY and nothing to report - the corpus held
+#: `$MAYBANK (1155.MY)$` and `$PCHEM (5183.MY)$` as entire articles, plus three
+#: variants of a giveaway scam ("My mom got FREE RM188 here wowww"). They are
+#: dropped rather than scored down because there is no story under them to
+#: score; a headline that is only a ticker tag cannot support a thesis.
+#:
+#: THE DOMAIN IS NOT THE FILTER, and that matters. moomoo also carries real
+#: syndicated journalism - "Foreigners Dump Banks While Locals Gobble Up
+#: Maybank", Dow Jones Market Talk, NVIDIA insider-sale filings - 11 of its 19
+#: articles on the 2026-09-11 corpus. Blocking the publisher would throw those
+#: away, and one of them is exactly the Bursa coverage this book is short of.
+#: The cashtag prefix separates the post from the reporting; the domain does not.
+#:
+#: Anchored at the start of the title, so a headline quoting a dollar amount is
+#: untouched: measured against all 3,374 titles it matched the 8 cashtag posts
+#: and none of the ~20 real headlines carrying "$1.25 Billion" and the like.
+#: Repeated because one post can tag several names at once
+#: (`$KPJ (5878.MY)$ $SUNMED (5555.MY)$ $IHH (5225.MY)$ Today KPJ up +3.45%`).
+CASHTAG_POST = re.compile(r"^\s*(\$[A-Za-z0-9.\-]{1,12}\s*\([^)]{1,24}\)\$\s*)+")
+
 #: Kept, but scored down: opinion listicles and crypto price talk that name a
 #: company without reporting anything about it.
 LOW_VALUE = re.compile(
@@ -192,6 +216,10 @@ def domain_of(url_or_domain: str) -> str:
 
 
 def is_junk(title: str, body: str = "", domain: str = "") -> bool:
+    # The cashtag test reads the TITLE alone: it is a prefix convention, and a
+    # body quoting a post ("shares of $AAPL (AAPL.US)$ rose") is still a story.
+    if CASHTAG_POST.match(title or ""):
+        return True
     return bool(JUNK.search(f"{title} {body}"))
 
 

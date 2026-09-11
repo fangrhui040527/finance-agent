@@ -553,6 +553,45 @@ re-investigates them:
     until 2026-09-06 and per-instrument from 2026-09-07. The unlinked mass is
     debris from a regime that has already been replaced, not a live fault.
 
+## 17. Asking for the ticker worked, and the ticker is what spam quotes
+
+#60 made the collector ask Google News for every alias a company is printed
+under, so `"PCHEM"` was searched for the first time on 2026-09-11. It worked:
+`MYX:5183` went from **0 articles, all time** to 2 on the first run, and Bursa
+coverage overall went 70 -> 98 in that single sweep.
+
+Both PCHEM articles were these:
+
+```
+$PCHEM (5183.MY)$
+$PCHEM (5183.MY)$ OMG!!! My mom got FREE RM188 here wowww, some of the users got RM88 and RM100
+```
+
+A cashtag is how a retail brokerage's social feed tags a post, and Google News
+carries moomoo.com posts under it. So the alias fix cleared the `name_coverage`
+alert on Petronas Chemicals **while the company still had no reporting at all** -
+the alert measured articles, and two arrived. A rule can be satisfied by the
+thing it was written to detect the absence of.
+
+Eight such posts were in the corpus. They arrive with an EMPTY BODY; four are
+variants of one giveaway scam, two are a bare ticker tag and nothing else.
+
+**THE PUBLISHER IS NOT THE FILTER.** The obvious fix - block moomoo.com - is
+wrong, and measuring said so: 11 of its 19 articles are real syndicated
+journalism (Dow Jones Market Talk, NVIDIA insider-sale filings, and
+*"Foreigners Dump Banks While Locals Gobble Up Maybank"*, which is precisely the
+Bursa reporting this book is short of). The cashtag prefix separates the post
+from the reporting; the domain does not. `clean.CASHTAG_POST` is anchored at
+the start of the title so a headline quoting money is untouched - measured
+against all 3,374 titles it matched the 8 posts and none of the ~20 real
+headlines carrying "$1.25 Billion" and the like.
+
+**What this does NOT do.** The corpus is append-only on purpose, so the 8
+already stored remain, and they carry `quality=0.65` - above `digest.MIN_QUALITY`
+of 0.4. They will still read as evidence, and for `MYX:5183` they are currently
+the ONLY evidence. The filter protects every future sweep and nothing behind it.
+Whether the read paths should also refuse a stored cashtag post is open.
+
 ## What the families have in common
 
 | Family | Shape |
@@ -569,11 +608,15 @@ re-investigates them:
 | no-op-that-writes | a run that decided to do nothing still leaves a trace, and the trace reads as work |
 | two-spellings-of-one-state | the same outcome is recorded two ways, and one of them the watching rule cannot read |
 | limit-before-filter | a bound is applied before the predicate, so the rarest rows are the ones that vanish |
+| satisfied-by-noise | a coverage rule counts arrivals, so junk that arrives clears the alarm the gap raised |
 
-Eleven of the twelve are invisible to a type checker and to a test that only
-exercises the happy path - and the twelfth is invisible to a test whose fixture
-is smaller than the limit it is testing, which is why the corpus tests missed it
-for as long as they had two articles in them. All twelve are visible to a test
-that asks *what would the wrong answer look like, and would I be able to tell?*
+Twelve of the thirteen are invisible to a type checker and to a test that only
+exercises the happy path. The twelfth is invisible to a test whose fixture is
+smaller than the limit it is testing, which is why the corpus tests missed it
+for as long as they had two articles in them. The thirteenth is invisible to
+every test there could be, because nothing was broken: the collector asked the
+right question and the internet answered with rubbish. Only reading the rows
+found it. All thirteen are visible to a test that asks *what would the wrong
+answer look like, and would I be able to tell?*
 
 That question is what `stress/run.py` is.
