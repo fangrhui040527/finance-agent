@@ -1,0 +1,261 @@
+{
+ "day": "2026-09-10",
+ "written_at": "2026-09-11T22:45:00Z",
+ "market": {
+  "regime": "neutral",
+  "notes": [
+   "every macro series is two days stale: SP500 7636.36, NASDAQCOM 26253.34, VIXCLS 16.46, T10Y2Y 0.40 all as of 2026-09-09",
+   "XNAS:SPY -0.60% 1d, -0.96% 5d; the three Nasdaq names are correctly dated",
+   "MYX:0820EA has no close for 2026-09-10; the pack's six Bursa rows are the 2026-09-09 session and are labelled MIS-DATED by the pack itself"
+  ]
+ },
+ "names": [
+  {
+   "instrument_id": "XNAS:AAPL",
+   "move": {
+    "return_1d": 0.0356,
+    "market_1d": -0.006,
+    "unexplained_share": 0.91,
+    "sigma": null,
+    "verdict": "no_identified_catalyst",
+    "measured_to": "2026-09-10",
+    "components": {
+     "market": -0.0038,
+     "idiosyncratic": 0.0376
+    },
+    "beta": 0.64
+   },
+   "causes": [
+    {
+     "claim": "iPhone Duo coverage turned from announcement to analyst reception on this day",
+     "evidence": [
+      "https://finance.yahoo.com/markets/stocks/articles/wall-street-analysts",
+      "https://news.google.com/rss/articles/CBMingFBVV95cUxPNTQtWjF3d2t1QzVnU"
+     ],
+     "chain": [
+      "analysts predict the iPhone Duo will be a top seller despite weight and a price up to $3,200",
+      "analyst reception of a launched product, per the reports as collected",
+      "unknown: no collected evidence reaches Apple's guidance, order figures or any primary document"
+     ],
+     "confidence": 0.3,
+     "confirm": "a sell-side note dated 2026-09-10 raising estimates or units, or pre-order data in the fact book",
+     "refute": "the move reverses on 2026-09-11 without new information",
+     "counter_evidence": [
+      "alphavantage:https://www.investing.com/news/analyst-ratings/bofa-cuts- (BofA cut its target to $370 on margin pressure, same day)"
+     ],
+     "note": "held to candidate because the 2026-09-09 page recorded the UNVEIL of the same product - 258 stories, 108 sources, 91 escalated - beside a -0.28% move with 0.15pp idiosyncratic. The same story cannot explain both days; the corpus cannot tell reception from coincidence."
+    }
+   ],
+   "open_questions": [
+    "does a 91%-unexplained +3.56% session survive as attributable once reception coverage is separated from the unveil coverage that explained nothing? (since 2026-09-10)"
+   ],
+   "watch": [
+    {
+     "when": "2026-09-10",
+     "what": "finnhub P/E (ttm) moved to 35.38 from 36.22 on 09-06 while the price rose, implying an earnings revision in the denominator rather than a re-rating"
+    }
+   ]
+  },
+  {
+   "instrument_id": "XNAS:NVDA",
+   "move": {
+    "return_1d": -0.0237,
+    "market_1d": -0.006,
+    "unexplained_share": 0.54,
+    "sigma": 0.62,
+    "verdict": "not_significant",
+    "measured_to": "2026-09-10",
+    "components": {
+     "market": -0.0104,
+     "idiosyncratic": -0.0121
+    },
+    "beta": 1.73,
+    "note": "336 stories from 42 sources collected; none needed to explain a 0.62-sigma move"
+   },
+   "causes": [],
+   "open_questions": [],
+   "watch": []
+  },
+  {
+   "instrument_id": "XNAS:MSFT",
+   "move": {
+    "return_1d": 0.0016,
+    "market_1d": -0.006,
+    "unexplained_share": 0.58,
+    "sigma": 0.32,
+    "verdict": "not_significant",
+    "measured_to": "2026-09-10",
+    "components": {
+     "market": -0.0053,
+     "idiosyncratic": 0.0072
+    },
+    "beta": 0.88
+   },
+   "causes": [],
+   "open_questions": [],
+   "watch": []
+  },
+  {
+   "instrument_id": "MYX:1155",
+   "move": {
+    "return_1d": 0.0,
+    "market_1d": null,
+    "unexplained_share": null,
+    "verdict": "not_decomposable",
+    "why_not": "MYX:0820EA has no close for 2026-09-10, so there is no market return",
+    "close_2026_09_09": "10.4600",
+    "close_2026_09_10": "10.4600",
+    "source": "data/price_cache.db fetched 2026-09-11",
+    "pack_row_is": "the 2026-09-09 session, labelled MIS-DATED by the pack itself"
+   },
+   "causes": [],
+   "open_questions": [],
+   "watch": []
+  },
+  {
+   "instrument_id": "MYX:5347",
+   "move": {
+    "return_1d": -0.0015,
+    "market_1d": null,
+    "unexplained_share": null,
+    "verdict": "not_decomposable",
+    "why_not": "MYX:0820EA has no close for 2026-09-10, so there is no market return",
+    "close_2026_09_09": "13.7400",
+    "close_2026_09_10": "13.7200",
+    "source": "data/price_cache.db fetched 2026-09-11",
+    "pack_row_is": "the 2026-09-09 session, labelled MIS-DATED by the pack itself"
+   },
+   "causes": [],
+   "open_questions": [],
+   "watch": []
+  },
+  {
+   "instrument_id": "MYX:5183",
+   "move": {
+    "return_1d": 0.0593,
+    "market_1d": null,
+    "unexplained_share": null,
+    "verdict": "not_decomposable",
+    "why_not": "MYX:0820EA has no close for 2026-09-10, so there is no market return",
+    "close_2026_09_09": "4.5500",
+    "close_2026_09_10": "4.8200",
+    "source": "data/price_cache.db fetched 2026-09-11",
+    "pack_row_is": "the 2026-09-09 session, labelled MIS-DATED by the pack itself"
+   },
+   "causes": [],
+   "open_questions": [
+    "collected nothing on this day; the widened query merged 2026-09-11. +5.93% is the largest single-session move any name in this book has produced and it has no verdict."
+   ],
+   "watch": []
+  },
+  {
+   "instrument_id": "MYX:5225",
+   "move": {
+    "return_1d": -0.0038,
+    "market_1d": null,
+    "unexplained_share": null,
+    "verdict": "not_decomposable",
+    "why_not": "MYX:0820EA has no close for 2026-09-10, so there is no market return",
+    "close_2026_09_09": "7.9200",
+    "close_2026_09_10": "7.8900",
+    "source": "data/price_cache.db fetched 2026-09-11",
+    "pack_row_is": "the 2026-09-09 session, labelled MIS-DATED by the pack itself"
+   },
+   "causes": [],
+   "open_questions": [],
+   "watch": []
+  },
+  {
+   "instrument_id": "MYX:8869",
+   "move": {
+    "return_1d": -0.0113,
+    "market_1d": null,
+    "unexplained_share": null,
+    "verdict": "not_decomposable",
+    "why_not": "MYX:0820EA has no close for 2026-09-10, so there is no market return",
+    "close_2026_09_09": "7.9800",
+    "close_2026_09_10": "7.8900",
+    "source": "data/price_cache.db fetched 2026-09-11",
+    "pack_row_is": "the 2026-09-09 session, labelled MIS-DATED by the pack itself"
+   },
+   "causes": [],
+   "open_questions": [],
+   "watch": []
+  },
+  {
+   "instrument_id": "MYX:3182",
+   "move": {
+    "return_1d": 0.0207,
+    "market_1d": null,
+    "unexplained_share": null,
+    "verdict": "not_decomposable",
+    "why_not": "MYX:0820EA has no close for 2026-09-10, so there is no market return",
+    "close_2026_09_09": "1.9300",
+    "close_2026_09_10": "1.9700",
+    "source": "data/price_cache.db fetched 2026-09-11",
+    "pack_row_is": "the 2026-09-09 session, labelled MIS-DATED by the pack itself"
+   },
+   "causes": [],
+   "open_questions": [],
+   "watch": []
+  }
+ ],
+ "data_quality": {
+  "failed": [
+   "collect.yml run 54 (schedule, us_preopen) 2026-09-11 16:41:47-16:41:52, failure in 5s",
+   "collect.yml run 55 (workflow_dispatch, us_preopen) 2026-09-11 22:36:37-22:36:43, failure in 6s",
+   "us_preopen and us_close uncollected for 2026-09-11"
+  ],
+  "degraded": [
+   "gdelt refused Apple and Microsoft at 22:41 and Press Metal and Maybank at 13:39; named the company 13 of 61",
+   "alphavantage_news quota exhausted for XNAS:MSFT",
+   "eodhd deferred every name by the 2-a-day credit budget",
+   "yahoo_rss read but empty for all six Bursa names at 13:39",
+   "google_news read but empty for Press Metal"
+  ],
+  "skipped": [],
+  "monitor_open": [
+   "fmp past cadence (110h, allowed 78h; was 86h on the previous page)",
+   "2 macro series past cadence: DOSM:CPI_HEADLINE 72d, CPIAUCSL 72d"
+  ],
+  "monitor_resolved": [
+   "name_coverage - opened on MYX:5183 by PR #60 and closed itself when the name started collecting"
+  ],
+  "findings": [
+   {
+    "name": "collector_down",
+    "severity": "blocking",
+    "detail": "Two runs dead in seconds with no logs; get_job_logs answers HTTP 404 for both, so no runner was ever allocated. Same signature as 2026-09-05 and 2026-09-06.",
+    "cause": "almost certainly the Actions spending cap. PR #62, merged today, records the repository at 90% of a USD 10 monthly budget with 19 days left in the cycle, and moved Windows CI to opt-in for that reason.",
+    "us_close_not_dispatched_because": "the first dispatch established the failure mode; a second identical dispatch cannot succeed while the cap holds",
+    "what_stops": "every sweep, every paper-book mark, and the Petronas Chemicals measurement",
+    "remedy": "only the account can lift it - Settings then Billing then Actions spending limit - or it clears at the cycle reset"
+   },
+   {
+    "name": "mis_dating_now_self_labelled",
+    "status": "open question answered",
+    "detail": "the pack marks each affected row MIS-DATED, names the instrument and the proxy, and prints a count line. Three pages had to find this by hand. Neither refusing nor falling back silently: labelling.",
+    "closes": "the question opened 2026-09-08"
+   },
+   {
+    "name": "pchem_query_fix_measured",
+    "status": "open question answered, against the prediction",
+    "detail": "the widened Google News query first ran in the 2026-09-11 13:37 bursa_close sweep. MYX:5183 went from 0 articles ever to 2. Both are www.moomoo.com posts titled '$PCHEM (5183.MY)$' with empty bodies, neither escalated; the second is promotional spam.",
+    "conclusion": "'PCHEM' matches the ticker-tag convention of retail social platforms, not the form the Malaysian business press prints. The query defect was real and is fixed; the coverage claim built on it is not supported. The name now collects noise where it collected nothing.",
+    "next_test": "a different index rather than another alias - nst_business, newly enabled by PR #62"
+   },
+   {
+    "name": "macro_staleness_resolved",
+    "status": "my earlier framing was wrong",
+    "detail": "the 2026-09-09 page reported 17 macro series past cadence, 12 of them DBnomics rows 436-497 days old, and carried re-sourcing as a purchasing decision. PR #62 settled it: the IMF never stopped publishing, DBnomics stopped carrying it, and FRED has the same PCPS series current. Now 2 series past cadence.",
+    "cost": "DBN:ALUMINIUM_USD read 2,525.96 at 2025-06 against FRED PALUMUSDM 3,158.27 for 2026-07; Press Metal is an aluminium smelter, so its main input price read about a quarter below market in every valuation of that name"
+   }
+  ]
+ },
+ "lessons": [
+  "A fix can work exactly as designed and still not deliver the benefit it was justified by; verifying the mechanism is not verifying the claim.",
+  "Where a number cannot be trusted, labelling beats refusing - the mis-dated rows carried a real return and only lacked a reader who knew which day it belonged to.",
+  "An aggregator going quiet is not a publisher going quiet; one route to a series is not evidence about the series.",
+  "Infrastructure has a budget and the budget is a dependency: a collector that cannot get a runner is indistinguishable, from inside the data, from a market with no news."
+ ]
+}
