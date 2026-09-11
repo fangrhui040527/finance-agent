@@ -20,6 +20,7 @@ quality floor are left out; nothing here is a new fact, only an arrangement.
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import asdict, dataclass, field
 from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
@@ -388,6 +389,36 @@ def _macro(facts, day: date) -> list[dict]:
     return out
 
 
+#: The one line of a digest that moves on its own. Everything else is a
+#: statement about what was collected; this is a statement about when the file
+#: was rendered, and the two must not be confused - see `_only_the_clock_moved`.
+_GENERATED = re.compile(r"^Generated .*?UTC", re.MULTILINE)
+
+
+def _only_the_clock_moved(existing: str, body: str) -> bool:
+    """True when the rendered digest differs from the file only in its own timestamp.
+
+    WHY THIS EXISTS. Two things dispatch the collector for one slot - the cron
+    and the nightly Routine's catch-up - and `_already_ran_today` makes the
+    second arrival a no-op that collects nothing. It was not a no-op here: the
+    digest was re-rendered with a later `Generated` line over identical
+    figures, so the workflow saw a changed file and pushed it. The 2026-09-08
+    23:23 commit is the whole shape of it - three files, three lines, `2084
+    articles` to `2084 articles`, `4465 observations` to `4465 observations`.
+
+    That is worse than wasted bytes. `git log data/digests` is the cheapest
+    record of when the collection actually moved, and a timestamp that advances
+    over unchanged data makes that record lie.
+
+    Only the clock is ignored. The slot and the three counts share that line
+    and are compared, because a different slot writing the same figures is a
+    fact about the collection and a re-render at a later minute is not.
+    """
+    return _GENERATED.sub("Generated", existing.strip()) == _GENERATED.sub(
+        "Generated", body.strip()
+    )
+
+
 def write_digest(
     digest: Digest, root: str | Path = DIGEST_DIR, *, engine: PolicyEngine | None = None
 ) -> tuple[Path, Path]:
@@ -402,6 +433,12 @@ def write_digest(
     Callers that have one (the CLI, the MCP tool) pass theirs; the default is
     there so that adding this gate cannot be sidestepped by a caller that
     simply has no engine to hand.
+
+    A re-render that would change nothing but the timestamp writes NOTHING, so
+    a second collector arrival on the same slot leaves the directory alone and
+    the commit step finds nothing to commit. The rail still runs first: a
+    digest is checked before it is compared, never waved through for being
+    similar to one that passed.
     """
     from core.guardrails.defaults import default_engine
     from core.guardrails.publish import publish
@@ -413,8 +450,17 @@ def write_digest(
     root.mkdir(parents=True, exist_ok=True)
     md = root / f"{digest.day}.md"
     js = root / f"{digest.day}.json"
+    latest = root / "latest.md"
+    if md.exists() and _only_the_clock_moved(md.read_text(encoding="utf-8"), body):
+        # `latest.md` is still brought into line when it is not already there -
+        # a skipped write must not be able to leave the pointer missing or
+        # behind the dated copy it points at.
+        if not latest.exists() or not _only_the_clock_moved(
+            latest.read_text(encoding="utf-8"), body
+        ):
+            latest.write_text(body + "\n", encoding="utf-8")
+        return md, js
     md.write_text(body + "\n", encoding="utf-8")
     js.write_text(digest.to_json() + "\n", encoding="utf-8")
-    latest = root / "latest.md"
     latest.write_text(body + "\n", encoding="utf-8")
     return md, js

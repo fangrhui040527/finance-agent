@@ -9,6 +9,22 @@ SQLite so the CLI, the MCP server and the web app share it across processes.
 The cache is NOT append-only on purpose: it is derived data, reconstructible
 from the source, and holding stale rows would be the dishonest choice.
 
+WHAT IT REFUSES TO SERVE. A body fetched DURING a session is not the session's
+bar. On 2026-09-08 XNAS:SPY was fetched mid-session and Yahoo answered with an
+in-progress row whose open was carried over from the previous day - open above
+its own high, which the bar parser correctly drops as corrupt. The body still
+looked fresh (fetched today, last CSV row dated today), so every later sweep
+that UTC day took a cache hit and never refetched, and the US market proxy
+silently ended four sessions earlier than the names it was measuring. The
+`us_close` sweep would have got the finished bar. The gate is the body's own
+disagreement with itself: it carries a ROW the parser will not accept as a BAR,
+which is what an in-progress session looks like on the wire. Such a body is a
+miss, so the next process fetches again and gets the finished session.
+
+Not caught: an in-progress row that happens to be self-consistent parses as a
+bar, and is then cached and read as that session's close. This gate cannot see
+that one. Nothing else currently can either.
+
 WHAT IT REFUSES TO HOLD. A feed that answers 403 answers with a page, not with
 bars, and until 2026-09-06 that page was cached like any other body: all 27
 Stooq rows in this repository's cache held the same 796 bytes of HTML. Nothing
@@ -24,7 +40,7 @@ from __future__ import annotations
 
 import sqlite3
 from collections.abc import Callable
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from pathlib import Path
 
 from core.provenance.ledger import _enable_wal
@@ -54,6 +70,47 @@ def looks_like_bars(body: str) -> bool:
         return False
     lines = text.splitlines()
     return len(lines) >= 2 and lines[0].count(",") >= 4
+
+
+def last_usable_bar_day(body: str) -> date | None:
+    """The last row that SURVIVES the bar parser, not merely the last row.
+
+    The difference is the whole point: an in-progress row carries a date and
+    looks like data, and is thrown away downstream. Asking the parser rather
+    than re-implementing its rules keeps one definition of "a usable bar".
+    The import is deferred because the feed owns the cache, not the reverse.
+    """
+    from core.market.feed import PriceFeed, PriceFeedError
+
+    try:
+        bars = PriceFeed.parse(body)
+    except PriceFeedError:
+        return None
+    return bars[-1].day if bars else None
+
+
+def last_dated_row(body: str) -> date | None:
+    """The date on the last row that carries one, parseable as a bar or not."""
+    for line in reversed((body or "").strip().splitlines()):
+        head = line.split(",", 1)[0].strip()[:10]
+        try:
+            return date.fromisoformat(head)
+        except ValueError:
+            continue
+    return None
+
+
+def is_mid_session(body: str) -> bool:
+    """Whether the body ends in a row the bar parser will not take.
+
+    A body that ends Friday when Friday is the last session it saw is complete,
+    whatever day it is read on. A body that carries a row for a LATER day than
+    its last usable bar was fetched while that day was still trading: the row is
+    the session so far, not the session.
+    """
+    usable = last_usable_bar_day(body)
+    dated = last_dated_row(body)
+    return usable is not None and dated is not None and usable < dated
 
 
 def offline() -> bool:
@@ -101,8 +158,16 @@ class PriceCache:
             self.conn.execute("DELETE FROM price_csv WHERE feed = ? AND symbol = ?", (feed, symbol))
             self.conn.commit()
             return None
-        if fetched_on != self._today() and not offline():
+        if offline():
+            self.last_served_from = fetched_on
+            return body
+        if fetched_on != self._today():
             return None  # a new session may have printed; the cached day is over
+        if is_mid_session(body):
+            # Fetched while the last session it saw was still trading. A hit
+            # here freezes the symbol a session behind for the rest of the day,
+            # and the reader cannot tell that from a market that was shut.
+            return None
         self.last_served_from = fetched_on
         return body
 

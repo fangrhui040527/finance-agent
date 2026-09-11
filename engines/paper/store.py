@@ -22,6 +22,16 @@ from engines.paper.settings import PaperSettings
 
 DECIDED = "decided"
 CONTROL = "control"
+
+#: The instrument id of an all-cash night. Not a tradable symbol and never
+#: routed to a market: it is the subject of the one row that says a decision to
+#: hold nothing was taken. `mic_of` would reject it, which is why every path
+#: that prices a target checks the reason before the id.
+CASH = "CASH"
+
+#: `reason` on that row. Recorded, then immediately resolved - there is no
+#: position to apply, so it must never sit in the pending queue.
+ALL_CASH = "all_cash"
 BOOKS = (DECIDED, CONTROL)
 
 SCHEMA = """
@@ -145,7 +155,7 @@ class TargetRow:
     decided_at: datetime
     instrument_id: str
     weight: Decimal
-    reason: str  # decision | stop | control_rebalance
+    reason: str  # decision | stop | control_rebalance | all_cash
     phase: str
     thesis: str = ""
     prediction_id: str | None = None

@@ -829,3 +829,83 @@ def test_a_name_with_no_alias_row_still_gets_asked_for():
     assert search_names().get("XKLS:9999") is None
     names = search_names().get("XKLS:9999") or ("Nobody Bhd",)
     assert '"Nobody Bhd"' in finance_query(names)
+
+
+def test_gdelt_is_asked_for_every_name_the_company_is_printed_under(stores):
+    """End to end: the alias reaches the adapter, not only the helper.
+
+    The per-name path sent `terms[0]` alone, so Petronas Chemicals was asked
+    for as "Petronas Chemicals" and never as "PCHEM". The linker has had
+    "PCHEM" the whole time - this corpus could recognise a name it never asked
+    for, which is what zero articles out of 2,671 looked like from outside.
+    """
+    corpus_db, facts_db = stores
+    adapters = RecordingAdapters({"gdelt": []})
+    run_sweep(
+        Cfg(sources=("gdelt",), watchlist=("MYX:5183", "MYX:1155")),
+        "bursa_close",
+        corpus_path=corpus_db,
+        facts_path=facts_db,
+        link_graph=False,
+        adapter_for=adapters,
+        entity_index=INDEX,
+        clock=lambda: NOW,
+        log=lambda m: None,
+    )
+    queries = [kw.get("query", "") for name, kw in adapters.calls if name == "gdelt"]
+    joined = " | ".join(queries)
+    assert '"PCHEM"' in joined, joined
+    assert '"Maybank"' in joined, joined
+    # One request per company still: the aliases widen the query, they do not
+    # multiply the requests, which is what the three-names-per-run cap counts.
+    assert len(queries) == 2, queries
+
+
+def test_a_gdelt_name_with_no_askable_alias_is_skipped_not_sent(stores):
+    """A phrase under five characters is refused by the DOC API as plain text,
+    costing three retries and up to a 90s read. The name is skipped instead."""
+    corpus_db, facts_db = stores
+    adapters = RecordingAdapters({"gdelt": []})
+    run_sweep(
+        Cfg(sources=("gdelt",), watchlist=("MYX:9999",)),
+        "bursa_close",
+        corpus_path=corpus_db,
+        facts_path=facts_db,
+        link_graph=False,
+        adapter_for=adapters,
+        entity_index=INDEX,
+        clock=lambda: NOW,
+        log=lambda m: None,
+    )
+    assert not [kw for name, kw in adapters.calls if name == "gdelt"]
+
+
+def test_a_source_with_nothing_to_do_in_this_slot_still_records_a_sweep(stores):
+    """A skip is a dispatch that had nothing to do, and the silence rule has to
+    see it.
+
+    `sweep_silence` reads `corpus.last_success` and nothing else. fmp is
+    per-instrument and `us_preopen` carries no per-instrument work, so fmp was
+    correctly skipped every weekday, recorded the skip in the PULLS table only,
+    and opened a silence alert on the fourth day about a collector that had
+    dispatched it on time all four days. The KeyMissing skip beside it has
+    always written both rows; this one now does too.
+    """
+    corpus_db, facts_db = stores
+    adapters = RecordingAdapters({})
+    run_sweep(
+        Cfg(sources=("fmp",), watchlist=("MYX:1155",)),
+        "us_preopen",  # a macro slot: no market's names are collected in it
+        corpus_path=corpus_db,
+        facts_path=facts_db,
+        link_graph=False,
+        adapter_for=adapters,
+        entity_index=INDEX,
+        clock=lambda: NOW,
+        log=lambda m: None,
+    )
+    with Corpus(corpus_db) as c:
+        rows = [s for s in c.sweeps() if s["source"] == "fmp"]
+        assert rows, "the skip left no sweep row, so the source reads as stopped"
+        assert "skipped" in (rows[0]["detail"] or "")
+        assert c.last_success("fmp") is not None, "sweep_silence would still fire"

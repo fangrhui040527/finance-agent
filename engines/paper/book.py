@@ -48,6 +48,8 @@ from engines.paper.rules import (
 )
 from engines.paper.settings import PaperSettings
 from engines.paper.store import (
+    ALL_CASH,
+    CASH,
     CONTROL,
     DECIDED,
     BookState,
@@ -138,6 +140,7 @@ class DecisionResult:
     targets: list[TargetRow] = field(default_factory=list)
     predictions: list[LoggedPrediction] = field(default_factory=list)
     superseded: int = 0
+    all_cash: bool = False
     dry_run: bool = False
     equity_usd: Decimal = Decimal(0)
 
@@ -157,6 +160,8 @@ class DecisionResult:
         ]
         for t in self.targets:
             lines.append(f"  {t.instrument_id:<12} {t.weight:>7.2%}  {t.reason}")
+        if self.all_cash:
+            lines.append("  all-cash: one row and one prediction, graded against the control book")
         if self.predictions:
             lines.append(f"  {len(self.predictions)} prediction(s) logged:")
             lines += [
@@ -232,7 +237,9 @@ def decide(
         watchlist=tuple(cfg.watchlist),
     )
 
-    recorded_today = store.targets_on(DECIDED, day, reason="decision")
+    recorded_today = [
+        t for t in store.targets_on(DECIDED, day) if t.reason in ("decision", ALL_CASH)
+    ]
     todays = [
         t for t in store.pending_targets(DECIDED) if t.decided_on == day and t.reason == "decision"
     ]
@@ -267,6 +274,18 @@ def decide(
             )
         )
 
+    # AN ALL-CASH NIGHT IS A DECISION. Until 2026-09-09 it was the one decision
+    # that left no trace: no weight raised and no name held is zero rows, so the
+    # book could not tell "held nothing on purpose" from "was never asked", and
+    # `decide` printed "this is logged and will be graded" over an empty write.
+    # It is also a CLAIM - that nothing in the fundable universe beats cash over
+    # the horizon - and the control book is the counterfactual that settles it.
+    # So it gets one row and one prediction, graded against the control instead
+    # of against a price.
+    all_cash = not rows
+    if all_cash:
+        rows.append(TargetRow(DECIDED, day, now, CASH, Decimal(0), ALL_CASH, phase.name, thesis))
+
     if learning is not None:
         from agents.learning.reflection import Horizon, Prediction
 
@@ -277,10 +296,22 @@ def decide(
         )
         for i, t in enumerate(rows):
             cur = current.get(t.instrument_id, Decimal(0))
-            direction = 1 if t.weight > cur else (-1 if (t.weight == 0 and cur > 0) else 0)
-            if direction == 0:
-                continue
-            slug = t.instrument_id.replace(":", "").lower()
+            if t.reason == ALL_CASH:
+                # +1 because the claim is "this book beats the control by
+                # holding nothing". `correct` is then direction * (realised -
+                # benchmark) > 0, which is exactly that question.
+                direction = 1
+                slug = "allcash"
+                statement = (
+                    f"all-cash: nothing in the fundable universe beats cash over "
+                    f"{horizon} sessions: {thesis}"
+                )
+            else:
+                direction = 1 if t.weight > cur else (-1 if (t.weight == 0 and cur > 0) else 0)
+                if direction == 0:
+                    continue
+                slug = t.instrument_id.replace(":", "").lower()
+                statement = f"{t.instrument_id} target {t.weight:.2%} (from {cur:.2%}): {thesis}"
             prior = len(store.targets_on(DECIDED, day))
             salt = hashlib.sha256(
                 f"{thesis}|{t.weight}|{now.isoformat()}|{prior}".encode()
@@ -292,7 +323,7 @@ def decide(
                 agent="paper",
                 made_at=made,
                 horizon=Horizon(f"{horizon}d"),
-                statement=f"{t.instrument_id} target {t.weight:.2%} (from {cur:.2%}): {thesis}",
+                statement=statement,
                 direction=direction,
                 confidence=confidence,
                 grade_on=grade_date(made, horizon),
@@ -302,6 +333,7 @@ def decide(
                     "from_weight": str(cur),
                     "to_weight": str(t.weight),
                     "phase": phase.name,
+                    "all_cash": t.reason == ALL_CASH,
                 },
             )
             if not dry_run:
@@ -336,8 +368,17 @@ def decide(
                     t.target_id, day, "superseded", f"replaced by a later decision on {day}"
                 )
             result.superseded = len(todays)
-        store.record_targets(rows)
+        ids = store.record_targets(rows)
+        for tid, t in zip(ids, rows, strict=True):
+            if t.reason == ALL_CASH:
+                # Resolved on the spot: there is no position to open, and a row
+                # left pending would be picked up by `apply_pending`, which
+                # would ask a market for the price of CASH.
+                store.resolve(
+                    tid, day, ALL_CASH, "held nothing; the row is the record that it was decided"
+                )
     result.targets = rows
+    result.all_cash = all_cash
     result.predictions = preds
     return result
 

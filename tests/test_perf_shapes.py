@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 
 from core.llm.tiers import TaskClass, Tier, Usage
@@ -206,3 +206,98 @@ def test_gdelt_pages_by_time_slice_and_dedupes(monkeypatch):
     urls = [r.payload.get("url") for r in out]
     assert urls.count("https://x/dup") == 1  # deduped across slices
     assert "startdatetime" in pages[0] and "enddatetime" in pages[0]
+
+
+# --- a body fetched mid-session is not that session ------------------------------
+
+MID_SESSION = (
+    "Date,Open,High,Low,Close,Volume\n"
+    "2026-09-04,772.01,772.87,769.00,770.19,34015600\n"
+    "2026-09-08,772.01,769.70,767.26,767.29,2948758\n"  # open above its own high
+)
+FINISHED = (
+    "Date,Open,High,Low,Close,Volume\n"
+    "2026-09-04,772.01,772.87,769.00,770.19,34015600\n"
+    "2026-09-08,770.50,773.10,767.26,772.90,41000000\n"
+)
+
+
+def test_a_body_whose_last_row_is_not_a_bar_is_not_a_cache_hit(tmp_path):
+    """XNAS:SPY, 2026-09-08: fetched mid-session, the in-progress row dropped by
+    the parser, and then served all day - so the US proxy measured to 2026-09-04
+    while the names it was measuring had printed 2026-09-08."""
+    from core.market.cache import PriceCache
+
+    c = PriceCache(tmp_path / "cache.db", today=lambda: "2026-09-08")
+    c.put("yahoo", "spy", MID_SESSION)
+    assert c.get("yahoo", "spy") is None  # miss: fetch again, the session is not over
+    c.put("yahoo", "spy", FINISHED)
+    assert c.get("yahoo", "spy") == FINISHED  # and once it is, the cache goes quiet
+
+
+def test_a_body_that_simply_ends_on_the_last_session_still_hits(tmp_path):
+    """A quiet market is not a partial fetch: Friday's body read on Monday is
+    complete, and refetching it every read is the quota burn the cache exists
+    to prevent."""
+    from core.market.cache import PriceCache
+
+    c = PriceCache(tmp_path / "cache.db", today=lambda: "2026-09-07")
+    c.put("yahoo", "spy", FINISHED.replace("2026-09-08", "2026-09-07"))
+    assert c.get("yahoo", "spy") is not None
+
+
+def test_offline_still_serves_what_it_has(tmp_path, monkeypatch):
+    """The feedback routine has no route to a price host. It gets the stale body
+    and reports the day it came from; it does not get nothing."""
+    from core.market.cache import PriceCache
+
+    c = PriceCache(tmp_path / "cache.db", today=lambda: "2026-09-08")
+    c.put("yahoo", "spy", MID_SESSION)
+    monkeypatch.setenv("FINPLANET_OFFLINE", "1")
+    assert c.get("yahoo", "spy") == MID_SESSION and c.last_served_from == "2026-09-08"
+
+
+# --- a dated row with no values, which is NOT a mid-session body -----------------
+#
+# The Bursa proxy 0820EA.KL, read from the shipped cache on 2026-09-11:
+#
+#     2026-09-08,1.8250,1.8250,1.8050,1.8050,6000.0
+#     2026-09-09,,,,,                                 <- dated, and empty
+#     2026-09-10,1.8300,1.8300,1.8300,1.8300,50900.0
+#
+# Yahoo serves a placeholder for a session it has nothing for. The parser drops
+# it, which is right, and the proxy's history keeps a HOLE at 2026-09-09 while
+# Maybank has a bar for that day. That mismatch is `pack.Move.mis_dated`'s job.
+#
+# What it must NOT do is make the body a cache miss. The hole is permanent - no
+# amount of refetching fills a session the upstream never recorded - so a miss
+# here buys nothing and spends the day's quota on every read.
+
+BLANK_MIDDLE = (
+    "Date,Open,High,Low,Close,Volume\n"
+    "2026-09-08,1.8250,1.8250,1.8050,1.8050,6000\n"
+    "2026-09-09,,,,,\n"
+    "2026-09-10,1.8300,1.8300,1.8300,1.8300,50900\n"
+)
+
+
+def test_a_hole_in_the_middle_is_not_a_session_still_running(tmp_path):
+    from core.market.cache import PriceCache, is_mid_session, last_dated_row, last_usable_bar_day
+
+    assert last_usable_bar_day(BLANK_MIDDLE) == date(2026, 9, 10)
+    assert last_dated_row(BLANK_MIDDLE) == date(2026, 9, 10)
+    assert not is_mid_session(BLANK_MIDDLE), "the newest row IS a bar; the gap is older"
+
+    c = PriceCache(tmp_path / "cache.db", today=lambda: "2026-09-10")
+    c.put("yahoo", "0820EA.KL", BLANK_MIDDLE)
+    assert c.get("yahoo", "0820EA.KL") == BLANK_MIDDLE, "refetching cannot fill a hole"
+
+
+def test_the_parser_drops_the_blank_row_rather_than_reading_it_as_zero(tmp_path):
+    """A row of empty fields read as 0.0 would be a session where the proxy
+    opened, closed and traded at nothing - and would decompose every name's move
+    against it."""
+    from core.market.feed import PriceFeed
+
+    days = [b.day for b in PriceFeed.parse(BLANK_MIDDLE)]
+    assert days == [date(2026, 9, 8), date(2026, 9, 10)]

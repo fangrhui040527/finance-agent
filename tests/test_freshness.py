@@ -65,3 +65,67 @@ def test_an_unknown_series_is_not_judged():
 def test_the_label_reads_as_stale_at_a_glance():
     assert age_label("DGS10", date(2026, 9, 3), TODAY) == "3d"
     assert age_label("DOSM:CPI_HEADLINE", date(1982, 12, 1), TODAY) == "15985d STALE (>70d)"
+
+
+# --- a stopped upstream, which is not a late one ---------------------------------------------
+
+
+def test_every_ended_series_still_declares_a_cadence():
+    """The rail behind the rail. ENDED suppresses the staleness judgement; if
+    the entry is ever deleted because the upstream came back, the series must
+    fall straight back onto a declared limit rather than into "not judged"."""
+    from knowledge.sources.freshness import ENDED
+
+    assert set(ENDED) <= set(MAX_AGE_DAYS), (
+        f"no cadence for {sorted(set(ENDED) - set(MAX_AGE_DAYS))}"
+    )
+
+
+def test_every_ended_id_is_a_series_a_collector_actually_stores():
+    """An ENDED entry for an id nothing fetches is a claim nothing can check."""
+    from knowledge.sources.dbnomics import SERIES as DBN
+    from knowledge.sources.fred import SERIES as FRED
+    from knowledge.sources.freshness import ENDED
+
+    collected = {s.series_id for s in DBN} | set(FRED) | {"BNM:OPR"}
+    assert set(ENDED) <= collected, f"nothing collects {sorted(set(ENDED) - collected)}"
+
+
+def test_a_stopped_upstream_reads_ended_not_stale():
+    """The whole point: STALE tells a reader to go and chase the upstream, and
+    that upstream has already been chased and found stopped."""
+    label = age_label("DBN:POLICY_RATE_MY", date(2025, 6, 1), date(2026, 9, 10))
+    assert label == "466d ENDED 2025-06"
+    assert "STALE" not in label
+
+
+def test_the_probe_verdict_matches_what_the_collector_last_stored():
+    """The recorded last period is the API's answer. If a later run stores a
+    newer point these dates are wrong, which `has_resumed` is there to catch."""
+    from knowledge.sources.freshness import ENDED
+
+    assert ENDED["DBN:GOVT_YIELD_MY"].last_period == date(2025, 5, 1)
+    assert ENDED["DBN:CPI_MY"].last_period == date(2025, 7, 1)
+    assert ENDED["DBN:BRENT_USD"].upstream == "IMF/PCPS"
+    assert {e.verdict for e in ENDED.values()} == {"FROZEN"}
+
+
+def test_a_series_that_starts_printing_again_stops_being_called_dead():
+    """Marking an upstream dead is the one judgement here that could hide a
+    live number, so it is checked against the observation every time."""
+    from knowledge.sources.freshness import ended_note, has_resumed
+
+    sid, today = "DBN:NEER_MY", date(2026, 9, 10)
+    assert not has_resumed(sid, date(2025, 5, 1))
+    assert has_resumed(sid, date(2026, 8, 1))
+    assert age_label(sid, date(2026, 8, 1), today) == "40d"
+    assert ended_note(sid, date(2026, 8, 1)) == ""
+    assert "BIS/WS_EER stopped at 2025-05" in ended_note(sid, date(2025, 5, 1))
+
+
+def test_a_live_series_is_never_called_ended():
+    from knowledge.sources.freshness import ended, ended_note
+
+    assert ended("DGS10") is None
+    assert ended_note("DGS10") == ""
+    assert age_label("DGS10", date(2026, 8, 1), TODAY) == "36d STALE (>7d)"

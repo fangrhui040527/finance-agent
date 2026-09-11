@@ -598,6 +598,40 @@ def _name_coverage_rules(cfg, now: datetime) -> list[Alert]:
     ]
 
 
+def _resumed_alerts(resumed: list[tuple[str, str, str]]) -> list[Alert]:
+    """A series recorded as ended that has printed again.
+
+    Marking an upstream dead is the one judgement in freshness.py that can hide
+    a live number: from then on the row says ENDED instead of its age and the
+    staleness rule looks away. This is the check that keeps that honest, and it
+    is why the collector still fetches all fifteen frozen series every sweep -
+    a verdict nothing can contradict is not a verdict.
+    """
+    if not resumed:
+        return []
+    named = ", ".join(f"{sid} (now {newest}, ended {last})" for sid, newest, last in resumed)
+    return [
+        Alert(
+            rule="series_resumed",
+            severity=WARN,
+            title=f"{len(resumed)} macro series marked ended has printed again: {named}",
+            detail="knowledge/sources/freshness.py ENDED says this upstream stopped, so every "
+            "macro row prints ENDED instead of its age and series_stale ignores it. The "
+            "upstream disagrees. Until the entry is removed the surfaces are describing a "
+            "live series as dead",
+            next_step="delete the id from freshness.ENDED so it is judged on its cadence "
+            "again, and re-run .github/workflows/dbnomics-probe.yml to see whether its "
+            "siblings came back too",
+            evidence={
+                "resumed": [
+                    {"series_id": sid, "newest": newest, "ended_at": last}
+                    for sid, newest, last in resumed
+                ]
+            },
+        )
+    ]
+
+
 def _series_rules(cfg, now: datetime) -> list[Alert]:
     """A macro series whose newest point is past its own publication cadence.
 
@@ -612,9 +646,18 @@ def _series_rules(cfg, now: datetime) -> list[Alert]:
     One alert for all of them, worst first: fifteen separate alerts about the
     same dead upstream is fifteen alerts nobody finishes reading. Series with
     no declared cadence in knowledge/sources/freshness.py are not judged.
+
+    A series whose upstream has STOPPED is not judged either. The 2026-09-06
+    probe read the DBnomics API and found the datasets behind fifteen ids
+    frozen, with no live sibling code to move to; freshness.ENDED records that,
+    every macro row prints `ENDED 2025-06`, and this rule stays quiet about
+    them, because an alert whose next step is "re-source your macro data" does
+    not belong in a nightly list of things that changed. What it does say is
+    the opposite case: a series marked ended that has started printing again,
+    which means the entry is now a lie and has to come out.
     """
     from knowledge.facts import FactBook
-    from knowledge.sources.freshness import age_days, max_age_days
+    from knowledge.sources.freshness import age_days, ended, has_resumed, max_age_days
 
     path = str(getattr(cfg, "facts_db", "data/facts.db"))
     if not Path(path).exists():
@@ -622,6 +665,7 @@ def _series_rules(cfg, now: datetime) -> list[Alert]:
 
     today = now.date()
     stale: list[tuple[int, int, str, str]] = []  # age, limit, series_id, obs_date
+    resumed: list[tuple[str, str, str]] = []  # series_id, newest, last period it had ended at
     with FactBook(path) as book:
         for sid in book.series_ids():
             limit = max_age_days(sid)
@@ -631,16 +675,22 @@ def _series_rules(cfg, now: datetime) -> list[Alert]:
             if not pts:
                 continue
             newest = pts[-1].obs_date
+            dead = ended(sid)
+            if dead is not None:
+                if has_resumed(sid, newest):
+                    resumed.append((sid, newest.isoformat(), dead.last_period.isoformat()))
+                continue
             age = age_days(newest, today)
             if age > limit:
                 stale.append((age, limit, sid, newest.isoformat()))
+    out = _resumed_alerts(resumed)
     if not stale:
-        return []
+        return out
 
     stale.sort(reverse=True)
     named = ", ".join(f"{sid} ({age}d, limit {limit})" for age, limit, sid, _ in stale[:6])
     more = f" and {len(stale) - 6} more" if len(stale) > 6 else ""
-    return [
+    return out + [
         Alert(
             rule="series_stale",
             severity=ALERT,
@@ -649,8 +699,9 @@ def _series_rules(cfg, now: datetime) -> list[Alert]:
             "and a healthy fetch look identical from the sweep table. Any reading that "
             "treats these as current is reading a figure from another year",
             next_step="check the upstream for each id (DBnomics and the IMF/BIS datasets "
-            "behind it, or DOSM), then either point the adapter at a live series or take "
-            "the id out of its SERIES table; `ask.py macro` marks each row STALE meanwhile",
+            "behind it, or DOSM), then either point the adapter at a live series, record it "
+            "in freshness.ENDED when the probe says the whole dataset stopped, or take the id "
+            "out of its SERIES table; `ask.py macro` marks each row STALE meanwhile",
             evidence={
                 "stale": [
                     {"series_id": sid, "newest": newest, "age_days": age, "limit_days": limit}
