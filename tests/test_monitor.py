@@ -985,13 +985,23 @@ def test_the_cli_prints_one_slot_per_line_and_collects_nothing(tmp_path, monkeyp
 
     Driven against the real clock rather than a frozen one - the command reads
     today from the wall clock, and `bursa_close` is the slot the cron owes every
-    day of the week, so recording it now is a stable assertion whatever day the
-    suite runs on."""
+    day of the week, so recording it TODAY is a stable assertion whatever day
+    the suite runs on.
+
+    TODAY, clamped, and that is the whole point of the `max`. `now - 5 minutes`
+    is not today for the first five minutes of a UTC day: it is 23:5x yesterday,
+    the slot has not run today, and the command is right to owe it. This test
+    failed exactly once that way, on a CI run that started at 00:02 UTC - a red
+    build on a correct command, from a docstring that promised stability it did
+    not have. The clamp keeps the ordinary run five minutes in the past and
+    holds the assertion inside the day the command is asking about."""
     import ask
     import core.config as C
 
+    now = datetime.now(UTC)
+    ran_at = max(now - timedelta(minutes=5), now.replace(hour=0, minute=0, second=0, microsecond=0))
     path = tmp_path / "corpus.db"
-    _ran(path, "bursa_close", datetime.now(UTC) - timedelta(minutes=5))
+    _ran(path, "bursa_close", ran_at)
     real = load_config()
     monkeypatch.setattr(C, "load", lambda *a, **k: replace(real, corpus_db=str(path)))
 
