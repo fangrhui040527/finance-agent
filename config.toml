@@ -268,7 +268,28 @@ min_graded_for_calibration = 30
 #
 #   thestar_business      404   the registered path no longer exists
 #   edge_malaysia         404   ditto
-#   nst_business          404   ditto
+#   nst_business          404   ditto - BUT SEE BELOW, this one was wrong
+#
+# PROBED A THIRD TIME, 2026-09-11, by a probe that asks the PUBLISHER instead of
+# re-trying one guessed path (.github/workflows/bursa-feeds-probe.yml: it reads
+# the RSS autodiscovery tags off each site's own pages, then tries conventional
+# paths, and reports per URL whether the items carry DATES). It changed two
+# answers and confirmed three:
+#
+#   nst_business          RECOVERED. /business/rss 404s; /feed serves 50 items,
+#                               50 dated, newest 11:09 the same morning. The
+#                               outlet was never dead - the URL was one path
+#                               wrong, and four days of "404" had been read as
+#                               a publisher with no feed.
+#   fmt_business          IMPROVED. The homepage advertises /feeds/rss/headlines,
+#                               fresher than the category path we used (02:58
+#                               against 02:25 on the same run).
+#   thestar_business      DEAD. Five candidates, all 404, and neither the
+#                               homepage nor the business page advertises any
+#                               feed. Not a wrong guess - no discoverable RSS.
+#   edge_malaysia         DEAD. Same shape, five candidates including the old
+#                               theedgemarkets.com host.
+#   bernama_business      UNUSABLE, confirmed twice: 10 items, 0 dated.
 #   bernama_business      10 items, none dated - refused rather than ingested,
 #                               because every one would enter the corpus stamped
 #                               with the moment it was fetched
@@ -283,7 +304,12 @@ enabled = [
   "gdelt", "google_news", "yahoo_rss",
   # The one Malaysian business feed that answered the probe on main (2026-09-04);
   # thestar/edge/nst returned 404, bernama undated, bnm_press HTML. Candidates.
-  "fmt_business",
+  # Two Malaysian outlets now, not one. The 2026-09-11 probe read each
+  # publisher's own pages: NST's registered `/business/rss` 404s but `/feed`
+  # serves 50 dated items, and FMT advertises a fresher feed than the category
+  # path we had. thestar and edge serve no discoverable RSS at all and bernama
+  # dates nothing - all three settled, see knowledge/feeds/registry.py.
+  "fmt_business", "nst_business",
   "edgar", "bnm_opr", "dosm_cpi",
   "finnhub", "fmp", "alphavantage_news", "fred",
   # 2026-09-05, the four sites asked for by their free routes (details/09):

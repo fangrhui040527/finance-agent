@@ -72,6 +72,11 @@ MAX_AGE_DAYS: dict[str, int] = {
     # FRED, monthly
     "CPIAUCSL": MONTHLY,
     "UNRATE": MONTHLY,
+    # Commodities through FRED (see fred.SERIES). PALUMUSDM is IMF PCPS, which
+    # publishes monthly with a long lag - the same cadence its DBnomics twin had.
+    # DCOILBRENTEU is an EIA daily series and gets a market series' limit.
+    "PALUMUSDM": MONTHLY,
+    "DCOILBRENTEU": DAILY,
     # Bank Negara: the OPR is an MPC decision, not a market price.
     "BNM:OPR": POLICY,
     # DOSM, monthly (knowledge/sources/dosm.py)
