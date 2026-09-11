@@ -59,16 +59,29 @@ FACTORIES: dict[str, Callable[..., FeedAdapter]] = {
 RSS_SOURCES: dict[str, tuple[str, str]] = {
     # name: (url, trust)
     "reuters_business": ("https://feeds.reuters.com/reuters/businessNews", "wire"),
+    # DEAD, settled by the 2026-09-11 runner probe. Every candidate answered 404
+    # and neither the homepage nor the business page advertises any feed at all:
+    #   /rss/business/business-news  /rss/Business  /rss/business
+    #   /rss/editors-pick            /rss
+    # Not a wrong guess to correct - The Star serves no RSS this probe can find.
     "thestar_business": ("https://www.thestar.com.my/rss/business/business-news", "curated_news"),
-    # CANDIDATE: The Edge publishes its feed list at /rss.html; the probe reads
-    # the advertised feed URLs off that page.
+    # DEAD, same probe, same shape: /rss.html /rss /feed /rss.xml and the old
+    # theedgemarkets.com/rss.xml all 404, and the pages advertise nothing.
     "edge_malaysia": ("https://theedgemalaysia.com/rss.html", "curated_news"),
-    # CANDIDATE: Bernama's feed index. Same treatment.
+    # UNUSABLE, not absent. This URL answers with 10 items and dates NONE of
+    # them, twice measured (2026-09-04 and 2026-09-11). The collector windows by
+    # time, so an undated feed is a feed it cannot use however current it is.
     "bernama_business": ("https://www.bernama.com/en/rssfeed.php", "wire"),
-    # CANDIDATE: WordPress category feed - the conventional path.
-    "fmt_business": ("https://www.freemalaysiatoday.com/category/business/feed/", "general_news"),
-    # CANDIDATE: conventional Drupal path; the probe decides.
-    "nst_business": ("https://www.nst.com.my/business/rss", "curated_news"),
+    # The publisher's OWN advertised feed, read off its autodiscovery tag on
+    # 2026-09-11 and fresher than the category path we used before it (02:58
+    # against 02:25 on the same probe). A site that points at its feed is the
+    # authority on where the feed is.
+    "fmt_business": ("https://www.freemalaysiatoday.com/feeds/rss/headlines", "general_news"),
+    # RECOVERED 2026-09-11. `/business/rss` was a guess and it 404s; `/feed`
+    # answers with 50 items, 50 of them dated, newest 11:09 the same morning.
+    # NST was never dead - the registered URL was one path wrong, which is the
+    # whole reason the probe exists rather than trusting a single 404.
+    "nst_business": ("https://www.nst.com.my/feed", "curated_news"),
     # REGISTERED, NOT ENABLED. Four sweeps settled this; the record, so nobody
     # repeats it:
     #

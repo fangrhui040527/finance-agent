@@ -66,6 +66,20 @@ SERIES: dict[str, str] = {
     "DEXMAUS": "Malaysian ringgit per US dollar",
     "SP500": "S&P 500, index level",
     "NASDAQCOM": "NASDAQ Composite, index level",
+    # Commodities, added 2026-09-11 to replace DBnomics ids that read 13 months
+    # older than these. The 2026-09-06 probe found our DBnomics copies frozen and
+    # the conclusion drawn from it - "the publishers stopped" - was WRONG. IMF
+    # PCPS is still publishing; DBnomics stopped carrying it. FRED answers
+    # 2026-07 where DBnomics answers 2025-06, from the same IMF series.
+    #
+    # PALUMUSDM is the one that cost something: Press Metal (MYX:8869) is an
+    # aluminium smelter and its input price read 2,525.96 when the market was
+    # 3,158.27 - a quarter low, under every valuation of that name.
+    "PALUMUSDM": "Aluminium, USD per tonne (IMF PCPS via FRED)",
+    # Brent from the EIA rather than the IMF: daily instead of monthly, and two
+    # days old instead of seventy. A different publisher entirely, which is why
+    # it never froze when the IMF route did.
+    "DCOILBRENTEU": "Brent crude, USD per barrel (EIA, daily)",
 }
 
 #: How far back each pull reaches. Wider than a day on purpose: monthly series

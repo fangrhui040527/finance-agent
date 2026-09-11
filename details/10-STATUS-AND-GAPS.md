@@ -323,12 +323,38 @@ approximation stated.
 
 ### Bursa coverage: the half of the book the corpus barely holds
 
-The book is six Bursa names and three Nasdaq names. The corpus is 1,968
-articles linked to the three US names and **62 to all six Malaysian ones**;
-`MYX:5183` (Petronas Chemicals) held **zero, all time**, and 857 of 2,671
-articles (32%) link to no instrument at all.
+The book is six Bursa names and three Nasdaq names. Re-measured on the
+2026-09-11 corpus of 3,218 articles: **2,201 link to the US names, 70 to all
+the Malaysian ones**, `MYX:5183` (Petronas Chemicals) still holds **zero, all
+time**, and 947 articles (29%) link to no instrument at all.
 
-Three causes, at different stages of fix:
+WHICH SOURCE ACTUALLY DELIVERS A BURSA NAME, measured rather than assumed:
+
+| source | articles | linked | Bursa |
+|---|---|---|---|
+| `google_news` | 716 | 88% | **65** |
+| `gdelt` | 871 | 23% | 4 |
+| `yahoo_rss` | 375 | 100% | 1 |
+| `fmt_business` | 126 | 6% | **0** |
+| `finnhub` | 996 | 100% | 0 |
+| `jin10_flash` | 79 | 1% | 0 |
+| `alphavantage_news` | 55 | 100% | 0 |
+
+`google_news` supplies **93% of all Bursa coverage by itself**. The one enabled
+Malaysian outlet supplies none of it: `fmt_business` is a general wire whose
+eight links are all US names. That single-source dependency is the real fragility
+behind the headline number - if Google News changes its query handling, Bursa
+coverage goes to near zero and no other source compensates.
+
+The 29% unlinked is mostly NOT a linking defect, and two candidate causes were
+checked and cleared on 2026-09-11 (details/07 section 16): 457 of the 947 are
+debris from GDELT's untargeted era, which ended 2026-09-07; and the 210 GDELT
+articles fetched for a name but not linked to it are correctly unlinked - they
+are genuinely about something else. A third cause WAS a defect and is fixed:
+`Corpus.articles()` applied its `limit` before its `instrument` filter, so six of
+the nine book names returned zero articles while the corpus held theirs.
+
+Four causes, at different stages of fix:
 
 1. **The query asked for one name.** Both per-name sources took the first alias
    in entities.yaml, so PCHEM and TNB — the forms the Malaysian press prints —
@@ -336,19 +362,35 @@ Three causes, at different stages of fix:
    fixed in [#60](https://github.com/fangrhui040527/finance-agent/pull/60).
    GDELT: fixed here (`gdelt.search_query`). `TNB` and `IHH` remain unaskable on
    GDELT alone, whose API refuses a phrase under five characters.
-2. **Four of the five Malaysian outlets are disabled.** thestar, edge and nst
-   answered 404 on 2026-09-04 and bernama dated nothing, so `fmt_business`
-   carries the whole Malaysian press by itself. One 404 on one guessed path is
-   not proof a publisher has no feed, and nothing here can reach a Malaysian
-   host to say otherwise. `.github/workflows/bursa-feeds-probe.yml` asks the
-   publishers directly — autodiscovery tags off their own pages, conventional
-   paths beside them, and a verdict per URL on whether its items carry DATES.
-   **This is the largest single lever on Bursa coverage and it is not yet
-   pulled: run the probe and enable whatever answers.**
+2. **The Malaysian outlets — probe run 2026-09-11, and it settled all four.**
+   The probe asked each publisher directly (autodiscovery tags off their own
+   pages, conventional paths beside them, a verdict per URL on whether items
+   carry DATES). Results: **NST was never dead** — `/business/rss` was one path
+   wrong and `/feed` serves 50 items, 50 of them dated; thestar and edge
+   advertise no feed anywhere and every candidate 404s, which is a finding, not
+   a wrong guess; bernama serves 10 items and dates none of them, twice
+   measured. Enabling NST doubles the Malaysian outlets from one to two — in
+   [#62](https://github.com/fangrhui040527/finance-agent/pull/62), not yet on
+   main. Note what the table above shows about the outlet we already had:
+   `fmt_business` delivered **0** Bursa links from 126 articles, so a second
+   Malaysian general-news wire is not guaranteed to move this number either.
+   The measurement to take after #62 lands is NST's Bursa link count, not its
+   article count.
 3. **GDELT reaches three names a run.** By design (`names_per_run=3`), because
    84 name-failures over 30 sweeps were HTTP 429 and a refusal costs three
    retries and up to a 90s read. Not a defect; it does mean each Bursa name
    comes round every second or third run.
+4. **GDELT's yield on Bursa names is not yet measurable.** Its link rate is low
+   (23% all time) because it answers a phrase query with topic-adjacent market
+   copy, which the linker correctly declines — that is noise, not a defect. The
+   tempting number is "293 articles for 2 Bursa links over the per-instrument
+   regime", and it should NOT be quoted: the alias expansion
+   (`gdelt.search_query`) only landed 2026-09-10 05:50, so all but one day of
+   that window asked GDELT for a single display name. The post-fix sample is one
+   day, 61 articles, 0 Bursa — and with `names_per_run=3` perhaps one Bursa name
+   was asked at all. **Give it a week before judging.** The comparison that will
+   matter is against GDELT's contribution to the US names (200 links), where it
+   plainly does earn its place.
 
 ### eodhd and alphavantage, settled on 2026-09-11
 

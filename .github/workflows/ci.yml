@@ -78,13 +78,26 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Windows on pull requests, where it guards what reaches main, and on
-        # demand. NOT on every push to every branch, which is what it used to
-        # mean and what made a windows-only bug cost four runs to find rather
-        # than one. Dropping it here does not weaken the gate: nothing reaches
-        # main without a pull request, and the pull request runs it.
+        # Windows ON DEMAND ONLY, from 2026-09-11. It used to run on every pull
+        # request, which was right while Actions minutes were free and wrong the
+        # moment they were not.
+        #
+        # THE ARITHMETIC. Windows bills at 2x linux and its job is the longest:
+        # ~12 minutes doubled is ~24 billable against ~14 for both linux minors
+        # and the audit together. Windows was 62% of the cost of every run. On
+        # 2026-09-11 this repository stood at 90% of a USD 10 monthly budget with
+        # 19 days to go, and eight pull-request runs in the preceding 26 hours -
+        # each re-running Windows to validate a one-line change - were the single
+        # largest discretionary line in it. The collector needs ~USD 0.16 a day
+        # and is the thing this repository is FOR; CI is overhead around it.
+        #
+        # WHAT THIS COSTS. A windows-only defect can now reach main. That is a
+        # real risk and it is taken deliberately: run this workflow by hand with
+        # `windows: true` before merging anything that touches paths, encodings,
+        # subprocesses or the sqlite build, which is where every windows-only
+        # failure in this repository has come from.
         os: >-
-          ${{ (github.event_name == 'pull_request' || inputs.windows)
+          ${{ inputs.windows
               && fromJSON('["ubuntu-latest", "windows-latest"]')
               || fromJSON('["ubuntu-latest"]') }}
         python: ["3.11", "3.12"]
