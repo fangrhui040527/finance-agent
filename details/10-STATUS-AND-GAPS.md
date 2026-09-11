@@ -350,6 +350,23 @@ Three causes, at different stages of fix:
    retries and up to a 90s read. Not a defect; it does mean each Bursa name
    comes round every second or third run.
 
+### The price cache: what is settled and what is not
+
+The "cached history is unstable between fetches" question is **closed** (see
+`details/07` §11). It was a US market holiday read across two market calendars,
+not instability. Two real things came out of settling it:
+
+* the mid-session capture **recurred on 2026-09-10** for `SPY` while the fix was
+  unmerged - the gate returns True on that body, so the fix is confirmed against
+  a case it was not written from;
+* a dated row with **empty fields** (`2026-09-09,,,,,` on the Bursa proxy) is a
+  third shape. Dropped by the parser, flagged downstream by `Move.mis_dated`,
+  and deliberately NOT a cache miss - the hole is permanent and refetching it
+  only spends quota.
+
+Still open, and recorded rather than hidden: an in-progress row that happens to
+be self-consistent parses as a bar and is read as that session's close.
+
 ### The macro series that have stopped
 
 All fifteen DBnomics ids are **ended upstream**, confirmed by the 2026-09-06

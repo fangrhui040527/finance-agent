@@ -322,6 +322,38 @@ Still not caught: an in-progress row that happens to be self-consistent parses
 as a bar and is read as that session's close. Recorded here because nothing in
 the system can currently see it.
 
+### The "unstable cached history", settled on 2026-09-11
+
+An open question carried since 2026-09-08 said the cached price HISTORY changed
+between fetches - 2026-09-07 present in one, absent in the next - with the
+mechanism unknown. Read against the shipped cache, it is three different things
+and only one of them is a defect:
+
+| symbol | tail | verdict |
+|---|---|---|
+| `SPY` | 09-04, **09-08**, 09-09, 09-10 | 2026-09-07 was **Labor Day**. Not a gap. |
+| `1155.KL` | 09-04, **09-07**, 09-08, 09-09, 09-10 | Bursa was open. Not a gap. |
+| `0820EA.KL` | 09-08, `2026-09-09,,,,,`, 09-10 | a dated row with NO VALUES |
+
+So the history was never unstable. One fetch read a Bursa symbol and the next a
+US one, across two market calendars, on a week where the US had a holiday
+Malaysia did not. **The question is closed.**
+
+What the reading did turn up is real, and it is two things:
+
+* **The mid-session defect recurred on 2026-09-10**, after §11 was written and
+  while the fix was still unmerged. `SPY` came back `open 764.08 > high 758.55`,
+  volume 3.59m against 32.77m the session before, and its open was carried
+  verbatim from 09-09. `is_mid_session` returns True on that exact body, which
+  is the fix confirmed against a case it was not written from.
+* **A dated row with empty fields** is a THIRD shape, distinct from a missing
+  row and from an inverted one. The parser drops it, correctly, leaving a
+  permanent hole at 09-09 in the proxy's history while the names it measures
+  have a bar for that day - which `pack.Move.mis_dated` is what flags. It must
+  NOT be made a cache miss: no amount of refetching fills a session the upstream
+  never recorded, so a miss there spends the day's quota to change nothing. A
+  test pins both halves.
+
 ## 12. Fifteen macro series that were stale in a way nobody could fix
 
 The `series_stale` rule fired every night on the same fifteen DBnomics ids —
@@ -436,6 +468,39 @@ a partial bar, so the later run is the one that gets the finished close. And the
 duplicate `marks` rows it leaves are read correctly: `marks()` and `latest_mark`
 both take the last row per day, so the equity series never double-counts.
 
+## 15. A skip that was invisible to the rule that watches for silence
+
+On 2026-09-11 `sweep_silence` opened on **fmp**: *"past its own cadence: fmp (90h
+ago, allowed 78h)"*. The collector had dispatched fmp on time every weekday.
+
+fmp is per-instrument, and `us_preopen` is a macro slot that carries no
+per-instrument work, so the right thing happened: it was skipped, with a reason.
+
+    facts.db  pulls   2026-09-10T16:37  fmp  skipped  no name in the book trades in slot 'us_preopen'
+                      2026-09-09T16:50  fmp  skipped  ...
+                      2026-09-08T16:48  fmp  skipped  ...
+    corpus.db sweeps  2026-09-07T08:49  fmp  ok       <- nothing after this
+
+`sweep_silence` reads `corpus.last_success` and nothing else. The skip was
+written to the PULLS table and not the SWEEPS table, so a source being
+dispatched on schedule read as a source that had stopped, and on the fourth day
+the monitor said so.
+
+The inconsistency was visible in the same function. The `KeyMissing` branch
+eight lines below has always written BOTH rows, which is why the 2026-09-04
+"fmp needs FMP_API_KEY" skip appears in both tables while the 09-08 one appears
+in neither-but-pulls. Two skips, two spellings, one of them invisible to the
+rule that exists to notice absence.
+
+A skip is a dispatch that had nothing to do. That is precisely what the silence
+rule needs to see - it asks whether the collector STOPPED, not whether the
+source returned rows - so the no-instruments skip now records a sweep the same
+way, with the reason in the detail.
+
+Note what this does NOT change: fmp still returns **HTTP 402** on its earnings
+endpoint (3,957 fetched, 0 kept) whenever it does run. Whether the free tier
+earns its requests is a purchasing question, recorded here and left open.
+
 ## What the families have in common
 
 | Family | Shape |
@@ -450,9 +515,10 @@ both take the last row per day, so the equity series never double-counts.
 | one-word-two-facts | a label collapses two conditions that ask the reader for different things |
 | ask-vs-recognise | the system can identify something it never requests, so it never arrives |
 | no-op-that-writes | a run that decided to do nothing still leaves a trace, and the trace reads as work |
+| two-spellings-of-one-state | the same outcome is recorded two ways, and one of them the watching rule cannot read |
 
-Nine of the ten are invisible to a type checker and to a test that only
-exercises the happy path. All ten are visible to a test that asks *what would
+Ten of the eleven are invisible to a type checker and to a test that only
+exercises the happy path. All eleven are visible to a test that asks *what would
 the wrong answer look like, and would I be able to tell?*
 
 That question is what `stress/run.py` is.

@@ -794,6 +794,24 @@ def _run_structured(
         result.status = SKIPPED
         result.detail = f"no name in the book trades in slot {slot!r}"
         facts.record_pull(run_id, spec.name, SKIPPED, detail=result.detail)
+        # AND a sweep row, like the KeyMissing skip below. `sweep_silence` reads
+        # corpus.last_success and nothing else, so a source whose skip is
+        # recorded only in the pulls table reads as a source that has STOPPED.
+        # That is what happened to fmp: per-instrument, and us_preopen carries no
+        # per-instrument work, so it was correctly skipped every weekday, left no
+        # sweep row, and opened a silence alert on the fourth day about a
+        # collector that was dispatching it on time. A skip is a dispatch that
+        # had nothing to do - which is exactly what the silence rule needs to
+        # see, and exactly what the KeyMissing branch has always recorded.
+        corpus.record_sweep(
+            run_id,
+            spec.name,
+            since,
+            OK,
+            at=tick(),
+            slot=slot,
+            detail=f"skipped: {result.detail}",
+        )
         return result, []
     if spec.kind == MIXED and spec.markets and not instruments:
         instruments = tuple(i for i in book if _mic_in(i, spec.markets))

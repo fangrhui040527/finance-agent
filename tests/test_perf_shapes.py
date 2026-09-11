@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 
 from core.llm.tiers import TaskClass, Tier, Usage
@@ -255,3 +255,49 @@ def test_offline_still_serves_what_it_has(tmp_path, monkeypatch):
     c.put("yahoo", "spy", MID_SESSION)
     monkeypatch.setenv("FINPLANET_OFFLINE", "1")
     assert c.get("yahoo", "spy") == MID_SESSION and c.last_served_from == "2026-09-08"
+
+
+# --- a dated row with no values, which is NOT a mid-session body -----------------
+#
+# The Bursa proxy 0820EA.KL, read from the shipped cache on 2026-09-11:
+#
+#     2026-09-08,1.8250,1.8250,1.8050,1.8050,6000.0
+#     2026-09-09,,,,,                                 <- dated, and empty
+#     2026-09-10,1.8300,1.8300,1.8300,1.8300,50900.0
+#
+# Yahoo serves a placeholder for a session it has nothing for. The parser drops
+# it, which is right, and the proxy's history keeps a HOLE at 2026-09-09 while
+# Maybank has a bar for that day. That mismatch is `pack.Move.mis_dated`'s job.
+#
+# What it must NOT do is make the body a cache miss. The hole is permanent - no
+# amount of refetching fills a session the upstream never recorded - so a miss
+# here buys nothing and spends the day's quota on every read.
+
+BLANK_MIDDLE = (
+    "Date,Open,High,Low,Close,Volume\n"
+    "2026-09-08,1.8250,1.8250,1.8050,1.8050,6000\n"
+    "2026-09-09,,,,,\n"
+    "2026-09-10,1.8300,1.8300,1.8300,1.8300,50900\n"
+)
+
+
+def test_a_hole_in_the_middle_is_not_a_session_still_running(tmp_path):
+    from core.market.cache import PriceCache, is_mid_session, last_dated_row, last_usable_bar_day
+
+    assert last_usable_bar_day(BLANK_MIDDLE) == date(2026, 9, 10)
+    assert last_dated_row(BLANK_MIDDLE) == date(2026, 9, 10)
+    assert not is_mid_session(BLANK_MIDDLE), "the newest row IS a bar; the gap is older"
+
+    c = PriceCache(tmp_path / "cache.db", today=lambda: "2026-09-10")
+    c.put("yahoo", "0820EA.KL", BLANK_MIDDLE)
+    assert c.get("yahoo", "0820EA.KL") == BLANK_MIDDLE, "refetching cannot fill a hole"
+
+
+def test_the_parser_drops_the_blank_row_rather_than_reading_it_as_zero(tmp_path):
+    """A row of empty fields read as 0.0 would be a session where the proxy
+    opened, closed and traded at nothing - and would decompose every name's move
+    against it."""
+    from core.market.feed import PriceFeed
+
+    days = [b.day for b in PriceFeed.parse(BLANK_MIDDLE)]
+    assert days == [date(2026, 9, 8), date(2026, 9, 10)]

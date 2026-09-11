@@ -841,3 +841,34 @@ def test_a_gdelt_name_with_no_askable_alias_is_skipped_not_sent(stores):
         log=lambda m: None,
     )
     assert not [kw for name, kw in adapters.calls if name == "gdelt"]
+
+
+def test_a_source_with_nothing_to_do_in_this_slot_still_records_a_sweep(stores):
+    """A skip is a dispatch that had nothing to do, and the silence rule has to
+    see it.
+
+    `sweep_silence` reads `corpus.last_success` and nothing else. fmp is
+    per-instrument and `us_preopen` carries no per-instrument work, so fmp was
+    correctly skipped every weekday, recorded the skip in the PULLS table only,
+    and opened a silence alert on the fourth day about a collector that had
+    dispatched it on time all four days. The KeyMissing skip beside it has
+    always written both rows; this one now does too.
+    """
+    corpus_db, facts_db = stores
+    adapters = RecordingAdapters({})
+    run_sweep(
+        Cfg(sources=("fmp",), watchlist=("MYX:1155",)),
+        "us_preopen",  # a macro slot: no market's names are collected in it
+        corpus_path=corpus_db,
+        facts_path=facts_db,
+        link_graph=False,
+        adapter_for=adapters,
+        entity_index=INDEX,
+        clock=lambda: NOW,
+        log=lambda m: None,
+    )
+    with Corpus(corpus_db) as c:
+        rows = [s for s in c.sweeps() if s["source"] == "fmp"]
+        assert rows, "the skip left no sweep row, so the source reads as stopped"
+        assert "skipped" in (rows[0]["detail"] or "")
+        assert c.last_success("fmp") is not None, "sweep_silence would still fire"
