@@ -211,12 +211,23 @@ questions:
     These are meme posts, which is not a flaw in the label: they are the only
     documents in the corpus carrying this ticker string, and the question is
     testing exact-token retrieval, not article quality.
+    The 2026-09-11 bursa_close sweep brought two more, and the completeness
+    guard named them - the same thing that happened to SPCX on 09-09, and what
+    that guard is for. All FOUR are labelled now, and this case should stop
+    moving: `clean.CASHTAG_POST` refuses a `$TICKER (code)$` post at the write
+    seam from that date, so no fifth one can arrive. The four below are the
+    closed set.
   relevant:
   - doc_id: https://news.google.com/rss/articles/CBMieEFVX3lxTE5SVDlkamM2R3BERzllSklkdWZVMDZ3WFVpWjlIcTdpcXdJLWJLOE9GUTA5MGlfUkJxbVZSV2h0aWt4SlVlVEhGTENRcHdDU1pxb0ctRXNjV3BSYzFmazZyMElzWUhNb2VQRHliLWtDQUdDQW1mWTdieA?oc=5
     title: '$MAYBANK (1155.MY)$'
   - doc_id: https://news.google.com/rss/articles/CBMiowFBVV95cUxOb0RoQ0N4OUJ5ZUtNS1pZaFl2UHNTWjNra2ZleTdaSXM4VTJvUVdXeXBkdVAyTjZVUl9lZVY4ejNwclllbGI3azlZbDJRN2Vvc1FIcWF2MkV5eU4yYlFzd1pwZFZiZzhHLVRGT05JSjZtRDhLRXRQTVpxLWUxdDhTRjl2cWJzWE5oZDNYTkdTdUZFaUhKVUV2eE1MMFotY0dTM2xF?oc=5
     title: '$MAYBANK (1155.MY)$ OMG!!! My fam got rm188 here wowww😆sharing luck here hope you guys got
       the top tier rewards 🍀[Share Link: MY 2026 Mid-Autumn Festival]'
+  - doc_id: https://news.google.com/rss/articles/CBMigwFBVV95cUxPNzFlZkZVRlZ4R3FxRUdmd0pFdElrSkpEN1pJYXViazNwQTlNTTlVeEpRQ24tM2J3d0ZzYmxxYk1uRDluYzREckRrd2xDVk9sY2Y2OU9MblQzUTNvd3oyUDlJcFJxZzVHYzBfUzhaamhIY1BGbDFaRHBRd1BLU3BLRUxqNA?oc=5
+    title: '$MAYBANK (1155.MY)$ Keep it up'
+  - doc_id: https://news.google.com/rss/articles/CBMiogFBVV95cUxPME1ldjc1TC1zR05SWmhaaldCRWVGcmNaa1habDlRRTVEaGFTN0ZGckJsYjQ1dXFadnpOX3d4cEtxQjlCZ2E4eXlsR2RqZl9YOHBKeTREOFhEWXluX0Z1NkJEZjlqLTFNT0kyb001UkZMdk9KNzZ2NFlMNHhObnZkRU9QZnRSWW5qY1BDdVlGUXlCZ1lRMDFQaHpXSEdVaWhfbWc?oc=5
+    title: '$MAYBANK (1155.MY)$ OMG!!! My mom got FREE RM188 here wowww, some of the users got RM88 too
+      today😆sharing luck here hope you guys get the top tier rewards 🍀[Share Link: MY 2026 Mid-Autumn Festival]'
 - query: M6 chip 2-nanometer
   kind: lexical
   note: exact spec tokens
