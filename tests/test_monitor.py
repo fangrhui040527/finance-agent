@@ -1116,6 +1116,70 @@ def test_a_one_name_book_has_nothing_to_compare_against(tmp_path):
     assert not [a for a in alerts if a.rule == "name_coverage"]
 
 
+def _corpus_with_ticker_tags(path: Path, by_instrument: dict[str, int], when="2026-09-06"):
+    """Rows shaped like the ones that silenced this rule: a ticker tag for a
+    title, an empty body, correctly linked to the company.
+
+    The tag carries the LOCAL code the platform prints - `$PCHEM (5183.MY)$` -
+    not the internal `MYX:5183`. Writing the internal form here made the first
+    version of this test fail against working code: the colon is not in the
+    pattern, correctly, because no such title exists."""
+    from knowledge.corpus import Corpus
+    from knowledge.news.features import Article
+
+    with Corpus(str(path)) as c:
+        n = 0
+        for iid, count in by_instrument.items():
+            local = f"{iid.split(':')[-1]}.MY"
+            for _ in range(count):
+                n += 1
+                c.add(
+                    Article(
+                        doc_id=f"tag{n}",
+                        title=f"$PCHEM ({local})$ OMG!!! My mom got FREE RM188 here wowww",
+                        body="",
+                        source_domain="www.moomoo.com",
+                        published_at=datetime.fromisoformat(f"{when}T08:00:00+00:00"),
+                        language="English",
+                        countries=(),
+                        instruments=(iid,),
+                        themes=(),
+                    ),
+                    source="google_news",
+                )
+
+
+def test_ticker_tag_rows_do_not_clear_the_coverage_rule(tmp_path):
+    """The failure this rule actually had. It opened on MYX:5183 as designed,
+    then logged `resolved` because two `$PCHEM (5183.MY)$` posts arrived - a
+    bare tag and a promotion, both empty-bodied. Nothing about the coverage had
+    changed. Counted in usable rows, the name is still uncovered."""
+    _corpus_with_links(tmp_path / "corpus.db", {"MYX:1155": 3})
+    _corpus_with_ticker_tags(tmp_path / "corpus.db", {"MYX:5183": 2})
+    alerts = evaluate(
+        _coverage_cfg(tmp_path, ("MYX:1155", "MYX:5183")),
+        db=str(_ledger(tmp_path / "led.db")),
+        now=NOWC,
+    )
+    hit = [a for a in alerts if a.rule == "name_coverage"]
+    assert hit, "a name whose only rows are ticker tags has collected nothing usable"
+    assert "MYX:5183" in hit[0].title
+    assert "MYX:1155" not in hit[0].title
+
+
+def test_a_real_story_still_clears_the_coverage_rule(tmp_path):
+    """The other direction, so the rule cannot be satisfied by dropping
+    everything: one row with a real body covers the name."""
+    _corpus_with_links(tmp_path / "corpus.db", {"MYX:1155": 3, "MYX:5183": 1})
+    _corpus_with_ticker_tags(tmp_path / "corpus.db", {"MYX:5183": 2})
+    alerts = evaluate(
+        _coverage_cfg(tmp_path, ("MYX:1155", "MYX:5183")),
+        db=str(_ledger(tmp_path / "led.db")),
+        now=NOWC,
+    )
+    assert not [a for a in alerts if a.rule == "name_coverage"]
+
+
 def test_an_id_that_is_a_prefix_of_another_is_not_counted_as_coverage(tmp_path):
     """`MYX:518` must not be satisfied by `MYX:5183`, which a bare LIKE does."""
     from knowledge.corpus import Corpus

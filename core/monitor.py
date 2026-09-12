@@ -540,6 +540,13 @@ def _slot_rules(cfg, now: datetime) -> list[Alert]:
     ]
 
 
+#: How many of a name's articles this rule reads before deciding it collected
+#: nothing. Only the zero/non-zero split is used, and `articles()` returns
+#: newest-first, so this only has to exceed the largest per-name count in the
+#: window - 1,426 on the 2026-09-12 corpus, against 3,838 rows in total.
+NAME_COVERAGE_SCAN = 10_000
+
+
 def _name_coverage_rules(cfg, now: datetime) -> list[Alert]:
     """A name in the book that collected nothing while its neighbours did.
 
@@ -555,12 +562,32 @@ def _name_coverage_rules(cfg, now: datetime) -> list[Alert]:
     collector is down, which is `sweep_silence`'s alert and not this one, and
     firing both would be two alerts about one fault. The comparison is the
     rule.
+
+    COUNTED IN USABLE ROWS, NOT STORED ONES, from 2026-09-12. This rule opened
+    on MYX:5183 exactly as designed and then logged `resolved` because two
+    `$PCHEM (5183.MY)$` posts arrived - a bare ticker tag and a "FREE RM188"
+    promotion, both with empty bodies, neither escalated. Nothing had changed
+    about the coverage the rule exists to watch; a stored-row count simply
+    cannot tell news from noise, so the rule was silenced by the very thing it
+    should have gone on reporting.
+
+    It now asks `retrieval.index.indexable` - the one definition of "can this
+    row answer anything" - so a name is covered when the corpus holds something
+    about it that could be retrieved or cited. There is deliberately no second
+    predicate here: duplicating that rule in SQL is how the two drift apart.
+
+    The zero/non-zero split is the only thing read from these rows, so the
+    `limit` below only has to exceed the largest per-name count in the window
+    (1,426 on the 2026-09-12 corpus, and `articles()` filters by instrument in
+    SQL). Newest-first truncation could understate a count; it cannot turn a
+    non-zero into a zero.
     """
     days = int(getattr(cfg, "alert_name_coverage_days", 0))
     if days <= 0:
         return []
 
     from knowledge.corpus import Corpus
+    from knowledge.retrieval.index import indexable
 
     path = str(getattr(cfg, "corpus_db", "data/corpus.db"))
     if not Path(path).exists():
@@ -573,7 +600,14 @@ def _name_coverage_rules(cfg, now: datetime) -> list[Alert]:
 
     since = now - timedelta(days=days)
     with Corpus(path) as corpus:
-        counts = {n: corpus.count_for_instrument(n, since=since) for n in dict.fromkeys(names)}
+        counts = {
+            n: sum(
+                1
+                for a in corpus.articles(instrument=n, since=since, limit=NAME_COVERAGE_SCAN)
+                if indexable(a)
+            )
+            for n in dict.fromkeys(names)
+        }
 
     empty = sorted(n for n, c in counts.items() if c == 0)
     covered = [n for n, c in counts.items() if c > 0]
@@ -588,7 +622,9 @@ def _name_coverage_rules(cfg, now: datetime) -> list[Alert]:
             + ", ".join(empty),
             detail=f"{len(covered)} other names did collect, so the sweep is running - this "
             "is one name going quiet inside a working collector, which is what a wrong "
-            "search phrase looks like",
+            "search phrase looks like. Counted in rows that could answer something: a "
+            "ticker-tag post with an empty body is stored but not usable, and does not "
+            "clear this rule",
             next_step="check knowledge/graph/data/entities.yaml - the query asks for every "
             "alias listed there, so a missing short form (the ticker, the initials) is a "
             "name the press uses and the collector never searches. Then "
