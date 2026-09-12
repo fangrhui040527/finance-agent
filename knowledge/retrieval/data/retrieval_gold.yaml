@@ -197,30 +197,25 @@ questions:
   relevant:
   - doc_id: https://finance.yahoo.com/technology/ai/articles/nvidia-nvda-20-billion-groq-190737433.html?.tsrc=rss
     title: NVIDIA (NVDA)’s $20 Billion Groq Bet Goes Live This Year With New AI Racks
-- query: 1155.MY
-  kind: lexical
-  note: >-
-    Bursa ticker in the Malaysian local form. BOTH documents carrying the token
-    are labelled, and that is the rule for a lexical question rather than a
-    convenience: the criterion is containment of the exact token, so every
-    document containing it is a correct retrieval and ranking any of them first
-    is correct. Labelling only one made the score turn on an arbitrary
-    tie-break - on 2026-09-07 a second, near-identical post arrived, scored
-    1.2500 exactly as the labelled one did, took rank 1, and dropped lexical MRR
-    from 1.000 to 0.938 with nothing about the search having changed.
-    These are meme posts, which is not a flaw in the label: they are the only
-    documents in the corpus carrying this ticker string, and the question is
-    testing exact-token retrieval, not article quality.
-  relevant:
-  - doc_id: https://news.google.com/rss/articles/CBMieEFVX3lxTE5SVDlkamM2R3BERzllSklkdWZVMDZ3WFVpWjlIcTdpcXdJLWJLOE9GUTA5MGlfUkJxbVZSV2h0aWt4SlVlVEhGTENRcHdDU1pxb0ctRXNjV3BSYzFmazZyMElzWUhNb2VQRHliLWtDQUdDQW1mWTdieA?oc=5
-    title: '$MAYBANK (1155.MY)$'
-  - doc_id: https://news.google.com/rss/articles/CBMiowFBVV95cUxOb0RoQ0N4OUJ5ZUtNS1pZaFl2UHNTWjNra2ZleTdaSXM4VTJvUVdXeXBkdVAyTjZVUl9lZVY4ejNwclllbGI3azlZbDJRN2Vvc1FIcWF2MkV5eU4yYlFzd1pwZFZiZzhHLVRGT05JSjZtRDhLRXRQTVpxLWUxdDhTRjl2cWJzWE5oZDNYTkdTdUZFaUhKVUV2eE1MMFotY0dTM2xF?oc=5
-    title: '$MAYBANK (1155.MY)$ OMG!!! My fam got rm188 here wowww😆sharing luck here hope you guys got
-      the top tier rewards 🍀[Share Link: MY 2026 Mid-Autumn Festival]'
-  - doc_id: https://news.google.com/rss/articles/CBMiogFBVV95cUxPME1ldjc1TC1zR05SWmhaaldCRWVGcmNaa1habDlRRTVEaGFTN0ZGckJsYjQ1dXFadnpOX3d4cEtxQjlCZ2E4eXlsR2RqZl9YOHBKeTREOFhEWXluX0Z1NkJEZjlqLTFNT0kyb001UkZMdk9KNzZ2NFlMNHhObnZkRU9QZnRSWW5qY1BDdVlGUXlCZ1lRMDFQaHpXSEdVaWhfbWc?oc=5
-    title: '$MAYBANK (1155.MY)$ OMG!!! My mom got FREE RM188 here wowww, some of the users got RM88 too today😆sharing luck here hope you guys get the top tier rewards 🍀[Share Link: MY 2026 Mid-Autumn Festival]'
-  - doc_id: https://news.google.com/rss/articles/CBMigwFBVV95cUxPNzFlZkZVRlZ4R3FxRUdmd0pFdElrSkpEN1pJYXViazNwQTlNTTlVeEpRQ24tM2J3d0ZzYmxxYk1uRDluYzREckRrd2xDVk9sY2Y2OU9MblQzUTNvd3oyUDlJcFJxZzVHYzBfUzhaamhIY1BGbDFaRHBRd1BLU3BLRUxqNA?oc=5
-    title: '$MAYBANK (1155.MY)$ Keep it up'
+# REMOVED 2026-09-12: `- query: 1155.MY`, a lexical question on the Bursa ticker
+# in Malaysian local form. Every one of the four documents in the corpus carrying
+# that token was a `$MAYBANK (1155.MY)$` ticker tag from www.moomoo.com - a bare
+# tag, "Keep it up", and two copies of a "FREE RM188" promotion. `indexable()`
+# now drops titles that OPEN with such a tag (they name a company and assert
+# nothing about it), so the question has no reachable answer and would score a
+# permanent zero on every leg.
+#
+# Deleted rather than kept-and-counted, which is the opposite of the call made
+# for 'regulators stopped short of breaking up an advertising business'. That one
+# stays because its answer exists and is real - four GDELT rows on a genuine
+# story the index filter cannot reach, so the zero measures a gap worth closing.
+# This one's answers were spam. A question whose only correct answers are spam
+# measures the spam, not the search.
+#
+# If a real document ever carries `1155.MY` - a broker note, an exchange filing -
+# the question is worth restoring, and this note is here so the next person knows
+# it existed and why it went.
+
 - query: M6 chip 2-nanometer
   kind: lexical
   note: exact spec tokens
