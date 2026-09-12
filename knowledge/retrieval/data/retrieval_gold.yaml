@@ -217,6 +217,10 @@ questions:
   - doc_id: https://news.google.com/rss/articles/CBMiowFBVV95cUxOb0RoQ0N4OUJ5ZUtNS1pZaFl2UHNTWjNra2ZleTdaSXM4VTJvUVdXeXBkdVAyTjZVUl9lZVY4ejNwclllbGI3azlZbDJRN2Vvc1FIcWF2MkV5eU4yYlFzd1pwZFZiZzhHLVRGT05JSjZtRDhLRXRQTVpxLWUxdDhTRjl2cWJzWE5oZDNYTkdTdUZFaUhKVUV2eE1MMFotY0dTM2xF?oc=5
     title: '$MAYBANK (1155.MY)$ OMG!!! My fam got rm188 here wowww😆sharing luck here hope you guys got
       the top tier rewards 🍀[Share Link: MY 2026 Mid-Autumn Festival]'
+  - doc_id: https://news.google.com/rss/articles/CBMiogFBVV95cUxPME1ldjc1TC1zR05SWmhaaldCRWVGcmNaa1habDlRRTVEaGFTN0ZGckJsYjQ1dXFadnpOX3d4cEtxQjlCZ2E4eXlsR2RqZl9YOHBKeTREOFhEWXluX0Z1NkJEZjlqLTFNT0kyb001UkZMdk9KNzZ2NFlMNHhObnZkRU9QZnRSWW5qY1BDdVlGUXlCZ1lRMDFQaHpXSEdVaWhfbWc?oc=5
+    title: '$MAYBANK (1155.MY)$ OMG!!! My mom got FREE RM188 here wowww, some of the users got RM88 too today😆sharing luck here hope you guys get the top tier rewards 🍀[Share Link: MY 2026 Mid-Autumn Festival]'
+  - doc_id: https://news.google.com/rss/articles/CBMigwFBVV95cUxPNzFlZkZVRlZ4R3FxRUdmd0pFdElrSkpEN1pJYXViazNwQTlNTTlVeEpRQ24tM2J3d0ZzYmxxYk1uRDluYzREckRrd2xDVk9sY2Y2OU9MblQzUTNvd3oyUDlJcFJxZzVHYzBfUzhaamhIY1BGbDFaRHBRd1BLU3BLRUxqNA?oc=5
+    title: '$MAYBANK (1155.MY)$ Keep it up'
 - query: M6 chip 2-nanometer
   kind: lexical
   note: exact spec tokens
@@ -244,6 +248,8 @@ questions:
   - doc_id: finnhub:141970797
     title: SpaceX, Nvidia Lead Schwab Buys As Software Rally Spurs Profit-Taking –
       Trading Gauge Posts First Dip Since April
+  - doc_id: finnhub:142089359
+    title: 'SpaceX signs $1.1 billion-per month computing deal'
 - query: KeyBanc Underweight rating Apple
   kind: lexical
   note: broker plus rating word
