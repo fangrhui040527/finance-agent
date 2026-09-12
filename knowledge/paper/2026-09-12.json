@@ -1,0 +1,88 @@
+{
+  "day": "2026-09-12",
+  "written_at": "2026-09-12T22:46:00Z",
+  "phase": "observe",
+  "equity_usd": 1000.0,
+  "cash_usd": 1000.0,
+  "control_equity_usd": 1000.0,
+  "drawdown": 0.0,
+  "halted": false,
+  "positions": [],
+  "changes": [],
+  "caps": [
+    {
+      "cap": "largest name",
+      "value": "0.00%",
+      "limit": "25%",
+      "breached": false
+    },
+    {
+      "cap": "invested",
+      "value": "0.00%",
+      "limit": "0%",
+      "breached": false
+    },
+    {
+      "cap": "cash floor",
+      "value": "100.00%",
+      "limit": "20%",
+      "breached": false
+    },
+    {
+      "cap": "names held",
+      "value": "0",
+      "limit": "0",
+      "breached": false
+    },
+    {
+      "cap": "drawdown from peak",
+      "value": "0.00%",
+      "limit": "8%",
+      "breached": false
+    },
+    {
+      "cap": "turnover used, 5 weekdays",
+      "value": "USD 0.00",
+      "limit": "USD 500.00",
+      "breached": false
+    }
+  ],
+  "attribution": {
+    "market": null,
+    "idiosyncratic": null,
+    "note": "no positions held; nothing to attribute"
+  },
+  "decision": {
+    "recorded": true,
+    "weights": {},
+    "thesis": "No fundable name carries both a decomposed move and evidence that survives reading. IHH fell 3.04% on 2026-09-11 on the Tokyo court dismissing its subsidiary's YEN 200bn claim - a dateable cause, and negative, so a long-only book cannot act on it, and no market cap is collected to size the claim against. Petronas Chemicals is up 19.20% in five sessions on 3.2x median volume with zero indexable rows. Apple is the only name with a candidate story and one share is 33.2% of equity against a 25% cap. Cash.",
+    "prediction_ids": [
+      "paper-2026-09-12-allcash-21d-1661"
+    ],
+    "grades_on": "2026-10-12",
+    "refusals": [],
+    "stores_checked": {
+      "paper.db targets": 2,
+      "paper.db applications": 2,
+      "learning.db predictions": 2
+    }
+  },
+  "mistakes": [],
+  "settled": [
+    "The collector outage carried as a billing diagnosis by the 2026-09-09, 09-10 and 09-11 pages is confirmed: the repository was made public on 2026-09-12, standard runners are unmetered on public repositories, and the collector ran the same day at 06:07Z and 12:54Z. paper-2026-09-11-allcash-21d-8bf9 will reach its 2026-10-11 grading date with marks behind it."
+  ],
+  "carried": [
+    "fmp is 134h past a 78h cadence, having gone 110 -> 120 -> 134 across three readings; it is where price_target_consensus comes from for the three Nasdaq names."
+  ],
+  "conditions_for_a_position": [
+    "MET, no effect: the collector has a runner again.",
+    "OPEN: Petronas Chemicals collects something a person wrote - 0 indexable rows on 2026-09-11, and 0 ever from nst_business (95 rows) or fmt_business (216 rows).",
+    "OPEN: the Bursa proxy prints a close so a Malaysian name can be decomposed - MYX:0820EA blank for 2026-09-11 on 500 shares traded.",
+    "NEW for Monday: whether IHH's own statement, published after Friday's close, moves the name on the next session, and whether a Bursa announcement puts a figure on the claim."
+  ],
+  "lessons": [
+    "A condition can be met and change nothing; the collector was the visible constraint, not the binding one.",
+    "An event that can be dated precisely and cannot be sized is not tradeable.",
+    "Price and evidence can diverge for a week without either being wrong; the response to a 19% move with no coverage is to widen the search, not the position."
+  ]
+}
