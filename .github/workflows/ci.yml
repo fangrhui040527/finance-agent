@@ -78,26 +78,32 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Windows ON DEMAND ONLY, from 2026-09-11. It used to run on every pull
-        # request, which was right while Actions minutes were free and wrong the
-        # moment they were not.
+        # Windows runs on PULL REQUESTS again, from 2026-09-12, and on demand.
+        # Not on pushes to main: that content was already tested as a pull
+        # request, which is the rule the rest of this file follows.
         #
-        # THE ARITHMETIC. Windows bills at 2x linux and its job is the longest:
-        # ~12 minutes doubled is ~24 billable against ~14 for both linux minors
-        # and the audit together. Windows was 62% of the cost of every run. On
-        # 2026-09-11 this repository stood at 90% of a USD 10 monthly budget with
-        # 19 days to go, and eight pull-request runs in the preceding 26 hours -
-        # each re-running Windows to validate a one-line change - were the single
-        # largest discretionary line in it. The collector needs ~USD 0.16 a day
-        # and is the thing this repository is FOR; CI is overhead around it.
+        # IT WAS NEVER A COVERAGE JUDGEMENT. Windows came off on 2026-09-11 for
+        # one reason - it bills at 2x linux and its job is the longest, ~12
+        # minutes doubled is ~24 billable against ~14 for both linux minors and
+        # the audit together, so it was 62% of every run. That day this
+        # repository stood at 90% of a USD 10 monthly budget with 19 days to go,
+        # and later the same day the budget ran out entirely: the collector
+        # itself began failing in under six seconds with no runner allocated and
+        # no logs, twice, which is the third time that has happened here.
         #
-        # WHAT THIS COSTS. A windows-only defect can now reach main. That is a
-        # real risk and it is taken deliberately: run this workflow by hand with
-        # `windows: true` before merging anything that touches paths, encodings,
-        # subprocesses or the sqlite build, which is where every windows-only
-        # failure in this repository has come from.
+        # WHY IT IS BACK. The repository was made PUBLIC on 2026-09-12.
+        # GitHub-hosted standard runners are unmetered on public repositories,
+        # so the arithmetic above is now zero on both sides and the only thing
+        # left to weigh is coverage. That weighs one way: the dev machine is
+        # Windows, two tests failed there for weeks while this file ran only on
+        # Linux, and every windows-only failure in this repository has come from
+        # paths, encodings, subprocesses or the sqlite build - none of which
+        # linux can speak to.
+        #
+        # `windows: true` on a manual dispatch still forces it, which is how you
+        # check a branch before opening the pull request.
         os: >-
-          ${{ inputs.windows
+          ${{ (github.event_name == 'pull_request' || inputs.windows)
               && fromJSON('["ubuntu-latest", "windows-latest"]')
               || fromJSON('["ubuntu-latest"]') }}
         python: ["3.11", "3.12"]
