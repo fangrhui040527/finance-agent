@@ -1,6 +1,6 @@
 # Digest 2026-09-12
 
-Generated 2026-09-12 06:07 UTC · slot `all` · 3838 articles in the corpus, 4512 observations, 3985 events in the fact book.
+Generated 2026-09-12 12:54 UTC · slot `all` · 3924 articles in the corpus, 4520 observations, 3985 events in the fact book.
 
 ## The book
 
@@ -81,6 +81,15 @@ Generated 2026-09-12 06:07 UTC · slot `all` · 3838 articles in the corpus, 451
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 12:54 | eodhd | ok | 0 | 0 | 0 | facts 0; MYX:5183: deferred by the 2-a-day credit budget; next in rotation; MYX: |
+| 12:54 | twse_openapi | ok | 8 | 0 | 0 | facts 8;  |
+| 12:54 | jin10_flash | ok | 18 | 2 | 1 | facts 0;  |
+| 12:54 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 12:54 | nst_business | ok | 50 | 46 | 45 |  |
+| 12:54 | fmt_business | ok | 40 | 40 | 40 |  |
+| 12:54 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals, IHH |
+| 12:54 | google_news | ok | 0 | 0 | 0 | read but empty: Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals, IHH |
+| 12:54 | gdelt | ok | 0 | 0 | 0 | read but empty: Maybank, Petronas Chemicals; failed: Tenaga; deferred to a later |
 | 06:07 | eodhd | ok | 0 | 0 | 0 | facts 0; XNAS:NVDA: deferred by the 2-a-day credit budget; next in rotation; XNA |
 | 06:07 | jin10_flash | ok | 17 | 5 | 3 | facts 0;  |
 | 06:07 | alphavantage_news | ok | 11 | 10 | 9 | facts 4; XNAS:MSFT: alphavantage quota exhausted for today: Thank you for using  |

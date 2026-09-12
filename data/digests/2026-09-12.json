@@ -1,6 +1,87 @@
 {
   "collection": [
     {
+      "at": "2026-09-12T12:54:35.848713+00:00",
+      "detail": "facts 0; MYX:5183: deferred by the 2-a-day credit budget; next in rotation; MYX:5225: deferred by the 2-a-day credit budget; next in rotation; MYX:8869: deferred by the 2-a-day credit budget; next in rotation; MYX:3182: deferred by the 2-a-day credit budget; next in rotation; outside the free plan (US only), so not asked for: MYX:5183, MYX:5225, MYX:8869, MYX:3182. The EODHD Fundamentals plan cove",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-12T12:54:35.509030+00:00",
+      "detail": "facts 8; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-12T12:54:32.218766+00:00",
+      "detail": "facts 0; ",
+      "fetched": 18,
+      "kept": 2,
+      "source": "jin10_flash",
+      "status": "ok",
+      "stored": 1
+    },
+    {
+      "at": "2026-09-12T12:54:31.062753+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-12T12:54:29.493314+00:00",
+      "detail": "",
+      "fetched": 50,
+      "kept": 46,
+      "source": "nst_business",
+      "status": "ok",
+      "stored": 45
+    },
+    {
+      "at": "2026-09-12T12:54:29.106191+00:00",
+      "detail": "",
+      "fetched": 40,
+      "kept": 40,
+      "source": "fmt_business",
+      "status": "ok",
+      "stored": 40
+    },
+    {
+      "at": "2026-09-12T12:54:28.915121+00:00",
+      "detail": "read but empty: Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals, IHH",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-12T12:54:27.645994+00:00",
+      "detail": "read but empty: Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals, IHH",
+      "fetched": 0,
+      "kept": 0,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-12T12:54:25.991260+00:00",
+      "detail": "read but empty: Maybank, Petronas Chemicals; failed: Tenaga; deferred to a later run: IHH, Press Metal, Genting",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "ok",
+      "stored": 0
+    },
+    {
       "at": "2026-09-12T06:07:44.055684+00:00",
       "detail": "facts 0; XNAS:NVDA: deferred by the 2-a-day credit budget; next in rotation; XNAS:AAPL: outside the plan or over today's credits; XNAS:MSFT: outside the plan or over today's credits",
       "fetched": 0,
@@ -74,18 +155,18 @@
     }
   ],
   "counts": {
-    "articles": 3838,
+    "articles": 3924,
     "documents": 0,
     "escalated": 871,
     "events": 3985,
     "failed_sweeps": 16,
     "linked": 2699,
-    "observations": 4512,
+    "observations": 4520,
     "series": 29,
-    "sweeps": 216
+    "sweeps": 225
   },
   "day": "2026-09-12",
-  "generated_at": "2026-09-12 06:07 UTC",
+  "generated_at": "2026-09-12 12:54 UTC",
   "macro": [
     {
       "change": "0.04",
