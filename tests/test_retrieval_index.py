@@ -232,6 +232,45 @@ def test_a_headline_that_DOES_name_a_company_is_kept():
     assert indexable(_art("Nvidia lifts its forecast", "Nvidia lifts its forecast", ("XNAS:NVDA",)))
 
 
+def test_a_title_that_opens_with_a_ticker_tag_is_not_indexed():
+    """`$MAYBANK (1155.MY)$` names a company and asserts nothing about it - the
+    one shape that passes "a headline is a citable claim" on a technicality
+    while failing its reasoning. 9 of 3,838 rows on the 2026-09-12 corpus, all
+    headline-only, all from www.moomoo.com."""
+    assert not indexable(_art("$MAYBANK (1155.MY)$", "", ("MYX:1155",)))
+    assert not indexable(_art("$MAYBANK (1155.MY)$ Keep it up", "", ("MYX:1155",)))
+    assert not indexable(
+        _art("$PCHEM (5183.MY)$ OMG!!! My mom got FREE RM188 here wowww", "", ("MYX:5183",))
+    )
+    # several tags in a row is the same shape
+    assert not indexable(
+        _art("$KPJ (5878.MY)$ $IHH (5225.MY)$ Today KPJ up", "", ("MYX:5878", "MYX:5225"))
+    )
+
+
+def test_a_ticker_tag_INSIDE_a_headline_is_kept():
+    """The rule anchors at the start on purpose. A tag inside a sentence belongs
+    to a real headline, and dropping those would cost real reporting: moomoo
+    also supplies an insider sale and Bursa flow colour, 13 of its 23 rows."""
+    assert indexable(_art("Maybank $MAYBANK (1155.MY)$ climbs on results", "", ("MYX:1155",)))
+    assert indexable(
+        _art("Foreigners Dump Banks While Locals Gobble Up Maybank", "", ("MYX:1155",))
+    )
+    assert indexable(_art("NVIDIA(NVDA.US) Director Sells US$235.64 Million", "", ("XNAS:NVDA",)))
+
+
+def test_a_ticker_tag_with_a_real_body_is_kept():
+    """The drop needs BOTH: tag-shaped title AND nothing beyond the headline. A
+    post that opens with a tag and then says something is a claim."""
+    assert indexable(
+        _art(
+            "$MAYBANK (1155.MY)$",
+            "Maybank guided to a lower NIM for the second half.",
+            ("MYX:1155",),
+        )
+    )
+
+
 def test_a_real_body_that_names_nobody_is_kept():
     """121 rows in the shipped corpus. Text that names no holding can still
     answer a macro or sector question; only the headline-only ones provably

@@ -29,6 +29,7 @@ Three rules, each of which is a silent failure if dropped:
 from __future__ import annotations
 
 import os
+import re
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
@@ -113,6 +114,11 @@ def news_text(art: Article) -> str:
     return f"{title}\n{body}"
 
 
+#: `$MAYBANK (1155.MY)$` - the tag a retail social platform stamps on a user
+#: post, matched only at the START of a title. See `indexable`.
+_TICKER_TAG = re.compile(r"\$[^$]{1,40}\([A-Z0-9.]{1,10}\)\$")
+
+
 def indexable(art: Article) -> bool:
     """Can this row answer anything? A headline naming nobody cannot.
 
@@ -148,10 +154,46 @@ def indexable(art: Article) -> bool:
     text that can still answer a macro or sector question. The rule is not
     "unlinked", it is "no text beyond a headline AND no name" - the one
     combination that provably answers nothing.
+
+    ONE EXCEPTION TO "A HEADLINE IS A CLAIM", added 2026-09-12. A title that
+    OPENS with a ticker tag - `$MAYBANK (1155.MY)$`, the marker a retail social
+    platform stamps on a user post - names a company and asserts nothing about
+    it. It is the one shape that satisfies the paragraph above on a technicality
+    while failing its reasoning: it cannot be cited for a claim, because there
+    is no claim. Measured on the 2026-09-12 corpus, 9 of 3,838 rows, every one
+    of them headline-only, every one from www.moomoo.com:
+
+        $MAYBANK (1155.MY)$
+        $MAYBANK (1155.MY)$ Keep it up
+        $PCHEM (5183.MY)$ OMG!!! My mom got FREE RM188 here wowww...
+
+    The rule is keyed on the SHAPE, not the domain. moomoo also supplies real
+    reporting - an NVIDIA director's USD 235.64m insider sale, "Foreigners Dump
+    Banks While Locals Gobble Up Maybank", Malaysian grid-earnings outlook - and
+    13 of its 23 rows are of that kind, 6 escalated. Dropping the domain would
+    have cost all of those; this drops 9 and keeps 13.
+
+    The anchor matters: `match`, not `search`. A tag INSIDE a sentence belongs
+    to a real headline and stays.
+
+    KNOWN AND ACCEPTED COST. MYX:5183 returns to zero INDEXED articles, because
+    both of the two it had are ticker tags. Indexed counts per book name after
+    this rule: Maybank 36, IHH 29, Genting 18, Tenaga 4, Press Metal 4, Petronas
+    Chemicals 0.
+
+    What this does NOT do, checked rather than assumed: it does not re-open the
+    `name_coverage` alert. That rule counts CORPUS rows via
+    `Corpus.count_for_instrument`, not indexed ones, so the two spam posts still
+    satisfy it and it stays `resolved` - it logged that on 2026-09-12 only
+    because they arrived. Whether coverage should be counted in usable rows
+    rather than stored ones is a separate question about that rule, left open
+    here deliberately: this change is about what the INDEX holds.
     """
     title = (art.title or "").strip()
     body = (art.body or "").strip()
     headline_only = not body or body == title
+    if headline_only and _TICKER_TAG.match(title):
+        return False
     return bool(art.instruments) or not headline_only
 
 
