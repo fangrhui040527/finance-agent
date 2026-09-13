@@ -1,14 +1,16 @@
 # Digest 2026-09-13
 
-Generated 2026-09-13 07:22 UTC · slot `all` · 3924 articles in the corpus, 4541 observations, 3990 events in the fact book.
+Generated 2026-09-13 13:50 UTC · slot `all` · 4024 articles in the corpus, 4541 observations, 3990 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-09-13 www.smartkarma.com — Bursa Short Interest Weekly (Sep 11th): Malayan Banking, RHB Bank, YTL, Greatech Technology, Genting [q 0.65, tone +0.0]
 
 ### Tenaga (MYX:5347)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 1 escalated
+- 2026-09-12 tickerreport.com — Tenaga Nasional Berhad (OTCMKTS: TNABY) Shares Gap Up – What Next? [q 0.65, tone +0.0] ★
 
 ### Petronas Chemicals (MYX:5183)
 - quiet: nothing collected for this name in the window
@@ -20,7 +22,8 @@ Generated 2026-09-13 07:22 UTC · slot `all` · 3924 articles in the corpus, 454
 - quiet: nothing collected for this name in the window
 
 ### Genting (MYX:3182)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-09-13 www.smartkarma.com — Bursa Short Interest Weekly (Sep 11th): Malayan Banking, RHB Bank, YTL, Greatech Technology, Genting [q 0.65, tone +0.0]
 
 ### NVIDIA (XNAS:NVDA)
 - quiet: nothing collected for this name in the window
@@ -54,6 +57,15 @@ Generated 2026-09-13 07:22 UTC · slot `all` · 3924 articles in the corpus, 454
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 13:50 | eodhd | ok | 0 | 0 | 0 | facts 0; MYX:8869: deferred by the 2-a-day credit budget; next in rotation; MYX: |
+| 13:50 | twse_openapi | ok | 8 | 0 | 0 | facts 0;  |
+| 13:50 | jin10_flash | ok | 17 | 4 | 3 | facts 0;  |
+| 13:50 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 13:50 | nst_business | ok | 50 | 48 | 46 |  |
+| 13:50 | fmt_business | ok | 45 | 45 | 45 |  |
+| 13:50 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Tenaga, Petronas Chemicals, IHH, Press Metal, Genting, Maybank |
+| 13:50 | google_news | ok | 10 | 10 | 4 | read but empty: Press Metal; named the company: 2 of 10 (lowest: IHH 0/2, Petron |
+| 13:50 | gdelt | ok | 2 | 2 | 2 | read but empty: Petronas Chemicals; failed: Maybank; named the company: 1 of 2 ( |
 | 07:22 | sec_xbrl | ok | 4188 | 0 | 0 | facts 0;  |
 | 07:22 | finmind | ok | 77 | 0 | 0 | facts 5;  |
 | 07:22 | twse_openapi | ok | 8 | 0 | 0 | facts 0;  |
