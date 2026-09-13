@@ -1,0 +1,159 @@
+{
+  "day": "2026-09-12",
+  "written_at": "2026-09-13T22:40:00Z",
+  "market": {
+    "regime": "neutral",
+    "notes": [
+      "2026-09-12 was a Saturday; no market in this book traded. Every return is the 2026-09-11 session, which the pack dates correctly ('no session for ... after 2026-09-11').",
+      "The Bursa proxy MYX:0820EA backfilled for the third consecutive night: it now prints 1.8300 for 2026-09-11, which the 2026-09-11 page recorded as blank. The six Bursa names are decomposable for the first time.",
+      "1.8300 is the same close as 09-10 on 500 shares against a 2,800-share median, so the Bursa market leg is +0.00% and every Bursa name's unexplained share is 100% by construction; MYX:5183 carries a beta of -0.99 against it.",
+      "US proxy XNAS:SPY +0.85% 1d, -1.15% 5d on 2026-09-11, unchanged from the previous page.",
+      "SP500, NASDAQCOM, VIXCLS and T10Y2Y all still newest at 2026-09-09; DGS10 4.80 and DGS2 4.39 at 2026-09-08."
+    ]
+  },
+  "names": [
+    {
+      "instrument_id": "MYX:5225",
+      "move": {
+        "return_1d": -0.0304,
+        "market_1d": 0.0,
+        "unexplained_share": 1.0,
+        "note": "2026-09-11 session. Idiosyncratic -2.97%, verdict no_identified_catalyst - the one significant Bursa move. 'Significant' here is against IHH's own history, not the market, because the market leg is +0.00% from a 500-share proxy print."
+      },
+      "causes": [],
+      "open_questions": [
+        "The Tokyo ruling reported 2026-09-10T11:37Z is still the only dated candidate and the corpus holds no primary document; the engine confirms the move is significant and still names no catalyst."
+      ],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:5183",
+      "move": {
+        "return_1d": 0.056,
+        "market_1d": 0.0,
+        "unexplained_share": 1.0,
+        "note": "2026-09-11 session. Idiosyncratic +5.47% at 1.45 sigma, not_significant: a 5.60% day is inside normal variation FOR THIS NAME. Beta -0.99 against the proxy. Nothing collected on 2026-09-12."
+      },
+      "causes": [],
+      "open_questions": [
+        "The single sessions are not_significant; the five-session run (+19.20% on 3.2x median volume) is what needs explaining, and the name still holds zero indexable rows."
+      ],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:1155",
+      "move": {
+        "return_1d": -0.0076,
+        "market_1d": 0.0,
+        "unexplained_share": 1.0,
+        "note": "2026-09-11 session. Idiosyncratic -0.68%, 0.67 sigma, not_significant. Quiet: nothing collected on 2026-09-12."
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:5347",
+      "move": {
+        "return_1d": -0.0087,
+        "market_1d": 0.0,
+        "unexplained_share": 1.0,
+        "note": "2026-09-11 session. Idiosyncratic -0.86%, 1.08 sigma, not_significant. One row collected on 2026-09-12, escalated: a tickerreport.com piece on the US OTC depositary receipt TNABY, not the Bursa line."
+      },
+      "causes": [],
+      "open_questions": [
+        "A story about a different listing of the same issuer was escalated on a day neither market was open; no cause is offered."
+      ],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:8869",
+      "move": {
+        "return_1d": -0.0165,
+        "market_1d": 0.0,
+        "unexplained_share": 1.0,
+        "note": "2026-09-11 session. Idiosyncratic -1.69%, 0.86 sigma, not_significant. Quiet: nothing collected on 2026-09-12."
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:3182",
+      "move": {
+        "return_1d": -0.0152,
+        "market_1d": 0.0,
+        "unexplained_share": 1.0,
+        "note": "2026-09-11 session. Idiosyncratic -1.29%, 0.68 sigma, not_significant. Quiet: nothing collected on 2026-09-12."
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": []
+    },
+    {
+      "instrument_id": "XNAS:NVDA",
+      "move": {
+        "return_1d": -0.0003,
+        "market_1d": 0.0085,
+        "unexplained_share": 0.48,
+        "note": "2026-09-11 session, unchanged from the previous page. 0.70 sigma, beta 1.74; market +1.48%, idiosyncratic -1.38%."
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": []
+    },
+    {
+      "instrument_id": "XNAS:AAPL",
+      "move": {
+        "return_1d": 0.0175,
+        "market_1d": 0.0085,
+        "unexplained_share": 0.65,
+        "note": "2026-09-11 session, unchanged. 0.58 sigma, beta 0.63; market +0.54%, idiosyncratic +1.00%."
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": []
+    },
+    {
+      "instrument_id": "XNAS:MSFT",
+      "move": {
+        "return_1d": 0.0065,
+        "market_1d": 0.0085,
+        "unexplained_share": 0.09,
+        "note": "2026-09-11 session, unchanged. 0.03 sigma, beta 0.87; market +0.74%, idiosyncratic -0.07%. Market-driven."
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": []
+    }
+  ],
+  "data_quality": {
+    "failed": [],
+    "degraded": [
+      "gdelt: failed Microsoft and Apple at 06:07 and Tenaga at 12:54; named the company in 13 of 66",
+      "alphavantage_news: quota exhausted for XNAS:MSFT",
+      "eodhd: 0 fetched in both sweeps, every name deferred by the 2-a-day credit budget",
+      "google_news and yahoo_rss: 0 fetched, read but empty for all six Bursa names at 12:54 - the correct result for a Saturday"
+    ],
+    "skipped": [
+      "us_close 2026-09-13: not run by cron; sweep --due named it and run 62 was dispatched at 2026-09-13 22:35 UTC, still in progress when this page was written"
+    ],
+    "monitor_open": [
+      "past its own cadence: alphavantage_news (40h ago, allowed 30h), edgar (40h ago, allowed 30h), finnhub (40h ago, allowed 30h)",
+      "2 macro series past their cadence: DOSM:CPI_HEADLINE (74d, limit 70), CPIAUCSL (74d, limit 70)",
+      "the collector missed 2 of 8 scheduled runs in 3d: bursa_close 3 of 3, us_close 2 of 3, us_preopen 1 of 2",
+      "1 of 9 book names collected nothing in 14d: MYX:5183"
+    ],
+    "notes": [
+      "fmp closed itself. Carried at 110h, 120h then 134h past a 78h cadence across three pages; the weekly sweep at 2026-09-13 07:22 UTC refreshed it. Evidence in the pack: Apple's consensus target reads 339.35 (fmp, 2026-09-13) where it read 341.31 (fmp, 2026-09-05).",
+      "The three new cadence alerts are all us_close sources and all exactly 40h stale, because us_close last completed at 2026-09-12 06:07 UTC. Three source rules firing on one missing slot is the design working.",
+      "The printed components do not reconstruct the printed 1d return for any Bursa name and the market leg is +0.00%, so nothing shown absorbs the gap: Maybank 0.08pp, Tenaga 0.01pp, PCHEM 0.13pp, IHH 0.07pp, Press Metal 0.04pp, Genting 0.23pp. Sector beta is stated as fixed at 0 with no sector proxy cached. Unknown: needs the attribution code read, not more data."
+    ]
+  },
+  "lessons": [
+    "A stale number is more dangerous than a missing one: the blank proxy stopped the arithmetic and announced itself, the backfilled one restarted it with a market return that is an artefact of 500 shares.",
+    "A rule that names its own source beats a rule that names the outage; three cadence alerts on one missing slot were each independently actionable.",
+    "An alert can close because the machine recovered rather than because anyone acted, and the page has to say which.",
+    "A story about a different listing of the same issuer is a link, not a cause, and a gate keyed on the company name cannot tell them apart."
+  ]
+}
