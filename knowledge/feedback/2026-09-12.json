@@ -136,10 +136,10 @@
       "google_news and yahoo_rss: 0 fetched, read but empty for all six Bursa names at 12:54 - the correct result for a Saturday"
     ],
     "skipped": [
-      "us_close 2026-09-13: not run by cron; sweep --due named it and run 62 was dispatched at 2026-09-13 22:35 UTC, still in progress when this page was written"
+      "us_close 2026-09-13: not run by cron; sweep --due named it, run 62 was dispatched at 2026-09-13 22:35 UTC and landed at 22:39 UTC as commit 7e3ae15"
     ],
     "monitor_open": [
-      "past its own cadence: alphavantage_news (40h ago, allowed 30h), edgar (40h ago, allowed 30h), finnhub (40h ago, allowed 30h)",
+      "AFTER the dispatched sweep landed: past its own cadence: fred (78h ago, allowed 78h)",
       "2 macro series past their cadence: DOSM:CPI_HEADLINE (74d, limit 70), CPIAUCSL (74d, limit 70)",
       "the collector missed 2 of 8 scheduled runs in 3d: bursa_close 3 of 3, us_close 2 of 3, us_preopen 1 of 2",
       "1 of 9 book names collected nothing in 14d: MYX:5183"
@@ -147,7 +147,8 @@
     "notes": [
       "fmp closed itself. Carried at 110h, 120h then 134h past a 78h cadence across three pages; the weekly sweep at 2026-09-13 07:22 UTC refreshed it. Evidence in the pack: Apple's consensus target reads 339.35 (fmp, 2026-09-13) where it read 341.31 (fmp, 2026-09-05).",
       "The three new cadence alerts are all us_close sources and all exactly 40h stale, because us_close last completed at 2026-09-12 06:07 UTC. Three source rules firing on one missing slot is the design working.",
-      "The printed components do not reconstruct the printed 1d return for any Bursa name and the market leg is +0.00%, so nothing shown absorbs the gap: Maybank 0.08pp, Tenaga 0.01pp, PCHEM 0.13pp, IHH 0.07pp, Press Metal 0.04pp, Genting 0.23pp. Sector beta is stated as fixed at 0 with no sector proxy cached. Unknown: needs the attribution code read, not more data."
+      "The printed components do not reconstruct the printed 1d return for any Bursa name and the market leg is +0.00%, so nothing shown absorbs the gap: Maybank 0.08pp, Tenaga 0.01pp, PCHEM 0.13pp, IHH 0.07pp, Press Metal 0.04pp, Genting 0.23pp. Sector beta is stated as fixed at 0 with no sector proxy cached. Unknown: needs the attribution code read, not more data.",
+      "The dispatched us_close closed all three source-cadence alerts (alphavantage_news, edgar, finnhub) within five minutes and revealed fred at exactly its 78h limit, a us_preopen and weekly source that the louder rows had been sitting above."
     ]
   },
   "lessons": [
