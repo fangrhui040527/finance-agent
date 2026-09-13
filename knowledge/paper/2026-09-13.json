@@ -1,0 +1,88 @@
+{
+  "day": "2026-09-13",
+  "written_at": "2026-09-13T22:42:00Z",
+  "phase": "observe",
+  "equity_usd": 1000.0,
+  "cash_usd": 1000.0,
+  "control_equity_usd": 1000.0,
+  "drawdown": 0.0,
+  "halted": false,
+  "positions": [],
+  "changes": [],
+  "caps": [
+    {
+      "cap": "largest name",
+      "value": "0.00%",
+      "limit": "25%",
+      "breached": false
+    },
+    {
+      "cap": "invested",
+      "value": "0.00%",
+      "limit": "0%",
+      "breached": false
+    },
+    {
+      "cap": "cash floor",
+      "value": "100.00%",
+      "limit": "20%",
+      "breached": false
+    },
+    {
+      "cap": "names held",
+      "value": "0",
+      "limit": "0",
+      "breached": false
+    },
+    {
+      "cap": "drawdown from peak",
+      "value": "0.00%",
+      "limit": "8%",
+      "breached": false
+    },
+    {
+      "cap": "turnover used, 5 weekdays",
+      "value": "USD 0.00",
+      "limit": "USD 500.00",
+      "breached": false
+    }
+  ],
+  "attribution": {
+    "market": null,
+    "idiosyncratic": null,
+    "note": "no positions held; nothing to attribute"
+  },
+  "decision": {
+    "recorded": true,
+    "weights": {},
+    "thesis": "The Bursa decomposition arrived overnight and it removes reasons to act rather than adding them. IHH -3.04% on 2026-09-11 is now no_identified_catalyst, but the market leg is +0.00% from a proxy that printed an unchanged close on 500 shares, so significant means large against IHH's own history and not against the market. Petronas Chemicals is not_significant at 1.45 sigma on the day and still holds zero indexable rows; the +19.20% five-session run is the anomaly and nothing explains it. Apple is one share at 33.2% of equity against a 25% cap. No session Saturday or Sunday; Monday is the first trading day with the widened query, the ticker-tag filter and name_coverage counting usable rows all in place. Cash.",
+    "prediction_ids": [
+      "paper-2026-09-13-allcash-21d-5baf"
+    ],
+    "grades_on": "2026-10-13",
+    "refusals": [],
+    "stores_checked": {
+      "paper.db targets": 3,
+      "paper.db applications": 3,
+      "learning.db predictions": 3
+    }
+  },
+  "mistakes": [],
+  "settled": [
+    "fmp closed: carried at 110h, 120h and 134h past a 78h cadence across three pages, refreshed by the weekly sweep at 2026-09-13 07:22 UTC without intervention. Apple's consensus target now reads 339.35 (fmp, 2026-09-13); price_target_consensus for all three Nasdaq names comes from there."
+  ],
+  "corrections": [
+    "The 2026-09-11 and 2026-09-12 paper pages described Petronas Chemicals' daily moves as the strongest thing in the book. Measured against the name's own volatility a +5.60% session is 1.45 sigma and not_significant. The five-session run is the finding; the single sessions are not."
+  ],
+  "conditions_for_a_position": [
+    "Monday 2026-09-14 is the first trading day with the widened query, the ticker-tag filter, name_coverage counting usable rows, and a collector that gets runners - all four in place at once.",
+    "OPEN: Petronas Chemicals collects something a person wrote; with the filter in place anything that survives indexable() is by construction not a ticker tag. Zero rows to date.",
+    "OPEN: the Bursa proxy prints a close on real volume. MYX:0820EA has printed 1.8300 twice in a row, the second time on 500 shares.",
+    "OPEN: a Bursa announcement puts a figure on the IHH claim, turning a dated event into a sizeable one."
+  ],
+  "lessons": [
+    "New information can argue for less action; both candidate names got weaker when the measurement arrived.",
+    "A verdict is only as good as the thing it is measured against: 'significant idiosyncratic move' against a proxy that did not really trade is a statement about one instrument's history wearing the clothes of a market comparison.",
+    "Judge a move against the name's own volatility before calling it large."
+  ]
+}
