@@ -68,7 +68,7 @@ class Cfg:
 
 def test_measure_takes_both_legs_from_the_same_sessions_and_decomposes():
     m = measure(FakeFeed(), "MYX:1155", "Maybank", DAY)
-    assert not m.error and m.proxy == "MYX:0820EA" and m.last_day == DAY
+    assert not m.error and m.proxy == "MYX:^KLSE" and m.last_day == DAY
     assert m.r1 is not None and m.m1 is not None and m.r5 is not None
     assert m.r1 < -0.02, "the shock is in the instrument's last return"
     assert m.beta is not None and 0.5 < m.beta < 1.2
@@ -79,7 +79,7 @@ def test_measure_takes_both_legs_from_the_same_sessions_and_decomposes():
 
 
 def test_a_name_whose_bars_are_missing_is_no_data_not_a_typed_leg():
-    m = measure(FakeFeed(missing=("MYX:0820EA",)), "MYX:1155", "Maybank", DAY)
+    m = measure(FakeFeed(missing=("MYX:^KLSE",)), "MYX:1155", "Maybank", DAY)
     assert m.error and "no bars cached" in m.error and m.r1 is None
     assert "NO DATA" in m.row()
 
@@ -159,7 +159,7 @@ def test_the_cli_writes_the_pack_and_exits_zero_even_when_prices_are_unreachable
         lambda cfg, day, **kw: build_pack(
             cfg,
             day,
-            feed=FakeFeed(missing=("XNAS:SPY", "MYX:0820EA")),
+            feed=FakeFeed(missing=("XNAS:SPY", "MYX:^KLSE")),
             corpus_path=str(tmp_path / "c.db"),
             facts_path=str(tmp_path / "f.db"),
             now=NOW,
@@ -176,9 +176,14 @@ def test_the_cli_writes_the_pack_and_exits_zero_even_when_prices_are_unreachable
 class GappyFeed(FakeFeed):
     """A feed where the PROXY skips a session the name printed.
 
-    0820EA is a thinly traded ETF and did not print on 2026-09-07. The six Bursa
-    names then reported Friday's move on a page dated Monday, two of them
-    sign-flipped, and nothing in the pack said so.
+    0820EA, the KLCI ETF this book used as its Bursa proxy until 2026-09-14, did
+    not print on 2026-09-07. The six Bursa names then reported Friday's move on a
+    page dated Monday, two of them sign-flipped, and nothing in the pack said so.
+
+    The ETF is gone and these tests stay, because the fault is not the ETF's: ANY
+    proxy can miss a session its names printed - a holiday one market observes and
+    the other does not, a vendor gap, a halt - and the labelling is what makes that
+    legible instead of silent.
     """
 
     blank: tuple = ()
@@ -191,16 +196,16 @@ class GappyFeed(FakeFeed):
 
 
 def test_a_proxy_that_did_not_print_makes_the_row_mis_dated_and_says_so():
-    m = measure(GappyFeed(blank=("MYX:0820EA",)), "MYX:1155", "Maybank", DAY)
+    m = measure(GappyFeed(blank=("MYX:^KLSE",)), "MYX:1155", "Maybank", DAY)
     assert not m.error
     assert m.last_day == DAY - timedelta(days=1) and m.own_last == DAY  # the session before
-    assert m.mis_dated and "MIS-DATED" in m.dating and "MYX:0820EA" in m.dating
+    assert m.mis_dated and "MIS-DATED" in m.dating and "MYX:^KLSE" in m.dating
     assert "MIS-DATED" in m.row()
 
 
 def test_a_market_that_was_simply_shut_is_correctly_dated_not_flagged():
     """Both legs quiet is a holiday, not a fault; only a silent fallback is."""
-    m = measure(GappyFeed(blank=("MYX:0820EA", "MYX:1155")), "MYX:1155", "Maybank", DAY)
+    m = measure(GappyFeed(blank=("MYX:^KLSE", "MYX:1155")), "MYX:1155", "Maybank", DAY)
     assert not m.error and not m.mis_dated
     assert m.last_day == DAY - timedelta(days=1) and "correctly dated" in m.dating
     assert "MIS-DATED" not in m.row()

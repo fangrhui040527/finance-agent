@@ -108,9 +108,30 @@ def test_exact_token_query_finds_the_ticker():
     assert hits[0].chunk.chunk_id == "c2"
 
 
-def test_rrf_fuses_both_rankings():
-    hits = corpus().search("margin", 4)
+def test_rrf_fuses_both_rankings_when_the_dense_leg_is_switched_on():
+    """The RRF machinery still works; it is simply not what ships today.
+
+    `Collection.FUSE_DENSE` is False because the corpus-fitted embedder was
+    measured to DRAG the shipped list below plain BM25. The fusion code is kept
+    and kept tested, because the flag exists to be flipped back the day a real
+    embedding model earns it - a mechanism nobody exercises is a mechanism
+    nobody can turn on safely.
+    """
+    col = corpus()
+    col.FUSE_DENSE = True  # instance attribute; the class default is untouched
+    hits = col.search("margin", 4)
     assert any(h.sparse_rank and h.dense_rank for h in hits)
+
+
+def test_the_shipped_default_does_not_fuse_the_dense_leg():
+    """Pin the default, so turning it back on is a decision and not a drift."""
+    from knowledge.retrieval.hybrid import Collection
+
+    assert Collection.FUSE_DENSE is False
+    hits = corpus().search("margin", 4)
+    assert hits, "dropping the dense leg must not empty the result list"
+    assert all(h.dense_rank is None for h in hits)
+    assert any(h.sparse_rank for h in hits), "the sparse leg still ranks"
 
 
 def test_freshness_is_a_hard_filter_not_a_hint():

@@ -761,7 +761,7 @@ no code in this repository built the return series it scores.
 `engines/backtest/book.py` is that plumbing.
 
 **A rule passes only if it beats all three benchmarks after costs** — the local
-index (`0820EA.KL` for Bursa, `SPY` for Nasdaq), an equal-weight version of the
+index (`^KLSE` for Bursa, `SPY` for Nasdaq), an equal-weight version of the
 same names, and buy-and-hold on those names — **and** clears a deflated Sharpe
 of 0.95. Beat none of them and the harness says the correct product is an index
 tracker; it is written to be able to say that.

@@ -195,6 +195,21 @@ class Collection:
         scored.sort(key=lambda x: -x[1])
         return [(c, s) for c, s in scored[:limit] if s > 0]
 
+    #: Does `search` FUSE the dense leg in? Measured, not assumed, and currently
+    #: no: over the 23 labelled questions the corpus-fitted embedder finds
+    #: nothing BM25 missed (`dense_lift` 0) and DRAGS the shipped list below
+    #: plain exact-token search - recall@10 0.4348 fused against 0.4783 for BM25
+    #: alone, on the 3,481-chunk corpus of 2026-09-14. A leg that subtracts is
+    #: not a leg, and shipping one is the failure `evaluate.py` exists to name.
+    #:
+    #: `dense()` below is UNTOUCHED and `evaluate.py` still scores it every run,
+    #: so this is a gate rather than a deletion: the day a real embedding model
+    #: (`EMBEDDING_API_KEY`) makes the leg earn its place, the number says so and
+    #: this flips back to True. `test_the_vector_leg_earns_its_place` enforces
+    #: exactly that - it is only legal for this to be True while the lift is
+    #: positive.
+    FUSE_DENSE = False
+
     def search(
         self,
         query: str,
@@ -205,7 +220,7 @@ class Collection:
         licence_exclude: str | None = "link_only",
     ) -> list[Hit]:
         sparse = self.bm25.search(query, limit * 4)
-        dns = self.dense(query, limit * 4)
+        dns = self.dense(query, limit * 4) if self.FUSE_DENSE else []
 
         ranks: dict[str, dict] = {}
         for i, (c, _) in enumerate(sparse):

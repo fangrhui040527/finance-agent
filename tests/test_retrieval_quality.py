@@ -328,23 +328,46 @@ def test_the_gold_set_has_both_families_in_useful_numbers():
 
 
 @pytest.mark.skipif(not Path("data/corpus.db").exists(), reason="no corpus in this checkout")
-def test_the_vector_leg_earns_its_place():
-    """The claim the old embedder failed, stated so it cannot silently fail again.
+def test_the_vector_leg_ships_only_while_it_earns_its_place():
+    """The shipped stack is never worse than its best single leg.
 
-    Deliberately structural rather than a target score. Absolute recall moves as
-    the corpus grows - more articles means more competition for the same ten
-    slots - and a test pinned to a number would go red for a reason that is not
-    a regression. These two hold whatever the corpus looks like: the vector leg
-    must find something exact-token search missed, and fusing the two must not
-    be worse than the better half.
+    THIS TEST USED TO ASSERT `dense_lift > 0` UNCONDITIONALLY, and said in its
+    own docstring that the claim held "whatever the corpus looks like". That
+    premise was false and the test was right to go red: on the 2026-09-14 corpus
+    of 3,481 chunks the corpus-fitted embedder found nothing BM25 missed AND
+    dragged the fused list below plain exact-token search - recall@10 0.4348
+    against 0.4783, losing a labelled question the sparse leg had found.
+
+    The assertion is not relaxed, it is aimed at the claim that is actually
+    enforceable. "The dense leg always helps" is a property of an embedder
+    nobody has bought yet. "We only SHIP a leg that helps" is a property of this
+    repository, and it is the one that keeps a measured-negative component out
+    of the answer path.
+
+    So: the dense leg is still measured on every run, and `Collection.FUSE_DENSE`
+    may only be True while that measurement is positive. Flipping the flag
+    without the number turns this red, which is the point.
     """
     from knowledge.retrieval.evaluate import report_for
+    from knowledge.retrieval.hybrid import Collection
 
     report = report_for(gold_path=GOLD)
-    assert report.dense_lift > 0, (
-        "the vector leg found nothing BM25 missed - it is a second lexical "
-        "search, which is what the hashing projection was"
+
+    if Collection.FUSE_DENSE:
+        assert report.dense_lift > 0, (
+            "FUSE_DENSE is on while the vector leg finds nothing BM25 missed - "
+            "it is a second lexical search, which is what the hashing projection "
+            "was. Either turn the flag off or get an embedder that earns it."
+        )
+
+    # The leg is gated, not deleted: evaluate.py must still score it, so the day
+    # a real model makes it worth fusing the number is there to say so.
+    assert report.legs["dense"].cases > 0, (
+        "the dense leg stopped being measured - a gate you cannot reopen on "
+        "evidence is a deletion wearing a flag"
     )
+
+    # What the user actually gets is never worse than the better half.
     assert report.legs["fused"].recall_at_10 >= report.legs["bm25"].recall_at_10
     assert report.legs["reranked"].recall_at_10 >= report.legs["bm25"].recall_at_10
 
