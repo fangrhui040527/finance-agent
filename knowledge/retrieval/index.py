@@ -29,11 +29,11 @@ Three rules, each of which is a silent failure if dropped:
 from __future__ import annotations
 
 import os
-import re
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 from knowledge.chunking.parent_child import Chunk, chunk_news
+from knowledge.news.clean import TICKER_TAG as _TICKER_TAG
 from knowledge.news.features import Article, LexiconExtractor
 from knowledge.retrieval.hybrid import Collection
 from knowledge.retrieval.method import METHOD_DIR, method_collections, method_stamp
@@ -114,9 +114,11 @@ def news_text(art: Article) -> str:
     return f"{title}\n{body}"
 
 
-#: `$MAYBANK (1155.MY)$` - the tag a retail social platform stamps on a user
-#: post, matched only at the START of a title. See `indexable`.
-_TICKER_TAG = re.compile(r"\$[^$]{1,40}\([A-Z0-9.]{1,10}\)\$")
+#: `$MAYBANK (1155.MY)$` is matched by `clean.TICKER_TAG`, imported at the top
+#: of this module rather than redefined here. `clean.is_junk` needs the same
+#: shape to stop these scoring as news for the digest, and two copies of one
+#: regex drift silently - one seam would keep ranking what the other had already
+#: decided was not a story. See `indexable`.
 
 
 def indexable(art: Article) -> bool:
