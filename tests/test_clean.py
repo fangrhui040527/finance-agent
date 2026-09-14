@@ -81,6 +81,59 @@ def test_junk_is_recognised_and_low_value_is_scored_not_dropped():
     assert not is_low_value("Nvidia beats on data-centre demand")
 
 
+def test_a_bare_ticker_tag_does_not_score_as_news():
+    """#65 stopped these RANKING; this stops them scoring as news.
+
+    The daily digest reads the corpus directly rather than through the retrieval
+    index, so filtering `indexable` left it untouched: `quality_score` gave a
+    ticker-tag post 0.65 against `digest.MIN_QUALITY` of 0.4. Nine were stored by
+    2026-09-14 and still arriving - `$SanDisk (SNDK.US)$ $Apple (AAPL.US)$ ...`
+    landed on 09-12, so the shape is not a Malaysian quirk.
+    """
+    from knowledge.digest import MIN_QUALITY
+
+    for title in (
+        "$MAYBANK (1155.MY)$",
+        "$PCHEM (5183.MY)$ OMG!!! My mom got FREE RM188 here wowww",
+        "$SanDisk (SNDK.US)$ $Apple (AAPL.US)$ $Tesla (TSLA.US)$ up today",
+    ):
+        assert is_junk(title), title
+        assert quality_score(title, "", "www.moomoo.com", linked=True) < MIN_QUALITY, title
+
+
+def test_the_publisher_is_not_the_filter():
+    """moomoo.com carries both. 11 of its 19 articles were real syndicated
+    journalism, one of them the Bursa reporting this book is short of - so the
+    tag is the signal and the domain is not."""
+    for title in (
+        "Foreigners Dump Banks While Locals Gobble Up Maybank",
+        "NVIDIA(NVDA.US) Director Sells US$235.64 Million in Common Stock",
+        "Tokyo Court Rejects IHH Subsidiary's $1.25 Billion Claim",
+        "Got $1,000? An Investment in Micron Could Be Worth This Much by 2027",
+    ):
+        assert not is_junk(title), title
+
+
+def test_a_ticker_tag_with_a_story_under_it_is_kept():
+    """The tag alone asserts nothing. The tag over a real body is a claim that
+    can be cited, and dropping it would lose reporting."""
+    body = "Petronas Chemicals reported a 12% rise in quarterly net profit."
+    assert not is_junk("$PCHEM (5183.MY)$ results", body)
+
+
+def test_both_seams_read_the_same_pattern():
+    """`clean.TICKER_TAG` is the canonical copy and `retrieval.index` imports it.
+
+    Two regexes for one concept drift, and the divergence is silent: one seam
+    would keep ranking a row the other had already decided was not a story. This
+    fails if someone reintroduces a private copy.
+    """
+    from knowledge.news.clean import TICKER_TAG
+    from knowledge.retrieval.index import _TICKER_TAG
+
+    assert _TICKER_TAG is TICKER_TAG
+
+
 def test_quality_rewards_a_summary_a_link_and_an_edited_source():
     bare = quality_score("Nvidia beats", "", "randomblog.example", linked=False)
     linked = quality_score("Nvidia beats estimates", "", "randomblog.example", linked=True)

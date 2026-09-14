@@ -133,6 +133,22 @@ JUNK = re.compile(
     re.IGNORECASE,
 )
 
+#: `$MAYBANK (1155.MY)$` - the tag a retail social platform stamps on a user
+#: post, which Google News then carries as if it were reporting. Matched only at
+#: the START of a title.
+#:
+#: THIS IS THE CANONICAL COPY. `knowledge/retrieval/index.indexable` imports it
+#: rather than keeping its own: one shape, one pattern, because two regexes for
+#: one concept drift and the divergence is silent - the index would stop ranking
+#: a row the corpus still scored as news, or the reverse.
+#:
+#: Introduced at the index seam in #65 with the measurement that settled the
+#: shape: filtering the whole moomoo.com domain removed 23 rows, filtering on
+#: this prefix removed 9. The domain is not the filter - 11 of moomoo's 19
+#: articles are real syndicated journalism, including the Bursa reporting this
+#: book is short of. The cashtag prefix separates the post from the reporting.
+TICKER_TAG = re.compile(r"\$[^$]{1,40}\([A-Z0-9.]{1,10}\)\$")
+
 #: Kept, but scored down: opinion listicles and crypto price talk that name a
 #: company without reporting anything about it.
 LOW_VALUE = re.compile(
@@ -192,6 +208,21 @@ def domain_of(url_or_domain: str) -> str:
 
 
 def is_junk(title: str, body: str = "", domain: str = "") -> bool:
+    # A ticker tag with nothing under it. #65 stopped these RANKING; this stops
+    # them scoring as news, which is a different path and was still open: the
+    # daily digest reads the corpus directly, and `quality_score` gave them 0.65
+    # against `digest.MIN_QUALITY` of 0.4. Nine were stored by 2026-09-14 and
+    # they were still arriving - `$SanDisk (SNDK.US)$ $Apple (AAPL.US)$ ...` on
+    # 09-12, so the shape is not a Malaysian quirk.
+    #
+    # Same condition as `indexable`, deliberately: headline-only AND the tag at
+    # the start. All nine stored rows are headline-only, so the guard costs
+    # nothing today, and a post that ever arrives with real text under it is a
+    # claim that can be cited - the two seams should not disagree about which.
+    stripped = (title or "").strip()
+    body_text = (body or "").strip()
+    if (not body_text or body_text == stripped) and TICKER_TAG.match(stripped):
+        return True
     return bool(JUNK.search(f"{title} {body}"))
 
 

@@ -553,6 +553,56 @@ re-investigates them:
     until 2026-09-06 and per-instrument from 2026-09-07. The unlinked mass is
     debris from a regime that has already been replaced, not a live fault.
 
+## 17. Asking for the ticker worked, and the ticker is what spam quotes
+
+#60 made the collector ask Google News for every alias a company is printed
+under, so `"PCHEM"` was searched for the first time on 2026-09-11. It worked:
+`MYX:5183` went from **0 articles, all time** to 2 on the first run, and Bursa
+coverage overall went 70 -> 98 in that single sweep.
+
+Both PCHEM articles were these:
+
+```
+$PCHEM (5183.MY)$
+$PCHEM (5183.MY)$ OMG!!! My mom got FREE RM188 here wowww, some of the users got RM88 and RM100
+```
+
+A cashtag is how a retail social platform tags a user post, and Google News
+carries them as if they were reporting. So the alias fix cleared the
+`name_coverage` alert on Petronas Chemicals **while the company still had no
+reporting at all**. The rule counted arrivals; two arrived. Nothing was broken -
+the collector asked the right question and the internet answered with rubbish -
+which is why only reading the rows found it.
+
+**The publisher is not the filter.** Blocking moomoo.com is the obvious move and
+measuring says it is wrong: 11 of its 19 articles are real syndicated journalism,
+including *"Foreigners Dump Banks While Locals Gobble Up Maybank"* - precisely
+the Bursa reporting this book is short of. #65 measured the same thing from the
+other side: the whole domain removed 23 rows, the tag prefix removed 9.
+
+**IT TOOK THREE FIXES AT THREE SEAMS, and that is the lesson.** One shape of junk
+reached the book by three independent paths, and closing one said nothing about
+the others:
+
+| seam | what it decides | fixed by |
+|---|---|---|
+| `retrieval.indexable` | can it RANK | #65 |
+| `monitor.name_coverage` | does the name look covered | #66 |
+| `clean.is_junk` -> `quality_score` | does it score as NEWS, for the digest | this |
+
+#65's own docstring recorded the second one as still open rather than assuming
+it had been covered, which is why #66 exists. The third survived both: the daily
+digest reads the corpus directly, not through the index, so a ticker-tag post
+still scored 0.65 against `digest.MIN_QUALITY` of 0.4 and remained eligible for
+the page a person actually reads. Nine were stored by 2026-09-14 and they were
+still arriving - `$SanDisk (SNDK.US)$ $Apple (AAPL.US)$ ...` on 09-12, so the
+shape is not a Malaysian quirk either.
+
+`clean.TICKER_TAG` is now the single copy and `retrieval.index` imports it. Two
+regexes for one concept drift, and the divergence would be silent: one seam
+ranking what the other had already decided was not a story. A test asserts the
+two are the same object.
+
 ## What the families have in common
 
 | Family | Shape |
@@ -569,6 +619,7 @@ re-investigates them:
 | no-op-that-writes | a run that decided to do nothing still leaves a trace, and the trace reads as work |
 | two-spellings-of-one-state | the same outcome is recorded two ways, and one of them the watching rule cannot read |
 | limit-before-filter | a bound is applied before the predicate, so the rarest rows are the ones that vanish |
+| satisfied-by-noise | a rule counts arrivals, so junk that arrives clears the alarm the gap raised |
 
 Eleven of the twelve are invisible to a type checker and to a test that only
 exercises the happy path - and the twelfth is invisible to a test whose fixture
