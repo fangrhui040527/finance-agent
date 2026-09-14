@@ -7,12 +7,22 @@
 # runner and prints sessions, blank closes, median volume, and each book name's
 # beta and R-squared against both.
 #
-# Read-only, keyless, stores nothing, enables nothing. Manual: the answer
-# changes when a vendor changes a symbol, not hourly.
+# Read-only, keyless, stores nothing, enables nothing.
+#
+# It runs on a push that touches the probe ITSELF, and manually otherwise. The
+# push trigger is not a schedule in disguise: the comparison is only worth
+# re-running when the comparison changes, and a `workflow_dispatch` workflow
+# cannot be dispatched until it sits on the default branch - which would mean
+# merging the proxy change before its evidence existed, the exact inversion
+# this probe is here to prevent.
 name: market-proxy-probe
 
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/market-proxy-probe.yml"
+      - ".github/scripts/market_proxy_probe.py"
 
 permissions:
   contents: read
