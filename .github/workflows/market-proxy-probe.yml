@@ -1,0 +1,48 @@
+# Does `^KLSE` exist, and does it explain the book better than the ETF?
+#
+# The development environment answers 403 for every Yahoo symbol, so the
+# candidate Bursa market proxy could not be fetched there even once. Four
+# journal pages carried `^KLSE` as a proposed remedy marked `not tested`. This
+# workflow is the test: it fetches the candidate and the incumbent from a
+# runner and prints sessions, blank closes, median volume, and each book name's
+# beta and R-squared against both.
+#
+# Read-only, keyless, stores nothing, enables nothing. Manual: the answer
+# changes when a vendor changes a symbol, not hourly.
+name: market-proxy-probe
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.12"
+          enable-cache: true
+
+      - name: Install
+        run: uv sync --frozen
+
+      - name: Probe both proxies
+        run: |
+          set +e
+          uv run python .github/scripts/market_proxy_probe.py | tee probe.txt
+          {
+            echo "## Bursa market proxy: candidate vs incumbent"
+            echo
+            echo '```'
+            cat probe.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"

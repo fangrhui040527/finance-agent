@@ -31,6 +31,16 @@ from datetime import UTC, date, datetime
 from core.market.prices import Bar, PriceSeries
 from core.net.breaker import CircuitBreaker
 
+#: Ids that name an INDEX rather than a tradable line. An index is only ever
+#: fetched as a price series - it is never sized, priced, charged a fee or
+#: held - so it needs no market adapter entry. It does need a symbol rule of
+#: its own, because no exchange suffix applies to it: Yahoo writes the FBM
+#: KLCI as `^KLSE`, with a caret and no `.KL`. A feed with no literal for an id
+#: listed here REFUSES rather than sending it through the suffix rule, which
+#: would build a plausible symbol for something else entirely - property 2 of
+#: this module, applied to the one case the suffix tables cannot express.
+INDEX_IDS: frozenset[str] = frozenset({"MYX:^KLSE"})
+
 
 class PriceFeedError(RuntimeError):
     """The source could not be reached or answered with something unusable."""
@@ -54,8 +64,31 @@ class PriceFeed(ABC):
 
     name: str = "abstract"
 
+    #: Index id -> this feed's literal symbol. See INDEX_IDS. Empty by default,
+    #: so a feed that has never been asked about an index refuses instead of
+    #: inheriting another feed's spelling.
+    LITERAL: dict[str, str] = {}
+
     @abstractmethod
     def symbol_for(self, instrument_id: str) -> str: ...
+
+    def _index_symbol(self, instrument_id: str) -> str:
+        """The literal symbol for an index id, or a refusal naming the fix.
+
+        Separate from the suffix rule because it is a different kind of answer:
+        the suffix tables say how a market spells its shares, and an index is
+        not one. A feed that cannot spell it says so - it does not fall through
+        and return `^KLSE.KL`, which Yahoo would answer for with somebody
+        else's prices or with nothing at all.
+        """
+        literal = self.LITERAL.get(instrument_id)
+        if literal is None:
+            raise SymbolUnmappable(
+                f"{instrument_id!r} is an index and {self.name!r} has no symbol for "
+                f"it. Add one to {type(self).__name__}.LITERAL and verify it with a "
+                f"live fetch - market-proxy-probe.yml does exactly that."
+            )
+        return literal
 
     @abstractmethod
     def _fetch_csv(self, symbol: str) -> str: ...
@@ -247,11 +280,18 @@ class StooqFeed(PriceFeed):
         self._breaker = CircuitBreaker("stooq")
         self.cache = cache
 
+    #: Index id -> this feed's literal symbol; see INDEX_IDS. Empty: no Stooq
+    #: symbol for the FBM KLCI has been verified from a runner, and Stooq is
+    #: behind a browser wall here anyway, so the chain falls through to Yahoo.
+    LITERAL: dict[str, str] = {}
+
     def symbol_for(self, instrument_id: str) -> str:
         if ":" not in instrument_id:
             raise SymbolUnmappable(
                 f"{instrument_id!r} has no market prefix; expected e.g. 'XNAS:NVDA'"
             )
+        if instrument_id in INDEX_IDS:
+            return self._index_symbol(instrument_id)
         from markets.registry import resolve_mic
 
         raw_mic, _, local = instrument_id.partition(":")
@@ -327,11 +367,19 @@ class YahooFeed(PriceFeed):
         self._breaker = CircuitBreaker("yahoo")
         self.cache = cache
 
+    #: Index id -> this feed's literal symbol; see INDEX_IDS. `^KLSE` is the FBM
+    #: KLCI as Yahoo writes it, confirmed from a runner by market-proxy-probe -
+    #: the dev environment answers 403 for every Yahoo symbol, so it could not
+    #: be confirmed here.
+    LITERAL: dict[str, str] = {"MYX:^KLSE": "^KLSE"}
+
     def symbol_for(self, instrument_id: str) -> str:
         if ":" not in instrument_id:
             raise SymbolUnmappable(
                 f"{instrument_id!r} has no market prefix; expected e.g. 'XNAS:NVDA'"
             )
+        if instrument_id in INDEX_IDS:
+            return self._index_symbol(instrument_id)
         from markets.registry import resolve_mic
 
         raw_mic, _, local = instrument_id.partition(":")
@@ -409,14 +457,33 @@ class YahooFeed(PriceFeed):
 
 
 #: The instrument whose bars stand for "the market" when a move is decomposed
-#: (`ask.py why --against`, the MCP tool's `market_proxy`). An ETF rather than
-#: the index itself because the price feeds carry ETFs under the same symbol
-#: rules as any share, and an index symbol would need a rule of its own per
-#: source. 0820EA is the FBM KLCI ETF on Bursa; SPY tracks the S&P 500.
+#: (`ask.py why --against`, the MCP tool's `market_proxy`). SPY tracks the S&P
+#: 500 and is one of the most heavily traded instruments in the world; `^KLSE`
+#: is the FBM KLCI itself.
+#:
+#: BURSA WAS `MYX:0820EA`, THE KLCI ETF, AND THAT WAS THE WRONG KIND OF THING.
+#: The original reason was symbol mechanics: the feeds carry ETFs under the
+#: same suffix rule as any share, and an index needs a rule of its own. That
+#: reason was real and it was cheap to fix - `_index_symbol` above is the rule.
+#: What it bought was four days of wrong answers:
+#:
+#:   median volume        2,800 shares/day, against Maybank's 11,027,500 (3,937x)
+#:   sessions not traded   164 of 1,231 (13.3%)
+#:   2026-09-10            no close at all, so the Bursa half of that day's page
+#:                         could not be decomposed and said so
+#:   2026-09-11            an UNCHANGED 1.8300 printed on 500 shares, so the
+#:                         market leg read +0.00%, every Bursa name's unexplained
+#:                         share was 100% by construction, and Petronas Chemicals
+#:                         carried a beta of -0.99 against "the market"
+#:
+#: A proxy must be at least as liquid as the things it explains. The ETF is
+#: not, and a stale proxy is worse than a missing one: a blank close stops the
+#: arithmetic and announces itself, while an unchanged close on 500 shares
+#: restarts it with a number that reads like a finding.
 MARKET_PROXIES: dict[str, str] = {
     "XNAS": "XNAS:SPY",
     "XNYS": "XNAS:SPY",
-    "XKLS": "MYX:0820EA",
+    "XKLS": "MYX:^KLSE",
 }
 
 

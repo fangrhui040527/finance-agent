@@ -206,7 +206,7 @@ PAPER_PRICES = {
     "XNAS:NVDA": 224.0,
     "XNAS:AAPL": 325.0,
     "XNAS:MSFT": 497.0,
-    "MYX:0820EA": 1.82,
+    "MYX:^KLSE": 1600.0,
     "XNAS:SPY": 765.0,
 }
 
