@@ -1,6 +1,78 @@
 {
   "collection": [
     {
+      "at": "2026-09-14T23:54:14.104716+00:00",
+      "detail": "facts 0; XNAS:AAPL: deferred by the 2-a-day credit budget; next in rotation; XNAS:MSFT: outside the plan or over today's credits; XNAS:NVDA: outside the plan or over today's credits",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-14T23:54:13.636132+00:00",
+      "detail": "facts 0; ",
+      "fetched": 20,
+      "kept": 10,
+      "source": "jin10_flash",
+      "status": "ok",
+      "stored": 8
+    },
+    {
+      "at": "2026-09-14T23:54:12.152899+00:00",
+      "detail": "facts 6; XNAS:MSFT: alphavantage quota exhausted for today: Thank you for using Alpha Vantage! Please consider spreading out your free API requests more sparingly (1 request per second). You may subscribe to any of the p; XNAS:NVDA: alphavantage quota exhausted for today: Thank you for using Alpha Vantage! Please consider spreading out your free API requests more sparingly (1 request per second). ",
+      "fetched": 14,
+      "kept": 14,
+      "source": "alphavantage_news",
+      "status": "ok",
+      "stored": 14
+    },
+    {
+      "at": "2026-09-14T23:54:11.919293+00:00",
+      "detail": "facts 0; ",
+      "fetched": 247,
+      "kept": 219,
+      "source": "finnhub",
+      "status": "ok",
+      "stored": 175
+    },
+    {
+      "at": "2026-09-14T23:54:10.560579+00:00",
+      "detail": "every name failed. First: XNAS:NVDA: edgar fetch failed: HTTP 429 for https://data.sec.gov/submissions/CIK0001045810.json",
+      "fetched": 0,
+      "kept": 0,
+      "source": "edgar",
+      "status": "failed",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-14T23:54:01.032641+00:00",
+      "detail": "named the company: 49 of 49 (lowest: Apple 14/14, Microsoft 17/17, NVIDIA 18/18)",
+      "fetched": 49,
+      "kept": 49,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 44
+    },
+    {
+      "at": "2026-09-14T23:54:00.657070+00:00",
+      "detail": "named the company: 74 of 81 (lowest: Apple 17/19, NVIDIA 36/40, Microsoft 21/22)",
+      "fetched": 89,
+      "kept": 81,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 81
+    },
+    {
+      "at": "2026-09-14T23:53:59.083955+00:00",
+      "detail": "read but empty: NVIDIA, Microsoft; failed: Apple",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "ok",
+      "stored": 0
+    },
+    {
       "at": "2026-09-14T18:10:02.097700+00:00",
       "detail": "facts 0; ",
       "fetched": 450,
@@ -119,18 +191,18 @@
     }
   ],
   "counts": {
-    "articles": 4396,
+    "articles": 4718,
     "documents": 0,
-    "escalated": 921,
+    "escalated": 990,
     "events": 3996,
-    "failed_sweeps": 17,
-    "linked": 2991,
-    "observations": 4561,
+    "failed_sweeps": 18,
+    "linked": 3298,
+    "observations": 4567,
     "series": 31,
-    "sweeps": 261
+    "sweeps": 269
   },
   "day": "2026-09-14",
-  "generated_at": "2026-09-14 18:10 UTC",
+  "generated_at": "2026-09-14 23:54 UTC",
   "macro": [
     {
       "change": "-0.05",
@@ -450,7 +522,7 @@
       "upcoming": []
     },
     {
-      "escalated": 10,
+      "escalated": 40,
       "events": [],
       "instrument_id": "XNAS:NVDA",
       "label": "NVIDIA",
@@ -545,11 +617,11 @@
         },
         {
           "concept": "av_news_sentiment",
-          "known_at": "2026-09-13",
+          "known_at": "2026-09-14",
           "label": "vendor sentiment",
-          "period_end": "2026-09-13",
+          "period_end": "2026-09-14",
           "source": "alphavantage_news",
-          "value": "0.31"
+          "value": "-0.10"
         },
         {
           "concept": "revenue",
@@ -578,105 +650,105 @@
       ],
       "stories": [
         {
-          "doc_id": "alphavantage:https://finance.yahoo.com/markets/stocks/articles/nvidia-nvda-looks-cheap-piper-191328167.html",
-          "domain": "Yahoo Finance",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-09-13T19:14:13+00:00",
-          "quality": 0.85,
-          "title": "Nvidia (NVDA) Looks Cheap on Piper\u2019s Forecasts, but the Earnings Assumptions Are the Real Test",
-          "uncertainty": 0.15432098765432098
-        },
-        {
-          "doc_id": "https://247wallst.com/investing/2026/09/13/anthropic-locks-down-517-billion-in-compute-ahead-of-ipo-and-its-still-not-enough/?.tsrc=rss",
-          "domain": "247wallst.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-13T15:36:09+00:00",
-          "quality": 0.85,
-          "title": "Anthropic Locks Down $517 Billion in Compute Ahead of IPO \u2014 and It\u2019s Still Not Enough",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "finnhub:142122966",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-13T13:01:01+00:00",
-          "quality": 0.85,
-          "title": "Is It Too Late to Buy Nvidia Stock?",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "alphavantage:https://www.fool.com/investing/2026/09/13/sundar-pichai-alphabets-backlog-514-billion/",
-          "domain": "The Motley Fool",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-09-13T12:50:40+00:00",
-          "quality": 0.85,
-          "title": "Sundar Pichai Says Alphabet's Cloud Backlog Hit $514 Billion After 82% Revenue Growth Last Quarter. Is Google Cloud Becoming a Bigger Growth Driver Than Search?",
-          "uncertainty": 0.11061946902654866
-        },
-        {
-          "doc_id": "finnhub:142123539",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-09-13T15:15:00+00:00",
-          "quality": 0.65,
-          "title": "Prediction: 2 AI Semiconductor Stocks That Will Join Micron and Broadcom in the $1 Trillion Club by 2028",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxNYmNCNTFlRHNJRzB5d0ZzYXVxMkxOR1VUcmR6NWtha0RpcjZjZG5DZmxqWVVhMGd6bF9PYnN4bFUyVndhQWJmdFlTZ3ZjdUtkZnBQbHV5YU0wVkNjMUlMVWN0WUw2OUx6alVvNXNuNGVLNnY5UWVyZ2MzTEZBS3dLY0FHNnpfdDRYdXNDaG9Pb1dNaThRWG1vSmd6UURxSjhCV1o0WGtVS1Z4RFZWMGhrQzRVSFcyMTlwNnpxZDR1bHg?oc=5",
-          "domain": "www.thedailystar.net",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-09-13T15:13:56+00:00",
-          "quality": 0.65,
-          "title": "Jensen Huang forecasts 70% Nvidia revenue growth as AI demand expands",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "finnhub:142123540",
-          "domain": "Yahoo",
+          "doc_id": "https://finance.yahoo.com/m/2084aecc-79ec-32d8-a4ee-0894a4e6a808/dow-jones-futures%3A-nvidia%2C.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
           "escalated": true,
           "intensity": 0.0,
           "polarity": -1.0,
-          "published_at": "2026-09-13T15:03:00+00:00",
-          "quality": 0.65,
-          "title": "UPS Cut Amazon Volumes on Purpose. The Margin Data Says It Worked.",
+          "published_at": "2026-09-14T22:29:28+00:00",
+          "quality": 1.0,
+          "title": "Dow Jones Futures: Nvidia, Micron, Sandisk Dive On AI Fears; Fed Rate Hike Looms",
+          "uncertainty": 0.3205128205128205
+        },
+        {
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/ai-leaders-slow-down-iren-190519922.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-14T19:05:19+00:00",
+          "quality": 1.0,
+          "title": "AI Leaders Say Slow Down. IREN Says Compute Demand May Never Be Satisfied. Nvidia Sits in the Middle",
+          "uncertainty": 0.684931506849315
+        },
+        {
+          "doc_id": "https://stocktwits.com/news-articles/markets/equity/iren-stock-slips-but-a-top-wall-street-bank-is-bullish/cZtmjA6RBTB?.tsrc=rss",
+          "domain": "stocktwits.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-14T23:21:53+00:00",
+          "quality": 0.85,
+          "title": "IREN Stock Slips, But A Top Wall Street Bank Is Bullish With Double-Upgrade And 50% Upside",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:142123542",
+          "doc_id": "finnhub:142141300",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "polarity": 1.0,
+          "published_at": "2026-09-14T21:00:15+00:00",
+          "quality": 0.85,
+          "title": "Broadcom Drops Over 4% as $21.7 Billion AI Forecast Meets Slowdown Fears",
+          "uncertainty": 0.4464285714285714
+        },
+        {
+          "doc_id": "alphavantage:https://www.cnbc.com/2026/09/14/apple-releases-ios-27-redesigned-siri-ai.html",
+          "domain": "CNBC",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-14T19:06:16+00:00",
+          "quality": 0.85,
+          "title": "Apple releases test of redesigned Siri AI before iPhone 18 hits stores this week",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142139103",
           "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 1.0,
-          "published_at": "2026-09-13T14:43:00+00:00",
-          "quality": 0.65,
-          "title": "Predicting Intel's Value by 2030 Could Make It Worth a Look Right Now",
-          "uncertainty": 0.9259259259259258
+          "published_at": "2026-09-14T16:48:22+00:00",
+          "quality": 0.85,
+          "title": "Nvidia, Palantir Pull Back From Anthropic Models Over Fears AI Could Expose Corporate Secrets",
+          "uncertainty": 0.21929824561403508
+        },
+        {
+          "doc_id": "https://247wallst.com/investing/2026/09/14/forget-the-magnificent-7-this-duo-says-broadcom-not-nvidia-wins-the-next-leg-of-ai/?.tsrc=rss",
+          "domain": "247wallst.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-14T16:15:19+00:00",
+          "quality": 0.85,
+          "title": "Forget the Magnificent 7. This Duo Says Broadcom, Not Nvidia, Wins the Next Leg of AI.",
+          "uncertainty": 0.23148148148148145
+        },
+        {
+          "doc_id": "finnhub:142140685",
+          "domain": "SeekingAlpha",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-14T16:13:22+00:00",
+          "quality": 0.85,
+          "title": "Nvidia: Too Cheap To Ignore Due To Misguided AI Panic",
+          "uncertainty": 0.0
         }
       ],
       "tone": {
-        "intensity_max": 0.333,
-        "n": 64,
-        "polarity_mean": 0.141,
-        "sources": 17,
+        "intensity_max": 0.667,
+        "n": 238,
+        "polarity_mean": 0.095,
+        "sources": 45,
         "uncertainty_mean": 0.142
       },
       "upcoming": []
     },
     {
-      "escalated": 3,
+      "escalated": 31,
       "events": [],
       "instrument_id": "XNAS:AAPL",
       "label": "Apple",
@@ -771,11 +843,11 @@
         },
         {
           "concept": "av_news_sentiment",
-          "known_at": "2026-09-13",
+          "known_at": "2026-09-14",
           "label": "vendor sentiment",
-          "period_end": "2026-09-13",
+          "period_end": "2026-09-14",
           "source": "alphavantage_news",
-          "value": "-0.11"
+          "value": "0.06"
         },
         {
           "concept": "revenue",
@@ -804,105 +876,105 @@
       ],
       "stories": [
         {
-          "doc_id": "https://news.google.com/rss/articles/CBMimAFBVV95cUxPR1prbjFwdTFVNjA4bkhSR094Mm02dzBEeHc5TjRscXNZZkh4N09XQUY3N1A1SnNIVzZEN0FqM2VlR0hYbThTVU5Oa2UwN1RRVTB4RnlPdWktSWVGeE52NmtabGc1ejZSa004Q3lBcXY2dGFyanZtdjl4dGhOSkNLMTVMcTlGVl96VnBQT2VOOVNCZm1XTkRCbA?oc=5",
-          "domain": "www.fool.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-09-13T22:33:37+00:00",
-          "quality": 0.65,
-          "title": "SpaceX vs. Apple: Wall Street Sees Strong Upside for One of These Stocks and Remains Neutral On the Other",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMihgFBVV95cUxNTExoVWVzSXBKYXZKemNTaVZtdGU0U0hDNklXaC1ULXVkR3J4akVzMFFha0wyd1oxUkhTNlc2U1FQTXZYUWtzaFAyWHlpSGh5Y3lYRlh0b080QmVTUmhwSUhyZmJFUEpOR0JwWVdlUEpjSjVRb0NoelJqRlVRNXY5QUxuc01yZw?oc=5",
-          "domain": "www.macobserver.com",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
-          "polarity": 1.0,
-          "published_at": "2026-09-13T18:28:35+00:00",
-          "quality": 0.65,
-          "title": "Apple Supplier TSMC Posts Record NT$514.8 Billion August Revenue, Up 53 Percent From a Year Ago",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMiowFBVV95cUxNSXZOR1RyUDRaSWM2czFkenRsaHVZNk5pUGtxUnlkUDY2eHVtY1Y1M2w2dFJtanVQc3BYbVZxN0w4VVp0ckNxREs1QjktaFVOYy05MDFtcENxekwwV3JEaTBpa2RyVU1TX2RoNmhxNGxmODJiSmMwYTJUUFFYaUdQOXQzeHVTWDdWeE0tWWdaZ1c2b2dHS0t0WVRrRktCQVRoOWdj?oc=5",
-          "domain": "ts2.tech",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-09-13T17:33:32+00:00",
-          "quality": 0.65,
-          "title": "Apple\u2019s Reported Beats Game Controller Is a Services Bet, Not an AAPL Catalyst Yet",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "finnhub:142122981",
-          "domain": "Yahoo",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-09-13T13:35:00+00:00",
-          "quality": 0.85,
-          "title": "Oklo vs. NuScale vs. TMC: 3 Speculative Bets, Ranked By Which One Pays Off First.",
-          "uncertainty": 0.641025641025641
-        },
-        {
-          "doc_id": "alphavantage:https://www.stl.news/paypal-stock-is-down-but-is-the-company-broken/",
-          "domain": "STL.News",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": -0.3333333333333333,
-          "published_at": "2026-09-13T13:26:13+00:00",
-          "quality": 0.85,
-          "title": "PayPal Stock Is Down But Is the Company Broken?",
-          "uncertainty": 0.26881720430107525
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMirwFBVV95cUxNclh1RFpPci1pUHpKM3lZbFNjSUVvRTFTLTFNcVhzc2ZtWVVLRlRNeVRQTkZrRC1HRDIxQ2hTNUUyUmdtcUFZOHdPN1FoaUhWejRIZVcxS1c2NTZjb1Z2S05OLVA0LUZmUko3RFQ3THlBOENsdjM1NkxQOFRSZng4Y1NRaGFKb2hnelhQY3RQS1hRRWdnUlQ5ZDFLMWJqRnBvNFNWMjZWTzluMTY4NF9J?oc=5",
-          "domain": "seekingalpha.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-13T18:09:30+00:00",
-          "quality": 0.8,
-          "title": "Apple\u2019s foldable iPhone could make the format the new normal, Gurman says (AAPL:NASDAQ)",
-          "uncertainty": 0.8333333333333334
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMimgFBVV95cUxPaTJjZ3BNcGExNl85VUxxaFUwUHB6eVB1LTQ3ckN3azFYbjBYRng2WU5TOGxGaHlOU3FueUt4ZnRjaUl1MUp3LXZWTmdPenRiTTRsMXBxRlVrdUNybG5IbXF5YVVEdXVPTkx6VUVVTjRFeE5IcHBqOHlvMmVMa3BSUW5jbXB6TTh2OWtOWW1EODF5eVpMekVaWjdB?oc=5",
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/apples-siri-upgrade-does-not-182110757.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
-          "escalated": false,
+          "escalated": true,
           "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-13T14:13:00+00:00",
-          "quality": 0.8,
-          "title": "Can New iPhone Duo Power Apple's Stock Higher?",
+          "polarity": 1.0,
+          "published_at": "2026-09-14T18:21:10+00:00",
+          "quality": 1.0,
+          "title": "Apple's Siri Upgrade Does Not Require Every User to Buy Another iPhone",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "https://news.google.com/rss/articles/CBMimwFBVV95cUxNcXR1MUZ0dUxXZXJrZ19GV0ZRYm53T3N2ZFNCYTItR3k2YVR6SHVacEpVWnd6YlhhN1BhNUw4ZEJFc3EzeFA3eml2TUJDbG8wWkllVXQ0VURDYzY0c1hrUHRyZlZ5STRwcFFIcVJETzN6bDREYkRVQmFFN3o3MmVTQ29aNU45ZE1lU1pmb1ZDcExxXzRYa1I2YmFPZw?oc=5",
-          "domain": "www.macobserver.com",
-          "escalated": false,
+          "doc_id": "https://finance.yahoo.com/technology/articles/jamf-announces-same-day-support-180500250.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-14T18:05:00+00:00",
+          "quality": 1.0,
+          "title": "Jamf Announces Same-Day Support For macOS Golden Gate 27, iOS 27 And Other OS 27 Releases",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/founded-apple-ex-head-worldwide-160000375.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-14T16:00:00+00:00",
+          "quality": 1.0,
+          "title": "Founded by Apple\u2019s Ex-Head of Worldwide Logistics Procurement, Aron Launches With First AI Chief of Staff for Procurement Teams and Raises $8 Million in Funding from Menlo Ventures and Storm Ventures",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "alphavantage:https://www.investing.com/news/stock-market-news/musks-xai-and-x-corp-settle-antitrust-case-against-apple-93CH-4900026",
+          "domain": "Investing.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-09-14T15:37:29+00:00",
+          "quality": 1.0,
+          "title": "Musk\u2019s xAI and X Corp. settle antitrust case against Apple",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/musk-xai-resolves-claims-against-152211610.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-09-14T15:22:11+00:00",
+          "quality": 1.0,
+          "title": "Musk\u2019s xAI Resolves Claims Against Apple Over AI Competition",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "alphavantage:https://ca.investing.com/news/stock-market-news/john-w-rose-sells-alphabet-inc-stock-worth-between-250001-and-500000-93CH-4838632",
+          "domain": "Investing.com Canada",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-14T19:10:11+00:00",
+          "quality": 0.85,
+          "title": "John W. Rose sells Alphabet Inc. stock worth between $250,001 and $500,000",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "alphavantage:https://www.cnbc.com/2026/09/14/apple-releases-ios-27-redesigned-siri-ai.html",
+          "domain": "CNBC",
+          "escalated": true,
           "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-09-13T22:30:00+00:00",
-          "quality": 0.65,
-          "title": "Apple General Counsel Jennifer Newstead Sold Shares Twice in September",
+          "published_at": "2026-09-14T19:06:16+00:00",
+          "quality": 0.85,
+          "title": "Apple releases test of redesigned Siri AI before iPhone 18 hits stores this week",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://qz.com/x-corp-spacexai-drop-antitrust-lawsuit-apple-091426?.tsrc=rss",
+          "domain": "qz.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-09-14T17:25:37+00:00",
+          "quality": 0.85,
+          "title": "X Corp and SpaceXAI drop antitrust lawsuit against Apple",
           "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 20,
-        "polarity_mean": 0.183,
-        "sources": 12,
-        "uncertainty_mean": 0.135
+        "n": 80,
+        "polarity_mean": 0.121,
+        "sources": 36,
+        "uncertainty_mean": 0.128
       },
       "upcoming": []
     },
     {
-      "escalated": 3,
+      "escalated": 18,
       "events": [],
       "instrument_id": "XNAS:MSFT",
       "label": "Microsoft",
@@ -997,11 +1069,11 @@
         },
         {
           "concept": "av_news_sentiment",
-          "known_at": "2026-09-13",
+          "known_at": "2026-09-14",
           "label": "vendor sentiment",
-          "period_end": "2026-09-13",
+          "period_end": "2026-09-14",
           "source": "alphavantage_news",
-          "value": "0.26"
+          "value": "0.23"
         },
         {
           "concept": "revenue",
@@ -1030,78 +1102,100 @@
       ],
       "stories": [
         {
-          "doc_id": "https://247wallst.com/investing/2026/09/13/anthropic-locks-down-517-billion-in-compute-ahead-of-ipo-and-its-still-not-enough/?.tsrc=rss",
-          "domain": "247wallst.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-13T15:36:09+00:00",
-          "quality": 0.85,
-          "title": "Anthropic Locks Down $517 Billion in Compute Ahead of IPO \u2014 and It\u2019s Still Not Enough",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "alphavantage:https://www.fool.com/investing/2026/09/13/sundar-pichai-alphabets-backlog-514-billion/",
-          "domain": "The Motley Fool",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-09-13T12:50:40+00:00",
-          "quality": 0.85,
-          "title": "Sundar Pichai Says Alphabet's Cloud Backlog Hit $514 Billion After 82% Revenue Growth Last Quarter. Is Google Cloud Becoming a Bigger Growth Driver Than Search?",
-          "uncertainty": 0.11061946902654866
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMixwFBVV95cUxPbjdtRU1wWWxDVGVaWHNuRl96OFpKYjB6enFNX2JrOHNHRHZIY0t3U3NiZllueXljeFJLYnpkZGtKdlhSbTZ1YWJvdTctRVJjV3lyUkFtYm5XQV9UakJ1RFg0elhrODY2NmZxc2Q4Y3dzYXdJeEdMMmtJcWhvWUZScE1POUdDaWtaUWRWMVd2WXdHRUotVTNYMnREd3lMcUQ0blN5NW0tek4zNVRPampCWjZ2Mzhrd0VXMGYtS2JLR01FTVFlNWdR0gHMAUFVX3lxTE9XV09KRjQ5eXdwNGNQVWh4OXBMQzdEdzNGWVlnakFJVlUwNk9FZDc0ek9sV0o4b04tdVV0NkxIOTVKdm5OUHNlRE90YThNXzRPZHlUOHYzZks0eUVqSFhBTEFTVDl4d0ZZc3hXY0hxZjlZRFVELWFiLXNMZTlRVVJrV2hwWDl6alZ6OXlzY0FSQ1k2Z1ltZ1I5a2ZfZWxMb3VzNXViR0lTU2RuUi1nRkFmWFlWZ0loQmNEMXFFMnpCMVA1cVZnZVpGNUlObw?oc=5",
-          "domain": "simplywall.st",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-09-13T22:27:45+00:00",
-          "quality": 0.65,
-          "title": "Data Center Expansion Might Change The Case For Investing In Microsoft Stock (MSFT)",
-          "uncertainty": 0.9615384615384615
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPb1JFRkZra3Q0bDMycjJKcTR3NHdlYVBVX09vTUVicE15VndCSEU4ejJZc21xaktVMnpJQ056bDZrd1J1bVVGYm9rUkxVQmVfZGFKRGdsUmlrX3N4aFhOUjdDUk5MNzQzdk9SbGdNZ1pqa0kwVFBnZzIzQ19XSDIxRndrSDRPZ09yS0RwSlNOYm9MMTFBSnZ4RzY1UVM?oc=5",
+          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/big-tech-issued-220-billion-212946047.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
-          "escalated": false,
+          "escalated": true,
           "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-13T20:28:00+00:00",
-          "quality": 0.8,
-          "title": "Amazon, Alphabet, and Microsoft: Which 2 to Buy and Which 1 to Avoid",
+          "polarity": 1.0,
+          "published_at": "2026-09-14T21:29:46+00:00",
+          "quality": 1.0,
+          "title": "Big Tech Issued About $220 Billion of Bonds. Alphabet and Meta Show How AI Is Warping the Credit Market",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "https://www.fool.com/investing/2026/09/13/ackman-trimmed-this-big-tech-position-to/?.tsrc=rss",
-          "domain": "www.fool.com",
-          "escalated": false,
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/amazon-microsoft-buy-gpus-u-212115814.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
           "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-13T16:50:00+00:00",
-          "quality": 0.65,
-          "title": "Billionaire Bill Ackman Trimmed This Big Tech Position to Back These 2 AI Contenders",
+          "polarity": -1.0,
+          "published_at": "2026-09-14T21:21:15+00:00",
+          "quality": 1.0,
+          "title": "Amazon and Microsoft Can Buy GPUs. But U.S. Construction Is Short 439,000 Workers",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "https://247wallst.com/investing/2026/09/13/forget-chatbot-benchmarks-google-just-found-1000-ways-into-microsofts-best-customers/?.tsrc=rss",
-          "domain": "247wallst.com",
-          "escalated": false,
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/ai-leaders-slow-down-iren-190519922.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
           "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-09-13T18:37:32+00:00",
-          "quality": 0.5,
-          "title": "Forget Chatbot Benchmarks. Google Just Found 1,000 Ways Into Microsoft\u2019s Best Customers.",
+          "published_at": "2026-09-14T19:05:19+00:00",
+          "quality": 1.0,
+          "title": "AI Leaders Say Slow Down. IREN Says Compute Demand May Never Be Satisfied. Nvidia Sits in the Middle",
+          "uncertainty": 0.684931506849315
+        },
+        {
+          "doc_id": "alphavantage:https://www.investing.com/news/stock-market-news/musks-xai-and-x-corp-settle-antitrust-case-against-apple-93CH-4900026",
+          "domain": "Investing.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-09-14T15:37:29+00:00",
+          "quality": 1.0,
+          "title": "Musk\u2019s xAI and X Corp. settle antitrust case against Apple",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142139123",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-14T16:45:31+00:00",
+          "quality": 0.85,
+          "title": "Whoever Spends Smarter Wins the Microsoft-Alphabet Cloud Fight. Here Is Who Is Ahead.",
+          "uncertainty": 0.20833333333333334
+        },
+        {
+          "doc_id": "finnhub:142139125",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-09-14T16:19:18+00:00",
+          "quality": 0.85,
+          "title": "Microsoft AI CEO Agrees: AI Is Getting Dangerous and Needs to Be Controlled",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "alphavantage:https://247wallst.com/investing/2026/09/14/apple-vs-microsoft-this-is-the-magnificent-seven-stock-id-buy-today/",
+          "domain": "24/7 Wall St.",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-14T13:00:40+00:00",
+          "quality": 0.85,
+          "title": "Apple vs. Microsoft: This Is the Magnificent Seven Stock I\u2019d Buy Today",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142136646",
+          "domain": "ChartMill",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-14T12:31:00+00:00",
+          "quality": 0.85,
+          "title": "Microsoft (NASDAQ:MSFT) Combines Strong Growth With a Quality Technical Setup",
           "uncertainty": 0.0
         }
       ],
       "tone": {
-        "intensity_max": 0.0,
-        "n": 6,
-        "polarity_mean": 0.333,
-        "sources": 5,
-        "uncertainty_mean": 0.179
+        "intensity_max": 0.333,
+        "n": 76,
+        "polarity_mean": 0.101,
+        "sources": 26,
+        "uncertainty_mean": 0.144
       },
       "upcoming": []
     }
