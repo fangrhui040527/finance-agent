@@ -1,0 +1,325 @@
+{
+  "day": "2026-09-14",
+  "written_at": "2026-09-15T22:40:00Z",
+  "market": {
+    "regime": "risk-off",
+    "notes": [
+      "First full trading day this book has measured with every piece in place: both markets traded, the Bursa leg is the index, and the decomposition prints its drift term for the first time.",
+      "The two halves went opposite ways. XNAS:SPY -0.45% 1d, -1.21% 5d, 1254 common sessions. MYX:^KLSE +0.67% 1d, -0.98% 5d, 1223 common sessions. Every Malaysian name therefore carries a positive market leg and every Nasdaq name a negative one.",
+      "SP500 7619.98 (-37.00), NASDAQCOM 26186.41 (-146.63), VIXCLS 17.10 (+1.26), T10Y2Y 0.32 (-0.01), all 2026-09-14; DGS2 4.63 (+0.07) and DGS10 4.96 (+0.01) at 2026-09-11; BAMLH0A0HYM2 2.71 (+0.06).",
+      "VIXCLS +1.26 and the 2-year +0.07 are the independent corroboration that risk and the short end were repriced on the day.",
+      "Corpus at 4,845 articles against 4,396 two days ago.",
+      "DRIFT IS PRINTED ON EVERY NAME AND IS NOISE ON EVERY NAME. The nine intercepts sit at 0.1-1.3 standard errors from zero; none clears 1.96, and every estimation note reads 'not distinguishable from zero'. This corrects the 2026-09-13 page, which called the per-name drifts economically legible before they had standard errors attached.",
+      "Nine names, nine not_significant verdicts. Not one clears the 1.5-sigma hunt threshold."
+    ]
+  },
+  "names": [
+    {
+      "instrument_id": "XNAS:NVDA",
+      "move": {
+        "return_1d": -0.0336,
+        "return_5d": -0.0842,
+        "market_1d": -0.0045,
+        "market_component": -0.0077,
+        "drift": -0.0014,
+        "drift_standard_errors": 0.8,
+        "idiosyncratic": -0.0244,
+        "beta": 1.73,
+        "sigma": 1.24,
+        "unexplained_share": 0.73,
+        "note": "The largest move on the page and still not_significant at 1.24 sigma: a 2.44pp residual is an ordinary Monday for this name's own daily dispersion. THE RESIDUAL IS MIS-LABELLED. Every line of tonight's pack ends 'sector beta fixed at 0 (no sector proxy cached)', so a sector-wide day has nowhere to land but a term named 'idiosyncratic', which asserts the company."
+      },
+      "causes": [
+        {
+          "claim": "A semiconductor sector move, not a company move. Micron, Sandisk and Broadcom fell on the same session on AI-demand fears; NVIDIA's residual is carrying a factor the model has no column for.",
+          "evidence": [
+            "finance.yahoo.com:2026-09-14:Dow Jones Futures: Nvidia, Micron, Sandisk Dive On AI Fears; Fed Rate Hike Looms (q 1.00, tone -1.0, escalated)",
+            "yahoo:2026-09-14:Broadcom Drops Over 4% as $21.7 Billion AI Forecast Meets Slowdown Fears (q 0.85, escalated)",
+            "finance.yahoo.com:2026-09-14:AI Leaders Say Slow Down. IREN Says Compute Demand May Never Be Satisfied. Nvidia Sits in the Middle (q 1.00, escalated)"
+          ],
+          "chain": [
+            "-3.36% on 2026-09-14 against a -0.77% market component, -2.44pp residual, 73% unexplained",
+            "three collected stories dated the same session name Micron, Sandisk and Broadcom falling with it on AI-demand fears",
+            "the decomposition has no sector factor: sector beta is fixed at 0 because no sector proxy is cached",
+            "with no sector column, a sector-wide session is arithmetically indistinguishable from company news",
+            "chain stops here: neither Micron, Sandisk nor Broadcom is a name this system prices, so the claim rests on three headlines and not on bars"
+          ],
+          "confidence": 0.65,
+          "confirm": "a cached semiconductor proxy showing a comparable fall on 2026-09-14, or Broadcom/Micron closes in the price cache",
+          "refute": "the rest of the complex flat or up on the day"
+        }
+      ],
+      "open_questions": [
+        "THE SAME SHAPE AS THE DEFECT FIXED ON MAIN TODAY, by a different route. Component.DRIFT was added because the fitted intercept was being subtracted into a residual named after something else. The sector leg is that failure still standing - but alpha was computed and not printed, while the sector factor is not computed at all, so this one cannot be fixed by reporting harder. It needs a cached sector proxy.",
+        "Filing or release for the Hugging Face transaction is unreachable for a second day, because edgar is failing. (since 2026-09-04)",
+        "Finnhub eps_actual rows still carry a knowable date in the future. (since 2026-09-04)"
+      ],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:5183",
+      "move": {
+        "return_1d": 0.0354,
+        "return_5d": 0.2256,
+        "market_1d": 0.0067,
+        "market_component": -0.0029,
+        "drift": 0.0017,
+        "drift_standard_errors": 0.4,
+        "idiosyncratic": 0.0366,
+        "beta": -0.44,
+        "sigma": 0.9,
+        "unexplained_share": 0.89,
+        "note": "+3.54% on the day, +22.56% over five, 89% unexplained, and still not_significant at 0.90 sigma. Beta to the index moved -0.10 -> -0.44 in one session on a 120-session window shrunk 20% toward prior; the number is unstable and is not itself a finding."
+      },
+      "causes": [
+        {
+          "claim": "Crude strength lifting refiners and petrochemicals together. For the first time since the name entered the book a dated story names it and asserts the mechanism.",
+          "evidence": [
+            "theedgemalaysia.com:2026-09-14:PETRONAS Chemicals rises to three-month high, refiners climb as Brent tops US$100 (q 0.80)",
+            "fred:DCOILBRENTEU:2026-09-09:109.51"
+          ],
+          "chain": [
+            "+3.54% on 2026-09-14, +22.56% over five sessions, 89% unexplained",
+            "a Malaysian-press story dated the same session names the company and says the refiners climbed with Brent above US$100",
+            "DCOILBRENTEU reads 109.51 at 2026-09-09, consistent with a print above US$100",
+            "the chain reaches a sector narrative and stops: the headline reports the rise ('rises to three-month high' is a price observation) rather than explaining it, and the fact book holds zero observations for this name, so there is no margin, spread or earnings figure to connect crude to its P&L"
+          ],
+          "confidence": 0.45,
+          "confirm": "a bodied Malaysian-press story carrying a spread or margin figure; DCOILBRENTEU refreshing above 100 on a date after 2026-09-09",
+          "refute": "Brent retracing while PCHEM holds +22.56%"
+        }
+      ],
+      "open_questions": [
+        "THE CONFIRMING OBSERVATION THE LAST PAGE SPECIFIED ARRIVED EXACTLY AS WRITTEN. The 2026-09-13 page recorded Brent as the only knowable candidate at confidence 0.25 and named the test as 'a collected story linking the move to feedstock or product spreads; a peer refiner or petrochemical name moving with it'. This story is both halves. Confidence 0.25 -> 0.45, moved by a stated amount rather than by feel.",
+        "How much of the 89% unexplained share is the beta being unstable rather than the move being real? -0.10 -> -0.44 in one session on a 120-session window.",
+        "Is there Malaysian press coverage of MYX:5183 in any index the collector reaches? theedgemalaysia.com has now carried it twice; nst_business is 404 and fmt_business (50 rows) has still never linked it. (since 2026-09-10)"
+      ],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:5225",
+      "move": {
+        "return_1d": 0.0144,
+        "return_5d": -0.0177,
+        "market_1d": 0.0067,
+        "market_component": 0.0052,
+        "drift": -0.001,
+        "drift_standard_errors": 1.0,
+        "idiosyncratic": 0.0102,
+        "beta": 0.78,
+        "sigma": 0.97,
+        "unexplained_share": 0.62,
+        "note": "The recovery from the 2026-09-11 Tokyo dismissal, independently reported. bernamabiz.com gives the same figure from the other side - 'IHH's Share Price Up 1.43 Pct Despite Fortis Mandatory Tender Offer Approval Delay' (2026-09-14, q 0.65) - and the cached bar agrees to a hundredth of a point."
+      },
+      "causes": [],
+      "open_questions": [
+        "No cause offered for a move the decomposition calls unremarkable. The Tokyo dismissal is still being written about ('Tokyo Court rejects IHH unit's claims against Daiichi Sankyo', sbr.com.sg, 2026-09-14) and a new item ('IHH Healthcare Malaysia, Timor-Leste ink pact for specialist healthcare', healthcareasiamagazine.com) asserts nothing quantified. A mention is not a cause."
+      ],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:3182",
+      "move": {
+        "return_1d": -0.0103,
+        "return_5d": -0.0634,
+        "market_1d": 0.0067,
+        "market_component": 0.0073,
+        "drift": -0.0022,
+        "drift_standard_errors": 1.3,
+        "idiosyncratic": -0.0154,
+        "beta": 1.1,
+        "sigma": 0.87,
+        "unexplained_share": 0.62,
+        "note": "Fell while Bursa rose: -1.03% against a +0.73% market component. not_significant at 0.87 sigma. The five-session -6.34% is the question, and the engine tests single sessions."
+      },
+      "causes": [
+        {
+          "claim": "The leverage story recorded on the 2026-09-13 page - Fitch's downgrade to BBB- and S&P's fallen-angel warning - continuing to be priced, with two same-week follow-ups.",
+          "evidence": [
+            "thestar.com.my:2026-09-13:Genting's debt bet rides on earnings ramp-up (q 0.80)",
+            "thestar.com.my:2026-09-13:RM170mil investment to expand Genting shopping experience (q 0.80)"
+          ],
+          "chain": [
+            "-6.34% over five sessions against a market -0.98%",
+            "Fitch downgrade to BBB- (2026-09-07) and S&P fallen-angel warning (2026-09-08/09), both recorded on the 2026-09-13 page",
+            "two thestar.com.my follow-ups dated 2026-09-13 restate the debt-against-earnings-ramp frame and add RM170mil of further capex",
+            "cause: expansion capex against soft Resorts World Genting earnings"
+          ],
+          "confidence": 0.55,
+          "confirm": "the 2026-09-07 and 2026-09-08 sessions carrying the bulk of the five-day fall, checkable from the cached bars",
+          "refute": "the decline spread evenly across the window, or Genting Malaysia (4715) and Genting Singapore moving differently"
+        }
+      ],
+      "open_questions": [
+        "This cause is attached to a five-day window the engine did not test; the 1d verdict's authority does not carry over to it."
+      ],
+      "watch": []
+    },
+    {
+      "instrument_id": "XNAS:MSFT",
+      "move": {
+        "return_1d": 0.0197,
+        "return_5d": 0.0114,
+        "market_1d": -0.0045,
+        "market_component": -0.0038,
+        "drift": -0.0002,
+        "drift_standard_errors": 0.1,
+        "idiosyncratic": 0.0237,
+        "beta": 0.86,
+        "sigma": 1.04,
+        "unexplained_share": 0.86,
+        "note": "Up on a down day: +1.97% against a -0.38% market component, 86% unexplained at 1.04 sigma, still not_significant."
+      },
+      "causes": [],
+      "open_questions": [
+        "UNKNOWN IS THE ANSWER. 76 stories collected; the strongest is 'Big Tech Issued About $220 Billion of Bonds' (finance.yahoo.com, q 1.00), which is about the credit market rather than about Microsoft. No collected evidence accounts for the move.",
+        "alphavantage_news quota was exhausted for this name, so one source's view of the session is missing."
+      ],
+      "watch": []
+    },
+    {
+      "instrument_id": "XNAS:AAPL",
+      "move": {
+        "return_1d": 0.0024,
+        "return_5d": 0.041,
+        "market_1d": -0.0045,
+        "market_component": -0.0029,
+        "drift": 0.0022,
+        "drift_standard_errors": 1.3,
+        "idiosyncratic": 0.0031,
+        "beta": 0.64,
+        "sigma": 0.18,
+        "unexplained_share": 0.38,
+        "note": "The most ordinary name on the page at 0.18 sigma. Its +0.22% drift is the largest on the book and still only 1.3 standard errors from zero."
+      },
+      "causes": [],
+      "open_questions": [
+        "The xAI antitrust settlement (Investing.com, qz.com, both 2026-09-14) is dated, real, and moved nothing. An event is not a cause when the decomposition finds nothing to explain."
+      ],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:1155",
+      "move": {
+        "return_1d": 0.0077,
+        "return_5d": -0.0113,
+        "market_1d": 0.0067,
+        "market_component": 0.0078,
+        "drift": -0.0008,
+        "drift_standard_errors": 1.2,
+        "idiosyncratic": 0.0006,
+        "beta": 1.17,
+        "sigma": 0.09,
+        "unexplained_share": 0.07,
+        "note": "The most completely market-explained name in the book: 7% unexplained at 0.09 sigma."
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:5347",
+      "move": {
+        "return_1d": 0.0029,
+        "return_5d": -0.0145,
+        "market_1d": 0.0067,
+        "market_component": 0.0049,
+        "drift": -0.0002,
+        "drift_standard_errors": 0.3,
+        "idiosyncratic": -0.0018,
+        "beta": 0.74,
+        "sigma": 0.26,
+        "unexplained_share": 0.26,
+        "note": "Quiet. Nothing collected for the name on either sweep; google_news named the company in 0 of 5 rows."
+      },
+      "causes": [],
+      "open_questions": [
+        "Is the 5d move the results print the 2026-09-04 roundup headline referred to? No primary figure collected. (since 2026-09-04)"
+      ],
+      "watch": [{"when": "2026-10-16", "what": "interim single-tier dividend payable (marketscreener.com, 2026-09-09, escalated)"}]
+    },
+    {
+      "instrument_id": "MYX:8869",
+      "move": {
+        "return_1d": 0.0,
+        "return_5d": -0.0276,
+        "market_1d": 0.0067,
+        "market_component": 0.0071,
+        "drift": 0.0005,
+        "drift_standard_errors": 0.3,
+        "idiosyncratic": -0.0076,
+        "beta": 1.06,
+        "sigma": 0.4,
+        "unexplained_share": 0.5,
+        "note": "A flat print against a rising index is -0.76pp idiosyncratic. 0.40 sigma, not_significant. Nothing was collected for the name; google_news named the company in 0 of 1."
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": []
+    }
+  ],
+  "machine": {
+    "answered": [
+      {
+        "question": "Should alpha be printed as a sixth component, or reported as drift with a warning when it exceeds the idiosyncratic term? (opened 2026-09-13)",
+        "answer": "Printed as a sixth component, WITH ITS STANDARD ERROR. Component.DRIFT shipped on main today (PR #70); Fit.intercept_se publishes the WLS standard error at the final Huber weights, and the estimation note appends 'N standard errors from zero' plus '(not distinguishable from zero)' below 1.96.",
+        "proof": "All nine names decompose exactly: market + drift + idiosyncratic sums to the realised local return to 1e-12. Every one of the nine drifts reads not distinguishable from zero, at 0.1 to 1.3 standard errors.",
+        "notes": [
+          "The invariant test that should have caught this PASSED, because its own body added fit.coefficients[0] back in. The only written record of the defect was the workaround; logged as a new defect-log family, 'compensated-in-the-test' (details/07-DEFECT-LOG.md §19).",
+          "Only the intercept's error is published. The slopes are shrunk toward a prior AFTER fitting, so their fitted standard errors would not describe the coefficients actually reported.",
+          "This corrects my own 2026-09-13 page, which read the per-name alphas as economically legible. With errors attached they are noise."
+        ]
+      },
+      {
+        "question": "Did the lockfile gap that let #69 through reach main? (opened 2026-09-14)",
+        "answer": "Closed. `uv sync --frozen` pins what gets installed and never checks the lock against pyproject.toml; `uv lock --check` does. CI now runs `uv lock --check` before Install (PR #71).",
+        "proof": "On merged main: uv lock --check clean, uv sync --frozen audits 66 packages, 2,569 passed / 0 failed, pyright 0, ruff clean."
+      }
+    ],
+    "monitor": {
+      "open": ["past its own cadence: edgar (48h ago, allowed 30h)"],
+      "resolved": ["series_stale"],
+      "notes": [
+        "series_stale closed BY CORRECTING THE RULE, not because data arrived: #69 raised MONTHLY from 70 days to 95 after establishing that a monthly figure legitimately reaches 75 (US CPI), 80 (IMF PCPS) or 86 (DOSM) days old. Three healthy series had been breaching a limit that was simply wrong.",
+        "The edgar alert and the edgar collection failure are the same event seen from two sides: HTTP 429 on every name, and 48h since the last successful run against a 30h cadence."
+      ]
+    },
+    "shipped_today": [
+      "#70 (1d39fc1) Component.DRIFT and Fit.intercept_se",
+      "#71 (b3403ff) uv lock --check in CI",
+      "#72 (24db678) gold label title corrected against data/corpus.db, with a test that checks every label's title",
+      "#69 (d49ec38) and #73 (68180fa) landed from the other session"
+    ]
+  },
+  "data_quality": {
+    "failed": [
+      "edgar: FAILED every name, first error 'XNAS:NVDA: edgar fetch failed: HTTP 429'. Rate limiting, not a dead endpoint. EDGAR is the only route this system has to US filings - the 8-K, 10-Q and Form 4 stream that makes an insider sale or a material event citable rather than inferred. Two days without it and a US name's events go dark.",
+      "nst_business: FAILED, HTTP Error 404: Not Found. Two days ago it was merely 37h past a 30h cadence; tonight it is gone. Enabled in #62 as the test of whether Malaysian business press would cover Petronas Chemicals, and one of only two Malaysian outlets this book reaches."
+    ],
+    "degraded": [
+      "gdelt: stored 0 rows across both sweeps. us_close read empty for NVIDIA and Microsoft and FAILED Apple; bursa_close read empty for Tenaga and Petronas Chemicals, FAILED Maybank, deferred one name.",
+      "alphavantage_news: quota exhausted for XNAS:MSFT",
+      "eodhd: every name deferred by the 2-a-day credit budget, both slots",
+      "google_news on the bursa sweep named the company in 9 of 23 - Press Metal 0 of 1, Tenaga 0 of 5, IHH 3 of 7"
+    ],
+    "skipped": [
+      "fmp: 'no name in the book trades in slot us_preopen'. A correct refusal stated as a reason rather than a silent zero - the work #73 landed today, visible in the record on its first night."
+    ],
+    "schedule": {
+      "day_us_close": "landed 2026-09-14T23:54Z, +2h39m past its 21:15 cron - inside the envelope, and the third consecutive night in the +2h30m band",
+      "tonight_us_close": "no run object at 22:35Z, +1h20m. NOT DISPATCHED. The same reading produced a duplicate run on 2026-09-14 and the correct no-op on 2026-09-15; observed delays reach +6h33m, and a slot inside that envelope is late, not dropped.",
+      "other_slots": "bursa_close +5h00m (14:20), us_preopen +4h43m (17:13). Both late and intact."
+    },
+    "fact_book": "All six Bursa names still hold ZERO observations. The EODHD Fundamentals gap, not a collector fault - and the reason the Petronas Chemicals chain stops at a sector narrative instead of reaching a spread.",
+    "price_cache": "Sixteen peer price lines remain unrefreshed since the collector outage."
+  },
+  "lessons": [
+    "A residual is only 'idiosyncratic' if every systematic factor has a column. With the sector beta fixed at 0, a sector-wide selloff is indistinguishable from company news, and the label asserts the difference the model cannot make.",
+    "The same defect can arrive twice in one system by different routes: alpha was computed and not printed, the sector factor is not computed at all. The first was fixable by reporting; the second needs data.",
+    "A coefficient without its standard error is a story waiting to be told. Yesterday's page read nine drifts as economically legible; tonight the same nine, with errors attached, are all noise - and nothing about the fits changed except what was printed.",
+    "A test can be the only written record of the defect it was meant to catch. The invariant held because the test compensated for the missing term in its own body; the workaround was the documentation.",
+    "A confirming observation written as a test is worth more than one written as a hope. The 09-13 page named the exact story it would take to raise confidence in Petronas Chemicals, and the next sweep produced it - which is why the confidence moved by a stated amount.",
+    "An alert that closes because the rule was wrong is a different event from one that closes because the data arrived, and a log that does not distinguish them teaches the wrong lesson about how healthy the system is.",
+    "A source can degrade from late to absent between two pages. nst_business was a cadence warning on Sunday and a 404 on Monday; only the page that reads both notices the direction."
+  ]
+}
