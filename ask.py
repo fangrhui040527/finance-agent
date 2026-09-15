@@ -1706,9 +1706,10 @@ def cmd_retrieval(a) -> int:
 
     The one number every other quality claim rested on and none of them had:
     given a question, does retrieval put an article that answers it in front of
-    the reader. Run it before and after any change to the embedder, the fusion
-    or the reranker - a change to search that nobody measured is a change
-    nobody can defend.
+    the reader. Run it before and after any change to the embedder or the
+    reranker - a change to search that nobody measured is a change nobody can
+    defend. The fusion this used to name is gone: it was run before and after,
+    and "after" was worse (defect log §18).
     """
     from knowledge.retrieval.evaluate import GOLD, report_for
 

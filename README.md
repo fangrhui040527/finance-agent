@@ -137,7 +137,7 @@ make up                      # postgres+timescale · qdrant · neo4j · redis ·
 | P4 | Attribution: robust regression, decomposition, long-horizon | `engines/attribution/` |
 | P5 | News corpus: five-dimension features, wire dedup, escalation gate | `knowledge/news/` |
 | P6 | Event taxonomy, base-rate table, six-factor catalyst scoring | `engines/events/` |
-| P3 | Parent-child chunking, hybrid BM25+dense+RRF, grader, scoped router | `knowledge/` |
+| P3 | Parent-child chunking, BM25 + rerank, grader, scoped router | `knowledge/` |
 | P10 | Concentration: HHI, effective bets, correlation clusters | `engines/risk/` |
 | P11 | Waterfall, five caps, unconstructable-if-breached decisions | `engines/sizing/` |
 | P12 | Purged walk-forward, cost model, deflated Sharpe, 3 benchmarks | `engines/backtest/` |

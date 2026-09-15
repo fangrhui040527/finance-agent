@@ -47,9 +47,35 @@ DAILY = 7
 #: observations but appear in one Monday release, so the newest point is
 #: routinely a week and a half old the day before the next one.
 WEEKLY = 12
-#: A monthly statistic, dated to the first of its month and published weeks
-#: later. Two months of ordinary lag, and a month of slack.
-MONTHLY = 70
+#: A monthly statistic, dated to the FIRST OF ITS MONTH and published weeks
+#: later. The stamping is what makes this large, and 70 was too small by
+#: arithmetic rather than by judgement.
+#:
+#: Month N's figure carries obs_date = 1 N, and stays the newest point until
+#: month N+1's figure PUBLISHES - which happens partway through month N+2. So
+#: the worst-case age of a perfectly healthy series is:
+#:
+#:     rest of N (31) + all of N+1 (31) + publication day in N+2
+#:
+#:     US CPI, published ~13th        75d
+#:     IMF PCPS, published ~18th      80d
+#:     DOSM Malaysia CPI, ~24th       86d
+#:
+#: 70 = 31 + 31 + 8, so it allowed eight days for a publication that lands
+#: mid-month or later, and every such series breached it every month while
+#: nothing was wrong. Measured on 2026-09-14: CPIAUCSL, DOSM:CPI_HEADLINE and
+#: PALUMUSDM all sat at 72-75 days against it - three series, two publishers,
+#: one arithmetic error. CPIAUCSL then cleared itself the moment August's print
+#: landed, which is the tell that the limit and not the data was wrong.
+#:
+#: 95 covers publication through the 33rd of the following month, so a late or
+#: holiday-delayed print is still silent. WHAT IT COSTS is the honest trade: a
+#: genuinely stopped monthly series is now called dead at 95 days instead of 70.
+#: Twenty-five days later, against a rule that fires every month with nothing
+#: wrong - and the DBnomics freeze in section 12 went 400+ days unseen, so the
+#: detection delay was never what failed. A monthly series whose publisher is
+#: reliably prompt can still be tightened by its own entry in MAX_AGE_DAYS.
+MONTHLY = 95
 #: A rate set at a scheduled meeting rather than by a market.
 POLICY = 100
 #: A quarterly release: one quarter, its lag, and slack.

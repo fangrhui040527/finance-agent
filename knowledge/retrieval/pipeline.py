@@ -1,14 +1,27 @@
 """The retrieval pipeline every agent shares.
 
-docs/02 section 3:
+docs/02 section 3 specifies:
 
   rewrite -> BM25 + dense in parallel -> RRF -> hard filters -> rerank
   -> parent expansion -> grade -> generate or retry or refuse
 
-Four properties separate this from a naive pipeline, and each is enforced here
+What runs, since 2026-09-14, is that with one stage gone:
+
+  rewrite -> BM25 -> hard filters -> rerank
+  -> parent expansion -> grade -> generate or retry or refuse
+
+The dense leg and the fusion came out because they were measured and found to
+be subtracting - dense lift zero on every question, fused recall below plain
+BM25. The `knowledge.retrieval.hybrid` module docstring carries the numbers and
+defect log §18 the whole account. Property 1 below is kept, struck through
+rather than deleted, because a property that was specified and then withdrawn on
+evidence is worth more to the next reader than a list that never mentions it.
+
+Four properties separate this from a naive pipeline, and three are enforced here
 rather than suggested:
 
-  1. Sparse and dense together, fused by RRF.
+  1. ~~Sparse and dense together, fused by RRF.~~ WITHDRAWN - measured, and the
+     dense half had nothing to contribute. BM25 selects alone.
   2. Freshness is a hard filter, not a rerank hint.
   3. Web search is TRIGGERED, never default, and is the lowest trust tier.
   4. Claim-to-chunk attribution is mandatory; an unsupported claim is dropped.
