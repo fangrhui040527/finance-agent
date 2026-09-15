@@ -233,17 +233,12 @@ questions:
     - leaving it out would have shown up as a search regression in the exact-token
     MRR rather than as corpus growth.
 
-    SECOND OCCURRENCE, 2026-09-15: the us_close sweep added four more, all
-    Finnhub, all round-ups naming SPCX in a list of tickers. Labelled for the
-    same reason. Worth recording that this is now a pattern rather than an
-    incident: SPCX is an index-adjacent ticker that appears in "stocks in focus"
-    round-ups, so its document set grows with ordinary market chatter and this
-    question will need re-labelling after most sweeps that touch it. The guard
-    fires on main rather than on the sweep commit that causes it, so each
-    occurrence lands on whatever pull request is open at the time. Whether a
-    containment question over an APPEND-ONLY corpus should be re-labelled
-    forever, or pinned to a snapshot of the corpus as of a stated date, is the
-    open design question. Not decided here - this change only clears the arrears.
+    It happened a second time, larger, on the 2026-09-15 sweeps: FOUR more
+    documents carrying the token arrived at once, and main went red on the guard
+    before any code change touched retrieval. Same response, same reason. Nine
+    labels now. A lexical question on a ticker that is having a news week is the
+    most expensive kind of label to keep complete, and that cost is the guard
+    working rather than a reason to loosen it.
   relevant:
   - doc_id: https://stocktwits.com/news-articles/markets/equity/s-and-p-500-dow-end-best-day-in-a-month/cZsufnBRJvu?.tsrc=rss
     title: S&P 500, Dow End Best Day In A Month On Calmer Yields As Rate Hike Bets Wane — SPCX, VSXY,
@@ -255,19 +250,19 @@ questions:
   - doc_id: finnhub:141970797
     title: SpaceX, Nvidia Lead Schwab Buys As Software Rally Spurs Profit-Taking –
       Trading Gauge Posts First Dip Since April
+  - doc_id: finnhub:142089359
+    title: 'SpaceX signs $1.1 billion-per month computing deal'
   - doc_id: finnhub:142132977
-    title: Why Are Nasdaq Futures Tumbling Premarket? MU, AMD, NVDA, ORCL, RUM, TSLA,
-      SPCX Stocks In Focus
+    title: Why Are Nasdaq Futures Tumbling Premarket? MU, AMD, NVDA, ORCL, RUM, TSLA, SPCX
+      Stocks In Focus
   - doc_id: finnhub:142131923
-    title: SPCX Stock Set For Index Boost? Elon Musk ‘Highly Confident’ Nvidia AI
-      Computers Will Launch Into Space Next Year
+    title: SPCX Stock Set For Index Boost? Elon Musk ‘Highly Confident’ Nvidia AI Computers
+      Will Launch Into Space In 2027
   - doc_id: finnhub:142137872
     title: Elon Musk ‘Highly Confident’ SPCX Will Put NVDA AI Computers in Space in 2027
   - doc_id: finnhub:142127496
-    title: "Why Retail Traders Couldn’t Take Their Eyes Off These Stocks Last Week:
-      AAPL, NVDA, ORCL, NOK, SPCX"
-  - doc_id: finnhub:142089359
-    title: 'SpaceX signs $1.1 billion-per month computing deal'
+    title: 'Why Retail Traders Couldn’t Take Their Eyes Off These Stocks Last Week: AAPL,
+      NVDA, ORCL, NOK, SPCX'
 - query: KeyBanc Underweight rating Apple
   kind: lexical
   note: broker plus rating word

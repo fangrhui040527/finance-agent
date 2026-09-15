@@ -48,6 +48,36 @@ def test_a_monthly_series_two_months_behind_is_normal():
     assert is_stale("CPIAUCSL", date(2025, 7, 1), TODAY)
 
 
+def test_the_monthly_limit_covers_a_publication_that_lands_mid_month():
+    """70 was too small by arithmetic, not by judgement.
+
+    A monthly figure carries obs_date = the FIRST of its month and stays the
+    newest point until the NEXT month's figure publishes, partway through the
+    month after that. So a healthy series peaks at:
+
+        rest of N (31) + all of N+1 (31) + publication day in N+2
+
+    which is 75d for US CPI (~13th), 80d for IMF PCPS (~18th) and 86d for
+    Malaysia's DOSM (~24th). 70 = 31 + 31 + 8, allowing eight days for a
+    publication that lands mid-month or later, so every such series breached it
+    every month with nothing wrong. On 2026-09-14 three series across two
+    publishers were doing exactly that.
+
+    This pins the arithmetic rather than the constant: if MONTHLY is ever
+    lowered back under a real publication calendar, this fails and says why.
+    """
+    # The three real calendars, at their worst-case age.
+    for publisher, worst_case in (("US CPI", 75), ("IMF PCPS", 80), ("DOSM Malaysia", 86)):
+        assert MONTHLY > worst_case, (
+            f"{publisher} peaks at {worst_case}d when perfectly healthy; "
+            f"MONTHLY={MONTHLY} would call it stale every month"
+        )
+
+    # And the limit must still catch something that genuinely stopped. The
+    # DBnomics freeze in details/07 section 12 sat 400+ days old.
+    assert is_stale("CPIAUCSL", date(2025, 6, 1), TODAY)
+
+
 def test_the_h10_exchange_rates_get_the_week_their_release_takes():
     """DEXMAUS and DTWEXBGS carry daily observations in a Monday release, so a
     nine-day-old newest point is the release schedule, not a stopped feed."""
@@ -64,7 +94,11 @@ def test_an_unknown_series_is_not_judged():
 
 def test_the_label_reads_as_stale_at_a_glance():
     assert age_label("DGS10", date(2026, 9, 3), TODAY) == "3d"
-    assert age_label("DOSM:CPI_HEADLINE", date(1982, 12, 1), TODAY) == "15985d STALE (>70d)"
+    # The limit is read from the constant, not spelled out: this test is about
+    # the LABEL being legible at a glance, and hardcoding the number made it
+    # fail when MONTHLY was corrected from 70 to 95 while the series was still
+    # correctly stale at 15,985 days.
+    assert age_label("DOSM:CPI_HEADLINE", date(1982, 12, 1), TODAY) == f"15985d STALE (>{MONTHLY}d)"
 
 
 # --- a stopped upstream, which is not a late one ---------------------------------------------
