@@ -603,6 +603,59 @@ regexes for one concept drift, and the divergence would be silent: one seam
 ranking what the other had already decided was not a story. A test asserts the
 two are the same object.
 
+## 18. A term the model had, the output did not, and a test added by hand
+
+`engines/attribution/decompose.py` builds the expected return from the fitted
+market model and subtracts it to get the abnormal return:
+
+```python
+expected = fit.coefficients[0] + c_mkt + c_sec + c_sty
+ar = realised_local - expected
+```
+
+`coefficients[0]` is α, the intercept. It is correct that it is there — that is
+the textbook market-model abnormal return, and the whole significance test rests
+on `ar` being the residual. The defect is twenty lines below, in `contribs`,
+which listed market, sector, style, currency and idiosyncratic and **not α**.
+
+So every decomposition this system has ever printed summed to the realised
+return *minus the fitted drift*, and no line of output named the difference.
+The residual is labelled `idiosyncratic`, which is a plausible enough name to
+absorb a missing term without anyone asking what happened to it.
+
+**The test knew.** `test_components_sum_back_to_the_realised_return` asserted
+exactly this invariant, and passed, because its body read:
+
+```python
+total = sum(c.contribution for c in m.components if c.component is not Component.CURRENCY)
+assert total + fit.coefficients[0] == pytest.approx(m.total_return_local, abs=1e-9)
+```
+
+It added the missing term itself. Somebody hit the gap, compensated for it in
+the assertion, and left the test's name saying the components sum back to the
+return. That is the family this belongs to: not a missing test, a test whose
+compensation was the only place the defect was recorded.
+
+Fixed by reporting the term: `Component.DRIFT` carries `coefficients[0]`, the
+six contributions sum to `total_return_base` exactly, and the test no longer
+adds anything by hand.
+
+**What it cost, measured on the nine names of the book at 2026-09-14.** The
+drift enters the `share_of_total` denominator, so every unexplained share falls
+a little — Genting 68% → 62%, NVIDIA 76% → 73%, Apple 52% → 38% (the largest,
+because Apple's residual was small and its drift was not). Those are corrections
+rather than changes: the denominator had been missing a real term.
+
+**And a second finding the fix produced, which corrects the journal page that
+reported the defect.** `knowledge/feedback/2026-09-13.md` said the per-name
+drifts were "economically legible" — Petronas Chemicals drifting up after a 19%
+run, Genting drifting down in a downtrend. Carrying `Fit.intercept_se` says
+otherwise. On 120-session windows all nine names' drifts are **0.1 to 1.3
+standard errors from zero** and not one clears 1.96. The pattern was read into
+noise. The estimation note now prints the standard-error count and the words
+*not distinguishable from zero*, so the next reader is told rather than left to
+find a story in a fitted intercept.
+
 ## What the families have in common
 
 | Family | Shape |
@@ -620,11 +673,22 @@ two are the same object.
 | two-spellings-of-one-state | the same outcome is recorded two ways, and one of them the watching rule cannot read |
 | limit-before-filter | a bound is applied before the predicate, so the rarest rows are the ones that vanish |
 | satisfied-by-noise | a rule counts arrivals, so junk that arrives clears the alarm the gap raised |
+| compensated-in-the-test | the assertion adds the term the code forgot, so the invariant passes and the defect is recorded nowhere else |
 
-Eleven of the twelve are invisible to a type checker and to a test that only
-exercises the happy path - and the twelfth is invisible to a test whose fixture
-is smaller than the limit it is testing, which is why the corpus tests missed it
-for as long as they had two articles in them. All twelve are visible to a test
-that asks *what would the wrong answer look like, and would I be able to tell?*
+Twelve of the fourteen are invisible to a type checker and to a test that only
+exercises the happy path. `limit-before-filter` is invisible to a test whose
+fixture is smaller than the limit it is testing, which is why the corpus tests
+missed it for as long as they had two articles in them. `compensated-in-the-test`
+is the one that had a test aimed straight at it: the assertion was amended to
+pass, so the suite went green and the only written record of the defect was the
+line of arithmetic added to work around it.
+
+(The count in this paragraph read "eleven of the twelve" against a table of
+thirteen rows before entry 18 was written. Corrected here rather than
+incremented, because incrementing a wrong number is how it got wrong.)
+
+All fourteen are visible to a test that asks *what would the wrong answer look
+like, and would I be able to tell?* - and the fourteenth adds a second question
+for the person writing the test: *am I fixing the code, or the assertion?*
 
 That question is what `stress/run.py` is.

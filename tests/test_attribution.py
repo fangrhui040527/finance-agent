@@ -72,10 +72,67 @@ def test_a_genuine_idiosyncratic_move_does_trigger_a_hunt():
 
 
 def test_components_sum_back_to_the_realised_return():
+    """No hand-added term. THIS TEST USED TO ADD `fit.coefficients[0]` ITSELF.
+
+    That made it pass while its own name was false: the printed components
+    summed to the return minus the fitted intercept, and the compensation lived
+    in the test rather than being reported to anyone reading a decomposition.
+    `Component.DRIFT` carries the intercept now, so the sum is the sum.
+    """
     fit = synthetic_fit()
     m = decompose("X", WINDOW, -0.03, -0.01, {}, -0.045, 0.0, fit)
     total = sum(c.contribution for c in m.components if c.component is not Component.CURRENCY)
-    assert total + fit.coefficients[0] == pytest.approx(m.total_return_local, abs=1e-9)
+    assert total == pytest.approx(m.total_return_local, abs=1e-12)
+
+
+def test_every_component_together_is_the_base_currency_return():
+    """The currency leg included, nothing left over, in a non-trivial case:
+    a fitted drift, a market leg, a sector leg and an FX leg all non-zero."""
+    fit = synthetic_fit()
+    m = decompose("US_X", WINDOW, 0.021, -0.004, {}, 0.033, -0.07, fit, base_currency="MYR")
+    assert {c.component for c in m.components} == set(Component)
+    assert sum(c.contribution for c in m.components) == pytest.approx(
+        m.total_return_base, abs=1e-12
+    )
+    assert m.component(Component.DRIFT).contribution == pytest.approx(fit.coefficients[0])
+
+
+def test_the_drift_is_reported_with_its_own_standard_error():
+    """A fitted intercept over a few hundred sessions is mostly noise, and the
+    note says so rather than printing a number that reads like a finding."""
+    fit = synthetic_fit()
+    assert fit.intercept_se is not None and fit.intercept_se > 0.0
+    m = decompose("X", WINDOW, -0.03, -0.01, {}, -0.045, 0.0, fit)
+    assert "drift" in m.estimation_note
+    assert "standard errors from zero" in m.estimation_note
+    # this synthetic series has no true drift, so the fit must not claim one
+    assert "not distinguishable from zero" in m.estimation_note
+
+
+def test_a_real_drift_is_distinguishable_and_says_so():
+    rng = random.Random(3)
+    rows = [[rng.gauss(0, 0.01), rng.gauss(0, 0.008)] for _ in range(400)]
+    y = [0.004 + 1.1 * a + 0.6 * b + rng.gauss(0, 0.004) for a, b in rows]
+    fit = huber_fit(rows, y)
+    assert fit.coefficients[0] == pytest.approx(0.004, abs=0.001)
+    m = decompose("X", WINDOW, -0.03, -0.01, {}, -0.045, 0.0, fit)
+    assert "not distinguishable from zero" not in m.estimation_note
+    assert m.component(Component.DRIFT).contribution > 0.003
+
+
+def test_the_drift_never_earns_a_cause_hunt():
+    """A drift is a property of the estimation window, not an event. Only the
+    residual is tested for significance, so a large drift cannot by itself
+    turn an ordinary session into something that wants a story."""
+    rng = random.Random(8)
+    rows = [[rng.gauss(0, 0.01), rng.gauss(0, 0.008)] for _ in range(400)]
+    y = [0.006 + 1.1 * a + 0.6 * b + rng.gauss(0, 0.004) for a, b in rows]
+    fit = huber_fit(rows, y)
+    expected = fit.coefficients[0] + fit.coefficients[1] * -0.03 + fit.coefficients[2] * -0.01
+    m = decompose("X", WINDOW, -0.03, -0.01, {}, expected, 0.0, fit)
+    assert abs(m.component(Component.DRIFT).contribution) > 0.005
+    assert m.verdict is Verdict.NOT_SIGNIFICANT
+    assert m.needs_cause_hunt() is False
 
 
 def test_shares_never_exceed_one_hundred_percent_when_components_offset():
