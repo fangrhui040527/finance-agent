@@ -1,0 +1,125 @@
+{
+  "day": "2026-09-15",
+  "written_at": "2026-09-15T22:52:00Z",
+  "phase": "observe",
+  "week": 2,
+  "equity_usd": 1000.0,
+  "cash_usd": 1000.0,
+  "control_equity_usd": 1000.0,
+  "drawdown": 0.0,
+  "halted": false,
+  "marks": 12,
+  "positions": [],
+  "changes": [],
+  "caps": [
+    {"cap": "largest name", "value": "0.00%", "limit": "25%", "breached": false},
+    {"cap": "invested", "value": "0.00%", "limit": "0%", "breached": false},
+    {"cap": "cash floor", "value": "100.00%", "limit": "20%", "breached": false},
+    {"cap": "names held", "value": "0", "limit": "0", "breached": false},
+    {"cap": "drawdown from peak", "value": "0.00%", "limit": "8%", "breached": false},
+    {"cap": "turnover used, 5 weekdays", "value": "USD 0.00", "limit": "USD 500.00", "breached": false}
+  ],
+  "attribution": {
+    "market": null,
+    "idiosyncratic": null,
+    "note": "no positions held; nothing to attribute"
+  },
+  "the_test_that_was_written_in_advance": {
+    "condition": "The 2026-09-14 page named one thing to watch: whether the Petronas Chemicals story gets a BODY - nst_business and fmt_business each collect 45-50 rows a Bursa session and neither has ever linked this name.",
+    "result": "NOT MET, and both sources were healthy when it was tested. nst_business - which answered HTTP 404 on the 09-14 sweep - returned and stored 48 rows; fmt_business stored 50. Three of those 98 rows linked any book name, and none was MYX:5183. google_news read empty for the name. It collected ZERO rows on a day it gave back 1.33%.",
+    "the_three_that_linked": [
+      "fmt_business:2026-09-15T10:55Z:MYX:1155:q1.00:body 111:SD Guthrie selldown driven by 'market overreaction'",
+      "nst_business:2026-09-15T12:23Z:MYX:5347:q1.00:body 214:TNB customers receive RM3.1bil AFA rebate since July 2025",
+      "nst_business:2026-09-15T11:06Z:MYX:4197:q1.00:body 195:PTT subsidiary bags RM83.26m earthworks contract from Sime Darby Property"
+    ],
+    "why_it_matters": "A refusal that survives a test it could have failed is worth more than the six refusals before it, which were never at risk."
+  },
+  "the_day": {
+    "MYX:^KLSE": [1698.01, 1679.21, -0.0111],
+    "XNAS:SPY": [760.88, 757.48, -0.0045],
+    "note": "Both halves fell; the index gave back Monday's +0.67% and more, and SPY had a second consecutive down session. Two Malaysian wires name the same market-level reason - 'Bursa ends lower ahead of FOMC decision as oil prices rise' (freemalaysiatoday.com, 09:38Z) and 'Bursa Malaysia ends lower ahead of FOMC decision, amid higher oil prices' (themalaysianreserve.com, 09:55Z). Recorded as a market statement, not a company one.",
+    "closes": {
+      "MYX:8869": [7.76, 7.52, -0.0309],
+      "MYX:5347": [13.64, 13.32, -0.0235],
+      "MYX:5183": [5.27, 5.2, -0.0133],
+      "MYX:5225": [7.76, 7.71, -0.0064],
+      "MYX:1155": [10.46, 10.42, -0.0038],
+      "MYX:3182": [1.92, 1.93, 0.0052],
+      "XNAS:NVDA": [210.96, 212.145, 0.0056],
+      "XNAS:AAPL": [333.08, 329.888, -0.0096],
+      "XNAS:MSFT": [505.41, 498.578, -0.0135]
+    },
+    "blind_spot": "MYX:8869 fell 3.09%, the largest move in the fundable set, and NOTHING was collected for it: gdelt failed the name, google_news read empty, neither Malaysian outlet linked it. Two consecutive sessions with zero rows, the second of them a 3% fall. The book cannot say whether that was aluminium, the index, or the company."
+  },
+  "decision": {
+    "recorded": true,
+    "weights": {},
+    "kind": "all_cash",
+    "prediction_id": "paper-2026-09-15-allcash-21d-af55",
+    "horizon_days": 21,
+    "grades_on": "2026-10-15",
+    "confidence": 0.55,
+    "confidence_note": "Unchanged from 2026-09-14 deliberately. Tonight's evidence bears on how well-founded the refusal is, not on how the next 21 sessions will go; moving the number would confuse the two.",
+    "claim": "nothing in the fundable universe beats cash over 21 sessions",
+    "fx": {"myr_per_usd": 4.0818, "source": "bnm", "date": "2026-09-15"},
+    "fundable_set": {
+      "MYX:5183": {"lot_usd": 127.39, "share_of_equity": 0.127, "round_trip": 0.0176},
+      "MYX:5225": {"lot_usd": 188.89, "share_of_equity": 0.189, "round_trip": 0.0123},
+      "MYX:8869": {"lot_usd": 184.23, "share_of_equity": 0.184, "round_trip": 0.0126},
+      "MYX:3182": {"lot_usd": 47.28, "share_of_equity": 0.047, "round_trip": 0.0452},
+      "XNAS:NVDA": {"lot_usd": 212.15, "share_of_equity": 0.212, "round_trip": 0.0121}
+    },
+    "excluded_on_the_25pc_cap": {"MYX:1155": 0.255, "MYX:5347": 0.326, "XNAS:AAPL": 0.33, "XNAS:MSFT": 0.499},
+    "the_name_that_got_a_document_is_unfundable": {
+      "instrument_id": "MYX:5347",
+      "evidence": [
+        "nst_business:2026-09-15T12:23Z:q1.00:body 214:TNB customers receive RM3.1bil AFA rebate since July 2025",
+        "businesstoday.com.my:2026-09-15T11:31Z:q0.80:TNB Clarifies AFA Not New, Replaced ICPT Mechanism, Returned Higher Rebate Of RM3.1 Billion"
+      ],
+      "note": "A bodied, dated, company-specific item from a Malaysian outlet - the exact shape of evidence this book has been asking for all week - on a name that fell 2.35%. It is 32.6% of equity against a 25% per-name cap, so it cannot be sized and therefore cannot be a decision. Recorded, not acted on."
+    },
+    "other_refusals": {
+      "MYX:1155": "Ten rows today, most of them naming the company as the RESEARCH HOUSE ('Maybank IB upgrades SD Guthrie'), not as the subject. A mention is not a cause, and this is not even about the company. The one item that is about it is a Singapore listing of USD 700m of bonds (marketscreener.com, q 0.65, no body). -0.38% against a -1.11% index: it outperformed and there is nothing to explain.",
+      "MYX:8869": "zero rows for a second session, on a 3.09% fall. Blind, and fundable at 18.4%.",
+      "MYX:5183": "zero rows, 1.33% given back. The stated condition was tested tonight and failed.",
+      "MYX:5225": "zero rows today; the Tokyo dismissal remains the last dated catalyst and it is negative.",
+      "MYX:3182": "zero rows today; the Fitch downgrade and S&P fallen-angel warning remain the last dated catalysts and both are negative.",
+      "XNAS:NVDA": "UNREADABLE TONIGHT, FOR A STATED REASON. All three US names hold zero rows published 2026-09-15 because the us_close sweep has not run - it is the late-but-not-dropped slot, no run object at +1h20m. The +0.56% that reversed a third of Monday's fall is a bar with no corpus behind it."
+    },
+    "verified_against_stores": {"paper.db targets": 5, "paper.db applications": 5, "learning.db predictions": 5}
+  },
+  "mistakes": [
+    "THE 'Monday's prices' TABLE ON THE 2026-09-14 PAPER PAGE CARRIES FIGURES THAT ARE NOT IN THE PACK. The repository's rule is that every number on a page is copied from the pack with its id and none is estimated; that table was typed. MYX:5347: the page said 13.640 -> 13.600, -0.29%; the cached bars say 13.600 -> 13.640, +0.29% - THE DIRECTION IS INVERTED. MYX:3182: the page said 1.930 -> 1.910; the bars say 1.940 -> 1.920, both closes one sen low. MYX:5183: the page said 5.090 -> 5.269, +3.52%, a float display rather than the 5.270 close, so +3.54%. The same session's feedback page, written from the pack, has Tenaga at +0.29% - so the two pages in this repository dated 2026-09-14 disagree with each other and the paper one is wrong. Recorded here rather than back-edited, which is the convention the 09-14 page itself used.",
+    "THE 09-14 FEEDBACK PAGE CALLED nst_business DEAD. It wrote 'has gone from late to gone' and asked whether the 404 was a dead URL or a path change. It was neither: the source answered normally on the next sweep - 50 fetched, 49 kept, 48 stored. One 404 is an outage, not a death, and the page should have said which of those it could tell from one observation. It could not, and it should have said so."
+  ],
+  "settled": [
+    "The nst_business 404 opened on the 2026-09-14 feedback page is closed as TRANSIENT, one sweep after it was opened.",
+    "The condition 'the Petronas Chemicals story gets a body' is closed as TESTED AND FAILED for 2026-09-15. It reopens for the next Bursa session."
+  ],
+  "corrections": [
+    "MYX:5347 on 2026-09-14 rose +0.29%, not fell -0.29%.",
+    "MYX:3182 on 2026-09-14: 1.940 -> 1.920, -1.03%.",
+    "MYX:5183 on 2026-09-14: 5.090 -> 5.270, +3.54%."
+  ],
+  "defects_this_book_depends_on": [
+    "A COLLECTION REASON THAT GETS CUT OFF. eodhd now explains itself and the explanation is truncated mid-sentence at exactly 400 characters: knowledge/facts.py:379 writes detail[:400] and knowledge/sweep.py:952 caps the composed string at 400 as well. Because the informative clause is appended last, the truncation removes precisely the part that explains the book's largest standing gap - 'outside the free plan (US only), so not asked for: MYX:5183, MYX:5225, MYX:8869, MYX:3182. The EODHD Fundamentals plan cove'. Not fixed tonight; recorded.",
+    "The sector beta is fixed at 0 because no sector proxy is cached, so any sector-wide session lands entirely in a residual labelled idiosyncratic. Opened on the 2026-09-14 feedback page from NVIDIA's -3.36%.",
+    "Sixteen peer price lines unrefreshed since the collector outage (11 US at 2026-09-02, 5 Bursa at 2026-08-31). They feed peer_set and the comps."
+  ],
+  "conditions_for_a_position": [
+    "OPEN, and nearest: a us_close sweep. Tonight's page is written with no corpus at all for the three US names on the day they moved - a timing artefact of writing at 22:52 UTC, and the next page will have it.",
+    "OPEN, and new: Press Metal collecting anything. Two sessions, a 3.09% fall, zero rows, fundable at 18.4%.",
+    "OPEN, tested and failed tonight: Petronas Chemicals collecting a body. A full Bursa session with no rows at all while giving back 1.33% of a 16.33% five-session run.",
+    "OPEN: any fundamental figure at all for a Bursa name. All six hold zero fact-book observations, and eodhd now names the reason - outside the free plan, US only.",
+    "OPEN: a per-name cap that admits Tenaga, or an equity level that does. The one name that collected a real document today is unfundable at 32.6% of equity.",
+    "CLOSED: the Bursa proxy. Replaced with the index on 2026-09-14."
+  ],
+  "lessons": [
+    "A condition written down in advance is worth more than one recognised afterwards. Tonight's refusal survived a test it could have failed; the six before it were never at risk, and that difference is not visible unless the test was written first.",
+    "A source answering 404 once is an outage, not a death. The page that called it dead had exactly one observation and drew a trend from it.",
+    "The rule 'every number is copied from the pack' is not a formality. A table typed from memory inverted a name's direction for a whole session, and the error was only visible because a second page computed the same session from the pack.",
+    "Evidence quality and outcome probability are different quantities. Tonight's evidence made the refusal better founded and said nothing about the next 21 sessions, so the confidence stayed where it was.",
+    "A cap that excludes a name also excludes its evidence. The only real document collected today belongs to a name this book cannot size, which means better collection does not by itself produce better decisions.",
+    "A reason that is appended last is the first thing a truncation removes. The eodhd explanation is cut at 400 characters exactly where it starts explaining."
+  ]
+}
