@@ -347,6 +347,14 @@ def test_the_shipped_legs_do_not_fall_behind_exact_token_search():
     the same ten documents it was handed. That is not a reason to drop the
     assertion. It is the assertion: the day it can fail is the day something
     re-enters the selection path, and that is exactly the day to look.
+
+    ONE ASSERTION IS BORROWED from the gated version of this test that #68 put
+    on main while this branch was being written. That version kept the fusion
+    behind `Collection.FUSE_DENSE = False` and pinned the dense leg as still
+    MEASURED, on the reasoning that "a gate you cannot reopen on evidence is a
+    deletion wearing a flag". The flag is gone here and the reasoning is not:
+    deleting the fusion is only defensible while the number that would justify
+    rebuilding it is still produced every run.
     """
     from knowledge.retrieval.evaluate import report_for
 
@@ -355,7 +363,14 @@ def test_the_shipped_legs_do_not_fall_behind_exact_token_search():
         "the shipped path is finding less than exact-token search alone - "
         "something has been added to selection that does not pay for its seats"
     )
-    assert "fused" not in report.legs, "the fusion is gone; a leg measuring it is stale"
+    assert report.legs["dense"].cases > 0, (
+        "the dense leg stopped being measured - deleting the fusion is only "
+        "defensible while the number that would justify rebuilding it still runs"
+    )
+    assert "fused" not in report.legs, (
+        "a `fused` leg is stale: with nothing to fuse it re-measures `bm25` and "
+        "reads as a second opinion it is not"
+    )
 
 
 # --- the gold set drifting under a growing corpus -------------------------------

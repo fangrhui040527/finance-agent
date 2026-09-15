@@ -642,8 +642,23 @@ come out of the other leg's real hits. The component added to make semantic
 retrieval better was making semantic retrieval worse — 18.8% against BM25's
 25.0% on exactly the sixteen questions it existed to serve.
 
-The fusion is removed. `Collection.search` is BM25 plus the hard filters, and
-`rerank` orders what it returns. After:
+The fusion is removed, in two steps by two hands. #68 switched it off behind a
+`Collection.FUSE_DENSE = False` class flag, keeping the RRF code gated so a
+future embedder could flip it back, and re-aimed the failing test from "the
+dense leg always helps" at "we only SHIP a leg that helps" — the right first
+move, and the sharper statement of the property. This removes the flag and the
+code under it, because a gate is a poor resting place: with nothing to fuse, the
+RRF path was exercised by no shipped call, `evaluate.py`'s `fused` column
+silently re-measured `bm25` (verified on main at `d3a1902` — 30.4/47.8/47.8,
+0.360, identical to `bm25` in every cell), and that column's own guard
+assertion, `fused.recall_at_10 >= bm25.recall_at_10`, had become BM25 compared
+against itself. Fifteen lines of rank fusion are cheaper to rewrite than to keep
+honest unused. What survives from the gated version is its best assertion: the
+dense leg must still be MEASURED every run, because deleting the fusion is only
+defensible while the number that would justify rebuilding it still exists.
+
+`Collection.search` is now BM25 plus the hard filters, and `rerank` orders what
+it returns. After:
 
 | leg | r@10 | MRR | semantic r@10 | semantic MRR |
 |---|---|---|---|---|

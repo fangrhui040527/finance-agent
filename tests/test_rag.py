@@ -132,6 +132,24 @@ def test_search_never_embeds_anything():
     assert col._vectors is None, "search built a vector index it never used"
 
 
+def test_the_shipped_default_does_not_fuse_the_dense_leg():
+    """Pin the default, so turning it back on is a decision and not a drift.
+
+    #68 wrote this against `Collection.FUSE_DENSE is False`. The flag is gone -
+    the fusion it gated went with it - so the same property is now pinned by
+    what it can no longer produce: a `Hit` cannot carry a dense rank, because
+    the field does not exist. Kept rather than deleted because the property it
+    guards did not change hands with the mechanism.
+    """
+    from knowledge.retrieval.hybrid import Collection, Hit
+
+    assert not hasattr(Collection, "FUSE_DENSE"), "the gate is gone, not re-hidden"
+    assert not hasattr(Hit("x", 0.0), "dense_rank")  # type: ignore[arg-type]
+    hits = corpus().search("margin", 4)
+    assert hits, "dropping the dense leg must not empty the result list"
+    assert any(h.sparse_rank for h in hits), "the sparse leg still ranks"
+
+
 def test_freshness_is_a_hard_filter_not_a_hint():
     col = Collection("kb_news")
     col.add(Chunk("old", "market story", "kb_news", as_of=NOW - timedelta(days=400)))

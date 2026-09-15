@@ -1,0 +1,282 @@
+{
+  "day": "2026-09-13",
+  "written_at": "2026-09-15T02:35:00Z",
+  "market": {
+    "regime": "neutral",
+    "notes": [
+      "2026-09-13 was a Sunday; no market in this book traded. Every return is the 2026-09-11 session, correctly dated by the pack.",
+      "FIRST PAGE WITH A REAL BURSA MARKET LEG. MYX:^KLSE was fetched by the us_close sweep at 2026-09-14T23:51Z and cached (yahoo, 114879 bytes, 1223 common sessions). It prints -1.10% for 2026-09-11 and -1.25% over five sessions. The three previous pages reported this leg as blank, blank, and +0.00% on 500 shares.",
+      "Measured A/B of the two proxies, same names, same session, same code path. Betas ETF -> index: Maybank 0.12 -> 1.18, Tenaga 0.14 -> 0.72, PCHEM -0.99 -> -0.10, IHH 0.22 -> 0.75, Press Metal 0.30 -> 1.01, Genting 0.11 -> 1.05. Unexplained share 100% for all six under the ETF; 32/6/98/72/34/10% under the index.",
+      "Under MYX:0820EA every name in the Malaysian half of the book had a beta near zero. A proxy against which nothing covaries is measuring its own illiquidity; the 100% unexplained share was arithmetic, not a finding.",
+      "XNAS:SPY +0.85% 1d, -1.15% 5d, 1254 common sessions. Unchanged.",
+      "SP500 7656.98, NASDAQCOM 26333.04, VIXCLS 15.84, T10Y2Y 0.33, all 2026-09-11; DGS10 4.95 and DGS2 4.56 at 2026-09-10."
+    ]
+  },
+  "names": [
+    {
+      "instrument_id": "MYX:5225",
+      "move": {
+        "return_1d": -0.0304,
+        "market_1d": -0.0110,
+        "market_component": -0.0082,
+        "idiosyncratic": -0.0213,
+        "beta": 0.75,
+        "unexplained_share": 0.72,
+        "note": "2026-09-11 session. The one significant idiosyncratic move in the book; engine verdict no_identified_catalyst. Under the ETF proxy the same move read 100% unexplained with beta 0.22."
+      },
+      "causes": [
+        {
+          "claim": "The Tokyo District Court dismissed Northern TK Venture's (IHH subsidiary) Y200bn / RM5.7bn damages claim against Daiichi Sankyo over the Fortis transaction, reported after the 2026-09-10 Bursa close; 2026-09-11 was the first session that could price it.",
+          "evidence": [
+            "google_news:themalaysianreserve.com:2026-09-10T10:41Z:IHH subsidiary's suit against Daiichi Sankyo dismissed by Tokyo court",
+            "google_news:www.theedgemarkets.com:2026-09-10T11:37Z:IHH unit loses 200 bil yen damages claim against Daiichi Sankyo",
+            "google_news:www.nst.com.my:2026-09-10T12:41Z:IHH Healthcare unit loses RM5.7bil claim against Japan's pharmaceutical giant",
+            "nst_business:www.nst.com.my:2026-09-11T10:49Z:IHH maintains claim on Fortis losses, respects court decision",
+            "google_news:theedgemalaysia.com:2026-09-11T11:15Z:IHH maintains it suffered losses from Fortis deal delays after 200 bil yen claim rejected"
+          ],
+          "chain": [
+            "share price -3.04% on 2026-09-11, -2.13pp idiosyncratic",
+            "Tokyo court dismissal of the NTK damages claim, first reported 2026-09-10T10:41Z, after the 09-10 Bursa close (trading 01:00-09:00 UTC)",
+            "company response 2026-09-11T10:49Z maintains the loss claim and respects the decision",
+            "primary document not collected: no Bursa announcement, no court filing, only press reports"
+          ],
+          "confidence": 0.7,
+          "confirm": "a bursa_announcements row for MYX:5225 dated 2026-09-10 or 2026-09-11, or a quantified P&L impact in the next results",
+          "refute": "Malaysian healthcare peers down comparably on 2026-09-11; untestable tonight because KPJ (5878) peer prices were last fetched 2026-08-31"
+        }
+      ],
+      "open_questions": [
+        "The catalyst matcher returns no_identified_catalyst against eight dated rows, two escalated, one with a body. What does it require that these do not supply?"
+      ],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:5183",
+      "move": {
+        "return_1d": 0.056,
+        "return_5d": 0.192,
+        "market_1d": -0.0110,
+        "market_component": 0.0011,
+        "idiosyncratic": 0.0533,
+        "beta": -0.10,
+        "sigma": 1.3,
+        "unexplained_share": 0.98,
+        "note": "not_significant at 1.30 sigma: a +5.60% day is inside normal variation FOR THIS NAME. The five-session +19.20% against a market -1.25% is the anomaly. The 98% unexplained share SURVIVED the change of market proxy (100% -> 98%, beta -0.99 -> -0.10), so it is a measurement rather than an artefact: a petrochemical exporter priced off crude genuinely does not covary with the KLCI."
+      },
+      "causes": [
+        {
+          "claim": "Crude strength over the same window is the only knowable candidate, and it is a co-movement with no collected document connecting it to the name.",
+          "evidence": ["fred:DCOILBRENTEU:2026-09-09:109.51 (+16.25 over the last 20 observations)"],
+          "chain": [
+            "PCHEM +19.20% over five sessions to 2026-09-11",
+            "Brent 109.51 at 2026-09-09, up roughly 17% over the last 20 observations",
+            "no collected story links the two; the mechanism (product spreads vs naphtha feedstock cost) is asserted by nobody in the corpus"
+          ],
+          "confidence": 0.25,
+          "confirm": "a collected story linking the move to feedstock or product spreads; a peer refiner or petrochemical name moving with it",
+          "refute": "Brent retracing while PCHEM holds the gain"
+        }
+      ],
+      "open_questions": [
+        "UNKNOWN IS THE ANSWER for the run itself. Evidence published on or before 2026-09-13, in full: two google_news rows from www.moomoo.com dated 2026-09-11, both empty-bodied, q 0.65 - '$PCHEM (5183.MY)$' and the 'FREE RM188' promotion. Exactly the rows #65/#66/#67 exclude, and they are excluded.",
+        "POST-CUTOFF, recorded for the 2026-09-14 page and playing no part in this reading: theedgemalaysia.com published 'PETRONAS Chemicals rises to three-month high, refiners climb as Brent tops US$100' at 2026-09-14T08:11Z."
+      ],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:3182",
+      "move": {
+        "return_1d": -0.0152,
+        "return_5d": -0.049,
+        "market_1d": -0.0110,
+        "market_component": -0.0116,
+        "idiosyncratic": -0.0012,
+        "beta": 1.05,
+        "sigma": 0.07,
+        "unexplained_share": 0.1,
+        "note": "The SESSION is market: 10% unexplained at 0.07 sigma, and no company story is warranted for it. The FIVE-DAY -4.90% against a market -1.25% is a different question, which the pack does not itself test."
+      },
+      "causes": [
+        {
+          "claim": "Two dated rating actions inside the five-session window: Fitch downgraded Genting Berhad to BBB- on 2026-09-07 (Resorts World Las Vegas to BB+), and S&P flagged 'fallen angel' risk on 2026-09-08/09.",
+          "evidence": [
+            "google_news:theedgemalaysia.com:2026-09-07T10:17Z:Fitch downgrades Genting's rating over high debt levels amid heavy spending",
+            "google_news:themalaysianreserve.com:2026-09-07T10:41Z:Fitch downgrades Genting to BBB- on high leverage, heavy expansion capex",
+            "google_news:www.businesstoday.com.my:2026-09-07T10:57Z:Fitch Downgrades Genting Berhad To BBB-, Resorts World Las Vegas To BB+",
+            "google_news:asgam.com:2026-09-08T12:31Z:S&P Global: expansion costs, subdued operational performance place Genting Bhd at risk of becoming a fallen angel",
+            "google_news:www.ggrasia.com:2026-09-09T01:52Z:Genting group faces fallen angel risk, no more buffer for earnings downside: S&P",
+            "google_news:www.igamingtoday.com:2026-09-08T23:03Z:Fitch Forecasts Soft 2026 Earnings for Resorts World Genting"
+          ],
+          "chain": [
+            "-4.90% over five sessions against a market -1.25%",
+            "Fitch downgrade to BBB- on 2026-09-07 citing leverage and expansion capex",
+            "S&P 'fallen angel' warning 2026-09-08/09: no buffer for earnings downside",
+            "cause: New York and Las Vegas expansion capex against soft Resorts World Genting earnings"
+          ],
+          "confidence": 0.6,
+          "confirm": "the 2026-09-07 and 2026-09-08 sessions carrying the bulk of the -4.90%, checkable from the cached bars",
+          "refute": "the decline spread evenly across five sessions, or Genting Malaysia (4715) and Genting Singapore moving differently"
+        }
+      ],
+      "open_questions": [
+        "This cause is attached to a five-day window the engine did not test; the 1d verdict's authority does not carry over to it."
+      ],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:1155",
+      "move": {
+        "return_1d": -0.0076,
+        "market_1d": -0.0110,
+        "market_component": -0.013,
+        "idiosyncratic": 0.0062,
+        "beta": 1.18,
+        "sigma": 0.87,
+        "unexplained_share": 0.32,
+        "note": "It OUTPERFORMED the market leg. not_significant. Beta 1.18 against the index where the ETF gave a bank 0.12."
+      },
+      "causes": [],
+      "open_questions": [
+        "Completed the buyout of Ageas's 30.95% stake in Maybank Ageas Holdings for EUR 1.1bn / MYR 4.83bn on 2026-09-11, reported by four independent outlets (yahoo_rss 04:45Z q 1.00 body 500; thestar.com.my 05:31Z; nst.com.my 05:25Z; theedgemalaysia.com 06:09Z). A completed, pre-announced transaction is an event, not an explanation for a move the decomposition calls unremarkable. Recorded as a fact; no cause claimed."
+      ],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:5347",
+      "move": {
+        "return_1d": -0.0087,
+        "market_1d": -0.0110,
+        "market_component": -0.008,
+        "idiosyncratic": -0.0006,
+        "beta": 0.72,
+        "sigma": 0.08,
+        "unexplained_share": 0.06,
+        "note": "The most completely market-explained name in the book tonight. Beta 0.72 is what a regulated utility should carry."
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [{"when": "2026-10-16", "what": "interim single-tier dividend payable (marketscreener.com, 2026-09-09, escalated)"}]
+    },
+    {
+      "instrument_id": "MYX:8869",
+      "move": {
+        "return_1d": -0.0165,
+        "market_1d": -0.0110,
+        "market_component": -0.0111,
+        "idiosyncratic": -0.0059,
+        "beta": 1.01,
+        "sigma": 0.31,
+        "unexplained_share": 0.34,
+        "note": "Market. One row in eight days and it is a conference sponsorship notice (news.metal.com, 2026-09-08)."
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": []
+    },
+    {
+      "instrument_id": "XNAS:NVDA",
+      "move": {
+        "return_1d": -0.0003,
+        "return_5d": -0.0445,
+        "market_1d": 0.0085,
+        "market_component": 0.0148,
+        "idiosyncratic": -0.0138,
+        "beta": 1.74,
+        "sigma": 0.7,
+        "unexplained_share": 0.48,
+        "note": "Gave back exactly what the market gave it. not_significant. 168 stories collected from 22 sources; volume of coverage is not evidence of a cause."
+      },
+      "causes": [],
+      "open_questions": ["Finnhub eps_actual 2.22 for period 2026-09-30 carries knowable 2026-09-30, a date in the future; which field is read as the report date?"],
+      "watch": []
+    },
+    {
+      "instrument_id": "XNAS:AAPL",
+      "move": {
+        "return_1d": 0.0175,
+        "market_1d": 0.0085,
+        "market_component": 0.0054,
+        "idiosyncratic": 0.01,
+        "beta": 0.63,
+        "sigma": 0.58,
+        "unexplained_share": 0.65,
+        "note": "not_significant at 0.58 sigma. No company story warranted."
+      },
+      "causes": [],
+      "open_questions": ["Does the 91%-unexplained +3.56% session of 2026-09-10 survive as attributable? The 09-11 follow-through was +1.75% at 0.58 sigma; no new evidence either way."],
+      "watch": []
+    },
+    {
+      "instrument_id": "XNAS:MSFT",
+      "move": {
+        "return_1d": 0.0065,
+        "market_1d": 0.0085,
+        "market_component": 0.0074,
+        "idiosyncratic": -0.0007,
+        "beta": 0.87,
+        "sigma": 0.03,
+        "unexplained_share": 0.09,
+        "note": "Market. 0.03 sigma."
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": []
+    }
+  ],
+  "machine": {
+    "answered": [
+      {
+        "question": "Which term is missing from the pack's printed decomposition? (opened 2026-09-12)",
+        "answer": "The regression intercept, fit.coefficients[0], at engines/attribution/decompose.py:197. It enters `expected` and is therefore subtracted out of the idiosyncratic residual, but it is not one of the five entries in `contribs`, so it is never printed.",
+        "proof": "Synthetic series with a known drift of +0.200%/session: fitted alpha +0.00213; return minus the sum of all five printed components +0.00213. Identical to five decimals.",
+        "per_name_alpha_pp": {"MYX:1155": -0.08, "MYX:5347": -0.01, "MYX:5183": 0.16, "MYX:5225": -0.09, "MYX:8869": 0.05, "MYX:3182": -0.24},
+        "notes": [
+          "Not the proxy's fault: the same gaps, to within 0.03pp, were present against the ETF when the market leg was +0.00%.",
+          "Genting's -0.24pp is twice its entire printed idiosyncratic component.",
+          "Still open: should alpha be printed as a sixth component, or reported as drift with a warning when it exceeds the idiosyncratic term?"
+        ]
+      },
+      {
+        "question": "Should the decomposition refuse when the proxy's session volume is below a floor? (opened 2026-09-12)",
+        "answer": "SUPERSEDED. The proxy is an index now and has no share volume to be thin. No volume floor would have helped: the ETF's problem on the other 1,067 sessions was not stale prints but that nothing covaried with it. A liquidity floor catches the bad day; only an R-squared check catches the bad instrument."
+      }
+    ],
+    "monitor": {
+      "open": [
+        "past its own cadence: nst_business (37h ago, allowed 30h)",
+        "2 macro series past their cadence: PALUMUSDM (76d, limit 70), DOSM:CPI_HEADLINE (76d, limit 70)"
+      ],
+      "resolved": ["name_coverage", "slots_missed"],
+      "notes": [
+        "slots_missed closed WITHOUT intervention. sweep --due named us_close at 22:37 UTC, 1h22m past its 21:15 cron. It was NOT dispatched, because the prior day's evidence puts scheduled-run delay at up to +6h33m and a slot inside that envelope is late, not dropped. The scheduled run arrived 2026-09-14T23:51:43Z (+2h36m) and wrote b42910e. A dispatch would have been a second duplicate in two days.",
+        "name_coverage on MYX:5183 closed: the 13:50 Bursa sweep gave the name indexable rows for the first time since the ticker-tag filter shipped.",
+        "DEFECT: stored alert rows keep their opening text and never refresh, so ask.py alerts reports DOSM:CPI_HEADLINE (15985d, 16 series) where the live rule computes 76d and 2 series; likewise stored sweep_silence names twse_openapi (33h) where the live rule names nst_business (37h)."
+      ]
+    }
+  },
+  "data_quality": {
+    "failed": [],
+    "degraded": [
+      "gdelt: failed NVIDIA and Apple and read empty for Microsoft on the us_close sweep (0 stored); failed Maybank and read empty for Petronas Chemicals on the bursa_close sweep; named the company in 2 of 10 there",
+      "alphavantage_news: quota exhausted for XNAS:MSFT",
+      "eodhd: every name deferred by the 2-a-day credit budget",
+      "fmp: HTTP 402 on the earnings endpoint (21 facts still written)"
+    ],
+    "skipped": [],
+    "price_cache": {
+      "fresh_2026-09-14": ["the 9 book names", "MYX:^KLSE", "XNAS:SPY", "MYX:0820EA"],
+      "stale_2026-09-02_13d": ["CSX", "F", "HBAN", "INTC", "KEY", "KO", "PFE", "PLUG", "SIRI", "T", "WBD"],
+      "stale_2026-08-31_15d": ["1023.KL", "1961.KL", "4197.KL", "5296.KL", "6012.KL"],
+      "note": "Sixteen peer lines unrefreshed since the collector outage. They feed peer_set and the comps, which is why the IHH refutation test (Malaysian healthcare peers on 09-11) could not be run."
+    },
+    "fact_book": "All six Bursa names hold ZERO observations; 'Facts, per name' reads NOTHING COLLECTED for every one, against 60+ figures for each US name. The EODHD Fundamentals gap, not a collector fault.",
+    "macro": "Fifteen DBnomics series remain frozen at stopped upstreams (BIS WS_CBPOL, BIS WS_EER, IMF CPI, IMF IFS, IMF PCPS), probed 2026-09-06."
+  },
+  "lessons": [
+    "A proxy is validated by the betas it produces, not by whether it returns data. The ETF returned a close on 1,067 of 1,231 sessions and gave a bank a beta of 0.12; the failure was visible in every fit for three years and nothing was looking at the fits.",
+    "When a fix lands, measure the same names both ways before writing about it. 'The proxy is better' is a claim; a beta table with the old column beside the new one is a finding, and it cost one script.",
+    "An unexplained share that survives a change of instrument is a measurement; one that does not was arithmetic. Petronas Chemicals held 98% and IHH fell from 100% to 72% - only one of those was ever about the company.",
+    "A residual labelled 'idiosyncratic' will absorb any term the printer forgets, silently and with a plausible name. The gap was visible for two pages before anyone read the line that produced it.",
+    "Waiting is an action and it needs its own evidence. sweep --due named a slot as owed and the correct response was to do nothing, because the delay distribution - not the cron - says when a run is missing."
+  ]
+}

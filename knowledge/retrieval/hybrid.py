@@ -22,8 +22,16 @@ top ten did not - and it was ZERO for both offline backends, the corpus-fitted
 that lifts nothing is a second lexical search wearing a vector's clothes, and
 this one was displacing real BM25 hits to seat its duplicates.
 
-So the fusion is gone from `Collection.search` and BM25 selects alone. This is
-a RETRACTION OF A MEASUREMENT, not of the design: the docs' argument may well
+So the fusion is gone from `Collection.search` and BM25 selects alone. It went
+in two steps by two hands: #68 switched it off behind a `FUSE_DENSE = False`
+class flag, keeping the RRF code gated so a future embedder could flip it back;
+this removes the flag and the code under it. The gate was the right first move
+and a poor resting place - it left the RRF path unexercised by anything that
+ships, the `fused` column in `evaluate.py` silently re-measuring `bm25`, and
+that column's guard test comparing BM25 against itself. Fifteen lines of rank
+fusion are cheaper to rewrite than to keep honest unused.
+
+This is a RETRACTION OF A MEASUREMENT, not of the design: the docs' argument may well
 be right about a real embedding model, and nothing here has tested one. What
 was tested is the two backends that run without a key, and neither earns a
 place in the path a reader's question actually takes.

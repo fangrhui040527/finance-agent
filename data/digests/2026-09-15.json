@@ -1,79 +1,7 @@
 {
   "collection": [
     {
-      "at": "2026-09-14T23:54:14.104716+00:00",
-      "detail": "facts 0; XNAS:AAPL: deferred by the 2-a-day credit budget; next in rotation; XNAS:MSFT: outside the plan or over today's credits; XNAS:NVDA: outside the plan or over today's credits",
-      "fetched": 0,
-      "kept": 0,
-      "source": "eodhd",
-      "status": "ok",
-      "stored": 0
-    },
-    {
-      "at": "2026-09-14T23:54:13.636132+00:00",
-      "detail": "facts 0; ",
-      "fetched": 20,
-      "kept": 10,
-      "source": "jin10_flash",
-      "status": "ok",
-      "stored": 8
-    },
-    {
-      "at": "2026-09-14T23:54:12.152899+00:00",
-      "detail": "facts 6; XNAS:MSFT: alphavantage quota exhausted for today: Thank you for using Alpha Vantage! Please consider spreading out your free API requests more sparingly (1 request per second). You may subscribe to any of the p; XNAS:NVDA: alphavantage quota exhausted for today: Thank you for using Alpha Vantage! Please consider spreading out your free API requests more sparingly (1 request per second). ",
-      "fetched": 14,
-      "kept": 14,
-      "source": "alphavantage_news",
-      "status": "ok",
-      "stored": 14
-    },
-    {
-      "at": "2026-09-14T23:54:11.919293+00:00",
-      "detail": "facts 0; ",
-      "fetched": 247,
-      "kept": 219,
-      "source": "finnhub",
-      "status": "ok",
-      "stored": 175
-    },
-    {
-      "at": "2026-09-14T23:54:10.560579+00:00",
-      "detail": "every name failed. First: XNAS:NVDA: edgar fetch failed: HTTP 429 for https://data.sec.gov/submissions/CIK0001045810.json",
-      "fetched": 0,
-      "kept": 0,
-      "source": "edgar",
-      "status": "failed",
-      "stored": 0
-    },
-    {
-      "at": "2026-09-14T23:54:01.032641+00:00",
-      "detail": "named the company: 49 of 49 (lowest: Apple 14/14, Microsoft 17/17, NVIDIA 18/18)",
-      "fetched": 49,
-      "kept": 49,
-      "source": "yahoo_rss",
-      "status": "ok",
-      "stored": 44
-    },
-    {
-      "at": "2026-09-14T23:54:00.657070+00:00",
-      "detail": "named the company: 74 of 81 (lowest: Apple 17/19, NVIDIA 36/40, Microsoft 21/22)",
-      "fetched": 89,
-      "kept": 81,
-      "source": "google_news",
-      "status": "ok",
-      "stored": 81
-    },
-    {
-      "at": "2026-09-14T23:53:59.083955+00:00",
-      "detail": "read but empty: NVIDIA, Microsoft; failed: Apple",
-      "fetched": 0,
-      "kept": 0,
-      "source": "gdelt",
-      "status": "ok",
-      "stored": 0
-    },
-    {
-      "at": "2026-09-14T18:10:02.097700+00:00",
+      "at": "2026-09-15T17:14:26.432036+00:00",
       "detail": "facts 0; ",
       "fetched": 450,
       "kept": 0,
@@ -82,25 +10,25 @@
       "stored": 0
     },
     {
-      "at": "2026-09-14T18:10:00.444530+00:00",
+      "at": "2026-09-15T17:14:24.469060+00:00",
       "detail": "facts 0; ",
-      "fetched": 18,
-      "kept": 7,
+      "fetched": 16,
+      "kept": 6,
       "source": "jin10_flash",
       "status": "ok",
-      "stored": 6
+      "stored": 4
     },
     {
-      "at": "2026-09-14T18:09:59.258916+00:00",
-      "detail": "facts 63; ",
-      "fetched": 487,
+      "at": "2026-09-15T17:14:23.218747+00:00",
+      "detail": "facts 18; ",
+      "fetched": 492,
       "kept": 0,
       "source": "fred",
       "status": "ok",
       "stored": 0
     },
     {
-      "at": "2026-09-14T18:08:55.347494+00:00",
+      "at": "2026-09-15T17:13:55.080458+00:00",
       "detail": "skipped: no name in the book trades in slot 'us_preopen'",
       "fetched": 0,
       "kept": 0,
@@ -109,8 +37,8 @@
       "stored": 0
     },
     {
-      "at": "2026-09-14T15:17:35.827328+00:00",
-      "detail": "facts 0; MYX:1155: deferred by the 2-a-day credit budget; next in rotation; MYX:5347: deferred by the 2-a-day credit budget; next in rotation; MYX:5183: deferred by the 2-a-day credit budget; next in rotation; MYX:5225: deferred by the 2-a-day credit budget; next in rotation; outside the free plan (US only), so not asked for: MYX:1155, MYX:5347, MYX:5183, MYX:5225. The EODHD Fundamentals plan cove",
+      "at": "2026-09-15T14:22:50.184142+00:00",
+      "detail": "facts 0; MYX:5183: deferred by the 2-a-day credit budget; next in rotation; MYX:5225: deferred by the 2-a-day credit budget; next in rotation; MYX:8869: deferred by the 2-a-day credit budget; next in rotation; MYX:3182: deferred by the 2-a-day credit budget; next in rotation; outside the free plan (US only), so not asked for: MYX:5183, MYX:5225, MYX:8869, MYX:3182. The EODHD Fundamentals plan cove",
       "fetched": 0,
       "kept": 0,
       "source": "eodhd",
@@ -118,8 +46,8 @@
       "stored": 0
     },
     {
-      "at": "2026-09-14T15:17:35.531364+00:00",
-      "detail": "facts 0; ",
+      "at": "2026-09-15T14:22:49.715591+00:00",
+      "detail": "facts 5; ",
       "fetched": 8,
       "kept": 0,
       "source": "twse_openapi",
@@ -127,16 +55,16 @@
       "stored": 0
     },
     {
-      "at": "2026-09-14T15:17:25.945763+00:00",
+      "at": "2026-09-15T14:22:44.649438+00:00",
       "detail": "facts 0; ",
-      "fetched": 20,
-      "kept": 6,
+      "fetched": 19,
+      "kept": 7,
       "source": "jin10_flash",
       "status": "ok",
       "stored": 4
     },
     {
-      "at": "2026-09-14T15:17:25.105169+00:00",
+      "at": "2026-09-15T14:22:43.502146+00:00",
       "detail": "facts 0; ",
       "fetched": 10,
       "kept": 0,
@@ -145,16 +73,16 @@
       "stored": 0
     },
     {
-      "at": "2026-09-14T15:17:23.353593+00:00",
-      "detail": "nst_business fetch failed: HTTP Error 404: Not Found - and https://www.nst.com.my/ advertises no feed of its own",
-      "fetched": 0,
-      "kept": 0,
+      "at": "2026-09-15T14:22:41.452947+00:00",
+      "detail": "",
+      "fetched": 50,
+      "kept": 49,
       "source": "nst_business",
-      "status": "failed",
-      "stored": 0
+      "status": "ok",
+      "stored": 48
     },
     {
-      "at": "2026-09-14T15:17:23.078550+00:00",
+      "at": "2026-09-15T14:22:41.194544+00:00",
       "detail": "",
       "fetched": 50,
       "kept": 50,
@@ -163,8 +91,8 @@
       "stored": 50
     },
     {
-      "at": "2026-09-14T15:17:21.593405+00:00",
-      "detail": "read but empty: Genting, Maybank, Tenaga, Petronas Chemicals, IHH, Press Metal",
+      "at": "2026-09-15T14:22:41.079507+00:00",
+      "detail": "read but empty: Maybank, Tenaga, Petronas Chemicals, IHH, Press Metal, Genting",
       "fetched": 0,
       "kept": 0,
       "source": "yahoo_rss",
@@ -172,17 +100,17 @@
       "stored": 0
     },
     {
-      "at": "2026-09-14T15:17:19.426325+00:00",
-      "detail": "named the company: 9 of 23 (lowest: Press Metal 0/1, Tenaga 0/5, IHH 3/7)",
+      "at": "2026-09-15T14:22:39.089764+00:00",
+      "detail": "read but empty: Petronas Chemicals, Press Metal, Genting; named the company: 6 of 22 (lowest: IHH 0/1, Tenaga 2/12, Maybank 4/9)",
       "fetched": 24,
-      "kept": 23,
+      "kept": 22,
       "source": "google_news",
       "status": "ok",
-      "stored": 22
+      "stored": 21
     },
     {
-      "at": "2026-09-14T15:17:17.428614+00:00",
-      "detail": "read but empty: Tenaga, Petronas Chemicals; failed: Maybank; deferred to a later run: IHH, Press Metal, Genting",
+      "at": "2026-09-15T14:22:37.310932+00:00",
+      "detail": "read but empty: Maybank; failed: Press Metal, Genting; deferred to a later run: Tenaga, Petronas Chemicals, IHH",
       "fetched": 0,
       "kept": 0,
       "source": "gdelt",
@@ -191,26 +119,26 @@
     }
   ],
   "counts": {
-    "articles": 4718,
+    "articles": 4845,
     "documents": 0,
     "escalated": 990,
-    "events": 3996,
+    "events": 3998,
     "failed_sweeps": 18,
-    "linked": 3298,
-    "observations": 4567,
+    "linked": 3307,
+    "observations": 4572,
     "series": 31,
-    "sweeps": 269
+    "sweeps": 282
   },
-  "day": "2026-09-14",
-  "generated_at": "2026-09-14 23:54 UTC",
+  "day": "2026-09-15",
+  "generated_at": "2026-09-15 17:14 UTC",
   "macro": [
     {
-      "change": "-0.05",
-      "obs_date": "2026-09-11",
+      "change": "0.06",
+      "obs_date": "2026-09-14",
       "series_id": "BAMLH0A0HYM2",
       "source": "fred",
       "title": "ICE BofA US high-yield option-adjusted spread, %",
-      "value": "2.65"
+      "value": "2.71"
     },
     {
       "change": "0",
@@ -237,36 +165,36 @@
       "value": "109.51"
     },
     {
-      "change": "0.0021",
-      "obs_date": "2026-09-04",
+      "change": "0.0061",
+      "obs_date": "2026-09-11",
       "series_id": "DEXMAUS",
       "source": "fred",
       "title": "Malaysian ringgit per US dollar",
-      "value": "4.04"
+      "value": "4.07"
     },
     {
       "change": "0",
-      "obs_date": "2026-09-10",
+      "obs_date": "2026-09-11",
       "series_id": "DFF",
       "source": "fred",
       "title": "Federal funds effective rate, %",
       "value": "3.63"
     },
     {
-      "change": "0.12",
-      "obs_date": "2026-09-10",
+      "change": "0.01",
+      "obs_date": "2026-09-11",
       "series_id": "DGS10",
       "source": "fred",
       "title": "10-year Treasury yield, %",
-      "value": "4.95"
+      "value": "4.96"
     },
     {
-      "change": "0.13",
-      "obs_date": "2026-09-10",
+      "change": "0.07",
+      "obs_date": "2026-09-11",
       "series_id": "DGS2",
       "source": "fred",
       "title": "2-year Treasury yield, %",
-      "value": "4.56"
+      "value": "4.63"
     },
     {
       "change": "0",
@@ -277,20 +205,20 @@
       "value": "137.10"
     },
     {
-      "change": "-0.0538",
-      "obs_date": "2026-09-04",
+      "change": "0.1339",
+      "obs_date": "2026-09-11",
       "series_id": "DTWEXBGS",
       "source": "fred",
       "title": "Broad US dollar index",
-      "value": "118.07"
+      "value": "118.21"
     },
     {
-      "change": "251.32",
-      "obs_date": "2026-09-11",
+      "change": "-146.63",
+      "obs_date": "2026-09-14",
       "series_id": "NASDAQCOM",
       "source": "fred",
       "title": "NASDAQ Composite, index level",
-      "value": "26,333.04"
+      "value": "26,186.41"
     },
     {
       "change": null,
@@ -301,20 +229,20 @@
       "value": "3,158.26"
     },
     {
-      "change": "65.28",
-      "obs_date": "2026-09-11",
+      "change": "-37",
+      "obs_date": "2026-09-14",
       "series_id": "SP500",
       "source": "fred",
       "title": "S&P 500, index level",
-      "value": "7,656.98"
+      "value": "7,619.98"
     },
     {
-      "change": "-0.06",
-      "obs_date": "2026-09-11",
+      "change": "-0.01",
+      "obs_date": "2026-09-14",
       "series_id": "T10Y2Y",
       "source": "fred",
       "title": "10y minus 2y Treasury spread, %",
-      "value": "0.33"
+      "value": "0.32"
     },
     {
       "change": "0",
@@ -325,12 +253,12 @@
       "value": "4.10"
     },
     {
-      "change": "-2",
-      "obs_date": "2026-09-11",
+      "change": "1.26",
+      "obs_date": "2026-09-14",
       "series_id": "VIXCLS",
       "source": "fred",
       "title": "CBOE VIX, index",
-      "value": "15.84"
+      "value": "17.10"
     }
   ],
   "names": [
@@ -342,6 +270,61 @@
       "snapshot": [],
       "stories": [
         {
+          "doc_id": "https://www.freemalaysiatoday.com/category/highlight/2026/09/15/sd-guthrie-selldown-driven-by-market-overreaction",
+          "domain": "www.freemalaysiatoday.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-15T10:55:00+00:00",
+          "quality": 1.0,
+          "title": "SD Guthrie selldown driven by \u2018market overreaction\u2019",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE9hTkNPZkFJdGwweHktbW4zWTVZTW5GMUtYQUx0d2ZON2EwRHlQYVVPb1QzZF9GZDhXM0NOTVpvTS1idGNVemM0eXRJbDg0OFRy?oc=5",
+          "domain": "theedgemalaysia.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-15T05:23:23+00:00",
+          "quality": 0.8,
+          "title": "Maybank IB upgrades SD Guthrie to \u2018buy\u2019 post sell-off, cites market overreaction to PNB's exchangeable sukuk",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMitgFBVV95cUxNWGFuWjdvemJweGYwdHM5b2R0ZVV4emlCRGdQbElwQmFjUlNuTmthMWgzeEQ4cnp5UGxQSEJjQVVMME5Nb2NMOGZ3LTdVSjZfZTlTX00yT2RfSldfMUFDRnZ2RV9uSkZyUW9FUHppbU1WbzVWU1NvcGUtdDlvLUd5WkJXaHJTdmZJNUdaY1pqb3ZuNkdyMl9YbUp4RGZJVV9lYkRYbmRwN2NXcW5LendOMTUzWE1wQQ?oc=5",
+          "domain": "seekingalpha.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-15T02:32:33+00:00",
+          "quality": 0.8,
+          "title": "Digital Core REIT (DGTCF) Presents at Maybank - REITAS - SGX SREIT Day - Slideshow",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxOWTNZbGVXWm5RbHlMTXdock1KNTRWRTVqQmlxN2p6Ym82MkZYeEs3dUFySUJVRHgtbHpRRVhhYWE4VHFHSVJBaWt6U0pZcUlNR2RuR25vd1pXXzlScmR0cW1abUlRLW5ZRV9zVm9tQnI1T1NtZDFHTWtUeXVJdG5ORzQxZHlWemFJQTA5V2N6N0JKdm5hZk5pdXpqRnFUOVJnV3FNVzdwa0g0NnRzSTJyVlpZbVI3MEdmWWFMMEpLNm1JbGs?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-15T02:16:00+00:00",
+          "quality": 0.8,
+          "title": "Maybank Indonesia begins operating as integrated financial group",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxOS0tsVmZrU3U0ellEOWo3UmxsYXhKbVZ0T00zRDhCR3lQTWlwWXFHLXVJTEJZYUR0TjE0ZXFxWnAzQkx3UXU3bzhIdHBOVGp1Q2VCanhPUkZONXVPb3JGSVdMY0R2ekV5dWpPdkNSRmdzOWpxUFJCR1JLOHBTS0hlc0R6Mnhnb09wVVo0cEw3M1p0eWVoblFybVlWU25fclNab0pUX1JTUVNNQ3UtWThnTXlvcVh5T3Y1?oc=5",
+          "domain": "www.marketscreener.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-15T05:37:51+00:00",
+          "quality": 0.65,
+          "title": "Malayan Banking Files for Singapore Listing of $700 Million Bonds",
+          "uncertainty": 0.0
+        },
+        {
           "doc_id": "https://news.google.com/rss/articles/CBMingFBVV95cUxNaG9Fd2wyQWNTTUFRdTE2alYxVmIyNVNwYW12eWRoMGV0LVlVTFdHOHVGXzUybF9UOXI3R0Utc3dQXzdrUkpmZVNjNEc3UTlJeC1URkFIR3ZqWUtGTXZza29GTURDTUliWFU1U2J4ak1tcmJxeXkwU2N5bTVZalQzekh3eVctMnB6akVXZWJRaVN0YU45NzRfQmRKa0ZZdw?oc=5",
           "domain": "paultan.org",
           "escalated": false,
@@ -351,24 +334,13 @@
           "quality": 0.65,
           "title": "2026 Mazda CX-5 \u2013 third-gen secures over 600 bookings before launch; Maybank reports circa RM160k price tag",
           "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMitgFBVV95cUxOeDFfcEFaWDA1dGJNYUQ1S05KZkowZ2pibkdVWGxPek4wU3h3d05JUDRIQ2dfZnExSlJqanV0YjV0cDF1X0w5bzBvLXM5LWFEVnpDb29RblZ0NUtsaXhpNVlXTmRaTnZPMXc2cVo5TDF6aUpHaW1nd2ZRMnljazJTZWJib3QxVlQyYjBCcS1oSFJZUmZfRng0anZaN1BiUjc5ZlkyTTNXX3VDZzFoWG5Kb1ZHVnhrdw?oc=5",
-          "domain": "www.minichart.com.sg",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-14T05:11:00+00:00",
-          "quality": 0.65,
-          "title": "Maybank Maintains Frencken BUY With SGD3.32 Target After SGD100m Placement",
-          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.0,
-        "n": 2,
+        "n": 6,
         "polarity_mean": 0.0,
-        "sources": 2,
+        "sources": 6,
         "uncertainty_mean": 0.0
       },
       "upcoming": []
@@ -379,8 +351,48 @@
       "instrument_id": "MYX:5347",
       "label": "Tenaga",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://www.nst.com.my/business/corporate/2026/09/1533525/tnb-customers-receive-rm31bil-afa-rebate-july-2025",
+          "domain": "www.nst.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-15T12:23:44+00:00",
+          "quality": 1.0,
+          "title": "TNB customers receive RM3.1bil AFA rebate since July 2025",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMi2wFBVV95cUxPOEphWmZaOFdwMFVxZG1oYmk0SFpsa1RIWUNtczl4QjNUeUswNmpEWHBtQmR3bFhPN2JOaFJicWNxTXRudUFwdXYxZVBGaG85SmltdS1CdUZwZFh3UUxoTFlJbnhVWHNCSjYyVzdYUHlVTDdGN21zaFdqV2JoR2FsQ3FYRm1ncmEwYnM5U3lTZDlJQkpQOVJXWURwNlFYbG9mTk9wcUhfdldRclhWdUFrZ2lYZ3pLZXlUNTJzUndSaDVMVXdES2hZNExuZVNRbE45N3ZqcHFVVEctOU0?oc=5",
+          "domain": "www.businesstoday.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-15T11:31:51+00:00",
+          "quality": 0.8,
+          "title": "TNB Clarifies AFA Not New, Replaced ICPT Mechanism, Returned Higher Rebate Of RM3.1 Billion To Users",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE9HYl9HcGo4NjF0dVF0R3pLeTZLVUtKN2lVaDRnSDMzaGdaWTU2cHNtRDcyNjJ3cFlYdWItVHJ5SnI3bEoySThISzFUY0xMNm45?oc=5",
+          "domain": "theedgemalaysia.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-15T06:30:00+00:00",
+          "quality": 0.8,
+          "title": "Brokers Digest: Local Equities - Tenaga Nasional Bhd, Duopharma Biotech Bhd, Wasco Bhd, Inari Amertron Bhd",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 3,
+        "polarity_mean": 0.0,
+        "sources": 3,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -400,22 +412,11 @@
           "quality": 0.8,
           "title": "Kelington, NuEnergy, GFM, Exsim Hospitality, Kerjaya Prospek, PETRONAS Chemicals, Tan Chong Motor and United Asiapac",
           "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE5qc3dHLWl4aldoakxvWUltbFUydWliSF9iRzRQSFhKM181MVFWTWVWbkVyNUtDOXdFMlRkUy1YNWhNM3M5aFhaQWlBNmJWamI2?oc=5",
-          "domain": "theedgemalaysia.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-14T08:11:58+00:00",
-          "quality": 0.8,
-          "title": "PETRONAS Chemicals rises to three-month high, refiners climb as Brent tops US$100",
-          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.0,
-        "n": 2,
+        "n": 1,
         "polarity_mean": 0.0,
         "sources": 1,
         "uncertainty_mean": 0.0
@@ -428,48 +429,8 @@
       "instrument_id": "MYX:5225",
       "label": "IHH",
       "snapshot": [],
-      "stories": [
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMiVEFVX3lxTE5WVy04NlByZGd2LTJoV21xeFJySVc1azJmc3k1V0pYdTMzNzBKSlA1c2EtcU50N2V0TXRfU3B4NWtGb0ZIYUlxMmFfcGN6SEgzbWdYQw?oc=5",
-          "domain": "bernamabiz.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-14T11:10:54+00:00",
-          "quality": 0.65,
-          "title": "IHH's Share Price Up 1.43 Pct Despite Fortis Mandatory Tender Offer Approval Delay",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMimgFBVV95cUxPeWJTZnJTMGpEMkgtaVJPUFpXUXpLY1EyWUpjSER0WnhDSDZVbTIyUWttR2w5WE5fOGNlT04tcnU4amZKdzRnQTdLRXhsd19BLVhiWnVTNGwtMG5mU05KWVk1cF92S2t6ZXVUNmJKczQ0SmVUYm9ITzZoX21yejc5bW1TbTJDQTFsS3VDWGNXVUlQZERVelJ0SnFR?oc=5",
-          "domain": "sbr.com.sg",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-14T02:37:43+00:00",
-          "quality": 0.65,
-          "title": "Tokyo Court rejects IHH unit's claims against Daiichi Sankyo",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxQX3NnZHhYNWdCWTNPVnJzeDNVaG53aFB4aWZQVDlZZXFZZ2QyMVhuMThXeVBOUGVqVUZCaTJUMWdrcUpadXdIVm5FMlZ5T0tXd0RZaWZsM0RpdU1jRWp1N1RWdmtIVVkzc1VYcm9jN1JTWTVwNUlKdkswdUdDQnlrcWh3c3pqcF9SaFVjbEcxNG1EZ0RzSHdhTk5wVHViNkliRlJER2Z3a1dxS2xfeUx6RTJOYlJ6TFZO?oc=5",
-          "domain": "healthcareasiamagazine.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-14T02:26:32+00:00",
-          "quality": 0.65,
-          "title": "IHH Healthcare Malaysia, Timor-Leste ink pact for specialist healthcare",
-          "uncertainty": 0.0
-        }
-      ],
-      "tone": {
-        "intensity_max": 0.0,
-        "n": 3,
-        "polarity_mean": 0.0,
-        "sources": 3,
-        "uncertainty_mean": 0.0
-      },
+      "stories": [],
+      "tone": {},
       "upcoming": []
     },
     {
@@ -488,41 +449,12 @@
       "instrument_id": "MYX:3182",
       "label": "Genting",
       "snapshot": [],
-      "stories": [
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMipwFBVV95cUxQSTlvbmNlMjNnS25TSFFWdTluTXVmREhfOWxQNjhMNzZ2RVp6MWk4N3VNSjcxYnpfdUxzR2dmWUhHOUszSlcwY1NLeE5YejlUUnpsZkpfTnRYa3luWFNZUTJBTjNQRXpZN0NkZUhPQjBlWlN2MXhWOXdHbTMwQV9WZkkwVGQxMTZQNm5pbHA4VEtSa2VOZjA4Y0RuSTFWVmZqSkZzeFlRRQ?oc=5",
-          "domain": "www.thestar.com.my",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-13T23:44:14+00:00",
-          "quality": 0.8,
-          "title": "Genting\u2019s debt bet rides on earnings ramp-up",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMisgFBVV95cUxNX2o3UWE4bkM3V3pNeTN1LWhkc3lHRE1md0xXTE53YUhJdVBxMjdEOVJtVV8yQ1dULU1TcWJ0TVFFMWY0UDl6c3E3cHRHNV9MRHhlWjREVmdwR0xSWldFV2NZb3VtVVh6T3RiU3BpTU5zMGlhZHp4enYxUVB1WURyMHFWYmRGNHNMNGE0eXNISGphaWxweXpETVpXbzVCV3NPMC1Zem5tbzhDRWlmODR6cEJR?oc=5",
-          "domain": "www.thestar.com.my",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-13T23:30:48+00:00",
-          "quality": 0.8,
-          "title": "RM170mil investment to expand Genting shopping experience",
-          "uncertainty": 0.0
-        }
-      ],
-      "tone": {
-        "intensity_max": 0.0,
-        "n": 2,
-        "polarity_mean": 0.0,
-        "sources": 1,
-        "uncertainty_mean": 0.0
-      },
+      "stories": [],
+      "tone": {},
       "upcoming": []
     },
     {
-      "escalated": 40,
+      "escalated": 17,
       "events": [],
       "instrument_id": "XNAS:NVDA",
       "label": "NVIDIA",
@@ -740,15 +672,15 @@
       ],
       "tone": {
         "intensity_max": 0.667,
-        "n": 238,
-        "polarity_mean": 0.095,
-        "sources": 45,
-        "uncertainty_mean": 0.142
+        "n": 102,
+        "polarity_mean": 0.108,
+        "sources": 31,
+        "uncertainty_mean": 0.118
       },
       "upcoming": []
     },
     {
-      "escalated": 31,
+      "escalated": 20,
       "events": [],
       "instrument_id": "XNAS:AAPL",
       "label": "Apple",
@@ -966,15 +898,15 @@
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 80,
-        "polarity_mean": 0.121,
-        "sources": 36,
-        "uncertainty_mean": 0.128
+        "n": 46,
+        "polarity_mean": 0.109,
+        "sources": 26,
+        "uncertainty_mean": 0.127
       },
       "upcoming": []
     },
     {
-      "escalated": 18,
+      "escalated": 12,
       "events": [],
       "instrument_id": "XNAS:MSFT",
       "label": "Microsoft",
@@ -1192,10 +1124,10 @@
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 76,
-        "polarity_mean": 0.101,
-        "sources": 26,
-        "uncertainty_mean": 0.144
+        "n": 58,
+        "polarity_mean": 0.052,
+        "sources": 21,
+        "uncertainty_mean": 0.133
       },
       "upcoming": []
     }
