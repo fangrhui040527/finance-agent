@@ -1,0 +1,111 @@
+{
+  "day": "2026-09-14",
+  "written_at": "2026-09-15T02:42:00Z",
+  "phase": "observe",
+  "equity_usd": 1000.0,
+  "cash_usd": 1000.0,
+  "control_equity_usd": 1000.0,
+  "drawdown": 0.0,
+  "halted": false,
+  "positions": [],
+  "changes": [],
+  "caps": [
+    {"cap": "largest name", "value": "0.00%", "limit": "25%", "breached": false},
+    {"cap": "invested", "value": "0.00%", "limit": "0%", "breached": false},
+    {"cap": "cash floor", "value": "100.00%", "limit": "20%", "breached": false},
+    {"cap": "names held", "value": "0", "limit": "0", "breached": false},
+    {"cap": "drawdown from peak", "value": "0.00%", "limit": "8%", "breached": false},
+    {"cap": "turnover used, 5 weekdays", "value": "USD 0.00", "limit": "USD 500.00", "breached": false}
+  ],
+  "attribution": {
+    "market": null,
+    "idiosyncratic": null,
+    "note": "no positions held; nothing to attribute"
+  },
+  "market_proxy_change": {
+    "note": "MYX:^KLSE was cached by the us_close sweep at 2026-09-14T23:51Z. Every Malaysian decomposition this book has read until tonight was computed against MYX:0820EA, an ETF with a median 2,800 shares a day. Same six names, same session, same code path:",
+    "beta_etf_to_index": {"MYX:1155": [0.12, 1.18], "MYX:5347": [0.14, 0.72], "MYX:5183": [-0.99, -0.10], "MYX:5225": [0.22, 0.75], "MYX:8869": [0.30, 1.01], "MYX:3182": [0.11, 1.05]},
+    "unexplained_etf_to_index": {"MYX:1155": [1.0, 0.32], "MYX:5347": [1.0, 0.06], "MYX:5183": [1.0, 0.98], "MYX:5225": [1.0, 0.72], "MYX:8869": [1.0, 0.34], "MYX:3182": [1.0, 0.10]},
+    "consequence": "Every '100% unexplained' quoted for a Malaysian name on any paper page was arithmetic produced by a proxy nothing covaried with. One number survived: MYX:5183 went 100% -> 98%, so it is a measurement rather than an artefact."
+  },
+  "monday_closes": {
+    "note": "First live Bursa session with the widened query, the ticker-tag filter, name_coverage on usable rows and a collector that gets runners all in place. 2026-09-11 -> 2026-09-14 close, MYR.",
+    "MYX:5183": [5.09, 5.269, 0.0352],
+    "MYX:5225": [7.65, 7.76, 0.0144],
+    "MYX:8869": [7.76, 7.76, 0.0],
+    "MYX:3182": [1.93, 1.91, -0.0104],
+    "MYX:1155": [10.38, 10.46, 0.0077],
+    "MYX:5347": [13.64, 13.6, -0.0029],
+    "cross_check": "IHH's +1.44% is independently reported by bernamabiz.com 2026-09-14T11:10Z ('Share Price Up 1.43 Pct'). The cached bar and the press agree to a hundredth of a point - the first Bursa mark this book has checked against a source rather than trusted."
+  },
+  "decision": {
+    "recorded": true,
+    "weights": {},
+    "kind": "all_cash",
+    "prediction_id": "paper-2026-09-14-allcash-21d-9d7e",
+    "horizon_days": 21,
+    "grades_on": "2026-10-14",
+    "confidence": 0.55,
+    "claim": "nothing in the fundable universe beats cash over 21 sessions",
+    "fundable_set": {
+      "MYX:5183": {"share_of_equity": 0.129, "round_trip": 0.0174},
+      "MYX:5225": {"share_of_equity": 0.19, "round_trip": 0.0122},
+      "MYX:8869": {"share_of_equity": 0.19, "round_trip": 0.0122},
+      "MYX:3182": {"share_of_equity": 0.047, "round_trip": 0.0455},
+      "XNAS:NVDA": {"share_of_equity": 0.211, "round_trip": 0.0122}
+    },
+    "excluded_on_the_25pc_cap": {"MYX:1155": 0.257, "MYX:5347": 0.335, "XNAS:AAPL": 0.333, "XNAS:MSFT": 0.503},
+    "why_this_refusal_is_different": "Six previous all-cash nights were decided by an ABSENCE - the interesting name was unfundable, or the fundable name had collected nothing. Tonight is the first where a fundable name has both a measured anomaly and a story naming it, and it is still a refusal.",
+    "candidate": {
+      "instrument_id": "MYX:5183",
+      "for": [
+        "98% unexplained against MYX:^KLSE, a share that SURVIVED the change of proxy from 100%",
+        "+19.20% over the five sessions to 2026-09-11, and a further +3.52% on 2026-09-14",
+        "fred:DCOILBRENTEU 109.51 at 2026-09-09, +16.25 over the last 20 observations",
+        "google_news:theedgemalaysia.com:2026-09-14T08:11Z:'PETRONAS Chemicals rises to three-month high, refiners climb as Brent tops US$100' - the first indexable story to name this name since it entered the book"
+      ],
+      "against": [
+        "The story is a headline with an EMPTY BODY: 0 characters, not escalated. The best evidence this name has ever collected and still not a document.",
+        "It describes a move that already happened. 'Rises to three-month high' is a report of the run, not a reason to expect more of it; sizing into a 19% advance on an after-the-fact headline is momentum wearing a citation.",
+        "The name holds ZERO observations in the fact book - no P/E, no earnings, no revenue, no target. No valuation anchor of any kind, so no answer to 'at what price would this stop being attractive'."
+      ]
+    },
+    "other_refusals": {
+      "MYX:5225": "dated, significant NEGATIVE catalyst: the Tokyo dismissal of Northern TK Venture's Y200bn claim against Daiichi Sankyo, 2026-09-10, eight collected rows. Not a long-only case.",
+      "MYX:3182": "Fitch downgrade of Genting Berhad to BBB- and S&P 'fallen angel' warning, 2026-09-07/09, six collected rows. Not a long-only case.",
+      "XNAS:NVDA": "not_significant at 0.70 sigma; 168 stories from 22 sources and no cause.",
+      "MYX:8869": "one collected row in eight days and it is a conference sponsorship notice."
+    },
+    "verified_against_stores": {
+      "paper.db targets": 4,
+      "paper.db applications": 4,
+      "learning.db predictions": 4
+    }
+  },
+  "mistakes": [
+    "The 2026-09-10 and 2026-09-11 paper pages used Malaysian 'unexplained share' figures as though they said something about the companies. They were computed against a proxy that gave a bank a beta of 0.12 and said nothing about anything. The later pages were explicit that the proxy was suspect; these two were not. Recorded here rather than back-edited into those pages.",
+    "NEAR-MISS, and the rule that came out of it: sweep --due reported us_close as owed at 1h22m past cron. On 2026-09-14 the same reading produced a dispatch and a duplicate run, because an observed 5h43m delay maximum was treated as a bound. Tonight it produced no action, and the scheduled run arrived at 2026-09-14T23:51:43Z, +2h36m. The delay distribution says when a run is missing; the cron only says when it was due."
+  ],
+  "settled": [
+    "The Bursa proxy condition carried on the 2026-09-13 page ('the proxy prints a close on real volume') is closed, and not the way it was written: the proxy was replaced rather than repaired. MYX:^KLSE has no share volume to be thin.",
+    "The name_coverage condition on MYX:5183 is closed: the 2026-09-13 Bursa sweep gave it indexable rows for the first time since the ticker-tag filter shipped, and the 2026-09-14 sweep added a story naming it in a headline."
+  ],
+  "corrections": [],
+  "defects_this_book_depends_on": [
+    "The printed decomposition omits the regression intercept (engines/attribution/decompose.py:197): fit.coefficients[0] enters `expected` but is not one of the five entries in `contribs`, so the components have never summed to the return. Genting's fitted drift is -0.24pp/day, twice its entire printed idiosyncratic component. Every 'how much was company-specific' figure in this journal is off by that name's alpha.",
+    "Sixteen peer price lines unrefreshed since the collector outage (11 US at 2026-09-02, 5 Bursa at 2026-08-31). They feed peer_set and the comps."
+  ],
+  "conditions_for_a_position": [
+    "OPEN and now specific: the Petronas Chemicals story gets a BODY. nst_business and fmt_business each collect 45-50 rows a Bursa session and neither has ever linked this name; a bodied Malaysian-press story tying the run to product spreads is the difference between a momentum observation and something this book can size.",
+    "OPEN: any fundamental figure at all for a Bursa name. All six hold zero fact-book observations; this is the EODHD Fundamentals gap.",
+    "OPEN: a Bursa announcement puts a figure on the IHH claim, turning a dated event into a sizeable one.",
+    "CLOSED: the Bursa proxy. Replaced with the index on 2026-09-14."
+  ],
+  "lessons": [
+    "A proxy is validated by the betas it produces, not by whether it returns data. Six pages of this book reasoned from betas of 0.12 for a bank and nothing was looking at the fits.",
+    "An unexplained share that survives a change of instrument is a measurement; one that does not was arithmetic. Only MYX:5183's did.",
+    "The best evidence a name has ever collected can still be insufficient, and saying so is more useful than grading the evidence on a curve.",
+    "A story that reports a move is not a reason to expect more of it. 'Rises to three-month high' cites the price, not a cause.",
+    "Waiting is an action and it needs its own evidence. The same reading of sweep --due produced a duplicate run one night and the correct no-op the next; what changed was knowing the delay distribution."
+  ]
+}
