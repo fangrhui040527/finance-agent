@@ -7,18 +7,26 @@ never once for ACCURACY. "The search is good" was a design intention that no
 number had ever been asked to defend.
 
 This is the number. A small human-labelled set of questions, each pinned to the
-articles in `data/corpus.db` that answer it, run through the four retrieval legs
-separately so each one's contribution is visible:
+articles in `data/corpus.db` that answer it, run through each retrieval leg
+separately so its contribution is visible:
 
-  bm25      exact-token search alone
-  dense     vector search alone
-  fused     both, merged by reciprocal rank fusion - what `Collection.search` is
-  reranked  fused, then put through `rerank`
+  bm25      exact-token search alone - what `Collection.search` selects with
+  dense     vector search alone, NOT in the shipped path
+  reranked  what a reader actually gets: `search` put through `rerank`
 
-The one column that matters most is the last: DENSE LIFT, the number of
-questions where the dense leg found a relevant article that BM25's own list did
-not contain. A dense leg that lifts nothing is a second lexical search wearing a
-vector's clothes, and the fusion is paying rank-fusion overhead for a duplicate.
+There used to be a fourth leg, `fused`, for BM25 and dense merged by reciprocal
+rank fusion. It was removed on 2026-09-14 along with the fusion itself, because
+this measurement is what killed it: fused r@10 landed at 43.5% BETWEEN its two
+legs (bm25 47.8%, dense 39.1%) rather than above them. A column that only
+re-measures `bm25` is a column that reads like a second opinion and is not one.
+
+The one column that still matters most is DENSE LIFT, the number of questions
+where the dense leg found a relevant article that BM25's own list did not
+contain. A dense leg that lifts nothing is a second lexical search wearing a
+vector's clothes. It is zero for both keyless backends, which is why the dense
+leg is scored here and wired nowhere. The number is now a DOOR rather than a
+guarantee: it is what an embedder has to move off zero to earn the fusion back,
+and `ask.py retrieval --embedder api` is how a hosted one gets its turn.
 
 RECALL HERE IS A LOWER BOUND. The labels name articles verified to answer the
 question; a corpus of 1,342 headlines certainly contains others nobody labelled,
@@ -44,7 +52,7 @@ GOLD = Path(__file__).parent / "data" / "retrieval_gold.yaml"
 #: a reader would recognise.
 DEPTH = 10
 
-LEGS = ("bm25", "dense", "fused", "reranked")
+LEGS = ("bm25", "dense", "reranked")
 
 
 @dataclass(frozen=True)
@@ -170,7 +178,8 @@ class Report:
         out.append("")
         out.append(
             f"dense lift: {self.dense_lift} of {self.cases} questions where the vector leg "
-            f"found a relevant article BM25's top {DEPTH} did not"
+            f"found a relevant article BM25's top {DEPTH} did not "
+            f"({'the fusion is earned - see hybrid.py' if self.dense_lift else 'not wired in'})"
         )
         if self.dense_lift_cases:
             for q in self.dense_lift_cases[:5]:
@@ -241,21 +250,25 @@ def _ids(results: list[Chunk] | list[Hit]) -> set[str]:
 
 
 def run_case(collection: Collection, case: Case, depth: int = DEPTH) -> dict[str, list[int]]:
-    """The same question down all four legs, with no filters in the way.
+    """The same question down every leg, with no filters in the way.
 
     Deliberately no freshness or entity filter: this measures the SEARCH, and a
     hard filter that removes a relevant document would be scored as a retrieval
     miss it is not responsible for.
+
+    `dense` is called directly rather than reached through `search`, because
+    `search` no longer touches it. That is the point of keeping the leg: it
+    scores the candidate the shipped path does NOT use, against the one it
+    does, on the same questions.
     """
     relevant = set(case.relevant)
     sparse = [c for c, _ in collection.bm25.search(case.query, depth)]
     dense = [c for c, _ in collection.dense(case.query, depth)]
-    fused = collection.search(case.query, limit=depth, licence_exclude=None)
-    ranked = rerank(case.query, fused, depth)
+    selected = collection.search(case.query, limit=depth, licence_exclude=None)
+    ranked = rerank(case.query, selected, depth)
     return {
         "bm25": _ranks(sparse, relevant),
         "dense": _ranks(dense, relevant),
-        "fused": _ranks(fused, relevant),
         "reranked": _ranks(ranked, relevant),
         "_dense_only": [1] if (_ids(dense) & relevant) - _ids(sparse) else [],
     }

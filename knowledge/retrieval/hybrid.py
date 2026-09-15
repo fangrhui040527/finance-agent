@@ -1,16 +1,49 @@
-"""Hybrid retrieval: BM25 + dense, fused with RRF, then reranked.
+"""Retrieval: BM25 selects, `rerank` orders. The vector leg is NOT wired in.
 
-docs/02 section 3. Dense-only retrieval loses half the job: finance queries are
-half semantic ("margin compression risk") and half exact-token ("MYR", "Q3 FY25",
-"0011.KL"). docs/09 section 6 records that BM25 fused with dense via reciprocal
-rank fusion beats either alone, and a cross-encoder rerank adds meaningfully on
-hard sets.
+docs/02 section 3 and docs/09 section 6 specify BM25 fused with a dense leg by
+reciprocal rank fusion, on the argument that finance queries are half semantic
+("margin compression risk") and half exact-token ("MYR", "Q3 FY25", "0011.KL")
+and that fusing the two beats either alone. That was the design. It was built,
+and then - on 2026-09-14, against the 23-question gold set and a 3,481-chunk
+corpus - it was MEASURED, and the measurement did not agree:
 
-The embedding backends live in `knowledge/retrieval/embedding.py` behind the
-`EmbeddingBackend` seam below. The default learns its vectors from the corpus
-it is indexing; a key promotes it to a real model. `knowledge/retrieval/
-evaluate.py` is what says whether any of that helps, and its numbers are the
-only reason to prefer one backend over another.
+    leg         r@10      what it is
+    bm25       47.8%      exact-token search alone
+    dense      39.1%      vector search alone
+    fused      43.5%      the two merged by RRF - what this module shipped
+    reranked   43.5%      fused, then reordered
+
+The fusion did not beat its better half. It landed BETWEEN the two legs, which
+is what rank fusion does when one leg carries no information the other lacks:
+it pays a duplicate's overhead by spending ranks on it. The decisive number is
+DENSE LIFT - questions where the vector leg found a relevant article BM25's own
+top ten did not - and it was ZERO for both offline backends, the corpus-fitted
+`DistributionalEmbedder` (0 of 23) and the `HashingEmbedder` before it. A leg
+that lifts nothing is a second lexical search wearing a vector's clothes, and
+this one was displacing real BM25 hits to seat its duplicates.
+
+So the fusion is gone from `Collection.search` and BM25 selects alone. It went
+in two steps by two hands: #68 switched it off behind a `FUSE_DENSE = False`
+class flag, keeping the RRF code gated so a future embedder could flip it back;
+this removes the flag and the code under it. The gate was the right first move
+and a poor resting place - it left the RRF path unexercised by anything that
+ships, the `fused` column in `evaluate.py` silently re-measuring `bm25`, and
+that column's guard test comparing BM25 against itself. Fifteen lines of rank
+fusion are cheaper to rewrite than to keep honest unused.
+
+This is a RETRACTION OF A MEASUREMENT, not of the design: the docs' argument may well
+be right about a real embedding model, and nothing here has tested one. What
+was tested is the two backends that run without a key, and neither earns a
+place in the path a reader's question actually takes.
+
+The apparatus to reverse this is deliberately intact. `Collection.dense`,
+`_index_dense` and every backend in `knowledge/retrieval/embedding.py` still
+work and are still scored as their own leg by `knowledge/retrieval/evaluate.py`;
+`ask.py retrieval --embedder api` and `.github/workflows/embedding-probe.yml`
+run that comparison against a hosted model, which is the one variant the
+verdict above does not cover. Bring the fusion back when, and only when, dense
+lift on that leg is above zero. Until then production never embeds anything -
+`Collection.embedder` is not even constructed until something asks for a vector.
 """
 
 from __future__ import annotations
@@ -26,7 +59,6 @@ from knowledge.retrieval.embedding import HashingEmbedder, default_embedder, tok
 
 __all__ = [
     "BM25",
-    "RRF_K",
     "Collection",
     "EmbeddingBackend",
     "HashingEmbedder",
@@ -36,8 +68,6 @@ __all__ = [
     "rerank",
     "tokenize",
 ]
-
-RRF_K = 60
 
 
 class EmbeddingBackend(Protocol):
@@ -84,8 +114,10 @@ def _sparse(vec: list[float], keep: int = DOC_NONZEROS) -> list[tuple[int, float
 class Hit:
     chunk: Chunk
     score: float
+    #: 1-based position in the BM25 list this hit was selected from, before the
+    #: hard filters thinned it and before `rerank` reordered it. The only rank
+    #: there is now; the `dense_rank` that sat beside it went with the fusion.
     sparse_rank: int | None = None
-    dense_rank: int | None = None
 
 
 class BM25:
@@ -144,7 +176,12 @@ class Collection:
 
     def __init__(self, name: str, embedder: EmbeddingBackend | None = None) -> None:
         self.name = name
-        self.embedder = embedder if embedder is not None else default_embedder()
+        # Deferred, because `search` no longer embeds and `build_router`
+        # registers twenty of these per process. Constructing a backend the
+        # production path never reaches is work nobody asked for, and holding
+        # one there would make "does retrieval embed?" unanswerable by
+        # inspection. `self.embedder` builds the default on first touch.
+        self._embedder = embedder
         self.bm25 = BM25()
         self._order: list[Chunk] = []
         self._vectors: list[tuple[Chunk, list[tuple[int, float]]]] | None = None
@@ -159,6 +196,13 @@ class Collection:
         self._order.append(chunk)
         self._by_id[chunk.chunk_id] = chunk
         self._vectors = None  # a new document changes what the old ones mean
+
+    @property
+    def embedder(self) -> EmbeddingBackend:
+        """The vector backend, built on first use. Only `dense` reaches it."""
+        if self._embedder is None:
+            self._embedder = default_embedder()
+        return self._embedder
 
     def add_all(self, chunks: list[Chunk]) -> None:
         for c in chunks:
@@ -195,21 +239,6 @@ class Collection:
         scored.sort(key=lambda x: -x[1])
         return [(c, s) for c, s in scored[:limit] if s > 0]
 
-    #: Does `search` FUSE the dense leg in? Measured, not assumed, and currently
-    #: no: over the 23 labelled questions the corpus-fitted embedder finds
-    #: nothing BM25 missed (`dense_lift` 0) and DRAGS the shipped list below
-    #: plain exact-token search - recall@10 0.4348 fused against 0.4783 for BM25
-    #: alone, on the 3,481-chunk corpus of 2026-09-14. A leg that subtracts is
-    #: not a leg, and shipping one is the failure `evaluate.py` exists to name.
-    #:
-    #: `dense()` below is UNTOUCHED and `evaluate.py` still scores it every run,
-    #: so this is a gate rather than a deletion: the day a real embedding model
-    #: (`EMBEDDING_API_KEY`) makes the leg earn its place, the number says so and
-    #: this flips back to True. `test_the_vector_leg_earns_its_place` enforces
-    #: exactly that - it is only legal for this to be True while the lift is
-    #: positive.
-    FUSE_DENSE = False
-
     def search(
         self,
         query: str,
@@ -219,18 +248,21 @@ class Collection:
         entity: str | None = None,
         licence_exclude: str | None = "link_only",
     ) -> list[Hit]:
-        sparse = self.bm25.search(query, limit * 4)
-        dns = self.dense(query, limit * 4) if self.FUSE_DENSE else []
+        """Candidates for `rerank`, chosen by BM25 and cut by the hard filters.
 
-        ranks: dict[str, dict] = {}
-        for i, (c, _) in enumerate(sparse):
-            ranks.setdefault(c.chunk_id, {"chunk": c})["sparse"] = i + 1
-        for i, (c, _) in enumerate(dns):
-            ranks.setdefault(c.chunk_id, {"chunk": c})["dense"] = i + 1
+        No vectors. See the module docstring for the measurement that removed
+        them; the short version is that the dense leg found nothing BM25 had
+        missed on any question in the gold set, so fusing it in only cost real
+        hits their seats.
 
-        fused: list[Hit] = []
-        for _cid, r in ranks.items():
-            chunk = r["chunk"]
+        Still four times `limit` from BM25, and for the reason that predates
+        the fusion: the filters below run AFTER selection, so a narrow pool
+        would let one stale or link-only document spend a slot the caller asked
+        to have filled. Over-fetching is what keeps `limit` a promise about
+        results rather than about candidates.
+        """
+        hits: list[Hit] = []
+        for i, (chunk, score) in enumerate(self.bm25.search(query, limit * 4)):
             # Hard filters, not rerank hints (docs/02 section 3 property 2).
             if max_age is not None and chunk.as_of is not None:
                 if (now or datetime.now(chunk.as_of.tzinfo)) - chunk.as_of > max_age:
@@ -239,15 +271,10 @@ class Collection:
                 continue
             if licence_exclude and chunk.metadata.get("licence") == licence_exclude:
                 continue
-            score = 0.0
-            if "sparse" in r:
-                score += 1.0 / (RRF_K + r["sparse"])
-            if "dense" in r:
-                score += 1.0 / (RRF_K + r["dense"])
-            fused.append(Hit(chunk, score, r.get("sparse"), r.get("dense")))
-
-        fused.sort(key=lambda h: -h.score)
-        return fused[:limit]
+            hits.append(Hit(chunk, score, i + 1))
+            if len(hits) == limit:
+                break
+        return hits
 
 
 def rerank(query: str, hits: list[Hit], top_k: int | None = None) -> list[Hit]:
@@ -264,12 +291,22 @@ def rerank(query: str, hits: list[Hit], top_k: int | None = None) -> list[Hit]:
     `knowledge/retrieval/data/retrieval_gold.yaml` it was worse at every weight
     tried, monotonically: MRR 0.495 at zero semantic weight, 0.478 at 0.3, 0.474
     at 0.6, 0.466 at 2.5, with the fusion term making no difference at any
-    setting. The reason is double counting - these hits are the FUSED list, so
-    the dense signal has already been spent selecting them, and spending it
-    again on their order adds its noise without adding its information.
+    setting.
 
-    The lesson generalises past this function: the place to spend a semantic
-    signal is where candidates are chosen, not where the chosen ones are sorted.
+    The reason first written down here was double counting: these hits were the
+    FUSED list, so the dense signal had already been spent selecting them and
+    spending it again on their order added noise without information. THAT
+    PREMISE IS GONE - the fusion was removed on 2026-09-14 and `search` now
+    hands this function a BM25 list that no vector has touched. The result
+    survives the premise, on the simpler reading the removal itself rests on:
+    dense lift is zero on this corpus, so the cosine carries no information to
+    double-count in the first place. It was noise at the selection stage and it
+    is noise here.
+
+    Which is why this stays lexical. If a hosted embedder ever earns the dense
+    leg back (module docstring), re-run this weight sweep before assuming the
+    answer: both findings above were measured against backends that had nothing
+    to say, and neither is evidence about one that does.
     """
     q = set(tokenize(query))
     ql = query.lower()
@@ -278,7 +315,7 @@ def rerank(query: str, hits: list[Hit], top_k: int | None = None) -> list[Hit]:
         toks = set(tokenize(h.chunk.text))
         overlap = len(q & toks) / (len(q) or 1)
         phrase = 0.25 if ql in h.chunk.text.lower() else 0.0
-        out.append(Hit(h.chunk, overlap + phrase, h.sparse_rank, h.dense_rank))
+        out.append(Hit(h.chunk, overlap + phrase, h.sparse_rank))
     out.sort(key=lambda h: -h.score)
     return out[: top_k or len(out)]
 

@@ -108,29 +108,45 @@ def test_exact_token_query_finds_the_ticker():
     assert hits[0].chunk.chunk_id == "c2"
 
 
-def test_rrf_fuses_both_rankings_when_the_dense_leg_is_switched_on():
-    """The RRF machinery still works; it is simply not what ships today.
+def test_search_never_embeds_anything():
+    """The fusion is gone, and this is what says so from outside the module.
 
-    `Collection.FUSE_DENSE` is False because the corpus-fitted embedder was
-    measured to DRAG the shipped list below plain BM25. The fusion code is kept
-    and kept tested, because the flag exists to be flipped back the day a real
-    embedding model earns it - a mechanism nobody exercises is a mechanism
-    nobody can turn on safely.
+    A docstring claiming the vector leg is unwired is a docstring; an embedder
+    that raises if anything asks it for a vector is a fact. Reaching through
+    `Collection.embedder` also covers the quieter half of the removal - the
+    backend is built lazily now, so a `search` that embedded nothing but
+    CONSTRUCTED a backend would still be paying to fit one per collection, and
+    `build_router` registers twenty.
     """
     col = corpus()
-    col.FUSE_DENSE = True  # instance attribute; the class default is untouched
+
+    class Detonates:
+        dimensions = 4
+
+        def embed(self, text: str) -> list[float]:
+            raise AssertionError("search reached the vector leg")
+
+    col._embedder = Detonates()
     hits = col.search("margin", 4)
-    assert any(h.sparse_rank and h.dense_rank for h in hits)
+    assert [h.sparse_rank for h in hits] == [1, 2]
+    assert col._vectors is None, "search built a vector index it never used"
 
 
 def test_the_shipped_default_does_not_fuse_the_dense_leg():
-    """Pin the default, so turning it back on is a decision and not a drift."""
-    from knowledge.retrieval.hybrid import Collection
+    """Pin the default, so turning it back on is a decision and not a drift.
 
-    assert Collection.FUSE_DENSE is False
+    #68 wrote this against `Collection.FUSE_DENSE is False`. The flag is gone -
+    the fusion it gated went with it - so the same property is now pinned by
+    what it can no longer produce: a `Hit` cannot carry a dense rank, because
+    the field does not exist. Kept rather than deleted because the property it
+    guards did not change hands with the mechanism.
+    """
+    from knowledge.retrieval.hybrid import Collection, Hit
+
+    assert not hasattr(Collection, "FUSE_DENSE"), "the gate is gone, not re-hidden"
+    assert not hasattr(Hit("x", 0.0), "dense_rank")  # type: ignore[arg-type]
     hits = corpus().search("margin", 4)
     assert hits, "dropping the dense leg must not empty the result list"
-    assert all(h.dense_rank is None for h in hits)
     assert any(h.sparse_rank for h in hits), "the sparse leg still ranks"
 
 

@@ -299,7 +299,7 @@ def test_evaluating_a_corpus_scores_every_leg():
     cases = [Case("cloud companies buying chips", ("d0",), "semantic")]
     report = evaluate(col, cases)
     assert report.cases == 1
-    assert set(report.legs) == {"bm25", "dense", "fused", "reranked"}
+    assert set(report.legs) == {"bm25", "dense", "reranked"}
     assert "dense lift" in report.summary()
 
 
@@ -328,48 +328,49 @@ def test_the_gold_set_has_both_families_in_useful_numbers():
 
 
 @pytest.mark.skipif(not Path("data/corpus.db").exists(), reason="no corpus in this checkout")
-def test_the_vector_leg_ships_only_while_it_earns_its_place():
-    """The shipped stack is never worse than its best single leg.
+def test_the_shipped_legs_do_not_fall_behind_exact_token_search():
+    """What the retired `test_the_vector_leg_earns_its_place` was guarding.
 
-    THIS TEST USED TO ASSERT `dense_lift > 0` UNCONDITIONALLY, and said in its
-    own docstring that the claim held "whatever the corpus looks like". That
-    premise was false and the test was right to go red: on the 2026-09-14 corpus
-    of 3,481 chunks the corpus-fitted embedder found nothing BM25 missed AND
-    dragged the fused list below plain exact-token search - recall@10 0.4348
-    against 0.4783, losing a labelled question the sparse leg had found.
+    That test asserted `dense_lift > 0` - the vector leg must find something
+    BM25 missed - and it failed, correctly and for a year's worth of runs, on
+    every keyless backend this system has had. The answer was not to soften the
+    assertion but to stop shipping the leg: `Collection.search` no longer fuses,
+    so there is no longer a claim about the vector leg to keep honest.
 
-    The assertion is not relaxed, it is aimed at the claim that is actually
-    enforceable. "The dense leg always helps" is a property of an embedder
-    nobody has bought yet. "We only SHIP a leg that helps" is a property of this
-    repository, and it is the one that keeps a measured-negative component out
-    of the answer path.
+    What still needs guarding is the reason the fusion went: recall at ten fell
+    BELOW plain BM25 while nobody was measuring. So this pins the floor rather
+    than the mechanism. Structural, not a target score - absolute recall moves
+    as the corpus grows and a pinned number would go red for reasons that are
+    not regressions.
 
-    So: the dense leg is still measured on every run, and `Collection.FUSE_DENSE`
-    may only be True while that measurement is positive. Flipping the flag
-    without the number turns this red, which is the point.
+    `reranked` can only equal `bm25` at r@10 today, because `rerank` reorders
+    the same ten documents it was handed. That is not a reason to drop the
+    assertion. It is the assertion: the day it can fail is the day something
+    re-enters the selection path, and that is exactly the day to look.
+
+    ONE ASSERTION IS BORROWED from the gated version of this test that #68 put
+    on main while this branch was being written. That version kept the fusion
+    behind `Collection.FUSE_DENSE = False` and pinned the dense leg as still
+    MEASURED, on the reasoning that "a gate you cannot reopen on evidence is a
+    deletion wearing a flag". The flag is gone here and the reasoning is not:
+    deleting the fusion is only defensible while the number that would justify
+    rebuilding it is still produced every run.
     """
     from knowledge.retrieval.evaluate import report_for
-    from knowledge.retrieval.hybrid import Collection
 
     report = report_for(gold_path=GOLD)
-
-    if Collection.FUSE_DENSE:
-        assert report.dense_lift > 0, (
-            "FUSE_DENSE is on while the vector leg finds nothing BM25 missed - "
-            "it is a second lexical search, which is what the hashing projection "
-            "was. Either turn the flag off or get an embedder that earns it."
-        )
-
-    # The leg is gated, not deleted: evaluate.py must still score it, so the day
-    # a real model makes it worth fusing the number is there to say so.
-    assert report.legs["dense"].cases > 0, (
-        "the dense leg stopped being measured - a gate you cannot reopen on "
-        "evidence is a deletion wearing a flag"
+    assert report.legs["reranked"].recall_at_10 >= report.legs["bm25"].recall_at_10, (
+        "the shipped path is finding less than exact-token search alone - "
+        "something has been added to selection that does not pay for its seats"
     )
-
-    # What the user actually gets is never worse than the better half.
-    assert report.legs["fused"].recall_at_10 >= report.legs["bm25"].recall_at_10
-    assert report.legs["reranked"].recall_at_10 >= report.legs["bm25"].recall_at_10
+    assert report.legs["dense"].cases > 0, (
+        "the dense leg stopped being measured - deleting the fusion is only "
+        "defensible while the number that would justify rebuilding it still runs"
+    )
+    assert "fused" not in report.legs, (
+        "a `fused` leg is stale: with nothing to fuse it re-measures `bm25` and "
+        "reads as a second opinion it is not"
+    )
 
 
 # --- the gold set drifting under a growing corpus -------------------------------
