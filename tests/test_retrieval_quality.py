@@ -299,7 +299,7 @@ def test_evaluating_a_corpus_scores_every_leg():
     cases = [Case("cloud companies buying chips", ("d0",), "semantic")]
     report = evaluate(col, cases)
     assert report.cases == 1
-    assert set(report.legs) == {"bm25", "dense", "fused", "reranked"}
+    assert set(report.legs) == {"bm25", "dense", "reranked"}
     assert "dense lift" in report.summary()
 
 
@@ -328,25 +328,34 @@ def test_the_gold_set_has_both_families_in_useful_numbers():
 
 
 @pytest.mark.skipif(not Path("data/corpus.db").exists(), reason="no corpus in this checkout")
-def test_the_vector_leg_earns_its_place():
-    """The claim the old embedder failed, stated so it cannot silently fail again.
+def test_the_shipped_legs_do_not_fall_behind_exact_token_search():
+    """What the retired `test_the_vector_leg_earns_its_place` was guarding.
 
-    Deliberately structural rather than a target score. Absolute recall moves as
-    the corpus grows - more articles means more competition for the same ten
-    slots - and a test pinned to a number would go red for a reason that is not
-    a regression. These two hold whatever the corpus looks like: the vector leg
-    must find something exact-token search missed, and fusing the two must not
-    be worse than the better half.
+    That test asserted `dense_lift > 0` - the vector leg must find something
+    BM25 missed - and it failed, correctly and for a year's worth of runs, on
+    every keyless backend this system has had. The answer was not to soften the
+    assertion but to stop shipping the leg: `Collection.search` no longer fuses,
+    so there is no longer a claim about the vector leg to keep honest.
+
+    What still needs guarding is the reason the fusion went: recall at ten fell
+    BELOW plain BM25 while nobody was measuring. So this pins the floor rather
+    than the mechanism. Structural, not a target score - absolute recall moves
+    as the corpus grows and a pinned number would go red for reasons that are
+    not regressions.
+
+    `reranked` can only equal `bm25` at r@10 today, because `rerank` reorders
+    the same ten documents it was handed. That is not a reason to drop the
+    assertion. It is the assertion: the day it can fail is the day something
+    re-enters the selection path, and that is exactly the day to look.
     """
     from knowledge.retrieval.evaluate import report_for
 
     report = report_for(gold_path=GOLD)
-    assert report.dense_lift > 0, (
-        "the vector leg found nothing BM25 missed - it is a second lexical "
-        "search, which is what the hashing projection was"
+    assert report.legs["reranked"].recall_at_10 >= report.legs["bm25"].recall_at_10, (
+        "the shipped path is finding less than exact-token search alone - "
+        "something has been added to selection that does not pay for its seats"
     )
-    assert report.legs["fused"].recall_at_10 >= report.legs["bm25"].recall_at_10
-    assert report.legs["reranked"].recall_at_10 >= report.legs["bm25"].recall_at_10
+    assert "fused" not in report.legs, "the fusion is gone; a leg measuring it is stale"
 
 
 # --- the gold set drifting under a growing corpus -------------------------------

@@ -603,6 +603,74 @@ regexes for one concept drift, and the divergence would be silent: one seam
 ranking what the other had already decided was not a story. A test asserts the
 two are the same object.
 
+## 18. A vector leg that was never asked to prove it, and was subtracting
+
+`knowledge/retrieval/hybrid.py` shipped BM25 fused with a dense leg by
+reciprocal rank fusion, as docs/02 §3 and docs/09 §6 specify. The argument is a
+good one: finance questions are half semantic ("margin compression risk") and
+half exact-token ("MYR", "Q3 FY25", "0011.KL"), and fusing the two should beat
+either alone. It was built to that argument, and then it was shipped on that
+argument, and for the whole life of the module *no number was ever asked to
+defend it*. §7 of this log is docstrings that described work nobody had done.
+This is the neighbouring failure: work that was done, described accurately, and
+never checked against the thing it was for.
+
+Measured on 2026-09-14 — the 23 labelled questions, 22 of which have an
+answer still reachable in the corpus, over 3,481 indexed chunks:
+
+| leg | r@10 | MRR | semantic r@10 | what it is |
+|---|---|---|---|---|
+| `bm25` | **47.8%** | 0.360 | 25.0% | exact-token search alone |
+| `dense` | 39.1% | 0.337 | 12.5% | vector search alone |
+| `fused` | 43.5% | 0.346 | 18.8% | the two by RRF — **what shipped** |
+| `reranked` | 43.5% | 0.406 | 18.8% | fused, then reordered — what a reader got |
+
+Two findings, and only the first is an inference-free reading of the table.
+
+**Dense lift was zero.** Not low — zero, on all 23 questions, for both keyless
+backends: the `HashingEmbedder` this system launched with and the corpus-fitted
+`DistributionalEmbedder` that replaced it. Dense lift counts questions where the
+vector leg found a relevant article BM25's own top ten did not, so zero is the
+direct statement that the leg contributed no document exact-token search had
+not already found. It was not a semantic index. It was a second lexical search
+with a slower inner loop.
+
+**So the fusion landed between its own legs rather than above them.** 43.5%
+against BM25's 47.8%. That is what rank fusion does when one leg is a duplicate
+of the other: it still spends ranks on the duplicate's opinions, and those ranks
+come out of the other leg's real hits. The component added to make semantic
+retrieval better was making semantic retrieval worse — 18.8% against BM25's
+25.0% on exactly the sixteen questions it existed to serve.
+
+The fusion is removed. `Collection.search` is BM25 plus the hard filters, and
+`rerank` orders what it returns. After:
+
+| leg | r@10 | MRR | semantic r@10 | semantic MRR |
+|---|---|---|---|---|
+| `reranked` before | 43.5% | 0.406 | 18.8% | 0.146 |
+| `reranked` after | **47.8%** | **0.422** | **25.0%** | **0.169** |
+
+**Read the recall move as one question, because that is what it is.** Twenty-
+three questions: 10 answered within the top ten before, 11 after; on the
+semantic block, 3 before and 4 after. A single question moving is not evidence
+of a 4.3-point improvement and should not be quoted as one. The evidence that
+carries weight here is the zero and the ordering — a leg that added nothing on
+any question, fused to a result strictly below one of its own inputs. That the
+shipped path also came out ahead on both recall and MRR is a consequence worth
+recording and too small to be the argument.
+
+**This is a retraction of a measurement, not of the design.** No hosted
+embedding model has ever been scored here. The docs may well be right that a
+real one beats BM25 alone; what was tested is the two backends that run without
+a key, and those two have now had three attempts between them — the fusion, a
+meaning-weighted reranker, and query expansion, the latter two rejected on
+2026-09-07 — with nothing to show on any. So the apparatus stays whole and
+wired to nothing: `Collection.dense`, all three backends, the `dense` leg in the
+evaluator, `ask.py retrieval --embedder api` and `.github/workflows/embedding-
+probe.yml`. Dense lift is now a door rather than a promise. Move it off zero and
+the fusion is worth rebuilding; until then production never embeds anything, and
+a test asserts that by handing `search` an embedder that raises if touched.
+
 ## What the families have in common
 
 | Family | Shape |
@@ -620,11 +688,22 @@ two are the same object.
 | two-spellings-of-one-state | the same outcome is recorded two ways, and one of them the watching rule cannot read |
 | limit-before-filter | a bound is applied before the predicate, so the rarest rows are the ones that vanish |
 | satisfied-by-noise | a rule counts arrivals, so junk that arrives clears the alarm the gap raised |
+| never-asked-to-prove-it | a component is built to a sound argument, works exactly as described, and no measurement is ever asked whether it helps — so nobody notices it subtracting |
 
-Eleven of the twelve are invisible to a type checker and to a test that only
-exercises the happy path - and the twelfth is invisible to a test whose fixture
-is smaller than the limit it is testing, which is why the corpus tests missed it
-for as long as they had two articles in them. All twelve are visible to a test
-that asks *what would the wrong answer look like, and would I be able to tell?*
+Twelve of the fourteen are invisible to a type checker and to a test that only
+exercises the happy path. A thirteenth, `limit-before-filter`, is invisible to a
+test whose fixture is smaller than the limit it is testing, which is why the
+corpus tests missed it for as long as they had two articles in them. Those
+thirteen are all visible to the same question: *what would the wrong answer look
+like, and would I be able to tell?*
 
-That question is what `stress/run.py` is.
+That question is what `stress/run.py` is, and it does not reach the fourteenth.
+`never-asked-to-prove-it` has no wrong answer to look for. The code is correct,
+the types check, the happy path passes, the adversarial path passes, and the
+component returns precisely what it promises — it simply does not help, and
+nothing in the shape of the code can say so. The only instrument that finds it
+is a labelled set of real questions with the right answers written down by a
+human, run against the whole path, comparing each part against the system
+without it. `knowledge/retrieval/data/retrieval_gold.yaml` is twenty-three such
+questions and it took a year to acquire one of them. That is the cost of being
+able to detect this family at all, and §18 is what one of them bought.

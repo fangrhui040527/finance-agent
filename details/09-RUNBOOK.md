@@ -862,32 +862,44 @@ the finding the check exists to make.
 ### `retrieval` — is the search any good?
 
 ```bash
-python ask.py retrieval                        # the shipped vectors
+python ask.py retrieval                        # the shipped path, plus the unwired dense leg
 python ask.py retrieval --embedder hashing     # the pre-2026-09-07 baseline
+python ask.py retrieval --embedder api         # the one backend never scored (needs a key)
 python ask.py retrieval --depth 20             # a more generous idea of "found"
 ```
 
-Runs `knowledge/retrieval/data/retrieval_gold.yaml` — 24 questions, each pinned
-to the articles in `data/corpus.db` verified to answer it — down all four
-retrieval legs separately, and prints recall at 1, 5 and 10 plus MRR for each.
+Runs `knowledge/retrieval/data/retrieval_gold.yaml` — 23 questions, each pinned
+to the articles in `data/corpus.db` verified to answer it — down each retrieval
+leg separately, and prints recall at 1, 5 and 10 plus MRR for each.
+
+The legs are `bm25` (what `Collection.search` selects with), `dense` (the vector
+leg, **not** in the shipped path) and `reranked` (what a reader actually gets).
+A fourth, `fused`, was removed on 2026-09-14 with the fusion itself — see
+defect log §18.
 
 Two things to read first. **Dense lift** is the number of questions where the
-vector leg found a relevant article BM25's own top ten did not; on the hashing
-projection this system shipped with it was **zero out of twenty-four**, which is
-what a vector leg that is really a second lexical search looks like. And the
-**semantic** block is where a change is judged: the lexical block is questions
-made of tickers and product names, which BM25 has always answered perfectly and
-which a change must not break.
+vector leg found a relevant article BM25's own top ten did not. It is **zero**,
+and has been on every keyless backend this system has had — the hashing
+projection and the corpus-fitted one alike — which is what a vector leg that is
+really a second lexical search looks like. It is now the door the dense leg has
+to come back through rather than a promise about the shipped path: move it off
+zero and the fusion is worth rebuilding. And the **semantic** block is where a
+change is judged: the lexical block is questions made of tickers and product
+names, which BM25 has always answered perfectly and which a change must not
+break.
 
 Recall is a floor. Only articles verified to answer each question are labelled,
 so an unlabelled hit scores as a miss; the comparison between legs is the
 finding, not the absolute number.
 
-Run it before and after any change to the embedder, the fusion or the reranker.
-Both of the obvious improvements tried on 2026-09-07 — a reranker that also
-weighed meaning, and expanding the question with its nearest corpus terms — were
-measured, found worse, and are recorded as rejected in the docstrings of
-`hybrid.rerank` and `pipeline.default_rewrite`.
+Run it before and after any change to the embedder or the reranker. THREE of the
+obvious improvements have now been measured and rejected: a reranker that also
+weighed meaning and a question expanded with its nearest corpus terms, both on
+2026-09-07, and the BM25-plus-dense fusion itself on 2026-09-14. The first two
+are recorded in the docstrings of `hybrid.rerank` and `pipeline.default_rewrite`;
+the third in the `hybrid` module docstring. The pattern in all three is one
+thing: on this corpus the vectors have nothing to add, and every attempt to
+spend them costs whatever it displaces.
 
 #### The vectors behind the search
 

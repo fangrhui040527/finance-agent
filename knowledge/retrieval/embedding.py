@@ -9,13 +9,24 @@ saying the same thing land in unrelated buckets and the "semantic" leg is an
 inferior copy of the lexical one. The fusion was paying rank-fusion overhead
 for a duplicate of its other half.
 
-Three backends now sit behind the same `EmbeddingBackend` seam:
+The `DistributionalEmbedder` below was written to answer that, and on 2026-09-14
+it was measured the same way and returned the same zero. So the fusion itself
+was removed (defect log §18) and NOTHING HERE IS IN THE PATH A READER'S QUESTION
+TAKES any more. This module is now apparatus: `Collection.dense` still works,
+`knowledge/retrieval/evaluate.py` still scores the dense leg beside the shipped
+one, and `ask.py retrieval --embedder api` still runs the one comparison that
+has never been made - a real model, against a corpus that has beaten two
+keyless ones. Dense lift above zero on that run is what puts any of this back
+into production.
+
+Three backends sit behind the same `EmbeddingBackend` seam:
 
   `HashingEmbedder`         the original. Kept, because it is the one backend
                             that needs neither a fitted corpus nor a key, and a
                             test that wants a fixed vector in three lines still
                             wants it.
-  `DistributionalEmbedder`  the default. Learns from the corpus's own word
+  `DistributionalEmbedder`  the default where a vector is asked for at all.
+                            Learns from the corpus's own word
                             company: two terms that keep the same neighbours
                             get similar vectors, so "cloud buyers" can reach an
                             article about hyperscalers. Offline, deterministic,

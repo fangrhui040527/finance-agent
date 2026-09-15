@@ -108,9 +108,28 @@ def test_exact_token_query_finds_the_ticker():
     assert hits[0].chunk.chunk_id == "c2"
 
 
-def test_rrf_fuses_both_rankings():
-    hits = corpus().search("margin", 4)
-    assert any(h.sparse_rank and h.dense_rank for h in hits)
+def test_search_never_embeds_anything():
+    """The fusion is gone, and this is what says so from outside the module.
+
+    A docstring claiming the vector leg is unwired is a docstring; an embedder
+    that raises if anything asks it for a vector is a fact. Reaching through
+    `Collection.embedder` also covers the quieter half of the removal - the
+    backend is built lazily now, so a `search` that embedded nothing but
+    CONSTRUCTED a backend would still be paying to fit one per collection, and
+    `build_router` registers twenty.
+    """
+    col = corpus()
+
+    class Detonates:
+        dimensions = 4
+
+        def embed(self, text: str) -> list[float]:
+            raise AssertionError("search reached the vector leg")
+
+    col._embedder = Detonates()
+    hits = col.search("margin", 4)
+    assert [h.sparse_rank for h in hits] == [1, 2]
+    assert col._vectors is None, "search built a vector index it never used"
 
 
 def test_freshness_is_a_hard_filter_not_a_hint():
