@@ -124,6 +124,17 @@ jobs:
           python-version: ${{ matrix.python }}
           enable-cache: true
 
+      # `--frozen` pins what gets INSTALLED; it does not check the lock against
+      # pyproject.toml, so a dependency added to pyproject and never locked
+      # passes every job silently. That is how `broker = ["futu-api>=9.0"]` sat
+      # unlocked: `uv sync --frozen` was happy, and `uv run` re-locked on
+      # developer machines, leaving a dirty uv.lock after any ordinary command.
+      # `uv lock --check` is the step that actually enforces "the lockfile is
+      # the contract" - it fails when the two disagree instead of papering over
+      # it. Runs before Install so the failure names the real cause.
+      - name: Lockfile matches pyproject
+        run: uv lock --check
+
       # --frozen: the lockfile is the contract. A resolver that drifts between
       # runs is a build that cannot be bisected.
       - name: Install

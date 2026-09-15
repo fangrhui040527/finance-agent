@@ -12,6 +12,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
+import yaml
 
 from knowledge.chunking.parent_child import Chunk
 from knowledge.retrieval.embedding import (
@@ -451,6 +452,57 @@ def test_every_lexical_label_in_the_shipped_gold_set_is_complete():
         "For a lexical question the criterion is containment, so it is a correct\n"
         "retrieval and belongs in `relevant`. Add it to "
         "knowledge/retrieval/data/retrieval_gold.yaml:\n  " + "\n  ".join(gaps)
+    )
+
+
+def test_every_gold_label_carries_the_document_s_real_title():
+    """The companion guard to completeness: a label must quote the corpus.
+
+    `title` is documentation - the tests match on `doc_id` - which is exactly
+    why it can rot without anything noticing, and a gold set whose titles are
+    approximations is one nobody can audit by reading.
+
+    It rotted once, which is why this exists. The completeness guard prints the
+    titles it wants added and TRUNCATES them to the terminal width:
+
+        'SPCX': SPCX Stock Set For Index Boost? Elon Musk 'Highly Confident' Nvidia AI
+
+    A label written from that line has to invent the tail. One was: the entry
+    for `finnhub:142131923` ended "Will Launch Into Space In 2027", borrowed
+    from its sibling `finnhub:142137872` ("...in Space in 2027"), where the
+    document itself says "Will Launch Into Space Next Year". Nothing was wrong
+    with the retrieval and nothing failed; the record simply stopped matching
+    the thing it recorded.
+
+    Whitespace is collapsed before comparing, because the YAML wraps long
+    titles across lines and that is formatting, not content.
+    """
+    from knowledge.corpus import Corpus
+    from knowledge.retrieval.evaluate import GOLD
+
+    if not Path("data/corpus.db").exists():
+        pytest.skip("no corpus in this checkout")
+    with Corpus("data/corpus.db") as corpus:
+        titles = {
+            a.doc_id: " ".join((a.title or "").split()) for a in corpus.articles(limit=100_000)
+        }
+    if not titles:
+        pytest.skip("corpus is empty")
+
+    doc = yaml.safe_load(Path(GOLD).read_text(encoding="utf-8"))
+    wrong = []
+    for case in doc["questions"]:
+        for row in case.get("relevant", []):
+            actual = titles.get(row["doc_id"])
+            if actual is None:  # labelled but not in THIS checkout's corpus
+                continue
+            claimed = " ".join(str(row.get("title", "")).split())
+            if claimed != actual:
+                wrong.append(f"{row['doc_id']}\n      label:  {claimed}\n      corpus: {actual}")
+    assert not wrong, (
+        "a gold label's title is not the document's title. Copy it from the "
+        "corpus rather than from the completeness guard's truncated output:\n  "
+        + "\n  ".join(wrong)
     )
 
 

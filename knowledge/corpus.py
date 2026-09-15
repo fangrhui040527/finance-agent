@@ -54,7 +54,7 @@ FAILED = "failed"
 #: when a run earns it (`_mostly_failed`) and imports the spelling from here,
 #: because this is the module that writes the column and the one that reads it
 #: back - a status the writer cannot spell is a status the reader never sees,
-#: which is exactly what happened. See `last_success` and defect log §19.
+#: which is exactly what happened. See `last_success` and defect log §20.
 DEGRADED = "degraded"
 
 SCHEMA = """

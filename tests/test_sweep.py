@@ -327,7 +327,7 @@ def test_most_names_unreachable_is_degraded_and_exits_3_but_still_stores(stores)
         # the run was degraded - so the console printed DEGRADED, the process
         # exited 3, and the only durable record said the source was fine.
         # Measured on 2026-09-15: 23 of 70 per-name sweeps, every one GDELT,
-        # degraded by `_mostly_failed` and stored as ok. Defect log §19.
+        # degraded by `_mostly_failed` and stored as ok. Defect log §20.
         assert c.sweeps()[0]["status"] == DEGRADED
         # And the property the old assertion was actually protecting, kept:
         # a degraded run still advances the watermark, because the names it DID
@@ -342,7 +342,7 @@ def test_a_failure_carries_its_reason_not_just_its_name():
     `_fetch_each` has always collected `(name, reason)`; the note joined the
     names and dropped the reasons. So GDELT answering HTTP 429 on two of three
     names every run for twelve days wrote `failed: NVIDIA, Apple` - which reads
-    as two companies having a quiet day, not as a throttle. Defect log §19.
+    as two companies having a quiet day, not as a throttle. Defect log §20.
     """
     from knowledge.sweep import _sweep_note
 

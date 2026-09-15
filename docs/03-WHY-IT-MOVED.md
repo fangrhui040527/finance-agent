@@ -297,13 +297,28 @@ The pre-announcement window `[−5,−1]` is deliberate: information leaks. Meas
 
 ```python
 class AttributionComponent(BaseModel):
-    component: Literal["market", "sector", "style", "currency", "idiosyncratic"]
+    component: Literal["market", "sector", "style", "drift", "currency", "idiosyncratic"]
     contribution: float  # in return space, local or base ccy (stated)
     share_of_total: float
-    beta: float | None  # None for currency and idiosyncratic
+    beta: float | None  # None for drift, currency and idiosyncratic
     r_squared_contribution: float | None
+```
 
+`drift` is `α` from the model in section 2.1. It is subtracted out of `AR` in
+section 2.3 — that is the market-model abnormal return and the significance
+test depends on it — so it has to be reported alongside the legs it is
+subtracted with, or **the components sum to the return minus α and nothing says
+so**. The six contributions sum to the base-currency return exactly.
 
+It is reported with its own standard error (`Fit.intercept_se`), because a
+fitted intercept over a few hundred sessions is a noisy estimate: a tenth of a
+percent a session is roughly one standard error on daily equity returns. The
+estimation note states the value, the number of standard errors from zero, and
+says *not distinguishable from zero* below 1.96. **A drift never earns a cause
+hunt** — it is a property of the estimation window, not an event, and the
+significance gate keys off `ε` alone.
+
+```python
 class CandidateCause(BaseModel):
     cause_type: str  # from the A5 event taxonomy
     description: str

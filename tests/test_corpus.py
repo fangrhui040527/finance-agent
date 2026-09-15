@@ -618,7 +618,7 @@ def test_one_name_failing_does_not_lose_the_others():
     assert len(records) == 1
     assert failed == [("Maybank", "timed out")] and not skipped
     # The name AND the reason it failed. `_fetch_each` has always returned the
-    # pair; the note used to print only the left half. Defect log §19.
+    # pair; the note used to print only the left half. Defect log §20.
     assert ask._sweep_note(failed, skipped) == "failed: timed out (Maybank)"
 
 

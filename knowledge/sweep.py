@@ -160,7 +160,7 @@ def _reason_note(failed) -> str:
     why GDELT could answer HTTP 429 on two of three names every run for twelve
     days with the nightly page saying only `failed: NVIDIA, Apple` - a symptom
     with its cause removed, which reads like bad luck rather than a throttle
-    nobody had set a user agent for. Defect log §19.
+    nobody had set a user agent for. Defect log §20.
     """
     by_reason: dict[str, list[str]] = {}
     for name, reason in failed:
@@ -622,7 +622,7 @@ def _run_news(
     # the reassuring one. Replaying `_mostly_failed` over the recorded details
     # on 2026-09-15: 23 of 70 per-name sweeps were degraded by the code's own
     # rule and stored as ok, every one of them GDELT, across the whole 12 days
-    # the corpus has existed. See defect log §19.
+    # the corpus has existed. See defect log §20.
     corpus.record_sweep(
         run_id,
         spec.name,

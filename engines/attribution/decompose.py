@@ -29,6 +29,15 @@ class Component(str, Enum):
     MARKET = "market"
     SECTOR = "sector"
     STYLE = "style"
+    #: The fitted intercept of the market model - what this instrument returned
+    #: on an average session of the estimation window once the factors were paid
+    #: for. docs/03 section 2.1 has always carried it as `alpha` in the model
+    #: equation; it was missing from the output contract, so the printed
+    #: components summed to the return MINUS this term and nothing said so.
+    #:
+    #: It never earns a cause hunt. A drift is a property of the estimation
+    #: window, not an event, and `needs_cause_hunt` keys off the residual alone.
+    DRIFT = "drift"
     CURRENCY = "currency"
     IDIOSYNCRATIC = "idiosyncratic"
 
@@ -186,6 +195,12 @@ def decompose(
         est_note += f", shrunk {fit.shrinkage:.0%} toward prior"
     if fit.n < 2 * MIN_OBSERVATIONS:
         est_note += " (short window; betas unstable)"
+    est_note += f"; drift {fit.coefficients[0] * 100:+.3f}pp/session"
+    if fit.intercept_se:
+        t = abs(fit.coefficients[0]) / fit.intercept_se
+        est_note += f", {t:.1f} standard errors from zero"
+        if t <= 1.96:
+            est_note += " (not distinguishable from zero)"
     betas = fit.coefficients[1:]
     b_mkt, b_sec = betas[0], betas[1]
     b_styles = dict(zip(names, betas[2:]))
@@ -194,13 +209,19 @@ def decompose(
     c_sec = b_sec * event_sector
     c_sty = sum(b_styles.get(n, 0.0) * event_styles.get(n, 0.0) for n in names)
     c_fx = total_base - realised_local
-    expected = fit.coefficients[0] + c_mkt + c_sec + c_sty
+    drift = fit.coefficients[0]
+    expected = drift + c_mkt + c_sec + c_sty
     ar = realised_local - expected
 
+    # `drift` is subtracted out of `ar` above - that is the textbook market-model
+    # abnormal return and the significance test below depends on it - so it MUST
+    # appear here too, or the printed components sum to the return minus alpha.
+    # They now sum to `total_return_base` exactly, which is pinned by test.
     contribs = [
         (Component.MARKET, c_mkt, b_mkt),
         (Component.SECTOR, c_sec, b_sec),
         (Component.STYLE, c_sty, None),
+        (Component.DRIFT, drift, None),
         (Component.CURRENCY, c_fx, None),
         (Component.IDIOSYNCRATIC, ar, None),
     ]
