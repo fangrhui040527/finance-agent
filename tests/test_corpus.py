@@ -617,7 +617,9 @@ def test_one_name_failing_does_not_lose_the_others():
     records, failed, skipped, counts = ask._fetch_each(_Feed, ("Maybank", "Tenaga"), NOW, 50)
     assert len(records) == 1
     assert failed == [("Maybank", "timed out")] and not skipped
-    assert "failed: Maybank" in ask._sweep_note(failed, skipped)
+    # The name AND the reason it failed. `_fetch_each` has always returned the
+    # pair; the note used to print only the left half. Defect log §19.
+    assert ask._sweep_note(failed, skipped) == "failed: timed out (Maybank)"
 
 
 def test_the_deadline_keeps_what_it_has_instead_of_being_killed_mid_run():

@@ -50,6 +50,12 @@ CORPUS_DB = "data/corpus.db"
 
 OK = "ok"
 FAILED = "failed"
+#: A run that read SOME of what it was asked for. `knowledge/sweep.py` decides
+#: when a run earns it (`_mostly_failed`) and imports the spelling from here,
+#: because this is the module that writes the column and the one that reads it
+#: back - a status the writer cannot spell is a status the reader never sees,
+#: which is exactly what happened. See `last_success` and defect log §19.
+DEGRADED = "degraded"
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS articles (
@@ -285,10 +291,24 @@ class Corpus:
     def last_success(self, source: str) -> datetime | None:
         """When this source was last read successfully - the watermark a sweep
         resumes from. A FAILED sweep deliberately does not move it: resuming
-        from a failure would put the window that was never read behind us."""
+        from a failure would put the window that was never read behind us.
+
+        DEGRADED COUNTS AS READ, and the distinction is the whole reason the
+        status is worth storing. A degraded run reached some of its names and
+        stored their articles; the window behind it HAS been read, for those
+        names, and holding the watermark back would re-fetch it every run
+        without ever reaching the names that failed. Only FAILED - nothing read
+        at all - leaves the window open.
+
+        So this is deliberately not the same question as "is this source
+        healthy". `sweep_silence` asks this one and should: a source that is
+        half-reachable is not silent. Whether half is enough is a different
+        alarm reading the same column, which it could not do while every run
+        was written down as `ok`.
+        """
         row = self.conn.execute(
-            "SELECT MAX(at) AS at FROM sweeps WHERE source = ? AND status = ?",
-            (source, OK),
+            "SELECT MAX(at) AS at FROM sweeps WHERE source = ? AND status IN (?, ?)",
+            (source, OK, DEGRADED),
         ).fetchone()
         return _dt(row["at"]) if row and row["at"] else None
 

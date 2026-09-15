@@ -29,7 +29,7 @@ import zlib
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 
-from knowledge.corpus import FAILED, OK, Corpus
+from knowledge.corpus import DEGRADED, FAILED, OK, Corpus
 from knowledge.facts import SKIPPED, FactBook
 from knowledge.feeds.adapter import FeedAdapter, FeedError, IngestStats, RawRecord
 from knowledge.news.features import Article
@@ -40,9 +40,6 @@ from knowledge.sources.catalog import MIXED, NEWS, SourceSpec
 #: fetching, keeps what it has and records which names it never reached - a
 #: job killed by the runner's cap commits nothing at all.
 SWEEP_DEADLINE_SECONDS = 600
-
-DEGRADED = "degraded"
-
 
 # --- the pieces that used to live in ask.py -------------------------------------------
 
@@ -136,13 +133,52 @@ def _mostly_failed(failed, skipped, counts) -> bool:
     return attempted > 0 and unreachable * 2 > attempted
 
 
+#: How much of a failure's own words to keep. Enough for the line that
+#: identifies it - `HTTP Error 429: Too Many Requests` is 38 - and short enough
+#: that three failing names cannot push the rest of the note out of the column.
+REASON_CHARS = 60
+
+#: How many DISTINCT reasons to spell out. Together with `REASON_CHARS` this is
+#: what bounds the note: grouping shortens it only while the names share a
+#: cause, and a source whose every name fails differently would otherwise write
+#: a line as long as its book. Three is enough to see whether a run has one
+#: problem or several, which is the question this part of the note answers; the
+#: rest are counted so the tail is never silently dropped.
+MAX_REASONS = 3
+
+
+def _reason_note(failed) -> str:
+    """`failed: HTTP Error 429: Too Many Requests (NVIDIA, Apple)`.
+
+    GROUPED BY REASON, not by name, because the reason is the finding and the
+    names are how many it happened to. Three names failing one way is one fact;
+    three names failing three ways is three, and a flat list of names says
+    neither.
+
+    `_fetch_each` has always collected `(name, reason)` and this function's
+    predecessor joined the names and dropped the reason on the floor. That is
+    why GDELT could answer HTTP 429 on two of three names every run for twelve
+    days with the nightly page saying only `failed: NVIDIA, Apple` - a symptom
+    with its cause removed, which reads like bad luck rather than a throttle
+    nobody had set a user agent for. Defect log §19.
+    """
+    by_reason: dict[str, list[str]] = {}
+    for name, reason in failed:
+        key = " ".join(str(reason).split())[:REASON_CHARS] or "no reason recorded"
+        by_reason.setdefault(key, []).append(name)
+    shown = list(by_reason.items())[:MAX_REASONS]
+    note = "failed: " + "; ".join(f"{reason} ({', '.join(names)})" for reason, names in shown)
+    rest = len(by_reason) - len(shown)
+    return note + (f"; +{rest} more" if rest > 0 else "")
+
+
 def _sweep_note(failed, skipped, counts=()) -> str:
     parts = []
     empty = [t for t, n in counts if n == 0]
     if empty:
         parts.append("read but empty: " + ", ".join(empty))
     if failed:
-        parts.append("failed: " + ", ".join(t for t, _ in failed))
+        parts.append(_reason_note(failed))
     if skipped:
         parts.append("not reached: " + ", ".join(skipped))
     return "; ".join(parts)
@@ -579,11 +615,19 @@ def _run_news(
         stats.escalated,
         stored.stored,
     )
+    # `result.status`, not a literal OK. It was OK here for the life of this
+    # function while the line above could set DEGRADED, so the console said
+    # "DEGRADED: 2 of 3 names could not be read" and the durable record said
+    # `ok` - two spellings of one state, and the watching rules only ever saw
+    # the reassuring one. Replaying `_mostly_failed` over the recorded details
+    # on 2026-09-15: 23 of 70 per-name sweeps were degraded by the code's own
+    # rule and stored as ok, every one of them GDELT, across the whole 12 days
+    # the corpus has existed. See defect log §19.
     corpus.record_sweep(
         run_id,
         spec.name,
         since,
-        OK,
+        result.status if result.status in (OK, DEGRADED) else OK,
         at=tick(),
         slot=slot,
         fetched=result.fetched,

@@ -71,8 +71,15 @@ class RecordingAdapters:
         if any(f in str(key) for f in self.fail):
 
             class _Broken(FixtureFeed):
+                # The message a throttled feed actually raises: what went
+                # wrong, not what was asked. It used to interpolate the whole
+                # Google News query, which is 200 characters of the question
+                # rather than the answer - and while the note dropped reasons
+                # entirely nothing noticed. Shared across names on purpose:
+                # a throttle hits every name the same way, and that is what
+                # lets `_reason_note` say it once.
                 def _fetch_raw(self, since, limit):
-                    raise FeedError(f"{key}: 429")
+                    raise FeedError("HTTP Error 429: Too Many Requests")
 
             return _Broken(records=[])
         rows = self.table.get(name, [])
@@ -308,10 +315,70 @@ def test_most_names_unreachable_is_degraded_and_exits_3_but_still_stores(stores)
     )
     (r,) = report.results
     assert r.status == DEGRADED and report.exit_code == 3
-    assert r.stored == 1 and "failed: Maybank, Tenaga" in r.detail
+    assert r.stored == 1
+    assert "Maybank" in r.detail and "Tenaga" in r.detail and "429" in r.detail
     with Corpus(corpus_db) as c:
         assert c.counts()["articles"] == 1
-        assert c.sweeps()[0]["status"] == "ok", "articles were stored, so the row says ok"
+        # THIS ASSERTION USED TO READ `== "ok"`, with the rationale "articles
+        # were stored, so the row says ok". The premise was right and the
+        # conclusion was not: storing articles means the WINDOW WAS READ, which
+        # is a fact about the watermark, not about the run's health. Writing
+        # `ok` spent the status column on the watermark and left nothing to say
+        # the run was degraded - so the console printed DEGRADED, the process
+        # exited 3, and the only durable record said the source was fine.
+        # Measured on 2026-09-15: 23 of 70 per-name sweeps, every one GDELT,
+        # degraded by `_mostly_failed` and stored as ok. Defect log §19.
+        assert c.sweeps()[0]["status"] == DEGRADED
+        # And the property the old assertion was actually protecting, kept:
+        # a degraded run still advances the watermark, because the names it DID
+        # reach have been read and re-reading them every run would be the cost
+        # of saying so.
+        assert c.last_success("google_news") is not None
+
+
+def test_a_failure_carries_its_reason_not_just_its_name():
+    """The cause survives into the note, grouped by cause rather than by name.
+
+    `_fetch_each` has always collected `(name, reason)`; the note joined the
+    names and dropped the reasons. So GDELT answering HTTP 429 on two of three
+    names every run for twelve days wrote `failed: NVIDIA, Apple` - which reads
+    as two companies having a quiet day, not as a throttle. Defect log §19.
+    """
+    from knowledge.sweep import _sweep_note
+
+    note = _sweep_note(
+        [
+            ("NVIDIA", "GDELT fetch failed: HTTP Error 429: Too Many Requests"),
+            ("Apple", "GDELT fetch failed: HTTP Error 429: Too Many Requests"),
+        ],
+        [],
+        [("Microsoft", 0)],
+    )
+    assert "429" in note, "the reason is the finding; the names are how many"
+    # One cause, named once, with both companies behind it.
+    assert note.count("429") == 1 and "NVIDIA, Apple" in note
+    assert "read but empty: Microsoft" in note
+
+
+def test_the_note_stays_bounded_when_every_name_fails_differently():
+    """Grouping only shortens while the names share a cause - so cap the rest.
+
+    A source whose every name fails its own way would otherwise write a note as
+    long as its book, into a column the nightly page has to render.
+    """
+    from knowledge.sweep import MAX_REASONS, _sweep_note
+
+    note = _sweep_note([(f"name{i}", f"distinct failure number {i}") for i in range(9)], [])
+    assert note.count("distinct failure") == MAX_REASONS
+    assert f"+{9 - MAX_REASONS} more" in note, "the tail is counted, never silently dropped"
+
+
+def test_a_long_reason_cannot_crowd_out_the_rest_of_the_note():
+    from knowledge.sweep import REASON_CHARS, _sweep_note
+
+    note = _sweep_note([("Maybank", "x" * 500)], ["Tenaga"])
+    assert "x" * REASON_CHARS in note and "x" * (REASON_CHARS + 1) not in note
+    assert "not reached: Tenaga" in note, "the later parts of the note survive"
 
 
 def test_every_name_failing_is_a_failed_row(stores):
