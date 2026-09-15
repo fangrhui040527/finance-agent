@@ -114,6 +114,10 @@ def market_fit(inst: list[float], mkt: list[float]) -> Fit | None:
         n=one.n,
         shrinkage=one.shrinkage,
         dof=one.dof,
+        # Widening the shape must not drop a field. The intercept's standard
+        # error is what lets the page say whether a drift is a drift or noise,
+        # and the one-factor fit is where it was computed.
+        intercept_se=one.intercept_se,
     )
 
 

@@ -29,13 +29,18 @@ def _solve(a: list[list[float]], b: list[float]) -> list[float]:
     return [m[i][n] / m[i][i] for i in range(n)]
 
 
+def _normal(X: list[list[float]], w: list[float]) -> list[list[float]]:
+    """X'WX, the weighted normal matrix."""
+    k = len(X[0])
+    return [
+        [sum(w[i] * X[i][p] * X[i][q] for i in range(len(w))) for q in range(k)] for p in range(k)
+    ]
+
+
 def _wls(X: list[list[float]], y: list[float], w: list[float]) -> list[float]:
     k = len(X[0])
-    ata = [
-        [sum(w[i] * X[i][p] * X[i][q] for i in range(len(y))) for q in range(k)] for p in range(k)
-    ]
     atb = [sum(w[i] * X[i][p] * y[i] for i in range(len(y))) for p in range(k)]
-    return _solve(ata, atb)
+    return _solve(_normal(X, w), atb)
 
 
 @dataclass(frozen=True)
@@ -49,6 +54,18 @@ class Fit:
     #: so the output can SAY it - a shrunk beta presented as estimated is a lie.
     shrinkage: float = 0.0
     dof: int = 0
+    #: Standard error of `coefficients[0]`, the intercept. The decomposition
+    #: reports the intercept as a component (Component.DRIFT), and a fitted
+    #: drift over 120 sessions is a NOISY estimate - a tenth of a percent a
+    #: session is roughly one standard error on daily equity returns. Carrying
+    #: the error lets the output say which it is instead of printing a number
+    #: that reads like a finding. None when it could not be computed.
+    #:
+    #: Only the INTERCEPT's error is offered. The slopes are optionally shrunk
+    #: toward a prior after fitting, so their fitted standard errors would no
+    #: longer describe the coefficients actually reported - publishing them
+    #: would be the same class of lie the `shrinkage` field exists to prevent.
+    intercept_se: float | None = None
 
     def predict(self, row: list[float]) -> float:
         return self.coefficients[0] + sum(c * v for c, v in zip(self.coefficients[1:], row))
@@ -101,7 +118,28 @@ def huber_fit(
     ybar = sum(y) / n
     sst = sum((v - ybar) ** 2 for v in y)
     r2 = 1.0 - (sum(r * r for r in resid) / sst) if sst > 1e-15 else 0.0
-    return Fit(coef, resid, sigma, r2, n, shrinkage=shrink_lambda if shrink_to else 0.0, dof=dof)
+
+    # sigma * sqrt((X'WX)^-1[0][0]) at the final Huber weights. For a robust
+    # fit the exact variance is a sandwich estimator, so this is an
+    # APPROXIMATION - stated here rather than in the field name, because the
+    # one question asked of it is "is this drift distinguishable from zero"
+    # and it is accurate enough to answer that. A singular matrix means the
+    # error is unknown, which is reported as None and never as zero.
+    try:
+        e0 = [1.0] + [0.0] * (len(coef) - 1)
+        v00 = _solve(_normal(X, w), e0)[0]
+    except ValueError:  # pragma: no cover - _wls above would have raised first
+        v00 = -1.0
+    return Fit(
+        coef,
+        resid,
+        sigma,
+        r2,
+        n,
+        shrinkage=shrink_lambda if shrink_to else 0.0,
+        dof=dof,
+        intercept_se=sigma * math.sqrt(v00) if v00 > 0.0 else None,
+    )
 
 
 def _mad_sigma(resid: list[float]) -> float:
