@@ -739,6 +739,80 @@ noise. The estimation note now prints the standard-error count and the words
 *not distinguishable from zero*, so the next reader is told rather than left to
 find a story in a fitted intercept.
 
+## 20. Three spellings of one state, and the source that decayed inside the gap
+
+GDELT's article yield fell from 83–166 per run to **zero** between 2026-09-12 and
+2026-09-14. Nothing alerted. The sweeps table said `ok` on every run, including
+the ones that returned nothing.
+
+`_news_per_instrument` computes `_mostly_failed` and the caller sets
+`result.status = DEGRADED`. That status reached two places and not the third:
+
+| surface | what it said | who reads it |
+|---|---|---|
+| console | `DEGRADED: 2 of 3 names could not be read` | a person watching a manual run |
+| exit code | `3` | the collector step |
+| **sweeps table** | **`ok`** — hardcoded at the `record_sweep` call | **every monitor rule, and every later question** |
+
+Only the third is durable. The collector runs unattended and commits with
+`[skip ci]`, so the console line went to a log nobody opens and the exit code to
+a step that tolerates 3. §15 is the same family one seam over — a state recorded
+two ways, one of which the watching rule cannot read.
+
+Replaying `_mostly_failed` over the recorded details on 2026-09-15: **23 of 70
+per-name sweeps were degraded by the code's own rule and stored as `ok`** — every
+single one GDELT, spread across all twelve days the corpus has existed. The
+durable record has never once said that source was degraded.
+
+**Why the hardcoded `ok` was written, and what was right about it.**
+`test_most_names_unreachable_is_degraded_and_exits_3_but_still_stores` asserted
+it deliberately: *"articles were stored, so the row says ok"*. The premise is
+correct and the conclusion does not follow. Storing articles means THE WINDOW WAS
+READ, which is a fact about the watermark — `last_success` keys on `status = OK`
+and is what a sweep resumes from. Writing `ok` spent the status column on the
+watermark and left nothing to carry the health of the run.
+
+Both facts fit, once they stop sharing one column: the status now records what
+happened, and `last_success` accepts `OK` **or** `DEGRADED`, because a degraded
+run did read the names it reached and holding the watermark back would re-fetch
+that window every run without ever reaching the names that failed. `sweep_silence`
+is unchanged and should be — a half-reachable source is not a silent one. Whether
+half is enough is a different alarm reading the same column, and it could not be
+written while every run was recorded as `ok`.
+
+**The second half: the cause was collected and thrown away.** `_fetch_each` has
+always returned `(name, reason)` pairs. `_sweep_note` did:
+
+```python
+parts.append("failed: " + ", ".join(t for t, _ in failed))
+```
+
+The reason went on the floor at the join. So the nightly page read `failed:
+NVIDIA, Apple` — two companies having a quiet day — when what GDELT actually
+answered was `HTTP Error 429: Too Many Requests`. A symptom with its cause
+removed reads like bad luck. Notes now group by reason rather than by name,
+because the reason is the finding and the names are how many it happened to:
+
+```
+failed: HTTP Error 429: Too Many Requests (NVIDIA, Apple)
+```
+
+Bounded by `REASON_CHARS` and `MAX_REASONS` so a source whose every name fails
+differently cannot write a note as long as its book; the surplus is counted
+(`+N more`), never silently dropped.
+
+**The 429 itself is not a code defect and is not fixed here.** A live probe on a
+runner (`sources-probe`, 2026-09-15) returned `GDELT fetch failed: HTTP Error
+429: Too Many Requests`, and the same run shows `GDELT_USER_AGENT` and
+`SEC_USER_AGENT` both empty. The plumbing is complete — `collect.yml` passes
+both, `adapter.py` reads `GDELT_USER_AGENT`, `edgar.py` reads `SEC_USER_AGENT`
+then falls back to it — so both sources are identifying themselves with the
+generic default that carries no contact address, which is what GDELT and the SEC
+each ask not to be sent. Setting the two repository secrets is the cheap test.
+That it is a one-line configuration fix is the point of this entry rather than an
+aside: the throttle was visible in the source's own reply from the first run, and
+twelve days of it were recorded as `ok`.
+
 ## What the families have in common
 
 | Family | Shape |
@@ -754,17 +828,24 @@ find a story in a fitted intercept.
 | ask-vs-recognise | the system can identify something it never requests, so it never arrives |
 | no-op-that-writes | a run that decided to do nothing still leaves a trace, and the trace reads as work |
 | two-spellings-of-one-state | the same outcome is recorded two ways, and one of them the watching rule cannot read |
+| cause-dropped-at-the-join | the failure's reason is collected and discarded while formatting, so the record names the symptom and not the cause |
 | limit-before-filter | a bound is applied before the predicate, so the rarest rows are the ones that vanish |
 | satisfied-by-noise | a rule counts arrivals, so junk that arrives clears the alarm the gap raised |
 | never-asked-to-prove-it | a component is built to a sound argument, works exactly as described, and no measurement is ever asked whether it helps — so nobody notices it subtracting |
 | compensated-in-the-test | the assertion adds the term the code forgot, so the invariant passes and the defect is recorded nowhere else |
 
-Twelve of the fifteen are invisible to a type checker and to a test that only
-exercises the happy path. A thirteenth, `limit-before-filter`, is invisible to a
+Thirteen of the sixteen are invisible to a type checker and to a test that
+only exercises the happy path. A fourteenth, `limit-before-filter`, is invisible to a
 test whose fixture is smaller than the limit it is testing, which is why the
 corpus tests missed it for as long as they had two articles in them. Those
-thirteen are all visible to the same question: *what would the wrong answer look
+fourteen are all visible to the same question: *what would the wrong answer look
 like, and would I be able to tell?*
+
+`cause-dropped-at-the-join`, the newest of them, is worth singling out for how
+cheaply it hid: the question above was asked and answered correctly at the point
+where the failure was CAUGHT — `_fetch_each` kept the reason — and then the
+answer was discarded one function later while formatting a string. A diagnosis
+is only as good as the last hand it passes through.
 
 That question is what `stress/run.py` is, and it does not reach the last two.
 `never-asked-to-prove-it` has no wrong answer to look for. The code is correct,
