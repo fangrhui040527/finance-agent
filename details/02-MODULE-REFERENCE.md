@@ -131,7 +131,7 @@ are now checked, and the result clamped.
 | Package | Owns |
 |---|---|
 | `graph/` | the entity graph — see `06-KNOWLEDGE-GRAPH.md`. 14 modules including 7 extractors. |
-| `retrieval/` | `hybrid.py` (lexical + dense), `pipeline.py` (`Router`) |
+| `retrieval/` | `hybrid.py` (lexical; dense built, measured, unwired), `pipeline.py` (`Router`) |
 | `chunking/` | `parent_child.py` — retrieve the child, return the parent |
 | `news/` | `features.py` — `LexiconExtractor`, `near_duplicate_hash`, `should_escalate` |
 | `feeds/` | `adapter.py` — `FixtureFeed`, `link_entities`, the offline-safe feed contract |
