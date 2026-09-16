@@ -1,0 +1,286 @@
+{
+  "day": "2026-09-15",
+  "written_at": "2026-09-16T22:45:00Z",
+  "market": {
+    "regime": "risk-off",
+    "notes": [
+      "Both halves fell. MYX:^KLSE -1.11% 1d, -2.05% 5d, 1223 common sessions. XNAS:SPY -0.46% 1d, -1.12% 5d, 1254 common sessions.",
+      "SP500 7585.73 (-34.25), NASDAQCOM 25981.57 (-204.84), VIXCLS 17.20 (+0.10), T10Y2Y 0.33 (+0.01), BAMLH0A0HYM2 2.76 (+0.05), all 2026-09-15; DGS10 4.97 (+0.01), DGS2 4.65 (+0.02) and the effective fed funds rate 3.63 at 2026-09-14; DCOILBRENTEU 109.51 at 2026-09-09.",
+      "Two Malaysian wires attribute the session in the same words - 'Bursa ends lower ahead of FOMC decision as oil prices rise' (freemalaysiatoday.com, 09:38Z) and 'Bursa Malaysia ends lower ahead of FOMC decision, amid higher oil prices' (themalaysianreserve.com, 09:55Z). A market-level statement about a pending policy decision, recorded as one; no name gets a company story out of it.",
+      "ONE NAME CLEARED THE SIGNIFICANCE THRESHOLD - Tenaga, the first since the Bursa half got a market proxy that measures the market - and the verdict it drew, no_identified_catalyst, does not mean what it appears to mean. See the machine section.",
+      "Drift prints on all nine and reads not distinguishable from zero on all nine, at 0.1 to 1.4 standard errors.",
+      "Corpus 5,249 articles, 4,587 observations, 4,007 events."
+    ]
+  },
+  "names": [
+    {
+      "instrument_id": "MYX:5347",
+      "move": {
+        "return_1d": -0.0235,
+        "return_5d": -0.0417,
+        "market_1d": -0.0111,
+        "market_component": -0.0083,
+        "drift": -0.0002,
+        "drift_standard_errors": 0.2,
+        "idiosyncratic": -0.015,
+        "beta": 0.75,
+        "sigma": null,
+        "sigma_note": "over the significance threshold; the pack prints 'significant idiosyncratic move; no catalyst matched yet' in place of a sigma for this verdict",
+        "unexplained_share": 0.64,
+        "note": "The only significant move in the book and the only no_identified_catalyst. It is also the one name that collected a bodied, company-specific Malaysian-press row on the same session."
+      },
+      "causes": [
+        {
+          "claim": "A regulated utility derated while it was publicly answering consumer complaints about rising bills under a fuel-cost pass-through, on a session both Bursa wires attributed partly to higher oil prices.",
+          "evidence": [
+            "nst_business:www.nst.com.my:2026-09-15T12:23Z:q1.00:body 214:TNB customers receive RM3.1bil AFA rebate since July 2025",
+            "google_news:www.businesstoday.com.my:2026-09-15T11:31Z:q0.80:TNB Clarifies AFA Not New, Replaced ICPT Mechanism, Returned Higher Rebate Of RM3.1 Billion To Users",
+            "fred:DCOILBRENTEU:2026-09-09:109.51"
+          ],
+          "chain": [
+            "-2.35% on 2026-09-15 against a -0.83% market component, -1.50pp idiosyncratic, 64% unexplained, over the significance threshold",
+            "TNB clarified the same session that the automatic fuel adjustment does not cause a sudden increase in electricity bills, FOLLOWING CONCERNS RAISED BY SOME CONSUMERS on rising bills (the body, verbatim)",
+            "a second outlet the same session frames it as the AFA replacing the ICPT and returning RM3.1bn to users",
+            "both Bursa wires name higher oil prices among the session's drivers; Brent reads 109.51 at 2026-09-09",
+            "THE CHAIN STOPS HERE. The collected evidence asserts the opposite of a problem - the mechanism is not new and it returned money to users. Nothing collected says the AFA is being changed or that TNB's fuel-cost recovery is at risk, and the fact book holds ZERO figures for this name, so there is no tariff base, no fuel cost and no margin to connect a pass-through to earnings. Unknown: no collected evidence reaches further."
+          ],
+          "confidence": 0.35,
+          "confirm": "a collected story reporting a regulatory review of the AFA, or a broker note quantifying a recovery risk",
+          "refute": "the clarification being routine and Malaysian utility peers falling comparably on 2026-09-15 - untestable tonight, because the five Bursa peer price lines were last fetched 2026-08-31"
+        }
+      ],
+      "open_questions": [
+        "Is a CLARIFICATION a typed event in the taxonomy at all, or does an announcement have to be a filing to become one?",
+        "Is the 5d move the results print the 2026-09-04 roundup headline referred to? No primary figure collected. (since 2026-09-04)"
+      ],
+      "watch": [{"when": "2026-10-16", "what": "interim single-tier dividend payable (marketscreener.com, 2026-09-09, escalated)"}]
+    },
+    {
+      "instrument_id": "MYX:8869",
+      "move": {
+        "return_1d": -0.0309,
+        "return_5d": -0.0529,
+        "market_1d": -0.0111,
+        "market_component": -0.0117,
+        "drift": 0.0005,
+        "drift_standard_errors": 0.3,
+        "idiosyncratic": -0.0197,
+        "beta": 1.06,
+        "sigma": 1.04,
+        "unexplained_share": 0.62,
+        "note": "The largest fall in the book and still not_significant at 1.04 sigma."
+      },
+      "causes": [],
+      "open_questions": [
+        "UNKNOWN, AND THE REASON IS COLLECTION RATHER THAN ANALYSIS. gdelt FAILED the name, google_news read empty for it, and neither Malaysian outlet linked it; the digest reads 'quiet: nothing collected for this name in the window'. A SECOND consecutive session with zero rows, the second of them a 3% fall.",
+        "The one figure that would bear on an aluminium smelter is PALUMUSDM at 3,158.26 dated 2026-07-01 - a monthly series, currently the newest print, 76 days old. It cannot speak to a single session.",
+        "Which of the eleven sources that claim to cover this name are actually reaching it?"
+      ],
+      "watch": []
+    },
+    {
+      "instrument_id": "XNAS:MSFT",
+      "move": {
+        "return_1d": -0.0164,
+        "return_5d": 0.0064,
+        "market_1d": -0.0046,
+        "market_component": -0.0039,
+        "drift": 0.0002,
+        "drift_standard_errors": 0.1,
+        "idiosyncratic": -0.0127,
+        "beta": 0.85,
+        "sigma": 0.55,
+        "unexplained_share": 0.76,
+        "note": "The largest US residual of the day at 0.55 sigma, and the event in the window points the other way."
+      },
+      "causes": [],
+      "open_questions": [
+        "NO CAUSE OFFERED, AND THE SIGN IS WHY. The strongest dated item is 'Microsoft announces quarterly dividend increase' (finance.yahoo.com, 2026-09-15, q 1.00, tone +1.0, escalated), a positive-signed event on a name that fell 1.64%. catalyst.py puts DIVIDEND_CHANGE at EXPECTED_SIGN 0 and DEFAULT_PRIOR 0.25 precisely because it usually explains nothing. Naming it here would be attaching the only dated event in the window to a move going the other way.",
+        "Two edgar insider_filing Form 4 events land 2026-09-15 - the first company events this book has collected since edgar went dark.",
+        "alphavantage_news quota was exhausted for this name for a third consecutive day, so one source's view of the session is missing."
+      ],
+      "watch": []
+    },
+    {
+      "instrument_id": "XNAS:AAPL",
+      "move": {
+        "return_1d": -0.0052,
+        "return_5d": 0.0478,
+        "market_1d": -0.0046,
+        "market_component": -0.0029,
+        "drift": 0.0022,
+        "drift_standard_errors": 1.3,
+        "idiosyncratic": -0.0045,
+        "beta": 0.63,
+        "sigma": 0.26,
+        "unexplained_share": 0.47,
+        "note": "The quietest name on the page at 0.26 sigma."
+      },
+      "causes": [],
+      "open_questions": [
+        "A STORY THAT NAMES A CAUSE FOR A MOVE THAT HAS NONE. 'Apple Stock Drops On Lukewarm iPhone 18 Pro Demand' (finance.yahoo.com, 2026-09-15, q 1.00, tone -1.0, escalated) is dated, bodied and explicitly causal; the decomposition says -0.52% at 0.26 sigma with a -0.45pp residual. Components before narrative: the story is evidence about sentiment, not about this session."
+      ],
+      "watch": []
+    },
+    {
+      "instrument_id": "XNAS:NVDA",
+      "move": {
+        "return_1d": 0.0057,
+        "return_5d": -0.0601,
+        "market_1d": -0.0046,
+        "market_component": -0.008,
+        "drift": -0.0017,
+        "drift_standard_errors": 0.9,
+        "idiosyncratic": 0.0154,
+        "beta": 1.74,
+        "sigma": 0.78,
+        "unexplained_share": 0.61,
+        "note": "Recovered about a third of Monday's -3.36%. 260 stories from 47 sources, 36 escalated, and none of them is about this session's +1.54pp. Volume of coverage is not evidence of a cause."
+      },
+      "causes": [],
+      "open_questions": [
+        "Filing or release for the Hugging Face transaction - edgar is answering again, so this is reachable for the first time in three days. (since 2026-09-04)",
+        "Finnhub earnings rows carry a knowable date in the future. (since 2026-09-04)"
+      ],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:1155",
+      "move": {
+        "return_1d": -0.0038,
+        "return_5d": -0.0114,
+        "market_1d": -0.0111,
+        "market_component": -0.013,
+        "drift": -0.0008,
+        "drift_standard_errors": 1.2,
+        "idiosyncratic": 0.01,
+        "beta": 1.18,
+        "sigma": 1.4,
+        "unexplained_share": 0.42,
+        "note": "It outperformed the market leg. 1.40 sigma is the closest miss of the significance threshold in the book."
+      },
+      "causes": [],
+      "open_questions": [
+        "A MENTION IS NOT A CAUSE, AND HERE MOST OF THEM ARE NOT EVEN MENTIONS OF THE COMPANY AS SUBJECT. Six rows, mostly the name appearing as the RESEARCH HOUSE ('Maybank IB upgrades SD Guthrie to buy post sell-off'). The one item about the company is a Singapore listing of USD 700m of bonds (marketscreener.com, q 0.65, no body)."
+      ],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:3182",
+      "move": {
+        "return_1d": 0.0052,
+        "return_5d": -0.0398,
+        "market_1d": -0.0111,
+        "market_component": -0.0117,
+        "drift": -0.0024,
+        "drift_standard_errors": 1.4,
+        "idiosyncratic": 0.0194,
+        "beta": 1.06,
+        "sigma": 1.09,
+        "unexplained_share": 0.58,
+        "note": "The only Bursa name up on a -1.11% index, +1.94pp idiosyncratic at 1.09 sigma, and nothing collected."
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:5183",
+      "move": {
+        "return_1d": -0.0133,
+        "return_5d": 0.1633,
+        "market_1d": -0.0111,
+        "market_component": 0.0035,
+        "drift": 0.0022,
+        "drift_standard_errors": 0.6,
+        "idiosyncratic": -0.0189,
+        "beta": -0.31,
+        "sigma": 0.46,
+        "unexplained_share": 0.77,
+        "note": "Its beta to the index has moved -0.10 -> -0.44 -> -0.31 across three sessions on a 120-session window shrunk 20% toward prior. That is instability, not a finding."
+      },
+      "causes": [],
+      "open_questions": [
+        "One row in the window and it is a roundup listing eight companies (theedgemalaysia.com, 2026-09-14). nst_business and fmt_business were both healthy on 2026-09-15 and stored 98 rows between them; three linked any book name and NONE linked this one. (since 2026-09-10)"
+      ],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:5225",
+      "move": {
+        "return_1d": -0.0064,
+        "return_5d": -0.0166,
+        "market_1d": -0.0111,
+        "market_component": -0.0085,
+        "drift": -0.001,
+        "drift_standard_errors": 1.1,
+        "idiosyncratic": 0.0031,
+        "beta": 0.77,
+        "sigma": 0.32,
+        "unexplained_share": 0.25,
+        "note": "The most market-explained name in the book. Nothing collected."
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": []
+    }
+  ],
+  "machine": {
+    "answered": [
+      {
+        "question": "What does the catalyst matcher require that the collected rows do not supply? (opened 2026-09-13, on IHH's no_identified_catalyst against eight dated rows)",
+        "answer": "NOTHING. It never sees them. engines/events/catalyst.py:189 scores a list of typed Event objects against the residual; articles are not candidates.",
+        "proof": "data/facts.db holds 4,007 events and NOT ONE belongs to a Bursa name: 3,922 from fmp, 46 from fred, 32 from edgar, 7 from finnhub. Per-instrument counts are XNAS:AAPL 1,802, XNAS:NVDA 1,161, XNAS:MSFT 998, MACRO:US 46, and nothing else. Every one of those routes is US-only; bursa_announcements answers 403.",
+        "consequence": "For the six Malaysian names the candidate list is empty before any evidence is weighed, so no_identified_catalyst is structurally the only verdict a significant Bursa move can receive - however good the evidence is. Tenaga drew it on a session that collected a q1.00 bodied row naming the company and describing what it did.",
+        "notes": [
+          "Three pages read this verdict as the matcher being too strict. It was never given anything to be strict about.",
+          "OPENS A NEW QUESTION: should a verdict distinguish 'no candidate was scored' from 'candidates were scored and none cleared 0.25'? They print identically and mean opposite things about how much work was done."
+        ]
+      },
+      {
+        "question": "Was edgar's HTTP 429 a rate limit or a dead route? (opened 2026-09-14)",
+        "answer": "A rate limit, and it passed without intervention. The 23:33 sweep fetched 3 and wrote 3 facts; sweep_silence resolved; two Microsoft Form 4 events dated 2026-09-15 are the first company events collected since it went dark.",
+        "notes": ["Second outage this week to recover on the next sweep after being written up as worse than it was; nst_business's 404 was the first."]
+      }
+    ],
+    "monitor": {
+      "open": [],
+      "resolved": ["sweep_silence"],
+      "notes": [
+        "0 OPEN ALERTS - the first night in this journal's record with nothing open.",
+        "sweep_silence closed because edgar answered, not because a rule was changed."
+      ]
+    }
+  },
+  "data_quality": {
+    "failed": [],
+    "degraded": [
+      "gdelt: HTTP Error 429: Too Many Requests on the us_close sweep, read-empty for NVIDIA and Apple; on the bursa sweep read empty for Maybank, FAILED Press Metal and Genting, deferred three. 0 rows stored for a third consecutive day - and the refusal now has a name.",
+      "alphavantage_news: quota exhausted for XNAS:MSFT, third consecutive day",
+      "eodhd: every name deferred by the 2-a-day credit budget on both slots; for the Bursa names the reason is explicit - outside the free plan (US only), so not asked for",
+      "yahoo_rss read empty for all six Bursa names, and named the company 51 of 51 on the US sweep",
+      "google_news named the company 6 of 22 on the bursa sweep against 76 of 87 on the US one"
+    ],
+    "skipped": [
+      "fmp: 'no name in the book trades in slot us_preopen'"
+    ],
+    "recovered": [
+      "edgar: 3 fetched, 3 facts on the 23:33 sweep after two days of HTTP 429 on every name",
+      "nst_business: 50 fetched, 49 kept, 48 stored, the day after a 404"
+    ],
+    "schedule": {
+      "day_us_close": "landed 2026-09-15T23:31:29Z, +2h16m past the 21:15 cron - inside the envelope, and the fourth consecutive night in the +2h to +2h40m band",
+      "today_slots": "bursa_close landed 2026-09-16T14:12:37Z (+4h52m past 09:20), us_preopen 17:13:53Z (+4h43m past 12:30). Both late and intact.",
+      "tonight_us_close": "no run object at 22:34Z, +1h19m. NOT DISPATCHED - the fourth consecutive correct no-op."
+    },
+    "fact_book": "All six Bursa names read NOTHING COLLECTED. Tonight that stops being a gap in the figures and becomes a gap in the VERDICTS: with zero events, the catalyst matcher cannot return anything but no_identified_catalyst for a Malaysian name.",
+    "price_cache": "Sixteen peer price lines remain unrefreshed since the collector outage, which is why the Tenaga refutation test - Malaysian utility peers on 2026-09-15 - could not be run."
+  },
+  "lessons": [
+    "A verdict that says 'nothing matched' should not be readable as 'nothing was there to match'. no_identified_catalyst on a Bursa name reports an empty candidate list, and the page that quotes it without saying so is reporting a data gap as an analytical finding.",
+    "When a component takes a list, check what is in the list before judging what it did with it. Three pages read the catalyst matcher as too strict; it was never given anything to be strict about.",
+    "An event's sign is part of its evidence. A dividend increase on a day the name fell 1.64% is not a weak explanation, it is an explanation pointing the wrong way, and saying so costs nothing.",
+    "Coverage that names the company is not the same as coverage about the company. Six of Maybank's rows name it as the research house issuing a call on somebody else.",
+    "A source that fails is not a source that is gone. Both of this week's outages - nst_business on 404, edgar on 429 - recovered on the next sweep without intervention, and both were written up as worse than they were."
+  ]
+}
