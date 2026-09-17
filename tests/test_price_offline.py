@@ -12,7 +12,10 @@ CSV = "date,open,high,low,close,volume\n2026-09-03,1,2,0.5,1.5,100\n"
 
 def test_a_stale_row_is_not_served_by_default(tmp_path):
     cache = PriceCache(tmp_path / "p.db", today=lambda: "2026-09-04")
-    cache.conn.execute("INSERT INTO price_csv VALUES ('yahoo','NVDA','2026-09-03',?)", (CSV,))
+    cache.conn.execute(
+        "INSERT INTO price_csv (feed, symbol, fetched_on, body) VALUES ('yahoo','NVDA','2026-09-03',?)",
+        (CSV,),
+    )
     cache.conn.commit()
     assert cache.get("yahoo", "NVDA") is None
 
@@ -24,7 +27,10 @@ def test_offline_serves_the_stale_row_and_says_which_day(tmp_path, monkeypatch):
     monkeypatch.setenv("FINPLANET_OFFLINE", "1")
     assert offline()
     cache = PriceCache(tmp_path / "p.db", today=lambda: "2026-09-04")
-    cache.conn.execute("INSERT INTO price_csv VALUES ('yahoo','NVDA','2026-09-03',?)", (CSV,))
+    cache.conn.execute(
+        "INSERT INTO price_csv (feed, symbol, fetched_on, body) VALUES ('yahoo','NVDA','2026-09-03',?)",
+        (CSV,),
+    )
     cache.conn.commit()
     assert cache.get("yahoo", "NVDA") == CSV
     assert cache.last_served_from == "2026-09-03"
@@ -49,7 +55,8 @@ def test_an_error_page_is_neither_stored_nor_served(tmp_path, monkeypatch):
 
     # A row already poisoned by an older build is dropped the first time it is read.
     cache.conn.execute(
-        "INSERT INTO price_csv VALUES ('stooq','1155.my','2026-09-04',?)", (ERROR_PAGE,)
+        "INSERT INTO price_csv (feed, symbol, fetched_on, body) VALUES ('stooq','1155.my','2026-09-04',?)",
+        (ERROR_PAGE,),
     )
     cache.conn.commit()
     assert cache.get("stooq", "1155.my") is None
@@ -59,9 +66,13 @@ def test_an_error_page_is_neither_stored_nor_served(tmp_path, monkeypatch):
 def test_prune_unusable_drops_the_error_pages_and_keeps_the_bars(tmp_path):
     cache = PriceCache(tmp_path / "p.db", today=lambda: "2026-09-04")
     cache.conn.execute(
-        "INSERT INTO price_csv VALUES ('stooq','1155.my','2026-09-04',?)", (ERROR_PAGE,)
+        "INSERT INTO price_csv (feed, symbol, fetched_on, body) VALUES ('stooq','1155.my','2026-09-04',?)",
+        (ERROR_PAGE,),
     )
-    cache.conn.execute("INSERT INTO price_csv VALUES ('yahoo','NVDA','2026-09-04',?)", (CSV,))
+    cache.conn.execute(
+        "INSERT INTO price_csv (feed, symbol, fetched_on, body) VALUES ('yahoo','NVDA','2026-09-04',?)",
+        (CSV,),
+    )
     cache.conn.commit()
     assert cache.prune_unusable() == 1
     assert [r[0] for r in cache.conn.execute("SELECT feed FROM price_csv")] == ["yahoo"]

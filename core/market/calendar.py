@@ -88,3 +88,46 @@ class SessionCalendar:
             if self.is_session(cur):
                 remaining -= 1
         return cur if not remaining else None
+
+
+# -- is a bar a close yet? ------------------------------------------------------------------
+
+#: `price_state` answers. Three, because two would lie: a caller that prints
+#: "settled" where the fetch instant is unknown is guessing, and one that prints
+#: "provisional" there cries wolf on every row cached before the column existed.
+SETTLED = "settled"
+PROVISIONAL = "provisional"
+UNKNOWN = "unknown"
+
+
+def price_state(mic: str, day: date, fetched_at: datetime | None) -> str:
+    """Whether a bar dated `day` is a settled close or the session so far.
+
+    A price is a close only once the market it came from has shut, and the bar
+    carries a date and nothing else - so the question is answered against WHEN
+    THE BODY WAS FETCHED, never when it is read. A row dated today, pulled at
+    17:13 UTC while Nasdaq trades until 20:00, is an intraday quote wearing a
+    close's shape: the same five columns, a plausible price, and it sits inside
+    the day's eventual high-low range, so nothing about it reads as unfinished.
+
+    This is the other half of `cache.is_mid_session`, which catches the case
+    where the vendor's in-progress row does not PARSE - a blank close, as Yahoo
+    returns for Bursa mid-session. When the vendor fills every column with the
+    session so far, the parser takes it and only the clock can tell.
+
+    `day` is the bar's own day, so a row from a previous session is settled
+    whatever time it was fetched: the market had already shut when it printed.
+    """
+    if fetched_at is None:
+        return UNKNOWN
+    try:
+        from markets.registry import get as adapter_for
+
+        calendar = adapter_for(mic).calendar
+    except (KeyError, ValueError):
+        return UNKNOWN
+    session = calendar.session(day)
+    if session is None:
+        return UNKNOWN  # a bar on a day this calendar does not call a session
+    at = fetched_at if fetched_at.tzinfo else fetched_at.replace(tzinfo=UTC)
+    return SETTLED if at >= session.close_utc() else PROVISIONAL
