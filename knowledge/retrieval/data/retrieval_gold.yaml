@@ -235,10 +235,17 @@ questions:
 
     It happened a second time, larger, on the 2026-09-15 sweeps: FOUR more
     documents carrying the token arrived at once, and main went red on the guard
-    before any code change touched retrieval. Same response, same reason. Nine
-    labels now. A lexical question on a ticker that is having a news week is the
-    most expensive kind of label to keep complete, and that cost is the guard
-    working rather than a reason to loosen it.
+    before any code change touched retrieval. Same response, same reason. A
+    lexical question on a ticker that is having a news week is the most expensive
+    kind of label to keep complete, and that cost is the guard working rather
+    than a reason to loosen it.
+
+    A third time on the 2026-09-15 us_close sweep, which committed after those
+    four were labelled: one more document, and main was red again by 2026-09-17
+    for every branch opened against it. TEN labels now. Three times in nine days
+    is the rate this label actually costs, and it is worth writing down: the
+    guard is doing its job on a schedule set by SPCX's news flow, not by anything
+    in this repository.
   relevant:
   - doc_id: https://stocktwits.com/news-articles/markets/equity/s-and-p-500-dow-end-best-day-in-a-month/cZsufnBRJvu?.tsrc=rss
     title: S&P 500, Dow End Best Day In A Month On Calmer Yields As Rate Hike Bets Wane — SPCX, VSXY,
@@ -263,6 +270,8 @@ questions:
   - doc_id: finnhub:142127496
     title: 'Why Retail Traders Couldn’t Take Their Eyes Off These Stocks Last Week: AAPL,
       NVDA, ORCL, NOK, SPCX'
+  - doc_id: https://news.google.com/rss/articles/CBMikwFBVV95cUxPa0U3dE9VcDh4TXFMeE9peXlxME9FY0tTeG1ibHdlTDhOUDBvSGdab2RSdEtMV3Nkcl9icmNFSmYzaGhFVUJTckJaTFhUZElJMzNUak1DdGJWeXExUEoxbk41WHR2ZjJWMGlFdC1yazYyZFZzQlo4TmRJNC1UZ1lRWEMxMnlqZ0lzQU9TbDREeTY0bzA?oc=5
+    title: Space Exploration Technologies (SPCX) Eyes Nvidia Launches, Is The Stock Overvalued?
 - query: KeyBanc Underweight rating Apple
   kind: lexical
   note: broker plus rating word
