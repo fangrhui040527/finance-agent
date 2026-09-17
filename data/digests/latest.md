@@ -1,6 +1,6 @@
 # Digest 2026-09-17
 
-Generated 2026-09-17 14:20 UTC · slot `all` · 5703 articles in the corpus, 4608 observations, 4007 events in the fact book.
+Generated 2026-09-17 17:13 UTC · slot `all` · 5708 articles in the corpus, 4608 observations, 4009 events in the fact book.
 
 ## The book
 
@@ -72,27 +72,31 @@ Generated 2026-09-17 14:20 UTC · slot `all` · 5703 articles in the corpus, 460
 
 | series | latest | as of | change | source |
 |---|---|---|---|---|
-| ICE BofA US high-yield option-adjusted spread, % | 2.76 | 2026-09-15 | +0.05 | fred |
+| ICE BofA US high-yield option-adjusted spread, % | 2.70 | 2026-09-16 | -0.06 | fred |
 | BNM Overnight Policy Rate, % | 2.75 | 2026-09-03 | +0 | bnm_opr |
 | US CPI, all items, index 1982-84=100 | 334.13 | 2026-08-01 | +1.318 | fred |
-| Brent crude, USD per barrel (EIA, daily) | 109.51 | 2026-09-09 | +3.39 | fred |
+| Brent crude, USD per barrel (EIA, daily) | 130.80 | 2026-09-15 | +9.55 | fred |
 | Malaysian ringgit per US dollar | 4.07 | 2026-09-11 | +0.0061 | fred |
-| Federal funds effective rate, % | 3.63 | 2026-09-14 | +0 | fred |
-| 10-year Treasury yield, % | 4.97 | 2026-09-14 | +0.01 | fred |
-| 2-year Treasury yield, % | 4.65 | 2026-09-14 | +0.02 | fred |
+| Federal funds effective rate, % | 3.63 | 2026-09-15 | +0 | fred |
+| 10-year Treasury yield, % | 5 | 2026-09-15 | +0.03 | fred |
+| 2-year Treasury yield, % | 4.67 | 2026-09-15 | +0.02 | fred |
 | Malaysia CPI headline, index 2010=100 | 137.10 | 2026-07-01 | +0 | dosm_cpi |
 | Broad US dollar index | 118.21 | 2026-09-11 | +0.1339 | fred |
-| NASDAQ Composite, index level | 25,981.57 | 2026-09-15 | -204.84 | fred |
+| NASDAQ Composite, index level | 25,978.42 | 2026-09-16 | -3.15 | fred |
 | Aluminium, USD per tonne (IMF PCPS via FRED) | 3,158.26 | 2026-07-01 |  | fred |
-| S&P 500, index level | 7,585.73 | 2026-09-15 | -34.25 | fred |
-| 10y minus 2y Treasury spread, % | 0.33 | 2026-09-15 | +0.01 | fred |
+| S&P 500, index level | 7,551.81 | 2026-09-16 | -33.92 | fred |
+| 10y minus 2y Treasury spread, % | 0.27 | 2026-09-16 | -0.06 | fred |
 | US unemployment rate, % | 4.10 | 2026-08-01 | +0 | fred |
-| CBOE VIX, index | 17.20 | 2026-09-15 | +0.1 | fred |
+| CBOE VIX, index | 17.71 | 2026-09-16 | +0.51 | fred |
 
 ## Collection
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 17:13 | dbnomics | ok | 450 | 0 | 0 | facts 0;  |
+| 17:13 | jin10_flash | ok | 19 | 9 | 5 | facts 0;  |
+| 17:13 | fred | ok | 506 | 0 | 0 | facts 14;  |
+| 17:13 | fmp | ok | 0 | 0 | 0 | skipped: no name in the book trades in slot 'us_preopen' |
 | 14:20 | eodhd | ok | 0 | 0 | 0 | facts 0; MYX:1155: deferred by the 2-a-day credit budget; next in rotation; MYX: |
 | 14:20 | twse_openapi | ok | 8 | 0 | 0 | facts 5;  |
 | 14:20 | jin10_flash | ok | 17 | 7 | 6 | facts 0;  |
