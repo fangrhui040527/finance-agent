@@ -50,7 +50,7 @@ Full design detail starts at **[`docs/README.md`](docs/README.md)**.
 ## Status
 
 **Everything except P16 is built and tested - including the thirteen-screen web
-app** (`make web`, 127.0.0.1 only). 1,400+ tests, no network and no keys needed
+app** (`make web`, 127.0.0.1 only). 2,500+ tests, no network and no keys needed
 to run any of them. CI runs lint (ruff), types (pyright), the suite with a 92%
 coverage floor, `verify.py`, stress, the eval ratchet, preflight doctor and the
 no-execution grep on ubuntu AND windows, 3.11 and 3.12, from a committed

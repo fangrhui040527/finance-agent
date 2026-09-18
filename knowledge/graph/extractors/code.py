@@ -55,6 +55,9 @@ DOC_SUFFIXES = (".md",)
 SKIP_DIRS = {
     ".git",
     ".venv",
+    # Nested worktrees. A second copy of every module defines every name
+    # twice, and a name defined twice resolves to no caller at all.
+    ".claude",
     "__pycache__",
     "node_modules",
     "debug",
@@ -127,8 +130,15 @@ def _module_name(path: Path, root: Path) -> str:
     return ".".join(parts) or rel.stem
 
 
+def _skipped(path: Path, root: Path) -> bool:
+    """Match the skip list below the root only. The checkout itself may sit
+    under a `.claude/` or a `build/` - every harness worktree does - and where
+    the repository lives says nothing about what is in it."""
+    return any(part in SKIP_DIRS for part in path.relative_to(root).parts)
+
+
 def python_files(root: Path) -> list[Path]:
-    return sorted(p for p in root.rglob("*.py") if not any(part in SKIP_DIRS for part in p.parts))
+    return sorted(p for p in root.rglob("*.py") if not _skipped(p, root))
 
 
 class CodeExtractor(Extractor):
@@ -270,7 +280,7 @@ class CodeExtractor(Extractor):
         pages = sorted(
             p
             for p in self.root.rglob("*")
-            if p.suffix in DOC_SUFFIXES and not any(part in SKIP_DIRS for part in p.parts)
+            if p.suffix in DOC_SUFFIXES and not _skipped(p, self.root)
         )
         for page in pages:
             try:
