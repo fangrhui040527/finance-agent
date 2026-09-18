@@ -39,6 +39,7 @@ file is dropped the first time it is read.
 from __future__ import annotations
 
 import sqlite3
+import threading
 from collections.abc import Callable
 from datetime import UTC, date, datetime
 from pathlib import Path
@@ -145,7 +146,19 @@ class PriceCache:
         if p.parent != Path("."):
             p.parent.mkdir(parents=True, exist_ok=True)
         self._path = str(p)
-        self.conn = sqlite3.connect(self._path)
+        # One cache lives for the whole process inside `default_feed()`, and the
+        # web app answers sync endpoints from a threadpool: the thread that opens
+        # this connection is not the thread that reads it next. sqlite3 refuses
+        # that by default, so it is allowed here - and allowing it is not enough
+        # on its own. The module's serialized mode protects one statement at a
+        # time; `get` is a read followed by a conditional delete and a commit,
+        # `put` a write followed by a commit, and two threads interleaving those
+        # on one connection commit each other's half-done work or read a row
+        # mid-replacement. `_lock` makes each method one step, so the connection
+        # is shared but never entered twice at once. Every other store opens per
+        # call and needs neither.
+        self.conn = sqlite3.connect(self._path, check_same_thread=False)
+        self._lock = threading.Lock()
         _enable_wal(self.conn, self._path, timeout_ms=5000)
         self.conn.executescript(SCHEMA)
         if "fetched_at" not in {r[1] for r in self.conn.execute("PRAGMA table_info(price_csv)")}:
@@ -158,6 +171,10 @@ class PriceCache:
         self._now = now or (lambda: datetime.now(UTC).isoformat())
 
     def get(self, feed: str, symbol: str) -> str | None:
+        with self._lock:
+            return self._get(feed, symbol)
+
+    def _get(self, feed: str, symbol: str) -> str | None:
         row = self.conn.execute(
             "SELECT fetched_on, body FROM price_csv WHERE feed = ? AND symbol = ?",
             (feed, symbol),
@@ -191,14 +208,15 @@ class PriceCache:
     def put(self, feed: str, symbol: str, body: str) -> None:
         if not looks_like_bars(body):
             return  # an error page is not a cache hit; let the next process try
-        self.conn.execute(
-            "INSERT INTO price_csv (feed, symbol, fetched_on, fetched_at, body)"
-            " VALUES (?,?,?,?,?)"
-            " ON CONFLICT(feed, symbol) DO UPDATE SET fetched_on=excluded.fetched_on,"
-            " fetched_at=excluded.fetched_at, body=excluded.body",
-            (feed, symbol, self._today(), self._now(), body),
-        )
-        self.conn.commit()
+        with self._lock:
+            self.conn.execute(
+                "INSERT INTO price_csv (feed, symbol, fetched_on, fetched_at, body)"
+                " VALUES (?,?,?,?,?)"
+                " ON CONFLICT(feed, symbol) DO UPDATE SET fetched_on=excluded.fetched_on,"
+                " fetched_at=excluded.fetched_at, body=excluded.body",
+                (feed, symbol, self._today(), self._now(), body),
+            )
+            self.conn.commit()
 
     def fetched_at(self, feed: str, symbol: str) -> datetime | None:
         """When this body was pulled, or None for a row cached before the column.
@@ -208,10 +226,11 @@ class PriceCache:
         market's shut, and `fetched_on` cannot answer that. See
         `core.market.calendar.price_state`, which owns the rule.
         """
-        row = self.conn.execute(
-            "SELECT fetched_at FROM price_csv WHERE feed = ? AND symbol = ?",
-            (feed, symbol),
-        ).fetchone()
+        with self._lock:
+            row = self.conn.execute(
+                "SELECT fetched_at FROM price_csv WHERE feed = ? AND symbol = ?",
+                (feed, symbol),
+            ).fetchone()
         if row is None or not row[0]:
             return None
         try:
@@ -222,10 +241,11 @@ class PriceCache:
 
     def prune_unusable(self) -> int:
         """Drop every cached body that is not a CSV of bars. Returns the count."""
-        rows = self.conn.execute("SELECT feed, symbol, body FROM price_csv").fetchall()
-        bad = [(f, s) for f, s, b in rows if not looks_like_bars(b)]
-        self.conn.executemany("DELETE FROM price_csv WHERE feed = ? AND symbol = ?", bad)
-        self.conn.commit()
+        with self._lock:
+            rows = self.conn.execute("SELECT feed, symbol, body FROM price_csv").fetchall()
+            bad = [(f, s) for f, s, b in rows if not looks_like_bars(b)]
+            self.conn.executemany("DELETE FROM price_csv WHERE feed = ? AND symbol = ?", bad)
+            self.conn.commit()
         return len(bad)
 
     def close(self) -> None:
