@@ -32,11 +32,17 @@ from engines.paper.settings import PaperSettings
 
 S = PaperSettings()
 
-# Nasdaq trades to 16:00 New York, 21:00 UTC in winter and 20:00 in summer; the
-# calendar carries tz_offset_hours=-5, so 21:00 UTC is the modelled shut. Bursa
-# closes 16:45 MYT, 08:45 UTC. Both are read off the adapters, never hardcoded
-# here - these comments say what the numbers below mean, they do not set them.
+# Nasdaq trades to 16:00 New York: 20:00 UTC under daylight saving, which a
+# September bar is, and 21:00 UTC in winter. The calendar runs on the named zone
+# now; while the adapter carried a fixed UTC-5 the modelled shut was 21:00 UTC
+# all year, an hour after the real September close. Bursa's closing auction and
+# trading-at-last end 17:00 MYT, 09:00 UTC. Both are read off the adapters,
+# never hardcoded here - these comments say what the numbers below mean, they
+# do not set them.
 BAR = date(2026, 9, 16)
+# Bursa did not open on BAR - it was Malaysia Day - so the Bursa cases use the
+# Thursday after. A bar dated a day with no session is tests/test_market_holidays.py.
+BURSA_BAR = date(2026, 9, 17)
 
 
 def test_a_bar_fetched_before_its_market_shut_is_not_called_a_close():
@@ -55,10 +61,19 @@ def test_a_bar_from_an_earlier_session_is_settled_whenever_it_was_pulled():
 
 
 def test_each_market_is_judged_by_its_own_clock():
-    """14:12 UTC is after Bursa's 08:45 shut and before Nasdaq's."""
-    at = datetime(2026, 9, 16, 14, 12, tzinfo=UTC)
-    assert price_state("MYX", BAR, at) == SETTLED
-    assert price_state("XNAS", BAR, at) == PROVISIONAL
+    """14:12 UTC is after Bursa's 09:00 shut and before Nasdaq's 20:00."""
+    at = datetime(2026, 9, 17, 14, 12, tzinfo=UTC)
+    assert price_state("MYX", BURSA_BAR, at) == SETTLED
+    assert price_state("XNAS", BURSA_BAR, at) == PROVISIONAL
+
+
+def test_the_modelled_shut_follows_new_york_daylight_saving():
+    """A September close is 20:00 UTC. With a fixed UTC-5 the calendar put it at
+    21:00, so a settled bar pulled in that hour was printed as the session so
+    far - the opposite error to the one this file opens with, from the same
+    cause: the clock the bar is judged by was not the market's own."""
+    assert price_state("XNAS", BAR, datetime(2026, 9, 16, 19, 59, tzinfo=UTC)) == PROVISIONAL
+    assert price_state("XNAS", BAR, datetime(2026, 9, 16, 20, 0, tzinfo=UTC)) == SETTLED
 
 
 def test_unknown_is_a_third_answer_and_not_a_guess():

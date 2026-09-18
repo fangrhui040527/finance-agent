@@ -15,6 +15,7 @@ turned into a market, is the fix.
 from __future__ import annotations
 
 from markets.contract import MarketAdapter
+from markets.holidays import closures
 from markets.xasx import XASX
 from markets.xetr import XETR
 from markets.xhkg import XHKG
@@ -90,11 +91,17 @@ def get(mic: str) -> MarketAdapter:
     mic = resolve_mic(mic)
     if mic not in _CACHE:
         try:
-            _CACHE[mic] = _ADAPTERS[mic]()
+            cls = _ADAPTERS[mic]
         except KeyError as exc:
             raise KeyError(
                 f"no adapter registered for MIC {mic!r}; supported: {supported()}"
             ) from exc
+        # The one place a market meets its published closures. The classes
+        # default to none so a test can build one bare, and for a year every
+        # caller got exactly that: `_ADAPTERS[mic]()` made each calendar a
+        # weekday filter, and Bursa traded Malaysia Day on paper.
+        table = closures(mic)
+        _CACHE[mic] = cls(holidays=table.holidays, early_closes=table.early_closes)
     return _CACHE[mic]
 
 

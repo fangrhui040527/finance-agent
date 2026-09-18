@@ -69,12 +69,13 @@ class XETR(MarketAdapter):
     settlement_days = 2
     known_at_strategy = KnownAtStrategy.SELF_BUILT
 
-    def __init__(self, holidays=frozenset(), half_days=frozenset()) -> None:
+    def __init__(self, holidays=frozenset(), half_days=frozenset(), early_closes=None) -> None:
         self._cal = SessionCalendar(
             windows=(SessionWindow(time(9, 0), time(17, 30)),),
             tz_offset_hours=1,  # CET; CEST in summer
             holidays=holidays,
             half_days=half_days,
+            early_closes=early_closes,
         )
 
     @property

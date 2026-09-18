@@ -11,7 +11,9 @@ error rather than a crash.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from collections.abc import Mapping
 from dataclasses import dataclass
+from datetime import date, time
 from decimal import Decimal
 from enum import Enum
 
@@ -124,6 +126,24 @@ class MarketAdapter(ABC):
     regulator: str
     settlement_days: int
     known_at_strategy: KnownAtStrategy
+
+    @abstractmethod
+    def __init__(
+        self,
+        holidays: frozenset[date] = frozenset(),
+        half_days: frozenset[date] = frozenset(),
+        early_closes: Mapping[date, time] | None = None,
+    ) -> None:
+        """The constructor is part of the contract.
+
+        Every adapter takes its closures this way, and every one defaults to
+        none, so `markets.registry.get` can hand a market its published table
+        without knowing which market it is building and a test can still build
+        one bare. An adapter owns its windows and its clock; the days it does
+        not open are data, and arrive from `markets/holidays.py`. Abstract so
+        that an adapter which forgets its constructor fails when it is built,
+        not when the registry passes it a table it cannot take.
+        """
 
     @property
     @abstractmethod
