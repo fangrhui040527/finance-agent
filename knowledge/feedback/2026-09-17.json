@@ -1,0 +1,310 @@
+{
+  "day": "2026-09-17",
+  "written_at": "2026-09-18T22:45:00Z",
+  "market": {
+    "regime": "risk_on",
+    "notes": [
+      "XNAS:SPY +1.13% 1d, +0.63% 5d; MYX:^KLSE -0.27% 1d, -2.31% 5d (first Bursa session after Malaysia Day)",
+      "SP500 7637.76 (+85.95), NASDAQCOM 26418.30 (+439.88), VIXCLS 15.44 (-2.27), T10Y2Y 0.27 (+0), BAMLH0A0HYM2 2.70 (+0), all 2026-09-17",
+      "DGS2 4.74 (+0.07), DGS10 5.01 (+0.01), DFF 3.63 at 2026-09-16: the short end moved on the Fed decision, the long end did not",
+      "DCOILBRENTEU 130.80 at 2026-09-15, no newer print; the 09-16 vintage caveat stands",
+      "businesstoday.com.my 'Stock Today: Maybank Dips Marginally On Fed Rate Hike' (q 0.80) is a market-level attribution, recorded as one"
+    ]
+  },
+  "names": [
+    {
+      "instrument_id": "MYX:1155",
+      "move": {
+        "return_1d": -0.0058,
+        "return_5d": -0.0096,
+        "market_1d": -0.0027,
+        "market_component": -0.003,
+        "drift": -0.0007,
+        "drift_standard_errors": 1.0,
+        "idiosyncratic": -0.0021,
+        "beta": 1.13,
+        "sigma": 0.29,
+        "unexplained_share": 0.37,
+        "verdict": "not_significant"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [],
+      "note": "Four rows, none with the company as subject: sukuk arranger, a certification, the Fed-hike wrap, a research-house citation."
+    },
+    {
+      "instrument_id": "MYX:5347",
+      "move": {
+        "return_1d": 0.0,
+        "return_5d": -0.0306,
+        "market_1d": -0.0027,
+        "market_component": -0.0021,
+        "drift": -0.0003,
+        "drift_standard_errors": 0.5,
+        "idiosyncratic": 0.0024,
+        "beta": 0.79,
+        "sigma": 0.35,
+        "unexplained_share": 0.5,
+        "verdict": "not_significant"
+      },
+      "causes": [
+        {
+          "claim": "FOLLOW-UP to the 2026-09-15 candidate, not a new cause: the AFA review convened for 09-17 produced consumer relief - AFA, retail charge and SST waived for households up to 800 kWh until 2026-12-31. The confirming observation the 09-16 page asked for arrived; the name printed +0.00%.",
+          "evidence": [
+            "soyacincau.com:2026-09-17:q0.65:TNB Bill Relief: Anwar announces AFA, retail charge and SST exemptions up to 800kWh until 31 December 2026",
+            "focusmalaysia.my:2026-09-17:q0.65:PMX ridiculed for using hazy spell as excuse for 'kaw kaw' spike in household TNB bill"
+          ],
+          "chain": [
+            "09-15: -2.35%, -1.50pp idiosyncratic, no_identified_catalyst, while TNB answered complaints about bills under the AFA pass-through",
+            "09-16: government review convened for 09-17",
+            "09-17: exemptions announced for households to 800 kWh until end-2026",
+            "who funds the exemption - Treasury, a later tariff period, or TNB's recovery - is not in any collected row; unknown: no collected evidence reaches further"
+          ],
+          "confidence": 0.35,
+          "confirm": "a story or filing naming who bears the cost of the exemptions",
+          "refute": "TNB stating the relief is fully compensated"
+        }
+      ],
+      "open_questions": [
+        "who funds the AFA/retail-charge/SST exemptions to 800 kWh (2026-09-17)",
+        "is the 5d move the results print the 2026-09-04 roundup referred to (2026-09-04)"
+      ],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:5183",
+      "move": {
+        "return_1d": -0.0654,
+        "return_5d": 0.0681,
+        "market_1d": -0.0027,
+        "market_component": 0.0003,
+        "drift": 0.0014,
+        "drift_standard_errors": 0.4,
+        "idiosyncratic": -0.0671,
+        "beta": -0.12,
+        "sigma": null,
+        "unexplained_share": 0.97,
+        "verdict": "no_identified_catalyst",
+        "note": "Largest single-session move in the book's record. Verdict reports an empty candidate list (no Bursa events in facts.db). Beta -0.12 on a 120-session window has read -0.10, -0.44, -0.31, -0.12 across four pages; the market leg is not a measurement and the residual is the move."
+      },
+      "causes": [],
+      "quiet": true,
+      "open_questions": [
+        "which of the eleven listed sources carries a Bursa-hours story about this name at all; google_news named it 0 of 5, gdelt refused it (2026-09-17)",
+        "collecting a body (2026-09-10)"
+      ],
+      "watch": [],
+      "no_cause_reason": "nothing collected for the name in the window; DCOILBRENTEU has no print after 2026-09-15 so a Brent retrace cannot be tested; the five Bursa peer price lines are dated 2026-08-31"
+    },
+    {
+      "instrument_id": "MYX:5225",
+      "move": {
+        "return_1d": -0.0026,
+        "return_5d": -0.029,
+        "market_1d": -0.0027,
+        "market_component": -0.002,
+        "drift": -0.0009,
+        "drift_standard_errors": 1.0,
+        "idiosyncratic": 0.0003,
+        "beta": 0.75,
+        "sigma": 0.03,
+        "unexplained_share": 0.09,
+        "verdict": "not_significant"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [
+        {
+          "when": null,
+          "what": "Fortis Supreme Court petition against the Delhi High Court order in the Daiichi proceedings (businesstoday.com.my 2026-09-17 q0.80; cnbctv18.com 2026-09-16 q0.65); EPF stake above 13% (tipranks.com q0.65)"
+        }
+      ]
+    },
+    {
+      "instrument_id": "MYX:8869",
+      "move": {
+        "return_1d": 0.0106,
+        "return_5d": -0.0476,
+        "market_1d": -0.0027,
+        "market_component": -0.0031,
+        "drift": 0.0002,
+        "drift_standard_errors": 0.1,
+        "idiosyncratic": 0.0135,
+        "beta": 1.15,
+        "sigma": 0.71,
+        "unexplained_share": 0.81,
+        "verdict": "not_significant"
+      },
+      "causes": [],
+      "quiet": true,
+      "open_questions": [
+        "collecting anything: four sessions, zero rows (2026-09-15)"
+      ],
+      "watch": [
+        {
+          "when": null,
+          "what": "PALUMUSDM next monthly print; 3158.26 at 2026-07-01 is the only figure held"
+        }
+      ]
+    },
+    {
+      "instrument_id": "MYX:3182",
+      "move": {
+        "return_1d": -0.0155,
+        "return_5d": -0.0155,
+        "market_1d": -0.0027,
+        "market_component": -0.0027,
+        "drift": -0.0022,
+        "drift_standard_errors": 1.3,
+        "idiosyncratic": -0.0107,
+        "beta": 1.0,
+        "sigma": 0.6,
+        "unexplained_share": 0.69,
+        "verdict": "not_significant"
+      },
+      "causes": [],
+      "open_questions": [
+        "the one linked row is about Genting Plantations, a different company; how many of the 22 rows linked to MYX:3182 are mis-linked (2026-09-17)"
+      ],
+      "watch": [],
+      "note": "theedgemalaysia.com momentum list naming Genting Plantations was linked to this name by a one-word match; nothing collected is about Genting Bhd."
+    },
+    {
+      "instrument_id": "XNAS:NVDA",
+      "move": {
+        "return_1d": 0.0254,
+        "return_5d": 0.0045,
+        "market_1d": 0.0113,
+        "market_component": 0.0195,
+        "drift": -0.0013,
+        "drift_standard_errors": 0.7,
+        "idiosyncratic": 0.0073,
+        "beta": 1.72,
+        "sigma": 0.37,
+        "unexplained_share": 0.26,
+        "verdict": "not_significant"
+      },
+      "causes": [],
+      "open_questions": [
+        "filing or release for the Hugging Face transaction (2026-09-04)"
+      ],
+      "watch": [
+        {
+          "when": "2026-11-17",
+          "what": "earnings_result Q3 2027 (finnhub)"
+        }
+      ],
+      "note": "212 stories, 36 sources, 38 escalated; the escalated set is the semiconductor complex (Micron, Broadcom, neoclouds) - a sector day with the sector leg fixed at 0, but 26% unexplained leaves little residual to mislabel."
+    },
+    {
+      "instrument_id": "XNAS:AAPL",
+      "move": {
+        "return_1d": 0.0138,
+        "return_5d": 0.0319,
+        "market_1d": 0.0113,
+        "market_component": 0.0072,
+        "drift": 0.0022,
+        "drift_standard_errors": 1.3,
+        "idiosyncratic": 0.0044,
+        "beta": 0.64,
+        "sigma": 0.26,
+        "unexplained_share": 0.32,
+        "verdict": "not_significant"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [
+        {
+          "when": "2026-10-28",
+          "what": "earnings_result Q4 2026 (finnhub)"
+        }
+      ],
+      "note": "Third iPhone 18 demand headline in three sessions from finance.yahoo.com at q1.00, pointing three ways, on sessions of 0.26, 0.23 and 0.26 sigma. UK $2.7bn app-tracking lawsuit dated and unmoved."
+    },
+    {
+      "instrument_id": "XNAS:MSFT",
+      "move": {
+        "return_1d": 0.0152,
+        "return_5d": 0.0108,
+        "market_1d": 0.0113,
+        "market_component": 0.0098,
+        "drift": 0.0002,
+        "drift_standard_errors": 0.1,
+        "idiosyncratic": 0.0052,
+        "beta": 0.86,
+        "sigma": 0.23,
+        "unexplained_share": 0.34,
+        "verdict": "not_significant"
+      },
+      "causes": [],
+      "open_questions": [
+        "the press reads the dividend raise as bearish via AI capex; no capex figure to test (2026-09-16)"
+      ],
+      "watch": [
+        {
+          "when": "2026-10-27",
+          "what": "earnings_result Q1 2027 (finnhub)"
+        }
+      ]
+    }
+  ],
+  "machine": {
+    "two_builds_of_the_same_pack": {
+      "built_0352Z_from_pre_us_close_cache": {
+        "XNAS:NVDA": 0.0245,
+        "XNAS:AAPL": 0.0026,
+        "XNAS:MSFT": 0.0125,
+        "XNAS:SPY": 0.0098
+      },
+      "built_2235Z_from_settled_bars": {
+        "XNAS:NVDA": 0.0254,
+        "XNAS:AAPL": 0.0138,
+        "XNAS:MSFT": 0.0152,
+        "XNAS:SPY": 0.0113
+      },
+      "bursa_rows_identical": true,
+      "note": "the 03:52 build's US 09-17 bars were intraday quotes captured by the 14:18 bursa_close price step on 09-17 - the defect #74 (merged 2026-09-18 03:15Z) named; fetched_at is written from today's sweeps onward"
+    },
+    "schedule": {
+      "day_us_close_landed": "2026-09-17T23:33:09Z",
+      "day_us_close_delay": "+2h18m",
+      "today_bursa_close": "2026-09-18T14:18:14Z (+4h58m)",
+      "today_us_preopen": "2026-09-18T17:12:48Z (+4h43m)",
+      "tonight_us_close_at_2239Z": "no run object (+1h24m); not dispatched - seventh consecutive correct no-op"
+    },
+    "fact_book": {
+      "bursa_names_with_observations": 0,
+      "bursa_events": 0,
+      "future_knowable_rows": 49,
+      "note": "the finnhub/fmp known_at = period_end stamp confirmed as a defect today; fix in flight"
+    },
+    "monitor": {
+      "open": 0,
+      "at": "2026-09-18T22:39Z"
+    }
+  },
+  "data_quality": {
+    "failed": [],
+    "degraded": [
+      "gdelt: HTTP 429 (Apple, Microsoft at 23:35; Petronas Chemicals at 14:20), read-empty NVIDIA/Tenaga/IHH, deferred Press Metal/Genting/Maybank; 0 rows stored, fifth consecutive day",
+      "alphavantage_news: quota exhausted for XNAS:MSFT, fifth day",
+      "eodhd: 0 facts both slots (2-a-day credit budget; Bursa names outside the free plan)",
+      "yahoo_rss: read but empty for all six Bursa names",
+      "google_news bursa_close: named the company 9 of 48 (Petronas Chemicals 0/5, Press Metal 0/1)"
+    ],
+    "skipped": [
+      "fmp: no name in the book trades in slot 'us_preopen' (structural - the slot carries no market codes; fix in flight)"
+    ],
+    "recovered": [
+      "edgar: fetched 6, wrote 6 facts",
+      "nst_business 46 rows, fmt_business 50 rows"
+    ]
+  },
+  "lessons": [
+    "The same session read twice is two different pages, and only the fetch time tells them apart: Apple moved 1.12pp between a pre-close build and a settled one without trading.",
+    "A name that is quiet in the corpus and violent in the tape is the case the collector exists for and handles worst: the largest move in the book's record produced zero rows.",
+    "A confirming observation can arrive and still not move the name; without a figure the page cannot tell priced-in from not-this-company's-cost.",
+    "A beta that flips sign from page to page measures the window, not the market leg; on such a name the residual is the move, and a market component of +0.03% is the window in print.",
+    "An entity match on one word is not a mention: Genting Plantations in a momentum list is not Genting Bhd."
+  ]
+}
