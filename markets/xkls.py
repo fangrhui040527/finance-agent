@@ -8,13 +8,25 @@ Fee schedule per docs/04 section 6.3 and docs/09 section 11, checked Aug 2026:
 Those minimums are what make small positions uneconomic - which is exactly what
 the cost-floor cap in docs/05 section 3 exists to catch.
 
+Sessions: 09:00-12:30 and 14:30-17:00 MYT, no daylight saving. Continuous
+trading in the afternoon ends 16:45, but the day is not over: the pre-closing
+phase runs to 16:50, the closing auction prints the day's close, and
+trading-at-last runs to 17:00. The close a bar carries is the auction's, so a
+calendar that ended the session at 16:45 had `price_state` calling a Bursa
+bar settled a quarter of an hour before its close existed.
+
+Closures come from `markets/holidays.py` by way of the registry. Bursa has no
+half days since 26 January 2024; an adapter built bare has no holidays, which
+is right for a test fixture and wrong for a market.
+
 Point-in-time: no vendor supplies known_at for Bursa. Self-built from
 announcement dates (docs/06 section 3.2).
 """
 
 from __future__ import annotations
 
-from datetime import time
+from collections.abc import Mapping
+from datetime import date, time
 from decimal import Decimal
 
 from core.market.calendar import SessionCalendar, SessionWindow
@@ -46,15 +58,21 @@ class XKLS(MarketAdapter):
     settlement_days = 2
     known_at_strategy = KnownAtStrategy.SELF_BUILT
 
-    def __init__(self, holidays=frozenset(), half_days=frozenset()) -> None:
+    def __init__(
+        self,
+        holidays: frozenset[date] = frozenset(),
+        half_days: frozenset[date] = frozenset(),
+        early_closes: Mapping[date, time] | None = None,
+    ) -> None:
         self._cal = SessionCalendar(
             windows=(
                 SessionWindow(time(9, 0), time(12, 30)),
-                SessionWindow(time(14, 30), time(16, 45)),
+                SessionWindow(time(14, 30), time(17, 0)),  # auction and trading-at-last included
             ),
             tz_offset_hours=8,
             holidays=holidays,
             half_days=half_days,
+            early_closes=early_closes,
         )
 
     @property

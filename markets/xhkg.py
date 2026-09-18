@@ -107,7 +107,7 @@ class XHKG(MarketAdapter):
     settlement_days = 2
     known_at_strategy = KnownAtStrategy.SELF_BUILT
 
-    def __init__(self, holidays=frozenset(), half_days=frozenset()) -> None:
+    def __init__(self, holidays=frozenset(), half_days=frozenset(), early_closes=None) -> None:
         # HKEX keeps a lunch break, unlike SGX: 09:30-12:00 and 13:00-16:00.
         self._cal = SessionCalendar(
             windows=(
@@ -117,6 +117,7 @@ class XHKG(MarketAdapter):
             tz_offset_hours=8,
             holidays=holidays,
             half_days=half_days,
+            early_closes=early_closes,
         )
 
     @property

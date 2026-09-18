@@ -69,12 +69,13 @@ class XNSE(MarketAdapter):
     settlement_days = 1  # T+1 since Jan 2023
     known_at_strategy = KnownAtStrategy.SELF_BUILT
 
-    def __init__(self, holidays=frozenset(), half_days=frozenset()) -> None:
+    def __init__(self, holidays=frozenset(), half_days=frozenset(), early_closes=None) -> None:
         self._cal = SessionCalendar(
             windows=(SessionWindow(time(9, 15), time(15, 30)),),
             tz_offset_hours=5,  # IST is UTC+5:30; the half hour is lost
             holidays=holidays,  # here and matters only for intraday work
             half_days=half_days,
+            early_closes=early_closes,
         )
 
     @property
