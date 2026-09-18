@@ -145,7 +145,13 @@ class PriceCache:
         if p.parent != Path("."):
             p.parent.mkdir(parents=True, exist_ok=True)
         self._path = str(p)
-        self.conn = sqlite3.connect(self._path)
+        # One cache lives for the whole process inside `default_feed()`, and the
+        # web app answers sync endpoints from a threadpool: the thread that opens
+        # this connection is not the thread that reads it next. sqlite3 refuses
+        # that by default; the module's serialized mode makes the sequential
+        # get/put pattern here safe once it is allowed. Every other store opens
+        # per call and needs no such thing.
+        self.conn = sqlite3.connect(self._path, check_same_thread=False)
         _enable_wal(self.conn, self._path, timeout_ms=5000)
         self.conn.executescript(SCHEMA)
         if "fetched_at" not in {r[1] for r in self.conn.execute("PRAGMA table_info(price_csv)")}:

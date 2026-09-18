@@ -265,7 +265,7 @@ Tell them the three rules that are not negotiable:
   retention is a privacy control, the traces hold verbatim prompts.
 - docker-compose binds loopback only and refuses to start without passwords
   in `.env` (no more shipped defaults).
-- The web app: `make web` / `run web`, twelve screens on 127.0.0.1:8765.
+- The web app: `make web` / `run web`, thirteen screens on 127.0.0.1:8765.
 
 ---
 

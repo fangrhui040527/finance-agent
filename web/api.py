@@ -527,6 +527,46 @@ def alerts(history: int = 20) -> S.Envelope:
     )
 
 
+# --- paper book ----------------------------------------------------------------
+
+
+@router.get("/paper")
+def paper() -> S.Envelope:
+    """The paper book's status page (docs/22): the hypothetical USD ledger.
+
+    One reading of `status()` serves both halves: `text` is what `T.paper_status`
+    renders - `Status.render()` plus the disclaimer, so the parity test holds by
+    construction - and `data` is the same Status as JSON. Reading it once matters
+    beyond tidiness: the fundable table walks the feed for every watchlist name,
+    so a second reading doubles the day's quota spend and can disagree with the
+    first when a bar lands between them. A book that was never opened is NO BOOK
+    in the text and None in the data; nothing here invents a balance.
+    """
+    from engines.paper.book import fx_for
+    from engines.paper.report import status as _status
+    from engines.paper.store import PaperStore
+
+    cfg = T._cfg()
+    store = PaperStore.open_existing(cfg.paper.database)
+    if store is not None:
+        with store:
+            if store.has_books():
+                st = _status(store, cfg, T._feed(), fx_for(cfg))
+                return S.envelope(
+                    st.render() + T.DISCLAIMER, data=st.as_json(), disclaimer=DISCLAIMER
+                )
+    return _run(T.paper_status)  # NO BOOK, in the tool's own words
+
+
+@router.get("/paper/report")
+def paper_report(days: int = 30) -> S.Envelope:
+    """The book against its control - scored, or CANNOT SCORE while the record
+    is shorter than a track record. The observability tool's words, unchanged."""
+    from mcp_server import observability as O
+
+    return _run(O.paper_report, days=days)
+
+
 # --- traces --------------------------------------------------------------------
 
 
