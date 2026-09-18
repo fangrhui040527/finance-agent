@@ -16,13 +16,25 @@ from dataclasses import dataclass, field
 from datetime import date
 from enum import Enum
 
-from engines.attribution.regression import Fit, corrado_rank_z, huber_fit
+from engines.attribution.regression import Fit, corrado_rank_z, huber_fit, rank_p_value
 
 ESTIMATION_LOOKBACK = 260
 ESTIMATION_GAP = 10  # window ends 10 sessions before the event
 MIN_OBSERVATIONS = 120
 SAR_HUNT_THRESHOLD = 1.5  # below this, no cause hunt
 IDIO_SHARE_MARKET_DRIVEN = 0.20
+#: Two-sided exact rank p-value at which the non-parametric test agrees a move
+#: is unusual. The parametric test uses |SAR| > 1.96, the same 5% in sigma units.
+RANK_P_THRESHOLD = 0.05
+#: Below this r-squared the market beta is a number the window did not really
+#: pin down. PCHEM printed "Beta -0.12" from a fit that explained 1% of its
+#: variance, and nothing in the note said the beta was not worth reading.
+WEAK_FIT_R2 = 0.10
+#: The currency leg's share of the gross move above which the reason says so.
+#: The verdict is about the local-currency legs; past this point the figure a
+#: base-currency holder sees is mostly the exchange rate, and a reason that
+#: did not say so would read as if the verdict described that figure.
+CURRENCY_DOMINANT_SHARE = 0.5
 
 
 class Component(str, Enum):
@@ -65,6 +77,13 @@ class Significance:
     rank_z: float
     parametric_significant: bool
     rank_significant: bool
+    #: Exact two-sided p-value of the event residual's rank among the estimation
+    #: residuals (`regression.rank_p_value`). `rank_significant` is this against
+    #: RANK_P_THRESHOLD. It used to be `rank_z` against 1.96, which for one event
+    #: day is unreachable - |z| stays under 1.73 - so the rank test never fired
+    #: and `agree` was False for every parametrically significant move. `rank_z`
+    #: is kept as the descriptive statistic it is.
+    rank_p: float = 1.0
 
     @property
     def agree(self) -> bool:
@@ -195,6 +214,18 @@ def decompose(
         est_note += f", shrunk {fit.shrinkage:.0%} toward prior"
     if fit.n < 2 * MIN_OBSERVATIONS:
         est_note += " (short window; betas unstable)"
+    # The fit's r-squared is what says whether the beta printed next to it means
+    # anything. A market beta from a fit that explains a hundredth of the
+    # variance is a coin toss with two decimals, and the market leg built on it
+    # is not evidence of anything; the residual, which is nearly the whole move
+    # in that case, is what the reader should look at.
+    # A robust fit can score marginally below the mean in squared error, which
+    # prints as "-0.00" and reads as a formatting fault; zero is what it means.
+    est_note += f"; R2 {max(fit.r_squared, 0.0):.2f}"
+    if fit.r_squared < WEAK_FIT_R2:
+        est_note += (
+            " (market beta weakly identified; read the unexplained share, not the market leg)"
+        )
     est_note += f"; drift {fit.coefficients[0] * 100:+.3f}pp/session"
     if fit.intercept_se:
         t = abs(fit.coefficients[0]) / fit.intercept_se
@@ -232,10 +263,26 @@ def decompose(
 
     sar = ar / fit.residual_sigma if fit.residual_sigma > 1e-12 else 0.0
     rank_z = corrado_rank_z(ar, fit.residuals)
-    sig = Significance(sar, rank_z, abs(sar) > 1.96, abs(rank_z) > 1.96)
+    rank_p = rank_p_value(ar, fit.residuals)
+    sig = Significance(sar, rank_z, abs(sar) > 1.96, rank_p < RANK_P_THRESHOLD, rank_p)
+    # docs/03 section 2.3: disagreement between the two tests is itself worth
+    # logging. It goes in the note, where the reader of the verdict sees it.
+    if not sig.agree:
+        est_note += (
+            f"; the parametric and rank tests disagree (|SAR| {abs(sar):.2f}, rank p {rank_p:.3f})"
+        )
 
-    idio_share = abs(ar) / gross
-    unexplained = idio_share
+    # `unexplained_share` keeps docs/03 section 2.5's definition, every leg in
+    # the denominator, the currency included. The MARKET_DRIVEN test cannot use
+    # it: the question there is whether the LOCAL move was the market's, and a
+    # currency leg in the denominator answered it for the wrong reason - NVDA up
+    # 3% in USD on a flat market, the ringgit leg -15%, came out as "the market
+    # and sector moved" with 16% unexplained. The gate is the local-currency legs
+    # only; a dominant currency leg is said in the reason instead.
+    unexplained = abs(ar) / gross
+    local_gross = sum(abs(v) for c, v, _ in contribs if c is not Component.CURRENCY) or 1.0
+    idio_local_share = abs(ar) / local_gross
+    fx_share = abs(c_fx) / gross
 
     if abs(sar) <= SAR_HUNT_THRESHOLD:
         verdict, reason = (
@@ -244,15 +291,23 @@ def decompose(
                 f"idiosyncratic move is {abs(sar):.2f} sigma, within normal variation for this instrument"
             ),
         )
-    elif idio_share < IDIO_SHARE_MARKET_DRIVEN:
+    elif idio_local_share < IDIO_SHARE_MARKET_DRIVEN:
         verdict, reason = (
             Verdict.MARKET_DRIVEN,
-            (f"only {idio_share:.0%} of the move is company-specific; the market and sector moved"),
+            (
+                f"only {idio_local_share:.0%} of the local-currency move is company-specific; "
+                "the market and sector moved"
+            ),
         )
     else:
         verdict, reason = (
             Verdict.NO_IDENTIFIED_CATALYST,
             ("significant idiosyncratic move; no catalyst matched yet"),
+        )
+    if fx_share >= CURRENCY_DOMINANT_SHARE:
+        reason += (
+            f"; in {base_currency} the move is {fx_share:.0%} currency, which the verdict "
+            "does not describe and which says nothing about the company"
         )
 
     return MoveExplanation(
