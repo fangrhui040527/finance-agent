@@ -1,0 +1,110 @@
+{
+  "day": "2026-09-17",
+  "written_at": "2026-09-17T22:52:00Z",
+  "phase": "observe",
+  "week": 2,
+  "equity_usd": 1000.0,
+  "cash_usd": 1000.0,
+  "control_equity_usd": 1000.0,
+  "drawdown": 0.0,
+  "halted": false,
+  "marks": 14,
+  "positions": [],
+  "changes": [],
+  "caps": [
+    {"cap": "largest name", "value": "0.00%", "limit": "25%", "breached": false},
+    {"cap": "invested", "value": "0.00%", "limit": "0%", "breached": false},
+    {"cap": "cash floor", "value": "100.00%", "limit": "20%", "breached": false},
+    {"cap": "names held", "value": "0", "limit": "0", "breached": false},
+    {"cap": "drawdown from peak", "value": "0.00%", "limit": "8%", "breached": false},
+    {"cap": "turnover used, 5 weekdays", "value": "USD 0.00", "limit": "USD 500.00", "breached": false}
+  ],
+  "attribution": {"market": null, "idiosyncratic": null, "note": "no positions held; nothing to attribute"},
+  "the_fed_hiked": {
+    "note": "The FOMC decision the 2026-09-15 Malaysian wires were waiting on has happened, and it was a RISE. The book has no position to express this and no tested rule that takes a policy rate as an input. Recorded because it reframes the session, not because it changes a weight; the decomposition belongs on tomorrow's feedback page.",
+    "evidence": [
+      "www.nst.com.my:2026-09-17T00:39Z:Wall Street swings after Fed hikes interest rate to battle inflation",
+      "www.businesstoday.com.my:2026-09-17T05:02Z:q0.80:Stock Today: Maybank Dips Marginally On Fed Rate Hike",
+      "www.nst.com.my:2026-09-17T04:38Z:US rate hike puts Malaysian banks' bond portfolios in spotlight",
+      "www.freemalaysiatoday.com:2026-09-17T09:32Z:Bursa ends lower as US bond yields, Fed tightening concerns weigh",
+      "www.malaymail.com:2026-09-17T10:06Z:Losers outpace gainers as Bursa Malaysia extends pullback on US rate fears"
+    ]
+  },
+  "bursa_reopened": {
+    "note": "Malaysia Day closed the exchange on 2026-09-16; the feedback page committed an hour ago establishes that from blank bars, an 89-row press day with no market wrap, and two Malaysia Day features. Closes below are against 2026-09-15, the last session before the holiday.",
+    "closes": {
+      "MYX:5183": [5.2, 4.86, -0.0654],
+      "MYX:3182": [1.93, 1.9, -0.0155],
+      "MYX:1155": [10.42, 10.36, -0.0058],
+      "MYX:5225": [7.71, 7.69, -0.0026],
+      "MYX:5347": [13.32, 13.32, 0.0],
+      "MYX:8869": [7.52, 7.6, 0.0106],
+      "MYX:^KLSE": [1679.21, 1674.74, -0.0027]
+    }
+  },
+  "it_became_fundable_by_falling": {
+    "instrument_id": "MYX:5183",
+    "before": {"price": 5.2, "lot_usd": 127.39, "share_of_equity": 0.127, "max_lots": 1, "round_trip": 0.0176},
+    "after": {"price": 4.86, "lot_usd": 118.55, "share_of_equity": 0.119, "max_lots": 2, "round_trip": 0.0187},
+    "note": "Nothing about the name improved. The cap admits it in proportion to how far it has fallen, and the round trip rose from 1.76% to 1.87% on the smaller ticket - the only thing that got worse. A per-name weight cap is a risk control, and reading its arithmetic as permission inverts it.",
+    "five_session_arc": "+22.56% to 2026-09-14, -1.33% on 09-15, no session on 09-16, -6.54% on 09-17",
+    "the_evidence_is_a_losers_list": "All five rows collected for it today are market wraps. The one that names it does so as a price observation: 'Hong Leong Bank, PetChem Lead Bursa Losers As ViTrox Tops Gainers' (businesstoday.com.my, 2026-09-17T09:35Z, q0.65, no body). That is the same shape as 'rises to three-month high' on 09-14, which the 09-15 page declined to treat as a cause, pointing the other way.",
+    "and_the_crude_leg_got_stronger": "Brent printed 130.80 at 2026-09-15 and the whole move above 120 became knowable only today. The crude leg that carried the run up is stronger than this book knew, and the name fell 6.54% anyway. That pairing is not something the collected evidence explains."
+  },
+  "decision": {
+    "recorded": true,
+    "weights": {},
+    "kind": "all_cash",
+    "prediction_id": "paper-2026-09-17-allcash-21d-7667",
+    "horizon_days": 21,
+    "grades_on": "2026-10-17",
+    "confidence": 0.55,
+    "confidence_note": "A fourth night unchanged. A rate hike is the kind of event that would tempt a number to move; it is not evidence about THIS claim, and a confidence that drifts with the news rather than with the odds makes the graded series unreadable.",
+    "claim": "nothing in the fundable universe beats cash over 21 sessions",
+    "fx": {"myr_per_usd": 4.0995, "source": "bnm", "date": "2026-09-17"},
+    "fundable_set": {
+      "MYX:5183": {"lot_usd": 118.55, "share_of_equity": 0.119, "round_trip": 0.0187, "max_lots": 2, "why_not": "fundable only because it fell 6.54%; its evidence is a losers list"},
+      "MYX:5225": {"lot_usd": 187.58, "share_of_equity": 0.188, "round_trip": 0.0123, "max_lots": 1, "why_not": "a contested Supreme Court petition and an EPF stake increase, pointing opposite ways, neither bodied"},
+      "MYX:8869": {"lot_usd": 185.39, "share_of_equity": 0.185, "round_trip": 0.0125, "max_lots": 1, "why_not": "ZERO ROWS FOR A FOURTH SESSION, and it was the only Bursa name up today (+1.06%)"},
+      "MYX:3182": {"lot_usd": 46.35, "share_of_equity": 0.046, "round_trip": 0.0459, "max_lots": 5, "why_not": "two rows, neither about the company; a 4.59% round trip"},
+      "XNAS:NVDA": {"lot_usd": 219.14, "share_of_equity": 0.219, "round_trip": 0.0118, "max_lots": 1, "why_not": "price provisional; yesterday 0.87 sigma against 281 stories from 41 sources and no cause"}
+    },
+    "excluded_on_the_25pc_cap": {"MYX:1155": 0.253, "MYX:5347": 0.325, "XNAS:AAPL": 0.333, "XNAS:MSFT": 0.496},
+    "verified_against_stores": {"paper.db targets": 7, "paper.db applications": 7, "learning.db predictions": 7}
+  },
+  "the_us_prices_are_provisional_for_a_third_night": {
+    "note": "NVIDIA 219.14, Apple 333.26 and Microsoft 496.44 come from the 17:12 UTC us_preopen sweep, and the US session shuts at 20:00. The pack still heads the table 'one lot at the last close'.",
+    "status": "PR #74 labels exactly this and is open, CI-blocked on an unrelated gold-set guard that PR #75 fixes; #75 is green on all four checks. Both wait on a merge decision. Until one lands, this note is the label.",
+    "changes_nothing_tonight": "Apple at 33.3% and Microsoft at 49.6% are excluded under any plausible settle, and NVIDIA at 21.9% is admitted under any."
+  },
+  "mistakes": [
+    "NONE NEW TONIGHT. The 2026-09-16 page's correction - that the 09-15 paper page published intraday quotes as closes - stands unchanged; the same defect is live again tonight and is labelled above rather than repeated as a mistake."
+  ],
+  "corrections": [],
+  "settled": [
+    "The 2026-09-16 page recorded Tenaga's government review as an ANNOUNCED, UNRESOLVED event. The meeting was convened for today and the collector caught nothing from it. An announced review that produces no collected outcome is exactly why it was not treated as a resolution."
+  ],
+  "defects_this_book_depends_on": [
+    "markets/xkls.py configures ZERO holidays, so the Bursa calendar counted Malaysia Day as a session. Opened on the 2026-09-16 feedback page. The paper book's horizon counts weekdays rather than sessions, so grading is approximate in the same direction.",
+    "The paper pack prints 'one lot at the last close' over a table whose newest rows may be intraday quotes. PR #74 open.",
+    "no_identified_catalyst on a Bursa name reports an empty candidate list, not a weighed rejection. Opened 2026-09-15.",
+    "The sector beta is fixed at 0, so any sector-wide session lands in a residual labelled idiosyncratic. Opened 2026-09-14.",
+    "Sixteen peer price lines unrefreshed since the collector outage."
+  ],
+  "conditions_for_a_position": [
+    "OPEN, and now on a fall rather than a run: Petronas Chemicals collecting a body. The question has not changed since 2026-09-10 and the name has moved +-22% around it.",
+    "OPEN, worsening: Press Metal collecting anything. Four sessions, zero rows, fundable throughout - across a -3.09% day, a holiday and a +1.06% recovery.",
+    "OPEN: a us_close sweep before the page is written, or #74 merged so the label is the pack's rather than the page's.",
+    "NEW, and not a condition for a position but a gap in what this system can represent: the Fed hiked and the book has no rate input. Recorded on the night it first mattered.",
+    "OPEN: a per-name cap that admits Tenaga, or an equity level that does.",
+    "OPEN: any fundamental figure at all for a Bursa name; eodhd names the reason - outside the free plan, US only.",
+    "CLOSED: the Bursa proxy, replaced with the index on 2026-09-14."
+  ],
+  "lessons": [
+    "A cap that admits a name because it fell is not telling you the name got better. Petronas Chemicals went from one lot to two by losing 6.54%, and the round trip got worse on the smaller ticket; reading that arithmetic as permission inverts a risk control.",
+    "The same shape of evidence points both ways and is worth no more in either direction. 'Rises to three-month high' and 'leads Bursa losers' are both price observations with no body, and a book that refuses the first must refuse the second.",
+    "A macro event the system cannot represent should be recorded as a gap, not narrated as context. The Fed hiked; this book has no rate input and no tested rule, and saying so is more useful than a paragraph about what rate rises usually do.",
+    "An announced review that produces no collected outcome stays unresolved. The government meeting on electricity bills was convened for today and the collector caught nothing from it - which is why the previous page was right not to treat the announcement as a resolution.",
+    "A vintage can make an old reading stronger and a new price harder to explain at the same time. Brent's move above 120 became knowable today, so the crude leg under Petronas Chemicals' run is better evidenced than it was - and the name fell 6.54% anyway."
+  ]
+}

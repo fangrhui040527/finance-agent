@@ -1,0 +1,153 @@
+{
+  "day": "2026-09-16",
+  "written_at": "2026-09-17T22:45:00Z",
+  "market": {
+    "regime": "risk-off",
+    "notes": [
+      "HALF THIS BOOK DID NOT TRADE. 2026-09-16 was a Wednesday and Malaysia Day; Bursa Malaysia was shut. Six of the nine names have no session, and the six Bursa rows in the pack's moves table are Tuesday's session, repeated and labelled - every Malaysian line carries 'no session for <name> or MYX:^KLSE after 2026-09-15; the figures are correctly dated to the last session on or before 2026-09-16'. No Bursa figure is restated on this page as a 2026-09-16 move.",
+      "XNAS:SPY -0.44% 1d, -1.10% 5d, third consecutive down session. SP500 7551.81 (-33.92), NASDAQCOM 25978.42 (-3.15), VIXCLS 17.71 (+0.51), T10Y2Y 0.27 (-0.06) - the flattest reading this journal has recorded - BAMLH0A0HYM2 2.70 (-0.06), all 2026-09-16; DGS10 5.00 (+0.03), DGS2 4.67 (+0.02) and the effective fed funds rate 3.63 at 2026-09-15.",
+      "DCOILBRENTEU reads 130.80 at 2026-09-15: 97.59 (09-02) -> 100.52 -> 102.24 -> 104.47 -> 106.12 -> 109.51 (09-09) -> 120.98 -> 118.06 -> 121.25 -> 130.80. +34% in nine observations, and everything from 2026-09-10 onward carries knowable 2026-09-17 - it landed in the fact book TODAY. The 2026-09-15 page quoted 109.51 dated 09-09 because that was the newest figure then knowable. That page was not wrong; it was correctly limited.",
+      "All three US drifts read not distinguishable from zero, at 0.1 to 1.3 standard errors. Every line still ends 'sector beta fixed at 0 (no sector proxy cached)'.",
+      "Corpus 5,708 articles, 4,608 observations, 4,009 events."
+    ]
+  },
+  "bursa_did_not_trade": {
+    "date": "2026-09-16",
+    "weekday": "Wednesday",
+    "reason": "Malaysia Day, a federal public holiday; Bursa Malaysia observes it",
+    "evidence": [
+      "THE BARS: ^KLSE, 1155.KL and 8869.KL each carry a 2026-09-16 row with EVERY OHLCV field empty, and trading resumes 2026-09-17 (^KLSE 1677.50 open -> 1674.74 close). That is what Yahoo emits for an exchange holiday, and it is the same blank-close shape cache.is_mid_session was written to catch.",
+      "THE PRESS: the Malaysian feeds stored 89 rows on 2026-09-16 and not one is a market wrap. There is a Bursa close report on 09-15 ('Bursa ends lower ahead of FOMC decision as oil prices rise', freemalaysiatoday.com 09:38Z) and another on 09-17 ('Bursa Malaysia opens lower but rebounds on bargain hunting', themalaysianreserve.com 02:17Z), and nothing between them.",
+      "THE DAY: www.nst.com.my filed two Malaysia Day features on 09-16 - 'KL attractions see many visitors going maskless amid haze on Malaysia Day' (10:21Z) and 'Doctors spend Malaysia Day diving to clean up Sabah waters' (13:46Z)."
+    ],
+    "the_system_does_not_know_this": "markets/xkls.py builds its SessionCalendar with holidays=frozenset() - ZERO holidays configured - so is_session(2026-09-16) returns True and the calendar counts Malaysia Day as a trading day; sessions_between(09-14, 09-18) returns all five weekdays. Nothing broke today, because the decomposition works from cached bars and there were none to find, and the pack's dating label did the work the calendar could not. But any count of sessions over a window spanning a Malaysian holiday is one too many."
+  },
+  "names": [
+    {
+      "instrument_id": "XNAS:MSFT",
+      "move": {
+        "return_1d": -0.0137,
+        "return_5d": -0.0027,
+        "market_1d": -0.0044,
+        "market_component": -0.0037,
+        "drift": 0.0003,
+        "drift_standard_errors": 0.1,
+        "idiosyncratic": -0.0103,
+        "beta": 0.85,
+        "sigma": 0.45,
+        "unexplained_share": 0.72,
+        "note": "Second consecutive fall. 0.45 sigma is an ordinary session for this name."
+      },
+      "causes": [
+        {
+          "claim": "The press reads the 8% quarterly dividend raise as BEARISH, via a claim about AI capital spending. Recorded as a framing, not as a cause: the decomposition does not call for one.",
+          "evidence": [
+            "finance.yahoo.com:2026-09-16:q1.00:escalated:Microsoft Slips as Its Quarterly Dividend Climbs 8%",
+            "finance.yahoo.com:2026-09-16:q1.00:escalated:Microsoft (MSFT) Could Be 18% Overvalued On Its Dividend Increase",
+            "Yahoo:2026-09-16:q0.85:escalated:How Microsoft's Dividend Boost Ties Directly to Its AI Spending",
+            "finance.yahoo.com:2026-09-15:q1.00:escalated:Microsoft announces quarterly dividend increase"
+          ],
+          "chain": [
+            "-1.37% on 2026-09-16 against a -0.37% market component, -1.03pp idiosyncratic, 72% unexplained, 0.45 sigma - NOT significant",
+            "the 2026-09-15 page recorded NO cause for that session's -1.64% on the explicit ground that its only dated event was a dividend increase, a positive-signed event on a name that fell",
+            "the 09-16 collection answers that objection directly: three same-day rows, two at q1.00 and escalated, tie the fall to the raise and route it through AI capital spending",
+            "THE CHAIN STOPS THERE. Every row asserts the link and none quantifies it; there is no capex or free-cash-flow figure in the fact book to test it against; and a headline pairing a fall with the day's news is the cheapest thing a financial wire produces.",
+            "components before narrative: the decomposition calls the session ordinary, so this is recorded as what the press asserts, not as what moved the price"
+          ],
+          "confidence": 0.3,
+          "confirm": "a collected story carrying a capex or free-cash-flow figure alongside the dividend, or the pattern persisting once the decomposition calls a Microsoft session significant",
+          "refute": "the name recovering while the dividend framing continues"
+        }
+      ],
+      "open_questions": [
+        "alphavantage_news quota was exhausted for this name for a FOURTH consecutive day - on the one name whose reading this page had to qualify."
+      ],
+      "watch": []
+    },
+    {
+      "instrument_id": "XNAS:AAPL",
+      "move": {
+        "return_1d": 0.0032,
+        "return_5d": 0.0541,
+        "market_1d": -0.0044,
+        "market_component": -0.0028,
+        "drift": 0.0021,
+        "drift_standard_errors": 1.3,
+        "idiosyncratic": 0.0039,
+        "beta": 0.64,
+        "sigma": 0.23,
+        "unexplained_share": 0.45,
+        "note": "0.23 sigma, after 0.26 sigma the day before. Two ordinary sessions in a row."
+      },
+      "causes": [],
+      "open_questions": [
+        "THE SAME q1.00 SOURCE NARRATED THE SAME PRODUCT IN BOTH DIRECTIONS, ONE DAY APART. 2026-09-15: 'Apple Stock Drops On Lukewarm iPhone 18 Pro Demand' (finance.yahoo.com, q1.00, escalated), session -0.52% at 0.26 sigma. 2026-09-16: 'iPhone 18 Pro Demand Might Be Stronger Than Expected, Which Is Good for Apple Stock' (finance.yahoo.com, q1.00, escalated), session +0.32% at 0.23 sigma. Neither session is significant and neither story explains one; the two days combined move less than this name's ordinary daily variation. NO CAUSE RECORDED, on either page. The clearest instance this journal has collected of why the decomposition runs first."
+      ],
+      "watch": []
+    },
+    {
+      "instrument_id": "XNAS:NVDA",
+      "move": {
+        "return_1d": 0.0082,
+        "return_5d": -0.0437,
+        "market_1d": -0.0044,
+        "market_component": -0.0076,
+        "drift": -0.0015,
+        "drift_standard_errors": 0.8,
+        "idiosyncratic": 0.0173,
+        "beta": 1.73,
+        "sigma": 0.87,
+        "unexplained_share": 0.65,
+        "note": "281 stories from 41 sources, 43 escalated, and none about this session's +1.73pp. The strongest are a CoreWeave/Rubin cluster item and an insider-selling note. Volume of coverage is not evidence of a cause, for the fourth page running."
+      },
+      "causes": [],
+      "open_questions": [
+        "Filing or release for the Hugging Face transaction - edgar answers but fetched 3 and wrote 0 facts today. (since 2026-09-04)",
+        "Finnhub earnings rows carry a knowable date in the future. (since 2026-09-04)"
+      ],
+      "watch": []
+    },
+    {"instrument_id": "MYX:1155", "move": {"note": "NO SESSION - Malaysia Day. Nothing collected for this name in the window."}, "causes": [], "open_questions": [], "watch": []},
+    {"instrument_id": "MYX:5347", "move": {"note": "NO SESSION - Malaysia Day. One row in the window, the 2026-09-15 nst_business AFA rebate story already read on the 09-15 page."}, "causes": [], "open_questions": ["CARRIED, NOT RAISED. The 09-15 page offered the AFA clarification as a cause at confidence 0.35 and the 09-16 collection produced the government review convened for 09-17. A fuel-cost pass-through under public complaint, with Brent up 34% in a fortnight, is a materially better-founded chain than it looked two days ago - but Tenaga did not trade on 09-16, so there is no move here to attach it to."], "watch": [{"when": "2026-09-17", "what": "government meeting to review measures on higher electricity bills"}]},
+    {"instrument_id": "MYX:5183", "move": {"note": "NO SESSION - Malaysia Day. Nothing collected."}, "causes": [], "open_questions": ["The 2026-09-14 story was 'refiners climb as Brent tops US$100'. Brent is now 130.80. The name collected nothing on 09-16 and did not trade. (since 2026-09-10)"], "watch": []},
+    {"instrument_id": "MYX:5225", "move": {"note": "NO SESSION - Malaysia Day."}, "causes": [], "open_questions": ["One row: 'Fortis Healthcare moves Supreme Court to stop forensic audit of IHH takeover' (cnbctv18.com, 2026-09-16, q0.65, no body). Procedural and unresolved; no move to attach it to."], "watch": []},
+    {"instrument_id": "MYX:8869", "move": {"note": "NO SESSION - Malaysia Day. Nothing collected, though the name did not trade."}, "causes": [], "open_questions": [], "watch": []},
+    {"instrument_id": "MYX:3182", "move": {"note": "NO SESSION - Malaysia Day. Nothing collected."}, "causes": [], "open_questions": [], "watch": []}
+  ],
+  "machine": {
+    "monitor": {
+      "open": [],
+      "resolved": [],
+      "notes": [
+        "0 OPEN ALERTS, second consecutive night - and the monitor says so carefully: 'This covers the rules that exist, over their own windows - it is not a statement that everything is well.' On a page whose largest finding is an exchange holiday no rule noticed, that caveat is doing real work.",
+        "No rule fired on the Bursa non-trading day, and none exists that would."
+      ]
+    }
+  },
+  "data_quality": {
+    "failed": [
+      "gdelt on the bursa_close sweep: 'no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests'. On us_close it read empty for all three US names. 0 rows stored for a FOURTH consecutive day, and the refusal is now consistently a 429 rather than silence."
+    ],
+    "degraded": [
+      "alphavantage_news: quota exhausted for XNAS:MSFT, fourth consecutive day",
+      "eodhd: every name deferred by the 2-a-day credit budget on both slots; for the Bursa names, outside the plan",
+      "edgar: fetched 3 and wrote 0 facts - answering, but the widened scope returned nothing storable",
+      "google_news on the bursa sweep fetched 10 against 24 the day before and named the company in 1 of 10, which is a holiday's news flow rather than a collector fault; yahoo_rss read empty for all six Bursa names",
+      "google_news on us_close named the company in 72 of 79; yahoo_rss 56 of 56"
+    ],
+    "skipped": ["fmp: 'no name in the book trades in slot us_preopen'"],
+    "schedule": {
+      "day_us_close": "landed 2026-09-16T23:38:52Z, +2h24m past the 21:15 cron - the fifth consecutive night in the +2h to +2h40m band",
+      "today_slots": "bursa_close landed 2026-09-17T14:18:14Z (+4h58m past 09:20), us_preopen 17:12:48Z (+4h43m past 12:30)",
+      "tonight_us_close": "no run object at 22:35Z, +1h20m. NOT DISPATCHED - the fifth consecutive correct no-op."
+    },
+    "fact_book": "All six Bursa names still read NOTHING COLLECTED, and data/facts.db still holds ZERO events for any of them."
+  },
+  "lessons": [
+    "A market that did not trade is a finding, not a blank. Six of nine names had no session today, and the page that restates yesterday's figures without saying so has invented a day of data.",
+    "A calendar with no holidays in it is not a calendar, it is a weekday filter. Nothing broke today only because the decomposition reads cached bars rather than asking which days were sessions.",
+    "The same source, at the same quality score, can narrate a product in both directions in twenty-four hours. Apple's two q1.00 headlines bracket two sessions that together move less than the name's ordinary daily variation - the argument for running the decomposition before reading the news, as cleanly as this journal is likely to get it.",
+    "A vintaged series protects the page that used it. Quoting Brent at 109.51 on Tuesday was correct on Tuesday; the 130.80 print did not exist yet, and a store that let the page silently pick up today's number would have made Tuesday's reasoning unreproducible.",
+    "An event's sign is evidence, and so is the market's reading of it. The 09-15 page declined to name a dividend increase behind a fall; the press then named exactly that. Both can be recorded without either becoming a cause, because the decomposition still says the session was ordinary."
+  ]
+}
