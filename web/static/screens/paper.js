@@ -99,14 +99,14 @@ function caps(d) {
   return section("caps (value / limit)", [
     table(
       ["cap", "value", "limit", "state"],
-      d.caps.map((c) => [c.cap, c.value, c.limit, c.breached ? chip("breached", "no") : chip("ok", "ok")])
+      (d.caps || []).map((c) => [c.cap, c.value, c.limit, c.breached ? chip("breached", "no") : chip("ok", "ok")])
     ),
   ]);
 }
 
 /* (d) which names one lot can buy at this equity, and at what price. */
 function fundable(d) {
-  const rows = d.fundable.map((f) => {
+  const rows = (d.fundable || []).map((f) => {
     const state = el("span");
     state.append(chip(f.price_state || "unknown", PRICE_STATE_KIND[f.price_state] || "n"));
     if (!f.fundable) state.append(" ", chip("not fundable at this equity", "no"));
@@ -131,10 +131,11 @@ function fundable(d) {
 
 /* (e) what is held and what is queued for the next bar. */
 function holdings(d) {
-  const held = d.positions.length
+  const positions = d.positions || [];
+  const held = positions.length
     ? table(
         ["instrument", "units", "avg cost", "close", "close day", "USD", "weight", "open P&L", ""],
-        d.positions.map((p) => [
+        positions.map((p) => [
           p.instrument_id,
           String(p.units),
           `${dec(p.avg_cost, 4)} ${p.currency || ""}`.trim(),
@@ -147,10 +148,11 @@ function holdings(d) {
         ])
       )
     : el("p", { class: "history", text: "none (cash)" });
-  const queued = d.pending.length
+  const pending = d.pending || [];
+  const queued = pending.length
     ? table(
         ["instrument", "weight", "reason", "decided on"],
-        d.pending.map((t) => [t.instrument_id, pct(t.weight), t.reason, t.decided_on])
+        pending.map((t) => [t.instrument_id, pct(t.weight), t.reason, t.decided_on])
       )
     : el("p", { class: "history", text: "none" });
   return [

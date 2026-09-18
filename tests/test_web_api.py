@@ -169,16 +169,49 @@ def test_calibration_parity(client):
 # --- the paper book -------------------------------------------------------------
 
 
-def test_paper_status_parity(client):
-    """The Paper book screen's words are paper_status's words, to the byte; its
-    tiles are the same Status as JSON - or None when no book has been opened,
-    in which case the text says NO BOOK rather than showing a balance."""
+def test_paper_status_parity(client, paper_env, monkeypatch):
+    """The Paper book screen's words are paper_status's words, to the byte, and
+    its tiles are the same Status as JSON - from ONE reading of a book built in
+    tmp on the synthetic feed. Offline and injected, like every other test here:
+    the shipped stores would send the fundable table to the wire for nine names."""
+    from datetime import UTC, datetime
+
+    from engines.paper import book as B
+    from engines.paper.book import mark
+    from engines.paper.report import status as _status
+
+    env = paper_env
+    monkeypatch.setenv("FINPLANET_OFFLINE", "1")
+    monkeypatch.setattr(T, "_cfg", lambda: env.cfg)
+    monkeypatch.setattr(T, "_feed", lambda: env.feed)
+    monkeypatch.setattr(B, "fx_for", lambda cfg, fx_db=None: env.fx)
+    mark(
+        env.store,
+        env.cfg,
+        env.feed,
+        env.fx,
+        day=env.week(1),
+        slot="us_close",
+        now=datetime(2026, 3, 2, tzinfo=UTC),
+    )
     body = client.get("/api/paper").json()
     assert body["text"] == T.paper_status()
-    if body["data"] is not None:
-        assert {"equity_usd", "caps", "fundable", "phase"} <= set(body["data"])
-    else:
-        assert body["text"].startswith("NO BOOK")
+    expected = _status(env.store, env.cfg, env.feed, env.fx).as_json()
+    assert body["data"]["equity_usd"] == expected["equity_usd"]
+    assert body["data"]["phase"] == expected["phase"]
+    assert [f["instrument_id"] for f in body["data"]["fundable"]] == [
+        f["instrument_id"] for f in expected["fundable"]
+    ]
+
+
+def test_paper_status_without_a_book_is_no_book(client, tmp_path, monkeypatch):
+    from dataclasses import replace
+
+    cfg = replace(T._cfg(), paper=replace(T._cfg().paper, database=str(tmp_path / "none.db")))
+    monkeypatch.setattr(T, "_cfg", lambda: cfg)
+    body = client.get("/api/paper").json()
+    assert body["text"] == T.paper_status()
+    assert body["text"].startswith("NO BOOK") and body["data"] is None
 
 
 def test_paper_report_parity(client):

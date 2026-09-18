@@ -534,26 +534,28 @@ def alerts(history: int = 20) -> S.Envelope:
 def paper() -> S.Envelope:
     """The paper book's status page (docs/22): the hypothetical USD ledger.
 
-    `text` IS `T.paper_status()` - the function the MCP server exposes, to the
-    byte. `data` is the same reading as structure: the store is opened the way
-    the tool opens it (PaperStore.open_existing on [paper] database, the default
-    feed, the BNM rate with the config fallback) and `status()` is read once
-    for the tiles. A book that was never opened is NO BOOK in the text and None
-    in the data; nothing here invents a balance.
+    One reading of `status()` serves both halves: `text` is what `T.paper_status`
+    renders - `Status.render()` plus the disclaimer, so the parity test holds by
+    construction - and `data` is the same Status as JSON. Reading it once matters
+    beyond tidiness: the fundable table walks the feed for every watchlist name,
+    so a second reading doubles the day's quota spend and can disagree with the
+    first when a bar lands between them. A book that was never opened is NO BOOK
+    in the text and None in the data; nothing here invents a balance.
     """
     from engines.paper.book import fx_for
     from engines.paper.report import status as _status
     from engines.paper.store import PaperStore
 
-    env = _run(T.paper_status)  # a config error is a 422 here, before any store is opened
     cfg = T._cfg()
     store = PaperStore.open_existing(cfg.paper.database)
-    if store is None:
-        return env
-    with store:
-        if store.has_books():
-            env.data = _status(store, cfg, T._feed(), fx_for(cfg)).as_json()
-    return env
+    if store is not None:
+        with store:
+            if store.has_books():
+                st = _status(store, cfg, T._feed(), fx_for(cfg))
+                return S.envelope(
+                    st.render() + T.DISCLAIMER, data=st.as_json(), disclaimer=DISCLAIMER
+                )
+    return _run(T.paper_status)  # NO BOOK, in the tool's own words
 
 
 @router.get("/paper/report")
