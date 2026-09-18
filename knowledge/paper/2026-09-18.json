@@ -1,0 +1,251 @@
+{
+  "day": "2026-09-18",
+  "written_at": "2026-09-18T22:53:00Z",
+  "phase": "observe",
+  "week": 2,
+  "equity_usd": 1000.0,
+  "cash_usd": 1000.0,
+  "control_equity_usd": 1000.0,
+  "drawdown": 0.0,
+  "halted": false,
+  "marks": 15,
+  "positions": [],
+  "changes": [],
+  "caps": [
+    {
+      "cap": "largest name",
+      "value": "0.00%",
+      "limit": "25%",
+      "breached": false
+    },
+    {
+      "cap": "invested",
+      "value": "0.00%",
+      "limit": "0%",
+      "breached": false
+    },
+    {
+      "cap": "cash floor",
+      "value": "100.00%",
+      "limit": "20%",
+      "breached": false
+    },
+    {
+      "cap": "names held",
+      "value": "0",
+      "limit": "0",
+      "breached": false
+    },
+    {
+      "cap": "drawdown from peak",
+      "value": "0.00%",
+      "limit": "8%",
+      "breached": false
+    },
+    {
+      "cap": "turnover used, 5 weekdays",
+      "value": "USD 0.00",
+      "limit": "USD 500.00",
+      "breached": false
+    }
+  ],
+  "attribution": {
+    "market": null,
+    "idiosyncratic": null,
+    "note": "no positions held; nothing to attribute"
+  },
+  "bursa_session": {
+    "note": "Closes against 2026-09-17. Two wraps disagree - 'Bursa rebounds on lower oil prices, easing US yields' (freemalaysiatoday.com, 01:29Z, an opening wrap) and 'Bursa closes lower, but broader market stays firm on tech and construction buying' (malaymail.com, 10:53Z). The close is the one that counts. 'Lower oil prices' is unverifiable here: DCOILBRENTEU still reads 130.80 at 2026-09-15. Decomposition belongs on tomorrow's feedback page.",
+    "closes": {
+      "MYX:5183": [
+        4.86,
+        4.71,
+        -0.0309
+      ],
+      "MYX:5347": [
+        13.32,
+        13.04,
+        -0.021
+      ],
+      "MYX:5225": [
+        7.69,
+        7.64,
+        -0.0065
+      ],
+      "MYX:1155": [
+        10.36,
+        10.32,
+        -0.0039
+      ],
+      "MYX:3182": [
+        1.9,
+        1.93,
+        0.0158
+      ],
+      "MYX:8869": [
+        7.6,
+        7.8,
+        0.0263
+      ],
+      "MYX:^KLSE": [
+        1674.74,
+        1665.56,
+        -0.0055
+      ]
+    }
+  },
+  "tenaga_the_review_produced_a_figure": {
+    "instrument_id": "MYX:5347",
+    "day_return": -0.021,
+    "index_return": -0.0055,
+    "figure": "RM120-150 million of AFA charges absorbed by TNB over four months (press headline, not a filing)",
+    "evidence": [
+      "www.businesstoday.com.my:2026-09-18T04:21Z:q0.80:Stock Today: TNB Slipped 0.9% After Electricity Subsidy Threshold Raised",
+      "www.nst.com.my:2026-09-18T09:15Z:q0.80:TNB to absorb RM120mil-RM150mil AFA charges over four months",
+      "www.nst.com.my:2026-09-18T10:25Z:q1.00:body:Up to 90pct domestic users covered with higher electricity bill protection threshold",
+      "theedgemalaysia.com:2026-09-18T11:24Z:q0.80:TNB sheds RM3 bil market cap after agreeing to absorb subsidy for domestic users"
+    ],
+    "note": "The 2026-09-16 page recorded the review as announced and unresolved; it convened 09-17 and produced nothing collected that day; the 09-17 feedback page wrote the confirming test as a story or filing naming who bears the cost. Today's rows name it. The Edge's RM3 bil is the Edge's figure: the fact book holds zero observations for the name, so no market capitalisation exists here to reconcile it against. One lot is USD 319.55, 32.0% of equity against a 25% cap - the third session (09-15, 09-16, 09-18) on which the clearest evidence and the cap point at the same excluded name."
+  },
+  "petronas_chemicals_fell_again_on_nothing": {
+    "instrument_id": "MYX:5183",
+    "day_return": -0.0309,
+    "two_sessions_since_holiday": -0.0942,
+    "rows_collected": 0,
+    "lot_usd": 115.42,
+    "share_of_equity": 0.115,
+    "max_lots": 2,
+    "round_trip": 0.0193,
+    "note": "Yesterday five rows, all wraps, one naming it on a losers list; today zero. The feedback page's confirming tests - a bodied Malaysian-press story dated 09-17 or 09-18, or DCOILBRENTEU below 120 - were both open and neither arrived. Round trip 1.76% -> 1.87% -> 1.93% on a ticket shrinking from 12.7% to 11.5% of equity; the cap admits more of the name each time it falls."
+  },
+  "press_metal_fifth_session_of_zero_rows": {
+    "instrument_id": "MYX:8869",
+    "day_return": 0.0263,
+    "sessions_with_zero_rows": [
+      "2026-09-14",
+      "2026-09-15",
+      "2026-09-16 (holiday)",
+      "2026-09-17",
+      "2026-09-18"
+    ],
+    "moves_across_them": "-3.09%, holiday, +1.06%, +2.63%",
+    "only_figure_held": "PALUMUSDM 3158.26 at 2026-07-01",
+    "lot_usd": 191.14,
+    "share_of_equity": 0.191
+  },
+  "the_us_prices": {
+    "note": "NVDA 219.12, AAPL 336.64, MSFT 493.575 fetched 13:39 UTC, nine minutes after the US open. The pack labels them itself for the first time: '3 price(s) above are the session so far, not a close'. PR #74 merged today (710ae87); the label is the pack's.",
+    "settled_2026_09_17": {
+      "XNAS:NVDA": 219.34,
+      "XNAS:AAPL": 337.0,
+      "XNAS:MSFT": 497.75
+    },
+    "provisional_used_on_the_09_17_page": {
+      "XNAS:NVDA": 219.14,
+      "XNAS:AAPL": 333.26,
+      "XNAS:MSFT": 496.44
+    },
+    "the_09_17_claim_held": "Apple 33.7% and Microsoft 49.8% out, NVIDIA 21.9% in, at the settled closes."
+  },
+  "decision": {
+    "recorded": true,
+    "weights": {},
+    "kind": "all_cash",
+    "prediction_id": "paper-2026-09-18-allcash-21d-667a",
+    "horizon_days": 21,
+    "grades_on": "2026-10-18",
+    "confidence": 0.55,
+    "confidence_note": "The seventh consecutive decision at 0.55; 0.60 on 2026-09-11 is the only other value in the series. Tenaga's figure would move a confidence if the name were in the fundable set; it is not, and a claim about the fundable set does not change because of a name outside it.",
+    "claim": "nothing in the fundable universe beats cash over 21 sessions",
+    "thesis": "All cash, eleventh session and the last observe decision before ramp opens on 2026-09-22. No fundable name carries evidence and a move together: Petronas Chemicals (11.5% of equity, two lots, round trip 1.93%) fell a further 3.09% to 4.71 with zero rows collected, the session after a 6.54% fall whose only evidence was a losers list; Press Metal (19.1%) rose 2.63%, the largest Bursa gain in the book, on a fifth consecutive session of zero rows; IHH (18.7%) carries a Fortis forensic audit the press now dates at up to nine months, title-only; Genting (4.7%) has zero rows and a 4.52% round trip; NVIDIA (21.9%) is priced nine minutes into its session with zero rows. The one dated event with a figure belongs to Tenaga - the review convened on 09-17 produced its outcome today, RM120-150 million of AFA charges absorbed over four months, and the stock closed -2.10% against ^KLSE -0.55% - and Tenaga is 32.0% of equity against a 25% per-name cap, the third session in which the evidence and the cap point at the same excluded name. Claim: nothing in the fundable universe beats cash over 21 sessions.",
+    "refusals": [],
+    "fx": {
+      "myr_per_usd": 4.0808,
+      "source": "bnm",
+      "date": "2026-09-18"
+    },
+    "fundable_set": {
+      "MYX:5183": {
+        "lot_usd": 115.42,
+        "share_of_equity": 0.115,
+        "round_trip": 0.0193,
+        "max_lots": 2,
+        "why_not": "-3.09% on zero rows, the session after -6.54% on a losers list; two lots allowed only because it fell"
+      },
+      "MYX:5225": {
+        "lot_usd": 187.22,
+        "share_of_equity": 0.187,
+        "round_trip": 0.0124,
+        "max_lots": 1,
+        "why_not": "a forensic audit the press now dates at up to nine months; title-only"
+      },
+      "MYX:8869": {
+        "lot_usd": 191.14,
+        "share_of_equity": 0.191,
+        "round_trip": 0.0122,
+        "max_lots": 1,
+        "why_not": "ZERO ROWS FOR A FIFTH SESSION; +2.63% today"
+      },
+      "MYX:3182": {
+        "lot_usd": 47.29,
+        "share_of_equity": 0.047,
+        "round_trip": 0.0452,
+        "max_lots": 5,
+        "why_not": "zero rows; a 4.52% round trip"
+      },
+      "XNAS:NVDA": {
+        "lot_usd": 219.12,
+        "share_of_equity": 0.219,
+        "round_trip": 0.0118,
+        "max_lots": 1,
+        "why_not": "priced nine minutes into its session; zero rows published today because us_close had not yet run",
+        "price_state": "provisional"
+      }
+    },
+    "excluded_on_the_25pc_cap": {
+      "MYX:1155": 0.253,
+      "MYX:5347": 0.32,
+      "XNAS:AAPL": 0.337,
+      "XNAS:MSFT": 0.494
+    },
+    "verified_against_stores": {
+      "paper.db targets": 8,
+      "paper.db applications": 8,
+      "learning.db predictions": 8
+    }
+  },
+  "mistakes": [
+    "paper-2026-09-18-allcash-21d-667a: the recorded thesis calls this 'the last observe decision before ramp opens on 2026-09-22'. It is not - engines/paper/rules.py counts week 2 through 2026-09-21 inclusive, so up to three more observe decisions (09-19, 09-20, 09-21) precede the first ramp session. The store row stands as written; this page is the correction; claim, horizon and weights are unaffected."
+  ],
+  "corrections": [],
+  "settled": [
+    "The 09-17 page's claim that the provisional US prices changed nothing held against the settled closes: Apple 33.7%, Microsoft 49.8% out; NVIDIA 21.9% in.",
+    "The Tenaga review recorded as announced and unresolved on 09-16 produced a collected outcome with a figure on 09-18, one day after it convened: RM120-150 million absorbed by TNB over four months, by press headline. A filing is not yet collected."
+  ],
+  "defects_this_book_depends_on": [
+    "A moomoo.com forum post ('Glad I made the switch from Maybank.') passed the linker and the quality floor at q 0.65 as MYX:1155's only row of the day. The ticker-tag filter added 2026-09-13 does not catch forum prose.",
+    "markets/xkls.py configures ZERO holidays, so the Bursa calendar counted Malaysia Day as a session. Opened on the 2026-09-16 feedback page; a fix is in flight.",
+    "no_identified_catalyst on a Bursa name reports an empty candidate list, not a weighed rejection. Opened 2026-09-15.",
+    "The sector beta is fixed at 0, so any sector-wide session lands in a residual labelled idiosyncratic. Opened 2026-09-14.",
+    "Sixteen peer price lines unrefreshed since 2026-08-31.",
+    "gdelt degraded on today's bursa_close sweep: 0 fetched, 0 kept.",
+    "bursa_close ran at 13:38 UTC against a 09:20 cron, 4h18m late; the us_close sweep had not run when this page was written."
+  ],
+  "conditions_for_a_position": [
+    "OPEN: Tenaga's own statement - a Bursa announcement or filing carrying the RM120-150 million. The one name with a figure is the one name over the cap.",
+    "OPEN, now on a two-session -9.42%: Petronas Chemicals collecting a body. Since 2026-09-10.",
+    "OPEN, worsening: Press Metal collecting anything. Five sessions, zero rows, fundable throughout.",
+    "CLOSED tonight: a us_close sweep before the page, or #74 merged so the label is the pack's - #74 merged (710ae87) and the pack now prints 'the session so far, not a close'.",
+    "OPEN: a per-name cap that admits Tenaga, or an equity level that does. Ramp on 2026-09-22 raises the invested cap to 40% and leaves the 25% per-name cap where it is.",
+    "OPEN: any fundamental figure at all for a Bursa name; eodhd names the reason - outside the free plan, US only.",
+    "OPEN, a gap not a condition: the Fed hiked on 09-17 and the book has no rate input.",
+    "CLOSED: the Bursa proxy, replaced with the index on 2026-09-14."
+  ],
+  "lessons": [
+    "An announced event resolves on the day its outcome is collected, not on the day it convenes. The review met on 09-17 and produced nothing collected; the figure arrived on 09-18, and a page that had closed the question a day early would have closed it on air.",
+    "A figure for a name over the cap is still a figure. RM120-150 million is the first number this journal holds for Tenaga's side of the AFA, and it is recorded in full even though no weight can follow from it.",
+    "A collected 'why' for the market is not a collected 'why' for a name. 'Bursa rebounds on lower oil prices' is a market wrap; it neither explains Petronas Chemicals' fall nor can it be checked against a crude print the fact book does not have.",
+    "A thesis is checked against the rules before it is recorded, not after. 'The last observe decision' was written from a calendar in the head instead of phase_for, and the store now carries the error permanently.",
+    "A phase change widens what the book may hold, not what it has evidence for. Ramp raises the invested cap from 0% to 40% on Tuesday and admits no name that tonight's page refuses."
+  ]
+}
