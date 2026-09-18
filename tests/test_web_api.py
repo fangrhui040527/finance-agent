@@ -166,6 +166,29 @@ def test_calibration_parity(client):
     assert body["text"] == T.calibration_status()
 
 
+# --- the paper book -------------------------------------------------------------
+
+
+def test_paper_status_parity(client):
+    """The Paper book screen's words are paper_status's words, to the byte; its
+    tiles are the same Status as JSON - or None when no book has been opened,
+    in which case the text says NO BOOK rather than showing a balance."""
+    body = client.get("/api/paper").json()
+    assert body["text"] == T.paper_status()
+    if body["data"] is not None:
+        assert {"equity_usd", "caps", "fundable", "phase"} <= set(body["data"])
+    else:
+        assert body["text"].startswith("NO BOOK")
+
+
+def test_paper_report_parity(client):
+    from mcp_server import observability
+
+    body = client.get("/api/paper/report").json()
+    assert body["text"] == observability.paper_report()
+    assert body["text"].startswith("PAPER BOOK")
+
+
 # --- the POST guard -------------------------------------------------------------
 
 

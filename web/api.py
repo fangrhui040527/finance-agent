@@ -527,6 +527,44 @@ def alerts(history: int = 20) -> S.Envelope:
     )
 
 
+# --- paper book ----------------------------------------------------------------
+
+
+@router.get("/paper")
+def paper() -> S.Envelope:
+    """The paper book's status page (docs/22): the hypothetical USD ledger.
+
+    `text` IS `T.paper_status()` - the function the MCP server exposes, to the
+    byte. `data` is the same reading as structure: the store is opened the way
+    the tool opens it (PaperStore.open_existing on [paper] database, the default
+    feed, the BNM rate with the config fallback) and `status()` is read once
+    for the tiles. A book that was never opened is NO BOOK in the text and None
+    in the data; nothing here invents a balance.
+    """
+    from engines.paper.book import fx_for
+    from engines.paper.report import status as _status
+    from engines.paper.store import PaperStore
+
+    env = _run(T.paper_status)  # a config error is a 422 here, before any store is opened
+    cfg = T._cfg()
+    store = PaperStore.open_existing(cfg.paper.database)
+    if store is None:
+        return env
+    with store:
+        if store.has_books():
+            env.data = _status(store, cfg, T._feed(), fx_for(cfg)).as_json()
+    return env
+
+
+@router.get("/paper/report")
+def paper_report(days: int = 30) -> S.Envelope:
+    """The book against its control - scored, or CANNOT SCORE while the record
+    is shorter than a track record. The observability tool's words, unchanged."""
+    from mcp_server import observability as O
+
+    return _run(O.paper_report, days=days)
+
+
 # --- traces --------------------------------------------------------------------
 
 

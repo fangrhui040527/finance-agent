@@ -18,6 +18,7 @@ const NAV = [
   ["portfolio", "Portfolio", "port"],
   ["sizing", "Sizing", "size"],
   ["predictions", "Predictions", "pred"],
+  ["paper", "Paper book", "paper"],
   ["trace", "Trace", "trace"],
   ["learn", "Learn", "learn"],
   ["settings", "Settings", "set"],
@@ -34,6 +35,7 @@ const ICONS = {
   port: '<circle cx="8" cy="8" r="5.5"/><path d="M8 2.5v5.5l3.9 3.9"/>',
   size: '<path d="M2 8h12"/><path d="M5 5 2 8l3 3M11 5l3 3-3 3"/>',
   pred: '<path d="M2 8h3l2-4 2 8 2-4h3"/>',
+  paper: '<path d="M3 2h10v12H3z"/><path d="M5 5h6M5 8h6M5 11h4"/>',
   trace:
     '<circle cx="4" cy="4" r="1.8"/><circle cx="12" cy="8" r="1.8"/><circle cx="6" cy="12" r="1.8"/><path d="M5.5 5.2 10.4 7M10.6 9.2 7.3 11.1"/>',
   learn:
