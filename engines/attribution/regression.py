@@ -150,11 +150,19 @@ def _mad_sigma(resid: list[float]) -> float:
 
 
 def corrado_rank_z(event_resid: float, estimation_resid: list[float]) -> float:
-    """Non-parametric rank test.
+    """Corrado's rank statistic, as a descriptive number.
 
     docs/03 section 2.3: equity residuals are fat-tailed and skewed; a t-test on
     20 observations will over-reject. Disagreement between the two tests is
     itself worth logging.
+
+    For ONE event day this statistic cannot be the decision. The most extreme
+    rank sits (N-1)/2 from the mean rank and the standard deviation of the
+    ranks 1..N is sqrt((N^2-1)/12), so |z| is below sqrt(3) = 1.73 however many
+    residuals there are; tested against 1.96 it could never fire, and for a
+    year the output recorded "the tests disagree" on every significant move.
+    Corrado's test is a cross-sectional or multi-day statistic. The single-day
+    decision is `rank_p_value`; this stays as the descriptive rank in sd units.
     """
     pool = list(estimation_resid) + [event_resid]
     n = len(pool)
@@ -166,6 +174,28 @@ def corrado_rank_z(event_resid: float, estimation_resid: list[float]) -> float:
     k = ranks[-1] - mean_rank
     sd = math.sqrt(sum((r - mean_rank) ** 2 for r in ranks) / n)
     return k / sd if sd > 1e-12 else 0.0
+
+
+def rank_p_value(event_resid: float, estimation_resid: list[float]) -> float:
+    """Exact two-sided p-value of one event residual's rank among the estimation residuals.
+
+    No normal approximation, so nothing is bounded away from significance.
+    Under the null the event residual is exchangeable with the n estimation
+    residuals, so its rank among the N = n + 1 pooled values is uniform on
+    1..N, and the two-sided tail probability of landing at rank r is
+    2 * min(r, N + 1 - r) / N. The most extreme rank therefore has p = 2 / N:
+    exactly 0.05 with 39 estimation residuals, below it from 40 on, and 0.017
+    at the MIN_OBSERVATIONS of 120. Ties take the mid-rank, and the value is
+    capped at 1 because the centre rank's two tails overlap.
+    """
+    n = len(estimation_resid)
+    if n == 0:
+        return 1.0
+    below = sum(1 for r in estimation_resid if r < event_resid)
+    above = sum(1 for r in estimation_resid if r > event_resid)
+    rank = below + 1.0 + (n - below - above) / 2.0
+    total = n + 1
+    return min(1.0, 2.0 * min(rank, total + 1 - rank) / total)
 
 
 def patell_z(event_resid: float, estimation_resid: list[float]) -> float:
