@@ -1,6 +1,25 @@
 {
   "day": "2026-09-17",
   "written_at": "2026-09-18T22:45:00Z",
+  "open_questions_carried": [
+    "**New (2026-09-17)**: Petronas Chemicals fell 6.54% and the collector stored nothing about it: `google_news` named it in 0 of 5 rows and `gdelt` refused it. Which of the eleven sources listed for the name carries a Bursa-hours story about it at all? (folds into the 2026-09-10 question)",
+    "**New (2026-09-17)**: the linker attached a *Genting Plantations* headline to MYX:3182. How many of the 22 rows linked to Genting Bhd are about Genting Plantations or Genting Malaysia instead?",
+    "**New (2026-09-17)**: who funds the AFA, retail-charge and SST exemptions to 800 kWh — the Treasury, a later tariff period, or TNB's own recovery? Nothing collected says, and the answer decides whether the story is about this company.",
+    "**New (2026-09-17)**: Apple's published session changed by 1.12pp between a build from a pre-close cache and a build from the settled bars. Which earlier pages were written from a pre-`us_close` cache? (The 09-15 page was; #74 restated it.)",
+    "`markets/xkls.py` configures zero holidays, so the Bursa calendar counts Malaysia Day as a session — a fix carrying the verified 2026 closures for both markets is in flight. (since 2026-09-16)",
+    "Does a page need to state a market's non-trading day as a fact rather than inferring it from blank bars? (since 2026-09-16)",
+    "The press reads Microsoft's dividend raise as bearish via AI capital spending; no capex figure in the fact book to test it. (since 2026-09-16)",
+    "Brent is +34% since 2026-09-02 and the whole move above 120 became knowable only on 09-17; how much macro commentary is written against a vintage that will be revised? (since 2026-09-16)",
+    "Petronas Chemicals collecting a body. Nothing on 09-15, 09-16 or 09-17 — and 09-17 was a −6.54% day. (since 2026-09-10)",
+    "Press Metal collecting anything: four sessions, zero rows. (since 2026-09-15)",
+    "The sector beta is fixed at 0, so any sector-wide session lands in a residual labelled `idiosyncratic`. (since 2026-09-14)",
+    "`no_identified_catalyst` on a Bursa name reports an empty candidate list, not a weighed rejection; does a verdict need to distinguish the two? (since 2026-09-15)",
+    "GDELT's refusal is a reproducible HTTP 429, now five days running. Per-IP on the shared runner? (since 2026-09-08)",
+    "Tenaga: is the 5d move the results print the 2026-09-04 roundup headline referred to? (since 2026-09-04)",
+    "NVIDIA: filing or release for the Hugging Face transaction — `edgar` wrote 6 facts today; none is it. (since 2026-09-04)",
+    "Finnhub earnings rows for NVDA carry a knowable date in the future — confirmed as a stamping defect today, fix in flight. (since 2026-09-04)",
+    "Whether the observe phase's grading against the control is informative at 21 days. (since 2026-09-08)"
+  ],
   "market": {
     "regime": "risk_on",
     "notes": [
