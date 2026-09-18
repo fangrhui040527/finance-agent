@@ -177,6 +177,30 @@ def test_finnhub_types_and_dates_everything_and_drops_only_bad_rows():
     assert c.requests == 6
 
 
+def test_finnhub_a_print_filed_under_a_later_quarter_end_is_knowable_the_day_it_was_seen():
+    """NVIDIA's late-August result reaches this endpoint labelled with the
+    calendar quarter end, 2026-09-30. Until 2026-09-18 known_at was pushed out
+    to that label, and a figure public on 5 September was invisible to every
+    as-of read until the 30th. The endpoint carries no announcement date, so
+    the day we saw the row is the earliest the store can vouch for."""
+    routes = dict(FINNHUB)
+    routes["stock/earnings"] = [
+        {"actual": 2.22, "estimate": 2.1384, "period": "2026-09-30", "surprisePercent": 3.8159},
+        {"actual": 1.87, "estimate": 1.7922, "period": "2026-06-30", "surprisePercent": 4.341},
+    ]
+    pull = FinnhubCollector(key="k", clock=CLOCK, opener=router(routes)).collect(
+        SINCE, ("XNAS:NVDA",)
+    )
+    prints = {o.period_end: o for o in pull.observations if o.concept == "eps_actual"}
+    later = prints[date(2026, 9, 30)]
+    assert later.known_at == NOW.date() and later.forward and later.value == Decimal("2.22")
+    earlier = prints[date(2026, 6, 30)]
+    assert earlier.known_at == NOW.date() and not earlier.forward
+    assert all(o.known_at <= NOW.date() for o in pull.observations), (
+        "never knowable later than the day it was seen"
+    )
+
+
 def test_finnhub_one_premium_endpoint_is_a_note_not_a_failure():
     routes = dict(FINNHUB)
     routes["stock/metric"] = http_error(403)
@@ -286,6 +310,42 @@ def test_fmp_weekly_pull_carries_statements_estimates_targets_grades_and_the_tra
     (doc,) = pull.documents
     assert doc.kind == "transcript" and doc.doc_id == "AAPL:transcript:2026Q3"
     assert doc.published_at == datetime(2026, 7, 31, 17, 0, tzinfo=UTC)
+
+
+def test_fmp_estimates_are_knowable_the_day_they_were_fetched_and_say_so():
+    """Consensus for FY27 is knowable today and describes a period that ends
+    in a year: known_at is the fetch day, period_end the target, and the row
+    says forward so the A1 bridge can build it."""
+    pull = FmpCollector(key="k", clock=CLOCK, opener=router(FMP)).collect(
+        SINCE, ("XNAS:AAPL",), slot="weekly"
+    )
+    est = next(o for o in pull.observations if o.concept == "est_eps")
+    assert est.known_at == NOW.date() and est.period_end == date(2027, 9, 30) and est.forward
+    assert est.value == Decimal("8.9") and est.payload == {"analysts": 30}
+
+
+def test_fmp_estimate_revisions_are_separate_vintages(tmp_path):
+    """AAPL's FY27 EPS consensus read 9.538 on 5 September and 9.571 on the
+    6th. Under the old stamp both rows carried known_at 2027-09-27: the
+    vintage was gone and neither was visible. Stamped with the fetch day, an
+    as-of read gets the figure the street held on that day."""
+    revisions = [
+        (datetime(2026, 9, 5, 2, tzinfo=UTC), "9.538"),
+        (datetime(2026, 9, 6, 12, tzinfo=UTC), "9.571"),
+    ]
+    with FactBook(tmp_path / "facts.db") as book:
+        for day, value in revisions:
+            estimates = [{"date": "2027-09-27", "epsAvg": value, "numAnalystsEps": 30}]
+            c = FmpCollector(
+                key="k",
+                clock=lambda d=day: d,
+                opener=router({**FMP, "analyst-estimates": estimates}),
+            )
+            pull = c.collect(SINCE, ("XNAS:AAPL",), slot="weekly")
+            book.add_observations(pull.observations, fetched_at=day)
+        assert book.latest("XNAS:AAPL", "est_eps", asof=date(2026, 9, 4)) is None
+        assert book.latest("XNAS:AAPL", "est_eps", asof=date(2026, 9, 5)).value == Decimal("9.538")
+        assert book.latest("XNAS:AAPL", "est_eps", asof=date(2026, 9, 6)).value == Decimal("9.571")
 
 
 def test_fmp_separates_a_change_of_mind_from_a_broker_restating_one():
@@ -623,6 +683,10 @@ def test_a_pull_lands_in_the_fact_book_and_bridges_to_a1(tmp_path):
         fact = store.as_known_at("XNAS:AAPL", "net_income", date(2026, 8, 15))
         assert fact is not None and fact.value == Decimal("23434000000")
         assert store.as_known_at("XNAS:AAPL", "net_income", date(2026, 7, 15)) is None
+        # The forward estimate crosses the bridge too, visible from the fetch day.
+        est = store.as_known_at("XNAS:AAPL", "est_eps", NOW.date())
+        assert est is not None and est.forward and est.period_end == date(2027, 9, 30)
+        assert store.as_known_at("XNAS:AAPL", "est_eps", NOW.date() - timedelta(days=1)) is None
         assert book.documents("XNAS:AAPL", kind="transcript")
 
 
