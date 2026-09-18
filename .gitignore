@@ -23,6 +23,9 @@ __pycache__/
 htmlcov/
 node_modules/
 package-lock.json
+# Nested worktrees the harness checks out under here: a second copy of this
+# very repository, which git would otherwise offer up as untracked content.
+.claude/
 
 # 3. SQLite's own scratch files. The databases in data/ ARE tracked on purpose,
 #    but WAL mode writes a -wal journal and a -shm shared-memory block beside

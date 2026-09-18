@@ -16,7 +16,18 @@ FORBIDDEN = re.compile(
 # `debug/` is gitignored runtime output: every trace report RENDERS the denied
 # place_order refusal by name (the same reason trace_run.py is allowlisted), so
 # the day the scan learned .html it started failing on its own evidence.
-SKIP_DIRS = {".git", ".venv", "docs", "debug", "__pycache__", ".pytest_cache", "node_modules"}
+# `.claude/` holds nested worktrees: a second copy of this whole tree, whose
+# copy of this file is not on the allowlist below.
+SKIP_DIRS = {
+    ".git",
+    ".venv",
+    ".claude",
+    "docs",
+    "debug",
+    "__pycache__",
+    ".pytest_cache",
+    "node_modules",
+}
 
 # Files that must name the forbidden tools in order to deny them. Exact paths,
 # not basenames: a basename allowlist would hand a free pass to any new file
