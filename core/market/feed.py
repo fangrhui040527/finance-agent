@@ -93,6 +93,23 @@ class PriceFeed(ABC):
     @abstractmethod
     def _fetch_csv(self, symbol: str) -> str: ...
 
+    def fetched_at(self, instrument_id: str) -> datetime | None:
+        """When the body behind this instrument's bars was pulled, if knowable.
+
+        One implementation for every cached feed, because the answer is the
+        cache's and not the feed's. A feed with no cache, or a symbol it cannot
+        spell, answers None - and None is reported as `unknown`, never as a
+        close. See `core.market.calendar.price_state`.
+        """
+        cache = getattr(self, "cache", None)
+        if cache is None:
+            return None
+        try:
+            symbol = self.symbol_for(instrument_id)
+        except (PriceFeedError, ValueError):
+            return None
+        return cache.fetched_at(self.name, symbol)
+
     def fetch(
         self,
         instrument_id: str,
@@ -512,6 +529,14 @@ class ChainedFeed:
     def __init__(self, feeds) -> None:
         self.feeds = list(feeds)
         self.source_used = None
+
+    def fetched_at(self, instrument_id: str) -> datetime | None:
+        """The first feed that has this symbol cached - the one `fetch` serves from."""
+        for feed in self.feeds:
+            at = feed.fetched_at(instrument_id)
+            if at is not None:
+                return at
+        return None
 
     def fetch(self, instrument_id: str, start=None, end=None) -> PriceSeries:
         failures = []

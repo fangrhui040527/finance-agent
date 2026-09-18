@@ -50,10 +50,17 @@ CREATE TABLE IF NOT EXISTS price_csv (
     feed      TEXT NOT NULL,
     symbol    TEXT NOT NULL,
     fetched_on TEXT NOT NULL,
+    fetched_at TEXT,
     body      TEXT NOT NULL,
     PRIMARY KEY (feed, symbol)
 );
 """
+
+#: `fetched_on` is the day, and the day cannot say whether a market had shut.
+#: `fetched_at` is the instant, added later and therefore nullable: every row
+#: cached before this column existed reads NULL, which `price_state` reports as
+#: `unknown` rather than guessing. Backfilling it would be inventing a time.
+_ADD_FETCHED_AT = "ALTER TABLE price_csv ADD COLUMN fetched_at TEXT"
 
 
 def looks_like_bars(body: str) -> bool:
@@ -132,6 +139,7 @@ class PriceCache:
         self,
         path: str | Path = "data/price_cache.db",
         today: Callable[[], str] | None = None,
+        now: Callable[[], str] | None = None,
     ) -> None:
         p = Path(path)
         if p.parent != Path("."):
@@ -140,8 +148,14 @@ class PriceCache:
         self.conn = sqlite3.connect(self._path)
         _enable_wal(self.conn, self._path, timeout_ms=5000)
         self.conn.executescript(SCHEMA)
+        if "fetched_at" not in {r[1] for r in self.conn.execute("PRAGMA table_info(price_csv)")}:
+            try:
+                self.conn.execute(_ADD_FETCHED_AT)
+            except sqlite3.OperationalError:  # pragma: no cover - another process won
+                pass
         self.conn.commit()
         self._today = today or (lambda: datetime.now(UTC).date().isoformat())
+        self._now = now or (lambda: datetime.now(UTC).isoformat())
 
     def get(self, feed: str, symbol: str) -> str | None:
         row = self.conn.execute(
@@ -178,12 +192,33 @@ class PriceCache:
         if not looks_like_bars(body):
             return  # an error page is not a cache hit; let the next process try
         self.conn.execute(
-            "INSERT INTO price_csv (feed, symbol, fetched_on, body) VALUES (?,?,?,?)"
+            "INSERT INTO price_csv (feed, symbol, fetched_on, fetched_at, body)"
+            " VALUES (?,?,?,?,?)"
             " ON CONFLICT(feed, symbol) DO UPDATE SET fetched_on=excluded.fetched_on,"
-            " body=excluded.body",
-            (feed, symbol, self._today(), body),
+            " fetched_at=excluded.fetched_at, body=excluded.body",
+            (feed, symbol, self._today(), self._now(), body),
         )
         self.conn.commit()
+
+    def fetched_at(self, feed: str, symbol: str) -> datetime | None:
+        """When this body was pulled, or None for a row cached before the column.
+
+        The instant, not the day: whether the newest bar in the body is a close
+        or the session so far turns on where the fetch fell relative to that
+        market's shut, and `fetched_on` cannot answer that. See
+        `core.market.calendar.price_state`, which owns the rule.
+        """
+        row = self.conn.execute(
+            "SELECT fetched_at FROM price_csv WHERE feed = ? AND symbol = ?",
+            (feed, symbol),
+        ).fetchone()
+        if row is None or not row[0]:
+            return None
+        try:
+            at = datetime.fromisoformat(row[0])
+        except ValueError:
+            return None
+        return at if at.tzinfo else at.replace(tzinfo=UTC)
 
     def prune_unusable(self) -> int:
         """Drop every cached body that is not a CSV of bars. Returns the count."""

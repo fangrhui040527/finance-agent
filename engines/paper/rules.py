@@ -15,6 +15,7 @@ from dataclasses import dataclass
 from datetime import date
 from decimal import Decimal
 
+from core.market.calendar import PROVISIONAL, UNKNOWN, price_state
 from core.market.feed import PriceFeedError
 from engines.paper.fx import FxQuote
 from engines.paper.pricing import (
@@ -102,10 +103,19 @@ class Fundable:
     max_lots: int
     round_trip: Decimal
     error: str = ""
+    #: Whether `price_local` is a settled close, the session so far, or
+    #: unknowable. `core.market.calendar.price_state` owns the rule; this field
+    #: only carries its answer so the page can say which it printed.
+    price_state: str = UNKNOWN
 
     @property
     def fundable(self) -> bool:
         return not self.error and self.max_lots >= 1
+
+    @property
+    def provisional(self) -> bool:
+        """The price was pulled while its market was still trading."""
+        return self.price_state == PROVISIONAL
 
     def row(self) -> str:
         if self.error:
@@ -113,10 +123,11 @@ class Fundable:
         verdict = (
             f"up to {self.max_lots} lot(s)" if self.fundable else "not fundable at this equity"
         )
+        mark = "  [the session so far, not the close]" if self.provisional else ""
         return (
             f"  {self.instrument_id:<12} {self.lot:>4} x {self.price_local:>10.4f} {self.currency}"
             f"  = USD {self.lot_usd:>8.2f}  ({self.lot_weight:.1%} of equity)"
-            f"  round trip {self.round_trip:.2%}  {verdict}"
+            f"  round trip {self.round_trip:.2%}  {verdict}{mark}"
         )
 
 
@@ -158,8 +169,27 @@ def fundables(
         weight = lot_usd / equity if equity > 0 else Decimal(0)
         max_lots = int(cap // lot_usd) if lot_usd > 0 else 0
         rt = round_trip_pct(mic_of(iid), getattr(cfg, "broker", None), close * lot, close)
-        out.append(Fundable(iid, ccy, lot, close, close_day, lot_usd, weight, max_lots, rt))
+        state = price_state(mic_of(iid), close_day, _fetched_at(feed, iid))
+        out.append(
+            Fundable(iid, ccy, lot, close, close_day, lot_usd, weight, max_lots, rt, "", state)
+        )
     return out
+
+
+def _fetched_at(feed, instrument_id: str):
+    """The feed's fetch instant, or None from a feed that does not keep one.
+
+    Tolerant on purpose: the tests build feeds out of fixtures, and a fixture
+    that cannot say when it was pulled should read `unknown` rather than break
+    the fundable table it is not testing.
+    """
+    ask = getattr(feed, "fetched_at", None)
+    if ask is None:
+        return None
+    try:
+        return ask(instrument_id)
+    except Exception:  # pragma: no cover - a feed that refuses is simply unknown
+        return None
 
 
 # -- validation ----------------------------------------------------------------------------

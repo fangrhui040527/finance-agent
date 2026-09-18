@@ -108,6 +108,9 @@ class Status:
                     "max_lots": f.max_lots,
                     "round_trip": float(f.round_trip),
                     "fundable": f.fundable,
+                    "price_local": float(f.price_local),
+                    "price_day": f.close_day.isoformat() if f.close_day else None,
+                    "price_state": f.price_state,
                     "error": f.error,
                 }
                 for f in self.fundable
@@ -123,6 +126,21 @@ class Status:
             "notes": self.notes,
         }
         return d
+
+    def _price_basis(self) -> str:
+        """What the fundable table's prices actually are.
+
+        The old header said "the last close" unconditionally, over a table whose
+        newest row may have been pulled mid-session. Say which, or say nothing:
+        a heading that is right on most nights and silently wrong on the rest is
+        worse than one that names the mixture.
+        """
+        priced = [f for f in self.fundable if not f.error]
+        if priced and all(f.provisional for f in priced):
+            return "the session so far - no price here is a close"
+        if any(f.provisional for f in priced):
+            return "the last close, except where marked"
+        return "the last close"
 
     def render(self) -> str:
         L: list[str] = []
@@ -177,9 +195,15 @@ class Status:
             f"    turnover used, 5 weekdays   USD {self.turnover_used_usd:>9,.2f} / {self.turnover_cap_usd:,.2f}"
         )
         L.append("")
-        L.append("  fundable at this equity (one lot at the last close)")
+        L.append(f"  fundable at this equity (one lot at {self._price_basis()})")
         for f in self.fundable:
             L.append(f.row())
+        provisional = [f.instrument_id for f in self.fundable if f.provisional]
+        if provisional:
+            L.append(
+                f"  {len(provisional)} price(s) above are the session so far, not a close - "
+                f"{', '.join(provisional)} were pulled while their market was still trading"
+            )
         L.append("")
         L.append(
             f"  fx MYR per USD {self.fx_rate} ({self.fx_source}, {self.fx_date}); marks use the mid"
