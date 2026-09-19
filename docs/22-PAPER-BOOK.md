@@ -54,6 +54,19 @@ close dates; the mark records both. A leg whose close is more than three
 weekdays old is flagged stale; a leg with no bar at all is carried at its
 last stored close, flagged, and `mark` exits 3.
 
+A mark's day is the **session** of the bars it was marked from — the last
+cached bar for the slot's market (`bursa_close` XKLS, `us_close` XNAS) on or
+before the day asked for — never the wall clock. A catch-up run on a Saturday
+marks Friday's session; a run on a holiday marks the session before it. A
+slot marks a book at most once per session day: a later run of the same
+session replaces the earlier mark in place, because a later fetch is closer
+to the close, and that replacement is the one UPDATE the ledger's guard
+permits. A day the calendar calls no session, with no cached bar to mark
+from, is refused (exit 2). Marks written before this rule (2026-09-19) sat on
+weekends; `mark` re-dates them onto their session from the cache on its next
+run and says what it moved. The calendars carry weekends only until the
+holiday tables land, so a Labor Day `us_close` mark stays on the Monday.
+
 ## 4. Position changes
 
 A decision recorded on day D applies at each market's **first cached bar

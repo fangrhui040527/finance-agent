@@ -156,6 +156,25 @@ def test_an_archived_lesson_is_still_there_after_a_restart(tmp_path):
         assert s.counts()["lessons"] == 0, "archived lessons are not active"
 
 
+def test_a_lesson_is_never_edited_in_place_or_deleted_but_is_re_saved_whole(tmp_path):
+    path = db(tmp_path)
+    with LearningStore(path) as s:
+        s.save_lesson(lesson())
+        with pytest.raises(sqlite3.IntegrityError, match="never edited in place"):
+            s.db.execute("UPDATE lessons SET text = 'gaps never reverse' WHERE lesson_id = 'L1'")
+        with pytest.raises(sqlite3.IntegrityError, match="never deleted"):
+            s.db.execute("DELETE FROM lessons")
+        # the store's own path re-derives a lesson and saves it whole; the status still moves
+        s.save_lesson(lesson(status=Status.ARCHIVED))
+        assert s.load_lessons().get("L1").status is Status.ARCHIVED
+        assert s.counts()["lessons"] == 0
+    with LearningStore(path) as s:
+        names = {
+            r[0] for r in s.db.execute("SELECT name FROM sqlite_master WHERE type = 'trigger'")
+        }
+        assert {"lessons_no_update", "lessons_no_delete"} <= names
+
+
 def test_a_human_authored_lesson_stays_read_only_across_a_restart(tmp_path):
     path = db(tmp_path)
     human = Lesson(

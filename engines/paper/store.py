@@ -2,10 +2,17 @@
 
 Five tables, ten triggers. Nothing is ever UPDATEd or DELETEd: a target is
 written once and *resolved* once by a row in `applications`; a position change
-is a fact about a bar; a mark is a fact about a date. The book's state at any
-moment is replayed from the initial cash and every position change since,
+is a fact about a bar; a mark is a fact about a session. The book's state at
+any moment is replayed from the initial cash and every position change since,
 which is what makes the record auditable to the cent - and what makes a
 "reset" impossible short of a new file.
+
+Marks carry the one qualification. A slot marks a book at most once per
+session day, and a later mark of the same session replaces the earlier one,
+because a later fetch is closer to the close: the 21:15 UTC run and the
+catch-up dispatched after it are two readings of one close, and the record
+wants the better one, not both. That replacement is the only UPDATE the
+ledger's own guard lets through, and it may change nothing but the reading.
 """
 
 from __future__ import annotations
@@ -110,6 +117,19 @@ CREATE TABLE IF NOT EXISTS marks (
 CREATE INDEX IF NOT EXISTS marks_book_day ON marks(book, day);
 """
 
+#: One mark per (book, session day, slot). Created by `_migrate_marks` rather
+#: than in SCHEMA: a ledger written before the rule can hold two marks for one
+#: session, and the index has to follow the de-duplication, not precede it.
+#: Its presence is also the marker that the migration has run.
+MARKS_UNIQUE_INDEX = "marks_book_day_slot"
+MARKS_UNIQUE_SQL = (
+    f"CREATE UNIQUE INDEX IF NOT EXISTS {MARKS_UNIQUE_INDEX} ON marks(book, day, slot);"
+)
+
+MARK_GUARD = (
+    "a mark is a fact about a session day: only a later mark of the same session replaces it"
+)
+
 _GUARDS = {
     "books": (
         "a paper book is opened once; there is no reset, only a new file",
@@ -124,17 +144,49 @@ _GUARDS = {
         "a position change you can edit proves nothing about what the book did",
         "position changes are never deleted: a book missing its losers is a story",
     ),
-    "marks": ("a mark is a fact about a date", "marks are never deleted"),
+    "marks": (MARK_GUARD, "marks are never deleted"),
+}
+
+#: The UPDATE a table's guard lets through. Only marks have one: the upsert
+#: that re-marks a session may change every reading on the row and nothing
+#: about which session it is - not the id, the book, the day or the slot -
+#: and it may never put an earlier reading over a later one.
+_UPDATE_ALLOWED_UNLESS = {
+    "marks": (
+        "NEW.mark_id IS NOT OLD.mark_id OR NEW.book IS NOT OLD.book "
+        "OR NEW.day IS NOT OLD.day OR NEW.slot IS NOT OLD.slot "
+        "OR NEW.marked_at < OLD.marked_at"
+    ),
 }
 
 
-def _trigger_sql(table: str, on_update: str, on_delete: str) -> str:
+def _trigger_statements(table: str, on_update: str, on_delete: str) -> tuple[str, str]:
+    when = _UPDATE_ALLOWED_UNLESS.get(table)
+    guard = f"WHEN {when}\n" if when else ""
     return (
         f"CREATE TRIGGER IF NOT EXISTS {table}_no_update BEFORE UPDATE ON {table}\n"
-        f"BEGIN SELECT RAISE(ABORT, '{on_update}'); END;\n"
+        f"{guard}BEGIN SELECT RAISE(ABORT, '{on_update}'); END",
         f"CREATE TRIGGER IF NOT EXISTS {table}_no_delete BEFORE DELETE ON {table}\n"
-        f"BEGIN SELECT RAISE(ABORT, '{on_delete}'); END;\n"
+        f"BEGIN SELECT RAISE(ABORT, '{on_delete}'); END",
     )
+
+
+def _trigger_sql(table: str, on_update: str, on_delete: str) -> str:
+    return ";\n".join(_trigger_statements(table, on_update, on_delete)) + ";\n"
+
+
+def _guards_sql() -> list[str]:
+    return [_trigger_sql(table, upd, dele) for table, (upd, dele) in _GUARDS.items()]
+
+
+#: Rows that share (book, day, slot) with a later mark - later by `marked_at`,
+#: then by id when two runs stamped the same instant. Text comparison is safe:
+#: every `marked_at` is written by `_iso`, UTC and one layout.
+_DUPLICATE_MARKS = (
+    "SELECT m.mark_id FROM marks m JOIN marks o "
+    "ON o.book = m.book AND o.day = m.day AND o.slot = m.slot "
+    "WHERE o.marked_at > m.marked_at OR (o.marked_at = m.marked_at AND o.mark_id > m.mark_id)"
+)
 
 
 def _d(text: str | None) -> Decimal:
@@ -281,13 +333,45 @@ class PaperStore:
         self.conn = sqlite3.connect(path, timeout=self.BUSY_TIMEOUT_MS / 1000)
         self.conn.row_factory = sqlite3.Row
         _enable_wal(self.conn, path, self.BUSY_TIMEOUT_MS)
+        apply_schema(self.conn, SCHEMA, *_guards_sql(), timeout_ms=self.BUSY_TIMEOUT_MS)
+        #: Duplicate marks this open removed from a ledger written before the
+        #: one-mark-per-session rule; zero on every open after the first.
+        self.marks_deduplicated = self._migrate_marks()
+        self.conn.commit()
+
+    def _migrate_marks(self) -> int:
+        """One mark per (book, session day, slot), on a ledger written before the rule.
+
+        Manual catch-up dispatches marked the same slot twice on one day and
+        the schema let them: sixteen (book, day, slot) groups in data/paper.db
+        carried two marks. The later one is kept - a later fetch is closer to
+        the close - and the earlier one goes, under the ledger's own delete
+        guard lifted for that one statement and put back in the same
+        transaction. The update guard is swapped at the same time, because the
+        one written before this rule refused every UPDATE and would refuse the
+        upsert that now records a mark. The unique index comes last and is
+        the marker: a ledger that has it has been through this, so every later
+        open pays one read of the schema and nothing else.
+        """
+        have = {
+            r[0]
+            for r in self.conn.execute(
+                "SELECT name FROM sqlite_master WHERE type = 'index' AND name = ?",
+                (MARKS_UNIQUE_INDEX,),
+            )
+        }
+        if MARKS_UNIQUE_INDEX in have:
+            return 0
+        before = self.conn.total_changes
         apply_schema(
             self.conn,
-            SCHEMA,
-            *(_trigger_sql(table, upd, dele) for table, (upd, dele) in _GUARDS.items()),
+            "DROP TRIGGER IF EXISTS marks_no_update; DROP TRIGGER IF EXISTS marks_no_delete;",
+            f"DELETE FROM marks WHERE mark_id IN ({_DUPLICATE_MARKS});",
+            MARKS_UNIQUE_SQL,
+            _trigger_sql("marks", *_GUARDS["marks"]),
             timeout_ms=self.BUSY_TIMEOUT_MS,
         )
-        self.conn.commit()
+        return self.conn.total_changes - before
 
     @classmethod
     def open_existing(cls, path: str | Path) -> PaperStore | None:
@@ -566,11 +650,40 @@ class PaperStore:
 
     # -- marks -------------------------------------------------------------------------------
 
+    #: Every reading on a mark row; what a re-mark of the same session replaces.
+    _MARK_READINGS = (
+        "marked_at",
+        "cash_usd",
+        "positions_usd",
+        "equity_usd",
+        "peak_usd",
+        "drawdown",
+        "halted",
+        "phase",
+        "fx_rate",
+        "fx_date",
+        "fx_source",
+        "positions_json",
+    )
+
     def record_mark(self, m: MarkRow) -> int:
-        cur = self.conn.execute(
+        """The row's id: a new row, or the session's existing row re-read.
+
+        One row per (book, session day, slot). The close run and the catch-up
+        dispatched after it both mark the same session, and the record wants
+        the later reading and exactly one of them - so a later mark replaces
+        the earlier in place, keeping its id, and an earlier mark arriving
+        after a later one (a replay) changes nothing. The id is read back
+        rather than taken from `lastrowid`, which the update path of an upsert
+        does not set.
+        """
+        set_clause = ", ".join(f"{c} = excluded.{c}" for c in self._MARK_READINGS)
+        self.conn.execute(
             "INSERT INTO marks (book, day, slot, marked_at, cash_usd, positions_usd, equity_usd, "
             "peak_usd, drawdown, halted, phase, fx_rate, fx_date, fx_source, positions_json) "
-            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) "
+            f"ON CONFLICT(book, day, slot) DO UPDATE SET {set_clause} "
+            "WHERE excluded.marked_at >= marks.marked_at",
             (
                 m.book,
                 m.day.isoformat(),
@@ -590,7 +703,84 @@ class PaperStore:
             ),
         )
         self.conn.commit()
-        return int(cur.lastrowid or 0)
+        row = self.conn.execute(
+            "SELECT mark_id FROM marks WHERE book = ? AND day = ? AND slot = ?",
+            (m.book, m.day.isoformat(), m.slot),
+        ).fetchone()
+        return int(row["mark_id"]) if row else 0
+
+    def mark_for(self, book: str, day: date, slot: str) -> MarkRow | None:
+        """The one mark a slot holds for a session, if it has marked it."""
+        r = self.conn.execute(
+            "SELECT * FROM marks WHERE book = ? AND day = ? AND slot = ?",
+            (book, day.isoformat(), slot),
+        ).fetchone()
+        return self._mark(r) if r else None
+
+    def all_marks(self) -> list[MarkRow]:
+        """Every mark row, every book, oldest first - the scan a re-stamp reads."""
+        return [
+            self._mark(r) for r in self.conn.execute("SELECT * FROM marks ORDER BY day, mark_id")
+        ]
+
+    def sessions_marked(self, book: str) -> int:
+        """Distinct session days with a mark, whatever the slots and however many runs."""
+        return int(
+            self.conn.execute(
+                "SELECT COUNT(DISTINCT day) FROM marks WHERE book = ?", (book,)
+            ).fetchone()[0]
+        )
+
+    def restamp_marks(self, moves: list[tuple[int, date]]) -> list[tuple[MarkRow, date, str]]:
+        """Re-date marks onto the session they were marked from.
+
+        `moves` pairs a mark id with the day it should carry. This is the one
+        place a mark's day changes, and only from a day its market never
+        traded to the session of the bars that priced it: a mark stamped with
+        the wall-clock Saturday of a catch-up run is Friday's mark filed under
+        the wrong day, not a different fact. Both guards are lifted for the
+        transaction and put back inside it. Where the session already has a
+        mark for that slot the later `marked_at` stays, so a move can replace
+        the session's earlier mark or be dropped in favour of a later one; the
+        return says which happened to each, oldest first.
+        """
+        if not moves:
+            return []
+        out: list[tuple[MarkRow, date, str]] = []
+        self.conn.execute("BEGIN IMMEDIATE")
+        try:
+            self.conn.execute("DROP TRIGGER IF EXISTS marks_no_update")
+            self.conn.execute("DROP TRIGGER IF EXISTS marks_no_delete")
+            for mark_id, new_day in moves:
+                r = self.conn.execute(
+                    "SELECT * FROM marks WHERE mark_id = ?", (mark_id,)
+                ).fetchone()
+                if r is None:
+                    continue
+                m = self._mark(r)
+                other = self.conn.execute(
+                    "SELECT mark_id, marked_at FROM marks WHERE book = ? AND day = ? AND slot = ?",
+                    (m.book, new_day.isoformat(), m.slot),
+                ).fetchone()
+                if other is not None and other["marked_at"] >= r["marked_at"]:
+                    self.conn.execute("DELETE FROM marks WHERE mark_id = ?", (mark_id,))
+                    out.append((m, new_day, "dropped"))
+                    continue
+                outcome = "moved"
+                if other is not None:
+                    self.conn.execute("DELETE FROM marks WHERE mark_id = ?", (other["mark_id"],))
+                    outcome = "replaced"
+                self.conn.execute(
+                    "UPDATE marks SET day = ? WHERE mark_id = ?", (new_day.isoformat(), mark_id)
+                )
+                out.append((m, new_day, outcome))
+            for statement in _trigger_statements("marks", *_GUARDS["marks"]):
+                self.conn.execute(statement)
+            self.conn.commit()
+        except BaseException:
+            self.conn.rollback()
+            raise
+        return out
 
     def _mark(self, r: sqlite3.Row) -> MarkRow:
         return MarkRow(

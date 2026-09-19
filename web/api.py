@@ -9,6 +9,7 @@ time from the text.
 
 from __future__ import annotations
 
+import logging
 from typing import Any
 
 from fastapi import APIRouter, HTTPException
@@ -18,17 +19,31 @@ from mcp_server.protocol import ToolError
 from web import schemas as S
 
 router = APIRouter()
+log = logging.getLogger(__name__)
 
 DISCLAIMER = T.DISCLAIMER.strip()
 
 
 def _run(fn, *args, data: Any = None, **kwargs) -> S.Envelope:
     """Call a tool function; its refusal strings become the refusal field, its
-    ToolError (bad arguments) becomes a 422 - the same split the wire makes."""
+    ToolError (bad arguments) becomes a 422 - the same split the wire makes.
+
+    Anything else that escapes is a defect, not an answer, and it used to leave
+    as Starlette's bare 500 with a plain-text body no screen could read. It is
+    logged in full here and answered as a refusal in the same envelope as every
+    other: the type of the fault and where to look, never the traceback, since
+    a stack trace on the wire is the server's insides offered to whoever asked.
+    No `data` rides with it - half an answer next to a refusal reads as the
+    answer.
+    """
     try:
         text = fn(*args, **kwargs)
     except ToolError as e:
         raise HTTPException(status_code=422, detail=str(e)) from e
+    except Exception as e:
+        log.exception("%s raised", getattr(fn, "__name__", repr(fn)))
+        text = f"REFUSED: internal error ({type(e).__name__}); see the server log"
+        data = None
     return S.envelope(text, data=data, disclaimer=DISCLAIMER)
 
 
