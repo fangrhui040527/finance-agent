@@ -63,9 +63,10 @@ def _zone(tz: str | None, offset_hours: int | None) -> tzinfo:
     integer offset stays for the markets that never shift and as the fallback.
 
     The fallback exists because Python ships no zone database on Windows: it
-    comes from the `tzdata` package, which the lock pins there, so the named
-    zone resolves on every CI runner. An environment installed some other way
-    may still lack it, and a calendar that raised there would take the fee
+    comes from the `tzdata` package, which this project depends on directly
+    (it used to arrive only behind the optional broker extra, and the Windows
+    CI runner had none). An environment installed some other way may still
+    lack it, and a calendar that raised there would take the fee
     schedules and lot sizes down with it. There the calendar runs on the offset
     and says so once, because a close an hour late is the defect `price_state`
     exists to catch and a silent one is indistinguishable from the right answer.

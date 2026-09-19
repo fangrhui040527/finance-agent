@@ -235,9 +235,9 @@ def test_a_named_zone_or_an_offset_but_not_neither():
 
 
 def test_an_unresolvable_zone_falls_back_to_the_offset_and_says_so():
-    """Python ships no zone database on Windows. The lock pins tzdata there, but
-    an environment installed without it must not lose its fee schedules over a
-    calendar - it runs an hour out under daylight saving, and is told once."""
+    """Python ships no zone database on Windows. tzdata is a direct dependency
+    now, but an environment installed without it must not lose its fee schedules
+    over a calendar - it runs an hour out under daylight saving, and is told once."""
     with pytest.warns(RuntimeWarning, match="not in this machine's zone database"):
         cal = SessionCalendar(ONE_WINDOW, -5, tz="Nowhere/Imaginary")
     assert _session(cal, date(2026, 9, 17)).close_utc() == datetime(2026, 9, 17, 21, 0, tzinfo=UTC)

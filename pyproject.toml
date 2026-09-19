@@ -17,6 +17,11 @@ dependencies = [
   # The web surface (web/). Loopback only; nothing else imports these.
   "fastapi>=0.115",
   "uvicorn>=0.30",
+  # The IANA zone database. Python ships none on Windows, and the session
+  # calendars run on named zones (America/New_York keeps daylight saving) so a
+  # settled Nasdaq bar is settled at 20:00Z, not 21:00Z. Pure data, a small
+  # wheel; on Linux zoneinfo prefers the system copy and this is the fallback.
+  "tzdata>=2024.1",
 ]
 
 # `pip install -e ".[dev]"` keeps working; uv reads [dependency-groups] below.
