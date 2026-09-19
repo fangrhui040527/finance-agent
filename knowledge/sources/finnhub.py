@@ -18,7 +18,11 @@ Free-tier facts this adapter is shaped around, measured against the docs:
   * Surprise and recommendation rows carry the period they DESCRIBE, not the
     day they were published. `known_at` is therefore the day we first saw the
     row - conservative, never earlier than true - which is what the
-    point-in-time guard needs.
+    point-in-time guard needs. That label can fall AFTER the day we saw it:
+    Finnhub files NVIDIA's late-August print under the calendar quarter end,
+    2026-09-30. Such a row is stored forward-labelled, never with known_at
+    pushed out to the label - which is what this adapter did until
+    2026-09-18, and it hid a public EPS print for 25 days.
 """
 
 from __future__ import annotations
@@ -262,6 +266,14 @@ class FinnhubCollector(Collector):
         rows = self.get_json(f"{BASE}/stock/earnings", {"symbol": symbol, "token": token})
         if not isinstance(rows, list):
             raise SourceError(f"finnhub stock/earnings for {symbol}: expected a list")
+        # This endpoint sends actual, estimate, surprise and the fiscal period a
+        # print describes - not the day it was announced. So known_at is the
+        # day we first saw the row: later than true, never earlier, which is
+        # the side the guard needs. The period label is a calendar quarter end
+        # and can lie after that day (NVIDIA's late-August print is filed under
+        # 2026-09-30); then the row is forward-labelled. It is never clamped up
+        # to the label, because a public figure dated a month into the future
+        # is invisible to every as-of read until then.
         today = self.today()
         for s in rows:
             if not isinstance(s, dict):
@@ -282,12 +294,13 @@ class FinnhubCollector(Collector):
                         self.name,
                         iid,
                         concept,
-                        known_at=max(today, period),
+                        known_at=today,
                         value=value,
                         period_end=period,
                         currency="USD" if concept != "eps_surprise_pct" else "",
                         unit="pct" if concept == "eps_surprise_pct" else "per_share",
                         payload={"quarter": s.get("quarter"), "year": s.get("year")},
+                        forward=period > today,
                     )
                 )
 
@@ -314,7 +327,7 @@ class FinnhubCollector(Collector):
                         self.name,
                         iid,
                         concept,
-                        known_at=max(today, period),
+                        known_at=today,
                         value=value,
                         period_end=period,
                         unit="analysts",

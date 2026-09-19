@@ -10,8 +10,16 @@ endpoint says nothing about the eight others.
 Point-in-time is handled with care here because this is where it matters
 most: a quarter's revenue is stamped `known_at = filingDate` (the day the
 10-Q went in), never the period end. `core.market.pointintime` refuses a
-Fact whose known_at precedes its period end, and this adapter never builds
-one.
+reported Fact whose known_at precedes its period end, and this adapter never
+builds one.
+
+Estimates are the other case. Consensus for next fiscal year is knowable
+today and describes a period that ends in a year, so it is stamped
+`known_at` = the day it was fetched, `period_end` = the period it targets,
+and `forward=True`. Each revision then lands as its own vintage. Until
+2026-09-18 this adapter clamped known_at up to the target period instead,
+which gave every revision one date years out and left all 46 rows in the
+fact book invisible to every as-of read.
 
 Two slots use it: `us_preopen` daily for the cheap, fast-moving pieces
 (rating changes, the earnings date, the target consensus); `weekly` for the
@@ -250,13 +258,14 @@ class FmpCollector(Collector):
                         self.name,
                         iid,
                         concept,
-                        known_at=max(today, period) if period > today else today,
+                        known_at=today,
                         value=value,
                         period_end=period,
                         currency="USD",
                         payload={
                             "analysts": r.get("numAnalystsEps") or r.get("numAnalystsRevenue")
                         },
+                        forward=True,
                     )
                 )
 
