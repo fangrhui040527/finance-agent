@@ -25,13 +25,14 @@ read, so a failed night is re-read tomorrow rather than skipped.
 from __future__ import annotations
 
 import sys
+import time
 import zlib
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 
 from knowledge.corpus import DEGRADED, FAILED, OK, Corpus
 from knowledge.facts import SKIPPED, FactBook
-from knowledge.feeds.adapter import FeedAdapter, FeedError, IngestStats, RawRecord
+from knowledge.feeds.adapter import FeedAdapter, FeedError, FeedThrottled, IngestStats, RawRecord
 from knowledge.news.features import Article
 from knowledge.sources import catalog
 from knowledge.sources.catalog import MIXED, NEWS, SourceSpec
@@ -40,6 +41,22 @@ from knowledge.sources.catalog import MIXED, NEWS, SourceSpec
 #: fetching, keeps what it has and records which names it never reached - a
 #: job killed by the runner's cap commits nothing at all.
 SWEEP_DEADLINE_SECONDS = 600
+
+#: How much of a source's detail the sweeps table keeps. 2000, up from 400:
+#: the nightly page quotes this column, and at 400 fmp's per-endpoint plan
+#: notes for three names were cut mid-URL before they named the second
+#: company, and a GDELT note lost the names it deferred. The column is TEXT,
+#: so this is a bound on prose, not a migration; it exists so a source that
+#: fails a different way for every name cannot write a page into a row.
+DETAIL_CHARS = 2000
+
+#: How far behind its watermark a GDELT request starts. The watermark is the
+#: time of the last successful READ, and GDELT indexes a story minutes to
+#: hours after it is published, so a story published just before the last
+#: read and indexed just after it falls between two windows. Two hours of
+#: overlap covers that; the corpus dedupes on dup_hash, so the overlap costs
+#: bytes and nothing else.
+GDELT_OVERLAP = timedelta(hours=2)
 
 # --- the pieces that used to live in ask.py -------------------------------------------
 
@@ -399,12 +416,16 @@ def run_sweep(
     entity_index=None,
     log=None,
     force: bool = False,
+    sleep=None,
 ) -> SweepReport:
     """Run every enabled source for `slot`. Never raises for a source failure.
 
     A named slot collects AT MOST ONCE PER UTC DAY. `force` is the operator's
     override; see `_already_ran_today` for why the guard exists and why it is
     here rather than in the thing that dispatches.
+
+    `sleep` is how a paced source (GDELT) waits between request starts; a test
+    injects it, with `clock`, so the pacing is asserted rather than endured.
     """
     from knowledge.feeds.registry import adapter_for as _adapter_for
     from knowledge.graph.extractors.gdelt import entity_index as _entity_index
@@ -413,6 +434,7 @@ def run_sweep(
     adapter_for = adapter_for or _adapter_for
     collector_for = collector_for or _collector_for
     tick = clock or (lambda: datetime.now(UTC))
+    pause = sleep or time.sleep
     emit = log or (lambda msg: print(msg, file=sys.stderr))
 
     started = tick()
@@ -500,6 +522,7 @@ def run_sweep(
                     adapter_for,
                     run_id,
                     emit,
+                    pause,
                 )
             else:
                 result, articles = _run_structured(
@@ -557,6 +580,7 @@ def _run_news(
     adapter_for,
     run_id,
     emit,
+    pause=None,
 ) -> tuple[SourceResult, list[Article]]:
     since = _since_for(corpus.last_success, spec.name, tick(), hours)
     result = SourceResult(spec.name, spec.kind, OK)
@@ -584,6 +608,7 @@ def _run_news(
                 watchlist,
                 languages,
                 emit,
+                pause,
             )
             stats = _merge_stats(articles, records)
             result.detail = notes
@@ -601,7 +626,7 @@ def _run_news(
             )
     except FeedError as e:
         corpus.record_sweep(
-            run_id, spec.name, since, FAILED, at=tick(), slot=slot, detail=str(e)[:400]
+            run_id, spec.name, since, FAILED, at=tick(), slot=slot, detail=str(e)[:DETAIL_CHARS]
         )
         result.status = FAILED
         result.detail = str(e)
@@ -655,57 +680,94 @@ def _news_per_instrument(
     watchlist,
     languages,
     emit,
+    pause=None,
 ):
-    """One request per name; every name's records normalised by its own feed."""
+    """One request per name - or per GROUP of names, for a source that takes several.
+
+    `spec.names_per_request` is the group size (1 for every source but GDELT),
+    `spec.seconds_between_requests` the least gap between two request starts,
+    and a `FeedThrottled` answer ends the slot: the groups not yet asked for
+    are DEFERRED, named as such, and never sent. Every request's records are
+    normalised by the feed that fetched them, as before.
+    """
     from knowledge.feeds.company_feeds import EDITION_FOR_MIC, finance_query
     from knowledge.graph.ids import display_names
     from knowledge.graph.ids import instrument_id as canonical
     from markets.registry import mic_of
 
+    pause = pause or time.sleep
     names = display_names()
+
+    def label_of(iid: str) -> str:
+        return str(names.get(canonical(iid) or iid) or iid)
+
     rotated = _rotate(tuple(instruments), _rotation_offset(tick()))
     # A throttled source asks about a tiling subset; everything else asks about
     # all of them. Applied after `_rotate` so an uncapped source is untouched.
     asked = _window(rotated, spec.names_per_run, tick())
-    deferred = _deferred_note(
-        [str(names.get(canonical(i) or i) or i) for i in asked],
-        [str(names.get(canonical(i) or i) or i) for i in rotated],
-    )
-    rotated = asked
-    per = max(1, limit // max(1, len(rotated)))
+    deferred = _deferred_note([label_of(i) for i in asked], [label_of(i) for i in rotated])
+    groups = _groups(asked, spec.names_per_request)
+    per = max(1, limit // max(1, len(groups)))
+    fetch_since = since - GDELT_OVERLAP if spec.name == "gdelt" else since
     articles: list[Article] = []
     records_total = 0
     failed: list[tuple[str, str]] = []
     skipped: list[str] = []
+    held: list[str] = []
     counts: list[tuple[str, int]] = []
     linked_counts: list[tuple[str, int, int]] = []
+    requests = 0
+    throttled = ""
+    last_start: datetime | None = None
 
-    for iid in rotated:
-        label: str = str(names.get(canonical(iid) or iid) or iid)
+    for group in groups:
+        labels = [label_of(i) for i in group]
+        if throttled:
+            # The quota is spent for this address until its window rolls over.
+            # Asking would spend the retry budget to learn that again, and the
+            # refused request would count against the next window as well.
+            held.extend(labels)
+            continue
         if tick() >= deadline:
-            skipped.append(label)
+            skipped.extend(labels)
             continue
         try:
-            feed = _feed_for(
-                spec,
-                cfg,
-                iid,
-                label,
-                adapter_for,
-                EDITION_FOR_MIC,
-                finance_query,
-                mic_of,
+            feed = _feed_for_group(
+                spec, cfg, group, labels, adapter_for, EDITION_FOR_MIC, finance_query, mic_of
             )
-        except ValueError as e:  # no edition, no symbol: this name cannot be asked for here
-            failed.append((label, str(e)))
+        except ValueError as e:  # no edition, no symbol: these names cannot be asked for here
+            failed.extend((label, str(e)) for label in labels)
             continue
         if feed is None:
-            counts.append((label, 0))
+            counts.extend((label, 0) for label in labels)
             continue
+        # One request in flight, and the documented pace between STARTS. The
+        # wait is measured from the previous start, so a request that itself
+        # took 34 s owes nothing and only a fast answer is followed by a pause.
+        if last_start is not None and spec.seconds_between_requests > 0:
+            owed = spec.seconds_between_requests - (tick() - last_start).total_seconds()
+            if owed > 0:
+                pause(owed)
+        last_start = tick()
+        requests += 1
+        ask = per
+        if spec.seconds_between_requests > 0:
+            # A paced source is asked for ONE page per request. Past its page
+            # size the adapter pages by slicing time, and every slice is a
+            # request this loop never saw: fired back to back, on the quota the
+            # pace exists to respect. `--limit` above 250 on a nine-name book
+            # would do exactly that, so the page size bounds the ask instead.
+            ask = min(per, int(getattr(feed, "MAX_RECORDS", per)))
         try:
-            records = feed.fetch(since, limit=per)
+            records = feed.fetch(fetch_since, limit=ask)
+        except FeedThrottled as e:
+            failed.extend((label, str(e)) for label in labels)
+            throttled = (
+                f"HTTP 429 on request {requests}: the rest of the slot is deferred, not asked"
+            )
+            continue
         except FeedError as e:
-            failed.append((label, str(e)))
+            failed.extend((label, str(e)) for label in labels)
             continue
         arts, _ = feed.normalize(
             records,
@@ -715,29 +777,43 @@ def _news_per_instrument(
             languages=languages,
         )
         if spec.name in ("yahoo_rss",):
+            (iid,) = group
             for a in arts:  # keyed by ticker: attributed even when the headline omits the name
                 if iid not in a.instruments:
                     a.instruments.insert(0, iid)
-        # PROVENANCE, NOT ATTRIBUTION. Every per-name source is asked for one
-        # company, so record which; only a source keyed by TICKER (above) may
-        # also assert it. GDELT is asked a PHRASE and answers from a full-text
-        # index this corpus never sees, and 457 of the 575 GDELT articles
-        # collected to 2026-09-06 named no book company at all - attributing
-        # those to the name that fetched them would put a brothel sale in
-        # Apple's evidence. Recorded instead, so the share is measurable
-        # (`ask.py sources --coverage`) rather than guessed at.
-        for a in arts:
-            a.fetched_for = iid
-        linked = sum(1 for a in arts if iid in a.instruments)
-        counts.append((label, len(records)))
-        linked_counts.append((label, linked, len(arts)))
+        _stamp_fetched_for(arts, group)
+        if len(group) == 1:
+            counts.append((labels[0], len(records)))
+            linked_counts.append(
+                (labels[0], sum(1 for a in arts if group[0] in a.instruments), len(arts))
+            )
+        else:
+            # A grouped answer is one list of records for several names, so
+            # "read but empty" for one of them means the answer named it
+            # nowhere, and the precision that can be measured is the group's.
+            for iid, label in zip(group, labels, strict=True):
+                counts.append((label, sum(1 for a in arts if iid in a.instruments)))
+            named_any = sum(1 for a in arts if any(i in a.instruments for i in group))
+            linked_counts.append((" + ".join(labels), named_any, len(arts)))
         records_total += len(records)
         articles.extend(arts)
 
+    grouped = ""
+    if spec.names_per_request > 1:
+        grouped = (
+            f"grouped {spec.names_per_request} names per request; "
+            f"{requests} request{'' if requests == 1 else 's'}"
+        )
+        if throttled:
+            grouped += f" ({throttled})"
+    held_note = f"deferred: {', '.join(held)}" if held else ""
+
     if not articles and not counts and (failed or skipped):
         first = failed[0][1] if failed else "deadline reached"
+        tail = "; ".join(x for x in (grouped, held_note) if x)
         raise FeedError(
-            f"no name could be read ({len(failed)} failed, {len(skipped)} not reached). First: {first}"
+            f"no name could be read ({len(failed)} failed, {len(skipped)} not reached). "
+            f"First: {first}" + (f"; {tail}" if tail else "")
         )
     degraded = _mostly_failed(failed, skipped, counts)
     if degraded:
@@ -745,7 +821,91 @@ def _news_per_instrument(
         emit(f"  {'':<20} DEGRADED: {n} of {n + len(counts)} names could not be read")
     note = _sweep_note(failed, skipped, counts)
     hit = _linked_note(linked_counts)
-    return records_total, articles, "; ".join(x for x in (note, hit, deferred) if x), degraded
+    # The shape the nightly page quotes: what was grouped and how many requests
+    # it took, then who is waiting on the next slot, then the per-name reading.
+    parts = (grouped, held_note, note, hit, deferred)
+    return records_total, articles, "; ".join(x for x in parts if x), degraded
+
+
+def _groups(names, size: int) -> list[tuple[str, ...]]:
+    """Consecutive groups of `size` names; a size of one is one name per request."""
+    size = max(1, int(size))
+    names = tuple(names)
+    return [names[i : i + size] for i in range(0, len(names), size)]
+
+
+def _stamp_fetched_for(articles: list[Article], group) -> None:
+    """Record which query fetched each article. PROVENANCE, NOT ATTRIBUTION.
+
+    Every per-name source is asked for one company, so record which; only a
+    source keyed by TICKER (yahoo_rss, in the caller) may also assert it. GDELT
+    is asked a PHRASE and answers from a full-text index this corpus never
+    sees, and 457 of the 575 GDELT articles collected to 2026-09-06 named no
+    book company at all - attributing those to the name that fetched them
+    would put a brothel sale in Apple's evidence. Recorded instead, so the
+    share is measurable (`ask.py sources --coverage`) rather than guessed at.
+
+    A GROUPED request was made for several names at once and the column holds
+    one id. An article that names a member of the group is stamped with that
+    member, so provenance and attribution agree; one that names none is
+    stamped with the group's first member, so it is counted as a miss rather
+    than vanishing from the coverage table. The total is exact and the
+    per-name split approximate - and because `_rotate` starts each run at a
+    different name, the misses spread across the group over the days rather
+    than piling on one company.
+    """
+    for a in articles:
+        a.fetched_for = next((iid for iid in group if iid in a.instruments), group[0])
+
+
+def _feed_for_group(spec, cfg, group, labels, adapter_for, edition_for_mic, finance_query, mic_of):
+    """The adapter for one request: a single name's feed, or GDELT's OR of several."""
+    if len(group) == 1:
+        return _feed_for(
+            spec, cfg, group[0], labels[0], adapter_for, edition_for_mic, finance_query, mic_of
+        )
+    if spec.name != "gdelt":
+        raise ValueError(
+            f"{spec.name} is asked one name at a time; the catalogue says {len(group)} per request"
+        )
+    query = _gdelt_group_query(group)
+    if not query:
+        return None  # every alias of every name is too short for the DOC API
+    return adapter_for(
+        "gdelt",
+        query=query,
+        languages=tuple(cfg.gdelt_languages),
+        countries=tuple(cfg.gdelt_countries),
+    )
+
+
+def _gdelt_group_query(group) -> str:
+    """`("Maybank" OR "Malayan Banking" OR "Tenaga" OR "Tenaga Nasional" OR ...)`.
+
+    One flat OR over every askable alias of every name in the group, rather
+    than the per-company `search_query` forms joined: the DOC API wants an OR
+    list inside one pair of parentheses and does not document nesting, and a
+    flat list is the shape `finance_query` already sends Google News. A name
+    with no alias long enough for the API contributes nothing here and is
+    recorded as read-but-empty by the caller, as the per-name path did.
+
+    What this does NOT bring back is the nine-name combined query that
+    `watchlist_terms` warns about, where a newest-first page of 250 was won by
+    whichever name publishes most. The slots already keep the Bursa names and
+    the US names apart, and three names from one market is a different size of
+    question from nine across two.
+    """
+    from knowledge.graph.extractors.gdelt import search_terms
+
+    terms: list[str] = []
+    for iid in group:
+        terms.extend(search_terms(iid))
+    terms = list(dict.fromkeys(terms))
+    if not terms:
+        return ""
+    if len(terms) == 1:
+        return f'"{terms[0]}"'
+    return "(" + " OR ".join(f'"{t}"' for t in terms) + ")"
 
 
 def _linked_note(linked_counts: list[tuple[str, int, int]]) -> str:
@@ -848,12 +1008,13 @@ def _run_structured(
         # AND a sweep row, like the KeyMissing skip below. `sweep_silence` reads
         # corpus.last_success and nothing else, so a source whose skip is
         # recorded only in the pulls table reads as a source that has STOPPED.
-        # That is what happened to fmp: per-instrument, and us_preopen carries no
-        # per-instrument work, so it was correctly skipped every weekday, left no
-        # sweep row, and opened a silence alert on the fourth day about a
-        # collector that was dispatching it on time. A skip is a dispatch that
-        # had nothing to do - which is exactly what the silence rule needs to
-        # see, and exactly what the KeyMissing branch has always recorded.
+        # That is what happened to fmp: per-instrument, and us_preopen carried
+        # no per-instrument work (its MIC set was empty until 2026-09-18), so it
+        # was correctly skipped every weekday, left no sweep row, and opened a
+        # silence alert on the fourth day about a collector that was dispatching
+        # it on time. A skip is a dispatch that had nothing to do - which is
+        # exactly what the silence rule needs to see, and exactly what the
+        # KeyMissing branch has always recorded.
         corpus.record_sweep(
             run_id,
             spec.name,
@@ -886,7 +1047,7 @@ def _run_structured(
             OK,
             at=tick(),
             slot=slot,
-            detail=f"skipped: {result.detail[:300]}",
+            detail=f"skipped: {result.detail[:DETAIL_CHARS]}",
         )
         return result, []
     except PlanExcluded as e:
@@ -899,7 +1060,13 @@ def _run_structured(
         result.detail = str(e)
         facts.record_pull(run_id, spec.name, FAILED, detail=result.detail)
         corpus.record_sweep(
-            run_id, spec.name, since, FAILED, at=tick(), slot=slot, detail=result.detail[:400]
+            run_id,
+            spec.name,
+            since,
+            FAILED,
+            at=tick(),
+            slot=slot,
+            detail=result.detail[:DETAIL_CHARS],
         )
         return result, []
 
@@ -927,7 +1094,7 @@ def _run_structured(
         result.filtered, result.escalated = stats.filtered, stats.escalated
     else:
         result.fetched = pull.fetched
-    result.detail = "; ".join(pull.notes)[:400]
+    result.detail = "; ".join(pull.notes)[:DETAIL_CHARS]
     facts.record_pull(
         run_id,
         spec.name,
@@ -949,7 +1116,7 @@ def _run_structured(
         duplicates=result.duplicates,
         unlinked=result.unlinked,
         escalated=result.escalated,
-        detail=(f"facts {stored}; " + result.detail)[:400],
+        detail=(f"facts {stored}; " + result.detail)[:DETAIL_CHARS],
     )
     return result, articles
 

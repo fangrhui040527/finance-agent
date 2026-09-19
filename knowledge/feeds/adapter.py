@@ -248,6 +248,20 @@ class FeedError(RuntimeError):
     """
 
 
+class FeedThrottled(FeedError):
+    """The source answered HTTP 429: this window's quota is spent.
+
+    A subclass, so every caller that treats a FeedError as a failure still
+    does - and the sweep, which knows what a slot is, can tell "this request
+    was refused" from "this host is refusing everything until the window
+    rolls over" and stop asking. GDELT's quota is counted per address, GitHub's
+    runners share addresses, and the four days to 2026-09-17 showed what
+    asking anyway costs: nine per-name requests a slot, the quota gone after
+    about five, every later request paid for in full and answered 429, and
+    0 rows stored.
+    """
+
+
 class GdeltFeed(FeedAdapter):
     """GDELT 2.0 DOC API. Free, no key, 15-minute cadence, 100+ languages.
 
@@ -264,6 +278,10 @@ class GdeltFeed(FeedAdapter):
          minimum is above 15 minutes and undocumented; asking for less returns
          an error, and a caller polling on a fast loop would otherwise turn its
          own impatience into an outage.
+      3. A 429 is `FeedThrottled`, not a plain failure, and it is not retried
+         into the ground: two attempts a minute apart, then the caller decides.
+         The sweep defers the rest of the slot; GDELT's quota is per address,
+         and a request that is refused still counts against it.
     """
 
     name = "gdelt"
@@ -291,14 +309,19 @@ class GdeltFeed(FeedAdapter):
     # sweep into a recorded failure. `with_retry` makes 3 attempts, so the worst
     # case is ~4.5min - inside the collect job's 15min cap.
     TIMEOUT = 90
-    #: Seconds for the FIRST retry wait, doubling from there. 5, not the
-    #: `with_retry` default of 0.5, because the failure being retried here is a
-    #: quota rather than a dropped packet: on 2026-09-04 four of nine companies
-    #: came back 429, and 0.5s and 1s waits put all three attempts inside the
-    #: same throttle window. GDELT asks for roughly one request every five
-    #: seconds. Costed against the sweep's 600s deadline: nine requests already
-    #: take ~310s at ~34s each, and this adds at most ~13s per failing company.
-    RETRY_BASE_SECONDS = 5.0
+    #: How many times one page is asked for, and the wait before the second
+    #: try. Two attempts a minute apart - not the `with_retry` default of three
+    #: at 0.5 s, and not the 5 s this was until 2026-09-18. The failure being
+    #: retried is a quota, not a dropped packet: GDELT answers 429 with no
+    #: Retry-After, and over the four days to 2026-09-17 a retry 5 s and 10 s
+    #: later landed inside the same throttle window every time, so one 429
+    #: cost three requests against the very quota that was exhausted and still
+    #: failed. One retry after a minute is the shape that can succeed; past
+    #: that it is the sweep's decision (`FeedThrottled`), which defers the rest
+    #: of the slot rather than keep asking. `with_retry` caps a computed wait
+    #: at 8 s unless told otherwise, which is why the cap is passed as well.
+    RETRY_ATTEMPTS = 2
+    RETRY_BASE_SECONDS = 60.0
     DEFAULT_USER_AGENT = "finplanet-analyst-mind/0.1 (personal research)"
 
     def __init__(
@@ -406,18 +429,25 @@ class GdeltFeed(FeedAdapter):
                 return resp.read()
 
         kwargs = {"sleep": self._sleep} if self._sleep is not None else {}
-        # base=RETRY_BASE_SECONDS, not the 0.5 default. The default produces
-        # waits of 0.5s and 1s, which is right for a dropped connection and
-        # useless against a quota: all three attempts land inside the same
-        # throttle window, so a 429 costs three requests and still fails. GDELT
-        # asks for about one request every five seconds. A Retry-After header
-        # still wins over this when the server names its own wait.
+        # Two attempts a minute apart (see RETRY_ATTEMPTS). A Retry-After
+        # header still wins over this when the server names its own wait.
         try:
             self._breaker.before_call()
-            body = with_retry(_transport, base=self.RETRY_BASE_SECONDS, **kwargs)
+            body = with_retry(
+                _transport,
+                attempts=self.RETRY_ATTEMPTS,
+                base=self.RETRY_BASE_SECONDS,
+                cap=self.RETRY_BASE_SECONDS,
+                **kwargs,
+            )
         except CircuitOpen as e:
             raise FeedError(str(e)) from e
-        except urllib.error.URLError as e:  # includes HTTPError after retries
+        except urllib.error.HTTPError as e:  # after the retry, if the code allowed one
+            self._breaker.record_failure(e)
+            if e.code == 429:
+                raise FeedThrottled(f"GDELT fetch failed: {e}") from e
+            raise FeedError(f"GDELT fetch failed: {e}") from e
+        except urllib.error.URLError as e:
             self._breaker.record_failure(e)
             raise FeedError(f"GDELT fetch failed: {e}") from e
         except OSError as e:

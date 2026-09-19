@@ -45,6 +45,13 @@ OK = "ok"
 FAILED = "failed"
 SKIPPED = "skipped"  # no key, or the plan does not include the endpoint
 
+#: How much of a pull's detail the pulls table keeps. 2000, up from 400, for
+#: the reason knowledge/sweep.DETAIL_CHARS gives: the nightly page quotes this
+#: column, and at 400 the per-endpoint plan notes of a three-name fmp pull
+#: were cut mid-URL before they named the second company. The column is TEXT,
+#: so this bounds prose and is no migration.
+DETAIL_CHARS = 2000
+
 #: Event kinds that record a THIRD PARTY'S VIEW of a company rather than
 #: something the company did, said or scheduled.
 #:
@@ -376,7 +383,15 @@ class FactBook:
         self.conn.execute(
             "INSERT INTO pulls (run_id, at, source, status, fetched, stored, detail)"
             " VALUES (?,?,?,?,?,?,?)",
-            (run_id, _iso(at or datetime.now(UTC)), source, status, fetched, stored, detail[:400]),
+            (
+                run_id,
+                _iso(at or datetime.now(UTC)),
+                source,
+                status,
+                fetched,
+                stored,
+                detail[:DETAIL_CHARS],
+            ),
         )
         self.conn.commit()
 
