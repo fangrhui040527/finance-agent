@@ -47,6 +47,9 @@ NO_PAGES = "tests/no-such-feedback"
 @pytest.fixture(autouse=True)
 def _no_real_pages(monkeypatch):
     monkeypatch.setattr("core.monitor.FEEDBACK_DIR", NO_PAGES)
+    # The price cache is tracked too, and on the day `price_stale` was written
+    # it held sixteen rows a fortnight behind. Its own tests build their own.
+    monkeypatch.setattr("core.monitor.PRICE_CACHE_DB", "tests/no-such-price-cache.db")
 
 
 def _ledger(path: Path, calls: int = 3, latency: float = 100.0, cost_scale: int = 100):

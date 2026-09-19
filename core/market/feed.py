@@ -71,8 +71,38 @@ class PriceFeed(ABC):
     #: inheriting another feed's spelling.
     LITERAL: dict[str, str] = {}
 
+    #: Canonical MIC -> the suffix this feed appends to a local code. Each feed
+    #: declares its own; the base holds an empty one so `instrument_of` below
+    #: can read whichever table the concrete feed carries.
+    SUFFIX: dict[str, str] = {}
+
     @abstractmethod
     def symbol_for(self, instrument_id: str) -> str: ...
+
+    def instrument_of(self, symbol: str) -> str | None:
+        """`symbol_for` run backwards: the `MIC:LOCAL` id behind a symbol this
+        feed spelled, or None when no table of this feed accounts for it.
+
+        For reading the cache, whose rows are keyed by (feed, symbol) and carry
+        no instrument id. It is an inversion of the tables and nothing more - a
+        literal is matched whole, a suffix exactly - because a guess here would
+        judge a row against another market's calendar, and a stale price read
+        as fresh is the failure the reader exists to catch. The id comes back
+        with the MIC, not the book's spelling: `1155.KL` is `XKLS:1155`, which
+        markets.registry resolves `MYX:1155` to as well.
+        """
+        for iid, literal in self.LITERAL.items():
+            if literal == symbol:
+                return iid
+        _, dot, tail = symbol.rpartition(".")
+        want = (dot + tail).upper() if dot else ""  # no dot: the bare spelling, if a table has one
+        for mic, suffix in self.SUFFIX.items():
+            spelled = suffix if not suffix or suffix.startswith(".") else "." + suffix
+            if spelled.upper() != want:
+                continue
+            local = symbol[: len(symbol) - len(spelled)] if spelled else symbol
+            return f"{mic}:{local.upper()}" if local else None
+        return None
 
     def _index_symbol(self, instrument_id: str) -> str:
         """The literal symbol for an index id, or a refusal naming the fix.
