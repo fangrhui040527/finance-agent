@@ -246,6 +246,13 @@ questions:
     is the rate this label actually costs, and it is worth writing down: the
     guard is doing its job on a schedule set by SPCX's news flow, not by anything
     in this repository.
+
+    A fourth time on the 2026-09-18 us_close sweep: one SeekingAlpha document,
+    labelled on 2026-09-19 when PR #76 went red on it. ELEVEN labels. Four
+    relabels in eleven days is the rate; a follow-up worth weighing is deriving
+    a lexical question's relevant set from containment at evaluation time, since
+    containment is the criterion this note keeps restating, and keeping the
+    hand list as documentation rather than as the truth the guard defends.
   relevant:
   - doc_id: https://stocktwits.com/news-articles/markets/equity/s-and-p-500-dow-end-best-day-in-a-month/cZsufnBRJvu?.tsrc=rss
     title: S&P 500, Dow End Best Day In A Month On Calmer Yields As Rate Hike Bets Wane — SPCX, VSXY,
@@ -272,6 +279,8 @@ questions:
       NVDA, ORCL, NOK, SPCX'
   - doc_id: https://news.google.com/rss/articles/CBMikwFBVV95cUxPa0U3dE9VcDh4TXFMeE9peXlxME9FY0tTeG1ibHdlTDhOUDBvSGdab2RSdEtMV3Nkcl9icmNFSmYzaGhFVUJTckJaTFhUZElJMzNUak1DdGJWeXExUEoxbk41WHR2ZjJWMGlFdC1yazYyZFZzQlo4TmRJNC1UZ1lRWEMxMnlqZ0lzQU9TbDREeTY0bzA?oc=5
     title: Space Exploration Technologies (SPCX) Eyes Nvidia Launches, Is The Stock Overvalued?
+  - doc_id: finnhub:142258366
+    title: "SpaceX: Don't Wait Till It Potentially Becomes The Largest AI Cloud"
 - query: KeyBanc Underweight rating Apple
   kind: lexical
   note: broker plus rating word
