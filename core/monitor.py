@@ -27,7 +27,7 @@ from __future__ import annotations
 import json
 import sqlite3
 from dataclasses import dataclass, field
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
 
@@ -40,6 +40,10 @@ WARN = "warn"
 #: docstring gives: a test that cannot point it somewhere of its own reads the
 #: repository's own tracked pages, whose questions age.
 FEEDBACK_DIR = "knowledge/feedback"
+#: Where the collector's price step writes and the routine reads offline. The
+#: same arrangement as FEEDBACK_DIR, for the same reason: the file is tracked,
+#: and every row in it ages.
+PRICE_CACHE_DB = "data/price_cache.db"
 ALERT = "alert"
 
 SCHEMA = """
@@ -143,11 +147,13 @@ def evaluate(
     debug_root: str = "debug",
     now: datetime | None = None,
     feedback_root: str = "",
+    price_cache: str = "",
 ) -> list[Alert]:
-    """Every rule, against the ledger, the traces and the nightly pages. Pure:
-    writes nothing. `debug_root` and `feedback_root` are parameters rather than
-    settings for the same reason: a test that cannot point them somewhere of
-    its own reads the repository's own tracked directories, which age."""
+    """Every rule, against the ledger, the traces, the nightly pages and the
+    price cache. Pure: writes nothing. `debug_root`, `feedback_root` and
+    `price_cache` are parameters rather than settings for the same reason: a
+    test that cannot point them somewhere of its own reads the repository's
+    own tracked directories, which age."""
     from core.provenance.ledger import ProvenanceLedger
 
     now = now or datetime.now(UTC)
@@ -229,6 +235,7 @@ def evaluate(
     out.extend(_series_rules(cfg, now))
     out.extend(_slot_rules(cfg, now))
     out.extend(_name_coverage_rules(cfg, now))
+    out.extend(_price_rules(cfg, now, price_cache))
     out.extend(_question_rules(now, feedback_root))
     out.extend(_paper_rules(cfg, now))
     out.extend(_trace_rules(debug_root, now))
@@ -748,6 +755,181 @@ def _series_rules(cfg, now: datetime) -> list[Alert]:
     ]
 
 
+#: How many sessions a cached price may trail its market's last finished
+#: session before that is a stop rather than the calendar. The book and its
+#: proxies are refetched at every close slot, so one session behind is one
+#: missed run - lateness, by the same reasoning as SLOT_SHORTFALL_MIN - and two
+#: is a fault. A peer is warmed by the same step but read only when someone
+#: asks for comparables, so it is allowed a trading week.
+PRICE_STALE_SESSIONS: dict[str, int] = {"book": 1, "proxy": 1, "peer": 5}
+
+
+def _last_session(calendar, now: datetime) -> date | None:
+    """The newest session this market has FINISHED by `now`.
+
+    Today counts only once the market has shut. A Bursa row fetched yesterday
+    is not behind at 03:00 UTC, when today's session has not opened, and a US
+    row is not behind at 15:00 UTC while today's is still running; both would
+    read one session short if the calendar day stood in for the close.
+    """
+    at = now if now.tzinfo else now.replace(tzinfo=UTC)
+    day = at.date()
+    for _ in range(31):  # a month without a session is a broken calendar, not a stop
+        session = calendar.session(day)
+        if session is not None and session.close_utc() <= at:
+            return day
+        day -= timedelta(days=1)
+    return None
+
+
+def _price_rules(cfg, now: datetime, path: str = "") -> list[Alert]:
+    """A cached price whose fetch day trails its market's last session.
+
+    `ask.py prices --book` refetches the book and each market's proxy at every
+    close slot, and until 2026-09-19 nothing else in the cache was ever
+    refetched: sixteen peer rows - the eleven US names comps had asked about
+    on 2026-09-02 and five Bursa names from 2026-08-31 - sat beside book rows
+    dated yesterday, and every peer table built from them compared this
+    week's book with a fortnight-old peer set. Nothing refused: a stale CSV
+    has the same five columns as a fresh one. `sweep_silence` and `paper_stale`
+    could not see it either, because the collector was running and the book
+    was being marked. So this rule reads the age of each row against the
+    calendar of ITS market, not the clock: a weekend or a holiday leaves the
+    row exactly as many sessions behind as it was.
+
+    The judgement is on `fetched_on`, not on the newest bar in the body, on
+    purpose: it is the collector's refresh that this watches, and the day is
+    the one column every row carries - `fetched_at` is NULL on rows cached
+    before it existed. A name is judged by its freshest row across feeds,
+    because the chain serves the first source that answers and leaves the
+    other's row to age behind it; that row is not the one being read.
+
+    One alert for all of them, the book first: a stale book name is tonight's
+    page decomposing the wrong day, a stale peer is a comps table nobody has
+    opened lately. Quiet without a cache file - a system nobody has priced
+    yet is not one whose prices stopped.
+    """
+    path = path or PRICE_CACHE_DB
+    if not Path(path).exists():
+        return []
+
+    from core.market.cache import PriceCache, looks_like_bars
+    from core.market.calendar import SessionCalendar
+    from core.market.feed import StooqFeed, YahooFeed, market_proxy_for
+    from markets.registry import get as adapter_for
+    from markets.registry import mic_of
+
+    def canonical(iid: str) -> str | None:
+        """`MYX:1155` and `XKLS:1155` are one name; the cache rows spell the MIC."""
+        try:
+            mic = mic_of(iid)
+        except ValueError:
+            return None
+        return f"{mic}:{iid.partition(':')[2].strip().upper()}"
+
+    book = list(
+        dict.fromkeys(
+            tuple(getattr(cfg, "watchlist", ()) or ()) + tuple(getattr(cfg, "holdings", ()) or ())
+        )
+    )
+    proxies = [p for p in dict.fromkeys(market_proxy_for(i) for i in book) if p]
+    expected: dict[str, tuple[str, str]] = {}  # canonical id -> (book spelling, role)
+    for role, ids in (("book", book), ("proxy", proxies)):
+        for iid in ids:
+            canon = canonical(iid)
+            if canon is not None:
+                expected.setdefault(canon, (iid, role))
+
+    feeds = {f.name: f for f in (StooqFeed(), YahooFeed())}
+    cache = PriceCache(path)
+    try:
+        rows = cache.conn.execute("SELECT feed, symbol, fetched_on, body FROM price_csv").fetchall()
+    finally:
+        cache.close()
+
+    freshest: dict[str, tuple[date, str, str]] = {}  # canonical id -> (fetched_on, feed, symbol)
+    for feed_name, symbol, fetched_on, body in rows:
+        feed = feeds.get(feed_name)
+        if feed is None or not looks_like_bars(body):
+            continue  # an error page under a symbol's name is not a price, stale or otherwise
+        try:
+            spelled = feed.instrument_of(symbol)
+            day = date.fromisoformat(fetched_on)
+        except (TypeError, ValueError):
+            continue
+        canon = canonical(spelled) if spelled else None
+        if canon is None:
+            continue  # no table accounts for the symbol, so no calendar can judge it
+        if canon not in freshest or freshest[canon][0] < day:
+            freshest[canon] = (day, feed_name, symbol)
+
+    calendars: dict[str, tuple[SessionCalendar, date] | None] = {}
+    stale: list[dict] = []
+    for canon, (day, feed_name, symbol) in freshest.items():
+        name, role = expected.get(canon, (symbol, "peer"))
+        mic = canon.partition(":")[0]
+        if mic not in calendars:
+            try:
+                calendar = adapter_for(mic).calendar
+            except (KeyError, ValueError):
+                calendars[mic] = None
+            else:
+                last = _last_session(calendar, now)
+                calendars[mic] = None if last is None else (calendar, last)
+        found = calendars[mic]
+        if found is None:
+            continue
+        calendar, last = found
+        behind = calendar.count_sessions(day + timedelta(days=1), last) if day < last else 0
+        allowed = PRICE_STALE_SESSIONS[role]
+        if behind > allowed:
+            stale.append(
+                {
+                    "name": name,
+                    "symbol": symbol,
+                    "feed": feed_name,
+                    "role": role,
+                    "market": mic,
+                    "fetched_on": day.isoformat(),
+                    "last_session": last.isoformat(),
+                    "sessions_behind": behind,
+                    "allowed": allowed,
+                }
+            )
+    if not stale:
+        return []
+
+    stale.sort(key=lambda s: (s["role"] == "peer", -s["sessions_behind"], s["name"]))
+    named = ", ".join(
+        f"{s['name']} ({s['role']}, {s['sessions_behind']} sessions behind)" for s in stale[:6]
+    )
+    more = f" and {len(stale) - 6} more" if len(stale) > 6 else ""
+    groups: dict[tuple[int, str, int], list[str]] = {}
+    for s in stale:
+        groups.setdefault((s["sessions_behind"], s["role"], s["allowed"]), []).append(s["name"])
+    listed = "; ".join(
+        f"{behind} sessions behind, {role} allowed {allowed}: {', '.join(names)}"
+        for (behind, role, allowed), names in groups.items()
+    )
+    return [
+        Alert(
+            rule="price_stale",
+            severity=ALERT if any(s["role"] != "peer" for s in stale) else WARN,
+            title=f"{len(stale)} cached {'price' if len(stale) == 1 else 'prices'} behind the "
+            f"market's last session: {named}{more}",
+            detail=f"{listed}. Counted in sessions of each row's own market, so a weekend or "
+            "a holiday is not in the number. A stale CSV has the same five columns as a "
+            "fresh one, so nothing that reads the cache refuses it: a book name this old is "
+            "tonight's page decomposing the wrong day, a peer this old is a comps table "
+            "comparing this week with another",
+            next_step="`ask.py prices --book` refetches the book, its proxies and the graph "
+            "peers of every book name; a FAILED line there names the source that refused, "
+            "and exit 3 means at least one did",
+            evidence={"stale": stale},
+        )
+    ]
+
+
 #: How long an open question may stand on the nightly pages before it is a
 #: finding rather than a question. Three weeks: long enough that a slow answer
 #: - a quarterly filing, a source that publishes monthly - is not an alert, and
@@ -986,6 +1168,7 @@ def check(
     debug_root: str = "debug",
     now: datetime | None = None,
     feedback_root: str = "",
+    price_cache: str = "",
 ) -> CheckResult:
     """Evaluate, diff against the last known state, and append only the changes."""
     from core.config import load as load_config
@@ -994,7 +1177,14 @@ def check(
     now = now or datetime.now(UTC)
     firing = {
         a.rule: a
-        for a in evaluate(cfg, db=db, debug_root=debug_root, now=now, feedback_root=feedback_root)
+        for a in evaluate(
+            cfg,
+            db=db,
+            debug_root=debug_root,
+            now=now,
+            feedback_root=feedback_root,
+            price_cache=price_cache,
+        )
     }
 
     opened: list[Alert] = []

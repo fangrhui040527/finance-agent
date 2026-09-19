@@ -297,6 +297,7 @@ The rules, all thresholds in `config.toml [monitor]` and bounded in code:
 | `slots_missed` | the collector fired fewer times than its own cron owes over `slot_window_days` whole days (0 = off) |
 | `series_stale` | a macro series' newest observation is past the cadence declared for it in `knowledge/sources/freshness.py` |
 | `series_resumed` | a series recorded as ENDED in that same file has printed past the period its upstream stopped at |
+| `price_stale` | a row in `data/price_cache.db` was fetched more than 1 session (book name, proxy) or 5 sessions (peer) before its own market's last finished session; weekends and holidays are not counted |
 | `open_question_stale` | a question the nightly pages carry has stood for more than 21 days |
 | `run_errors` | the newest traced run contains an error event |
 | `methodology_changed` | the manifest hash moved between the last two runs |
