@@ -1,6 +1,78 @@
 {
   "collection": [
     {
+      "at": "2026-09-19T23:06:51.775907+00:00",
+      "detail": "facts 0; XNAS:MSFT: deferred by the 2-a-day credit budget; next in rotation; XNAS:NVDA: outside the plan or over today's credits; XNAS:AAPL: outside the plan or over today's credits",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-19T23:06:51.695350+00:00",
+      "detail": "facts 0; ",
+      "fetched": 19,
+      "kept": 8,
+      "source": "jin10_flash",
+      "status": "ok",
+      "stored": 7
+    },
+    {
+      "at": "2026-09-19T23:06:50.935088+00:00",
+      "detail": "facts 4; XNAS:MSFT: alphavantage quota exhausted for today: Thank you for using Alpha Vantage! Please consider spreading out your free API requests more sparingly (1 request per second). You may subscribe to any of the p; XNAS:NVDA: alphavantage quota exhausted for today: Thank you for using Alpha Vantage! Please consider spreading out your free API requests more sparingly (1 request per second). ",
+      "fetched": 1,
+      "kept": 1,
+      "source": "alphavantage_news",
+      "status": "ok",
+      "stored": 1
+    },
+    {
+      "at": "2026-09-19T23:06:50.570502+00:00",
+      "detail": "facts 6; ",
+      "fetched": 114,
+      "kept": 102,
+      "source": "finnhub",
+      "status": "ok",
+      "stored": 77
+    },
+    {
+      "at": "2026-09-19T23:06:48.652043+00:00",
+      "detail": "facts 0; ",
+      "fetched": 5,
+      "kept": 0,
+      "source": "edgar",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-19T23:06:48.534753+00:00",
+      "detail": "named the company: 33 of 33 (lowest: Apple 6/6, Microsoft 7/7, NVIDIA 20/20)",
+      "fetched": 33,
+      "kept": 33,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 28
+    },
+    {
+      "at": "2026-09-19T23:06:48.089694+00:00",
+      "detail": "named the company: 17 of 24 (lowest: Microsoft 1/2, Apple 5/7, NVIDIA 11/15)",
+      "fetched": 25,
+      "kept": 24,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 23
+    },
+    {
+      "at": "2026-09-19T23:06:46.710271+00:00",
+      "detail": "read but empty: Microsoft, NVIDIA; failed: GDELT fetch failed: HTTP Error 429: Too Many Requests (Apple)",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "ok",
+      "stored": 0
+    },
+    {
       "at": "2026-09-19T13:13:22.959608+00:00",
       "detail": "facts 0; MYX:8869: deferred by the 2-a-day credit budget; next in rotation; MYX:3182: deferred by the 2-a-day credit budget; next in rotation; MYX:1155: deferred by the 2-a-day credit budget; next in rotation; MYX:5347: deferred by the 2-a-day credit budget; next in rotation; outside the free plan (US only), so not asked for: MYX:1155, MYX:5347, MYX:8869, MYX:3182. The EODHD Fundamentals plan cove",
       "fetched": 0,
@@ -83,18 +155,18 @@
     }
   ],
   "counts": {
-    "articles": 6447,
+    "articles": 6583,
     "documents": 0,
-    "escalated": 1201,
+    "escalated": 1213,
     "events": 4023,
     "failed_sweeps": 19,
-    "linked": 4386,
-    "observations": 4644,
+    "linked": 4509,
+    "observations": 4654,
     "series": 31,
-    "sweeps": 362
+    "sweeps": 370
   },
   "day": "2026-09-19",
-  "generated_at": "2026-09-19 13:13 UTC",
+  "generated_at": "2026-09-19 23:06 UTC",
   "macro": [
     {
       "change": "0",
@@ -287,18 +359,18 @@
       "upcoming": []
     },
     {
-      "escalated": 15,
+      "escalated": 23,
       "events": [],
       "instrument_id": "XNAS:NVDA",
       "label": "NVIDIA",
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-09-18",
+          "known_at": "2026-09-19",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "27.41"
+          "value": "27.47"
         },
         {
           "concept": "pb",
@@ -326,11 +398,11 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-09-18",
+          "known_at": "2026-09-19",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
-          "value": "2.23"
+          "value": "2.22"
         },
         {
           "concept": "high_52w",
@@ -382,11 +454,11 @@
         },
         {
           "concept": "av_news_sentiment",
-          "known_at": "2026-09-18",
+          "known_at": "2026-09-19",
           "label": "vendor sentiment",
-          "period_end": "2026-09-18",
+          "period_end": "2026-09-19",
           "source": "alphavantage_news",
-          "value": "0.38"
+          "value": "0.14"
         },
         {
           "concept": "revenue",
@@ -414,6 +486,50 @@
         }
       ],
       "stories": [
+        {
+          "doc_id": "finnhub:142272941",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-19T17:07:00+00:00",
+          "quality": 0.85,
+          "title": "Huang just doubled his chip forecast and blocked a regulator",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142270867",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-09-19T12:11:08+00:00",
+          "quality": 0.85,
+          "title": "Could IonQ (IONQ) AI Written Quantum Circuits Unlock More Real World Workloads?",
+          "uncertainty": 0.14204545454545456
+        },
+        {
+          "doc_id": "finnhub:142266042",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-19T01:17:00+00:00",
+          "quality": 0.85,
+          "title": "Nvidia, SK Hynix send strong signal to Micron investors",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142264908",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-18T23:21:54+00:00",
+          "quality": 0.85,
+          "title": "Jim Cramer Said This AI Firm Has More Orders Than \u201cAlmost Anybody\u201d Other Than NVIDIA",
+          "uncertainty": 0.0
+        },
         {
           "doc_id": "finnhub:142259265",
           "domain": "Yahoo",
@@ -457,63 +573,19 @@
           "quality": 0.85,
           "title": "Prediction: This Is Where Nvidia Stock Could Be by the End of Next Year",
           "uncertainty": 0.390625
-        },
-        {
-          "doc_id": "finnhub:142254112",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-09-18T12:19:11+00:00",
-          "quality": 0.85,
-          "title": "Here\u2019s When Nividia\u2019s Dominance Fades, Opening Broadcom\u2019s Era of Dominance",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMihwFBVV95cUxOX1dTamJ1aHFmSUJtU3ZXV1diZDd3RGROdl9lTEY4UEEzQmFicF85MzdFWXpoT01Xckp6MlZ5eU5RcEpsVWl6Qmw3Y0NoMXJtdzViV21DZ0h6aXhFRkRWWjNjYmk1ZTRCSnY0X052TWIxMEg3a05NMnh5MGtaMEpzYXNla1ZMeEU?oc=5",
-          "domain": "www.reuters.com",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
-          "polarity": 1.0,
-          "published_at": "2026-09-18T21:41:08+00:00",
-          "quality": 0.8,
-          "title": "Nvidia-backed AI cloud firm Nscale reveals revenue surge in US IPO filing",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMipAFBVV95cUxPVktxdWZTUVR2MDIyYVBnR0I3dTl2ZWdxaHpKVEladHdQekNRUDFMcXJNaDlseGhXSUdKRm0zVHY5WnJwTW9wU3EzX2Z5UmhmU1NTNm0xMFhtMzVwMXZWM3Y5RUhjNUNoWDlGVjBRUnZIckZOWFBMS0pvVWctcUtaOUFSY3BjTlNuNkZmdVc3NlJ3dDFfQXhya3FTa0V3bXZILUgyNQ?oc=5",
-          "domain": "finance.yahoo.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-09-18T16:50:02+00:00",
-          "quality": 0.8,
-          "title": "Will Micron Follow Nvidia and Give Investors a Huge Dividend Hike?",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxObUdKSDd2eFZMMFJWU0Z4dy14Qm9nc1NkRFBJaHUxSWhwbnpZdmR5eHZuRkJNZ1RyTlE0UXkwRVRjenBJLTJmVm1iYW03QUxXSjAybElsSVhLeUdFeWVFTGlYbVRha3NuZ19mdlhaOWh4ZVlNa1VOQWJIWFFkN3ZvOVU2X3V2aEFD?oc=5",
-          "domain": "www.barrons.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-18T16:02:00+00:00",
-          "quality": 0.8,
-          "title": "Nvidia Chip Sales Could Double Next Year, CEO Jensen Huang Says",
-          "uncertainty": 1.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 78,
-        "polarity_mean": 0.256,
-        "sources": 23,
-        "uncertainty_mean": 0.108
+        "n": 172,
+        "polarity_mean": 0.18,
+        "sources": 31,
+        "uncertainty_mean": 0.143
       },
       "upcoming": []
     },
     {
-      "escalated": 17,
+      "escalated": 21,
       "events": [],
       "instrument_id": "XNAS:AAPL",
       "label": "Apple",
@@ -552,11 +624,11 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-09-18",
+          "known_at": "2026-09-19",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
-          "value": "1.08"
+          "value": "1.09"
         },
         {
           "concept": "high_52w",
@@ -568,11 +640,11 @@
         },
         {
           "concept": "low_52w",
-          "known_at": "2026-09-18",
+          "known_at": "2026-09-19",
           "label": "52w low",
           "period_end": null,
           "source": "finnhub",
-          "value": "236.32"
+          "value": "236.65"
         },
         {
           "concept": "price_target_consensus",
@@ -608,11 +680,11 @@
         },
         {
           "concept": "av_news_sentiment",
-          "known_at": "2026-09-18",
+          "known_at": "2026-09-19",
           "label": "vendor sentiment",
-          "period_end": "2026-09-18",
+          "period_end": "2026-09-19",
           "source": "alphavantage_news",
-          "value": "0.16"
+          "value": "0.35"
         },
         {
           "concept": "revenue",
@@ -696,6 +768,17 @@
           "uncertainty": 0.5896226415094339
         },
         {
+          "doc_id": "https://stocktwits.com/news-articles/markets/equity/coinbase-apple-tesla-perpetual-futures-coin-tsla-aapl/cZtxEhbRBEs?.tsrc=rss",
+          "domain": "stocktwits.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-19T15:11:11+00:00",
+          "quality": 0.85,
+          "title": "Coinbase Files With CFTC To List US Single-Stock Perpetual Futures, Including AAPL And TSLA Contracts",
+          "uncertainty": 0.0
+        },
+        {
           "doc_id": "alphavantage:https://www.cnbc.com/video/2026/09/18/morgan-stanleys-woodring-on-apple-early-demand-seems-fine-supply-is-better-lead-times-are-flat.html",
           "domain": "CNBC",
           "escalated": true,
@@ -716,30 +799,19 @@
           "quality": 0.85,
           "title": "Apple TV's Emmy Sweep Adds Momentum to AAPL's Services Business",
           "uncertainty": 0.0
-        },
-        {
-          "doc_id": "alphavantage:https://www.oregonlive.com/crime/2026/09/oregon-woman-alleges-apple-airtag-enabled-stalking-by-ex.html",
-          "domain": "OregonLive.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": -1.0,
-          "published_at": "2026-09-18T15:48:40+00:00",
-          "quality": 0.85,
-          "title": "Oregon woman alleges Apple AirTag enabled stalking by ex",
-          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 48,
-        "polarity_mean": 0.125,
-        "sources": 19,
-        "uncertainty_mean": 0.092
+        "n": 62,
+        "polarity_mean": 0.113,
+        "sources": 24,
+        "uncertainty_mean": 0.086
       },
       "upcoming": []
     },
     {
-      "escalated": 6,
+      "escalated": 7,
       "events": [],
       "instrument_id": "XNAS:MSFT",
       "label": "Microsoft",
@@ -778,7 +850,7 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-09-18",
+          "known_at": "2026-09-19",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
@@ -889,6 +961,17 @@
           "uncertainty": 0.0
         },
         {
+          "doc_id": "https://news.google.com/rss/articles/CBMi5gFBVV95cUxQOXlpZmhqcmlGcXdBSDBGS3lOUmcxMkZzbTFrdG1KeFBRZ3ZOelNOb2hoR3l6V2Nab1EzRXJfOW1ibk1KU25ITlQtQmlob2JMaGZqREtENC1qYUs5T2k1T1NPTlNMN3dTY3pyby1zUDBsMmZzT3ZneGNlVjJfOGZwdGt5VVAwUlZ0cVZaT2tCeHFzeWNTTUZfMDJCZkZYaFhwOXdVdjlvb2hrMnpZSUpIeWVMeDVkMFg2YjRTeTFRd0NteUNVbmthTXN5dm81VkxUX1M1WGdGd09NQnIyNkJtOHMtSHhBUQ?oc=5",
+          "domain": "www.tipranks.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-19T15:16:43+00:00",
+          "quality": 0.65,
+          "title": "Microsoft Battles AI Backlash While Doubling Down on Growth",
+          "uncertainty": 0.0
+        },
+        {
           "doc_id": "https://news.google.com/rss/articles/CBMi2wFBVV95cUxONnFfT3AzaV9hUEI0bm9XbkZMQW9HNmhXWFczbE5LTk04YnBJUExxaVk5ZGZlMEg1cEtvZl8yX0dPQ3U1Vi1UVVg3X2M4cE53T21BRjhiOTdJSUpDZkQwd05ESVYyWE0zV0ZTRkR3U3RWdHljY0twRXVMN3k4c1BTalBZQUNkeGFjTEw4NzU1Z2NQN0JVTTA5NzR3RmhtTVBWMF9hU0pESmx3bTdtbk8tR1NHY0pyVXBnOXB5Wm5lcVdmR2dLcEpncjExZVNQbjktS3hXV1ZldDFqNlE?oc=5",
           "domain": "www.tipranks.com",
           "escalated": true,
@@ -942,25 +1025,14 @@
           "quality": 1.0,
           "title": "Nvidia-Backed Data Center Firm Nscale Files Publicly for US IPO",
           "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://stocktwits.com/news-articles/markets/equity/nvidia-backed-cloud-platform-nscale-files-for-ipo/cZtH7g6RBEQ?.tsrc=rss",
-          "domain": "stocktwits.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-18T21:31:11+00:00",
-          "quality": 0.85,
-          "title": "Nvidia-Backed Cloud Platform Nscale Files For IPO \u2014 NVDA Stock In Focus",
-          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 37,
-        "polarity_mean": 0.297,
-        "sources": 17,
-        "uncertainty_mean": 0.092
+        "n": 48,
+        "polarity_mean": 0.312,
+        "sources": 20,
+        "uncertainty_mean": 0.096
       },
       "upcoming": []
     }
