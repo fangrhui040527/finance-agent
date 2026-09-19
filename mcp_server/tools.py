@@ -49,7 +49,7 @@ from engines.attribution.decompose import MIN_OBSERVATIONS, EstimationInputs, de
 from engines.attribution.regression import Fit, huber_fit
 from engines.risk.concentration import Limits, Position
 from engines.sizing.caps import cost_floor_bps, cost_floor_value, to_base
-from knowledge.pack import EST_WINDOW, market_fit
+from knowledge.pack import ESTIMATION_GAP, estimation_slice, market_fit
 from markets.brokers import cost_at
 from markets.registry import get as market_get
 from markets.registry import known_prefixes, market_currency, mic_of, supported
@@ -678,9 +678,11 @@ def measured_legs(
     Built the way `knowledge.pack.measure` builds the nightly row, so the tool
     and the pack agree about a name's day: intersect the session dates, take the
     last `bars_back + 1` common sessions as the window, and estimate on the
-    EST_WINDOW common returns that end where the window opens. The window stays
+    pack's `estimation_slice` of the common returns before it: up to 260
+    sessions, ending ten sessions before the window opens. The window stays
     out of its own estimation - a move that is inside the sigma it is tested
-    against is that much less likely to look like anything.
+    against is that much less likely to look like anything - and so does the
+    run-up to it.
 
     Two things this replaces, both reproduced against the cached bars. Each
     leg was the last N bars of ITS OWN series, so a holiday one series carried
@@ -714,15 +716,18 @@ def measured_legs(
 
     ri, rm = daily(closes[instrument]), daily(closes[market_proxy])
     # Return k is the move INTO days[k + 1]. The estimation window is the
-    # EST_WINDOW returns before the event window's first return, dated by the
-    # sessions those returns land on.
-    est = slice(-(EST_WINDOW + bars_back), -bars_back)
-    est_i, est_m, est_days = ri[est], rm[est], days[1:][est]
+    # pack's `estimation_slice` taken on the returns up to and including the
+    # event window's first return: up to ESTIMATION_LOOKBACK sessions, ending
+    # ESTIMATION_GAP sessions before the window, dated by the sessions those
+    # returns land on - the same window the nightly row is fitted on.
+    head = len(ri) - bars_back + 1
+    est = estimation_slice(head)
+    est_i, est_m, est_days = ri[:head][est], rm[:head][est], days[1:][:head][est]
     first = days[-(bars_back + 1)]
     fit: Fit | None
     try:
         if sector_proxy:
-            fit = estimate(EstimationInputs(est_i, est_m, daily(closes[sector_proxy])[est]))
+            fit = estimate(EstimationInputs(est_i, est_m, daily(closes[sector_proxy])[:head][est]))
         else:
             fit = market_fit(est_i, est_m)
     except ValueError as e:  # collinear legs: the same proxy twice, or a flat one
@@ -737,7 +742,7 @@ def measured_legs(
         else:
             estimation = (
                 f"estimated on the {len(est_i)} sessions {est_days[0]} to {est_days[-1]} "
-                f"the legs share"
+                f"the legs share, ending {ESTIMATION_GAP} sessions before the window"
             )
             if not sector_proxy:
                 estimation += "; sector beta fixed at 0 (no sector proxy)"

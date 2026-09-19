@@ -29,6 +29,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Callable
 from datetime import UTC, date, datetime
 
+from core.market.bars import drop_carried_rows
 from core.market.prices import Bar, PriceSeries
 from core.net.breaker import CircuitBreaker
 
@@ -577,7 +578,7 @@ def aligned_closes(
     unique = list(dict.fromkeys(instruments))
     by_day: dict[str, dict[date, float]] = {}
     for iid in unique:
-        by_day[iid] = {b.day: b.close for b in feed.fetch(iid, end=end).raw()}
+        by_day[iid] = {b.day: b.close for b in drop_carried_rows(feed.fetch(iid, end=end).raw())}
     common = set.intersection(*(set(days) for days in by_day.values()))
     days = sorted(common)
     if not days:

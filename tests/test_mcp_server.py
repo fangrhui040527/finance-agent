@@ -17,6 +17,7 @@ import pytest
 
 from core.market.cache import PriceCache
 from core.market.feed import ChainedFeed, PriceFeed
+from knowledge.pack import estimation_slice
 from mcp_server import tools as T
 from mcp_server.protocol import (
     INTERNAL_ERROR,
@@ -387,9 +388,20 @@ def test_measured_legs_are_paired_on_the_sessions_both_printed(monkeypatch):
     assert (legs.first, legs.last) == (d0, d1), "the carried 08-31 is not a common session"
     assert legs.instrument_return == pytest.approx(share[d1] / share[d0] - 1)
     assert legs.market_return == pytest.approx(mkt[d1] / mkt[d0] - 1)
-    assert legs.fit is not None and legs.fit.n == 120
+    # 140 shared sessions give 139 returns; the pack's slice ends ten sessions
+    # before the window and takes what is left, capped at 260.
+    expected_n = len(range(139)[estimation_slice(139)])
+    assert legs.fit is not None and legs.fit.n == expected_n
     assert legs.fit.coefficients[1] == pytest.approx(1.2, abs=0.15)
-    assert f"to {d0}" in legs.estimation, "the window is not in its own estimation"
+    # The estimation ends ten sessions before the window opens (the pack's
+    # ESTIMATION_GAP), so neither the window nor the run-up to it is inside
+    # its own sigma: d0 is sessions[-2], the estimation's last session is
+    # sessions[-12].
+    sessions = sorted(mkt)
+    assert f"to {sessions[-12]}" in legs.estimation, (
+        "the estimation does not end ten sessions before the window"
+    )
+    assert f"to {d0}" not in legs.estimation, "the window is inside its own estimation"
 
     monkeypatch.setattr(T, "_feed", lambda: feed)
     out = text(
@@ -409,7 +421,8 @@ def test_measured_betas_are_not_called_synthetic_and_typed_ones_are(monkeypatch)
     )
     assert "SYNTHETIC" not in measured
     assert "Betas are stated" not in measured
-    assert "betas from 120 sessions" in measured
+    expected_n = len(range(139)[estimation_slice(139)])
+    assert f"betas from {expected_n} sessions" in measured
 
     typed = text(
         call("why_did_it_move", instrument="MYX:1155", instrument_return=-0.09, market_return=-0.08)
