@@ -145,7 +145,8 @@ def cmd_plan(a) -> int:
 
 
 def cmd_why(a) -> int:
-    if not getattr(a, "fetch", False) and (a.move is None or a.market is None):
+    fetch = getattr(a, "fetch", False)
+    if not fetch and (a.move is None or a.market is None):
         print(
             "give --move AND --market, or --fetch --against <proxy> to measure both "
             "from the price feed. One typed leg against one measured leg is a "
@@ -153,41 +154,45 @@ def cmd_why(a) -> int:
             file=sys.stderr,
         )
         return 2
-    fit = _fit_from_csv(a.history) if a.history else _fit_synthetic(a.beta_market, a.beta_sector)
+    # Measured beats typed, but only if BOTH legs are measured. A real
+    # instrument return against a typed market return is not a decomposition,
+    # it is a subtraction dressed as one.
+    if fetch and not a.against:
+        print(
+            "--fetch needs --against: an instrument return measured against a "
+            "typed market return is not a decomposition.",
+            file=sys.stderr,
+        )
+        return 2
     end = date.fromisoformat(a.on) if a.on else date.today()
     window = (end - timedelta(days=a.days), end)
-    measured = False
 
-    if getattr(a, "fetch", False):
-        # Measured beats typed, but only if BOTH legs are measured. A real
-        # instrument return against a typed market return is not a decomposition,
-        # it is a subtraction dressed as one.
-        if not a.against:
-            print(
-                "--fetch needs --against: an instrument return measured against a "
-                "typed market return is not a decomposition.",
-                file=sys.stderr,
-            )
-            return 2
+    # The betas come from one of three places, and the output says which: a
+    # --history file the operator chose; the same sessions the legs were
+    # measured on; or, for typed legs with neither, a synthetic fit of the
+    # stated betas whose sigma belongs to no instrument.
+    fit = _fit_from_csv(a.history) if a.history else None
+    legs = None
+    if fetch:
+        from mcp_server.tools import measured_legs
+
         try:
-            legs = _window_returns(
-                [a.instrument, a.against] + ([a.sector_proxy] if a.sector_proxy else []),
-                a.days,
-                end,
+            legs = measured_legs(
+                _feed(), a.instrument, a.against, a.days, end, sector_proxy=a.sector_proxy
             )
-            a.move, first_day, last_day = legs[a.instrument]
-            a.market, _, _ = legs[a.against]
-            if a.sector_proxy:
-                a.sector, _, _ = legs[a.sector_proxy]
         except PriceFeedError as e:
             print(f"no prices: {e}", file=sys.stderr)
             return 3
-        window = (first_day, last_day)
-        measured = True
-        print(
-            f"measured  {a.instrument} {a.move:+.2%} against {a.against} "
-            f"{a.market:+.2%} over {first_day} to {last_day}\n"
-        )
+        a.move, a.market = legs.instrument_return, legs.market_return
+        if legs.sector_return is not None:
+            a.sector = legs.sector_return
+        window = (legs.first, legs.last)
+        print(f"measured  {legs.measured_line()}\n")
+        if not a.history:
+            fit = legs.fit
+    synthetic = legs is None and not a.history
+    if synthetic:
+        fit = _fit_synthetic(a.beta_market, a.beta_sector)
 
     from mcp_server.tools import graph_peers
 
@@ -212,15 +217,25 @@ def cmd_why(a) -> int:
     exp = decompose(
         a.instrument, window, a.market, a.sector, {}, a.move, a.fx, fit, base_currency=a.currency
     )
+    if synthetic:
+        from mcp_server.tools import synthetic_note
+
+        exp.estimation_note = synthetic_note(a.beta_market, a.beta_sector)
+    elif legs is not None and not a.history:
+        if fit is None:
+            exp.reason = legs.estimation
+        else:
+            exp.estimation_note = f"{exp.estimation_note}; {legs.estimation}"
     print(decomposition_bars(exp))
     print()
     print(head.text)
     for c in head.caveats:
         print(f"  caveat: {c}")
-    if not a.history:
-        print("\n  betas are stated, not estimated: pass --history with 120+ rows of")
-        print("  instrument,market,sector returns for a real estimation window.")
-    if not measured:
+    if synthetic:
+        print("\n  betas are stated, not estimated, and the sigma is not this instrument's:")
+        print("  pass --history with 120+ rows of instrument,market,sector returns, or")
+        print("  --fetch --against <proxy> to estimate them on the sessions the legs share.")
+    if legs is None:
         print("  returns are stated, not measured: pass --fetch --against <proxy> to")
         print("  take both legs from the price feed instead.")
     return 0
@@ -231,43 +246,6 @@ def _feed():
     """The price seam. A chain, not a name: stooq.com walled itself off on
     2026-08-31 and a CLI wired to one source by name went dark with it."""
     return default_feed()
-
-
-def _window_returns(instruments: list[str], bars_back: int, end: date | None) -> dict:
-    """All legs of a decomposition, concurrently, each id fetched exactly once.
-
-    The legs are independent HTTP calls to a slow free source; serially they
-    cost up to 3x the timeout. Duplicates (instrument == market proxy) are
-    deduplicated BEFORE fetching, or the same URL would be paid for twice in
-    one command.
-    """
-    from concurrent.futures import ThreadPoolExecutor
-
-    unique = list(dict.fromkeys(instruments))
-    if len(unique) == 1:
-        return {unique[0]: _window_return(unique[0], bars_back, end)}
-    with ThreadPoolExecutor(max_workers=min(3, len(unique))) as pool:
-        futures = {i: pool.submit(_window_return, i, bars_back, end) for i in unique}
-        return {i: f.result() for i, f in futures.items()}
-
-
-def _window_return(instrument: str, bars_back: int, end: date | None):
-    """Realised return over the last `bars_back` TRADING bars, from real data.
-
-    Trading bars, not calendar days: a 5-calendar-day window over a long weekend
-    is three sessions, and pretending otherwise silently changes the horizon the
-    whole decomposition is about.
-    """
-    series = _feed().fetch(instrument, end=end)
-    bars = series.raw()
-    if len(bars) < bars_back + 1:
-        raise PriceFeedError(
-            f"{instrument} has {len(bars)} bars up to {end or 'today'}, "
-            f"need {bars_back + 1} to measure a {bars_back}-bar return"
-        )
-    window = bars[-(bars_back + 1) :]
-    first, last = window[0], window[-1]
-    return (last.close / first.close) - 1.0, first.day, last.day
 
 
 def cmd_prices(a) -> int:
@@ -2112,7 +2090,12 @@ def main(argv=None) -> int:
     wy.add_argument("--sector", type=float, default=0.0)
     wy.add_argument("--fx", type=float, default=0.0, help="base-currency leg")
     wy.add_argument("--currency", default="MYR")
-    wy.add_argument("--days", type=int, default=1, help="window length in calendar days")
+    wy.add_argument(
+        "--days",
+        type=int,
+        default=1,
+        help="window length: trading bars with --fetch, calendar days for typed returns",
+    )
     wy.add_argument("--on", help="window end date (YYYY-MM-DD), default today")
     wy.add_argument("--history", help="CSV of instrument,market,sector returns")
     wy.add_argument("--beta-market", type=float, default=1.1, help="used only without --history")

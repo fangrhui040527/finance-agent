@@ -24,6 +24,7 @@ from __future__ import annotations
 import csv
 import io
 import math
+import threading
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 from datetime import UTC, date, datetime
@@ -553,7 +554,43 @@ class ChainedFeed:
         )
 
 
+def aligned_closes(
+    feed, instruments: list[str], end: date | None = None
+) -> tuple[list[date], dict[str, list[float]]]:
+    """Closes of several instruments on the sessions they ALL printed, in order.
+
+    The legs of a decomposition have to be measured over the same sessions or
+    the subtraction between them means nothing, and "the last N bars of each
+    series" does not arrange that: on 2026-08-31 (Merdeka) Yahoo carried a bar
+    for the Bursa shares and none for ^KLSE, so a share's flat carried day was
+    paired with the index's move over the PREVIOUS session and the difference
+    read as a company-specific move. Intersecting the session dates first makes
+    the pairing right by construction - a day only one leg printed falls out -
+    and the returned dates say which sessions were used.
+
+    Each id is fetched once and in the calling thread. The second leg of a pair
+    is nearly always the cached market proxy, so a thread had nothing to buy,
+    and fetching from the caller's thread is what lets one process-wide feed
+    keep one sqlite connection. A leg the feed cannot serve raises
+    `PriceFeedError` as usual; legs that share no session raise `NoData`.
+    """
+    unique = list(dict.fromkeys(instruments))
+    by_day: dict[str, dict[date, float]] = {}
+    for iid in unique:
+        by_day[iid] = {b.day: b.close for b in feed.fetch(iid, end=end).raw()}
+    common = set.intersection(*(set(days) for days in by_day.values()))
+    days = sorted(common)
+    if not days:
+        raise NoData(f"{' and '.join(unique)} share no session up to {end or 'today'}")
+    return days, {iid: [by_day[iid][d] for d in days] for iid in unique}
+
+
 _DEFAULT: ChainedFeed | None = None
+#: `default_feed()` is called from whichever thread asks first - the web app's
+#: threadpool as readily as the MCP loop - and two first callers building two
+#: feeds would leave two caches on one file and two sets of breakers that never
+#: hear about each other's failures. The lock makes the first build the only one.
+_DEFAULT_LOCK = threading.Lock()
 
 
 def default_feed() -> ChainedFeed:
@@ -565,11 +602,13 @@ def default_feed() -> ChainedFeed:
     repeated question costs zero quota (Stooq counts daily hits)."""
     global _DEFAULT
     if _DEFAULT is None:
-        try:
-            from core.market.cache import PriceCache
+        with _DEFAULT_LOCK:
+            if _DEFAULT is None:
+                try:
+                    from core.market.cache import PriceCache
 
-            cache = PriceCache()
-        except Exception:  # a broken cache must degrade to fetching, not block prices
-            cache = None
-        _DEFAULT = ChainedFeed([StooqFeed(cache=cache), YahooFeed(cache=cache)])
+                    cache = PriceCache()
+                except Exception:  # a broken cache must degrade to fetching, not block prices
+                    cache = None
+                _DEFAULT = ChainedFeed([StooqFeed(cache=cache), YahooFeed(cache=cache)])
     return _DEFAULT
