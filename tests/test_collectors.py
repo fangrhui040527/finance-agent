@@ -403,6 +403,32 @@ def test_fmp_plan_error_message_is_a_note_and_other_errors_are_failures():
     )
     assert not pull.documents and any("earning-call-transcript" in n for n in pull.notes)
     assert pull.observations, "the rest of the pull still landed"
+    assert any("outside the plan" in n for n in pull.notes), pull.notes
+
+
+def test_fmp_a_402_is_one_legible_note_per_endpoint_and_is_not_asked_again():
+    """`/stable/earnings` answered HTTP 402 every week to 2026-09-13. It was
+    already a note rather than a failure - `get_json` maps 402 to PlanExcluded
+    - but the note was a redacted URL per name per endpoint, and three names'
+    worth ran past the column before it named the second company. Now the
+    endpoint is named once, with every name it was not collected for, and
+    once refused it is not requested for the next name: the boundary is the
+    plan's, not the company's, and the second call would learn the same fact
+    for the price of a request."""
+    routes = dict(FMP)
+    routes["earnings?"] = http_error(402)
+    c = FmpCollector(key="k", clock=CLOCK, opener=router(routes))
+    pull = c.collect(SINCE, ("XNAS:AAPL", "XNAS:MSFT"), slot="us_preopen")
+    about_earnings = [n for n in pull.notes if "/earnings" in n]
+    assert len(about_earnings) == 1, pull.notes
+    (note,) = about_earnings
+    assert "outside the plan (HTTP 402)" in note and "AAPL" in note and "MSFT" in note, note
+    assert not any("financialmodelingprep.com" in n for n in pull.notes), pull.notes
+    assert c.requests == 5, "grades and targets for both names, earnings once"
+    assert pull.observations and not any(e.kind == "earnings_result" for e in pull.events)
+    # The boundary is one run's: a plan bought tomorrow is asked tomorrow.
+    c.collect(SINCE, ("XNAS:AAPL",), slot="us_preopen")
+    assert c.requests == 8
 
 
 def test_fmp_a_filing_date_before_the_period_end_is_not_trusted():
@@ -1480,3 +1506,77 @@ def test_the_statement_collectors_are_registered_and_catalogued():
     assert COLLECTORS["sec_xbrl"] is SecCompanyFacts and COLLECTORS["eodhd"] is EodhdFundamentals
     assert CATALOG["sec_xbrl"].markets == ("XNAS", "XNYS") and CATALOG["sec_xbrl"].keyless
     assert "XKLS" in CATALOG["eodhd"].markets
+
+
+# --- EODHD_PLAN: the budget the run is shaped to ---------------------------------------------
+
+WHOLE_BOOK = (
+    "MYX:1155",
+    "MYX:5347",
+    "MYX:5183",
+    "MYX:5225",
+    "MYX:8869",
+    "MYX:3182",
+    "XNAS:NVDA",
+    "XNAS:AAPL",
+    "XNAS:MSFT",
+    "XTAI:2330",
+    "XLON:VOD",  # no EODHD suffix: never asked for on any plan
+)
+
+
+def test_eodhd_on_a_paid_plan_asks_every_name_every_run_bursa_included(monkeypatch):
+    """The free-plan rotation was hard-wired: two names a day, US only, and the
+    Bursa names gated out at the top. A month of the Fundamentals Data Feed is
+    100,000 calls a day with KLSE included - there is nothing to ration, and a
+    rotation would only make the newest quarter arrive days late. EODHD_PLAN
+    says which plan the key is on; on a paid one every name is asked, every
+    run, and the first note says so."""
+    monkeypatch.setenv("EODHD_PLAN", "fundamentals")
+    open_ = router({"fundamentals/": EODHD_PAYLOAD})
+    c = EodhdFundamentals(clock=CLOCK, opener=open_, key="tok.12345678")
+    pull = c.collect(SINCE, WHOLE_BOOK, slot="bursa_close")
+    assert pull.requests == 10, open_.calls
+    assert any("1155.KLSE" in u for u in open_.calls) and any("2330.TW" in u for u in open_.calls)
+    assert pull.notes[0].startswith("EODHD plan: fundamentals"), pull.notes[0]
+    assert not any("deferred" in n or "outside the" in n for n in pull.notes), pull.notes
+    assert {o.instrument_id for o in pull.observations} >= {"MYX:1155", "XNAS:NVDA", "XTAI:2330"}
+
+
+def test_eodhd_free_is_the_default_and_the_run_names_it(monkeypatch):
+    """Unset means free, and the rotation is exactly what it was."""
+    monkeypatch.delenv("EODHD_PLAN", raising=False)
+    open_ = router({"fundamentals/": EODHD_PAYLOAD})
+    c = EodhdFundamentals(clock=CLOCK, opener=open_, key="tok.12345678")
+    pull = c.collect(SINCE, WHOLE_BOOK, slot="bursa_close")
+    assert pull.requests == 2
+    assert all(".US" in u for u in open_.calls), open_.calls
+    assert pull.notes[0].startswith("EODHD plan: free (2 names a day"), pull.notes[0]
+    assert any("deferred by the 2-a-day credit budget" in n for n in pull.notes)
+    assert any("outside the free plan (US only)" in n and "MYX:1155" in n for n in pull.notes)
+
+
+def test_eodhd_refuses_a_plan_name_it_does_not_know(monkeypatch):
+    """Not a quiet fall back to free: an operator who paid and misspelt the
+    variable would otherwise watch two names a day and read it as the plan
+    not having taken effect at EODHD's end."""
+    from knowledge.sources.eodhd import plan_from_env
+
+    monkeypatch.setenv("EODHD_PLAN", "premium")
+    with pytest.raises(SourceError, match="EODHD_PLAN='premium'"):
+        EodhdFundamentals(clock=CLOCK, opener=router({}), key="tok.12345678").collect(
+            SINCE, ("XNAS:AAPL",)
+        )
+    assert plan_from_env("All-In-One").names_per_run == 0, "case and dashes as EODHD spells them"
+    assert plan_from_env("").name == "free"
+
+
+def test_the_plan_kwarg_wins_over_the_environment(monkeypatch):
+    """The way `key` wins over EODHD_API_KEY: a one-off run names it without
+    touching what the scheduled run reads."""
+    monkeypatch.setenv("EODHD_PLAN", "free")
+    open_ = router({"fundamentals/": EODHD_PAYLOAD})
+    pull = EodhdFundamentals(
+        clock=CLOCK, opener=open_, key="tok.12345678", plan="all-in-one"
+    ).collect(SINCE, WHOLE_BOOK, slot="us_close")
+    assert pull.requests == 10 and pull.notes[0].startswith("EODHD plan: all-in-one")

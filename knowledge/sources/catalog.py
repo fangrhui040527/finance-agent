@@ -19,8 +19,8 @@ source has something new:
                 transcripts, Malaysian CPI - things that change monthly.
 
 A per-instrument source runs once per name in the book whose market the slot
-covers: at bursa_close the Bursa names, at us_close the Nasdaq names. A source
-with no market runs on its own terms at the slots it lists.
+covers: at bursa_close the Bursa names, at us_preopen and us_close the US
+names. A source with no market runs on its own terms at the slots it lists.
 """
 
 from __future__ import annotations
@@ -31,7 +31,14 @@ from dataclasses import dataclass
 #: slot has no per-instrument work of its own (macro only).
 SLOTS: dict[str, frozenset[str]] = {
     "bursa_close": frozenset({"XKLS"}),
-    "us_preopen": frozenset(),
+    # The US names, for the daily pieces fmp collects before the open: the
+    # earnings date, rating changes, the target consensus. This was an empty
+    # set - "macro only" - while fmp was catalogued per-instrument in this very
+    # slot, so `instruments_for` handed it no names and it was SKIPPED every
+    # weekday: twelve skipped pulls in a row and nothing collected outside
+    # `weekly`, per the sweeps table to 2026-09-17. fmp is the only
+    # per-instrument source in the slot; the news sources run at the closes.
+    "us_preopen": frozenset({"XNAS", "XNYS"}),
     "us_close": frozenset({"XNAS", "XNYS"}),
     "weekly": frozenset({"XKLS", "XNAS", "XNYS"}),
     # Every source, every instrument - `ask.py sweep` with no slot named, the
@@ -63,6 +70,15 @@ class SourceSpec:
     #: failing. `knowledge.sweep._window` tiles the list across days so the cap
     #: costs cadence rather than coverage.
     names_per_run: int = 0
+    #: How many names one request may carry. One for a source that is asked a
+    #: single company at a time. GDELT takes an OR of quoted phrases, and the
+    #: linker attaches each story to every name it mentions, so three names in
+    #: one request cost one request and lose nothing in attribution.
+    names_per_request: int = 1
+    #: The least time between two request STARTS to this source, in seconds.
+    #: Zero for a source that answers every request; GDELT documents about one
+    #: request every five seconds and answers 429 past it.
+    seconds_between_requests: float = 0.0
 
     @property
     def keyless(self) -> bool:
@@ -80,24 +96,32 @@ CATALOG: dict[str, SourceSpec] = {
     "gdelt": SourceSpec(
         "gdelt",
         NEWS,
-        "GDELT 2.0 DOC: worldwide, 100+ languages, three names per run",
+        "GDELT 2.0 DOC: worldwide, 100+ languages; three names per request, 15 s apart",
         "general_news",
         ("bursa_close", "us_close"),
         per_instrument=True,
         docs="https://blog.gdeltproject.org/gdelt-doc-2-0-api-debuts/",
-        # Three, because asking for more does not get more. Measured over the
-        # 30 recorded GDELT sweeps to 2026-09-07: 24 of them had at least one
-        # name fail, 84 name-failures in all, a mean of 3.5 names per run
-        # refused with HTTP 429 - and a refusal is not free. Each one spends
-        # three attempts at RETRY_BASE_SECONDS 5 and up to a 90s read before it
-        # gives up, which is how this source came to account for 10,433s of the
-        # 10,655s every sweep has ever spent: 98%, at 73.5s per indexed row
-        # against google_news's 0.1s.
+        # Three names per REQUEST and fifteen seconds between requests, in
+        # place of the three-names-per-RUN cap this carried to 2026-09-18. The
+        # cap was reasoned from a true measurement - nine per-name requests a
+        # slot, the quota gone after about five, every later name refused with
+        # 429 and paid for in retries, 98% of all sweep time - and it did not
+        # work: the sweeps table shows 0 rows stored for four days running to
+        # 2026-09-17. A cap on names does not change the PACE, and GitHub's
+        # runners share the address the quota is counted against, so even
+        # three requests fired back to back could land on a spent quota.
         #
-        # The cap is not a trade of coverage for time. The names it drops are
-        # the ones already being refused, and `_window` brings each of them
-        # round within two days.
-        names_per_run=3,
+        # GDELT itself documents about one request every five seconds. So the
+        # queries are grouped - the adapter already builds an OR of quoted
+        # phrases (`search_query`), and the linker attaches a story to every
+        # name it mentions, so nothing is lost in attribution - and nine names
+        # become three requests that start at least fifteen seconds apart. The
+        # first 429 ends the slot: the groups not yet asked for are deferred
+        # to the next one, which starts from a different name
+        # (`_rotation_offset`), so a refused group is not the same group
+        # tomorrow. Coverage is kept, not traded for cadence.
+        names_per_request=3,
+        seconds_between_requests=15.0,
     ),
     "google_news": SourceSpec(
         "google_news",

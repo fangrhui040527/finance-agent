@@ -3,16 +3,23 @@
 EODHD (eodhd.com) covers 60+ exchanges including Bursa Malaysia, which is the
 one market this book holds and no free statement source reaches. Its free
 plan is small and honest about it: 20 API credits a day, and a fundamentals
-request costs 10, so two names a day, US only. The paid Fundamentals plan
-lifts both limits and covers KLSE; the adapter is written for that day and
-runs within the free budget until then.
+request costs 10, so two names a day, US only. The paid Fundamentals Data Feed
+(100,000 calls a day, KLSE included) and the All-In-One plan lift both limits;
+EODHD_PLAN says which one the key is on, and the collector shapes the run to
+it rather than to the free budget it was first written against.
 
   key       EODHD_API_KEY, optional: without it the collector records itself as
             skipped with the variable named (the FinMind shape, the sweep's
             semantics), and nothing else changes.
-  budget    MAX_NAMES_PER_RUN names per run, rotated by the day of the year and
-            the slot so the same two names are not asked every time; every
-            deferred name gets a note saying when its turn comes.
+  plan      EODHD_PLAN: free | fundamentals | all-in-one, `free` unless set,
+            read once per run. On the free plan MAX_NAMES_PER_RUN names a run,
+            US only, rotated by the day of the year and the slot so the same
+            two names are not asked every time, and every deferred name gets a
+            note saying when its turn comes. On a paid plan EVERY book name,
+            EVERY run, KLSE and Taiwan included: at 100,000 calls a day there
+            is nothing to ration, and a rotation would only make the newest
+            quarter arrive days late. The first note of every pull names the
+            plan, so the sweeps table says which budget the run was shaped to.
   refusals  402/403 and a body that says "limit" or "not available" are the
             plan's boundary: a note naming the name, never a retry storm. A
             KLSE or Taiwan name on the free plan gets the exact note "EODHD
@@ -27,6 +34,8 @@ rule), never the period end.
 from __future__ import annotations
 
 import os
+from collections.abc import Set as AbstractSet
+from dataclasses import dataclass
 from datetime import date, datetime
 from decimal import Decimal
 
@@ -43,10 +52,53 @@ from knowledge.sources.base import (
 
 URL = "https://eodhd.com/api/fundamentals/{symbol}"
 KEY_ENV = "EODHD_API_KEY"
+PLAN_ENV = "EODHD_PLAN"
 SYMBOL_SUFFIX = {"XKLS": "KLSE", "XNAS": "US", "XNYS": "US", "XTAI": "TW"}
-FREE_PLAN_MARKETS = {"XNAS", "XNYS"}
+FREE_PLAN_MARKETS = frozenset({"XNAS", "XNYS"})
+PAID_PLAN_MARKETS = frozenset(SYMBOL_SUFFIX)
 MAX_NAMES_PER_RUN = 2
 SLOT_ORDER = ("bursa_close", "us_preopen", "us_close", "weekly", "all")
+
+
+@dataclass(frozen=True)
+class Plan:
+    """What one EODHD plan lets a run ask for."""
+
+    name: str
+    markets: frozenset[str]
+    #: Names one run asks for; 0 is every name in the book, every run.
+    names_per_run: int
+
+    def describe(self) -> str:
+        if self.names_per_run:
+            return f"{self.name} ({self.names_per_run} names a day, US only, rotated)"
+        return f"{self.name} (every book name every run; KLSE and TW included)"
+
+
+PLANS: dict[str, Plan] = {
+    "free": Plan("free", FREE_PLAN_MARKETS, MAX_NAMES_PER_RUN),
+    "fundamentals": Plan("fundamentals", PAID_PLAN_MARKETS, 0),
+    "all-in-one": Plan("all-in-one", PAID_PLAN_MARKETS, 0),
+}
+
+
+def plan_from_env(raw: str | None = None) -> Plan:
+    """The plan EODHD_PLAN names, or the free plan when it is unset.
+
+    A value that names no plan is a SourceError, not a quiet fall back to
+    free: an operator who paid for the Fundamentals feed and misspelt the
+    variable would otherwise watch the rotation carry on at two names a day
+    and read it as the plan not having taken effect at EODHD's end.
+    """
+    value = (raw if raw is not None else os.environ.get(PLAN_ENV, "")).strip().lower() or "free"
+    try:
+        return PLANS[value]
+    except KeyError:
+        raise SourceError(
+            f"{PLAN_ENV}={value!r} names no EODHD plan this collector knows; "
+            f"one of {', '.join(PLANS)}"
+        ) from None
+
 
 INCOME = {
     "totalRevenue": "revenue",
@@ -105,15 +157,30 @@ class EodhdFundamentals(Collector):
     name = "eodhd"
     key_env = None  # optional; read directly so a missing key is a skip, not a failure
 
+    def __init__(self, *args, plan: str | None = None, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        # An explicit plan name wins over EODHD_PLAN, the way `key` wins over
+        # EODHD_API_KEY: a test or a one-off run names it without touching the
+        # environment the scheduled run reads.
+        self._plan_name = plan
+
     def _token(self) -> str:
         token = (self._key or os.environ.get(KEY_ENV, "")).strip()
         if not token:
             raise KeyMissing(f"eodhd needs {KEY_ENV} (optional); skipped until it is set")
         return token
 
+    def plan(self) -> Plan:
+        return plan_from_env(self._plan_name)
+
     @staticmethod
     def rotation(
-        instruments: tuple[str, ...], today: date, slot: str, *, plan_markets=FREE_PLAN_MARKETS
+        instruments: tuple[str, ...],
+        today: date,
+        slot: str,
+        *,
+        plan_markets: AbstractSet[str] = FREE_PLAN_MARKETS,
+        names_per_run: int = MAX_NAMES_PER_RUN,
     ) -> tuple[list[str], list[str]]:
         """The names this run asks for, and the ones deferred to a later turn.
 
@@ -130,41 +197,44 @@ class EodhdFundamentals(Collector):
         rotation", and a Bursa name on the free plan is never next; it needs a
         paid plan, and saying so once is more use than saying "later" every day.
 
-        `plan_markets` is a parameter so a paid plan is one config change rather
-        than an edit here: widen it and the Bursa names join the rotation.
+        `plan_markets` and `names_per_run` are parameters so a paid plan is one
+        environment variable rather than an edit here: `Plan` widens the first
+        and zeroes the second, and every name is asked for every run.
         """
         eligible = [i for i in instruments if symbol_for(i) and market_of(i) in plan_markets]
         names = eligible or [i for i in instruments if symbol_for(i)]
-        if len(names) <= MAX_NAMES_PER_RUN:
+        if names_per_run <= 0 or len(names) <= names_per_run:
             return names, []
         slot_ix = SLOT_ORDER.index(slot) if slot in SLOT_ORDER else 0
-        offset = (
-            today.timetuple().tm_yday * MAX_NAMES_PER_RUN + slot_ix * MAX_NAMES_PER_RUN
-        ) % len(names)
+        offset = (today.timetuple().tm_yday * names_per_run + slot_ix * names_per_run) % len(names)
         ordered = names[offset:] + names[:offset]
-        return ordered[:MAX_NAMES_PER_RUN], ordered[MAX_NAMES_PER_RUN:]
+        return ordered[:names_per_run], ordered[names_per_run:]
 
     def collect(
         self, since: datetime, instruments: tuple[str, ...] = (), slot: str = "all"
     ) -> Pull:
         pull = Pull()
         token = self._token()
+        plan = self.plan()  # once per run, not once per name
         today = self.today()
-        asked, deferred = self.rotation(instruments, today, slot)
+        asked, deferred = self.rotation(
+            instruments, today, slot, plan_markets=plan.markets, names_per_run=plan.names_per_run
+        )
+        pull.notes.append(f"EODHD plan: {plan.describe()}")
         for iid in deferred:
             pull.notes.append(
-                f"{iid}: deferred by the {MAX_NAMES_PER_RUN}-a-day credit budget; next in rotation"
+                f"{iid}: deferred by the {plan.names_per_run}-a-day credit budget; next in rotation"
             )
         # Named once per run, not once per name: six identical lines saying the
         # same thing about the same plan is a wall, not a message.
         outside = [
             i
             for i in instruments
-            if symbol_for(i) and market_of(i) not in FREE_PLAN_MARKETS and i not in asked
+            if symbol_for(i) and market_of(i) not in plan.markets and i not in asked
         ]
         if outside:
             pull.notes.append(
-                f"outside the free plan (US only), so not asked for: {', '.join(outside)}. "
+                f"outside the {plan.name} plan (US only), so not asked for: {', '.join(outside)}. "
                 f"The EODHD Fundamentals plan covers KLSE and TW."
             )
         failures: list[str] = []
@@ -177,7 +247,7 @@ class EodhdFundamentals(Collector):
                     {"api_token": token, "fmt": "json", "filter": "Financials"},
                 )
             except PlanExcluded:
-                if mic not in FREE_PLAN_MARKETS:
+                if mic not in plan.markets:
                     pull.notes.append(
                         f"{iid}: EODHD free plan: US only; the Fundamentals plan covers KLSE"
                     )
