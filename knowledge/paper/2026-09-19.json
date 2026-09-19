@@ -1,0 +1,211 @@
+{
+  "day": "2026-09-19",
+  "written_at": "2026-09-19T22:46:00Z",
+  "phase": "observe",
+  "week": 2,
+  "equity_usd": 1000.0,
+  "cash_usd": 1000.0,
+  "control_equity_usd": 1000.0,
+  "drawdown": 0.0,
+  "halted": false,
+  "marks": 16,
+  "positions": [],
+  "changes": [],
+  "caps": [
+    {
+      "cap": "largest name",
+      "value": "0.00%",
+      "limit": "25%",
+      "breached": false
+    },
+    {
+      "cap": "invested",
+      "value": "0.00%",
+      "limit": "0%",
+      "breached": false
+    },
+    {
+      "cap": "cash floor",
+      "value": "100.00%",
+      "limit": "20%",
+      "breached": false
+    },
+    {
+      "cap": "names held",
+      "value": "0",
+      "limit": "0",
+      "breached": false
+    },
+    {
+      "cap": "drawdown from peak",
+      "value": "0.00%",
+      "limit": "8%",
+      "breached": false
+    },
+    {
+      "cap": "turnover used, 5 weekdays",
+      "value": "USD 0.00",
+      "limit": "USD 500.00",
+      "breached": false
+    }
+  ],
+  "attribution": {
+    "market": null,
+    "idiosyncratic": null,
+    "note": "no positions held; nothing to attribute"
+  },
+  "no_session": {
+    "note": "Saturday; neither market opened. Nothing traded, nothing changed in the ledger."
+  },
+  "the_us_legs_are_settled": {
+    "note": "For the first time every price in the fundable table is a close: Thursday's Bursa closes and the US closes settled by the 23:19Z us_close sweep on 09-18. The pack heads the table 'one lot at the last close' with no row marked.",
+    "settled_vs_the_09_18_page": {
+      "XNAS:NVDA": [
+        219.12,
+        222.27,
+        0.219,
+        0.222,
+        "in, one lot"
+      ],
+      "XNAS:AAPL": [
+        336.64,
+        336.13,
+        0.337,
+        0.336,
+        "out"
+      ],
+      "XNAS:MSFT": [
+        493.575,
+        493.78,
+        0.494,
+        0.494,
+        "out"
+      ]
+    },
+    "the_09_18_claim_held": true
+  },
+  "the_mark_count_is_not_a_session_count": {
+    "marks": 16,
+    "bursa_sessions_since_open": 9,
+    "duplicates": {
+      "2026-09-17": "two marks per book",
+      "2026-09-18": "two marks per book"
+    },
+    "weekend": [
+      "2026-09-19"
+    ],
+    "note": "One mark from each collector slot that runs the price step, and one on a Saturday. Equity unaffected on a cash book; an invested book's day return would be written twice a day and once on weekends unless the store keys marks by session. Fix in flight on the development branch."
+  },
+  "what_the_feedback_page_changed": [
+    "Tenaga -2.10% on 09-18 was the first session after the household exemptions, 78% unexplained and significant; the RM120-150 million figure was published fifteen minutes after the close; the decomposition returned no_identified_catalyst because the verdict never consults the corpus. 32.0% of equity, over the cap.",
+    "Petronas Chemicals -3.09% read not significant at 0.78 sigma because its 120-session sigma contains the +22.56% run; -9.42% over two sessions; zero rows.",
+    "Press Metal +2.63% significant on a fifth consecutive session of zero rows."
+  ],
+  "decision": {
+    "recorded": true,
+    "weights": {},
+    "kind": "all_cash",
+    "prediction_id": "paper-2026-09-19-allcash-21d-b7bd",
+    "horizon_days": 21,
+    "grades_on": "2026-10-19",
+    "confidence": 0.55,
+    "confidence_note": "The eighth consecutive decision at 0.55. A Saturday row grades against the same control as Friday's; it exists because the contract asks for one row a night.",
+    "claim": "nothing in the fundable universe beats cash over 21 sessions",
+    "thesis": "All cash, twelfth session, a Saturday with no session on either market; two observe decisions remain after this one (09-20 and 09-21) before ramp opens on 2026-09-22. The fundable set is unchanged at Thursday's Bursa closes and the US legs are now settled closes: Petronas Chemicals 11.5% of equity, two lots, after -3.09% on zero rows and -9.42% over the two sessions since the holiday; Press Metal 19.1% after +2.63% on a fifth consecutive session of zero rows; IHH 18.7% with a forensic audit the press dates at up to nine months; Genting 4.7% with zero rows and a 4.52% round trip; NVIDIA 22.2% at 222.27 with 204 stories and no dated event. Tenaga fell 2.10% on the first session after the household exemptions were announced, 78% unexplained, and the RM120-150 million figure was published fifteen minutes after that close; the name is 32.0% of equity against the 25% per-name cap, and the decomposition's verdict could not see the five rows that name the cause. Claim: nothing in the fundable universe beats cash over 21 sessions.",
+    "refusals": [],
+    "fx": {
+      "myr_per_usd": 4.0808,
+      "source": "bnm",
+      "date": "2026-09-18"
+    },
+    "fundable_set": {
+      "MYX:5183": {
+        "lot_usd": 115.42,
+        "share_of_equity": 0.115,
+        "round_trip": 0.0193,
+        "max_lots": 2,
+        "why_not": "-9.42% in two sessions on zero rows; two lots allowed only because it fell"
+      },
+      "MYX:5225": {
+        "lot_usd": 187.22,
+        "share_of_equity": 0.187,
+        "round_trip": 0.0124,
+        "max_lots": 1,
+        "why_not": "a forensic audit the press dates at up to nine months; title-only"
+      },
+      "MYX:8869": {
+        "lot_usd": 191.14,
+        "share_of_equity": 0.191,
+        "round_trip": 0.0122,
+        "max_lots": 1,
+        "why_not": "ZERO ROWS FOR A FIFTH SESSION; +2.63% significant and unexplained"
+      },
+      "MYX:3182": {
+        "lot_usd": 47.29,
+        "share_of_equity": 0.047,
+        "round_trip": 0.0452,
+        "max_lots": 5,
+        "why_not": "zero rows; a 4.52% round trip"
+      },
+      "XNAS:NVDA": {
+        "lot_usd": 222.27,
+        "share_of_equity": 0.222,
+        "round_trip": 0.0117,
+        "max_lots": 1,
+        "why_not": "a settled close; 204 stories, none a dated event; 84% unexplained at 0.83 sigma",
+        "price_state": "settled"
+      }
+    },
+    "excluded_on_the_25pc_cap": {
+      "MYX:1155": 0.253,
+      "MYX:5347": 0.32,
+      "XNAS:AAPL": 0.336,
+      "XNAS:MSFT": 0.494
+    },
+    "verified_against_stores": {
+      "paper.db targets": 9,
+      "paper.db applications": 9,
+      "learning.db predictions": 9
+    }
+  },
+  "mistakes": [],
+  "corrections": [],
+  "settled": [
+    "The 09-18 page's claim that the provisional US quotes changed nothing held against the settled closes (NVIDIA 22.2% in; Apple 33.6% and Microsoft 49.4% out).",
+    "Tonight's thesis counts the remaining observe decisions correctly (09-20, 09-21), checked against engines/paper/rules.py before recording."
+  ],
+  "defects_this_book_depends_on": [
+    "data/paper.db writes two marks per book per day when both collector slots run the price step, and a mark on days with no session (2026-09-19). Sixteen marks for nine Bursa sessions. Fix in flight on the development branch.",
+    "engines/attribution/decompose.py assigns no_identified_catalyst from significance alone; no matcher consults the corpus, and facts.db holds zero events for any Bursa name.",
+    "markets/xkls.py configures ZERO holidays on main; the fix is merged on the development branch, not on main.",
+    "The sector beta is fixed at 0. Opened 2026-09-14.",
+    "Sixteen peer price lines unrefreshed since 2026-08-31.",
+    "gdelt: 0 rows for a sixth consecutive day (HTTP 429)."
+  ],
+  "conditions_for_a_position": [
+    "OPEN: Tenaga's own statement - a Bursa announcement or filing carrying the RM120-150 million, and whether it is a loss or a deferral. The name is over the cap either way.",
+    "OPEN, on a two-session -9.42%: Petronas Chemicals collecting a body, and a Brent print for 09-16 to 09-18. Since 2026-09-10.",
+    "OPEN, worsening: Press Metal collecting anything. Five sessions.",
+    "OPEN: a per-name cap that admits Tenaga, or an equity level that does. Ramp raises the invested cap to 40% and leaves the 25% per-name cap where it is.",
+    "OPEN: any fundamental figure at all for a Bursa name; eodhd names the reason - outside the free plan.",
+    "OPEN, a gap not a condition: the Fed hiked on 09-17 and the book has no rate input.",
+    "CLOSED: a us_close sweep before the page, or #74's label - both true tonight; every US price is a settled close.",
+    "CLOSED: the Bursa proxy, replaced with the index on 2026-09-14."
+  ],
+  "ramp_opens_2026_09_22": {
+    "invested_cap": "0% -> 40%",
+    "per_name_cap": "25%, unchanged",
+    "fills": "at each market's first cached bar after the decision - one session after the page that decided it",
+    "live_from_ramp": [
+      "-8% per-name stop",
+      "drawdown halt at 8%",
+      "turnover cap USD 500 per five weekdays"
+    ],
+    "note": "Ramp widens what may be held; nothing on this page or the feedback page adds a reason to hold any of the five fundable names."
+  },
+  "lessons": [
+    "A settled page costs one sweep, not one day. The US legs read as closes because us_close ran before the pack was built; the label the pack carries for a provisional bar is only needed on the nights it does not.",
+    "A mark is a row, not a session. Two collector slots each wrote one, and a Saturday wrote one; a count that reads sixteen for nine sessions is counting the collector's schedule.",
+    "A finding about the machine is recorded on the paper page even when it changes no weight. The verdict that could not see Tenaga's cause is what the ramp-week pages will be reading every night."
+  ]
+}
