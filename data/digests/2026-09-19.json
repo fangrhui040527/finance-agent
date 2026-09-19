@@ -1,8 +1,8 @@
 {
   "collection": [
     {
-      "at": "2026-09-18T23:20:01.147537+00:00",
-      "detail": "facts 0; XNAS:NVDA: deferred by the 2-a-day credit budget; next in rotation; XNAS:AAPL: outside the plan or over today's credits; XNAS:MSFT: outside the plan or over today's credits",
+      "at": "2026-09-19T13:13:22.959608+00:00",
+      "detail": "facts 0; MYX:8869: deferred by the 2-a-day credit budget; next in rotation; MYX:3182: deferred by the 2-a-day credit budget; next in rotation; MYX:1155: deferred by the 2-a-day credit budget; next in rotation; MYX:5347: deferred by the 2-a-day credit budget; next in rotation; outside the free plan (US only), so not asked for: MYX:1155, MYX:5347, MYX:8869, MYX:3182. The EODHD Fundamentals plan cove",
       "fetched": 0,
       "kept": 0,
       "source": "eodhd",
@@ -10,115 +10,7 @@
       "stored": 0
     },
     {
-      "at": "2026-09-18T23:20:00.570694+00:00",
-      "detail": "facts 0; ",
-      "fetched": 19,
-      "kept": 9,
-      "source": "jin10_flash",
-      "status": "ok",
-      "stored": 8
-    },
-    {
-      "at": "2026-09-18T23:19:59.318841+00:00",
-      "detail": "facts 6; XNAS:MSFT: alphavantage quota exhausted for today: Thank you for using Alpha Vantage! Please consider spreading out your free API requests more sparingly (1 request per second). You may subscribe to any of the p; XNAS:NVDA: alphavantage quota exhausted for today: Thank you for using Alpha Vantage! Please consider spreading out your free API requests more sparingly (1 request per second). ",
-      "fetched": 9,
-      "kept": 9,
-      "source": "alphavantage_news",
-      "status": "ok",
-      "stored": 8
-    },
-    {
-      "at": "2026-09-18T23:19:59.108991+00:00",
-      "detail": "facts 10; ",
-      "fetched": 208,
-      "kept": 192,
-      "source": "finnhub",
-      "status": "ok",
-      "stored": 150
-    },
-    {
-      "at": "2026-09-18T23:19:57.556797+00:00",
-      "detail": "facts 5; ",
-      "fetched": 11,
-      "kept": 0,
-      "source": "edgar",
-      "status": "ok",
-      "stored": 0
-    },
-    {
-      "at": "2026-09-18T23:19:57.440043+00:00",
-      "detail": "named the company: 56 of 56 (lowest: Apple 18/18, Microsoft 19/19, NVIDIA 19/19)",
-      "fetched": 57,
-      "kept": 56,
-      "source": "yahoo_rss",
-      "status": "ok",
-      "stored": 46
-    },
-    {
-      "at": "2026-09-18T23:19:57.004247+00:00",
-      "detail": "named the company: 68 of 84 (lowest: NVIDIA 29/37, Microsoft 13/16, Apple 26/31)",
-      "fetched": 100,
-      "kept": 84,
-      "source": "google_news",
-      "status": "ok",
-      "stored": 81
-    },
-    {
-      "at": "2026-09-18T23:19:55.554064+00:00",
-      "detail": "read but empty: Apple, Microsoft; failed: GDELT fetch failed: HTTP Error 429: Too Many Requests (NVIDIA)",
-      "fetched": 0,
-      "kept": 0,
-      "source": "gdelt",
-      "status": "ok",
-      "stored": 0
-    },
-    {
-      "at": "2026-09-18T16:40:06.975898+00:00",
-      "detail": "facts 0; ",
-      "fetched": 450,
-      "kept": 0,
-      "source": "dbnomics",
-      "status": "ok",
-      "stored": 0
-    },
-    {
-      "at": "2026-09-18T16:40:03.167497+00:00",
-      "detail": "facts 0; ",
-      "fetched": 19,
-      "kept": 6,
-      "source": "jin10_flash",
-      "status": "ok",
-      "stored": 4
-    },
-    {
-      "at": "2026-09-18T16:40:02.131118+00:00",
-      "detail": "facts 11; ",
-      "fetched": 513,
-      "kept": 0,
-      "source": "fred",
-      "status": "ok",
-      "stored": 0
-    },
-    {
-      "at": "2026-09-18T16:39:32.855553+00:00",
-      "detail": "skipped: no name in the book trades in slot 'us_preopen'",
-      "fetched": 0,
-      "kept": 0,
-      "source": "fmp",
-      "status": "ok",
-      "stored": 0
-    },
-    {
-      "at": "2026-09-18T13:39:10.155004+00:00",
-      "detail": "facts 0; MYX:5183: deferred by the 2-a-day credit budget; next in rotation; MYX:5225: deferred by the 2-a-day credit budget; next in rotation; MYX:8869: deferred by the 2-a-day credit budget; next in rotation; MYX:3182: deferred by the 2-a-day credit budget; next in rotation; outside the free plan (US only), so not asked for: MYX:5183, MYX:5225, MYX:8869, MYX:3182. The EODHD Fundamentals plan cove",
-      "fetched": 0,
-      "kept": 0,
-      "source": "eodhd",
-      "status": "ok",
-      "stored": 0
-    },
-    {
-      "at": "2026-09-18T13:39:09.807376+00:00",
+      "at": "2026-09-19T13:13:22.523402+00:00",
       "detail": "facts 5; ",
       "fetched": 8,
       "kept": 0,
@@ -127,16 +19,16 @@
       "stored": 0
     },
     {
-      "at": "2026-09-18T13:38:59.037545+00:00",
+      "at": "2026-09-19T13:13:17.085872+00:00",
       "detail": "facts 0; ",
-      "fetched": 19,
-      "kept": 3,
+      "fetched": 17,
+      "kept": 6,
       "source": "jin10_flash",
       "status": "ok",
-      "stored": 2
+      "stored": 5
     },
     {
-      "at": "2026-09-18T13:38:58.106234+00:00",
+      "at": "2026-09-19T13:13:15.832580+00:00",
       "detail": "facts 0; ",
       "fetched": 10,
       "kept": 0,
@@ -145,26 +37,26 @@
       "stored": 0
     },
     {
-      "at": "2026-09-18T13:38:56.238660+00:00",
+      "at": "2026-09-19T13:13:13.719942+00:00",
       "detail": "",
       "fetched": 50,
-      "kept": 46,
+      "kept": 50,
       "source": "nst_business",
       "status": "ok",
-      "stored": 44
+      "stored": 48
     },
     {
-      "at": "2026-09-18T13:38:56.050281+00:00",
+      "at": "2026-09-19T13:13:13.526827+00:00",
       "detail": "",
-      "fetched": 43,
-      "kept": 43,
+      "fetched": 49,
+      "kept": 49,
       "source": "fmt_business",
       "status": "ok",
-      "stored": 43
+      "stored": 49
     },
     {
-      "at": "2026-09-18T13:38:55.816038+00:00",
-      "detail": "read but empty: Genting, Maybank, Tenaga, Petronas Chemicals, IHH, Press Metal",
+      "at": "2026-09-19T13:13:13.388015+00:00",
+      "detail": "read but empty: Petronas Chemicals, IHH, Press Metal, Genting, Maybank, Tenaga",
       "fetched": 0,
       "kept": 0,
       "source": "yahoo_rss",
@@ -172,17 +64,17 @@
       "stored": 0
     },
     {
-      "at": "2026-09-18T13:38:53.469698+00:00",
-      "detail": "read but empty: Genting, Petronas Chemicals; named the company: 5 of 23 (lowest: Press Metal 0/1, Tenaga 3/17, Maybank 1/3)",
-      "fetched": 23,
-      "kept": 23,
+      "at": "2026-09-19T13:13:11.703212+00:00",
+      "detail": "read but empty: Petronas Chemicals, IHH, Press Metal; named the company: 1 of 4 (lowest: Genting 0/1, Tenaga 0/2, Maybank 1/1)",
+      "fetched": 4,
+      "kept": 4,
       "source": "google_news",
       "status": "ok",
-      "stored": 22
+      "stored": 2
     },
     {
-      "at": "2026-09-18T13:38:51.476966+00:00",
-      "detail": "read but empty: Tenaga; failed: GDELT fetch failed: HTTP Error 429: Too Many Requests (Genting, Maybank); deferred to a later run: Petronas Chemicals, IHH, Press Metal",
+      "at": "2026-09-19T13:13:10.060157+00:00",
+      "detail": "read but empty: Maybank; failed: GDELT fetch failed: HTTP Error 429: Too Many Requests (Press Metal, Genting); deferred to a later run: Tenaga, Petronas Chemicals, IHH",
       "fetched": 0,
       "kept": 0,
       "source": "gdelt",
@@ -191,18 +83,18 @@
     }
   ],
   "counts": {
-    "articles": 6343,
+    "articles": 6447,
     "documents": 0,
     "escalated": 1201,
     "events": 4023,
     "failed_sweeps": 19,
     "linked": 4386,
-    "observations": 4639,
+    "observations": 4644,
     "series": 31,
-    "sweeps": 353
+    "sweeps": 362
   },
-  "day": "2026-09-18",
-  "generated_at": "2026-09-18 23:20 UTC",
+  "day": "2026-09-19",
+  "generated_at": "2026-09-19 13:13 UTC",
   "macro": [
     {
       "change": "0",
@@ -340,98 +232,18 @@
       "instrument_id": "MYX:1155",
       "label": "Maybank",
       "snapshot": [],
-      "stories": [
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMikwFBVV95cUxNWnV5VWpOU2UwQlRnM3E4V2dKOURZS2I5dUZXZXU0QW4yQjRoYko5LUdIVEZoa1o0TlltWWtyLThaN040dWktMDNvSjFCN2l1RVRUYlJ1RGxpSzZLQ1I3OHA0SzZhOXNRazRfcnQtTS02MEVLbGRjdjNWenFyOG9JajlERnRQTGFzTUxtM3N2alVpcnc?oc=5",
-          "domain": "www.moomoo.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-18T01:29:41+00:00",
-          "quality": 0.65,
-          "title": "Glad I made the switch from Maybank.",
-          "uncertainty": 0.0
-        }
-      ],
-      "tone": {
-        "intensity_max": 0.0,
-        "n": 1,
-        "polarity_mean": 0.0,
-        "sources": 1,
-        "uncertainty_mean": 0.0
-      },
+      "stories": [],
+      "tone": {},
       "upcoming": []
     },
     {
-      "escalated": 1,
+      "escalated": 0,
       "events": [],
       "instrument_id": "MYX:5347",
       "label": "Tenaga",
       "snapshot": [],
-      "stories": [
-        {
-          "doc_id": "https://www.nst.com.my/news/nation/2026/09/1535612/90pct-domestic-users-covered-higher-electricity-bill-protection",
-          "domain": "www.nst.com.my",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-18T10:25:21+00:00",
-          "quality": 1.0,
-          "title": "Up to 90pct domestic users covered with higher electricity bill protection threshold",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE1tTzBXa1lsWVRNLVBrTnI4ZXplWmhHaFN1UDZNWll2UEhiekhDcmNjY25ObUF2MEo1WkJlV3J5RkpqVTQ0QUJtcldEbzN4WEZC?oc=5",
-          "domain": "theedgemalaysia.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-18T11:24:43+00:00",
-          "quality": 0.8,
-          "title": "TNB sheds RM3 bil market cap after agreeing to absorb subsidy for domestic users",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMivwFBVV95cUxONFhNUXl1a0ZNTFRNek5fUnpCejM5YjJ1ak5ZVHlINDMxd2E0NE9fUjRGRFdDaW1pVTJDYVFtTm8xZzF4aFI0MkFKWkx3MjhURmQwTlhQWnVaRkNBT1dBOWFzQXhPNElJUHU2QXEybV9Xc2lmeGdwT05xcnV1bHctLTNkQjU5c1B3VUgwOTM1Tk94ZExZTG1zVWJQNEJPcF9FTzJCS05taWNJRVpqSW5SZzYyZ3JjdDV0ZGFUS2R6dw?oc=5",
-          "domain": "www.nst.com.my",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-18T09:15:12+00:00",
-          "quality": 0.8,
-          "title": "TNB to absorb RM120mil-RM150mil AFA charges over four months",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMitgFBVV95cUxNYzRyX1Vsb2pDWU52cmVqek1UampwaHNqOFdXWE1HYnlMWE1OZVRjTExtLVVyajNCelgwNUdUdnNVSXdJSk8tMGNpYnBwUnZ1REFFQVMwZEJoNDlZbzdpTm9VQlFfQkJrNGtSWjBVZHk5X25WTS1pd0dwZkRJY2wxcnJ5d2s5SDM1YmVpeS14OXhhRlpDTnNuVFEtNmZNcVlzSTdCQVUwaWRjSG5HbzNLZkp1RlFLdw?oc=5",
-          "domain": "www.businesstoday.com.my",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-18T04:21:13+00:00",
-          "quality": 0.8,
-          "title": "Stock Today: TNB Slipped 0.9% After Electricity Subsidy Threshold Raised",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMimgFBVV95cUxQUUxVNlBoXzRXaERyZWhUaGlRWldhaWZxaEUtOTFYNHc0aF9HU2tMMmNZbGFJNVBUWk1tU2FNcjhYVTcxWW1PbnZjczBVVHBadWpwbkZYa19sX1l2UXJCMWViMUlaa0dxTjY5Q3JRWVF4bjJVMlpncnJDaXNFMExlU1RPZGNpeWFnVDJ6NnVCeGtKRHVOLV9waGRR?oc=5",
-          "domain": "soyacincau.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-17T12:45:37+00:00",
-          "quality": 0.65,
-          "title": "TNB Bill Relief: Anwar announces AFA, retail charge and SST exemptions up to 800kWh until 31 December 2026",
-          "uncertainty": 0.0
-        }
-      ],
-      "tone": {
-        "intensity_max": 0.0,
-        "n": 5,
-        "polarity_mean": 0.0,
-        "sources": 4,
-        "uncertainty_mean": 0.0
-      },
+      "stories": [],
+      "tone": {},
       "upcoming": []
     },
     {
@@ -450,26 +262,8 @@
       "instrument_id": "MYX:5225",
       "label": "IHH",
       "snapshot": [],
-      "stories": [
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxOSU50OXczUDhPenNka3htcDNoemQ3TEVQWVh2T2stRDd3bjlNUlpqNVZjMUFJakF6by14RVIxNkFrTC1Sazd5bFFFOHpDOW14V3c2XzQydF85NE1udjZpaklUblZDQTRNOG5iOVVLa0x1WGRvVUphRTRzWHlQY0RkWjhTVUdQM19HS09nRVpRTHN0M2hLSDFGU3JUSFJldGVUT3Q2UlYzTUZQa3RPZjdOU2FvREZmVjBRZmlv?oc=5",
-          "domain": "themalaysianreserve.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-18T00:41:52+00:00",
-          "quality": 0.8,
-          "title": "Fortis Healthcare forensic audit could keep IHH in limbo for up to 9 months",
-          "uncertainty": 0.9615384615384615
-        }
-      ],
-      "tone": {
-        "intensity_max": 0.0,
-        "n": 1,
-        "polarity_mean": 0.0,
-        "sources": 1,
-        "uncertainty_mean": 0.962
-      },
+      "stories": [],
+      "tone": {},
       "upcoming": []
     },
     {
@@ -493,7 +287,7 @@
       "upcoming": []
     },
     {
-      "escalated": 29,
+      "escalated": 15,
       "events": [],
       "instrument_id": "XNAS:NVDA",
       "label": "NVIDIA",
@@ -676,50 +470,50 @@
           "uncertainty": 0.0
         },
         {
-          "doc_id": "alphavantage:https://www.marketbeat.com/instant-alerts/filing-boston-trust-walden-corp-has-25265-million-stake-in-nvidia-corporation-nvda-2026-09-18/",
-          "domain": "MarketBeat",
+          "doc_id": "https://news.google.com/rss/articles/CBMihwFBVV95cUxOX1dTamJ1aHFmSUJtU3ZXV1diZDd3RGROdl9lTEY4UEEzQmFicF85MzdFWXpoT01Xckp6MlZ5eU5RcEpsVWl6Qmw3Y0NoMXJtdzViV21DZ0h6aXhFRkRWWjNjYmk1ZTRCSnY0X052TWIxMEg3a05NMnh5MGtaMEpzYXNla1ZMeEU?oc=5",
+          "domain": "www.reuters.com",
           "escalated": true,
-          "intensity": 0.0,
+          "intensity": 0.3333333333333333,
           "polarity": 1.0,
-          "published_at": "2026-09-18T07:38:01+00:00",
-          "quality": 0.85,
-          "title": "Boston Trust Walden Corp Has $252.65 Million Stake in NVIDIA Corporation $NVDA",
+          "published_at": "2026-09-18T21:41:08+00:00",
+          "quality": 0.8,
+          "title": "Nvidia-backed AI cloud firm Nscale reveals revenue surge in US IPO filing",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:142256482",
-          "domain": "Benzinga",
+          "doc_id": "https://news.google.com/rss/articles/CBMipAFBVV95cUxPVktxdWZTUVR2MDIyYVBnR0I3dTl2ZWdxaHpKVEladHdQekNRUDFMcXJNaDlseGhXSUdKRm0zVHY5WnJwTW9wU3EzX2Z5UmhmU1NTNm0xMFhtMzVwMXZWM3Y5RUhjNUNoWDlGVjBRUnZIckZOWFBMS0pvVWctcUtaOUFSY3BjTlNuNkZmdVc3NlJ3dDFfQXhya3FTa0V3bXZILUgyNQ?oc=5",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-18T16:50:02+00:00",
+          "quality": 0.8,
+          "title": "Will Micron Follow Nvidia and Give Investors a Huge Dividend Hike?",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxObUdKSDd2eFZMMFJWU0Z4dy14Qm9nc1NkRFBJaHUxSWhwbnpZdmR5eHZuRkJNZ1RyTlE0UXkwRVRjenBJLTJmVm1iYW03QUxXSjAybElsSVhLeUdFeWVFTGlYbVRha3NuZ19mdlhaOWh4ZVlNa1VOQWJIWFFkN3ZvOVU2X3V2aEFD?oc=5",
+          "domain": "www.barrons.com",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-09-18T05:58:22+00:00",
-          "quality": 0.85,
-          "title": "Exploring The Competitive Space: NVIDIA Versus Industry Peers In Semiconductors & Semiconductor Equipment",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "finnhub:142231735",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-09-17T23:35:49+00:00",
-          "quality": 0.85,
-          "title": "Why AMD Stock Jumped Today",
-          "uncertainty": 0.0
+          "published_at": "2026-09-18T16:02:00+00:00",
+          "quality": 0.8,
+          "title": "Nvidia Chip Sales Could Double Next Year, CEO Jensen Huang Says",
+          "uncertainty": 1.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 204,
-        "polarity_mean": 0.167,
-        "sources": 37,
-        "uncertainty_mean": 0.132
+        "n": 78,
+        "polarity_mean": 0.256,
+        "sources": 23,
+        "uncertainty_mean": 0.108
       },
       "upcoming": []
     },
     {
-      "escalated": 37,
+      "escalated": 17,
       "events": [],
       "instrument_id": "XNAS:AAPL",
       "label": "Apple",
@@ -902,28 +696,6 @@
           "uncertainty": 0.5896226415094339
         },
         {
-          "doc_id": "https://finance.yahoo.com/m/74d62a29-1f7b-3f95-924b-399b49b779b5/apple-iphone-18-pro-sales.html?.tsrc=rss",
-          "domain": "finance.yahoo.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-09-17T20:07:24+00:00",
-          "quality": 1.0,
-          "title": "Apple iPhone 18 Pro Sales Helped By Carrier Promotions",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/googl-down-7-past-3-153400623.html?.tsrc=rss",
-          "domain": "finance.yahoo.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-09-17T15:34:00+00:00",
-          "quality": 1.0,
-          "title": "GOOGL Down 7% in the Past 3 Months: Buy, Sell or Hold the Stock?",
-          "uncertainty": 0.0
-        },
-        {
           "doc_id": "alphavantage:https://www.cnbc.com/video/2026/09/18/morgan-stanleys-woodring-on-apple-early-demand-seems-fine-supply-is-better-lead-times-are-flat.html",
           "domain": "CNBC",
           "escalated": true,
@@ -933,19 +705,41 @@
           "quality": 0.85,
           "title": "Morgan Stanley\u2019s Woodring on Apple: Early demand seems fine, supply is better, lead times are flat",
           "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142259066",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "polarity": 1.0,
+          "published_at": "2026-09-18T16:20:00+00:00",
+          "quality": 0.85,
+          "title": "Apple TV's Emmy Sweep Adds Momentum to AAPL's Services Business",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "alphavantage:https://www.oregonlive.com/crime/2026/09/oregon-woman-alleges-apple-airtag-enabled-stalking-by-ex.html",
+          "domain": "OregonLive.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-09-18T15:48:40+00:00",
+          "quality": 0.85,
+          "title": "Oregon woman alleges Apple AirTag enabled stalking by ex",
+          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 102,
-        "polarity_mean": 0.083,
-        "sources": 39,
-        "uncertainty_mean": 0.08
+        "n": 48,
+        "polarity_mean": 0.125,
+        "sources": 19,
+        "uncertainty_mean": 0.092
       },
       "upcoming": []
     },
     {
-      "escalated": 17,
+      "escalated": 6,
       "events": [],
       "instrument_id": "XNAS:MSFT",
       "label": "Microsoft",
@@ -1095,78 +889,78 @@
           "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:142250567",
-          "domain": "SeekingAlpha",
+          "doc_id": "https://news.google.com/rss/articles/CBMi2wFBVV95cUxONnFfT3AzaV9hUEI0bm9XbkZMQW9HNmhXWFczbE5LTk04YnBJUExxaVk5ZGZlMEg1cEtvZl8yX0dPQ3U1Vi1UVVg3X2M4cE53T21BRjhiOTdJSUpDZkQwd05ESVYyWE0zV0ZTRkR3U3RWdHljY0twRXVMN3k4c1BTalBZQUNkeGFjTEw4NzU1Z2NQN0JVTTA5NzR3RmhtTVBWMF9hU0pESmx3bTdtbk8tR1NHY0pyVXBnOXB5Wm5lcVdmR2dLcEpncjExZVNQbjktS3hXV1ZldDFqNlE?oc=5",
+          "domain": "www.tipranks.com",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 1.0,
-          "published_at": "2026-09-18T06:45:00+00:00",
-          "quality": 0.85,
-          "title": "Microsoft: Don't Let The Smaller Dividend Hike Fool You - I See $600+ Long-Term",
-          "uncertainty": 0.2976190476190476
-        },
-        {
-          "doc_id": "finnhub:142247889",
-          "domain": "SeekingAlpha",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.3333333333333333,
-          "published_at": "2026-09-18T05:30:56+00:00",
-          "quality": 0.85,
-          "title": "Microsoft Stock Hit My Target. Now I'm Stepping Back (Rating Downgrade)",
+          "published_at": "2026-09-18T14:18:59+00:00",
+          "quality": 0.65,
+          "title": "Microsoft vs. Alphabet: One AI Stock Gets an Upgrade, but the Sidelines Call for the Other, Says Top Investor",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:142238990",
-          "domain": "Yahoo",
+          "doc_id": "https://news.google.com/rss/articles/CBMijAFBVV95cUxNbk5iNFgyclhNZkpRd0tVSW5oOU1lczR1cG41VkZpb2NOV0doNGNLZU1MTFJLanFWMjRBdEJ1M0xyYkp1UWZzYUxQc0JuNWdOT043VHZjR1ZBX1Ztc1RPalM2TU0xbDc3MTlhaVdEU2pqeDIwZVVONVhCUlEwOENGc3Bpb2JxQjRGLTQzZQ?oc=5",
+          "domain": "tradersunion.com",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 1.0,
-          "published_at": "2026-09-18T04:55:55+00:00",
-          "quality": 0.85,
-          "title": "Traders Wary Of Rising AI Risks: Market Snapshot",
-          "uncertainty": 0.30991735537190085
+          "published_at": "2026-09-18T14:03:33+00:00",
+          "quality": 0.65,
+          "title": "Strong trading above major averages lifts Microsoft stock higher",
+          "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:142237231",
-          "domain": "Yahoo",
+          "doc_id": "https://news.google.com/rss/articles/CBMi1wFBVV95cUxQZWtNQjZPa1hpQ0lIV1E4LThoYkxMRUxxYzNudV9Lb21Zc1R4Vk5NQmJLTW9QMmhxRWtuQlRDemgyTjhyREZxU0ktZVFGNDJzdVp0OUY1QVBiRlJzZ05zSWU4VjJveEFKQzg3Tk9SaVR5NjNwZlkzeGVVUDZsb2xNRHlQc3NMWlZ6MUhaSmJWQklPbmlzQ0pMdGVPdmc3ZHh2TTNiYklnOXRUaUh1bGFJaDN1MUV0aVNnTDIzRVBKZmctNGdFMDRGMG44SDBmc1FndlBNSU1PTQ?oc=5",
+          "domain": "www.easternprogress.com",
           "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-18T13:45:03+00:00",
+          "quality": 0.65,
+          "title": "Why Microsoft (MSFT) is a Top Growth Stock for the Long-Term",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMimwFBVV95cUxNRXlQRzN6SkpoMmcxcHBKdGlQc1RxRS1haWVtUEVIODdUaEZfSlluTW1TMVdfNktTZDZUZlIzcGdvQ3lhS0hVVGhqUnp5eURudVZuTkM2M2RsX01fNWNzMXdkejhiU2daWW42eU9LeHdPS0RBRkNrYlNBTDE1c2ZXcVJCd2lOTEdleWJnVWRyNWlyRzRBZW5MY0czdw?oc=5",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "polarity": 1.0,
+          "published_at": "2026-09-18T14:32:00+00:00",
+          "quality": 0.45,
+          "title": "3 Reasons to Hold Microsoft Stock After a 31.2% Surge in 3 Months",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/nvidia-backed-data-center-firm-195220456.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": false,
           "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-09-18T03:16:12+00:00",
-          "quality": 0.85,
-          "title": "Marvell Technology (MRVL) Deepens Its AI Infrastructure Footprint",
+          "published_at": "2026-09-18T19:52:20+00:00",
+          "quality": 1.0,
+          "title": "Nvidia-Backed Data Center Firm Nscale Files Publicly for US IPO",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:142238168",
-          "domain": "SeekingAlpha",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-09-18T01:48:34+00:00",
-          "quality": 0.85,
-          "title": "Microsoft And Alphabet: Same Multiple Now, So The Forward Setup Decides",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "finnhub:142234482",
-          "domain": "Yahoo",
-          "escalated": true,
+          "doc_id": "https://stocktwits.com/news-articles/markets/equity/nvidia-backed-cloud-platform-nscale-files-for-ipo/cZtH7g6RBEQ?.tsrc=rss",
+          "domain": "stocktwits.com",
+          "escalated": false,
           "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-09-17T23:53:34+00:00",
+          "published_at": "2026-09-18T21:31:11+00:00",
           "quality": 0.85,
-          "title": "Microsoft (MSFT) Puts a Clock on Free Xbox Cloud Gaming",
+          "title": "Nvidia-Backed Cloud Platform Nscale Files For IPO \u2014 NVDA Stock In Focus",
           "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 80,
-        "polarity_mean": 0.233,
-        "sources": 23,
-        "uncertainty_mean": 0.117
+        "n": 37,
+        "polarity_mean": 0.297,
+        "sources": 17,
+        "uncertainty_mean": 0.092
       },
       "upcoming": []
     }
