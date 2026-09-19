@@ -116,6 +116,27 @@ def test_bad_arguments_are_422_not_500(client):
     assert resp.status_code == 422
 
 
+def test_an_unexpected_exception_is_a_refusal_in_the_envelope_not_a_bare_500(
+    client, monkeypatch, caplog
+):
+    """A tool that raises is a defect, and it used to leave as Starlette's
+    plain-text 500. It is logged in full and answered as a refusal: the fault's
+    type and where to look, never the traceback."""
+
+    def boom():
+        raise RuntimeError("the store ate itself")
+
+    monkeypatch.setattr(T, "calibration_status", boom)
+    resp = client.get("/api/calibration")
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["ok"] is True and body["data"] is None
+    assert body["refusal"]["reason"] == "REFUSED: internal error (RuntimeError); see the server log"
+    assert body["text"] == body["refusal"]["reason"]
+    assert "ate itself" not in resp.text and "Traceback" not in resp.text
+    assert "the store ate itself" in caplog.text  # the log has what the wire does not
+
+
 def test_predictions_round_trip_through_the_store(client, tmp_path):
     args = {
         "instrument": "MYX:1155",

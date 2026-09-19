@@ -185,13 +185,149 @@ def test_a_drawdown_past_the_halt_line_blocks_new_entries_but_not_reductions(pap
 
 def test_a_target_with_no_bar_in_five_weekdays_expires(paper_env):
     env = paper_env
-    env.feed.__init__(date(2025, 9, 1), env.week(3))  # the world ends on the decision day
+    # The three decided names stop printing on the decision day; the rest of
+    # the market goes on. The market has to go on: a mark is stamped with the
+    # session of the bars it is marked from, so a world with no bar after the
+    # decision has no later session to expire anything against.
+    for iid in W:
+        env.feed.series[iid] = [b for b in env.feed.series[iid] if b.day <= env.week(3)]
     _mark(env, env.week(2, 4))
     assert not _decide(env, env.week(3)).refused
     r = _mark(env, env.week(4, 1))  # six weekdays later, no bar since
+    assert r.day == env.week(4, 1)
     assert [a.status for a in r.applied[DECIDED]] == ["expired"] * 3
-    assert all("STALE" not in p for p in [])  # marks carried the last close and flagged it
     assert r.marks[DECIDED].positions == [] and r.exit_code == 0
+
+
+# -- which session a mark belongs to ---------------------------------------------------------
+
+
+def test_a_mark_is_stamped_with_the_session_of_its_bars_not_the_clock(paper_env):
+    env = paper_env
+    fri, sat, sun = env.week(1, 4), env.week(1, 5), env.week(1, 6)
+    r = mark(env.store, env.cfg, env.feed, env.fx, day=sat, slot="us_close", now=_at(sat, 6, 7))
+    assert r.exit_code == 0 and r.day == fri
+    assert any(f"marked as {fri}" in n for n in r.notes), r.notes
+    assert env.store.mark_for(DECIDED, sat, "us_close") is None
+    first = env.store.mark_for(DECIDED, fri, "us_close")
+    assert first is not None and first.marked_at == _at(sat, 6, 7)
+    # Sunday's run is a later reading of the same session: it replaces, it does not add
+    r = mark(env.store, env.cfg, env.feed, env.fx, day=sun, slot="us_close", now=_at(sun, 22, 0))
+    assert r.day == fri and any("replaces the us_close mark" in n for n in r.notes), r.notes
+    again = env.store.mark_for(DECIDED, fri, "us_close")
+    assert again is not None and again.mark_id == first.mark_id
+    assert again.marked_at == _at(sun, 22, 0), "the later reading replaced the earlier in place"
+    assert env.store.sessions_marked(DECIDED) == 1
+    assert env.store.counts()["marks"] == 2  # one per book
+    # a bursa_close run the same Saturday marks Friday's Bursa session, its own row
+    r = mark(env.store, env.cfg, env.feed, env.fx, day=sat, slot="bursa_close", now=_at(sat, 12))
+    assert r.day == fri and env.store.sessions_marked(DECIDED) == 1
+    assert env.store.counts()["marks"] == 4
+
+
+def test_a_day_with_no_session_and_no_bar_to_mark_from_is_refused(paper_env):
+    env = paper_env
+    env.feed.__init__(env.week(2), date(2026, 7, 31))  # the cache begins in week two
+    sat = env.week(1, 5)
+    r = mark(env.store, env.cfg, env.feed, env.fx, day=sat, slot="us_close", now=_at(sat))
+    assert r.exit_code == 2 and r.refusal and "not a session" in r.refusal
+    assert r.marks == {} and env.store.counts()["marks"] == 0
+    assert "REFUSED" in r.render()
+    # a calendar session with no bar yet stands on the calendar's word: all cash, no bar needed
+    fri = env.week(1, 4)
+    r = mark(env.store, env.cfg, env.feed, env.fx, day=fri, slot="us_close", now=_at(fri))
+    assert r.exit_code == 0 and r.day == fri and r.marks[DECIDED].equity_usd == Decimal(1000)
+
+
+def test_marks_stamped_with_a_wall_clock_weekend_are_restamped_to_their_session(paper_env):
+    from engines.paper.store import MarkRow
+
+    env = paper_env
+    fri, sat, sun = env.week(1, 4), env.week(1, 5), env.week(1, 6)
+
+    def row(book, day, at, equity):
+        return MarkRow(
+            book,
+            day,
+            "us_close",
+            at,
+            Decimal(equity),
+            Decimal(0),
+            Decimal(equity),
+            Decimal(1000),
+            Decimal(0),
+            False,
+            "observe",
+            Decimal(4),
+            day,
+            "config",
+            [],
+        )
+
+    # What the ledger held before the rule: Friday marked at the close, then a
+    # Saturday catch-up and a Sunday run each filed under the wall-clock day.
+    for book in (DECIDED, CONTROL):
+        env.store.record_mark(row(book, fri, _at(fri, 21, 15), 1000))
+        env.store.record_mark(row(book, sat, _at(sat, 6, 7), 1000))
+        env.store.record_mark(row(book, sun, _at(sun, 22, 0), 1000))
+    assert env.store.sessions_marked(DECIDED) == 3
+    r = _mark(env, env.week(2))
+    assert r.exit_code == 0
+    # oldest first: Saturday's reading replaces Friday's, then Sunday's replaces Saturday's
+    assert sum("replacing that session's earlier mark" in n for n in r.notes) == 4, r.notes
+    assert env.store.mark_for(DECIDED, sat, "us_close") is None
+    assert env.store.mark_for(DECIDED, sun, "us_close") is None
+    kept = env.store.mark_for(DECIDED, fri, "us_close")
+    assert kept is not None and kept.marked_at == _at(sun, 22, 0), "the later reading stays"
+    assert env.store.sessions_marked(DECIDED) == 2  # Friday and Monday
+    # a second run has nothing left to re-date
+    r = _mark(env, env.week(2, 1))
+    assert not any("re-dated" in n or "dropped" in n for n in r.notes), r.notes
+
+
+def test_two_slots_on_one_session_are_one_session_marked(paper_env):
+    from mcp_server import observability
+
+    env = paper_env
+    d = env.week(1)
+    _mark(env, d, slot="bursa_close")
+    _mark(env, d, slot="us_close")
+    assert env.store.sessions_marked(DECIDED) == 1 and len(env.store.marks(DECIDED)) == 1
+    report = observability.paper_report(db=str(env.tmp / "paper.db"))
+    assert "1 session(s) marked" in report
+
+
+# -- the clock on a prediction -----------------------------------------------------------------
+
+
+def test_made_at_is_the_clock_and_the_grading_date_counts_from_the_decision_day(paper_env):
+    from engines.paper.book import DECISION_NIGHT, grade_date
+
+    env = paper_env
+    d = env.week(1, 1)
+    after_midnight = _at(d + timedelta(days=1), 2, 42)  # the Routine ran late
+    res = _decide(env, d, now=after_midnight)
+    assert not res.refused and len(res.predictions) == 3
+    logged = {p.prediction_id: p for p in env.learning.pending()}
+    nominal = datetime.combine(d, DECISION_NIGHT, tzinfo=UTC)
+    for t in res.targets:
+        assert t.decided_on == d and t.decided_at == after_midnight
+        p = logged[t.prediction_id]
+        assert p.made_at == after_midnight, "the row says when the call was made"
+        assert p.prediction_id.startswith(f"paper-{d}-")
+        assert p.grade_on == grade_date(nominal, 21) and p.context["decided_on"] == d.isoformat()
+        assert "replayed_at" not in p.context
+    # A replay - the horizon has already run out - keeps the nominal clock and says so
+    d2 = env.week(1, 2)
+    later = _at(env.week(12))
+    res = _decide(env, d2, now=later)
+    assert not res.refused
+    logged = {p.prediction_id: p for p in env.learning.pending()}
+    for t in res.targets:
+        p = logged[t.prediction_id]
+        assert p.made_at == datetime.combine(d2, DECISION_NIGHT, tzinfo=UTC)
+        assert p.grade_on == grade_date(p.made_at, 21) <= later.date()
+        assert p.context["replayed_at"] == later.isoformat() and t.decided_at == later
 
 
 def test_the_control_rebalances_in_ramp_and_again_in_full(paper_env):

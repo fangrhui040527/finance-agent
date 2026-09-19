@@ -1234,10 +1234,13 @@ def scorecard(db: str = "", root: str = DEBUG_ROOT) -> str:
         latest, ctl = fig["latest"], fig["control_latest"]
         ret = latest.equity_usd / fig["initial"] - 1
         cret = (ctl.equity_usd / fig["initial"] - 1) if ctl is not None else Decimal(0)
+        # Equal is level, not behind: an all-cash book at +0.00% against a
+        # control at +0.00% has neither won nor lost, and calling it behind
+        # would report a verdict the arithmetic never reached.
         rows.append(
             (
                 "paper book",
-                "ahead" if ret > cret else "behind",
+                "ahead" if ret > cret else ("level" if ret == cret else "behind"),
                 f"{ret:+.2%} vs control {cret:+.2%} over {fig['marks']} sessions; drawdown "
                 f"{latest.drawdown:.2%}{'; HALTED' if latest.halted else ''}",
             )
