@@ -88,26 +88,27 @@ def test_a_stale_book_name_is_an_alert_that_names_it_and_the_next_step(tmp_path)
 def test_a_peer_gets_a_trading_week_and_is_a_warning_on_its_own(tmp_path):
     """The two-week-old peers of 2026-09-19, in miniature: CSX (US) and 1023.KL
     (Bursa) are in no book and behind no proxy, so they are peers, and the alert
-    names both with their own market's session count."""
+    names both with their own market's session count - counted on each market's
+    holiday calendar, so Labor Day and Malaysia Day are not sessions."""
     path = _cache(
         tmp_path / "p.db",
         [
             ("yahoo", "1155.KL", "2026-09-18"),
             ("yahoo", "NVDA", "2026-09-18"),
             ("yahoo", "INTC", "2026-09-11"),  # Fri; 14-18 is five sessions: allowed
-            ("yahoo", "CSX", "2026-09-02"),  # twelve sessions
-            ("yahoo", "1023.KL", "2026-08-31"),  # fourteen
+            ("yahoo", "CSX", "2026-09-02"),  # eleven sessions: Labor Day 09-07 is not one
+            ("yahoo", "1023.KL", "2026-08-31"),  # thirteen: Malaysia Day 09-16 is not one
         ],
     )
     alerts = _stale(_price_rules(_cfg(), SATURDAY, path))
     assert len(alerts) == 1 and alerts[0].severity == WARN
     assert alerts[0].title == (
         "2 cached prices behind the market's last session: "
-        "1023.KL (peer, 14 sessions behind), CSX (peer, 12 sessions behind)"
+        "1023.KL (peer, 13 sessions behind), CSX (peer, 11 sessions behind)"
     )
     assert "INTC" not in alerts[0].title
     assert (
-        "14 sessions behind, peer allowed 5: 1023.KL; 12 sessions behind, peer allowed 5: CSX"
+        "13 sessions behind, peer allowed 5: 1023.KL; 11 sessions behind, peer allowed 5: CSX"
         in (alerts[0].detail)
     )
 
