@@ -1,6 +1,78 @@
 {
   "collection": [
     {
+      "at": "2026-09-20T23:19:06.301818+00:00",
+      "detail": "facts 0; XNAS:AAPL: deferred by the 2-a-day credit budget; next in rotation; XNAS:MSFT: outside the plan or over today's credits; XNAS:NVDA: outside the plan or over today's credits",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-20T23:19:05.145810+00:00",
+      "detail": "facts 0; ",
+      "fetched": 17,
+      "kept": 9,
+      "source": "jin10_flash",
+      "status": "ok",
+      "stored": 7
+    },
+    {
+      "at": "2026-09-20T23:19:03.001596+00:00",
+      "detail": "facts 4; XNAS:MSFT: alphavantage quota exhausted for today: Thank you for using Alpha Vantage! Please consider spreading out your free API requests more sparingly (1 request per second). You may subscribe to any of the p; XNAS:NVDA: alphavantage quota exhausted for today: Thank you for using Alpha Vantage! Please consider spreading out your free API requests more sparingly (1 request per second). ",
+      "fetched": 3,
+      "kept": 3,
+      "source": "alphavantage_news",
+      "status": "ok",
+      "stored": 3
+    },
+    {
+      "at": "2026-09-20T23:19:02.003156+00:00",
+      "detail": "facts 9; ",
+      "fetched": 122,
+      "kept": 112,
+      "source": "finnhub",
+      "status": "ok",
+      "stored": 88
+    },
+    {
+      "at": "2026-09-20T23:18:52.270161+00:00",
+      "detail": "facts 0; ",
+      "fetched": 0,
+      "kept": 0,
+      "source": "edgar",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-20T23:18:50.742403+00:00",
+      "detail": "named the company: 30 of 30 (lowest: Apple 5/5, Microsoft 5/5, NVIDIA 20/20)",
+      "fetched": 30,
+      "kept": 30,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 27
+    },
+    {
+      "at": "2026-09-20T23:18:48.820114+00:00",
+      "detail": "no name could be read (3 failed, 0 not reached). First: google_news:US fetch failed: HTTP Error 503: Service Unavailable",
+      "fetched": 0,
+      "kept": 0,
+      "source": "google_news",
+      "status": "failed",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-20T23:17:33.412148+00:00",
+      "detail": "no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "failed",
+      "stored": 0
+    },
+    {
       "at": "2026-09-20T13:37:32.347975+00:00",
       "detail": "facts 0; MYX:1155: deferred by the 2-a-day credit budget; next in rotation; MYX:5347: deferred by the 2-a-day credit budget; next in rotation; MYX:5183: deferred by the 2-a-day credit budget; next in rotation; MYX:5225: deferred by the 2-a-day credit budget; next in rotation; outside the free plan (US only), so not asked for: MYX:1155, MYX:5347, MYX:5183, MYX:5225. The EODHD Fundamentals plan cove",
       "fetched": 0,
@@ -137,18 +209,18 @@
     }
   ],
   "counts": {
-    "articles": 6683,
+    "articles": 6808,
     "documents": 0,
-    "escalated": 1213,
+    "escalated": 1227,
     "events": 4026,
-    "failed_sweeps": 19,
-    "linked": 4511,
-    "observations": 4673,
+    "failed_sweeps": 21,
+    "linked": 4629,
+    "observations": 4686,
     "series": 31,
-    "sweeps": 385
+    "sweeps": 393
   },
   "day": "2026-09-20",
-  "generated_at": "2026-09-20 13:37 UTC",
+  "generated_at": "2026-09-20 23:19 UTC",
   "macro": [
     {
       "change": "0",
@@ -377,18 +449,18 @@
       "upcoming": []
     },
     {
-      "escalated": 5,
+      "escalated": 15,
       "events": [],
       "instrument_id": "XNAS:NVDA",
       "label": "NVIDIA",
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-09-19",
+          "known_at": "2026-09-20",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "27.47"
+          "value": "27.77"
         },
         {
           "concept": "pb",
@@ -416,7 +488,7 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-09-19",
+          "known_at": "2026-09-20",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
@@ -472,11 +544,11 @@
         },
         {
           "concept": "av_news_sentiment",
-          "known_at": "2026-09-19",
+          "known_at": "2026-09-20",
           "label": "vendor sentiment",
-          "period_end": "2026-09-19",
+          "period_end": "2026-09-20",
           "source": "alphavantage_news",
-          "value": "0.14"
+          "value": "0.31"
         },
         {
           "concept": "revenue",
@@ -505,6 +577,61 @@
       ],
       "stories": [
         {
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/nvidia-ceo-jensen-huang-expects-213034571.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-20T21:30:34+00:00",
+          "quality": 1.0,
+          "title": "Nvidia CEO Jensen Huang Expects Chip Sales To Double Next Year as He Downplays AI Slowdown Calls: 'When a Product is Not Safe...'",
+          "uncertainty": 0.390625
+        },
+        {
+          "doc_id": "finnhub:142289556",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-20T16:20:08+00:00",
+          "quality": 0.85,
+          "title": "Musk Says NVIDIA (NVDA) AI Chips Are Headed to Space With SpaceX (SPCX) Next Year",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "alphavantage:https://www.benzinga.com/markets/tech/26/09/61885260/apple-aapl-weekly-recap-iphone-18-pro-nvidia-ai-server-musk-lawsuit",
+          "domain": "Benzinga",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-20T11:27:01+00:00",
+          "quality": 0.85,
+          "title": "Apple's Big Week: iPhone 18 Pro, Nvidia AI Servers, Musk Drops Lawsuit - Apple (NASDAQ:AAPL), SAMSUNG ELE",
+          "uncertainty": 0.1358695652173913
+        },
+        {
+          "doc_id": "finnhub:142277304",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-20T02:11:49+00:00",
+          "quality": 0.85,
+          "title": "Nvidia Stock And 2 US AI Infrastructure Plays Tied To Federal Defense Spending",
+          "uncertainty": 0.26881720430107525
+        },
+        {
+          "doc_id": "finnhub:142275783",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-19T23:09:32+00:00",
+          "quality": 0.85,
+          "title": "Nvidia (NVDA) Forms Alliance To Build A Power Flexible AI Data Center",
+          "uncertainty": 0.0
+        },
+        {
           "doc_id": "finnhub:142272941",
           "domain": "Yahoo",
           "escalated": true,
@@ -527,94 +654,39 @@
           "uncertainty": 0.14204545454545456
         },
         {
-          "doc_id": "https://www.fool.com/investing/2026/09/19/intel-can-supply-only-about-half-of-what-its-customers-want-that-s-a-better-problem-than-it-sounds/?.tsrc=rss",
+          "doc_id": "https://www.fool.com/investing/2026/09/20/prediction-even-with-the-1999-price-tag-apples-fol/?.tsrc=rss",
           "domain": "www.fool.com",
           "escalated": true,
           "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-09-19T22:01:01+00:00",
-          "quality": 0.65,
-          "title": "Intel Can Supply Only About Half of What Its Customers Want. That's a Better Problem Than It Sounds.",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "finnhub:142272105",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-09-19T15:50:00+00:00",
+          "published_at": "2026-09-20T16:37:00+00:00",
           "quality": 0.65,
-          "title": "Better Artificial Intelligence (AI) Stock Pick for 2027: Nvidia versus Micron",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxPeEoyZFBvOVhsSHJybHJpMnM3R2Y4bFo1QXI4U016d2xGRlJhVUs5TzIyOFZuZTN0NklSV21QMndDWmMxNU5QTHpHOThGNU5SbXIwMkt0MGNiYVQ2MjVOQWtTQU1kSWNHaVY5VFl4dktzNWN0eGczeWJnNjAtVnBlNG5BMk55Y2M4TUZv?oc=5",
-          "domain": "pluang.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-09-19T15:06:18+00:00",
-          "quality": 0.65,
-          "title": "Nvidia could reach $240 by 2026 amid strong AI demand, with potential highs of $270 or lows near $200.",
-          "uncertainty": 1.0
-        },
-        {
-          "doc_id": "https://finance.yahoo.com/m/e99f9364-a043-396e-a132-0a986e95b51d/anthropic-reportedly-delays.html?.tsrc=rss",
-          "domain": "finance.yahoo.com",
-          "escalated": false,
-          "intensity": 0.3333333333333333,
-          "polarity": -1.0,
-          "published_at": "2026-09-19T17:48:41+00:00",
-          "quality": 0.85,
-          "title": "Anthropic Reportedly Delays IPO; OpenAI Expects Massive Cash Burn",
-          "uncertainty": 0.4310344827586207
-        },
-        {
-          "doc_id": "finnhub:142272946",
-          "domain": "Yahoo",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-19T17:12:00+00:00",
-          "quality": 0.85,
-          "title": "Cisco (CSCO) Leans on Splunk to Broaden Its Share of Enterprise AI Spending. It Faces a Big Test",
-          "uncertainty": 0.17123287671232876
-        },
-        {
-          "doc_id": "finnhub:142272267",
-          "domain": "Yahoo",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-19T16:05:00+00:00",
-          "quality": 0.85,
-          "title": "Is Berkshire Hathaway Stock a Better Buy Than an S&P 500 Index Fund?",
+          "title": "Prediction: Even With the $1,999 Price Tag, Apple's Foldable iPhone Duo Will Be a Hit and Apple Will Join Nvidia in the $5 Trillion Club.",
           "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 50,
-        "polarity_mean": 0.1,
-        "sources": 14,
-        "uncertainty_mean": 0.171
+        "n": 135,
+        "polarity_mean": 0.099,
+        "sources": 17,
+        "uncertainty_mean": 0.165
       },
       "upcoming": []
     },
     {
-      "escalated": 4,
+      "escalated": 10,
       "events": [],
       "instrument_id": "XNAS:AAPL",
       "label": "Apple",
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-09-18",
+          "known_at": "2026-09-20",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "37.63"
+          "value": "38.05"
         },
         {
           "concept": "pb",
@@ -642,7 +714,7 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-09-19",
+          "known_at": "2026-09-20",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
@@ -698,11 +770,11 @@
         },
         {
           "concept": "av_news_sentiment",
-          "known_at": "2026-09-19",
+          "known_at": "2026-09-20",
           "label": "vendor sentiment",
-          "period_end": "2026-09-19",
+          "period_end": "2026-09-20",
           "source": "alphavantage_news",
-          "value": "0.35"
+          "value": "-0.02"
         },
         {
           "concept": "revenue",
@@ -731,6 +803,39 @@
       ],
       "stories": [
         {
+          "doc_id": "alphavantage:https://www.claimdepot.com/settlements/smartphone-ai-settlement",
+          "domain": "Claim Depot",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-09-20T21:18:44+00:00",
+          "quality": 0.85,
+          "title": "Claim Form Open: $250 million Apple iPhone false advertising class action settlement",
+          "uncertainty": 0.1923076923076923
+        },
+        {
+          "doc_id": "alphavantage:https://www.yahoo.com/news/videos/oregon-woman-lawsuit-alleges-apple-205655943.html",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-09-20T20:56:00+00:00",
+          "quality": 0.85,
+          "title": "Oregon Woman\u2019s Lawsuit Alleges Apple AirTag Enabled Stalking by Ex-Boyfriend",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "alphavantage:https://www.benzinga.com/markets/tech/26/09/61885260/apple-aapl-weekly-recap-iphone-18-pro-nvidia-ai-server-musk-lawsuit",
+          "domain": "Benzinga",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-20T11:27:01+00:00",
+          "quality": 0.85,
+          "title": "Apple's Big Week: iPhone 18 Pro, Nvidia AI Servers, Musk Drops Lawsuit - Apple (NASDAQ:AAPL), SAMSUNG ELE",
+          "uncertainty": 0.1358695652173913
+        },
+        {
           "doc_id": "https://stocktwits.com/news-articles/markets/equity/coinbase-apple-tesla-perpetual-futures-coin-tsla-aapl/cZtxEhbRBEs?.tsrc=rss",
           "domain": "stocktwits.com",
           "escalated": true,
@@ -739,6 +844,39 @@
           "published_at": "2026-09-19T15:11:11+00:00",
           "quality": 0.85,
           "title": "Coinbase Files With CFTC To List US Single-Stock Perpetual Futures, Including AAPL And TSLA Contracts",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://www.fool.com/investing/2026/09/20/prediction-even-with-the-1999-price-tag-apples-fol/?.tsrc=rss",
+          "domain": "www.fool.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-20T16:37:00+00:00",
+          "quality": 0.65,
+          "title": "Prediction: Even With the $1,999 Price Tag, Apple's Foldable iPhone Duo Will Be a Hit and Apple Will Join Nvidia in the $5 Trillion Club.",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://www.thestreet.com/investing/stocks/apple-stock-jim-cramer-iphone-duo?.tsrc=rss",
+          "domain": "www.thestreet.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-20T16:33:00+00:00",
+          "quality": 0.65,
+          "title": "Jim Cramer sends strong signal to Apple stock investors",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142288676",
+          "domain": "Benzinga",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-09-20T07:00:21+00:00",
+          "quality": 0.65,
+          "title": "iPhone 18 Pro Hits Stores, Samsung Retakes Smartphone Throne and More: This Week in Appleverse",
           "uncertainty": 0.0
         },
         {
@@ -751,96 +889,30 @@
           "quality": 0.65,
           "title": "Evercore ISI Raises Apple (NASDAQ: AAPL) Price Target To $380 As iPhone 18 Demand Signals Stronger Upgrade Cycle",
           "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxQVEhXWXRVN2cwb0hwaGVlc0hLS1ZKRFoycWJYbVM0SDY3d3pXT2p6Zjh0b1dyT1Ytam9Jd3FTbTFjclRvZlJ6QktFNEx5cGY0dWVIRTZJTEFKaXViX0ZnZ1k5aEstQVcwTVJELWYxTkx6TVBZLTQ5cFI5OFhYejRGYVBRMmpMd0luaTRqV1hkQVh2dTBkRkpya2ZVSnpfMVV5NGFqNFJFbjVzdnV6UEowZmp1dGVnTUJzSUc2cGE1Z21URTAxMlBYYXR3M2MwMzJMa2c4?oc=5",
-          "domain": "www.foreignpolicyjournal.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-19T15:56:00+00:00",
-          "quality": 0.65,
-          "title": "New Apple (NASDAQ: AAPL) CEO John Ternus Brings \"Apple DNA\" To Push Company To The \"Next Level\"",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMimAFBVV95cUxQNGEtY0NTT1dNWTlwUmVSdDBKZEd5Q21xN3JKMUhsZVRrZHlOb2RfVHhvSUVlbk9yaW9DY3VQdmJKUHVCSWRURUVCSGdVdFNxYmhtbUNLZ0M0ZVI0UlVKWm52UTRrcmF5SHRMcWc2SUliTm52dVdYU2VMQ2N0MjZVZ1ZRZUJrU1FBYlhCMUVxeGg3dWFIRzRmQQ?oc=5",
-          "domain": "www.fool.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": -1.0,
-          "published_at": "2026-09-19T13:30:00+00:00",
-          "quality": 0.65,
-          "title": "John Ternus's First iPhone Launch Prompted a Bank of America Price Target Cut. Is Apple Stock a Buy?",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMilgFBVV95cUxOMnlQRjZQNnA3dnZVZ3I2VDYwRUFDbzhwUVJjSm1qS2h1LXJ5ejE0a1EwYkFqcEtBZ2NuRlJJc2gwclhGYWxrV1N2Q05SZXhpWk9CZ2VjOE1MTWtWd3JFT1NKYldJWVpJeHFVdkE3eDFOS3l4WU55LVpRSXQ3TUFMYmI2MUFtVFAwSUtVRVhHVDFIajFwX0E?oc=5",
-          "domain": "finance.yahoo.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-19T21:08:09+00:00",
-          "quality": 0.8,
-          "title": "Can Apple\u2019s iPhone Duo Really Change Smartphones Forever?",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://www.thestreet.com/markets/bank-of-america-does-the-math-on-apples-1200-iphone-offer?.tsrc=rss",
-          "domain": "www.thestreet.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-19T22:07:00+00:00",
-          "quality": 0.65,
-          "title": "Bank of America does the math on Apple's $1,200 iPhone offer",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://www.thestreet.com/investing/apple-gets-bullish-wall-street-call-as-iphone-demand-jumps?.tsrc=rss",
-          "domain": "www.thestreet.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-19T16:03:00+00:00",
-          "quality": 0.65,
-          "title": "Apple gets bullish Wall Street call as iPhone demand jumps",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMigwFBVV95cUxQeHV3MDRDMnNWU2pnUXptVmo0R1RJb01LRXo3MVUzSXZkVWQ1Q1dNY2lvQ2NmQ00zWDJ4VU1kYTk5SHRFRlg5NnFfTFdFdjNzY2FxemtnTFhoQVlfeVUxbm9lTENtS3BaZXloSC1KSkRoV3lIR3FIeVdjY2w5S3pwNUtXYw?oc=5",
-          "domain": "www.ilounge.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-19T14:29:34+00:00",
-          "quality": 0.65,
-          "title": "Apple Eyeing a Return to the Server Market",
-          "uncertainty": 0.0
         }
       ],
       "tone": {
-        "intensity_max": 0.0,
-        "n": 12,
-        "polarity_mean": 0.083,
-        "sources": 7,
-        "uncertainty_mean": 0.075
+        "intensity_max": 0.333,
+        "n": 27,
+        "polarity_mean": 0.037,
+        "sources": 10,
+        "uncertainty_mean": 0.098
       },
       "upcoming": []
     },
     {
-      "escalated": 1,
+      "escalated": 3,
       "events": [],
       "instrument_id": "XNAS:MSFT",
       "label": "Microsoft",
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-09-18",
+          "known_at": "2026-09-20",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "27.50"
+          "value": "27.41"
         },
         {
           "concept": "pb",
@@ -868,7 +940,7 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-09-19",
+          "known_at": "2026-09-20",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
@@ -957,6 +1029,28 @@
       ],
       "stories": [
         {
+          "doc_id": "https://www.fool.com/coverage/better-buy/2026/09/20/better-artificial-intelligence-stock-advanced-micro-devices-vs-sk-hynix/?.tsrc=rss",
+          "domain": "www.fool.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-20T19:28:28+00:00",
+          "quality": 0.85,
+          "title": "Better Artificial Intelligence Stock: Advanced Micro Devices vs. SK Hynix",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://www.fool.com/investing/2026/09/20/prediction-micron-will-earn-more-profit-than-microsoft-in-fiscal-2027/?.tsrc=rss",
+          "domain": "www.fool.com",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "polarity": 1.0,
+          "published_at": "2026-09-20T17:37:01+00:00",
+          "quality": 0.85,
+          "title": "Prediction: Micron Will Earn More Profit Than Microsoft in Fiscal 2027",
+          "uncertainty": 0.0
+        },
+        {
           "doc_id": "https://news.google.com/rss/articles/CBMi5gFBVV95cUxQOXlpZmhqcmlGcXdBSDBGS3lOUmcxMkZzbTFrdG1KeFBRZ3ZOelNOb2hoR3l6V2Nab1EzRXJfOW1ibk1KU25ITlQtQmlob2JMaGZqREtENC1qYUs5T2k1T1NPTlNMN3dTY3pyby1zUDBsMmZzT3ZneGNlVjJfOGZwdGt5VVAwUlZ0cVZaT2tCeHFzeWNTTUZfMDJCZkZYaFhwOXdVdjlvb2hrMnpZSUpIeWVMeDVkMFg2YjRTeTFRd0NteUNVbmthTXN5dm81VkxUX1M1WGdGd09NQnIyNkJtOHMtSHhBUQ?oc=5",
           "domain": "www.tipranks.com",
           "escalated": true,
@@ -966,6 +1060,39 @@
           "quality": 0.65,
           "title": "Microsoft Battles AI Backlash While Doubling Down on Growth",
           "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/mitsui-high-tec-tse-6966-200942133.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-20T20:09:42+00:00",
+          "quality": 0.85,
+          "title": "What Mitsui High-tec (TSE:6966)'s Upgraded 2026 Forecast and Dividend Hike Means For Shareholders",
+          "uncertainty": 0.14367816091954022
+        },
+        {
+          "doc_id": "finnhub:142277308",
+          "domain": "Yahoo",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-20T03:19:33+00:00",
+          "quality": 0.85,
+          "title": "Can Nokia Oyj (HLSE:NOKIA) Speed Up Telecom AI With Its New Data Push?",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142275803",
+          "domain": "Yahoo",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-19T23:30:38+00:00",
+          "quality": 0.85,
+          "title": "AI risk debate: Existential threat or dangerous tool?",
+          "uncertainty": 0.3125
         },
         {
           "doc_id": "https://finance.yahoo.com/healthcare/articles/investors-reacting-ultragenyx-pharmaceutical-rare-141033462.html?.tsrc=rss",
@@ -988,58 +1115,14 @@
           "quality": 0.85,
           "title": "Bill Ackman's Pershing Square IPO Breaks Out",
           "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://247wallst.com/investing/etf/2026/09/19/dgrw-pays-dividends-every-month-its-biggest-stocks-look-nothing-like-a-high-yield-etf/?.tsrc=rss",
-          "domain": "247wallst.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-09-19T22:57:37+00:00",
-          "quality": 0.7,
-          "title": "DGRW Pays Dividends Every Month. Its Biggest Stocks Look Nothing Like a High-Yield ETF",
-          "uncertainty": 0.21186440677966104
-        },
-        {
-          "doc_id": "https://www.entrepreneur.com/business-news/ai-made-execution-easier-it-also-changed-the-founders-most-important-job?.tsrc=rss",
-          "domain": "www.entrepreneur.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-19T18:30:00+00:00",
-          "quality": 0.7,
-          "title": "AI Made Execution Easier. It Also Changed the Founder\u2019s Most Important Job.",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://247wallst.com/investing/2026/09/19/ibm-has-raised-its-dividend-for-31-years-inflation-is-still-winning/?.tsrc=rss",
-          "domain": "247wallst.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-09-19T14:02:51+00:00",
-          "quality": 0.7,
-          "title": "IBM Has Raised Its Dividend for 31 Years. Inflation Is Still Winning",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://www.barchart.com/story/news/4695415/1-year-into-the-microsoft-deal-iren-is-delivering-and-a-rally-may-follow-soon?.tsrc=rss",
-          "domain": "www.barchart.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-19T14:27:34+00:00",
-          "quality": 0.65,
-          "title": "1 Year Into the Microsoft Deal, IREN Is Delivering and a Rally May Follow Soon",
-          "uncertainty": 0.4629629629629629
         }
       ],
       "tone": {
-        "intensity_max": 0.0,
-        "n": 7,
-        "polarity_mean": 0.571,
-        "sources": 6,
-        "uncertainty_mean": 0.096
+        "intensity_max": 0.333,
+        "n": 14,
+        "polarity_mean": 0.5,
+        "sources": 7,
+        "uncertainty_mean": 0.081
       },
       "upcoming": []
     }
