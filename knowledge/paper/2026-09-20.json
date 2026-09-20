@@ -1,0 +1,176 @@
+{
+  "day": "2026-09-20",
+  "written_at": "2026-09-20T22:41:00Z",
+  "phase": "observe",
+  "week": 2,
+  "equity_usd": 1000.0,
+  "cash_usd": 1000.0,
+  "control_equity_usd": 1000.0,
+  "drawdown": 0.0,
+  "halted": false,
+  "marks": 17,
+  "positions": [],
+  "changes": [],
+  "caps": [
+    {
+      "cap": "largest name",
+      "value": "0.00%",
+      "limit": "25%",
+      "breached": false
+    },
+    {
+      "cap": "invested",
+      "value": "0.00%",
+      "limit": "0%",
+      "breached": false
+    },
+    {
+      "cap": "cash floor",
+      "value": "100.00%",
+      "limit": "20%",
+      "breached": false
+    },
+    {
+      "cap": "names held",
+      "value": "0",
+      "limit": "0",
+      "breached": false
+    },
+    {
+      "cap": "drawdown from peak",
+      "value": "0.00%",
+      "limit": "8%",
+      "breached": false
+    },
+    {
+      "cap": "turnover used, 5 weekdays",
+      "value": "USD 0.00",
+      "limit": "USD 500.00",
+      "breached": false
+    }
+  ],
+  "attribution": {
+    "market": null,
+    "idiosyncratic": null,
+    "note": "no positions held; nothing to attribute"
+  },
+  "no_session": {
+    "note": "Sunday; neither market opened. The fundable table is Thursday's settled closes at Thursday's BNM rate for a third page; BNM publishes no weekend rate."
+  },
+  "the_mark_count": {
+    "marks": 17,
+    "weekend_marks_on_main": [
+      "2026-09-19",
+      "2026-09-20"
+    ],
+    "note": "main's store still writes a mark on days with no session; the one-mark-per-session rule is on PR #76. The migration re-dated the weekend rows when rehearsed on a copy tonight."
+  },
+  "what_the_weekend_collected": [
+    "97 Malaysian-press rows stored on Saturday, none linked to a book name; no follow-up to Tenaga's RM120-150 million; Petronas Chemicals a fifth calendar day without a row; Press Metal a sixth.",
+    "US names: weekend coverage and one third-party filing (Coinbase asking the CFTC to list single-stock perpetual futures naming AAPL); no company event.",
+    "One vintage: DOSM:CPI_HEADLINE 137.50 for 2026-08-01 against 137.10 for July; Monday is the first session that can trade it."
+  ],
+  "decision": {
+    "recorded": true,
+    "weights": {},
+    "kind": "all_cash",
+    "prediction_id": "paper-2026-09-20-allcash-21d-dbaf",
+    "horizon_days": 21,
+    "grades_on": "2026-10-20",
+    "confidence": 0.55,
+    "confidence_note": "The ninth consecutive decision at 0.55. A weekend row exists because the contract asks for one a night; it grades against the same control as Friday's and Saturday's.",
+    "claim": "nothing in the fundable universe beats cash over 21 sessions",
+    "thesis": "All cash, thirteenth session, a Sunday with no session on either market; one observe decision remains (Monday 09-21) before ramp opens on 2026-09-22. The fundable set is unchanged at Thursday's settled closes: Petronas Chemicals 11.5% of equity, two lots, with zero rows collected for five calendar days across -6.54% and -3.09% sessions; Press Metal 19.1% with zero rows for six calendar days; IHH 18.7% with a forensic audit the press dates at up to nine months; Genting 4.7% with zero rows and a 4.52% round trip; NVIDIA 22.2% with 172 weekend stories and no dated event. Saturday's two sweeps stored 97 Malaysian-press rows and linked none to a book name; Tenaga's RM120-150 million figure drew no filing, broker note or weekend feature, and the name is 32.0% of equity against the 25% per-name cap. Malaysia's August CPI printed at 137.50 and the first session that can trade it is Monday's. Claim: nothing in the fundable universe beats cash over 21 sessions.",
+    "refusals": [],
+    "fx": {
+      "myr_per_usd": 4.0808,
+      "source": "bnm",
+      "date": "2026-09-18"
+    },
+    "fundable_set": {
+      "MYX:5183": {
+        "lot_usd": 115.42,
+        "share_of_equity": 0.115,
+        "round_trip": 0.0193,
+        "max_lots": 2,
+        "why_not": "zero rows for five calendar days across -6.54% and -3.09% sessions; two lots allowed only because it fell"
+      },
+      "MYX:5225": {
+        "lot_usd": 187.22,
+        "share_of_equity": 0.187,
+        "round_trip": 0.0124,
+        "max_lots": 1,
+        "why_not": "a forensic audit the press dates at up to nine months; title-only"
+      },
+      "MYX:8869": {
+        "lot_usd": 191.14,
+        "share_of_equity": 0.191,
+        "round_trip": 0.0122,
+        "max_lots": 1,
+        "why_not": "ZERO ROWS FOR SIX CALENDAR DAYS; +2.63% significant and unexplained on Thursday"
+      },
+      "MYX:3182": {
+        "lot_usd": 47.29,
+        "share_of_equity": 0.047,
+        "round_trip": 0.0452,
+        "max_lots": 5,
+        "why_not": "zero rows; a 4.52% round trip"
+      },
+      "XNAS:NVDA": {
+        "lot_usd": 222.27,
+        "share_of_equity": 0.222,
+        "round_trip": 0.0117,
+        "max_lots": 1,
+        "why_not": "172 weekend stories, none a dated event; 84% unexplained at 0.83 sigma on Thursday",
+        "price_state": "settled"
+      }
+    },
+    "excluded_on_the_25pc_cap": {
+      "MYX:1155": 0.253,
+      "MYX:5347": 0.32,
+      "XNAS:AAPL": 0.336,
+      "XNAS:MSFT": 0.494
+    },
+    "verified_against_stores": {
+      "paper.db targets": 10,
+      "paper.db applications": 10,
+      "learning.db predictions": 10
+    }
+  },
+  "mistakes": [],
+  "corrections": [],
+  "settled": [
+    "Tonight's thesis counts one remaining observe decision (Monday 09-21), checked against engines/paper/rules.py: 09-21 is thirteen days from the start (week 2), 09-22 fourteen (week 3)."
+  ],
+  "defects_this_book_depends_on": [
+    "main's store writes a mark on days with no session (2026-09-19, 2026-09-20) and two per slot-day; the fix is on PR #76.",
+    "engines/attribution/decompose.py assigns no_identified_catalyst from significance alone; no matcher consults the corpus.",
+    "markets/xkls.py configures ZERO holidays on main; the fix is on PR #76.",
+    "The sector beta is fixed at 0. Opened 2026-09-14; proxies specified, none wired.",
+    "gdelt: 0 rows for a seventh consecutive day (HTTP 429); the pacing fix is on PR #76.",
+    "main's collector stamped 13 more forward figures with a future known_at over the weekend; the fix is on PR #76."
+  ],
+  "conditions_for_a_position": [
+    "OPEN: Tenaga's own statement on the RM120-150 million and Monday's session against it; the name is over the cap either way.",
+    "OPEN: the August CPI print and whether any Bursa name's press reads it.",
+    "OPEN, five calendar days of silence: Petronas Chemicals collecting a body. Since 2026-09-10.",
+    "OPEN, worsening: Press Metal collecting anything. Six calendar days.",
+    "OPEN: PR #76 merged before Tuesday's page, so the first applied decision is marked once per session, dated on the holiday calendars and decomposed on the longer window.",
+    "OPEN: a per-name cap that admits Tenaga, or an equity level that does.",
+    "OPEN: any fundamental figure at all for a Bursa name; eodhd names the reason - outside the free plan.",
+    "OPEN, a gap not a condition: the Fed hiked on 09-17 and the book has no rate input.",
+    "CLOSED: a us_close sweep before the page, or #74's label - every US price is a settled close.",
+    "CLOSED: the Bursa proxy, replaced with the index on 2026-09-14."
+  ],
+  "ramp_opens_2026_09_22": {
+    "invested_cap": "0% -> 40%",
+    "per_name_cap": "25%, unchanged",
+    "fills": "at each market's first cached bar after the decision",
+    "note": "Monday's page is the last one that can change the fundable set's evidence before a refusal becomes a position not taken."
+  },
+  "lessons": [
+    "A weekend decision is a row, not a session, and it says so. Two of the three rows recorded since Friday's close grade against the same control on consecutive days; the record is one decision a night because the contract asks for one, and the page names which ones are calendar rows.",
+    "The fundable table can be three pages old and still current. Thursday's closes at Thursday's rate stand until a market opens; the date on the table, not the date on the page, is what the reader checks.",
+    "The last observe session is the last free look. Monday's page is the final one whose refusals cost nothing; from Tuesday a refusal is a position not taken, and the reasons carried into it are the ones written this weekend."
+  ]
+}
