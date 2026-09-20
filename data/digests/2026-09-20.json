@@ -1,6 +1,87 @@
 {
   "collection": [
     {
+      "at": "2026-09-20T13:37:32.347975+00:00",
+      "detail": "facts 0; MYX:1155: deferred by the 2-a-day credit budget; next in rotation; MYX:5347: deferred by the 2-a-day credit budget; next in rotation; MYX:5183: deferred by the 2-a-day credit budget; next in rotation; MYX:5225: deferred by the 2-a-day credit budget; next in rotation; outside the free plan (US only), so not asked for: MYX:1155, MYX:5347, MYX:5183, MYX:5225. The EODHD Fundamentals plan cove",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-20T13:37:31.801219+00:00",
+      "detail": "facts 0; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-20T13:37:27.117565+00:00",
+      "detail": "facts 0; ",
+      "fetched": 20,
+      "kept": 7,
+      "source": "jin10_flash",
+      "status": "ok",
+      "stored": 6
+    },
+    {
+      "at": "2026-09-20T13:37:25.804387+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-20T13:37:23.744738+00:00",
+      "detail": "",
+      "fetched": 50,
+      "kept": 48,
+      "source": "nst_business",
+      "status": "ok",
+      "stored": 46
+    },
+    {
+      "at": "2026-09-20T13:37:23.286293+00:00",
+      "detail": "",
+      "fetched": 39,
+      "kept": 39,
+      "source": "fmt_business",
+      "status": "ok",
+      "stored": 39
+    },
+    {
+      "at": "2026-09-20T13:37:23.127853+00:00",
+      "detail": "read but empty: Tenaga, Petronas Chemicals, IHH, Press Metal, Genting, Maybank",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-20T13:37:21.652930+00:00",
+      "detail": "read but empty: IHH, Press Metal, Genting; named the company: 2 of 10 (lowest: Tenaga 0/7, Petronas Chemicals 1/2, Maybank 1/1)",
+      "fetched": 11,
+      "kept": 10,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 9
+    },
+    {
+      "at": "2026-09-20T13:37:19.962649+00:00",
+      "detail": "read but empty: Press Metal; failed: GDELT fetch failed: HTTP Error 429: Too Many Requests (Genting, Maybank); deferred to a later run: Tenaga, Petronas Chemicals, IHH",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "degraded",
+      "stored": 0
+    },
+    {
       "at": "2026-09-20T07:38:59.774965+00:00",
       "detail": "facts 0; ",
       "fetched": 4188,
@@ -56,18 +137,18 @@
     }
   ],
   "counts": {
-    "articles": 6583,
+    "articles": 6683,
     "documents": 0,
     "escalated": 1213,
     "events": 4026,
     "failed_sweeps": 19,
-    "linked": 4509,
+    "linked": 4511,
     "observations": 4673,
     "series": 31,
-    "sweeps": 376
+    "sweeps": 385
   },
   "day": "2026-09-20",
-  "generated_at": "2026-09-20 07:39 UTC",
+  "generated_at": "2026-09-20 13:37 UTC",
   "macro": [
     {
       "change": "0",
@@ -205,8 +286,26 @@
       "instrument_id": "MYX:1155",
       "label": "Maybank",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMivwFBVV95cUxQSGhoS3dIUjk3SmR5M095dngtNXFNWFNhZlRacDdJYWhlSXYxckhGZktLZVgtWHdTQ3hWRXdRQ3lBNFU5NDd3dXRzNWFsdmdJdkVEMnRVVHItZWJvNkdlaUlDWGRzSVRXeU9CUmJoWk1SX1dJc3A5U2JEWjNveHV3YXpUU0NRRG9RQk9zSUozOHhxNDFRZzRURjdPZE9UaUVwSjNQcTJHNmhzcURyUHFvcjI5b2NGWVNRc3QzSlF4NA?oc=5",
+          "domain": "www.moomoo.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-20T03:49:31+00:00",
+          "quality": 0.65,
+          "title": "$Maybank Retail Money Market-I Fund (MYU0100A2266.MF)$",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -225,8 +324,26 @@
       "instrument_id": "MYX:5183",
       "label": "Petronas Chemicals",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiswFBVV95cUxNX05mbW02U1VvTlRsNmZRMkgxQjVpYkxlVjZQTWUtUUhTbnZoZENPbDU1RmZ1NG4wb2xRODVhY0ZVN1pJMVhLNDRfd1FGaDNWbTF2dzY4QkVnNUlmWUpUTkZEYjJmaGJkNnZuckp0NHdobkRYcUZMeldEcGNTLW4tdng3cFpabG80OURhbTRSMG9ocC1RUlFfMUNLRklWam5PQy1nNHB6TVQ4OFAxVkJvNjZJRQ?oc=5",
+          "domain": "www.smartkarma.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-20T02:42:03+00:00",
+          "quality": 0.65,
+          "title": "Bursa Short Interest Weekly (Sep 18th): RHB Bank, JPG, Petronas Chemicals, Frontken",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {

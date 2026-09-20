@@ -1,17 +1,19 @@
 # Digest 2026-09-20
 
-Generated 2026-09-20 07:39 UTC · slot `all` · 6583 articles in the corpus, 4673 observations, 4026 events in the fact book.
+Generated 2026-09-20 13:37 UTC · slot `all` · 6683 articles in the corpus, 4673 observations, 4026 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-09-20 www.moomoo.com — $Maybank Retail Money Market-I Fund (MYU0100A2266.MF)$ [q 0.65, tone +0.0]
 
 ### Tenaga (MYX:5347)
 - quiet: nothing collected for this name in the window
 
 ### Petronas Chemicals (MYX:5183)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-09-20 www.smartkarma.com — Bursa Short Interest Weekly (Sep 18th): RHB Bank, JPG, Petronas Chemicals, Frontken [q 0.65, tone +0.0]
 
 ### IHH (MYX:5225)
 - quiet: nothing collected for this name in the window
@@ -82,6 +84,15 @@ Generated 2026-09-20 07:39 UTC · slot `all` · 6583 articles in the corpus, 467
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 13:37 | eodhd | ok | 0 | 0 | 0 | facts 0; MYX:1155: deferred by the 2-a-day credit budget; next in rotation; MYX: |
+| 13:37 | twse_openapi | ok | 8 | 0 | 0 | facts 0;  |
+| 13:37 | jin10_flash | ok | 20 | 7 | 6 | facts 0;  |
+| 13:37 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 13:37 | nst_business | ok | 50 | 48 | 46 |  |
+| 13:37 | fmt_business | ok | 39 | 39 | 39 |  |
+| 13:37 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Tenaga, Petronas Chemicals, IHH, Press Metal, Genting, Maybank |
+| 13:37 | google_news | ok | 11 | 10 | 9 | read but empty: IHH, Press Metal, Genting; named the company: 2 of 10 (lowest: T |
+| 13:37 | gdelt | degraded | 0 | 0 | 0 | read but empty: Press Metal; failed: GDELT fetch failed: HTTP Error 429: Too Man |
 | 07:38 | sec_xbrl | ok | 4188 | 0 | 0 | facts 0;  |
 | 07:38 | finmind | ok | 77 | 0 | 0 | facts 5;  |
 | 07:38 | twse_openapi | ok | 8 | 0 | 0 | facts 0;  |
