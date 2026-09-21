@@ -264,6 +264,12 @@ questions:
     relabels in twelve days, three of them on consecutive sweeps, is the
     measured cost of keeping this list by hand; the containment follow-up above
     is the fix.
+
+    A seventh on the 2026-09-21 us_close sweep: a futures wrap that lists the
+    ticker among seven in its title. FOURTEEN labels. Four consecutive sweeps
+    have each added one; the list is now maintained nightly as a chore, which
+    is the strongest argument yet for deriving a lexical question's relevant
+    set from containment at evaluation time.
   relevant:
   - doc_id: https://stocktwits.com/news-articles/markets/equity/s-and-p-500-dow-end-best-day-in-a-month/cZsufnBRJvu?.tsrc=rss
     title: S&P 500, Dow End Best Day In A Month On Calmer Yields As Rate Hike Bets Wane — SPCX, VSXY,
@@ -296,6 +302,8 @@ questions:
     title: "Dow Drops To Record Worst Week In Six Months Amid Elevated Yields, Oil — NVDA, TSLA, SPCX, ONON In Focus"
   - doc_id: finnhub:142289556
     title: "Musk Says NVIDIA (NVDA) AI Chips Are Headed to Space With SpaceX (SPCX) Next Year"
+  - doc_id: finnhub:142306187
+    title: "Nasdaq, S&P 500, Dow Futures Rise Ahead Of Trump-Xi Summit This Week: NVDA, META, CRML, GLND, SPCX, RKLB, BE Stocks In Focus"
 - query: KeyBanc Underweight rating Apple
   kind: lexical
   note: broker plus rating word
