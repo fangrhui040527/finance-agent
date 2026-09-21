@@ -1,6 +1,78 @@
 {
   "collection": [
     {
+      "at": "2026-09-21T22:38:21.130776+00:00",
+      "detail": "facts 0; XNAS:NVDA: deferred by the 2-a-day credit budget; next in rotation; XNAS:AAPL: outside the plan or over today's credits; XNAS:MSFT: outside the plan or over today's credits",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-21T22:38:20.688825+00:00",
+      "detail": "facts 0; ",
+      "fetched": 21,
+      "kept": 11,
+      "source": "jin10_flash",
+      "status": "ok",
+      "stored": 7
+    },
+    {
+      "at": "2026-09-21T22:38:19.372864+00:00",
+      "detail": "facts 4; XNAS:MSFT: alphavantage quota exhausted for today: Thank you for using Alpha Vantage! Please consider spreading out your free API requests more sparingly (1 request per second). You may subscribe to any of the p; XNAS:NVDA: alphavantage quota exhausted for today: Thank you for using Alpha Vantage! Please consider spreading out your free API requests more sparingly (1 request per second). ",
+      "fetched": 8,
+      "kept": 8,
+      "source": "alphavantage_news",
+      "status": "ok",
+      "stored": 8
+    },
+    {
+      "at": "2026-09-21T22:38:18.999227+00:00",
+      "detail": "facts 6; ",
+      "fetched": 270,
+      "kept": 242,
+      "source": "finnhub",
+      "status": "ok",
+      "stored": 183
+    },
+    {
+      "at": "2026-09-21T22:38:17.765908+00:00",
+      "detail": "facts 0; ",
+      "fetched": 0,
+      "kept": 0,
+      "source": "edgar",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-21T22:38:17.598451+00:00",
+      "detail": "named the company: 55 of 55 (lowest: Apple 18/18, Microsoft 18/18, NVIDIA 19/19)",
+      "fetched": 55,
+      "kept": 55,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 43
+    },
+    {
+      "at": "2026-09-21T22:38:17.144921+00:00",
+      "detail": "named the company: 76 of 88 (lowest: NVIDIA 37/45, Apple 22/26, Microsoft 17/17)",
+      "fetched": 95,
+      "kept": 88,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 76
+    },
+    {
+      "at": "2026-09-21T22:38:15.682172+00:00",
+      "detail": "failed: GDELT fetch failed: HTTP Error 429: Too Many Requests (Microsoft); named the company: 13 of 122 (lowest: NVIDIA 7/68, Apple 6/54)",
+      "fetched": 166,
+      "kept": 122,
+      "source": "gdelt",
+      "status": "ok",
+      "stored": 114
+    },
+    {
       "at": "2026-09-21T18:17:38.670246+00:00",
       "detail": "facts 0; ",
       "fetched": 450,
@@ -119,18 +191,18 @@
     }
   ],
   "counts": {
-    "articles": 6938,
+    "articles": 7369,
     "documents": 0,
-    "escalated": 1233,
+    "escalated": 1309,
     "events": 4030,
     "failed_sweeps": 21,
-    "linked": 4649,
-    "observations": 4686,
+    "linked": 4977,
+    "observations": 4696,
     "series": 31,
-    "sweeps": 406
+    "sweeps": 414
   },
   "day": "2026-09-21",
-  "generated_at": "2026-09-21 18:17 UTC",
+  "generated_at": "2026-09-21 22:38 UTC",
   "macro": [
     {
       "change": "-0.02",
@@ -494,18 +566,18 @@
       "upcoming": []
     },
     {
-      "escalated": 4,
+      "escalated": 38,
       "events": [],
       "instrument_id": "XNAS:NVDA",
       "label": "NVIDIA",
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-09-20",
+          "known_at": "2026-09-21",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "27.77"
+          "value": "27.98"
         },
         {
           "concept": "pb",
@@ -622,6 +694,17 @@
       ],
       "stories": [
         {
+          "doc_id": "https://finance.yahoo.com/m/a4f80799-1385-3797-8b95-623477a26bf8/nvidia-stock-can-surge-on.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "polarity": 1.0,
+          "published_at": "2026-09-21T20:14:00+00:00",
+          "quality": 1.0,
+          "title": "Nvidia Stock Can Surge on Trump\u2019s China Talks. Why They Are Crucial.",
+          "uncertainty": 0.0
+        },
+        {
           "doc_id": "https://finance.yahoo.com/technology/ai/articles/nvidia-ceo-jensen-huang-expects-213034571.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
           "escalated": true,
@@ -633,105 +716,94 @@
           "uncertainty": 0.390625
         },
         {
-          "doc_id": "finnhub:142289556",
+          "doc_id": "finnhub:142315452",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "polarity": 0.0,
+          "published_at": "2026-09-21T20:07:15+00:00",
+          "quality": 0.85,
+          "title": "AMD Joins the $1 Trillion Market Cap Club",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142315108",
           "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-09-20T16:20:08+00:00",
+          "published_at": "2026-09-21T18:33:33+00:00",
           "quality": 0.85,
-          "title": "Musk Says NVIDIA (NVDA) AI Chips Are Headed to Space With SpaceX (SPCX) Next Year",
+          "title": "Morgan Stanley Says AI Adoption Has Barely Started: 'We're at the National Anthem'",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "https://www.fool.com/investing/2026/09/20/prediction-even-with-the-1999-price-tag-apples-fol/?.tsrc=rss",
-          "domain": "www.fool.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-20T16:37:00+00:00",
-          "quality": 0.65,
-          "title": "Prediction: Even With the $1,999 Price Tag, Apple's Foldable iPhone Duo Will Be a Hit and Apple Will Join Nvidia in the $5 Trillion Club.",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "finnhub:142288942",
+          "doc_id": "finnhub:142314191",
           "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 1.0,
-          "published_at": "2026-09-20T14:40:01+00:00",
-          "quality": 0.65,
-          "title": "OpenAI Just Beat Google, Meta, and Amazon To This Key Milestone. Is It Bullish for AI Stocks.",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://beincrypto.com/nvidia-ceo-ai-production-ramp/?.tsrc=rss",
-          "domain": "beincrypto.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-20T21:31:46+00:00",
+          "published_at": "2026-09-21T15:30:16+00:00",
           "quality": 0.85,
-          "title": "AI Bubble Fears Grow, But Nvidia CEO Gives Bulls a New Argument Anyway",
+          "title": "Broadcom\u2019s AI Opportunity Is Bigger Than Its Stock Price Suggests",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:142289553",
+          "doc_id": "finnhub:142314199",
           "domain": "Yahoo",
-          "escalated": false,
+          "escalated": true,
           "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-20T17:03:13+00:00",
+          "polarity": 1.0,
+          "published_at": "2026-09-21T14:54:48+00:00",
           "quality": 0.85,
-          "title": "President Trump to Create an \u201cAI Force,\u201d Appoint an AI Czar as AI Fears Grow",
+          "title": "Can CoreWeave Stock Handle The Cost Of Its Own Growth?",
+          "uncertainty": 0.24038461538461536
+        },
+        {
+          "doc_id": "finnhub:142312085",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-21T13:02:00+00:00",
+          "quality": 0.85,
+          "title": "Zacks Market Edge Highlights: ExxonMobil, JPMorgan Chase and NVIDIA",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:142288938",
+          "doc_id": "finnhub:142312097",
           "domain": "Yahoo",
-          "escalated": false,
+          "escalated": true,
           "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-20T15:20:00+00:00",
+          "polarity": 1.0,
+          "published_at": "2026-09-21T13:01:00+00:00",
           "quality": 0.85,
-          "title": "The Caterpillar Correction Shouldn't Last Much Longer",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "finnhub:142288939",
-          "domain": "Yahoo",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-20T15:13:44+00:00",
-          "quality": 0.85,
-          "title": "3 AI Hardware Stocks Linked To Nvidia And US China Trade Talks",
-          "uncertainty": 0.13297872340425532
+          "title": "Nvidia and Micron are part of Zacks Earnings Preview",
+          "uncertainty": 0.3787878787878788
         }
       ],
       "tone": {
-        "intensity_max": 0.333,
-        "n": 43,
-        "polarity_mean": 0.186,
-        "sources": 5,
-        "uncertainty_mean": 0.171
+        "intensity_max": 0.667,
+        "n": 215,
+        "polarity_mean": 0.157,
+        "sources": 33,
+        "uncertainty_mean": 0.166
       },
       "upcoming": []
     },
     {
-      "escalated": 4,
+      "escalated": 26,
       "events": [],
       "instrument_id": "XNAS:AAPL",
       "label": "Apple",
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-09-20",
+          "known_at": "2026-09-21",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "38.05"
+          "value": "38.31"
         },
         {
           "concept": "pb",
@@ -815,11 +887,11 @@
         },
         {
           "concept": "av_news_sentiment",
-          "known_at": "2026-09-20",
+          "known_at": "2026-09-21",
           "label": "vendor sentiment",
-          "period_end": "2026-09-20",
+          "period_end": "2026-09-21",
           "source": "alphavantage_news",
-          "value": "-0.02"
+          "value": "-0.01"
         },
         {
           "concept": "revenue",
@@ -848,116 +920,116 @@
       ],
       "stories": [
         {
-          "doc_id": "alphavantage:https://www.claimdepot.com/settlements/smartphone-ai-settlement",
-          "domain": "Claim Depot",
+          "doc_id": "https://finance.yahoo.com/video/meta-stock-jumps-wells-fargo-195200224.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
           "escalated": true,
-          "intensity": 0.0,
-          "polarity": -1.0,
-          "published_at": "2026-09-20T21:18:44+00:00",
-          "quality": 0.85,
-          "title": "Claim Form Open: $250 million Apple iPhone false advertising class action settlement",
-          "uncertainty": 0.1923076923076923
-        },
-        {
-          "doc_id": "alphavantage:https://www.yahoo.com/news/videos/oregon-woman-lawsuit-alleges-apple-205655943.html",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": -1.0,
-          "published_at": "2026-09-20T20:56:00+00:00",
-          "quality": 0.85,
-          "title": "Oregon Woman\u2019s Lawsuit Alleges Apple AirTag Enabled Stalking by Ex-Boyfriend",
+          "intensity": 0.3333333333333333,
+          "polarity": 1.0,
+          "published_at": "2026-09-21T19:52:00+00:00",
+          "quality": 1.0,
+          "title": "Meta stock jumps as Wells Fargo raises price target",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "https://www.fool.com/investing/2026/09/20/prediction-even-with-the-1999-price-tag-apples-fol/?.tsrc=rss",
-          "domain": "www.fool.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-20T16:37:00+00:00",
-          "quality": 0.65,
-          "title": "Prediction: Even With the $1,999 Price Tag, Apple's Foldable iPhone Duo Will Be a Hit and Apple Will Join Nvidia in the $5 Trillion Club.",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://www.thestreet.com/investing/stocks/apple-stock-jim-cramer-iphone-duo?.tsrc=rss",
-          "domain": "www.thestreet.com",
+          "doc_id": "https://finance.yahoo.com/technology/articles/apple-edged-higher-oura-prices-191453187.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 1.0,
-          "published_at": "2026-09-20T16:33:00+00:00",
-          "quality": 0.65,
-          "title": "Jim Cramer sends strong signal to Apple stock investors",
+          "published_at": "2026-09-21T19:14:53+00:00",
+          "quality": 1.0,
+          "title": "Apple Edged Higher as Oura Prices a $15.6 Billion Challenge",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "https://finance.yahoo.com/video/why-indias-big-tech-companies-162028038.html?.tsrc=rss",
+          "doc_id": "https://finance.yahoo.com/video/apple-iphone-duo-consumers-bite-174100022.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
-          "escalated": false,
+          "escalated": true,
           "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-09-20T16:20:28+00:00",
-          "quality": 0.85,
-          "title": "Why India's Big Tech Companies Are Betting on Hyderabad",
+          "published_at": "2026-09-21T17:41:00+00:00",
+          "quality": 1.0,
+          "title": "Apple\u2019s new iPhone Duo: Will consumers bite?",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:142290345",
-          "domain": "Yahoo",
-          "escalated": false,
+          "doc_id": "https://finance.yahoo.com/media-advertising/articles/pixalate-launches-openepg-db-1-172000553.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
           "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-20T13:06:41+00:00",
-          "quality": 0.85,
-          "title": "How to Play AAPL Stock Amid Reports Apple Is Building Its Own AI Server",
+          "polarity": -1.0,
+          "published_at": "2026-09-21T17:20:00+00:00",
+          "quality": 1.0,
+          "title": "Pixalate Launches OpenEPG DBTM 1.0 and Pre-Bid API for CTV Open Programmatic Advertising: Mapping 580,000+ Shows Across 13,900+ Channels, Including Tubi, Samsung TV Plus and The Roku Channel, With Zero Publisher Opt-In Required",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:142288139",
-          "domain": "Yahoo",
-          "escalated": false,
+          "doc_id": "alphavantage:https://www.benzinga.com/trading-ideas/long-ideas/26/09/61909226/apple-should-acquire-disney-robinhood-uber-or-these-companies-all-in-podcast-host-says",
+          "domain": "Benzinga",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-21T20:38:05+00:00",
+          "quality": 0.85,
+          "title": "Apple Should Acquire Disney, Robinhood, Uber or these Companies, All-In Podcast Host Says",
+          "uncertainty": 0.26595744680851063
+        },
+        {
+          "doc_id": "alphavantage:https://www.foreignpolicyjournal.com/2026/09/21/apple-nasdaq-aapl-cuts-fitness-audio-staff-as-company-eyes-major-service-overhaul/",
+          "domain": "Foreign Policy Journal",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-09-21T19:48:43+00:00",
+          "quality": 0.85,
+          "title": "Apple (NASDAQ: AAPL) Cuts Fitness+ Audio Staff As Company Eyes Major Service Overhaul",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://stocktwits.com/news-articles/markets/equity/meta-stock-set-for-best-day-in-13-months-on-muse-popularity-as-amazon-moves-to-block-it/cZMRq6LRBIS?.tsrc=rss",
+          "domain": "stocktwits.com",
+          "escalated": true,
           "intensity": 0.3333333333333333,
           "polarity": 0.0,
-          "published_at": "2026-09-20T13:00:22+00:00",
+          "published_at": "2026-09-21T19:45:32+00:00",
           "quality": 0.85,
-          "title": "Turning 73 Forces a Withdrawal From This Stock Whether the Owner Wants the Cash or Not",
+          "title": "META Stock Set For Best Day In 13 Months On Muse Popularity As Amazon Moves to Block It",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "https://www.fool.com/investing/2026/09/20/10-years-later-5-low-risk-stocks-for-the-next-year/?.tsrc=rss",
-          "domain": "www.fool.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-09-20T21:01:23+00:00",
-          "quality": 0.7,
-          "title": "10 Years Later: 5 Low-Risk Stocks for the Next Year",
-          "uncertainty": 0.40322580645161293
+          "doc_id": "finnhub:142314767",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "polarity": 0.0,
+          "published_at": "2026-09-21T16:32:00+00:00",
+          "quality": 0.85,
+          "title": "Meta's Muse Era: Why Arm and AMD Will Soar",
+          "uncertainty": 0.0
         }
       ],
       "tone": {
-        "intensity_max": 0.333,
-        "n": 10,
-        "polarity_mean": 0.0,
-        "sources": 5,
-        "uncertainty_mean": 0.16
+        "intensity_max": 0.667,
+        "n": 83,
+        "polarity_mean": 0.177,
+        "sources": 37,
+        "uncertainty_mean": 0.059
       },
       "upcoming": []
     },
     {
-      "escalated": 2,
+      "escalated": 26,
       "events": [],
       "instrument_id": "XNAS:MSFT",
       "label": "Microsoft",
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-09-20",
+          "known_at": "2026-09-21",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "27.41"
+          "value": "27.39"
         },
         {
           "concept": "pb",
@@ -1041,11 +1113,11 @@
         },
         {
           "concept": "av_news_sentiment",
-          "known_at": "2026-09-18",
+          "known_at": "2026-09-21",
           "label": "vendor sentiment",
-          "period_end": "2026-09-18",
+          "period_end": "2026-09-21",
           "source": "alphavantage_news",
-          "value": "0.20"
+          "value": "0.03"
         },
         {
           "concept": "revenue",
@@ -1074,67 +1146,100 @@
       ],
       "stories": [
         {
-          "doc_id": "https://www.fool.com/coverage/better-buy/2026/09/20/better-artificial-intelligence-stock-advanced-micro-devices-vs-sk-hynix/?.tsrc=rss",
-          "domain": "www.fool.com",
+          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/microsoft-msft-stock-looks-reasonable-211138209.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 1.0,
-          "published_at": "2026-09-20T19:28:28+00:00",
-          "quality": 0.85,
-          "title": "Better Artificial Intelligence Stock: Advanced Micro Devices vs. SK Hynix",
+          "published_at": "2026-09-21T21:11:38+00:00",
+          "quality": 1.0,
+          "title": "Microsoft (MSFT) Stock Looks Reasonable Despite Its 75% Five Year Run",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "https://www.fool.com/investing/2026/09/20/prediction-micron-will-earn-more-profit-than-microsoft-in-fiscal-2027/?.tsrc=rss",
-          "domain": "www.fool.com",
+          "doc_id": "https://finance.yahoo.com/video/meta-stock-jumps-wells-fargo-195200224.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
           "escalated": true,
           "intensity": 0.3333333333333333,
           "polarity": 1.0,
-          "published_at": "2026-09-20T17:37:01+00:00",
-          "quality": 0.85,
-          "title": "Prediction: Micron Will Earn More Profit Than Microsoft in Fiscal 2027",
+          "published_at": "2026-09-21T19:52:00+00:00",
+          "quality": 1.0,
+          "title": "Meta stock jumps as Wells Fargo raises price target",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/mitsui-high-tec-tse-6966-200942133.html?.tsrc=rss",
+          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/microsoft-vs-alibaba-cloud-ai-153200503.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
-          "escalated": false,
+          "escalated": true,
           "intensity": 0.0,
           "polarity": 1.0,
-          "published_at": "2026-09-20T20:09:42+00:00",
+          "published_at": "2026-09-21T15:32:00+00:00",
+          "quality": 1.0,
+          "title": "Microsoft vs Alibaba: Which Cloud AI Stock Is Better Positioned?",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://www.trefis.com/articles/616009/is-apple-stocks-shrinking-share-count-worth-paying-up-for-near-the-highs/2026-09-21?.tsrc=rss",
+          "domain": "www.trefis.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-21T19:00:27+00:00",
           "quality": 0.85,
-          "title": "What Mitsui High-tec (TSE:6966)'s Upgraded 2026 Forecast and Dividend Hike Means For Shareholders",
-          "uncertainty": 0.14367816091954022
-        },
-        {
-          "doc_id": "https://www.fool.com/investing/2026/09/20/bill-ackman-built-a-24-billion-stake-in-microsoft/?.tsrc=rss",
-          "domain": "www.fool.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-20T22:29:00+00:00",
-          "quality": 0.65,
-          "title": "Bill Ackman Built a $2.4 Billion Stake in Microsoft, Calling It a \"Core Holding\" Bought at a \"Highly Compelling Valuation.\" Here's Why He's Betting Big on Big Tech.",
+          "title": "Is Apple Stock's Shrinking Share Count Worth Paying Up For Near The Highs?",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "https://www.fool.com/investing/2026/09/20/i-own-constellation-for-the-nuclear-fleet-not-the/?.tsrc=rss",
-          "domain": "www.fool.com",
-          "escalated": false,
+          "doc_id": "https://qz.com/nscale-ipo-microsoft-anthropic-contract-backlog-092126?.tsrc=rss",
+          "domain": "qz.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-21T17:34:56+00:00",
+          "quality": 0.85,
+          "title": "Microsoft and Anthropic dominate Nscale's $103B IPO contract backlog",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142314209",
+          "domain": "Yahoo",
+          "escalated": true,
           "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-09-20T18:50:00+00:00",
-          "quality": 0.5,
-          "title": "I Own Constellation for the Nuclear Fleet, Not the AI Headlines. Here's Why That Matters Now.",
+          "published_at": "2026-09-21T15:13:48+00:00",
+          "quality": 0.85,
+          "title": "Is It Too Late To Buy Microsoft Stock After Its Summer Run?",
           "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142314215",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-21T14:24:20+00:00",
+          "quality": 0.85,
+          "title": "Meta Spikes 7% as Wells Fargo Lifts Price Target to $796 Ahead of Connect; Alphabet Nudges Higher, Microsoft Holds Flat",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142315132",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-21T13:28:29+00:00",
+          "quality": 0.85,
+          "title": "Tesla, Microsoft and Adobe Forecast: AI Stocks Eye Key Moves",
+          "uncertainty": 0.4310344827586207
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 5,
-        "polarity_mean": 0.6,
-        "sources": 2,
-        "uncertainty_mean": 0.029
+        "n": 72,
+        "polarity_mean": 0.296,
+        "sources": 24,
+        "uncertainty_mean": 0.081
       },
       "upcoming": []
     }
