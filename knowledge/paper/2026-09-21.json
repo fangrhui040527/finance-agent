@@ -1,0 +1,196 @@
+{
+  "day": "2026-09-21",
+  "written_at": "2026-09-21T22:58:00Z",
+  "phase": "observe",
+  "week": 2,
+  "equity_usd": 1000.0,
+  "cash_usd": 1000.0,
+  "control_equity_usd": 1000.0,
+  "drawdown": 0.0,
+  "halted": false,
+  "marks": 18,
+  "positions": [],
+  "changes": [],
+  "caps": [
+    {
+      "cap": "largest name",
+      "value": "0.00%",
+      "limit": "25%",
+      "breached": false
+    },
+    {
+      "cap": "invested",
+      "value": "0.00%",
+      "limit": "0%",
+      "breached": false
+    },
+    {
+      "cap": "cash floor",
+      "value": "100.00%",
+      "limit": "20%",
+      "breached": false
+    },
+    {
+      "cap": "names held",
+      "value": "0",
+      "limit": "0",
+      "breached": false
+    },
+    {
+      "cap": "drawdown from peak",
+      "value": "0.00%",
+      "limit": "8%",
+      "breached": false
+    },
+    {
+      "cap": "turnover used, 5 weekdays",
+      "value": "USD 0.00",
+      "limit": "USD 500.00",
+      "breached": false
+    }
+  ],
+  "attribution": {
+    "market": null,
+    "idiosyncratic": null,
+    "note": "no positions held; nothing to attribute"
+  },
+  "the_fundable_table": {
+    "note": "Monday's settled Bursa closes at BNM 4.076 (2026-09-21): MYX:1155 10.38, MYX:5347 13.04, MYX:5183 4.60, MYX:5225 7.62, MYX:8869 7.58, MYX:3182 1.88. US prices XNAS:NVDA 224.84, XNAS:AAPL 337.52, XNAS:MSFT 492.50 labelled 'the session so far, not the close' at 22:41Z, 2h40m after the 20:00Z close: main's calendar does not yet count the bar as settled; the America/New_York fix is on PR #76."
+  },
+  "the_mark_count": {
+    "marks": 18,
+    "rows_on_main": 88,
+    "rows_after_migration_on_development_branch": 46,
+    "note": "main still writes two marks per slot-day and one on days with no session; the one-mark-per-session rule is on PR #76."
+  },
+  "what_the_day_collected": [
+    "Monday's collector was carried by hand: bursa_close dispatched 15:22Z (+6h02m, no cron by then), the cron fired 15:54Z (+6h34m) and met the already-ran guard; us_preopen by cron 18:17Z (+5h47m); us_close absent at +1h20m, dispatched 22:36Z, landed 22:38Z. The prices in the table come from those runs.",
+    "Feedback 2026-09-20 (Sunday): Petronas Chemicals' first row in six days is a short-interest weekly title naming it among four Bursa names with notable positions in the week of -6.54% and -3.09%, with no source to check it against; IHH one weekend feature (India expansion amid margin pressure); nothing for Tenaga a full weekend after RM120-150 million; nothing for Press Metal, seventh calendar day; DFF +0.25 on 2026-09-17 with no collected release.",
+    "Monday's own session is decomposed on the 2026-09-21 feedback page, not this one."
+  ],
+  "decision": {
+    "recorded": true,
+    "weights": {},
+    "kind": "all_cash",
+    "prediction_id": "paper-2026-09-21-allcash-21d-c04f",
+    "horizon_days": 21,
+    "grades_on": "2026-10-21",
+    "confidence": 0.55,
+    "confidence_note": "The tenth consecutive decision at 0.55; the last observe decision, graded against the control book like the ten before it.",
+    "claim": "nothing in the fundable universe beats cash over 21 sessions",
+    "thesis": "All cash, fourteenth session, Monday 2026-09-21: the last observe decision, with ramp opening on 2026-09-22 at a 40% invested cap and 25% per name. Monday's Bursa closes are settled at BNM 4.076: Petronas Chemicals 4.60 MYR, 11.3% of equity, up to two lots, whose only collected row in six days is a short-interest weekly title; Press Metal 7.58, 18.6%, zero rows for seven calendar days; IHH 7.62, 18.7%, one weekend feature on India expansion amid margin pressure; Genting 1.88, 4.6%, zero rows and a 4.64% round trip; NVIDIA 224.84 provisional, 22.5%, 135 weekend stories and no dated event. Tenaga at 32.0% and Maybank at 25.5% sit over the 25% cap, as do AAPL 33.8% and MSFT 49.2%. The federal funds effective rate stepped +0.25 on 09-17 with no collected release. Claim: nothing in the fundable universe beats cash over 21 sessions.",
+    "refusals": [],
+    "fx": {
+      "myr_per_usd": 4.076,
+      "source": "bnm",
+      "date": "2026-09-21"
+    },
+    "fundable_set": {
+      "MYX:5183": {
+        "lot_usd": 112.86,
+        "share_of_equity": 0.113,
+        "round_trip": 0.0197,
+        "max_lots": 2,
+        "price_local": 4.6,
+        "price_state": "settled",
+        "why_not": "one row in six days, a short-interest title; two lots allowed only because it fell"
+      },
+      "MYX:5225": {
+        "lot_usd": 186.95,
+        "share_of_equity": 0.187,
+        "round_trip": 0.0124,
+        "max_lots": 1,
+        "price_local": 7.62,
+        "price_state": "settled",
+        "why_not": "a forensic audit the press dates at up to nine months; one weekend feature on margin pressure"
+      },
+      "MYX:8869": {
+        "lot_usd": 185.97,
+        "share_of_equity": 0.186,
+        "round_trip": 0.0125,
+        "max_lots": 1,
+        "price_local": 7.58,
+        "price_state": "settled",
+        "why_not": "ZERO ROWS FOR SEVEN CALENDAR DAYS"
+      },
+      "MYX:3182": {
+        "lot_usd": 46.12,
+        "share_of_equity": 0.046,
+        "round_trip": 0.0464,
+        "max_lots": 5,
+        "price_local": 1.88,
+        "price_state": "settled",
+        "why_not": "zero rows; a 4.64% round trip"
+      },
+      "XNAS:NVDA": {
+        "lot_usd": 224.84,
+        "share_of_equity": 0.225,
+        "round_trip": 0.0115,
+        "max_lots": 1,
+        "price_local": 224.835,
+        "price_state": "provisional",
+        "why_not": "135 weekend stories, none a dated event; the price is labelled provisional after the close"
+      }
+    },
+    "excluded_on_the_25pc_cap": {
+      "MYX:1155": 0.255,
+      "MYX:5347": 0.32,
+      "XNAS:AAPL": 0.338,
+      "XNAS:MSFT": 0.492
+    },
+    "verified_against_stores": {
+      "paper.db targets": 11,
+      "paper.db applications": 11,
+      "learning.db predictions": 11
+    }
+  },
+  "mistakes": [
+    {
+      "where": "knowledge/paper/2026-09-20.md, closing line",
+      "decision_date": "2026-09-20",
+      "prediction_id": "paper-2026-09-20-allcash-21d-dbaf",
+      "claim_made": "Week 2 of observe, day seven",
+      "what_the_code_says": "engines/paper/rules.py: week = (day - start).days // 7 + 1 with start 2026-09-08; week 2 begins 2026-09-15, so 2026-09-20 is its sixth day and 2026-09-21 its seventh and last",
+      "stored_thesis": "correct: thirteenth session, one observe decision remaining",
+      "fix": "the count is checked against rules.py each night, not against the previous page"
+    }
+  ],
+  "corrections": [],
+  "settled": [
+    "2026-09-21 is the fourteenth session from the 2026-09-08 start and the seventh day of week 2; 2026-09-22 is the first day of week 3, ramp.",
+    "The three US prices are closes pulled 2h40m after the bell; the provisional label is main's calendar, not the market."
+  ],
+  "defects_this_book_depends_on": [
+    "main's store writes a mark on days with no session and two per slot-day: 88 rows against 46 after the PR #76 migration; the fix is on PR #76.",
+    "main's calendar labels a Nasdaq close provisional at 22:41Z; the America/New_York settle time is on PR #76.",
+    "engines/attribution/decompose.py assigns no_identified_catalyst from significance alone; no matcher consults the corpus.",
+    "markets/xkls.py configures ZERO holidays on main; the fix is on PR #76.",
+    "The sector beta is fixed at 0. Opened 2026-09-14; proxies specified, none wired.",
+    "gdelt: 0 rows for an eighth consecutive day (HTTP 429); the pacing fix is on PR #76.",
+    "62 forward-dated known_at rows on main, unchanged since Saturday; the fix is on PR #76.",
+    "GitHub's cron delivered Monday's three slots 5h47m to 6h34m late; two of the three runs were dispatched by hand."
+  ],
+  "conditions_for_a_position": [
+    "OPEN: Monday's session decomposed on the 2026-09-21 feedback page; Petronas Chemicals, Press Metal and Genting closed below Thursday and the share that was the market is not yet measured.",
+    "OPEN: Tenaga's own statement on the RM120-150 million; the name is over the cap either way.",
+    "OPEN, six days, one title: Petronas Chemicals collecting a body. Since 2026-09-10.",
+    "OPEN, worsening: Press Metal collecting anything. Seven calendar days.",
+    "OPEN: PR #76 merged before Tuesday's page, so the first applied decision is marked once per session, dated on the holiday calendars, priced on a calendar that knows when Nasdaq closes, and decomposed on the longer window.",
+    "OPEN: a per-name cap that admits Tenaga, or an equity level that does.",
+    "OPEN: any fundamental figure at all for a Bursa name; eodhd names the reason - outside the free plan.",
+    "OPEN, a gap not a condition: DFF +0.25 on 09-17 with no collected release, and the book has no rate input.",
+    "CLOSED: a us_close sweep before the page - dispatched and landed 22:38Z; the Bursa prices are settled closes.",
+    "CLOSED: the Bursa proxy, replaced with the index on 2026-09-14."
+  ],
+  "ramp_opens_2026_09_22": {
+    "invested_cap": "0% -> 40%",
+    "per_name_cap": "25%, unchanged",
+    "fills": "at each market's first cached bar after the decision: a Bursa fill on Wednesday's session, a Nasdaq fill at Tuesday's US close at the earliest",
+    "note": "Tomorrow night's decision is the first the book applies; tonight's is the last that costs nothing."
+  },
+  "lessons": [
+    "The last observe decision is recorded from the same evidence as the ten before it. The phase boundary changes what a refusal costs from tomorrow, not what tonight's stores say; a decision that would have been different only because it is the last one would be a decision about the calendar.",
+    "A provisional label after the close is a calendar fault, not a market fact. The three US prices were pulled two hours and forty minutes after the bell and the store still calls them the session so far, because main settles Nasdaq on the wrong clock; the page names the fault and uses the prices.",
+    "A page's own footer is data. The day count on the 09-20 page was off by one against the code while its stored thesis was right; the check that catches it is one line against rules.py, and it belongs in every page, including this one."
+  ]
+}

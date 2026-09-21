@@ -1,0 +1,220 @@
+{
+  "day": "2026-09-20",
+  "written_at": "2026-09-21T22:46:00Z",
+  "open_questions_carried": [
+    "`DFF` stepped +0.25 on 2026-09-17 and the collector holds no release, statement or story for it; is the FOMC statement missing because the only calendar row it reads is the malformed daily *FOMC Press Release* listing? (since 2026-09-20)",
+    "A short-interest weekly named Petronas Chemicals for the week to 09-18 and the collector has no short-selling source to check it against; would Bursa's daily short-selling report be the row that finally gives the name a body? (since 2026-09-20)",
+    "The decomposition returned `no_identified_catalyst` for Tenaga on the one day the corpus held five rows about the cause; the reason string is fixed in `decompose.py` and no matcher is consulted. What does wiring one to the corpus look like? (since 2026-09-18)",
+    "RM3 billion of market value against RM120–150 million over four months, both press figures. Is the market pricing the four months or the precedent, and what figure for TNB would let the page tell? No follow-up collected on 09-19 or 09-20. (since 2026-09-18)",
+    "Petronas Chemicals' −3.10pp idiosyncratic day reads *not significant* because its own 120-session sigma contains the +22.56% run. Is a sigma that includes the anomaly the right yardstick for the sessions after it? (since 2026-09-18)",
+    "The FRED release calendar lists *FOMC Press Release* on seven consecutive days including a Sunday; what is the feed listing? Now 09-22 to 09-28, and a +0.25 step in `DFF` went by with no row. (since 2026-09-18)",
+    "Petronas Chemicals fell 6.54% and then 3.09% and the collector stored nothing about either: which of the eleven sources listed for the name carries a Bursa-hours story about it at all? One row in six days, a short-interest roundup. (since 2026-09-17, folds into the 2026-09-10 question)",
+    "The linker attached a *Genting Plantations* headline to MYX:3182; how many of the rows linked to Genting Bhd are about Genting Plantations or Genting Malaysia instead? (since 2026-09-17)",
+    "Apple's published session changed by 1.12pp between a build from a pre-close cache and a build from the settled bars; which earlier pages were written from a pre-`us_close` cache? (since 2026-09-17)",
+    "`markets/xkls.py` configures zero holidays on `main`, so the Bursa calendar counts Malaysia Day as a session — the fix is on PR #76, green, not merged. (since 2026-09-16)",
+    "Does a page need to state a market's non-trading day as a fact rather than inferring it from blank bars? Tonight's did. (since 2026-09-16)",
+    "Brent is +34% since 2026-09-02 and the whole move above 120 became knowable only on 09-17; how much macro commentary is written against a vintage that will be revised? Still no print after 09-15, six days. (since 2026-09-16)",
+    "Petronas Chemicals collecting a body. One title on 09-20 and nothing on 09-15 to 09-19. (since 2026-09-10)",
+    "Press Metal collecting anything: five sessions and a full weekend, zero rows, seven calendar days. (since 2026-09-15)",
+    "The sector beta is fixed at 0, so any sector-wide session lands in a residual labelled `idiosyncratic`. Proxies are specified on the development notes; none is wired. (since 2026-09-14)",
+    "`no_identified_catalyst` on a Bursa name reports an empty candidate list, not a weighed rejection; does a verdict need to distinguish the two? (since 2026-09-15)",
+    "GDELT's refusal is a reproducible HTTP 429, now eight days running. Per-IP on the shared runner? (since 2026-09-08)",
+    "Tenaga: is the 5d move the results print the 2026-09-04 roundup headline referred to? (since 2026-09-04)",
+    "NVIDIA: filing or release for the Hugging Face transaction — `edgar` fetched nothing on Sunday; the five Form 4s of 09-16 are insider filings. (since 2026-09-04)",
+    "Finnhub earnings rows for NVDA carry a knowable date in the future — 62 such rows on `main`, unchanged, and one is printed on this page's digest; the fix is on PR #76. (since 2026-09-04)",
+    "Whether the observe phase's grading against the control is informative at 21 days; tonight's is the last observe decision. (since 2026-09-08)"
+  ],
+  "market": {
+    "regime": "no_session",
+    "notes": [
+      "Sunday: neither Bursa nor Nasdaq opened. The pack's moves table repeats the 2026-09-18 session (every row 'last session 2026-09-18'); five-day figures unchanged: XNAS:SPY -0.34%, MYX:^KLSE -2.34%",
+      "Friday's prints arrived over the weekend: SP500 7650.50 (+12.74), NASDAQCOM 26522.55 (+104.25), VIXCLS 14.81 (-0.63), T10Y2Y 0.25 (-0.02), BAMLH0A0HYM2 2.68 (-0.02) at 2026-09-18; DGS10 4.94 (-0.07), DGS2 4.67 (-0.07), DFF 3.88 (+0.25) at 2026-09-17",
+      "DFF +0.25 on 2026-09-17 with no collected release, statement or story; the FRED release calendar lists FOMC Press Release daily 09-22..09-28",
+      "DCOILBRENTEU 130.80 at 2026-09-15 (sixth day without a newer print); DEXMAUS 4.0685 at 2026-09-11; DOSM:CPI_HEADLINE 137.50 for 2026-08-01 unchanged from Saturday's new vintage"
+    ]
+  },
+  "names": [
+    {
+      "instrument_id": "MYX:1155",
+      "move": {
+        "note": "NO SESSION - Sunday 2026-09-20; the pack's row is the 2026-09-18 session, published on that day's page, and is not a new measurement"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [
+        {
+          "when": "2026-09-21",
+          "what": "whether the first Bursa session after the Tenaga figure and the August CPI print produced a row about either; any source but a short-interest roundup naming Petronas Chemicals; a first Press Metal row"
+        }
+      ],
+      "note": "one row, a moomoo ticker tag for the Maybank Retail Money Market-I Fund (q 0.65), a fund product, not the bank"
+    },
+    {
+      "instrument_id": "MYX:5347",
+      "move": {
+        "note": "NO SESSION - Sunday 2026-09-20; the pack's row is the 2026-09-18 session, published on that day's page, and is not a new measurement"
+      },
+      "causes": [],
+      "open_questions": [
+        "is the market pricing the four months or the precedent (2026-09-18)",
+        "is the 5d move the results print the 2026-09-04 roundup referred to (2026-09-04)"
+      ],
+      "watch": [
+        {
+          "when": "2026-09-21",
+          "what": "whether the first Bursa session after the Tenaga figure and the August CPI print produced a row about either; any source but a short-interest roundup naming Petronas Chemicals; a first Press Metal row"
+        }
+      ],
+      "note": "nothing collected; the RM120-150 million figure has gone a full weekend without a filing, broker note or feature"
+    },
+    {
+      "instrument_id": "MYX:5183",
+      "move": {
+        "note": "NO SESSION - Sunday 2026-09-20; the pack's row is the 2026-09-18 session, published on that day's page, and is not a new measurement"
+      },
+      "causes": [],
+      "open_questions": [
+        "collecting a body (2026-09-10)",
+        "is a sigma that includes the +22.56% run the right yardstick (2026-09-18)",
+        "would Bursa's daily short-selling report give the name a body (2026-09-20)"
+      ],
+      "watch": [
+        {
+          "when": "2026-09-21",
+          "what": "whether the first Bursa session after the Tenaga figure and the August CPI print produced a row about either; any source but a short-interest roundup naming Petronas Chemicals; a first Press Metal row"
+        }
+      ],
+      "note": "first row in six calendar days: 'Bursa Short Interest Weekly (Sep 18th): RHB Bank, JPG, Petronas Chemicals, Frontken' (www.smartkarma.com 2026-09-20 q0.65), a title naming the company among four with notable short positions in the week of the -6.54% and -3.09% sessions; no short-selling source to check it against; a mention is not a cause"
+    },
+    {
+      "instrument_id": "MYX:5225",
+      "move": {
+        "note": "NO SESSION - Sunday 2026-09-20; the pack's row is the 2026-09-18 session, published on that day's page, and is not a new measurement"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [
+        {
+          "when": "2026-09-21",
+          "what": "whether the first Bursa session after the Tenaga figure and the August CPI print produced a row about either; any source but a short-interest roundup naming Petronas Chemicals; a first Press Metal row"
+        }
+      ],
+      "note": "'IHH expands in India amid margin pressure' (www.thestar.com.my 2026-09-20 q0.80), a weekend feature and the first Star row linked to the name in the record"
+    },
+    {
+      "instrument_id": "MYX:8869",
+      "move": {
+        "note": "NO SESSION - Sunday 2026-09-20; the pack's row is the 2026-09-18 session, published on that day's page, and is not a new measurement"
+      },
+      "causes": [],
+      "open_questions": [
+        "collecting anything: five sessions and a full weekend (2026-09-15)"
+      ],
+      "watch": [
+        {
+          "when": "2026-09-21",
+          "what": "whether the first Bursa session after the Tenaga figure and the August CPI print produced a row about either; any source but a short-interest roundup naming Petronas Chemicals; a first Press Metal row"
+        }
+      ],
+      "note": "nothing collected for a seventh consecutive calendar day; google_news and gdelt both read empty for the name on Sunday"
+    },
+    {
+      "instrument_id": "MYX:3182",
+      "move": {
+        "note": "NO SESSION - Sunday 2026-09-20; the pack's row is the 2026-09-18 session, published on that day's page, and is not a new measurement"
+      },
+      "causes": [],
+      "open_questions": [
+        "how many rows linked to Genting Bhd are about Genting Plantations or Genting Malaysia (2026-09-17)"
+      ],
+      "watch": [
+        {
+          "when": "2026-09-21",
+          "what": "whether the first Bursa session after the Tenaga figure and the August CPI print produced a row about either; any source but a short-interest roundup naming Petronas Chemicals; a first Press Metal row"
+        }
+      ],
+      "note": "nothing collected"
+    },
+    {
+      "instrument_id": "XNAS:NVDA",
+      "move": {
+        "note": "NO SESSION - Sunday 2026-09-20; the pack's row is the 2026-09-18 session, published on that day's page, and is not a new measurement"
+      },
+      "causes": [],
+      "open_questions": [
+        "filing or release for the Hugging Face transaction (2026-09-04)",
+        "the snapshot prints 'last EPS surprise % 3.82 (finnhub, 2026-09-30)', a knowable date nine days in the future (2026-09-04)"
+      ],
+      "watch": [
+        {
+          "when": "2026-11-17",
+          "what": "Q3 FY2027 results after the close (finnhub)"
+        }
+      ],
+      "note": "135 stories from 17 sources, 15 escalated, all weekend coverage: Huang's doubled chip forecast restated (finance.yahoo.com 09-20 q1.00); the SpaceX-in-orbit story from Musk's side (Yahoo 09-20 q0.85); one undated announcement-shaped item on a power-flexible AI data centre alliance (Yahoo 09-19 q0.85). pe_ttm 27.77, beta 2.22 (finnhub 2026-09-20). Five Form 4 insider filings dated 2026-09-16 (edgar) are the only events in the window."
+    },
+    {
+      "instrument_id": "XNAS:AAPL",
+      "move": {
+        "note": "NO SESSION - Sunday 2026-09-20; the pack's row is the 2026-09-18 session, published on that day's page, and is not a new measurement"
+      },
+      "causes": [],
+      "open_questions": [
+        "which earlier pages were written from a pre-us_close cache (2026-09-17)"
+      ],
+      "watch": [
+        {
+          "when": "2026-10-28",
+          "what": "Q4 FY2026 results after the close (finnhub)"
+        }
+      ],
+      "note": "27 stories from 10 sources, 10 escalated: two negative-tone legal items (class-action claim form, Claim Depot 09-20 q0.85; AirTag stalking lawsuit, Yahoo 09-20 q0.85); an Evercore ISI target of $380 reported by foreignpolicyjournal.com (09-19 q0.65), not a broker or a wire; launch-week roundups. pe_ttm 38.05 (finnhub 2026-09-20), target_consensus 342.13 (fmp 2026-09-20)."
+    },
+    {
+      "instrument_id": "XNAS:MSFT",
+      "move": {
+        "note": "NO SESSION - Sunday 2026-09-20; the pack's row is the 2026-09-18 session, published on that day's page, and is not a new measurement"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [
+        {
+          "when": "2026-10-27",
+          "what": "Q1 FY2027 results (finnhub)"
+        }
+      ],
+      "note": "14 stories from 7 sources, 3 escalated, half linker noise (Mitsui High-tec, Nokia, Ultragenyx, Pershing Square rows). About the company: 'Microsoft Battles AI Backlash While Doubling Down on Growth' (tipranks 09-19 q0.65) and two Motley Fool comparisons. pe_ttm 27.41 (finnhub 2026-09-20); alphavantage_news quota exhausted an eighth day, vendor sentiment still 2026-09-18."
+    }
+  ],
+  "machine": {
+    "schedule": "Sunday: weekly 07:38Z (+5h38m); bursa_close 13:35Z (+4h15m) on a no-session day; us_close 23:14Z (+1h59m), inside the +1h51m..+2h40m band, the eleventh confirmation. Monday: no scheduled run by 15:21Z; bursa_close at +6h01m (past the +5h43m all-time maximum) dispatched by hand 15:22Z, landed 5cecf70; the cron fired 15:54Z (+6h34m), hit the already-ran guard and only refreshed the mark and digest (2040153); us_preopen by cron 18:17Z (+5h47m), 09ff221; us_close absent at 22:35Z (+1h20m) and dispatched at 22:36Z, the first departure from the ten-night no-op, because a two-hour band measured on two-hour-late days describes nothing on a six-hour-late day. sweep --due named only that slot. landed at 22:38Z as 9c0b152, before this page was committed.",
+    "fact_book": "All six Bursa names NOTHING COLLECTED, zero events. Forward-dated known_at rows on main: 62, unchanged since Saturday; NVIDIA's digest snapshot prints one (last EPS surprise, finnhub, 2026-09-30). 6,938 articles, 4,686 observations, 4,030 events when the pack was built (22:35Z on 09-21).",
+    "pull_request_76": "Calendars, attribution window, point-in-time stamping, collector pacing, mark store and peers on PR #76: merged from main five times since Saturday as the sweeps landed, green on ubuntu 3.11/3.12, windows 3.12 and audit at 184c645, mergeable, waiting on a merge decision; tomorrow is the first ramp decision.",
+    "monitor": "0 open alerts at 22:36Z on 09-21, seventh night running; slots_missed did not trip on a day whose runs all arrived, late.",
+    "page_rule": "The pack printed a moves table under a Sunday heading with every row dated last session 2026-09-18; the page copied the date, not the table."
+  },
+  "data_quality": {
+    "failed": [
+      "google_news us_close: no name could be read (3 failed, 0 not reached)",
+      "gdelt us_close: fetch failed (HTTP error), 0 rows"
+    ],
+    "degraded": [
+      "gdelt bursa_close: HTTP 429 and read-empty for Press Metal; 0 rows stored, eighth consecutive day (paced, grouped requests are on PR #76, not main)",
+      "alphavantage_news: quota exhausted for XNAS:MSFT, eighth day; 3 rows and 4 facts for the others",
+      "eodhd: 0 facts both slots (2-a-day credit budget)",
+      "fmp: HTTP 402 on the earnings endpoint; 3,965 fetched, 17 facts",
+      "yahoo_rss: read but empty for all six Bursa names (30 of 30 named the company on the US sweep)",
+      "google_news bursa_close: 10 rows, named a book company in 2; read empty for IHH, Press Metal, Genting",
+      "edgar: 0 fetched, 0 stored (Sunday)"
+    ],
+    "skipped": [],
+    "recovered": [
+      "finnhub 88 rows, 9 facts; nst_business 46 and fmt_business 39 rows (two linked to a book name: Petronas Chemicals via smartkarma, IHH via The Star); jin10_flash 13 rows over two slots; finmind 5 facts; sec_xbrl 4,188 fetched, nothing new; dbnomics 450 fetched, 15 frozen series unchanged"
+    ]
+  },
+  "lessons": [
+    "A delay band is a measurement of the days it was taken on. Ten no-ops at +1h20m were correct against a cron that ran two hours late; on a day when the same cron ran six hours late, +1h20m meant something else, and the rule had to be re-read against that day before it was applied.",
+    "One row on the seventh day is a title, not a body. The first Petronas Chemicals row in six days names the company in a short-interest roundup for the week it fell nine percent; it says the position existed and nothing about why, and the collector has no source that could.",
+    "The store's faults print themselves on the page. A last-EPS-surprise figure knowable on 2026-09-30 sits in NVIDIA's snapshot nine days before that date; the reader can see the point-in-time defect without opening the database, which is the right place for it to be seen."
+  ]
+}
