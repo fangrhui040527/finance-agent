@@ -1,6 +1,6 @@
 # Digest 2026-09-21
 
-Generated 2026-09-21 15:23 UTC · slot `all` · 6935 articles in the corpus, 4686 observations, 4026 events in the fact book.
+Generated 2026-09-21 18:17 UTC · slot `all` · 6938 articles in the corpus, 4686 observations, 4030 events in the fact book.
 
 ## The book
 
@@ -72,27 +72,31 @@ Generated 2026-09-21 15:23 UTC · slot `all` · 6935 articles in the corpus, 468
 
 | series | latest | as of | change | source |
 |---|---|---|---|---|
-| ICE BofA US high-yield option-adjusted spread, % | 2.70 | 2026-09-17 | +0 | fred |
+| ICE BofA US high-yield option-adjusted spread, % | 2.68 | 2026-09-18 | -0.02 | fred |
 | BNM Overnight Policy Rate, % | 2.75 | 2026-09-03 | +0 | bnm_opr |
 | US CPI, all items, index 1982-84=100 | 334.13 | 2026-08-01 | +1.318 | fred |
 | Brent crude, USD per barrel (EIA, daily) | 130.80 | 2026-09-15 | +9.55 | fred |
 | Malaysian ringgit per US dollar | 4.07 | 2026-09-11 | +0.0061 | fred |
-| Federal funds effective rate, % | 3.63 | 2026-09-16 | +0 | fred |
-| 10-year Treasury yield, % | 5.01 | 2026-09-16 | +0.01 | fred |
-| 2-year Treasury yield, % | 4.74 | 2026-09-16 | +0.07 | fred |
+| Federal funds effective rate, % | 3.88 | 2026-09-17 | +0.25 | fred |
+| 10-year Treasury yield, % | 4.94 | 2026-09-17 | -0.07 | fred |
+| 2-year Treasury yield, % | 4.67 | 2026-09-17 | -0.07 | fred |
 | Malaysia CPI headline, index 2010=100 | 137.50 | 2026-08-01 | +0.4 | dosm_cpi |
 | Broad US dollar index | 118.21 | 2026-09-11 | +0.1339 | fred |
-| NASDAQ Composite, index level | 26,418.30 | 2026-09-17 | +439.88 | fred |
+| NASDAQ Composite, index level | 26,522.55 | 2026-09-18 | +104.25 | fred |
 | Aluminium, USD per tonne (IMF PCPS via FRED) | 3,158.26 | 2026-07-01 |  | fred |
-| S&P 500, index level | 7,637.76 | 2026-09-17 | +85.95 | fred |
-| 10y minus 2y Treasury spread, % | 0.27 | 2026-09-17 | +0 | fred |
+| S&P 500, index level | 7,650.50 | 2026-09-18 | +12.74 | fred |
+| 10y minus 2y Treasury spread, % | 0.25 | 2026-09-18 | -0.02 | fred |
 | US unemployment rate, % | 4.10 | 2026-08-01 | +0 | fred |
-| CBOE VIX, index | 15.44 | 2026-09-17 | -2.27 | fred |
+| CBOE VIX, index | 14.81 | 2026-09-18 | -0.63 | fred |
 
 ## Collection
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 18:17 | dbnomics | ok | 450 | 0 | 0 | facts 0;  |
+| 18:17 | jin10_flash | ok | 20 | 5 | 3 | facts 0;  |
+| 18:17 | fred | ok | 487 | 0 | 0 | facts 12;  |
+| 18:17 | fmp | ok | 0 | 0 | 0 | skipped: no name in the book trades in slot 'us_preopen' |
 | 15:23 | eodhd | ok | 0 | 0 | 0 | facts 0; MYX:5183: deferred by the 2-a-day credit budget; next in rotation; MYX: |
 | 15:23 | twse_openapi | ok | 8 | 0 | 0 | facts 0;  |
 | 15:23 | jin10_flash | ok | 21 | 4 | 3 | facts 0;  |
