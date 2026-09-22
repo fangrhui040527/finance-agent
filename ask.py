@@ -2470,7 +2470,7 @@ def main(argv=None) -> int:
     sw.add_argument(
         "--force",
         action="store_true",
-        help="collect even if this slot already ran today (the cron and the catch-up "
+        help="collect even if this slot's firing already ran (the cron and the catch-up "
         "can both fire for one slot; the second is skipped unless you say otherwise)",
     )
     sw.set_defaults(fn=cmd_sweep)

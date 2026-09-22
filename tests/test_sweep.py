@@ -629,7 +629,7 @@ def test_the_second_run_of_a_slot_on_the_same_day_collects_nothing(stores):
 
     second = _sweep(corpus_db, facts_db, at=NOW + timedelta(hours=1))
     assert second.already_ran, "the second arrival must be a no-op"
-    assert "already collected today" in second.already_ran
+    assert "already collected" in second.already_ran
     assert second.results == [], "no source is contacted at all"
 
     with Corpus(corpus_db) as c:
@@ -655,6 +655,51 @@ def test_tomorrow_is_a_new_day(stores):
     corpus_db, facts_db = stores
     _sweep(corpus_db, facts_db)
     assert not _sweep(corpus_db, facts_db, at=NOW + timedelta(days=1)).already_ran
+
+
+def test_a_firing_that_lands_after_midnight_is_still_the_previous_evenings(stores):
+    """2026-09-22. The catch-up collected Monday's us_close at 22:38; Monday's
+    21:15 cron then arrived at 00:06 Tuesday. Keyed to the UTC day, the guard
+    saw a new day with no us_close in it and collected Monday's close again -
+    and then skipped Tuesday's own 21:15 firing as a repeat. Keyed to the
+    firing, the 00:06 arrival is the no-op and Tuesday's 21:15 collects."""
+    corpus_db, facts_db = stores
+    catch_up = datetime(2026, 9, 21, 22, 38, tzinfo=UTC)
+    late_cron = datetime(2026, 9, 22, 0, 6, tzinfo=UTC)
+    tuesdays_cron = datetime(2026, 9, 22, 21, 20, tzinfo=UTC)
+    assert not _sweep(corpus_db, facts_db, slot="us_close", at=catch_up).already_ran
+    late = _sweep(corpus_db, facts_db, slot="us_close", at=late_cron)
+    assert late.already_ran, "Monday's firing had already collected"
+    assert "since its scheduled 2026-09-21 21:15 UTC" in late.already_ran
+    assert not _sweep(corpus_db, facts_db, slot="us_close", at=tuesdays_cron).already_ran
+
+
+def test_a_late_firing_that_did_collect_after_midnight_does_not_spend_the_next_days(stores):
+    """The other order of the same night: nothing had collected Monday's close,
+    so the late cron at 00:06 rightly did - Monday's firing, on Tuesday's date -
+    and Tuesday's 21:15 must still be a new firing, not a repeat of it."""
+    corpus_db, facts_db = stores
+    late_cron = datetime(2026, 9, 22, 0, 6, tzinfo=UTC)
+    tuesdays_cron = datetime(2026, 9, 22, 21, 20, tzinfo=UTC)
+    wednesdays_stragglers = datetime(2026, 9, 23, 0, 30, tzinfo=UTC)
+    assert not _sweep(corpus_db, facts_db, slot="us_close", at=late_cron).already_ran
+    assert not _sweep(corpus_db, facts_db, slot="us_close", at=tuesdays_cron).already_ran
+    assert _sweep(corpus_db, facts_db, slot="us_close", at=wednesdays_stragglers).already_ran
+
+
+def test_an_off_schedule_run_by_hand_is_judged_on_the_day_not_the_week(stores):
+    """The window opens at the last firing but is never wider than a day: a
+    person firing `us_preopen` on a Saturday is not refused because Friday's
+    ran. Driven through the guard itself, because the test config enables no
+    source that runs at pre-open."""
+    from knowledge.sweep import _already_ran
+
+    corpus_db, _ = stores
+    friday = datetime(2026, 9, 25, 12, 35, tzinfo=UTC)
+    with Corpus(corpus_db) as c:
+        c.record_sweep("fri", "fred", friday, "ok", at=friday, slot="us_preopen")
+    assert _already_ran(corpus_db, "us_preopen", friday + timedelta(hours=2))
+    assert not _already_ran(corpus_db, "us_preopen", datetime(2026, 9, 26, 14, 0, tzinfo=UTC))
 
 
 def test_force_and_slot_all_and_a_named_source_all_run_anyway(stores):

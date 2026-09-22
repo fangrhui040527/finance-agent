@@ -53,9 +53,14 @@ Three properties, and each of them is load-bearing:
   tell a dropped cron from a very late one — on 2026-09-07 the catch-up collected
   `us_close` at 22:38 and the cron arrived at 23:31 and collected it again — so
   the guard sits at the collector instead of the dispatcher: a named slot runs at
-  most once per UTC day, whoever gets there first, and the second arrival exits 0
-  having contacted nothing. `--force`, `--slot all` and a named `--source` are the
-  ways past it. See docs/14 §"One slot, one collection a day".
+  most once per firing, whoever gets there first, and the second arrival exits 0
+  having contacted nothing. The firing's window opens at the slot's scheduled
+  time, not at midnight: on 2026-09-22 Monday's 21:15 `us_close` arrived at 00:06
+  Tuesday, and a guard keyed to the UTC day let it collect Monday's close a second
+  time and then skipped Tuesday's own firing as a repeat. `--due` judges each slot
+  the same way and never names a slot whose time has not come. `--force` (also a
+  dispatch input on collect.yml), `--slot all` and a named `--source` are the ways
+  past the guard. See docs/14 §"One slot, one collection a day".
 * **It dispatches, it does not collect.** The routine's session has no route to
   any data host; the runner does.
 * **It never guesses.** When the store holds runs that do not record which slot

@@ -285,6 +285,54 @@ def test_marks_stamped_with_a_wall_clock_weekend_are_restamped_to_their_session(
     assert not any("re-dated" in n or "dropped" in n for n in r.notes), r.notes
 
 
+def test_a_mark_filed_under_a_session_that_had_not_opened_is_restamped_to_its_bars(paper_env):
+    """2026-09-22 00:09Z: Monday's us_close collector arrived after midnight and
+    a build that stamped the wall clock filed a mark under Tuesday holding
+    Monday's closes - thirteen hours before Tuesday's session opened. It is
+    Monday's mark on the wrong day, and the later reading of Monday at that."""
+    from engines.paper.store import MarkRow
+
+    env = paper_env
+    mon, tue, wed = env.week(2), env.week(2, 1), env.week(2, 2)
+
+    def row(book, day, at):
+        return MarkRow(
+            book,
+            day,
+            "us_close",
+            at,
+            Decimal(1000),
+            Decimal(0),
+            Decimal(1000),
+            Decimal(1000),
+            Decimal(0),
+            False,
+            "observe",
+            Decimal(4),
+            day,
+            "config",
+            [],
+        )
+
+    for book in (DECIDED, CONTROL):
+        env.store.record_mark(row(book, mon, _at(mon, 22, 38)))  # Monday's close, on time
+        env.store.record_mark(row(book, tue, _at(tue, 0, 9)))  # the late arrival, under Tuesday
+    assert env.store.sessions_marked(DECIDED) == 2
+    r = _mark(env, wed)
+    assert r.exit_code == 0
+    moved = [n for n in r.notes if "before that session opened" in n]
+    assert len(moved) == 2 and all("replacing that session's earlier mark" in n for n in moved), (
+        r.notes
+    )
+    assert env.store.mark_for(DECIDED, tue, "us_close") is None
+    kept = env.store.mark_for(DECIDED, mon, "us_close")
+    assert kept is not None and kept.marked_at == _at(tue, 0, 9), "the later reading stays"
+    assert env.store.sessions_marked(DECIDED) == 2  # Monday and Wednesday
+    # a mark taken during its session stands: the test is the open, not the close
+    r = _mark(env, env.week(2, 3))
+    assert not any("re-dated" in n or "dropped" in n for n in r.notes), r.notes
+
+
 def test_two_slots_on_one_session_are_one_session_marked(paper_env):
     from mcp_server import observability
 

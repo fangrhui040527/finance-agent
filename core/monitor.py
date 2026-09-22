@@ -27,7 +27,7 @@ from __future__ import annotations
 import json
 import sqlite3
 from dataclasses import dataclass, field
-from datetime import UTC, date, datetime, timedelta
+from datetime import UTC, date, datetime, time, timedelta
 from decimal import Decimal
 from pathlib import Path
 
@@ -359,14 +359,52 @@ def _sweep_rules(cfg, now: datetime) -> list[Alert]:
 
 #: Which slots the cron in `.github/workflows/collect.yml` owes on a given
 #: weekday, 0 = Monday. `us_preopen` runs `1-5` (Mon-Fri) and `weekly` fires on
-#: Sunday; the other two run every day. Kept beside SLOT_MAX_GAP_HOURS because
-#: they read the same cron and must not drift apart.
+#: Sunday; the other two run every day. Kept beside SLOT_TIMES because they
+#: read the same cron and must not drift apart.
 SLOT_WEEKDAYS: dict[str, frozenset[int]] = {
     "bursa_close": frozenset(range(7)),
     "us_preopen": frozenset(range(5)),
     "us_close": frozenset(range(7)),
     "weekly": frozenset({6}),
 }
+
+#: When that cron fires each slot, UTC. A slot's day starts HERE, not at
+#: midnight: the 21:15 us_close that lands at 00:06 the next morning is still
+#: the previous evening's firing, and both things that ask "did this slot run"
+#: - the guard in knowledge/sweep.py and the catch-up in `slots_outstanding` -
+#: judge a run against the firing it belongs to.
+SLOT_TIMES: dict[str, time] = {
+    "bursa_close": time(9, 20),
+    "us_preopen": time(12, 30),
+    "us_close": time(21, 15),
+    "weekly": time(2, 0),
+}
+
+
+def slot_window_start(slot: str, now: datetime) -> datetime:
+    """The slot's most recent scheduled firing at or before `now`.
+
+    WHY NOT MIDNIGHT. On 2026-09-22 Monday's 21:15 UTC us_close arrived at
+    00:06 on Tuesday, 2h51m late, which is an ordinary night for this cron.
+    Monday's close had already been collected at 22:38 by the catch-up, but a
+    guard keyed to the UTC day saw a fresh day with no us_close in it and
+    collected a second time, filed the run under Tuesday, and marked the paper
+    book with Monday's closes under Tuesday's date. Tuesday's own 21:15 firing
+    then found a us_close "today" and was skipped: one close collected twice,
+    the next not at all, and the catch-up owed nothing either, because it read
+    the same calendar. Judged from the firing instead, the 00:06 run is
+    Monday's and Tuesday's 21:15 is a new one.
+
+    Walks back a week at most; every slot fires at least once a week.
+    """
+    at = SLOT_TIMES[slot]
+    for back in range(8):
+        day = (now - timedelta(days=back)).date()
+        fired = datetime.combine(day, at, tzinfo=UTC)
+        if day.weekday() in SLOT_WEEKDAYS[slot] and fired <= now:
+            return fired
+    raise ValueError(f"{slot!r} has no scheduled firing in the week before {now:%Y-%m-%d %H:%M}Z")
+
 
 #: A run may land in the next UTC day and still be the previous day's slot -
 #: 21:15 delayed by three hours is 00:15 tomorrow - so one firing short across
@@ -399,6 +437,14 @@ def slots_outstanding(corpus_path: str, now: datetime) -> tuple[list[str], str]:
     moment a replacement run is worth firing: news expires, and a collection
     recovered the same evening is worth most of one that happened on time.
 
+    A slot is owed once its firing today has come round (`SLOT_TIMES`) and no
+    run has landed SINCE THAT FIRING. Since the firing, not since midnight: a
+    run that lands after midnight is the previous evening's firing arriving
+    late, and counting it as today's is how a slot gets collected twice one
+    day and not at all the next (see `slot_window_start`). A slot whose time
+    has not come is not owed yet - firing us_close at 14:00 would collect a
+    close that has not happened.
+
     Returns the slot names and, when the answer is empty for a reason worth
     printing, why. Three ways it says nothing:
 
@@ -412,7 +458,8 @@ def slots_outstanding(corpus_path: str, now: datetime) -> tuple[list[str], str]:
     different answers, and only the second is silence worth acting on.
     """
     day_start = datetime(now.year, now.month, now.day, tzinfo=UTC)
-    due = [s for s, weekdays in SLOT_WEEKDAYS.items() if day_start.weekday() in weekdays]
+    firings = {s: slot_window_start(s, now) for s in SLOT_WEEKDAYS}
+    due = [s for s, fired in firings.items() if fired >= day_start]
     if not Path(corpus_path).exists():
         return [], f"no corpus at {corpus_path}"
 
@@ -422,10 +469,11 @@ def slots_outstanding(corpus_path: str, now: datetime) -> tuple[list[str], str]:
         ran = corpus.slot_runs(day_start, now)
         total = corpus.run_count(day_start, now)
         ever = corpus.first_slot_row()
+        since_firing = {s: corpus.slot_runs(firings[s], now).get(s, 0) for s in due}
 
     if ran.get("all"):
         return [], "a run covering every slot has already happened today"
-    outstanding = [s for s in due if not ran.get(s)]
+    outstanding = [s for s in due if not since_firing[s]]
     if outstanding and ever is None and total:
         return [], (
             f"{total} run(s) today, none recording which slot - nothing to attribute. "

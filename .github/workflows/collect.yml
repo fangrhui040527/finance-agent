@@ -43,6 +43,14 @@ on:
         type: choice
         options: [all, bursa_close, us_preopen, us_close, weekly]
         default: all
+      # A named slot collects once per firing; the second arrival is a no-op
+      # (knowledge/sweep.py). This is the person's override for the case the
+      # guard cannot know about - a run that collected the wrong thing, or a
+      # source repaired since the slot ran - and it is never set by the cron.
+      force:
+        description: "collect even if this slot's firing already ran"
+        type: boolean
+        default: false
 
 # The sweep COMMITS what it collected. ci.yml is contents: read; this one
 # cannot be.
@@ -146,7 +154,7 @@ jobs:
           GDELT_USER_AGENT: ${{ secrets.GDELT_USER_AGENT }}
         run: |
           set +e
-          uv run python ask.py sweep --slot "${{ steps.slot.outputs.slot }}"
+          uv run python ask.py sweep --slot "${{ steps.slot.outputs.slot }}" ${{ inputs.force && '--force' || '' }}
           echo "code=$?" >> "$GITHUB_OUTPUT"
           exit 0
 

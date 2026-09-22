@@ -174,6 +174,25 @@ def slot_is_session(cfg, slot: str, day: date) -> bool:
     return False
 
 
+def session_open(cfg, slot: str, day: date) -> datetime | None:
+    """When the first market the slot marks from opens on `day`, UTC.
+
+    None when no market the slot marks from calls `day` a session, or none of
+    them can be looked up. A mark taken before this instant cannot carry the
+    day's bars, provisional or settled: the market had not opened.
+    """
+    opens: list[datetime] = []
+    for mic in slot_markets(cfg, slot):
+        try:
+            calendar = market_get(mic).calendar
+        except KeyError:
+            continue
+        session = calendar.session(day)
+        if session is not None:
+            opens.append(session.open_utc())
+    return min(opens) if opens else None
+
+
 def bars_session(feed, cfg, slot: str, on_or_before: date) -> date | None:
     """The day of the last cached bar, on or before the day, on any name the slot marks from."""
     seen: date | None = None
@@ -1025,11 +1044,40 @@ def restamp_marks(store: PaperStore, feed, cfg) -> list[str]:
     later reading stays. A mark whose bars are not in the cache is left where
     it is, and the run says so. Cheap on every run: one scan of the marks,
     and nothing to do once the ledger carries no such day.
+
+    The second shape of the same fault is a mark on a session day that had not
+    OPENED when the mark was taken. On 2026-09-22 Monday's 21:15Z us_close
+    collector arrived at 00:09Z Tuesday and a build that still stamped the
+    wall clock filed a mark under Tuesday holding Monday's closes - thirteen
+    hours before Tuesday's US session opened. Such a mark cannot carry the
+    bars of the day it names, provisional or settled, so it is re-dated to
+    the last cached bar before that day, under the same later-reading-stays
+    rule. The test is the open, not the close, on purpose: a mark taken
+    during the session from a provisional bar is that day's mark, and a later
+    run of the same slot replaces it.
     """
     moves: list[tuple[int, date]] = []
     notes: list[str] = []
+    because: dict[int, str] = {}
     for m in store.all_marks():
         if slot_is_session(cfg, m.slot, m.day):
+            opened = session_open(cfg, m.slot, m.day)
+            taken = m.marked_at if m.marked_at.tzinfo else m.marked_at.replace(tzinfo=UTC)
+            if opened is None or taken >= opened:
+                continue
+            session = bars_session(feed, cfg, m.slot, m.day - timedelta(days=1))
+            if session is None:
+                notes.append(
+                    f"{m.book}: the {m.day} {m.slot} mark was taken at {taken:%Y-%m-%d %H:%M}Z, "
+                    "before that session opened, and the cache holds no earlier bar to say "
+                    "which one it priced; left as it is"
+                )
+                continue
+            if m.mark_id is not None:
+                moves.append((m.mark_id, session))
+                because[m.mark_id] = (
+                    f", taken at {taken:%Y-%m-%d %H:%M}Z before that session opened,"
+                )
             continue
         session = bars_session(feed, cfg, m.slot, m.day)
         if session is None:
@@ -1046,7 +1094,9 @@ def restamp_marks(store: PaperStore, feed, cfg) -> list[str]:
             "replaced": f"re-dated to its session {new_day}, replacing that session's earlier mark",
             "dropped": f"dropped: a later mark of its session {new_day} already exists",
         }[outcome]
-        notes.append(f"{m.book}: the {m.day} {m.slot} mark {what}")
+        notes.append(
+            f"{m.book}: the {m.day} {m.slot} mark{because.get(m.mark_id or -1, '')} {what}"
+        )
     return notes
 
 

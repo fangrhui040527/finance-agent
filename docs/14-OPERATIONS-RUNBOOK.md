@@ -494,17 +494,29 @@ collected tomorrow is not news. The dispatcher genuinely cannot know, at the
 moment it must decide, which of the two it is looking at.
 
 So the guard is at the **collector**, where the question is settled rather than
-predicted: `run_sweep` refuses a named slot that already has a run recorded for
-the current UTC day. Whoever arrives first collects; the second arrival — cron or
+predicted: `run_sweep` refuses a named slot that already has a run recorded since
+the slot's most recent scheduled firing (`core.monitor.SLOT_TIMES`), or in the
+last 24 hours, whichever window is shorter. Whoever arrives first collects; the second arrival — cron or
 catch-up, in either order — exits **0** in seconds having contacted nothing. Exit
 0 and not 2, because a slot that already ran is a no-op, not a fault, and a
 scheduler told otherwise would raise an alarm about a day that worked.
 
 Three ways past it, each an explicit act by a person: `--slot all` (the recovery
-hammer, never guarded), a named `--source`, or `--force`. And a store whose rows
-carry no `slot` at all is **not** read as having run — that column landed on
-2026-09-07, and treating older rows as prior runs would refuse every slot on any
-store written before that build.
+hammer, never guarded), a named `--source`, or `--force` (also a `force` input on
+the collect.yml dispatch form). And a store whose rows carry no `slot` at all is
+**not** read as having run — that column landed on 2026-09-07, and treating older
+rows as prior runs would refuse every slot on any store written before that build.
+
+The window opens at the **firing, not at midnight.** The first build asked "has
+this slot run since 00:00 UTC", and on 2026-09-22 Monday's 21:15 `us_close`
+arrived at 00:06 Tuesday — 2h51m late, an ordinary night for this cron — found a
+new day with no `us_close` in it, collected Monday's close a second time (the
+catch-up had taken it at 22:38), and filed the run under Tuesday. Tuesday's own
+21:15 firing was then a "repeat" and skipped, and `--due` owed nothing either,
+because it read the same calendar: one close collected twice, the next not at
+all. Measured from the firing, the 00:06 arrival sees the 22:38 run and stops,
+and Tuesday's 21:15 sees nothing since 21:15 and collects. `--due` judges each
+slot the same way and never names one whose time has not come round.
 
 Same-day recovery is most of the value: **news is the only thing that expires.**
 Prices, filings and macro series are re-fetchable tomorrow; a wire feed serves a

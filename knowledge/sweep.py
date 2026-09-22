@@ -346,8 +346,8 @@ class SweepReport:
 # --- the run ------------------------------------------------------------------------------
 
 
-def _already_ran_today(corpus_path: str, slot: str, started: datetime) -> str:
-    """Has this slot already collected today? Returns the reason to skip, or "".
+def _already_ran(corpus_path: str, slot: str, started: datetime) -> str:
+    """Has this slot's firing already collected? Returns the reason to skip, or "".
 
     THE RACE THIS CLOSES. Two things fire this collector for the same slot: the
     GitHub cron it is scheduled on, and the nightly Routine's catch-up when the
@@ -368,6 +368,19 @@ def _already_ran_today(corpus_path: str, slot: str, started: datetime) -> str:
     instead of a sweep. It is also the only place that stays correct if a third
     thing ever dispatches this workflow.
 
+    "ALREADY" IS MEASURED FROM THE SLOT'S OWN FIRING, NOT FROM MIDNIGHT. The
+    first build of this guard asked whether the slot had run since 00:00 UTC.
+    On 2026-09-22 Monday's 21:15 us_close cron arrived at 00:06 Tuesday - 2h51m
+    late, an ordinary night here - found a new day with no us_close in it, and
+    collected Monday's close a second time (the catch-up had taken it at
+    22:38); it was filed under Tuesday, so Tuesday's own 21:15 firing was then
+    skipped as a repeat. The window now opens at the slot's most recent
+    scheduled time (`core.monitor.slot_window_start`): the 00:06 arrival sees
+    the 22:38 run and stops, and Tuesday's 21:15 sees nothing since 21:15 and
+    collects. The window is also never wider than 24 hours, so a person who
+    fires the weekly slot on a Wednesday by hand is judged on the day, not on
+    the Sunday before it.
+
     Three deliberate exemptions, each an explicit act by a person:
 
       * `slot="all"`, the recovery hammer: it is dispatched by hand to re-collect
@@ -383,17 +396,19 @@ def _already_ran_today(corpus_path: str, slot: str, started: datetime) -> str:
     """
     from pathlib import Path as _Path
 
+    from core.monitor import slot_window_start
+
     if not _Path(corpus_path).exists():
         return ""
-    day_start = datetime(started.year, started.month, started.day, tzinfo=UTC)
+    since = max(slot_window_start(slot, started), started - timedelta(hours=24))
     with Corpus(corpus_path) as corpus:
-        ran = corpus.slot_runs(day_start, started)
+        ran = corpus.slot_runs(since, started)
     n = ran.get(slot, 0)
     if not n:
         return ""
     return (
-        f"already collected today: {n} run(s) recorded for slot {slot!r} since "
-        f"{day_start:%Y-%m-%d} 00:00 UTC. Skipped rather than collected twice - "
+        f"already collected: {n} run(s) recorded for slot {slot!r} since its scheduled "
+        f"{since:%Y-%m-%d %H:%M} UTC. Skipped rather than collected twice - "
         f"the cron and the catch-up can both fire for one slot. "
         f"Use --force, --slot all, or name a --source to run anyway."
     )
@@ -420,9 +435,10 @@ def run_sweep(
 ) -> SweepReport:
     """Run every enabled source for `slot`. Never raises for a source failure.
 
-    A named slot collects AT MOST ONCE PER UTC DAY. `force` is the operator's
-    override; see `_already_ran_today` for why the guard exists and why it is
-    here rather than in the thing that dispatches.
+    A named slot collects AT MOST ONCE PER FIRING. `force` is the operator's
+    override; see `_already_ran` for why the guard exists, why it is here
+    rather than in the thing that dispatches, and why its day starts at the
+    slot's scheduled time rather than at midnight.
 
     `sleep` is how a paced source (GDELT) waits between request starts; a test
     injects it, with `clock`, so the pacing is asserted rather than endured.
@@ -446,7 +462,7 @@ def run_sweep(
         return report
 
     if not force and not sources and slot != "all":
-        prior = _already_ran_today(corpus_path or cfg.corpus_db, slot, started)
+        prior = _already_ran(corpus_path or cfg.corpus_db, slot, started)
         if prior:
             report.already_ran = prior
             emit(f"sweep {run_id}  slot {slot}: {prior}")

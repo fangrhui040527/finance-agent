@@ -278,7 +278,7 @@ def test_the_digest_stars_by_the_gate_in_force_today_not_the_one_at_ingest(tmp_p
 # --- a second arrival on the same slot must leave the directory alone -------------
 #
 # Two things dispatch the collector for one slot - the cron and the nightly
-# Routine's catch-up - and `_already_ran_today` makes the second a no-op that
+# Routine's catch-up - and `_already_ran` makes the second a no-op that
 # collects nothing. It was not a no-op here. The digest was re-rendered with a
 # later `Generated` line over identical figures, the workflow saw three changed
 # files and pushed them: the 2026-09-08 23:23 commit is `2084 articles` to
