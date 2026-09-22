@@ -101,6 +101,58 @@ def test_the_cache_records_when_a_body_was_pulled(tmp_path):
     assert cache.fetched_at("yahoo", "NEVER-FETCHED") is None
 
 
+def test_a_body_is_stale_once_its_market_has_shut_since_it_was_pulled(tmp_path):
+    """2026-09-22. Monday's us_close collector arrived at 00:08 UTC Tuesday and
+    refetched every book name, so each Bursa row was fetched-on Tuesday with
+    Monday's close as its last bar. Bursa shut at 09:00 UTC, and a cache keyed
+    to the day served Monday's closes to every read for the rest of Tuesday -
+    the bursa_close sweep at 09:25 first. The row was today's; the session was
+    not. Each market is judged by its own clock: Nasdaq had not shut between
+    00:08 and 09:25, so the US row pulled at the same instant is still fresh."""
+    clock = {"now": "2026-09-22T00:08:56+00:00"}
+    cache = PriceCache(tmp_path / "p.db", today=lambda: clock["now"][:10], now=lambda: clock["now"])
+    monday = _body("2026-09-21")
+    cache.put("yahoo", "5183.KL", monday)
+    cache.put("yahoo", "NVDA", monday)
+    clock["now"] = "2026-09-22T08:59:00+00:00"  # Bursa still trading
+    assert cache.get("yahoo", "5183.KL", mic="XKLS") == monday
+    clock["now"] = "2026-09-22T09:25:00+00:00"  # the bursa_close sweep
+    assert cache.get("yahoo", "5183.KL", mic="XKLS") is None, "Bursa shut at 09:00 since the pull"
+    assert cache.get("yahoo", "5183.KL", mic="MYX") is None, "the book's spelling of the market"
+    assert cache.get("yahoo", "NVDA", mic="XNAS") == monday, "no Nasdaq session shut since 00:08"
+    clock["now"] = "2026-09-22T20:05:00+00:00"
+    assert cache.get("yahoo", "NVDA", mic="XNAS") is None
+    # a caller that cannot name the market keeps the day rule: the looser answer, never a fresher one
+    assert cache.get("yahoo", "5183.KL") == monday
+    assert cache.get("yahoo", "5183.KL", mic="NOPE") == monday
+
+
+def test_the_feed_names_the_market_so_the_cache_can_judge_the_session(tmp_path, monkeypatch):
+    """What the 09:25 bursa_close sweep of 2026-09-22 has to do: fetch Tuesday's
+    Bursa close, not be served Monday's from a row stamped that morning."""
+    from core.market.feed import YahooFeed
+
+    clock = {"now": "2026-09-22T00:08:56+00:00"}
+    cache = PriceCache(tmp_path / "p.db", today=lambda: clock["now"][:10], now=lambda: clock["now"])
+    feed = YahooFeed()
+    feed.cache = cache
+    pulls: list[str] = []
+
+    def pull(symbol):
+        pulls.append(symbol)
+        return _body("2026-09-21")
+
+    monkeypatch.setattr(feed, "_fetch_csv", pull)
+    feed.fetch("MYX:5183")
+    assert pulls == ["5183.KL"]
+    clock["now"] = "2026-09-22T08:59:00+00:00"
+    feed.fetch("MYX:5183")
+    assert pulls == ["5183.KL"], "served from the cache while Bursa is still trading"
+    clock["now"] = "2026-09-22T09:25:00+00:00"
+    feed.fetch("MYX:5183")
+    assert pulls == ["5183.KL", "5183.KL"], "Bursa shut at 09:00; the cached row is a session old"
+
+
 def test_a_database_written_before_the_column_existed_still_opens(tmp_path):
     """Every cached row predates this change; none may be given an invented time."""
     p = tmp_path / "old.db"

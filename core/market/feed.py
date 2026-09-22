@@ -61,6 +61,18 @@ class SymbolUnmappable(PriceFeedError):
     """No rule exists to turn this instrument id into a source symbol."""
 
 
+def _mic_or_none(instrument_id: str) -> str | None:
+    """The canonical MIC an id trades on, for the cache to judge freshness by;
+    None for an id the registry cannot place, which the cache reads as "judge
+    by the day alone", never as fresh."""
+    try:
+        from markets.registry import mic_of
+
+        return mic_of(instrument_id)
+    except (KeyError, ValueError):
+        return None
+
+
 class PriceFeed(ABC):
     """One source of daily bars. Subclass, map the symbol, fetch the CSV."""
 
@@ -156,7 +168,7 @@ class PriceFeed(ABC):
         """
         symbol = self.symbol_for(instrument_id)
         cache = getattr(self, "cache", None)
-        body = cache.get(self.name, symbol) if cache is not None else None
+        body = cache.get(self.name, symbol, mic=_mic_or_none(instrument_id)) if cache else None
         if body is None:
             body = self._fetch_csv(symbol)
             if cache is not None:

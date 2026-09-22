@@ -441,7 +441,7 @@ nothing in this environment can reach a Malaysian host to tell the difference.
 
 ## 14. A no-op run that still committed
 
-`_already_ran_today` (§ the doubled slot) makes the second collector arrival on
+`_already_ran` (§ the doubled slot) makes the second collector arrival on
 a slot a no-op: the cron and the nightly catch-up both fire, whoever is first
 collects, the second costs seconds instead of 370 requests. It was not a no-op
 in one place. The digest was re-rendered with a later `Generated` line over
@@ -812,6 +812,66 @@ each ask not to be sent. Setting the two repository secrets is the cheap test.
 That it is a one-line configuration fix is the point of this entry rather than an
 aside: the throttle was visible in the source's own reply from the first run, and
 twelve days of it were recorded as `ok`.
+
+## 21. A guard that read the calendar while the cron read the clock
+
+§14's guard asked "has this slot run since 00:00 UTC". The cron it guards has
+never fired on time here — 14 minutes to 6h34m late across September — and on
+2026-09-22 Monday's 21:15 `us_close` arrived at **00:06:24 UTC on Tuesday**,
+2h51m late, an ordinary night. The guard saw a fresh day with no `us_close` in
+it. The catch-up had already collected Monday's close at 22:38, so the second
+sweep was the doubled collection §14 exists to prevent, filed under Tuesday
+(`da1298c`, "the 2026-09-22 us_close sweep").
+
+It did not stop at the corpus. The paper mark that runs after the sweep, on a
+build that still stamped the wall clock, wrote a `2026-09-22 us_close` mark at
+00:09:01 holding Monday's closes (fx dated 2026-09-21), thirteen hours before
+Tuesday's session opened; and because 2026-09-22 is the first day of the ramp,
+that mark's phase was `ramp` and the control book's rebalance fired from it —
+three targets, decided at 00:09:01, sized against Monday's closes rather than
+Tuesday's. The decision day is the right one and the fills land at the first
+bar after it either way; the sizing is the part the 09-22 paper page records.
+
+And the fault runs forward. Tuesday's own 21:15 firing finds a `us_close` run
+"today" and exits 0 as a repeat, and `--due` at 22:33 — which read the same
+midnight — owes nothing: one close collected twice, the next not at all, with
+every rule reporting a day that worked.
+
+The fix keys both questions to the **firing**. `core.monitor.SLOT_TIMES` holds
+the cron's four times beside `SLOT_WEEKDAYS`; `slot_window_start` returns the
+slot's most recent scheduled firing at or before now. The guard skips a slot
+only when a run is recorded since that firing (never more than 24 hours back,
+so a `weekly` fired by hand on a Wednesday is judged on the day); `--due`
+names a slot only once its firing today has come round and nothing has landed
+since. The 00:06 arrival now sees the 22:38 run and stops, and Tuesday's 21:15
+sees nothing since 21:15 and collects. `restamp_marks` gained the second shape
+of the weekend rule: a mark on a session day taken before that session
+**opened** cannot carry its bars and is re-dated to the last cached bar before
+it, later reading stays — the open and not the close, because a mark taken
+mid-session from a provisional bar is that day's mark and a later run replaces
+it. collect.yml gained a `force` dispatch input, the override the guard's own
+docstring promised and the form could not pass.
+
+The price cache had the same midnight in it. The 00:08 collector refetched
+every book name and each market's proxy, and `PriceCache.get` served a row for
+the rest of the UTC day it was fetched on (`fetched_on == today`) unless its
+last row failed to parse. The three US names and `^KLSE` came back from Yahoo
+with Monday's row blank in the close column — the parser drops it, so those
+rows read as mid-session and would have been refetched at 09:25. The Bursa
+names came back complete through Monday: `5183.KL`, fetched-on Tuesday, last
+bar Monday, and after Bursa shut at 09:00 UTC that row would have been served
+to the bursa_close sweep at 09:25, to the paper mark behind it, and to every
+read until Wednesday — Tuesday's Bursa closes never fetched on Tuesday. The
+row was today's; the session was not. `get` now takes the market's MIC from
+the feed and refuses a body pulled before that market's most recent session
+close (`calendar.last_session_close`): the Bursa row pulled at 00:08 is stale
+at 09:01 and served until then; a US row pulled at 00:08 is fresh until 20:00,
+because no Nasdaq session shut in between. A caller that cannot name the
+market keeps the day rule, which is the looser answer, never the fresher one.
+
+Not changed: the control book's three 2026-09-22 targets. They are the record
+of what the machine did, on the correct decision day; the page says how they
+were sized.
 
 ## What the families have in common
 

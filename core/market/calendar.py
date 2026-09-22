@@ -187,6 +187,32 @@ PROVISIONAL = "provisional"
 UNKNOWN = "unknown"
 
 
+def last_session_close(mic: str, now: datetime) -> datetime | None:
+    """When `mic` last finished a session at or before `now`, in UTC.
+
+    None when the MIC has no adapter, or no session closed in the fortnight
+    before `now` - both read by a caller as "cannot judge", never as fresh.
+    The companion of `price_state`: that one asks whether a bar was pulled
+    after ITS session shut; this one asks whether a session has shut since a
+    body was pulled at all, which is the question a cache has to answer
+    before serving that body again.
+    """
+    try:
+        from markets.registry import get as adapter_for
+
+        calendar = adapter_for(mic).calendar
+    except (KeyError, ValueError):
+        return None
+    at = now if now.tzinfo else now.replace(tzinfo=UTC)
+    day = at.date()
+    for _ in range(14):
+        session = calendar.session(day)
+        if session is not None and session.close_utc() <= at:
+            return session.close_utc()
+        day -= timedelta(days=1)
+    return None
+
+
 def price_state(mic: str, day: date, fetched_at: datetime | None) -> str:
     """Whether a bar dated `day` is a settled close or the session so far.
 
