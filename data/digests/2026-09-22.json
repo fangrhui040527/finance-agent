@@ -1,6 +1,87 @@
 {
   "collection": [
     {
+      "at": "2026-09-22T14:05:28.411689+00:00",
+      "detail": "facts 0; MYX:8869: deferred by the 2-a-day credit budget; next in rotation; MYX:3182: deferred by the 2-a-day credit budget; next in rotation; MYX:1155: deferred by the 2-a-day credit budget; next in rotation; MYX:5347: deferred by the 2-a-day credit budget; next in rotation; outside the free plan (US only), so not asked for: MYX:1155, MYX:5347, MYX:8869, MYX:3182. The EODHD Fundamentals plan cove",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-22T14:05:27.819569+00:00",
+      "detail": "facts 5; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-22T14:05:22.957842+00:00",
+      "detail": "facts 0; ",
+      "fetched": 16,
+      "kept": 5,
+      "source": "jin10_flash",
+      "status": "ok",
+      "stored": 3
+    },
+    {
+      "at": "2026-09-22T14:05:21.668461+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-22T14:05:19.631438+00:00",
+      "detail": "",
+      "fetched": 50,
+      "kept": 48,
+      "source": "nst_business",
+      "status": "ok",
+      "stored": 44
+    },
+    {
+      "at": "2026-09-22T14:05:05.325571+00:00",
+      "detail": "",
+      "fetched": 46,
+      "kept": 46,
+      "source": "fmt_business",
+      "status": "ok",
+      "stored": 46
+    },
+    {
+      "at": "2026-09-22T14:05:05.154405+00:00",
+      "detail": "read but empty: Genting, Maybank, Tenaga, Petronas Chemicals, IHH, Press Metal",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-22T14:05:01.997345+00:00",
+      "detail": "read but empty: Petronas Chemicals; named the company: 7 of 17 (lowest: Genting 0/1, Press Metal 0/1, Maybank 1/4)",
+      "fetched": 18,
+      "kept": 17,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 14
+    },
+    {
+      "at": "2026-09-22T14:04:59.556772+00:00",
+      "detail": "failed: GDELT fetch failed: HTTP Error 429: Too Many Requests (Petronas Chemicals, IHH); named the company: 0 of 2 (lowest: Tenaga 0/2); deferred to a later run: Press Metal, Genting, Maybank",
+      "fetched": 2,
+      "kept": 2,
+      "source": "gdelt",
+      "status": "degraded",
+      "stored": 2
+    },
+    {
       "at": "2026-09-22T00:08:53.701910+00:00",
       "detail": "facts 0; XNAS:MSFT: deferred by the 2-a-day credit budget; next in rotation; XNAS:NVDA: outside the plan or over today's credits; XNAS:AAPL: outside the plan or over today's credits",
       "fetched": 0,
@@ -74,18 +155,18 @@
     }
   ],
   "counts": {
-    "articles": 7408,
+    "articles": 7517,
     "documents": 0,
-    "escalated": 1311,
+    "escalated": 1312,
     "events": 4030,
     "failed_sweeps": 21,
-    "linked": 4994,
-    "observations": 4696,
+    "linked": 5000,
+    "observations": 4701,
     "series": 31,
-    "sweeps": 422
+    "sweeps": 431
   },
   "day": "2026-09-22",
-  "generated_at": "2026-09-22 00:09 UTC",
+  "generated_at": "2026-09-22 14:05 UTC",
   "macro": [
     {
       "change": "-0.02",
@@ -223,8 +304,26 @@
       "instrument_id": "MYX:1155",
       "label": "Maybank",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiywFBVV95cUxNSXA3VjZvT3dSTTM0VnVPY3h3WmZfZGZRQjF2NHdGSzNGSlk3TUdhSUFjLTd0dVRjRHZEMGZ6UkUyVkpaa2lNVmowOVltYWl0LXEwNUtoYTR6RV84eWRQOUphbHJyclFHNFMyLVltVl9qbUJTR1RxeE5WSzdSbUt6N25QWVBEaXl1SWg4UEZITmR1em5XNzVkSkNOR3hNd2ZnMGpQR0VLS3JDYWtEcHlaQ3IwdDhKNXlCR01IWndObFBzWllEU3RXM1hmSQ?oc=5",
+          "domain": "www.ad-hoc-news.de",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-22T02:04:08+00:00",
+          "quality": 0.65,
+          "title": "Malayan Banking stock edges higher as investors return to Malaysian blue chips",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -244,13 +343,57 @@
           "quality": 0.65,
           "title": "SNAPSHOT | Brokerage firms downgrade TNB to 'hold' over subsidy; child dies after allegedly thrown into river, uncle nabbed",
           "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMitAFBVV95cUxPUlJPcVJYb1RJUzR6MmZwTW1ZMjdfWkR1UFA2M3NmSTRCXzFxVjJ3ZTBXa1hPM1ZrbnB6djI3RlRaWk5pbmMycVMxYkpTbHhRQVM0ajdjWkNtbThQa1pzYlRyTVU5MnA0dG42OHZPMXF6X3ZZNXFaRXdNNlMxZkFzY2IzYm82ZFZNN0JsdHY1aS1nNEFQQzJObWZMeFlQYzgxcy1vQ2lBQWRNbnlQY09vUHcwdGE?oc=5",
+          "domain": "www.businesstoday.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-22T03:33:07+00:00",
+          "quality": 0.8,
+          "title": "Stock Today: TNB Climbs 0.46% As Investors Weigh RM150 Million Cost Hit",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE9JcWVXNVd1VGZOVmtodXlnOUhlY1lkRHMxTDVhcHJaOGotUFZqUTd5YndfZ1ZOeHRVM2hZRWhFYk9iNXJpVl9yVkFaaHpIRWNB?oc=5",
+          "domain": "theedgemalaysia.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-22T03:28:15+00:00",
+          "quality": 0.8,
+          "title": "AirAsia Group, Capital A, KYM Holdings, TMK Chemical, Tenaga Nasional, Vestland, Eco World, Zetrix AI, Jati Tinggi",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMisgFBVV95cUxQNWZId2NSV3dpSm5WUFhDNGhPUmxSSFZZZlhsU1MtRmYwb2ZJS0hxNzRuaHVmSGE5V0FiMVNHcGxxQlE0UnJEMmhWWlFWRFVrTGc2N3RCNlIxZnlXOUxGVnFieV9QeDF4OXBUZklKbnItdWhJVGZrLTFXOWZmSTBMcWxVQ29PMlFGTndBNk5TUmZFa2M0d09GNGRzRHRCa2pqQ2hsdFJCdkpsb1VodlB4T2R3?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-22T00:15:03+00:00",
+          "quality": 0.8,
+          "title": "Minimal impact for TNB with retail charge exemption",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMidkFVX3lxTE9GUENwOFhwVG1iemdMZXFBdDNXTnNrQW5ZQUVoWXpvdkhrZV9tS1FLaXFNb3hGVVhaYVpZYnM4TXhmVm5FY1drUEtOVGNBemdYbUI2Nl9sS3FNX2VkWldncjZjM2NwN0swMExnR0VpWHlVRTdyWGc?oc=5",
+          "domain": "finance.biggo.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-22T00:25:00+00:00",
+          "quality": 0.65,
+          "title": "TNB Shares Face Downgrades as Utility Absorbs RM150 Million Electricity Subsidy",
+          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.0,
-        "n": 1,
-        "polarity_mean": -1.0,
-        "sources": 1,
+        "n": 5,
+        "polarity_mean": -0.2,
+        "sources": 5,
         "uncertainty_mean": 0.0
       },
       "upcoming": []
@@ -266,13 +409,31 @@
       "upcoming": []
     },
     {
-      "escalated": 0,
+      "escalated": 1,
       "events": [],
       "instrument_id": "MYX:5225",
       "label": "IHH",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiUEFVX3lxTFA3VjVNc2xQRV9LUHdyUjhKdC1fQmJfOEFDUzVzWGVlM0pGaUczTzI2ejBIQXhkOVhDZW9PUFl0WUp5MEtnY3dsMWZxLWYyQjZn?oc=5",
+          "domain": "theedgemalaysia.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-22T08:06:09+00:00",
+          "quality": 0.8,
+          "title": "IHH Healthcare rises over 5% as Macquarie flags strong earnings outlook",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 1.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
