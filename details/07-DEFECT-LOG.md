@@ -967,6 +967,25 @@ the project); it had been red for two weeks. The round trip also showed that
 id) as a Python traceback; it prints `refused: <reason>` and exits 1, as
 `grade` already did.
 
+## 23. A queued run started from the commit its trigger carried
+
+The first two collections on the merged code, dispatched three seconds apart on
+2026-09-23 (`us_close` to recover Tuesday's skipped close, then `bursa_close`),
+were queued one behind the other by the workflow's concurrency group, as
+intended. The second then checked out `dc6e822`, the commit its dispatch event
+carried, not the branch as it stood when the first had finished and pushed
+`8948539`. It collected for two minutes and failed at the commit step: eight
+stores and digests conflicted, and binary SQLite files do not merge.
+
+The commit step's failure was PR #76's change working: before it, the step
+ended in `|| true` and would have reported success with the collection
+dropped. The fault was upstream of it: `actions/checkout` without `ref`
+checks out the event's SHA. The same applies to a scheduled run that queues
+behind a dispatched one. The checkout now names the branch
+(`ref: ${{ github.ref_name }}`), so a queued run starts from what the run
+before it pushed, and `tests/test_collect_workflow.py` fails if that `ref` is
+removed.
+
 ## What the families have in common
 
 | Family | Shape |
