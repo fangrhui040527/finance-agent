@@ -100,9 +100,13 @@ MAX_AGE_DAYS: dict[str, int] = {
     "UNRATE": MONTHLY,
     # Commodities through FRED (see fred.SERIES). PALUMUSDM is IMF PCPS, which
     # publishes monthly with a long lag - the same cadence its DBnomics twin had.
-    # DCOILBRENTEU is an EIA daily series and gets a market series' limit.
+    # DCOILBRENTEU carries daily EIA spot prices but EIA publishes them in one
+    # weekly release, so it is WEEKLY like H.10. With the DAILY limit it raised
+    # "past its cadence (8d, limit 7)" on 2026-09-23 with nothing wrong: the
+    # prints had arrived on 09-14 (through 09-09) and 09-17 (through 09-15),
+    # and the next was not due until that week's release.
     "PALUMUSDM": MONTHLY,
-    "DCOILBRENTEU": DAILY,
+    "DCOILBRENTEU": WEEKLY,
     # Bank Negara: the OPR is an MPC decision, not a market price.
     "BNM:OPR": POLICY,
     # DOSM, monthly (knowledge/sources/dosm.py)

@@ -42,22 +42,28 @@ def _new_id(instrument: str, made: datetime, statement: str) -> str:
 def cmd_log(a) -> int:
     made = datetime.now(UTC)
     horizon = Horizon(a.horizon)
-    grade_on = date.fromisoformat(a.grade_on) if a.grade_on else _grade_date(made, horizon)
-
-    p = Prediction(
-        prediction_id=a.id or _new_id(a.instrument, made, a.statement),
-        instrument_id=a.instrument,
-        agent=a.agent,
-        made_at=made,
-        horizon=horizon,
-        statement=a.statement,
-        direction=a.direction,
-        confidence=a.confidence,
-        grade_on=grade_on,
-    )
-    with LearningStore(a.db) as s:
-        s.record(p)
-        n = s.counts()
+    # A past --grade-on, a confidence outside 0..1 and a reused id each carry a
+    # reason, and each reached the operator as a traceback. `grade` already
+    # prints its refusals as one line; `log` now does the same.
+    try:
+        grade_on = date.fromisoformat(a.grade_on) if a.grade_on else _grade_date(made, horizon)
+        p = Prediction(
+            prediction_id=a.id or _new_id(a.instrument, made, a.statement),
+            instrument_id=a.instrument,
+            agent=a.agent,
+            made_at=made,
+            horizon=horizon,
+            statement=a.statement,
+            direction=a.direction,
+            confidence=a.confidence,
+            grade_on=grade_on,
+        )
+        with LearningStore(a.db) as s:
+            s.record(p)
+            n = s.counts()
+    except ValueError as e:
+        print(f"refused: {e}", file=sys.stderr)
+        return 1
     arrow = {1: "up", -1: "down", 0: "no directional view"}[p.direction]
     print(f"logged {p.prediction_id}")
     print(f"  {p.instrument_id} {arrow} over {horizon.value}, stated {p.confidence:.0%}")

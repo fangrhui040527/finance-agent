@@ -156,6 +156,25 @@ def test_an_archived_lesson_is_still_there_after_a_restart(tmp_path):
         assert s.counts()["lessons"] == 0, "archived lessons are not active"
 
 
+def test_a_lesson_is_never_edited_in_place_or_deleted_but_is_re_saved_whole(tmp_path):
+    path = db(tmp_path)
+    with LearningStore(path) as s:
+        s.save_lesson(lesson())
+        with pytest.raises(sqlite3.IntegrityError, match="never edited in place"):
+            s.db.execute("UPDATE lessons SET text = 'gaps never reverse' WHERE lesson_id = 'L1'")
+        with pytest.raises(sqlite3.IntegrityError, match="never deleted"):
+            s.db.execute("DELETE FROM lessons")
+        # the store's own path re-derives a lesson and saves it whole; the status still moves
+        s.save_lesson(lesson(status=Status.ARCHIVED))
+        assert s.load_lessons().get("L1").status is Status.ARCHIVED
+        assert s.counts()["lessons"] == 0
+    with LearningStore(path) as s:
+        names = {
+            r[0] for r in s.db.execute("SELECT name FROM sqlite_master WHERE type = 'trigger'")
+        }
+        assert {"lessons_no_update", "lessons_no_delete"} <= names
+
+
 def test_a_human_authored_lesson_stays_read_only_across_a_restart(tmp_path):
     path = db(tmp_path)
     human = Lesson(
@@ -239,5 +258,21 @@ def test_due_lists_overdue_items(tmp_path, capsys):
 
 
 def test_a_grading_date_in_the_past_cannot_be_logged_at_all(tmp_path, capsys):
-    with pytest.raises(ValueError, match="not a horizon"):
-        run(["log", "X", "1", "5d", "0.6", "s", "--grade-on", "2020-01-01"], db(tmp_path), capsys)
+    path = db(tmp_path)
+    code = predict.main(
+        ["--db", path, "log", "X", "1", "5d", "0.6", "s", "--grade-on", "2020-01-01"]
+    )
+    err = capsys.readouterr().err
+    # A refusal with its reason on one line, as `grade` gives one - not a traceback.
+    assert code == 1 and err.startswith("refused: ") and "not a horizon" in err
+    with LearningStore(path) as s:
+        assert s.pending() == [], "nothing is written when the log is refused"
+
+
+def test_the_cli_refuses_a_reused_id_and_an_impossible_confidence_in_words(tmp_path, capsys):
+    path = db(tmp_path)
+    assert run(["log", "X", "1", "5d", "0.5", "s", "--id", "dup"], path, capsys)[0] == 0
+    assert predict.main(["--db", path, "log", "X", "1", "5d", "0.5", "s", "--id", "dup"]) == 1
+    assert "refused: dup is already logged" in capsys.readouterr().err
+    assert predict.main(["--db", path, "log", "X", "1", "5d", "1.5", "s"]) == 1
+    assert "refused: " in capsys.readouterr().err

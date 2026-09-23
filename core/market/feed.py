@@ -24,10 +24,12 @@ from __future__ import annotations
 import csv
 import io
 import math
+import threading
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 from datetime import UTC, date, datetime
 
+from core.market.bars import drop_carried_rows
 from core.market.prices import Bar, PriceSeries
 from core.net.breaker import CircuitBreaker
 
@@ -59,6 +61,18 @@ class SymbolUnmappable(PriceFeedError):
     """No rule exists to turn this instrument id into a source symbol."""
 
 
+def _mic_or_none(instrument_id: str) -> str | None:
+    """The canonical MIC an id trades on, for the cache to judge freshness by;
+    None for an id the registry cannot place, which the cache reads as "judge
+    by the day alone", never as fresh."""
+    try:
+        from markets.registry import mic_of
+
+        return mic_of(instrument_id)
+    except (KeyError, ValueError):
+        return None
+
+
 class PriceFeed(ABC):
     """One source of daily bars. Subclass, map the symbol, fetch the CSV."""
 
@@ -69,8 +83,38 @@ class PriceFeed(ABC):
     #: inheriting another feed's spelling.
     LITERAL: dict[str, str] = {}
 
+    #: Canonical MIC -> the suffix this feed appends to a local code. Each feed
+    #: declares its own; the base holds an empty one so `instrument_of` below
+    #: can read whichever table the concrete feed carries.
+    SUFFIX: dict[str, str] = {}
+
     @abstractmethod
     def symbol_for(self, instrument_id: str) -> str: ...
+
+    def instrument_of(self, symbol: str) -> str | None:
+        """`symbol_for` run backwards: the `MIC:LOCAL` id behind a symbol this
+        feed spelled, or None when no table of this feed accounts for it.
+
+        For reading the cache, whose rows are keyed by (feed, symbol) and carry
+        no instrument id. It is an inversion of the tables and nothing more - a
+        literal is matched whole, a suffix exactly - because a guess here would
+        judge a row against another market's calendar, and a stale price read
+        as fresh is the failure the reader exists to catch. The id comes back
+        with the MIC, not the book's spelling: `1155.KL` is `XKLS:1155`, which
+        markets.registry resolves `MYX:1155` to as well.
+        """
+        for iid, literal in self.LITERAL.items():
+            if literal == symbol:
+                return iid
+        _, dot, tail = symbol.rpartition(".")
+        want = (dot + tail).upper() if dot else ""  # no dot: the bare spelling, if a table has one
+        for mic, suffix in self.SUFFIX.items():
+            spelled = suffix if not suffix or suffix.startswith(".") else "." + suffix
+            if spelled.upper() != want:
+                continue
+            local = symbol[: len(symbol) - len(spelled)] if spelled else symbol
+            return f"{mic}:{local.upper()}" if local else None
+        return None
 
     def _index_symbol(self, instrument_id: str) -> str:
         """The literal symbol for an index id, or a refusal naming the fix.
@@ -124,7 +168,7 @@ class PriceFeed(ABC):
         """
         symbol = self.symbol_for(instrument_id)
         cache = getattr(self, "cache", None)
-        body = cache.get(self.name, symbol) if cache is not None else None
+        body = cache.get(self.name, symbol, mic=_mic_or_none(instrument_id)) if cache else None
         if body is None:
             body = self._fetch_csv(symbol)
             if cache is not None:
@@ -553,7 +597,43 @@ class ChainedFeed:
         )
 
 
+def aligned_closes(
+    feed, instruments: list[str], end: date | None = None
+) -> tuple[list[date], dict[str, list[float]]]:
+    """Closes of several instruments on the sessions they ALL printed, in order.
+
+    The legs of a decomposition have to be measured over the same sessions or
+    the subtraction between them means nothing, and "the last N bars of each
+    series" does not arrange that: on 2026-08-31 (Merdeka) Yahoo carried a bar
+    for the Bursa shares and none for ^KLSE, so a share's flat carried day was
+    paired with the index's move over the PREVIOUS session and the difference
+    read as a company-specific move. Intersecting the session dates first makes
+    the pairing right by construction - a day only one leg printed falls out -
+    and the returned dates say which sessions were used.
+
+    Each id is fetched once and in the calling thread. The second leg of a pair
+    is nearly always the cached market proxy, so a thread had nothing to buy,
+    and fetching from the caller's thread is what lets one process-wide feed
+    keep one sqlite connection. A leg the feed cannot serve raises
+    `PriceFeedError` as usual; legs that share no session raise `NoData`.
+    """
+    unique = list(dict.fromkeys(instruments))
+    by_day: dict[str, dict[date, float]] = {}
+    for iid in unique:
+        by_day[iid] = {b.day: b.close for b in drop_carried_rows(feed.fetch(iid, end=end).raw())}
+    common = set.intersection(*(set(days) for days in by_day.values()))
+    days = sorted(common)
+    if not days:
+        raise NoData(f"{' and '.join(unique)} share no session up to {end or 'today'}")
+    return days, {iid: [by_day[iid][d] for d in days] for iid in unique}
+
+
 _DEFAULT: ChainedFeed | None = None
+#: `default_feed()` is called from whichever thread asks first - the web app's
+#: threadpool as readily as the MCP loop - and two first callers building two
+#: feeds would leave two caches on one file and two sets of breakers that never
+#: hear about each other's failures. The lock makes the first build the only one.
+_DEFAULT_LOCK = threading.Lock()
 
 
 def default_feed() -> ChainedFeed:
@@ -565,11 +645,13 @@ def default_feed() -> ChainedFeed:
     repeated question costs zero quota (Stooq counts daily hits)."""
     global _DEFAULT
     if _DEFAULT is None:
-        try:
-            from core.market.cache import PriceCache
+        with _DEFAULT_LOCK:
+            if _DEFAULT is None:
+                try:
+                    from core.market.cache import PriceCache
 
-            cache = PriceCache()
-        except Exception:  # a broken cache must degrade to fetching, not block prices
-            cache = None
-        _DEFAULT = ChainedFeed([StooqFeed(cache=cache), YahooFeed(cache=cache)])
+                    cache = PriceCache()
+                except Exception:  # a broken cache must degrade to fetching, not block prices
+                    cache = None
+                _DEFAULT = ChainedFeed([StooqFeed(cache=cache), YahooFeed(cache=cache)])
     return _DEFAULT

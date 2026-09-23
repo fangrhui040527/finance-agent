@@ -265,7 +265,7 @@ Tell them the three rules that are not negotiable:
   retention is a privacy control, the traces hold verbatim prompts.
 - docker-compose binds loopback only and refuses to start without passwords
   in `.env` (no more shipped defaults).
-- The web app: `make web` / `run web`, twelve screens on 127.0.0.1:8765.
+- The web app: `make web` / `run web`, thirteen screens on 127.0.0.1:8765.
 
 ---
 
@@ -297,6 +297,7 @@ The rules, all thresholds in `config.toml [monitor]` and bounded in code:
 | `slots_missed` | the collector fired fewer times than its own cron owes over `slot_window_days` whole days (0 = off) |
 | `series_stale` | a macro series' newest observation is past the cadence declared for it in `knowledge/sources/freshness.py` |
 | `series_resumed` | a series recorded as ENDED in that same file has printed past the period its upstream stopped at |
+| `price_stale` | a row in `data/price_cache.db` was fetched more than 1 session (book name, proxy) or 5 sessions (peer) before its own market's last finished session; weekends and holidays are not counted |
 | `open_question_stale` | a question the nightly pages carry has stood for more than 21 days |
 | `run_errors` | the newest traced run contains an error event |
 | `methodology_changed` | the manifest hash moved between the last two runs |
@@ -493,17 +494,33 @@ collected tomorrow is not news. The dispatcher genuinely cannot know, at the
 moment it must decide, which of the two it is looking at.
 
 So the guard is at the **collector**, where the question is settled rather than
-predicted: `run_sweep` refuses a named slot that already has a run recorded for
-the current UTC day. Whoever arrives first collects; the second arrival — cron or
+predicted: `run_sweep` refuses a named slot that already has a run recorded since
+the slot's most recent scheduled firing (`core.monitor.SLOT_TIMES`), or in the
+last 24 hours, whichever window is shorter. Whoever arrives first collects; the second arrival — cron or
 catch-up, in either order — exits **0** in seconds having contacted nothing. Exit
 0 and not 2, because a slot that already ran is a no-op, not a fault, and a
 scheduler told otherwise would raise an alarm about a day that worked.
 
 Three ways past it, each an explicit act by a person: `--slot all` (the recovery
-hammer, never guarded), a named `--source`, or `--force`. And a store whose rows
-carry no `slot` at all is **not** read as having run — that column landed on
-2026-09-07, and treating older rows as prior runs would refuse every slot on any
-store written before that build.
+hammer, never guarded), a named `--source`, or `--force` (also a `force` input on
+the collect.yml dispatch form). And a store whose rows carry no `slot` at all is
+**not** read as having run — that column landed on 2026-09-07, and treating older
+rows as prior runs would refuse every slot on any store written before that build.
+
+The window opens at the **firing, not at midnight.** The first build asked "has
+this slot run since 00:00 UTC", and on 2026-09-22 Monday's 21:15 `us_close`
+arrived at 00:06 Tuesday — 2h51m late, an ordinary night for this cron — found a
+new day with no `us_close` in it, collected Monday's close a second time (the
+catch-up had taken it at 22:38), and filed the run under Tuesday. Tuesday's own
+21:15 firing was then a "repeat" and skipped, and `--due` owed nothing either,
+because it read the same calendar: one close collected twice, the next not at
+all. Measured from the firing, the 00:06 arrival sees the 22:38 run and stops,
+and Tuesday's 21:15 sees nothing since 21:15 and collects. `--due` judges each
+slot the same way and never names one whose time has not come round. It looks
+back 24 hours rather than to midnight, so a routine that runs after midnight
+still sees the previous evening's firing if it produced no run; on 2026-09-23
+the routine ran at 02:27 UTC and a midnight rule printed nothing for Tuesday's
+uncollected `us_close`.
 
 Same-day recovery is most of the value: **news is the only thing that expires.**
 Prices, filings and macro series are re-fetchable tomorrow; a wire feed serves a

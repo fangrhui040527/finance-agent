@@ -14,7 +14,7 @@ import pytest
 
 from knowledge.corpus import Corpus
 from knowledge.facts import FactBook, Observation, SeriesPoint
-from knowledge.feeds.adapter import FeedError, FixtureFeed
+from knowledge.feeds.adapter import FeedError, FeedThrottled, FixtureFeed
 from knowledge.news.features import Article
 from knowledge.sources.base import Collector, KeyMissing, PlanExcluded, Pull, SourceError
 from knowledge.sweep import DEGRADED, probe, run_sweep
@@ -629,7 +629,7 @@ def test_the_second_run_of_a_slot_on_the_same_day_collects_nothing(stores):
 
     second = _sweep(corpus_db, facts_db, at=NOW + timedelta(hours=1))
     assert second.already_ran, "the second arrival must be a no-op"
-    assert "already collected today" in second.already_ran
+    assert "already collected" in second.already_ran
     assert second.results == [], "no source is contacted at all"
 
     with Corpus(corpus_db) as c:
@@ -655,6 +655,51 @@ def test_tomorrow_is_a_new_day(stores):
     corpus_db, facts_db = stores
     _sweep(corpus_db, facts_db)
     assert not _sweep(corpus_db, facts_db, at=NOW + timedelta(days=1)).already_ran
+
+
+def test_a_firing_that_lands_after_midnight_is_still_the_previous_evenings(stores):
+    """2026-09-22. The catch-up collected Monday's us_close at 22:38; Monday's
+    21:15 cron then arrived at 00:06 Tuesday. Keyed to the UTC day, the guard
+    saw a new day with no us_close in it and collected Monday's close again -
+    and then skipped Tuesday's own 21:15 firing as a repeat. Keyed to the
+    firing, the 00:06 arrival is the no-op and Tuesday's 21:15 collects."""
+    corpus_db, facts_db = stores
+    catch_up = datetime(2026, 9, 21, 22, 38, tzinfo=UTC)
+    late_cron = datetime(2026, 9, 22, 0, 6, tzinfo=UTC)
+    tuesdays_cron = datetime(2026, 9, 22, 21, 20, tzinfo=UTC)
+    assert not _sweep(corpus_db, facts_db, slot="us_close", at=catch_up).already_ran
+    late = _sweep(corpus_db, facts_db, slot="us_close", at=late_cron)
+    assert late.already_ran, "Monday's firing had already collected"
+    assert "since its scheduled 2026-09-21 21:15 UTC" in late.already_ran
+    assert not _sweep(corpus_db, facts_db, slot="us_close", at=tuesdays_cron).already_ran
+
+
+def test_a_late_firing_that_did_collect_after_midnight_does_not_spend_the_next_days(stores):
+    """The other order of the same night: nothing had collected Monday's close,
+    so the late cron at 00:06 rightly did - Monday's firing, on Tuesday's date -
+    and Tuesday's 21:15 must still be a new firing, not a repeat of it."""
+    corpus_db, facts_db = stores
+    late_cron = datetime(2026, 9, 22, 0, 6, tzinfo=UTC)
+    tuesdays_cron = datetime(2026, 9, 22, 21, 20, tzinfo=UTC)
+    wednesdays_stragglers = datetime(2026, 9, 23, 0, 30, tzinfo=UTC)
+    assert not _sweep(corpus_db, facts_db, slot="us_close", at=late_cron).already_ran
+    assert not _sweep(corpus_db, facts_db, slot="us_close", at=tuesdays_cron).already_ran
+    assert _sweep(corpus_db, facts_db, slot="us_close", at=wednesdays_stragglers).already_ran
+
+
+def test_an_off_schedule_run_by_hand_is_judged_on_the_day_not_the_week(stores):
+    """The window opens at the last firing but is never wider than a day: a
+    person firing `us_preopen` on a Saturday is not refused because Friday's
+    ran. Driven through the guard itself, because the test config enables no
+    source that runs at pre-open."""
+    from knowledge.sweep import _already_ran
+
+    corpus_db, _ = stores
+    friday = datetime(2026, 9, 25, 12, 35, tzinfo=UTC)
+    with Corpus(corpus_db) as c:
+        c.record_sweep("fri", "fred", friday, "ok", at=friday, slot="us_preopen")
+    assert _already_ran(corpus_db, "us_preopen", friday + timedelta(hours=2))
+    assert not _already_ran(corpus_db, "us_preopen", datetime(2026, 9, 26, 14, 0, tzinfo=UTC))
 
 
 def test_force_and_slot_all_and_a_named_source_all_run_anyway(stores):
@@ -781,32 +826,67 @@ def test_nothing_deferred_says_nothing():
     assert _deferred_note(["A", "B"], ["A", "B"]) == ""
 
 
-def test_only_the_throttled_source_carries_a_cap():
-    """A cap on a source that answers every request would cost coverage for
-    nothing. google_news returns 79% on-topic at 0.1s a row; it is not the
-    problem and must not inherit the fix."""
+def test_only_the_throttled_source_groups_and_paces_its_requests():
+    """The grouping and the pace are GDELT's and must not leak onto a source
+    that answers every request: google_news returns 79% on-topic at 0.1s a
+    row, one company per query, and inherits neither. And the per-run CAP is
+    gone from gdelt rather than stacked under the grouping: it dropped names
+    without changing the pace, which is why four days of capped runs stored
+    nothing (2026-09-14 to 17)."""
     from knowledge.sources.catalog import CATALOG
 
-    assert CATALOG["gdelt"].names_per_run == 3
-    assert CATALOG["google_news"].names_per_run == 0
-    assert CATALOG["yahoo_rss"].names_per_run == 0
+    assert CATALOG["gdelt"].names_per_request == 3
+    assert CATALOG["gdelt"].seconds_between_requests >= 15
+    assert CATALOG["gdelt"].names_per_run == 0, "grouping replaces the cap"
+    for name in ("google_news", "yahoo_rss"):
+        assert CATALOG[name].names_per_request == 1 and CATALOG[name].names_per_run == 0
+        assert CATALOG[name].seconds_between_requests == 0
 
 
 BOOK_MY = ("MYX:1155", "MYX:5347", "MYX:5183", "MYX:5225", "MYX:8869", "MYX:3182")
+BOOK_US = ("XNAS:NVDA", "XNAS:AAPL", "XNAS:MSFT")
+THROTTLED = "GDELT fetch failed: HTTP Error 429: Too Many Requests"
 
 
-def test_a_capped_source_makes_three_requests_for_a_six_name_book(stores):
-    """End to end: the cap reaches the adapter, not just the helper.
+class RefusingAdapters(RecordingAdapters):
+    """RecordingAdapters whose N-th gdelt feed raises instead of answering.
 
-    Six Malaysian names, three requests. The three that do not go out are the
-    ones GDELT was refusing anyway - 84 name-failures over 30 recorded runs,
-    every one paid for with three attempts and up to a 90s read.
+    Refuses by ORDINAL, not by name: the rotation decides which names land in
+    which group, and the sweep must not need to know. `error` and `message`
+    are what the refused feed raises - FeedThrottled with a 429 by default, or
+    a plain FeedError for the test that pins the difference between them.
     """
+
+    def __init__(
+        self, refuse_request: int, error: type[FeedError] = FeedThrottled, message: str = THROTTLED
+    ):
+        super().__init__({"gdelt": []})
+        self.refuse_request = refuse_request
+        self.error = error
+        self.message = message
+        self.gdelt_requests = 0
+
+    def __call__(self, name, **kw):
+        if name != "gdelt":
+            return super().__call__(name, **kw)
+        self.gdelt_requests += 1
+        if self.gdelt_requests != self.refuse_request:
+            return super().__call__(name, **kw)
+        self.calls.append((name, kw))
+        error, message = self.error, self.message
+
+        class _Refused(FixtureFeed):
+            def _fetch_raw(self, since, limit):
+                raise error(message)
+
+        return _Refused(records=[])
+
+
+def _sweep_gdelt(stores, adapters, book, slot, **kw):
     corpus_db, facts_db = stores
-    adapters = RecordingAdapters({"gdelt": []})
-    report = run_sweep(
-        Cfg(sources=("gdelt",), watchlist=BOOK_MY),
-        "bursa_close",
+    return run_sweep(
+        Cfg(sources=("gdelt",), watchlist=book),
+        slot,
         corpus_path=corpus_db,
         facts_path=facts_db,
         link_graph=False,
@@ -814,30 +894,200 @@ def test_a_capped_source_makes_three_requests_for_a_six_name_book(stores):
         entity_index=INDEX,
         clock=lambda: NOW,
         log=lambda m: None,
+        sleep=kw.pop("sleep", lambda s: None),
+        **kw,
     )
-    gdelt_calls = [kw for name, kw in adapters.calls if name == "gdelt"]
-    assert len(gdelt_calls) == 3, [kw.get("query") for kw in gdelt_calls]
+
+
+def test_a_nine_name_book_is_three_grouped_requests_fifteen_seconds_apart(stores):
+    """End to end: the grouping and the pace reach the adapter, not just the catalogue.
+
+    Nine names were nine requests back to back, and GDELT's quota - about one
+    request every five seconds, counted per address, and GitHub's runners share
+    addresses - was gone after about five. Three requests, each carrying three
+    companies' phrases, starting at least fifteen seconds apart, is under it.
+    The clock is frozen, so every gap owed is the full fifteen seconds.
+    """
+    corpus_db, _ = stores
+    adapters = RecordingAdapters({"gdelt": []})
+    waits: list[float] = []
+    report = _sweep_gdelt(stores, adapters, BOOK_MY + BOOK_US, "all", sleep=waits.append)
+    queries = [kw["query"] for name, kw in adapters.calls if name == "gdelt"]
+    assert len(queries) == 3, queries
+    # Every company's phrases are in exactly one request: linkage is unchanged.
+    for phrase in ('"Maybank"', '"PCHEM"', '"Genting"', '"NVIDIA"', '"Apple"', '"Microsoft"'):
+        assert sum(phrase in q for q in queries) == 1, (phrase, queries)
+    assert all(q.startswith("(") and q.count("(") == 1 for q in queries), "one flat OR, no nesting"
+    assert waits == [15.0, 15.0], waits
     assert report.exit_code == 0
-
-
-def test_the_names_not_asked_about_are_named_in_the_sweep_row(stores):
-    """Otherwise a deferred name and a name with no news are the same row."""
-    corpus_db, facts_db = stores
-    adapters = RecordingAdapters({"gdelt": []})
-    run_sweep(
-        Cfg(sources=("gdelt",), watchlist=BOOK_MY),
-        "bursa_close",
-        corpus_path=corpus_db,
-        facts_path=facts_db,
-        link_graph=False,
-        adapter_for=adapters,
-        entity_index=INDEX,
-        clock=lambda: NOW,
-        log=lambda m: None,
-    )
     with Corpus(corpus_db) as c:
         (sweep,) = c.sweeps()
-    assert "deferred to a later run" in (sweep["detail"] or "")
+    assert sweep["detail"].startswith("grouped 3 names per request; 3 requests"), sweep["detail"]
+    assert "deferred" not in sweep["detail"]
+
+
+def test_a_six_name_book_is_two_requests(stores):
+    """Six Bursa names at bursa_close: two groups, one pause between them."""
+    adapters = RecordingAdapters({"gdelt": []})
+    waits: list[float] = []
+    _sweep_gdelt(stores, adapters, BOOK_MY, "bursa_close", sleep=waits.append)
+    assert len([1 for name, _ in adapters.calls if name == "gdelt"]) == 2
+    assert waits == [15.0]
+
+
+def test_a_paced_source_is_asked_for_one_page_per_request(stores):
+    """Past its page size the adapter pages by slicing time, and every slice is
+    a request the pacing loop never saw - fired back to back, on the quota the
+    pace exists to respect. `--limit 1000` on a nine-name book is 333 records a
+    group against a 250-record page; the ask is bounded at the page instead."""
+    limits: list[int] = []
+
+    def adapters(name, **kw):
+        class _OnePage(FixtureFeed):
+            MAX_RECORDS = 250
+
+            def _fetch_raw(self, since, limit):
+                limits.append(limit)
+                return []
+
+        return _OnePage(records=[])
+
+    _sweep_gdelt(stores, adapters, BOOK_MY + BOOK_US, "all", limit=1000)
+    assert limits == [250, 250, 250], limits
+
+
+def test_the_first_429_ends_the_slot_and_names_the_groups_it_deferred(stores):
+    """A 429 is the quota for this ADDRESS, not for this request. Asking the
+    next group would spend the retry budget to learn that again, and the
+    refused request would count against the next window too. So the sweep
+    stops, and the row says so: which request was refused, and which names
+    wait for the next slot - whose rotation starts elsewhere, so they are not
+    the same names refused tomorrow."""
+    corpus_db, _ = stores
+    adapters = RefusingAdapters(refuse_request=2)
+    report = _sweep_gdelt(stores, adapters, BOOK_MY + BOOK_US, "all")
+    assert adapters.gdelt_requests == 2, "the third group was never asked"
+    (r,) = report.results
+    assert r.status == "ok", r.detail  # three read, three refused: not more than half
+    assert r.detail.startswith(
+        "grouped 3 names per request; 2 requests "
+        "(HTTP 429 on request 2: the rest of the slot is deferred, not asked); deferred: "
+    ), r.detail
+    deferred = r.detail.split("deferred: ", 1)[1].split(";")[0]
+    assert len(deferred.split(", ")) == 3, deferred
+    rest = r.detail.split("deferred: ", 1)[1]
+    assert "HTTP Error 429" in rest, "the names that were refused still say why"
+    with Corpus(corpus_db) as c:
+        (sweep,) = c.sweeps()
+        assert sweep["status"] == "ok" and "deferred: " in sweep["detail"]
+        assert c.last_success("gdelt") is not None, "the group that WAS read moves the watermark"
+
+
+def test_a_429_on_the_first_request_is_a_failed_row_that_still_names_the_deferred(stores):
+    """Nothing read, so the watermark stays and the row is failed - and the six
+    names never asked are named in it, because a failed row listing three
+    companies reads as three companies with a problem."""
+    corpus_db, _ = stores
+    adapters = RefusingAdapters(refuse_request=1)
+    report = _sweep_gdelt(stores, adapters, BOOK_MY + BOOK_US, "all")
+    assert adapters.gdelt_requests == 1
+    (r,) = report.results
+    assert r.status == "failed" and report.exit_code == 3
+    assert "no name could be read" in r.detail and "429" in r.detail, r.detail
+    deferred = r.detail.split("deferred: ", 1)[1].split(";")[0]
+    assert len(deferred.split(", ")) == 6, deferred
+    with Corpus(corpus_db) as c:
+        assert c.last_success("gdelt") is None
+
+
+def test_a_plain_failure_on_one_group_does_not_defer_the_others(stores):
+    """Only a 429 is the quota. A 503 on one group says nothing about the next,
+    which is asked as before - the deferral is for what waiting cannot fix
+    inside one slot, not for every bad answer."""
+    adapters = RefusingAdapters(
+        refuse_request=2,
+        error=FeedError,
+        message="GDELT fetch failed: HTTP Error 503: Service Unavailable",
+    )
+    report = _sweep_gdelt(stores, adapters, BOOK_MY + BOOK_US, "all")
+    assert adapters.gdelt_requests == 3
+    (r,) = report.results
+    assert "deferred" not in r.detail and "503" in r.detail, r.detail
+    assert r.detail.startswith("grouped 3 names per request; 3 requests;"), r.detail
+
+
+def test_gdelt_is_asked_from_two_hours_before_its_watermark(stores):
+    """The watermark is the time of the last READ, and GDELT indexes a story
+    minutes to hours after it is published, so a story published just before
+    the last read and indexed just after it fell between two windows. The
+    overlap is free - the corpus dedupes on dup_hash - and google_news, which
+    serves a fixed two-day window of its own, is not widened."""
+    corpus_db, facts_db = stores
+    seen: dict[str, list[datetime]] = {}
+
+    def adapters(name, **kw):
+        class _Since(FixtureFeed):
+            def _fetch_raw(self, since, limit):
+                seen.setdefault(name, []).append(since)
+                return []
+
+        return _Since(records=[])
+
+    run_sweep(
+        Cfg(sources=("gdelt", "google_news"), watchlist=("MYX:1155",)),
+        "bursa_close",
+        hours=24,
+        corpus_path=corpus_db,
+        facts_path=facts_db,
+        link_graph=False,
+        adapter_for=adapters,
+        entity_index=INDEX,
+        clock=lambda: NOW,
+        log=lambda m: None,
+    )
+    assert seen["gdelt"] == [NOW - timedelta(hours=26)]
+    assert seen["google_news"] == [NOW - timedelta(hours=24)]
+
+
+def test_a_grouped_query_is_one_flat_or_of_every_askable_alias():
+    """The DOC API wants an OR list inside ONE pair of parentheses and does not
+    document nesting, so the per-company forms are flattened rather than
+    joined. A name with no alias long enough for the API contributes nothing,
+    and a group made only of such names sends no request at all."""
+    from knowledge.sweep import _gdelt_group_query, _groups
+
+    q = _gdelt_group_query(("MYX:5183", "MYX:1155", "MYX:9999"))
+    for phrase in ('"Petronas Chemicals"', '"PCHEM"', '"Maybank"', '"Malayan Banking"'):
+        assert phrase in q, q
+    assert q.count("(") == 1 and q.startswith("(") and q.endswith(")"), q
+    assert _gdelt_group_query(("MYX:9999",)) == ""
+    assert _groups(tuple("ABCDEFGHI"), 3) == [tuple("ABC"), tuple("DEF"), tuple("GHI")]
+    assert _groups(tuple("ABCD"), 3) == [tuple("ABC"), ("D",)]
+    assert _groups(("A", "B"), 1) == [("A",), ("B",)]
+
+
+def test_a_grouped_article_is_stamped_with_the_member_it_names(stores):
+    """Provenance with one id per row and three names per request: an article
+    naming a member of the group is stamped with that member, so provenance
+    and attribution agree; one naming none is stamped with the group's first,
+    so it is counted as a miss in the coverage table rather than vanishing
+    from it. The total is exact; the per-name split is what one column can
+    carry."""
+    corpus_db, _ = stores
+    adapters = RecordingAdapters(
+        {"gdelt": [row(1, "Nvidia beats"), row(2, "Chip demand broadly firm")]}
+    )
+    _sweep_gdelt(stores, adapters, BOOK_US, "us_close")
+    assert len([1 for name, _ in adapters.calls if name == "gdelt"]) == 1
+    with Corpus(corpus_db) as c:
+        stored = {a.title: a for a in c.articles(limit=10)}
+        assert stored["Nvidia beats"].fetched_for == "XNAS:NVDA"
+        assert stored["Nvidia beats"].instruments == ["XNAS:NVDA"]
+        assert stored["Chip demand broadly firm"].fetched_for in set(BOOK_US)
+        assert stored["Chip demand broadly firm"].instruments == []  # not claimed
+        rows = c.coverage()
+        assert sum(kept for _, _, kept, _ in rows) == 2
+        assert sum(named for _, _, _, named in rows) == 1
 
 
 def test_an_uncapped_source_still_asks_about_every_name(stores):
@@ -923,9 +1173,9 @@ def test_gdelt_is_asked_for_every_name_the_company_is_printed_under(stores):
     joined = " | ".join(queries)
     assert '"PCHEM"' in joined, joined
     assert '"Maybank"' in joined, joined
-    # One request per company still: the aliases widen the query, they do not
-    # multiply the requests, which is what the three-names-per-run cap counts.
-    assert len(queries) == 2, queries
+    # Two companies fit one grouped request: the aliases widen the query, they
+    # do not multiply the requests, and neither does a second company.
+    assert len(queries) == 1, queries
 
 
 def test_a_gdelt_name_with_no_askable_alias_is_skipped_not_sent(stores):
@@ -952,17 +1202,17 @@ def test_a_source_with_nothing_to_do_in_this_slot_still_records_a_sweep(stores):
     see it.
 
     `sweep_silence` reads `corpus.last_success` and nothing else. fmp is
-    per-instrument and `us_preopen` carries no per-instrument work, so fmp was
-    correctly skipped every weekday, recorded the skip in the PULLS table only,
-    and opened a silence alert on the fourth day about a collector that had
-    dispatched it on time all four days. The KeyMissing skip beside it has
-    always written both rows; this one now does too.
+    per-instrument, and when a slot hands it no names (here: a Bursa-only book
+    at the US pre-open) it is correctly skipped, recorded the skip in the PULLS
+    table only, and opened a silence alert on the fourth day about a collector
+    that had dispatched it on time all four days. The KeyMissing skip beside
+    it has always written both rows; this one now does too.
     """
     corpus_db, facts_db = stores
     adapters = RecordingAdapters({})
     run_sweep(
         Cfg(sources=("fmp",), watchlist=("MYX:1155",)),
-        "us_preopen",  # a macro slot: no market's names are collected in it
+        "us_preopen",  # the US names' slot: a Bursa-only book has nothing in it
         corpus_path=corpus_db,
         facts_path=facts_db,
         link_graph=False,
@@ -976,3 +1226,93 @@ def test_a_source_with_nothing_to_do_in_this_slot_still_records_a_sweep(stores):
         assert rows, "the skip left no sweep row, so the source reads as stopped"
         assert "skipped" in (rows[0]["detail"] or "")
         assert c.last_success("fmp") is not None, "sweep_silence would still fire"
+
+
+def test_fmp_is_asked_for_the_us_names_before_the_open(stores):
+    """SLOTS['us_preopen'] was an empty set - "macro only" - while fmp was
+    catalogued per-instrument in that very slot, so `instruments_for` handed it
+    no names and it was SKIPPED every weekday: twelve skipped pulls to
+    2026-09-17, and the earnings dates and rating changes the slot exists for
+    never collected. fmp is the ONLY per-instrument source in the slot, so
+    giving it the US names starts no other per-name work."""
+    from knowledge.sources import catalog
+
+    book = ("MYX:1155", "XNAS:NVDA", "XNYS:JPM")
+    assert catalog.instruments_for("us_preopen", catalog.CATALOG["fmp"], book) == (
+        "XNAS:NVDA",
+        "XNYS:JPM",
+    )
+    per_name = [
+        s.name for s in catalog.sources_for("us_preopen", catalog.CATALOG) if s.per_instrument
+    ]
+    assert per_name == ["fmp"], per_name
+
+    corpus_db, facts_db = stores
+    fmp = CannedCollector()
+    fmp.name = "fmp"
+    report = run_sweep(
+        Cfg(sources=("fmp",), watchlist=book),
+        "us_preopen",
+        corpus_path=corpus_db,
+        facts_path=facts_db,
+        collector_for=collectors_returning(fmp=fmp),
+        clock=lambda: NOW,
+        log=lambda m: None,
+    )
+    assert report.results[0].status == "ok", report.results[0].detail
+    ((_, instruments, slot),) = fmp.seen
+    assert instruments == ("XNAS:NVDA", "XNYS:JPM") and slot == "us_preopen"
+
+
+# --- the recorded detail is what the nightly page quotes ------------------------------------
+
+
+def test_a_structured_sources_detail_is_not_cut_at_400_characters(stores):
+    """The nightly page quotes the per-source detail from the sweeps and pulls
+    tables. At 400 characters fmp's per-endpoint notes for three names were
+    cut mid-URL before they named the second company. The bound is 2000 now;
+    the columns are TEXT, so nothing else changed."""
+    corpus_db, facts_db = stores
+    long_note = "; ".join(f"endpoint {i}: outside the plan for NVDA, AAPL, MSFT" for i in range(30))
+    assert 400 < len(long_note) < 2000
+    fred = CannedCollector(pull=Pull(notes=[long_note]))
+    run_sweep(
+        Cfg(sources=("fred",)),
+        "us_preopen",
+        corpus_path=corpus_db,
+        facts_path=facts_db,
+        collector_for=collectors_returning(fred=fred),
+        clock=lambda: NOW,
+        log=lambda m: None,
+    )
+    with Corpus(corpus_db) as c:
+        (sweep,) = c.sweeps()
+    assert long_note in sweep["detail"]
+    with FactBook(facts_db) as book:
+        (pull_detail,) = [r[0] for r in book.conn.execute("SELECT detail FROM pulls")]
+    assert pull_detail == long_note
+
+
+def test_a_news_failures_detail_is_bounded_at_2000_not_400(stores):
+    corpus_db, facts_db = stores
+    reason = "HTTP Error 429: Too Many Requests; " * 120  # ~4,200 characters
+
+    def broken(name, **kw):
+        class _Broken(FixtureFeed):
+            def _fetch_raw(self, since, limit):
+                raise FeedError(reason)
+
+        return _Broken(records=[])
+
+    run_sweep(
+        Cfg(sources=("thestar_business",)),
+        "bursa_close",
+        corpus_path=corpus_db,
+        facts_path=facts_db,
+        adapter_for=broken,
+        clock=lambda: NOW,
+        log=lambda m: None,
+    )
+    with Corpus(corpus_db) as c:
+        (sweep,) = c.sweeps()
+    assert len(sweep["detail"]) == 2000 and sweep["detail"] == reason[:2000]

@@ -441,7 +441,7 @@ nothing in this environment can reach a Malaysian host to tell the difference.
 
 ## 14. A no-op run that still committed
 
-`_already_ran_today` (§ the doubled slot) makes the second collector arrival on
+`_already_ran` (§ the doubled slot) makes the second collector arrival on
 a slot a no-op: the cron and the nightly catch-up both fire, whoever is first
 collects, the second costs seconds instead of 370 requests. It was not a no-op
 in one place. The digest was re-rendered with a later `Generated` line over
@@ -812,6 +812,160 @@ each ask not to be sent. Setting the two repository secrets is the cheap test.
 That it is a one-line configuration fix is the point of this entry rather than an
 aside: the throttle was visible in the source's own reply from the first run, and
 twelve days of it were recorded as `ok`.
+
+## 21. A guard that read the calendar while the cron read the clock
+
+§14's guard asked "has this slot run since 00:00 UTC". The cron it guards has
+never fired on time here — 14 minutes to 6h34m late across September — and on
+2026-09-22 Monday's 21:15 `us_close` arrived at **00:06:24 UTC on Tuesday**,
+2h51m late, an ordinary night. The guard saw a fresh day with no `us_close` in
+it. The catch-up had already collected Monday's close at 22:38, so the second
+sweep was the doubled collection §14 exists to prevent, filed under Tuesday
+(`da1298c`, "the 2026-09-22 us_close sweep").
+
+It did not stop at the corpus. The paper mark that runs after the sweep, on a
+build that still stamped the wall clock, wrote a `2026-09-22 us_close` mark at
+00:09:01 holding Monday's closes (fx dated 2026-09-21), thirteen hours before
+Tuesday's session opened; and because 2026-09-22 is the first day of the ramp,
+that mark's phase was `ramp` and the control book's rebalance fired from it —
+three targets, decided at 00:09:01, sized against Monday's closes rather than
+Tuesday's. The decision day is the right one and the fills land at the first
+bar after it either way; the sizing is the part the 09-22 paper page records.
+
+And the fault runs forward. Tuesday's own 21:15 firing finds a `us_close` run
+"today" and exits 0 as a repeat, and `--due` at 22:33 — which read the same
+midnight — owes nothing: one close collected twice, the next not at all, with
+every rule reporting a day that worked.
+
+The fix keys both questions to the **firing**. `core.monitor.SLOT_TIMES` holds
+the cron's four times beside `SLOT_WEEKDAYS`; `slot_window_start` returns the
+slot's most recent scheduled firing at or before now. The guard skips a slot
+only when a run is recorded since that firing (never more than 24 hours back,
+so a `weekly` fired by hand on a Wednesday is judged on the day); `--due`
+names a slot only once its firing today has come round and nothing has landed
+since. The 00:06 arrival now sees the 22:38 run and stops, and Tuesday's 21:15
+sees nothing since 21:15 and collects. `restamp_marks` gained the second shape
+of the weekend rule: a mark on a session day taken before that session
+**opened** cannot carry its bars and is re-dated to the last cached bar before
+it, later reading stays — the open and not the close, because a mark taken
+mid-session from a provisional bar is that day's mark and a later run replaces
+it. collect.yml gained a `force` dispatch input, the override the guard's own
+docstring promised and the form could not pass.
+
+The price cache had the same midnight in it. The 00:08 collector refetched
+every book name and each market's proxy, and `PriceCache.get` served a row for
+the rest of the UTC day it was fetched on (`fetched_on == today`) unless its
+last row failed to parse. The three US names and `^KLSE` came back from Yahoo
+with Monday's row blank in the close column — the parser drops it, so those
+rows read as mid-session and would have been refetched at 09:25. The Bursa
+names came back complete through Monday: `5183.KL`, fetched-on Tuesday, last
+bar Monday, and after Bursa shut at 09:00 UTC that row would have been served
+to the bursa_close sweep at 09:25, to the paper mark behind it, and to every
+read until Wednesday — Tuesday's Bursa closes never fetched on Tuesday. The
+row was today's; the session was not. `get` now takes the market's MIC from
+the feed and refuses a body pulled before that market's most recent session
+close (`calendar.last_session_close`): the Bursa row pulled at 00:08 is stale
+at 09:01 and served until then; a US row pulled at 00:08 is fresh until 20:00,
+because no Nasdaq session shut in between. A caller that cannot name the
+market keeps the day rule, which is the looser answer, never the fresher one.
+
+A review of that fix the next morning found two more faults in it. The catch-up
+still owed only firings since 00:00 UTC. On 2026-09-23 the routine itself ran
+at 02:27 UTC, four hours late, and Tuesday's 21:15 firing, which main's guard
+had skipped, was invisible to it: `slots_outstanding` returned nothing, the
+same silence this section describes, arriving by a different door. It now owes
+any firing of the last 24 hours with no run of that slot, or of `all`, since
+it; at 22:33 that window holds exactly the day's own firings. And the
+real-clock test of `sweep --due` recorded its run five minutes back, which
+between 09:20 and 09:25 UTC lands before the `bursa_close` firing and fails a
+correct command, the trap its own docstring describes at 00:02. It now records
+the run at or after the firing.
+
+The same morning's rehearsal of tonight's pipeline on this branch found the
+third shape of the fault in the feedback pack. The paper book's fundable table
+has labelled a price pulled before its market shut since 2026-09-16; the
+pack's moves table never asked. Built for 2026-09-22 from `main`'s cache, it
+decomposed NVIDIA, Apple and Microsoft from quotes pulled at 14:05 UTC, 35
+minutes into the session, exactly as it would a close, which is also the
+shape of the 1.12pp Apple discrepancy carried as an open question since
+2026-09-17. `measure` now runs both legs through `price_state` and a
+provisional leg marks the row and gets its own block under the table, beside
+STALE NAMES and MIS-DATED; a leg whose fetch time is unknown is not labelled.
+The 2026-09-22 pack now marks six rows STALE and three PROVISIONAL, which is
+every row it has.
+
+The paper book's fundable table had the mirror gap. It labelled a price pulled
+mid-session but printed an older session's close under the heading "the last
+close" with no date: the first ramp decision was sized on six Bursa prices from
+Monday, eight hours after Tuesday's session shut, and the table could not say
+so. `fundables` now compares each close with the latest session its market has
+finished by the end of the day (or by now, when that is earlier) and the row says
+`[the 2026-09-21 close; XKLS has since closed 2026-09-22]`, with a footnote
+beside the provisional one.
+
+Two open questions the nightly pages had carried since 2026-09-16 and
+2026-09-18 turned out to be collector faults, not facts about the market.
+FRED lists "FOMC Press Release" (release 101) on every day of its calendar,
+weekends included; the collector stored each as a `macro_release`, so every
+page's watch list carried an FOMC date on every row from 2026-09-07 and the
+one real decision, the +0.25 in `DFF` on 09-17, could not be told from the
+thirty that were not. A release listed on five or more days of the fortnight
+is now a daily table: noted on the pull, not stored, and collapsed to one
+line where rows already stored are read. And `DCOILBRENTEU` sat under the
+DAILY freshness limit although EIA publishes its daily spot prices in one
+weekly release: the monitor raised *past its cadence (8d, limit 7)* on
+2026-09-23 with nothing wrong. It is WEEKLY now, like the H.10 rates.
+
+Not changed: the control book's three 2026-09-22 targets. They are the record
+of what the machine did, on the correct decision day; the page says how they
+were sized.
+
+## 22. A verdict that read as a search nobody ran
+
+Every significant idiosyncratic row in the feedback pack has read
+`no_identified_catalyst` - *significant idiosyncratic move; no catalyst matched
+yet*. Three pages built on that sentence as if it reported a search. None had
+been run. The sentence is a literal in `decompose`, which never looks at a
+candidate; the pack calls `decompose` and nothing else. On 2026-09-18 Tenaga
+carried the verdict on the one session the corpus held five dated rows about
+the cause, and the page could only ask why the matcher had missed them. It had
+not missed them. It had never been called.
+
+The same sentence said "significant" of every residual past the 1.5 sigma at
+which the cause hunt starts, while the `Significance` object beside it applies
+1.96, a 5% test. Re-measured on 2026-09-23 from the current cache: Press Metal
+on 2026-09-21 was 2.01 sigma and the page was right to call it the one
+significant name. Tenaga on 2026-09-18 was 1.92 and Petronas Chemicals'
+-6.71% residual on 2026-09-17 was 1.60. Neither clears the test, and both pages
+called them significant. (The bars may have been refetched since those pages
+were built, so these are today's figures, not a correction of the pages' own
+numbers.)
+
+`catalyst.attach`, the matcher's own verdict, had the adjacent fault: an empty
+candidate list and a list weighed and rejected shared one reason, and that
+reason ends *no-news moves of this size have historically tended to REVERSE*.
+The reversal finding is about moves whose news was looked at and found
+wanting. A name the collector held nothing about has not been looked at.
+
+Now: `decompose` states the sigma and whether it clears 5%, and says no
+candidate has been weighed; `attach` gives an empty list its own reason
+(*an empty evidence set is not a rejection*) and gives a rejection the count
+and the best score it rejected; the pack adds that it runs no matcher, so the
+verdict means a company-specific cause is warranted, not that none exists. The
+pack line also ends the reason with a full stop. It used to run into the next
+field: *no catalyst matched yet Beta 1.04*.
+
+Two faults of the same age surfaced while testing this, both in the
+`qa/phase1` suite, which CI does not run. Its forward-record round trip logged
+`--grade-on 2026-09-21` as a literal, and `log` refuses a grading date that is
+not in the future, so the test had failed on its own setup since that morning.
+`tests/test_learning_store.py` already warned about this exact trap in a
+comment. And its stress assertion expected two standing notes when one had
+been closed on 2026-09-08 by b738dab (config database paths are confined to
+the project); it had been red for two weeks. The round trip also showed that
+`predict.py log` printed a refusal (past date, impossible confidence, reused
+id) as a Python traceback; it prints `refused: <reason>` and exits 1, as
+`grade` already did.
 
 ## What the families have in common
 

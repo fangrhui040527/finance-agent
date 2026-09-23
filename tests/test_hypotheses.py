@@ -13,6 +13,20 @@ def _store(tmp_path) -> HypothesisStore:
     return HypothesisStore(tmp_path / "learning.db")
 
 
+def test_opening_a_registry_that_has_its_tables_writes_nothing(tmp_path):
+    """A read of the registry must not edit the file: data/learning.db is
+    tracked, and `CREATE IF NOT EXISTS` on every open dirtied it."""
+    path = tmp_path / "learning.db"
+    with HypothesisStore(path) as s:
+        s.create("Banks re-rate", "MYX banks re-rate as NIM stabilises above 2.25%")
+    before = path.read_bytes()
+    with HypothesisStore(path) as s:
+        assert len(s.all()) == 1
+    assert path.read_bytes() == before
+    wal = path.with_name(path.name + "-wal")
+    assert not wal.exists() or wal.stat().st_size == 0
+
+
 def test_create_starts_exploring_and_is_immutable(tmp_path):
     with _store(tmp_path) as s:
         hid = s.create("Banks re-rate", "MYX banks re-rate as NIM stabilises above 2.25%")

@@ -18,6 +18,7 @@ SCREENS = [
     "portfolio",
     "thesis",
     "predictions",
+    "paper",
     "trace",
     "learn",
     "world",

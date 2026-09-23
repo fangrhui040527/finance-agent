@@ -8,6 +8,7 @@ import { sizing } from "/screens/sizing.js";
 import { portfolio } from "/screens/portfolio.js";
 import { thesis } from "/screens/thesis.js";
 import { predictions } from "/screens/predictions.js";
+import { paper } from "/screens/paper.js";
 import { trace } from "/screens/trace.js";
 import { learn } from "/screens/learn.js";
 import { world } from "/screens/world.js";
@@ -22,6 +23,7 @@ export const screens = {
   portfolio,
   thesis,
   predictions,
+  paper,
   trace,
   learn,
   world,

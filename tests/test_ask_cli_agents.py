@@ -451,6 +451,21 @@ def test_fetch_measures_both_legs_from_the_feed(capsys, feed):
     assert "stated, not measured" not in out
 
 
+def test_fetch_pairs_the_legs_on_the_sessions_both_printed(capsys, feed):
+    """The share has a 01-07 bar the proxy lacks - the Merdeka shape. Each leg
+    used to be the last N bars of its own series, so the share's 01-07 move was
+    set against the proxy's 01-06 one; the window is now the sessions both
+    printed, and the output says which they were."""
+    feed({"nvda.us": CSV, "spy.us": "\n".join(MKT.splitlines()[:-1]) + "\n"})
+    code, out = run(
+        ["why", "XNAS:NVDA", "--fetch", "--against", "XNAS:SPY", "--on", "2026-01-07"], capsys
+    )
+    assert code == 0
+    assert "over 2026-01-05 to 2026-01-06" in out
+    assert "2026-01-07" not in out.split("\n\n")[0], "the unshared bar is not in the window"
+    assert "XNAS:SPY +0.98%" in out, "the proxy's 01-06 session, not its last bar"
+
+
 def test_fetch_without_a_market_proxy_is_refused(capsys):
     code, _ = run(["why", "XNAS:NVDA", "--fetch", "--move", "0.05", "--market", "0.01"], capsys)
     assert code == 2, "a measured leg against a typed leg is not a decomposition"

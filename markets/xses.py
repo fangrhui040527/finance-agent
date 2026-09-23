@@ -60,7 +60,7 @@ class XSES(MarketAdapter):
     settlement_days = 2
     known_at_strategy = KnownAtStrategy.SELF_BUILT
 
-    def __init__(self, holidays=frozenset(), half_days=frozenset()) -> None:
+    def __init__(self, holidays=frozenset(), half_days=frozenset(), early_closes=None) -> None:
         # SGX removed the securities-market lunch break in 2011: one continuous
         # session, unlike Bursa's two.
         self._cal = SessionCalendar(
@@ -68,6 +68,7 @@ class XSES(MarketAdapter):
             tz_offset_hours=8,
             holidays=holidays,
             half_days=half_days,
+            early_closes=early_closes,
         )
 
     @property

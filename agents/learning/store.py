@@ -85,6 +85,22 @@ BEGIN SELECT RAISE(ABORT, 'an outcome is graded once'); END;
 CREATE TRIGGER IF NOT EXISTS outcomes_no_delete
 BEFORE DELETE ON outcomes
 BEGIN SELECT RAISE(ABORT, 'outcomes are never deleted'); END;
+
+-- A lesson is refused an UPDATE and a DELETE like a prediction is; until
+-- 2026-09-19 it was the one table here without the guard. The store's own
+-- path writes a lesson whole, by id, with INSERT OR REPLACE, which SQLite
+-- resolves without firing a delete trigger (recursive triggers are off), so
+-- a lesson's status still moves from active to stale to archived and its hit
+-- rate is still re-derived from the graded record. What is refused is the
+-- edit in place and the quiet removal - the two ways a record becomes a memory.
+CREATE TRIGGER IF NOT EXISTS lessons_no_update
+BEFORE UPDATE ON lessons
+BEGIN SELECT RAISE(ABORT,
+  'a lesson is re-derived and saved whole, never edited in place'); END;
+CREATE TRIGGER IF NOT EXISTS lessons_no_delete
+BEFORE DELETE ON lessons
+BEGIN SELECT RAISE(ABORT,
+  'lessons are never deleted: archive one and it stays on the record'); END;
 """
 
 

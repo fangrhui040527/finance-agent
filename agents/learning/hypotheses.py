@@ -26,9 +26,10 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
 
-from core.provenance.ledger import _enable_wal
+from core.provenance.ledger import _enable_wal, apply_schema
 
 STATUSES = ("exploring", "testing", "validated", "rejected", "monitoring")
+TABLES = ("hypotheses", "hypothesis_events", "hypothesis_links")
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS hypotheses (
@@ -93,11 +94,24 @@ class HypothesisStore:
         p = Path(path)
         if p.parent != Path("."):
             p.parent.mkdir(parents=True, exist_ok=True)
-        self.db = sqlite3.connect(str(p))
+        self.db = sqlite3.connect(str(p), timeout=5)
         self.db.row_factory = sqlite3.Row
         _enable_wal(self.db, str(p), timeout_ms=5000)
-        self.db.executescript(SCHEMA)
-        self.db.commit()
+        # The schema runs only when a table is missing. `CREATE IF NOT EXISTS`
+        # on every open looked free, but on a file that predates these tables
+        # it is a write, and one GET of the registry left data/learning.db
+        # modified under git - a read that edits a tracked binary. A store that
+        # has its tables is opened, not touched.
+        if self._missing_tables():
+            apply_schema(self.db, SCHEMA, timeout_ms=5000)
+
+    def _missing_tables(self) -> bool:
+        marks = ",".join("?" * len(TABLES))
+        n = self.db.execute(
+            f"SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name IN ({marks})",
+            TABLES,
+        ).fetchone()[0]
+        return int(n) < len(TABLES)
 
     # -- writes (all INSERTs; the triggers make anything else impossible) ------
 

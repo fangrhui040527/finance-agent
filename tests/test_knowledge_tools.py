@@ -164,6 +164,47 @@ def test_a_stopped_upstream_is_named_under_the_table_not_only_in_the_row(tmp_pat
     assert "DGS10" in text and "STALE" not in text
 
 
+def test_a_release_listed_every_day_prints_once_as_a_table(tmp_path):
+    """Thirty stored "FOMC Press Release" rows printed one per day on every
+    page's watch list; the one weekly print among them was hard to find."""
+    now = datetime(2026, 9, 22, tzinfo=UTC)
+    rows = [
+        EventRecord(
+            source="fred",
+            event_id=f"fred:101:{d}",
+            instrument_id="MACRO:US",
+            kind="macro_release",
+            announced_at=datetime(d.year, d.month, d.day, tzinfo=UTC),
+            title="FOMC Press Release",
+            payload={"time": "not published by FRED"},
+        )
+        for d in (date(2026, 9, 22) + timedelta(days=i) for i in range(7))
+    ] + [
+        EventRecord(
+            source="fred",
+            event_id="fred:180:2026-09-24",
+            instrument_id="MACRO:US",
+            kind="macro_release",
+            announced_at=datetime(2026, 9, 24, tzinfo=UTC),
+            title="Unemployment Insurance Weekly Claims Report",
+            payload={"time": "not published by FRED"},
+        )
+    ]
+    with FactBook(tmp_path / "f.db") as book:
+        book.add_series(
+            [
+                SeriesPoint(
+                    "fred", "DFF", date(2026, 9, 18), Decimal("3.88"), known_at=date(2026, 9, 19)
+                )
+            ]
+        )
+        book.add_events(rows)
+        text = macro_context(book, now=now)
+    assert text.count("FOMC Press Release") == 1
+    assert "a daily table, not a scheduled print" in text
+    assert "09-24         Unemployment Insurance Weekly Claims Report  (fred)" in text
+
+
 def test_a_book_of_live_series_prints_no_stopped_upstream_block(tmp_path):
     with FactBook(tmp_path / "f.db") as book:
         book.add_series(

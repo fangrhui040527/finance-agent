@@ -25,19 +25,45 @@ from dataclasses import dataclass, field
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
+from core.market.bars import drop_carried_rows
 from core.market.feed import PriceFeedError, market_proxy_for
-from engines.attribution.decompose import MIN_OBSERVATIONS, decompose
+from engines.attribution.decompose import (
+    ESTIMATION_GAP,
+    ESTIMATION_LOOKBACK,
+    MIN_OBSERVATIONS,
+    Verdict,
+    decompose,
+)
 from engines.attribution.regression import Fit, huber_fit
 from knowledge.digest import build_digest
 from knowledge.facts import FactBook
 from knowledge.report import fact_snapshot, macro_context
+from markets.registry import market_currency, mic_of
 
 PACK_DIR = Path("knowledge/feedback")
-#: Sessions of returns the market beta is estimated on, ending the day before.
-EST_WINDOW = 120
-#: Pull of the estimated beta toward 1.0. docs/03: robust estimators on 120
-#: sessions still carry noise; a fifth of the way to the structural prior.
+#: The most sessions of returns the market beta is estimated on. The window
+#: actually fitted is `estimation_slice`: it ends ESTIMATION_GAP sessions before
+#: the event and shortens to what the pair has, down to MIN_OBSERVATIONS.
+EST_WINDOW = ESTIMATION_LOOKBACK
+#: Pull of the estimated beta toward 1.0. docs/03: robust estimators on a few
+#: hundred sessions still carry noise; a fifth of the way to the structural prior.
 SHRINK = 0.2
+
+
+def estimation_slice(n_returns: int) -> slice:
+    """Which of `n_returns` session returns, the last being the event's, the beta is fitted on.
+
+    docs/03 section 2.2 rule 1: the window is [t-260, t-11]. It ends
+    ESTIMATION_GAP sessions before the event so that a move which took several
+    sessions to play out is in neither its own benchmark nor its own sigma.
+    Until now the pack fitted the 120 returns immediately before the event -
+    equal to MIN_OBSERVATIONS, so every row said "short window; betas
+    unstable", and with no gap at all. The lookback shortens to what the pair
+    has; below MIN_OBSERVATIONS `market_fit` refuses, and that is the floor.
+    """
+    available = max(n_returns - ESTIMATION_GAP - 1, 0)
+    lookback = min(ESTIMATION_LOOKBACK, available)
+    return slice(-(lookback + ESTIMATION_GAP + 1), -(ESTIMATION_GAP + 1))
 
 
 @dataclass
@@ -61,7 +87,16 @@ class Move:
     components: dict[str, float] = field(default_factory=dict)
     asked_for: date | None = None
     own_last: date | None = None
+    mkt_last: date | None = None
     dating: str = ""
+    #: What the returns are denominated in: the instrument's market currency,
+    #: read off its adapter. Not the book's currency, which the pack does not
+    #: convert to because no FX return is measured.
+    currency: str = ""
+    #: Set when either leg's bar for `last_day` was pulled before its market
+    #: shut: the figures are the session so far, not the session. See
+    #: `_provisional_note`.
+    provisional: str = ""
 
     @property
     def mis_dated(self) -> bool:
@@ -82,10 +117,36 @@ class Move:
             and self.last_day < self.own_last <= self.asked_for
         )
 
+    @property
+    def stale(self) -> bool:
+        """The PROXY printed a session this measurement does not include.
+
+        The mirror of `mis_dated`. When the market traded and the name did not,
+        the name is halted, delisted or its feed has stopped, and every figure
+        in the row belongs to its last real session. The note used to call this
+        "no session for either" whenever the NAME lacked a later bar, without
+        looking at the proxy - a stale name labelled as a market holiday.
+        `mis_dated` takes precedence when both legs printed sessions the other
+        did not, because that is the fault it already names.
+        """
+        return bool(
+            self.asked_for
+            and self.last_day
+            and self.mkt_last
+            and self.last_day < self.mkt_last <= self.asked_for
+            and not self.mis_dated
+        )
+
     def row(self) -> str:
         if self.error:
             return f"| {self.label} ({self.instrument_id}) | NO DATA | | | | {self.error[:90]} |"
-        flag = f" **MIS-DATED: this is the {self.last_day} session**" if self.mis_dated else ""
+        flag = ""
+        if self.mis_dated:
+            flag = f" **MIS-DATED: this is the {self.last_day} session**"
+        elif self.stale:
+            flag = f" **STALE NAME: this is the {self.last_day} session**"
+        if self.provisional:
+            flag += f" **PROVISIONAL: the {self.last_day} session so far, not the close**"
         return (
             f"| {self.label} ({self.instrument_id}) | {self.r1:+.2%} | {self.m1:+.2%} | "
             f"{self.r5:+.2%} | {self.m5:+.2%} | {self.verdict}"
@@ -122,7 +183,14 @@ def market_fit(inst: list[float], mkt: list[float]) -> Fit | None:
 
 
 def measure(feed, instrument_id: str, label: str, day: date, base_currency: str = "MYR") -> Move:
-    """One name against its proxy, from whatever the feed serves for `day`."""
+    """One name against its proxy, from whatever the feed serves for `day`.
+
+    `base_currency` is the book's. The returns are NOT converted to it: no FX
+    return is measured, so the row is in the instrument's own market currency
+    and says so when that differs. Passing the book's currency into the
+    decomposition with a zero FX leg labelled a USD return as MYR with
+    "currency 0.00%", which is a conversion that never happened.
+    """
     proxy = market_proxy_for(instrument_id)
     move = Move(instrument_id, label, proxy or "")
     if proxy is None:
@@ -135,8 +203,13 @@ def measure(feed, instrument_id: str, label: str, day: date, base_currency: str 
         move.error = str(e).splitlines()[0]
         return move
     move.served_from = getattr(feed, "source_used", "") or ""
-    closes_i = {b.day: b.close for b in own.raw()}
-    closes_m = {b.day: b.close for b in mkt.raw()}
+    # The vendor writes a Bursa holiday as a row - the previous close carried
+    # forward on zero volume for a share, the previous row repeated whole for
+    # the index - and both pass the bar parser. Dropped before the intersection
+    # so the day is missing from BOTH legs and reaches `_dating_note` as a
+    # closed market, instead of printing a 0.00% session with a verdict.
+    closes_i = {b.day: b.close for b in drop_carried_rows(own.raw())}
+    closes_m = {b.day: b.close for b in drop_carried_rows(mkt.raw())}
     common = sorted(set(closes_i) & set(closes_m))
     if len(common) < 6:
         move.error = f"only {len(common)} common sessions with {proxy}; need 6 for a 5-bar return"
@@ -148,12 +221,19 @@ def measure(feed, instrument_id: str, label: str, day: date, base_currency: str 
     move.last_day = common[-1]
     move.asked_for = day
     move.own_last = max(closes_i) if closes_i else None
+    move.mkt_last = max(closes_m) if closes_m else None
     move.sessions = len(common)
     move.dating = _dating_note(move, own_days=set(closes_i), mkt_days=set(closes_m))
     move.r1, move.m1 = ri[-1], rm[-1]
     move.r5, move.m5 = ci[-1] / ci[-6] - 1.0, cm[-1] / cm[-6] - 1.0
+    move.currency = market_currency(mic_of(instrument_id))
+    move.provisional = _provisional_note(feed, (instrument_id, proxy), move.last_day)
 
-    est_i, est_m = ri[-EST_WINDOW - 1 : -1], rm[-EST_WINDOW - 1 : -1]
+    est = estimation_slice(len(ri))
+    est_i, est_m = ri[est], rm[est]
+    # ri[k] is the return INTO common[k + 1], so the window's sessions are the
+    # same slice of the days one step along.
+    est_days = common[1:][est]
     fit = market_fit(est_i, est_m)
     exp = decompose(
         instrument_id,
@@ -164,28 +244,88 @@ def measure(feed, instrument_id: str, label: str, day: date, base_currency: str 
         ri[-1],
         0.0,
         fit,
-        base_currency=base_currency,
+        base_currency=move.currency,
     )
     move.verdict = exp.verdict.value
     move.unexplained = exp.unexplained_share if fit is not None else None
     move.reason = exp.reason
+    if exp.verdict is Verdict.NO_IDENTIFIED_CATALYST:
+        # The page read this verdict as a search that found nothing - "no
+        # catalyst matched" on Tenaga the one day the corpus held five rows about
+        # the cause. Nothing here scores a candidate; the verdict is the
+        # decomposition's alone.
+        move.reason += (
+            ". The pack runs no catalyst matcher: this verdict says a company-specific "
+            "cause is warranted, not that none exists, and the stories and events below "
+            "are unweighed"
+        )
     move.estimation = (
-        (exp.estimation_note + "; sector beta fixed at 0 (no sector proxy cached)")
+        f"{exp.estimation_note}; window {est_days[0]}..{est_days[-1]} "
+        f"({ESTIMATION_GAP} sessions before the event); "
+        "sector beta fixed at 0 (no sector proxy cached)"
         if fit is not None
-        else f"no estimate: {len(est_i)} sessions, {MIN_OBSERVATIONS} needed"
+        else (
+            f"no estimate: {len(est_i)} sessions before the {ESTIMATION_GAP}-session gap, "
+            f"{MIN_OBSERVATIONS} needed"
+        )
     )
+    if move.currency != base_currency:
+        move.estimation += f"; returns in {move.currency}, {base_currency} leg not measured"
     move.beta = fit.coefficients[1] if fit is not None else None
     move.components = {c.component.value: c.contribution for c in exp.components}
     return move
+
+
+def _fetched_at(feed, instrument_id: str) -> datetime | None:
+    """When the body behind an id's bars was pulled; None from a feed that
+    keeps no such record (a fixture, a feed with no cache)."""
+    ask = getattr(feed, "fetched_at", None)
+    if ask is None:
+        return None
+    try:
+        return ask(instrument_id)
+    except Exception:  # a feed that cannot say is simply unknown
+        return None
+
+
+def _provisional_note(feed, legs: tuple[str, ...], day: date) -> str:
+    """Say so when a leg's bar for `day` was pulled before its market shut.
+
+    The paper book's fundable table has labelled such prices since 2026-09-16;
+    this table did not. On 2026-09-17 Apple's published session moved 1.12pp
+    between a build from a pre-close cache and one from the settled bars, and
+    on 2026-09-22 the only US bars `main` held for the day were quotes pulled
+    at 14:05 UTC, 35 minutes into the session: a decomposition of either reads
+    exactly like one of a close. The rule is `core.market.calendar.price_state`,
+    the same one the fundable table uses; a leg whose fetch time is unknown is
+    not labelled, because `unknown` is not `provisional`.
+    """
+    from core.market.calendar import PROVISIONAL, price_state
+
+    pulled = []
+    for iid in legs:
+        at = _fetched_at(feed, iid)
+        if at is not None and price_state(mic_of(iid), day, at) == PROVISIONAL:
+            pulled.append(f"{iid} pulled {at:%Y-%m-%d %H:%M}Z")
+    if not pulled:
+        return ""
+    return (
+        f"PROVISIONAL: {'; '.join(pulled)}, before its market's {day} close, so the "
+        f"{day} figures in this row are the session so far, not the close"
+    )
 
 
 def _dating_note(move: Move, *, own_days: set[date], mkt_days: set[date]) -> str:
     """Say, in one line, which day this measurement is really about and why.
 
     A fallback to an earlier session is not itself a fault - markets close. The
-    fault is a SILENT fallback, and the two cases have different cures: a quiet
-    market needs nothing, a proxy that did not print needs a different proxy or
-    a stated refusal. They are told apart here so the page cannot confuse them.
+    fault is a SILENT fallback, and the three cases have different cures: a
+    quiet market needs nothing, a proxy that did not print needs a different
+    proxy or a stated refusal, and a name that did not print while its market
+    did is halted or its feed has stopped and wants looking at. They are told
+    apart here so the page cannot confuse them. The holiday reading is the
+    last resort, reached only when NEITHER leg has a later session; the note
+    used to reach it whenever the name lacked one.
     """
     asked, last = move.asked_for, move.last_day
     if asked is None or last is None or last >= asked:
@@ -196,6 +336,12 @@ def _dating_note(move: Move, *, own_days: set[date], mkt_days: set[date]) -> str
             f"MIS-DATED: {move.instrument_id} printed {', '.join(d.isoformat() for d in missed)} "
             f"but the proxy {move.proxy} did not, so every figure in this row is the "
             f"{last} session, not {asked}"
+        )
+    proxy_only = sorted(d for d in mkt_days - own_days if last < d <= asked)
+    if proxy_only:
+        return (
+            f"STALE NAME: {move.proxy} printed {', '.join(d.isoformat() for d in proxy_only)} "
+            f"but {move.instrument_id} did not; every figure in this row is the {last} session"
         )
     return (
         f"no session for {move.instrument_id} or {move.proxy} after {last}; the figures are "
@@ -254,7 +400,7 @@ def build_pack(
             f"- **{m.label}** ({m.instrument_id}) vs {m.proxy}, last session {m.last_day}, "
             f"{m.sessions} common sessions"
             + (f", source {m.served_from}" if m.served_from else "")
-            + f". {m.reason}"
+            + f". {m.reason.rstrip('.')}."
             + (
                 f" Beta {m.beta:.2f}; {m.estimation}."
                 if m.beta is not None
@@ -262,6 +408,7 @@ def build_pack(
             )
             + (f" Components: {comps}." if comps else "")
             + (f" {m.dating}." if m.dating else "")
+            + (f" {m.provisional}." if m.provisional else "")
         )
     out.append("")
 
@@ -274,6 +421,30 @@ def build_pack(
             "",
         ]
         out += [f"- {m.dating}" for m in stale]
+        out.append("")
+
+    halted = [m for m in moves if m.stale]
+    if halted:
+        out += [
+            f"**{len(halted)} of {len(moves)} rows are STALE NAMES.** The market proxy printed a "
+            f"session the name did not - a halt, a delisting or a feed that has stopped - so the "
+            f"decomposition is the name's last real session. Do not date these {day}, and treat "
+            f"the name's price feed as suspect until it prints again:",
+            "",
+        ]
+        out += [f"- {m.dating}" for m in halted]
+        out.append("")
+
+    unsettled = [m for m in moves if m.provisional]
+    if unsettled:
+        out += [
+            f"**{len(unsettled)} of {len(moves)} rows are PROVISIONAL.** A leg's bar for the "
+            f"row's session was pulled while its market was still trading, so the return and "
+            f"its decomposition are the session so far. Do not read them as {day}'s close; "
+            f"the next close sweep refetches them:",
+            "",
+        ]
+        out += [f"- {m.label} ({m.instrument_id}): {m.provisional}" for m in unsettled]
         out.append("")
 
     digest = build_digest(

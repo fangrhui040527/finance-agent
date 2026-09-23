@@ -49,8 +49,8 @@ Full design detail starts at **[`docs/README.md`](docs/README.md)**.
 
 ## Status
 
-**Everything except P16 is built and tested - including the twelve-screen web
-app** (`make web`, 127.0.0.1 only). 1,400+ tests, no network and no keys needed
+**Everything except P16 is built and tested - including the thirteen-screen web
+app** (`make web`, 127.0.0.1 only). 2,500+ tests, no network and no keys needed
 to run any of them. CI runs lint (ruff), types (pyright), the suite with a 92%
 coverage floor, `verify.py`, stress, the eval ratchet, preflight doctor and the
 no-execution grep on ubuntu AND windows, 3.11 and 3.12, from a committed
@@ -106,7 +106,7 @@ make stress                  # adversarial: volume, NaN, thresholds, concurrency
 make trace                   # full traced system run -> debug/<run_id>/
 make mcp-check               # MCP handshake selftest, no client needed
 make doctor                  # preflight: what this installation can actually do
-make web                     # the twelve screens on http://127.0.0.1:8765
+make web                     # the thirteen screens on http://127.0.0.1:8765
 make sweep                   # fetch every enabled source and KEEP it -> data/corpus.db
 make graph                   # build the knowledge graph -> data/graph.db
 make graph-report            # hubs, orphans, review queue, surprising links

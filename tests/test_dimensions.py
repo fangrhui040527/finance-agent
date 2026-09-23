@@ -307,6 +307,33 @@ def test_the_scorecard_says_cannot_score_rather_than_green(tmp_path):
     assert "statement about the evidence, not about the system" in out
 
 
+def test_the_scorecard_calls_an_equal_book_level_not_behind(tmp_path, monkeypatch):
+    """An all-cash book at +0.00% against a control at +0.00% has neither won
+    nor lost; the old line said 'behind' for a verdict the arithmetic never reached."""
+    from types import SimpleNamespace
+
+    flat = SimpleNamespace(equity_usd=Decimal(1000), drawdown=Decimal(0), halted=False)
+    figures = {
+        "opened": "2026-09-04",
+        "marks": 10,
+        "need": 10,
+        "initial": Decimal(1000),
+        "latest": flat,
+        "control_latest": flat,
+    }
+    monkeypatch.setattr(O, "_paper_figures", lambda cfg: figures)
+    out = O.scorecard(db=str(_ledger(tmp_path / "l.db", [{}])), root=str(tmp_path / "none"))
+    line = next(ln for ln in out.splitlines() if ln.strip().startswith("paper book"))
+    assert line.split()[2] == "level" and "+0.00% vs control +0.00%" in line
+    ahead = {
+        **figures,
+        "latest": SimpleNamespace(equity_usd=Decimal(1010), drawdown=Decimal(0), halted=False),
+    }
+    monkeypatch.setattr(O, "_paper_figures", lambda cfg: ahead)
+    out = O.scorecard(db=str(tmp_path / "l.db"), root=str(tmp_path / "none"))
+    assert "ahead" in next(ln for ln in out.splitlines() if ln.strip().startswith("paper book"))
+
+
 def test_the_scorecard_carries_evidence_for_every_line(tmp_path):
     db = _ledger(tmp_path / "l.db", [{"latency": 50.0}])
     out = O.scorecard(db=str(db), root=str(tmp_path / "none"))

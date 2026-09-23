@@ -223,9 +223,26 @@ def macro_calendar(book: FactBook, now: datetime | None = None, days: int = 7) -
         if e.instrument_id.startswith("MACRO:")
     ]
     if coming:
+        # A title listed on most days of the window is a daily table the
+        # calendar carries, not a scheduled print (see fred.DAILY_TABLE_DAYS):
+        # one line says so instead of one line per day. Rows stored before the
+        # collector learned this age out of the store on their own.
+        from knowledge.sources.fred import DAILY_TABLE_DAYS
+
+        listed: dict[tuple[str, str], set] = {}
+        for e in coming:
+            listed.setdefault((e.source, e.title), set()).add(e.announced_at.date())
+        tables = {k for k, ds in listed.items() if len(ds) >= DAILY_TABLE_DAYS}
         out += ["", f"releases, next {days} days"]
         for e in sorted(coming, key=lambda e: e.announced_at)[:40]:
+            if (e.source, e.title) in tables:
+                continue
             when = e.announced_at
             stamp = f"{when:%m-%d}" if e.payload.get("time") else f"{when:%m-%d %H:%M}Z"
             out.append(f"    {stamp:<13} {e.title}  ({e.source})")
+        for source, title in sorted(tables):
+            out.append(
+                f"    {'every day':<13} {title}  ({source}) - listed on "
+                f"{len(listed[(source, title)])} days: a daily table, not a scheduled print"
+            )
     return out

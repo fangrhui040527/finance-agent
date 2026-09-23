@@ -12,7 +12,11 @@ Four tables, one rule each:
   * **observations** - a figure about an instrument, stamped with `known_at`:
     the day it became knowable, never the period it describes. This is the
     on-disk form of `core.market.pointintime.Fact`, and `as_fact_store` hands
-    exactly that to A1 so the look-ahead guard still applies.
+    exactly that to A1 so the look-ahead guard still applies. A row whose
+    period label lies after that day - an estimate, or a print a vendor files
+    under a later fiscal date - carries `forward` so the guard knows it is
+    not a look-ahead; the flag travels in `payload_json`, so the schema is
+    the one every existing copy already has.
   * **events** - something dated: a filing, an insider trade, a scheduled
     result, a rating change. Announced and effective dates are separate
     columns because conflating them is the A5 prohibition in docs/02.
@@ -44,6 +48,13 @@ FACTS_DB = "data/facts.db"
 OK = "ok"
 FAILED = "failed"
 SKIPPED = "skipped"  # no key, or the plan does not include the endpoint
+
+#: How much of a pull's detail the pulls table keeps. 2000, up from 400, for
+#: the reason knowledge/sweep.DETAIL_CHARS gives: the nightly page quotes this
+#: column, and at 400 the per-endpoint plan notes of a three-name fmp pull
+#: were cut mid-URL before they named the second company. The column is TEXT,
+#: so this bounds prose and is no migration.
+DETAIL_CHARS = 2000
 
 #: Event kinds that record a THIRD PARTY'S VIEW of a company rather than
 #: something the company did, said or scheduled.
@@ -175,6 +186,12 @@ class Observation:
     unit: str = ""
     currency: str = ""
     payload: dict = field(default_factory=dict)
+    #: The period label lies after the day the figure was seen: an estimate of
+    #: a period to come, or a print a vendor files under a later fiscal date.
+    #: `known_at` stays the day it was seen - never pushed out to the label,
+    #: which is what hid a public EPS print for 25 days - and the A1 bridge
+    #: hands this to `Fact`, whose guard would otherwise refuse the row.
+    forward: bool = False
 
     @property
     def value_text(self) -> str:
@@ -273,7 +290,11 @@ class FactBook:
                     _num(o.value) if o.value is not None else None,
                     o.unit,
                     o.currency,
-                    json.dumps(o.payload, sort_keys=True, default=str),
+                    json.dumps(
+                        {**o.payload, "forward": True} if o.forward else o.payload,
+                        sort_keys=True,
+                        default=str,
+                    ),
                     at,
                 ),
             )
@@ -376,7 +397,15 @@ class FactBook:
         self.conn.execute(
             "INSERT INTO pulls (run_id, at, source, status, fetched, stored, detail)"
             " VALUES (?,?,?,?,?,?,?)",
-            (run_id, _iso(at or datetime.now(UTC)), source, status, fetched, stored, detail[:400]),
+            (
+                run_id,
+                _iso(at or datetime.now(UTC)),
+                source,
+                status,
+                fetched,
+                stored,
+                detail[:DETAIL_CHARS],
+            ),
         )
         self.conn.commit()
 
@@ -551,6 +580,11 @@ class FactBook:
         Only observations with a numeric value AND a period end become Facts -
         a fact without a period is a snapshot, not a reported figure, and the
         point-in-time guard needs both dates to mean anything.
+
+        The `forward` label is passed through as stored and nothing is inferred
+        from the dates: a row that was knowable before its period ended and
+        does not say so is a collector stamping a reported figure wrongly, and
+        `Fact` refusing it here is the guard doing its job, not a nuisance.
         """
         from core.market.pointintime import Fact, FactStore
         from markets.registry import get as market_get
@@ -581,6 +615,7 @@ class FactBook:
                     currency=r["currency"] or "",
                     accounting_standard=standard,
                     source_doc_id=f"{r['source']}:{iid}:{r['concept']}:{r['period_end']}",
+                    forward=bool(json.loads(r["payload_json"]).get("forward")),
                 )
             )
         return store
@@ -590,6 +625,10 @@ class FactBook:
     @staticmethod
     def _to_observation(r: sqlite3.Row) -> Observation:
         value = as_decimal(r["value_text"]) if r["value_num"] is not None else None
+        payload = json.loads(r["payload_json"])
+        # The label rides in payload_json to keep the schema; on the way out it
+        # goes back to being a field, so the payload is the vendor's extras again.
+        forward = bool(payload.pop("forward", False))
         return Observation(
             source=r["source"],
             instrument_id=r["instrument_id"],
@@ -600,7 +639,8 @@ class FactBook:
             period_end=date.fromisoformat(r["period_end"]) if r["period_end"] else None,
             unit=r["unit"],
             currency=r["currency"],
-            payload=json.loads(r["payload_json"]),
+            payload=payload,
+            forward=forward,
         )
 
     @staticmethod

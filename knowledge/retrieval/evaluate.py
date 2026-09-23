@@ -307,7 +307,12 @@ def unlabelled_lexical_matches(collection: Collection, case: Case) -> list[str]:
         if want <= set(toks) and chunk.chunk_id not in labelled:
             if chunk.metadata.get("doc_id") in labelled:
                 continue
-            out.append(f"{case.query!r}: {chunk.text[:70]}")
+            # The whole first line, up to 200 characters, not the first 70.
+            # This line is what a person reads to decide whether the document
+            # belongs under the label, and a title cut at 70 reads as a
+            # different story: #72 labelled one wrong on exactly that.
+            first = (chunk.text.splitlines() or [""])[0][:200]
+            out.append(f"{case.query!r}: {first}")
     return out
 
 

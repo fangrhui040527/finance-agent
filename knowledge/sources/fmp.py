@@ -3,15 +3,28 @@
 The research review singles FMP out for depth of history and for the
 earnings-call transcript endpoint - management's own words, dated. On the
 free plan (250 calls a day) the statements and estimates are there; some of
-the rest answers with a JSON "Error Message" naming the plan. That answer is
-recorded as a note and the pull continues, because a plan boundary on one
-endpoint says nothing about the eight others.
+the rest answers with a JSON "Error Message" naming the plan, or with HTTP
+402 outright (`/stable/earnings` did, every week to 2026-09-13). Either is
+recorded as ONE note per endpoint - "outside the plan", with the names it was
+not collected for - and the pull continues, because a plan boundary on one
+endpoint says nothing about the eight others. An endpoint refused once is not
+asked again for the next name in the same run: the boundary is the plan's,
+not the company's, and the second request would spend a call to learn it
+twice.
 
 Point-in-time is handled with care here because this is where it matters
 most: a quarter's revenue is stamped `known_at = filingDate` (the day the
 10-Q went in), never the period end. `core.market.pointintime` refuses a
-Fact whose known_at precedes its period end, and this adapter never builds
-one.
+reported Fact whose known_at precedes its period end, and this adapter never
+builds one.
+
+Estimates are the other case. Consensus for next fiscal year is knowable
+today and describes a period that ends in a year, so it is stamped
+`known_at` = the day it was fetched, `period_end` = the period it targets,
+and `forward=True`. Each revision then lands as its own vintage. Until
+2026-09-18 this adapter clamped known_at up to the target period instead,
+which gave every revision one date years out and left all 46 rows in the
+fact book invisible to every as-of read.
 
 Two slots use it: `us_preopen` daily for the cheap, fast-moving pieces
 (rating changes, the earnings date, the target consensus); `weekly` for the
@@ -58,10 +71,34 @@ BALANCE = {
 }
 
 
+class EndpointExcluded(PlanExcluded):
+    """One FMP endpoint the plan does not include, named by its path.
+
+    Carries the path so `collect` can say it once - "/earnings is outside the
+    plan (HTTP 402); not collected for NVDA, AAPL, MSFT" - rather than once
+    per name with a redacted URL each. The per-name form is what the pulls
+    table held to 2026-09-17: three names, several endpoints, and a line that
+    ran past the column before it named the second company.
+    """
+
+    def __init__(self, path: str, why: str) -> None:
+        super().__init__(f"fmp /{path}: outside the plan ({why})")
+        self.path = path
+        self.why = why
+
+
 class FmpCollector(Collector):
     name = "fmp"
     key_env = "FMP_API_KEY"
     QUARTERS = 8
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        #: path -> why, for the endpoints this run has been refused on, and the
+        #: symbols each refusal stood in for. One run's boundary is one run's:
+        #: `collect` clears both, so a plan bought tomorrow is asked tomorrow.
+        self._excluded: dict[str, str] = {}
+        self._excluded_for: dict[str, list[str]] = {}
 
     def collect(
         self, since: datetime, instruments: tuple[str, ...] = (), slot: str = "all"
@@ -69,6 +106,8 @@ class FmpCollector(Collector):
         key = self.key
         pull = Pull()
         failures: list[str] = []
+        self._excluded.clear()
+        self._excluded_for.clear()
         deep = slot in ("weekly", "all")
         for iid in instruments:
             symbol = local_code(iid).upper()
@@ -79,11 +118,16 @@ class FmpCollector(Collector):
             for step in steps:
                 try:
                     step(one, iid, symbol, since, key)
+                except EndpointExcluded:
+                    pass  # recorded by _get; said once per endpoint below
                 except PlanExcluded as e:
                     one.notes.append(str(e))
                 except SourceError as e:
                     failures.append(f"{iid} {step.__name__}: {e}")
             pull.extend(one)
+        for path, why in self._excluded.items():
+            names = ", ".join(dict.fromkeys(self._excluded_for.get(path, ())))
+            pull.notes.append(f"fmp /{path} is outside the plan ({why}); not collected for {names}")
         if instruments and failures and len(failures) >= 3 * len(instruments):
             raise SourceError("every endpoint failed. First: " + failures[0])
         pull.notes.extend(failures)
@@ -93,14 +137,29 @@ class FmpCollector(Collector):
     # -- transport with FMP's error convention -------------------------------------
 
     def _get(self, path: str, params: dict) -> list | dict:
-        payload = self.get_json(f"{BASE}/{path}", params)
+        symbol = str(params.get("symbol") or "")
+        if path in self._excluded:
+            # Refused earlier this run, so not asked for another name: the
+            # plan is per endpoint, not per company.
+            self._excluded_for.setdefault(path, []).append(symbol)
+            raise EndpointExcluded(path, self._excluded[path])
+        try:
+            payload = self.get_json(f"{BASE}/{path}", params)
+        except PlanExcluded as e:  # get_json's 402/403, with the redacted URL
+            code = getattr(e.__cause__, "code", None)
+            raise self._exclude(path, symbol, f"HTTP {code}" if code else str(e)) from e
         if isinstance(payload, dict) and payload.get("Error Message"):
             msg = str(payload["Error Message"])
             low = msg.lower()
             if any(w in low for w in ("plan", "premium", "subscription", "upgrade", "exclusive")):
-                raise PlanExcluded(f"fmp {path}: {msg[:160]}")
+                raise self._exclude(path, symbol, msg[:160])
             raise SourceError(f"fmp {path}: {msg[:160]}")
         return payload
+
+    def _exclude(self, path: str, symbol: str, why: str) -> EndpointExcluded:
+        self._excluded[path] = why
+        self._excluded_for.setdefault(path, []).append(symbol)
+        return EndpointExcluded(path, why)
 
     # -- daily pieces ----------------------------------------------------------------
 
@@ -197,9 +256,13 @@ class FmpCollector(Collector):
             ("cash-flow-statement", CASHFLOW),
             ("balance-sheet-statement", BALANCE),
         ):
-            rows = self._get(
-                path, {"symbol": symbol, "period": "quarter", "limit": self.QUARTERS, "apikey": key}
-            )
+            try:
+                rows = self._get(
+                    path,
+                    {"symbol": symbol, "period": "quarter", "limit": self.QUARTERS, "apikey": key},
+                )
+            except EndpointExcluded:
+                continue  # one statement outside the plan says nothing about the other two
             if not isinstance(rows, list):
                 raise SourceError(f"fmp {path} for {symbol}: expected a list")
             for r in rows:
@@ -250,13 +313,14 @@ class FmpCollector(Collector):
                         self.name,
                         iid,
                         concept,
-                        known_at=max(today, period) if period > today else today,
+                        known_at=today,
                         value=value,
                         period_end=period,
                         currency="USD",
                         payload={
                             "analysts": r.get("numAnalystsEps") or r.get("numAnalystsRevenue")
                         },
+                        forward=True,
                     )
                 )
 

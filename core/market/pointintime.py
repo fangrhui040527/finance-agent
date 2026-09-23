@@ -33,7 +33,27 @@ class LookaheadError(AssertionError):
 
 @dataclass(frozen=True)
 class Fact:
-    """One reported figure, stamped with when it became knowable."""
+    """One figure, stamped with when it became knowable.
+
+    For a REPORTED figure `known_at` may not precede `period_end`: a quarter's
+    revenue cannot be public before the quarter has ended, and a Fact built the
+    other way round is the naive period-end join this module exists to refuse.
+
+    `forward` names the two cases where the period label honestly lies after
+    the day the figure was knowable, and the guard steps aside for them:
+
+      * an estimate of a period still to come. Consensus EPS for next fiscal
+        year is knowable today and describes a period that ends in a year.
+      * a print a vendor files under a fiscal-period end that falls after the
+        announcement. Finnhub labels NVIDIA's late-August result "2026-09-30".
+
+    Before the field existed the collectors satisfied the guard by clamping
+    known_at UP to the period end, and on 2026-09-18 the fact book held a
+    published EPS print invisible for 25 days and 46 forward estimates dated
+    2027 to 2031 - three revisions of one AAPL figure under a single vintage.
+    Visibility is still decided by known_at alone: `forward` changes what may
+    be stored, never what a query at `asof` may see.
+    """
 
     instrument_id: str
     concept: str
@@ -44,12 +64,15 @@ class Fact:
     accounting_standard: AccountingStandard
     source_doc_id: str
     is_restatement: bool = False
+    forward: bool = False
 
     def __post_init__(self) -> None:
-        if self.known_at < self.period_end:
+        if self.known_at < self.period_end and not self.forward:
             raise ValueError(
                 f"known_at {self.known_at} precedes period_end {self.period_end}: "
-                "a figure cannot be public before the period it describes has ended"
+                "a reported figure cannot be public before the period it describes has "
+                "ended; an estimate, or a print labelled with a later fiscal date, "
+                "must say forward=True"
             )
 
 

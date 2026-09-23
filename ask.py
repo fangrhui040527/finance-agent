@@ -145,7 +145,8 @@ def cmd_plan(a) -> int:
 
 
 def cmd_why(a) -> int:
-    if not getattr(a, "fetch", False) and (a.move is None or a.market is None):
+    fetch = getattr(a, "fetch", False)
+    if not fetch and (a.move is None or a.market is None):
         print(
             "give --move AND --market, or --fetch --against <proxy> to measure both "
             "from the price feed. One typed leg against one measured leg is a "
@@ -153,41 +154,45 @@ def cmd_why(a) -> int:
             file=sys.stderr,
         )
         return 2
-    fit = _fit_from_csv(a.history) if a.history else _fit_synthetic(a.beta_market, a.beta_sector)
+    # Measured beats typed, but only if BOTH legs are measured. A real
+    # instrument return against a typed market return is not a decomposition,
+    # it is a subtraction dressed as one.
+    if fetch and not a.against:
+        print(
+            "--fetch needs --against: an instrument return measured against a "
+            "typed market return is not a decomposition.",
+            file=sys.stderr,
+        )
+        return 2
     end = date.fromisoformat(a.on) if a.on else date.today()
     window = (end - timedelta(days=a.days), end)
-    measured = False
 
-    if getattr(a, "fetch", False):
-        # Measured beats typed, but only if BOTH legs are measured. A real
-        # instrument return against a typed market return is not a decomposition,
-        # it is a subtraction dressed as one.
-        if not a.against:
-            print(
-                "--fetch needs --against: an instrument return measured against a "
-                "typed market return is not a decomposition.",
-                file=sys.stderr,
-            )
-            return 2
+    # The betas come from one of three places, and the output says which: a
+    # --history file the operator chose; the same sessions the legs were
+    # measured on; or, for typed legs with neither, a synthetic fit of the
+    # stated betas whose sigma belongs to no instrument.
+    fit = _fit_from_csv(a.history) if a.history else None
+    legs = None
+    if fetch:
+        from mcp_server.tools import measured_legs
+
         try:
-            legs = _window_returns(
-                [a.instrument, a.against] + ([a.sector_proxy] if a.sector_proxy else []),
-                a.days,
-                end,
+            legs = measured_legs(
+                _feed(), a.instrument, a.against, a.days, end, sector_proxy=a.sector_proxy
             )
-            a.move, first_day, last_day = legs[a.instrument]
-            a.market, _, _ = legs[a.against]
-            if a.sector_proxy:
-                a.sector, _, _ = legs[a.sector_proxy]
         except PriceFeedError as e:
             print(f"no prices: {e}", file=sys.stderr)
             return 3
-        window = (first_day, last_day)
-        measured = True
-        print(
-            f"measured  {a.instrument} {a.move:+.2%} against {a.against} "
-            f"{a.market:+.2%} over {first_day} to {last_day}\n"
-        )
+        a.move, a.market = legs.instrument_return, legs.market_return
+        if legs.sector_return is not None:
+            a.sector = legs.sector_return
+        window = (legs.first, legs.last)
+        print(f"measured  {legs.measured_line()}\n")
+        if not a.history:
+            fit = legs.fit
+    synthetic = legs is None and not a.history
+    if synthetic:
+        fit = _fit_synthetic(a.beta_market, a.beta_sector)
 
     from mcp_server.tools import graph_peers
 
@@ -212,15 +217,25 @@ def cmd_why(a) -> int:
     exp = decompose(
         a.instrument, window, a.market, a.sector, {}, a.move, a.fx, fit, base_currency=a.currency
     )
+    if synthetic:
+        from mcp_server.tools import synthetic_note
+
+        exp.estimation_note = synthetic_note(a.beta_market, a.beta_sector)
+    elif legs is not None and not a.history:
+        if fit is None:
+            exp.reason = legs.estimation
+        else:
+            exp.estimation_note = f"{exp.estimation_note}; {legs.estimation}"
     print(decomposition_bars(exp))
     print()
     print(head.text)
     for c in head.caveats:
         print(f"  caveat: {c}")
-    if not a.history:
-        print("\n  betas are stated, not estimated: pass --history with 120+ rows of")
-        print("  instrument,market,sector returns for a real estimation window.")
-    if not measured:
+    if synthetic:
+        print("\n  betas are stated, not estimated, and the sigma is not this instrument's:")
+        print("  pass --history with 120+ rows of instrument,market,sector returns, or")
+        print("  --fetch --against <proxy> to estimate them on the sessions the legs share.")
+    if legs is None:
         print("  returns are stated, not measured: pass --fetch --against <proxy> to")
         print("  take both legs from the price feed instead.")
     return 0
@@ -231,43 +246,6 @@ def _feed():
     """The price seam. A chain, not a name: stooq.com walled itself off on
     2026-08-31 and a CLI wired to one source by name went dark with it."""
     return default_feed()
-
-
-def _window_returns(instruments: list[str], bars_back: int, end: date | None) -> dict:
-    """All legs of a decomposition, concurrently, each id fetched exactly once.
-
-    The legs are independent HTTP calls to a slow free source; serially they
-    cost up to 3x the timeout. Duplicates (instrument == market proxy) are
-    deduplicated BEFORE fetching, or the same URL would be paid for twice in
-    one command.
-    """
-    from concurrent.futures import ThreadPoolExecutor
-
-    unique = list(dict.fromkeys(instruments))
-    if len(unique) == 1:
-        return {unique[0]: _window_return(unique[0], bars_back, end)}
-    with ThreadPoolExecutor(max_workers=min(3, len(unique))) as pool:
-        futures = {i: pool.submit(_window_return, i, bars_back, end) for i in unique}
-        return {i: f.result() for i, f in futures.items()}
-
-
-def _window_return(instrument: str, bars_back: int, end: date | None):
-    """Realised return over the last `bars_back` TRADING bars, from real data.
-
-    Trading bars, not calendar days: a 5-calendar-day window over a long weekend
-    is three sessions, and pretending otherwise silently changes the horizon the
-    whole decomposition is about.
-    """
-    series = _feed().fetch(instrument, end=end)
-    bars = series.raw()
-    if len(bars) < bars_back + 1:
-        raise PriceFeedError(
-            f"{instrument} has {len(bars)} bars up to {end or 'today'}, "
-            f"need {bars_back + 1} to measure a {bars_back}-bar return"
-        )
-    window = bars[-(bars_back + 1) :]
-    first, last = window[0], window[-1]
-    return (last.close / first.close) - 1.0, first.day, last.day
 
 
 def cmd_prices(a) -> int:
@@ -297,14 +275,83 @@ def cmd_prices(a) -> int:
     return 0
 
 
+#: How many peer symbols one `prices --book` run adds beyond the book and its
+#: proxies. The graph grows by edits nobody thinks of as price decisions; the
+#: cap keeps one of them from turning the collector's price step into a burst
+#: a source throttles, and the round-robin in `_book_peers` keeps the cap from
+#: starving the names at the end of the list.
+PEER_WARM_CAP = 24
+
+
+def _peer_lookup():
+    """The graph's peer function, or None when no graph has been built.
+
+    A seam, so a test can script the peers without building a graph, and so
+    an unbuilt graph reads as "not built" - which `graph_peers` alone cannot
+    say: it answers an empty set for that and for a name with no peers alike.
+    """
+    from pathlib import Path
+
+    from knowledge.graph.build import DEFAULT_DB
+
+    if not Path(DEFAULT_DB).exists():
+        return None
+    from mcp_server.tools import graph_peers
+
+    return graph_peers
+
+
+def _book_peers(book: list[str], asof: date, lookup, cap: int = PEER_WARM_CAP) -> dict[str, str]:
+    """Peer id -> the book name it was found through: same market only,
+    nothing already in the book, at most `cap` in all.
+
+    Same market because that is the peer set every comparable is built from -
+    `peers_of` lists the others as excluded, and a cache warmed for a name no
+    table will read is quota spent on nothing. Round-robin over the book rather
+    than first come, so that when the cap binds every name keeps its nearest
+    peers instead of the first name keeping all of its own.
+    """
+    queues: list[tuple[str, list[str]]] = []
+    for iid in book:
+        try:
+            home = mic_of(iid)
+        except ValueError:
+            continue
+        peers: list[str] = []
+        for peer in sorted(lookup(iid, asof)):
+            try:
+                same = mic_of(peer) == home
+            except ValueError:
+                same = False
+            if same and peer not in book:
+                peers.append(peer)
+        queues.append((iid, peers))
+
+    out: dict[str, str] = {}
+    while len(out) < cap and any(q for _, q in queues):
+        for iid, q in queues:
+            while q:
+                peer = q.pop(0)
+                if peer not in out:
+                    out[peer] = iid
+                    break
+            if len(out) >= cap:
+                break
+    return out
+
+
 def _prices_book(a) -> int:
-    """Warm the price cache for every name in the book and each market's proxy.
+    """Warm the price cache for every name in the book, each market's proxy,
+    and the graph peers of every book name.
 
     The collector runs this after each close so data/price_cache.db carries
     the day's bars for every name the routine will ask about - the routine
     itself runs where no price host is reachable and reads the cache with
-    FINPLANET_OFFLINE=1. Exit 3 if any name could not be fetched; the others
-    are still cached.
+    FINPLANET_OFFLINE=1. The peers are in the list because peer_set, the
+    workup and comps read their bars from the same cache, and until
+    2026-09-19 nothing refetched them: sixteen peer rows sat two and three
+    weeks behind the book beside them. Exit 3 if any name could not be
+    fetched; the others are still cached.
     """
     from core.market.feed import market_proxy_for
 
@@ -315,9 +362,24 @@ def _prices_book(a) -> int:
         return 2
     book = list(dict.fromkeys(tuple(cfg.watchlist) + tuple(cfg.holdings)))
     proxies = [p for p in dict.fromkeys(market_proxy_for(i) for i in book) if p]
+
+    peers: dict[str, str] = {}
+    lookup = _peer_lookup()
+    if lookup is None:
+        print(f"  {'peers':<14} skipped: no graph built, so none are known (`make graph`)")
+    else:
+        try:
+            peers = _book_peers(book, datetime.now(UTC).date(), lookup)
+        # The peers are an extra: a broken graph must not cost the book its bars.
+        except Exception as e:
+            print(f"  {'peers':<14} skipped: {type(e).__name__}: {e}", file=sys.stderr)
+        else:
+            print(f"  {'peers':<14} {len(peers)} added from the graph (cap {PEER_WARM_CAP})")
+
+    names = book + proxies + list(peers)
     failed = 0
     feed = _feed()
-    for iid in book + proxies:
+    for iid in names:
         try:
             series = feed.fetch(iid)
         except PriceFeedError as e:
@@ -325,11 +387,15 @@ def _prices_book(a) -> int:
             print(f"  {iid:<14} FAILED  {str(e).splitlines()[0][:120]}", file=sys.stderr)
             continue
         last = series.raw()[-1]
+        tag = f"  peer of {peers[iid]}" if iid in peers else ""
         print(
             f"  {iid:<14} {len(series):>5} bars  last {last.day} close {last.close:.4f}"
-            f"  via {feed.source_used}"
+            f"  via {feed.source_used}{tag}"
         )
-    print(f"  {'cached':<14} {len(book) + len(proxies) - failed} of {len(book) + len(proxies)}")
+    print(
+        f"  {'cached':<14} {len(names) - failed} of {len(names)}"
+        f"  ({len(book)} book, {len(proxies)} proxies, {len(peers)} peers)"
+    )
     return 3 if failed else 0
 
 
@@ -2112,7 +2178,12 @@ def main(argv=None) -> int:
     wy.add_argument("--sector", type=float, default=0.0)
     wy.add_argument("--fx", type=float, default=0.0, help="base-currency leg")
     wy.add_argument("--currency", default="MYR")
-    wy.add_argument("--days", type=int, default=1, help="window length in calendar days")
+    wy.add_argument(
+        "--days",
+        type=int,
+        default=1,
+        help="window length: trading bars with --fetch, calendar days for typed returns",
+    )
     wy.add_argument("--on", help="window end date (YYYY-MM-DD), default today")
     wy.add_argument("--history", help="CSV of instrument,market,sector returns")
     wy.add_argument("--beta-market", type=float, default=1.1, help="used only without --history")
@@ -2129,7 +2200,9 @@ def main(argv=None) -> int:
     pr = sub.add_parser("prices", help="daily bars from the live feed")
     pr.add_argument("instrument", nargs="?", default="")
     pr.add_argument(
-        "--book", action="store_true", help="warm the cache for every book name and market proxy"
+        "--book",
+        action="store_true",
+        help="warm the cache for every book name, market proxy and graph peer of the book",
     )
     pr.add_argument("--days", type=int, default=20, help="bars to show")
     pr.add_argument("--on", help="as-at date (YYYY-MM-DD); later bars are not returned")
@@ -2397,7 +2470,7 @@ def main(argv=None) -> int:
     sw.add_argument(
         "--force",
         action="store_true",
-        help="collect even if this slot already ran today (the cron and the catch-up "
+        help="collect even if this slot's firing already ran (the cron and the catch-up "
         "can both fire for one slot; the second is skipped unless you say otherwise)",
     )
     sw.set_defaults(fn=cmd_sweep)

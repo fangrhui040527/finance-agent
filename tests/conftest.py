@@ -40,6 +40,9 @@ def keyless_env(monkeypatch: pytest.MonkeyPatch) -> None:
         "LLM_BACKEND_CHEAP",
         "FINPLANET_CHEAP",
         "FINPLANET_DEBUG_DIR",
+        # Offline serves stale cache rows by design; a shell that exports it
+        # would fail the tests that check the default refuses them.
+        "FINPLANET_OFFLINE",
         # Every free-provider key and override (docs/21): a GROQ_API_KEY in a
         # developer's shell would otherwise turn "no key -> echo" tests into
         # "no key -> groq" on that one machine.

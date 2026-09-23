@@ -289,6 +289,21 @@ def test_repeating_one_rule_does_not_inflate_the_correction(tmp_path):
         assert led.distinct_rules(u, START, START) == 1
 
 
+def test_an_identical_run_answers_with_its_existing_row_and_a_new_configuration_counts(tmp_path):
+    """Trial 7 of data/trials.db re-ran trial 3 byte for byte twelve minutes
+    later. The ledger keeps what it has, but it stops adding such rows, and
+    the correction counts configurations - rule and session count - not runs."""
+    with TrialLedger(str(tmp_path / "t.db")) as led:
+        u = led.universe_key(["XNAS:AAPL", "XNAS:MSFT", "XNAS:NVDA"])
+        first = led.record("momentum_12_1", u, START, START, 981, 1.19, 0.55)
+        again = led.record("momentum_12_1", u, START, START, 981, 1.19, 0.55)
+        assert again == first and led.count() == 1
+        longer = led.record("momentum_12_1", u, START, START, 985, 1.21, 0.56)
+        assert longer != first and led.count() == 2
+        assert led.distinct_rules(u, START, START) == 2
+        assert led.conn.execute("PRAGMA journal_mode").fetchone()[0] == "wal"
+
+
 # --- the live wiring ----------------------------------------------------------
 
 

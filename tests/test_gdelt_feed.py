@@ -18,7 +18,8 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 
-from knowledge.feeds.adapter import FeedError, GdeltFeed
+from knowledge.feeds.adapter import FeedError, FeedThrottled, GdeltFeed
+from tests.conftest import http_error
 from tests.conftest import opener_for as _opener
 
 NOW = datetime(2026, 8, 27, 12, 0, tzinfo=UTC)
@@ -223,11 +224,16 @@ def test_any_OTHER_unexpected_object_is_still_an_error():
 
 def test_a_rate_limit_waits_long_enough_to_be_worth_waiting():
     """429 is a quota, not a dropped packet. The `with_retry` default backs off
-    0.5s then 1s, which puts all three attempts inside the same throttle window
-    - three requests spent to fail exactly as the first one did."""
+    0.5s then 1s, which puts all three attempts inside the same throttle
+    window - and 5s then 10s, which this used to send, did too: measured over
+    the four days to 2026-09-17, every retry of a 429 was itself a 429, so one
+    refusal cost three requests against the very quota that was spent. Two
+    attempts a minute apart is the shape that can succeed; anything past it is
+    the sweep's decision, not the feed's."""
     from knowledge.feeds.adapter import GdeltFeed as G
 
-    assert G.RETRY_BASE_SECONDS >= 5.0, "GDELT asks for ~1 request per 5 seconds"
+    assert G.RETRY_ATTEMPTS == 2
+    assert G.RETRY_BASE_SECONDS >= 60.0, "a retry inside the throttle window is a wasted request"
 
     waits: list[float] = []
     calls = {"n": 0}
@@ -240,5 +246,42 @@ def test_a_rate_limit_waits_long_enough_to_be_worth_waiting():
     with pytest.raises(FeedError, match="429"):
         feed.fetch(NOW - timedelta(hours=1))
 
-    assert calls["n"] == 3, "still three attempts, just spaced usefully"
-    assert waits and waits[0] >= 5.0, f"first wait was {waits[0]}s, inside the throttle window"
+    assert calls["n"] == 2, "one retry, not two"
+    assert len(waits) == 1 and waits[0] >= 60.0, f"waited {waits}, inside the throttle window"
+
+
+def test_a_429_is_throttled_and_any_other_failure_is_merely_failed():
+    """The sweep tells the two apart: a 429 is the quota for the whole address
+    and ends the slot, a 503 is one bad answer and the next group is asked.
+    Both are still FeedErrors, so nothing that treats a failure as a failure
+    has to change."""
+
+    def too_many(req, timeout=None):
+        raise http_error(429)
+
+    feed = GdeltFeed(opener=too_many, sleep=lambda s: None)
+    with pytest.raises(FeedThrottled):
+        feed.fetch(NOW - timedelta(hours=1))
+    assert issubclass(FeedThrottled, FeedError)
+
+    def unavailable(req, timeout=None):
+        raise http_error(503)
+
+    feed = GdeltFeed(opener=unavailable, sleep=lambda s: None)
+    with pytest.raises(FeedError) as caught:
+        feed.fetch(NOW - timedelta(hours=1))
+    assert not isinstance(caught.value, FeedThrottled)
+
+
+def test_a_retry_after_header_still_names_the_wait():
+    """When the server says how long, that wins over the minute - GDELT sends
+    none today, and the day it does the wait should be its number."""
+    waits: list[float] = []
+
+    def named(req, timeout=None):
+        raise http_error(429, headers={"Retry-After": "7"})
+
+    feed = GdeltFeed(opener=named, sleep=waits.append)
+    with pytest.raises(FeedThrottled):
+        feed.fetch(NOW - timedelta(hours=1))
+    assert len(waits) == 1 and 7.0 <= waits[0] < 8.0, waits  # jitter adds at most a tenth

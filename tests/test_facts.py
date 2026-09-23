@@ -76,6 +76,45 @@ def test_the_fact_store_bridge_keeps_the_lookahead_guard(book):
     assert fact is not None and fact.value == Decimal("4200") and fact.currency == "USD"
 
 
+def test_a_forward_figure_keeps_its_label_through_the_store_and_the_bridge(book):
+    """Consensus for FY27 is knowable today and describes a period that ends
+    in a year. The label rides in payload_json, so the schema is the one every
+    copy already has, and comes back as a field, so the payload is the
+    vendor's extras again."""
+    book.add_observations(
+        [
+            Observation(
+                "fmp",
+                "XNAS:AAPL",
+                "est_eps",
+                D,
+                Decimal("9.538"),
+                period_end=date(2027, 9, 27),
+                currency="USD",
+                payload={"analysts": 30},
+                forward=True,
+            )
+        ]
+    )
+    (o,) = book.observations("XNAS:AAPL", "est_eps")
+    assert o.forward and o.known_at == D and o.payload == {"analysts": 30}
+    (raw,) = book.conn.execute("SELECT payload_json FROM observations").fetchone()
+    assert raw == '{"analysts": 30, "forward": true}'
+    store = book.as_fact_store(["XNAS:AAPL"])
+    fact = store.as_known_at("XNAS:AAPL", "est_eps", D)
+    assert fact is not None and fact.forward and fact.period_end == date(2027, 9, 27)
+    assert store.as_known_at("XNAS:AAPL", "est_eps", D - timedelta(days=1)) is None
+
+
+def test_the_bridge_refuses_a_reported_figure_stamped_before_its_period_ended(book):
+    """Nothing is inferred from the dates. A row knowable before its period
+    ended that does not say forward is a collector stamping a reported figure
+    wrongly, and the guard refusing it is the point of the guard."""
+    book.add_observations([obs("4200", period=date(2026, 12, 31), known=D)])
+    with pytest.raises(ValueError, match="reported figure cannot be public before"):
+        book.as_fact_store(["XNAS:AAPL"])
+
+
 def test_a_snapshot_without_a_period_is_not_a_fact(book):
     book.add_observations([Observation("finnhub", "XNAS:AAPL", "pe_ttm", D, Decimal("31.2"))])
     assert book.observations("XNAS:AAPL", "pe_ttm")[0].value == Decimal("31.2")

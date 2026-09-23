@@ -177,6 +177,30 @@ def test_finnhub_types_and_dates_everything_and_drops_only_bad_rows():
     assert c.requests == 6
 
 
+def test_finnhub_a_print_filed_under_a_later_quarter_end_is_knowable_the_day_it_was_seen():
+    """NVIDIA's late-August result reaches this endpoint labelled with the
+    calendar quarter end, 2026-09-30. Until 2026-09-18 known_at was pushed out
+    to that label, and a figure public on 5 September was invisible to every
+    as-of read until the 30th. The endpoint carries no announcement date, so
+    the day we saw the row is the earliest the store can vouch for."""
+    routes = dict(FINNHUB)
+    routes["stock/earnings"] = [
+        {"actual": 2.22, "estimate": 2.1384, "period": "2026-09-30", "surprisePercent": 3.8159},
+        {"actual": 1.87, "estimate": 1.7922, "period": "2026-06-30", "surprisePercent": 4.341},
+    ]
+    pull = FinnhubCollector(key="k", clock=CLOCK, opener=router(routes)).collect(
+        SINCE, ("XNAS:NVDA",)
+    )
+    prints = {o.period_end: o for o in pull.observations if o.concept == "eps_actual"}
+    later = prints[date(2026, 9, 30)]
+    assert later.known_at == NOW.date() and later.forward and later.value == Decimal("2.22")
+    earlier = prints[date(2026, 6, 30)]
+    assert earlier.known_at == NOW.date() and not earlier.forward
+    assert all(o.known_at <= NOW.date() for o in pull.observations), (
+        "never knowable later than the day it was seen"
+    )
+
+
 def test_finnhub_one_premium_endpoint_is_a_note_not_a_failure():
     routes = dict(FINNHUB)
     routes["stock/metric"] = http_error(403)
@@ -288,6 +312,42 @@ def test_fmp_weekly_pull_carries_statements_estimates_targets_grades_and_the_tra
     assert doc.published_at == datetime(2026, 7, 31, 17, 0, tzinfo=UTC)
 
 
+def test_fmp_estimates_are_knowable_the_day_they_were_fetched_and_say_so():
+    """Consensus for FY27 is knowable today and describes a period that ends
+    in a year: known_at is the fetch day, period_end the target, and the row
+    says forward so the A1 bridge can build it."""
+    pull = FmpCollector(key="k", clock=CLOCK, opener=router(FMP)).collect(
+        SINCE, ("XNAS:AAPL",), slot="weekly"
+    )
+    est = next(o for o in pull.observations if o.concept == "est_eps")
+    assert est.known_at == NOW.date() and est.period_end == date(2027, 9, 30) and est.forward
+    assert est.value == Decimal("8.9") and est.payload == {"analysts": 30}
+
+
+def test_fmp_estimate_revisions_are_separate_vintages(tmp_path):
+    """AAPL's FY27 EPS consensus read 9.538 on 5 September and 9.571 on the
+    6th. Under the old stamp both rows carried known_at 2027-09-27: the
+    vintage was gone and neither was visible. Stamped with the fetch day, an
+    as-of read gets the figure the street held on that day."""
+    revisions = [
+        (datetime(2026, 9, 5, 2, tzinfo=UTC), "9.538"),
+        (datetime(2026, 9, 6, 12, tzinfo=UTC), "9.571"),
+    ]
+    with FactBook(tmp_path / "facts.db") as book:
+        for day, value in revisions:
+            estimates = [{"date": "2027-09-27", "epsAvg": value, "numAnalystsEps": 30}]
+            c = FmpCollector(
+                key="k",
+                clock=lambda d=day: d,
+                opener=router({**FMP, "analyst-estimates": estimates}),
+            )
+            pull = c.collect(SINCE, ("XNAS:AAPL",), slot="weekly")
+            book.add_observations(pull.observations, fetched_at=day)
+        assert book.latest("XNAS:AAPL", "est_eps", asof=date(2026, 9, 4)) is None
+        assert book.latest("XNAS:AAPL", "est_eps", asof=date(2026, 9, 5)).value == Decimal("9.538")
+        assert book.latest("XNAS:AAPL", "est_eps", asof=date(2026, 9, 6)).value == Decimal("9.571")
+
+
 def test_fmp_separates_a_change_of_mind_from_a_broker_restating_one():
     """A reiteration is not an event: nothing happened. This endpoint returns
     every republication, and they are the overwhelming majority - 3,917 rows in
@@ -343,6 +403,32 @@ def test_fmp_plan_error_message_is_a_note_and_other_errors_are_failures():
     )
     assert not pull.documents and any("earning-call-transcript" in n for n in pull.notes)
     assert pull.observations, "the rest of the pull still landed"
+    assert any("outside the plan" in n for n in pull.notes), pull.notes
+
+
+def test_fmp_a_402_is_one_legible_note_per_endpoint_and_is_not_asked_again():
+    """`/stable/earnings` answered HTTP 402 every week to 2026-09-13. It was
+    already a note rather than a failure - `get_json` maps 402 to PlanExcluded
+    - but the note was a redacted URL per name per endpoint, and three names'
+    worth ran past the column before it named the second company. Now the
+    endpoint is named once, with every name it was not collected for, and
+    once refused it is not requested for the next name: the boundary is the
+    plan's, not the company's, and the second call would learn the same fact
+    for the price of a request."""
+    routes = dict(FMP)
+    routes["earnings?"] = http_error(402)
+    c = FmpCollector(key="k", clock=CLOCK, opener=router(routes))
+    pull = c.collect(SINCE, ("XNAS:AAPL", "XNAS:MSFT"), slot="us_preopen")
+    about_earnings = [n for n in pull.notes if "/earnings" in n]
+    assert len(about_earnings) == 1, pull.notes
+    (note,) = about_earnings
+    assert "outside the plan (HTTP 402)" in note and "AAPL" in note and "MSFT" in note, note
+    assert not any("financialmodelingprep.com" in n for n in pull.notes), pull.notes
+    assert c.requests == 5, "grades and targets for both names, earnings once"
+    assert pull.observations and not any(e.kind == "earnings_result" for e in pull.events)
+    # The boundary is one run's: a plan bought tomorrow is asked tomorrow.
+    c.collect(SINCE, ("XNAS:AAPL",), slot="us_preopen")
+    assert c.requests == 8
 
 
 def test_fmp_a_filing_date_before_the_period_end_is_not_trusted():
@@ -623,6 +709,10 @@ def test_a_pull_lands_in_the_fact_book_and_bridges_to_a1(tmp_path):
         fact = store.as_known_at("XNAS:AAPL", "net_income", date(2026, 8, 15))
         assert fact is not None and fact.value == Decimal("23434000000")
         assert store.as_known_at("XNAS:AAPL", "net_income", date(2026, 7, 15)) is None
+        # The forward estimate crosses the bridge too, visible from the fetch day.
+        est = store.as_known_at("XNAS:AAPL", "est_eps", NOW.date())
+        assert est is not None and est.forward and est.period_end == date(2027, 9, 30)
+        assert store.as_known_at("XNAS:AAPL", "est_eps", NOW.date() - timedelta(days=1)) is None
         assert book.documents("XNAS:AAPL", kind="transcript")
 
 
@@ -835,6 +925,37 @@ def test_dbnomics_relays_the_apis_own_error_message():
 
 
 # --- FRED release calendar -------------------------------------------------------------------
+
+
+def test_a_release_fred_lists_every_day_is_a_table_not_a_print():
+    """FRED lists "FOMC Press Release" on every day of the fortnight, weekends
+    included. Stored as events it put an FOMC date on every row of every page's
+    watch list, and the one real decision could not be told from the rest."""
+    from datetime import timedelta as _td
+
+    daily = [
+        {"release_id": 101, "release_name": "FOMC Press Release", "date": str(d)}
+        for d in (date(2026, 9, 5) + _td(days=i) for i in range(14))
+    ]
+    weekly = [
+        {
+            "release_id": 180,
+            "release_name": "Unemployment Insurance Weekly Claims Report",
+            "date": d,
+        }
+        for d in ("2026-09-10", "2026-09-17")
+    ]
+
+    def opener(req, timeout=None):
+        if "releases/dates" in req.full_url:
+            return FakeResponse(json.dumps({"release_dates": daily + weekly}))
+        return FakeResponse(json.dumps({"observations": [{"date": "2026-09-01", "value": "4.33"}]}))
+
+    c = FredCollector(series={"DFF": "fed funds"}, key="k", clock=CLOCK, opener=opener)
+    pull = c.collect(SINCE, slot="us_preopen")
+    titles = {e.title for e in pull.events if e.kind == "macro_release"}
+    assert titles == {"Unemployment Insurance Weekly Claims Report"}, titles
+    assert any("'FOMC Press Release' listed on" in n and "daily table" in n for n in pull.notes)
 
 
 def test_fred_adds_the_release_calendar_as_macro_events_and_survives_its_absence():
@@ -1416,3 +1537,77 @@ def test_the_statement_collectors_are_registered_and_catalogued():
     assert COLLECTORS["sec_xbrl"] is SecCompanyFacts and COLLECTORS["eodhd"] is EodhdFundamentals
     assert CATALOG["sec_xbrl"].markets == ("XNAS", "XNYS") and CATALOG["sec_xbrl"].keyless
     assert "XKLS" in CATALOG["eodhd"].markets
+
+
+# --- EODHD_PLAN: the budget the run is shaped to ---------------------------------------------
+
+WHOLE_BOOK = (
+    "MYX:1155",
+    "MYX:5347",
+    "MYX:5183",
+    "MYX:5225",
+    "MYX:8869",
+    "MYX:3182",
+    "XNAS:NVDA",
+    "XNAS:AAPL",
+    "XNAS:MSFT",
+    "XTAI:2330",
+    "XLON:VOD",  # no EODHD suffix: never asked for on any plan
+)
+
+
+def test_eodhd_on_a_paid_plan_asks_every_name_every_run_bursa_included(monkeypatch):
+    """The free-plan rotation was hard-wired: two names a day, US only, and the
+    Bursa names gated out at the top. A month of the Fundamentals Data Feed is
+    100,000 calls a day with KLSE included - there is nothing to ration, and a
+    rotation would only make the newest quarter arrive days late. EODHD_PLAN
+    says which plan the key is on; on a paid one every name is asked, every
+    run, and the first note says so."""
+    monkeypatch.setenv("EODHD_PLAN", "fundamentals")
+    open_ = router({"fundamentals/": EODHD_PAYLOAD})
+    c = EodhdFundamentals(clock=CLOCK, opener=open_, key="tok.12345678")
+    pull = c.collect(SINCE, WHOLE_BOOK, slot="bursa_close")
+    assert pull.requests == 10, open_.calls
+    assert any("1155.KLSE" in u for u in open_.calls) and any("2330.TW" in u for u in open_.calls)
+    assert pull.notes[0].startswith("EODHD plan: fundamentals"), pull.notes[0]
+    assert not any("deferred" in n or "outside the" in n for n in pull.notes), pull.notes
+    assert {o.instrument_id for o in pull.observations} >= {"MYX:1155", "XNAS:NVDA", "XTAI:2330"}
+
+
+def test_eodhd_free_is_the_default_and_the_run_names_it(monkeypatch):
+    """Unset means free, and the rotation is exactly what it was."""
+    monkeypatch.delenv("EODHD_PLAN", raising=False)
+    open_ = router({"fundamentals/": EODHD_PAYLOAD})
+    c = EodhdFundamentals(clock=CLOCK, opener=open_, key="tok.12345678")
+    pull = c.collect(SINCE, WHOLE_BOOK, slot="bursa_close")
+    assert pull.requests == 2
+    assert all(".US" in u for u in open_.calls), open_.calls
+    assert pull.notes[0].startswith("EODHD plan: free (2 names a day"), pull.notes[0]
+    assert any("deferred by the 2-a-day credit budget" in n for n in pull.notes)
+    assert any("outside the free plan (US only)" in n and "MYX:1155" in n for n in pull.notes)
+
+
+def test_eodhd_refuses_a_plan_name_it_does_not_know(monkeypatch):
+    """Not a quiet fall back to free: an operator who paid and misspelt the
+    variable would otherwise watch two names a day and read it as the plan
+    not having taken effect at EODHD's end."""
+    from knowledge.sources.eodhd import plan_from_env
+
+    monkeypatch.setenv("EODHD_PLAN", "premium")
+    with pytest.raises(SourceError, match="EODHD_PLAN='premium'"):
+        EodhdFundamentals(clock=CLOCK, opener=router({}), key="tok.12345678").collect(
+            SINCE, ("XNAS:AAPL",)
+        )
+    assert plan_from_env("All-In-One").names_per_run == 0, "case and dashes as EODHD spells them"
+    assert plan_from_env("").name == "free"
+
+
+def test_the_plan_kwarg_wins_over_the_environment(monkeypatch):
+    """The way `key` wins over EODHD_API_KEY: a one-off run names it without
+    touching what the scheduled run reads."""
+    monkeypatch.setenv("EODHD_PLAN", "free")
+    open_ = router({"fundamentals/": EODHD_PAYLOAD})
+    pull = EodhdFundamentals(
+        clock=CLOCK, opener=open_, key="tok.12345678", plan="all-in-one"
+    ).collect(SINCE, WHOLE_BOOK, slot="us_close")
+    assert pull.requests == 10 and pull.notes[0].startswith("EODHD plan: all-in-one")

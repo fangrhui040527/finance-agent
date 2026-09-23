@@ -18,7 +18,18 @@ ROOT = Path(__file__).resolve().parent.parent
 # so `if path == "/tmp"` in a comment about portability does not trip it, and
 # so a Windows-safe relative "tmp/..." is left alone.
 POSIX_SCRATCH = re.compile(r"""["'](?:/tmp|/var/tmp|/var/folders)[/"']""")
-SKIP_DIRS = {".git", ".venv", "docs", "debug", "__pycache__", ".pytest_cache", "node_modules"}
+# `.claude/` holds nested worktrees: a second copy of this whole tree, whose
+# copy of this file is not on the allowlist below.
+SKIP_DIRS = {
+    ".git",
+    ".venv",
+    ".claude",
+    "docs",
+    "debug",
+    "__pycache__",
+    ".pytest_cache",
+    "node_modules",
+}
 
 # This file must spell the pattern out in order to forbid it.
 ALLOWED_PATHS = {"tests/test_paths_are_portable.py"}

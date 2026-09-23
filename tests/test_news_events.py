@@ -328,6 +328,20 @@ def test_no_catalyst_clearing_the_threshold_yields_the_no_news_verdict():
     )
     assert m.verdict is Verdict.NO_IDENTIFIED_CATALYST
     assert "REVERSE" in m.reason
+    assert "1 candidate(s) weighed and none cleared 0.25" in m.reason
+    assert "dividend_change" in m.reason
+
+
+def test_an_empty_candidate_list_is_not_read_as_a_no_news_move():
+    """Nothing offered is not the same finding as everything rejected. The
+    reversal tendency belongs to moves whose news was looked at and found
+    wanting; a name the collector held nothing about has not been looked at."""
+    m = attach(big_idio_move(), [])
+    assert m.verdict is Verdict.NO_IDENTIFIED_CATALYST
+    assert "no candidate cause was offered to weigh" in m.reason
+    assert "not a rejection" in m.reason
+    assert "REVERSE" not in m.reason
+    assert "sigma" in m.reason
 
 
 def test_close_candidates_all_stay_shown():

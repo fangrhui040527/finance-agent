@@ -18,7 +18,8 @@ produces exactly the confident wrong answer it exists to prevent.
 The window is part of the key. Ten rules tried on 2010-2020 do not inflate the
 correction for a rule tried on 2015-2025 - those are different experiments -
 but re-running the same rule on the same window does not inflate it either,
-because what counts is DISTINCT rules, not repetitions.
+because what counts is DISTINCT configurations, not repetitions: an identical
+re-run is not even written, it answers with the row it already has.
 """
 
 from __future__ import annotations
@@ -27,6 +28,8 @@ import sqlite3
 from dataclasses import dataclass
 from datetime import UTC, date, datetime
 from pathlib import Path
+
+from core.provenance.ledger import _enable_wal, apply_schema
 
 DEFAULT_PATH = Path("data/trials.db")
 
@@ -70,14 +73,21 @@ class Trial:
 
 
 class TrialLedger:
+    BUSY_TIMEOUT_MS = 10_000
+
     def __init__(self, path: str | Path = DEFAULT_PATH) -> None:
         self.path = str(path)
         if self.path != ":memory:":
             Path(self.path).parent.mkdir(parents=True, exist_ok=True)
-        self.conn = sqlite3.connect(self.path)
+        self.conn = sqlite3.connect(self.path, timeout=self.BUSY_TIMEOUT_MS / 1000)
         self.conn.row_factory = sqlite3.Row
-        self.conn.executescript(SCHEMA)
-        self.conn.commit()
+        # The shared helpers, in the shared order: busy_timeout first, then
+        # WAL tolerating a lost race, then the DDL under BEGIN IMMEDIATE. This
+        # was the one store still in rollback-journal mode, so a gate writing
+        # its row while a report read the history could meet a lock neither
+        # side retried. See core/provenance/ledger for why the order matters.
+        _enable_wal(self.conn, self.path, self.BUSY_TIMEOUT_MS)
+        apply_schema(self.conn, SCHEMA, timeout_ms=self.BUSY_TIMEOUT_MS)
 
     def __enter__(self) -> TrialLedger:
         return self
@@ -105,6 +115,23 @@ class TrialLedger:
         note: str = "",
         now: datetime | None = None,
     ) -> int:
+        """The row's id - the existing one when this configuration is already on the ledger.
+
+        The same rule on the same universe, window and session count is the
+        same experiment. Running it again is reproducibility, not a second
+        guess at the data, and a row per run would deflate every survivor for
+        the sin of being repeatable. Trial 7 of data/trials.db is such a
+        re-run of trial 3 (momentum_12_1, twelve minutes later, byte for
+        byte); it stays, because the ledger is append-only, and the distinct
+        count below sees it once.
+        """
+        existing = self.conn.execute(
+            "SELECT trial_id FROM trials WHERE rule = ? AND universe = ? AND start_day = ? "
+            "AND end_day = ? AND sessions = ? ORDER BY trial_id LIMIT 1",
+            (rule, universe, start_day.isoformat(), end_day.isoformat(), int(sessions)),
+        ).fetchone()
+        if existing is not None:
+            return int(existing[0])
         cur = self.conn.execute(
             "INSERT INTO trials (ran_at, rule, universe, start_day, end_day, sessions, "
             "net_sharpe, net_cagr, note) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
@@ -124,15 +151,18 @@ class TrialLedger:
         return int(cur.lastrowid or 0)
 
     def distinct_rules(self, universe: str, start_day: date, end_day: date) -> int:
-        """How many DIFFERENT rules have been tried on exactly this experiment.
+        """How many DIFFERENT configurations have been tried on exactly this experiment.
 
-        Distinct rather than total: re-running one rule is not a second guess at
-        the data, and counting it would deflate every result for the sin of
-        being reproducible.
+        A configuration is a rule and the session count it scored - the same
+        rule over more or fewer sessions of the same window saw different
+        data and is a further try. Distinct rather than total: re-running one
+        configuration is not a second guess at the data, and counting it
+        would deflate every result for the sin of being reproducible. The
+        name stays for the gate that calls it.
         """
         row = self.conn.execute(
-            "SELECT COUNT(DISTINCT rule) FROM trials "
-            "WHERE universe = ? AND start_day = ? AND end_day = ?",
+            "SELECT COUNT(*) FROM (SELECT DISTINCT rule, sessions FROM trials "
+            "WHERE universe = ? AND start_day = ? AND end_day = ?)",
             (universe, start_day.isoformat(), end_day.isoformat()),
         ).fetchone()
         return int(row[0]) if row else 0

@@ -399,7 +399,7 @@ def _only_the_clock_moved(existing: str, body: str) -> bool:
     """True when the rendered digest differs from the file only in its own timestamp.
 
     WHY THIS EXISTS. Two things dispatch the collector for one slot - the cron
-    and the nightly Routine's catch-up - and `_already_ran_today` makes the
+    and the nightly Routine's catch-up - and `_already_ran` makes the
     second arrival a no-op that collects nothing. It was not a no-op here: the
     digest was re-rendered with a later `Generated` line over identical
     figures, so the workflow saw a changed file and pushed it. The 2026-09-08

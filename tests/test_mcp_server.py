@@ -8,10 +8,16 @@ gets a refusal, every time, from code rather than from a prompt.
 
 import io
 import json
+import random
+import threading
+from datetime import date, timedelta
 from pathlib import Path
 
 import pytest
 
+from core.market.cache import PriceCache
+from core.market.feed import ChainedFeed, PriceFeed
+from knowledge.pack import estimation_slice
 from mcp_server import tools as T
 from mcp_server.protocol import (
     INTERNAL_ERROR,
@@ -314,6 +320,181 @@ def test_supplied_returns_are_labelled_as_supplied():
         call("why_did_it_move", instrument="MYX:1155", instrument_return=-0.09, market_return=-0.08)
     )
     assert "as SUPPLIED by the caller, not measured" in out
+
+
+# --- measured legs: the same sessions, and this instrument's own sigma ------
+# Two defects, both reproduced against the cached bars. Each leg of a measured
+# decomposition was the last N bars of ITS OWN series, so on 2026-08-31 - a
+# Bursa holiday Yahoo carried for the shares and skipped for ^KLSE - Maybank's
+# flat carried day was paired with the index's move over the previous session.
+# And the measured legs were decomposed against the synthetic fit built for
+# typed returns, whose 0.4% residual sigma flagged Genting's ordinary -1.55% as
+# significant when the nightly pack, estimating on real sessions, read 0.60
+# sigma. Nothing here touches the network: a scripted feed goes through the
+# real parser, the real cache and the real tool.
+class _Scripted(PriceFeed):
+    """Answers from a dict of id -> CSV body, through the base class's parser and cache."""
+
+    name = "scripted"
+
+    def __init__(self, bodies, cache=None):
+        self.bodies, self.cache = dict(bodies), cache
+
+    def symbol_for(self, instrument_id):
+        return instrument_id
+
+    def _fetch_csv(self, symbol):
+        return self.bodies[symbol]
+
+
+def _sessions(last: date, n: int) -> list[date]:
+    days, d = [], last
+    while len(days) < n:
+        if d.weekday() < 5:
+            days.append(d)
+        d -= timedelta(days=1)
+    return days[::-1]
+
+
+def _csv(closes: dict[date, float]) -> str:
+    rows, prev = ["date,open,high,low,close,volume"], None
+    for day, c in sorted(closes.items()):
+        o = c if prev is None else prev
+        rows.append(f"{day},{o},{max(o, c) * 1.001},{min(o, c) * 0.999},{c},1000")
+        prev = c
+    return "\n".join(rows) + "\n"
+
+
+def _two_symbol_world(seed=1):
+    """140 shared sessions to Friday 2026-08-28, then a carried Monday 08-31 bar
+    for the share only - the Merdeka shape, on a beta-1.2 name."""
+    rng = random.Random(seed)
+    mkt, share, pm, ps = {}, {}, 1600.0, 10.0
+    for d in _sessions(date(2026, 8, 28), 140):
+        m = rng.gauss(0, 0.008)
+        pm *= 1 + m
+        ps *= 1 + 1.2 * m + rng.gauss(0, 0.01)
+        mkt[d], share[d] = pm, ps
+    share[date(2026, 8, 31)] = ps
+    return mkt, share
+
+
+def test_measured_legs_are_paired_on_the_sessions_both_printed(monkeypatch):
+    mkt, share = _two_symbol_world()
+    feed = ChainedFeed([_Scripted({"MYX:1155": _csv(share), "MYX:^KLSE": _csv(mkt)})])
+    d0, d1 = date(2026, 8, 27), date(2026, 8, 28)
+
+    legs = T.measured_legs(feed, "MYX:1155", "MYX:^KLSE", 1, date(2026, 8, 31))
+    assert (legs.first, legs.last) == (d0, d1), "the carried 08-31 is not a common session"
+    assert legs.instrument_return == pytest.approx(share[d1] / share[d0] - 1)
+    assert legs.market_return == pytest.approx(mkt[d1] / mkt[d0] - 1)
+    # 140 shared sessions give 139 returns; the pack's slice ends ten sessions
+    # before the window and takes what is left, capped at 260.
+    expected_n = len(range(139)[estimation_slice(139)])
+    assert legs.fit is not None and legs.fit.n == expected_n
+    assert legs.fit.coefficients[1] == pytest.approx(1.2, abs=0.15)
+    # The estimation ends ten sessions before the window opens (the pack's
+    # ESTIMATION_GAP), so neither the window nor the run-up to it is inside
+    # its own sigma: d0 is sessions[-2], the estimation's last session is
+    # sessions[-12].
+    sessions = sorted(mkt)
+    assert f"to {sessions[-12]}" in legs.estimation, (
+        "the estimation does not end ten sessions before the window"
+    )
+    assert f"to {d0}" not in legs.estimation, "the window is inside its own estimation"
+
+    monkeypatch.setattr(T, "_feed", lambda: feed)
+    out = text(
+        call("why_did_it_move", instrument="MYX:1155", market_proxy="MYX:^KLSE", as_at="2026-08-31")
+    )
+    assert f"{d0} to {d1}" in out
+    assert f"MYX:^KLSE {mkt[d1] / mkt[d0] - 1:+.2%}" in out, "the matching session's market leg"
+    assert "MEASURED" in out and "sessions the legs share" in out
+
+
+def test_measured_betas_are_not_called_synthetic_and_typed_ones_are(monkeypatch):
+    mkt, share = _two_symbol_world()
+    feed = ChainedFeed([_Scripted({"MYX:1155": _csv(share), "MYX:^KLSE": _csv(mkt)})])
+    monkeypatch.setattr(T, "_feed", lambda: feed)
+    measured = text(
+        call("why_did_it_move", instrument="MYX:1155", market_proxy="MYX:^KLSE", as_at="2026-08-31")
+    )
+    assert "SYNTHETIC" not in measured
+    assert "Betas are stated" not in measured
+    expected_n = len(range(139)[estimation_slice(139)])
+    assert f"betas from {expected_n} sessions" in measured
+
+    typed = text(
+        call("why_did_it_move", instrument="MYX:1155", instrument_return=-0.09, market_return=-0.08)
+    )
+    assert "SYNTHETIC betas (stated 1.10/0.50); sigma is not this instrument's" in typed
+    assert "Betas are stated" in typed and "not this instrument's" in typed
+
+
+def test_too_few_common_sessions_is_unavailable_not_a_borrowed_sigma(monkeypatch):
+    """Thirty shared sessions measure a return and cannot estimate a beta. The
+    old code answered with the synthetic fit's sigma and a verdict."""
+    mkt, share = _two_symbol_world()
+    keep = sorted(mkt)[-30:]
+    feed = ChainedFeed(
+        [
+            _Scripted(
+                {
+                    "MYX:1155": _csv({d: share[d] for d in keep}),
+                    "MYX:^KLSE": _csv({d: mkt[d] for d in keep}),
+                }
+            )
+        ]
+    )
+    monkeypatch.setattr(T, "_feed", lambda: feed)
+    out = text(
+        call("why_did_it_move", instrument="MYX:1155", market_proxy="MYX:^KLSE", as_at="2026-08-31")
+    )
+    assert "attribution unavailable" in out
+    assert "betas not estimated" in out and "120 needed" in out
+    assert "SYNTHETIC" not in out and "no_identified_catalyst" not in out
+
+
+def test_two_measured_calls_then_a_price_read_share_one_feed_and_one_cache(tmp_path, monkeypatch):
+    """The threadpool that fetched the two legs built the process-wide feed and
+    its sqlite connection inside a worker thread, and the next call from the
+    main thread found a connection it was not allowed to use. Sequential now;
+    the lock is for the web app, which reads one cache from a threadpool."""
+    mkt, share = _two_symbol_world()
+    bodies = {"MYX:1155": _csv(share), "MYX:^KLSE": _csv(mkt)}
+    cache = PriceCache(tmp_path / "p.db", today=lambda: "2026-08-31")
+    fetched: list[str] = []
+
+    class Counting(_Scripted):
+        def _fetch_csv(self, symbol):
+            fetched.append(symbol)
+            return super()._fetch_csv(symbol)
+
+    feed = ChainedFeed([Counting(bodies, cache=cache)])
+    monkeypatch.setattr(T, "_feed", lambda: feed)
+    first = T.why_did_it_move(instrument="MYX:1155", market_proxy="MYX:^KLSE", as_at="2026-08-31")
+    second = T.why_did_it_move(instrument="MYX:1155", market_proxy="MYX:^KLSE", as_at="2026-08-31")
+    prices = T.get_prices(instrument="MYX:1155", bars=2)
+    assert "MEASURED" in first and "MEASURED" in second
+    assert "2026-08-31" in prices
+    assert sorted(fetched) == ["MYX:1155", "MYX:^KLSE"], "the cache answered every repeat"
+
+    errors: list[BaseException] = []
+
+    def hammer(symbol: str) -> None:
+        try:
+            for _ in range(200):
+                assert cache.get("scripted", symbol) == bodies[symbol]
+                cache.put("scripted", symbol, bodies[symbol])
+        except BaseException as e:  # noqa: BLE001 - anything a thread raised is the finding
+            errors.append(e)
+
+    threads = [threading.Thread(target=hammer, args=(s,)) for s in bodies for _ in range(2)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+    assert not errors, errors
 
 
 def test_a_factor_model_on_too_little_history_is_refused():

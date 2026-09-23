@@ -160,7 +160,9 @@ def test_fetch_does_not_demand_the_numbers_it_exists_to_measure(monkeypatch, cap
     assert ask.main(["why", "MYX:1155", "--fetch", "--against", "MYX:1023", "--days", "2"]) == 0
     out = capsys.readouterr().out
     assert "measured" in out
-    assert "unexplained" in out
+    # Four sessions measure a return and cannot estimate a beta. This used to
+    # print an unexplained share anyway, against a synthetic fit's sigma.
+    assert "betas not estimated" in out and "unexplained" not in out
 
 
 def test_without_fetch_both_typed_legs_are_still_required(capsys):

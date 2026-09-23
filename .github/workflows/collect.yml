@@ -43,6 +43,14 @@ on:
         type: choice
         options: [all, bursa_close, us_preopen, us_close, weekly]
         default: all
+      # A named slot collects once per firing; the second arrival is a no-op
+      # (knowledge/sweep.py). This is the person's override for the case the
+      # guard cannot know about - a run that collected the wrong thing, or a
+      # source repaired since the slot ran - and it is never set by the cron.
+      force:
+        description: "collect even if this slot's firing already ran"
+        type: boolean
+        default: false
 
 # The sweep COMMITS what it collected. ci.yml is contents: read; this one
 # cannot be.
@@ -136,11 +144,17 @@ jobs:
           ALPHAVANTAGE_API_KEY: ${{ secrets.ALPHAVANTAGE_API_KEY || env.ALPHAVANTAGE_API_KEY }}
           FRED_API_KEY: ${{ secrets.FRED_API_KEY || env.FRED_API_KEY }}
           EODHD_API_KEY: ${{ secrets.EODHD_API_KEY || env.EODHD_API_KEY }}
+          # Which EODHD plan the key is on (free | fundamentals | all-in-one).
+          # Not a secret, but kept beside the key it describes; absent means
+          # the free plan and its two-names-a-day rotation. See .env.example.
+          EODHD_PLAN: ${{ secrets.EODHD_PLAN || 'free' }}
           SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
+          # Should carry a real contact e-mail: GDELT throttles by address, and
+          # GitHub's runners share addresses. See .env.example.
           GDELT_USER_AGENT: ${{ secrets.GDELT_USER_AGENT }}
         run: |
           set +e
-          uv run python ask.py sweep --slot "${{ steps.slot.outputs.slot }}"
+          uv run python ask.py sweep --slot "${{ steps.slot.outputs.slot }}" ${{ inputs.force && '--force' || '' }}
           echo "code=$?" >> "$GITHUB_OUTPUT"
           exit 0
 
@@ -160,18 +174,28 @@ jobs:
       # data/price_cache.db. The nightly feedback routine decomposes moves from
       # this cache (FINPLANET_OFFLINE=1) because the session it runs in has no
       # route to a price host. Close slots and manual runs only.
+      #
+      # This step and the two after it stay NON-FATAL - a price host down must
+      # not cost the sweep its commit - but non-fatal is not silent. Each one
+      # writes a ::warning:: annotation when it exits non-zero, so a failure
+      # shows on the run's summary page instead of in a log nobody opens.
       - name: Cache the day's prices
         if: steps.slot.outputs.slot == 'bursa_close' || steps.slot.outputs.slot == 'us_close' || steps.slot.outputs.slot == 'all'
         run: |
           set +e
           uv run python ask.py prices --book
+          code=$?
+          if [ "$code" -ne 0 ]; then
+            echo "::warning title=prices not cached::ask.py prices --book exited $code; today's bars may be missing from data/price_cache.db, and the paper mark and the nightly decomposition read from it"
+          fi
           exit 0
 
       # The paper book (docs/22): apply whatever was decided at the first
       # cached bar after the decision, mark both books at today's closes, raise
       # stops, grade the predictions whose date has come. Runs from the cache
       # just written, so it needs no network of its own. A marking fault must
-      # never cost the sweep its commit - it is printed and the job goes on.
+      # never cost the sweep its commit - it is printed, annotated, and the job
+      # goes on.
       - name: Mark the paper book
         if: steps.slot.outputs.slot == 'bursa_close' || steps.slot.outputs.slot == 'us_close' || steps.slot.outputs.slot == 'all'
         env:
@@ -179,7 +203,15 @@ jobs:
         run: |
           set +e
           uv run python ask.py paper mark --slot "${{ steps.slot.outputs.slot }}"
+          code=$?
+          if [ "$code" -ne 0 ]; then
+            echo "::warning title=paper book not marked::ask.py paper mark exited $code; today's marks are missing from data/paper.db"
+          fi
           uv run python ask.py paper grade
+          code=$?
+          if [ "$code" -ne 0 ]; then
+            echo "::warning title=predictions not graded::ask.py paper grade exited $code"
+          fi
           exit 0
 
       # The day's digest: per name, what was collected, what escalated, what
@@ -190,6 +222,10 @@ jobs:
         run: |
           set +e
           uv run python ask.py digest --write
+          code=$?
+          if [ "$code" -ne 0 ]; then
+            echo "::warning title=digest not written::ask.py digest --write exited $code; the nightly routine will find no page for today"
+          fi
           exit 0
 
       - name: What the stores hold now
@@ -224,12 +260,47 @@ jobs:
           fi
           # [skip ci]: a data commit; ten test jobs to validate a row of news is waste.
           git commit -m "chore(corpus): the $(date -u +%Y-%m-%d) ${{ steps.slot.outputs.slot }} sweep [skip ci]"
-          # Another slot may have pushed while this one ran; rebase our one
-          # data commit onto it rather than fail the push.
+          ours="$(git rev-parse HEAD)"
+          # Another slot, or the nightly Routine (which commits data/paper.db
+          # and data/learning.db), may have pushed while this one ran; rebase
+          # our one data commit onto it rather than fail the push.
           # --autostash: the sweep leaves stores it did not stage (a cache file)
           # modified in the tree, and a rebase refuses to start over them.
-          git pull --rebase --autostash origin "${GITHUB_REF_NAME}" || true
-          git push
+          if git pull --rebase --autostash origin "${GITHUB_REF_NAME}"; then
+            git push
+            exit 0
+          fi
+          # The rebase stopped - on this repository that means a binary
+          # conflict on a data/*.db both sides changed. This line used to be
+          # `|| true`, which left the stopped rebase in place and let `git
+          # push` fail quietly against a detached HEAD: the run went green and
+          # the day's collection never reached main. Abort it, and re-apply
+          # our commit on top of whatever is on the branch NOW. Not `-X
+          # theirs`: every store is append-only, so taking either side whole
+          # discards the other side's rows. A cherry-pick that applies cleanly
+          # is the same commit rebased; one that conflicts is a real conflict,
+          # and the retry is for the race where a third push lands between
+          # our fetch and our push, not for wishing the conflict away.
+          git rebase --abort || true
+          for attempt in 1 2 3; do
+            git fetch origin "${GITHUB_REF_NAME}"
+            # FETCH_HEAD is what that fetch brought, whatever refspec the
+            # checkout configured. Whatever is not in $ours was never going to
+            # be pushed.
+            git reset --hard FETCH_HEAD
+            if git cherry-pick "$ours"; then
+              if git push; then
+                exit 0
+              fi
+              echo "push rejected on attempt $attempt; the branch moved again"
+              continue
+            fi
+            conflicted="$(git diff --name-only --diff-filter=U | tr '\n' ' ')"
+            git cherry-pick --abort || true
+            echo "::error title=data commit conflicts with ${GITHUB_REF_NAME}::attempt $attempt of 3: this run's commit $ours conflicts on: ${conflicted}"
+          done
+          echo "::error title=sweep not pushed::gave up after 3 attempts. The day's collection is in commit $ours on this runner only; fetch it from the run's logs and re-apply by hand, or dispatch the slot again."
+          exit 1
 
       # Exit 3 is "a source was degraded": part of the day was collected and
       # committed, and the sweep said which names and why. That is a warning

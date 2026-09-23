@@ -24,6 +24,7 @@ So three invariants hold across every tool below:
 from __future__ import annotations
 
 import sqlite3
+from dataclasses import dataclass
 from datetime import UTC, date, datetime, timedelta
 from decimal import ROUND_HALF_UP, Decimal, InvalidOperation
 
@@ -42,12 +43,13 @@ from core.config import ConfigError
 from core.config import load as load_config
 from core.contracts.money import BASE_CURRENCY
 from core.guardrails.defaults import default_engine
-from core.market.feed import ChainedFeed, PriceFeedError, default_feed
+from core.market.feed import ChainedFeed, PriceFeedError, aligned_closes, default_feed
 from core.registry.loader import load as load_registry
-from engines.attribution.decompose import MIN_OBSERVATIONS, decompose
-from engines.attribution.regression import huber_fit
+from engines.attribution.decompose import MIN_OBSERVATIONS, EstimationInputs, decompose, estimate
+from engines.attribution.regression import Fit, huber_fit
 from engines.risk.concentration import Limits, Position
 from engines.sizing.caps import cost_floor_bps, cost_floor_value, to_base
+from knowledge.pack import ESTIMATION_GAP, estimation_slice, market_fit
 from markets.brokers import cost_at
 from markets.registry import get as market_get
 from markets.registry import known_prefixes, market_currency, mic_of, supported
@@ -521,27 +523,26 @@ def why_did_it_move(
     Either supply the returns, or give market_proxy and both legs are measured
     from the feed. A measured instrument leg against a typed market leg is not a
     decomposition, so mixing them is refused.
+
+    The two paths differ in more than where the returns come from. Measured
+    legs are taken over the sessions both series printed, and the betas and the
+    residual sigma are estimated on the same sessions before the window, the
+    way the nightly pack does it. Typed legs are decomposed against a SYNTHETIC
+    fit built from the stated betas, whose sigma is a made-up 0.4% a session and
+    not this instrument's: its significance is illustrative, and the output
+    says so every time.
     """
     end = _parse_date(as_at) if as_at else None
-    measured = False
+    legs: MeasuredLegs | None = None
     window = ((end or date.today()) - timedelta(days=max(1, bars)), end or date.today())
 
     if market_proxy:
         try:
-            if instrument == market_proxy:
-                instrument_return, first, last = _window_return(instrument, bars, end)
-                market_return = instrument_return
-            else:
-                from concurrent.futures import ThreadPoolExecutor
-
-                with ThreadPoolExecutor(max_workers=2) as pool:
-                    fa = pool.submit(_window_return, instrument, bars, end)
-                    fb = pool.submit(_window_return, market_proxy, bars, end)
-                    instrument_return, first, last = fa.result()
-                    market_return, _, _ = fb.result()
-            window, measured = (first, last), True
+            legs = measured_legs(_feed(), instrument, market_proxy, bars, end)
         except PriceFeedError as e:
             return f"NO DATA: {e}"
+        instrument_return, market_return = legs.instrument_return, legs.market_return
+        window = (legs.first, legs.last)
     elif instrument_return is None or market_return is None:
         raise ToolError(
             "give instrument_return AND market_return, or give market_proxy to "
@@ -563,7 +564,7 @@ def why_did_it_move(
                 f"once reached a verdict as `nan% unexplained`."
             )
 
-    fit = _synthetic_fit(beta_market, beta_sector)
+    fit = legs.fit if legs is not None else _synthetic_fit(beta_market, beta_sector)
     sector = sector_return if sector_return is not None else 0.0
     exp = decompose(
         instrument,
@@ -576,6 +577,14 @@ def why_did_it_move(
         fit,
         base_currency=currency,
     )
+    if legs is None:
+        # `decompose` describes the synthetic fit as "betas from 250 sessions",
+        # which is true of the fit and false of the instrument. Say what it is.
+        exp.estimation_note = synthetic_note(beta_market, beta_sector)
+    elif fit is None:
+        exp.reason = legs.estimation
+    else:
+        exp.estimation_note = f"{exp.estimation_note}; {legs.estimation}"
 
     a9 = A9Attribution(context())
     findings = a9.run(
@@ -591,17 +600,21 @@ def why_did_it_move(
         peers=graph_peers(instrument, window[1]),
     )
 
-    provenance = (
-        f"returns MEASURED from the price feed, {window[0]} to {window[1]}"
-        if measured
-        else "returns as SUPPLIED by the caller, not measured"
-    )
-    caveat = (
-        ""
-        if measured
-        else "\n\nBetas are stated, not estimated from a real window. Treat the split "
-        "between market and sector as illustrative until a factor model is fitted."
-    )
+    if legs is not None:
+        provenance = f"returns MEASURED from the price feed: {legs.measured_line()}"
+        caveat = ""
+    else:
+        provenance = "returns as SUPPLIED by the caller, not measured"
+        # Unconditional on this path. It used to be dropped whenever the legs
+        # were measured - and the measured legs were decomposed against this
+        # same synthetic fit, so the one case that most needed the warning was
+        # the one case that never carried it.
+        caveat = (
+            "\n\nBetas are stated, not estimated from a real window, and the sigma the "
+            "significance is measured against is synthetic, not this instrument's. "
+            "Treat the split between market and idiosyncratic as illustrative; give "
+            "market_proxy to measure both legs and estimate the betas on the same sessions."
+        )
     return (
         f"{decomposition_bars(exp)}\n\n"
         f"{_lines(findings)}\n\n"
@@ -609,16 +622,160 @@ def why_did_it_move(
     )
 
 
-def _window_return(instrument: str, bars_back: int, end: date | None):
-    series = _feed().fetch(instrument, end=end)
-    raw = series.raw()
-    if len(raw) < bars_back + 1:
-        raise PriceFeedError(
-            f"{instrument} has {len(raw)} bars up to {end or 'today'}, "
-            f"need {bars_back + 1} for a {bars_back}-bar return"
+@dataclass(frozen=True)
+class MeasuredLegs:
+    """Every leg of a decomposition from the same sessions, and the fit that goes with them.
+
+    One object rather than a tuple per leg because the legs only mean anything
+    together: the returns run over the same `first` to `last`, and the betas
+    were estimated on the sessions before `first` that the same series share.
+    The MCP tool and `ask.py why --fetch` both build their output from this,
+    so the two surfaces cannot drift apart on what "measured" means.
+    """
+
+    instrument: str
+    market_proxy: str
+    bars: int
+    first: date
+    last: date
+    instrument_return: float
+    market_return: float
+    #: Sessions every leg printed up to `last`, the window included.
+    sessions: int
+    #: The fit from the sessions before the window, or None when there were
+    #: fewer than MIN_OBSERVATIONS of them. None is an answer: the decomposition
+    #: is then ATTRIBUTION_UNAVAILABLE, never measured against a sigma that
+    #: belongs to no instrument.
+    fit: Fit | None
+    #: What the fit is, in one clause - for the estimation note, or the refusal.
+    estimation: str
+    sector_proxy: str | None = None
+    sector_return: float | None = None
+
+    def measured_line(self) -> str:
+        legs = (
+            f"{self.instrument} {self.instrument_return:+.2%} against "
+            f"{self.market_proxy} {self.market_return:+.2%}"
         )
-    win = raw[-(bars_back + 1) :]
-    return (win[-1].close / win[0].close) - 1.0, win[0].day, win[-1].day
+        if self.sector_proxy is not None and self.sector_return is not None:
+            legs += f" and {self.sector_proxy} {self.sector_return:+.2%}"
+        return (
+            f"{legs} over {self.first} to {self.last}: {self.bars} bar(s) of the "
+            f"{self.sessions} sessions the legs share"
+        )
+
+
+def measured_legs(
+    feed,
+    instrument: str,
+    market_proxy: str,
+    bars_back: int,
+    end: date | None,
+    sector_proxy: str | None = None,
+) -> MeasuredLegs:
+    """Measure every leg over the same sessions and estimate the betas before them.
+
+    Built the way `knowledge.pack.measure` builds the nightly row, so the tool
+    and the pack agree about a name's day: intersect the session dates, take the
+    last `bars_back + 1` common sessions as the window, and estimate on the
+    pack's `estimation_slice` of the common returns before it: up to 260
+    sessions, ending ten sessions before the window opens. The window stays
+    out of its own estimation - a move that is inside the sigma it is tested
+    against is that much less likely to look like anything - and so does the
+    run-up to it.
+
+    Two things this replaces, both reproduced against the cached bars. Each
+    leg was the last N bars of ITS OWN series, so a holiday one series carried
+    and the other skipped paired different sessions (Maybank's flat 2026-08-31
+    against the index's move over 08-27 to 08-28). And the measured legs were
+    then decomposed against the synthetic fit meant for typed returns, whose
+    0.4% sigma flagged every ordinary day on a name with more idiosyncratic
+    volatility than that - Genting's -1.55% on 2026-09-17 read as significant
+    here and as 0.60 sigma in the pack.
+
+    Without a sector proxy the fit is the pack's one-factor fit with the sector
+    beta fixed at zero; with one, the engine's own two-factor estimator on the
+    same aligned window. Fewer than MIN_OBSERVATIONS common sessions before the
+    window is a None fit, never a shorter one. Raises `PriceFeedError` when the
+    legs do not share enough sessions for the window itself.
+    """
+    bars_back = max(1, int(bars_back))
+    ids = [instrument, market_proxy] + ([sector_proxy] if sector_proxy else [])
+    days, closes = aligned_closes(feed, ids, end)
+    if len(days) < bars_back + 1:
+        raise PriceFeedError(
+            f"{' and '.join(dict.fromkeys(ids))} share {len(days)} session(s) up to "
+            f"{end or 'today'}, need {bars_back + 1} for a {bars_back}-bar return"
+        )
+
+    def daily(c: list[float]) -> list[float]:
+        return [b / a - 1.0 for a, b in zip(c, c[1:])]
+
+    def over_window(c: list[float]) -> float:
+        return c[-1] / c[-(bars_back + 1)] - 1.0
+
+    ri, rm = daily(closes[instrument]), daily(closes[market_proxy])
+    # Return k is the move INTO days[k + 1]. The estimation window is the
+    # pack's `estimation_slice` taken on the returns up to and including the
+    # event window's first return: up to ESTIMATION_LOOKBACK sessions, ending
+    # ESTIMATION_GAP sessions before the window, dated by the sessions those
+    # returns land on - the same window the nightly row is fitted on.
+    head = len(ri) - bars_back + 1
+    est = estimation_slice(head)
+    est_i, est_m, est_days = ri[:head][est], rm[:head][est], days[1:][:head][est]
+    first = days[-(bars_back + 1)]
+    fit: Fit | None
+    try:
+        if sector_proxy:
+            fit = estimate(EstimationInputs(est_i, est_m, daily(closes[sector_proxy])[:head][est]))
+        else:
+            fit = market_fit(est_i, est_m)
+    except ValueError as e:  # collinear legs: the same proxy twice, or a flat one
+        fit = None
+        estimation = f"betas not estimated: the legs cannot support a factor model ({e})"
+    else:
+        if fit is None:
+            estimation = (
+                f"betas not estimated: {len(est_i)} common session(s) before {first}, "
+                f"{MIN_OBSERVATIONS} needed"
+            )
+        else:
+            estimation = (
+                f"estimated on the {len(est_i)} sessions {est_days[0]} to {est_days[-1]} "
+                f"the legs share, ending {ESTIMATION_GAP} sessions before the window"
+            )
+            if not sector_proxy:
+                estimation += "; sector beta fixed at 0 (no sector proxy)"
+    return MeasuredLegs(
+        instrument=instrument,
+        market_proxy=market_proxy,
+        bars=bars_back,
+        first=first,
+        last=days[-1],
+        instrument_return=over_window(closes[instrument]),
+        market_return=over_window(closes[market_proxy]),
+        sessions=len(days),
+        fit=fit,
+        estimation=estimation,
+        sector_proxy=sector_proxy or None,
+        sector_return=over_window(closes[sector_proxy]) if sector_proxy else None,
+    )
+
+
+def synthetic_note(beta_market: float, beta_sector: float) -> str:
+    """The estimation note for a fit that estimated nothing.
+
+    `_synthetic_fit` below is a regression on random numbers with the stated
+    betas baked in, and `decompose` reports it as "betas from 250 sessions" -
+    true of the fit, false of the instrument. Its 0.4% residual sigma is the
+    part that misleads: the significance of a typed move is measured against
+    it, so a name with more idiosyncratic volatility than that reads as
+    significant on an ordinary day. The note names both facts.
+    """
+    return (
+        f"SYNTHETIC betas (stated {beta_market:.2f}/{beta_sector:.2f}); "
+        f"sigma is not this instrument's"
+    )
 
 
 def _synthetic_fit(beta_market: float, beta_sector: float, seed: int = 7):

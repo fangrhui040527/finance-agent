@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import hashlib
 from dataclasses import dataclass, field, replace
-from datetime import UTC, date, datetime, timedelta
+from datetime import UTC, date, datetime, time, timedelta
 from decimal import ROUND_DOWN, ROUND_HALF_UP, Decimal
 
 from core.market.feed import PriceFeedError
@@ -58,6 +58,7 @@ from engines.paper.store import (
     PositionChange,
     TargetRow,
 )
+from markets.registry import get as market_get
 from markets.registry import mic_of
 
 CENT = Decimal("0.01")
@@ -65,6 +66,22 @@ TENTH_BP = Decimal("0.0001")
 EXPIRE_AFTER_WEEKDAYS = 5
 STALE_AFTER_WEEKDAYS = 3
 HORIZONS = (1, 5, 21, 63, 252)
+
+#: The hour the nightly Routine decides (docs/22 section 8). A prediction's
+#: grading date counts from the decision day at this hour, so the date is a
+#: function of the day decided and the horizon, not of when the row was
+#: written: a decision for Monday's session recorded at 02:42 UTC on Tuesday
+#: grades on the same date as one recorded at 22:30 UTC on Monday.
+DECISION_NIGHT = time(22, 30)
+
+#: The market a close slot marks from. `manual` and `all` are absent on
+#: purpose: they mark from every market the book trades. XNYS is named for
+#: the day a NYSE name joins the watchlist; the registry has no adapter for it
+#: yet, and `slot_is_session` skips a MIC it cannot look up.
+SLOT_MARKETS: dict[str, frozenset[str]] = {
+    "bursa_close": frozenset({"XKLS"}),
+    "us_close": frozenset({"XNAS", "XNYS"}),
+}
 
 
 def _cents(x: Decimal) -> Decimal:
@@ -118,6 +135,95 @@ def turnover_used(store: PaperStore, book: str, on: date, sessions: int = 5) -> 
     return sum(
         (c.consideration_usd for c in store.changes(book, end=on) if c.day > start), Decimal(0)
     )
+
+
+# -- which session a mark belongs to -------------------------------------------------------
+
+
+def slot_names(cfg, slot: str) -> tuple[str, ...]:
+    """The watchlist names whose market the slot closes; all of them for manual/all."""
+    names = tuple(cfg.watchlist)
+    mics = SLOT_MARKETS.get(slot)
+    if mics is None:
+        return names
+    return tuple(i for i in names if mic_of(i) in mics)
+
+
+def slot_markets(cfg, slot: str) -> frozenset[str]:
+    mics = SLOT_MARKETS.get(slot)
+    if mics is not None:
+        return mics
+    return frozenset(mic_of(i) for i in cfg.watchlist) or frozenset({"XKLS", "XNAS"})
+
+
+def slot_is_session(cfg, slot: str, day: date) -> bool:
+    """Whether a market the slot marks from calls `day` a session.
+
+    The calendars as they stand: weekends only, until the holiday tables land.
+    A Labor Day us_close mark therefore passes here and is caught, if at all,
+    by the bars - there is no XNAS bar that day, so `session_day` stamps the
+    Friday before it.
+    """
+    for mic in slot_markets(cfg, slot):
+        try:
+            calendar = market_get(mic).calendar
+        except KeyError:
+            continue
+        if calendar.is_session(day):
+            return True
+    return False
+
+
+def session_open(cfg, slot: str, day: date) -> datetime | None:
+    """When the first market the slot marks from opens on `day`, UTC.
+
+    None when no market the slot marks from calls `day` a session, or none of
+    them can be looked up. A mark taken before this instant cannot carry the
+    day's bars, provisional or settled: the market had not opened.
+    """
+    opens: list[datetime] = []
+    for mic in slot_markets(cfg, slot):
+        try:
+            calendar = market_get(mic).calendar
+        except KeyError:
+            continue
+        session = calendar.session(day)
+        if session is not None:
+            opens.append(session.open_utc())
+    return min(opens) if opens else None
+
+
+def bars_session(feed, cfg, slot: str, on_or_before: date) -> date | None:
+    """The day of the last cached bar, on or before the day, on any name the slot marks from."""
+    seen: date | None = None
+    for iid in slot_names(cfg, slot):
+        try:
+            _, close_day = last_close(feed, iid, on_or_before)
+        except PriceFeedError:
+            continue
+        if seen is None or close_day > seen:
+            seen = close_day
+    return seen
+
+
+def session_day(feed, cfg, slot: str, day: date) -> date | None:
+    """The session a mark asked for on `day` belongs to; None if there is none to mark.
+
+    A mark is a fact about the bars it is marked from, so its day is the
+    session those bars closed - the last cached bar for the slot's market on
+    or before the day asked for - never the wall clock. A catch-up run on a
+    Saturday marks Friday's session; a run on a holiday marks the session
+    before it; each replaces that session's earlier mark rather than adding a
+    day the market never traded. Until 2026-09-19 the wall clock was the
+    stamp, which put sixteen marks on Saturdays and Sundays and filed the run
+    that priced Friday 2026-09-11's close under the 12th. Without a cached bar
+    to say otherwise, the day asked for stands if the calendar calls it a
+    session, and nothing is marked if it does not.
+    """
+    from_bars = bars_session(feed, cfg, slot, day)
+    if from_bars is not None:
+        return from_bars
+    return day if slot_is_session(cfg, slot, day) else None
 
 
 # -- decide ------------------------------------------------------------------------------
@@ -289,11 +395,23 @@ def decide(
     if learning is not None:
         from agents.learning.reflection import Horizon, Prediction
 
-        # A replayed decision is made "at" its own day, not at the wall clock:
-        # the grading date and the record must be about the day decided.
-        made = (
-            now if now.date() == day else datetime(day.year, day.month, day.day, 22, 30, tzinfo=UTC)
-        )
+        # `made_at` is the clock. The row says when the call was actually
+        # made; the day decided lives in decided_on, in the id and in the
+        # context, and the grading date counts from that day (DECISION_NIGHT),
+        # so a decision recorded after midnight neither claims hours it did
+        # not have nor lengthens its horizon. Until 2026-09-19 such a decision
+        # was stamped 22:30Z of its day: paper-2026-09-14-allcash said made
+        # 22:30Z on the 14th and was decided at 02:42Z on the 15th.
+        #
+        # A replay is the one case that keeps the nominal stamp: a decision
+        # for a day whose horizon has already run out in real time. The log
+        # refuses a prediction whose grading date is behind it - a horizon set
+        # after the fact is not a horizon - so the row carries the decision
+        # night as its clock and says in its context when it was written.
+        nominal = datetime.combine(day, DECISION_NIGHT, tzinfo=UTC)
+        grade_on = grade_date(nominal, horizon)
+        replayed = grade_on <= now.date()
+        made = nominal if replayed else now
         for i, t in enumerate(rows):
             cur = current.get(t.instrument_id, Decimal(0))
             if t.reason == ALL_CASH:
@@ -326,7 +444,7 @@ def decide(
                 statement=statement,
                 direction=direction,
                 confidence=confidence,
-                grade_on=grade_date(made, horizon),
+                grade_on=grade_on,
                 context={
                     "paper": True,
                     "decided_on": day.isoformat(),
@@ -334,6 +452,7 @@ def decide(
                     "to_weight": str(t.weight),
                     "phase": phase.name,
                     "all_cash": t.reason == ALL_CASH,
+                    **({"replayed_at": now.isoformat()} if replayed else {}),
                 },
             )
             if not dry_run:
@@ -773,13 +892,26 @@ class MarkResult:
     stops: list[TargetRow] = field(default_factory=list)
     control_targets: list[TargetRow] = field(default_factory=list)
     problems: list[str] = field(default_factory=list)
+    #: What the run did to the record besides marking: the session it stamped
+    #: when that is not the day asked for, the earlier mark it replaced, the
+    #: marks it re-dated. Said, not counted as problems.
+    notes: list[str] = field(default_factory=list)
+    #: Why nothing was marked - the day is no session and the cache holds no
+    #: bar to mark from. Exit 2, the code for "refused", like every refusal.
+    refusal: str = ""
 
     @property
     def exit_code(self) -> int:
+        if self.refusal:
+            return 2
         return 3 if self.problems else 0
 
     def render(self) -> str:
         lines = [f"paper mark {self.day} ({self.slot})"]
+        if self.refusal:
+            lines.append(f"  REFUSED: {self.refusal}")
+        for n in self.notes:
+            lines.append(f"  note: {n}")
         for book, m in self.marks.items():
             flag = "  HALTED" if m.halted else ""
             lines.append(
@@ -818,22 +950,58 @@ def mark(
     from engines.paper.control import control_units, rebalance_due
 
     now = now or datetime.now(UTC)
+    if now.tzinfo is None:
+        now = now.replace(tzinfo=UTC)  # the store writes UTC; compare like with like
     settings = settings_of(cfg, store)
-    phase = phase_for(day, settings)
     result = MarkResult(day, slot)
     if not store.has_books():
         result.problems.append("NO BOOK: run `ask.py paper init` first")
         return result
+    if store.marks_deduplicated:
+        result.notes.append(
+            f"removed {store.marks_deduplicated} duplicate mark(s) on opening the ledger: "
+            "a slot marks a session once, and the later reading stays"
+        )
+        store.marks_deduplicated = 0
+    result.notes += restamp_marks(store, feed, cfg)
+    session = session_day(feed, cfg, slot, day)
+    if session is None:
+        result.refusal = (
+            f"{day} is not a session of the {slot} market and the cache holds no earlier "
+            "bar to mark from; nothing marked"
+        )
+        return result
+    if session != day:
+        result.notes.append(
+            f"marked as {session}: the session of the last cached bar on or before {day} "
+            f"for the market(s) the {slot} slot marks"
+        )
+        day = result.day = session
+    phase = phase_for(day, settings)
     for book in (DECIDED, CONTROL):
         result.applied[book] = apply_pending(store, cfg, feed, fx, book=book, up_to=day)
+        prior = store.mark_for(book, day, slot)
         m, problems = mark_book(store, cfg, feed, fx, book=book, day=day, slot=slot, now=now)
+        if prior is not None:
+            if m.marked_at >= prior.marked_at:
+                result.notes.append(
+                    f"{book}: replaces the {slot} mark of {day} taken at {prior.marked_at:%H:%M}Z"
+                )
+            else:
+                # A replay clocked before the mark on record: the store kept
+                # the later reading, so that is the one this run reports.
+                m = prior
+                result.notes.append(
+                    f"{book}: the {slot} mark of {day} taken at {prior.marked_at:%H:%M}Z is "
+                    "later than this run's clock and stays"
+                )
         result.marks[book] = m
         result.problems += [f"{book}: {p}" for p in problems]
         if book == DECIDED:
             result.stops = stop_checks(store, cfg, m, now)
         elif rebalance_due(store, day, phase):
             quote = fx.asof(day)
-            funds = fundables(feed, cfg, m.equity_usd, quote, day, settings)
+            funds = fundables(feed, cfg, m.equity_usd, quote, day, settings, now=now)
             units = control_units(funds, m.equity_usd, phase, settings)
             held = {p.instrument_id: p.units for p in store.state(CONTROL).positions}
             rows = []
@@ -862,6 +1030,74 @@ def mark(
                 store.record_targets(rows)
             result.control_targets = rows
     return result
+
+
+def restamp_marks(store: PaperStore, feed, cfg) -> list[str]:
+    """Move marks stamped with a day their market never traded onto the session of their bars.
+
+    Before the session-day rule a catch-up run on a Saturday wrote a Saturday
+    mark: sixteen such rows sat in data/paper.db, and Friday 2026-09-11 had
+    no us_close mark while the 06:07Z run that priced its close was filed
+    under the 12th. Each mark on a non-session day is re-dated to the last
+    cached bar for its slot's market on or before the day it carries - the
+    bars it was marked from - and where that session already has a mark the
+    later reading stays. A mark whose bars are not in the cache is left where
+    it is, and the run says so. Cheap on every run: one scan of the marks,
+    and nothing to do once the ledger carries no such day.
+
+    The second shape of the same fault is a mark on a session day that had not
+    OPENED when the mark was taken. On 2026-09-22 Monday's 21:15Z us_close
+    collector arrived at 00:09Z Tuesday and a build that still stamped the
+    wall clock filed a mark under Tuesday holding Monday's closes - thirteen
+    hours before Tuesday's US session opened. Such a mark cannot carry the
+    bars of the day it names, provisional or settled, so it is re-dated to
+    the last cached bar before that day, under the same later-reading-stays
+    rule. The test is the open, not the close, on purpose: a mark taken
+    during the session from a provisional bar is that day's mark, and a later
+    run of the same slot replaces it.
+    """
+    moves: list[tuple[int, date]] = []
+    notes: list[str] = []
+    because: dict[int, str] = {}
+    for m in store.all_marks():
+        if slot_is_session(cfg, m.slot, m.day):
+            opened = session_open(cfg, m.slot, m.day)
+            taken = m.marked_at if m.marked_at.tzinfo else m.marked_at.replace(tzinfo=UTC)
+            if opened is None or taken >= opened:
+                continue
+            session = bars_session(feed, cfg, m.slot, m.day - timedelta(days=1))
+            if session is None:
+                notes.append(
+                    f"{m.book}: the {m.day} {m.slot} mark was taken at {taken:%Y-%m-%d %H:%M}Z, "
+                    "before that session opened, and the cache holds no earlier bar to say "
+                    "which one it priced; left as it is"
+                )
+                continue
+            if m.mark_id is not None:
+                moves.append((m.mark_id, session))
+                because[m.mark_id] = (
+                    f", taken at {taken:%Y-%m-%d %H:%M}Z before that session opened,"
+                )
+            continue
+        session = bars_session(feed, cfg, m.slot, m.day)
+        if session is None:
+            notes.append(
+                f"{m.book}: the {m.day} {m.slot} mark is on no session and the cache holds no "
+                "bar on or before it to say which one it priced; left as it is"
+            )
+            continue
+        if session != m.day and m.mark_id is not None:
+            moves.append((m.mark_id, session))
+    for m, new_day, outcome in store.restamp_marks(moves):
+        what = {
+            "moved": f"re-dated to its session {new_day}",
+            "replaced": f"re-dated to its session {new_day}, replacing that session's earlier mark",
+            "dropped": f"dropped: a later mark of its session {new_day} already exists",
+        }[outcome]
+        notes.append(
+            f"{m.book}: the {m.day} {m.slot} mark{because.get(m.mark_id or -1, '')} {what}"
+        )
+    return notes
 
 
 def _unused(_: Fundable | BookState | Refusal) -> None:  # keeps the imports honest for pyright
