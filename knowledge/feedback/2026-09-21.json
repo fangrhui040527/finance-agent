@@ -1,0 +1,266 @@
+{
+  "day": "2026-09-21",
+  "written_at": "2026-09-23T02:45:00Z",
+  "open_questions_carried": [
+    "Petronas Chemicals, Press Metal and Genting fell 2.3–2.8% on a +0.08% index day with no row about any of them; one factor or three stories? No Bursa sector proxy is cached. (since 2026-09-21)",
+    "Tuesday 09-22's `us_close` firing was skipped because the doubled 00:06Z run was counted as Tuesday's, and the six Bursa rows were never refetched on Tuesday; is the gap recovered by a forced run, or recorded and left? (since 2026-09-21)",
+    "Tenaga: the 09-21 rows hold both readings, *minimal earnings impact* and *undermines the IBR framework*, as titles. Which one did the −4.12% five-day move price, and what figure would let the page tell? (since 2026-09-18; rows collected 09-21)",
+    "`DFF` stepped +0.25 on 2026-09-17 and the collector holds no release, statement or story for it; is the FOMC statement missing because the only calendar row it reads is the malformed daily *FOMC Press Release* listing, now 09-24 to 09-30? (since 2026-09-20)",
+    "A short-interest weekly named Petronas Chemicals for the week to 09-18 and the collector has no short-selling source to check it against; would Bursa's daily short-selling report give the name a body? (since 2026-09-20)",
+    "The decomposition returned `no_identified_catalyst` for Tenaga on the one day the corpus held five rows about the cause; the reason string is fixed in `decompose.py` and no matcher is consulted. What does wiring one to the corpus look like? Tonight Press Metal carries the same verdict with zero rows. (since 2026-09-18)",
+    "Petronas Chemicals' idiosyncratic days read *not significant* because its own 120-session sigma contains the +22.56% run: −3.10pp on 09-18, −2.41pp on 09-21. Is a sigma that includes the anomaly the right yardstick for the sessions after it? (since 2026-09-18)",
+    "Petronas Chemicals collecting a body: one title in eight days. Which of the eleven sources listed for the name carries a Bursa-hours story about it at all? (since 2026-09-10; folded 09-17)",
+    "The linker attached a *Genting Plantations* headline to MYX:3182; how many rows linked to Genting Bhd are about its subsidiaries or its venues instead? Tonight both rows were venue stories. (since 2026-09-17)",
+    "Apple's published session changed by 1.12pp between a build from a pre-close cache and a build from the settled bars; which earlier pages were written from a pre-`us_close` cache? Tuesday's US bars on `main` are 14:05Z intraday quotes. (since 2026-09-17)",
+    "`markets/xkls.py` configures zero holidays on `main`, so the Bursa calendar counts Malaysia Day as a session; the fix is on PR #76. (since 2026-09-16)",
+    "Does a page need to state a market's non-trading day as a fact rather than inferring it from blank bars? (since 2026-09-16)",
+    "Brent is +34% since 2026-09-02, the move above 120 became knowable only on 09-17, and there has been no print after 09-15 for eight days; the monitor now alerts on it. (since 2026-09-16)",
+    "Press Metal collecting anything: eight calendar days, zero rows, and a significant idiosyncratic fall on the eighth. (since 2026-09-15)",
+    "The sector beta is fixed at 0, so any sector-wide session lands in a residual labelled `idiosyncratic`. (since 2026-09-14)",
+    "`no_identified_catalyst` reports an empty candidate list, not a weighed rejection; does a verdict need to distinguish the two? (since 2026-09-15)",
+    "GDELT stored 114 rows on 09-21's US sweep and still answered 429 for one name and for the Bursa sweep; per-IP throttling on the shared runner, and does the pacing on PR #76 clear it? (since 2026-09-08)",
+    "Tenaga: is the 5d move the results print the 2026-09-04 roundup headline referred to? (since 2026-09-04)",
+    "NVIDIA: filing or release for the Hugging Face transaction; `edgar` fetched nothing on 09-21. (since 2026-09-04)",
+    "Finnhub earnings rows for NVDA carry a knowable date in the future: 62 rows on `main`, unchanged; the fix is on PR #76. (since 2026-09-04)",
+    "Whether the observe phase's grading against the control is informative at 21 days; the first observe grades fall due 2026-10-11. (since 2026-09-08)"
+  ],
+  "market": {
+    "regime": "neutral",
+    "notes": [
+      "MYX:^KLSE +0.08% 1d, -1.17% 5d; XNAS:SPY +1.55% 1d, +1.66% 5d",
+      "SP500 7764.70 (+114.2) and NASDAQCOM 27122.09 (+599.54) at 2026-09-21; VIXCLS 14.87 (+0.06); BAMLH0A0HYM2 2.68 at 09-18",
+      "DGS10 5.01 (+0.07) and DGS2 4.76 (+0.09) at 2026-09-18; T10Y2Y 0.20 (-0.05) at 09-21; DFF 3.88 at 09-18, unchanged after the +0.25 step on 09-17; DEXMAUS 4.0793 at 09-18",
+      "DCOILBRENTEU 130.80 still the 2026-09-15 print, eight days, past cadence",
+      "DOSM:CPI_HEADLINE 137.50 had 09-21 as its first tradable session; no row reads it",
+      "Petronas Chemicals, Press Metal and Genting fell 2.3-2.8% on a +0.08% index day with no row about any of them"
+    ]
+  },
+  "names": [
+    {
+      "instrument_id": "MYX:1155",
+      "move": {
+        "return_1d": 0.0058,
+        "market_1d": 0.0008,
+        "unexplained_share": 0.78,
+        "note": "idiosyncratic +0.55%, 0.77 sigma, not_significant"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [],
+      "note": "one row, a Maybank research-arm note on Thai F&B stocks (kaohooninternational.com, q 0.65): a mention of the broker, not the bank"
+    },
+    {
+      "instrument_id": "MYX:5347",
+      "move": {
+        "return_1d": 0.0,
+        "market_1d": 0.0008,
+        "unexplained_share": 0.11,
+        "note": "market-level; 5d -4.12% vs -1.17%"
+      },
+      "causes": [],
+      "evidence_day": {
+        "rows": 12,
+        "sources": 10,
+        "escalated": 5,
+        "readings": [
+          {
+            "reading": "four-month cost, minimal earnings impact",
+            "evidence": [
+              "google_news:Fuel cost absorption seen having minimal impact on TNB earnings (2026-09-21T00:51Z, q 0.80)",
+              "google_news:TNB To Absorb Up To RM150 Mln Extra Costs From Expanded AFA Exemptions -- CIMB Securities (06:06Z)"
+            ]
+          },
+          {
+            "reading": "regulatory precedent",
+            "evidence": [
+              "google_news:Policy Intervention Could Undermine TNB And IBR Framework (businesstoday, 04:32Z, q 0.80)",
+              "https://www.freemalaysiatoday.com/category/highlight/2026/09/21/tnb-downgraded-after-it-shoulders-electricity-subsidy-burden",
+              "google_news:SNAPSHOT | Brokerage firms downgrade TNB to 'hold' over subsidy (malaysiakini, 12:56Z)"
+            ]
+          }
+        ],
+        "note": "titles only; the rows arrived on a session the stock did not move, so no cause is offered for the day"
+      },
+      "open_questions": [
+        "which reading the -4.12% five-day move priced, and what figure would tell (since 2026-09-18)"
+      ],
+      "watch": [
+        {
+          "when": "next sessions",
+          "what": "a body for any downgrade row; an Energy Commission statement on the exemption's duration"
+        }
+      ],
+      "confirm": "a broker note or regulator statement naming the IBR framework as the risk, with a target-price cut",
+      "refute": "Tenaga regaining the five-day gap to the index while the downgrades stand"
+    },
+    {
+      "instrument_id": "MYX:5183",
+      "move": {
+        "return_1d": -0.0234,
+        "market_1d": 0.0008,
+        "unexplained_share": 0.97,
+        "note": "idiosyncratic -2.41%, 0.61 sigma, not_significant; 5d -9.63% vs -1.17%"
+      },
+      "causes": [
+        {
+          "claim": "unknown: no collected evidence reaches it",
+          "evidence": [],
+          "chain": [],
+          "confidence": null,
+          "confirm": "a first row dated 2026-09-21 or later about the company",
+          "refute": "the same fall across Bursa petrochemical peers on the day"
+        }
+      ],
+      "open_questions": [
+        "the 120-session sigma contains the +22.56% run (since 2026-09-18)"
+      ],
+      "watch": [],
+      "note": "quiet: nothing collected in the window; DCOILBRENTEU last printed 2026-09-15"
+    },
+    {
+      "instrument_id": "MYX:5225",
+      "move": {
+        "return_1d": -0.0026,
+        "market_1d": 0.0008,
+        "unexplained_share": 0.6,
+        "note": "idiosyncratic -0.23%, 0.25 sigma, not_significant"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [],
+      "note": "one register row: google_news:EPF Lifts Stake in IHH Healthcare to Over 13 Per Cent (tipranks.com, 10:20Z, q 0.65); nothing for a 0.25-sigma day to explain"
+    },
+    {
+      "instrument_id": "MYX:8869",
+      "move": {
+        "return_1d": -0.0282,
+        "market_1d": 0.0008,
+        "unexplained_share": 0.96,
+        "note": "idiosyncratic -2.95%, verdict no_identified_catalyst, the only significant move in the book"
+      },
+      "causes": [
+        {
+          "claim": "unknown: no collected evidence reaches it",
+          "evidence": [],
+          "chain": [
+            "zero rows for eight calendar days",
+            "the only aluminium input is PALUMUSDM 3,158.26 for 2026-07-01, monthly, 84 days old",
+            "sector beta fixed at 0"
+          ],
+          "confidence": null,
+          "confirm": "a first Press Metal row dated 2026-09-21 or later naming something that happened to the company",
+          "refute": "the same fall across other Bursa aluminium or industrial names on the day"
+        }
+      ],
+      "open_questions": [
+        "collecting anything (since 2026-09-15)"
+      ],
+      "watch": [],
+      "note": "monitor warn: 1 of 9 book names collected nothing in 14d: MYX:8869"
+    },
+    {
+      "instrument_id": "MYX:3182",
+      "move": {
+        "return_1d": -0.0259,
+        "market_1d": 0.0008,
+        "unexplained_share": 0.91,
+        "note": "idiosyncratic -2.49%, 1.44 sigma, not_significant"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [],
+      "note": "two venue rows, mentions not causes: google_news:#SHOWBIZ: Sunset by NEON stands firm against ticket price hikes ahead of Genting return (nst.com.my, q 0.80); google_news:Why is everything cheaper at Genting Premium Outlets? (newswav.com, q 0.65)"
+    },
+    {
+      "instrument_id": "XNAS:NVDA",
+      "move": {
+        "return_1d": 0.023,
+        "market_1d": 0.0155,
+        "unexplained_share": 0.09,
+        "note": "market-driven: market component +2.68% at beta 1.73"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [
+        {
+          "when": "2026-11-17",
+          "what": "earnings_result"
+        }
+      ],
+      "note": "225 stories from 36 sources; no event in the window"
+    },
+    {
+      "instrument_id": "XNAS:AAPL",
+      "move": {
+        "return_1d": 0.0085,
+        "market_1d": 0.0155,
+        "unexplained_share": 0.23,
+        "note": "market-driven"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [
+        {
+          "when": "2026-10-28",
+          "what": "earnings_result"
+        }
+      ],
+      "note": "rating_reiteration events from fmp: B of A Securities 2026-09-17, Evercore ISI 2026-09-18"
+    },
+    {
+      "instrument_id": "XNAS:MSFT",
+      "move": {
+        "return_1d": 0.0159,
+        "market_1d": 0.0155,
+        "unexplained_share": 0.15,
+        "note": "market-driven"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [
+        {
+          "when": "2026-10-27",
+          "what": "earnings_result"
+        }
+      ]
+    }
+  ],
+  "machine": {
+    "schedule": "Monday 09-21 as on the 09-20 page. Tuesday 09-22: Monday's us_close cron arrived 00:06Z (+2h51m) and collected Monday's close a second time (run 20260922T000636, da1298c) because main's guard counts runs since 00:00 UTC; bursa_close 14:02Z (+4h42m, b02908f); us_preopen 17:11Z (+4h41m, 357b25a); Tuesday's us_close cron 23:35Z (+2h20m) met the guard, which counted the 00:06Z run as Tuesday's, and skipped the sweep (8ded45c changed only data/paper.db): Tuesday's US-close news was not collected. The routine fired 22:43Z 09-22 and ran from 02:26Z 09-23; sweep --due at 02:27Z named bursa_close, us_preopen, us_close, Wednesday's slots whose firings had not come round, and none was dispatched.",
+    "price_cache": "the 00:08Z refetch stamped every Bursa row fetched 2026-09-22 with Monday as its last bar, and main serves a row for the rest of the UTC day it was fetched on, so Tuesday's Bursa closes were never fetched; the US rows were refetched at 14:05Z, 35 minutes into Tuesday's session, and those intraday quotes are the last US bars on file",
+    "fact_book": "all six Bursa names NOTHING COLLECTED; forward-dated known_at on main 62, unchanged; NVIDIA snapshot prints last EPS surprise % 3.82 knowable 2026-09-30",
+    "fixes": "firing-keyed guard, per-market cache freshness, premature-mark restamp, 260-session betas, calendars: PR #76, green and mergeable, not merged"
+  },
+  "data_quality": {
+    "failed": [
+      "gdelt bursa_close: HTTP 429, read empty for Petronas Chemicals and IHH"
+    ],
+    "degraded": [
+      "gdelt us_close: 114 rows stored (first in eight days) and HTTP 429 for Microsoft",
+      "alphavantage_news: quota exhausted for XNAS:MSFT, ninth day; 8 rows, 4 facts",
+      "eodhd: 0 facts both slots (2-a-day credit budget)",
+      "yahoo_rss: read empty for all six Bursa names; 55 of 55 named the company on the US sweep",
+      "google_news: Bursa 38 kept, 17 naming the company (Petronas Chemicals 0/1, Press Metal 0/1); US 88 kept, 76 naming",
+      "edgar: 0 fetched"
+    ],
+    "skipped": [
+      "fmp us_preopen: no name in the book trades in slot 'us_preopen'"
+    ],
+    "lost": [
+      "us_close firing of 2026-09-22: skipped by the calendar-day guard; not collected",
+      "Bursa closes of 2026-09-22: not fetched (cache served the 00:08Z rows)"
+    ],
+    "alerts": [
+      "ALERT: 1 macro series past their cadence: DCOILBRENTEU (8d, limit 7)",
+      "warn: 1 of 9 book names collected nothing in 14d: MYX:8869"
+    ],
+    "recovered": [
+      "finnhub 183 rows, 6 facts; nst_business 45 and fmt_business 50 rows; jin10_flash 13 over three slots; fred 12 facts; dbnomics 450 fetched, 15 frozen series"
+    ]
+  },
+  "lessons": [
+    "The evidence day and the price day are different days. Tenaga's twelve rows about Friday's figure arrived on a session it did not move (+0.00%, 11% unexplained); a page that reads only what moved would never have read them, and a page that reads them as causes of Monday would be wrong.",
+    "A guard keyed to the calendar fails in the direction of the delay. A cron that runs late crosses midnight; counted by date, the late run spends the next day's slot, so one close is collected twice and the next not at all, and a count of runs per day reports both days as complete.",
+    "Three names falling the same amount on the same flat day is a pattern the decomposition cannot report while the sector beta is 0: each residual reads as that company's own, and each is marked `unknown` separately."
+  ]
+}

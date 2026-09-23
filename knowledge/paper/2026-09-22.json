@@ -1,0 +1,139 @@
+{
+  "day": "2026-09-22",
+  "written_at": "2026-09-23T02:40:00Z",
+  "phase": "ramp",
+  "week": 3,
+  "equity_usd": 1000.0,
+  "cash_usd": 1000.0,
+  "control_equity_usd": 1000.0,
+  "drawdown": 0.0,
+  "halted": false,
+  "positions": [],
+  "changes": [],
+  "control_pending": [
+    {
+      "instrument_id": "MYX:8869",
+      "units": 100,
+      "weight": 0.186
+    },
+    {
+      "instrument_id": "MYX:5183",
+      "units": 100,
+      "weight": 0.1129
+    },
+    {
+      "instrument_id": "MYX:3182",
+      "units": 200,
+      "weight": 0.0922
+    }
+  ],
+  "control_pending_note": "control_rebalance recorded 2026-09-22T00:09:01Z by main's doubled us_close run, sized at Monday's closes; applies at each market's first cached bar after 2026-09-22",
+  "caps": [
+    {
+      "cap": "largest name",
+      "value": "0.00%",
+      "limit": "25%",
+      "breached": false
+    },
+    {
+      "cap": "invested",
+      "value": "0.00%",
+      "limit": "40%",
+      "breached": false
+    },
+    {
+      "cap": "cash floor",
+      "value": "100.00%",
+      "limit": "20%",
+      "breached": false
+    },
+    {
+      "cap": "drawdown from peak",
+      "value": "0.00%",
+      "limit": "8%",
+      "breached": false
+    },
+    {
+      "cap": "turnover, 5 weekdays",
+      "value": "USD 0.00",
+      "limit": "USD 500.00",
+      "breached": false
+    }
+  ],
+  "prices": {
+    "bursa": "Monday 2026-09-21 closes: main's cache did not refetch Bursa on 2026-09-22",
+    "us": "quotes pulled 2026-09-22T14:05Z, labelled the session so far",
+    "fx": "4.076 MYR per USD, bnm, 2026-09-22"
+  },
+  "fundable": [
+    {
+      "instrument_id": "MYX:5183",
+      "lot_usd": 112.86,
+      "share": 0.113,
+      "round_trip": 0.0197,
+      "lots": 2
+    },
+    {
+      "instrument_id": "MYX:5225",
+      "lot_usd": 186.95,
+      "share": 0.187,
+      "round_trip": 0.0124,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:8869",
+      "lot_usd": 185.97,
+      "share": 0.186,
+      "round_trip": 0.0125,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:3182",
+      "lot_usd": 46.12,
+      "share": 0.046,
+      "round_trip": 0.0464,
+      "lots": 5
+    },
+    {
+      "instrument_id": "XNAS:NVDA",
+      "lot_usd": 227.24,
+      "share": 0.227,
+      "round_trip": 0.0114,
+      "lots": 1,
+      "price": "provisional"
+    }
+  ],
+  "over_cap": {
+    "MYX:1155": 0.255,
+    "MYX:5347": 0.32,
+    "XNAS:AAPL": 0.339,
+    "XNAS:MSFT": 0.496
+  },
+  "attribution": null,
+  "decision": {
+    "recorded": true,
+    "weights": {},
+    "all_cash": true,
+    "prediction_id": "paper-2026-09-22-allcash-21d-33c5",
+    "grades_on": "2026-10-22",
+    "confidence": 0.55,
+    "decided_at": "2026-09-23T02:33:01Z",
+    "thesis": "All cash, fifteenth session, the first ramp decision; recorded after Bursa's Wednesday open, on Monday's Bursa closes and Tuesday's 14:05Z US quotes; nothing in the fundable universe beats cash over 21 sessions.",
+    "refusals": []
+  },
+  "stores": {
+    "decided_targets": 12,
+    "applications": 12,
+    "predictions": 12
+  },
+  "mistakes": [
+    "The stored thesis gives the wrong clock. The thesis on `paper-2026-09-22-allcash-21d-33c5` (decision date 2026-09-22) says it was recorded *at about 02:50 UTC*; the target row's `decided_at` is 02:33:01 UTC on 09-23. Both are after Bursa's 01:00 UTC Wednesday open, so the reason the thesis gives still holds; the figure in it does not.",
+    "The learning store dates the same prediction four hours early. `data/learning.db` records `made_at` 2026-09-22T22:30:00Z for `paper-2026-09-22-allcash-21d-33c5`, the nominal decision night, while the decision was taken at 02:33 UTC on 09-23. `main` stamps the prediction at the decision night; the real-clock fix is on PR #76. For an all-cash row the stamp moves no fill; for a weighted row it would date the decision before the Bursa open it fills at.",
+    "The 09-21 page misstated when this decision could fill. It said a Nasdaq fill of Tuesday's decision would be *Tuesday's US close at the earliest*. By the ledger's rule a decision dated 2026-09-22 applies at the first cached bar strictly after 2026-09-22, Wednesday's in both markets. The error is on the page that closed the observe phase (decision 2026-09-21, `paper-2026-09-21-allcash-21d-c04f`), not in any store."
+  ],
+  "lessons": [
+    "A decision recorded after its fill bar has opened is a decision the ledger cannot audit. Whatever the reasons for the delay, the only row that stays clean is the one with no fill, and the page has to say which case it is.",
+    "A price table is as fresh as the cache rule behind it. Tuesday's table read Monday's Bursa closes under no warning at all, while the US quotes were labelled; the stale half was the unlabelled one.",
+    "Two clocks on one decision is a defect even when both agree on the day. The target row says 02:33 UTC on the 23rd and the prediction says 22:30 UTC on the 22nd; a grader that reads the second would place the decision before the open it fills at."
+  ]
+}
