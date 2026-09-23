@@ -881,6 +881,19 @@ between 09:20 and 09:25 UTC lands before the `bursa_close` firing and fails a
 correct command, the trap its own docstring describes at 00:02. It now records
 the run at or after the firing.
 
+The same morning's rehearsal of tonight's pipeline on this branch found the
+third shape of the fault in the feedback pack. The paper book's fundable table
+has labelled a price pulled before its market shut since 2026-09-16; the
+pack's moves table never asked. Built for 2026-09-22 from `main`'s cache, it
+decomposed NVIDIA, Apple and Microsoft from quotes pulled at 14:05 UTC, 35
+minutes into the session, exactly as it would a close, which is also the
+shape of the 1.12pp Apple discrepancy carried as an open question since
+2026-09-17. `measure` now runs both legs through `price_state` and a
+provisional leg marks the row and gets its own block under the table, beside
+STALE NAMES and MIS-DATED; a leg whose fetch time is unknown is not labelled.
+The 2026-09-22 pack now marks six rows STALE and three PROVISIONAL, which is
+every row it has.
+
 Not changed: the control book's three 2026-09-22 targets. They are the record
 of what the machine did, on the correct decision day; the page says how they
 were sized.

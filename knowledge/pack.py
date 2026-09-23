@@ -92,6 +92,10 @@ class Move:
     #: read off its adapter. Not the book's currency, which the pack does not
     #: convert to because no FX return is measured.
     currency: str = ""
+    #: Set when either leg's bar for `last_day` was pulled before its market
+    #: shut: the figures are the session so far, not the session. See
+    #: `_provisional_note`.
+    provisional: str = ""
 
     @property
     def mis_dated(self) -> bool:
@@ -140,6 +144,8 @@ class Move:
             flag = f" **MIS-DATED: this is the {self.last_day} session**"
         elif self.stale:
             flag = f" **STALE NAME: this is the {self.last_day} session**"
+        if self.provisional:
+            flag += f" **PROVISIONAL: the {self.last_day} session so far, not the close**"
         return (
             f"| {self.label} ({self.instrument_id}) | {self.r1:+.2%} | {self.m1:+.2%} | "
             f"{self.r5:+.2%} | {self.m5:+.2%} | {self.verdict}"
@@ -220,6 +226,7 @@ def measure(feed, instrument_id: str, label: str, day: date, base_currency: str 
     move.r1, move.m1 = ri[-1], rm[-1]
     move.r5, move.m5 = ci[-1] / ci[-6] - 1.0, cm[-1] / cm[-6] - 1.0
     move.currency = market_currency(mic_of(instrument_id))
+    move.provisional = _provisional_note(feed, (instrument_id, proxy), move.last_day)
 
     est = estimation_slice(len(ri))
     est_i, est_m = ri[est], rm[est]
@@ -256,6 +263,45 @@ def measure(feed, instrument_id: str, label: str, day: date, base_currency: str 
     move.beta = fit.coefficients[1] if fit is not None else None
     move.components = {c.component.value: c.contribution for c in exp.components}
     return move
+
+
+def _fetched_at(feed, instrument_id: str) -> datetime | None:
+    """When the body behind an id's bars was pulled; None from a feed that
+    keeps no such record (a fixture, a feed with no cache)."""
+    ask = getattr(feed, "fetched_at", None)
+    if ask is None:
+        return None
+    try:
+        return ask(instrument_id)
+    except Exception:  # a feed that cannot say is simply unknown
+        return None
+
+
+def _provisional_note(feed, legs: tuple[str, ...], day: date) -> str:
+    """Say so when a leg's bar for `day` was pulled before its market shut.
+
+    The paper book's fundable table has labelled such prices since 2026-09-16;
+    this table did not. On 2026-09-17 Apple's published session moved 1.12pp
+    between a build from a pre-close cache and one from the settled bars, and
+    on 2026-09-22 the only US bars `main` held for the day were quotes pulled
+    at 14:05 UTC, 35 minutes into the session: a decomposition of either reads
+    exactly like one of a close. The rule is `core.market.calendar.price_state`,
+    the same one the fundable table uses; a leg whose fetch time is unknown is
+    not labelled, because `unknown` is not `provisional`.
+    """
+    from core.market.calendar import PROVISIONAL, price_state
+
+    pulled = []
+    for iid in legs:
+        at = _fetched_at(feed, iid)
+        if at is not None and price_state(mic_of(iid), day, at) == PROVISIONAL:
+            pulled.append(f"{iid} pulled {at:%Y-%m-%d %H:%M}Z")
+    if not pulled:
+        return ""
+    return (
+        f"PROVISIONAL: {'; '.join(pulled)}, before its market's {day} close, so the "
+        f"{day} figures in this row are the session so far, not the close"
+    )
 
 
 def _dating_note(move: Move, *, own_days: set[date], mkt_days: set[date]) -> str:
@@ -351,6 +397,7 @@ def build_pack(
             )
             + (f" Components: {comps}." if comps else "")
             + (f" {m.dating}." if m.dating else "")
+            + (f" {m.provisional}." if m.provisional else "")
         )
     out.append("")
 
@@ -375,6 +422,18 @@ def build_pack(
             "",
         ]
         out += [f"- {m.dating}" for m in halted]
+        out.append("")
+
+    unsettled = [m for m in moves if m.provisional]
+    if unsettled:
+        out += [
+            f"**{len(unsettled)} of {len(moves)} rows are PROVISIONAL.** A leg's bar for the "
+            f"row's session was pulled while its market was still trading, so the return and "
+            f"its decomposition are the session so far. Do not read them as {day}'s close; "
+            f"the next close sweep refetches them:",
+            "",
+        ]
+        out += [f"- {m.label} ({m.instrument_id}): {m.provisional}" for m in unsettled]
         out.append("")
 
     digest = build_digest(

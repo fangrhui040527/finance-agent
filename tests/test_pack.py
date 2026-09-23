@@ -226,6 +226,47 @@ def test_a_name_that_did_not_print_when_its_market_did_is_stale_not_a_holiday():
     assert "**STALE NAME: this is the 2026-09-03 session**" in m.row()
 
 
+@dataclass
+class PulledAtFeed(FakeFeed):
+    """FakeFeed plus an answer to "when was this pulled": US legs at 14:05 UTC on
+    DAY, 35 minutes into Nasdaq's session; Bursa legs after Bursa's 09:00 shut."""
+
+    def fetched_at(self, iid):
+        if iid.startswith("XNAS"):
+            return datetime(2026, 9, 4, 14, 5, tzinfo=UTC)
+        return datetime(2026, 9, 4, 9, 30, tzinfo=UTC)
+
+
+def test_a_row_decomposed_from_a_bar_pulled_mid_session_says_so():
+    """2026-09-22: the only US bars on `main` for the day were 14:05 UTC quotes,
+    and the moves table decomposed them like closes. A Bursa leg pulled after
+    its own 09:00 shut is settled, whatever Nasdaq was doing."""
+    nvda = measure(PulledAtFeed(), "XNAS:NVDA", "NVIDIA", DAY)
+    assert not nvda.error and nvda.last_day == DAY
+    assert nvda.provisional.startswith("PROVISIONAL: XNAS:NVDA pulled 2026-09-04 14:05Z")
+    assert "XNAS:SPY pulled 2026-09-04 14:05Z" in nvda.provisional, "the proxy leg too"
+    assert "**PROVISIONAL: the 2026-09-04 session so far, not the close**" in nvda.row()
+    maybank = measure(PulledAtFeed(), "MYX:1155", "Maybank", DAY)
+    assert not maybank.error and maybank.provisional == ""
+    assert "PROVISIONAL" not in maybank.row()
+    # a feed that cannot say when it pulled is not guessed at
+    assert measure(FakeFeed(), "XNAS:NVDA", "NVIDIA", DAY).provisional == ""
+
+
+def test_the_pack_lists_provisional_rows(tmp_path):
+    text = build_pack(
+        Cfg(),
+        DAY,
+        corpus_path=str(tmp_path / "c.db"),
+        facts_path=str(tmp_path / "f.db"),
+        feed=PulledAtFeed(),
+        now=NOW,
+        previous_dir=tmp_path / "fb",
+    )
+    assert "1 of 2 rows are PROVISIONAL" in text
+    assert "- NVIDIA (XNAS:NVDA): PROVISIONAL: XNAS:NVDA pulled 2026-09-04 14:05Z" in text
+
+
 def test_the_pack_lists_stale_names_apart_from_mis_dated_rows(tmp_path):
     text = build_pack(
         Cfg(),
