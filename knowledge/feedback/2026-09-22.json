@@ -1,0 +1,321 @@
+{
+  "day": "2026-09-22",
+  "written_at": "2026-09-23T23:10:00Z",
+  "measured_session": {
+    "bursa": "2026-09-21 (MIS-DATED: ^KLSE blank on 09-22)",
+    "us": "2026-09-22"
+  },
+  "pack_built": "2026-09-23T22:50Z, rebuilt after run 20260923T224441 refetched the US bars; the 22:44Z build had them blank",
+  "open_questions_carried": [
+    "IHH: the Macquarie row (*\"rises over 5%\"*, 09-22) sits on a session the pack cannot decompose. When `^KLSE`'s 09-22 row fills, what share of the day was IHH's own? (since 2026-09-22)",
+    "A blank bar shared by a name and its proxy is labelled *correctly dated*, as if the market was shut: the 22:44Z build did this for the US rows while `SP500` printed 2026-09-22 in the same pack. Should the pack check the market calendar, or an independent index print, before calling a gap a non-session? (since 2026-09-22)",
+    "The move to 260-session betas re-measured the same Monday: Tenaga 11% → 30% unexplained, IHH 60% → 76%, Maybank 78% → 84%. Which window's shares do pages compare across the change? (since 2026-09-22)",
+    "Petronas Chemicals, Press Metal and Genting fell 2.3–2.8% on a +0.08% index day with no row about any of them: one factor or three stories? No Bursa sector proxy is cached. (since 2026-09-21)",
+    "Tenaga: the rows hold both readings, *minimal impact* and *undermines the IBR framework*, as titles, now over two days. Which one did the −4.12% five-day move price, and what figure would let the page tell? (since 2026-09-18)",
+    "`DFF` stepped +0.25 on 2026-09-17 and the collector holds no statement for it. The pack now reads the daily *FOMC Press Release* listing as a table (`a5ae7ba`), so no calendar row points at the meeting. Where does a statement come from? (since 2026-09-20)",
+    "A short-interest weekly named Petronas Chemicals for the week to 09-18. Would Bursa's daily short-selling report give the name a body? (since 2026-09-20)",
+    "The verdict now says no matcher ran (`b66009e`). Wiring one to the corpus is still open: tonight Press Metal is significant at 5% with zero rows to weigh. (since 2026-09-18)",
+    "Petronas Chemicals' idiosyncratic days read *not significant* because its own sigma contains the +22.56% run. The 260-session window still contains it (0.60 sigma for −2.37pp). (since 2026-09-18)",
+    "Petronas Chemicals collecting a body: which of the eleven listed sources carries a Bursa-hours story about it at all? (since 2026-09-10; folded 09-17)",
+    "The linker attached a *Genting Plantations* headline to MYX:3182. How many Genting Bhd rows are about subsidiaries or venues? (since 2026-09-17)",
+    "Which earlier pages were written from a pre-close cache? `dfc45e3` now labels such rows; Tuesday's US bars are not intraday but blank. (since 2026-09-17)",
+    "Does a page need to state a market's non-trading day as a fact rather than infer it from blank bars? Tonight a blank bar was read as a non-trading day that was not one. (since 2026-09-16)",
+    "Brent: 114.89 at 09-22 against 130.80 at 09-15, +22.18 over twenty observations. The staleness is answered (weekly publication); what the move did to Petronas Chemicals' feedstock reading is not, because the decomposition has no commodity leg. (since 2026-09-16)",
+    "Press Metal collecting anything: zero rows again on 09-22 and on Wednesday's Bursa sweep. (since 2026-09-15)",
+    "The sector beta is fixed at 0, so any sector-wide session lands in a residual labelled `idiosyncratic`. (since 2026-09-14)",
+    "GDELT: degraded on 09-22 and failed on both 09-23 sweeps with 429 on the first request; now past its cadence. Per-IP throttling on the shared runner? (since 2026-09-08)",
+    "Tenaga: is the 5d move the results print the 2026-09-04 roundup headline referred to? (since 2026-09-04)",
+    "NVIDIA: filing or release for the Hugging Face transaction. (since 2026-09-04)",
+    "Whether the observe phase's grading against the control is informative at 21 days; the first observe grades fall due 2026-10-11. (since 2026-09-08)"
+  ],
+  "market": {
+    "regime": "neutral",
+    "notes": [
+      "XNAS:SPY -0.02% 1d, +2.11% 5d; MYX:^KLSE has no 2026-09-22 bar, its figures are Monday's: +0.08% 1d, -1.17% 5d",
+      "SP500 7764.64 (-0.06) and NASDAQCOM 27244.28 (+122.19) at 2026-09-22; VIXCLS 14.21 (-0.66); BAMLH0A0HYM2 2.68 (+0.02); T10Y2Y 0.25 (+0.05)",
+      "DGS10 4.96 (-0.05) and DGS2 4.76 (+0) at 2026-09-21; DFF 3.88 at 09-21; DEXMAUS 4.0793 at 09-18",
+      "DCOILBRENTEU 114.89 at 2026-09-22 (-1.26), against 130.80 at 09-15 carried by the last three pages; +22.18 over 20 observations; series_stale resolved",
+      "the 22:44Z build labelled the US rows correctly dated to 09-21 because name and proxy were both blank, while SP500 printed 2026-09-22: a shared data gap read as a non-session; the 22:46Z refetch filled them"
+    ]
+  },
+  "names": [
+    {
+      "instrument_id": "MYX:1155",
+      "move": {
+        "return_1d": 0.0058,
+        "market_1d": 0.0008,
+        "unexplained_share": 0.84,
+        "session": "2026-09-21",
+        "note": "MIS-DATED; idiosyncratic +0.51%, 0.70 sigma, not_significant; 78% on the 09-21 page (120-session betas)"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [],
+      "evidence_day": {
+        "rows": 1,
+        "note": "Malayan Banking stock edges higher as investors return to Malaysian blue chips (ad-hoc-news.de via google_news, 02:04Z, q 0.65): describes a price, not an event"
+      }
+    },
+    {
+      "instrument_id": "MYX:5347",
+      "move": {
+        "return_1d": 0.0,
+        "market_1d": 0.0008,
+        "unexplained_share": 0.3,
+        "session": "2026-09-21",
+        "note": "MIS-DATED; idiosyncratic -0.04%, 0.05 sigma; 11% on the 09-21 page; 5d -4.12% vs -1.17%"
+      },
+      "causes": [],
+      "open_questions": [
+        "which reading the -4.12% five-day move priced (since 2026-09-18)"
+      ],
+      "watch": [
+        {
+          "when": "next sessions",
+          "what": "a body for any downgrade row; Tuesday's decomposition once ^KLSE's 09-22 row fills"
+        }
+      ],
+      "evidence_day": {
+        "rows": 5,
+        "escalated": 1,
+        "readings": [
+          {
+            "reading": "minimal impact",
+            "evidence": [
+              "google_news:Minimal impact for TNB with retail charge exemption (thestar.com.my, 2026-09-22T00:15Z, q 0.80)"
+            ]
+          },
+          {
+            "reading": "downgrades / precedent",
+            "evidence": [
+              "google_news:TNB Shares Face Downgrades as Utility Absorbs RM150 Million Electricity Subsidy (finance.biggo.com, 00:25Z, q 0.65)",
+              "google_news:SNAPSHOT | Brokerage firms downgrade TNB to 'hold' over subsidy (malaysiakini, 2026-09-21T12:56Z)"
+            ]
+          }
+        ],
+        "note": "titles only; Tuesday's session is not decomposed, so no cause is offered"
+      },
+      "confirm": "a broker note or Energy Commission statement naming the IBR framework as the risk",
+      "refute": "Tenaga closing the five-day gap to the index while the downgrades stand"
+    },
+    {
+      "instrument_id": "MYX:5183",
+      "move": {
+        "return_1d": -0.0234,
+        "market_1d": 0.0008,
+        "unexplained_share": 0.96,
+        "session": "2026-09-21",
+        "note": "MIS-DATED; idiosyncratic -2.37%, 0.60 sigma, not_significant, R2 0.00; 97% on the 09-21 page; 5d -9.63% vs -1.17%"
+      },
+      "causes": [
+        {
+          "claim": "unknown: no collected evidence reaches it",
+          "evidence": [],
+          "chain": [
+            "quiet: nothing collected in the window",
+            "DCOILBRENTEU printed 114.89 at 09-22 but the decomposition has no commodity leg"
+          ],
+          "confidence": null,
+          "confirm": "a row about the company dated 09-21 or later",
+          "refute": "the same fall across Bursa petrochemical peers on the day"
+        }
+      ],
+      "open_questions": [
+        "sigma containing the +22.56% run (since 2026-09-18)",
+        "which source carries a Bursa-hours story (since 2026-09-10)"
+      ],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:5225",
+      "move": {
+        "return_1d": -0.0026,
+        "market_1d": 0.0008,
+        "unexplained_share": 0.76,
+        "session": "2026-09-21",
+        "note": "MIS-DATED; idiosyncratic -0.30%, 0.27 sigma, not_significant; 60% on the 09-21 page"
+      },
+      "causes": [],
+      "open_questions": [
+        "what share of 09-22 was IHH's own (since 2026-09-22)"
+      ],
+      "watch": [],
+      "pending": [
+        {
+          "session": "2026-09-22",
+          "candidate": "Macquarie flags strong earnings outlook",
+          "evidence": [
+            "google_news:IHH Healthcare rises over 5% as Macquarie flags strong earnings outlook (theedgemalaysia.com, 2026-09-22T08:06Z, q 0.80, escalated, no body)"
+          ],
+          "chain": [
+            "broker note",
+            "unknown: no collected evidence reaches further; no Macquarie figure in the corpus or fact book"
+          ],
+          "status": "not offered as a cause: the pack holds no 09-22 decomposition (^KLSE row blank); 'over 5%' is the headline's figure, not a measurement",
+          "confirm": "once ^KLSE's 09-22 row fills, IHH's 09-22 unexplained share above half at a significant sigma, and a body or second source naming the Macquarie figure",
+          "refute": "the filled row shows the index taking most of the day, or the verdict is not_significant"
+        }
+      ]
+    },
+    {
+      "instrument_id": "MYX:8869",
+      "move": {
+        "return_1d": -0.0282,
+        "market_1d": 0.0008,
+        "unexplained_share": 0.93,
+        "session": "2026-09-21",
+        "note": "MIS-DATED; idiosyncratic -3.05%, 2.01 sigma, significant at 5%, no candidate cause weighed, pack runs no matcher; parametric and rank tests disagree (rank p 0.069); 96% on the 09-21 page"
+      },
+      "causes": [
+        {
+          "claim": "unknown: no collected evidence reaches it",
+          "evidence": [],
+          "chain": [
+            "zero rows on 09-22 and on the 09-23 Bursa sweep",
+            "only aluminium input PALUMUSDM 3,158.26 for 2026-07-01",
+            "sector beta fixed at 0"
+          ],
+          "confidence": null,
+          "confirm": "a first Press Metal row dated 2026-09-21 or later naming something that happened to the company",
+          "refute": "the same fall across other Bursa industrial names on the day"
+        }
+      ],
+      "open_questions": [
+        "collecting anything (since 2026-09-15)"
+      ],
+      "watch": [],
+      "monitor": "monitor warn still open: 1 of 9 book names collected nothing in 14d: MYX:8869"
+    },
+    {
+      "instrument_id": "MYX:3182",
+      "move": {
+        "return_1d": -0.0259,
+        "market_1d": 0.0008,
+        "unexplained_share": 0.88,
+        "session": "2026-09-21",
+        "note": "MIS-DATED; idiosyncratic -2.41%, 1.35 sigma, not_significant; drift -0.261pp/session, 2.3 standard errors from zero; 91% on the 09-21 page"
+      },
+      "causes": [
+        {
+          "claim": "unknown: no collected evidence reaches it",
+          "evidence": [],
+          "chain": [
+            "quiet: nothing collected in the window"
+          ],
+          "confidence": null,
+          "confirm": "a row about Genting Bhd itself dated 09-21 or later",
+          "refute": "the same fall across Bursa gaming or leisure names"
+        }
+      ],
+      "open_questions": [],
+      "watch": []
+    },
+    {
+      "instrument_id": "XNAS:NVDA",
+      "move": {
+        "return_1d": 0.0066,
+        "market_1d": -0.0002,
+        "unexplained_share": 0.91,
+        "session": "2026-09-22",
+        "note": "idiosyncratic +0.73%, 0.40 sigma, not_significant; market -0.03% at beta 1.70 on a flat day, so the share is high and the size small; 5d +7.87% vs +2.11%"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [
+        {
+          "when": "2026-11-17",
+          "what": "earnings_result"
+        }
+      ],
+      "evidence_day": {
+        "rows": 308,
+        "note": "commentary, not events: finnhub:142340958, finnhub:142343761"
+      }
+    },
+    {
+      "instrument_id": "XNAS:AAPL",
+      "move": {
+        "return_1d": 0.0023,
+        "market_1d": -0.0002,
+        "unexplained_share": 0.61,
+        "session": "2026-09-22",
+        "note": "idiosyncratic +0.15%, 0.10 sigma, not_significant; 5d +2.54% vs +2.11%"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [
+        {
+          "when": "2026-10-28",
+          "what": "earnings_result"
+        }
+      ],
+      "evidence_day": {
+        "note": "company rows on 09-22, not offered as causes on a 0.10-sigma day: 'Apple stock hits all-time high at 344.94 USD' (alphavantage_news, Investing.com, 13:38Z, an intraday headline figure; the pack measures +0.23% for the close); 'US opposes part of Apple contempt finding in Epic Games case at US Supreme Court' (Reuters via alphavantage_news, 18:24Z)"
+      }
+    },
+    {
+      "instrument_id": "XNAS:MSFT",
+      "move": {
+        "return_1d": -0.0072,
+        "market_1d": -0.0002,
+        "unexplained_share": 0.87,
+        "session": "2026-09-22",
+        "note": "idiosyncratic -0.62%, 0.33 sigma, not_significant; 5d +0.18% vs +2.11%"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [
+        {
+          "when": "2026-10-27",
+          "what": "earnings_result"
+        }
+      ],
+      "evidence_day": {
+        "note": "fmp rating_reiteration 2026-09-22 Oppenheimer maintain Outperform; finnhub:142341978 dividend title repeats finnhub:142196947 of 2026-09-16"
+      }
+    }
+  ],
+  "machine": {
+    "schedule": "09-22: 00:08Z Monday's us_close collected a second time (20260922T000636); bursa_close 14:02Z +4h42m (20260922T140245, 109 stored); us_preopen 17:11Z +4h41m (20260922T171128, 1 stored); us_close firing 23:35Z skipped by the calendar-day guard. 09-23: PR #76 merged 09:50Z (dc6e822); catch-up us_close 09:52Z (20260923T095232, 513 stored, 8948539) recovered Tuesday's US news; bursa_close dispatched beside it failed to commit (event-SHA checkout, binary store conflict) and was re-dispatched 10:19Z (20260923T101939, 97 stored, c907921); the 14:14Z bursa_close cron (+4h54m) was a no-op under the firing-keyed guard (820b674: data/paper.db, data/price_cache.db only); us_preopen cron 17:24Z. Tonight: sweep --due at 22:44Z named us_close, dispatched 22:44Z, landed 22:46Z (20260923T224441, 329 stored, gdelt failed, 086ce03); its refetch filled the US 09-22 bars and the pack was rebuilt at 22:50Z",
+    "price_cache": "^KLSE 2026-09-22 row blank after the 09:54Z refetch on 09-23 while the six Bursa names hold 09-22; SPY, NVDA, AAPL, MSFT blank through the 14:15Z refetch and filled at 22:46Z",
+    "fact_book": "all six Bursa names NOTHING COLLECTED; forward-dated known_at on main 0 (62 on the last page); NVIDIA EPS-surprise row now knowable 2026-09-05",
+    "fixes": "PR #76 merged 2026-09-23 09:50Z; PR #77 (checkout the branch head for queued collect runs) open, CI green, mergeable"
+  },
+  "data_quality": {
+    "failed": [
+      "gdelt: both 09-23 sweeps, HTTP 429 on the first request"
+    ],
+    "degraded": [
+      "gdelt 09-22: 429 for Microsoft and Apple (00:08Z, 21 stored) and Petronas Chemicals (14:04Z, 2 stored)",
+      "alphavantage_news: quota exhausted for XNAS:MSFT (00:08Z)",
+      "eodhd: 0 facts both slots (2-a-day credit budget)",
+      "yahoo_rss: read empty for all six Bursa names (14:05Z)",
+      "google_news: Bursa 17 kept, 14 stored, 7 of 17 naming the company, empty for Petronas Chemicals",
+      "prices: ^KLSE 2026-09-22 blank (six Bursa rows MIS-DATED); US 09-22 bars blank until 22:46Z on 09-23"
+    ],
+    "skipped": [
+      "fmp us_preopen: no name in the book trades in slot 'us_preopen' (predates PR #76)"
+    ],
+    "lost": [],
+    "recovered": [
+      "us_close of 2026-09-22: news recovered 2026-09-23 09:52Z (513 rows); US prices filled 22:46Z; ^KLSE 09-22 still blank"
+    ],
+    "alerts": [
+      "ALERT: past its own cadence: gdelt (33h ago, allowed 30h)",
+      "warn: 15 cached prices behind the market's last session (peers only)",
+      "warn (open): 1 of 9 book names collected nothing in 14d: MYX:8869",
+      "resolved: series_stale (DCOILBRENTEU)"
+    ]
+  },
+  "lessons": [
+    "A blank bar shared by a name and its proxy looks like a holiday: a mis-dating check that fires only when one side printed called Tuesday's US rows correctly dated to Monday, and a refetch two minutes later showed Tuesday traded; only an independent print could have told the first build.",
+    "A headline figure is not a measurement: a claim that arrives on a session the pack cannot decompose can be recorded, but not sized, split from the market, or called a cause.",
+    "Changing the estimation window changes last week's findings without a new price; a comparison of unexplained shares across pages needs the window stated beside them."
+  ],
+  "closed": [
+    "Tuesday's lost us_close: news recovered 2026-09-23 09:52Z (513 rows); US prices 22:46Z",
+    "Bursa calendar holidays: merged with PR #76",
+    "no_identified_catalyst empty vs weighed: merged with PR #76 (b66009e)",
+    "Finnhub forward-dated knowable dates: 0 on main"
+  ]
+}
