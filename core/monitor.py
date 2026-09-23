@@ -427,8 +427,14 @@ def slots_due(start: datetime, end: datetime) -> dict[str, int]:
     return {s: n for s, n in due.items() if n}
 
 
+#: How far back a catch-up looks for a firing that never produced a run. A day,
+#: because the question is "what did the schedule owe since this time
+#: yesterday", and a firing older than that is past recovering as news.
+CATCH_UP_LOOKBACK = timedelta(hours=24)
+
+
 def slots_outstanding(corpus_path: str, now: datetime) -> tuple[list[str], str]:
-    """Which of TODAY's slots are still owed, for a catch-up to fire.
+    """Which slots are still owed, for a catch-up to fire.
 
     Deliberately a DIFFERENT question from `slots_missed`. That rule judges
     whole finished days, because a day still in progress cannot be short of
@@ -437,13 +443,21 @@ def slots_outstanding(corpus_path: str, now: datetime) -> tuple[list[str], str]:
     moment a replacement run is worth firing: news expires, and a collection
     recovered the same evening is worth most of one that happened on time.
 
-    A slot is owed once its firing today has come round (`SLOT_TIMES`) and no
-    run has landed SINCE THAT FIRING. Since the firing, not since midnight: a
-    run that lands after midnight is the previous evening's firing arriving
-    late, and counting it as today's is how a slot gets collected twice one
-    day and not at all the next (see `slot_window_start`). A slot whose time
-    has not come is not owed yet - firing us_close at 14:00 would collect a
-    close that has not happened.
+    A slot is owed when its most recent firing (`SLOT_TIMES`) fell in the last
+    24 hours and no run of that slot, or of `all`, has landed SINCE THAT
+    FIRING. Since the firing, not since midnight: a run that lands after
+    midnight is the previous evening's firing arriving late, and counting it as
+    today's is how a slot gets collected twice one day and not at all the next
+    (see `slot_window_start`). A slot whose time has not come is not owed yet -
+    firing us_close at 14:00 would collect a close that has not happened.
+
+    The last 24 hours, not today, because the catch-up does not always run
+    before midnight. On 2026-09-23 the nightly routine ran at 02:27 UTC, four
+    hours late; Tuesday's 21:15 us_close firing had produced no sweep, and a
+    rule that only owed slots fired since 00:00 printed nothing, so the one
+    collection a late catch-up exists to recover was the one it could not see.
+    At the routine's usual 22:33 the window covers exactly the day's own
+    firings, so nothing changes on a night that runs on time.
 
     Returns the slot names and, when the answer is empty for a reason worth
     printing, why. Three ways it says nothing:
@@ -459,7 +473,7 @@ def slots_outstanding(corpus_path: str, now: datetime) -> tuple[list[str], str]:
     """
     day_start = datetime(now.year, now.month, now.day, tzinfo=UTC)
     firings = {s: slot_window_start(s, now) for s in SLOT_WEEKDAYS}
-    due = [s for s, fired in firings.items() if fired >= day_start]
+    due = [s for s, fired in firings.items() if fired > now - CATCH_UP_LOOKBACK]
     if not Path(corpus_path).exists():
         return [], f"no corpus at {corpus_path}"
 
@@ -469,11 +483,12 @@ def slots_outstanding(corpus_path: str, now: datetime) -> tuple[list[str], str]:
         ran = corpus.slot_runs(day_start, now)
         total = corpus.run_count(day_start, now)
         ever = corpus.first_slot_row()
-        since_firing = {s: corpus.slot_runs(firings[s], now).get(s, 0) for s in due}
+        since_firing = {s: corpus.slot_runs(firings[s], now) for s in due}
 
     if ran.get("all"):
         return [], "a run covering every slot has already happened today"
-    outstanding = [s for s in due if not since_firing[s]]
+    # A `--slot all` run after a slot's firing collected that slot's sources too.
+    outstanding = [s for s in due if not (since_firing[s].get(s) or since_firing[s].get("all"))]
     if outstanding and ever is None and total:
         return [], (
             f"{total} run(s) today, none recording which slot - nothing to attribute. "

@@ -58,7 +58,9 @@ Three properties, and each of them is load-bearing:
   time, not at midnight: on 2026-09-22 Monday's 21:15 `us_close` arrived at 00:06
   Tuesday, and a guard keyed to the UTC day let it collect Monday's close a second
   time and then skipped Tuesday's own firing as a repeat. `--due` judges each slot
-  the same way and never names a slot whose time has not come. `--force` (also a
+  the same way, never names a slot whose time has not come, and looks back 24
+  hours rather than to midnight, so a routine running late past midnight still
+  sees the previous evening's uncollected firing. `--force` (also a
   dispatch input on collect.yml), `--slot all` and a named `--source` are the ways
   past the guard. See docs/14 §"One slot, one collection a day".
 * **It dispatches, it does not collect.** The routine's session has no route to

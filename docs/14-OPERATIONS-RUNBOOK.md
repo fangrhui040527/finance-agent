@@ -516,7 +516,11 @@ catch-up had taken it at 22:38), and filed the run under Tuesday. Tuesday's own
 because it read the same calendar: one close collected twice, the next not at
 all. Measured from the firing, the 00:06 arrival sees the 22:38 run and stops,
 and Tuesday's 21:15 sees nothing since 21:15 and collects. `--due` judges each
-slot the same way and never names one whose time has not come round.
+slot the same way and never names one whose time has not come round. It looks
+back 24 hours rather than to midnight, so a routine that runs after midnight
+still sees the previous evening's firing if it produced no run; on 2026-09-23
+the routine ran at 02:27 UTC and a midnight rule printed nothing for Tuesday's
+uncollected `us_close`.
 
 Same-day recovery is most of the value: **news is the only thing that expires.**
 Prices, filings and macro series are re-fetchable tomorrow; a wire feed serves a

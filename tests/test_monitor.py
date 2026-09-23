@@ -727,15 +727,17 @@ def _slot_cfg(tmp_path: Path, days: int = 3, **over):
 
 
 def _full_days(path: Path, now: datetime, days: int, skip: set[str] | None = None):
-    """Every firing the cron owes over the window, minus what `skip` names."""
-    from core.monitor import SLOT_WEEKDAYS
+    """Every firing the cron owes over the window, minus what `skip` names, each
+    landing five minutes after its own scheduled time."""
+    from core.monitor import SLOT_TIMES, SLOT_WEEKDAYS
 
     skip = skip or set()
     for back in range(1, days + 1):
         day = now - timedelta(days=back)
         for slot, weekdays in SLOT_WEEKDAYS.items():
             if day.weekday() in weekdays and slot not in skip:
-                _ran(path, slot, day.replace(hour=9, minute=20))
+                at = SLOT_TIMES[slot]
+                _ran(path, slot, day.replace(hour=at.hour, minute=at.minute) + timedelta(minutes=5))
     return path
 
 
@@ -972,6 +974,28 @@ def test_a_run_that_landed_after_midnight_is_the_previous_firings(tmp_path):
     assert due == []
 
 
+def test_a_catch_up_after_midnight_still_sees_the_evening_firing_that_never_ran(tmp_path):
+    """2026-09-23: the routine ran at 02:27 UTC. Tuesday's 21:15 us_close had
+    produced no sweep, and a rule that owed only slots fired since midnight
+    printed nothing - the one collection a late catch-up exists to recover."""
+    path = tmp_path / "corpus.db"
+    _ran(path, "bursa_close", datetime(2026, 9, 22, 14, 2, tzinfo=UTC))
+    _ran(path, "us_preopen", datetime(2026, 9, 22, 17, 11, tzinfo=UTC))
+    due, why = _outstanding(tmp_path, datetime(2026, 9, 23, 2, 27, tzinfo=UTC))
+    assert due == ["us_close"] and why == "", "Tuesday's firing is 5h12m old and never ran"
+    # Wednesday's own slots have not come round at 02:27, and Monday's firings are too old
+    assert "bursa_close" not in due and "us_preopen" not in due
+
+
+def test_a_run_of_everything_after_a_firing_settles_that_firing(tmp_path):
+    """`--slot all` collects every slot's sources; one that landed after the
+    evening firing settles it, even across midnight."""
+    path = tmp_path / "corpus.db"
+    _ran(path, "all", datetime(2026, 9, 22, 23, 50, tzinfo=UTC))
+    due, _ = _outstanding(tmp_path, datetime(2026, 9, 23, 2, 27, tzinfo=UTC))
+    assert "us_close" not in due
+
+
 def test_a_slot_that_already_ran_today_is_not_owed_again(tmp_path):
     now = datetime(2026, 9, 10, 14, 0, tzinfo=UTC)
     path = tmp_path / "corpus.db"
@@ -1040,9 +1064,18 @@ def test_the_cli_prints_one_slot_per_line_and_collects_nothing(tmp_path, monkeyp
     holds the assertion inside the day the command is asking about."""
     import ask
     import core.config as C
+    from core.monitor import slot_window_start
 
     now = datetime.now(UTC)
-    ran_at = max(now - timedelta(minutes=5), now.replace(hour=0, minute=0, second=0, microsecond=0))
+    # At or after bursa_close's most recent firing, whatever the hour: recorded
+    # five minutes back, a run at 09:22 UTC lands before the 09:20 firing and
+    # the command is right to owe the slot - the same trap the clamp below was
+    # written for, at a different hour.
+    ran_at = max(
+        now - timedelta(minutes=5),
+        now.replace(hour=0, minute=0, second=0, microsecond=0),
+        slot_window_start("bursa_close", now),
+    )
     path = tmp_path / "corpus.db"
     _ran(path, "bursa_close", ran_at)
     real = load_config()

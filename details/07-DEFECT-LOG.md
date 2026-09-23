@@ -869,6 +869,18 @@ at 09:01 and served until then; a US row pulled at 00:08 is fresh until 20:00,
 because no Nasdaq session shut in between. A caller that cannot name the
 market keeps the day rule, which is the looser answer, never the fresher one.
 
+A review of that fix the next morning found two more faults in it. The catch-up
+still owed only firings since 00:00 UTC. On 2026-09-23 the routine itself ran
+at 02:27 UTC, four hours late, and Tuesday's 21:15 firing, which main's guard
+had skipped, was invisible to it: `slots_outstanding` returned nothing, the
+same silence this section describes, arriving by a different door. It now owes
+any firing of the last 24 hours with no run of that slot, or of `all`, since
+it; at 22:33 that window holds exactly the day's own firings. And the
+real-clock test of `sweep --due` recorded its run five minutes back, which
+between 09:20 and 09:25 UTC lands before the `bursa_close` firing and fails a
+correct command, the trap its own docstring describes at 00:02. It now records
+the run at or after the firing.
+
 Not changed: the control book's three 2026-09-22 targets. They are the record
 of what the machine did, on the correct decision day; the page says how they
 were sized.
