@@ -17,7 +17,7 @@ import math
 from dataclasses import dataclass
 from datetime import datetime
 
-from engines.attribution.decompose import MoveExplanation, Verdict
+from engines.attribution.decompose import MoveExplanation, Verdict, sigma_phrase
 from engines.events.taxonomy import BaseRate, BaseRateTable, Event, EventType
 
 SCORE_THRESHOLD = 0.25
@@ -250,10 +250,25 @@ def attach(explanation: MoveExplanation, candidates: list[CandidateCause]) -> Mo
     ):
         return explanation
 
-    if not candidates or candidates[0].score < SCORE_THRESHOLD:
+    # An empty list and a list that was weighed and rejected used to share one
+    # reason, so a name the collector held nothing about read as a searched
+    # no-news move - the reading the REVERSE sentence is licensed for. Only a
+    # rejection earns it; an empty evidence set says nothing about the news.
+    sigma = explanation.significance
+    size = f"idiosyncratic move of {sigma_phrase(sigma.standardised_ar)}" if sigma else "move"
+    if not candidates:
         explanation.verdict = Verdict.NO_IDENTIFIED_CATALYST
         explanation.reason = (
-            "significant idiosyncratic move with no catalyst clearing the threshold. "
+            f"{size}, and no candidate cause was offered to weigh. An empty evidence set is "
+            "not a rejection: whether this was a no-news move cannot be told from it"
+        )
+        return explanation
+    if candidates[0].score < SCORE_THRESHOLD:
+        top = candidates[0]
+        explanation.verdict = Verdict.NO_IDENTIFIED_CATALYST
+        explanation.reason = (
+            f"{size}; {len(candidates)} candidate(s) weighed and none cleared {SCORE_THRESHOLD} "
+            f"(best: {top.cause_type} at lag {top.lag_sessions}, {top.score:.2f}). "
             "No-news moves of this size have historically tended to REVERSE, whereas "
             "news-driven moves tend to drift - the distinction is the information here"
         )

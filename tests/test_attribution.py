@@ -69,6 +69,23 @@ def test_a_genuine_idiosyncratic_move_does_trigger_a_hunt():
     assert m.verdict is Verdict.NO_IDENTIFIED_CATALYST
     assert m.needs_cause_hunt() is True
     assert m.unexplained_share > 0.8
+    assert "significant at 5%" in m.reason
+    # decompose weighs no candidate, and its reason must not read as a search.
+    assert "no candidate cause has been weighed" in m.reason
+    assert "matched" not in m.reason
+
+
+def test_a_residual_past_the_hunt_line_but_under_5pct_is_not_called_significant():
+    """Tenaga's 09-18 row (1.92 sigma) and Petronas Chemicals' 09-17 row (1.60)
+    both read "significant idiosyncratic move". The hunt starts at 1.5 sigma,
+    which is not the 1.96 the same object's own parametric test uses."""
+    fit = synthetic_fit()
+    drift, sigma = fit.coefficients[0], fit.residual_sigma
+    m = decompose("X", WINDOW, 0.0, 0.0, {}, drift + 1.7 * sigma, 0.0, fit)
+    assert m.verdict is Verdict.NO_IDENTIFIED_CATALYST and m.needs_cause_hunt()
+    assert m.significance is not None and not m.significance.parametric_significant
+    assert "1.70 sigma" in m.reason and "short of the 1.96 a 5% test needs" in m.reason
+    assert "significant at 5%" not in m.reason
 
 
 def test_components_sum_back_to_the_realised_return():

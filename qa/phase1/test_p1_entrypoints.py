@@ -44,12 +44,15 @@ def test_verify_py_passes_all_fourteen_sections(run_cli):
     assert "14. Surface" in out
 
 
-def test_stress_suite_holds_with_no_findings_and_only_the_two_standing_notes(run_cli):
+def test_stress_suite_holds_with_no_findings_and_only_the_one_standing_note(run_cli):
     out = ok(run_cli(["stress/run.py"], timeout=600))
     assert "FINDINGS 0" in out
-    assert "NOTES 2" in out, "a new note is worth reading, a missing one means a probe went quiet"
-    assert "traversing db path" in out
+    assert "NOTES 1" in out, "a new note is worth reading, a missing one means a probe went quiet"
     assert "echoed in thesis output" in out
+    # The second standing note, a config database path that climbs out of the
+    # project, was closed by b738dab (2026-09-08): the loader drops the `..`
+    # segments. The probe still runs and has to say so, not go quiet.
+    assert "HELD     traversing db path normalised" in out
     held = int(re.search(r"HELD (\d+)", out).group(1))
     assert held >= 150
 
@@ -280,26 +283,33 @@ def test_prices_refuses_an_unmapped_market_naming_every_source_without_the_netwo
 # -- predict.py, the forward record ---------------------------------------------
 
 def test_predict_log_due_grade_status_round_trip(run_cli, tmp_path):
+    # Every date relative to the real clock. This test logged `--grade-on
+    # 2026-09-21` as a literal and `log` refuses a grading date that is not in
+    # the future, so it failed on its own setup from that day on.
+    from datetime import date, timedelta
+
+    grade_on = date.today() + timedelta(days=21)
+    before, after = grade_on - timedelta(days=20), grade_on + timedelta(days=10)
     db = str(tmp_path / "learning.db")
     out = ok(run_cli(["predict.py", "--db", db, "log", "MYX:1155", "1", "21d", "0.62",
-                      "NIM stabilises", "--id", "p-1", "--grade-on", "2026-09-21"]))
-    assert "logged p-1" in out and "grades on 2026-09-21" in out
+                      "NIM stabilises", "--id", "p-1", "--grade-on", grade_on.isoformat()]))
+    assert "logged p-1" in out and f"grades on {grade_on}" in out
 
-    out = ok(run_cli(["predict.py", "--db", db, "due", "--today", "2026-09-01"]))
-    assert "nothing due" in out and "Next grades 2026-09-21" in out
-    out = ok(run_cli(["predict.py", "--db", db, "due", "--today", "2026-10-01"]))
+    out = ok(run_cli(["predict.py", "--db", db, "due", "--today", before.isoformat()]))
+    assert "nothing due" in out and f"Next grades {grade_on}" in out
+    out = ok(run_cli(["predict.py", "--db", db, "due", "--today", after.isoformat()]))
     assert "1 due for grading" in out and "overdue" in out
 
     proc = run_cli(["predict.py", "--db", db, "grade", "p-1", "--return", "0.03",
-                    "--benchmark", "0.01", "--today", "2026-09-01"])
+                    "--benchmark", "0.01", "--today", before.isoformat()])
     assert proc.returncode == 1 and "would score noise" in proc.stderr
 
     out = ok(run_cli(["predict.py", "--db", db, "grade", "p-1", "--return", "0.03",
-                      "--benchmark", "0.01", "--today", "2026-09-21"]))
+                      "--benchmark", "0.01", "--today", grade_on.isoformat()]))
     assert "graded p-1: correct" in out and "excess +2.00%" in out
 
     proc = run_cli(["predict.py", "--db", db, "grade", "p-1", "--return", "0.03",
-                    "--benchmark", "0.01", "--today", "2026-09-22"])
+                    "--benchmark", "0.01", "--today", (grade_on + timedelta(days=1)).isoformat()])
     assert proc.returncode == 1 and "not pending" in proc.stderr, "an outcome is graded once"
 
     out = ok(run_cli(["predict.py", "--db", db, "status"]))
@@ -311,8 +321,10 @@ def test_predict_refuses_a_duplicate_id_and_a_bad_confidence(run_cli, tmp_path):
     ok(run_cli(["predict.py", "--db", db, "log", "MYX:1155", "1", "5d", "0.5", "x", "--id", "dup"]))
     proc = run_cli(["predict.py", "--db", db, "log", "MYX:1155", "1", "5d", "0.5", "x", "--id", "dup"])
     assert proc.returncode != 0 and "already logged" in (proc.stderr + proc.stdout)
+    assert "Traceback" not in proc.stderr, "a refusal is a sentence, not a stack"
     proc = run_cli(["predict.py", "--db", db, "log", "MYX:1155", "1", "5d", "1.5", "x"])
     assert proc.returncode != 0 and "probability" in (proc.stderr + proc.stdout)
+    assert "Traceback" not in proc.stderr
 
 # -- the paper book -------------------------------------------------------------
 

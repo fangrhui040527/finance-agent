@@ -79,6 +79,26 @@ def test_measure_takes_both_legs_from_the_same_sessions_and_decomposes():
     assert set(m.components) >= {"market", "idiosyncratic"}
 
 
+def test_a_catalyst_verdict_says_no_matcher_ran(tmp_path):
+    """Tenaga's 09-18 row read "no catalyst matched yet" on the day the corpus
+    held five rows about the cause; the pack scores no candidate, so the
+    verdict is the decomposition's alone and the line has to say so."""
+    m = measure(FakeFeed(shock=-0.06), "MYX:1155", "Maybank", DAY)
+    assert m.verdict == "no_identified_catalyst"
+    assert "significant at 5%" in m.reason
+    assert "The pack runs no catalyst matcher" in m.reason and "matched yet" not in m.reason
+    text = build_pack(
+        Cfg(),
+        DAY,
+        corpus_path=str(tmp_path / "c.db"),
+        facts_path=str(tmp_path / "f.db"),
+        feed=FakeFeed(shock=-0.06),
+        now=NOW,
+    )
+    # The reason ends in a full stop before the estimation note, not "yet Beta".
+    assert "are unweighed. Beta " in text
+
+
 def test_a_name_whose_bars_are_missing_is_no_data_not_a_typed_leg():
     m = measure(FakeFeed(missing=("MYX:^KLSE",)), "MYX:1155", "Maybank", DAY)
     assert m.error and "no bars cached" in m.error and m.r1 is None

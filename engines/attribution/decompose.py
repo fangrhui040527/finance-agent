@@ -22,6 +22,8 @@ ESTIMATION_LOOKBACK = 260
 ESTIMATION_GAP = 10  # window ends 10 sessions before the event
 MIN_OBSERVATIONS = 120
 SAR_HUNT_THRESHOLD = 1.5  # below this, no cause hunt
+#: |SAR| past which the parametric test calls a residual significant at 5%.
+PARAMETRIC_Z = 1.96
 IDIO_SHARE_MARKET_DRIVEN = 0.20
 #: Two-sided exact rank p-value at which the non-parametric test agrees a move
 #: is unusual. The parametric test uses |SAR| > 1.96, the same 5% in sigma units.
@@ -113,7 +115,11 @@ class MoveExplanation:
         return next((x for x in self.components if x.component is c), None)
 
     def needs_cause_hunt(self) -> bool:
-        """Only a significant idiosyncratic move earns a search for a story."""
+        """Only an idiosyncratic move past SAR_HUNT_THRESHOLD earns a search for a story.
+
+        That is a lower bar than significance at 5% (PARAMETRIC_Z): a cause is
+        looked for from 1.5 sigma, and the verdict's reason says which side of
+        1.96 the move is on."""
         return (
             self.verdict
             not in (Verdict.NOT_SIGNIFICANT, Verdict.MARKET_DRIVEN, Verdict.ATTRIBUTION_UNAVAILABLE)
@@ -137,6 +143,16 @@ class EstimationInputs:
 
     def style_names(self) -> list[str]:
         return sorted(self.styles)
+
+
+def sigma_phrase(sar: float) -> str:
+    """How far past normal variation a residual is, in the words a verdict uses."""
+    if abs(sar) > PARAMETRIC_Z:
+        return f"{abs(sar):.2f} sigma, significant at 5%"
+    return (
+        f"{abs(sar):.2f} sigma, past the {SAR_HUNT_THRESHOLD} at which causes are looked for "
+        f"but short of the {PARAMETRIC_Z} a 5% test needs"
+    )
 
 
 def estimate(inputs: EstimationInputs) -> Fit | None:
@@ -264,7 +280,7 @@ def decompose(
     sar = ar / fit.residual_sigma if fit.residual_sigma > 1e-12 else 0.0
     rank_z = corrado_rank_z(ar, fit.residuals)
     rank_p = rank_p_value(ar, fit.residuals)
-    sig = Significance(sar, rank_z, abs(sar) > 1.96, rank_p < RANK_P_THRESHOLD, rank_p)
+    sig = Significance(sar, rank_z, abs(sar) > PARAMETRIC_Z, rank_p < RANK_P_THRESHOLD, rank_p)
     # docs/03 section 2.3: disagreement between the two tests is itself worth
     # logging. It goes in the note, where the reader of the verdict sees it.
     if not sig.agree:
@@ -300,9 +316,14 @@ def decompose(
             ),
         )
     else:
+        # This function never looks at a candidate cause; `catalyst.attach`
+        # does. "no catalyst matched yet" read as a search that came back empty
+        # on every pack, where no matcher runs at all. And "significant" was
+        # said of every residual past the hunt threshold, though 1.5 to 1.96
+        # sigma does not clear the 5% test `Significance` itself applies.
         verdict, reason = (
             Verdict.NO_IDENTIFIED_CATALYST,
-            ("significant idiosyncratic move; no catalyst matched yet"),
+            f"idiosyncratic move is {sigma_phrase(sar)}; no candidate cause has been weighed",
         )
     if fx_share >= CURRENCY_DOMINANT_SHARE:
         reason += (

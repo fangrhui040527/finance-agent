@@ -920,6 +920,53 @@ Not changed: the control book's three 2026-09-22 targets. They are the record
 of what the machine did, on the correct decision day; the page says how they
 were sized.
 
+## 22. A verdict that read as a search nobody ran
+
+Every significant idiosyncratic row in the feedback pack has read
+`no_identified_catalyst` - *significant idiosyncratic move; no catalyst matched
+yet*. Three pages built on that sentence as if it reported a search. None had
+been run. The sentence is a literal in `decompose`, which never looks at a
+candidate; the pack calls `decompose` and nothing else. On 2026-09-18 Tenaga
+carried the verdict on the one session the corpus held five dated rows about
+the cause, and the page could only ask why the matcher had missed them. It had
+not missed them. It had never been called.
+
+The same sentence said "significant" of every residual past the 1.5 sigma at
+which the cause hunt starts, while the `Significance` object beside it applies
+1.96, a 5% test. Re-measured on 2026-09-23 from the current cache: Press Metal
+on 2026-09-21 was 2.01 sigma and the page was right to call it the one
+significant name. Tenaga on 2026-09-18 was 1.92 and Petronas Chemicals'
+-6.71% residual on 2026-09-17 was 1.60. Neither clears the test, and both pages
+called them significant. (The bars may have been refetched since those pages
+were built, so these are today's figures, not a correction of the pages' own
+numbers.)
+
+`catalyst.attach`, the matcher's own verdict, had the adjacent fault: an empty
+candidate list and a list weighed and rejected shared one reason, and that
+reason ends *no-news moves of this size have historically tended to REVERSE*.
+The reversal finding is about moves whose news was looked at and found
+wanting. A name the collector held nothing about has not been looked at.
+
+Now: `decompose` states the sigma and whether it clears 5%, and says no
+candidate has been weighed; `attach` gives an empty list its own reason
+(*an empty evidence set is not a rejection*) and gives a rejection the count
+and the best score it rejected; the pack adds that it runs no matcher, so the
+verdict means a company-specific cause is warranted, not that none exists. The
+pack line also ends the reason with a full stop. It used to run into the next
+field: *no catalyst matched yet Beta 1.04*.
+
+Two faults of the same age surfaced while testing this, both in the
+`qa/phase1` suite, which CI does not run. Its forward-record round trip logged
+`--grade-on 2026-09-21` as a literal, and `log` refuses a grading date that is
+not in the future, so the test had failed on its own setup since that morning.
+`tests/test_learning_store.py` already warned about this exact trap in a
+comment. And its stress assertion expected two standing notes when one had
+been closed on 2026-09-08 by b738dab (config database paths are confined to
+the project); it had been red for two weeks. The round trip also showed that
+`predict.py log` printed a refusal (past date, impossible confidence, reused
+id) as a Python traceback; it prints `refused: <reason>` and exits 1, as
+`grade` already did.
+
 ## What the families have in common
 
 | Family | Shape |

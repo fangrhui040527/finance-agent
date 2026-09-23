@@ -31,6 +31,7 @@ from engines.attribution.decompose import (
     ESTIMATION_GAP,
     ESTIMATION_LOOKBACK,
     MIN_OBSERVATIONS,
+    Verdict,
     decompose,
 )
 from engines.attribution.regression import Fit, huber_fit
@@ -248,6 +249,16 @@ def measure(feed, instrument_id: str, label: str, day: date, base_currency: str 
     move.verdict = exp.verdict.value
     move.unexplained = exp.unexplained_share if fit is not None else None
     move.reason = exp.reason
+    if exp.verdict is Verdict.NO_IDENTIFIED_CATALYST:
+        # The page read this verdict as a search that found nothing - "no
+        # catalyst matched" on Tenaga the one day the corpus held five rows about
+        # the cause. Nothing here scores a candidate; the verdict is the
+        # decomposition's alone.
+        move.reason += (
+            ". The pack runs no catalyst matcher: this verdict says a company-specific "
+            "cause is warranted, not that none exists, and the stories and events below "
+            "are unweighed"
+        )
     move.estimation = (
         f"{exp.estimation_note}; window {est_days[0]}..{est_days[-1]} "
         f"({ESTIMATION_GAP} sessions before the event); "
@@ -389,7 +400,7 @@ def build_pack(
             f"- **{m.label}** ({m.instrument_id}) vs {m.proxy}, last session {m.last_day}, "
             f"{m.sessions} common sessions"
             + (f", source {m.served_from}" if m.served_from else "")
-            + f". {m.reason}"
+            + f". {m.reason.rstrip('.')}."
             + (
                 f" Beta {m.beta:.2f}; {m.estimation}."
                 if m.beta is not None

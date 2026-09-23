@@ -831,7 +831,7 @@ responses     3 for 3 requests
           <tbody>
             <tr><td class="k"><code>market_driven</code></td><td>Under 20% of the move was company-specific.</td><td>Nothing. The company did not do anything.</td></tr>
             <tr><td class="k"><code>not_significant</code></td><td>Within normal daily variation for this name.</td><td>Nothing. Most moves are noise.</td></tr>
-            <tr><td class="k"><code>no_identified_catalyst</code></td><td>Real, significant, unexplained. No candidate cleared the threshold.</td><td>Treat as a finding. Unexplained moves of this size have historically tended to <em>reverse</em>.</td></tr>
+            <tr><td class="k"><code>no_identified_catalyst</code></td><td>Company-specific and past 1.5 sigma; the reason says whether it clears the 5% test. Either candidates were weighed and none cleared the threshold, or none was offered: the reason says which. The feedback pack runs no matcher, so there it only means a cause is warranted.</td><td>A weighed rejection is a finding: no-news moves of this size have historically tended to <em>reverse</em>. An empty evidence set is not one.</td></tr>
             <tr><td class="k"><code>partially_explained</code></td><td>A catalyst matched, but a large residual remains.</td><td>Read the unexplained share before you act on the story.</td></tr>
             <tr><td class="k"><code>explained</code></td><td>A catalyst matched with a strong score.</td><td>Still check the unexplained share. It is never zero.</td></tr>
             <tr><td class="k"><code>attribution_unavailable</code></td><td>Fewer than 120 usable observations, or collinear factors.</td><td>Get more history. Do not interpret the bars.</td></tr>
