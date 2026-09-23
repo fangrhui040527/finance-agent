@@ -1,6 +1,6 @@
 # Digest 2026-09-23
 
-Generated 2026-09-23 09:54 UTC · slot `all` · 8031 articles in the corpus, 4723 observations, 4033 events in the fact book.
+Generated 2026-09-23 10:22 UTC · slot `all` · 8128 articles in the corpus, 4728 observations, 4033 events in the fact book.
 
 ## The book
 
@@ -8,7 +8,8 @@ Generated 2026-09-23 09:54 UTC · slot `all` · 8031 articles in the corpus, 472
 - quiet: nothing collected for this name in the window
 
 ### Tenaga (MYX:5347)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-09-23 www.freemalaysiatoday.com — TNB clarifies subsidy absorption a one-off contribution [q 0.80, tone +0.0]
 
 ### Petronas Chemicals (MYX:5183)
 - quiet: nothing collected for this name in the window
@@ -83,6 +84,15 @@ Generated 2026-09-23 09:54 UTC · slot `all` · 8031 articles in the corpus, 472
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 10:21 | eodhd | ok | 0 | 0 | 0 | facts 0; EODHD plan: free (2 names a day, US only, rotated); MYX:1155: deferred  |
+| 10:21 | twse_openapi | ok | 8 | 0 | 0 | facts 5;  |
+| 10:21 | jin10_flash | ok | 20 | 10 | 9 | facts 0;  |
+| 10:21 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 10:21 | nst_business | ok | 50 | 48 | 47 |  |
+| 10:21 | fmt_business | ok | 39 | 39 | 39 |  |
+| 10:21 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Tenaga, Petronas Chemicals, IHH, Press Metal, Genting, Maybank |
+| 10:21 | google_news | ok | 3 | 3 | 2 | read but empty: Petronas Chemicals, IHH, Press Metal, Genting; named the company |
+| 10:21 | gdelt | failed | 0 | 0 | 0 | no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP |
 | 09:54 | eodhd | ok | 0 | 0 | 0 | facts 0; EODHD plan: free (2 names a day, US only, rotated); XNAS:AAPL: deferred |
 | 09:54 | jin10_flash | ok | 20 | 7 | 5 | facts 0;  |
 | 09:54 | alphavantage_news | ok | 33 | 32 | 30 | facts 12; XNAS:MSFT: alphavantage quota exhausted for today: Thank you for using |

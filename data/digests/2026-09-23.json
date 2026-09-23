@@ -1,6 +1,87 @@
 {
   "collection": [
     {
+      "at": "2026-09-23T10:21:44.624354+00:00",
+      "detail": "facts 0; EODHD plan: free (2 names a day, US only, rotated); MYX:1155: deferred by the 2-a-day credit budget; next in rotation; MYX:5347: deferred by the 2-a-day credit budget; next in rotation; MYX:5183: deferred by the 2-a-day credit budget; next in rotation; MYX:5225: deferred by the 2-a-day credit budget; next in rotation; outside the free plan (US only), so not asked for: MYX:1155, MYX:5347, MYX:5183, MYX:5225. The EODHD Fundamentals plan covers KLSE and TW.; MYX:8869: EODHD free plan: US only; the Fundamentals plan covers KLSE; MYX:3182: EODHD free plan: US only; the Fundamentals plan covers KLSE",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-23T10:21:44.383086+00:00",
+      "detail": "facts 5; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-23T10:21:18.228403+00:00",
+      "detail": "facts 0; ",
+      "fetched": 20,
+      "kept": 10,
+      "source": "jin10_flash",
+      "status": "ok",
+      "stored": 9
+    },
+    {
+      "at": "2026-09-23T10:21:17.051480+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-23T10:21:15.344493+00:00",
+      "detail": "",
+      "fetched": 50,
+      "kept": 48,
+      "source": "nst_business",
+      "status": "ok",
+      "stored": 47
+    },
+    {
+      "at": "2026-09-23T10:21:15.173255+00:00",
+      "detail": "",
+      "fetched": 39,
+      "kept": 39,
+      "source": "fmt_business",
+      "status": "ok",
+      "stored": 39
+    },
+    {
+      "at": "2026-09-23T10:21:15.008571+00:00",
+      "detail": "read but empty: Tenaga, Petronas Chemicals, IHH, Press Metal, Genting, Maybank",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-23T10:21:13.398140+00:00",
+      "detail": "read but empty: Petronas Chemicals, IHH, Press Metal, Genting; named the company: 1 of 3 (lowest: Maybank 0/1, Tenaga 1/2)",
+      "fetched": 3,
+      "kept": 3,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 2
+    },
+    {
+      "at": "2026-09-23T10:21:11.781930+00:00",
+      "detail": "no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked); deferred: Genting, Maybank, Tenaga",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "failed",
+      "stored": 0
+    },
+    {
       "at": "2026-09-23T09:54:08.153745+00:00",
       "detail": "facts 0; EODHD plan: free (2 names a day, US only, rotated); XNAS:AAPL: deferred by the 2-a-day credit budget; next in rotation; XNAS:MSFT: outside the plan or over today's credits; XNAS:NVDA: outside the plan or over today's credits",
       "fetched": 0,
@@ -74,18 +155,18 @@
     }
   ],
   "counts": {
-    "articles": 8031,
+    "articles": 8128,
     "documents": 0,
     "escalated": 1410,
     "events": 4033,
-    "failed_sweeps": 22,
-    "linked": 5495,
-    "observations": 4723,
+    "failed_sweeps": 23,
+    "linked": 5496,
+    "observations": 4728,
     "series": 31,
-    "sweeps": 443
+    "sweeps": 452
   },
   "day": "2026-09-23",
-  "generated_at": "2026-09-23 09:54 UTC",
+  "generated_at": "2026-09-23 10:22 UTC",
   "macro": [
     {
       "change": "-0.02",
@@ -233,8 +314,26 @@
       "instrument_id": "MYX:5347",
       "label": "Tenaga",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxNSFBhYzZCbGhpck5uNWtpOWNXUFc0WlhTN3VjeXFUbktYVVJkNFRXcWotM0JRTEdvdERwS2hXOUpLTzJIdkdBUkZ1NktZcDJncFp2VVB5NVJLUGpZLU4yclBmcUJsZ0N6M0FtNllpempvb05fdnJENUFpYjNpeUNBcmFxSWM3QkpRS3BxMkJlanNMd2pMTFpQNE9ZUWlCTUYtZjV3M2h3ODgtMjNyXzVxWnpzWl9ad19OSHlJ?oc=5",
+          "domain": "www.freemalaysiatoday.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-23T10:09:09+00:00",
+          "quality": 0.8,
+          "title": "TNB clarifies subsidy absorption a one-off contribution",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
