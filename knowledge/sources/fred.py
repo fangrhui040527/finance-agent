@@ -19,7 +19,7 @@ it as zero.
 
 from __future__ import annotations
 
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 
 from knowledge.facts import EventRecord, SeriesPoint, as_decimal
 from knowledge.sources.base import Collector, Pull, SourceError, parse_date
@@ -52,6 +52,14 @@ MAJOR_RELEASES: tuple[str, ...] = (
     "Import and Export Price",
     "Consumer Credit",
 )
+
+#: A release FRED lists on this many days of the fortnight is a daily table,
+#: not a scheduled print. "FOMC Press Release" (release 101) is listed on every
+#: day, weekends included: stored as events it put an FOMC date on every row of
+#: every page's "what to watch" from 2026-09-07, and a real FOMC decision (the
+#: +0.25 in DFF on 2026-09-17) could not be told from the thirty that were not.
+#: Weekly releases list twice in a fortnight, so five leaves them alone.
+DAILY_TABLE_DAYS = 5
 
 SERIES: dict[str, str] = {
     "DFF": "Federal funds effective rate, %",
@@ -174,6 +182,7 @@ class FredCollector(Collector):
         if not isinstance(rows, list):
             pull.notes.append("release calendar: no release_dates list in the reply")
             return
+        kept: list[tuple[dict, date, str]] = []
         for r in rows:
             if not isinstance(r, dict):
                 continue
@@ -182,6 +191,19 @@ class FredCollector(Collector):
             if day is None or not name or day < today:
                 continue
             if not any(m.lower() in name.lower() for m in MAJOR_RELEASES):
+                continue
+            kept.append((r, day, name))
+        days_listed: dict[str, set[date]] = {}
+        for _, day, name in kept:
+            days_listed.setdefault(name, set()).add(day)
+        daily = sorted(n for n, ds in days_listed.items() if len(ds) >= DAILY_TABLE_DAYS)
+        for name in daily:
+            pull.notes.append(
+                f"release calendar: {name!r} listed on {len(days_listed[name])} days of the "
+                "fortnight - a daily table, not a scheduled print; not stored as a release"
+            )
+        for r, day, name in kept:
+            if name in daily:
                 continue
             pull.events.append(
                 EventRecord(

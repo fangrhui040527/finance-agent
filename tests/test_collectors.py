@@ -927,6 +927,37 @@ def test_dbnomics_relays_the_apis_own_error_message():
 # --- FRED release calendar -------------------------------------------------------------------
 
 
+def test_a_release_fred_lists_every_day_is_a_table_not_a_print():
+    """FRED lists "FOMC Press Release" on every day of the fortnight, weekends
+    included. Stored as events it put an FOMC date on every row of every page's
+    watch list, and the one real decision could not be told from the rest."""
+    from datetime import timedelta as _td
+
+    daily = [
+        {"release_id": 101, "release_name": "FOMC Press Release", "date": str(d)}
+        for d in (date(2026, 9, 5) + _td(days=i) for i in range(14))
+    ]
+    weekly = [
+        {
+            "release_id": 180,
+            "release_name": "Unemployment Insurance Weekly Claims Report",
+            "date": d,
+        }
+        for d in ("2026-09-10", "2026-09-17")
+    ]
+
+    def opener(req, timeout=None):
+        if "releases/dates" in req.full_url:
+            return FakeResponse(json.dumps({"release_dates": daily + weekly}))
+        return FakeResponse(json.dumps({"observations": [{"date": "2026-09-01", "value": "4.33"}]}))
+
+    c = FredCollector(series={"DFF": "fed funds"}, key="k", clock=CLOCK, opener=opener)
+    pull = c.collect(SINCE, slot="us_preopen")
+    titles = {e.title for e in pull.events if e.kind == "macro_release"}
+    assert titles == {"Unemployment Insurance Weekly Claims Report"}, titles
+    assert any("'FOMC Press Release' listed on" in n and "daily table" in n for n in pull.notes)
+
+
 def test_fred_adds_the_release_calendar_as_macro_events_and_survives_its_absence():
     def opener(req, timeout=None):
         if "releases/dates" in req.full_url:

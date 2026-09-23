@@ -86,6 +86,15 @@ def test_the_h10_exchange_rates_get_the_week_their_release_takes():
     assert is_stale("DEXMAUS", date(2026, 8, 1), TODAY)
 
 
+def test_brent_gets_the_week_its_release_takes():
+    """EIA publishes daily Brent spot prices in one weekly release. On
+    2026-09-23 the newest point was 09-15, eight days old the day before the
+    next release, and the DAILY limit raised an alert with nothing wrong."""
+    wed = date(2026, 9, 23)
+    assert not is_stale("DCOILBRENTEU", date(2026, 9, 15), wed)
+    assert is_stale("DCOILBRENTEU", date(2026, 9, 1), wed), "three weeks is a stopped feed"
+
+
 def test_an_unknown_series_is_not_judged():
     assert max_age_days("SOMETHING:NEW") is None
     assert not is_stale("SOMETHING:NEW", date(2001, 1, 1), TODAY)

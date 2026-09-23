@@ -903,6 +903,19 @@ finished by the end of the day (or by now, when that is earlier) and the row say
 `[the 2026-09-21 close; XKLS has since closed 2026-09-22]`, with a footnote
 beside the provisional one.
 
+Two open questions the nightly pages had carried since 2026-09-16 and
+2026-09-18 turned out to be collector faults, not facts about the market.
+FRED lists "FOMC Press Release" (release 101) on every day of its calendar,
+weekends included; the collector stored each as a `macro_release`, so every
+page's watch list carried an FOMC date on every row from 2026-09-07 and the
+one real decision, the +0.25 in `DFF` on 09-17, could not be told from the
+thirty that were not. A release listed on five or more days of the fortnight
+is now a daily table: noted on the pull, not stored, and collapsed to one
+line where rows already stored are read. And `DCOILBRENTEU` sat under the
+DAILY freshness limit although EIA publishes its daily spot prices in one
+weekly release: the monitor raised *past its cadence (8d, limit 7)* on
+2026-09-23 with nothing wrong. It is WEEKLY now, like the H.10 rates.
+
 Not changed: the control book's three 2026-09-22 targets. They are the record
 of what the machine did, on the correct decision day; the page says how they
 were sized.
