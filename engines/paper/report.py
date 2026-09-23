@@ -111,6 +111,7 @@ class Status:
                     "price_local": float(f.price_local),
                     "price_day": f.close_day.isoformat() if f.close_day else None,
                     "price_state": f.price_state,
+                    "newer_session": f.newer_session.isoformat() if f.newer_session else None,
                     "error": f.error,
                 }
                 for f in self.fundable
@@ -138,7 +139,7 @@ class Status:
         priced = [f for f in self.fundable if not f.error]
         if priced and all(f.provisional for f in priced):
             return "the session so far - no price here is a close"
-        if any(f.provisional for f in priced):
+        if any(f.provisional or f.newer_session for f in priced):
             return "the last close, except where marked"
         return "the last close"
 
@@ -203,6 +204,13 @@ class Status:
             L.append(
                 f"  {len(provisional)} price(s) above are the session so far, not a close - "
                 f"{', '.join(provisional)} were pulled while their market was still trading"
+            )
+        behind = [f.instrument_id for f in self.fundable if f.newer_session]
+        if behind:
+            L.append(
+                f"  {len(behind)} price(s) above are an older session's close - "
+                f"{', '.join(behind)}: the cache holds no bar for the session their market "
+                f"has closed since"
             )
         L.append("")
         L.append(

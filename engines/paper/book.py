@@ -1001,7 +1001,7 @@ def mark(
             result.stops = stop_checks(store, cfg, m, now)
         elif rebalance_due(store, day, phase):
             quote = fx.asof(day)
-            funds = fundables(feed, cfg, m.equity_usd, quote, day, settings)
+            funds = fundables(feed, cfg, m.equity_usd, quote, day, settings, now=now)
             units = control_units(funds, m.equity_usd, phase, settings)
             held = {p.instrument_id: p.units for p in store.state(CONTROL).positions}
             rows = []

@@ -894,6 +894,15 @@ STALE NAMES and MIS-DATED; a leg whose fetch time is unknown is not labelled.
 The 2026-09-22 pack now marks six rows STALE and three PROVISIONAL, which is
 every row it has.
 
+The paper book's fundable table had the mirror gap. It labelled a price pulled
+mid-session but printed an older session's close under the heading "the last
+close" with no date: the first ramp decision was sized on six Bursa prices from
+Monday, eight hours after Tuesday's session shut, and the table could not say
+so. `fundables` now compares each close with the latest session its market has
+finished by the end of the day (or by now, when that is earlier) and the row says
+`[the 2026-09-21 close; XKLS has since closed 2026-09-22]`, with a footnote
+beside the provisional one.
+
 Not changed: the control book's three 2026-09-22 targets. They are the record
 of what the machine did, on the correct decision day; the page says how they
 were sized.

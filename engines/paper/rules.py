@@ -12,10 +12,10 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from datetime import date
+from datetime import UTC, date, datetime, time
 from decimal import Decimal
 
-from core.market.calendar import PROVISIONAL, UNKNOWN, price_state
+from core.market.calendar import PROVISIONAL, UNKNOWN, last_session_close, price_state
 from core.market.feed import PriceFeedError
 from engines.paper.fx import FxQuote
 from engines.paper.pricing import (
@@ -107,6 +107,10 @@ class Fundable:
     #: unknowable. `core.market.calendar.price_state` owns the rule; this field
     #: only carries its answer so the page can say which it printed.
     price_state: str = UNKNOWN
+    #: The market's latest finished session when it is newer than `close_day`:
+    #: the price is an older session's close, and the cache holds no bar for
+    #: the session the market has closed since. None when the price is current.
+    newer_session: date | None = None
 
     @property
     def fundable(self) -> bool:
@@ -124,6 +128,11 @@ class Fundable:
             f"up to {self.max_lots} lot(s)" if self.fundable else "not fundable at this equity"
         )
         mark = "  [the session so far, not the close]" if self.provisional else ""
+        if self.newer_session is not None:
+            mark += (
+                f"  [the {self.close_day} close; {mic_of(self.instrument_id)} has since "
+                f"closed {self.newer_session}]"
+            )
         return (
             f"  {self.instrument_id:<12} {self.lot:>4} x {self.price_local:>10.4f} {self.currency}"
             f"  = USD {self.lot_usd:>8.2f}  ({self.lot_weight:.1%} of equity)"
@@ -139,9 +148,20 @@ def fundables(
     day: date,
     settings: PaperSettings,
     names: tuple[str, ...] | None = None,
+    now: datetime | None = None,
 ) -> list[Fundable]:
-    """Each watchlist name at its last close: one lot in USD, and how many the cap allows."""
+    """Each watchlist name at its last close: one lot in USD, and how many the cap allows.
+
+    Each row also says when its close is OLDER than the latest session its
+    market has finished by the end of `day` (or by `now`, when that is
+    earlier). On 2026-09-22 the table priced every Bursa name at Monday's
+    close under the heading "the last close" while Tuesday's session had
+    closed eight hours earlier: the cache held no Tuesday bar, and nothing on
+    the page could tell the reader so.
+    """
     out: list[Fundable] = []
+    end_of_day = datetime.combine(day, time.max, tzinfo=UTC)
+    as_of = min(now or datetime.now(UTC), end_of_day)
     cap = settings.max_weight_per_name * equity
     for iid in names or tuple(cfg.watchlist):
         lot = lot_size(iid)
@@ -170,8 +190,12 @@ def fundables(
         max_lots = int(cap // lot_usd) if lot_usd > 0 else 0
         rt = round_trip_pct(mic_of(iid), getattr(cfg, "broker", None), close * lot, close)
         state = price_state(mic_of(iid), close_day, _fetched_at(feed, iid))
+        shut = last_session_close(mic_of(iid), as_of)
+        newer = shut.date() if shut is not None and shut.date() > close_day else None
         out.append(
-            Fundable(iid, ccy, lot, close, close_day, lot_usd, weight, max_lots, rt, "", state)
+            Fundable(
+                iid, ccy, lot, close, close_day, lot_usd, weight, max_lots, rt, "", state, newer
+            )
         )
     return out
 

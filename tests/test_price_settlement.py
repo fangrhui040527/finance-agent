@@ -219,6 +219,55 @@ def test_a_feed_that_cannot_say_when_it_pulled_reads_unknown_not_close(paper_env
     assert not any(f.provisional for f in by.values())
 
 
+def test_a_price_older_than_the_markets_latest_session_says_so(paper_env):
+    """2026-09-22: every Bursa price in the table was Monday's close under the
+    heading "the last close", eight hours after Tuesday's session shut. The
+    cache held no Tuesday bar and the page could not say so."""
+    from engines.paper.rules import fundables
+
+    q = paper_env.fx.asof(date(2026, 3, 13))
+    friday = date(2026, 3, 13)
+    feed = _CutFeed(paper_env.feed, last=date(2026, 3, 12))  # no Friday bar cached
+    by = {
+        f.instrument_id: f
+        for f in fundables(
+            feed,
+            paper_env.cfg,
+            Decimal(1000),
+            q,
+            friday,
+            S,
+            now=datetime(2026, 3, 13, 22, 30, tzinfo=UTC),
+        )
+    }
+    maybank = by["MYX:1155"]
+    assert maybank.close_day == date(2026, 3, 12) and maybank.newer_session == friday
+    assert "[the 2026-03-12 close; XKLS has since closed 2026-03-13]" in maybank.row()
+    # before Friday's Bursa close the Thursday bar IS the latest session: nothing to say
+    early = fundables(
+        feed,
+        paper_env.cfg,
+        Decimal(1000),
+        q,
+        friday,
+        S,
+        now=datetime(2026, 3, 13, 5, 0, tzinfo=UTC),
+    )
+    assert all(f.newer_session is None for f in early if f.instrument_id.startswith("MYX"))
+
+
+class _CutFeed:
+    """The synthetic feed with nothing cached after `last`."""
+
+    def __init__(self, inner, last):
+        self._inner, self._last = inner, last
+        self.name = inner.name
+
+    def fetch(self, instrument_id, start=None, end=None):
+        end = min(end, self._last) if end else self._last
+        return self._inner.fetch(instrument_id, start=start, end=end)
+
+
 def test_the_heading_stops_claiming_a_close_it_cannot_vouch_for(paper_env):
     from engines.paper.report import status
 
