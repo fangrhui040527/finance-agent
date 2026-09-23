@@ -1,6 +1,6 @@
 # Digest 2026-09-23
 
-Generated 2026-09-23 10:22 UTC · slot `all` · 8128 articles in the corpus, 4728 observations, 4033 events in the fact book.
+Generated 2026-09-23 17:24 UTC · slot `all` · 8131 articles in the corpus, 4731 observations, 4036 events in the fact book.
 
 ## The book
 
@@ -57,33 +57,38 @@ Generated 2026-09-23 10:22 UTC · slot `all` · 8128 articles in the corpus, 472
 - 2026-09-22 Yahoo — MSFT Layoffs: Microsoft Cuts 268 Xbox Jobs As Gaming Reset Deepens [q 0.85, tone -1.0] ★
 - 2026-09-22 Yahoo — Price Prediction: Marvell, AMD & Broadcom- Our Bold Price Predictions for 2027 [q 0.85, tone +0.0] ★
 - 2026-09-22 Yahoo — AI Alliances And Raised Targets Could Be A Game Changer For ServiceNow (NOW) [q 0.85, tone +1.0] ★
-- snapshot: P/E (ttm) 27.66 (finnhub, 2026-09-23) · P/B 6.26 (finnhub, 2026-09-05) · EPS (ttm) 17.95 (finnhub, 2026-09-05) · dividend yield 0.79 (finnhub, 2026-09-05) · beta 1.06 (finnhub, 2026-09-23) · 52w high 553.72 (finnhub, 2026-09-05) · 52w low 349.20 (finnhub, 2026-09-05) · target (consensus) 553.39 (fmp, 2026-09-05) · analysts: buy 41 (finnhub, 2026-09-05) · analysts: hold 5 (finnhub, 2026-09-05) · analysts: sell 0 (finnhub, 2026-09-05) · vendor sentiment 0.12 (alphavantage_news, 2026-09-23) · revenue (last quarter) 90.01bn (sec_xbrl, 2026-07-29) · net income (last quarter) 35.77bn (sec_xbrl, 2026-07-29) · last EPS surprise % 9.53 (finnhub, 2026-09-05)
+- event 2026-09-22 rating_reiteration — Oppenheimer maintain Outperform (fmp)
+- snapshot: P/E (ttm) 27.66 (finnhub, 2026-09-23) · P/B 6.26 (finnhub, 2026-09-05) · EPS (ttm) 17.95 (finnhub, 2026-09-05) · dividend yield 0.79 (finnhub, 2026-09-05) · beta 1.06 (finnhub, 2026-09-23) · 52w high 553.72 (finnhub, 2026-09-05) · 52w low 349.20 (finnhub, 2026-09-05) · target (consensus) 556.42 (fmp, 2026-09-23) · analysts: buy 41 (finnhub, 2026-09-05) · analysts: hold 5 (finnhub, 2026-09-05) · analysts: sell 0 (finnhub, 2026-09-05) · vendor sentiment 0.12 (alphavantage_news, 2026-09-23) · revenue (last quarter) 90.01bn (sec_xbrl, 2026-07-29) · net income (last quarter) 35.77bn (sec_xbrl, 2026-07-29) · last EPS surprise % 9.53 (finnhub, 2026-09-05)
 
 ## Macro
 
 | series | latest | as of | change | source |
 |---|---|---|---|---|
-| ICE BofA US high-yield option-adjusted spread, % | 2.68 | 2026-09-18 | -0.02 | fred |
+| ICE BofA US high-yield option-adjusted spread, % | 2.68 | 2026-09-22 | +0.02 | fred |
 | BNM Overnight Policy Rate, % | 2.75 | 2026-09-03 | +0 | bnm_opr |
 | US CPI, all items, index 1982-84=100 | 334.13 | 2026-08-01 | +1.318 | fred |
-| Brent crude, USD per barrel (EIA, daily) | 130.80 | 2026-09-15 | +9.55 | fred |
+| Brent crude, USD per barrel (EIA, daily) | 114.89 | 2026-09-22 | -1.26 | fred |
 | Malaysian ringgit per US dollar | 4.08 | 2026-09-18 | -0.0172 | fred |
-| Federal funds effective rate, % | 3.88 | 2026-09-18 | +0 | fred |
-| 10-year Treasury yield, % | 5.01 | 2026-09-18 | +0.07 | fred |
-| 2-year Treasury yield, % | 4.76 | 2026-09-18 | +0.09 | fred |
+| Federal funds effective rate, % | 3.88 | 2026-09-21 | +0 | fred |
+| 10-year Treasury yield, % | 4.96 | 2026-09-21 | -0.05 | fred |
+| 2-year Treasury yield, % | 4.76 | 2026-09-21 | +0 | fred |
 | Malaysia CPI headline, index 2010=100 | 137.50 | 2026-08-01 | +0.4 | dosm_cpi |
 | Broad US dollar index | 119.51 | 2026-09-18 | +0.1644 | fred |
-| NASDAQ Composite, index level | 27,122.09 | 2026-09-21 | +599.54 | fred |
+| NASDAQ Composite, index level | 27,244.28 | 2026-09-22 | +122.19 | fred |
 | Aluminium, USD per tonne (IMF PCPS via FRED) | 3,158.26 | 2026-07-01 |  | fred |
-| S&P 500, index level | 7,764.70 | 2026-09-21 | +114.2 | fred |
-| 10y minus 2y Treasury spread, % | 0.20 | 2026-09-21 | -0.05 | fred |
+| S&P 500, index level | 7,764.64 | 2026-09-22 | -0.06 | fred |
+| 10y minus 2y Treasury spread, % | 0.25 | 2026-09-22 | +0.05 | fred |
 | US unemployment rate, % | 4.10 | 2026-08-01 | +0 | fred |
-| CBOE VIX, index | 14.87 | 2026-09-21 | +0.06 | fred |
+| CBOE VIX, index | 14.21 | 2026-09-22 | -0.66 | fred |
 
 ## Collection
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 17:24 | dbnomics | ok | 450 | 0 | 0 | facts 0;  |
+| 17:24 | jin10_flash | ok | 16 | 4 | 3 | facts 0;  |
+| 17:24 | fred | ok | 484 | 0 | 0 | facts 17; release calendar: 'FOMC Press Release' listed on 15 days of the fortni |
+| 17:24 | fmp | ok | 3943 | 0 | 0 | facts 5; fmp /earnings is outside the plan (HTTP 402); not collected for NVDA, A |
 | 10:21 | eodhd | ok | 0 | 0 | 0 | facts 0; EODHD plan: free (2 names a day, US only, rotated); MYX:1155: deferred  |
 | 10:21 | twse_openapi | ok | 8 | 0 | 0 | facts 5;  |
 | 10:21 | jin10_flash | ok | 20 | 10 | 9 | facts 0;  |

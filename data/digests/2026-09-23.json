@@ -1,6 +1,42 @@
 {
   "collection": [
     {
+      "at": "2026-09-23T17:24:36.478101+00:00",
+      "detail": "facts 0; ",
+      "fetched": 450,
+      "kept": 0,
+      "source": "dbnomics",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-23T17:24:33.279212+00:00",
+      "detail": "facts 0; ",
+      "fetched": 16,
+      "kept": 4,
+      "source": "jin10_flash",
+      "status": "ok",
+      "stored": 3
+    },
+    {
+      "at": "2026-09-23T17:24:31.548257+00:00",
+      "detail": "facts 17; release calendar: 'FOMC Press Release' listed on 15 days of the fortnight - a daily table, not a scheduled print; not stored as a release",
+      "fetched": 484,
+      "kept": 0,
+      "source": "fred",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-23T17:24:25.401835+00:00",
+      "detail": "facts 5; fmp /earnings is outside the plan (HTTP 402); not collected for NVDA, AAPL, MSFT",
+      "fetched": 3943,
+      "kept": 0,
+      "source": "fmp",
+      "status": "ok",
+      "stored": 0
+    },
+    {
       "at": "2026-09-23T10:21:44.624354+00:00",
       "detail": "facts 0; EODHD plan: free (2 names a day, US only, rotated); MYX:1155: deferred by the 2-a-day credit budget; next in rotation; MYX:5347: deferred by the 2-a-day credit budget; next in rotation; MYX:5183: deferred by the 2-a-day credit budget; next in rotation; MYX:5225: deferred by the 2-a-day credit budget; next in rotation; outside the free plan (US only), so not asked for: MYX:1155, MYX:5347, MYX:5183, MYX:5225. The EODHD Fundamentals plan covers KLSE and TW.; MYX:8869: EODHD free plan: US only; the Fundamentals plan covers KLSE; MYX:3182: EODHD free plan: US only; the Fundamentals plan covers KLSE",
       "fetched": 0,
@@ -155,22 +191,22 @@
     }
   ],
   "counts": {
-    "articles": 8128,
+    "articles": 8131,
     "documents": 0,
     "escalated": 1410,
-    "events": 4033,
+    "events": 4036,
     "failed_sweeps": 23,
     "linked": 5496,
-    "observations": 4728,
+    "observations": 4731,
     "series": 31,
-    "sweeps": 452
+    "sweeps": 456
   },
   "day": "2026-09-23",
-  "generated_at": "2026-09-23 10:22 UTC",
+  "generated_at": "2026-09-23 17:24 UTC",
   "macro": [
     {
-      "change": "-0.02",
-      "obs_date": "2026-09-18",
+      "change": "0.02",
+      "obs_date": "2026-09-22",
       "series_id": "BAMLH0A0HYM2",
       "source": "fred",
       "title": "ICE BofA US high-yield option-adjusted spread, %",
@@ -193,12 +229,12 @@
       "value": "334.13"
     },
     {
-      "change": "9.55",
-      "obs_date": "2026-09-15",
+      "change": "-1.26",
+      "obs_date": "2026-09-22",
       "series_id": "DCOILBRENTEU",
       "source": "fred",
       "title": "Brent crude, USD per barrel (EIA, daily)",
-      "value": "130.80"
+      "value": "114.89"
     },
     {
       "change": "-0.0172",
@@ -210,23 +246,23 @@
     },
     {
       "change": "0",
-      "obs_date": "2026-09-18",
+      "obs_date": "2026-09-21",
       "series_id": "DFF",
       "source": "fred",
       "title": "Federal funds effective rate, %",
       "value": "3.88"
     },
     {
-      "change": "0.07",
-      "obs_date": "2026-09-18",
+      "change": "-0.05",
+      "obs_date": "2026-09-21",
       "series_id": "DGS10",
       "source": "fred",
       "title": "10-year Treasury yield, %",
-      "value": "5.01"
+      "value": "4.96"
     },
     {
-      "change": "0.09",
-      "obs_date": "2026-09-18",
+      "change": "0",
+      "obs_date": "2026-09-21",
       "series_id": "DGS2",
       "source": "fred",
       "title": "2-year Treasury yield, %",
@@ -249,12 +285,12 @@
       "value": "119.51"
     },
     {
-      "change": "599.54",
-      "obs_date": "2026-09-21",
+      "change": "122.19",
+      "obs_date": "2026-09-22",
       "series_id": "NASDAQCOM",
       "source": "fred",
       "title": "NASDAQ Composite, index level",
-      "value": "27,122.09"
+      "value": "27,244.28"
     },
     {
       "change": null,
@@ -265,20 +301,20 @@
       "value": "3,158.26"
     },
     {
-      "change": "114.2",
-      "obs_date": "2026-09-21",
+      "change": "-0.06",
+      "obs_date": "2026-09-22",
       "series_id": "SP500",
       "source": "fred",
       "title": "S&P 500, index level",
-      "value": "7,764.70"
+      "value": "7,764.64"
     },
     {
-      "change": "-0.05",
-      "obs_date": "2026-09-21",
+      "change": "0.05",
+      "obs_date": "2026-09-22",
       "series_id": "T10Y2Y",
       "source": "fred",
       "title": "10y minus 2y Treasury spread, %",
-      "value": "0.20"
+      "value": "0.25"
     },
     {
       "change": "0",
@@ -289,12 +325,12 @@
       "value": "4.10"
     },
     {
-      "change": "0.06",
-      "obs_date": "2026-09-21",
+      "change": "-0.66",
+      "obs_date": "2026-09-22",
       "series_id": "VIXCLS",
       "source": "fred",
       "title": "CBOE VIX, index",
-      "value": "14.87"
+      "value": "14.21"
     }
   ],
   "names": [
@@ -830,7 +866,15 @@
     },
     {
       "escalated": 18,
-      "events": [],
+      "events": [
+        {
+          "kind": "rating_reiteration",
+          "source": "fmp",
+          "title": "Oppenheimer maintain Outperform",
+          "url": "",
+          "when": "2026-09-22T00:00:00+00:00"
+        }
+      ],
       "instrument_id": "XNAS:MSFT",
       "label": "Microsoft",
       "snapshot": [
@@ -892,11 +936,11 @@
         },
         {
           "concept": "price_target_consensus",
-          "known_at": "2026-09-05",
+          "known_at": "2026-09-23",
           "label": "target (consensus)",
           "period_end": null,
           "source": "fmp",
-          "value": "553.39"
+          "value": "556.42"
         },
         {
           "concept": "analyst_buy",
