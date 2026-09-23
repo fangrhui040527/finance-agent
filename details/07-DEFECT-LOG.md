@@ -986,6 +986,14 @@ behind a dispatched one. The checkout now names the branch
 before it pushed, and `tests/test_collect_workflow.py` fails if that `ref` is
 removed.
 
+The group is not a queue, and the first version of this entry and of the runbook
+said it was. GitHub holds one waiting run per concurrency group; a third arrival
+cancels the waiting one (a review bot caught the claim on the fix's own pull
+request). `cancel-in-progress: false` protects only the run already working. A
+cancelled run records nothing, so its slot reads as missed and `sweep --due`
+owes it for 24 hours; the runbook now says to dispatch no more than one slot
+while another runs and another waits.
+
 ## What the families have in common
 
 | Family | Shape |

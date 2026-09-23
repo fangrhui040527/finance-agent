@@ -526,16 +526,26 @@ Same-day recovery is most of the value: **news is the only thing that expires.**
 Prices, filings and macro series are re-fetchable tomorrow; a wire feed serves a
 recent window and nothing brings back the hours it has rolled past.
 
-Runs of collect.yml **queue; they never overlap**, and each checks out the
-branch as it stands when it starts, not the commit its trigger carried. The
-stores are binary SQLite files, so two runs that each start from the same
-commit cannot both commit: on 2026-09-23 a `bursa_close` dispatched three
-seconds after a `us_close` checked out the older commit, collected, and failed
-at the commit step on eight conflicting files. That failure is loud on purpose
-(`gave up after 3 attempts`); the collection is lost with the runner, and the
-remedy is to dispatch the slot again, which the guard allows because nothing
-was recorded. Dispatching two slots back to back is safe now that each run
-checks out the branch head.
+Runs of collect.yml **never overlap**: the `collect` concurrency group lets one
+run work and one wait, and each checks out the branch as it stands when it
+starts, not the commit its trigger carried. The stores are binary SQLite files,
+so two runs that each start from the same commit cannot both commit: on
+2026-09-23 a `bursa_close` dispatched three seconds after a `us_close` checked
+out the older commit, collected, and failed at the commit step on eight
+conflicting files. That failure is loud on purpose (`gave up after 3
+attempts`); the collection is lost with the runner, and the remedy is to
+dispatch the slot again, which the guard allows because nothing was recorded.
+Dispatching two slots back to back is safe now that each run checks out the
+branch head.
+
+The group is not a queue beyond that one waiting run. GitHub holds at most one
+pending run per group, and a third arrival while one runs and one waits
+**cancels the waiting run** and takes its place (`cancel-in-progress: false`
+protects only the run already working). A cancelled run collected nothing and
+recorded nothing, so its slot reads as missed: `slots_missed` names it and
+`sweep --due` owes it for 24 hours after its firing, which is how the nightly
+routine recovers it. Dispatch at most one slot while another is running and
+another is waiting; three at once loses the middle one until the catch-up.
 
 Two shapes of failure look different in the run history and want different
 fixes: a run **created and never given a machine**

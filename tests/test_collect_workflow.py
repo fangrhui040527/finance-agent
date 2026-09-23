@@ -2,7 +2,7 @@
 
 `collect.yml` is the only workflow that pushes, and what it pushes is binary
 SQLite stores that git cannot merge. So a run has to start from the branch as
-it stands when the run starts, and runs have to queue rather than overlap.
+it stands when the run starts, and two runs must never work at once.
 """
 
 from __future__ import annotations
@@ -18,7 +18,11 @@ def _workflow() -> dict:
     return yaml.safe_load(WORKFLOW.read_text(encoding="utf-8"))
 
 
-def test_runs_queue_behind_each_other_and_are_never_cancelled():
+def test_runs_never_overlap_and_the_one_working_is_never_cancelled():
+    """One group, so two runs never work at once. `cancel-in-progress: false`
+    protects the run already working; it does not make a queue. GitHub holds one
+    waiting run per group and a third arrival cancels it, which the catch-up
+    (`sweep --due`) recovers. The runbook says so; this pins the part in code."""
     group = _workflow()["concurrency"]
     assert group["group"] == "collect"
     assert group["cancel-in-progress"] is False
