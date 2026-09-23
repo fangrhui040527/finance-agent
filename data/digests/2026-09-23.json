@@ -1,6 +1,78 @@
 {
   "collection": [
     {
+      "at": "2026-09-23T22:46:16.789047+00:00",
+      "detail": "facts 0; EODHD plan: free (2 names a day, US only, rotated); XNAS:AAPL: deferred by the 2-a-day credit budget; next in rotation; XNAS:MSFT: outside the plan or over today's credits; XNAS:NVDA: outside the plan or over today's credits",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-23T22:46:16.314204+00:00",
+      "detail": "facts 0; ",
+      "fetched": 19,
+      "kept": 6,
+      "source": "jin10_flash",
+      "status": "ok",
+      "stored": 2
+    },
+    {
+      "at": "2026-09-23T22:46:14.896665+00:00",
+      "detail": "facts 1; XNAS:MSFT: alphavantage quota exhausted for today: Thank you for using Alpha Vantage! Please consider spreading out your free API requests more sparingly (1 request per second). You may subscribe to any of the p; XNAS:NVDA: alphavantage quota exhausted for today: Thank you for using Alpha Vantage! Please consider spreading out your free API requests more sparingly (1 request per second). You may subscribe to any of the p",
+      "fetched": 8,
+      "kept": 8,
+      "source": "alphavantage_news",
+      "status": "ok",
+      "stored": 7
+    },
+    {
+      "at": "2026-09-23T22:46:13.934249+00:00",
+      "detail": "facts 0; ",
+      "fetched": 226,
+      "kept": 209,
+      "source": "finnhub",
+      "status": "ok",
+      "stored": 148
+    },
+    {
+      "at": "2026-09-23T22:46:11.614100+00:00",
+      "detail": "facts 1; ",
+      "fetched": 1,
+      "kept": 0,
+      "source": "edgar",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-23T22:46:11.083845+00:00",
+      "detail": "named the company: 54 of 54 (lowest: Apple 15/15, Microsoft 20/20, NVIDIA 19/19)",
+      "fetched": 54,
+      "kept": 54,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 48
+    },
+    {
+      "at": "2026-09-23T22:46:10.101699+00:00",
+      "detail": "named the company: 111 of 131 (lowest: NVIDIA 52/67, Microsoft 35/38, Apple 24/26)",
+      "fetched": 143,
+      "kept": 131,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 124
+    },
+    {
+      "at": "2026-09-23T22:46:07.074739+00:00",
+      "detail": "no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked)",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "failed",
+      "stored": 0
+    },
+    {
       "at": "2026-09-23T17:24:36.478101+00:00",
       "detail": "facts 0; ",
       "fetched": 450,
@@ -191,18 +263,18 @@
     }
   ],
   "counts": {
-    "articles": 8131,
+    "articles": 8460,
     "documents": 0,
-    "escalated": 1410,
-    "events": 4036,
-    "failed_sweeps": 23,
-    "linked": 5496,
-    "observations": 4731,
+    "escalated": 1474,
+    "events": 4037,
+    "failed_sweeps": 24,
+    "linked": 5808,
+    "observations": 4732,
     "series": 31,
-    "sweeps": 456
+    "sweeps": 464
   },
   "day": "2026-09-23",
-  "generated_at": "2026-09-23 17:24 UTC",
+  "generated_at": "2026-09-23 22:46 UTC",
   "macro": [
     {
       "change": "0.02",
@@ -413,7 +485,7 @@
       "upcoming": []
     },
     {
-      "escalated": 34,
+      "escalated": 63,
       "events": [],
       "instrument_id": "XNAS:NVDA",
       "label": "NVIDIA",
@@ -541,105 +613,105 @@
       ],
       "stories": [
         {
-          "doc_id": "alphavantage:https://www.marketbeat.com/instant-alerts/filing-16745-shares-in-apple-inc-aapl-bought-by-burnham-co-llc-2026-09-23/",
-          "domain": "MarketBeat",
+          "doc_id": "https://finance.yahoo.com/m/cad78429-3538-3029-9d64-374cfc9c9655/ionq-wants-to-be-the-nvidia.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
           "escalated": true,
           "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-09-23T07:15:49+00:00",
-          "quality": 0.85,
-          "title": "16,745 Shares in Apple Inc. $AAPL Bought by Burnham & Co LLC",
-          "uncertainty": 0.14705882352941177
+          "polarity": 0.0,
+          "published_at": "2026-09-23T21:25:00+00:00",
+          "quality": 1.0,
+          "title": "IonQ Wants to Be the Nvidia of Quantum. Now They Are Partners.",
+          "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:142350341",
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/nvidia-slips-four-macs-attack-172611727.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-23T17:26:11+00:00",
+          "quality": 1.0,
+          "title": "Nvidia Slips as Four Macs Attack Cloud Inference Economics",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://www.fool.com/investing/2026/09/23/prediction-intel-names-a-major-outside-customer-for-its-next-factory-process-before-2027/?.tsrc=rss",
+          "domain": "www.fool.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-23T22:07:01+00:00",
+          "quality": 0.85,
+          "title": "Prediction: Intel Names a Major Outside Customer for Its Next Factory Process Before 2027",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142363167",
           "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "polarity": -1.0,
-          "published_at": "2026-09-23T02:12:06+00:00",
+          "published_at": "2026-09-23T20:33:00+00:00",
           "quality": 0.85,
-          "title": "Nvidia (NVDA) Targets 22,000 GPUs For New Southeast Asia AI Factory Hubs",
-          "uncertainty": 0.0
+          "title": "Palantir, IonQ, Royal Caribbean, Paychex, McDonald\u2019s, and More Stocks That Explain Today\u2019s Market",
+          "uncertainty": 0.16447368421052633
         },
         {
-          "doc_id": "finnhub:142343761",
+          "doc_id": "finnhub:142364008",
           "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
-          "polarity": -1.0,
-          "published_at": "2026-09-22T22:45:19+00:00",
-          "quality": 0.85,
-          "title": "Nvidia\u2019s Cooling Stock Valuations Are Being Looked At As A Warning Signal",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "finnhub:142343766",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
           "polarity": 1.0,
-          "published_at": "2026-09-22T20:44:00+00:00",
+          "published_at": "2026-09-23T19:00:00+00:00",
           "quality": 0.85,
-          "title": "AI Stocks Can\u2019t Carry the Entire Market Forever",
-          "uncertainty": 0.2808988764044944
+          "title": "Sandisk vs. NVIDIA: Which AI Stock Is the Better Buy Now?",
+          "uncertainty": 0.40322580645161293
         },
         {
-          "doc_id": "finnhub:142341961",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
-          "polarity": 1.0,
-          "published_at": "2026-09-22T19:05:33+00:00",
-          "quality": 0.85,
-          "title": "Intel Is Up 25% in 5 Days. The $145 Price Target Just Moved Too",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "finnhub:142341953",
+          "doc_id": "finnhub:142364010",
           "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-09-22T18:00:47+00:00",
+          "published_at": "2026-09-23T18:42:14+00:00",
           "quality": 0.85,
-          "title": "3 Big Tech Stocks With the Most Upside Right Now",
-          "uncertainty": 0.25
+          "title": "Nvidia Backed This AI Drug Startup. AbbVie Just Became a Partner Before Its IPO",
+          "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:142340958",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": -1.0,
-          "published_at": "2026-09-22T17:29:12+00:00",
-          "quality": 0.85,
-          "title": "Is NVIDIA Funding Its Own Stock Rally?",
-          "uncertainty": 0.4934210526315789
-        },
-        {
-          "doc_id": "finnhub:142340969",
+          "doc_id": "finnhub:142359331",
           "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.3333333333333333,
-          "polarity": -1.0,
-          "published_at": "2026-09-22T16:41:58+00:00",
+          "polarity": 0.0,
+          "published_at": "2026-09-23T13:42:57+00:00",
           "quality": 0.85,
-          "title": "Big Short Investor Issues AI Warning: \u201870% of AI Revenue Is Just Two Companies, And One of Them I Think Is in Trouble\u2019",
-          "uncertainty": 0.3731343283582089
+          "title": "Intel Skyrocketed 30% Higher in 1 Month: Here\u2019s What to Do Now",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142359327",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "polarity": 1.0,
+          "published_at": "2026-09-23T13:00:24+00:00",
+          "quality": 0.85,
+          "title": "Nvidia Stock Set For 40% Surge: 3 Catalysts That Could Drive the Next Big Move",
+          "uncertainty": 0.4098360655737705
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 176,
-        "polarity_mean": 0.17,
-        "sources": 35,
-        "uncertainty_mean": 0.127
+        "n": 329,
+        "polarity_mean": 0.155,
+        "sources": 45,
+        "uncertainty_mean": 0.133
       },
       "upcoming": []
     },
     {
-      "escalated": 21,
+      "escalated": 32,
       "events": [],
       "instrument_id": "XNAS:AAPL",
       "label": "Apple",
@@ -767,6 +839,28 @@
       ],
       "stories": [
         {
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/42-state-ag-coalition-state-195129692.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-23T19:51:29+00:00",
+          "quality": 1.0,
+          "title": "The 42-State AG Coalition: How State Attorneys General Are Building the Agent Liability Framework Congress Won\u2019t",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/nvidia-slips-four-macs-attack-172611727.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-23T17:26:11+00:00",
+          "quality": 1.0,
+          "title": "Nvidia Slips as Four Macs Attack Cloud Inference Economics",
+          "uncertainty": 0.0
+        },
+        {
           "doc_id": "https://finance.yahoo.com/video/ai-transform-shopping-human-touch-195900364.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
           "escalated": true,
@@ -800,6 +894,28 @@
           "uncertainty": 0.18656716417910446
         },
         {
+          "doc_id": "alphavantage:https://indianexpress.com/article/technology/tech-news-technology/snapdragon-8-elite-gen-6-qualcomm-bet-on-agentic-ai-new-mobile-chips-10889844/",
+          "domain": "The Indian Express",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-23T22:14:00+00:00",
+          "quality": 0.85,
+          "title": "\u2018A phone is unique to you, it\u2019s not going anywhere\u2019: Qualcomm CEO\u2019s big bet on Agentic AI as company unveils new mobile chips",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://firstformoney.com/apple-settlement-over-siri-intelligence-features-means-eligible-iphone-owners-can-receive-up-to-95/?.tsrc=rss",
+          "domain": "firstformoney.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-09-23T19:24:56+00:00",
+          "quality": 0.85,
+          "title": "Apple Settlement Over Siri Intelligence Features Means Eligible iPhone Owners Can Receive Up to $95",
+          "uncertainty": 0.18115942028985504
+        },
+        {
           "doc_id": "alphavantage:https://www.marketbeat.com/instant-alerts/filing-forum-private-client-group-llc-takes-position-in-apple-inc-aapl-2026-09-23/",
           "domain": "MarketBeat",
           "escalated": true,
@@ -809,63 +925,19 @@
           "quality": 0.85,
           "title": "Forum Private Client Group LLC Takes Position in Apple Inc. $AAPL",
           "uncertainty": 0.14705882352941177
-        },
-        {
-          "doc_id": "alphavantage:https://www.marketbeat.com/instant-alerts/filing-16745-shares-in-apple-inc-aapl-bought-by-burnham-co-llc-2026-09-23/",
-          "domain": "MarketBeat",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-09-23T07:15:49+00:00",
-          "quality": 0.85,
-          "title": "16,745 Shares in Apple Inc. $AAPL Bought by Burnham & Co LLC",
-          "uncertainty": 0.14705882352941177
-        },
-        {
-          "doc_id": "alphavantage:https://www.tradingview.com/news/stocktwits:79f4127aa094b:0-why-did-aapl-okta-amd-stocks-jump-to-52-week-highs-today/",
-          "domain": "TradingView",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
-          "polarity": 1.0,
-          "published_at": "2026-09-23T03:17:13+00:00",
-          "quality": 0.85,
-          "title": "Why Did AAPL, OKTA, AMD Stocks Jump To 52-Week Highs Today?",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "alphavantage:https://www.reuters.com/legal/government/us-opposes-part-apple-contempt-finding-epic-games-case-us-supreme-court-2026-09-22/",
-          "domain": "Reuters",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": -1.0,
-          "published_at": "2026-09-22T18:24:33+00:00",
-          "quality": 0.85,
-          "title": "US opposes part of Apple contempt finding in Epic Games case at US Supreme Court",
-          "uncertainty": 0.16025641025641024
-        },
-        {
-          "doc_id": "finnhub:142340986",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
-          "polarity": 1.0,
-          "published_at": "2026-09-22T17:54:01+00:00",
-          "quality": 0.85,
-          "title": "Apple doesn't need to be in first place for AI. Here's why.",
-          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 1.0,
-        "n": 119,
-        "polarity_mean": 0.146,
-        "sources": 46,
-        "uncertainty_mean": 0.091
+        "n": 171,
+        "polarity_mean": 0.103,
+        "sources": 62,
+        "uncertainty_mean": 0.087
       },
       "upcoming": []
     },
     {
-      "escalated": 18,
+      "escalated": 38,
       "events": [
         {
           "kind": "rating_reiteration",
@@ -1001,100 +1073,100 @@
       ],
       "stories": [
         {
-          "doc_id": "finnhub:142342950",
-          "domain": "Yahoo",
+          "doc_id": "https://finance.yahoo.com/video/microsoft-president-brad-smith-ai-205600130.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
           "escalated": true,
-          "intensity": 0.0,
+          "intensity": 0.3333333333333333,
           "polarity": 0.0,
-          "published_at": "2026-09-22T20:15:38+00:00",
-          "quality": 0.85,
-          "title": "What Is Microsoft (MSFT) Facing As Its AI Partner Seeks A $1.2 Trillion Valuation?",
+          "published_at": "2026-09-23T20:56:00+00:00",
+          "quality": 1.0,
+          "title": "Microsoft President Brad Smith: AI Systems Need an \u2018Emergency Brake\u2019",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:142341980",
-          "domain": "Yahoo",
+          "doc_id": "https://finance.yahoo.com/video/microsoft-president-brad-smith-ai-204100614.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
           "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-22T19:11:00+00:00",
-          "quality": 0.85,
-          "title": "NEC Announces Ohio Attorney General's Office Upgrade to Integra-ID\u00ae 7 Software-as-a-Service Biometric Platform",
-          "uncertainty": 0.0
+          "intensity": 0.3333333333333333,
+          "polarity": 1.0,
+          "published_at": "2026-09-23T20:41:00+00:00",
+          "quality": 1.0,
+          "title": "Microsoft President Brad Smith: AI\u2019s Power Is Advancing Faster Than Its Safety",
+          "uncertainty": 0.3012048192771084
         },
         {
-          "doc_id": "finnhub:142341978",
-          "domain": "Yahoo",
+          "doc_id": "https://finance.yahoo.com/m/87f2f4b3-94ae-38c6-aad5-741ff974d445/microsoft-stock-gets-another.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 1.0,
-          "published_at": "2026-09-22T18:30:08+00:00",
-          "quality": 0.85,
-          "title": "Microsoft (MSFT) Raises Its Dividend 8%. Does AI Spending Change the Investment Case?",
+          "published_at": "2026-09-23T20:14:48+00:00",
+          "quality": 1.0,
+          "title": "Microsoft Stock Gets Another Upgrade, Price-Target Hike",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:142340969",
+          "doc_id": "https://finance.yahoo.com/video/ai-safety-wont-advance-rely-183512899.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-23T18:35:12+00:00",
+          "quality": 1.0,
+          "title": "AI Safety Won't Advance If We Rely On Two Companies, Says Smith",
+          "uncertainty": 0.3676470588235294
+        },
+        {
+          "doc_id": "finnhub:142363063",
           "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.3333333333333333,
-          "polarity": -1.0,
-          "published_at": "2026-09-22T16:41:58+00:00",
-          "quality": 0.85,
-          "title": "Big Short Investor Issues AI Warning: \u201870% of AI Revenue Is Just Two Companies, And One of Them I Think Is in Trouble\u2019",
-          "uncertainty": 0.3731343283582089
-        },
-        {
-          "doc_id": "finnhub:142341002",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": -1.0,
-          "published_at": "2026-09-22T16:29:19+00:00",
-          "quality": 0.85,
-          "title": "IREN\u2019s Energy Pipeline Optionality is Very Appealing So Should You Buy It?",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "finnhub:142340998",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": -1.0,
-          "published_at": "2026-09-22T16:21:29+00:00",
-          "quality": 0.85,
-          "title": "MSFT Layoffs: Microsoft Cuts 268 Xbox Jobs As Gaming Reset Deepens",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "finnhub:142341005",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-09-22T16:00:09+00:00",
+          "published_at": "2026-09-23T16:52:57+00:00",
           "quality": 0.85,
-          "title": "Price Prediction: Marvell, AMD & Broadcom- Our Bold Price Predictions for 2027",
+          "title": "Microsoft Can\u2019t Hold $500 While the Nasdaq Hits a Record. What\u2019s Going On?",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:142339794",
+          "doc_id": "finnhub:142363065",
           "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 1.0,
-          "published_at": "2026-09-22T15:18:02+00:00",
+          "published_at": "2026-09-23T16:19:34+00:00",
           "quality": 0.85,
-          "title": "AI Alliances And Raised Targets Could Be A Game Changer For ServiceNow (NOW)",
-          "uncertainty": 0.15432098765432098
+          "title": "How Deeper Azure and Copilot Adoption Across Regulated Industries Will Impact Microsoft (MSFT) Investors",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142363066",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-23T15:25:00+00:00",
+          "quality": 0.85,
+          "title": "Microsoft Stock Wins Upgrade. Why This Analyst Sees 15% Upside.",
+          "uncertainty": 0.5434782608695652
+        },
+        {
+          "doc_id": "finnhub:142361851",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-23T14:50:05+00:00",
+          "quality": 0.85,
+          "title": "Is Snowflake Buying Its Growth With Its Margin?",
+          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 89,
-        "polarity_mean": 0.082,
-        "sources": 31,
-        "uncertainty_mean": 0.077
+        "n": 168,
+        "polarity_mean": 0.157,
+        "sources": 43,
+        "uncertainty_mean": 0.091
       },
       "upcoming": []
     }
