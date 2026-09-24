@@ -1,0 +1,177 @@
+{
+  "day": "2026-09-24",
+  "written_at": "2026-09-24T22:55:00Z",
+  "phase": "ramp",
+  "week": 3,
+  "equity_usd": 1000.0,
+  "cash_usd": 1000.0,
+  "control_equity_usd": 989.34,
+  "control_return_to_date": -0.01066,
+  "drawdown": 0.0,
+  "control_drawdown": 0.0107,
+  "halted": false,
+  "marks": 15,
+  "positions": [],
+  "changes": [],
+  "control_changes": [],
+  "control_mark": {
+    "equity_usd": 989.34,
+    "cash_usd": 602.28,
+    "positions_usd": 387.06,
+    "day_return": -0.0024,
+    "positions": [
+      {
+        "instrument_id": "MYX:8869",
+        "units": 100,
+        "avg_cost": "7.63",
+        "close": "7.46",
+        "value_usd": 182.75,
+        "weight": 0.1847,
+        "pnl_open_usd": -4.16
+      },
+      {
+        "instrument_id": "MYX:5183",
+        "units": 100,
+        "avg_cost": "4.51",
+        "close": "4.58",
+        "value_usd": 112.2,
+        "weight": 0.1134,
+        "pnl_open_usd": 1.71
+      },
+      {
+        "instrument_id": "MYX:3182",
+        "units": 200,
+        "avg_cost": "1.93",
+        "close": "1.88",
+        "value_usd": 92.11,
+        "weight": 0.0931,
+        "pnl_open_usd": -2.45
+      }
+    ],
+    "note": "fx 4.078 -> 4.082; the pack does not split the day return into price and FX"
+  },
+  "caps": [
+    {
+      "cap": "largest name",
+      "value": "0.00%",
+      "limit": "25%",
+      "breached": false
+    },
+    {
+      "cap": "invested",
+      "value": "0.00%",
+      "limit": "40%",
+      "breached": false
+    },
+    {
+      "cap": "cash floor",
+      "value": "100.00%",
+      "limit": "20%",
+      "breached": false
+    },
+    {
+      "cap": "names held",
+      "value": "0",
+      "limit": "0",
+      "breached": false
+    },
+    {
+      "cap": "drawdown from peak",
+      "value": "0.00%",
+      "limit": "8% halts entries",
+      "breached": false
+    },
+    {
+      "cap": "turnover, 5 weekdays",
+      "value": "USD 0.00",
+      "limit": "USD 500.00",
+      "breached": false
+    }
+  ],
+  "prices": {
+    "bursa": "Thursday 2026-09-24 settled closes (10:18Z pull)",
+    "us": "Thursday 2026-09-24 settled closes (22:47Z refetch)",
+    "fx": "4.082 MYR per USD, bnm, 2026-09-24"
+  },
+  "fundable": [
+    {
+      "instrument_id": "MYX:1155",
+      "lot_usd": 247.92,
+      "share": 0.248,
+      "round_trip": 0.0117,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:5183",
+      "lot_usd": 112.2,
+      "share": 0.112,
+      "round_trip": 0.0198,
+      "lots": 2
+    },
+    {
+      "instrument_id": "MYX:5225",
+      "lot_usd": 197.45,
+      "share": 0.197,
+      "round_trip": 0.0118,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:8869",
+      "lot_usd": 182.75,
+      "share": 0.183,
+      "round_trip": 0.0127,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:3182",
+      "lot_usd": 46.06,
+      "share": 0.046,
+      "round_trip": 0.0464,
+      "lots": 5
+    },
+    {
+      "instrument_id": "XNAS:NVDA",
+      "lot_usd": 224.58,
+      "share": 0.225,
+      "round_trip": 0.0116,
+      "lots": 1
+    }
+  ],
+  "over_cap": {
+    "MYX:5347": 0.32,
+    "XNAS:AAPL": 0.336,
+    "XNAS:MSFT": 0.498
+  },
+  "ledger": {
+    "marks_rows_per_book": 30,
+    "mark_days": 15,
+    "late_cron": "c5fcb74 (14:13Z) changed only data/paper.db"
+  },
+  "attribution": null,
+  "decision": {
+    "recorded": true,
+    "weights": {},
+    "all_cash": true,
+    "prediction_id": "paper-2026-09-24-allcash-21d-e5b2",
+    "grades_on": "2026-10-24",
+    "confidence": 0.55,
+    "decided_at": "2026-09-24T22:54:29Z",
+    "made_at": "2026-09-24T22:54:29Z",
+    "thesis": "All cash, the third ramp decision and fourteenth all-cash row, recorded before Bursa's Friday open on Thursday's settled closes; the 2026-09-23 feedback page's two significant Bursa verdicts come from a two-session window scored against a one-session sigma, IHH's candidate is a Tuesday headline with no body (0.30), Maybank's fall has no row, and the US names moved with their market; claim: nothing in the fundable universe beats cash over 21 sessions.",
+    "refusals": []
+  },
+  "stores": {
+    "decided_targets": 14,
+    "decided_applications": 14,
+    "predictions": 14
+  },
+  "mistakes": [
+    "The 2026-09-23 feedback page (bdebbc2) stated 'Written 23:05 UTC' against a commit stamped 22:52:56 UTC; 566b750 corrected the page and JSON to 22:52.",
+    "The feedback page's first draft called tonight's google_news 503 the first such failure; the sweep record holds one at 2026-09-20T23:18Z; corrected before the commit."
+  ],
+  "lessons": [
+    "A significance level is only as good as the window under it: a decision keyed on 'significant at 5%' needs the pack to state how many sessions the return spans.",
+    "Fourteen all-cash rows are fourteen claims graded against an invested control, so the record will show whether cash was a view or a default.",
+    "A time on a page is a figure like any other and is copied, not typed."
+  ]
+}
