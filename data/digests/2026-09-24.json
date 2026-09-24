@@ -1,6 +1,78 @@
 {
   "collection": [
     {
+      "at": "2026-09-24T22:47:27.708556+00:00",
+      "detail": "facts 0; EODHD plan: free (2 names a day, US only, rotated); XNAS:NVDA: deferred by the 2-a-day credit budget; next in rotation; XNAS:AAPL: outside the plan or over today's credits; XNAS:MSFT: outside the plan or over today's credits",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-24T22:47:27.479583+00:00",
+      "detail": "facts 0; ",
+      "fetched": 20,
+      "kept": 6,
+      "source": "jin10_flash",
+      "status": "ok",
+      "stored": 3
+    },
+    {
+      "at": "2026-09-24T22:47:26.365282+00:00",
+      "detail": "facts 6; XNAS:MSFT: alphavantage quota exhausted for today: Thank you for using Alpha Vantage! Please consider spreading out your free API requests more sparingly (1 request per second). You may subscribe to any of the p; XNAS:NVDA: alphavantage quota exhausted for today: Thank you for using Alpha Vantage! Please consider spreading out your free API requests more sparingly (1 request per second). You may subscribe to any of the p",
+      "fetched": 21,
+      "kept": 21,
+      "source": "alphavantage_news",
+      "status": "ok",
+      "stored": 20
+    },
+    {
+      "at": "2026-09-24T22:47:25.962413+00:00",
+      "detail": "facts 11; ",
+      "fetched": 283,
+      "kept": 256,
+      "source": "finnhub",
+      "status": "ok",
+      "stored": 200
+    },
+    {
+      "at": "2026-09-24T22:47:22.977630+00:00",
+      "detail": "facts 1; ",
+      "fetched": 2,
+      "kept": 0,
+      "source": "edgar",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-24T22:47:22.725374+00:00",
+      "detail": "named the company: 55 of 55 (lowest: Apple 18/18, Microsoft 18/18, NVIDIA 19/19)",
+      "fetched": 55,
+      "kept": 55,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 51
+    },
+    {
+      "at": "2026-09-24T22:47:22.370613+00:00",
+      "detail": "no name could be read (3 failed, 0 not reached). First: google_news:US fetch failed: HTTP Error 503: Service Unavailable",
+      "fetched": 0,
+      "kept": 0,
+      "source": "google_news",
+      "status": "failed",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-24T22:46:10.275574+00:00",
+      "detail": "no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked)",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "failed",
+      "stored": 0
+    },
+    {
       "at": "2026-09-24T17:29:55.503141+00:00",
       "detail": "facts 0; ",
       "fetched": 450,
@@ -119,18 +191,18 @@
     }
   ],
   "counts": {
-    "articles": 8592,
+    "articles": 8866,
     "documents": 0,
-    "escalated": 1474,
-    "events": 4040,
-    "failed_sweeps": 24,
-    "linked": 5812,
-    "observations": 4737,
+    "escalated": 1517,
+    "events": 4041,
+    "failed_sweeps": 26,
+    "linked": 6083,
+    "observations": 4754,
     "series": 31,
-    "sweeps": 477
+    "sweeps": 485
   },
   "day": "2026-09-24",
-  "generated_at": "2026-09-24 17:29 UTC",
+  "generated_at": "2026-09-24 22:47 UTC",
   "macro": [
     {
       "change": "0.05",
@@ -370,18 +442,18 @@
       "upcoming": []
     },
     {
-      "escalated": 23,
+      "escalated": 44,
       "events": [],
       "instrument_id": "XNAS:NVDA",
       "label": "NVIDIA",
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-09-23",
+          "known_at": "2026-09-24",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "28.51"
+          "value": "28.58"
         },
         {
           "concept": "pb",
@@ -409,7 +481,7 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-09-23",
+          "known_at": "2026-09-24",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
@@ -465,11 +537,11 @@
         },
         {
           "concept": "av_news_sentiment",
-          "known_at": "2026-09-23",
+          "known_at": "2026-09-24",
           "label": "vendor sentiment",
-          "period_end": "2026-09-23",
+          "period_end": "2026-09-24",
           "source": "alphavantage_news",
-          "value": "0.16"
+          "value": "0.28"
         },
         {
           "concept": "revenue",
@@ -498,6 +570,17 @@
       ],
       "stories": [
         {
+          "doc_id": "https://finance.yahoo.com/m/8ea0b1f5-46a4-34c2-85d6-4408049c70de/chip-stocks-retreat.-qualcomm.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-09-24T20:42:17+00:00",
+          "quality": 1.0,
+          "title": "Chip Stocks Retreat. Qualcomm Secures Apple Licensing Deal.",
+          "uncertainty": 0.0
+        },
+        {
           "doc_id": "https://finance.yahoo.com/m/cad78429-3538-3029-9d64-374cfc9c9655/ionq-wants-to-be-the-nvidia.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
           "escalated": true,
@@ -520,83 +603,72 @@
           "uncertainty": 0.0
         },
         {
-          "doc_id": "https://www.fool.com/investing/2026/09/23/prediction-intel-names-a-major-outside-customer-for-its-next-factory-process-before-2027/?.tsrc=rss",
-          "domain": "www.fool.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-23T22:07:01+00:00",
-          "quality": 0.85,
-          "title": "Prediction: Intel Names a Major Outside Customer for Its Next Factory Process Before 2027",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "finnhub:142363167",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": -1.0,
-          "published_at": "2026-09-23T20:33:00+00:00",
-          "quality": 0.85,
-          "title": "Palantir, IonQ, Royal Caribbean, Paychex, McDonald\u2019s, and More Stocks That Explain Today\u2019s Market",
-          "uncertainty": 0.16447368421052633
-        },
-        {
-          "doc_id": "finnhub:142364008",
+          "doc_id": "finnhub:142385563",
           "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 1.0,
-          "published_at": "2026-09-23T19:00:00+00:00",
+          "published_at": "2026-09-24T18:00:00+00:00",
           "quality": 0.85,
-          "title": "Sandisk vs. NVIDIA: Which AI Stock Is the Better Buy Now?",
-          "uncertainty": 0.40322580645161293
+          "title": "Marvell vs. NVIDIA: One AI Stock Looks Like the Better Buy Now",
+          "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:142364010",
+          "doc_id": "finnhub:142384566",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-24T17:14:39+00:00",
+          "quality": 0.85,
+          "title": "I'm Buying More Nvidia Stock Right Now. Here's Why.",
+          "uncertainty": 0.9259259259259258
+        },
+        {
+          "doc_id": "finnhub:142383488",
           "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-09-23T18:42:14+00:00",
+          "published_at": "2026-09-24T15:30:00+00:00",
           "quality": 0.85,
-          "title": "Nvidia Backed This AI Drug Startup. AbbVie Just Became a Partner Before Its IPO",
+          "title": "Camus Energy Joins AI Energy Management Alliance to Accelerate Data Center Power Integration",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:142359331",
+          "doc_id": "finnhub:142379506",
           "domain": "Yahoo",
           "escalated": true,
-          "intensity": 0.3333333333333333,
-          "polarity": 0.0,
-          "published_at": "2026-09-23T13:42:57+00:00",
-          "quality": 0.85,
-          "title": "Intel Skyrocketed 30% Higher in 1 Month: Here\u2019s What to Do Now",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "finnhub:142359327",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
+          "intensity": 0.0,
           "polarity": 1.0,
-          "published_at": "2026-09-23T13:00:24+00:00",
+          "published_at": "2026-09-24T13:29:19+00:00",
           "quality": 0.85,
-          "title": "Nvidia Stock Set For 40% Surge: 3 Catalysts That Could Drive the Next Big Move",
-          "uncertainty": 0.4098360655737705
+          "title": "Intel Drops 3% as Profit Taking Follows 223% YTD Run; AMD Falls 3%, NVIDIA Slips",
+          "uncertainty": 0.18115942028985504
+        },
+        {
+          "doc_id": "finnhub:142379507",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-24T13:27:40+00:00",
+          "quality": 0.85,
+          "title": "Jensen Huang Says AI Boom Will Eventually Hit a 'Period of Digestion,' But Not for 2-3 Years",
+          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 132,
-        "polarity_mean": 0.129,
-        "sources": 23,
-        "uncertainty_mean": 0.138
+        "n": 282,
+        "polarity_mean": 0.142,
+        "sources": 26,
+        "uncertainty_mean": 0.154
       },
       "upcoming": []
     },
     {
-      "escalated": 9,
+      "escalated": 33,
       "events": [
         {
           "kind": "rating_reiteration",
@@ -611,11 +683,11 @@
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-09-23",
+          "known_at": "2026-09-24",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "38.64"
+          "value": "38.19"
         },
         {
           "concept": "pb",
@@ -643,7 +715,7 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-09-23",
+          "known_at": "2026-09-24",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
@@ -651,19 +723,19 @@
         },
         {
           "concept": "high_52w",
-          "known_at": "2026-09-05",
+          "known_at": "2026-09-24",
           "label": "52w high",
           "period_end": null,
           "source": "finnhub",
-          "value": "344.57"
+          "value": "345.34"
         },
         {
           "concept": "low_52w",
-          "known_at": "2026-09-23",
+          "known_at": "2026-09-24",
           "label": "52w low",
           "period_end": null,
           "source": "finnhub",
-          "value": "240.21"
+          "value": "243.42"
         },
         {
           "concept": "price_target_consensus",
@@ -699,11 +771,11 @@
         },
         {
           "concept": "av_news_sentiment",
-          "known_at": "2026-09-23",
+          "known_at": "2026-09-24",
           "label": "vendor sentiment",
-          "period_end": "2026-09-23",
+          "period_end": "2026-09-24",
           "source": "alphavantage_news",
-          "value": "0.27"
+          "value": "0.30"
         },
         {
           "concept": "revenue",
@@ -732,6 +804,28 @@
       ],
       "stories": [
         {
+          "doc_id": "https://finance.yahoo.com/m/8ea0b1f5-46a4-34c2-85d6-4408049c70de/chip-stocks-retreat.-qualcomm.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-09-24T20:42:17+00:00",
+          "quality": 1.0,
+          "title": "Chip Stocks Retreat. Qualcomm Secures Apple Licensing Deal.",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://finance.yahoo.com/video/era-ai-wearables-focused-listening-200354391.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-24T20:03:54+00:00",
+          "quality": 1.0,
+          "title": "The era of AI wearables focused on listening is here",
+          "uncertainty": 0.1838235294117647
+        },
+        {
           "doc_id": "https://finance.yahoo.com/technology/ai/articles/42-state-ag-coalition-state-195129692.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
           "escalated": true,
@@ -754,83 +848,61 @@
           "uncertainty": 0.0
         },
         {
-          "doc_id": "alphavantage:https://indianexpress.com/article/technology/tech-news-technology/snapdragon-8-elite-gen-6-qualcomm-bet-on-agentic-ai-new-mobile-chips-10889844/",
-          "domain": "The Indian Express",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-23T22:14:00+00:00",
-          "quality": 0.85,
-          "title": "\u2018A phone is unique to you, it\u2019s not going anywhere\u2019: Qualcomm CEO\u2019s big bet on Agentic AI as company unveils new mobile chips",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://firstformoney.com/apple-settlement-over-siri-intelligence-features-means-eligible-iphone-owners-can-receive-up-to-95/?.tsrc=rss",
-          "domain": "firstformoney.com",
+          "doc_id": "alphavantage:https://tidbits.com/2026/09/24/claim-your-share-of-apples-250-million-siri-settlement/",
+          "domain": "TidBITS",
           "escalated": true,
           "intensity": 0.0,
           "polarity": -1.0,
-          "published_at": "2026-09-23T19:24:56+00:00",
+          "published_at": "2026-09-24T18:47:37+00:00",
           "quality": 0.85,
-          "title": "Apple Settlement Over Siri Intelligence Features Means Eligible iPhone Owners Can Receive Up to $95",
-          "uncertainty": 0.18115942028985504
-        },
-        {
-          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/apple-average-iphone-wait-times-164534217.html?.tsrc=rss",
-          "domain": "finance.yahoo.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-09-23T16:45:34+00:00",
-          "quality": 0.8,
-          "title": "Apple Average iPhone Wait Times Increase, UBS Says; Maintains 'Neutral' Rating",
+          "title": "Claim Your Share of Apple\u2019s $250 Million Siri Settlement",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "https://news.google.com/rss/articles/CBMidkFVX3lxTE5oX3l5bTZSMjRLN2xWYUZfYVgwWGhQZmJpY1VkSC1mSHBFb3kwOEFJRGhPOEcxNWZfVWxkRnpadDB3dnU2NVdORExIa3o1cmcwTU1WZzdKMTNoU3otYjdnVWdzTG1OTmFMeERTWW1PVE5SeUNINnc?oc=5",
-          "domain": "finance.biggo.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-23T21:06:00+00:00",
-          "quality": 0.65,
-          "title": "Anticipation for \"iPhone Air 2\" and a Stock Pullback: What's Apple's Next Move?",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMikAFBVV95cUxNNkJidTdjT05ZcFhqR1JyUlB5eEtYTWdZS2wtbi1jMWpDZDFQdUg5eWw2MktibXUydHFXRXZDdmtwdEY1SkthX0Q4TzZPSnFNcG9YTWp5dHNqUVAtdjZ6bF9MLXRYRGpERHRnT0ZvOXhzb2hCMl9ISDl4SUluWjk0NktFbnAwTHl2TEt6RDQ1Tmc?oc=5",
-          "domain": "coindcx.com",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
-          "polarity": 1.0,
-          "published_at": "2026-09-23T13:55:42+00:00",
-          "quality": 0.65,
-          "title": "Nasdaq Closes at Record 27,244 as Apple Touches $345 High",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMi-wFBVV95cUxPS25rUTR2dk15UURqOTVyWDFad1hZbFd5dWpLT08wYUlFN28tcjBsZTg1ajVSc1l3LTJMeldsdjVwZUJ4QVJVYXZkYkEySWVIZzlpNHVpT29CaDAxY0U0c09JZm5lMHF0c2JFX1NTZXRIbWxQRTRuNnNudGFlQmtjakRwR0dqUG5YeTM2R041S3FKRGFESWNKU0hQbGtnV0twa0Q3Zjl1RDcyUGM5NDdRSVRhcndJUUhIRk5LXzZCZEc0anBBcjJtMVY5d0U5REoyeWdwdVFmQVdtUXFLVlBRTGVtbWRWbU5DMjM4NGJkUWdpcElzYUt6UFV6Zw?oc=5",
-          "domain": "tech.yahoo.com",
+          "doc_id": "alphavantage:https://seekingalpha.com/news/4646542-qualcomm-rises-as-it-renews-patent-license-agreement-with-apple",
+          "domain": "Seeking Alpha",
           "escalated": true,
           "intensity": 0.0,
           "polarity": -1.0,
-          "published_at": "2026-09-23T12:15:09+00:00",
-          "quality": 0.65,
-          "title": "Tech layoffs 2026: Tracking all the job losses across Xbox, Apple, Oracle, Uber, TikTok, Meta and others",
+          "published_at": "2026-09-24T18:38:58+00:00",
+          "quality": 0.85,
+          "title": "Qualcomm slips even as it renews patent license agreement with Apple (QCOM:NASDAQ)",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "alphavantage:https://www.abc4.com/news/local-news/walmart-sams-club-tap-to-pay-utah/",
+          "domain": "ABC4 Utah",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-24T17:41:03+00:00",
+          "quality": 0.85,
+          "title": "All Utah Walmart and Sam\u2019s Club stores now feature Tap to Pay, fuel centers to follow by mid-2027",
+          "uncertainty": 0.14705882352941177
+        },
+        {
+          "doc_id": "finnhub:142383509",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-24T14:08:32+00:00",
+          "quality": 0.85,
+          "title": "Qualcomm Renews Global Apple Patent License \u2014 Extends Key Licensing Relationship Into 2027",
           "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 44,
-        "polarity_mean": -0.045,
-        "sources": 22,
-        "uncertainty_mean": 0.061
+        "n": 109,
+        "polarity_mean": 0.046,
+        "sources": 39,
+        "uncertainty_mean": 0.089
       },
       "upcoming": []
     },
     {
-      "escalated": 20,
+      "escalated": 29,
       "events": [
         {
           "kind": "rating_change",
@@ -845,11 +917,11 @@
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-09-23",
+          "known_at": "2026-09-24",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "27.66"
+          "value": "28.22"
         },
         {
           "concept": "pb",
@@ -877,7 +949,7 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-09-23",
+          "known_at": "2026-09-24",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
@@ -933,11 +1005,11 @@
         },
         {
           "concept": "av_news_sentiment",
-          "known_at": "2026-09-23",
+          "known_at": "2026-09-24",
           "label": "vendor sentiment",
-          "period_end": "2026-09-23",
+          "period_end": "2026-09-24",
           "source": "alphavantage_news",
-          "value": "0.12"
+          "value": "0.21"
         },
         {
           "concept": "revenue",
@@ -965,6 +1037,17 @@
         }
       ],
       "stories": [
+        {
+          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/microsoft-msft-sustain-recurring-cash-202321015.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "polarity": 1.0,
+          "published_at": "2026-09-24T20:23:21+00:00",
+          "quality": 1.0,
+          "title": "Can Microsoft (MSFT) Sustain its Recurring Cash Flows, Growing Payouts, and Azure Momentum?",
+          "uncertainty": 0.0
+        },
         {
           "doc_id": "https://finance.yahoo.com/video/microsoft-president-brad-smith-ai-205600130.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
@@ -1010,56 +1093,45 @@
           "uncertainty": 0.3676470588235294
         },
         {
-          "doc_id": "finnhub:142363063",
-          "domain": "Yahoo",
+          "doc_id": "https://247wallst.com/investing/2026/09/24/alphabet-drops-below-350-buying-opportunity-or-the-start-of-something-worse/?.tsrc=rss",
+          "domain": "247wallst.com",
           "escalated": true,
-          "intensity": 0.3333333333333333,
-          "polarity": 0.0,
-          "published_at": "2026-09-23T16:52:57+00:00",
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-09-24T17:08:33+00:00",
           "quality": 0.85,
-          "title": "Microsoft Can\u2019t Hold $500 While the Nasdaq Hits a Record. What\u2019s Going On?",
+          "title": "Alphabet Drops Below $350: Buying Opportunity or the Start of Something Worse?",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:142363065",
+          "doc_id": "finnhub:142379111",
           "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 1.0,
-          "published_at": "2026-09-23T16:19:34+00:00",
+          "published_at": "2026-09-24T13:14:30+00:00",
           "quality": 0.85,
-          "title": "How Deeper Azure and Copilot Adoption Across Regulated Industries Will Impact Microsoft (MSFT) Investors",
-          "uncertainty": 0.0
+          "title": "Alphabet Or Meta: Whose AI Build Would You Rather Fund?",
+          "uncertainty": 0.14534883720930233
         },
         {
-          "doc_id": "finnhub:142363066",
+          "doc_id": "finnhub:142378399",
           "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 1.0,
-          "published_at": "2026-09-23T15:25:00+00:00",
+          "published_at": "2026-09-24T12:59:37+00:00",
           "quality": 0.85,
-          "title": "Microsoft Stock Wins Upgrade. Why This Analyst Sees 15% Upside.",
-          "uncertainty": 0.5434782608695652
-        },
-        {
-          "doc_id": "finnhub:142361851",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-09-23T14:50:05+00:00",
-          "quality": 0.85,
-          "title": "Is Snowflake Buying Its Growth With Its Margin?",
-          "uncertainty": 0.0
+          "title": "Microsoft Stock\u2019s Big Test: Delivering on a $678 Billion Backlog",
+          "uncertainty": 0.16447368421052633
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 69,
-        "polarity_mean": 0.261,
-        "sources": 21,
-        "uncertainty_mean": 0.117
+        "n": 125,
+        "polarity_mean": 0.277,
+        "sources": 26,
+        "uncertainty_mean": 0.116
       },
       "upcoming": []
     }
