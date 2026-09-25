@@ -27,7 +27,7 @@
       },
       "causes": [],
       "open_questions": [
-        "no row for a significant fall; the fact book holds no Bursa entitlement dates, so an ex-date would read as idiosyncratic (since 2026-09-23)"
+        "The fact book holds no Bursa entitlement dates. Maybank's significant fall was a gap down at Wednesday's open with no row. Which source carries Bursa ex-dates, so that an ex-date is not read as an idiosyncratic move? (since 2026-09-23)"
       ],
       "watch": [
         {
@@ -51,7 +51,7 @@
       },
       "causes": [],
       "open_questions": [
-        "which reading the five-day move priced (since 2026-09-18)"
+        "Tenaga: the rows hold both readings, *minimal impact* and *undermines the IBR framework*, as titles, now over three days. Tonight's two rows are both *minimal impact* and both post-close. Which reading did the five-day move (now −3.67%) price, and what figure would let the page tell? (since 2026-09-18)"
       ],
       "watch": [
         {
@@ -111,7 +111,7 @@
         }
       ],
       "open_questions": [
-        "what share of Tuesday alone was IHH's own; pending ^KLSE 2026-09-22 and a sector leg (since 2026-09-22)"
+        "IHH: what share of Tuesday was IHH's own? Answered at two-session resolution: 90% unexplained, and the cached closes put the whole move on Tuesday. It stays open for the one-session reading, pending `^KLSE` 09-22 and a sector leg; KPJ also rose. (since 2026-09-22)"
       ],
       "watch": [
         {
@@ -253,7 +253,31 @@
       "fmp /earnings: outside the plan (HTTP 402) for NVDA, AAPL, MSFT"
     ]
   },
-  "open_questions_carried": 23,
+  "open_questions_carried": [
+    "The pack measures across a blank proxy row without saying so: every Bursa \"1d\" tonight is 09-21 → 09-23. Should the pack refuse the row, label it two-session, or scale the sigma by the number of sessions spanned? (since 2026-09-23)",
+    "The fact book holds no Bursa entitlement dates. Maybank's significant fall was a gap down at Wednesday's open with no row. Which source carries Bursa ex-dates, so that an ex-date is not read as an idiosyncratic move? (since 2026-09-23)",
+    "`google_news` failed with HTTP 503 on all three US queries at 22:47Z on 09-24, as it did at 23:18Z on 09-20, both on `us_close`. Two outages, or throttling at that hour like GDELT's? (since 2026-09-23)",
+    "IHH: what share of Tuesday was IHH's own? Answered at two-session resolution: 90% unexplained, and the cached closes put the whole move on Tuesday. It stays open for the one-session reading, pending `^KLSE` 09-22 and a sector leg; KPJ also rose. (since 2026-09-22)",
+    "A blank bar shared by a name and its proxy is labelled *correctly dated*, as if the market was shut. Should the pack check the market calendar, or an independent index print, before calling a gap a non-session? Tonight's two-session join is the same gap seen from the other side. (since 2026-09-22)",
+    "The move to 260-session betas re-measured the same Monday: Tenaga 11% → 30% unexplained, IHH 60% → 76%, Maybank 78% → 84%. Which window's shares do pages compare across the change? (since 2026-09-22)",
+    "Petronas Chemicals, Press Metal and Genting fell 2.3–2.8% on a +0.08% index day with no row about any of them: one factor or three stories? No Bursa sector proxy is cached. Tonight Petronas Chemicals is at **−14.80%** over five sessions. (since 2026-09-21)",
+    "Tenaga: the rows hold both readings, *minimal impact* and *undermines the IBR framework*, as titles, now over three days. Tonight's two rows are both *minimal impact* and both post-close. Which reading did the five-day move (now −3.67%) price, and what figure would let the page tell? (since 2026-09-18)",
+    "`DFF` stepped +0.25 on 2026-09-17 and the collector holds no statement for it. Where does a statement come from? (since 2026-09-20)",
+    "A short-interest weekly named Petronas Chemicals for the week to 09-18. Would Bursa's daily short-selling report give the name a body? (since 2026-09-20)",
+    "Wiring a catalyst matcher to the corpus is still open: tonight two names are significant at 5%, and one of them has zero rows to weigh. (since 2026-09-18)",
+    "Petronas Chemicals' idiosyncratic days read *not significant* because its own sigma contains the +22.56% run. The 260-session window still contains it. (since 2026-09-18)",
+    "Petronas Chemicals collecting a body: which of the eleven listed sources carries a Bursa-hours story about it at all? (since 2026-09-10; folded 09-17)",
+    "The linker attached a *Genting Plantations* headline to MYX:3182. How many Genting Bhd rows are about subsidiaries or venues? (since 2026-09-17)",
+    "Which earlier pages were written from a pre-close cache? `dfc45e3` labels such rows. (since 2026-09-17)",
+    "Does a page need to state a market's non-trading day as a fact rather than infer it from blank bars? (since 2026-09-16)",
+    "Brent: 114.89 at 09-22, +22.18 over twenty observations. What the move did to Petronas Chemicals' feedstock reading is still unanswered, because the decomposition has no commodity leg. (since 2026-09-16)",
+    "Press Metal collecting anything: zero rows again on 09-23 and on Thursday's Bursa sweep (*read but empty: Press Metal*). (since 2026-09-15)",
+    "The sector beta is fixed at 0, so any sector-wide session lands in a residual labelled `idiosyncratic`. Tonight that bears on IHH directly. (since 2026-09-14)",
+    "GDELT: failed on all three 09-23 sweeps, recovered for one sweep at 10:17Z on 09-24, then failed with 429 again. Per-IP throttling on the shared runner? (since 2026-09-08)",
+    "Tenaga: is the 5d move the results print the 2026-09-04 roundup headline referred to? (since 2026-09-04)",
+    "NVIDIA: filing or release for the Hugging Face transaction. (since 2026-09-04)",
+    "Whether the observe phase's grading against the control is informative at 21 days; the first observe grades fall due 2026-10-11. (since 2026-09-08)"
+  ],
   "lessons": [
     "A gap in the proxy on the session before the one measured is as dangerous as a gap on the session itself: the first mis-dates the row and is flagged; the second silently stretches 1d over two sessions against a one-session sigma.",
     "A window that contains the event is not a window that isolates it: IHH's two-session return holds the whole Macquarie day and a flat Wednesday, so the share says nothing about how the day split between IHH and its sector.",
