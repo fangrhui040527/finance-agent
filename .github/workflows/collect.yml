@@ -74,7 +74,18 @@ jobs:
       run:
         shell: bash
     steps:
+      # The branch as it stands when this run starts, not the commit the event
+      # carried. The concurrency group queues a run behind the one in flight,
+      # and without `ref` a queued run checks out the SHA from when it was
+      # triggered: on 2026-09-23 the bursa_close run dispatched three seconds
+      # after us_close started from dc6e822, collected, and could not commit,
+      # because us_close had pushed new copies of the same binary stores in
+      # between and SQLite files do not merge. A cron run queued behind a
+      # dispatch hits the same wall. (The group holds one waiting run; a third
+      # arrival cancels the waiting one, and `sweep --due` recovers its slot.)
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.ref_name }}
 
       - uses: astral-sh/setup-uv@v7
         with:

@@ -270,6 +270,12 @@ questions:
     have each added one; the list is now maintained nightly as a chore, which
     is the strongest argument yet for deriving a lexical question's relevant
     set from containment at evaluation time.
+
+    An eighth on 2026-09-23, from the catch-up that recovered Tuesday 09-22's
+    skipped us_close: a Stocktwits close wrap and a Finnhub headline, both
+    listing the ticker among others in the title. SIXTEEN labels. It reached a
+    pull request that touches no retrieval code (#77, a workflow fix) and went
+    red on it, which is the cost of the hand list landing on unrelated work.
   relevant:
   - doc_id: https://stocktwits.com/news-articles/markets/equity/s-and-p-500-dow-end-best-day-in-a-month/cZsufnBRJvu?.tsrc=rss
     title: S&P 500, Dow End Best Day In A Month On Calmer Yields As Rate Hike Bets Wane — SPCX, VSXY,
@@ -304,6 +310,10 @@ questions:
     title: "Musk Says NVIDIA (NVDA) AI Chips Are Headed to Space With SpaceX (SPCX) Next Year"
   - doc_id: finnhub:142306187
     title: "Nasdaq, S&P 500, Dow Futures Rise Ahead Of Trump-Xi Summit This Week: NVDA, META, CRML, GLND, SPCX, RKLB, BE Stocks In Focus"
+  - doc_id: https://stocktwits.com/news-articles/markets/equity/nasdaq-jumps-to-close-at-record-as-chipmakers-climb-oil-prices-cool-aapl-meta-spcx-msft-vktx-in-focus/cZM5GHbRB7L?.tsrc=rss
+    title: "Nasdaq Jumps To Close At Record As Chipmakers Climb, Oil Prices Cool — AAPL, META, SPCX, MSFT, VKTX In Focus"
+  - doc_id: finnhub:142322687
+    title: "TSLA, SPCX, AAPL Could Be Next To ‘Rip’ After Meta’s Muse Rally, Analyst Says — Here Are The Catalysts"
 - query: KeyBanc Underweight rating Apple
   kind: lexical
   note: broker plus rating word
