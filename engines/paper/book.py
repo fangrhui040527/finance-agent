@@ -52,6 +52,7 @@ from engines.paper.store import (
     CASH,
     CONTROL,
     DECIDED,
+    INDEX,
     BookState,
     MarkRow,
     PaperStore,
@@ -891,6 +892,10 @@ class MarkResult:
     applied: dict[str, list[Applied]] = field(default_factory=dict)
     stops: list[TargetRow] = field(default_factory=list)
     control_targets: list[TargetRow] = field(default_factory=list)
+    #: The index book's rebalance rows, and the line that says what they left
+    #: out. A hundred rows are summarised on the page, never listed.
+    index_targets: list[TargetRow] = field(default_factory=list)
+    index_summary: str = ""
     problems: list[str] = field(default_factory=list)
     #: What the run did to the record besides marking: the session it stamped
     #: when that is not the day asked for, the earlier mark it replaced, the
@@ -919,6 +924,9 @@ class MarkResult:
                 f"positions {m.positions_usd:>9,.2f}  peak {m.peak_usd:,.2f}  drawdown {m.drawdown:.2%}"
                 f"  fx {m.fx_rate} ({m.fx_source} {m.fx_date}){flag}"
             )
+            if book == INDEX:
+                lines += _index_applied_lines(self.applied.get(book, []))
+                continue
             for a in self.applied.get(book, []):
                 if a.change:
                     c = a.change
@@ -932,9 +940,83 @@ class MarkResult:
             lines.append(f"  stop raised: {t.instrument_id} - {t.thesis}")
         for t in self.control_targets:
             lines.append(f"  control target: {t.instrument_id} {t.target_units} units")
+        if self.index_summary:
+            lines.append(f"  {self.index_summary}")
         for p in self.problems:
             lines.append(f"  PROBLEM: {p}")
         return "\n".join(lines)
+
+
+def _index_applied_lines(applied: list[Applied]) -> list[str]:
+    """The index book's day in counts: a rebalance resolves a hundred targets."""
+    if not applied:
+        return []
+    counts: dict[str, int] = {}
+    fees = cash = Decimal(0)
+    for a in applied:
+        key = a.change.action if a.change else a.status
+        counts[key] = counts.get(key, 0) + 1
+        if a.change:
+            fees += a.change.fee_usd
+            cash += a.change.cash_delta_usd
+    lines = [
+        "    "
+        + ", ".join(f"{k} {v}" for k, v in sorted(counts.items()))
+        + f"  fees USD {fees:,.2f}  cash {cash:+,.2f}"
+    ]
+    for a in applied:
+        if a.status == "skipped":
+            lines.append(f"    skipped   {a.target.instrument_id:<10} {a.detail}")
+    return lines
+
+
+def index_rebalance(store: PaperStore, cfg, feed, fx: UsdMyr, *, mark_row: MarkRow, now: datetime):
+    """Write the index book's rebalance targets for the next open, if one is due."""
+    from engines.paper.control import rebalance_due
+    from engines.paper.index import REASON, rebalance_targets
+    from engines.paper.universe import check, load_universe
+
+    settings = settings_of(cfg, store)
+    day = mark_row.day
+    phase = phase_for(day, settings)
+    if not rebalance_due(store, day, phase, book=INDEX, reason=REASON):
+        return None
+    universe = load_universe(index_universe_path(store))
+    quote = fx.asof(day)
+    funds = fundables(
+        feed, cfg, mark_row.equity_usd, quote, day, settings, names=universe.ids, now=now
+    )
+    res = rebalance_targets(
+        store,
+        funds,
+        check(universe, feed),
+        universe,
+        equity=mark_row.equity_usd,
+        day=day,
+        now=now,
+        phase=phase,
+        settings=settings,
+    )
+    if any((t.target_units or 0) > 0 for t in res.targets):
+        store.record_targets(res.targets)
+    else:
+        # Nothing priced, nothing to hold: write nothing, so the next mark
+        # tries again instead of waiting for the month to turn.
+        res.targets = []
+    return res
+
+
+def index_universe_path(store: PaperStore):
+    """The universe file the index book was opened with, resolved from the repository root."""
+    from pathlib import Path
+
+    from engines.paper.universe import DEFAULT_UNIVERSE
+
+    named = store.book_terms(INDEX).get("universe")
+    if not named:
+        return DEFAULT_UNIVERSE
+    p = Path(named)
+    return p if p.is_absolute() else Path(__file__).resolve().parents[2] / p
 
 
 def mark(
@@ -978,7 +1060,11 @@ def mark(
         )
         day = result.day = session
     phase = phase_for(day, settings)
-    for book in (DECIDED, CONTROL):
+    # The index book from its opening day on: a replay marking an earlier
+    # session must not write marks for a book that did not exist yet.
+    index_open = store.book_opened_on(INDEX)
+    books = (DECIDED, CONTROL) + ((INDEX,) if index_open and day >= index_open else ())
+    for book in books:
         result.applied[book] = apply_pending(store, cfg, feed, fx, book=book, up_to=day)
         prior = store.mark_for(book, day, slot)
         m, problems = mark_book(store, cfg, feed, fx, book=book, day=day, slot=slot, now=now)
@@ -999,7 +1085,21 @@ def mark(
         result.problems += [f"{book}: {p}" for p in problems]
         if book == DECIDED:
             result.stops = stop_checks(store, cfg, m, now)
-        elif rebalance_due(store, day, phase):
+        elif book == INDEX:
+            try:
+                res = index_rebalance(store, cfg, feed, fx, mark_row=m, now=now)
+            except (OSError, ValueError) as e:  # a broken universe file must not cost the marks
+                result.problems.append(f"index: rebalance not written: {e}")
+            else:
+                if res is not None:
+                    result.index_targets = res.targets
+                    result.index_summary = (
+                        res.summary()
+                        if res.targets
+                        else "index rebalance due and not written: no member is priced and "
+                        "fundable yet; the next mark tries again"
+                    )
+        elif book == CONTROL and rebalance_due(store, day, phase):
             quote = fx.asof(day)
             funds = fundables(feed, cfg, m.equity_usd, quote, day, settings, now=now)
             units = control_units(funds, m.equity_usd, phase, settings)

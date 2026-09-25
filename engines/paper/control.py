@@ -13,7 +13,7 @@ from decimal import Decimal
 
 from engines.paper.rules import Fundable, Phase
 from engines.paper.settings import PaperSettings
-from engines.paper.store import PaperStore
+from engines.paper.store import CONTROL, PaperStore
 
 
 def control_units(
@@ -41,14 +41,24 @@ def control_units(
     return {iid: u for iid, u in units.items() if u > 0}
 
 
-def rebalance_due(store: PaperStore, day: date, phase: Phase) -> bool:
-    """First mark of a new calendar month, or of a new phase; never in observe."""
+def rebalance_due(
+    store: PaperStore,
+    day: date,
+    phase: Phase,
+    book: str = CONTROL,
+    reason: str = "control_rebalance",
+) -> bool:
+    """First mark of a new calendar month, or of a new phase; never in observe.
+
+    The same clock for every passive book - the control and the index - each
+    read from its own rebalance rows.
+    """
     if not phase.invests:
         return False
-    last = store.last_control_rebalance()
+    last = store.last_rebalance(book, reason)
     if last is None:
         return True
     if (last.year, last.month) != (day.year, day.month):
         return True
-    rows = store.targets_on("control", last, reason="control_rebalance")
+    rows = store.targets_on(book, last, reason=reason)
     return bool(rows) and rows[0].phase != phase.name

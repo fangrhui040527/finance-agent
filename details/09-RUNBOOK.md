@@ -164,7 +164,7 @@ row, never a typed leg.
 
 ### `paper` — the USD 1,000 paper book
 
-One subcommand, six actions. `docs/22-PAPER-BOOK.md` is the full account; this
+One subcommand, seven actions. `docs/22-PAPER-BOOK.md` is the full account; this
 is the operator's card.
 
 ```
@@ -174,6 +174,8 @@ ask.py paper decide --weights "MYX:5183=0.20,XNAS:NVDA=0.22" --thesis "..." [--h
 ask.py paper mark   [--slot bursa_close|us_close|manual|all]   apply pending targets at the next cached open, then mark
 ask.py paper pack   [--write] [--out knowledge/paper]          the deterministic half of the nightly paper journal
 ask.py paper grade  [--dry-run]                     grade paper predictions whose date has come, against the control
+ask.py paper init --index [--date D] [--notional 1000000] [--universe FILE]   open the FBM100 index book beside the two (once)
+ask.py paper universe [--universe FILE]             each index member's expected and listed name; exit 3 if a code lists another company
 ```
 
 Exit codes: `0` done; `2` refused or nothing to do (a refusal lists every cap
