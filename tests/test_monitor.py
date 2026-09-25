@@ -489,6 +489,33 @@ def test_no_pages_directory_is_not_an_error(tmp_path):
     assert not [a for a in alerts if a.rule == "open_question_stale"]
 
 
+def test_a_page_carrying_a_count_is_named_not_a_dead_monitor(tmp_path):
+    """2026-09-24: a page carried `"open_questions_carried": 23` where the list
+    belongs, and `ask.py watch` died with "'int' object is not iterable" - the
+    one check that exists to notice things dying."""
+    now = datetime(2026, 9, 26, 8, 0, tzinfo=UTC)
+    root = _pages(tmp_path / "pages", days_old=30)
+    (root / "2026-09-26.json").write_text(
+        '{"day": "2026-09-26", "open_questions_carried": 23}', encoding="utf-8"
+    )
+    alerts = evaluate(
+        _cfg(), db=str(_ledger(tmp_path / "led.db")), now=now, feedback_root=str(root)
+    )
+    (bad,) = [a for a in alerts if a.rule == "feedback_page_malformed"]
+    assert "2026-09-26.json" in bad.title and "int, not a list" in bad.title
+    # the page before it still reads: its 30-day question is reported, not lost
+    assert [a for a in alerts if a.rule == "open_question_stale"]
+
+
+def test_well_formed_pages_raise_no_malformed_alert(tmp_path):
+    now = datetime(2026, 9, 25, 8, 0, tzinfo=UTC)
+    root = _pages(tmp_path / "pages", days_old=7)
+    alerts = evaluate(
+        _cfg(), db=str(_ledger(tmp_path / "led.db")), now=now, feedback_root=str(root)
+    )
+    assert not [a for a in alerts if a.rule == "feedback_page_malformed"]
+
+
 # --- series staleness ------------------------------------------------------------------------
 
 
