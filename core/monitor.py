@@ -1009,17 +1009,39 @@ def _question_rules(now: datetime, directory: str = "") -> list[Alert]:
     question three weeks old and one asked last night were the same prose in
     the same list. An old one is usually not a hard question - it is a source
     that was never wired, and it belongs in front of a person.
+
+    A page the ledger cannot read is skipped, and said so here: on 2026-09-24 a
+    page carried the count of its questions where the list belongs, and this
+    rule took the whole monitor down with it instead of naming the page.
     """
-    from knowledge.feedback_questions import open_questions
+    from knowledge.feedback_questions import malformed, open_questions
 
     directory = directory or FEEDBACK_DIR
     if not Path(directory).is_dir():
         return []
+    out: list[Alert] = []
+    skipped = malformed(directory)
+    if skipped:
+        out.append(
+            Alert(
+                rule="feedback_page_malformed",
+                severity=WARN,
+                title=f"{len(skipped)} feedback page(s) skipped by the question ledger: "
+                f"{skipped[-1][0]}: {skipped[-1][1]}",
+                detail="a page whose JSON does not parse, or whose question fields have the "
+                "wrong shape, is left out of the ledger rather than crashing it - so its "
+                "questions are missing from the ages this monitor reports until it is fixed",
+                next_step="fix the named JSON against knowledge/feedback/README.md "
+                "(`open_questions_carried` is a list of question strings); "
+                "`ask.py pack --questions` lists what is skipped",
+                evidence={"pages": [{"page": name, "fault": why} for name, why in skipped]},
+            )
+        )
     old = [q for q in open_questions(directory) if q.age_days > OPEN_QUESTION_DAYS]
     if not old:
-        return []
+        return out
     worst = old[0]
-    return [
+    return out + [
         Alert(
             rule="open_question_stale",
             severity=WARN,

@@ -74,16 +74,58 @@ def _key(text: str) -> str:
 
 
 def _pages(directory: str | Path) -> list[tuple[date, dict]]:
+    return _read(directory)[0]
+
+
+def malformed(directory: str | Path = FEEDBACK_DIR) -> list[tuple[str, str]]:
+    """(file name, what is wrong) for every page the ledger had to skip.
+
+    A skipped page is not a crash, but it is not nothing either: its questions
+    are missing from the ledger until the page is fixed. On 2026-09-24 a page
+    carried the COUNT of its questions (23) where the list belongs, and the
+    monitor died on it with "'int' object is not iterable".
+    """
+    return _read(directory)[1]
+
+
+def _read(directory: str | Path) -> tuple[list[tuple[date, dict]], list[tuple[str, str]]]:
     out: list[tuple[date, dict]] = []
+    faults: list[tuple[str, str]] = []
     for path in sorted(Path(directory).glob("[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9].json")):
         try:
             day = date.fromisoformat(path.stem)
             data = json.loads(path.read_text(encoding="utf-8"))
-        except (ValueError, OSError, json.JSONDecodeError):
+        except (ValueError, OSError, json.JSONDecodeError) as e:
+            faults.append((path.name, f"does not parse: {type(e).__name__}"))
             continue  # a page that will not parse is a page, not a crash
-        if isinstance(data, dict):
-            out.append((day, data))
-    return out
+        fault = _shape_fault(data)
+        if fault:
+            faults.append((path.name, fault))
+            continue  # nor is a page whose ledger fields have the wrong shape
+        out.append((day, data))
+    return out, faults
+
+
+def _shape_fault(data) -> str:
+    """Why the ledger cannot read this page, or "" if it can.
+
+    The whole page is skipped rather than the one bad field: a carried list
+    read as empty would close every question the page meant to carry.
+    """
+    if not isinstance(data, dict):
+        return f"the page is a {type(data).__name__}, not an object"
+    carried = data.get("open_questions_carried")
+    if carried is not None and not isinstance(carried, list):
+        return f"open_questions_carried is a {type(carried).__name__}, not a list of questions"
+    names = data.get("names")
+    if names is not None and not isinstance(names, list):
+        return f"names is a {type(names).__name__}, not a list"
+    for name in names or []:
+        asked = name.get("open_questions") if isinstance(name, dict) else None
+        if asked is not None and not isinstance(asked, list):
+            iid = name.get("instrument_id") or "a name"
+            return f"open_questions under {iid} is a {type(asked).__name__}, not a list"
+    return ""
 
 
 def open_questions(directory: str | Path = FEEDBACK_DIR) -> list[OpenQuestion]:
@@ -221,6 +263,11 @@ def render(directory: str | Path = FEEDBACK_DIR) -> str:
     if closed:
         lines += ["", f"NO LONGER CARRIED: {len(closed)}"]
         lines += [q.line() for q in closed[:10]]
+    skipped = malformed(directory)
+    if skipped:
+        lines += ["", f"SKIPPED, NOT READ: {len(skipped)} page(s)"]
+        lines += [f"  {name}: {why}" for name, why in skipped]
+        lines += ["  Their questions are missing from the ledger until the page is fixed."]
     loose = uncarried(directory)
     if loose:
         lines += ["", f"ASKED ON {pages[-1][0]} BUT NOT CARRIED: {len(loose)}"]
@@ -240,4 +287,4 @@ def render(directory: str | Path = FEEDBACK_DIR) -> str:
     return "\n".join(lines)
 
 
-__all__ = ["OpenQuestion", "answered", "open_questions", "render", "uncarried"]
+__all__ = ["OpenQuestion", "answered", "malformed", "open_questions", "render", "uncarried"]

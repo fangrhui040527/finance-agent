@@ -11,7 +11,13 @@ from __future__ import annotations
 import json
 from datetime import date
 
-from knowledge.feedback_questions import answered, open_questions, render, uncarried
+from knowledge.feedback_questions import (
+    answered,
+    malformed,
+    open_questions,
+    render,
+    uncarried,
+)
 
 BURSA = "The six Bursa names have no fact-book coverage; which source is the shortest path?"
 
@@ -97,6 +103,45 @@ def test_a_page_that_will_not_parse_is_a_page_not_a_crash(tmp_path):
     write(tmp_path, "2026-09-04", [f"{BURSA} (since 2026-09-04)"])
     (tmp_path / "2026-09-05.json").write_text("{ not json", encoding="utf-8")
     assert len(open_questions(tmp_path)) == 1
+
+
+def test_a_page_carrying_a_count_is_skipped_and_named_not_a_crash(tmp_path):
+    """2026-09-24: the count of questions (23) sat where the list belongs. The
+    page is skipped whole - reading the bad field as empty would close every
+    question it meant to carry - and the ledger stands on the page before."""
+    write(tmp_path, "2026-09-04", [f"{BURSA} (since 2026-09-04)"])
+    (tmp_path / "2026-09-05.json").write_text(
+        json.dumps({"day": "2026-09-05", "open_questions_carried": 23}), encoding="utf-8"
+    )
+    (q,) = open_questions(tmp_path)
+    assert q.last_carried == date(2026, 9, 4)
+    assert answered(tmp_path) == []
+    (fault,) = malformed(tmp_path)
+    assert fault[0] == "2026-09-05.json" and "int, not a list" in fault[1]
+    assert "SKIPPED, NOT READ: 1" in render(tmp_path)
+
+
+def test_a_name_whose_questions_are_not_a_list_is_skipped_too(tmp_path):
+    write(tmp_path, "2026-09-04", [f"{BURSA} (since 2026-09-04)"])
+    write(
+        tmp_path,
+        "2026-09-05",
+        [f"{BURSA} (since 2026-09-04)"],
+        [{"instrument_id": "MYX:1155", "open_questions": "is it an ex-date?"}],
+    )
+    assert uncarried(tmp_path) == []  # read from the good page, not the skipped one
+    (fault,) = malformed(tmp_path)
+    assert "MYX:1155" in fault[1]
+
+
+def test_an_unparseable_page_is_named_as_skipped(tmp_path):
+    (tmp_path / "2026-09-05.json").write_text("{ not json", encoding="utf-8")
+    assert malformed(tmp_path)[0][0] == "2026-09-05.json"
+
+
+def test_well_formed_pages_have_no_faults(tmp_path):
+    write(tmp_path, "2026-09-04", [f"{BURSA} (since 2026-09-04)"])
+    assert malformed(tmp_path) == []
 
 
 def test_no_pages_says_so_rather_than_reporting_nothing_open(tmp_path):

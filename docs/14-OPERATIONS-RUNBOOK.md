@@ -299,6 +299,7 @@ The rules, all thresholds in `config.toml [monitor]` and bounded in code:
 | `series_resumed` | a series recorded as ENDED in that same file has printed past the period its upstream stopped at |
 | `price_stale` | a row in `data/price_cache.db` was fetched more than 1 session (book name, proxy) or 5 sessions (peer) before its own market's last finished session; weekends and holidays are not counted |
 | `open_question_stale` | a question the nightly pages carry has stood for more than 21 days |
+| `feedback_page_malformed` | a feedback page's JSON does not parse, or its question fields are not lists; the ledger skips that page instead of crashing, so its questions are missing until it is fixed |
 | `run_errors` | the newest traced run contains an error event |
 | `methodology_changed` | the manifest hash moved between the last two runs |
 
