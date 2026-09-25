@@ -166,10 +166,25 @@ class PriceFeed(ABC):
         attribution both ask "what was knowable on day X"; a feed that returns
         tomorrow's bar makes every downstream guard irrelevant.
         """
+        from core.market.cache import offline
+
         symbol = self.symbol_for(instrument_id)
         cache = getattr(self, "cache", None)
         body = cache.get(self.name, symbol, mic=_mic_or_none(instrument_id)) if cache else None
         if body is None:
+            if offline():
+                # FINPLANET_OFFLINE=1 means never fetch, and until 2026-09-25 it
+                # meant that only for a symbol the cache held. Stooq holds none,
+                # so every "offline" read went to stooq.com first; while Stooq
+                # refused at once that cost nothing, and when it began to hang
+                # instead, `paper status` on a runner sat 14 minutes in its
+                # socket reads - 3 attempts of 30 s per name until the breaker
+                # opened, again in every process. A miss offline is an answer:
+                # this feed has nothing to serve, and the chain moves on.
+                raise NoData(
+                    f"{self.name} has nothing cached for {instrument_id} (symbol {symbol!r}) "
+                    "and FINPLANET_OFFLINE=1 forbids fetching it"
+                )
             body = self._fetch_csv(symbol)
             if cache is not None:
                 cache.put(self.name, symbol, body)
