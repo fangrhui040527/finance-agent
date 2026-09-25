@@ -169,3 +169,59 @@ def test_prices_without_an_instrument_or_book_is_a_usage_error(capsys):
 def test_offline_accepts_the_usual_spellings(monkeypatch, flag):
     monkeypatch.setenv("FINPLANET_OFFLINE", flag)
     assert offline()
+
+
+class _Hangs:
+    """An opener standing in for a host that accepts and never answers."""
+
+    def __init__(self) -> None:
+        self.calls = 0
+
+    def __call__(self, req, timeout=None):
+        self.calls += 1
+        raise TimeoutError("timed out")
+
+
+def test_offline_a_feed_with_nothing_cached_answers_at_once_and_never_fetches(
+    tmp_path, monkeypatch
+):
+    """2026-09-25: system-test part 7, `FINPLANET_OFFLINE=1 ask.py paper status`,
+    hung 14 minutes on two runs. The cache holds Yahoo's bodies and no Stooq
+    row, and the chain asks Stooq first, so each "offline" read went to
+    stooq.com - which had begun to hang instead of refusing. Offline, a miss
+    is NoData, raised before any socket is opened, and the chain takes the
+    next feed's cached body."""
+    from core.market.feed import ChainedFeed, NoData, PriceFeedError, StooqFeed
+
+    monkeypatch.setenv("FINPLANET_OFFLINE", "1")
+    cache = PriceCache(tmp_path / "p.db", today=lambda: "2026-09-25")
+    cache.conn.execute(
+        "INSERT INTO price_csv (feed, symbol, fetched_on, body) VALUES ('yahoo','NVDA','2026-09-24',?)",
+        (CSV,),
+    )
+    cache.conn.commit()
+    stooq_net, yahoo_net = _Hangs(), _Hangs()
+    stooq = StooqFeed(opener=stooq_net, sleep=lambda s: None, cache=cache)
+    yahoo = YahooFeed(opener=yahoo_net, sleep=lambda s: None, cache=cache)
+
+    with pytest.raises(NoData, match="FINPLANET_OFFLINE=1 forbids fetching"):
+        stooq.fetch("XNAS:NVDA")
+    series = ChainedFeed([stooq, yahoo]).fetch("XNAS:NVDA")
+    assert series.raw()[-1].close == 1.5
+    assert stooq_net.calls == 0 and yahoo_net.calls == 0, "offline opened a socket"
+
+    # Nothing cached anywhere: an answer naming both feeds, not a wait.
+    with pytest.raises(PriceFeedError, match="(?s)stooq: .*forbids.*yahoo: .*forbids"):
+        ChainedFeed([stooq, yahoo]).fetch("XNAS:AAPL")
+    assert stooq_net.calls == 0 and yahoo_net.calls == 0
+
+
+def test_online_a_cache_miss_still_fetches(tmp_path, monkeypatch):
+    from core.market.feed import PriceFeedError, StooqFeed
+
+    monkeypatch.delenv("FINPLANET_OFFLINE", raising=False)
+    net = _Hangs()
+    feed = StooqFeed(opener=net, sleep=lambda s: None, cache=PriceCache(tmp_path / "p.db"))
+    with pytest.raises(PriceFeedError):
+        feed.fetch("XNAS:NVDA")
+    assert net.calls == 3, "online, the miss is fetched (and retried) as before"
