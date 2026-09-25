@@ -29,6 +29,10 @@ from engines.paper.settings import PaperSettings
 
 DECIDED = "decided"
 CONTROL = "control"
+#: The benchmark: a passive, equal-weight basket of a whole market index
+#: (engines/paper/index.py). Opened on its own day with its own notional, never
+#: by `init_books`, so a ledger that has not asked for it carries two books.
+INDEX = "index"
 
 #: The instrument id of an all-cash night. Not a tradable symbol and never
 #: routed to a market: it is the subject of the one row that says a decision to
@@ -39,7 +43,10 @@ CASH = "CASH"
 #: `reason` on that row. Recorded, then immediately resolved - there is no
 #: position to apply, so it must never sit in the pending queue.
 ALL_CASH = "all_cash"
+#: The books `init_books` opens. The index is opened separately, by `open_book`.
 BOOKS = (DECIDED, CONTROL)
+#: Every book a mark may carry, in the order a page lists them.
+ALL_BOOKS = (DECIDED, CONTROL, INDEX)
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS books (
@@ -394,6 +401,25 @@ class PaperStore:
     def has_books(self) -> bool:
         return self.conn.execute("SELECT COUNT(*) FROM books").fetchone()[0] > 0
 
+    def has_book(self, book: str) -> bool:
+        return (
+            self.conn.execute("SELECT 1 FROM books WHERE book = ?", (book,)).fetchone() is not None
+        )
+
+    def open_books(self) -> tuple[str, ...]:
+        """The books this ledger carries, decided and control first."""
+        held = {r["book"] for r in self.conn.execute("SELECT book FROM books")}
+        return tuple(b for b in ALL_BOOKS if b in held)
+
+    def book_opened_on(self, book: str) -> date | None:
+        row = self.conn.execute("SELECT opened_on FROM books WHERE book = ?", (book,)).fetchone()
+        return date.fromisoformat(row["opened_on"]) if row else None
+
+    def book_terms(self, book: str) -> dict:
+        """What the book was opened with, as `caps_json` froze it."""
+        row = self.conn.execute("SELECT caps_json FROM books WHERE book = ?", (book,)).fetchone()
+        return json.loads(row["caps_json"]) if row else {}
+
     def opened_on(self) -> date | None:
         row = self.conn.execute("SELECT opened_on FROM books WHERE book = ?", (DECIDED,)).fetchone()
         return date.fromisoformat(row["opened_on"]) if row else None
@@ -420,6 +446,36 @@ class PaperStore:
                 "INSERT INTO books VALUES (?,?,?,?,?)",
                 (book, opened_on.isoformat(), str(settings.initial_cash_usd), "USD", caps),
             )
+        self.conn.commit()
+
+    def open_book(self, book: str, opened_on: date, initial_cash_usd: Decimal, terms: dict) -> None:
+        """Open one more book beside the two `init_books` opened.
+
+        Once, like every book: the row is the book's opening cash, and a second
+        opening would be a reset under another name. Refused before the two
+        main books exist, because the phases every book trades by are theirs.
+        """
+        if book in BOOKS:
+            raise ValueError(f"the {book} book is opened by `ask.py paper init`, not here")
+        if not self.has_book(DECIDED):
+            raise ValueError("no paper book yet: run `ask.py paper init` first")
+        if self.has_book(book):
+            raise ValueError(
+                f"the {book} book was opened on {self.book_opened_on(book)}; it is append-only "
+                "and has no reset"
+            )
+        if initial_cash_usd <= 0:
+            raise ValueError(f"a book opens with cash above zero, not USD {initial_cash_usd}")
+        self.conn.execute(
+            "INSERT INTO books VALUES (?,?,?,?,?)",
+            (
+                book,
+                opened_on.isoformat(),
+                str(initial_cash_usd),
+                "USD",
+                json.dumps(terms, sort_keys=True),
+            ),
+        )
         self.conn.commit()
 
     # -- targets ----------------------------------------------------------------------------
@@ -493,9 +549,12 @@ class PaperStore:
         return self._target(r) if r else None
 
     def last_control_rebalance(self) -> date | None:
+        return self.last_rebalance(CONTROL, "control_rebalance")
+
+    def last_rebalance(self, book: str, reason: str) -> date | None:
         r = self.conn.execute(
             "SELECT MAX(decided_on) AS d FROM targets WHERE book = ? AND reason = ?",
-            (CONTROL, "control_rebalance"),
+            (book, reason),
         ).fetchone()
         return date.fromisoformat(r["d"]) if r and r["d"] else None
 

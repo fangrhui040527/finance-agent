@@ -55,7 +55,20 @@ CREATE TABLE IF NOT EXISTS price_csv (
     body      TEXT NOT NULL,
     PRIMARY KEY (feed, symbol)
 );
+CREATE TABLE IF NOT EXISTS listed_name (
+    feed    TEXT NOT NULL,
+    symbol  TEXT NOT NULL,
+    name    TEXT NOT NULL,
+    seen_on TEXT NOT NULL,
+    PRIMARY KEY (feed, symbol)
+);
 """
+
+#: `listed_name` is the company name a source printed beside a symbol's bars
+#: (Yahoo's chart `meta.longName`). Kept because a code written from memory can
+#: name another company, and the bars alone cannot say so: 5264.KL prices
+#: whatever Bursa lists under 5264. The name is the one check a price fetch
+#: carries for free. Derived data, replaced on each fetch like the bodies.
 
 #: `fetched_on` is the day, and the day cannot say whether a market had shut.
 #: `fetched_at` is the instant, added later and therefore nullable: every row
@@ -262,6 +275,27 @@ class PriceCache:
         except ValueError:
             return None
         return at if at.tzinfo else at.replace(tzinfo=UTC)
+
+    def put_name(self, feed: str, symbol: str, name: str) -> None:
+        name = (name or "").strip()
+        if not name:
+            return
+        with self._lock:
+            self.conn.execute(
+                "INSERT INTO listed_name (feed, symbol, name, seen_on) VALUES (?,?,?,?)"
+                " ON CONFLICT(feed, symbol) DO UPDATE SET name=excluded.name,"
+                " seen_on=excluded.seen_on",
+                (feed, symbol, name, self._today()),
+            )
+            self.conn.commit()
+
+    def name(self, feed: str, symbol: str) -> str | None:
+        """The company name the source last printed for this symbol, if any."""
+        with self._lock:
+            row = self.conn.execute(
+                "SELECT name FROM listed_name WHERE feed = ? AND symbol = ?", (feed, symbol)
+            ).fetchone()
+        return row[0] if row else None
 
     def prune_unusable(self) -> int:
         """Drop every cached body that is not a CSV of bars. Returns the count."""

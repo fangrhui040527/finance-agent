@@ -340,6 +340,69 @@ def _book_peers(book: list[str], asof: date, lookup, cap: int = PEER_WARM_CAP) -
     return out
 
 
+#: Seconds between two index-member fetches that went to the network. A
+#: hundred names back to back is the burst Yahoo throttles; a cache hit waits
+#: for nothing.
+INDEX_FETCH_PAUSE = 0.3
+#: The history an index member's fetch asks for. The index book marks from the
+#: last close and never estimates over five years, and a hundred five-year
+#: bodies would triple data/price_cache.db, which every close slot commits.
+#: Two years still covers the 260-session window a peer table reads.
+INDEX_RANGE = "2y"
+
+
+def _index_members(cfg) -> list[str]:
+    """The index book's members, or none while the ledger has not opened it."""
+    from engines.paper.book import index_universe_path
+    from engines.paper.store import INDEX, PaperStore
+    from engines.paper.universe import load_universe
+
+    store = PaperStore.open_existing(cfg.paper.database)
+    if store is None:
+        return []
+    with store:
+        if not store.has_book(INDEX):
+            return []
+        return list(load_universe(index_universe_path(store)).ids)
+
+
+def _index_feed(feed):
+    """Yahoo alone, at INDEX_RANGE, on the cache the book's feed writes to.
+
+    A seam, so a test can script it. Yahoo alone because it is the source that
+    prints a company name beside the bars (engines/paper/universe.py checks each
+    code by it), and Stooq has been walled since 2026-08-31.
+    """
+    from core.market.feed import YahooFeed
+
+    cache = next(
+        (f.cache for f in getattr(feed, "feeds", []) if getattr(f, "cache", None) is not None),
+        getattr(feed, "cache", None),
+    )
+    return YahooFeed(cache=cache, range_=INDEX_RANGE)
+
+
+def _prices_index(feed, members: list[str], already: set[str]) -> tuple[int, int, list[str]]:
+    """Fetch the index members the book loop did not; (cached, asked, failed ids)."""
+    import time
+
+    todo = [i for i in members if i not in already]
+    if not todo:
+        return 0, 0, []
+    idx = _index_feed(feed)
+    failed: list[str] = []
+    for iid in todo:
+        before = idx.fetched_at(iid)
+        try:
+            idx.fetch(iid)
+        except PriceFeedError as e:
+            failed.append(iid)
+            print(f"  {iid:<14} FAILED  {str(e).splitlines()[0][:120]}  (index)", file=sys.stderr)
+        if idx.fetched_at(iid) != before or iid in failed:
+            time.sleep(INDEX_FETCH_PAUSE)
+    return len(todo) - len(failed), len(todo), failed
+
+
 def _prices_book(a) -> int:
     """Warm the price cache for every name in the book, each market's proxy,
     and the graph peers of every book name.
@@ -396,6 +459,23 @@ def _prices_book(a) -> int:
         f"  {'cached':<14} {len(names) - failed} of {len(names)}"
         f"  ({len(book)} book, {len(proxies)} proxies, {len(peers)} peers)"
     )
+    # The index book's members, once the ledger has opened it. After the book
+    # so every name the book loop fetched at full history is a cache hit here.
+    # Their failures are printed and counted apart and do not set the exit
+    # code: a code that lists no company answers 404 every day, and a warning
+    # every day would teach the reader to ignore the one that matters.
+    try:
+        members = _index_members(cfg)
+    except Exception as e:  # the index is an extra: it must not cost the book its bars
+        print(f"  {'index':<14} skipped: {type(e).__name__}: {e}", file=sys.stderr)
+        members = []
+    if members:
+        cached, asked, index_failed = _prices_index(feed, members, set(names))
+        tail = f"; failed: {', '.join(index_failed)}" if index_failed else ""
+        print(
+            f"  {'index':<14} {cached} of {asked} members not already above cached"
+            f" ({len(members)} in the universe, range {INDEX_RANGE}){tail}"
+        )
     return 3 if failed else 0
 
 
@@ -1322,6 +1402,12 @@ def cmd_paper(a) -> int:
         return 2
     fx = fx_for(cfg, a.fx_db or None)
 
+    if a.action == "init" and a.index:
+        return _paper_init_index(a, cfg, db, day)
+
+    if a.action == "universe":
+        return _paper_universe(a, cfg, db)
+
     if a.action == "init":
         try:
             start = date.fromisoformat(a.start) if a.start else settings.start_date
@@ -1430,6 +1516,106 @@ def cmd_paper(a) -> int:
             return 0
     print(f"paper: unknown action {a.action}", file=sys.stderr)
     return 2
+
+
+def _paper_init_index(a, cfg, db: str, day: date) -> int:
+    """Open the index book: once, beside the decided and control books."""
+    from pathlib import Path
+
+    from engines.paper.book import settings_of
+    from engines.paper.index import INDEX_NOTIONAL_USD
+    from engines.paper.store import INDEX, PaperStore
+    from engines.paper.universe import load_universe
+
+    try:
+        universe = load_universe(a.universe or None)
+        notional = Decimal(a.notional) if a.notional else INDEX_NOTIONAL_USD
+    except (OSError, ValueError, ArithmeticError) as e:
+        print(f"paper init --index refused: {e}", file=sys.stderr)
+        return 2
+    store = PaperStore.open_existing(db)
+    if store is None or not store.has_books():
+        print(f"paper: NO BOOK at {db}; run `ask.py paper init` first", file=sys.stderr)
+        return 2
+    here = Path(__file__).resolve().parent
+    where = Path(universe.path).resolve()
+    named = str(where.relative_to(here)) if where.is_relative_to(here) else str(where)
+    with store:
+        terms = {
+            **settings_of(cfg, store).as_dict(),
+            "initial_cash_usd": str(notional),
+            "universe": named,
+            "universe_as_of": universe.as_of.isoformat() if universe.as_of else None,
+            "universe_source": universe.source,
+            "universe_names": len(universe.members),
+        }
+        try:
+            store.open_book(INDEX, day, notional, terms)
+        except ValueError as e:
+            print(f"paper init --index refused: {e}", file=sys.stderr)
+            return 2
+    print(
+        f"opened the index book at {db} on {day}: notional USD {notional:,.2f} - a scale for "
+        f"percentages, not money - across {universe.describe()} from {named}"
+    )
+    print(
+        "equal value in whole lots under the same phase ceilings as the control; it rebalances "
+        "at its first mark with prices, then monthly and at each new phase"
+    )
+    return 0
+
+
+def _paper_universe(a, cfg, db: str) -> int:
+    """Each index member against the name its price source printed. Reads the cache only."""
+    from engines.paper.book import index_universe_path
+    from engines.paper.store import INDEX, PaperStore
+    from engines.paper.universe import AGREES, DISAGREES, UNVERIFIED, check, load_universe
+
+    path = a.universe or None
+    opened = None
+    store = PaperStore.open_existing(db)
+    if store is not None:
+        with store:
+            if store.has_book(INDEX):
+                opened = store.book_opened_on(INDEX)
+                path = path or index_universe_path(store)
+    try:
+        universe = load_universe(path)
+    except (OSError, ValueError) as e:
+        print(f"paper universe: {e}", file=sys.stderr)
+        return 2
+    feed = default_feed()
+    rows = check(universe, feed)
+    state = f"the index book opened {opened}" if opened else "no index book opened yet"
+    print(f"UNIVERSE  {universe.describe()}  - {state}")
+    print(f"  file {universe.path}")
+    counts = {AGREES: 0, DISAGREES: 0, UNVERIFIED: 0}
+    cached = 0
+    for r in rows:
+        counts[r.verdict] += 1
+        at = feed.fetched_at(r.member.instrument_id)
+        cached += at is not None
+        listed = r.listed or "-"
+        when = f"cached {at:%Y-%m-%d}" if at else "not cached"
+        print(
+            f"  {r.member.instrument_id:<12} {r.member.name[:30]:<30} listed as {listed[:36]:<36} "
+            f"{r.verdict:<10} {when}"
+        )
+    print(
+        f"  {len(rows)} names: {cached} with a cached price; names agree {counts[AGREES]}, "
+        f"DISAGREE {counts[DISAGREES]}, unverified {counts[UNVERIFIED]}"
+    )
+    if counts[DISAGREES]:
+        print(
+            "  DISAGREES: the code lists another company. The index book leaves it out until "
+            f"{universe.path} is corrected against the official constituent list."
+        )
+    if counts[UNVERIFIED]:
+        print(
+            "  unverified: no source has printed a name for the code yet; the collector's next "
+            "Yahoo fetch of it will."
+        )
+    return 3 if counts[DISAGREES] else 0
 
 
 def cmd_facts(a) -> int:
@@ -2513,12 +2699,24 @@ def main(argv=None) -> int:
     pk.set_defaults(fn=cmd_pack)
 
     pa = sub.add_parser(
-        "paper", help="the USD 1,000 paper book: init, decide, mark, status, pack, grade"
+        "paper",
+        help="the USD 1,000 paper book: init, decide, mark, status, pack, grade, universe",
     )
-    pa.add_argument("action", choices=("init", "decide", "mark", "status", "pack", "grade"))
+    pa.add_argument(
+        "action", choices=("init", "decide", "mark", "status", "pack", "grade", "universe")
+    )
     pa.add_argument("--db", default="", help="paper ledger (default: [paper] database)")
     pa.add_argument("--date", default="", help="YYYY-MM-DD; default today (UTC)")
     pa.add_argument("--start", default="", help="init: the book's start date")
+    pa.add_argument(
+        "--index",
+        action="store_true",
+        help="init: open the index book (an equal-weight FBM100 benchmark) on --date",
+    )
+    pa.add_argument("--notional", default="", help="init --index: USD scale, default 1,000,000")
+    pa.add_argument(
+        "--universe", default="", help="init --index / universe: the members file to use"
+    )
     pa.add_argument(
         "--weights",
         default="",

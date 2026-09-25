@@ -1,0 +1,123 @@
+# The index book's universe: Bursa's FTSE Bursa Malaysia Top 100 (FBM100) -
+# the 30 FBM KLCI names plus the 70 FBM Mid 70 names - as best known on
+# 2026-09-25.
+#
+# NOT YET CHECKED against the official constituent list. Bursa publishes it as
+# FBM100_Constituents_List_<Mon><YYYY>.pdf after each June and December review;
+# the session that wrote this file could not reach bursamalaysia.com, so the
+# names below come from memory and will be wrong in places: a name that left the
+# index, one that joined it, a code that moved. The collector checks each code
+# against the company name Yahoo reports for it (`ask.py paper universe`) and the
+# index book skips any name that does not match or has no price, so a wrong code
+# costs a slot, never a wrong company's prices. Replace this list with the
+# official one when it is to hand, and record the review it came from below.
+#
+# `segment` is the sub-index each name is believed to sit in. Nothing reads it
+# for weighting - the index book is equal-weight across all of them - it is here
+# so a review can be applied one half at a time.
+as_of: 2026-09-25
+source: "memory; to be checked against Bursa's FBM100 constituent list"
+review: null
+names:
+  # FBM KLCI (30)
+  - {id: "MYX:1155", name: "Malayan Banking", segment: KLCI}
+  - {id: "MYX:1295", name: "Public Bank", segment: KLCI}
+  - {id: "MYX:1023", name: "CIMB Group Holdings", segment: KLCI}
+  - {id: "MYX:5347", name: "Tenaga Nasional", segment: KLCI}
+  - {id: "MYX:5225", name: "IHH Healthcare", segment: KLCI}
+  - {id: "MYX:8869", name: "Press Metal Aluminium Holdings", segment: KLCI}
+  - {id: "MYX:5183", name: "Petronas Chemicals Group", segment: KLCI}
+  - {id: "MYX:6947", name: "CelcomDigi", segment: KLCI}
+  - {id: "MYX:6012", name: "Maxis", segment: KLCI}
+  - {id: "MYX:6033", name: "Petronas Gas", segment: KLCI}
+  - {id: "MYX:5681", name: "Petronas Dagangan", segment: KLCI}
+  - {id: "MYX:5285", name: "SD Guthrie", segment: KLCI}
+  - {id: "MYX:1961", name: "IOI Corporation", segment: KLCI}
+  - {id: "MYX:2445", name: "Kuala Lumpur Kepong", segment: KLCI}
+  - {id: "MYX:3182", name: "Genting", segment: KLCI}
+  - {id: "MYX:4715", name: "Genting Malaysia", segment: KLCI}
+  - {id: "MYX:5819", name: "Hong Leong Bank", segment: KLCI}
+  - {id: "MYX:1082", name: "Hong Leong Financial Group", segment: KLCI}
+  - {id: "MYX:1066", name: "RHB Bank", segment: KLCI}
+  - {id: "MYX:6888", name: "Axiata Group", segment: KLCI}
+  - {id: "MYX:4863", name: "Telekom Malaysia", segment: KLCI}
+  - {id: "MYX:3816", name: "MISC", segment: KLCI}
+  - {id: "MYX:4065", name: "PPB Group", segment: KLCI}
+  - {id: "MYX:4677", name: "YTL Corporation", segment: KLCI}
+  - {id: "MYX:6742", name: "YTL Power International", segment: KLCI}
+  - {id: "MYX:5211", name: "Sunway", segment: KLCI}
+  - {id: "MYX:5296", name: "MR D.I.Y. Group", segment: KLCI}
+  - {id: "MYX:5326", name: "99 Speed Mart Retail Holdings", segment: KLCI}
+  - {id: "MYX:4197", name: "Sime Darby", segment: KLCI}
+  - {id: "MYX:4707", name: "Nestle (Malaysia)", segment: KLCI}
+  # FBM Mid 70 (70)
+  - {id: "MYX:5398", name: "Gamuda", segment: MID70}
+  - {id: "MYX:7084", name: "QL Resources", segment: MID70}
+  - {id: "MYX:1015", name: "AMMB Holdings", segment: MID70}
+  - {id: "MYX:5246", name: "Westports Holdings", segment: MID70}
+  - {id: "MYX:0166", name: "Inari Amertron", segment: MID70}
+  - {id: "MYX:3336", name: "IJM Corporation", segment: MID70}
+  - {id: "MYX:2488", name: "Alliance Bank Malaysia", segment: MID70}
+  - {id: "MYX:5258", name: "Bank Islam Malaysia", segment: MID70}
+  - {id: "MYX:1171", name: "Malaysia Building Society", segment: MID70}
+  - {id: "MYX:5185", name: "Affin Bank", segment: MID70}
+  - {id: "MYX:5139", name: "AEON Credit Service (M)", segment: MID70}
+  - {id: "MYX:1163", name: "Allianz Malaysia", segment: MID70}
+  - {id: "MYX:8621", name: "LPI Capital", segment: MID70}
+  - {id: "MYX:6139", name: "Syarikat Takaful Malaysia Keluarga", segment: MID70}
+  - {id: "MYX:1818", name: "Bursa Malaysia", segment: MID70}
+  - {id: "MYX:5264", name: "Malakoff Corporation", segment: MID70}
+  - {id: "MYX:3069", name: "Mega First Corporation", segment: MID70}
+  - {id: "MYX:5209", name: "Gas Malaysia", segment: MID70}
+  - {id: "MYX:7277", name: "Dialog Group", segment: MID70}
+  - {id: "MYX:5199", name: "Hibiscus Petroleum", segment: MID70}
+  - {id: "MYX:5210", name: "Bumi Armada", segment: MID70}
+  - {id: "MYX:5243", name: "Velesto Energy", segment: MID70}
+  - {id: "MYX:2291", name: "Genting Plantations", segment: MID70}
+  - {id: "MYX:5222", name: "FGV Holdings", segment: MID70}
+  - {id: "MYX:1899", name: "Batu Kawan", segment: MID70}
+  - {id: "MYX:2089", name: "United Plantations", segment: MID70}
+  - {id: "MYX:5126", name: "Sarawak Oil Palms", segment: MID70}
+  - {id: "MYX:5031", name: "TIME dotCom", segment: MID70}
+  - {id: "MYX:0138", name: "MY E.G. Services", segment: MID70}
+  - {id: "MYX:6399", name: "Astro Malaysia Holdings", segment: MID70}
+  - {id: "MYX:3689", name: "Fraser & Neave Holdings", segment: MID70}
+  - {id: "MYX:3255", name: "Heineken Malaysia", segment: MID70}
+  - {id: "MYX:2836", name: "Carlsberg Brewery Malaysia", segment: MID70}
+  - {id: "MYX:4162", name: "British American Tobacco (Malaysia)", segment: MID70}
+  - {id: "MYX:5306", name: "Farm Fresh", segment: MID70}
+  - {id: "MYX:5102", name: "Guan Chong", segment: MID70}
+  - {id: "MYX:6599", name: "AEON Co. (M)", segment: MID70}
+  - {id: "MYX:1562", name: "Sports Toto", segment: MID70}
+  - {id: "MYX:5248", name: "Bermaz Auto", segment: MID70}
+  - {id: "MYX:6633", name: "Leong Hup International", segment: MID70}
+  - {id: "MYX:5318", name: "DXN Holdings", segment: MID70}
+  - {id: "MYX:5878", name: "KPJ Healthcare", segment: MID70}
+  - {id: "MYX:7153", name: "Kossan Rubber Industries", segment: MID70}
+  - {id: "MYX:7113", name: "Top Glove Corporation", segment: MID70}
+  - {id: "MYX:5168", name: "Hartalega Holdings", segment: MID70}
+  - {id: "MYX:5284", name: "Lotte Chemical Titan Holding", segment: MID70}
+  - {id: "MYX:3794", name: "Malayan Cement", segment: MID70}
+  - {id: "MYX:4731", name: "Scientex", segment: MID70}
+  - {id: "MYX:5263", name: "Sunway Construction Group", segment: MID70}
+  - {id: "MYX:7161", name: "Kerjaya Prospek Group", segment: MID70}
+  - {id: "MYX:5288", name: "Sime Darby Property", segment: MID70}
+  - {id: "MYX:5099", name: "Capital A", segment: MID70}
+  - {id: "MYX:5032", name: "Bintulu Port Holdings", segment: MID70}
+  - {id: "MYX:5005", name: "Unisem (M)", segment: MID70}
+  - {id: "MYX:0097", name: "ViTrox Corporation", segment: MID70}
+  - {id: "MYX:7160", name: "Pentamaster Corporation", segment: MID70}
+  - {id: "MYX:0128", name: "Frontken Corporation", segment: MID70}
+  - {id: "MYX:3867", name: "Malaysian Pacific Industries", segment: MID70}
+  - {id: "MYX:0208", name: "Greatech Technology", segment: MID70}
+  - {id: "MYX:9822", name: "SAM Engineering & Equipment (M)", segment: MID70}
+  - {id: "MYX:8664", name: "S P Setia", segment: MID70}
+  - {id: "MYX:5249", name: "IOI Properties Group", segment: MID70}
+  - {id: "MYX:1651", name: "Malaysian Resources Corporation", segment: MID70}
+  - {id: "MYX:5148", name: "UEM Sunrise", segment: MID70}
+  - {id: "MYX:8583", name: "Mah Sing Group", segment: MID70}
+  - {id: "MYX:8206", name: "Eco World Development Group", segment: MID70}
+  - {id: "MYX:5235SS", name: "KLCC Property Holdings", segment: MID70}
+  - {id: "MYX:5176", name: "Sunway Real Estate Investment Trust", segment: MID70}
+  - {id: "MYX:5212", name: "Pavilion Real Estate Investment Trust", segment: MID70}
+  - {id: "MYX:5227", name: "IGB Real Estate Investment Trust", segment: MID70}

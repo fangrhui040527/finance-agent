@@ -154,6 +154,22 @@ class PriceFeed(ABC):
             return None
         return cache.fetched_at(self.name, symbol)
 
+    def listed_name(self, instrument_id: str) -> str | None:
+        """The company name this source printed beside the instrument's bars.
+
+        None from a feed that prints none, a feed with no cache, or a symbol it
+        has not fetched since names were kept. Read from the cache, like
+        `fetched_at`, so an offline reader sees what the collector saw.
+        """
+        cache = getattr(self, "cache", None)
+        if cache is None or not hasattr(cache, "name"):
+            return None
+        try:
+            symbol = self.symbol_for(instrument_id)
+        except (PriceFeedError, ValueError):
+            return None
+        return cache.name(self.name, symbol)
+
     def fetch(
         self,
         instrument_id: str,
@@ -422,11 +438,15 @@ class YahooFeed(PriceFeed):
         "XETR": ".DE",
     }
 
-    def __init__(self, opener=None, sleep=None, cache=None) -> None:
+    def __init__(self, opener=None, sleep=None, cache=None, range_: str | None = None) -> None:
         self._opener = opener
         self._sleep = sleep
         self._breaker = CircuitBreaker("yahoo")
         self.cache = cache
+        #: The history one fetch asks for. RANGE unless a caller that needs
+        #: less says so - the index book's hundred names are marked from the
+        #: last close and never estimated over five years (ask.py prices).
+        self.range = range_ or self.RANGE
 
     #: Index id -> this feed's literal symbol; see INDEX_IDS. `^KLSE` is the FBM
     #: KLCI as Yahoo writes it, confirmed from a runner by market-proxy-probe -
@@ -462,7 +482,7 @@ class YahooFeed(PriceFeed):
         from urllib.parse import quote, urlencode
 
         return (
-            f"{self.CHART_URL}{quote(symbol)}?{urlencode({'range': self.RANGE, 'interval': '1d'})}"
+            f"{self.CHART_URL}{quote(symbol)}?{urlencode({'range': self.range, 'interval': '1d'})}"
         )
 
     def _fetch_csv(self, symbol: str) -> str:
@@ -502,7 +522,14 @@ class YahooFeed(PriceFeed):
         quote_block = quotes[0] if isinstance(quotes[0], dict) else {}
         # Session timestamps are the exchange's open in UTC seconds; adding the
         # exchange offset yields the exchange's own calendar day.
-        offset = int((result.get("meta") or {}).get("gmtoffset") or 0)
+        meta = result.get("meta") or {}
+        offset = int(meta.get("gmtoffset") or 0)
+        # The name Yahoo lists the symbol under, kept beside the bars: the one
+        # check that a code written from memory is the company it was meant to
+        # be (engines/paper/universe.py). A body with no name is still bars.
+        listed = meta.get("longName") or meta.get("shortName")
+        if listed and self.cache is not None and hasattr(self.cache, "put_name"):
+            self.cache.put_name(self.name, symbol, str(listed))
 
         def cell(column: str, i: int) -> str:
             series = quote_block.get(column) or []
@@ -580,6 +607,15 @@ class ChainedFeed:
             at = feed.fetched_at(instrument_id)
             if at is not None:
                 return at
+        return None
+
+    def listed_name(self, instrument_id: str) -> str | None:
+        """The first name any feed in the chain recorded for this instrument."""
+        for feed in self.feeds:
+            ask = getattr(feed, "listed_name", None)
+            named = ask(instrument_id) if ask is not None else None
+            if named:
+                return named
         return None
 
     def fetch(self, instrument_id: str, start=None, end=None) -> PriceSeries:

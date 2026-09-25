@@ -125,6 +125,52 @@ cheapest lot first, one lot per name per round while the name stays under the
 per-name cap and the total under the phase ceiling. Its targets apply at the
 next bar like everything else.
 
+### 6a. The index book (FBM100, equal weight)
+
+The control answers "what would equal lots of the watchlist have done", and at
+USD 1,000 with 100-share Bursa lots that is three or four names - it measures
+lot sizes as much as the market. The index book answers the wider question:
+what would the market itself have done. It holds every fundable member of the
+FTSE Bursa Malaysia Top 100 at equal value, and it is a third book beside the
+other two, never a change to either.
+
+| | control | index |
+|---|---|---|
+| names | the fundable watchlist (9) | every fundable member of `engines/paper/data/fbm100.yaml` (100) |
+| sizing | greedy equal lots, cheapest first | equal value, nearest whole lot, 1% inside the ceiling for entry costs |
+| money | USD 1,000 | a notional, USD 1,000,000 by default - a scale for percentages, not money |
+| opened | with the ledger | on its own day: `ask.py paper init --index` |
+| phases, cash floor, lots, fees, FX, slippage | the book's | the same |
+| stops, halt, turnover cap | none | none |
+| rebalance | first mark of a month or phase | the same clock, plus its first mark with prices |
+| grading | the benchmark every prediction is graded against | shown beside the others, grades nothing |
+
+The notional is there because equal weight across a hundred names in whole lots
+needs 40% of it, split a hundred ways, to buy at least one lot of the dearest
+member (Nestle, about RM 9,000 a lot). Everything compared across books is in
+percent, and the status page gives each book's return over the index book's
+own window - from its opening day - because it opened later than the others.
+The index pays the same fees, but the per-trade platform fee weighs less on a
+larger trade, so its cost drag is its own figure on the page, not the control's.
+
+**The universe file is not yet checked.** It was written from memory on
+2026-09-25 because the session that wrote it could not reach
+bursamalaysia.com, and it will be wrong in places. The collector is the check:
+each Yahoo fetch records the company name Yahoo lists the code under
+(`price_cache.db`, table `listed_name`), and `ask.py paper universe` prints
+every member's expected and listed names with a verdict. A code whose listed
+name cannot be the expected company (`DISAGREES`) is left out of every
+rebalance, and the command exits 3 until the file is fixed; a code with no
+name yet (`unverified`) is held. Replace the list with Bursa's published one
+(`FBM100_Constituents_List_<Mon><YYYY>.pdf`, after each June and December
+review) and record the review in the file.
+
+The collector's price step fetches the members the book loop did not, at two
+years of history rather than five (a hundred five-year bodies would triple
+`data/price_cache.db`, which every close slot commits), with a pause between
+network fetches. Their failures are printed and counted apart and do not set
+the step's exit code.
+
 ## 7. Predictions and grading
 
 Every raised weight is logged as a `+1` prediction and every exit to zero as
