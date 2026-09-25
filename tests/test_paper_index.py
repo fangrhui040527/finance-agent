@@ -423,6 +423,16 @@ YAHOO_KL = json.dumps(
 )
 
 
+def test_opening_the_cache_to_read_leaves_the_committed_file_unchanged(tmp_path):
+    path = tmp_path / "c.db"
+    PriceCache(path).close()
+    before = path.read_bytes()
+    cache = PriceCache(path)
+    assert cache.name("yahoo", "6012.KL") is None
+    cache.close()
+    assert path.read_bytes() == before, "a read-only open must not add the listed_name table"
+
+
 def test_yahoo_keeps_the_name_it_lists_a_code_under_and_asks_for_the_range_given(tmp_path):
     cache = PriceCache(tmp_path / "c.db", today=lambda: "2026-01-05")
     seen: list = []

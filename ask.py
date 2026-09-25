@@ -1539,7 +1539,9 @@ def _paper_init_index(a, cfg, db: str, day: date) -> int:
         return 2
     here = Path(__file__).resolve().parent
     where = Path(universe.path).resolve()
-    named = str(where.relative_to(here)) if where.is_relative_to(here) else str(where)
+    # Forward slashes whatever the platform: the ledger is committed, and a
+    # book opened on Windows is marked by a Linux runner that must resolve it.
+    named = where.relative_to(here).as_posix() if where.is_relative_to(here) else where.as_posix()
     with store:
         terms = {
             **settings_of(cfg, store).as_dict(),

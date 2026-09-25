@@ -55,6 +55,16 @@ CREATE TABLE IF NOT EXISTS price_csv (
     body      TEXT NOT NULL,
     PRIMARY KEY (feed, symbol)
 );
+"""
+
+#: `listed_name` is the company name a source printed beside a symbol's bars
+#: (Yahoo's chart `meta.longName`). Kept because a code written from memory can
+#: name another company, and the bars alone cannot say so: 5264.KL prices
+#: whatever Bursa lists under 5264. The name is the one check a price fetch
+#: carries for free. Derived data, replaced on each fetch like the bodies.
+#: Created by the first write, not on open: the cache file is committed, and a
+#: process that only reads it must leave it byte-for-byte as it found it.
+_LISTED_NAME = """
 CREATE TABLE IF NOT EXISTS listed_name (
     feed    TEXT NOT NULL,
     symbol  TEXT NOT NULL,
@@ -63,12 +73,6 @@ CREATE TABLE IF NOT EXISTS listed_name (
     PRIMARY KEY (feed, symbol)
 );
 """
-
-#: `listed_name` is the company name a source printed beside a symbol's bars
-#: (Yahoo's chart `meta.longName`). Kept because a code written from memory can
-#: name another company, and the bars alone cannot say so: 5264.KL prices
-#: whatever Bursa lists under 5264. The name is the one check a price fetch
-#: carries for free. Derived data, replaced on each fetch like the bodies.
 
 #: `fetched_on` is the day, and the day cannot say whether a market had shut.
 #: `fetched_at` is the instant, added later and therefore nullable: every row
@@ -281,6 +285,7 @@ class PriceCache:
         if not name:
             return
         with self._lock:
+            self.conn.executescript(_LISTED_NAME)
             self.conn.execute(
                 "INSERT INTO listed_name (feed, symbol, name, seen_on) VALUES (?,?,?,?)"
                 " ON CONFLICT(feed, symbol) DO UPDATE SET name=excluded.name,"
@@ -292,9 +297,12 @@ class PriceCache:
     def name(self, feed: str, symbol: str) -> str | None:
         """The company name the source last printed for this symbol, if any."""
         with self._lock:
-            row = self.conn.execute(
-                "SELECT name FROM listed_name WHERE feed = ? AND symbol = ?", (feed, symbol)
-            ).fetchone()
+            try:
+                row = self.conn.execute(
+                    "SELECT name FROM listed_name WHERE feed = ? AND symbol = ?", (feed, symbol)
+                ).fetchone()
+            except sqlite3.OperationalError:  # no name written yet: no table either
+                return None
         return row[0] if row else None
 
     def prune_unusable(self) -> int:
