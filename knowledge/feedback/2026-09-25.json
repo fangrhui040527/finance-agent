@@ -1,0 +1,253 @@
+{
+  "day": "2026-09-25",
+  "written_at": "2026-09-26T22:53:23Z",
+  "measured_session": {
+    "bursa": "2026-09-25 (one session: ^KLSE 1,672.31 on 09-24 -> 1,671.62 on 09-25; 09-22 bar now filled, 1,683.50)",
+    "us": "2026-09-25"
+  },
+  "pack_built": "2026-09-26T22:46:00Z",
+  "market": {
+    "regime": "neutral",
+    "notes": [
+      "MYX:^KLSE -0.04% 1d, +0.36% 5d (no blank row crossed); XNAS:SPY +0.54% 1d, +1.27% 5d",
+      "no FRED series printed a later date than on the 2026-09-24 page: SP500 7704.13 and NASDAQCOM 26939.37 at 09-24; BAMLH0A0HYM2 2.80; T10Y2Y 0.31; DGS10 5.11 and DGS2 4.85 at 09-23; DFF 3.88; VIXCLS 14.21 at 09-22; DCOILBRENTEU 114.89 at 09-22; DEXMAUS 4.0793 at 09-18",
+      "finnhub:142424978 (20:39Z): stocks rose on reported US-Iran progress and oil back below USD 100; the Brent series has no print after 09-22 to check it",
+      "one name past 1.5 sigma: Microsoft 1.74 sigma; IHH's 2026-09-22 session re-measured alone at 3.80 sigma"
+    ]
+  },
+  "names": [
+    {
+      "instrument_id": "MYX:1155",
+      "move": {
+        "return_1d": 0.0099,
+        "market_1d": -0.0004,
+        "unexplained_share": 0.95,
+        "session": "2026-09-25",
+        "note": "market -0.04%, drift -0.02%, idiosyncratic +1.05%, 1.44 sigma, not_significant; closes 10.12 -> 10.22; 5d -0.97% vs +0.36%; rows are the research arm on Bloomberry (asgam 02:24Z, agbrief 04:18Z), a Singapore growth title after Thursday's close, and BTS debit-card rows: mentions, not causes"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:5347",
+      "move": {
+        "return_1d": 0.0061,
+        "market_1d": -0.0004,
+        "unexplained_share": 0.92,
+        "session": "2026-09-25",
+        "note": "market -0.03%, drift -0.02%, idiosyncratic +0.67%, 0.83 sigma, not_significant; closes 13.06 -> 13.14; 5d +0.77% vs +0.36%; both rows in the window are Shree TNB Polymers (an Indian IPO) attached on 'TNB'"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:5183",
+      "move": {
+        "return_1d": -0.0197,
+        "market_1d": -0.0004,
+        "unexplained_share": 0.98,
+        "session": "2026-09-25",
+        "note": "quiet: nothing collected; market -0.04%, drift -0.01%, idiosyncratic -1.92%, 0.49 sigma, not_significant, R2 0.00; closes 4.58 -> 4.49; 5d -4.67% vs +0.36%; google_news read empty 09:34Z"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:5225",
+      "move": {
+        "return_1d": -0.0037,
+        "market_1d": -0.0004,
+        "unexplained_share": 0.84,
+        "session": "2026-09-25",
+        "note": "market -0.03%, drift -0.02%, idiosyncratic -0.31%, 0.28 sigma, not_significant; closes 8.06 -> 8.03 on 1,543,700 shares; the first session that could read the appeal moved within normal variation; re-measured alone, 2026-09-22 (Macquarie session) is +4.99% vs +0.99%, idiosyncratic +4.21%, 3.80 sigma, significant at 5%, 83% unexplained (ask.py pack --date 2026-09-22, 22:49Z, not written)"
+      },
+      "causes": [],
+      "open_questions": [
+        "Does IHH carry the Daiichi Sankyo claim at any value in its accounts? Friday, the first session that could read the appeal, moved 0.28 sigma. (since 2026-09-24)",
+        "IHH's Tuesday is significant alone (3.80 sigma). The one candidate, the Macquarie headline, has no body. Which source carries the note's figures? (since 2026-09-22)"
+      ],
+      "watch": [
+        {
+          "when": "open",
+          "what": "a body or second source for the 2026-09-22 Macquarie note"
+        }
+      ]
+    },
+    {
+      "instrument_id": "MYX:8869",
+      "move": {
+        "return_1d": 0.0,
+        "market_1d": -0.0004,
+        "unexplained_share": 0.34,
+        "session": "2026-09-25",
+        "note": "quiet: nothing collected; market -0.04%, drift +0.14%, idiosyncratic -0.09%, 0.06 sigma, not_significant; closes 7.46 -> 7.46; 5d -4.36% vs +0.36%; monitor open: collected nothing in 14d"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:3182",
+      "move": {
+        "return_1d": 0.0,
+        "market_1d": -0.0004,
+        "unexplained_share": 0.5,
+        "session": "2026-09-25",
+        "note": "market -0.04%, drift -0.27%, idiosyncratic +0.31%, 0.17 sigma, not_significant; drift -0.269pp/session at 2.3 standard errors; R2 0.08; closes 1.88 -> 1.88; 5d -2.59% vs +0.36%; three in-session rows about businesses carrying the Genting name (Indonesian land law 02:45Z, Genting New York 04:51Z, Genting UK casinos 08:46Z), titles only, not weighed"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": []
+    },
+    {
+      "instrument_id": "XNAS:NVDA",
+      "move": {
+        "return_1d": 0.0022,
+        "market_1d": 0.0054,
+        "unexplained_share": 0.4,
+        "session": "2026-09-25",
+        "note": "market +0.93% at beta 1.72, drift -0.06%, idiosyncratic -0.65%, 0.36 sigma, not_significant; closes 224.58 -> 225.07; 5d +1.26% vs +1.27%"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [
+        {
+          "when": "2026-11-17",
+          "what": "earnings_result"
+        }
+      ]
+    },
+    {
+      "instrument_id": "XNAS:AAPL",
+      "move": {
+        "return_1d": 0.0153,
+        "market_1d": 0.0054,
+        "unexplained_share": 0.68,
+        "session": "2026-09-25",
+        "note": "market +0.40%, drift +0.08%, idiosyncratic +1.05%, 0.70 sigma, not_significant; closes 335.92 -> 341.07; 5d +1.47% vs +1.27%; USD 250m Siri settlement row (yahoo_rss 19:08Z) and Qualcomm's reversal row (247wallst 17:02Z), not weighed"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [
+        {
+          "when": "2026-10-28",
+          "what": "earnings_result"
+        }
+      ]
+    },
+    {
+      "instrument_id": "XNAS:MSFT",
+      "move": {
+        "return_1d": 0.0366,
+        "market_1d": 0.0054,
+        "unexplained_share": 0.85,
+        "session": "2026-09-25",
+        "note": "market +0.48%, drift -0.08%, idiosyncratic +3.27%, 1.74 sigma, no_identified_catalyst (past 1.5, short of 1.96); closes 497.93 -> 516.17 on 38,154,200 shares (16,657,600 Thursday); 5d +4.53% vs +1.27%; cached open 499.04 (+0.22%) disagrees with rows describing a 3% rise before or at the open"
+      },
+      "causes": [
+        {
+          "claim": "Copilot relaunch (Home, Code, Autopilot; usage-based billing) announced before the US open",
+          "evidence": [
+            "finnhub:142421651",
+            "finnhub:142424639",
+            "finnhub:142422002",
+            "finnhub:142426663",
+            "sec_xbrl:MSFT:capex_fy:2026-06-30"
+          ],
+          "chain": [
+            "Copilot relaunch announced 08:08Z, body links the company's post on blogs.microsoft.com (not fetched)",
+            "the rows describe a turn to enterprise use and usage-based billing",
+            "set against doubt that AI capex pays: capex 115.95bn USD FY to 2026-06-30 (sec_xbrl, knowable 2026-07-29)",
+            "unknown: no collected evidence reaches further (no Copilot revenue figure or billing terms in the stores)"
+          ],
+          "confidence": 0.45,
+          "confirm": "a second price source puts Friday's open near +3%, placing the move after the 08:08Z announcement and before the session's other news; or fmp records rating/target changes in the next sessions citing the relaunch",
+          "refute": "Monday 2026-09-28's idiosyncratic leg gives back most of +3.27% with no new Microsoft row, as the 09-23 Stifel-day leg did on 09-24",
+          "not_separated": [
+            "Oppenheimer target to USD 570 after HQ visit (thestreet 11:37Z; finnhub:142423777; finnhub:142424214), no fmp event",
+            "8% dividend increase (ad-hoc-news 11:11Z; fool.com 19:35Z), no fact-book event",
+            "over USD 10bn Gulf cloud and AI investment (tradersunion 14:02Z); India cloud row (stocktwits 15:28Z)",
+            "Nadella interviews (finnhub:142423775 13:57Z, finnhub:142423773 14:00Z)"
+          ]
+        }
+      ],
+      "open_questions": [
+        "Microsoft's cached bar opens at 499.04 (+0.22%), while two rows describe a 3% rise before or at the open. Which is right? And should the collector hold a second price source for the open on a day a cause is being timed? (since 2026-09-25)"
+      ],
+      "watch": [
+        {
+          "when": "2026-09-28",
+          "what": "idiosyncratic leg: holds or reverses"
+        },
+        {
+          "when": "2026-10-27",
+          "what": "earnings_result"
+        }
+      ]
+    }
+  ],
+  "machine": {
+    "guard": "Friday's late us_close cron (run 109, 23:56Z) changed only data/paper.db (afa2e76); Saturday's bursa_close cron arrived 13:45Z, 4h25m late (run 110, 001eb5d, 20260926T134519), and its 13:47Z price refetch filled ^KLSE 2026-09-22",
+    "tonight": "sweep --due 22:44Z named us_close (2026-09-26); dispatched 22:44Z as collect run 111; landed 22:46Z, run 20260926T224438, 53a61c0; 163 stored (finnhub 92, google_news 32, yahoo_rss 26, alphavantage_news 13); gdelt failed (HTTP 429)",
+    "monitor": "ask.py watch 22:49Z: NEW alert past its own cadence gdelt and twse_openapi (37h, allowed 30h); NEW price_stale (15 peers, third night, alerts.db not committed); still open MYX:8869 nothing in 14d; resolved series_stale; slots_missed not open",
+    "system_test": "pack still carries no doc_id/event_id (M7); ids on this page read from corpus.db directly"
+  },
+  "data_quality": {
+    "failed": [
+      "gdelt: HTTP 429 on first request, 09-25 us_close 22:46Z, 09-26 bursa_close 13:46Z, 09-26 us_close 22:46Z",
+      "twse_openapi: 09-26 bursa_close 13:46Z, every table returned an HTML 'FOR SECURITY REASONS' page"
+    ],
+    "degraded": [
+      "yahoo_rss: read empty for all six Bursa names (09-25 09:34Z, 09-26 13:46Z)",
+      "google_news Bursa 09:34Z: 57 fetched, 38 stored, empty for Petronas Chemicals, named the company in 20 of 46 (Press Metal 0/2, Tenaga 2/15)",
+      "gdelt 09-25 09:34Z: 7 stored, HTTP 429 on request 2 (IHH, Press Metal, Genting not read)",
+      "alphavantage_news: quota exhausted for XNAS:MSFT and XNAS:NVDA (09-25 and 09-26 us_close)",
+      "eodhd: 0 facts, 2-a-day credit budget",
+      "linker: both Tenaga rows in the window are Shree TNB Polymers",
+      "prices: single source; MSFT cached open 499.04 disagrees with rows describing a 3% rise at the open"
+    ],
+    "skipped": [
+      "fmp /earnings: outside the plan (HTTP 402) for NVDA, AAPL, MSFT"
+    ]
+  },
+  "open_questions_carried": [
+    "Microsoft's cached bar opens at 499.04 (+0.22%), while two rows describe a 3% rise before or at the open. Which is right? And should the collector hold a second price source for the open on a day a cause is being timed? (since 2026-09-25)",
+    "On Saturday's sweep `twse_openapi` returned an HTML *FOR SECURITY REASONS* page for every table. Is that a weekend block, or a block on the runner's address? The monitor now alerts on its cadence. (since 2026-09-25)",
+    "The monitor announced the same `price_stale` change as NEW for a third night. The routine never commits `data/alerts.db`, so the stored state is days old (system test M9). Should the routine commit the alerts store, or should it live outside git? (since 2026-09-24)",
+    "Does IHH carry the Daiichi Sankyo claim at any value in its accounts? Friday, the first session that could read the appeal, moved 0.28 sigma. (since 2026-09-24)",
+    "The pack measures across a blank proxy row without saying so (M3). `^KLSE` 09-22 is filled as of 2026-09-26T13:47Z, so tonight's figures cross none. The defect waits for the next blank: should the pack refuse the row, label it two-session, or scale the sigma? (since 2026-09-23)",
+    "The fact book holds no Bursa entitlement dates. Which source carries Bursa ex-dates? (since 2026-09-23)",
+    "`google_news` failed on all three US queries on the 09-24 `us_close`. It answered on both `us_close` sweeps since (149 stored on 09-25, 32 on 09-26). Were those two outages, or throttling at that hour on some nights? (since 2026-09-23)",
+    "IHH's Tuesday is significant alone (3.80 sigma). The one candidate, the Macquarie headline, has no body. Which source carries the note's figures? (since 2026-09-22)",
+    "A blank bar shared by a name and its proxy is labelled *correctly dated*, as if the market was shut. The `^KLSE` 09-22 bar arrived four days late, so that blank was the feed's and the market was open. Should the pack check the calendar or an independent index print first? (since 2026-09-22)",
+    "The move to 260-session betas re-measured the same Monday. Which window's shares do pages compare across the change? (since 2026-09-22)",
+    "Petronas Chemicals, Press Metal and Genting fell 2.3–2.8% on a +0.08% index day with no row about any of them: one factor or three stories? On Friday they read −1.97%, 0.00% and 0.00%. No Bursa sector proxy is cached. (since 2026-09-21)",
+    "Tenaga: the rows hold both readings, *minimal impact* and *undermines the IBR framework*, as titles only. Friday +0.61% (0.83 sigma); five sessions +0.77%. What figure would let the page tell the readings apart? (since 2026-09-18)",
+    "`DFF` stepped +0.25 on 2026-09-17 and the collector holds no statement for it. Where does a statement come from? (since 2026-09-20)",
+    "A short-interest weekly named Petronas Chemicals for the week to 09-18. Would Bursa's daily short-selling report give the name a body? (since 2026-09-20)",
+    "Wiring a catalyst matcher to the corpus is still open. Tonight Microsoft is the case: a verdict that warrants a cause, 134 linked rows, and nothing in the pack that weighs them. (since 2026-09-18)",
+    "Petronas Chemicals' idiosyncratic days read *not significant* because its own sigma contains the +22.56% run. The 260-session window still contains it. (since 2026-09-18)",
+    "Petronas Chemicals collecting a body: which of the eleven listed sources carries a Bursa-hours story about it at all? There were zero rows again on 09-25. (since 2026-09-10; folded 09-17)",
+    "The linker attached a *Genting Plantations* headline to MYX:3182, then *Ho Wah Genting*. Both of Tenaga's rows in Friday's window are *Shree TNB Polymers*. How many rows per name are about other companies? (since 2026-09-17)",
+    "Which earlier pages were written from a pre-close cache? `dfc45e3` labels such rows. (since 2026-09-17)",
+    "Does a page need to state a market's non-trading day as a fact rather than infer it from blank bars? (since 2026-09-16)",
+    "Brent: 114.89 at 09-22, +22.18 over twenty observations, with no print since. Friday's market row says oil fell back below $100. What the move did to Petronas Chemicals' feedstock reading is still unanswered, because the decomposition has no commodity leg. (since 2026-09-16)",
+    "Press Metal collecting anything: zero rows on 09-25, named in 0 of 2 `google_news` rows at 09:34Z, and read empty on Saturday. (since 2026-09-15)",
+    "The sector beta is fixed at 0, so any sector-wide session lands in a residual labelled `idiosyncratic`. Tonight that bears on Microsoft's +3.27%: a software-sector day would sit inside it unseen. (since 2026-09-14)",
+    "GDELT has hit HTTP 429 on the first request in three consecutive sweeps, and the monitor now alerts on it. Is it per-IP throttling on the shared runner? (since 2026-09-08)",
+    "Tenaga: is the 5d move the results print the 2026-09-04 roundup headline referred to? (since 2026-09-04)",
+    "NVIDIA: filing or release for the Hugging Face transaction. (since 2026-09-04)",
+    "Is the observe phase's grading against the control informative at 21 days? The first observe grades fall due 2026-10-11. (since 2026-09-08)"
+  ],
+  "lessons": [
+    "A late bar can answer an old question: ^KLSE's 09-22 bar arrived four days late and turned IHH's two-session reading into a one-session reading significant at 5%, so a question held open for a missing bar should be re-measured the night the bar lands.",
+    "The story named in the most headlines is not thereby the cause: only timing against the price path separates same-day stories, and that needs an open price two sources agree on.",
+    "Coverage is not impact: IHH's appeal produced seven same-day rows and the first session able to read them moved 0.28 sigma."
+  ],
+  "closed": [
+    "IHH: what share of Tuesday was IHH's own? (since 2026-09-22) - 83% unexplained, idiosyncratic +4.21%, 3.80 sigma, measured alone after ^KLSE 2026-09-22 was filled"
+  ]
+}
