@@ -1,6 +1,78 @@
 {
   "collection": [
     {
+      "at": "2026-09-26T22:46:11.764776+00:00",
+      "detail": "facts 0; EODHD plan: free (2 names a day, US only, rotated); XNAS:AAPL: deferred by the 2-a-day credit budget; next in rotation; XNAS:MSFT: outside the plan or over today's credits; XNAS:NVDA: outside the plan or over today's credits",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-26T22:46:11.249663+00:00",
+      "detail": "facts 0; ",
+      "fetched": 14,
+      "kept": 3,
+      "source": "jin10_flash",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-26T22:46:10.054904+00:00",
+      "detail": "facts 8; XNAS:MSFT: alphavantage quota exhausted for today: Thank you for using Alpha Vantage! Please consider spreading out your free API requests more sparingly (1 request per second). You may subscribe to any of the p; XNAS:NVDA: alphavantage quota exhausted for today: Thank you for using Alpha Vantage! Please consider spreading out your free API requests more sparingly (1 request per second). You may subscribe to any of the p",
+      "fetched": 16,
+      "kept": 15,
+      "source": "alphavantage_news",
+      "status": "ok",
+      "stored": 13
+    },
+    {
+      "at": "2026-09-26T22:46:09.694208+00:00",
+      "detail": "facts 10; ",
+      "fetched": 130,
+      "kept": 119,
+      "source": "finnhub",
+      "status": "ok",
+      "stored": 92
+    },
+    {
+      "at": "2026-09-26T22:46:08.374820+00:00",
+      "detail": "facts 0; ",
+      "fetched": 0,
+      "kept": 0,
+      "source": "edgar",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-26T22:46:08.164033+00:00",
+      "detail": "named the company: 31 of 31 (lowest: Apple 6/6, Microsoft 5/5, NVIDIA 20/20)",
+      "fetched": 31,
+      "kept": 31,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 26
+    },
+    {
+      "at": "2026-09-26T22:46:07.747694+00:00",
+      "detail": "named the company: 27 of 34 (lowest: NVIDIA 8/13, Microsoft 6/8, Apple 13/13)",
+      "fetched": 40,
+      "kept": 34,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 32
+    },
+    {
+      "at": "2026-09-26T22:46:06.148396+00:00",
+      "detail": "no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked)",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "failed",
+      "stored": 0
+    },
+    {
       "at": "2026-09-26T13:46:54.274934+00:00",
       "detail": "facts 0; EODHD plan: free (2 names a day, US only, rotated); MYX:1155: deferred by the 2-a-day credit budget; next in rotation; MYX:5347: deferred by the 2-a-day credit budget; next in rotation; MYX:5183: deferred by the 2-a-day credit budget; next in rotation; MYX:5225: deferred by the 2-a-day credit budget; next in rotation; outside the free plan (US only), so not asked for: MYX:1155, MYX:5347, MYX:5183, MYX:5225. The EODHD Fundamentals plan covers KLSE and TW.; MYX:8869: EODHD free plan: US only; the Fundamentals plan covers KLSE; MYX:3182: EODHD free plan: US only; the Fundamentals plan covers KLSE",
       "fetched": 0,
@@ -83,18 +155,18 @@
     }
   ],
   "counts": {
-    "articles": 9545,
+    "articles": 9708,
     "documents": 0,
-    "escalated": 1623,
-    "events": 4138,
-    "failed_sweeps": 29,
-    "linked": 6515,
-    "observations": 4778,
+    "escalated": 1645,
+    "events": 4139,
+    "failed_sweeps": 30,
+    "linked": 6673,
+    "observations": 4795,
     "series": 31,
-    "sweeps": 515
+    "sweeps": 523
   },
   "day": "2026-09-26",
-  "generated_at": "2026-09-26 13:47 UTC",
+  "generated_at": "2026-09-26 22:46 UTC",
   "macro": [
     {
       "change": "0.07",
@@ -341,18 +413,18 @@
       "upcoming": []
     },
     {
-      "escalated": 30,
+      "escalated": 35,
       "events": [],
       "instrument_id": "XNAS:NVDA",
       "label": "NVIDIA",
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-09-25",
+          "known_at": "2026-09-26",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "27.84"
+          "value": "28.11"
         },
         {
           "concept": "pb",
@@ -380,7 +452,7 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-09-25",
+          "known_at": "2026-09-26",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
@@ -436,11 +508,11 @@
         },
         {
           "concept": "av_news_sentiment",
-          "known_at": "2026-09-25",
+          "known_at": "2026-09-26",
           "label": "vendor sentiment",
-          "period_end": "2026-09-25",
+          "period_end": "2026-09-26",
           "source": "alphavantage_news",
-          "value": "0.11"
+          "value": "0.02"
         },
         {
           "concept": "revenue",
@@ -469,6 +541,17 @@
       ],
       "stories": [
         {
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/ionq-ionq-just-landed-nvidia-175356083.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-09-26T17:53:56+00:00",
+          "quality": 1.0,
+          "title": "IonQ (IONQ) Just Landed Nvidia Less Than 2 Years After Jensen Huang\u2019s 30-Year Quantum Warning",
+          "uncertainty": 0.17857142857142855
+        },
+        {
           "doc_id": "https://finance.yahoo.com/markets/stocks/articles/does-ionqs-nvidia-quantum-tie-210735580.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
           "escalated": true,
@@ -478,6 +561,28 @@
           "quality": 1.0,
           "title": "Does IonQ's NVIDIA Quantum Tie-Up Reframe the Long-Term Hardware Opportunity for Rigetti Computing (RGTI)?",
           "uncertainty": 0.14534883720930233
+        },
+        {
+          "doc_id": "finnhub:142436033",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-26T08:35:00+00:00",
+          "quality": 0.85,
+          "title": "Amazon Has No Dividend. Here's Why Long-Term Investors Should Own It Anyway.",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142433111",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-26T04:51:01+00:00",
+          "quality": 0.85,
+          "title": "NVIDIA (NVDA) vs. Broadcom (AVGO): Which AI Chip Stock Has the Stronger Moat?",
+          "uncertainty": 0.0
         },
         {
           "doc_id": "finnhub:142424978",
@@ -522,63 +627,30 @@
           "quality": 0.85,
           "title": "Nvidia Stock Moves Lower as Einride Scales Physical AI",
           "uncertainty": 0.0
-        },
-        {
-          "doc_id": "finnhub:142424607",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-25T16:43:22+00:00",
-          "quality": 0.85,
-          "title": "Nvidia GPU Demand Is So Extreme, Even Bad Cloud Infrastructure Is Selling, SemiAnalysis Says",
-          "uncertainty": 0.2232142857142857
-        },
-        {
-          "doc_id": "finnhub:142424608",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
-          "polarity": 0.0,
-          "published_at": "2026-09-25T16:00:18+00:00",
-          "quality": 0.85,
-          "title": "If You Invest $500 a Month in Nvidia Starting Now, This is What You\u2019d Have in 2030",
-          "uncertainty": 0.5952380952380952
-        },
-        {
-          "doc_id": "finnhub:142423747",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-25T15:41:00+00:00",
-          "quality": 0.85,
-          "title": "RMX Signs Compute Supply Purchase Order with Technologent for NVIDIA H200 GPUs",
-          "uncertainty": 0.0
         }
       ],
       "tone": {
-        "intensity_max": 0.333,
-        "n": 100,
-        "polarity_mean": 0.075,
-        "sources": 25,
-        "uncertainty_mean": 0.178
+        "intensity_max": 0.667,
+        "n": 195,
+        "polarity_mean": 0.138,
+        "sources": 32,
+        "uncertainty_mean": 0.169
       },
       "upcoming": []
     },
     {
-      "escalated": 15,
+      "escalated": 27,
       "events": [],
       "instrument_id": "XNAS:AAPL",
       "label": "Apple",
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-09-25",
+          "known_at": "2026-09-26",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "38.14"
+          "value": "38.49"
         },
         {
           "concept": "pb",
@@ -606,7 +678,7 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-09-25",
+          "known_at": "2026-09-26",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
@@ -662,11 +734,11 @@
         },
         {
           "concept": "av_news_sentiment",
-          "known_at": "2026-09-25",
+          "known_at": "2026-09-26",
           "label": "vendor sentiment",
-          "period_end": "2026-09-25",
+          "period_end": "2026-09-26",
           "source": "alphavantage_news",
-          "value": "0.09"
+          "value": "0.07"
         },
         {
           "concept": "revenue",
@@ -706,105 +778,105 @@
           "uncertainty": 0.13736263736263735
         },
         {
-          "doc_id": "alphavantage:https://www.thenewstribune.com/news/state/washington/article317386405.html",
-          "domain": "Tacoma News Tribune",
+          "doc_id": "alphavantage:https://unn.ua/en/news/apple-has-been-ordered-to-pay-a-record-dollar57-billion-in-a-case-concerning-a-patent-for-haptic-feedback-technology",
+          "domain": "\u0423\u043a\u0440\u0430\u0457\u043d\u0441\u044c\u043a\u0456 \u041d\u0430\u0446\u0456\u043e\u043d\u0430\u043b\u044c\u043d\u0456 \u041d\u043e\u0432\u0438\u043d\u0438 (\u0423\u041d\u041d)",
           "escalated": true,
-          "intensity": 0.0,
-          "polarity": -1.0,
-          "published_at": "2026-09-25T20:59:21+00:00",
-          "quality": 0.85,
-          "title": "Apple reaches $250 million iPhone settlement. Who\u2019s eligible to get money in WA?",
-          "uncertainty": 0.1582278481012658
-        },
-        {
-          "doc_id": "alphavantage:https://uk.finance.yahoo.com/news/alphabet-vs-apple-consumer-ai-170200892.html",
-          "domain": "Yahoo Finance UK",
-          "escalated": true,
-          "intensity": 0.0,
+          "intensity": 0.3333333333333333,
           "polarity": 1.0,
-          "published_at": "2026-09-25T17:50:40+00:00",
+          "published_at": "2026-09-26T16:49:44+00:00",
           "quality": 0.85,
-          "title": "Alphabet vs. Apple: Which Consumer AI Tech Stock Has an Edge Now?",
+          "title": "Apple has been ordered to pay a record $5.7 billion in a case concerning a patent for haptic feedback technology",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "https://247wallst.com/investing/2026/09/25/qualcomm-rallies-6-as-buyers-reverse-apple-renewal-selloff-apple-stock-ticks-up/?.tsrc=rss",
-          "domain": "247wallst.com",
+          "doc_id": "alphavantage:https://www.reuters.com/legal/litigation/us-jury-says-apple-owes-record-57-billion-haptic-technology-patent-case-2026-09-26/",
+          "domain": "Reuters",
           "escalated": true,
           "intensity": 0.3333333333333333,
           "polarity": 0.0,
-          "published_at": "2026-09-25T17:02:46+00:00",
+          "published_at": "2026-09-26T14:16:26+00:00",
           "quality": 0.85,
-          "title": "Qualcomm Rallies 6% as Buyers Reverse Apple Renewal Selloff; Apple Stock Ticks Up",
+          "title": "US jury says Apple owes record $5.7 billion in haptic technology patent case",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:142424625",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
-          "polarity": 1.0,
-          "published_at": "2026-09-25T16:30:30+00:00",
-          "quality": 0.85,
-          "title": "Apple Stock Outlook: Our Target Leaves Wall Street Behind",
-          "uncertainty": 0.2604166666666667
-        },
-        {
-          "doc_id": "alphavantage:https://topclassactions.com/lawsuit-settlements/lawsuit-news/apple-hit-with-another-lawsuit-over-airtag-stalking-after-class-action-fails/",
-          "domain": "Top Class Actions",
+          "doc_id": "finnhub:142439150",
+          "domain": "CNBC",
           "escalated": true,
           "intensity": 0.0,
-          "polarity": -1.0,
-          "published_at": "2026-09-25T14:17:42+00:00",
+          "polarity": 0.0,
+          "published_at": "2026-09-26T10:55:59+00:00",
           "quality": 0.85,
-          "title": "Apple hit with another lawsuit over AirTag stalking after class action fails",
+          "title": "Apple faces $5.7 billion patent infringement verdict over iPhone and Apple Watch haptics",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "alphavantage:https://www.tradingkey.com/news/market-movers/262186970-market-movers-qcom-20260925",
-          "domain": "TradingKey",
+          "doc_id": "alphavantage:https://www.marketbeat.com/instant-alerts/filing-womack-financial-llc-makes-new-investment-in-apple-inc-aapl-2026-09-26/",
+          "domain": "MarketBeat",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 1.0,
-          "published_at": "2026-09-25T14:12:19+00:00",
+          "published_at": "2026-09-26T07:36:22+00:00",
           "quality": 0.85,
-          "title": "Qualcomm Inc Stock (QCOM) Opened Up by 3.05% on Sep 25: What Signal Does It Send?",
-          "uncertainty": 0.2717391304347826
+          "title": "Womack Financial LLC Makes New Investment in Apple Inc. $AAPL",
+          "uncertainty": 0.29069767441860467
         },
         {
-          "doc_id": "finnhub:142424627",
-          "domain": "Yahoo",
+          "doc_id": "alphavantage:https://www.marketbeat.com/instant-alerts/filing-ames-national-corp-buys-17539-shares-of-apple-inc-aapl-2026-09-26/",
+          "domain": "MarketBeat",
           "escalated": true,
           "intensity": 0.0,
-          "polarity": -1.0,
-          "published_at": "2026-09-25T13:39:45+00:00",
+          "polarity": 1.0,
+          "published_at": "2026-09-26T07:26:06+00:00",
           "quality": 0.85,
-          "title": "Bernstein sees downside risk to Apple\u2019s December quarter results",
-          "uncertainty": 0.5102040816326531
+          "title": "Ames National Corp Buys 17,539 Shares of Apple Inc. $AAPL",
+          "uncertainty": 0.1582278481012658
+        },
+        {
+          "doc_id": "alphavantage:https://www.marketbeat.com/instant-alerts/filing-10144-shares-in-apple-inc-aapl-bought-by-veratis-advisors-inc-2026-09-26/",
+          "domain": "MarketBeat",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-26T07:18:29+00:00",
+          "quality": 0.85,
+          "title": "10,144 Shares in Apple Inc. $AAPL Bought by Veratis Advisors Inc.",
+          "uncertainty": 0.17123287671232876
+        },
+        {
+          "doc_id": "alphavantage:https://www.marketbeat.com/instant-alerts/filing-ally-financial-inc-acquires-new-position-in-apple-inc-aapl-2026-09-26/",
+          "domain": "MarketBeat",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-26T06:52:21+00:00",
+          "quality": 0.85,
+          "title": "Ally Financial Inc. Acquires New Position in Apple Inc. $AAPL",
+          "uncertainty": 0.17605633802816903
         }
       ],
       "tone": {
         "intensity_max": 0.667,
-        "n": 57,
-        "polarity_mean": 0.123,
-        "sources": 35,
-        "uncertainty_mean": 0.086
+        "n": 91,
+        "polarity_mean": 0.165,
+        "sources": 53,
+        "uncertainty_mean": 0.091
       },
       "upcoming": []
     },
     {
-      "escalated": 20,
+      "escalated": 23,
       "events": [],
       "instrument_id": "XNAS:MSFT",
       "label": "Microsoft",
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-09-25",
+          "known_at": "2026-09-26",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "27.39"
+          "value": "28.48"
         },
         {
           "concept": "pb",
@@ -832,7 +904,7 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-09-25",
+          "known_at": "2026-09-26",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
@@ -888,11 +960,11 @@
         },
         {
           "concept": "av_news_sentiment",
-          "known_at": "2026-09-25",
+          "known_at": "2026-09-26",
           "label": "vendor sentiment",
-          "period_end": "2026-09-25",
+          "period_end": "2026-09-26",
           "source": "alphavantage_news",
-          "value": "0.06"
+          "value": "0.00"
         },
         {
           "concept": "revenue",
@@ -929,6 +1001,28 @@
           "published_at": "2026-09-25T18:43:00+00:00",
           "quality": 1.0,
           "title": "Microsoft Stock Is on Pace for Its Highest Close in Nearly 11 Months. Here\u2019s Why.",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142426663",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "polarity": 1.0,
+          "published_at": "2026-09-25T23:13:47+00:00",
+          "quality": 0.85,
+          "title": "Azure\u2019s Inflection Point: Can Microsoft (MSFT) Balance AI Growth With Capex Risk?",
+          "uncertainty": 0.1838235294117647
+        },
+        {
+          "doc_id": "finnhub:142426660",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-09-25T23:09:41+00:00",
+          "quality": 0.85,
+          "title": "What Is Microsoft (MSFT) Planning With Its $10 Billion Gulf Cloud And AI Push?",
           "uncertainty": 0.0
         },
         {
@@ -985,36 +1079,14 @@
           "quality": 0.85,
           "title": "Microsoft shares rise over 3% after expanded Copilot release",
           "uncertainty": 0.0
-        },
-        {
-          "doc_id": "finnhub:142423773",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-25T14:00:56+00:00",
-          "quality": 0.85,
-          "title": "Why 'trust' will Microsoft's 'biggest' AI issue: CEO Satya Nadella explains",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "finnhub:142422014",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-25T12:16:38+00:00",
-          "quality": 0.85,
-          "title": "Goldman Sachs just gave AI stock fans a cold, hard reality check",
-          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.667,
-        "n": 91,
-        "polarity_mean": 0.17,
-        "sources": 37,
-        "uncertainty_mean": 0.057
+        "n": 110,
+        "polarity_mean": 0.159,
+        "sources": 44,
+        "uncertainty_mean": 0.056
       },
       "upcoming": []
     }
