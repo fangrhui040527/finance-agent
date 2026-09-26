@@ -276,6 +276,11 @@ questions:
     listing the ticker among others in the title. SIXTEEN labels. It reached a
     pull request that touches no retrieval code (#77, a workflow fix) and went
     red on it, which is the cost of the hand list landing on unrelated work.
+
+    A ninth on the 2026-09-25 sweeps, found by the 2026-09-26 self-check: two
+    Finnhub documents, one with the ticker in its title and one that carries
+    it only in the body ("NASDAQ:SPCX"), which a title scan would have missed
+    and the containment guard did not. EIGHTEEN labels.
   relevant:
   - doc_id: https://stocktwits.com/news-articles/markets/equity/s-and-p-500-dow-end-best-day-in-a-month/cZsufnBRJvu?.tsrc=rss
     title: S&P 500, Dow End Best Day In A Month On Calmer Yields As Rate Hike Bets Wane — SPCX, VSXY,
@@ -314,6 +319,10 @@ questions:
     title: "Nasdaq Jumps To Close At Record As Chipmakers Climb, Oil Prices Cool — AAPL, META, SPCX, MSFT, VKTX In Focus"
   - doc_id: finnhub:142322687
     title: "TSLA, SPCX, AAPL Could Be Next To ‘Rip’ After Meta’s Muse Rally, Analyst Says — Here Are The Catalysts"
+  - doc_id: finnhub:142408138
+    title: "SPCX Stock Climbs Premarket As Musk Teases 3 Nvidia Chip Waves — Google Books SpaceX Ride For Orbital AI Test"
+  - doc_id: finnhub:142393680
+    title: "Mark Zuckerberg's Muse Push Rockets Meta Past Musk's SpaceX — Instagram, Facebook Parent Now Worth $1.98 Trillion"
 - query: KeyBanc Underweight rating Apple
   kind: lexical
   note: broker plus rating word
