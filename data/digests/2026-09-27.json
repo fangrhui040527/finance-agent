@@ -1,6 +1,87 @@
 {
   "collection": [
     {
+      "at": "2026-09-27T14:44:06.684364+00:00",
+      "detail": "facts 0; EODHD plan: free (2 names a day, US only, rotated); MYX:5183: deferred by the 2-a-day credit budget; next in rotation; MYX:5225: deferred by the 2-a-day credit budget; next in rotation; MYX:8869: deferred by the 2-a-day credit budget; next in rotation; MYX:3182: deferred by the 2-a-day credit budget; next in rotation; outside the free plan (US only), so not asked for: MYX:5183, MYX:5225, MYX:8869, MYX:3182. The EODHD Fundamentals plan covers KLSE and TW.; MYX:1155: EODHD free plan: US only; the Fundamentals plan covers KLSE; MYX:5347: EODHD free plan: US only; the Fundamentals plan covers KLSE",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-27T14:44:06.408348+00:00",
+      "detail": "facts 0; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-27T14:43:42.948320+00:00",
+      "detail": "facts 0; ",
+      "fetched": 16,
+      "kept": 5,
+      "source": "jin10_flash",
+      "status": "ok",
+      "stored": 3
+    },
+    {
+      "at": "2026-09-27T14:43:41.888637+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-27T14:43:40.221175+00:00",
+      "detail": "",
+      "fetched": 50,
+      "kept": 49,
+      "source": "nst_business",
+      "status": "ok",
+      "stored": 46
+    },
+    {
+      "at": "2026-09-27T14:43:38.815162+00:00",
+      "detail": "",
+      "fetched": 48,
+      "kept": 48,
+      "source": "fmt_business",
+      "status": "ok",
+      "stored": 48
+    },
+    {
+      "at": "2026-09-27T14:43:38.626923+00:00",
+      "detail": "read but empty: Genting, Maybank, Tenaga, Petronas Chemicals, IHH, Press Metal",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-27T14:43:36.719256+00:00",
+      "detail": "read but empty: Press Metal; named the company: 3 of 8 (lowest: IHH 0/4, Petronas Chemicals 0/1, Maybank 1/1)",
+      "fetched": 10,
+      "kept": 8,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 6
+    },
+    {
+      "at": "2026-09-27T14:43:35.029209+00:00",
+      "detail": "no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked); deferred: Petronas Chemicals, IHH, Press Metal",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "failed",
+      "stored": 0
+    },
+    {
       "at": "2026-09-27T05:49:06.272516+00:00",
       "detail": "facts 0; ",
       "fetched": 4157,
@@ -56,18 +137,18 @@
     }
   ],
   "counts": {
-    "articles": 9708,
+    "articles": 9811,
     "documents": 0,
     "escalated": 1645,
     "events": 4139,
-    "failed_sweeps": 30,
-    "linked": 6673,
+    "failed_sweeps": 31,
+    "linked": 6676,
     "observations": 4813,
     "series": 31,
-    "sweeps": 529
+    "sweeps": 538
   },
   "day": "2026-09-27",
-  "generated_at": "2026-09-27 05:49 UTC",
+  "generated_at": "2026-09-27 14:44 UTC",
   "macro": [
     {
       "change": "0.07",
@@ -205,8 +286,26 @@
       "instrument_id": "MYX:1155",
       "label": "Maybank",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMickFVX3lxTFB4OGJubUtsTU1zMmtJcWt6YmFvSDlUTnFPZkpZOGwwdTZadUdFWUo5aFdPdkFhMWd1UENuTHpqVzd6OTJXRXRWVzlTc3EzVlJsS2lrRW83OGo2S1pIQUxzXzhWUXNDYll6WjNGZVJ3WVl4dw?oc=5",
+          "domain": "milelion.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-27T13:55:01+00:00",
+          "quality": 0.65,
+          "title": "Review: Maybank World Mastercard",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -215,8 +314,26 @@
       "instrument_id": "MYX:5347",
       "label": "Tenaga",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxPbnBqdFBla3ZrbzlIQnFZZnZDMzNqZEFwaFdTeEFoa2FsaVRLdFNfUXUxZF9aVUU0bVZoQzdpWnZ4TzhZMUFnZGljRTM0alRpTUFkNEREVi1nVE9VZ2hkNVo5SU53c19DeXdMemI3bENHcHR6QVZuSmF5NXNQUHFwWnNMa0xvbHU0SThpQnVXLWtxSUQ4bUliZU9aR0pVcHVha3FXRkRuYXVBd1ZJT1RLeXJ3RktoQXVh?oc=5",
+          "domain": "www.nst.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-27T02:25:55+00:00",
+          "quality": 0.8,
+          "title": "TNB navigates rising generation costs under regulated power framework",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {

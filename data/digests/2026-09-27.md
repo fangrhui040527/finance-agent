@@ -1,14 +1,16 @@
 # Digest 2026-09-27
 
-Generated 2026-09-27 05:49 UTC · slot `all` · 9708 articles in the corpus, 4813 observations, 4139 events in the fact book.
+Generated 2026-09-27 14:44 UTC · slot `all` · 9811 articles in the corpus, 4813 observations, 4139 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-09-27 milelion.com — Review: Maybank World Mastercard [q 0.65, tone +0.0]
 
 ### Tenaga (MYX:5347)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-09-27 www.nst.com.my — TNB navigates rising generation costs under regulated power framework [q 0.80, tone +0.0]
 
 ### Petronas Chemicals (MYX:5183)
 - quiet: nothing collected for this name in the window
@@ -84,6 +86,15 @@ Generated 2026-09-27 05:49 UTC · slot `all` · 9708 articles in the corpus, 481
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 14:44 | eodhd | ok | 0 | 0 | 0 | facts 0; EODHD plan: free (2 names a day, US only, rotated); MYX:5183: deferred  |
+| 14:44 | twse_openapi | ok | 8 | 0 | 0 | facts 0;  |
+| 14:43 | jin10_flash | ok | 16 | 5 | 3 | facts 0;  |
+| 14:43 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 14:43 | nst_business | ok | 50 | 49 | 46 |  |
+| 14:43 | fmt_business | ok | 48 | 48 | 48 |  |
+| 14:43 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Genting, Maybank, Tenaga, Petronas Chemicals, IHH, Press Metal |
+| 14:43 | google_news | ok | 10 | 8 | 6 | read but empty: Press Metal; named the company: 3 of 8 (lowest: IHH 0/4, Petrona |
+| 14:43 | gdelt | failed | 0 | 0 | 0 | no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP |
 | 05:49 | sec_xbrl | ok | 4157 | 0 | 0 | facts 0;  |
 | 05:49 | finmind | ok | 76 | 0 | 0 | facts 4;  |
 | 05:49 | twse_openapi | ok | 8 | 0 | 0 | facts 0;  |
