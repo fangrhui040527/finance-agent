@@ -1,0 +1,202 @@
+{
+  "day": "2026-09-26",
+  "written_at": "2026-09-27T22:52:17Z",
+  "measured_session": {
+    "bursa": "none - Saturday; last session 2026-09-25 (on the 2026-09-25 page)",
+    "us": "none - Saturday; last session 2026-09-25 (on the 2026-09-25 page)"
+  },
+  "pack_built": "2026-09-27T22:46:00Z",
+  "market": {
+    "regime": "no_session",
+    "notes": [
+      "Saturday: neither Bursa nor Nasdaq opened; the pack's moves rows all read 'last session 2026-09-25'; five-session figures are Friday's: MYX:^KLSE +0.36%, XNAS:SPY +1.27%",
+      "no FRED series printed a later date than on the 2026-09-25 page: SP500 7704.13, NASDAQCOM 26939.37, BAMLH0A0HYM2 2.80, T10Y2Y 0.31 at 09-24; DGS10 5.11, DGS2 4.85, DFF 3.88 at 09-23; VIXCLS 14.21, DCOILBRENTEU 114.89 at 09-22; DEXMAUS 4.0793 at 09-18",
+      "three company events over the weekend, each first readable by Monday 2026-09-28's session: Apple's USD 5.7bn patent verdict, Maybank's RM1.56bn AT1 sukuk redemption, India's Supreme Court clearing a forensic audit of the Fortis share transfers (IHH)",
+      "finnhub:142426661 (Friday 22:51Z): indices ended the week higher on chipmakers and easing oil; the Brent series has no print after 09-22 to check it"
+    ]
+  },
+  "names": [
+    {
+      "instrument_id": "MYX:1155",
+      "move": {
+        "note": "NO SESSION - Saturday 2026-09-26; the pack's row is the 2026-09-25 session, published on that page, and is not a new measurement"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [
+        {
+          "when": "2026-09-28",
+          "what": "first session that can read the sukuk redemption"
+        }
+      ],
+      "note": "one company event: 'Maybank Fully Redeems RM1.56 Billion AT1 Sukuk On First Call Date' (businesstoday.com.my via google_news, 2026-09-26T03:43Z, title only); what happened to the bank, not a mention; no fact-book event; NOTHING COLLECTED"
+    },
+    {
+      "instrument_id": "MYX:5347",
+      "move": {
+        "note": "NO SESSION - Saturday 2026-09-26; the pack's row is the 2026-09-25 session, published on that page, and is not a new measurement"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [],
+      "note": "one linked row, an Indian IPO: 'Shree TNB Polymers Ltd IPO Date...' (moneycontrol.com via google_news, 09:24Z) - third day the linker attached that company on the letters TNB"
+    },
+    {
+      "instrument_id": "MYX:5183",
+      "move": {
+        "note": "NO SESSION - Saturday 2026-09-26; the pack's row is the 2026-09-25 session, published on that page, and is not a new measurement"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [],
+      "note": "nothing collected; google_news read empty 09-26 13:46Z and named it 0 of 1 on 09-27 14:43Z"
+    },
+    {
+      "instrument_id": "MYX:5225",
+      "move": {
+        "note": "NO SESSION - Saturday 2026-09-26; the pack's row is the 2026-09-25 session, published on that page, and is not a new measurement"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [
+        {
+          "when": "2026-09-28",
+          "what": "any row with a body on the Fortis audit or the Tokyo appeal"
+        }
+      ],
+      "note": "India's Supreme Court let a forensic audit of the Fortis share transfers proceed: linked row economictimes.indiatimes.com via google_news 2026-09-26T01:04Z (title only); earliest row lawbeat.in 2026-09-25T07:40Z during Bursa's afternoon session, not linked; Friday moved -0.37%, 0.28 sigma; Sunday's three Fortis-response rows name no IHH and carry no body"
+    },
+    {
+      "instrument_id": "MYX:8869",
+      "move": {
+        "note": "NO SESSION - Saturday 2026-09-26; the pack's row is the 2026-09-25 session, published on that page, and is not a new measurement"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [],
+      "note": "nothing collected; google_news read empty Saturday and Sunday; monitor: collected nothing in 14d"
+    },
+    {
+      "instrument_id": "MYX:3182",
+      "move": {
+        "note": "NO SESSION - Saturday 2026-09-26; the pack's row is the 2026-09-25 session, published on that page, and is not a new measurement"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [],
+      "note": "nothing collected; google_news read empty 09-26 13:46Z"
+    },
+    {
+      "instrument_id": "XNAS:NVDA",
+      "move": {
+        "note": "NO SESSION - Saturday 2026-09-26; the pack's row is the 2026-09-25 session, published on that page, and is not a new measurement"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [
+        {
+          "when": "2026-11-17",
+          "what": "earnings_result"
+        }
+      ],
+      "note": "102 rows on Saturday, features (IonQ tie-up first collected 09-24, finnhub:142366590) and chip-moat comparisons; no dated company event; pe_ttm 28.12 (finnhub, 2026-09-27)"
+    },
+    {
+      "instrument_id": "XNAS:AAPL",
+      "move": {
+        "note": "NO SESSION - Saturday 2026-09-26; the pack's row is the 2026-09-25 session, published on that page, and is not a new measurement"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [
+        {
+          "when": "2026-09-28",
+          "what": "idiosyncratic leg in the first session after the verdict: past 1.5 sigma makes the verdict the dated candidate; inside normal variation says the session did not price it"
+        },
+        {
+          "when": "2026-10-28",
+          "what": "earnings_result"
+        }
+      ],
+      "note": "USD 5.7bn patent verdict (Taction Technology, haptics, two patents, not willful; Apple to appeal): earliest row alphavantage:https://news.bloomberglaw.com/ip-law/apple-owes-5-7-billion-to-litigation-funded-firm-in-patent-case at 2026-09-25T23:30Z, 3h30m after Friday's close; Reuters alphavantage:https://www.reuters.com/legal/litigation/us-jury-says-apple-owes-record-57-billion-haptic-technology-patent-case-2026-09-26/ (14:16Z); CNBC finnhub:142439150; Benzinga finnhub:142447595; unweighed scale: net income 29.79bn USD quarter to 2026-06-27, cash 39.54bn (sec_xbrl); no fact-book event; 37 linked rows on Saturday"
+    },
+    {
+      "instrument_id": "XNAS:MSFT",
+      "move": {
+        "note": "NO SESSION - Saturday 2026-09-26; the pack's row is the 2026-09-25 session, published on that page, and is not a new measurement"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [
+        {
+          "when": "2026-09-28",
+          "what": "idiosyncratic leg: giving back most of +3.27% with no new Microsoft row refutes the Copilot reading"
+        },
+        {
+          "when": "2026-10-27",
+          "what": "earnings_result"
+        }
+      ],
+      "note": "16 Saturday rows, all about Friday (finnhub:142432566, finnhub:142436448, RBC Buy reiteration via google_news 18:32Z title only); none states Friday's open, so the open disagreement stands"
+    }
+  ],
+  "machine": {
+    "saturday": "bursa_close cron arrived 13:45Z (4h25m late; 20260926T134519, 001eb5d); us_close dispatched 22:44Z, landed 22:46Z (20260926T224438, 53a61c0), 163 stored; the late us_close cron at 23:38Z changed only data/paper.db (c73ae5b): the guard held",
+    "sunday": "weekly (cron 02:00Z) dispatched by the self-check, landed 05:49Z (c8222af, 20260927T054845); its cron arrived 07:56Z (5h56m late) and the guard left the stores untouched; bursa_close cron arrived 14:41Z (5h21m late; 4dcca93, 20260927T144211)",
+    "tonight": "sweep --due 22:44Z named us_close (2026-09-27); dispatched 22:44Z as collect run 116; landed 22:46Z, 3589d73, run 20260927T224433; finnhub 85, yahoo_rss 31, google_news 22, alphavantage_news 14; gdelt failed",
+    "monitor": "ask.py watch 22:48Z: NEW alert past its own cadence gdelt (61h, allowed 30h), twse_openapi no longer listed; NEW warning for the fourth night, 15 cached peer prices behind (no book name or proxy); still open MYX:8869 nothing in 14d; resolved series_stale; slots_missed not open",
+    "fact_book": "all six Bursa names NOTHING COLLECTED; weekend +31 observations (4,795 -> 4,826), no new events (4,139); no event kind for verdicts, appeals or settlements",
+    "pack": "no doc_id in the pack (system test M7); ids and times read from corpus.db"
+  },
+  "data_quality": {
+    "failed": [
+      "gdelt: HTTP 429 on the first request in five consecutive sweeps (09-25 us_close 22:46Z, 09-26 bursa_close 13:46Z, 09-26 us_close 22:46Z, 09-27 bursa_close 14:43Z, 09-27 us_close 22:46Z); last stored rows 09-25 09:34Z",
+      "twse_openapi: 09-26 bursa_close 13:46Z, HTML 'FOR SECURITY REASONS' for every table (answered on both Sunday sweeps)"
+    ],
+    "degraded": [
+      "yahoo_rss: read empty for all six Bursa names (09-26 13:46Z, 09-27 14:43Z)",
+      "google_news Bursa: 09-26 5 stored, empty for Press Metal, Genting and Petronas Chemicals, named the company 3 of 10; 09-27 6 stored, empty for Press Metal, 3 of 8 (IHH 0/4)",
+      "alphavantage_news: quota exhausted for XNAS:MSFT on both us_close sweeps",
+      "eodhd: 0 facts every sweep (2-a-day credit budget)",
+      "fmp: /earnings and /income-statement outside the plan (HTTP 402) on the weekly"
+    ],
+    "skipped": [],
+    "meaning": "US names: thick, bodied evidence (Apple's verdict with Bloomberg Law, Reuters and CNBC bodies). Bursa names: three google_news titles without bodies; the Malaysian RSS feeds named none of the six. A blank Bursa entry is an empty store, not a quiet company."
+  },
+  "open_questions_carried": [
+    "The fact book has no event kind for a court verdict, an appeal or a settlement; its kinds are ratings, insider trades, earnings dates, macro releases and filings. Apple's $5.7 billion verdict and Friday's $250 million Siri settlement exist only in the corpus. Where would a legal event be recorded, so that a later page can date it? (since 2026-09-26)",
+    "Microsoft's cached bar opens at 499.04 (+0.22%), while two rows describe a 3% rise before or at the open. None of Saturday's sixteen Microsoft rows states the open. Which is right? And should the collector hold a second price source for the open on a day a cause is being timed? (since 2026-09-25)",
+    "The monitor announced the same `price_stale` change as NEW for a fourth night. The routine never commits `data/alerts.db`, so the stored state is days old (system test M9). Should the routine commit the alerts store, or should it live outside git? (since 2026-09-24)",
+    "Does IHH carry the Daiichi Sankyo claim at any value in its accounts? Friday, the first session that could read the appeal, moved 0.28 sigma. India's Supreme Court has since let a forensic audit of the Fortis share transfers go ahead; the rows are titles only, and the first was published Friday at 07:40Z. (since 2026-09-24)",
+    "The pack measures across a blank proxy row without saying so (M3). `^KLSE` 09-22 has been filled since 2026-09-26T13:47Z, so Friday's figures cross no blank. The defect waits for the next one: should the pack refuse the row, label it two-session, or scale the sigma? (since 2026-09-23)",
+    "The fact book holds no Bursa entitlement dates. Which source carries Bursa ex-dates? (since 2026-09-23)",
+    "`google_news` failed on all three US queries on the 09-24 `us_close`. It has answered on all three `us_close` sweeps since (149 stored on 09-25, 32 on 09-26, 22 on 09-27). Were those two outages, or throttling at that hour on some nights? (since 2026-09-23)",
+    "IHH's Tuesday is significant alone (3.80 sigma). The one candidate, the Macquarie headline, has no body. Which source carries the note's figures? (since 2026-09-22)",
+    "A blank bar shared by a name and its proxy is labelled *correctly dated*, as if the market was shut. The `^KLSE` 09-22 bar arrived four days late, so that blank was the feed's and the market was open. Should the pack check the calendar or an independent index print first? (since 2026-09-22)",
+    "The move to 260-session betas re-measured the same Monday. Which window's shares do pages compare across the change? (since 2026-09-22)",
+    "Petronas Chemicals, Press Metal and Genting fell 2.3–2.8% on a +0.08% index day with no row about any of them: one factor or three stories? On Friday they read −1.97%, 0.00% and 0.00%. No Bursa sector proxy is cached. (since 2026-09-21)",
+    "Tenaga: the rows hold both readings, *minimal impact* and *undermines the IBR framework*, as titles only. Friday +0.61% (0.83 sigma); five sessions +0.77%. What figure would let the page tell the readings apart? (since 2026-09-18)",
+    "`DFF` stepped +0.25 on 2026-09-17 and the collector holds no statement for it. Where does a statement come from? (since 2026-09-20)",
+    "A short-interest weekly named Petronas Chemicals for the week to 09-18. Would Bursa's daily short-selling report give the name a body? (since 2026-09-20)",
+    "Wiring a catalyst matcher to the corpus is still open. Microsoft is Friday's case: a verdict that warrants a cause, 134 linked rows, and nothing in the pack that weighs them. Apple's verdict is Monday's: a dated event published after the close. (since 2026-09-18)",
+    "Petronas Chemicals' idiosyncratic days read *not significant* because its own sigma contains the +22.56% run. The 260-session window still contains it. (since 2026-09-18)",
+    "Petronas Chemicals collecting a body: which of the eleven listed sources carries a Bursa-hours story about it at all? There were zero rows on 09-25 and 09-26, and `google_news` named it in 0 of 1 on 09-27. (since 2026-09-10; folded 09-17)",
+    "The linker attached a *Genting Plantations* headline to MYX:3182, then *Ho Wah Genting*. Tenaga's rows on Thursday, Friday and Saturday are all *Shree TNB Polymers*. How many rows per name are about other companies? (since 2026-09-17)",
+    "Which earlier pages were written from a pre-close cache? `dfc45e3` labels such rows. (since 2026-09-17)",
+    "Does a page need to state a market's non-trading day as a fact rather than infer it from blank bars? (since 2026-09-16)",
+    "Brent: 114.89 at 09-22, +22.18 over twenty observations, with no print since. Friday's market row says oil fell back below $100. What the move did to Petronas Chemicals' feedstock reading is still unanswered, because the decomposition has no commodity leg. (since 2026-09-16)",
+    "Press Metal collecting anything: zero rows on 09-25 and 09-26, and `google_news` read empty for it on Saturday and Sunday. (since 2026-09-15)",
+    "The sector beta is fixed at 0, so any sector-wide session lands in a residual labelled `idiosyncratic`. That bears on Microsoft's +3.27%: a software-sector day would sit inside it unseen. (since 2026-09-14)",
+    "GDELT has hit HTTP 429 on its first request in five consecutive sweeps, from 09-25 `us_close` through 09-27 `us_close`, and the monitor's cadence alert reads 61h. Is it per-IP throttling on the shared runner? (since 2026-09-08)",
+    "Tenaga: is the 5d move the results print the 2026-09-04 roundup headline referred to? (since 2026-09-04)",
+    "NVIDIA: filing or release for the Hugging Face transaction. (since 2026-09-04)",
+    "Is the observe phase's grading against the control informative at 21 days? The first observe grades fall due 2026-10-11. (since 2026-09-08)"
+  ],
+  "lessons": [
+    "A company event can arrive without a session to read it: Apple's verdict was published 3h30m after Friday's close, so a page that attributes Monday's move to it has to date the story against Monday's session, not against the day it was published.",
+    "The row that names a company can arrive a day after the story: the Supreme Court ruling first reached the corpus during Friday's Bursa session in a row naming Fortis, not IHH, and the row naming IHH came the next day; linking by name dates a story by its second telling."
+  ],
+  "closed": [
+    "On Saturday's sweep twse_openapi returned an HTML FOR SECURITY REASONS page for every table. Is that a weekend block, or a block on the runner's address? (since 2026-09-25) - it answered on both Sunday sweeps (05:48Z, 14:43Z), so not a weekend block; one refusal on record, and the monitor's cadence alert for it has cleared"
+  ]
+}
