@@ -14,12 +14,13 @@ assert spec is not None and spec.loader is not None
 blob = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(blob)
 
-# Synthetic keys in each provider's shape. None is real.
-FINNHUB = "c1abcdef01qtj63p8580c1abcdef01qtj63p858g"  # 40 lowercase alphanumerics
-FMP = "aBy2D8zf9ueVQK2MMsSwkrT3fLuREBk4"  # 32 mixed-case alphanumerics
-AV = "5J9AHRK0RZFZGEBF"  # 16 uppercase alphanumerics
-FRED = "db0264da0829925fab2d5357f6a20670"  # 32 lowercase hex
-GROQ = "gsk_" + "Ylw8h9R3PvrwxYuotQm5WGdyb3FYbgpikCOctB3Nlts4QHyNt5Ox"  # gsk_ + 52
+# Synthetic keys in each provider's shape, spelled so no one can mistake
+# them for a real key or derive one from them.
+FINNHUB = "syntheticnotarealkeyforthetests000000000"  # 40 lowercase alphanumerics
+FMP = "SyntheticNotARealKeyForTests0000"  # 32 mixed-case alphanumerics
+AV = "SYNTHETICNOTREAL"  # 16 uppercase alphanumerics
+FRED = "deadbeefdeadbeefdeadbeefdeadbeef"  # 32 lowercase hex
+GROQ = "gsk_" + "SyntheticNotARealKeyForTheTests000000000000000000000"  # gsk_ + 52
 EODHD = "1a2b3c4d5e6f7a.12345678"  # hex, a dot, a short hex suffix
 
 
