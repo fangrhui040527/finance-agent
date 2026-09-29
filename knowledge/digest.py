@@ -31,6 +31,7 @@ from core.guardrails.publish import PUBLICATION_NOTICE
 from knowledge.corpus import Corpus
 from knowledge.facts import FactBook
 from knowledge.news.features import Article, LexiconExtractor
+from knowledge.redact import scrub
 
 DIGEST_DIR = Path("data/digests")
 
@@ -245,7 +246,8 @@ def build_digest(
                 "fetched": r["fetched"],
                 "kept": r["kept"],
                 "stored": r["stored"],
-                "detail": r["detail"],
+                # rows stored before knowledge.redact existed are cleaned here too
+                "detail": scrub(r["detail"] or ""),
             }
             for r in corpus.sweeps(limit=200)
             if start.isoformat() <= r["at"] < end.isoformat()

@@ -1,0 +1,215 @@
+{
+  "day": "2026-09-27",
+  "written_at": "2026-09-28T22:51:33Z",
+  "measured_session": {
+    "bursa": "none - Sunday; last session 2026-09-25 (on the 2026-09-25 page)",
+    "us": "none - Sunday; last session 2026-09-25 (on the 2026-09-25 page)"
+  },
+  "pack_built": "2026-09-28T22:44:00Z",
+  "market": {
+    "regime": "no_session",
+    "notes": [
+      "Sunday: neither Bursa nor Nasdaq opened; the pack's moves rows all read 'last session 2026-09-25'; five-session figures are Friday's: MYX:^KLSE +0.36%, XNAS:SPY +1.27%",
+      "FRED now carries Friday's prints: SP500 7743.41 (+39.28), NASDAQCOM 27068.72 (+129.35), BAMLH0A0HYM2 2.93 (+0.13), T10Y2Y 0.36 (+0.05) at 09-25; DGS10 5.18 (+0.07), DGS2 4.87 (+0.02), DFF 3.88 at 09-24; unchanged VIXCLS 14.21 and DCOILBRENTEU 114.89 at 09-22, DEXMAUS 4.0793 at 09-18",
+      "one new company item: finnhub:142448482 (2026-09-27T17:30Z), China 'has indicated it may allow' Alibaba and ByteDance to buy Nvidia's RTX Pro 5500, per The Information; first readable by Monday 2026-09-28's session; no primary statement collected",
+      "Sunday 22:34Z (finance.yahoo.com): US futures fell and oil rose on Iran comments; the Brent series has no print after 09-22 to check it"
+    ]
+  },
+  "names": [
+    {
+      "instrument_id": "MYX:1155",
+      "move": {
+        "note": "NO SESSION - Sunday 2026-09-27; the pack's row is the 2026-09-25 session, published on that page, and is not a new measurement"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [
+        {
+          "when": "2026-09-28",
+          "what": "first session that can read the AT1 sukuk redemption"
+        }
+      ],
+      "note": "one linked row, a card review: 'Review: Maybank World Mastercard' (milelion.com via google_news, 13:55Z, title only) - a mention; nothing more on the sukuk redemption; NOTHING COLLECTED"
+    },
+    {
+      "instrument_id": "MYX:5347",
+      "move": {
+        "note": "NO SESSION - Sunday 2026-09-27; the pack's row is the 2026-09-25 session, published on that page, and is not a new measurement"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [],
+      "note": "'TNB navigates rising generation costs under regulated power framework' (nst.com.my via google_news, 02:25Z, title only): bears on the 09-18 framework question, holds no figure; no Shree TNB Polymers row on Sunday"
+    },
+    {
+      "instrument_id": "MYX:5183",
+      "move": {
+        "note": "NO SESSION - Sunday 2026-09-27; the pack's row is the 2026-09-25 session, published on that page, and is not a new measurement"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [],
+      "note": "nothing linked on Sunday; yahoo_rss read empty for all six Bursa names at 14:43Z"
+    },
+    {
+      "instrument_id": "MYX:5225",
+      "move": {
+        "note": "NO SESSION - Sunday 2026-09-27; the pack's row is the 2026-09-25 session, published on that page, and is not a new measurement"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [],
+      "note": "nothing linked on Sunday; google_news named IHH in 0 of 4 at 14:43Z; Sunday's three Fortis-response rows (on the 09-26 page) name no IHH"
+    },
+    {
+      "instrument_id": "MYX:8869",
+      "move": {
+        "note": "NO SESSION - Sunday 2026-09-27; the pack's row is the 2026-09-25 session, published on that page, and is not a new measurement"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [],
+      "note": "nothing collected; google_news read empty 14:43Z; monitor: collected nothing in 14d"
+    },
+    {
+      "instrument_id": "MYX:3182",
+      "move": {
+        "note": "NO SESSION - Sunday 2026-09-27; the pack's row is the 2026-09-25 session, published on that page, and is not a new measurement"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [],
+      "note": "two Business Times (Singapore) rows about the subsidiary Genting Singapore against Marina Bay Sands, one saying it 'helps anchor Malaysian parent group's finances' (businesstimes.com.sg via google_news, published 2026-09-27T23:00Z, two hours before Monday's Bursa open; first collected 2026-09-28T10:09Z; titles only) - about the subsidiary, the parent mentioned"
+    },
+    {
+      "instrument_id": "XNAS:NVDA",
+      "move": {
+        "note": "NO SESSION - Sunday 2026-09-27; the pack's row is the 2026-09-25 session, published on that page, and is not a new measurement"
+      },
+      "causes": [
+        {
+          "claim": "candidate for Monday 2026-09-28 only: China may allow Alibaba and ByteDance to buy Nvidia's RTX Pro 5500 (report by The Information)",
+          "evidence": [
+            "finnhub:142448482"
+          ],
+          "chain": [
+            "The Information's report, relayed by Investing.com at 2026-09-27T17:30Z",
+            "unknown: no collected evidence reaches further - no row carries a statement from China's government, Alibaba, ByteDance or Nvidia, and The Information is not a collected source"
+          ],
+          "confidence": null,
+          "confirm": "Monday's idiosyncratic leg past 1.5 sigma with the report as the only dated NVIDIA event, and a row from Beijing, either buyer or Nvidia stating the approval",
+          "refute": "Monday's leg inside normal variation, or a row from the government or the company denying the report"
+        }
+      ],
+      "open_questions": [],
+      "watch": [
+        {
+          "when": "2026-09-28",
+          "what": "idiosyncratic leg after the China report"
+        },
+        {
+          "when": "2026-11-17",
+          "what": "earnings_result"
+        }
+      ],
+      "note": "103 linked rows on Sunday; five retellings within four hours via google_news (seekingalpha.com 17:39Z 'may allow', finance.biggo.com 18:06Z 'Signals Approval', firstpost.com 18:45Z 'mulls', beincrypto.com 19:00Z, kucoin.com 21:12Z); the page reads the relay, not the strongest title; pe_ttm 28.12 (finnhub, 2026-09-27)"
+    },
+    {
+      "instrument_id": "XNAS:AAPL",
+      "move": {
+        "note": "NO SESSION - Sunday 2026-09-27; the pack's row is the 2026-09-25 session, published on that page, and is not a new measurement"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [
+        {
+          "when": "2026-09-28",
+          "what": "idiosyncratic leg in the first session after the verdict: past 1.5 sigma makes the verdict the dated candidate; inside normal variation says the session did not price it"
+        },
+        {
+          "when": "2026-10-28",
+          "what": "earnings_result"
+        }
+      ],
+      "note": "26 linked rows; the verdict retold by Benzinga (finnhub:142447595 05:25Z; alphavantage Benzinga 09:46Z) with no new fact; CEO change mentioned (finnhub:142447903 'departing CEO' Tim Cook; finnhub:142445807 'new CEO, John Ternus'), undated, no fact-book event - mentions; MarketBeat 13F rows - mentions"
+    },
+    {
+      "instrument_id": "XNAS:MSFT",
+      "move": {
+        "note": "NO SESSION - Sunday 2026-09-27; the pack's row is the 2026-09-25 session, published on that page, and is not a new measurement"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [
+        {
+          "when": "2026-09-28",
+          "what": "idiosyncratic leg: giving back most of +3.27% with no new Microsoft row refutes the Copilot reading"
+        },
+        {
+          "when": "2026-10-27",
+          "what": "earnings_result"
+        }
+      ],
+      "note": "20 linked rows about Friday's Copilot additions, dated 09-25 by the rows (finance.yahoo.com 19:39Z 'Code' in Copilot; finnhub:142445052 Word/Excel/PowerPoint in Copilot; thestreet.com 17:17Z); SeekingAlpha 'Muse' rating upgrade (finnhub:142447280) is a contributor's, not a broker event; none states the announcement time or Friday's open, so the open disagreement stands"
+    }
+  ],
+  "machine": {
+    "sunday": "weekly dispatched by the self-check, landed 05:49Z (c8222af, 20260927T054845); cron run 114 arrived 07:56Z (5h56m late), guard held; bursa_close cron run 115 arrived 14:41Z (5h21m late; 4dcca93, 20260927T144211); us_close dispatched 22:44Z as run 116, landed 22:46Z (3589d73, 20260927T224433); us_close cron run 117 arrived 23:47Z (2h32m late), changed only data/paper.db (e25147a): the guard held",
+    "monday": "bursa_close dispatched 10:07Z as run 118, landed 10:09Z (3f9ccc1, 20260928T100738); its cron run 119 arrived 17:39Z (8h19m late), changed only data/paper.db (980c23b): the guard held; us_preopen cron run 120 arrived 19:48Z (7h18m late; 8ca83cc, 20260928T194845)",
+    "tonight": "sweep --due 22:44Z named us_close (2026-09-28); dispatched 22:44Z as collect run 121; landed 22:45Z, 59e1383, run 20260928T224445; finnhub 246, google_news 142, gdelt 132, yahoo_rss 41, jin10_flash 10; alphavantage_news failed (daily quota exhausted)",
+    "monitor": "ask.py watch 22:48Z after tonight's sweep: gdelt cadence alert (85h at 22:46Z) gone; NEW warning for the fifth night, 15 cached peer prices behind (no book name or proxy); NEW warning, 2 questions carried over 21 days (Tenaga and NVIDIA since 09-04; both closed tonight); still open MYX:8869 nothing in 14d; resolved series_stale; slots_missed not open",
+    "fact_book": "all six Bursa names NOTHING COLLECTED; Sunday +1 event (4,139 -> 4,140), observations 4,826",
+    "pack": "no doc_id in the pack (system test M7); ids and times read from corpus.db"
+  },
+  "data_quality": {
+    "failed": [
+      "gdelt: HTTP 429 on six consecutive sweeps (09-25 us_close, 09-26 bursa_close, 09-26 us_close, 09-27 bursa_close 14:43Z, 09-27 us_close 22:46Z, 09-28 bursa_close 10:09Z); answered on 09-28 us_close 22:45Z (250 fetched, 132 stored, one grouped request); last stored rows before that 09-25 09:34Z",
+      "alphavantage_news: 09-28 us_close 22:45Z, daily quota exhausted for every name"
+    ],
+    "degraded": [
+      "yahoo_rss: read empty for all six Bursa names (09-27 14:43Z; 09-28 10:09Z stored 0)",
+      "google_news Bursa: 09-27 14:43Z 6 stored, empty for Press Metal, named the company 3 of 8 (IHH 0/4)",
+      "alphavantage_news: quota exhausted for XNAS:MSFT on the 09-27 us_close",
+      "eodhd: 0 facts every sweep (2-a-day credit budget); deferred MYX:5183 and XNAS:NVDA on Sunday",
+      "fmp: /earnings outside the plan (HTTP 402) on the weekly"
+    ],
+    "skipped": [],
+    "meaning": "US names: Sunday's Apple and Microsoft rows carry bodies; NVIDIA's one company item is a single relayed sentence from a source the collector does not read. Bursa names: five titles without bodies, one about a subsidiary and one a card review. A blank Bursa entry is an empty store, not a quiet company."
+  },
+  "open_questions_carried": [
+    "Does a primary statement follow The Information's report that China may let Alibaba and ByteDance buy the RTX Pro 5500? The collected rows are one relayed sentence and five retellings, and none quotes Beijing, either buyer or Nvidia. (since 2026-09-27)",
+    "The fact book has no event kind for a court verdict, an appeal or a settlement; its kinds are ratings, insider trades, earnings dates, macro releases and filings. Apple's $5.7 billion verdict and Friday's $250 million Siri settlement exist only in the corpus. Where would a legal event be recorded, so that a later page can date it? (since 2026-09-26)",
+    "Microsoft's cached bar opens at 499.04 (+0.22%), while two rows describe a 3% rise before or at the open. None of Saturday's sixteen Microsoft rows states the open. Which is right? And should the collector hold a second price source for the open on a day a cause is being timed? (since 2026-09-25)",
+    "The monitor announced the same `price_stale` change as NEW for a fourth night. The routine never commits `data/alerts.db`, so the stored state is days old (system test M9). Should the routine commit the alerts store, or should it live outside git? (since 2026-09-24)",
+    "Does IHH carry the Daiichi Sankyo claim at any value in its accounts? Friday, the first session that could read the appeal, moved 0.28 sigma. India's Supreme Court has since let a forensic audit of the Fortis share transfers go ahead; the rows are titles only, and the first was published Friday at 07:40Z. (since 2026-09-24)",
+    "The pack measures across a blank proxy row without saying so (M3). `^KLSE` 09-22 has been filled since 2026-09-26T13:47Z, so Friday's figures cross no blank. The defect waits for the next one: should the pack refuse the row, label it two-session, or scale the sigma? (since 2026-09-23)",
+    "The fact book holds no Bursa entitlement dates. Which source carries Bursa ex-dates? (since 2026-09-23)",
+    "`google_news` failed on all three US queries on the 09-24 `us_close`. It has answered on all three `us_close` sweeps since (149 stored on 09-25, 32 on 09-26, 22 on 09-27). Were those two outages, or throttling at that hour on some nights? (since 2026-09-23)",
+    "IHH's Tuesday is significant alone (3.80 sigma). The one candidate, the Macquarie headline, has no body. Which source carries the note's figures? (since 2026-09-22)",
+    "A blank bar shared by a name and its proxy is labelled *correctly dated*, as if the market was shut. The `^KLSE` 09-22 bar arrived four days late, so that blank was the feed's and the market was open. Should the pack check the calendar or an independent index print first? (since 2026-09-22)",
+    "The move to 260-session betas re-measured the same Monday. Which window's shares do pages compare across the change? (since 2026-09-22)",
+    "Petronas Chemicals, Press Metal and Genting fell 2.3–2.8% on a +0.08% index day with no row about any of them: one factor or three stories? On Friday they read −1.97%, 0.00% and 0.00%. No Bursa sector proxy is cached. (since 2026-09-21)",
+    "Tenaga: the rows hold both readings, *minimal impact* and *undermines the IBR framework*, as titles only. Friday +0.61% (0.83 sigma); five sessions +0.77%. What figure would let the page tell the readings apart? (since 2026-09-18)",
+    "`DFF` stepped +0.25 on 2026-09-17 and the collector holds no statement for it. Where does a statement come from? (since 2026-09-20)",
+    "A short-interest weekly named Petronas Chemicals for the week to 09-18. Would Bursa's daily short-selling report give the name a body? (since 2026-09-20)",
+    "Wiring a catalyst matcher to the corpus is still open. Microsoft is Friday's case: a verdict that warrants a cause, 134 linked rows, and nothing in the pack that weighs them. Apple's verdict is Monday's: a dated event published after the close. (since 2026-09-18)",
+    "Petronas Chemicals' idiosyncratic days read *not significant* because its own sigma contains the +22.56% run. The 260-session window still contains it. (since 2026-09-18)",
+    "Petronas Chemicals collecting a body: which of the eleven listed sources carries a Bursa-hours story about it at all? There were zero rows on 09-25 and 09-26, and `google_news` named it in 0 of 1 on 09-27. (since 2026-09-10; folded 09-17)",
+    "The linker attached a *Genting Plantations* headline to MYX:3182, then *Ho Wah Genting*. Tenaga's rows on Thursday, Friday and Saturday are all *Shree TNB Polymers*. How many rows per name are about other companies? (since 2026-09-17)",
+    "Which earlier pages were written from a pre-close cache? `dfc45e3` labels such rows. (since 2026-09-17)",
+    "Does a page need to state a market's non-trading day as a fact rather than infer it from blank bars? (since 2026-09-16)",
+    "Brent: 114.89 at 09-22, +22.18 over twenty observations, with no print since. Friday's market row says oil fell back below $100. What the move did to Petronas Chemicals' feedstock reading is still unanswered, because the decomposition has no commodity leg. (since 2026-09-16)",
+    "Press Metal collecting anything: zero rows on 09-25 and 09-26, and `google_news` read empty for it on Saturday and Sunday. (since 2026-09-15)",
+    "The sector beta is fixed at 0, so any sector-wide session lands in a residual labelled `idiosyncratic`. That bears on Microsoft's +3.27%: a software-sector day would sit inside it unseen. (since 2026-09-14)",
+    "GDELT hit HTTP 429 on six consecutive sweeps, from 09-25 `us_close` through 09-28 `bursa_close`, then answered on 09-28 `us_close` with one grouped request (132 stored). Was it per-IP throttling on the shared runner, and does the one-request form keep it answering? (since 2026-09-08)",
+    "Is the observe phase's grading against the control informative at 21 days? The first observe grades fall due 2026-10-11. (since 2026-09-08)"
+  ],
+  "lessons": [
+    "A report's wording hardens as it is retold: The Information's 'has indicated it may allow' became 'Signals Approval' 36 minutes and two sites later; a page quotes the earliest relay, not the strongest title.",
+    "A question tied to a window that has closed cannot be answered by more collection: Tenaga's five-session question outlived its window by three weeks; a carried question should name a source or an observation that could answer it, not a move that will scroll out of the pack."
+  ],
+  "closed": [
+    "Tenaga: is the 5d move the results print the 2026-09-04 roundup headline referred to? (since 2026-09-04) - cannot be answered from the collected sources: bursa_announcements, the one source that would carry a Bursa results print, is registered and not enabled (403 on every name from a runner, config.toml); the fact book has read NOTHING COLLECTED for Tenaga on every page; the five sessions it asked about ended three weeks ago; the missing Bursa source is carried by the ex-dates and Petronas Chemicals questions",
+    "NVIDIA: filing or release for the Hugging Face transaction. (since 2026-09-04) - answered, negatively: since 09-04 edgar recorded ten NVIDIA filings, all Form 4 insider filings; the last 8-K on record is dated 09-02 (items 8.01), before the first story; a later 10-Q or 8-K naming it will be dated by the fact book"
+  ]
+}

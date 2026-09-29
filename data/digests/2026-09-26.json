@@ -1,8 +1,8 @@
 {
   "collection": [
     {
-      "at": "2026-09-25T22:46:15.342273+00:00",
-      "detail": "facts 0; EODHD plan: free (2 names a day, US only, rotated); XNAS:MSFT: deferred by the 2-a-day credit budget; next in rotation; XNAS:NVDA: outside the plan or over today's credits; XNAS:AAPL: outside the plan or over today's credits",
+      "at": "2026-09-26T22:46:11.764776+00:00",
+      "detail": "facts 0; EODHD plan: free (2 names a day, US only, rotated); XNAS:AAPL: deferred by the 2-a-day credit budget; next in rotation; XNAS:MSFT: outside the plan or over today's credits; XNAS:NVDA: outside the plan or over today's credits",
       "fetched": 0,
       "kept": 0,
       "source": "eodhd",
@@ -10,61 +10,61 @@
       "stored": 0
     },
     {
-      "at": "2026-09-25T22:46:15.256109+00:00",
+      "at": "2026-09-26T22:46:11.249663+00:00",
       "detail": "facts 0; ",
-      "fetched": 21,
-      "kept": 9,
+      "fetched": 14,
+      "kept": 3,
       "source": "jin10_flash",
       "status": "ok",
-      "stored": 6
+      "stored": 0
     },
     {
-      "at": "2026-09-25T22:46:14.102560+00:00",
-      "detail": "facts 10; XNAS:MSFT: alphavantage quota exhausted for today: Thank you for using Alpha Vantage! Please consider spreading out your free API requests more sparingly (1 request per second). You may subscribe to any of the p; XNAS:NVDA: alphavantage quota exhausted for today: Thank you for using Alpha Vantage! Please consider spreading out your free API requests more sparingly (1 request per second). You may subscribe to any of the p",
-      "fetched": 26,
-      "kept": 24,
+      "at": "2026-09-26T22:46:10.054904+00:00",
+      "detail": "facts 8; XNAS:MSFT: alphavantage quota exhausted for today: Thank you for using Alpha Vantage! Please consider spreading out your free API requests more sparingly (1 request per second). You may subscribe to any of the p; XNAS:NVDA: alphavantage quota exhausted for today: Thank you for using Alpha Vantage! Please consider spreading out your free API requests more sparingly (1 request per second). You may subscribe to any of the p",
+      "fetched": 16,
+      "kept": 15,
       "source": "alphavantage_news",
       "status": "ok",
-      "stored": 23
+      "stored": 13
     },
     {
-      "at": "2026-09-25T22:46:13.577196+00:00",
-      "detail": "facts 105; ",
-      "fetched": 284,
-      "kept": 255,
+      "at": "2026-09-26T22:46:09.694208+00:00",
+      "detail": "facts 10; ",
+      "fetched": 130,
+      "kept": 119,
       "source": "finnhub",
       "status": "ok",
-      "stored": 202
+      "stored": 92
     },
     {
-      "at": "2026-09-25T22:46:11.274969+00:00",
+      "at": "2026-09-26T22:46:08.374820+00:00",
       "detail": "facts 0; ",
-      "fetched": 1,
+      "fetched": 0,
       "kept": 0,
       "source": "edgar",
       "status": "ok",
       "stored": 0
     },
     {
-      "at": "2026-09-25T22:46:11.074780+00:00",
-      "detail": "named the company: 55 of 55 (lowest: Apple 17/17, Microsoft 18/18, NVIDIA 20/20)",
-      "fetched": 55,
-      "kept": 55,
+      "at": "2026-09-26T22:46:08.164033+00:00",
+      "detail": "named the company: 31 of 31 (lowest: Apple 6/6, Microsoft 5/5, NVIDIA 20/20)",
+      "fetched": 31,
+      "kept": 31,
       "source": "yahoo_rss",
       "status": "ok",
-      "stored": 45
+      "stored": 26
     },
     {
-      "at": "2026-09-25T22:46:10.499770+00:00",
-      "detail": "named the company: 134 of 154 (lowest: NVIDIA 40/52, Apple 38/45, Microsoft 56/57)",
-      "fetched": 178,
-      "kept": 154,
+      "at": "2026-09-26T22:46:07.747694+00:00",
+      "detail": "named the company: 27 of 34 (lowest: NVIDIA 8/13, Microsoft 6/8, Apple 13/13)",
+      "fetched": 40,
+      "kept": 34,
       "source": "google_news",
       "status": "ok",
-      "stored": 149
+      "stored": 32
     },
     {
-      "at": "2026-09-25T22:46:08.531593+00:00",
+      "at": "2026-09-26T22:46:06.148396+00:00",
       "detail": "no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked)",
       "fetched": 0,
       "kept": 0,
@@ -73,44 +73,8 @@
       "stored": 0
     },
     {
-      "at": "2026-09-25T17:29:24.031747+00:00",
-      "detail": "facts 0; ",
-      "fetched": 450,
-      "kept": 0,
-      "source": "dbnomics",
-      "status": "ok",
-      "stored": 0
-    },
-    {
-      "at": "2026-09-25T17:29:21.680179+00:00",
-      "detail": "facts 0; ",
-      "fetched": 17,
-      "kept": 5,
-      "source": "jin10_flash",
-      "status": "ok",
-      "stored": 3
-    },
-    {
-      "at": "2026-09-25T17:29:20.773959+00:00",
-      "detail": "facts 8; release calendar: 'FOMC Press Release' listed on 15 days of the fortnight - a daily table, not a scheduled print; not stored as a release",
-      "fetched": 496,
-      "kept": 0,
-      "source": "fred",
-      "status": "ok",
-      "stored": 0
-    },
-    {
-      "at": "2026-09-25T17:28:49.385001+00:00",
-      "detail": "facts 0; fmp /earnings is outside the plan (HTTP 402); not collected for NVDA, AAPL, MSFT",
-      "fetched": 3945,
-      "kept": 0,
-      "source": "fmp",
-      "status": "ok",
-      "stored": 0
-    },
-    {
-      "at": "2026-09-25T09:34:38.380705+00:00",
-      "detail": "facts 0; EODHD plan: free (2 names a day, US only, rotated); MYX:8869: deferred by the 2-a-day credit budget; next in rotation; MYX:3182: deferred by the 2-a-day credit budget; next in rotation; MYX:1155: deferred by the 2-a-day credit budget; next in rotation; MYX:5347: deferred by the 2-a-day credit budget; next in rotation; outside the free plan (US only), so not asked for: MYX:1155, MYX:5347, MYX:8869, MYX:3182. The EODHD Fundamentals plan covers KLSE and TW.; MYX:5183: EODHD free plan: US only; the Fundamentals plan covers KLSE; MYX:5225: EODHD free plan: US only; the Fundamentals plan covers KLSE",
+      "at": "2026-09-26T13:46:54.274934+00:00",
+      "detail": "facts 0; EODHD plan: free (2 names a day, US only, rotated); MYX:1155: deferred by the 2-a-day credit budget; next in rotation; MYX:5347: deferred by the 2-a-day credit budget; next in rotation; MYX:5183: deferred by the 2-a-day credit budget; next in rotation; MYX:5225: deferred by the 2-a-day credit budget; next in rotation; outside the free plan (US only), so not asked for: MYX:1155, MYX:5347, MYX:5183, MYX:5225. The EODHD Fundamentals plan covers KLSE and TW.; MYX:8869: EODHD free plan: US only; the Fundamentals plan covers KLSE; MYX:3182: EODHD free plan: US only; the Fundamentals plan covers KLSE",
       "fetched": 0,
       "kept": 0,
       "source": "eodhd",
@@ -118,25 +82,25 @@
       "stored": 0
     },
     {
-      "at": "2026-09-25T09:34:37.925570+00:00",
-      "detail": "facts 5; ",
-      "fetched": 8,
+      "at": "2026-09-26T13:46:54.024904+00:00",
+      "detail": "every TWSE table failed. First: valuation: twse_openapi returned non-JSON: '<html>\\n<head>\\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">\\n</head>\\n<body> \\n\u56e0\u70ba\u5b89\u5168\u6027\u8003\u91cf\uff0c\u60a8\u6240\u57f7\u884c\u7684\u9801\u9762\u7121\u6cd5\u5448\u73fe\u3002<BR>\\nFOR SECURITY REASONS, THIS PAGE CAN N'",
+      "fetched": 0,
       "kept": 0,
       "source": "twse_openapi",
-      "status": "ok",
+      "status": "failed",
       "stored": 0
     },
     {
-      "at": "2026-09-25T09:34:30.731700+00:00",
+      "at": "2026-09-26T13:46:52.242745+00:00",
       "detail": "facts 0; ",
-      "fetched": 17,
-      "kept": 4,
+      "fetched": 18,
+      "kept": 8,
       "source": "jin10_flash",
       "status": "ok",
-      "stored": 3
+      "stored": 6
     },
     {
-      "at": "2026-09-25T09:34:29.726604+00:00",
+      "at": "2026-09-26T13:46:51.040682+00:00",
       "detail": "facts 0; ",
       "fetched": 10,
       "kept": 0,
@@ -145,26 +109,26 @@
       "stored": 0
     },
     {
-      "at": "2026-09-25T09:34:27.862737+00:00",
+      "at": "2026-09-26T13:46:49.378126+00:00",
+      "detail": "",
+      "fetched": 50,
+      "kept": 48,
+      "source": "nst_business",
+      "status": "ok",
+      "stored": 45
+    },
+    {
+      "at": "2026-09-26T13:46:49.067767+00:00",
       "detail": "",
       "fetched": 50,
       "kept": 50,
-      "source": "nst_business",
-      "status": "ok",
-      "stored": 48
-    },
-    {
-      "at": "2026-09-25T09:34:27.692715+00:00",
-      "detail": "",
-      "fetched": 49,
-      "kept": 49,
       "source": "fmt_business",
       "status": "ok",
-      "stored": 49
+      "stored": 50
     },
     {
-      "at": "2026-09-25T09:34:27.532623+00:00",
-      "detail": "read but empty: IHH, Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals",
+      "at": "2026-09-26T13:46:48.839781+00:00",
+      "detail": "read but empty: Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals, IHH",
       "fetched": 0,
       "kept": 0,
       "source": "yahoo_rss",
@@ -172,37 +136,37 @@
       "stored": 0
     },
     {
-      "at": "2026-09-25T09:34:26.015477+00:00",
-      "detail": "read but empty: Petronas Chemicals; named the company: 20 of 46 (lowest: Press Metal 0/2, Tenaga 2/15, Maybank 6/10)",
-      "fetched": 57,
-      "kept": 46,
+      "at": "2026-09-26T13:46:48.071766+00:00",
+      "detail": "read but empty: Press Metal, Genting, Petronas Chemicals; named the company: 3 of 10 (lowest: Tenaga 1/7, Maybank 1/2, IHH 1/1)",
+      "fetched": 12,
+      "kept": 10,
       "source": "google_news",
       "status": "ok",
-      "stored": 38
+      "stored": 5
     },
     {
-      "at": "2026-09-25T09:34:23.851390+00:00",
-      "detail": "grouped 3 names per request; 2 requests (HTTP 429 on request 2: the rest of the slot is deferred, not asked); read but empty: Tenaga, Petronas Chemicals; failed: GDELT fetch failed: HTTP Error 429: Too Many Requests (IHH, Press Metal, Genting); named the company: 2 of 7 (lowest: Maybank + Tenaga + Petronas Chemicals 2/7)",
-      "fetched": 8,
-      "kept": 7,
+      "at": "2026-09-26T13:46:46.354552+00:00",
+      "detail": "no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked); deferred: Tenaga, Petronas Chemicals, IHH",
+      "fetched": 0,
+      "kept": 0,
       "source": "gdelt",
-      "status": "ok",
-      "stored": 7
+      "status": "failed",
+      "stored": 0
     }
   ],
   "counts": {
-    "articles": 9439,
+    "articles": 9708,
     "documents": 0,
-    "escalated": 1623,
-    "events": 4138,
-    "failed_sweeps": 27,
-    "linked": 6512,
-    "observations": 4778,
+    "escalated": 1645,
+    "events": 4139,
+    "failed_sweeps": 30,
+    "linked": 6673,
+    "observations": 4795,
     "series": 31,
-    "sweeps": 506
+    "sweeps": 523
   },
-  "day": "2026-09-25",
-  "generated_at": "2026-09-25 22:46 UTC",
+  "day": "2026-09-26",
+  "generated_at": "2026-09-26 22:46 UTC",
   "macro": [
     {
       "change": "0.07",
@@ -335,84 +299,29 @@
   ],
   "names": [
     {
-      "escalated": 3,
+      "escalated": 0,
       "events": [],
       "instrument_id": "MYX:1155",
       "label": "Maybank",
       "snapshot": [],
       "stories": [
         {
-          "doc_id": "https://news.google.com/rss/articles/CBMitAFBVV95cUxNWFZuU0tHcHJ4Yk4talpHU3ZvWTJESG1FR0RPREdGTjVlOGZxTHV0NEt4b1lZaEVuT2lZaXpud1ZzMEk0bHNoRERSdHBTY2pHdjcwczlNZzMxc044NHdkZGdpV1NSRlFMdTJncGwzZkhwZkY5VzJ4eGh6QlhrVmlwUXdQQUYzRmxCUW9QTzRHWFFicFdoUUxVc1FlMnNGQk1rcDFIc0hHdFNONjhQMjJxMUZrV20?oc=5",
-          "domain": "www.businesstimes.com.sg",
-          "escalated": true,
+          "doc_id": "https://news.google.com/rss/articles/CBMirwFBVV95cUxNR1hLQWpRWXg0RVVXZnRhZFU2SjNmTEtPM2VkOElNa1IzbXRaS01zZ2hnZnZwSG5wbm9vZmRCekd2STJZYlNrMVdoQ19XNHpkZ3JRNkI5QjZFUHg0TGQxZVF2ZDVpT3Y1b2VFNlZ2SmQ5dXJ3VmotLUFsUnMxQ2JRYUowaVpIU2pmcEdVZFVKdTlia3VncFQ3cWlmNTVUeFR0WjV2aEgtY25USU4xdWlJ?oc=5",
+          "domain": "www.businesstoday.com.my",
+          "escalated": false,
           "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-09-24T22:00:00+00:00",
+          "polarity": 0.0,
+          "published_at": "2026-09-26T03:43:06+00:00",
           "quality": 0.8,
-          "title": "Maybank looks to a more connected Asean for its next phase of Singapore growth",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMivAFBVV95cUxNS3p2OGhvVjFHdWlTUWU3ZVpBSXhDUGhYVU1TdkdSOFQzaXc0cGVmd3lIcEJoTW9kNWhDSlplSWtzZFpRNFJQLXNnOEhXV1RuOGhrRmNpYzZ3ZFh2MnlsRzB1UU0zVHV6S2NUMkRvZ2hMY2h1OU0tc05mdERrR0FmeERYb0pqaVNYQUVEMDAzMUluUkgzSkUwbkY0d0l4azg2TDRfeG82Q1luaGxvOGhuNXVuZmVUMGZtTF9mNQ?oc=5",
-          "domain": "agbrief.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": -1.0,
-          "published_at": "2026-09-25T04:18:44+00:00",
-          "quality": 0.65,
-          "title": "Maybank cuts Bloomberry EBITDA forecasts despite signs of stabilization",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMi6gFBVV95cUxOcGx2RXptVUFoUTZHT1N1amtSZnh1WWVWMUtkanI0VEJQenJUWnUwcjlxazJLb09ONENIZldjU3BWOHM5ZjZMZWs3WVliTVU2ZG9RR09zUkloYVpGbl9mRjVXWUhRbkpaMEVVZEU4WkQ4UE0xYjVfSlhhb2lORS1BQ0IyQ1dRcG1SaFZ6ZkItLVQxdE90ZHpyRG9LZ2hHS09xZVg0Y1BvRFpaWjB1Q3lpUG5GeDN4RE5WOUlNNF9OZDh4R1BvczhvLW9qNEJCNENQbnBtS05jOHNodDgyanlxUlBsVXgtSUtfVXc?oc=5",
-          "domain": "asgam.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-09-25T02:24:11+00:00",
-          "quality": 0.65,
-          "title": "Maybank Securities expecting Solaire parent Bloomberry to return to profit in 2027 on VIP improvement, online platform growth - IAG",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMixgFBVV95cUxNYmU5UEhrTWVxZGtFSGQ2NV9ENkpYYzItZ1VIMnFhbEJvS2FFTS1MbzhRUWdvMmdydG1ZZUQ4alI5X3hpUDE4b25WUGlsR3p0a2pIUWttTnExT18yTVh3cjJKLXV0Y1FoVmZfM3N5TmozMWh2MTJsbVF5Xy05XzE3LWpkcE1lZVoyX0s2dklaM0FmZmJsZ05wOF8zYWx3Mm1IYzJIQWdadHBLSVdUZHZkV3JDVjFKVlVtZnlxUEhGal95d2N4UWc?oc=5",
-          "domain": "myc.my",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-25T03:24:05+00:00",
-          "quality": 0.65,
-          "title": "Malaysian BTS Fans Turn Maybank Branches Into Mini Concerts For Limited-Edition ARIRANG Debit Card",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "gdelt:https://bworldonline.com/banking-finance/2026/09/24/781209/maybank-philippine-banks-stay-resilient-despite-rise-in-bad-loans/",
-          "domain": "bworldonline.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-24T23:45:00+00:00",
-          "quality": 0.65,
-          "title": "Maybank: Philippine banks stay resilient despite rise in bad loans",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "gdelt:https://www.therakyatpost.com/living/2026/09/24/maybank-limits-bts-world-tour-debit-card-to-60-per-branch-per-day-online-applications-open-28-september/",
-          "domain": "therakyatpost.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-24T12:00:00+00:00",
-          "quality": 0.65,
-          "title": "Maybank Limits BTS World Tour Debit Card To 60 Per Branch Per Day, Online Applications Open 28 September",
+          "title": "Maybank Fully Redeems RM1.56 Billion AT1 Sukuk On First Call Date",
           "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.0,
-        "n": 6,
-        "polarity_mean": 0.167,
-        "sources": 6,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
         "uncertainty_mean": 0.0
       },
       "upcoming": []
@@ -425,33 +334,22 @@
       "snapshot": [],
       "stories": [
         {
-          "doc_id": "https://news.google.com/rss/articles/CBMiekFVX3lxTE5qbUtzT2t6MGpod1hneDVMVjFkV3J6SWFEMTFGTGxmd1NSMHNJTGxpRUNZSTRQM01yUnBkWFlhRHdRRkwzdnM3SndKX0p4MVdZdllva05yTHBNZThWSkJtdmFFMG95V214anJlTjAyOWxyNDYwMHppYjdn?oc=5",
-          "domain": "www.cnbctv18.com",
+          "doc_id": "https://news.google.com/rss/articles/CBMiekFVX3lxTFBaMHRnbEt2SnlyQURhZFo3dkFxMTl1M2NaWkN4NWhFU2lWUkxVMmVSSDVGU2NQbVNrQW9VdldxX2x1d3lheFJpc0JyUS1uYVZtZmdKRElIR0tZcENqbXI0eDRrQ3BHa3p0TURIVnozcXprUHUwYUdia0dR?oc=5",
+          "domain": "www.moneycontrol.com",
           "escalated": false,
           "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-09-25T00:52:31+00:00",
+          "published_at": "2026-09-26T09:24:35+00:00",
           "quality": 0.65,
-          "title": "Shree TNB Polymers Ltd. IPO: Check Issue Date, Price, Subscription, Financials & Other Details",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMipwFBVV95cUxQSDBXcUx5NjlJQjAwSXlrTkp5dVNqN0RYNXBCZkVPcmpDWFZyMk8zc0FqSkU3WXVEMzc3SmluYlpFMjNjd1VGUlczTFlEeGFLZW43OFNnYnFoVUZIbWR0WHowbmtzeWpWV1B1UXZKV0hPdlBKNDUwdVREV1I1UnZiZDhhZkZDNmtycTdiX091UTl6T2RDN0NnNDFmSDRxSV83ZUhlc0piSQ?oc=5",
-          "domain": "univest.in",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-24T20:50:08+00:00",
-          "quality": 0.65,
-          "title": "Shree TNB Polymers IPO Day 1 Subscription Status 25 Sep 2026",
+          "title": "Shree TNB Polymers Ltd IPO Date: Check Issue Date, Price, Lot size, Subscription, News and Details - Moneycontrol",
           "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.0,
-        "n": 2,
+        "n": 1,
         "polarity_mean": 0.0,
-        "sources": 2,
+        "sources": 1,
         "uncertainty_mean": 0.0
       },
       "upcoming": []
@@ -474,33 +372,22 @@
       "snapshot": [],
       "stories": [
         {
-          "doc_id": "https://news.google.com/rss/articles/CBMiUEFVX3lxTFBiRUlPSmVraFVwQ3hMd1VPdXc4bnR5Q1V0bDFGR1dNVkhta015cWNyZlU2bGxMNkRGaW1yQWQ5OUV6QVo3LUM2T2hpTWhFQXhS?oc=5",
-          "domain": "theedgemalaysia.com",
+          "doc_id": "https://news.google.com/rss/articles/CBMipgJBVV95cUxOOXNOa19PWGNGTzZvR3o2VzVEUnZ2d1d3SWw4cTNhQXBvNlZGTzZoc3NtdFEwU1d1a0xkbmlEaXd5TnUwaXZHazluWnZZTHdBNGlfLVlWcnFlcVpQLUJJT3JlS2FEbVpTQkpiUV9CU2wwOUZjYlhvZWY4dHd2UXEyTkI0bHVKeHl1ZnJjZ2FnS183YTl5eDFycFYzekp6aEpQQ1dJby1JejZDNTlPYnljS181MDJLaDZOZ29HZl9ZYU1Wa2ZjLU9kS0R1bWRpclhfbUNleGZoUGJsWWlwS2VHa3d4a3o2emJwTVBvXzFuSGMwVWE3TUNlcjdad2hOWS1zTE9Fai1TT0lEMVFNQktrMDhwZTRWZHF3Q0lYOTRuSW5pTHVhc1HSAZ8CQVVfeXFMTVE2MEFwR2pDc0ZIUGY4LXEwS2lNV25PbFNWXzFkbjhYUktQUW5qTENPTGU0Tlp0QVYtbE01MkdMTV85eC1RVGZXX1dJZ2lsd3A5eF84WGl1akdRTUJzY09qNThva05ZYktBRWlLS2ZSelNDamdoTGhFejJvejZ1ZVJZRXJUemNNd2NKLTdJMzE3TmJhZl9iSnB2TWlhU2xqSVY1dVlocm5nclA1Z0xaVVc4T2dOOTJIbTZ1WExERzhwTUNHUHRueWg3SWhWcVhMTU5vMU02TjFIWW9CX3VuQ0V2VE1OVG92U3BQWndOSWt2SGtCN2x2ZDBfUnZjdENuaktPTUg1MXQtSDZTZ2N4MHVtZmZCcTVqRGd2Y3JuNE0?oc=5",
+          "domain": "economictimes.indiatimes.com",
           "escalated": false,
           "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-09-24T16:34:52+00:00",
-          "quality": 0.8,
-          "title": "HE Group, Eco World, MNRB, Zetrix AI, UUE, IOI Properties, IHH Healthcare, MyNews, Superlon, Infomina, Ajinomoto Malaysia, Inta Bina",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMiowFBVV95cUxNWEdOTi1VRmc0WVRReW9uUnRNYnc2cTdWdmdpZWlEaHN1YTJhRm1NOFdZakZMcmtwdmFhd25DelBHZWNTX1h4X0dfMTh3TXVwUEI4ajl6MndkdEZOS0lyV1Y0VUxwZlJIRHJBdlprbEd1dHVNUklya25rREU4MEFLdnlzRWVLTWFDM3oyWXhPUkE0TjNQbWJhSzFMbUNydFd1OGo0?oc=5",
-          "domain": "www.nst.com.my",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-24T13:02:26+00:00",
-          "quality": 0.8,
-          "title": "IHH unit appeals RM5.3bil Japan claim ruling",
+          "published_at": "2026-09-26T01:04:33+00:00",
+          "quality": 0.65,
+          "title": "SC clears forensic audit of Fortis-IHH deal involving erstwhile Religare promoters Singh brothers",
           "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.0,
-        "n": 2,
+        "n": 1,
         "polarity_mean": 0.0,
-        "sources": 2,
+        "sources": 1,
         "uncertainty_mean": 0.0
       },
       "upcoming": []
@@ -521,74 +408,23 @@
       "instrument_id": "MYX:3182",
       "label": "Genting",
       "snapshot": [],
-      "stories": [
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMiywFBVV95cUxPaEZRSDBsS3hHTGE4RzhZXzRlaGJpckNvODhDT0tZMU5seVk2SXdJQ012QThUYnU0b2ctei0taWVCNVFnWEhWaWtLTTJfYzl5VTBSRUZNV0hwTlVidWdiNzM2SFJxbjBlMm9nbmFBcXctT19BWmVXVTJsRDJiaVUwVlRmeDducVZwZWtJaUVzTjdrMkN6RnFNQk5XLVNzNVpEYVRuRl9ZTTBqclQzLWJ5S2RWN0NSajhITjctcDZQamtRbmczUUZmRnlZRQ?oc=5",
-          "domain": "www.businesstoday.com.my",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-25T02:45:09+00:00",
-          "quality": 0.8,
-          "title": "SD Guthrie, KLK, Genting Face Regulatory Uncertainty From Indonesia's New Land Reform Law",
-          "uncertainty": 0.9615384615384615
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxOdGFQR1JCUndqXzQwNWhqa0otOXN0ZFM3Vjh1ejBOT3M5dkVFWXFTSkZONVNSRFluUGtiZ3FHWEJkbjBCNWZQOFBzZlp1ODBaOThYMmcxVFhmdWJ4RndIUjF3WExqM2JUcU45b0JhWTlWQlI0N3VzT1NFaXVPejV5bnBXRVgwcnZZdkw0ckpaVy1MUDdja1BDcXBLQU9pRlk3MEJhMmUyVWRIZw?oc=5",
-          "domain": "www.intergameonline.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-25T08:46:00+00:00",
-          "quality": 0.65,
-          "title": "38% of Genting UK casinos 'unprofitable' with MGD rise",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMijAFBVV95cUxNdWsxZzktdmhKUnJCUnBMNE1PVC1JaDFfbG5tXzZkT3NicmxWT3JkX21zR2tzSTQ1aTlGMlB5U3dubDUwVU5DZm84Vzl3WVNsdUFjVWlaMXZQMUExTnhpZzJDT3lGWEZQNWhyOG40bmt4Vll4Tk5KRVhNQkhnTHBIU1NaMWtUeS1wQmlVQg?oc=5",
-          "domain": "www.ggrasia.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-25T04:51:24+00:00",
-          "quality": 0.65,
-          "title": "Fitch sees Genting New York EBITDA reaching US$450mln by 2028",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxNOUJTMzZuV1dYQWZRaHBFWFoxbUQybGZ6bWx4N0hMTlBxMW40YUJhZ1l2Tldyc1NZOEJjRkVhSG1MX2NIVEtVVjNQUHhocmhYMzR4eVI0MmNkbmdPMmZFcklnX085cVpBc1VrSVB0elRfVE1jaEdNcm5IZzJuX0FhdVlfbk9VZHNmRzhld2dyRGo2blozZ1ZWYVBiak9XVjVNR0dYRDRJRDQ?oc=5",
-          "domain": "www.tradingview.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-24T14:57:16+00:00",
-          "quality": 0.65,
-          "title": "Enterprise value to revenue forward of Ho Wah Genting Bhd. \u2013 MYX:HWGB",
-          "uncertainty": 0.0
-        }
-      ],
-      "tone": {
-        "intensity_max": 0.0,
-        "n": 4,
-        "polarity_mean": 0.0,
-        "sources": 4,
-        "uncertainty_mean": 0.24
-      },
+      "stories": [],
+      "tone": {},
       "upcoming": []
     },
     {
-      "escalated": 52,
+      "escalated": 35,
       "events": [],
       "instrument_id": "XNAS:NVDA",
       "label": "NVIDIA",
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-09-25",
+          "known_at": "2026-09-26",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "27.84"
+          "value": "28.11"
         },
         {
           "concept": "pb",
@@ -616,7 +452,7 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-09-25",
+          "known_at": "2026-09-26",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
@@ -672,11 +508,11 @@
         },
         {
           "concept": "av_news_sentiment",
-          "known_at": "2026-09-25",
+          "known_at": "2026-09-26",
           "label": "vendor sentiment",
-          "period_end": "2026-09-25",
+          "period_end": "2026-09-26",
           "source": "alphavantage_news",
-          "value": "0.11"
+          "value": "0.02"
         },
         {
           "concept": "revenue",
@@ -705,6 +541,17 @@
       ],
       "stories": [
         {
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/ionq-ionq-just-landed-nvidia-175356083.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-09-26T17:53:56+00:00",
+          "quality": 1.0,
+          "title": "IonQ (IONQ) Just Landed Nvidia Less Than 2 Years After Jensen Huang\u2019s 30-Year Quantum Warning",
+          "uncertainty": 0.17857142857142855
+        },
+        {
           "doc_id": "https://finance.yahoo.com/markets/stocks/articles/does-ionqs-nvidia-quantum-tie-210735580.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
           "escalated": true,
@@ -716,14 +563,25 @@
           "uncertainty": 0.14534883720930233
         },
         {
-          "doc_id": "https://finance.yahoo.com/m/8ea0b1f5-46a4-34c2-85d6-4408049c70de/chip-stocks-retreat.-qualcomm.html?.tsrc=rss",
-          "domain": "finance.yahoo.com",
+          "doc_id": "finnhub:142436033",
+          "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
-          "polarity": -1.0,
-          "published_at": "2026-09-24T20:42:17+00:00",
-          "quality": 1.0,
-          "title": "Chip Stocks Retreat. Qualcomm Secures Apple Licensing Deal.",
+          "polarity": 1.0,
+          "published_at": "2026-09-26T08:35:00+00:00",
+          "quality": 0.85,
+          "title": "Amazon Has No Dividend. Here's Why Long-Term Investors Should Own It Anyway.",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142433111",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-26T04:51:01+00:00",
+          "quality": 0.85,
+          "title": "NVIDIA (NVDA) vs. Broadcom (AVGO): Which AI Chip Stock Has the Stronger Moat?",
           "uncertainty": 0.0
         },
         {
@@ -769,52 +627,30 @@
           "quality": 0.85,
           "title": "Nvidia Stock Moves Lower as Einride Scales Physical AI",
           "uncertainty": 0.0
-        },
-        {
-          "doc_id": "finnhub:142424607",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-25T16:43:22+00:00",
-          "quality": 0.85,
-          "title": "Nvidia GPU Demand Is So Extreme, Even Bad Cloud Infrastructure Is Selling, SemiAnalysis Says",
-          "uncertainty": 0.2232142857142857
-        },
-        {
-          "doc_id": "finnhub:142424608",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
-          "polarity": 0.0,
-          "published_at": "2026-09-25T16:00:18+00:00",
-          "quality": 0.85,
-          "title": "If You Invest $500 a Month in Nvidia Starting Now, This is What You\u2019d Have in 2030",
-          "uncertainty": 0.5952380952380952
         }
       ],
       "tone": {
-        "intensity_max": 0.333,
-        "n": 264,
-        "polarity_mean": 0.131,
-        "sources": 30,
-        "uncertainty_mean": 0.18
+        "intensity_max": 0.667,
+        "n": 195,
+        "polarity_mean": 0.138,
+        "sources": 32,
+        "uncertainty_mean": 0.169
       },
       "upcoming": []
     },
     {
-      "escalated": 47,
+      "escalated": 27,
       "events": [],
       "instrument_id": "XNAS:AAPL",
       "label": "Apple",
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-09-25",
+          "known_at": "2026-09-26",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "38.14"
+          "value": "38.49"
         },
         {
           "concept": "pb",
@@ -842,7 +678,7 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-09-25",
+          "known_at": "2026-09-26",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
@@ -898,11 +734,11 @@
         },
         {
           "concept": "av_news_sentiment",
-          "known_at": "2026-09-25",
+          "known_at": "2026-09-26",
           "label": "vendor sentiment",
-          "period_end": "2026-09-25",
+          "period_end": "2026-09-26",
           "source": "alphavantage_news",
-          "value": "0.09"
+          "value": "0.07"
         },
         {
           "concept": "revenue",
@@ -942,105 +778,105 @@
           "uncertainty": 0.13736263736263735
         },
         {
-          "doc_id": "https://finance.yahoo.com/m/8ea0b1f5-46a4-34c2-85d6-4408049c70de/chip-stocks-retreat.-qualcomm.html?.tsrc=rss",
-          "domain": "finance.yahoo.com",
+          "doc_id": "alphavantage:https://unn.ua/en/news/apple-has-been-ordered-to-pay-a-record-dollar57-billion-in-a-case-concerning-a-patent-for-haptic-feedback-technology",
+          "domain": "\u0423\u043a\u0440\u0430\u0457\u043d\u0441\u044c\u043a\u0456 \u041d\u0430\u0446\u0456\u043e\u043d\u0430\u043b\u044c\u043d\u0456 \u041d\u043e\u0432\u0438\u043d\u0438 (\u0423\u041d\u041d)",
           "escalated": true,
-          "intensity": 0.0,
-          "polarity": -1.0,
-          "published_at": "2026-09-24T20:42:17+00:00",
-          "quality": 1.0,
-          "title": "Chip Stocks Retreat. Qualcomm Secures Apple Licensing Deal.",
+          "intensity": 0.3333333333333333,
+          "polarity": 1.0,
+          "published_at": "2026-09-26T16:49:44+00:00",
+          "quality": 0.85,
+          "title": "Apple has been ordered to pay a record $5.7 billion in a case concerning a patent for haptic feedback technology",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "https://finance.yahoo.com/video/era-ai-wearables-focused-listening-200354391.html?.tsrc=rss",
-          "domain": "finance.yahoo.com",
+          "doc_id": "alphavantage:https://www.reuters.com/legal/litigation/us-jury-says-apple-owes-record-57-billion-haptic-technology-patent-case-2026-09-26/",
+          "domain": "Reuters",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "polarity": 0.0,
+          "published_at": "2026-09-26T14:16:26+00:00",
+          "quality": 0.85,
+          "title": "US jury says Apple owes record $5.7 billion in haptic technology patent case",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142439150",
+          "domain": "CNBC",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-09-24T20:03:54+00:00",
-          "quality": 1.0,
-          "title": "The era of AI wearables focused on listening is here",
-          "uncertainty": 0.1838235294117647
+          "published_at": "2026-09-26T10:55:59+00:00",
+          "quality": 0.85,
+          "title": "Apple faces $5.7 billion patent infringement verdict over iPhone and Apple Watch haptics",
+          "uncertainty": 0.0
         },
         {
-          "doc_id": "alphavantage:https://www.thenewstribune.com/news/state/washington/article317386405.html",
-          "domain": "Tacoma News Tribune",
+          "doc_id": "alphavantage:https://www.marketbeat.com/instant-alerts/filing-womack-financial-llc-makes-new-investment-in-apple-inc-aapl-2026-09-26/",
+          "domain": "MarketBeat",
           "escalated": true,
           "intensity": 0.0,
-          "polarity": -1.0,
-          "published_at": "2026-09-25T20:59:21+00:00",
+          "polarity": 1.0,
+          "published_at": "2026-09-26T07:36:22+00:00",
           "quality": 0.85,
-          "title": "Apple reaches $250 million iPhone settlement. Who\u2019s eligible to get money in WA?",
+          "title": "Womack Financial LLC Makes New Investment in Apple Inc. $AAPL",
+          "uncertainty": 0.29069767441860467
+        },
+        {
+          "doc_id": "alphavantage:https://www.marketbeat.com/instant-alerts/filing-ames-national-corp-buys-17539-shares-of-apple-inc-aapl-2026-09-26/",
+          "domain": "MarketBeat",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-26T07:26:06+00:00",
+          "quality": 0.85,
+          "title": "Ames National Corp Buys 17,539 Shares of Apple Inc. $AAPL",
           "uncertainty": 0.1582278481012658
         },
         {
-          "doc_id": "alphavantage:https://uk.finance.yahoo.com/news/alphabet-vs-apple-consumer-ai-170200892.html",
-          "domain": "Yahoo Finance UK",
+          "doc_id": "alphavantage:https://www.marketbeat.com/instant-alerts/filing-10144-shares-in-apple-inc-aapl-bought-by-veratis-advisors-inc-2026-09-26/",
+          "domain": "MarketBeat",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 1.0,
-          "published_at": "2026-09-25T17:50:40+00:00",
+          "published_at": "2026-09-26T07:18:29+00:00",
           "quality": 0.85,
-          "title": "Alphabet vs. Apple: Which Consumer AI Tech Stock Has an Edge Now?",
-          "uncertainty": 0.0
+          "title": "10,144 Shares in Apple Inc. $AAPL Bought by Veratis Advisors Inc.",
+          "uncertainty": 0.17123287671232876
         },
         {
-          "doc_id": "https://247wallst.com/investing/2026/09/25/qualcomm-rallies-6-as-buyers-reverse-apple-renewal-selloff-apple-stock-ticks-up/?.tsrc=rss",
-          "domain": "247wallst.com",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
-          "polarity": 0.0,
-          "published_at": "2026-09-25T17:02:46+00:00",
-          "quality": 0.85,
-          "title": "Qualcomm Rallies 6% as Buyers Reverse Apple Renewal Selloff; Apple Stock Ticks Up",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "finnhub:142424625",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
-          "polarity": 1.0,
-          "published_at": "2026-09-25T16:30:30+00:00",
-          "quality": 0.85,
-          "title": "Apple Stock Outlook: Our Target Leaves Wall Street Behind",
-          "uncertainty": 0.2604166666666667
-        },
-        {
-          "doc_id": "alphavantage:https://topclassactions.com/lawsuit-settlements/lawsuit-news/apple-hit-with-another-lawsuit-over-airtag-stalking-after-class-action-fails/",
-          "domain": "Top Class Actions",
+          "doc_id": "alphavantage:https://www.marketbeat.com/instant-alerts/filing-ally-financial-inc-acquires-new-position-in-apple-inc-aapl-2026-09-26/",
+          "domain": "MarketBeat",
           "escalated": true,
           "intensity": 0.0,
-          "polarity": -1.0,
-          "published_at": "2026-09-25T14:17:42+00:00",
+          "polarity": 1.0,
+          "published_at": "2026-09-26T06:52:21+00:00",
           "quality": 0.85,
-          "title": "Apple hit with another lawsuit over AirTag stalking after class action fails",
-          "uncertainty": 0.0
+          "title": "Ally Financial Inc. Acquires New Position in Apple Inc. $AAPL",
+          "uncertainty": 0.17605633802816903
         }
       ],
       "tone": {
         "intensity_max": 0.667,
-        "n": 127,
-        "polarity_mean": 0.181,
-        "sources": 51,
-        "uncertainty_mean": 0.087
+        "n": 91,
+        "polarity_mean": 0.165,
+        "sources": 53,
+        "uncertainty_mean": 0.091
       },
       "upcoming": []
     },
     {
-      "escalated": 27,
+      "escalated": 23,
       "events": [],
       "instrument_id": "XNAS:MSFT",
       "label": "Microsoft",
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-09-25",
+          "known_at": "2026-09-26",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "27.39"
+          "value": "28.48"
         },
         {
           "concept": "pb",
@@ -1068,7 +904,7 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-09-25",
+          "known_at": "2026-09-26",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
@@ -1124,11 +960,11 @@
         },
         {
           "concept": "av_news_sentiment",
-          "known_at": "2026-09-25",
+          "known_at": "2026-09-26",
           "label": "vendor sentiment",
-          "period_end": "2026-09-25",
+          "period_end": "2026-09-26",
           "source": "alphavantage_news",
-          "value": "0.06"
+          "value": "0.00"
         },
         {
           "concept": "revenue",
@@ -1168,14 +1004,25 @@
           "uncertainty": 0.0
         },
         {
-          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/microsoft-msft-sustain-recurring-cash-202321015.html?.tsrc=rss",
-          "domain": "finance.yahoo.com",
+          "doc_id": "finnhub:142426663",
+          "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.3333333333333333,
           "polarity": 1.0,
-          "published_at": "2026-09-24T20:23:21+00:00",
-          "quality": 1.0,
-          "title": "Can Microsoft (MSFT) Sustain its Recurring Cash Flows, Growing Payouts, and Azure Momentum?",
+          "published_at": "2026-09-25T23:13:47+00:00",
+          "quality": 0.85,
+          "title": "Azure\u2019s Inflection Point: Can Microsoft (MSFT) Balance AI Growth With Capex Risk?",
+          "uncertainty": 0.1838235294117647
+        },
+        {
+          "doc_id": "finnhub:142426660",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-09-25T23:09:41+00:00",
+          "quality": 0.85,
+          "title": "What Is Microsoft (MSFT) Planning With Its $10 Billion Gulf Cloud And AI Push?",
           "uncertainty": 0.0
         },
         {
@@ -1232,25 +1079,14 @@
           "quality": 0.85,
           "title": "Microsoft shares rise over 3% after expanded Copilot release",
           "uncertainty": 0.0
-        },
-        {
-          "doc_id": "finnhub:142423773",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-09-25T14:00:56+00:00",
-          "quality": 0.85,
-          "title": "Why 'trust' will Microsoft's 'biggest' AI issue: CEO Satya Nadella explains",
-          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.667,
-        "n": 148,
-        "polarity_mean": 0.19,
-        "sources": 45,
-        "uncertainty_mean": 0.081
+        "n": 110,
+        "polarity_mean": 0.159,
+        "sources": 44,
+        "uncertainty_mean": 0.056
       },
       "upcoming": []
     }

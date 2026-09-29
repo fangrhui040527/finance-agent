@@ -43,6 +43,7 @@ from pathlib import Path
 
 from core.provenance.ledger import _enable_wal
 from knowledge.news.features import Article
+from knowledge.redact import scrub
 
 #: Tracked in git like every other database here - see .gitignore, which keeps
 #: out secrets and derived files and nothing else. This one is neither.
@@ -263,6 +264,7 @@ class Corpus:
     ) -> None:
         """Every attempt, including the ones that found nothing and the ones
         that could not run. The row IS the difference between those two."""
+        detail = scrub(detail)
         self.conn.execute(
             """INSERT INTO sweeps
                (run_id, at, source, since, status, slot, fetched, kept, stored,

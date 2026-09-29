@@ -1,0 +1,150 @@
+{
+  "day": "2026-09-26",
+  "written_at": "2026-09-26T22:56:13Z",
+  "phase": "ramp",
+  "week": 3,
+  "equity_usd": 1000.0,
+  "cash_usd": 1000.0,
+  "control_equity_usd": 987.93,
+  "control_return_to_date": -0.0121,
+  "drawdown": 0.0,
+  "control_drawdown": 0.0121,
+  "halted": false,
+  "marks": 16,
+  "positions": [],
+  "changes": [],
+  "control_changes": [],
+  "control_mark": {
+    "marked_on": "2026-09-25",
+    "equity_usd": 987.93,
+    "cash_usd": 602.28,
+    "positions_usd": 385.65,
+    "day_return": -0.0014,
+    "note": "Saturday, no session; no mark since Friday's (one-mark-per-session rule, PR #76); holdings MYX:8869 100, MYX:5183 100, MYX:3182 200 unchanged"
+  },
+  "caps": [
+    {
+      "cap": "largest name",
+      "value": "0.00%",
+      "limit": "25%",
+      "breached": false
+    },
+    {
+      "cap": "invested",
+      "value": "0.00%",
+      "limit": "40%",
+      "breached": false
+    },
+    {
+      "cap": "cash floor",
+      "value": "100.00%",
+      "limit": "20%",
+      "breached": false
+    },
+    {
+      "cap": "names held",
+      "value": "0",
+      "limit": "0",
+      "breached": false
+    },
+    {
+      "cap": "drawdown from peak",
+      "value": "0.00%",
+      "limit": "8% halts entries",
+      "breached": false
+    },
+    {
+      "cap": "turnover, 5 weekdays",
+      "value": "USD 0.00",
+      "limit": "USD 500.00",
+      "breached": false
+    }
+  ],
+  "prices": {
+    "bursa": "Friday 2026-09-25 settled closes; no session since",
+    "us": "Friday 2026-09-25 settled closes; no session since",
+    "fx": "4.0735 MYR per USD, bnm, 2026-09-25 (no weekend rate)"
+  },
+  "fundable": [
+    {
+      "instrument_id": "MYX:5183",
+      "lot_usd": 110.22,
+      "share": 0.11,
+      "round_trip": 0.0202,
+      "lots": 2
+    },
+    {
+      "instrument_id": "MYX:5225",
+      "lot_usd": 197.13,
+      "share": 0.197,
+      "round_trip": 0.0119,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:8869",
+      "lot_usd": 183.13,
+      "share": 0.183,
+      "round_trip": 0.0127,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:3182",
+      "lot_usd": 46.15,
+      "share": 0.046,
+      "round_trip": 0.0464,
+      "lots": 5
+    },
+    {
+      "instrument_id": "XNAS:NVDA",
+      "lot_usd": 225.07,
+      "share": 0.225,
+      "round_trip": 0.0115,
+      "lots": 1
+    }
+  ],
+  "over_cap": {
+    "MYX:1155": 0.251,
+    "MYX:5347": 0.323,
+    "XNAS:AAPL": 0.341,
+    "XNAS:MSFT": 0.516
+  },
+  "ledger": {
+    "mark_days": 16,
+    "weekend": "Saturday's bursa_close cron (001eb5d, 13:45Z) and us_close dispatch (53a61c0, 22:46Z) committed data/paper.db and added no mark"
+  },
+  "attribution": null,
+  "decision": {
+    "recorded": true,
+    "weights": {},
+    "all_cash": true,
+    "calendar_row": true,
+    "prediction_id": "paper-2026-09-26-allcash-21d-cf74",
+    "grades_on": "2026-10-26",
+    "confidence": 0.55,
+    "decided_at": "2026-09-26T22:54:40Z",
+    "made_at": "2026-09-26T22:54:40Z",
+    "thesis": "All cash, a weekend calendar row (the sixteenth all-cash row, fifth of the ramp), recorded on Saturday with no session since Friday's closes; the 2026-09-25 feedback page puts every fundable name inside its normal variation on Friday (largest Maybank 1.44 sigma, not fundable at 25.1% of equity), IHH's first session after the appeal moved 0.28 sigma, and IHH's 2026-09-22 session re-measured alone is significant (3.80 sigma) but its one candidate cause is a headline without a body and the move is four sessions old; Microsoft, the one name past 1.5 sigma (1.74), is not fundable at 51.6% of equity; claim: nothing in the fundable universe beats cash over 21 sessions.",
+    "refusals": []
+  },
+  "stores": {
+    "decided_targets": 16,
+    "decided_applications": 16,
+    "predictions": 16
+  },
+  "evidence": {
+    "feedback_page": "knowledge/feedback/2026-09-25.md (910b4f6)",
+    "notes": [
+      "every fundable name inside normal variation on 2026-09-25; largest Bursa leg Maybank 1.44 sigma (not fundable, 25.1%)",
+      "IHH first session after the appeal: idiosyncratic -0.31%, 0.28 sigma",
+      "IHH 2026-09-22 re-measured alone after ^KLSE 09-22 filled: idiosyncratic +4.21%, 3.80 sigma; only candidate a Macquarie headline without a body",
+      "Microsoft +3.66%, idiosyncratic +3.27%, 1.74 sigma; candidate Copilot relaunch at 0.45; not fundable at 51.6%"
+    ]
+  },
+  "mistakes": [
+    "The 2026-09-25 page (decision paper-2026-09-25-allcash-21d-468d) ended 'The next decision is for 2026-09-28'; the routine records one decision a night including weekends (paper-2026-09-19-allcash-21d-b7bd, paper-2026-09-20-allcash-21d-dbaf), and tonight's row paper-2026-09-26-allcash-21d-cf74 is dated 2026-09-26."
+  ],
+  "lessons": [
+    "A weekend row carries no new price, only new measurement; a decision that changes on a weekend should name the re-measurement that changed it.",
+    "A page's statement about the routine is a claim about a ledger and the ledger can check it: 'the next decision is for 2026-09-28' was false against weekend rows already recorded."
+  ]
+}

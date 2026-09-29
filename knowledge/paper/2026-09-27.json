@@ -1,0 +1,152 @@
+{
+  "day": "2026-09-27",
+  "written_at": "2026-09-27T22:55:37Z",
+  "phase": "ramp",
+  "week": 3,
+  "equity_usd": 1000.0,
+  "cash_usd": 1000.0,
+  "control_equity_usd": 987.93,
+  "control_return_to_date": -0.0121,
+  "drawdown": 0.0,
+  "control_drawdown": 0.0121,
+  "halted": false,
+  "marks": 16,
+  "positions": [],
+  "changes": [],
+  "control_changes": [],
+  "control_mark": {
+    "marked_on": "2026-09-25",
+    "equity_usd": 987.93,
+    "cash_usd": 602.28,
+    "positions_usd": 385.65,
+    "day_return": -0.0014,
+    "note": "Sunday, no session; no mark since Friday's (one-mark-per-session rule, PR #76); holdings MYX:8869 100, MYX:5183 100, MYX:3182 200 unchanged"
+  },
+  "caps": [
+    {
+      "cap": "largest name",
+      "value": "0.00%",
+      "limit": "25%",
+      "breached": false
+    },
+    {
+      "cap": "invested",
+      "value": "0.00%",
+      "limit": "40%",
+      "breached": false
+    },
+    {
+      "cap": "cash floor",
+      "value": "100.00%",
+      "limit": "20%",
+      "breached": false
+    },
+    {
+      "cap": "names held",
+      "value": "0",
+      "limit": "0",
+      "breached": false
+    },
+    {
+      "cap": "drawdown from peak",
+      "value": "0.00%",
+      "limit": "8% halts entries",
+      "breached": false
+    },
+    {
+      "cap": "turnover, 5 weekdays",
+      "value": "USD 0.00",
+      "limit": "USD 500.00",
+      "breached": false
+    }
+  ],
+  "prices": {
+    "bursa": "Friday 2026-09-25 settled closes; no session since",
+    "us": "Friday 2026-09-25 settled closes; no session since",
+    "fx": "4.0735 MYR per USD, bnm, 2026-09-25 (no weekend rate)"
+  },
+  "fundable": [
+    {
+      "instrument_id": "MYX:5183",
+      "lot_usd": 110.22,
+      "share": 0.11,
+      "round_trip": 0.0202,
+      "lots": 2
+    },
+    {
+      "instrument_id": "MYX:5225",
+      "lot_usd": 197.13,
+      "share": 0.197,
+      "round_trip": 0.0119,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:8869",
+      "lot_usd": 183.13,
+      "share": 0.183,
+      "round_trip": 0.0127,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:3182",
+      "lot_usd": 46.15,
+      "share": 0.046,
+      "round_trip": 0.0464,
+      "lots": 5
+    },
+    {
+      "instrument_id": "XNAS:NVDA",
+      "lot_usd": 225.07,
+      "share": 0.225,
+      "round_trip": 0.0115,
+      "lots": 1
+    }
+  ],
+  "over_cap": {
+    "MYX:1155": 0.251,
+    "MYX:5347": 0.323,
+    "XNAS:AAPL": 0.341,
+    "XNAS:MSFT": 0.516
+  },
+  "ledger": {
+    "mark_days": 16,
+    "weekend": "Sunday's bursa_close cron (4dcca93, 14:41Z) and us_close dispatch (3589d73, 22:46Z) committed data/paper.db and added no row: counts matched b4965c6 (targets 19, applications 19, marks 64, position_changes 3) until tonight's decision"
+  },
+  "attribution": null,
+  "decision": {
+    "recorded": true,
+    "weights": {},
+    "all_cash": true,
+    "calendar_row": true,
+    "prediction_id": "paper-2026-09-27-allcash-21d-9d18",
+    "grades_on": "2026-10-27",
+    "confidence": 0.55,
+    "decided_at": "2026-09-27T22:54:12Z",
+    "made_at": "2026-09-27T22:54:12Z",
+    "thesis": "All cash, a weekend calendar row (the seventeenth all-cash row, sixth of the ramp), recorded on Sunday with no session since Friday's closes; the 2026-09-26 feedback page records three weekend company events and none in a fundable name that a Monday fill could act on: Apple's USD 5.7bn patent verdict (published 3h30m after Friday's close) and Maybank's RM1.56bn AT1 sukuk redemption are in names over the 25% cap (34.1% and 25.1% of equity); the one fundable name with a weekend row, IHH, has a Supreme Court forensic-audit ruling reported in titles without bodies, whose first row came during Friday's session, which moved 0.28 sigma; every fundable name was inside its normal variation on Friday; claim: nothing in the fundable universe beats cash over 21 sessions.",
+    "refusals": [],
+    "cli_output": "recorded 1 target(s) for 2026-09-27 (week 3, ramp: invested weight capped at 40%), sized against equity USD 1,000.00\n  CASH           0.00%  all_cash\n  all-cash: one row and one prediction, graded against the control book\n  1 prediction(s) logged:\n    paper-2026-09-27-allcash-21d-9d18  +21d  grades on 2026-10-27\n  applies at each market's first cached bar after this day"
+  },
+  "stores": {
+    "decided_targets": 17,
+    "decided_applications": 17,
+    "predictions": 17
+  },
+  "evidence": {
+    "feedback_page": "knowledge/feedback/2026-09-26.md (cc5546f, lead corrected in 5f1dc13)",
+    "notes": [
+      "Apple: USD 5.7bn patent verdict, first row 2026-09-25T23:30Z (3h30m after Friday's close); Monday 09-28 first session to read it; not fundable (34.1%)",
+      "Maybank: RM1.56bn AT1 sukuk fully redeemed on first call date (title only); not fundable (25.1%)",
+      "IHH: India's Supreme Court let a forensic audit of the Fortis share transfers proceed; first row (lawbeat.in, not linked) 2026-09-25T07:40Z during Friday's session, which moved 0.28 sigma; titles only",
+      "Microsoft: no Saturday row states Friday's open; the open disagreement stands; not fundable (51.6%)",
+      "Petronas Chemicals, Press Metal, Genting: nothing collected over the weekend"
+    ]
+  },
+  "mistakes": [
+    "Saturday's feedback page cc5546f (written for 2026-09-26) led with 'Monday 09-28 is the first session that can read each one' and listed IHH's Supreme Court ruling, whose first row its own IHH section dated to Friday 07:40Z during Bursa's session; 5f1dc13 corrected the lead and JSON note at 22:54:01Z, before decision paper-2026-09-27-allcash-21d-9d18 (22:54:12Z), whose thesis dates the row to Friday's session."
+  ],
+  "lessons": [
+    "The weekend's dated events fell on names the book cannot fund: Apple and Maybank carried them, both over the 25% cap at USD 1,000, while three of the five fundable names collected nothing at all.",
+    "Three rows now apply at the same Monday bars, each decided on the same prices; a weekend row adds information only when its thesis names what it knew that Friday's did not."
+  ]
+}
