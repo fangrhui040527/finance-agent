@@ -229,10 +229,32 @@ class PriceCache:
     #: The day the last `get` answered from, for a caller that wants to say so.
     last_served_from: str | None = None
 
-    def put(self, feed: str, symbol: str, body: str) -> None:
+    def put(self, feed: str, symbol: str, body: str) -> str:
+        """Store a fetched body, and return the body the cache now holds.
+
+        WHAT IT REFUSES TO REPLACE. A refetch that knows less than the row it
+        would overwrite is not stored. On 2026-09-29 the us_close collector,
+        3h44m late, refetched at 00:59 UTC and Yahoo answered with Monday's
+        row present but its close blank, for NVDA, AAPL, MSFT, SPY and ^KLSE.
+        The parser drops that row, so the body's last usable bar was Friday's,
+        and it replaced a body pulled at 22:45 UTC that held Monday's settled
+        close. Every offline reader - the nightly pack, the paper book - then
+        priced the US names at Friday's close for a session that had already
+        closed and been cached. A body whose last usable bar is EARLIER than
+        the held body's is that regression; the held body stays, and the caller
+        is handed it, because its bars are settled and the new ones are not.
+        """
         if not looks_like_bars(body):
-            return  # an error page is not a cache hit; let the next process try
+            return body  # an error page is not a cache hit; let the next process try
         with self._lock:
+            row = self.conn.execute(
+                "SELECT body FROM price_csv WHERE feed = ? AND symbol = ?", (feed, symbol)
+            ).fetchone()
+            if row is not None and looks_like_bars(row[0]):
+                held = last_usable_bar_day(row[0])
+                fresh = last_usable_bar_day(body)
+                if held is not None and (fresh is None or fresh < held):
+                    return row[0]
             self.conn.execute(
                 "INSERT INTO price_csv (feed, symbol, fetched_on, fetched_at, body)"
                 " VALUES (?,?,?,?,?)"
@@ -241,6 +263,7 @@ class PriceCache:
                 (feed, symbol, self._today(), self._now(), body),
             )
             self.conn.commit()
+            return body
 
     def fetched_at(self, feed: str, symbol: str) -> datetime | None:
         """When this body was pulled, or None for a row cached before the column.

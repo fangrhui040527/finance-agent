@@ -172,7 +172,7 @@ class PriceFeed(ABC):
         if body is None:
             body = self._fetch_csv(symbol)
             if cache is not None:
-                cache.put(self.name, symbol, body)
+                body = cache.put(self.name, symbol, body)
         bars = self.parse(body, symbol)
         if start is not None:
             bars = [b for b in bars if b.day >= start]
