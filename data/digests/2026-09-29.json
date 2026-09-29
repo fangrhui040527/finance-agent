@@ -1,6 +1,42 @@
 {
   "collection": [
     {
+      "at": "2026-09-29T18:13:41.869394+00:00",
+      "detail": "facts 0; ",
+      "fetched": 450,
+      "kept": 0,
+      "source": "dbnomics",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-29T18:13:39.740229+00:00",
+      "detail": "facts 0; ",
+      "fetched": 20,
+      "kept": 3,
+      "source": "jin10_flash",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-29T18:13:38.793956+00:00",
+      "detail": "facts 17; release calendar: 'FOMC Press Release' listed on 15 days of the fortnight - a daily table, not a scheduled print; not stored as a release",
+      "fetched": 475,
+      "kept": 0,
+      "source": "fred",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-29T18:13:07.046729+00:00",
+      "detail": "facts 0; fmp /earnings is outside the plan (HTTP 402); not collected for NVDA, AAPL, MSFT",
+      "fetched": 3945,
+      "kept": 0,
+      "source": "fmp",
+      "status": "ok",
+      "stored": 0
+    },
+    {
       "at": "2026-09-29T10:09:56.163181+00:00",
       "detail": "facts 0; EODHD plan: free (2 names a day, US only, rotated); MYX:1155: deferred by the 2-a-day credit budget; next in rotation; MYX:5347: deferred by the 2-a-day credit budget; next in rotation; MYX:5183: deferred by the 2-a-day credit budget; next in rotation; MYX:5225: deferred by the 2-a-day credit budget; next in rotation; outside the free plan (US only), so not asked for: MYX:1155, MYX:5347, MYX:5183, MYX:5225. The EODHD Fundamentals plan covers KLSE and TW.; MYX:8869: EODHD free plan: US only; the Fundamentals plan covers KLSE; MYX:3182: EODHD free plan: US only; the Fundamentals plan covers KLSE",
       "fetched": 0,
@@ -91,18 +127,18 @@
     "linked": 7305,
     "observations": 4833,
     "series": 31,
-    "sweeps": 576
+    "sweeps": 580
   },
   "day": "2026-09-29",
-  "generated_at": "2026-09-29 10:10 UTC",
+  "generated_at": "2026-09-29 18:13 UTC",
   "macro": [
     {
-      "change": "0.13",
-      "obs_date": "2026-09-25",
+      "change": "0.09",
+      "obs_date": "2026-09-28",
       "series_id": "BAMLH0A0HYM2",
       "source": "fred",
       "title": "ICE BofA US high-yield option-adjusted spread, %",
-      "value": "2.93"
+      "value": "3.02"
     },
     {
       "change": "0",
@@ -129,36 +165,36 @@
       "value": "114.89"
     },
     {
-      "change": "-0.0172",
-      "obs_date": "2026-09-18",
+      "change": "-0.0133",
+      "obs_date": "2026-09-25",
       "series_id": "DEXMAUS",
       "source": "fred",
       "title": "Malaysian ringgit per US dollar",
-      "value": "4.08"
+      "value": "4.07"
     },
     {
       "change": "0",
-      "obs_date": "2026-09-24",
+      "obs_date": "2026-09-25",
       "series_id": "DFF",
       "source": "fred",
       "title": "Federal funds effective rate, %",
       "value": "3.88"
     },
     {
-      "change": "0.07",
-      "obs_date": "2026-09-24",
+      "change": "-0.01",
+      "obs_date": "2026-09-25",
       "series_id": "DGS10",
       "source": "fred",
       "title": "10-year Treasury yield, %",
-      "value": "5.18"
+      "value": "5.17"
     },
     {
-      "change": "0.02",
-      "obs_date": "2026-09-24",
+      "change": "-0.06",
+      "obs_date": "2026-09-25",
       "series_id": "DGS2",
       "source": "fred",
       "title": "2-year Treasury yield, %",
-      "value": "4.87"
+      "value": "4.81"
     },
     {
       "change": "0.4",
@@ -169,20 +205,20 @@
       "value": "137.50"
     },
     {
-      "change": "0.1644",
-      "obs_date": "2026-09-18",
+      "change": "-0.2221",
+      "obs_date": "2026-09-25",
       "series_id": "DTWEXBGS",
       "source": "fred",
       "title": "Broad US dollar index",
-      "value": "119.51"
+      "value": "120.33"
     },
     {
-      "change": "129.35",
-      "obs_date": "2026-09-25",
+      "change": "-248.34",
+      "obs_date": "2026-09-28",
       "series_id": "NASDAQCOM",
       "source": "fred",
       "title": "NASDAQ Composite, index level",
-      "value": "27,068.72"
+      "value": "26,820.38"
     },
     {
       "change": null,
@@ -193,20 +229,20 @@
       "value": "3,158.26"
     },
     {
-      "change": "39.28",
-      "obs_date": "2026-09-25",
+      "change": "-59.72",
+      "obs_date": "2026-09-28",
       "series_id": "SP500",
       "source": "fred",
       "title": "S&P 500, index level",
-      "value": "7,743.41"
+      "value": "7,683.69"
     },
     {
-      "change": "0.05",
-      "obs_date": "2026-09-25",
+      "change": "-0.04",
+      "obs_date": "2026-09-28",
       "series_id": "T10Y2Y",
       "source": "fred",
       "title": "10y minus 2y Treasury spread, %",
-      "value": "0.36"
+      "value": "0.32"
     },
     {
       "change": "0",
