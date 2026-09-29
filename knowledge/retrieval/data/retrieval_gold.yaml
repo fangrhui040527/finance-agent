@@ -285,6 +285,11 @@ questions:
     A tenth on the 2026-09-28 us_close sweep, Monday's: four Finnhub documents,
     two with the ticker in the title and two carrying it only in the body.
     TWENTY-TWO labels, and the first time one sweep brought four since 09-15.
+
+    An eleventh on the 2026-09-29 us_close sweep, Tuesday's: three documents,
+    all with the ticker in the title - a Stocktwits close wrap, a Stocktwits
+    item on compute agreements reported in an IPO prospectus, and a Google News
+    press-release headline. TWENTY-FIVE labels.
   relevant:
   - doc_id: https://stocktwits.com/news-articles/markets/equity/s-and-p-500-dow-end-best-day-in-a-month/cZsufnBRJvu?.tsrc=rss
     title: S&P 500, Dow End Best Day In A Month On Calmer Yields As Rate Hike Bets Wane — SPCX, VSXY,
@@ -335,6 +340,12 @@ questions:
     title: "Musk: SpaceX’s Colossus 2 Capacity Poised to Double by December “If We Get Lucky”"
   - doc_id: finnhub:142469112
     title: "Nvidia & Meta deliver big updates, while Trump reconsiders Biden's fuel mandates"
+  - doc_id: https://news.google.com/rss/articles/CBMipgFBVV95cUxPdzdTeVI5WUM5aUdKRXlyN1FUYS0yM1BPQ1A0Z1oteU5CT2k2eXl1aHF6bWVpa2VUdFN6anMwdEtnTzhmZFhBS1pIdkRNSnFfSHc3dXFTSk42RFFvcHZzRG8tbnN0YnI4ZmUxdWd3amtzNnUwQTc5b3U1a1gwd184cmVYMGxkY1RJazYxdVFDbE5Bak5YU1dNUlZtcDE5ZlRXMndDQUZn?oc=5
+    title: "NewsOut Expands Market Coverage to SpaceX (NASDAQ:SPCX), NVIDIA (NASDAQ:NVDA) and CrowdStrike (NASDAQ: CRWD) as Its Combined Distribution With New to The Street Reaches Approximately 6.5 Million YouTube Subscribers"
+  - doc_id: https://stocktwits.com/news-articles/markets/equity/anthropic-s-ipo-prospectus-space-x-in-compute-agreements/cZMZJoDRBW7?.tsrc=rss
+    title: "SPCX Stock Adds 3%: Anthropic's IPO Prospectus Reportedly Shows $84.5B To SpaceX In Compute Agreements"
+  - doc_id: https://stocktwits.com/news-articles/markets/equity/s-and-p-500-dow-extend-losses-from-elevated-yield-pressure-spcx-tgt-aapl-mu-ntap-in-focus/cZMZLlCRBW0?.tsrc=rss
+    title: "S&P 500, Dow Extend Losses From Elevated Yield Pressure — SPCX, TGT, AAPL, MU, NTAP In Focus"
 - query: KeyBanc Underweight rating Apple
   kind: lexical
   note: broker plus rating word
