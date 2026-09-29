@@ -1611,3 +1611,17 @@ def test_the_plan_kwarg_wins_over_the_environment(monkeypatch):
         clock=CLOCK, opener=open_, key="tok.12345678", plan="all-in-one"
     ).collect(SINCE, WHOLE_BOOK, slot="us_close")
     assert pull.requests == 10 and pull.notes[0].startswith("EODHD plan: all-in-one")
+
+
+def test_alphavantage_quota_notice_that_echoes_the_key_is_raised_without_it():
+    """2026-09-28: the quota notice named the caller's key, and the error text
+    carried it into the sweep log and three committed files."""
+    echoed = "SYNTHETICECHO000"  # synthetic, in the vendor's key shape
+    body = {
+        "Information": f"We have detected your API key as {echoed} and our standard API rate "
+        "limit is 25 requests per day."
+    }
+    c = AlphaVantageNews(key="k", clock=CLOCK, opener=router({"alphavantage": body}))
+    with pytest.raises(SourceError, match="quota exhausted for today") as exc:
+        c.collect(SINCE, ("XNAS:NVDA",))
+    assert echoed not in str(exc.value)
