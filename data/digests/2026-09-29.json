@@ -1,18 +1,100 @@
 {
-  "collection": [],
+  "collection": [
+    {
+      "at": "2026-09-29T10:09:56.163181+00:00",
+      "detail": "facts 0; EODHD plan: free (2 names a day, US only, rotated); MYX:1155: deferred by the 2-a-day credit budget; next in rotation; MYX:5347: deferred by the 2-a-day credit budget; next in rotation; MYX:5183: deferred by the 2-a-day credit budget; next in rotation; MYX:5225: deferred by the 2-a-day credit budget; next in rotation; outside the free plan (US only), so not asked for: MYX:1155, MYX:5347, MYX:5183, MYX:5225. The EODHD Fundamentals plan covers KLSE and TW.; MYX:8869: EODHD free plan: US only; the Fundamentals plan covers KLSE; MYX:3182: EODHD free plan: US only; the Fundamentals plan covers KLSE",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-29T10:09:55.732895+00:00",
+      "detail": "facts 0; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-29T10:08:54.360821+00:00",
+      "detail": "facts 0; ",
+      "fetched": 18,
+      "kept": 5,
+      "source": "jin10_flash",
+      "status": "ok",
+      "stored": 2
+    },
+    {
+      "at": "2026-09-29T10:08:53.299811+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-29T10:08:51.221755+00:00",
+      "detail": "",
+      "fetched": 50,
+      "kept": 49,
+      "source": "nst_business",
+      "status": "ok",
+      "stored": 47
+    },
+    {
+      "at": "2026-09-29T10:08:50.830877+00:00",
+      "detail": "",
+      "fetched": 50,
+      "kept": 50,
+      "source": "fmt_business",
+      "status": "ok",
+      "stored": 50
+    },
+    {
+      "at": "2026-09-29T10:08:50.670009+00:00",
+      "detail": "read but empty: Genting, Maybank, Tenaga, Petronas Chemicals, IHH, Press Metal",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-09-29T10:08:48.990701+00:00",
+      "detail": "named the company: 8 of 20 (lowest: Genting 0/1, Petronas Chemicals 0/1, Press Metal 0/2)",
+      "fetched": 26,
+      "kept": 20,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 15
+    },
+    {
+      "at": "2026-09-29T10:08:47.210305+00:00",
+      "detail": "no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked); deferred: IHH, Press Metal, Genting",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "failed",
+      "stored": 0
+    }
+  ],
   "counts": {
-    "articles": 10648,
+    "articles": 10762,
     "documents": 0,
-    "escalated": 1825,
+    "escalated": 1826,
     "events": 4141,
-    "failed_sweeps": 34,
-    "linked": 7298,
+    "failed_sweeps": 35,
+    "linked": 7305,
     "observations": 4833,
     "series": 31,
-    "sweeps": 567
+    "sweeps": 576
   },
   "day": "2026-09-29",
-  "generated_at": "2026-09-29 00:59 UTC",
+  "generated_at": "2026-09-29 10:10 UTC",
   "macro": [
     {
       "change": "0.13",
@@ -145,13 +227,64 @@
   ],
   "names": [
     {
-      "escalated": 0,
+      "escalated": 1,
       "events": [],
       "instrument_id": "MYX:1155",
       "label": "Maybank",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiYEFVX3lxTFBKR2k0QWFzektVNW9rUGp6UlQtVGRmbEQzY2wxV1M2N2Jaam4xQmUwZ0ZGT2d6R0ZqVTNYRWtTd2JldmduX0Q1eW5uX0ZZdWhiMXdoTURBd2RNQjV4bDd2NA?oc=5",
+          "domain": "www.kaohooninternational.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-09-29T03:46:32+00:00",
+          "quality": 0.65,
+          "title": "Maybank Maintains \u2018Buy\u2019 on TRUE, Highlights Robust Dividend Outlook and Attractive Valuation",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMitwFBVV95cUxQaWRmUGdpSlYtVThNc3ZwRUphOEJ5OTVWeTVnUUhJaTZXdG81NGFxUXc5alBXTFMzMWxCNlNaSDNoZmhLWHM5UXVBclhuOUJGMnNXTmx0Z3E5WmcyR05JN1JvaVJRSXN6aVR3Uy0yMFZ0ZUcxa2RvaUdOOEk0SkJ4V3ZOZWlSZmlxaXE1M3Q4ZEJUeGhULVNWZ0daVzlLbU40a2Z3cVFtd1NJbVdtaU5NblBsNEhxZVE?oc=5",
+          "domain": "www.businesstoday.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-29T07:54:17+00:00",
+          "quality": 0.8,
+          "title": "Stock Today: Maybank Falls 1.2% After RM1.56 Billion AT1 Sukuk Redemption",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMilwFBVV95cUxNZXV6dThkdDdDZFZ3dlVNMEp4bHhsSHQ2ajJaaVN2YjUzakFpVjNLUEZYaUFDbWR5ZTRya2xsZHdWb1M4NXVRRnZFQlNYckxSWVRxTmZVa2xMcEM2bVVPS1hxTGx5Y18tNzM3YVhrVlNTNG5ycWdNam81c19FalIzMkswWi15UVN5V05pZHljT3RMb0dLMnhv?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-28T23:31:11+00:00",
+          "quality": 0.8,
+          "title": "Maybank finalises RM2.5bil sukuk",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMirAFBVV95cUxPa1AxUlZJd25sLU85NEo1ZkdIZkczV09NazdrVVhDUkp2OVE5aFhiRHZQUjRxUHB4eXU3ZkNFTHJtTXM2SmFtd1Vrc3ZKdFBWWWJmaFVrcm1WRVJnZk5RMnZCWnh1Vlc0cWpKZnVNY184MmtuRzc2R1FLTGRRcTBMMVhJMEg5eW1ZOHktM2RNaE9lTV83QkhfZ2VuTWZqa2FtNUxpOXlwdEsxVWdL?oc=5",
+          "domain": "www.marketscreener.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-29T03:13:12+00:00",
+          "quality": 0.65,
+          "title": "Maybank Issues 2.5 Billion Ringgit in AT1 Islamic Bonds",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 4,
+        "polarity_mean": 0.25,
+        "sources": 4,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -160,8 +293,26 @@
       "instrument_id": "MYX:5347",
       "label": "Tenaga",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiswFBVV95cUxORjRndEp4TkJZbnl4Xzd0N0lRSjVwZVNYeVZuaFdWR3VqcGRIMnhmdmdlN1IxSWgzRzloa0piV2cxak92YWNjOWFrZU1XVWtiN3hfYXo3S1d4b250bjBfWno0azRuQ0VzMmFBQlRDakVVLWJKZ19oSmc1am9RTUkzM21DUm84RnN3U0c3UVBIcnc5Z3gtOGdJOFNyZXJPSjA3ZGY4VHIwMXBsS1JlTWZuUVdvdw?oc=5",
+          "domain": "scanx.trade",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-29T06:04:55+00:00",
+          "quality": 0.65,
+          "title": "Shree TNB Polymers IPO Day 2: Subscribed 0.39x; QIB demand at 0.75x",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -180,8 +331,37 @@
       "instrument_id": "MYX:5225",
       "label": "IHH",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPajV3LVBuN1ZTbmc4WDNlZFV1a0FLRm90T1M0bXhyVnBVTWV4VlROUnVSVmpKMnlCWDYwNUdNWVIzNmNsT3R5VG43M0hZb1VQYlNtcWJ1NmprTDNGMzBSM2Q4RTZsTy1DQ3pvdEZGYlBYalZyUF82eFAyTHdjTnpHVTV5T3dDVTFRajVJd1FkWXNCVEFyNUZVajNVcWg?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-28T23:05:02+00:00",
+          "quality": 0.8,
+          "title": "Fortis buy was transparent, says IHH",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMixwFBVV95cUxNUmRuUEhCdmExcE9uMGYyOXZTbTRjN3N2dGxxcTNkbDNvYTZ4TnFvcjZLMmF6eF92VHNVbkhfVkZjR3k0VUhPRXBiT0pKc0JYZzRsbGxzNGJVenBoSmNhOVNkRU1ZWm1Dc1NHNVVlQy0xUnhfQ1lQMHctVU5jalhVV1lBeERpRkwwQmRUZjFMa1NuMDh4VkVGbmNKRW54clZtRmZ0blF0cHNkTUdPTE5oWnljMWNqcERROEtaQ1d2bWd2aHlfVG5B?oc=5",
+          "domain": "www.tipranks.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-09-29T09:52:20+00:00",
+          "quality": 0.65,
+          "title": "Fortis, IHH to Cooperate With Court-Ordered Forensic Audit on 2018 Stake Deal",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 2,
+        "polarity_mean": 0.0,
+        "sources": 2,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {

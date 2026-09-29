@@ -1,20 +1,27 @@
 # Digest 2026-09-29
 
-Generated 2026-09-29 00:59 UTC · slot `all` · 10648 articles in the corpus, 4833 observations, 4141 events in the fact book.
+Generated 2026-09-29 10:10 UTC · slot `all` · 10762 articles in the corpus, 4833 observations, 4141 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- quiet: nothing collected for this name in the window
+- tone: 4 stories from 4 sources, polarity +0.25, peak intensity 0.00, uncertainty 0.00 · 1 escalated
+- 2026-09-29 www.kaohooninternational.com — Maybank Maintains ‘Buy’ on TRUE, Highlights Robust Dividend Outlook and Attractive Valuation [q 0.65, tone +1.0] ★
+- 2026-09-29 www.businesstoday.com.my — Stock Today: Maybank Falls 1.2% After RM1.56 Billion AT1 Sukuk Redemption [q 0.80, tone +0.0]
+- 2026-09-28 www.thestar.com.my — Maybank finalises RM2.5bil sukuk [q 0.80, tone +0.0]
+- 2026-09-29 www.marketscreener.com — Maybank Issues 2.5 Billion Ringgit in AT1 Islamic Bonds [q 0.65, tone +0.0]
 
 ### Tenaga (MYX:5347)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-09-29 scanx.trade — Shree TNB Polymers IPO Day 2: Subscribed 0.39x; QIB demand at 0.75x [q 0.65, tone +0.0]
 
 ### Petronas Chemicals (MYX:5183)
 - quiet: nothing collected for this name in the window
 
 ### IHH (MYX:5225)
-- quiet: nothing collected for this name in the window
+- tone: 2 stories from 2 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-09-28 www.thestar.com.my — Fortis buy was transparent, says IHH [q 0.80, tone +0.0]
+- 2026-09-29 www.tipranks.com — Fortis, IHH to Cooperate With Court-Ordered Forensic Audit on 2018 Stake Deal [q 0.65, tone +0.0]
 
 ### Press Metal (MYX:8869)
 - quiet: nothing collected for this name in the window
@@ -80,6 +87,20 @@ Generated 2026-09-29 00:59 UTC · slot `all` · 10648 articles in the corpus, 48
 | 10y minus 2y Treasury spread, % | 0.36 | 2026-09-25 | +0.05 | fred |
 | US unemployment rate, % | 4.10 | 2026-08-01 | +0 | fred |
 | CBOE VIX, index | 14.21 | 2026-09-22 | -0.66 | fred |
+
+## Collection
+
+| at (UTC) | source | status | fetched | kept | stored | detail |
+|---|---|---|---|---|---|---|
+| 10:09 | eodhd | ok | 0 | 0 | 0 | facts 0; EODHD plan: free (2 names a day, US only, rotated); MYX:1155: deferred  |
+| 10:09 | twse_openapi | ok | 8 | 0 | 0 | facts 0;  |
+| 10:08 | jin10_flash | ok | 18 | 5 | 2 | facts 0;  |
+| 10:08 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 10:08 | nst_business | ok | 50 | 49 | 47 |  |
+| 10:08 | fmt_business | ok | 50 | 50 | 50 |  |
+| 10:08 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Genting, Maybank, Tenaga, Petronas Chemicals, IHH, Press Metal |
+| 10:08 | google_news | ok | 26 | 20 | 15 | named the company: 8 of 20 (lowest: Genting 0/1, Petronas Chemicals 0/1, Press M |
+| 10:08 | gdelt | failed | 0 | 0 | 0 | no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP |
 
 ---
 
