@@ -1,0 +1,264 @@
+{
+ "day": "2026-09-29",
+ "written_at": "2026-09-30T22:58:00Z",
+ "measured_session": {
+  "bursa": "2026-09-29 (^KLSE 1,670.02 -> 1,643.96)",
+  "us": "2026-09-29 (SPY 765.61 -> 764.20)"
+ },
+ "pack_built": "2026-09-30T22:48:00Z",
+ "market": {
+  "regime": "neutral",
+  "notes": [
+   "MYX:^KLSE -1.56% 1d, -2.35% 5d, volume 206,047,200 (141,231,900 Monday), opened -0.35%, closed 0.60 above the low; XNAS:SPY -0.18% 1d, -1.19% 5d",
+   "FRED at 09-29: SP500 7670.84 (-12.85), NASDAQCOM 26797.54 (-22.84), BAMLH0A0HYM2 3.08 (+0.06; +0.43 over 20 obs; up at each of the last five prints), T10Y2Y 0.37 (+0.05), VIXCLS 16.04 (-0.03), DCOILBRENTEU 113.96 (-6.01); DGS10 5.24 and DGS2 4.92 are 09-28 prints; DEXMAUS 4.0707 still 09-25",
+   "Brent gap filled (known 09-30): 09-23 117.45, 09-24 120.92, 09-25 116.01, 09-28 119.97, 09-29 113.96; Monday's 'oil prices jump' confirmed",
+   "Bursa rows: 'Bursa opens lower on Wall Street weakness as rising oil prices, US bond yields weigh' (themalaysianreserve via google_news 02:14Z, title only); no row explains the widening from -0.35% at the open to -1.56% at the close",
+   "breadth: 99 cached Bursa names (FBM100 members + book): 65 fell, 19 rose, 15 unchanged, median -0.93% (price_cache.db, yahoo, fetched 2026-09-30T10:09Z)",
+   "US rows: finnhub:142500233 (19:22Z) oil prices slide and Treasury yields rise; finnhub:142506646 (23:55Z) bond market weakness; stocktwits via yahoo_rss (22:30Z) 30-year yields highest since 2002 (no 30-year series collected)",
+   "two names past 1.5 sigma: Tenaga 2.52 sigma (significant at 5%), Apple 1.74 sigma"
+  ]
+ },
+ "names": [
+  {
+   "instrument_id": "MYX:5347",
+   "move": {
+    "return_1d": -0.0334,
+    "market_1d": -0.0156,
+    "unexplained_share": 0.61,
+    "session": "2026-09-29",
+    "note": "market -1.30% at beta 0.83, drift -0.02%, idiosyncratic -2.03%, 2.52 sigma, significant at 5%, no_identified_catalyst; R2 0.24; closes 13.16 -> 12.72 on 10,054,700 shares (5,724,300 Monday); opened 12.94 (-1.67%), closed at the session low; 5d -2.90% vs -2.35%; why: unknown, no collected evidence reaches further (the one linked row is Shree TNB Polymers, another company; facts.db NOTHING COLLECTED; bursa_announcements stored no filing); peer check 09-28 -> 09-29 (price_cache.db, names checked against Yahoo's listed_name): YTL Power 6742 +0.52%, Gas Malaysia 5209 +0.20%, Petronas Gas 6033 -0.69%, Malakoff 5264 -1.86%, YTL Corp 4677 -2.14%: not a utilities day, but five names are not a sector index"
+   },
+   "causes": [],
+   "open_questions": [
+    "Tenaga fell 2.52 sigma with no collected row, while YTL Power and Gas Malaysia rose. What did the company, the Energy Commission or a Bursa filing publish on 09-29? `bursa_announcements` stored nothing for it. Which source would have carried it? (since 2026-09-29)"
+   ],
+   "watch": [
+    {
+     "when": "2026-09-30",
+     "what": "idiosyncratic leg: holding most of -2.03% while utilities do not fall reads company-specific; giving it back with no Tenaga row reads a one-session flow (businesstoday 09-30 05:04Z utilities rally row; cached bar 12.72 -> 12.96)"
+    }
+   ]
+  },
+  {
+   "instrument_id": "XNAS:AAPL",
+   "move": {
+    "return_1d": -0.0266,
+    "market_1d": -0.0018,
+    "unexplained_share": 0.92,
+    "session": "2026-09-29",
+    "note": "market -0.14% at beta 0.75, drift +0.09%, idiosyncratic -2.61%, 1.74 sigma, no_identified_catalyst; closes 338.40 -> 329.40 on 38,427,200 (32,820,800 Monday); opened 336.97 (-0.42%), low 328.70: about five-sixths of the fall after the open; GOOGL -0.53%, MSFT -0.05%, META not cached; 5d -3.05% vs -1.19%"
+   },
+   "causes": [
+    {
+     "claim": "Bank of America note on Meta's Muse AI agent and Apple's transaction and referral revenue, published during the session",
+     "evidence": [
+      "finnhub:142498035",
+      "finnhub:142498034",
+      "alphavantage:https://finance.yahoo.com/markets/stocks/articles/apple-could-keep-every-iphone-1425291",
+      "yahoo_rss:https://247wallst.com/investing/2026/09/29/apple-falls-2-as-bank-of-america-flags-metas-shopping-age",
+      "yahoo_rss:tikr.com 2026-09-29T19:32Z",
+      "yahoo_rss:finance.yahoo.com 2026-09-21T18:04Z (Muse downloads)",
+      "sec_xbrl:AAPL:revenue:2026-06-27"
+     ],
+     "chain": [
+      "earliest collected row 14:25Z (TheFly via finnhub), 55 minutes after the open; reporters attribute the fall to it (Investing.com, 247wallst, Barron's, Benzinga)",
+      "the note cuts both ways: Buy reiterated, 'concerns about Muse are overblown' (alphavantage summary); the fact book holds no Bank of America row, only Morgan Stanley maintain Overweight (fmp)",
+      "the exposure named is Apple's cut of routed transactions (App Store '30% rev share on notice', tikr); Muse's traction dates from 09-21",
+      "unknown: no collected evidence reaches further (the note is not collected; the fact book has no services or App Store revenue line to size the exposure)"
+     ],
+     "confidence": 0.45,
+     "confirm": "Wednesday 09-30's idiosyncratic leg holds most of -2.61% with no new Apple-specific row; or a second broker note or an fmp rating change cites Muse or agent commerce",
+     "refute": "Wednesday recovers most of -2.61% with no new Apple row; or a row dated before 14:25Z attributes the fall to something else"
+    }
+   ],
+   "open_questions": [
+    "Bank of America's note names Apple's transaction and referral revenue as the exposure. The fact book has no services or App Store line for Apple. Which filing field would size it? (since 2026-09-29)",
+    "The fact book holds two Q4 result dates for Apple, 2026-10-28 and 2026-10-29, both from `finnhub`. Which one does the company's own calendar give? (since 2026-09-28)"
+   ],
+   "watch": [
+    {
+     "when": "2026-09-30",
+     "what": "idiosyncratic leg: holds or gives back -2.61%"
+    },
+    {
+     "when": "2026-10-28",
+     "what": "earnings_result (fact book also holds 2026-10-29)"
+    },
+    {
+     "when": "2027-01-27",
+     "what": "earnings_result Q1 2027 (added 2026-09-29T22:46Z)"
+    }
+   ]
+  },
+  {
+   "instrument_id": "XNAS:NVDA",
+   "move": {
+    "return_1d": -0.0072,
+    "market_1d": -0.0018,
+    "unexplained_share": 0.48,
+    "session": "2026-09-29",
+    "note": "market -0.31%, drift -0.06%, idiosyncratic -0.34%, 0.19 sigma, not_significant; closes 228.86 -> 227.21 on 101,203,000; opened 230.97. Monday's test: price half met (leg gave back about a ninth of +3.02%; AMD 607.87 -> 607.57, INTC 116.03 -> 115.93; AVGO +1.58%); filing half not met (no NVIDIA 8-K after 09-03, edgar 0001045810-26-000078). Buyback reading 0.50 -> 0.55; China item stays 0.20 (finnhub:142474513, finnhub:142496689: no statement from Beijing or a buyer)"
+   },
+   "causes": [],
+   "open_questions": [
+    "Does an 8-K or 10-Q record NVIDIA's USD 150 billion authorization increase? Tuesday met the price half of the test. `edgar` still holds no NVIDIA 8-K after 09-03. (since 2026-09-28)",
+    "Does a primary statement follow the report that China may let Alibaba and ByteDance buy the RTX Pro 5500? Tuesday adds an Alibaba \"nears approval\" row and a lobbying report. Neither quotes Beijing or a buyer. (since 2026-09-27)"
+   ],
+   "watch": [
+    {
+     "when": "2026-11-17",
+     "what": "earnings_result"
+    }
+   ]
+  },
+  {
+   "instrument_id": "MYX:1155",
+   "move": {
+    "return_1d": -0.0167,
+    "market_1d": -0.0156,
+    "unexplained_share": 0.04,
+    "session": "2026-09-29",
+    "note": "market-driven: market -1.60% at beta 1.02, drift -0.01%, idiosyncratic -0.07%, 0.09 sigma; closes 10.16 -> 9.99 on 18,041,700 (7,581,800 Monday); businesstoday 07:54Z 'Maybank Falls 1.2% After RM1.56 Billion AT1 Sukuk Redemption' attributes a move that was the market's"
+   },
+   "causes": [],
+   "open_questions": [],
+   "watch": []
+  },
+  {
+   "instrument_id": "MYX:5183",
+   "move": {
+    "return_1d": -0.0316,
+    "market_1d": -0.0156,
+    "unexplained_share": 0.6,
+    "session": "2026-09-29",
+    "note": "quiet; nothing collected; 0.49 sigma; R2 0.00; market -1.26%, drift +0.04%, idiosyncratic -1.93%; closes 4.43 -> 4.29; Lotte Chemical Titan (5284.KL) -2.99%; Brent -6.01 to 113.96, no commodity leg; 5d -5.51%"
+   },
+   "causes": [],
+   "open_questions": [],
+   "watch": [
+    {
+     "when": "2026-09-30",
+     "what": "cached bar 4.29 -> 4.18 on 10,768,100; Hengyuan -14% row (nst_business 08:11Z)"
+    }
+   ]
+  },
+  {
+   "instrument_id": "MYX:5225",
+   "move": {
+    "return_1d": -0.0175,
+    "market_1d": -0.0156,
+    "unexplained_share": 0.25,
+    "session": "2026-09-29",
+    "note": "0.39 sigma; market -1.28%, drift -0.03%, idiosyncratic -0.44%; Fortis/IHH forensic audit row (tipranks via google_news 09:52Z, after the close, title only)"
+   },
+   "causes": [],
+   "open_questions": [],
+   "watch": []
+  },
+  {
+   "instrument_id": "MYX:8869",
+   "move": {
+    "return_1d": -0.0093,
+    "market_1d": -0.0156,
+    "unexplained_share": 0.26,
+    "session": "2026-09-29",
+    "note": "quiet; nothing collected; 0.43 sigma; idiosyncratic +0.65%; closes 7.52 -> 7.45; monitor: nothing in 14d"
+   },
+   "causes": [],
+   "open_questions": [],
+   "watch": []
+  },
+  {
+   "instrument_id": "MYX:3182",
+   "move": {
+    "return_1d": -0.0105,
+    "market_1d": -0.0156,
+    "unexplained_share": 0.28,
+    "session": "2026-09-29",
+    "note": "quiet; 0.37 sigma; drift -0.28% at 2.4 SE; idiosyncratic +0.66%; closes 1.90 -> 1.88"
+   },
+   "causes": [],
+   "open_questions": [],
+   "watch": []
+  },
+  {
+   "instrument_id": "XNAS:MSFT",
+   "move": {
+    "return_1d": -0.0005,
+    "market_1d": -0.0018,
+    "unexplained_share": 0.44,
+    "session": "2026-09-29",
+    "note": "0.10 sigma; market -0.16%, drift -0.08%, idiosyncratic +0.19%; closes 509.22 -> 508.96; Jefferies Copilot row (yahoo_rss 18:06Z) not weighed"
+   },
+   "causes": [],
+   "open_questions": [],
+   "watch": [
+    {
+     "when": "2026-10-27",
+     "what": "earnings_result"
+    }
+   ]
+  }
+ ],
+ "machine": {
+  "tuesday": "bursa_close dispatched by the day catch-up 10:06Z run 123 (ef942e2); cron run 124 15:53Z restamp only; us_preopen cron run 125 18:13Z; us_close dispatched 22:44Z run 126 landed 23:02Z (642186f), prices --book 15m16s",
+  "wednesday": "bursa_close dispatched by the Bursa catch-up 10:06Z run 128 landed 10:09Z (4276e78), first FBM100 fetch, 97 index targets, price step 55s; cron run 129 15:55Z restamp (c811f8d); us_preopen cron run 130 18:06Z (3f42d31)",
+  "tonight": "sweep --due 22:44Z named us_close; dispatched 22:45Z as run 131; landed 22:47Z (7ea8b8e); price step 14s; gdelt failed (HTTP 429)",
+  "monitor": "ask.py watch 22:48Z: NEW ALERT gdelt past its own cadence (48h, allowed 30h); NEW price_stale 11 rows (the four FBM100 members cleared; the eleven left are the rows #85 stops judging); still open MYX:8869 nothing in 14d; resolved series_stale; slots_missed not open; data/alerts.db restored",
+  "system_test": "pack still carries no doc_id (M7); ids on this page read from corpus.db directly"
+ },
+ "data_quality": {
+  "failed": [
+   "gdelt: HTTP 429 on every sweep since 09-28 us_close (09-29 bursa_close, 09-29 us_close, 09-30 us_close); monitor cadence alert 48h"
+  ],
+  "degraded": [
+   "yahoo_rss: read empty for all six Bursa names (09-29 10:08Z)",
+   "google_news Bursa 09-29 10:08Z: named the company in 8 of 20",
+   "alphavantage_news: quota exhausted for MSFT (09-29 and 09-30 us_close)",
+   "eodhd: 0 facts, 2-a-day credit budget",
+   "linker: Tenaga's linked row is Shree TNB Polymers",
+   "fact book: all six Bursa names NOTHING COLLECTED",
+   "DEXMAUS: no print after 09-25"
+  ],
+  "skipped": [
+   "fmp /earnings: outside the plan (HTTP 402) for NVDA, AAPL, MSFT"
+  ]
+ },
+ "open_questions_carried": [
+  "Tenaga fell 2.52 sigma with no collected row, while YTL Power and Gas Malaysia rose. What did the company, the Energy Commission or a Bursa filing publish on 09-29? `bursa_announcements` stored nothing for it. Which source would have carried it? (since 2026-09-29)",
+  "Bank of America's note names Apple's transaction and referral revenue as the exposure. The fact book has no services or App Store line for Apple. Which filing field would size it? (since 2026-09-29)",
+  "Does an 8-K or 10-Q record NVIDIA's USD 150 billion authorization increase? Tuesday met the price half of the test. `edgar` still holds no NVIDIA 8-K after 09-03. (since 2026-09-28)",
+  "The fact book holds two Q4 result dates for Apple, 2026-10-28 and 2026-10-29, both from `finnhub`. Which one does the company's own calendar give? (since 2026-09-28)",
+  "On the 09-29 `us_close` run, `ask.py prices --book` took 15m16s of a 25-minute job. Tonight's took 14 seconds. The log does not time each feed, so which one held it is still unanswered. Does the price step need a per-feed time before a run times out and loses a day's commit? (since 2026-09-28)",
+  "Does a primary statement follow the report that China may let Alibaba and ByteDance buy the RTX Pro 5500? Tuesday adds an Alibaba \"nears approval\" row and a lobbying report. Neither quotes Beijing or a buyer. (since 2026-09-27)",
+  "The fact book has no event kind for a court verdict, an appeal or a settlement. Where would a legal event be recorded, so that a later page can date it? (since 2026-09-26)",
+  "Microsoft's cached bar opens at 499.04 (+0.22%), while two rows describe a 3% rise before or at the open. Which is right? Should the collector hold a second price source for the open on a day a cause is being timed? (since 2026-09-25)",
+  "The monitor announced `price_stale` as NEW for a seventh night. The routine never commits `data/alerts.db`, so the stored state is days old (system test M9). Should the routine commit the alerts store, or should it live outside git? (since 2026-09-24)",
+  "Does IHH carry the Daiichi Sankyo claim at any value in its accounts? Tuesday adds the forensic-audit row, as a title only, and moved 0.39 sigma. (since 2026-09-24)",
+  "The pack measures across a blank proxy row without saying so (M3). No blank is crossed tonight. Should the pack refuse the row, label it two-session, or scale the sigma? (since 2026-09-23)",
+  "The fact book holds no Bursa entitlement dates. Which source carries Bursa ex-dates? (since 2026-09-23)",
+  "IHH's Tuesday 09-22 was significant alone (3.80 sigma). The one candidate, the Macquarie headline, has no body. Which source carries the note's figures? (since 2026-09-22)",
+  "A blank bar shared by a name and its proxy is labelled *correctly dated*, as if the market was shut. Should the pack check the calendar or an independent index print first? (since 2026-09-22)",
+  "The move to 260-session betas re-measured the same Monday. Which window's shares do pages compare across the change? (since 2026-09-22)",
+  "Petronas Chemicals, Press Metal and Genting: one factor or three stories? On Tuesday all three fell with a market-wide −1.56%, at 0.49, 0.43 and 0.37 sigma. No Bursa sector proxy is cached. (since 2026-09-21)",
+  "Tenaga: the rows hold both readings of the IBR framework, *minimal impact* and *undermines*, as titles only. Tuesday's 2.52 sigma came with no row of either kind. (since 2026-09-18)",
+  "`DFF` stepped +0.25 on 2026-09-17 and the collector holds no statement for it. Where does a statement come from? (since 2026-09-20)",
+  "A short-interest weekly named Petronas Chemicals for the week to 09-18. Would Bursa's daily short-selling report give the name a body? (since 2026-09-20)",
+  "Wiring a catalyst matcher to the corpus is still open. Apple is Tuesday's case: `no_identified_catalyst` at 1.74 sigma, 197 linked rows, and one note several reporters name. (since 2026-09-18)",
+  "Petronas Chemicals' idiosyncratic days read *not significant* because its own sigma contains the +22.56% run. Tuesday's −1.93% read 0.49 sigma. (since 2026-09-18)",
+  "Petronas Chemicals collecting a body: which of the eleven listed sources carries a Bursa-hours story about it at all? There were zero rows again on Tuesday. (since 2026-09-10; folded 09-17)",
+  "The linker attached *Genting Plantations* and *Ho Wah Genting* to MYX:3182. Tenaga's rows from Thursday through Tuesday are all *Shree TNB Polymers*. How many rows per name are about other companies? (since 2026-09-17)",
+  "Which earlier pages were written from a pre-close cache? `dfc45e3` labels such rows. (since 2026-09-17)",
+  "Does a page need to state a market's non-trading day as a fact rather than infer it from blank bars? (since 2026-09-16)",
+  "Brent is now filled to 09-29: 119.97 on Monday (+3.96, the \"oil prices jump\" the 09-28 page could not check) and 113.96 on Tuesday. What the move did to Petronas Chemicals' feedstock reading is still unanswered, because the decomposition has no commodity leg. (since 2026-09-16)",
+  "Press Metal collecting anything: there were zero rows on Tuesday. (since 2026-09-15)",
+  "The sector beta is fixed at 0, so any sector-wide session lands in a residual labelled `idiosyncratic`. The FBM100 members are now cached every Bursa close: 99 names, including five utilities and a petrochemical peer. Tuesday's utilities check was done by hand. Should the pack compute a sector leg from them? (since 2026-09-14)",
+  "Is the observe phase's grading against the control informative at 21 days? The first observe grades fall due 2026-10-11. (since 2026-09-08)"
+ ],
+ "lessons": [
+  "A headline's attribution is not a decomposition. *Maybank Falls 1.2% After… Sukuk Redemption* described a session in which the company's own leg was 0.07 of 1.67 points. Read the market leg before the headline's cause.",
+  "Where the move happens decides which rows can be causes. Apple opened −0.42% and closed −2.66%, so a note first seen 55 minutes after the open can be a candidate. NVIDIA on Monday was complete at the open, and a session-hours row could not be. Check the open before weighing the timestamps.",
+  "A significant leg with no row is still a finding, and the peers bound it. Tenaga fell 2.52 sigma while YTL Power and Gas Malaysia rose. With nothing collected, the page can say it was not a utilities day. It cannot say why."
+ ],
+ "closed": []
+}
