@@ -40,6 +40,7 @@ from core.config import load as load_config
 from core.contracts.money import BASE_CURRENCY
 from core.guardrails.defaults import default_engine
 from core.market.feed import PriceFeedError, default_feed
+from core.market.warm import WARM_CAP as PEER_WARM_CAP  # the `price_stale` rule reads it too
 from core.registry.loader import load as load_registry
 from engines.attribution.decompose import MIN_OBSERVATIONS
 from engines.attribution.regression import huber_fit
@@ -275,69 +276,21 @@ def cmd_prices(a) -> int:
     return 0
 
 
-#: How many peer symbols one `prices --book` run adds beyond the book and its
-#: proxies. The graph grows by edits nobody thinks of as price decisions; the
-#: cap keeps one of them from turning the collector's price step into a burst
-#: a source throttles, and the round-robin in `_book_peers` keeps the cap from
-#: starving the names at the end of the list.
-PEER_WARM_CAP = 24
-
-
 def _peer_lookup():
     """The graph's peer function, or None when no graph has been built.
 
-    A seam, so a test can script the peers without building a graph, and so
-    an unbuilt graph reads as "not built" - which `graph_peers` alone cannot
-    say: it answers an empty set for that and for a name with no peers alike.
+    A seam, so a test can script the peers without building a graph.
     """
-    from pathlib import Path
+    from core.market.warm import graph_lookup
 
-    from knowledge.graph.build import DEFAULT_DB
-
-    if not Path(DEFAULT_DB).exists():
-        return None
-    from mcp_server.tools import graph_peers
-
-    return graph_peers
+    return graph_lookup()
 
 
 def _book_peers(book: list[str], asof: date, lookup, cap: int = PEER_WARM_CAP) -> dict[str, str]:
-    """Peer id -> the book name it was found through: same market only,
-    nothing already in the book, at most `cap` in all.
+    """Peer id -> the book name it was found through (core/market/warm.py)."""
+    from core.market.warm import warm_peers
 
-    Same market because that is the peer set every comparable is built from -
-    `peers_of` lists the others as excluded, and a cache warmed for a name no
-    table will read is quota spent on nothing. Round-robin over the book rather
-    than first come, so that when the cap binds every name keeps its nearest
-    peers instead of the first name keeping all of its own.
-    """
-    queues: list[tuple[str, list[str]]] = []
-    for iid in book:
-        try:
-            home = mic_of(iid)
-        except ValueError:
-            continue
-        peers: list[str] = []
-        for peer in sorted(lookup(iid, asof)):
-            try:
-                same = mic_of(peer) == home
-            except ValueError:
-                same = False
-            if same and peer not in book:
-                peers.append(peer)
-        queues.append((iid, peers))
-
-    out: dict[str, str] = {}
-    while len(out) < cap and any(q for _, q in queues):
-        for iid, q in queues:
-            while q:
-                peer = q.pop(0)
-                if peer not in out:
-                    out[peer] = iid
-                    break
-            if len(out) >= cap:
-                break
-    return out
+    return warm_peers(book, asof, lookup, cap)
 
 
 #: Seconds between two index-member fetches that went to the network. A
@@ -353,17 +306,9 @@ INDEX_RANGE = "2y"
 
 def _index_members(cfg) -> list[str]:
     """The index book's members, or none while the ledger has not opened it."""
-    from engines.paper.book import index_universe_path
-    from engines.paper.store import INDEX, PaperStore
-    from engines.paper.universe import load_universe
+    from core.market.warm import index_members
 
-    store = PaperStore.open_existing(cfg.paper.database)
-    if store is None:
-        return []
-    with store:
-        if not store.has_book(INDEX):
-            return []
-        return list(load_universe(index_universe_path(store)).ids)
+    return index_members(cfg.paper.database)
 
 
 def _index_feed(feed):

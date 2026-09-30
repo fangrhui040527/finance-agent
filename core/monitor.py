@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import json
 import sqlite3
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from datetime import UTC, date, datetime, time, timedelta
 from decimal import Decimal
@@ -823,8 +824,14 @@ def _series_rules(cfg, now: datetime) -> list[Alert]:
 #: proxies are refetched at every close slot, so one session behind is one
 #: missed run - lateness, by the same reasoning as SLOT_SHORTFALL_MIN - and two
 #: is a fault. A peer is warmed by the same step but read only when someone
-#: asks for comparables, so it is allowed a trading week.
-PRICE_STALE_SESSIONS: dict[str, int] = {"book": 1, "proxy": 1, "peer": 5}
+#: asks for comparables, so it is allowed a trading week. An index member is
+#: warmed at the Bursa close too, and the index book marks around a member it
+#: cannot price, so it gets the same week.
+PRICE_STALE_SESSIONS: dict[str, int] = {"book": 1, "proxy": 1, "peer": 5, "index": 5}
+
+#: The roles a stale row makes an ALERT of and names first: the book is
+#: tonight's page, and a proxy is the market leg every decomposition subtracts.
+_JUDGED_FIRST = ("book", "proxy")
 
 
 def _last_session(calendar, now: datetime) -> date | None:
@@ -845,7 +852,13 @@ def _last_session(calendar, now: datetime) -> date | None:
     return None
 
 
-def _price_rules(cfg, now: datetime, path: str = "") -> list[Alert]:
+def _price_rules(
+    cfg,
+    now: datetime,
+    path: str = "",
+    peers: Iterable[str] | None = None,
+    members: Iterable[str] | None = None,
+) -> list[Alert]:
     """A cached price whose fetch day trails its market's last session.
 
     `ask.py prices --book` refetches the book and each market's proxy at every
@@ -871,6 +884,17 @@ def _price_rules(cfg, now: datetime, path: str = "") -> list[Alert]:
     page decomposing the wrong day, a stale peer is a comps table nobody has
     opened lately. Quiet without a cache file - a system nobody has priced
     yet is not one whose prices stopped.
+
+    It judges what `prices --book` refreshes and nothing else: the book, its
+    proxies, the graph peers that step warms and, once the ledger has opened
+    it, the index book's members (core/market/warm.py holds both sets). Until
+    2026-09-30 it took every other cached row for a peer, and fifteen rows that
+    comps had asked about once - KO, PFE, SIRI and the like, in no set anything
+    refreshes - stood in a warning whose next step could never clear them. A
+    row outside the refreshed set is not read by any table this rule guards.
+    `peers` and `members` are seams for a test; left None they are read from
+    the graph and the paper ledger, and a graph that will not load warms no
+    peers there, so it judges none here.
     """
     path = path or PRICE_CACHE_DB
     if not Path(path).exists():
@@ -890,14 +914,32 @@ def _price_rules(cfg, now: datetime, path: str = "") -> list[Alert]:
             return None
         return f"{mic}:{iid.partition(':')[2].strip().upper()}"
 
-    book = list(
+    book: list[str] = list(
         dict.fromkeys(
             tuple(getattr(cfg, "watchlist", ()) or ()) + tuple(getattr(cfg, "holdings", ()) or ())
         )
     )
     proxies = [p for p in dict.fromkeys(market_proxy_for(i) for i in book) if p]
     expected: dict[str, tuple[str, str]] = {}  # canonical id -> (book spelling, role)
-    for role, ids in (("book", book), ("proxy", proxies)):
+    if peers is None or members is None:
+        from core.market.warm import graph_lookup, index_members, warm_peers
+    if peers is None:
+        try:
+            lookup = graph_lookup()
+            peers = list(warm_peers(book, now.date(), lookup)) if lookup is not None else []
+        except Exception:  # prices --book warms no peers from a broken graph either
+            peers = []
+    if members is None:
+        try:
+            members = index_members(cfg.paper.database)
+        except Exception:  # nor members from a ledger it cannot read
+            members = []
+    for role, ids in (
+        ("book", book),
+        ("proxy", proxies),
+        ("peer", list(peers)),
+        ("index", list(members)),
+    ):
         for iid in ids:
             canon = canonical(iid)
             if canon is not None:
@@ -929,7 +971,9 @@ def _price_rules(cfg, now: datetime, path: str = "") -> list[Alert]:
     calendars: dict[str, tuple[SessionCalendar, date] | None] = {}
     stale: list[dict] = []
     for canon, (day, feed_name, symbol) in freshest.items():
-        name, role = expected.get(canon, (symbol, "peer"))
+        if canon not in expected:
+            continue  # nothing refreshes it, so nothing this rule guards reads it
+        name, role = expected[canon]
         mic = canon.partition(":")[0]
         if mic not in calendars:
             try:
@@ -962,7 +1006,7 @@ def _price_rules(cfg, now: datetime, path: str = "") -> list[Alert]:
     if not stale:
         return []
 
-    stale.sort(key=lambda s: (s["role"] == "peer", -s["sessions_behind"], s["name"]))
+    stale.sort(key=lambda s: (s["role"] not in _JUDGED_FIRST, -s["sessions_behind"], s["name"]))
     named = ", ".join(
         f"{s['name']} ({s['role']}, {s['sessions_behind']} sessions behind)" for s in stale[:6]
     )
@@ -977,7 +1021,7 @@ def _price_rules(cfg, now: datetime, path: str = "") -> list[Alert]:
     return [
         Alert(
             rule="price_stale",
-            severity=ALERT if any(s["role"] != "peer" for s in stale) else WARN,
+            severity=ALERT if any(s["role"] in _JUDGED_FIRST for s in stale) else WARN,
             title=f"{len(stale)} cached {'price' if len(stale) == 1 else 'prices'} behind the "
             f"market's last session: {named}{more}",
             detail=f"{listed}. Counted in sessions of each row's own market, so a weekend or "
@@ -985,9 +1029,9 @@ def _price_rules(cfg, now: datetime, path: str = "") -> list[Alert]:
             "fresh one, so nothing that reads the cache refuses it: a book name this old is "
             "tonight's page decomposing the wrong day, a peer this old is a comps table "
             "comparing this week with another",
-            next_step="`ask.py prices --book` refetches the book, its proxies and the graph "
-            "peers of every book name; a FAILED line there names the source that refused, "
-            "and exit 3 means at least one did",
+            next_step="`ask.py prices --book` refetches the book, its proxies, the graph "
+            "peers of every book name and the index book's members; a FAILED line there "
+            "names the source that refused, and exit 3 means at least one did",
             evidence={"stale": stale},
         )
     ]
