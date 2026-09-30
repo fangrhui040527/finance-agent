@@ -1,0 +1,186 @@
+{
+ "day": "2026-09-30",
+ "written_at": "2026-09-30T22:57:00Z",
+ "phase": "ramp",
+ "week": 4,
+ "equity_usd": 1000.0,
+ "cash_usd": 1000.0,
+ "control_equity_usd": 980.02,
+ "control_return_to_date": -0.02,
+ "drawdown": 0.0,
+ "control_drawdown": 0.02,
+ "halted": false,
+ "marks": 19,
+ "positions": [],
+ "changes": [],
+ "control_changes": [],
+ "control_mark": {
+  "marked_on": "2026-09-30",
+  "equity_usd": 980.02,
+  "cash_usd": 602.28,
+  "positions_usd": 377.74,
+  "day_return": -0.0022,
+  "note": "Wednesday's session; marked at the bursa_close slot (10:09Z, collect run 128 from the Bursa catch-up, 4276e78; restamped 15:55Z by the late cron, c811f8d) and the us_close slot (22:47Z, run 131, 7ea8b8e) with the same figures; holdings MYX:8869 100 (close 7.45), MYX:5183 100 (4.18), MYX:3182 200 (1.89)"
+ },
+ "index_book": {
+  "opened": "2026-09-30",
+  "commit": "73fb9d1",
+  "notional_usd": 1000000,
+  "members_listed": 100,
+  "targets": 97,
+  "left_out": {
+   "MYX:1171": "code lists as MBSB Berhad",
+   "MYX:0138": "code lists as Zetrix AI Berhad",
+   "MYX:5222": "no Yahoo quote (HTTP 404)"
+  },
+  "mark": {
+   "marked_on": "2026-09-30",
+   "equity_usd": 1000000.0,
+   "cash_usd": 1000000.0,
+   "positions_usd": 0.0,
+   "held": 0,
+   "pending": 97
+  },
+  "fills": "at Thursday 2026-10-01's Bursa open",
+  "note": "a scale for percentages, not money; constituent list written from memory, to be checked against Bursa's"
+ },
+ "caps": [
+  {
+   "cap": "largest name",
+   "value": "0.00%",
+   "limit": "25%",
+   "breached": false
+  },
+  {
+   "cap": "invested",
+   "value": "0.00%",
+   "limit": "40%",
+   "breached": false
+  },
+  {
+   "cap": "cash floor",
+   "value": "100.00%",
+   "limit": "20%",
+   "breached": false
+  },
+  {
+   "cap": "names held",
+   "value": "0",
+   "limit": "0",
+   "breached": false
+  },
+  {
+   "cap": "drawdown from peak",
+   "value": "0.00%",
+   "limit": "8% halts entries",
+   "breached": false
+  },
+  {
+   "cap": "turnover, 5 weekdays",
+   "value": "USD 0.00",
+   "limit": "USD 500.00",
+   "breached": false
+  }
+ ],
+ "prices": {
+  "bursa": "Wednesday 2026-09-30 closes (cached 10:08-10:09Z)",
+  "us": "Wednesday 2026-09-30 closes (us_close sweep 22:47Z)",
+  "fx": "4.0795 MYR per USD, bnm, 2026-09-30"
+ },
+ "fundable": [
+  {
+   "instrument_id": "MYX:1155",
+   "lot_usd": 244.88,
+   "share": 0.245,
+   "round_trip": 0.0098,
+   "lots": 1
+  },
+  {
+   "instrument_id": "MYX:5183",
+   "lot_usd": 102.46,
+   "share": 0.102,
+   "round_trip": 0.0216,
+   "lots": 2
+  },
+  {
+   "instrument_id": "MYX:5225",
+   "lot_usd": 191.94,
+   "share": 0.192,
+   "round_trip": 0.0121,
+   "lots": 1
+  },
+  {
+   "instrument_id": "MYX:8869",
+   "lot_usd": 182.62,
+   "share": 0.183,
+   "round_trip": 0.0127,
+   "lots": 1
+  },
+  {
+   "instrument_id": "MYX:3182",
+   "lot_usd": 46.33,
+   "share": 0.046,
+   "round_trip": 0.0462,
+   "lots": 5
+  },
+  {
+   "instrument_id": "XNAS:NVDA",
+   "lot_usd": 228.38,
+   "share": 0.228,
+   "round_trip": 0.0114,
+   "lots": 1
+  }
+ ],
+ "over_cap": {
+  "MYX:5347": 0.318,
+  "XNAS:AAPL": 0.333,
+  "XNAS:MSFT": 0.513
+ },
+ "ledger": {
+  "mark_days": 19,
+  "wednesday": "marks for 2026-09-30 at the bursa_close slot (10:09Z; restamped 15:55Z, c811f8d) and the us_close slot (22:47Z, 7ea8b8e), same figures; index book's first mark set 97 targets, no applications yet"
+ },
+ "attribution": null,
+ "decision": {
+  "recorded": true,
+  "weights": {},
+  "all_cash": true,
+  "calendar_row": false,
+  "prediction_id": "paper-2026-09-30-allcash-21d-ee21",
+  "grades_on": "2026-10-30",
+  "confidence": 0.55,
+  "decided_at": "2026-09-30T22:54:04Z",
+  "made_at": "2026-09-30T22:54:04Z",
+  "refusals": [],
+  "rows_read_before_deciding": true,
+  "thesis": "All cash, the twentieth all-cash row and second decision of ramp week 4, recorded after Wednesday 2026-09-30's closes on both markets and applied at Thursday's first cached bars; the evening sweep's rows for fundable names were read before it. Tuesday is now decomposed on the 2026-09-29 feedback page: Bursa fell 1.56% and every fundable Bursa name fell inside normal variation (Maybank 0.09 sigma with 4% unexplained, its 'falls 1.2% after sukuk redemption' headline being the market's move; IHH 0.39; Press Metal 0.43; Genting 0.37; Petronas Chemicals 0.49); NVIDIA's leg gave back -0.34% of Monday's +3.02% while AMD and INTC did not recover, so the buyback reading holds at 0.55 and the buyback is priced. Wednesday is not decomposed: ^KLSE +0.44%, Maybank 9.99 unchanged, Petronas Chemicals -2.56% to 4.18 on 10,768,100 shares with nothing collected, IHH -0.51% after a title-only row that it plans to raise its Fortis stake to 51% (economictimes 02:05Z, during Bursa's session), Press Metal unchanged with nothing collected, Genting +0.53% with a UK casino tax row after Bursa's close (gambling.com 09:49Z); NVIDIA +0.51% against SPY -0.21% with rows on an AI safety accord, a data-centre digital-twin deal (finnhub:142513048) and ARK buying (finnhub:142515534), none carrying a figure the fact book holds, and no 8-K for the buyback. Claim: nothing in the fundable universe beats cash over 21 sessions."
+ },
+ "stores": {
+  "decided_targets": 20,
+  "decided_applications": 20,
+  "predictions": 20,
+  "index_targets": 97,
+  "index_applications": 0
+ },
+ "evidence": {
+  "feedback_page": "knowledge/feedback/2026-09-29.md (6c53077)",
+  "notes": [
+   "Tuesday decomposed: every fundable Bursa name inside normal variation on a -1.56% market (Maybank 0.09 sigma, 4% unexplained, market-driven; IHH 0.39; Press Metal 0.43; Genting 0.37; Petronas Chemicals 0.49); NVIDIA 0.19 sigma, leg -0.34% held most of Monday's +3.02% while AMD -0.05% and INTC -0.09%: buyback reading 0.55; Tenaga 2.52 sigma and Apple 1.74 sigma, neither fundable",
+   "Wednesday not decomposed: ^KLSE 1,643.96 -> 1,651.17 (+0.44%); Maybank 9.99 -> 9.99, Petronas Chemicals 4.29 -> 4.18 on 10,768,100 (2,289,800 Tuesday), IHH 7.87 -> 7.83, Press Metal 7.45 -> 7.45, Genting 1.88 -> 1.89; SPY 764.20 -> 762.63; NVIDIA 227.21 -> 228.38",
+   "NVIDIA (235 rows): Jacobs digital twin (finnhub:142513048), open agent safety platform (finnhub:142517407), White House AI safety accord (yahoo via google_news 14:17Z, title), ARK buying (finnhub:142515534), DeepSeek-Huawei tooling (finnhub:142512087, finnhub:142517403); no figure the fact book holds; no 8-K after 09-03",
+   "Maybank: Bintan halal hub with Gallant Venture (nst via google_news 05:41Z, title); 'Gains 0.5% In Afternoon Trade' (businesstoday 06:50Z; cached close unchanged); research on another company; a warrant listing",
+   "IHH: plans to raise Fortis stake to 51% and reach 10,000 beds by 2031 (economictimes via google_news 02:05Z, during Bursa's session, title only)",
+   "Genting: UK tax hike could close 13 Genting casinos (gambling.com 09:49Z, after the close, title only); three non-company rows",
+   "Petronas Chemicals, Press Metal: nothing collected since the last decision"
+  ]
+ },
+ "mistakes": [],
+ "mistakes_checked": [
+  "paper-2026-09-29-allcash-21d-7831 reason 2 (Bursa's Tuesday a broad fall with no decomposition) holds: every fundable Bursa name inside normal variation; Maybank 96% market",
+  "paper-2026-09-29-allcash-21d-7831 reason 1 (NVIDIA's buyback priced before a target could apply) holds: Tuesday's leg held while chip peers did not recover; Wednesday's rows carry no new figure",
+  "its thesis placed Maybank's new sukuk beside its Tuesday fall without claiming cause; the decomposition says the fall was the market's; not a decision mistake"
+ ],
+ "lessons": [
+  "Consecutive all-cash rows are one claim graded many times, not many tests: twenty rows each grade against the same three control holdings over overlapping 21-session windows, so their hit rate overstates the evidence."
+ ]
+}
