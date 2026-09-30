@@ -1,0 +1,267 @@
+{
+ "day": "2026-09-28",
+ "written_at": "2026-09-29T23:08:18Z",
+ "measured_session": {
+  "bursa": "2026-09-28 (^KLSE 1,671.62 -> 1,670.02)",
+  "us": "2026-09-28 (SPY 771.35 -> 765.61)"
+ },
+ "pack_built": "2026-09-29T23:02:00Z",
+ "market": {
+  "regime": "neutral",
+  "notes": [
+   "MYX:^KLSE -0.10% 1d, +0.18% 5d; XNAS:SPY -0.74% 1d, -1.02% 5d",
+   "FRED at 09-28: SP500 7683.69 (-59.72), NASDAQCOM 26820.38 (-248.34), BAMLH0A0HYM2 3.02 (+0.09; +0.39 over 20 obs), T10Y2Y 0.32 (-0.04); DGS10 5.17, DGS2 4.81, DFF 3.88 still 09-25; VIXCLS 14.21 and DCOILBRENTEU 114.89 still 09-22",
+   "finnhub:142470094 (19:21Z): Dow off lows after an Iran report, oil prices jump, Nvidia gains on a buyback; finnhub:142471920 (23:07Z): indexes drop under pressure from elevated yields",
+   "cached chip peers 09-25 -> 09-28 (price_cache.db, yahoo, fetched 2026-09-29T23:02Z): AMD 630.63 -> 607.87 (-3.61%), INTC 123.00 -> 116.03 (-5.67%), AVGO 352.81 -> 349.57 (-0.92%); NVIDIA's leg is not a chip-sector day",
+   "one name past 1.5 sigma: NVIDIA 1.65 sigma; every Bursa name inside normal variation"
+  ]
+ },
+ "names": [
+  {
+   "instrument_id": "XNAS:NVDA",
+   "move": {
+    "return_1d": 0.0168,
+    "market_1d": -0.0074,
+    "unexplained_share": 0.69,
+    "session": "2026-09-28",
+    "note": "market -1.27% at beta 1.71, drift -0.06%, idiosyncratic +3.02%, 1.65 sigma, no_identified_catalyst; closes 225.07 -> 228.86 on 142,344,300 shares (89,947,700 Friday); cached open 229.75 (+2.08%): the move was complete at the open; 5d +0.65% vs -1.02%"
+   },
+   "causes": [
+    {
+     "claim": "USD 150bn increase to the share-repurchase authorization (total USD 235bn, through fiscal 2028), announced before the open",
+     "evidence": [
+      "finnhub:142466054",
+      "google_news:nvidianews.nvidia.com 2026-09-28T11:07Z (title only)",
+      "finnhub:142469090",
+      "finnhub:142464211",
+      "finnhub:142470094",
+      "sec_xbrl:NVDA:buybacks_fy:2026-01-25"
+     ],
+     "chain": [
+      "authorization announced; earliest collected row 08:25Z, company newsroom title 11:07Z (post not fetched)",
+      "rows read it as confidence in AI demand against doubt about AI spending (finnhub:142466054; Barron's via yahoo_rss)",
+      "scale: about 3.7x the 40.09bn USD repurchased in the fiscal year to 2026-01-25 (sec_xbrl); operating cash flow 102.72bn that year",
+      "unknown: no collected evidence reaches further (no 8-K in the fact book; newsroom post not fetched)"
+     ],
+     "confidence": 0.5,
+     "confirm": "an 8-K or 10-Q naming the authorization reaches the fact book; Tuesday 09-29's idiosyncratic leg holds most of +3.02% while AMD and INTC do not recover",
+     "refute": "Tuesday's leg gives back most of +3.02% with no new NVIDIA row"
+    },
+    {
+     "claim": "China's reported review of RTX Pro 5500 purchases by Alibaba and ByteDance",
+     "evidence": [
+      "finnhub:142448482",
+      "finnhub:142460540",
+      "finnhub:142470095",
+      "finnhub:142474513"
+     ],
+     "chain": [
+      "The Information's report (Sunday 17:30Z relay), Reuters: the industry ministry asked companies to disclose purchase plans",
+      "unknown: no collected evidence reaches further (no statement from Beijing or either buyer; the Nvidia comment in finnhub:142460540 falls after the collected 500 characters)"
+     ],
+     "confidence": 0.2,
+     "confirm": "a statement from Beijing, a buyer or Nvidia confirms the purchases and the stock responds on the day",
+     "refute": "a statement denies them and the leg does not move, which says the item carried none of Monday"
+    }
+   ],
+   "open_questions": [
+    "Does an 8-K or 10-Q record NVIDIA's USD 150 billion authorization increase? The collected primary source is the newsroom's title, and `edgar` holds no NVIDIA filing after 09-02 except Form 4s. (since 2026-09-28)"
+   ],
+   "watch": [
+    {
+     "when": "2026-09-29",
+     "what": "idiosyncratic leg: holds or gives back +3.02%"
+    },
+    {
+     "when": "2026-11-17",
+     "what": "earnings_result"
+    }
+   ]
+  },
+  {
+   "instrument_id": "XNAS:AAPL",
+   "move": {
+    "return_1d": -0.0078,
+    "market_1d": -0.0074,
+    "unexplained_share": 0.33,
+    "session": "2026-09-28",
+    "note": "market -0.56%, drift +0.09%, idiosyncratic -0.31%, 0.21 sigma, not_significant; closes 341.07 -> 338.40; the session did not price the USD 5.7bn verdict (finnhub:142466149 12:55Z, before the open); Burford Capital rose over 12% (finnhub:142468069)"
+   },
+   "causes": [],
+   "open_questions": [
+    "The fact book holds two Q4 result dates for Apple, 2026-10-28 and 2026-10-29, both from `finnhub`. Which one does the company's own calendar give? (since 2026-09-28)"
+   ],
+   "watch": [
+    {
+     "when": "2026-10-28",
+     "what": "earnings_result (fact book also holds 2026-10-29)"
+    }
+   ]
+  },
+  {
+   "instrument_id": "XNAS:MSFT",
+   "move": {
+    "return_1d": -0.0135,
+    "market_1d": -0.0074,
+    "unexplained_share": 0.45,
+    "session": "2026-09-28",
+    "note": "market -0.65%, drift -0.08%, idiosyncratic -0.61%, 0.32 sigma, not_significant; closes 516.17 -> 509.22; gave back under a fifth of Friday's +3.27%, so the 09-25 page's refutation is not met; job-cuts row finnhub:142469115 (17:09Z) not weighed"
+   },
+   "causes": [],
+   "open_questions": [],
+   "watch": [
+    {
+     "when": "2026-10-27",
+     "what": "earnings_result"
+    }
+   ]
+  },
+  {
+   "instrument_id": "MYX:1155",
+   "move": {
+    "return_1d": -0.0059,
+    "market_1d": -0.001,
+    "unexplained_share": 0.81,
+    "session": "2026-09-28",
+    "note": "market -0.10%, drift -0.02%, idiosyncratic -0.47%, 0.65 sigma, not_significant; closes 10.22 -> 10.16 on 7,581,800 shares; first session after the RM1.56bn AT1 sukuk redemption; new RM2.5bn AT1 sukuk reported after the close (thestar 23:31Z, title only)"
+   },
+   "causes": [],
+   "open_questions": [],
+   "watch": [
+    {
+     "when": "2026-09-29",
+     "what": "first session after the RM2.5bn AT1 sukuk issue"
+    }
+   ]
+  },
+  {
+   "instrument_id": "MYX:5347",
+   "move": {
+    "return_1d": 0.0015,
+    "market_1d": -0.001,
+    "unexplained_share": 0.72,
+    "session": "2026-09-28",
+    "note": "quiet; 0.31 sigma; the one linked row is Shree TNB Polymers"
+   },
+   "causes": [],
+   "open_questions": [],
+   "watch": []
+  },
+  {
+   "instrument_id": "MYX:5183",
+   "move": {
+    "return_1d": -0.0134,
+    "market_1d": -0.001,
+    "unexplained_share": 0.93,
+    "session": "2026-09-28",
+    "note": "quiet; nothing collected; 0.32 sigma; R2 0.00"
+   },
+   "causes": [],
+   "open_questions": [],
+   "watch": []
+  },
+  {
+   "instrument_id": "MYX:5225",
+   "move": {
+    "return_1d": -0.0025,
+    "market_1d": -0.001,
+    "unexplained_share": 0.59,
+    "session": "2026-09-28",
+    "note": "0.13 sigma; titles only: target lowered to RM9.06 (themalaysianreserve 01:54Z), Supreme Court disposes of Fortis' petition (09:56Z, 10:02Z), 'Fortis buy was transparent, says IHH' (thestar)"
+   },
+   "causes": [],
+   "open_questions": [],
+   "watch": []
+  },
+  {
+   "instrument_id": "MYX:8869",
+   "move": {
+    "return_1d": 0.008,
+    "market_1d": -0.001,
+    "unexplained_share": 0.77,
+    "session": "2026-09-28",
+    "note": "quiet; nothing collected; 0.51 sigma; closes 7.46 -> 7.52"
+   },
+   "causes": [],
+   "open_questions": [],
+   "watch": []
+  },
+  {
+   "instrument_id": "MYX:3182",
+   "move": {
+    "return_1d": 0.0106,
+    "market_1d": -0.001,
+    "unexplained_share": 0.8,
+    "session": "2026-09-28",
+    "note": "0.78 sigma; drift -0.27% at 2.3 SE; rows about Genting Malaysia, Genting Singapore and a BIMB note on MGS yields"
+   },
+   "causes": [],
+   "open_questions": [],
+   "watch": []
+  }
+ ],
+ "machine": {
+  "monday": "bursa_close dispatched 10:07Z run 118 (3f9ccc1), cron run 119 17:39Z restamp; us_preopen cron run 120 19:48Z; us_close dispatched 22:44Z run 121 landed 22:45Z (59e1383); late us_close cron run 122 at 00:59Z Tuesday blanked Monday's close in price_cache for NVDA, AAPL, MSFT, SPY, ^KLSE (2de3cb5); fixed by #83 (40032e8), rows refilled 10:10Z",
+  "tuesday": "bursa_close dispatched by the day catch-up 10:06Z run 123 (ef942e2); cron run 124 15:53Z restamp only (a061bd6); us_preopen cron run 125 18:13Z (128556b)",
+  "tonight": "sweep --due 22:44Z named us_close; dispatched 22:44Z as run 126; landed 23:02Z (642186f), 18 minutes: prices --book took 15m16s of a 25-minute job, all 23 bars via yahoo; gdelt failed (HTTP 429)",
+  "monitor": "ask.py watch 23:04Z: NEW price_stale (15 peers, sixth night); still open MYX:8869 nothing in 14d; resolved series_stale; slots_missed not open; data/alerts.db restored",
+  "merged_today": "#83 price cache refuses a regressing body (40032e8); #80 offline reads never fetch (87e2d00)",
+  "system_test": "pack still carries no doc_id (M7); ids on this page read from corpus.db directly"
+ },
+ "data_quality": {
+  "failed": [
+   "gdelt: HTTP 429 on first request, 09-28 bursa_close 10:09Z, 09-29 bursa_close 10:08Z, 09-29 us_close 22:46Z (answered once, 09-28 us_close, 132 stored)",
+   "alphavantage_news: daily quota exhausted, 09-28 us_close 22:45Z (echoed key masked in the pack)"
+  ],
+  "degraded": [
+   "yahoo_rss: read empty for all six Bursa names (09-28 10:09Z, 09-29 10:08Z)",
+   "google_news Bursa 09-28 10:09Z: read empty for Press Metal, named the company in 13 of 30",
+   "price_cache: late us_close cron 00:59Z 09-29 blanked Monday's close for NVDA, AAPL, MSFT, SPY, ^KLSE until 10:10Z; fixed by #83",
+   "prices --book: 15m16s on 09-29 us_close (job limit 25 min), all bars via yahoo; Stooq first in the online chain",
+   "alphavantage_news: quota exhausted for MSFT and NVDA (09-29 us_close)",
+   "eodhd: 0 facts, 2-a-day credit budget",
+   "linker: Tenaga's linked row is Shree TNB Polymers"
+  ],
+  "skipped": [
+   "fmp /earnings: outside the plan (HTTP 402) for NVDA, AAPL, MSFT"
+  ]
+ },
+ "open_questions_carried": [
+  "Does an 8-K or 10-Q record NVIDIA's USD 150 billion authorization increase? The collected primary source is the newsroom's title, and `edgar` holds no NVIDIA filing after 09-02 except Form 4s. (since 2026-09-28)",
+  "The fact book holds two Q4 result dates for Apple, 2026-10-28 and 2026-10-29, both from `finnhub`. Which one does the company's own calendar give? (since 2026-09-28)",
+  "On the 09-29 `us_close` run, `ask.py prices --book` took 15m16s of a 25-minute job, with all 23 bars from Yahoo. Which feed held it, and does Stooq's place first in the online chain need to change before a run times out and loses a day's commit? (since 2026-09-28)",
+  "Does a primary statement follow the report that China may let Alibaba and ByteDance buy the RTX Pro 5500? Monday's rows add that China's industry ministry asked companies to disclose purchase plans (Reuters via The Information), and a Benzinga update \"to include a comment from Nvidia\" whose collected body ends before the comment. None quotes Beijing or either buyer. (since 2026-09-27)",
+  "The fact book has no event kind for a court verdict, an appeal or a settlement. Apple's USD 5.7 billion verdict exists only in the corpus; on Monday it moved Burford Capital over 12% and Apple 0.21 sigma. Where would a legal event be recorded, so that a later page can date it? (since 2026-09-26)",
+  "Microsoft's cached bar opens at 499.04 (+0.22%), while two rows describe a 3% rise before or at the open. Monday gave back −0.61% of Friday's +3.27%. Which is right? And should the collector hold a second price source for the open on a day a cause is being timed? (since 2026-09-25)",
+  "The monitor announced the same `price_stale` change as NEW for a sixth night. The routine never commits `data/alerts.db`, so the stored state is days old (system test M9). Should the routine commit the alerts store, or should it live outside git? (since 2026-09-24)",
+  "Does IHH carry the Daiichi Sankyo claim at any value in its accounts? The Supreme Court has disposed of Fortis' petition, and IHH says it will cooperate with the forensic audit and that the Fortis purchase was transparent. All of that is titles only. Monday moved 0.13 sigma. (since 2026-09-24)",
+  "The pack measures across a blank proxy row without saying so (M3). No blank is crossed tonight. The defect waits for the next one: should the pack refuse the row, label it two-session, or scale the sigma? (since 2026-09-23)",
+  "The fact book holds no Bursa entitlement dates. Which source carries Bursa ex-dates? (since 2026-09-23)",
+  "IHH's Tuesday is significant alone (3.80 sigma). The one candidate, the Macquarie headline, has no body. Which source carries the note's figures? (since 2026-09-22)",
+  "A blank bar shared by a name and its proxy is labelled *correctly dated*, as if the market was shut. The `^KLSE` 09-22 bar arrived four days late, so that blank was the feed's and the market was open. Should the pack check the calendar or an independent index print first? (since 2026-09-22)",
+  "The move to 260-session betas re-measured the same Monday. Which window's shares do pages compare across the change? (since 2026-09-22)",
+  "Petronas Chemicals, Press Metal and Genting fell 2.3–2.8% on a +0.08% index day with no row about any of them: one factor or three stories? On Monday they read −1.34%, +0.80% and +1.06%, in opposite directions. No Bursa sector proxy is cached. (since 2026-09-21)",
+  "Tenaga: the rows hold both readings, *minimal impact* and *undermines the IBR framework*, as titles only. Monday +0.15% (0.31 sigma). What figure would let the page tell the readings apart? (since 2026-09-18)",
+  "`DFF` stepped +0.25 on 2026-09-17 and the collector holds no statement for it. Where does a statement come from? (since 2026-09-20)",
+  "A short-interest weekly named Petronas Chemicals for the week to 09-18. Would Bursa's daily short-selling report give the name a body? (since 2026-09-20)",
+  "Wiring a catalyst matcher to the corpus is still open. NVIDIA is Monday's case: `no_identified_catalyst` at 1.65 sigma, 285 linked rows, two dated items before the open, and nothing in the pack that weighs them. (since 2026-09-18)",
+  "Petronas Chemicals' idiosyncratic days read *not significant* because its own sigma contains the +22.56% run. The 260-session window still contains it. (since 2026-09-18)",
+  "Petronas Chemicals collecting a body: which of the eleven listed sources carries a Bursa-hours story about it at all? There were zero rows on Monday, and `google_news` named it in 0 of 1 on Tuesday's sweep. (since 2026-09-10; folded 09-17)",
+  "The linker attached a *Genting Plantations* headline to MYX:3182, then *Ho Wah Genting*. Tenaga's rows on Thursday through Monday are all *Shree TNB Polymers*. How many rows per name are about other companies? (since 2026-09-17)",
+  "Which earlier pages were written from a pre-close cache? `dfc45e3` labels such rows. (since 2026-09-17)",
+  "Does a page need to state a market's non-trading day as a fact rather than infer it from blank bars? (since 2026-09-16)",
+  "Brent: 114.89 at 09-22, +22.18 over twenty observations, with no print since. Monday's market row says oil jumped. What the move did to Petronas Chemicals' feedstock reading is still unanswered, because the decomposition has no commodity leg. (since 2026-09-16)",
+  "Press Metal collecting anything: zero rows on Monday, and `google_news` read empty for it on Monday's sweep. (since 2026-09-15)",
+  "The sector beta is fixed at 0, so any sector-wide session lands in a residual labelled `idiosyncratic`. On Monday the cached peers answered it for one name: NVIDIA rose while AMD, INTC and AVGO fell. The pack does not make that check. (since 2026-09-14)",
+  "Is the observe phase's grading against the control informative at 21 days? The first observe grades fall due 2026-10-11. (since 2026-09-08)"
+ ],
+ "lessons": [
+  "A gap at the open limits the candidates to what was public before it: NVIDIA opened +2.08% and closed +1.68%, so a session-hours row cannot be a cause of a move complete at the open.",
+  "A claim can be priced by the counterparty and not by the defendant: the USD 5.7bn verdict moved Burford Capital over 12% and Apple 0.21 sigma.",
+  "A company leg is company-specific only when its peers moved otherwise; with the sector beta fixed at 0, the cached peers are the check (NVIDIA +1.68% while AMD -3.61%, INTC -5.67%)."
+ ],
+ "closed": [
+  "GDELT hit HTTP 429 on six consecutive sweeps, from 09-25 `us_close` through 09-28 `bursa_close`, then answered on 09-28 `us_close` with one grouped request (132 stored). Was it per-IP throttling on the shared runner, and does the one-request form keep it answering? (since 2026-09-08) - answered for what the collector can see, no: the grouped request failed on the next two sweeps; per-IP throttling cannot be settled from collected data; the monitor's cadence alert reports outages",
+  "`google_news` failed on all three US queries on the 09-24 `us_close`. It has answered on all three `us_close` sweeps since (149 stored on 09-25, 32 on 09-26, 22 on 09-27). Were those two outages, or throttling at that hour on some nights? (since 2026-09-23) - not recurred on five us_close sweeps (149, 32, 22, 142, 143 stored); the collection table would show a recurrence"
+ ]
+}

@@ -42,6 +42,7 @@ from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
 from core.provenance.ledger import _enable_wal, apply_schema
+from knowledge.redact import scrub
 
 FACTS_DB = "data/facts.db"
 
@@ -394,6 +395,7 @@ class FactBook:
         stored: int = 0,
         detail: str = "",
     ) -> None:
+        detail = scrub(detail)
         self.conn.execute(
             "INSERT INTO pulls (run_id, at, source, status, fetched, stored, detail)"
             " VALUES (?,?,?,?,?,?,?)",

@@ -1,0 +1,160 @@
+{
+  "day": "2026-09-28",
+  "written_at": "2026-09-28T22:55:49Z",
+  "phase": "ramp",
+  "week": 3,
+  "equity_usd": 1000.0,
+  "cash_usd": 1000.0,
+  "control_equity_usd": 987.84,
+  "control_return_to_date": -0.0122,
+  "drawdown": 0.0,
+  "control_drawdown": 0.0122,
+  "halted": false,
+  "marks": 17,
+  "positions": [],
+  "changes": [],
+  "control_changes": [],
+  "control_mark": {
+    "marked_on": "2026-09-28",
+    "equity_usd": 987.84,
+    "cash_usd": 602.28,
+    "positions_usd": 385.56,
+    "day_return": -0.0001,
+    "note": "Monday's session; marked at the bursa_close slot (rewritten by the late cron at 17:40Z, 980c23b) and the us_close slot (22:45Z, 59e1383) with the same figures; holdings MYX:8869 100 (close 7.52), MYX:5183 100 (4.43), MYX:3182 200 (1.90)"
+  },
+  "caps": [
+    {
+      "cap": "largest name",
+      "value": "0.00%",
+      "limit": "25%",
+      "breached": false
+    },
+    {
+      "cap": "invested",
+      "value": "0.00%",
+      "limit": "40%",
+      "breached": false
+    },
+    {
+      "cap": "cash floor",
+      "value": "100.00%",
+      "limit": "20%",
+      "breached": false
+    },
+    {
+      "cap": "names held",
+      "value": "0",
+      "limit": "0",
+      "breached": false
+    },
+    {
+      "cap": "drawdown from peak",
+      "value": "0.00%",
+      "limit": "8% halts entries",
+      "breached": false
+    },
+    {
+      "cap": "turnover, 5 weekdays",
+      "value": "USD 0.00",
+      "limit": "USD 500.00",
+      "breached": false
+    }
+  ],
+  "prices": {
+    "bursa": "Monday 2026-09-28 settled closes",
+    "us": "Monday 2026-09-28 settled closes (us_close sweep 22:45Z)",
+    "fx": "4.085 MYR per USD, bnm, 2026-09-28"
+  },
+  "fundable": [
+    {
+      "instrument_id": "MYX:1155",
+      "lot_usd": 248.71,
+      "share": 0.249,
+      "round_trip": 0.0116,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:5183",
+      "lot_usd": 108.45,
+      "share": 0.108,
+      "round_trip": 0.0204,
+      "lots": 2
+    },
+    {
+      "instrument_id": "MYX:5225",
+      "lot_usd": 196.08,
+      "share": 0.196,
+      "round_trip": 0.0119,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:8869",
+      "lot_usd": 184.09,
+      "share": 0.184,
+      "round_trip": 0.0126,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:3182",
+      "lot_usd": 46.51,
+      "share": 0.047,
+      "round_trip": 0.0459,
+      "lots": 5
+    },
+    {
+      "instrument_id": "XNAS:NVDA",
+      "lot_usd": 228.86,
+      "share": 0.229,
+      "round_trip": 0.0114,
+      "lots": 1
+    }
+  ],
+  "over_cap": {
+    "MYX:5347": 0.322,
+    "XNAS:AAPL": 0.338,
+    "XNAS:MSFT": 0.509
+  },
+  "ledger": {
+    "mark_days": 17,
+    "monday": "marks for 2026-09-28 at the bursa_close slot (17:40Z, late cron, 980c23b) and the us_close slot (22:45Z, 59e1383), same figures"
+  },
+  "attribution": null,
+  "decision": {
+    "recorded": true,
+    "weights": {},
+    "all_cash": true,
+    "calendar_row": false,
+    "prediction_id": "paper-2026-09-28-allcash-21d-111e",
+    "grades_on": "2026-10-28",
+    "confidence": 0.55,
+    "decided_at": "2026-09-28T22:53:24Z",
+    "made_at": "2026-09-28T22:53:24Z",
+    "thesis": "All cash, the eighteenth all-cash row and seventh ramp decision, recorded after Monday 2026-09-28's closes on both markets and applied at Tuesday's first cached bars; the one fundable name with a new dated company item, NVIDIA (one lot 22.9% of equity), has it as a report without a primary source - The Information, relayed at 2026-09-27T17:30Z (finnhub:142448482), that China may let Alibaba and ByteDance buy the RTX Pro 5500 - and Monday's session has already read it (lot USD 228.86 against Friday's 225.07); Maybank's lot is 24.9% of equity at Monday's close and rate against 25.1% at Friday's, and its one weekend event, a RM1.56bn AT1 sukuk redemption on first call, is a title with no figure; IHH, Press Metal and Petronas Chemicals collected nothing on Sunday and Genting only a feature on its Singapore subsidiary; Monday's session is not yet decomposed (tomorrow night's feedback page); claim: nothing in the fundable universe beats cash over 21 sessions.",
+    "refusals": [],
+    "cli_output": "recorded 1 target(s) for 2026-09-28 (week 3, ramp: invested weight capped at 40%), sized against equity USD 1,000.00\n  CASH           0.00%  all_cash\n  all-cash: one row and one prediction, graded against the control book\n  1 prediction(s) logged:\n    paper-2026-09-28-allcash-21d-111e  +21d  grades on 2026-10-28\n  applies at each market's first cached bar after this day",
+    "thesis_incomplete": "omits NVIDIA's USD 150bn buyback authorization announced Monday 2026-09-28 (finnhub:142466054 08:25Z; finnhub:142469090), held in the corpus from 22:45:13Z, eight minutes before the decision"
+  },
+  "stores": {
+    "decided_targets": 18,
+    "decided_applications": 18,
+    "predictions": 18
+  },
+  "evidence": {
+    "feedback_page": "knowledge/feedback/2026-09-27.md (f26e9b4)",
+    "notes": [
+      "Monday's session is not decomposed yet; the 2026-09-28 feedback page is written tomorrow night",
+      "NVIDIA: The Information's China report (finnhub:142448482, 2026-09-27T17:30Z), updated Monday with a comment from Nvidia and Reuters' account of MIIT asking companies to disclose purchase plans (finnhub:142460540, 06:42Z)",
+      "NVIDIA: USD 150bn buyback authorization increase, total remaining USD 235bn through fiscal 2028, 'the company said in a statement on Monday' (finnhub:142469090); earliest row finnhub:142466054 08:25Z, premarket; no filing in the fact book; read after the decision",
+      "IHH: 'maintains Buy, target price lowered to RM9.06' (themalaysianreserve.com, 01:54Z, title only); Supreme Court disposed of Fortis' petition, IHH to cooperate with the audit (businesstoday.com.my 09:56Z, marketscreener.com 10:02Z, titles only); read after the decision",
+      "Genting: 'Rising MGS yield to impact IOIPG, Genting and YTL's net profits - BIMB Research' (nst.com.my 08:39Z); read after the decision",
+      "Maybank: lot 24.9% of equity at Monday's close and 4.085, against 25.1% at Friday's and 4.0735; fundable again with no new evidence"
+    ]
+  },
+  "mistakes": [
+    "paper-2026-09-27-allcash-21d-9d18 (decided 2026-09-27T22:54:12Z) called IHH 'the one fundable name with a weekend row' and listed NVIDIA as 'no dated company event', while the corpus had held since 22:46Z The Information's China report (finnhub:142448482, published 17:30Z Sunday); the decision was drafted from Saturday's feedback page without reading Sunday's evening rows",
+    "paper-2026-09-28-allcash-21d-111e (decided 2026-09-28T22:53:24Z) names the China report as NVIDIA's one new dated company item and omits Monday's USD 150bn buyback authorization, held in the corpus from 22:45:13Z (finnhub:142466054, finnhub:142469090), eight minutes earlier; Monday's rows were read after the decision; the row stands as recorded (append-only), and no second decision was recorded to correct it"
+  ],
+  "lessons": [
+    "A decision recorded minutes after a sweep lands reads that sweep only if the routine looks: on two nights running the evening's sweep held a dated event for a fundable name eight minutes before the decision, and neither thesis names it."
+  ]
+}

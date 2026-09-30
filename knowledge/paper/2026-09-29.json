@@ -1,0 +1,161 @@
+{
+ "day": "2026-09-29",
+ "written_at": "2026-09-29T23:11:53Z",
+ "phase": "ramp",
+ "week": 4,
+ "equity_usd": 1000.0,
+ "cash_usd": 1000.0,
+ "control_equity_usd": 982.19,
+ "control_return_to_date": -0.0178,
+ "drawdown": 0.0,
+ "control_drawdown": 0.0178,
+ "halted": false,
+ "marks": 18,
+ "positions": [],
+ "changes": [],
+ "control_changes": [],
+ "control_mark": {
+  "marked_on": "2026-09-29",
+  "equity_usd": 982.19,
+  "cash_usd": 602.28,
+  "positions_usd": 379.91,
+  "day_return": -0.0057,
+  "note": "Tuesday's session; marked at the bursa_close slot (10:10Z catch-up, restamped 15:53Z by the late cron, a061bd6) and the us_close slot (23:02Z, 642186f) with the same figures; holdings MYX:8869 100 (close 7.45), MYX:5183 100 (4.29), MYX:3182 200 (1.88)"
+ },
+ "caps": [
+  {
+   "cap": "largest name",
+   "value": "0.00%",
+   "limit": "25%",
+   "breached": false
+  },
+  {
+   "cap": "invested",
+   "value": "0.00%",
+   "limit": "40%",
+   "breached": false
+  },
+  {
+   "cap": "cash floor",
+   "value": "100.00%",
+   "limit": "20%",
+   "breached": false
+  },
+  {
+   "cap": "names held",
+   "value": "0",
+   "limit": "0",
+   "breached": false
+  },
+  {
+   "cap": "drawdown from peak",
+   "value": "0.00%",
+   "limit": "8% halts entries",
+   "breached": false
+  },
+  {
+   "cap": "turnover, 5 weekdays",
+   "value": "USD 0.00",
+   "limit": "USD 500.00",
+   "breached": false
+  }
+ ],
+ "prices": {
+  "bursa": "Tuesday 2026-09-29 closes (cached 10:09-10:10Z)",
+  "us": "Tuesday 2026-09-29 closes (us_close sweep 23:02Z)",
+  "fx": "4.08 MYR per USD, bnm, 2026-09-29",
+  "cache": "Monday's closes blanked by the 00:59Z refetch (2de3cb5) were restored at 10:10Z; #83 (40032e8) keeps the cache from storing a regressing body"
+ },
+ "fundable": [
+  {
+   "instrument_id": "MYX:1155",
+   "lot_usd": 244.85,
+   "share": 0.245,
+   "round_trip": 0.0098,
+   "lots": 1
+  },
+  {
+   "instrument_id": "MYX:5183",
+   "lot_usd": 105.15,
+   "share": 0.105,
+   "round_trip": 0.0211,
+   "lots": 2
+  },
+  {
+   "instrument_id": "MYX:5225",
+   "lot_usd": 192.89,
+   "share": 0.193,
+   "round_trip": 0.0121,
+   "lots": 1
+  },
+  {
+   "instrument_id": "MYX:8869",
+   "lot_usd": 182.6,
+   "share": 0.183,
+   "round_trip": 0.0127,
+   "lots": 1
+  },
+  {
+   "instrument_id": "MYX:3182",
+   "lot_usd": 46.08,
+   "share": 0.046,
+   "round_trip": 0.0464,
+   "lots": 5
+  },
+  {
+   "instrument_id": "XNAS:NVDA",
+   "lot_usd": 227.21,
+   "share": 0.227,
+   "round_trip": 0.0114,
+   "lots": 1
+  }
+ ],
+ "over_cap": {
+  "MYX:5347": 0.312,
+  "XNAS:AAPL": 0.329,
+  "XNAS:MSFT": 0.509
+ },
+ "ledger": {
+  "mark_days": 18,
+  "tuesday": "marks for 2026-09-29 at the bursa_close slot (10:10Z catch-up; restamped 15:53Z, a061bd6) and the us_close slot (23:02Z, 642186f), same figures; no duplicate (book, day, slot) rows"
+ },
+ "attribution": null,
+ "decision": {
+  "recorded": true,
+  "weights": {},
+  "all_cash": true,
+  "calendar_row": false,
+  "prediction_id": "paper-2026-09-29-allcash-21d-7831",
+  "grades_on": "2026-10-29",
+  "confidence": 0.55,
+  "decided_at": "2026-09-29T23:10:28Z",
+  "made_at": "2026-09-29T23:10:28Z",
+  "thesis": "All cash, the nineteenth all-cash row and first decision of ramp week 4, recorded after Tuesday 2026-09-29's closes on both markets and applied at Wednesday's first cached bars; the evening sweeps' rows for fundable names were read before it. NVIDIA (one lot 22.7% of equity): Monday's USD 150bn buyback increase (newsroom title 11:07Z; finnhub:142466054 08:25Z) is measured on the 2026-09-28 feedback page as idiosyncratic +3.02% at 1.65 sigma, the whole move in the opening gap (+2.08%) while AMD, INTC and AVGO fell; Tuesday closed 227.21 (-0.72% against SPY -0.18%), not yet decomposed; after Monday's close came an AI agent safety platform (techcrunch 21:00Z), an FT report of talks with insurers on AI financing risk (finnhub:142485020), a report that it and AMD lobbied against China export limits (finnhub:142496689), a Rosenblatt rating reaffirmation (marketbeat.com 12:22Z, title) and Reuters on why it sees its stock as good value (20:56Z), none with a figure the fact book holds. Maybank (24.5%): a new RM2.5bn AT1 sukuk reported after Monday's close (thestar 23:31Z, title only), then a Tuesday fall of 1.67% to 9.99. IHH (19.3%): 'Fortis buy was transparent' (thestar 23:05Z) and cooperation with the court-ordered audit (tipranks 09:52Z), titles only. Petronas Chemicals, Press Metal and Genting collected nothing. Bursa fell on Tuesday (^KLSE 1,670.02 to 1,643.96, -1.56%) with every fundable Bursa name lower, and that session is not decomposed; claim: nothing in the fundable universe beats cash over 21 sessions.",
+  "refusals": [],
+  "rows_read_before_deciding": true
+ },
+ "stores": {
+  "decided_targets": 19,
+  "decided_applications": 19,
+  "predictions": 19
+ },
+ "evidence": {
+  "feedback_page": "knowledge/feedback/2026-09-28.md (290d433)",
+  "notes": [
+   "Monday decomposed: NVIDIA idiosyncratic +3.02% at 1.65 sigma, cached open +2.08% (move complete at the open), AMD -3.61%, INTC -5.67%, AVGO -0.92% the same day; buyback (confidence 0.50) and China report (0.20) not separated",
+   "Tuesday not decomposed: ^KLSE 1,670.02 -> 1,643.96 (-1.56%); Maybank 10.16 -> 9.99, Petronas Chemicals 4.43 -> 4.29, IHH 8.01 -> 7.87, Press Metal 7.52 -> 7.45, Genting 1.90 -> 1.88; SPY 765.61 -> 764.20; NVIDIA 228.86 -> 227.21",
+   "NVIDIA after Monday's close: AI agent safety platform (techcrunch via gdelt 21:00Z); FT on talks with insurers (finnhub:142485020); report of lobbying against China export limits with AMD (finnhub:142496689); Rosenblatt reaffirmation (marketbeat 12:22Z, title); Reuters 'a pretty good value' (20:56Z, title); no 8-K for the buyback in the fact book",
+   "Maybank: RM2.5bn AT1 sukuk (thestar 23:31Z Monday; marketscreener 03:13Z), titles; 'Falls 1.2% After RM1.56 Billion AT1 Sukuk Redemption' (businesstoday 07:54Z)",
+   "IHH: 'Fortis buy was transparent' (thestar 23:05Z Monday); cooperation with the forensic audit (tipranks 09:52Z); titles",
+   "Petronas Chemicals, Press Metal, Genting: nothing collected since the last decision"
+  ]
+ },
+ "mistakes": [],
+ "mistakes_checked": [
+  "paper-2026-09-28-allcash-21d-111e reason 2 ('NVIDIA's dated items are ones Monday's session already read') holds: NVIDIA opened +2.08% and its +1.68% day was complete at the open",
+  "tonight's thesis was drafted after the evening rows for every fundable name were listed; decided 2026-09-29T23:10:28Z, eight minutes after the us_close sweep landed (23:02Z)"
+ ],
+ "lessons": [
+  "A company event is tradable only for the sessions that have not yet read it: NVIDIA's buyback moved the stock in Monday's opening gap, and a target recorded after that session applies two sessions later."
+ ]
+}

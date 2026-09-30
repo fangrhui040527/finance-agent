@@ -1,0 +1,168 @@
+{
+  "day": "2026-09-25",
+  "written_at": "2026-09-25T22:55:12Z",
+  "phase": "ramp",
+  "week": 3,
+  "equity_usd": 1000.0,
+  "cash_usd": 1000.0,
+  "control_equity_usd": 987.93,
+  "control_return_to_date": -0.0121,
+  "drawdown": 0.0,
+  "control_drawdown": 0.0121,
+  "halted": false,
+  "marks": 16,
+  "positions": [],
+  "changes": [],
+  "control_changes": [],
+  "control_mark": {
+    "equity_usd": 987.93,
+    "cash_usd": 602.28,
+    "positions_usd": 385.65,
+    "day_return": -0.0014,
+    "positions": [
+      {
+        "instrument_id": "MYX:8869",
+        "units": 100,
+        "avg_cost": "7.63",
+        "close": "7.46",
+        "value_usd": 183.13,
+        "weight": 0.1854,
+        "pnl_open_usd": -4.17
+      },
+      {
+        "instrument_id": "MYX:5183",
+        "units": 100,
+        "avg_cost": "4.51",
+        "close": "4.49",
+        "value_usd": 110.22,
+        "weight": 0.1116,
+        "pnl_open_usd": -0.49
+      },
+      {
+        "instrument_id": "MYX:3182",
+        "units": 200,
+        "avg_cost": "1.93",
+        "close": "1.88",
+        "value_usd": 92.3,
+        "weight": 0.0934,
+        "pnl_open_usd": -2.45
+      }
+    ],
+    "note": "fx 4.082 -> 4.0735; 8869 and 3182 closed unchanged, so their USD change is the rate; 5183 4.58 -> 4.49 carries the price fall; the pack does not split the day return further"
+  },
+  "caps": [
+    {
+      "cap": "largest name",
+      "value": "0.00%",
+      "limit": "25%",
+      "breached": false
+    },
+    {
+      "cap": "invested",
+      "value": "0.00%",
+      "limit": "40%",
+      "breached": false
+    },
+    {
+      "cap": "cash floor",
+      "value": "100.00%",
+      "limit": "20%",
+      "breached": false
+    },
+    {
+      "cap": "names held",
+      "value": "0",
+      "limit": "0",
+      "breached": false
+    },
+    {
+      "cap": "drawdown from peak",
+      "value": "0.00%",
+      "limit": "8% halts entries",
+      "breached": false
+    },
+    {
+      "cap": "turnover, 5 weekdays",
+      "value": "USD 0.00",
+      "limit": "USD 500.00",
+      "breached": false
+    }
+  ],
+  "prices": {
+    "bursa": "Friday 2026-09-25 settled closes (09:34Z pull, af8810e)",
+    "us": "Friday 2026-09-25 settled closes (22:46Z us_close refetch, 52f16f2)",
+    "fx": "4.0735 MYR per USD, bnm, 2026-09-25"
+  },
+  "fundable": [
+    {
+      "instrument_id": "MYX:5183",
+      "lot_usd": 110.22,
+      "share": 0.11,
+      "round_trip": 0.0202,
+      "lots": 2
+    },
+    {
+      "instrument_id": "MYX:5225",
+      "lot_usd": 197.13,
+      "share": 0.197,
+      "round_trip": 0.0119,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:8869",
+      "lot_usd": 183.13,
+      "share": 0.183,
+      "round_trip": 0.0127,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:3182",
+      "lot_usd": 46.15,
+      "share": 0.046,
+      "round_trip": 0.0464,
+      "lots": 5
+    },
+    {
+      "instrument_id": "XNAS:NVDA",
+      "lot_usd": 225.07,
+      "share": 0.225,
+      "round_trip": 0.0115,
+      "lots": 1
+    }
+  ],
+  "over_cap": {
+    "MYX:1155": 0.251,
+    "MYX:5347": 0.323,
+    "XNAS:AAPL": 0.341,
+    "XNAS:MSFT": 0.516
+  },
+  "ledger": {
+    "mark_days": 16,
+    "late_cron": "885ab68 (14:37Z) changed only data/paper.db"
+  },
+  "attribution": null,
+  "decision": {
+    "recorded": true,
+    "weights": {},
+    "all_cash": true,
+    "prediction_id": "paper-2026-09-25-allcash-21d-468d",
+    "grades_on": "2026-10-25",
+    "confidence": 0.55,
+    "decided_at": "2026-09-25T22:51:55Z",
+    "made_at": "2026-09-25T22:51:55Z",
+    "thesis": "All cash, the fourth ramp decision and fifteenth all-cash row, recorded after Friday's Bursa and US closes; the 2026-09-24 feedback page is a clean single session in which no name moved outside its normal variation (largest idiosyncratic leg Press Metal at 1.04 sigma), and IHH's appeal rows were all published after that close, so Friday's session is the first that could read them and no page has measured it yet; claim: nothing in the fundable universe beats cash over 21 sessions.",
+    "refusals": []
+  },
+  "stores": {
+    "decided_targets": 15,
+    "decided_applications": 15,
+    "predictions": 15
+  },
+  "mistakes": [
+    "The 2026-09-24 feedback page (3b0c324), on which decision paper-2026-09-25-allcash-21d-468d (recorded 22:51:55Z) rests, stated 'Written 22:52 UTC' against a commit stamped 22:49:07 UTC; 9f34710 corrected the page and JSON to 22:49; the fix proposed on the 2026-09-24 paper page was not applied."
+  ],
+  "lessons": [
+    "A lesson proposed on a page changes nothing until something checks it: the written-time defect recurred on the next feedback page, and a check comparing a page's stated time with its commit time would catch it.",
+    "At USD 1,000 a name whose one lot sits near 25% of equity moves in and out of the fundable set on ordinary daily moves (Maybank 24.8% -> 25.1%), so the fundable set is a function of price as much as of evidence."
+  ]
+}

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import sqlite3
 from dataclasses import dataclass
 from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
@@ -175,6 +176,28 @@ def test_the_days_collection_rows_are_on_the_page(tmp_path):
     d = build_digest(Cfg(), NOW.date(), corpus_path=corpus_db, facts_path=facts_db, now=NOW)
     (row,) = d.collection
     assert row["source"] == "google_news" and "read but empty" in row["detail"]
+
+
+def test_a_key_stored_in_an_old_sweep_row_is_not_republished(tmp_path):
+    """Rows written before the store scrubbed its input still hold what the
+    vendor sent; the digest is committed, so it cleans them on the way out."""
+    corpus_db, facts_db = seed(tmp_path)
+    echoed = "SYNTHETICECHO000"  # synthetic, in Alpha Vantage's key shape
+    with sqlite3.connect(corpus_db) as conn:
+        conn.execute(
+            "INSERT INTO sweeps (run_id, at, source, since, status, detail) VALUES (?,?,?,?,?,?)",
+            (
+                "r-old",
+                NOW.isoformat(),
+                "alphavantage_news",
+                NOW.isoformat(),
+                "failed",
+                f"alphavantage quota exhausted for today: We have detected your API key as {echoed} and",
+            ),
+        )
+    d = build_digest(Cfg(), NOW.date(), corpus_path=corpus_db, facts_path=facts_db, now=NOW)
+    (row,) = [r for r in d.collection if r["source"] == "alphavantage_news"]
+    assert echoed not in row["detail"] and "quota exhausted for today" in row["detail"]
 
 
 def test_markdown_and_json_agree_and_are_written(tmp_path):

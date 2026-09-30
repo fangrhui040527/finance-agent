@@ -29,6 +29,7 @@ from decimal import Decimal
 
 from knowledge.facts import Observation, as_decimal
 from knowledge.news.features import Article
+from knowledge.redact import scrub
 from knowledge.sources.base import Collector, Pull, SourceError, local_code, parse_datetime
 
 URL = "https://www.alphavantage.co/query"
@@ -173,7 +174,7 @@ class AlphaVantageNews(Collector):
             raise SourceError("alphavantage: expected an object")
         for field in ("Information", "Note"):
             if payload.get(field):
-                notice = str(payload[field])
+                notice = scrub(str(payload[field]))
                 raise SourceError(f"alphavantage {classify_notice(notice)}: {notice[:160]}")
         if payload.get("Error Message"):
             raise SourceError(f"alphavantage: {str(payload['Error Message'])[:160]}")
