@@ -1,6 +1,6 @@
 # Digest 2026-09-30
 
-Generated 2026-09-30 18:06 UTC · slot `all` · 11368 articles in the corpus, 4849 observations, 4153 events in the fact book.
+Generated 2026-09-30 22:47 UTC · slot `all` · 11800 articles in the corpus, 4864 observations, 4153 events in the fact book.
 
 ## The book
 
@@ -32,45 +32,45 @@ Generated 2026-09-30 18:06 UTC · slot `all` · 11368 articles in the corpus, 48
 - 2026-09-30 www.thestar.com.my — Peak convenience: Inside Resorts World Genting connected ecosystem for guests [q 0.80, tone +0.0]
 
 ### NVIDIA (XNAS:NVDA)
-- tone: 127 stories from 25 sources, polarity +0.27, peak intensity 0.67, uncertainty 0.16 · 35 escalated
+- tone: 340 stories from 49 sources, polarity +0.23, peak intensity 0.67, uncertainty 0.15 · 79 escalated
 - 2026-09-29 finance.yahoo.com — Jensen Huang: AI data center push will create 1 million US jobs [q 1.00, tone +0.0] ★
-- 2026-09-29 www.thestreet.com — AMD takes on Nvidia with aggressive $8.2 billion bet on AI’s next era [q 0.85, tone +0.0] ★
-- 2026-09-29 Yahoo — Apple, Meta, Iovance, Carnival, Fair Isaac, Bloom Energy, SpaceX, and More Stocks That Explain Today’s Market [q 0.85, tone +0.5] ★
-- 2026-09-29 ChartMill — Nvidia - $235 billion for share buybacks. Good news? [q 0.85, tone +1.0] ★
-- 2026-09-29 247wallst.com — Cramer Says Nvidia’s $150 Billion Buyback Only Matters If It Copies One Apple Executive [q 0.85, tone +1.0] ★
-- 2026-09-29 SeekingAlpha — Nvidia: The Valuation Still Doesn't Match The AI Growth [q 0.85, tone +1.0] ★
-- 2026-09-29 Yahoo — Wall Street Is Watching Nvidia. I’m Watching Credo. Here’s My 2027 Price Target [q 0.85, tone +1.0] ★
-- 2026-09-29 Yahoo — Next Generation Computing Market Report 2026: Capitalize on the $486 Billion Revenue Surge to $811.85 Billion by 2030 as Microsoft, AWS, NVIDIA, IBM and Intel Accelerate AI, Quantum and Edge Computing Disruption [q 0.85, tone +1.0] ★
+- 2026-09-30 cdn.jwplayer.com — NVIDIA Is World's Largest Stock Yet Still Undervalued [q 0.85, tone +0.0] ★
+- 2026-09-30 Yahoo — Amazon Signs $1 Billion Synopsys Deal as AWS Steps Up Nvidia Challenge [q 0.85, tone +0.0] ★
+- 2026-09-30 www.thestreet.com — TSMC's next move could ripple far beyond Apple, Nvidia [q 0.85, tone +0.0] ★
+- 2026-09-30 SeekingAlpha — AMD Stock Crosses $1 Trillion -- And The Market Still Underestimates The Dark Horse [q 0.85, tone +1.0] ★
+- 2026-09-30 Yahoo — BAG Ventures Closes Inaugural Fund I on the Strength of 150+ Operators Supporting Enterprise AI Founders [q 0.85, tone +1.0] ★
+- 2026-09-30 SeekingAlpha — Nvidia's Demand Outlook Still Supports The Bull Case [q 0.85, tone +1.0] ★
+- 2026-09-30 Benzinga — Growth Leads Sectors In Wednesday Trading As Defensives Trail [q 0.85, tone +1.0] ★
 - event 2026-09-29 rating_reiteration — Rosenblatt maintain Buy (fmp)
-- snapshot: P/E (ttm) 29.03 (finnhub, 2026-09-28) · P/B 28.81 (finnhub, 2026-09-05) · EPS (ttm) 7.91 (finnhub, 2026-09-05) · dividend yield 0.03 (finnhub, 2026-09-05) · beta 2.22 (finnhub, 2026-09-27) · 52w high 236.54 (finnhub, 2026-09-05) · 52w low 164.27 (finnhub, 2026-09-10) · target (consensus) 345.21 (fmp, 2026-09-05) · analysts: buy 41 (finnhub, 2026-09-05) · analysts: hold 3 (finnhub, 2026-09-05) · analysts: sell 1 (finnhub, 2026-09-05) · vendor sentiment 0.31 (alphavantage_news, 2026-09-29) · revenue (last quarter) 96.22bn (sec_xbrl, 2026-08-26) · net income (last quarter) 59.69bn (sec_xbrl, 2026-08-26) · last EPS surprise % 3.82 (finnhub, 2026-09-05)
+- snapshot: P/E (ttm) 28.71 (finnhub, 2026-09-30) · P/B 28.81 (finnhub, 2026-09-05) · EPS (ttm) 7.91 (finnhub, 2026-09-05) · dividend yield 0.03 (finnhub, 2026-09-05) · beta 2.22 (finnhub, 2026-09-30) · 52w high 236.54 (finnhub, 2026-09-05) · 52w low 164.27 (finnhub, 2026-09-10) · target (consensus) 345.21 (fmp, 2026-09-05) · analysts: buy 41 (finnhub, 2026-09-05) · analysts: hold 3 (finnhub, 2026-09-05) · analysts: sell 1 (finnhub, 2026-09-05) · vendor sentiment 0.19 (alphavantage_news, 2026-09-30) · revenue (last quarter) 96.22bn (sec_xbrl, 2026-08-26) · net income (last quarter) 59.69bn (sec_xbrl, 2026-08-26) · last EPS surprise % 3.82 (finnhub, 2026-09-05)
 
 ### Apple (XNAS:AAPL)
-- tone: 77 stories from 39 sources, polarity +0.05, peak intensity 0.67, uncertainty 0.18 · 20 escalated
-- 2026-09-29 Benzinga — Apple Faces New AI Threat From Meta’s Muse - Meta Platforms (NASDAQ:META) [q 0.85, tone +1.0] ★
-- 2026-09-29 Yahoo — Apple, Meta, Iovance, Carnival, Fair Isaac, Bloom Energy, SpaceX, and More Stocks That Explain Today’s Market [q 0.85, tone +0.5] ★
-- 2026-09-29 www.trefis.com — Has MSFT Stock Run Out Of Steam? [q 0.85, tone +1.0] ★
-- 2026-09-29 247wallst.com — Cramer Says Nvidia’s $150 Billion Buyback Only Matters If It Copies One Apple Executive [q 0.85, tone +1.0] ★
-- 2026-09-29 247wallst.com — Apple Falls 2% as Bank of America Flags Meta’s Shopping Agent; Alphabet Slips, Microsoft Holds Steady [q 0.85, tone -1.0] ★
-- 2026-09-29 Yahoo — Nvidia Is Spending Big on Buybacks. Why Apple Is the Only Mag 7 Rival Joining In. [q 0.85, tone +1.0] ★
-- 2026-09-29 Benzinga — How Much Do You Need to Have Netflix, Disney and the 8 Major Streaming Platforms? [q 0.85, tone +0.0] ★
-- 2026-09-29 Yahoo Finance — Apple Could Keep Every iPhone Sale Yet Lose Discovery Referral, BofA Warns — Says Muse Concerns Are Overdone [q 0.85, tone +1.0] ★
+- tone: 180 stories from 62 sources, polarity +0.13, peak intensity 0.67, uncertainty 0.14 · 60 escalated
+- 2026-09-30 finance.yahoo.com — Apple Predicted To Sell 6 Million iPhone Duo Handsets This Year [q 1.00, tone +1.0] ★
+- 2026-09-30 finance.yahoo.com — Alphabet Rides on Google Services Growth: Can It Beat META & AAPL? [q 1.00, tone +1.0] ★
+- 2026-09-30 www.trefis.com — What Is The Case For Waiting On Qualcomm Stock? [q 0.85, tone +0.0] ★
+- 2026-09-30 www.thestreet.com — TSMC's next move could ripple far beyond Apple, Nvidia [q 0.85, tone +0.0] ★
+- 2026-09-30 Inc.com — Steve Jobs Was Wrong About the Apple Store. Why He Changed His Mind [q 0.85, tone +1.0] ★
+- 2026-09-30 Yahoo — Apple to enter smart-home market with Siri AI hub [q 0.85, tone +0.0] ★
+- 2026-09-30 Yahoo — QUALCOMM (QCOM) Is Down 6.7% After Renewing Apple Patent Deal And Deepening AI, Cloud Push [q 0.85, tone +0.0] ★
+- 2026-09-30 Yahoo — Alphabet Rallies 3% as Traders Weigh White House Safety Accord; Apple Gains 2.5%, Meta Platforms Treads Water [q 0.85, tone +0.0] ★
 - event 2026-09-29 rating_reiteration — Morgan Stanley maintain Overweight (fmp)
 - upcoming 2026-10-29 earnings_result — Q4 2026 results after the close (finnhub)
 - upcoming 2026-10-28 earnings_result — Q4 2026 results after the close (finnhub)
-- snapshot: P/E (ttm) 38.48 (finnhub, 2026-09-28) · P/B 50.98 (finnhub, 2026-09-05) · EPS (ttm) 8.72 (finnhub, 2026-09-05) · dividend yield 0.51 (finnhub, 2026-09-05) · beta 1.09 (finnhub, 2026-09-28) · 52w high 345.34 (finnhub, 2026-09-24) · 52w low 243.42 (finnhub, 2026-09-24) · target (consensus) 342.13 (fmp, 2026-09-20) · analysts: buy 22 (finnhub, 2026-09-05) · analysts: hold 15 (finnhub, 2026-09-05) · analysts: sell 3 (finnhub, 2026-09-05) · vendor sentiment 0.09 (alphavantage_news, 2026-09-29) · revenue (last quarter) 109.42bn (sec_xbrl, 2026-07-31) · net income (last quarter) 29.79bn (sec_xbrl, 2026-07-31) · last EPS surprise % -0.89 (finnhub, 2026-09-05)
+- snapshot: P/E (ttm) 37.59 (finnhub, 2026-09-30) · P/B 50.98 (finnhub, 2026-09-05) · EPS (ttm) 8.72 (finnhub, 2026-09-05) · dividend yield 0.51 (finnhub, 2026-09-05) · beta 1.09 (finnhub, 2026-09-30) · 52w high 345.34 (finnhub, 2026-09-24) · 52w low 243.42 (finnhub, 2026-09-24) · target (consensus) 342.13 (fmp, 2026-09-20) · analysts: buy 22 (finnhub, 2026-09-05) · analysts: hold 15 (finnhub, 2026-09-05) · analysts: sell 3 (finnhub, 2026-09-05) · vendor sentiment 0.13 (alphavantage_news, 2026-09-30) · revenue (last quarter) 109.42bn (sec_xbrl, 2026-07-31) · net income (last quarter) 29.79bn (sec_xbrl, 2026-07-31) · last EPS surprise % -0.89 (finnhub, 2026-09-05)
 
 ### Microsoft (XNAS:MSFT)
-- tone: 74 stories from 24 sources, polarity +0.25, peak intensity 0.67, uncertainty 0.08 · 22 escalated
+- tone: 151 stories from 37 sources, polarity +0.24, peak intensity 0.67, uncertainty 0.10 · 40 escalated
+- 2026-09-30 finance.yahoo.com — Microsoft (MSFT) Could Be 21% Above Fair Value After ClickHouse Expansion [q 1.00, tone +1.0] ★
 - 2026-09-29 finance.yahoo.com — IonQ vs. Microsoft: Which Stock Has More Quantum Upside in October? [q 1.00, tone +1.0] ★
-- 2026-09-29 www.trefis.com — Has MSFT Stock Run Out Of Steam? [q 0.85, tone +1.0] ★
-- 2026-09-29 247wallst.com — Apple Falls 2% as Bank of America Flags Meta’s Shopping Agent; Alphabet Slips, Microsoft Holds Steady [q 0.85, tone -1.0] ★
-- 2026-09-29 Yahoo — Prediction: The Next Phase of Amazon’s Growth Could Be Its Most Profitable Yet [q 0.85, tone +1.0] ★
-- 2026-09-29 Yahoo — Application Integration Market Report 2026: Capitalize on the $60.73 Billion Market by 2030 as iPaaS, Multi-Cloud and Cybersecurity Disrupt Enterprise IT—Benchmark Microsoft, IBM, Oracle, SAP and Salesforce to Secure Share at 21.1% CAGR [q 0.85, tone +1.0] ★
-- 2026-09-29 Yahoo — Digital Transformation Market Report 2026: Capitalize on the $2.47 Trillion Revenue Surge to $5.01 Trillion by 2030 as Microsoft, Google, IBM, Accenture and Oracle Accelerate AI, Cloud and Automation Disruption [q 0.85, tone +0.3] ★
-- 2026-09-29 Yahoo — Next Generation Computing Market Report 2026: Capitalize on the $486 Billion Revenue Surge to $811.85 Billion by 2030 as Microsoft, AWS, NVIDIA, IBM and Intel Accelerate AI, Quantum and Edge Computing Disruption [q 0.85, tone +1.0] ★
-- 2026-09-29 Yahoo — IT BFSI Market Report 2026: Capitalize on the $171.25 Billion Revenue Surge to $359.2 Billion by 2030 as AI, Cloud and Cybersecurity Disrupt Competition Across Microsoft, AWS, Accenture, IBM and Oracle [q 0.85, tone +0.3] ★
+- 2026-09-30 Yahoo — Microsoft Stock Is Having Its Best Quarter Since 1991 [q 0.85, tone +0.0] ★
+- 2026-09-30 Yahoo — Why Gabelli Bought Microsoft Corporation (MSFT) Near Its 52-Week Lows [q 0.85, tone +1.0] ★
+- 2026-09-30 Yahoo — The AI Revolution Could Be Microsoft’s Next Trillion-Dollar Opportunity [q 0.85, tone +1.0] ★
+- 2026-09-30 Benzinga — Growth Leads Sectors In Wednesday Trading As Defensives Trail [q 0.85, tone +1.0] ★
+- 2026-09-30 SeekingAlpha — Microsoft: Copilot Finally Has A Plan [q 0.85, tone +1.0] ★
+- 2026-09-30 Yahoo — Could Amazon Stock Survive AI Spending Outrunning Its Cash? [q 0.85, tone -1.0] ★
 - upcoming 2026-10-27 earnings_result — Q1 2027 results (finnhub)
-- snapshot: P/E (ttm) 28.00 (finnhub, 2026-09-28) · P/B 6.26 (finnhub, 2026-09-05) · EPS (ttm) 17.95 (finnhub, 2026-09-05) · dividend yield 0.79 (finnhub, 2026-09-05) · beta 1.06 (finnhub, 2026-09-27) · 52w high 553.72 (finnhub, 2026-09-05) · 52w low 349.20 (finnhub, 2026-09-05) · target (consensus) 559.33 (fmp, 2026-09-30) · analysts: buy 41 (finnhub, 2026-09-05) · analysts: hold 5 (finnhub, 2026-09-05) · analysts: sell 0 (finnhub, 2026-09-05) · vendor sentiment 0.12 (alphavantage_news, 2026-09-29) · revenue (last quarter) 90.01bn (sec_xbrl, 2026-07-29) · net income (last quarter) 35.77bn (sec_xbrl, 2026-07-29) · last EPS surprise % 9.53 (finnhub, 2026-09-05)
+- snapshot: P/E (ttm) 27.92 (finnhub, 2026-09-30) · P/B 6.26 (finnhub, 2026-09-05) · EPS (ttm) 17.95 (finnhub, 2026-09-05) · dividend yield 0.79 (finnhub, 2026-09-05) · beta 1.06 (finnhub, 2026-09-30) · 52w high 553.72 (finnhub, 2026-09-05) · 52w low 349.20 (finnhub, 2026-09-05) · target (consensus) 559.33 (fmp, 2026-09-30) · analysts: buy 41 (finnhub, 2026-09-05) · analysts: hold 5 (finnhub, 2026-09-05) · analysts: sell 0 (finnhub, 2026-09-05) · vendor sentiment 0.33 (alphavantage_news, 2026-09-30) · revenue (last quarter) 90.01bn (sec_xbrl, 2026-07-29) · net income (last quarter) 35.77bn (sec_xbrl, 2026-07-29) · last EPS surprise % 9.53 (finnhub, 2026-09-05)
 
 ## Macro
 
@@ -97,6 +97,14 @@ Generated 2026-09-30 18:06 UTC · slot `all` · 11368 articles in the corpus, 48
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 22:47 | eodhd | ok | 0 | 0 | 0 | facts 0; EODHD plan: free (2 names a day, US only, rotated); XNAS:NVDA: deferred |
+| 22:47 | jin10_flash | ok | 21 | 7 | 4 | facts 0;  |
+| 22:47 | alphavantage_news | ok | 35 | 35 | 32 | facts 6; XNAS:MSFT: alphavantage quota exhausted for today: Thank you for using  |
+| 22:47 | finnhub | ok | 329 | 281 | 227 | facts 9;  |
+| 22:47 | edgar | ok | 6 | 0 | 0 | facts 0;  |
+| 22:47 | yahoo_rss | ok | 47 | 47 | 39 | named the company: 47 of 47 (lowest: Apple 14/14, Microsoft 15/15, NVIDIA 18/18) |
+| 22:47 | google_news | ok | 168 | 140 | 130 | named the company: 131 of 140 (lowest: NVIDIA 48/53, Apple 48/51, Microsoft 35/3 |
+| 22:47 | gdelt | failed | 0 | 0 | 0 | no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP |
 | 18:06 | dbnomics | ok | 450 | 0 | 0 | facts 0;  |
 | 18:06 | jin10_flash | ok | 18 | 2 | 1 | facts 0;  |
 | 18:06 | fred | ok | 481 | 0 | 0 | facts 21; release calendar: 'FOMC Press Release' listed on 15 days of the fortni |
