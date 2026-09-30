@@ -15,13 +15,39 @@ from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
 
-from engines.paper.store import CONTROL, DECIDED, PaperStore
+from engines.paper.store import CONTROL, DECIDED, INDEX, PaperStore
 
 PAPER_DIR = Path("knowledge/paper")
 
 
 def _fmt_pct(x: Decimal | float | None) -> str:
     return "-" if x is None else f"{float(x):+.2%}"
+
+
+def _index_changes(changes, resolved) -> list[str]:
+    """The index book's day as totals, and every target it could not apply."""
+    out: list[str] = []
+    if changes:
+        counts: dict[str, int] = {}
+        for c in changes:
+            counts[c.action] = counts.get(c.action, 0) + 1
+        fees = sum((c.fee_usd for c in changes), Decimal(0))
+        spread = sum((c.fx_spread_usd for c in changes), Decimal(0))
+        slip = sum((c.slippage_usd for c in changes), Decimal(0))
+        cash = sum((c.cash_delta_usd for c in changes), Decimal(0))
+        out.append(
+            f"- {len(changes)} position change(s): "
+            + ", ".join(f"{k} {v}" for k, v in sorted(counts.items()))
+            + f"; fees USD {fees:,.2f}, fx spread {spread:,.2f}, slippage {slip:,.2f}, "
+            f"cash {cash:+,.2f}"
+        )
+    by_status: dict[str, list[str]] = {}
+    for t, a in resolved:
+        by_status.setdefault(a.status, []).append(f"{t.instrument_id} ({a.detail})")
+    for status_, rows in sorted(by_status.items()):
+        out.append(f"- {status_} {len(rows)}: " + "; ".join(rows))
+    out.append("")
+    return out
 
 
 def build_paper_pack(
@@ -69,8 +95,9 @@ def build_paper_pack(
         st = status(store, cfg, feed, fx, day=day)
         out += ["## Status", "", "```", st.render(), "```", ""]
 
+        books = (DECIDED, CONTROL) + ((INDEX,) if store.has_book(INDEX) else ())
         out += ["## Today's changes", ""]
-        for book in (DECIDED, CONTROL):
+        for book in books:
             changes = store.changes(book, start=day, end=day)
             resolved = [
                 (t, a)
@@ -82,6 +109,10 @@ def build_paper_pack(
                 continue
             out.append(f"### {book}")
             out.append("")
+            if book == INDEX:
+                # A rebalance is a hundred rows; the page needs the totals.
+                out += _index_changes(changes, resolved)
+                continue
             if changes:
                 out.append(
                     "| action | name | units | price | fee USD | fx spread USD | slippage USD | cash USD | realised USD |"
@@ -106,7 +137,7 @@ def build_paper_pack(
             "| book | day | equity USD | cash | positions | day return | drawdown | halted |",
             "|---|---|---|---|---|---|---|---|",
         ]
-        for book in (DECIDED, CONTROL):
+        for book in books:
             marks = store.marks(book)
             today = [m for m in marks if m.day == day]
             m = today[-1] if today else (marks[-1] if marks else None)

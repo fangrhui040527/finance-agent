@@ -13,12 +13,13 @@ import json
 from dataclasses import asdict, dataclass, field
 from datetime import UTC, date, datetime
 from decimal import Decimal
+from pathlib import Path
 
 from engines.backtest.metrics import drawdown_profile
 from engines.paper.book import current_weights, settings_of, turnover_used
 from engines.paper.fx import UsdMyr
 from engines.paper.rules import Fundable, Phase, fundables, min_names, names_rule, phase_for
-from engines.paper.store import CONTROL, DECIDED, MarkRow, PaperStore, TargetRow
+from engines.paper.store import CONTROL, DECIDED, INDEX, MarkRow, PaperStore, TargetRow
 
 
 @dataclass
@@ -27,6 +28,113 @@ class CapRow:
     value: str
     limit: str
     breached: bool
+
+
+@dataclass
+class IndexLine:
+    """The index book in one reading, and the other two books over its window.
+
+    Its window, because it opened later than they did: a return "to date" for
+    each book would compare different stretches of the market. `since` is the
+    index book's opening day, and every return here runs from the last mark on
+    or before it.
+    """
+
+    opened_on: date
+    notional_usd: Decimal
+    universe: str
+    members: int
+    marked_on: date | None
+    equity_usd: Decimal
+    cash_usd: Decimal
+    names_held: int
+    pending: int
+    cost_pct: Decimal
+    index_return: Decimal | None
+    decided_return: Decimal | None
+    control_return: Decimal | None
+
+    def as_json(self) -> dict:
+        def f(x: Decimal | None) -> float | None:
+            return float(x) if x is not None else None
+
+        return {
+            "opened_on": self.opened_on.isoformat(),
+            "notional_usd": float(self.notional_usd),
+            "universe": self.universe,
+            "members": self.members,
+            "marked_on": self.marked_on.isoformat() if self.marked_on else None,
+            "equity_usd": float(self.equity_usd),
+            "cash_usd": float(self.cash_usd),
+            "names_held": self.names_held,
+            "pending": self.pending,
+            "cost_pct_of_notional": float(self.cost_pct),
+            "since": self.opened_on.isoformat(),
+            "index_return": f(self.index_return),
+            "decided_return": f(self.decided_return),
+            "control_return": f(self.control_return),
+        }
+
+    def render(self) -> list[str]:
+        L = [
+            f"  index book: {self.universe}, equal weight, opened {self.opened_on} at notional "
+            f"USD {self.notional_usd:,.0f} - a scale for percentages, not money"
+        ]
+        if self.marked_on is None:
+            L.append("    not yet marked")
+            return L
+        L.append(
+            f"    equity USD {self.equity_usd:,.2f}  cash {self.cash_usd:,.2f}  "
+            f"{self.names_held} of {self.members} names held  {self.pending} pending  "
+            f"cost to date {self.cost_pct:.2%} of notional"
+        )
+
+        def pct(x: Decimal | None) -> str:
+            return "-" if x is None else f"{x:+.2%}"
+
+        L.append(
+            f"    since {self.opened_on}: index {pct(self.index_return)}  decided "
+            f"{pct(self.decided_return)}  control {pct(self.control_return)}"
+        )
+        return L
+
+
+def _since(store: PaperStore, book: str, start: date, day: date) -> Decimal | None:
+    """A book's return from its last mark on or before `start` to its last on or before `day`."""
+    now = store.latest_mark(book, on_or_before=day)
+    base = store.latest_mark(book, on_or_before=start)
+    base_equity = base.equity_usd if base else store.initial_cash(book)
+    if now is None or base_equity <= 0:
+        return None
+    return now.equity_usd / base_equity - 1
+
+
+def index_line(store: PaperStore, day: date) -> IndexLine | None:
+    if not store.has_book(INDEX):
+        return None
+    opened = store.book_opened_on(INDEX)
+    assert opened is not None
+    terms = store.book_terms(INDEX)
+    notional = store.initial_cash(INDEX)
+    m = store.latest_mark(INDEX, on_or_before=day)
+    cost = store.cost_to_date(INDEX)
+    name = str(terms.get("universe") or "index")
+    label = Path(name).stem.upper() if name else "INDEX"
+    return IndexLine(
+        opened_on=opened,
+        notional_usd=notional,
+        universe=label,
+        members=int(terms.get("universe_names") or 0),
+        marked_on=m.day if m else None,
+        equity_usd=m.equity_usd if m else notional,
+        cash_usd=m.cash_usd if m else notional,
+        names_held=len(m.positions) if m else 0,
+        pending=len(store.pending_targets(INDEX)),
+        cost_pct=cost.pct_of_initial,
+        index_return=(m.equity_usd / notional - 1) if (m and notional > 0) else None,
+        decided_return=_since(store, DECIDED, opened, day) if m else None,
+        control_return=_since(store, CONTROL, opened, day) if m else None,
+    )
 
 
 @dataclass
@@ -57,6 +165,8 @@ class Status:
     return_to_date: Decimal | None
     control_return_to_date: Decimal | None
     notes: list[str] = field(default_factory=list)
+    #: The index book (engines/paper/index.py), or None while it is not open.
+    index: IndexLine | None = None
 
     def as_json(self) -> dict:
         d = {
@@ -125,6 +235,7 @@ class Status:
             },
             "cost": self.cost,
             "notes": self.notes,
+            "index": self.index.as_json() if self.index else None,
         }
         return d
 
@@ -167,6 +278,8 @@ class Status:
                 L.append(f"  return to date {self.return_to_date:+.2%}{ctl}")
             if self.control_equity_usd is not None:
                 L.append(f"  control book equity USD {self.control_equity_usd:,.2f}")
+        if self.index is not None:
+            L += self.index.render()
         L.append("")
         L.append("  positions")
         if not self.positions:
@@ -317,6 +430,7 @@ def status(store: PaperStore, cfg, feed, fx: UsdMyr, *, day: date | None = None)
         return_to_date=(equity / initial - 1) if (m and initial > 0) else None,
         control_return_to_date=(mc.equity_usd / initial - 1) if (mc and initial > 0) else None,
         notes=notes,
+        index=index_line(store, day),
     )
 
 
