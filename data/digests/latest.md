@@ -1,26 +1,35 @@
 # Digest 2026-09-30
 
-Generated 2026-09-30 00:27 UTC · slot `all` · 11249 articles in the corpus, 4843 observations, 4149 events in the fact book.
+Generated 2026-09-30 10:09 UTC · slot `all` · 11367 articles in the corpus, 4848 observations, 4149 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- quiet: nothing collected for this name in the window
+- tone: 4 stories from 4 sources, polarity +0.25, peak intensity 0.00, uncertainty 0.00 · 1 escalated
+- 2026-09-30 www.kaohooninternational.com — Maybank Forecasts Robust 4Q26 Recovery for ADVANC, Maintains ‘Buy’ With THB387 Target [q 0.65, tone +1.0] ★
+- 2026-09-30 www.businesstoday.com.my — Stock Today: Maybank Gains 0.5% In Afternoon Trade [q 0.80, tone +0.0]
+- 2026-09-30 www.nst.com.my — Maybank, Gallant Venture to develop Bintan halal hub [q 0.80, tone +0.0]
+- 2026-09-30 www.moomoo.com — $RHBBANKC82 (MAYBANK INVESTMENT BANK BHD) (106682.MY)$ [q 0.65, tone +0.0]
 
 ### Tenaga (MYX:5347)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-09-30 scanx.trade — Shree TNB Polymers IPO Day 3: Subscribed 0.51x; QIB demand stalls at 0.75x [q 0.65, tone +0.0]
 
 ### Petronas Chemicals (MYX:5183)
 - quiet: nothing collected for this name in the window
 
 ### IHH (MYX:5225)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 1 escalated
+- 2026-09-30 health.economictimes.indiatimes.com — IHH plans to raise Fortis stake to 51%, expand capacity to 10,000 beds by 2031 [q 0.65, tone +0.0] ★
 
 ### Press Metal (MYX:8869)
 - quiet: nothing collected for this name in the window
 
 ### Genting (MYX:3182)
-- quiet: nothing collected for this name in the window
+- tone: 3 stories from 3 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.33 · 2 escalated
+- 2026-09-30 www.nst.com.my — Ren Bao set for Genting climb after strong finish [q 1.00, tone +1.0] ★
+- 2026-09-30 www.gambling.com — UK Tax Hike Could Close 13 Genting Casinos, Cut 900 Jobs [q 0.65, tone -1.0] ★
+- 2026-09-30 www.thestar.com.my — Peak convenience: Inside Resorts World Genting connected ecosystem for guests [q 0.80, tone +0.0]
 
 ### NVIDIA (XNAS:NVDA)
 - tone: 127 stories from 25 sources, polarity +0.27, peak intensity 0.67, uncertainty 0.16 · 35 escalated
@@ -81,6 +90,20 @@ Generated 2026-09-30 00:27 UTC · slot `all` · 11249 articles in the corpus, 48
 | 10y minus 2y Treasury spread, % | 0.32 | 2026-09-28 | -0.04 | fred |
 | US unemployment rate, % | 4.10 | 2026-08-01 | +0 | fred |
 | CBOE VIX, index | 14.21 | 2026-09-22 | -0.66 | fred |
+
+## Collection
+
+| at (UTC) | source | status | fetched | kept | stored | detail |
+|---|---|---|---|---|---|---|
+| 10:08 | eodhd | ok | 0 | 0 | 0 | facts 0; EODHD plan: free (2 names a day, US only, rotated); MYX:5183: deferred  |
+| 10:08 | twse_openapi | ok | 8 | 0 | 0 | facts 5;  |
+| 10:08 | jin10_flash | ok | 17 | 6 | 2 | facts 0;  |
+| 10:08 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 10:08 | nst_business | ok | 50 | 50 | 50 |  |
+| 10:08 | fmt_business | ok | 50 | 50 | 50 |  |
+| 10:08 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Petronas Chemicals, IHH, Press Metal, Genting, Maybank, Tenaga |
+| 10:08 | google_news | ok | 27 | 22 | 16 | read but empty: Press Metal; named the company: 11 of 22 (lowest: Petronas Chemi |
+| 10:08 | gdelt | failed | 0 | 0 | 0 | no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP |
 
 ---
 
