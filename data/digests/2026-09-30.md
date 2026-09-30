@@ -1,6 +1,6 @@
 # Digest 2026-09-30
 
-Generated 2026-09-30 10:09 UTC · slot `all` · 11367 articles in the corpus, 4848 observations, 4149 events in the fact book.
+Generated 2026-09-30 18:06 UTC · slot `all` · 11368 articles in the corpus, 4849 observations, 4153 events in the fact book.
 
 ## The book
 
@@ -41,6 +41,7 @@ Generated 2026-09-30 10:09 UTC · slot `all` · 11367 articles in the corpus, 48
 - 2026-09-29 SeekingAlpha — Nvidia: The Valuation Still Doesn't Match The AI Growth [q 0.85, tone +1.0] ★
 - 2026-09-29 Yahoo — Wall Street Is Watching Nvidia. I’m Watching Credo. Here’s My 2027 Price Target [q 0.85, tone +1.0] ★
 - 2026-09-29 Yahoo — Next Generation Computing Market Report 2026: Capitalize on the $486 Billion Revenue Surge to $811.85 Billion by 2030 as Microsoft, AWS, NVIDIA, IBM and Intel Accelerate AI, Quantum and Edge Computing Disruption [q 0.85, tone +1.0] ★
+- event 2026-09-29 rating_reiteration — Rosenblatt maintain Buy (fmp)
 - snapshot: P/E (ttm) 29.03 (finnhub, 2026-09-28) · P/B 28.81 (finnhub, 2026-09-05) · EPS (ttm) 7.91 (finnhub, 2026-09-05) · dividend yield 0.03 (finnhub, 2026-09-05) · beta 2.22 (finnhub, 2026-09-27) · 52w high 236.54 (finnhub, 2026-09-05) · 52w low 164.27 (finnhub, 2026-09-10) · target (consensus) 345.21 (fmp, 2026-09-05) · analysts: buy 41 (finnhub, 2026-09-05) · analysts: hold 3 (finnhub, 2026-09-05) · analysts: sell 1 (finnhub, 2026-09-05) · vendor sentiment 0.31 (alphavantage_news, 2026-09-29) · revenue (last quarter) 96.22bn (sec_xbrl, 2026-08-26) · net income (last quarter) 59.69bn (sec_xbrl, 2026-08-26) · last EPS surprise % 3.82 (finnhub, 2026-09-05)
 
 ### Apple (XNAS:AAPL)
@@ -53,6 +54,7 @@ Generated 2026-09-30 10:09 UTC · slot `all` · 11367 articles in the corpus, 48
 - 2026-09-29 Yahoo — Nvidia Is Spending Big on Buybacks. Why Apple Is the Only Mag 7 Rival Joining In. [q 0.85, tone +1.0] ★
 - 2026-09-29 Benzinga — How Much Do You Need to Have Netflix, Disney and the 8 Major Streaming Platforms? [q 0.85, tone +0.0] ★
 - 2026-09-29 Yahoo Finance — Apple Could Keep Every iPhone Sale Yet Lose Discovery Referral, BofA Warns — Says Muse Concerns Are Overdone [q 0.85, tone +1.0] ★
+- event 2026-09-29 rating_reiteration — Morgan Stanley maintain Overweight (fmp)
 - upcoming 2026-10-29 earnings_result — Q4 2026 results after the close (finnhub)
 - upcoming 2026-10-28 earnings_result — Q4 2026 results after the close (finnhub)
 - snapshot: P/E (ttm) 38.48 (finnhub, 2026-09-28) · P/B 50.98 (finnhub, 2026-09-05) · EPS (ttm) 8.72 (finnhub, 2026-09-05) · dividend yield 0.51 (finnhub, 2026-09-05) · beta 1.09 (finnhub, 2026-09-28) · 52w high 345.34 (finnhub, 2026-09-24) · 52w low 243.42 (finnhub, 2026-09-24) · target (consensus) 342.13 (fmp, 2026-09-20) · analysts: buy 22 (finnhub, 2026-09-05) · analysts: hold 15 (finnhub, 2026-09-05) · analysts: sell 3 (finnhub, 2026-09-05) · vendor sentiment 0.09 (alphavantage_news, 2026-09-29) · revenue (last quarter) 109.42bn (sec_xbrl, 2026-07-31) · net income (last quarter) 29.79bn (sec_xbrl, 2026-07-31) · last EPS surprise % -0.89 (finnhub, 2026-09-05)
@@ -68,33 +70,37 @@ Generated 2026-09-30 10:09 UTC · slot `all` · 11367 articles in the corpus, 48
 - 2026-09-29 Yahoo — Next Generation Computing Market Report 2026: Capitalize on the $486 Billion Revenue Surge to $811.85 Billion by 2030 as Microsoft, AWS, NVIDIA, IBM and Intel Accelerate AI, Quantum and Edge Computing Disruption [q 0.85, tone +1.0] ★
 - 2026-09-29 Yahoo — IT BFSI Market Report 2026: Capitalize on the $171.25 Billion Revenue Surge to $359.2 Billion by 2030 as AI, Cloud and Cybersecurity Disrupt Competition Across Microsoft, AWS, Accenture, IBM and Oracle [q 0.85, tone +0.3] ★
 - upcoming 2026-10-27 earnings_result — Q1 2027 results (finnhub)
-- snapshot: P/E (ttm) 28.00 (finnhub, 2026-09-28) · P/B 6.26 (finnhub, 2026-09-05) · EPS (ttm) 17.95 (finnhub, 2026-09-05) · dividend yield 0.79 (finnhub, 2026-09-05) · beta 1.06 (finnhub, 2026-09-27) · 52w high 553.72 (finnhub, 2026-09-05) · 52w low 349.20 (finnhub, 2026-09-05) · target (consensus) 556.42 (fmp, 2026-09-23) · analysts: buy 41 (finnhub, 2026-09-05) · analysts: hold 5 (finnhub, 2026-09-05) · analysts: sell 0 (finnhub, 2026-09-05) · vendor sentiment 0.12 (alphavantage_news, 2026-09-29) · revenue (last quarter) 90.01bn (sec_xbrl, 2026-07-29) · net income (last quarter) 35.77bn (sec_xbrl, 2026-07-29) · last EPS surprise % 9.53 (finnhub, 2026-09-05)
+- snapshot: P/E (ttm) 28.00 (finnhub, 2026-09-28) · P/B 6.26 (finnhub, 2026-09-05) · EPS (ttm) 17.95 (finnhub, 2026-09-05) · dividend yield 0.79 (finnhub, 2026-09-05) · beta 1.06 (finnhub, 2026-09-27) · 52w high 553.72 (finnhub, 2026-09-05) · 52w low 349.20 (finnhub, 2026-09-05) · target (consensus) 559.33 (fmp, 2026-09-30) · analysts: buy 41 (finnhub, 2026-09-05) · analysts: hold 5 (finnhub, 2026-09-05) · analysts: sell 0 (finnhub, 2026-09-05) · vendor sentiment 0.12 (alphavantage_news, 2026-09-29) · revenue (last quarter) 90.01bn (sec_xbrl, 2026-07-29) · net income (last quarter) 35.77bn (sec_xbrl, 2026-07-29) · last EPS surprise % 9.53 (finnhub, 2026-09-05)
 
 ## Macro
 
 | series | latest | as of | change | source |
 |---|---|---|---|---|
-| ICE BofA US high-yield option-adjusted spread, % | 3.02 | 2026-09-28 | +0.09 | fred |
+| ICE BofA US high-yield option-adjusted spread, % | 3.08 | 2026-09-29 | +0.06 | fred |
 | BNM Overnight Policy Rate, % | 2.75 | 2026-09-03 | +0 | bnm_opr |
 | US CPI, all items, index 1982-84=100 | 334.13 | 2026-08-01 | +1.318 | fred |
-| Brent crude, USD per barrel (EIA, daily) | 114.89 | 2026-09-22 | -1.26 | fred |
+| Brent crude, USD per barrel (EIA, daily) | 113.96 | 2026-09-29 | -6.01 | fred |
 | Malaysian ringgit per US dollar | 4.07 | 2026-09-25 | -0.0133 | fred |
-| Federal funds effective rate, % | 3.88 | 2026-09-25 | +0 | fred |
-| 10-year Treasury yield, % | 5.17 | 2026-09-25 | -0.01 | fred |
-| 2-year Treasury yield, % | 4.81 | 2026-09-25 | -0.06 | fred |
+| Federal funds effective rate, % | 3.88 | 2026-09-28 | +0 | fred |
+| 10-year Treasury yield, % | 5.24 | 2026-09-28 | +0.07 | fred |
+| 2-year Treasury yield, % | 4.92 | 2026-09-28 | +0.11 | fred |
 | Malaysia CPI headline, index 2010=100 | 137.50 | 2026-08-01 | +0.4 | dosm_cpi |
 | Broad US dollar index | 120.33 | 2026-09-25 | -0.2221 | fred |
-| NASDAQ Composite, index level | 26,820.38 | 2026-09-28 | -248.34 | fred |
+| NASDAQ Composite, index level | 26,797.54 | 2026-09-29 | -22.84 | fred |
 | Aluminium, USD per tonne (IMF PCPS via FRED) | 3,158.26 | 2026-07-01 |  | fred |
-| S&P 500, index level | 7,683.69 | 2026-09-28 | -59.72 | fred |
-| 10y minus 2y Treasury spread, % | 0.32 | 2026-09-28 | -0.04 | fred |
+| S&P 500, index level | 7,670.84 | 2026-09-29 | -12.85 | fred |
+| 10y minus 2y Treasury spread, % | 0.37 | 2026-09-29 | +0.05 | fred |
 | US unemployment rate, % | 4.10 | 2026-08-01 | +0 | fred |
-| CBOE VIX, index | 14.21 | 2026-09-22 | -0.66 | fred |
+| CBOE VIX, index | 16.04 | 2026-09-29 | -0.03 | fred |
 
 ## Collection
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 18:06 | dbnomics | ok | 450 | 0 | 0 | facts 0;  |
+| 18:06 | jin10_flash | ok | 18 | 2 | 1 | facts 0;  |
+| 18:06 | fred | ok | 481 | 0 | 0 | facts 21; release calendar: 'FOMC Press Release' listed on 15 days of the fortni |
+| 18:05 | fmp | ok | 3947 | 0 | 0 | facts 3; fmp /earnings is outside the plan (HTTP 402); not collected for NVDA, A |
 | 10:08 | eodhd | ok | 0 | 0 | 0 | facts 0; EODHD plan: free (2 names a day, US only, rotated); MYX:5183: deferred  |
 | 10:08 | twse_openapi | ok | 8 | 0 | 0 | facts 5;  |
 | 10:08 | jin10_flash | ok | 17 | 6 | 2 | facts 0;  |
