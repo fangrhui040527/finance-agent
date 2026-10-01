@@ -290,6 +290,11 @@ questions:
     all with the ticker in the title - a Stocktwits close wrap, a Stocktwits
     item on compute agreements reported in an IPO prospectus, and a Google News
     press-release headline. TWENTY-FIVE labels.
+
+    A twelfth on the 2026-09-30 us_close sweep, Wednesday's, found by the
+    2026-10-01 self-check: a Stocktwits close wrap with the ticker in its title,
+    and a Finnhub headline on Nvidia's data-centre jobs claim that carries it
+    only in the body. TWENTY-SEVEN labels.
   relevant:
   - doc_id: https://stocktwits.com/news-articles/markets/equity/s-and-p-500-dow-end-best-day-in-a-month/cZsufnBRJvu?.tsrc=rss
     title: S&P 500, Dow End Best Day In A Month On Calmer Yields As Rate Hike Bets Wane — SPCX, VSXY,
@@ -346,6 +351,10 @@ questions:
     title: "SPCX Stock Adds 3%: Anthropic's IPO Prospectus Reportedly Shows $84.5B To SpaceX In Compute Agreements"
   - doc_id: https://stocktwits.com/news-articles/markets/equity/s-and-p-500-dow-extend-losses-from-elevated-yield-pressure-spcx-tgt-aapl-mu-ntap-in-focus/cZMZLlCRBW0?.tsrc=rss
     title: "S&P 500, Dow Extend Losses From Elevated Yield Pressure — SPCX, TGT, AAPL, MU, NTAP In Focus"
+  - doc_id: https://stocktwits.com/news-articles/markets/equity/s-and-p-500-dow-end-lower-as-investors-shrug-off-cooler-than-expected-inflation-data-mgm-spcx-aapl-tsm-in-focus/cZMFmUrRBL1?.tsrc=rss
+    title: "S&P 500, Dow End Lower As Investors Shrug Off Cooler-Than-Expected Inflation Data — MGM, SPCX, AAPL, TSM In Focus"
+  - doc_id: finnhub:142513041
+    title: "Nvidia CEO Jensen Huang: AI data center build-out could create 1 million jobs and reshape the US economy"
 - query: KeyBanc Underweight rating Apple
   kind: lexical
   note: broker plus rating word
