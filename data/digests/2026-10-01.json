@@ -1,18 +1,100 @@
 {
-  "collection": [],
+  "collection": [
+    {
+      "at": "2026-10-01T10:10:12.243484+00:00",
+      "detail": "facts 0; EODHD plan: free (2 names a day, US only, rotated); MYX:8869: deferred by the 2-a-day credit budget; next in rotation; MYX:3182: deferred by the 2-a-day credit budget; next in rotation; MYX:1155: deferred by the 2-a-day credit budget; next in rotation; MYX:5347: deferred by the 2-a-day credit budget; next in rotation; outside the free plan (US only), so not asked for: MYX:1155, MYX:5347, MYX:8869, MYX:3182. The EODHD Fundamentals plan covers KLSE and TW.; MYX:5183: EODHD free plan: US only; the Fundamentals plan covers KLSE; MYX:5225: EODHD free plan: US only; the Fundamentals plan covers KLSE",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-01T10:10:11.949035+00:00",
+      "detail": "facts 5; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-01T10:09:40.005175+00:00",
+      "detail": "facts 0; ",
+      "fetched": 19,
+      "kept": 5,
+      "source": "jin10_flash",
+      "status": "ok",
+      "stored": 3
+    },
+    {
+      "at": "2026-10-01T10:09:39.046385+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-01T10:09:37.091011+00:00",
+      "detail": "",
+      "fetched": 50,
+      "kept": 50,
+      "source": "nst_business",
+      "status": "ok",
+      "stored": 48
+    },
+    {
+      "at": "2026-10-01T10:09:36.799731+00:00",
+      "detail": "",
+      "fetched": 50,
+      "kept": 50,
+      "source": "fmt_business",
+      "status": "ok",
+      "stored": 50
+    },
+    {
+      "at": "2026-10-01T10:09:36.564823+00:00",
+      "detail": "read but empty: Genting, Maybank, Tenaga, Petronas Chemicals, IHH, Press Metal",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-01T10:09:35.088097+00:00",
+      "detail": "read but empty: Petronas Chemicals, Press Metal; named the company: 6 of 15 (lowest: Genting 0/2, IHH 0/2, Tenaga 1/4)",
+      "fetched": 15,
+      "kept": 15,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 13
+    },
+    {
+      "at": "2026-10-01T10:09:32.958794+00:00",
+      "detail": "no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked); deferred: Press Metal, Genting, Maybank",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "failed",
+      "stored": 0
+    }
+  ],
   "counts": {
-    "articles": 11800,
+    "articles": 11914,
     "documents": 0,
-    "escalated": 2070,
+    "escalated": 2071,
     "events": 4153,
-    "failed_sweeps": 38,
-    "linked": 8206,
-    "observations": 4864,
+    "failed_sweeps": 39,
+    "linked": 8213,
+    "observations": 4869,
     "series": 31,
-    "sweeps": 609
+    "sweeps": 618
   },
   "day": "2026-10-01",
-  "generated_at": "2026-10-01 00:34 UTC",
+  "generated_at": "2026-10-01 10:11 UTC",
   "macro": [
     {
       "change": "0.06",
@@ -145,13 +227,64 @@
   ],
   "names": [
     {
-      "escalated": 0,
+      "escalated": 1,
       "events": [],
       "instrument_id": "MYX:1155",
       "label": "Maybank",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxPOFRNMV9JOWwyc0tFSnRpUnVrTnM0M0owWkcyaFV2U3YzNlZ0cDlJaW85eTB5T0JjMFNFR1Y0dlJqZ3pfZ05aM3UwSmROa0lmQ1VtSGo5ZzhSU0lMLWNvNkExVk9kd0p5T0VYMktpR0FfTVMxLWtFU3hIbU4wR19KZm56RE5QUXg2Z3ZLdS1WdERiaC1NSFFfaEdXeklxRTE5OGlraTJQMUFZNm9Cak9MaWlGWEhjdVlYRGtrRi13S1pMU2FsYndUYw?oc=5",
+          "domain": "www.ad-hoc-news.de",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-01T08:14:49+00:00",
+          "quality": 0.65,
+          "title": "Malayan Banking lifts profit while Malayan Banking stock has MYR 120.8 billion value",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMilgFBVV95cUxNdDlZbWF1U29kdFVmT3Y4S1lIUFRPT0dyb2hhcE5IckdxbkhvR0JHcHZkZGVPQ3h5Y0UxMzY0LXVRck5RcnBpOFJIelkyWWZYY3F5OGFYeWxEVVpDN1dINGtmT1lYaHo4d3hzWG5hTC02b3VhQWJFR3BUX2t1WnVfRktZQV9uS3piUFRHQS1tNXNkeDZ3Z1E?oc=5",
+          "domain": "fintechnews.sg",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-01T08:43:52+00:00",
+          "quality": 0.65,
+          "title": "Maybank AM Brings First SGD Tokenised Money Market Share Class to Synthesys",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMigwFBVV95cUxQVlUzcENYSnF3VFZtY1lEVWlCOWwtUjY5RFIyWVlNcHJ6c2ZlY0RIamN5dHVjQ29PV0ltS0d4cmxmWUplTTI0TE5uNGhyTmZESWZsVnBtVHdONUVCaFhfWTAwZHpFYjBWM3JoNXBUdEtsTGhqU25jTVNsNWgtVndudFFGTQ?oc=5",
+          "domain": "fintechnews.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-01T03:44:40+00:00",
+          "quality": 0.65,
+          "title": "Maybank, Hong Leong Win Best CEO and CFO Honours at Bursa Malaysia Awards",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMigAJBVV95cUxNeENCZmNOOEx6RlFsUDFibkhFQmtqTzVqQ0tSTFh3MEh1bW9NWW1BcXB0dF9HekRMVXh4Szhqd0N5a0xYLW8yeFNBdEViRkpiaFZObWhUNFZ4QXVaOG9RWi1zR01jUTNUeV9WVFZHckhsRVNEOHUtQmdJQktsTjNsN3R5VGdIUDRidmllblM2eGdKeE5vM0R4NUUzVWktWi1pbWdCSXdvNVUyWlFrMV8yLXpmQ3dJbWltTFNRcDdDc0ZUbUEweXRBbVhWamltb3BlbzdhblU5aGVKWTR5TUlydjlkRER0MUtYLW4zcXRmVGVIbUc4V2ExNW5MUVlnQVJN0gGGAkFVX3lxTE1VR2hXbzBWalc2dHp2cV9SYThCM3RYTHAxa3hCY0l1SzVONENLb2JRNFR1dVJKYVlfbWNtc3ZDeDl3ck12NnN3ZUdwRlNoYnJtT0Q4UTl5djZxZFE3X2Y1MzJfNV9KOHpUYURvNEZJbTgzLXgycFJkYWJrQWl1bTNYOG9sdzNaSGtRQVB3ZWdwLUJtWDFVald1bldIbEpmZVVKMzYwVXFPdVltS2liRWxWTXdVMzJSWE9mcEFTbFY0N3ZVUVAzaWJ2UWFaUWZwa1RVQTc2bG5wdWlHMWFMeU9fWVpYWUl5UjBSTDJURzRmRDc0dTVQVFRobGdHb01HZDU4d1gtUVE?oc=5",
+          "domain": "www.manilatimes.net",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-01T03:13:58+00:00",
+          "quality": 0.65,
+          "title": "Maybank Asset Management brings Tokenised Singapore Dollar Money Market Fund into Synthesys Network",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 4,
+        "polarity_mean": 0.25,
+        "sources": 4,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -160,8 +293,26 @@
       "instrument_id": "MYX:5347",
       "label": "Tenaga",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiugFBVV95cUxQRzhrQVRwZHlTaFlCV2ZfaHMycFNYdVJRX2ZxR1YtZkN3bzRYTGNCVktoVjVkNlFSZjdzemJpNWdfX1N0TzFIckdGU2RMUGFqMmg0SFdJM1E4YXVoVk9Idlh3UExFSU9BaHI4dHNsSGNuRGxkOUFLM0JuZ3lYTE93U29pQ3JjUjVPd0ZnLUVRZlE2cmdKcm1uREZKdTE3a0IyaHNMWUFNd0pXczh0XzE5Z0hZMjYzeFlibkE?oc=5",
+          "domain": "scanx.trade",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-01T05:56:04+00:00",
+          "quality": 0.65,
+          "title": "Shree TNB Polymers IPO Day 4: Subscribed 0.75x; QIB demand flat at 0.75x",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -200,8 +351,37 @@
       "instrument_id": "MYX:3182",
       "label": "Genting",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://www.nst.com.my/sports/cycling/2026/10/1545509/race-rivalry-and-pride-tsen-brothers-ltdl",
+          "domain": "www.nst.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-01T08:57:34+00:00",
+          "quality": 1.0,
+          "title": "Race of rivalry and pride for Tsen brothers at LTdL",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://www.nst.com.my/sports/cycling/2026/10/1545439/breuillard-overcomes-illness-win-ltdl-queen-stage",
+          "domain": "www.nst.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-01T07:40:00+00:00",
+          "quality": 1.0,
+          "title": "Breuillard overcomes illness to win LTdL Queen Stage",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 2,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {

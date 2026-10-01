@@ -1,14 +1,19 @@
 # Digest 2026-10-01
 
-Generated 2026-10-01 00:34 UTC · slot `all` · 11800 articles in the corpus, 4864 observations, 4153 events in the fact book.
+Generated 2026-10-01 10:11 UTC · slot `all` · 11914 articles in the corpus, 4869 observations, 4153 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- quiet: nothing collected for this name in the window
+- tone: 4 stories from 4 sources, polarity +0.25, peak intensity 0.00, uncertainty 0.00 · 1 escalated
+- 2026-10-01 www.ad-hoc-news.de — Malayan Banking lifts profit while Malayan Banking stock has MYR 120.8 billion value [q 0.65, tone +1.0] ★
+- 2026-10-01 fintechnews.sg — Maybank AM Brings First SGD Tokenised Money Market Share Class to Synthesys [q 0.65, tone +0.0]
+- 2026-10-01 fintechnews.my — Maybank, Hong Leong Win Best CEO and CFO Honours at Bursa Malaysia Awards [q 0.65, tone +0.0]
+- 2026-10-01 www.manilatimes.net — Maybank Asset Management brings Tokenised Singapore Dollar Money Market Fund into Synthesys Network [q 0.65, tone +0.0]
 
 ### Tenaga (MYX:5347)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-10-01 scanx.trade — Shree TNB Polymers IPO Day 4: Subscribed 0.75x; QIB demand flat at 0.75x [q 0.65, tone +0.0]
 
 ### Petronas Chemicals (MYX:5183)
 - quiet: nothing collected for this name in the window
@@ -20,7 +25,9 @@ Generated 2026-10-01 00:34 UTC · slot `all` · 11800 articles in the corpus, 48
 - quiet: nothing collected for this name in the window
 
 ### Genting (MYX:3182)
-- quiet: nothing collected for this name in the window
+- tone: 2 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-10-01 www.nst.com.my — Race of rivalry and pride for Tsen brothers at LTdL [q 1.00, tone +0.0]
+- 2026-10-01 www.nst.com.my — Breuillard overcomes illness to win LTdL Queen Stage [q 1.00, tone +0.0]
 
 ### NVIDIA (XNAS:NVDA)
 - tone: 129 stories from 30 sources, polarity +0.17, peak intensity 0.67, uncertainty 0.14 · 28 escalated
@@ -81,6 +88,20 @@ Generated 2026-10-01 00:34 UTC · slot `all` · 11800 articles in the corpus, 48
 | 10y minus 2y Treasury spread, % | 0.37 | 2026-09-29 | +0.05 | fred |
 | US unemployment rate, % | 4.10 | 2026-08-01 | +0 | fred |
 | CBOE VIX, index | 16.04 | 2026-09-29 | -0.03 | fred |
+
+## Collection
+
+| at (UTC) | source | status | fetched | kept | stored | detail |
+|---|---|---|---|---|---|---|
+| 10:10 | eodhd | ok | 0 | 0 | 0 | facts 0; EODHD plan: free (2 names a day, US only, rotated); MYX:8869: deferred  |
+| 10:10 | twse_openapi | ok | 8 | 0 | 0 | facts 5;  |
+| 10:09 | jin10_flash | ok | 19 | 5 | 3 | facts 0;  |
+| 10:09 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 10:09 | nst_business | ok | 50 | 50 | 48 |  |
+| 10:09 | fmt_business | ok | 50 | 50 | 50 |  |
+| 10:09 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Genting, Maybank, Tenaga, Petronas Chemicals, IHH, Press Metal |
+| 10:09 | google_news | ok | 15 | 15 | 13 | read but empty: Petronas Chemicals, Press Metal; named the company: 6 of 15 (low |
+| 10:09 | gdelt | failed | 0 | 0 | 0 | no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP |
 
 ---
 
