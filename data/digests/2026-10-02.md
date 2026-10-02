@@ -1,26 +1,47 @@
 # Digest 2026-10-02
 
-Generated 2026-10-02 00:48 UTC · slot `all` · 12294 articles in the corpus, 4890 observations, 4166 events in the fact book.
+Generated 2026-10-02 15:53 UTC · slot `all` · 12434 articles in the corpus, 4895 observations, 4166 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- quiet: nothing collected for this name in the window
+- tone: 3 stories from 3 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-10-02 www.businesstoday.com.my — Stock Today: Maybank Gains 0.5% After ASB Disposal [q 0.80, tone +0.0]
+- 2026-10-02 serrarigroup.com — Maybank Tokenises SGD Money Market Fund on Synthesys [q 0.65, tone +0.0]
+- 2026-10-02 www.minichart.com.sg — Maybank Keeps BUY on Centurion and Coliwoo as Living Sector Deals Reshape Portfolios [q 0.65, tone +0.0]
 
 ### Tenaga (MYX:5347)
-- quiet: nothing collected for this name in the window
+- tone: 5 stories from 4 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 1 escalated
+- 2026-10-02 www.nst.com.my — TNB share price up on Kenyir project's outlook [q 0.80, tone +0.0] ★
+- 2026-10-02 www.malaymail.com — TNB announces pro-rated relief for households exceeding 600kWh limit in September [q 0.80, tone +0.0]
+- 2026-10-02 freemalaysiatoday.com — TNB customers to get pro rata credit in October bills [q 0.80, tone +0.0]
+- 2026-10-02 www.nst.com.my — CIMB keeps "Buy" call on TNB, RM15.90 target [q 0.80, tone +0.0]
+- 2026-10-02 scanx.trade — Shree TNB Polymers IPO Day 5: Subscribed 1.05x; NII demand leads at 2.65x [q 0.65, tone +0.0]
 
 ### Petronas Chemicals (MYX:5183)
-- quiet: nothing collected for this name in the window
+- tone: 7 stories from 6 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-10-02 theedgemalaysia.com — Gas Malaysia, PETRONAS Chemicals, TXCD, Berjaya Corp, Zetrix AI, Country Heights, Lim Seong Hai, Mah Sing, Kinergy Advancement [q 0.80, tone +0.0]
+- 2026-10-02 www.thestar.com.my — PETRONAS Chemicals appoints Izwan Ismail as MD, CEO effective Jan 1, 2027 [q 0.80, tone +0.0]
+- 2026-10-02 www.theedgemarkets.com — Izwan Ismail appointed PETRONAS Chemicals MD, CEO [q 0.80, tone +0.0]
+- 2026-10-02 theedgemalaysia.com — PETRONAS Chemicals announces CEO's retirement, Izwan Ismail to take over effective Jan 1, 2027 [q 0.80, tone +0.0]
+- 2026-10-02 www.businesstoday.com.my — Petronas Chemicals Appoints Izwan Ismail As MD, CEO From Jan 1 [q 0.80, tone +0.0]
+- 2026-10-02 www.tradingview.com — Petronas Chemicals Appoints Managing Director/CEO [q 0.65, tone +0.0]
+- 2026-10-02 www.moomoo.com — Malaysia Closing Bell on Oct 02 | PCHEM Was the Top Gainer of FBM KLCI [q 0.65, tone +0.0]
 
 ### IHH (MYX:5225)
-- quiet: nothing collected for this name in the window
+- tone: 2 stories from 2 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.07 · 0 escalated
+- 2026-10-02 finance.yahoo.com — Daiichi Sankyo (TSE:4568) Faces Fresh Court Uncertainty After Appeal In Fortis Case [q 1.00, tone +0.0]
+- 2026-10-02 healthcareasiamagazine.com — IHH to cooperate with Fortis audit, stands by its 31% stake purchase [q 0.65, tone +0.0]
 
 ### Press Metal (MYX:8869)
 - quiet: nothing collected for this name in the window
 
 ### Genting (MYX:3182)
-- quiet: nothing collected for this name in the window
+- tone: 4 stories from 3 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-10-02 www.thestar.com.my — Fitch: Genting, Genting Malaysia face challenging deleveraging path [q 0.80, tone +0.0]
+- 2026-10-01 www.thestar.com.my — Cycling: Tsens on the ascent – brothers steal limelight at Genting [q 0.80, tone +0.0]
+- 2026-10-02 sbcnews.co.uk — Coventry bids farewell to Genting Casinos [q 0.65, tone +0.0]
+- 2026-10-02 thesun.my — Sunset By NEON Chapter Two draws more than 14,000 festivalgoers to Genting Highlands [q 0.65, tone +0.0]
 
 ### NVIDIA (XNAS:NVDA)
 - tone: 112 stories from 28 sources, polarity +0.21, peak intensity 0.67, uncertainty 0.17 · 21 escalated
@@ -82,6 +103,20 @@ Generated 2026-10-02 00:48 UTC · slot `all` · 12294 articles in the corpus, 48
 | 10y minus 2y Treasury spread, % | 0.41 | 2026-09-30 | +0.04 | fred |
 | US unemployment rate, % | 4.10 | 2026-08-01 | +0 | fred |
 | CBOE VIX, index | 16.34 | 2026-09-30 | +0.3 | fred |
+
+## Collection
+
+| at (UTC) | source | status | fetched | kept | stored | detail |
+|---|---|---|---|---|---|---|
+| 15:52 | eodhd | ok | 0 | 0 | 0 | facts 0; EODHD plan: free (2 names a day, US only, rotated); MYX:1155: deferred  |
+| 15:52 | twse_openapi | ok | 8 | 0 | 0 | facts 5;  |
+| 15:52 | jin10_flash | ok | 18 | 3 | 2 | facts 0;  |
+| 15:52 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 15:52 | nst_business | ok | 50 | 49 | 47 |  |
+| 15:52 | fmt_business | ok | 50 | 50 | 50 |  |
+| 15:52 | yahoo_rss | ok | 1 | 1 | 1 | read but empty: Genting, Maybank, Tenaga, Petronas Chemicals, Press Metal; named |
+| 15:52 | google_news | ok | 35 | 33 | 25 | read but empty: Press Metal; named the company: 20 of 33 (lowest: Maybank 3/7, I |
+| 15:52 | gdelt | ok | 16 | 15 | 15 | grouped 3 names per request; 2 requests (HTTP 429 on request 2: the rest of the  |
 
 ---
 

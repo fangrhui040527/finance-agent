@@ -1,18 +1,100 @@
 {
-  "collection": [],
+  "collection": [
+    {
+      "at": "2026-10-02T15:52:28.379380+00:00",
+      "detail": "facts 0; EODHD plan: free (2 names a day, US only, rotated); MYX:1155: deferred by the 2-a-day credit budget; next in rotation; MYX:5347: deferred by the 2-a-day credit budget; next in rotation; MYX:5183: deferred by the 2-a-day credit budget; next in rotation; MYX:5225: deferred by the 2-a-day credit budget; next in rotation; outside the free plan (US only), so not asked for: MYX:1155, MYX:5347, MYX:5183, MYX:5225. The EODHD Fundamentals plan covers KLSE and TW.; MYX:8869: EODHD free plan: US only; the Fundamentals plan covers KLSE; MYX:3182: EODHD free plan: US only; the Fundamentals plan covers KLSE",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-02T15:52:27.865595+00:00",
+      "detail": "facts 5; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-02T15:52:22.867530+00:00",
+      "detail": "facts 0; ",
+      "fetched": 18,
+      "kept": 3,
+      "source": "jin10_flash",
+      "status": "ok",
+      "stored": 2
+    },
+    {
+      "at": "2026-10-02T15:52:21.834691+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-02T15:52:19.970175+00:00",
+      "detail": "",
+      "fetched": 50,
+      "kept": 49,
+      "source": "nst_business",
+      "status": "ok",
+      "stored": 47
+    },
+    {
+      "at": "2026-10-02T15:52:19.764466+00:00",
+      "detail": "",
+      "fetched": 50,
+      "kept": 50,
+      "source": "fmt_business",
+      "status": "ok",
+      "stored": 50
+    },
+    {
+      "at": "2026-10-02T15:52:19.613534+00:00",
+      "detail": "read but empty: Genting, Maybank, Tenaga, Petronas Chemicals, Press Metal; named the company: 1 of 1 (lowest: IHH 1/1)",
+      "fetched": 1,
+      "kept": 1,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 1
+    },
+    {
+      "at": "2026-10-02T15:52:17.524320+00:00",
+      "detail": "read but empty: Press Metal; named the company: 20 of 33 (lowest: Maybank 3/7, IHH 2/4, Tenaga 4/8)",
+      "fetched": 35,
+      "kept": 33,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 25
+    },
+    {
+      "at": "2026-10-02T15:52:15.277398+00:00",
+      "detail": "grouped 3 names per request; 2 requests (HTTP 429 on request 2: the rest of the slot is deferred, not asked); read but empty: Petronas Chemicals, IHH; failed: GDELT fetch failed: HTTP Error 429: Too Many Requests (Press Metal, Genting, Maybank); named the company: 2 of 15 (lowest: Tenaga + Petronas Chemicals + IHH 2/15)",
+      "fetched": 16,
+      "kept": 15,
+      "source": "gdelt",
+      "status": "ok",
+      "stored": 15
+    }
+  ],
   "counts": {
-    "articles": 12294,
+    "articles": 12434,
     "documents": 0,
-    "escalated": 2140,
+    "escalated": 2142,
     "events": 4166,
     "failed_sweeps": 40,
-    "linked": 8577,
-    "observations": 4890,
+    "linked": 8601,
+    "observations": 4895,
     "series": 31,
-    "sweeps": 630
+    "sweeps": 639
   },
   "day": "2026-10-02",
-  "generated_at": "2026-10-02 00:48 UTC",
+  "generated_at": "2026-10-02 15:53 UTC",
   "macro": [
     {
       "change": "0.04",
@@ -150,18 +232,120 @@
       "instrument_id": "MYX:1155",
       "label": "Maybank",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMimAFBVV95cUxPdnJrN3llelZhNkU2SVN4N3N0SGI1Uks3ZGxBbTBqT3JTMTBJa245bXV6NnYzMWJxOGVoTTh4R1JvR2RvS2tSeExiVkExUHBVaWp1NmZ6S1U3UWFlckxzTzM0YS1LTGVwLVo5U3RpNnVRSUNNb0RlS1paVWoyLW1zeHBrWWN2N2VnYzE1RlJsXy1kOFBwdVgtRg?oc=5",
+          "domain": "www.businesstoday.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-02T03:14:11+00:00",
+          "quality": 0.8,
+          "title": "Stock Today: Maybank Gains 0.5% After ASB Disposal",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMihAFBVV95cUxNbm5jQTI3cWMzSHNRNWVfTnJFV2xCV21nRnBfTDdwVkdObXFGUnhmb1o1MVR6UHJ1MnIzWVVGOEk4NTF3VEI0eHQzWE9kUS1oUi05dmVMd0cxZVphVXJDbEY1OXU2WGJQZWg3OVNoWjJQSnVxMXdSbnhYdUtpZ1ZFSXpYWEs?oc=5",
+          "domain": "serrarigroup.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-02T07:00:34+00:00",
+          "quality": 0.65,
+          "title": "Maybank Tokenises SGD Money Market Fund on Synthesys",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxNamx4U0NMVkFWNGxrazNZMFNES2JQR21sbUt4OUVYOUNQejFPdUFTLTJsZDdwX0NUcVMyMXZsZWxUV2EyN0VKOE5zTHZaaXRtMURnaFppWl9faWFJMGlPTG5GRVItSWg3bWZZcWlXN0poWVB5SGozYTFDUE9tUUExVkNIUVBMYnZKQnpuS2ZQTExsYkViUlZYems4Z1NfN19QSFFTdS1NUXpHcWphOUM1c0hnYmZlRWU4QUZ2Nmd4aHZrd1k?oc=5",
+          "domain": "www.minichart.com.sg",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-02T02:39:00+00:00",
+          "quality": 0.65,
+          "title": "Maybank Keeps BUY on Centurion and Coliwoo as Living Sector Deals Reshape Portfolios",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 3,
+        "polarity_mean": 0.0,
+        "sources": 3,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
-      "escalated": 0,
+      "escalated": 1,
       "events": [],
       "instrument_id": "MYX:5347",
       "label": "Tenaga",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMingFBVV95cUxOc3MwU1JiaWM5dFFURm1SeHk3ekpyWHB6bXVkM0xWQ0wxbXhlVzFOcUZtY3JiMDFrUXVwaHZ1OTg1RjdJMVJDSGhudlFLYTFQdXRHaWt5S3pMMzBxRkpYaWV6eWVaTVRCM0pGd2otQXBYMUFHR2g1ZXVETXB4dEJQWDhONTJnZ1hXZVBETzN1ZlJfYndhbnpjelY4SklqZw?oc=5",
+          "domain": "www.nst.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-02T04:53:54+00:00",
+          "quality": 0.8,
+          "title": "TNB share price up on Kenyir project's outlook",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMi2wFBVV95cUxPRkhXLS05R2JtRTNKVE9LWFVXdnZJei1kU0RaNGFYcFF1YU5LaVI5RTRoMWNqX1ptem55YlNSY2hUdkF0NnpkYWZ2ZDRsZDZMSS1WVVotQjlKaU1PNERFdnhlQ3hzLXNocWlPNHRQZGxkU2ZabmdxTDRYeHp3TlZjeFJLb0xRZkk4RzVDQkVNUVdrZ1NueEFOczI0Wi1pelV3dlV2RjNGbkRaT1RDX2FkNFI0d1VsYzVLSTUtYW1sNnhxTFYtZEJHMTN3Q0lFeEY2THBDM0tvLTlIOWPSAdsBQVVfeXFMT0ZIVy0tOUdibUUzSlRPS1hVV3Z2SXotZFNEWjRhWHBRdWFOS2lSOUU0aDFjal9abXpueWJTUmNoVHZBdDZ6ZGFmdmQ0bGQ2TEktVlVaLUI5SmlNTzRERXZ4ZUN4cy1zaHFpTzR0UGRsZFNmWm5ncUw0WHh6d05WY3hSS29MUWZJOEc1Q0JFTVFXa2dTbnhBTnMyNFotaXpVd3ZVdkYzRm5EWk9UQ19hZDRSNHdVbGM1S0k1LWFtbDZ4cUxWLWRCRzEzd0NJRXhGNkxwQzNLby05SDlj?oc=5",
+          "domain": "www.malaymail.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-02T04:41:03+00:00",
+          "quality": 0.8,
+          "title": "TNB announces pro-rated relief for households exceeding 600kWh limit in September",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "gdelt:https://www.freemalaysiatoday.com/category/nation/2026/10/02/tnb-customers-to-get-pro-rata-credit-in-october-bills",
+          "domain": "freemalaysiatoday.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-02T04:15:00+00:00",
+          "quality": 0.8,
+          "title": "TNB customers to get pro rata credit in October bills",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMioAFBVV95cUxOMGEzeWtpN2d5XzhZby1aY0ozaDMyWllLWkxubnJhN0lCcFJvRjZtbDRZMnVDU21mc2k0d0FfRzZndDBRLVptVVF0QmM1MXBEakk0SWlsN0w3RHZaYm5vbzlwOEpybUtTVllNcFZJb0RBZkU1RUhUdTFFZm5ta1pBT1JxYzFBTm43cG9mWWdMeUJyaHViZjlhYlJ5NlRwbnhs?oc=5",
+          "domain": "www.nst.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-02T02:29:27+00:00",
+          "quality": 0.8,
+          "title": "CIMB keeps \"Buy\" call on TNB, RM15.90 target",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxPczB4anZwUXQyU3JPT1J2YkU4X3Q0X1M2bU4tY1haVEtYREJHNEwyamktOVRDcU1xcmtta216dElMOGlMTjk1ZjIxd0xIX2xtUWtYSXpkandhWkNOWTVmOUF5bkcwVWU0Rkc5WWVFQ3NkZjhYR0FDVjRyUGxERDdvczMwTWl6OVZnWndBc2h2Sk14YzFhZi1jRmd2cGxPUmE2amMzRVRWcFZEcnZJelpfVkdGeUZXVG5NaGNv?oc=5",
+          "domain": "scanx.trade",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-02T06:04:51+00:00",
+          "quality": 0.65,
+          "title": "Shree TNB Polymers IPO Day 5: Subscribed 1.05x; NII demand leads at 2.65x",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 5,
+        "polarity_mean": 0.0,
+        "sources": 4,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -170,8 +354,92 @@
       "instrument_id": "MYX:5183",
       "label": "Petronas Chemicals",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiUEFVX3lxTFBORFp4bjJMWm84TmtHNFJvNUJ1aHFZUHlZOHUybGIzR0FNMWdaLWNRckdMM3lNMU9pWTZFYnpzT1RjNjM0aEhsTzFsNlhXSFN6?oc=5",
+          "domain": "theedgemalaysia.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-02T14:53:09+00:00",
+          "quality": 0.8,
+          "title": "Gas Malaysia, PETRONAS Chemicals, TXCD, Berjaya Corp, Zetrix AI, Country Heights, Lim Seong Hai, Mah Sing, Kinergy Advancement",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiugFBVV95cUxOS01qd0ROQ0h5RXlhTWdpdGpfNHBLem1CYzVPTF9sMHBMaFNCSURHbERxbERfOGJ3cTVRUGdVYk1hZU51ZXR4enREVFBvaEh1OHZCakpjZk44RUFKZU5GWXNscnU5SGNPT29ld3c1Z1JFNmVja1lxU21QajRzc3g3QlljbHl2X2Z6UF9yRGl5WXM4MjE3NTNRaDhaUzVpd0FSb2MtcnlpaWlwSlFiZWZpVHl5VVZ4VzhzaEE?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-02T10:09:00+00:00",
+          "quality": 0.8,
+          "title": "PETRONAS Chemicals appoints Izwan Ismail as MD, CEO effective Jan 1, 2027",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiU0FVX3lxTFBweTNxbUQtNXJadWI0ZkxVYkdFbGdob3d1cHJsT2d1QmNZcTZFTi0zX3dTMEQ2UTJXR19qV2JjV0M4YkNUajA1UTFHQ0ZFWFBJbzB3?oc=5",
+          "domain": "www.theedgemarkets.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-02T10:03:24+00:00",
+          "quality": 0.8,
+          "title": "Izwan Ismail appointed PETRONAS Chemicals MD, CEO",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE1VVlBSdXRoZUs0RmEwQ0VfMUlZdHBycVoyX0h3TXZCc2Niellib1NiWDgycWpZTHNXWUM5Y0RuRFRMblRibU44UjR2RGNaNTZI?oc=5",
+          "domain": "theedgemalaysia.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-02T10:03:24+00:00",
+          "quality": 0.8,
+          "title": "PETRONAS Chemicals announces CEO's retirement, Izwan Ismail to take over effective Jan 1, 2027",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMipwFBVV95cUxNUzVCMTFidm1kYmNraGY3c1ZueEVYOTZkeXphVDNqVzlMekdlUG1jMzVUNzgzNGppRDdZc3V1UU16VXMtcEFWRGpfaTVHMmhQWGlDNGdkVTZ2QjB1X2QzWlRiUGYyVldOYzRyeTRoTmhXZGFRV3pxeXBMWDdwTmJ5VjdqVE1uM3A5REhmajBZdER5WW9aclIzTUpuWEVYdXJvcjd4LXJPaw?oc=5",
+          "domain": "www.businesstoday.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-02T10:02:15+00:00",
+          "quality": 0.8,
+          "title": "Petronas Chemicals Appoints Izwan Ismail As MD, CEO From Jan 1",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxNVkpjYVB2VnhWdTVhOFBENHdqTFlJb3V2cVJQVDN3WGVTbE9UaTFwS3QtalYtT04waVdoNW1WVXpRcUk4QWpYdEsxaWdFNGpsVmxZdGg5TmRjWUI2TUdYS0MtUGJNUmJWal9MTWNkT0FZQWpMdEFtR2FqSmNkQ0xIaWswYkQ2NkZmYUVuRVFhRzlwU1J0cXc4ZnRSUmM1MkE2YXN4bW5PTG5nWXBwck16QzR1WlJZbWJDWkJF?oc=5",
+          "domain": "www.tradingview.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-02T10:19:02+00:00",
+          "quality": 0.65,
+          "title": "Petronas Chemicals Appoints Managing Director/CEO",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMifkFVX3lxTE5oaVFjUTl2S21LQVlvWUF6MjR5QlZzM0phT0ZvdE1IX2lIYjFfX1dVSnNsSHphTlpjazJVWklGRnIwSWhBeWJsQ3lkcEk3NS1TYUpPV1d0YTBzRFBscWpRVEYtWGpSYS1qUDM4RUhUTGRmZk5tMG1KNDBYYzVQdw?oc=5",
+          "domain": "www.moomoo.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-02T09:20:00+00:00",
+          "quality": 0.65,
+          "title": "Malaysia Closing Bell on Oct 02 | PCHEM Was the Top Gainer of FBM KLCI",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 7,
+        "polarity_mean": 0.0,
+        "sources": 6,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -180,8 +448,37 @@
       "instrument_id": "MYX:5225",
       "label": "IHH",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://finance.yahoo.com/healthcare/articles/daiichi-sankyo-tse-4568-faces-080713202.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-02T08:07:13+00:00",
+          "quality": 1.0,
+          "title": "Daiichi Sankyo (TSE:4568) Faces Fresh Court Uncertainty After Appeal In Fortis Case",
+          "uncertainty": 0.14367816091954022
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxQT2NkTUJLMzR1c2NkNXlTOTRQM21DLW9iMXRnVlVib1NJeGVwdEJYWWFIY1EyQ3NHNDdQaDhSd1NzWDlhdEx1X2UyRk1uUEpZRXhKNW4zNmVZbFFwNFl1emJoOExOV05VWk4ySFg2VVZHNW9yVk9lTzVWcXo1RExIMFdEVkRzQ2ZlekVKaGtvbGRvUHV0UlA0WGdWWG9vWWh3Y1ppYlRpNjhUUQ?oc=5",
+          "domain": "healthcareasiamagazine.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-02T04:01:48+00:00",
+          "quality": 0.65,
+          "title": "IHH to cooperate with Fortis audit, stands by its 31% stake purchase",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 2,
+        "polarity_mean": 0.0,
+        "sources": 2,
+        "uncertainty_mean": 0.072
+      },
       "upcoming": []
     },
     {
@@ -200,8 +497,59 @@
       "instrument_id": "MYX:3182",
       "label": "Genting",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMixAFBVV95cUxPeDk3UUo5RTBxVmhpakNFQUxPMFRNNHRSTFp2Nk5RcDAtRHkxaXlUZ1ZtNjBxSHcxTjZjZG9sTklWRmdZbTJwamU0czBadl9sQzVjR2tWZ0toeFdIckpJa1NQN0pTbk5OYTlIb1Y5Z0ZlYXpGcllmblR0Zmx5bUxEblB0akl3ODdqckdqVlFRbGRsWjJlVklGMzdHRThXSnRMVlBoQjJqMzNLM3Y4aExDZEJBdHg1S09wVFgwY3NoVjVVOWxt?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-02T02:47:00+00:00",
+          "quality": 0.8,
+          "title": "Fitch: Genting, Genting Malaysia face challenging deleveraging path",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMirgFBVV95cUxORjNaSFVUdW9WT0RRTHZqR3hoWUlOSVlwZW5qYmdXOTN4cE94RHJ4QTRfMC1uYUZORjR1OUdUczlDNktCT0IyQU8wZ0hCSHhXNWRGc2tCMEttcHZXRzJqeGd5V1AxZ1VoNHFZVUtxUUNxZ0ozLTkxQlYxMUM4U216YnlBUmx1S3dOMEcycnpsZERJcDJ2VVdpamcxRUtDRm9LN2xCZDJKRzBROVQ4SUE?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-01T23:59:55+00:00",
+          "quality": 0.8,
+          "title": "Cycling: Tsens on the ascent \u2013 brothers steal limelight at Genting",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMid0FVX3lxTE02V1ZldWNJRWQyVkIyT0NTclA0TWtNUUY4eldYT3I2bGV4WjJCQ1M3clV6d0pCTW5xRkIwRTRlZWRKVl9VZ1MtRFM3dGFTZElSQU9xZlE5R0pzZnZHRS11dDhyWUVNdjYtbHY2ZVlZdzJ4aVVaZnlF?oc=5",
+          "domain": "sbcnews.co.uk",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-02T10:26:55+00:00",
+          "quality": 0.65,
+          "title": "Coventry bids farewell to Genting Casinos",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMid0FVX3lxTE9uTXdNTEo1MUFKS2JfYnVHdnVIVXM0eDRFYTZqQm1mOGQ1NTU3QkFweklJb3FsNURVcEpBbnppZzI4V2txV1JLTUFCN3JBRm1nZkk0cWI2T1piUHFIa2tncDhFMUlGMkQwWXZTU1dfRnp6MC1PWGhr?oc=5",
+          "domain": "thesun.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-02T09:26:48+00:00",
+          "quality": 0.65,
+          "title": "Sunset By NEON Chapter Two draws more than 14,000 festivalgoers to Genting Highlands",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 4,
+        "polarity_mean": 0.0,
+        "sources": 3,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
