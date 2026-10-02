@@ -13,6 +13,8 @@ from dataclasses import replace
 from datetime import UTC, date, datetime
 from pathlib import Path
 
+import pytest
+
 from core.config import load as load_config
 from core.market.cache import PriceCache
 from core.monitor import ALERT, WARN, _price_rules, evaluate
@@ -47,6 +49,15 @@ def _cache(path: Path, rows: list[tuple[str, str, str]], body: str = CSV) -> str
 
 def _stale(alerts):
     return [a for a in alerts if a.rule == "price_stale"]
+
+
+@pytest.fixture(autouse=True)
+def _nothing_else_refreshed(monkeypatch):
+    """Left to itself the rule reads the graph and the paper ledger for the
+    peers and members `prices --book` warms; here both are empty unless a case
+    names them, so no case depends on the repository's own graph or book."""
+    monkeypatch.setattr("core.market.warm.graph_lookup", lambda: None)
+    monkeypatch.setattr("core.market.warm.index_members", lambda db: [])
 
 
 def test_a_fresh_book_and_a_book_one_session_behind_are_quiet(tmp_path):
@@ -87,9 +98,9 @@ def test_a_stale_book_name_is_an_alert_that_names_it_and_the_next_step(tmp_path)
 
 def test_a_peer_gets_a_trading_week_and_is_a_warning_on_its_own(tmp_path):
     """The two-week-old peers of 2026-09-19, in miniature: CSX (US) and 1023.KL
-    (Bursa) are in no book and behind no proxy, so they are peers, and the alert
-    names both with their own market's session count - counted on each market's
-    holiday calendar, so Labor Day and Malaysia Day are not sessions."""
+    (Bursa) are graph peers `prices --book` warms, and the alert names both with
+    their own market's session count - counted on each market's holiday
+    calendar, so Labor Day and Malaysia Day are not sessions."""
     path = _cache(
         tmp_path / "p.db",
         [
@@ -100,16 +111,17 @@ def test_a_peer_gets_a_trading_week_and_is_a_warning_on_its_own(tmp_path):
             ("yahoo", "1023.KL", "2026-08-31"),  # thirteen: Malaysia Day 09-16 is not one
         ],
     )
-    alerts = _stale(_price_rules(_cfg(), SATURDAY, path))
+    peers = ["XNAS:INTC", "XNAS:CSX", "MYX:1023"]
+    alerts = _stale(_price_rules(_cfg(), SATURDAY, path, peers=peers))
     assert len(alerts) == 1 and alerts[0].severity == WARN
     assert alerts[0].title == (
         "2 cached prices behind the market's last session: "
-        "1023.KL (peer, 13 sessions behind), CSX (peer, 11 sessions behind)"
+        "MYX:1023 (peer, 13 sessions behind), XNAS:CSX (peer, 11 sessions behind)"
     )
     assert "INTC" not in alerts[0].title
     assert (
-        "13 sessions behind, peer allowed 5: 1023.KL; 11 sessions behind, peer allowed 5: CSX"
-        in (alerts[0].detail)
+        "13 sessions behind, peer allowed 5: MYX:1023; "
+        "11 sessions behind, peer allowed 5: XNAS:CSX" in (alerts[0].detail)
     )
 
 
@@ -117,13 +129,15 @@ def test_the_book_is_named_before_the_peers_and_makes_the_alert_an_alert(tmp_pat
     rows = [("yahoo", f"P{i}", "2026-09-01") for i in range(8)]  # eight peers, thirteen behind
     rows.append(("yahoo", "NVDA", "2026-09-15"))  # a book name, three behind
     path = _cache(tmp_path / "p.db", rows)
-    (alert,) = _stale(_price_rules(_cfg(), SATURDAY, path))
+    peers = [f"XNAS:P{i}" for i in range(8)]
+    (alert,) = _stale(_price_rules(_cfg(), SATURDAY, path, peers=peers))
     assert alert.severity == ALERT
     assert alert.title.startswith(
-        "9 cached prices behind the market's last session: XNAS:NVDA (book, 3 sessions behind), P0"
+        "9 cached prices behind the market's last session: "
+        "XNAS:NVDA (book, 3 sessions behind), XNAS:P0"
     )
     assert alert.title.endswith(" and 3 more")
-    assert [r["name"] for r in alert.evidence["stale"]][:2] == ["XNAS:NVDA", "P0"]
+    assert [r["name"] for r in alert.evidence["stale"]][:2] == ["XNAS:NVDA", "XNAS:P0"]
 
 
 def test_a_weekend_is_not_staleness_and_neither_is_a_session_still_running(tmp_path):
@@ -177,11 +191,11 @@ def test_an_error_page_and_an_unreadable_symbol_are_not_judged(tmp_path):
     its next read. A symbol no suffix table accounts for has no calendar to be
     judged against, and guessing one would judge it against the wrong market."""
     path = _cache(tmp_path / "p.db", [("yahoo", "CSX", "2026-08-01")], body=ERROR_PAGE)
-    assert _price_rules(_cfg(), SATURDAY, path) == []
+    assert _price_rules(_cfg(), SATURDAY, path, peers=["XNAS:CSX"]) == []
     path = _cache(
         tmp_path / "q.db", [("yahoo", "ABC.XX", "2026-08-01"), ("other", "CSX", "2026-08-01")]
     )
-    assert _price_rules(_cfg(), SATURDAY, path) == []
+    assert _price_rules(_cfg(), SATURDAY, path, peers=["XNAS:CSX"]) == []
 
 
 def test_no_cache_file_is_a_no_op_that_creates_none(tmp_path):
@@ -196,7 +210,7 @@ def test_the_rule_is_registered_where_watch_and_open_alerts_read(tmp_path, monke
     monkeypatch.setattr("core.monitor.FEEDBACK_DIR", "tests/no-such-feedback")
     ledger = tmp_path / "led.db"
     ProvenanceLedger(ledger).close()
-    path = _cache(tmp_path / "p.db", [("yahoo", "CSX", "2026-09-02")])
+    path = _cache(tmp_path / "p.db", [("yahoo", "NVDA", "2026-09-02")])
 
     alerts = evaluate(_cfg(), db=str(ledger), now=SATURDAY, price_cache=path)
     assert [a.rule for a in _stale(alerts)] == ["price_stale"]
@@ -221,3 +235,93 @@ def test_the_feeds_read_their_own_symbols_back_and_refuse_the_rest():
     # Round trip for every id the book writes.
     for iid in ("MYX:1155", "XNAS:NVDA", "MYX:^KLSE"):
         assert y.instrument_of(y.symbol_for(iid)) in (iid, iid.replace("MYX:", "XKLS:"))
+
+
+def test_a_row_nothing_refreshes_is_not_judged(tmp_path):
+    """The 2026-09-30 finding: fifteen rows comps had asked about once - KO, PFE,
+    SIRI and the like - were in no set `prices --book` warms, so a warning whose
+    next step was that command could never clear. Only the warmed peer is named."""
+    path = _cache(
+        tmp_path / "p.db",
+        [
+            ("yahoo", "1155.KL", "2026-09-18"),
+            ("yahoo", "NVDA", "2026-09-18"),
+            ("yahoo", "KO", "2026-08-24"),
+            ("yahoo", "PFE", "2026-08-24"),
+            ("yahoo", "4197.KL", "2026-08-24"),
+            ("yahoo", "AMD", "2026-09-01"),
+        ],
+    )
+    assert _price_rules(_cfg(), SATURDAY, path, peers=[], members=[]) == []
+    (alert,) = _stale(_price_rules(_cfg(), SATURDAY, path, peers=["XNAS:AMD"], members=[]))
+    assert alert.severity == WARN
+    assert [(r["name"], r["role"]) for r in alert.evidence["stale"]] == [("XNAS:AMD", "peer")]
+    assert "KO" not in alert.title and "4197" not in alert.title
+
+
+def test_an_index_member_is_judged_once_the_ledger_opens_the_book(tmp_path):
+    """The collector fetches the members at every Bursa close once the index book
+    is open, and the book marks around a member it cannot price: a trading week,
+    then a warning that names the role."""
+    path = _cache(tmp_path / "p.db", [("yahoo", "5296.KL", "2026-09-01")])
+    assert _price_rules(_cfg(), SATURDAY, path, members=[]) == []
+    (alert,) = _stale(_price_rules(_cfg(), SATURDAY, path, members=["MYX:5296"]))
+    assert alert.severity == WARN
+    (row,) = alert.evidence["stale"]
+    assert (row["name"], row["role"], row["allowed"]) == ("MYX:5296", "index", 5)
+    assert "index book's members" in alert.next_step
+
+
+def test_left_to_itself_the_rule_reads_the_sets_prices_book_warms(tmp_path, monkeypatch):
+    """No seams passed: the peers come from the graph through the same
+    `warm_peers` the collector's price step calls, and the members from the
+    ledger. A peer in another market, and a graph neighbour already in the book,
+    are warmed by nothing, so they are not judged either."""
+    import ask
+    from core.market import warm
+
+    graph = {
+        "XNAS:NVDA": {"XNAS:AMD", "MYX:1023"},  # 1023 is another market: never warmed
+        "MYX:1155": {"MYX:1295", "XNAS:NVDA"},
+    }
+
+    def lookup(iid, asof):
+        return graph.get(iid, set())
+
+    monkeypatch.setattr("core.market.warm.graph_lookup", lambda: lookup)
+    monkeypatch.setattr("core.market.warm.index_members", lambda db: ["MYX:5296"])
+    path = _cache(
+        tmp_path / "p.db",
+        [
+            ("yahoo", "1155.KL", "2026-09-18"),
+            ("yahoo", "NVDA", "2026-09-18"),
+            ("yahoo", "AMD", "2026-09-01"),
+            ("yahoo", "1295.KL", "2026-09-01"),
+            ("yahoo", "5296.KL", "2026-09-01"),
+            ("yahoo", "KO", "2026-09-01"),
+        ],
+    )
+    (alert,) = _stale(_price_rules(_cfg(), SATURDAY, path))
+    judged = {(r["name"], r["role"]) for r in alert.evidence["stale"]}
+    assert judged == {("XNAS:AMD", "peer"), ("MYX:1295", "peer"), ("MYX:5296", "index")}
+    book = ["MYX:1155", "XNAS:NVDA"]
+    assert {n for n, role in judged if role == "peer"} == set(
+        ask._book_peers(book, SATURDAY.date(), lookup)
+    )
+    assert ask.PEER_WARM_CAP == warm.WARM_CAP
+
+
+def test_a_graph_that_will_not_load_judges_no_peers_and_still_the_book(tmp_path, monkeypatch):
+    """`prices --book` skips the peers when the graph raises; the rule does the
+    same rather than lose the book's judgement to it."""
+
+    def broken():
+        raise RuntimeError("graph.db is not a database")
+
+    monkeypatch.setattr("core.market.warm.graph_lookup", broken)
+    path = _cache(
+        tmp_path / "p.db", [("yahoo", "NVDA", "2026-09-15"), ("yahoo", "AMD", "2026-09-01")]
+    )
+    (alert,) = _stale(_price_rules(_cfg(), SATURDAY, path))
+    assert alert.severity == ALERT
+    assert [r["name"] for r in alert.evidence["stale"]] == ["XNAS:NVDA"]
