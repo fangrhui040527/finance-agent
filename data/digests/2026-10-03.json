@@ -1,6 +1,87 @@
 {
   "collection": [
     {
+      "at": "2026-10-03T14:20:48.335801+00:00",
+      "detail": "facts 0; EODHD plan: free (2 names a day, US only, rotated); MYX:5183: deferred by the 2-a-day credit budget; next in rotation; MYX:5225: deferred by the 2-a-day credit budget; next in rotation; MYX:8869: deferred by the 2-a-day credit budget; next in rotation; MYX:3182: deferred by the 2-a-day credit budget; next in rotation; outside the free plan (US only), so not asked for: MYX:5183, MYX:5225, MYX:8869, MYX:3182. The EODHD Fundamentals plan covers KLSE and TW.; MYX:1155: EODHD free plan: US only; the Fundamentals plan covers KLSE; MYX:5347: EODHD free plan: US only; the Fundamentals plan covers KLSE",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-03T14:20:48.258218+00:00",
+      "detail": "facts 5; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-03T14:20:39.738233+00:00",
+      "detail": "facts 0; ",
+      "fetched": 18,
+      "kept": 8,
+      "source": "jin10_flash",
+      "status": "ok",
+      "stored": 7
+    },
+    {
+      "at": "2026-10-03T14:20:38.798136+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-03T14:20:37.259063+00:00",
+      "detail": "",
+      "fetched": 50,
+      "kept": 46,
+      "source": "nst_business",
+      "status": "ok",
+      "stored": 44
+    },
+    {
+      "at": "2026-10-03T14:20:36.899661+00:00",
+      "detail": "",
+      "fetched": 40,
+      "kept": 40,
+      "source": "fmt_business",
+      "status": "ok",
+      "stored": 40
+    },
+    {
+      "at": "2026-10-03T14:20:36.805187+00:00",
+      "detail": "read but empty: Petronas Chemicals, IHH, Press Metal, Genting, Maybank, Tenaga",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-03T14:20:35.195014+00:00",
+      "detail": "read but empty: Petronas Chemicals, Press Metal; named the company: 3 of 3 (lowest: IHH 1/1, Maybank 1/1, Tenaga 1/1)",
+      "fetched": 4,
+      "kept": 3,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 3
+    },
+    {
+      "at": "2026-10-03T14:20:33.563280+00:00",
+      "detail": "no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked); deferred: Petronas Chemicals, IHH, Press Metal",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "failed",
+      "stored": 0
+    },
+    {
       "at": "2026-10-03T00:31:29.434562+00:00",
       "detail": "facts 0; EODHD plan: free (2 names a day, US only, rotated); XNAS:NVDA: deferred by the 2-a-day credit budget; next in rotation; XNAS:AAPL: outside the plan or over today's credits; XNAS:MSFT: outside the plan or over today's credits",
       "fetched": 0,
@@ -74,18 +155,18 @@
     }
   ],
   "counts": {
-    "articles": 12762,
+    "articles": 12856,
     "documents": 0,
     "escalated": 2215,
     "events": 4173,
-    "failed_sweeps": 41,
-    "linked": 8917,
-    "observations": 4914,
+    "failed_sweeps": 42,
+    "linked": 8921,
+    "observations": 4919,
     "series": 31,
-    "sweeps": 651
+    "sweeps": 660
   },
   "day": "2026-10-03",
-  "generated_at": "2026-10-03 00:32 UTC",
+  "generated_at": "2026-10-03 14:21 UTC",
   "macro": [
     {
       "change": "0.12",
@@ -223,8 +304,26 @@
       "instrument_id": "MYX:1155",
       "label": "Maybank",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMi0gFBVV95cUxNVW5tbWoxYXV1TWs1Nk0xU3BHckVCZm5pbVh0SDNtMTdGV1hiRHFoWHprZVJaVnRrQlhWV3RRU215QlZ5ZzhoUW9Ld29idnVGdlNtbThrXzNIZDRkdW12c09nSTFlV0NvQlpjeHhzRlNQeDM5RjVmQnZKOFVCZUdSMXhqeVdNYmpHRklQY053VlZOUVNkWWYyN1kzSXpETWVZQ1NwMlhEU0VsanpkWWdpVVpmbkk1Q196Nld1el85ZVExa2RWWnBIRzNydVpWNlFxQnc?oc=5",
+          "domain": "www.ad-hoc-news.de",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-03T08:15:22+00:00",
+          "quality": 0.65,
+          "title": "Ageas completes Maybank stake sale and Ageas stock costs EUR 73.60 versus its close",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -233,8 +332,26 @@
       "instrument_id": "MYX:5347",
       "label": "Tenaga",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMihwFBVV95cUxOXzdiMF9kWWNfcWt1eHJlTHV1TFlYZXk0RW1DaS14N0FrcjloZV9yRmVuOHZjNWo4UGdiRVVOV2tGelg5bnZjdXNiV2k5cDZ2RUZvWGZCSXNuc0lvLVN2ZENMVmViRlBYNloyMTUwNDBZNWJGcEtqUmkyRzRzSUo5c3RvN0t2Wnc?oc=5",
+          "domain": "www.businesstoday.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-03T05:07:06+00:00",
+          "quality": 0.8,
+          "title": "TNB Moving Higher Up The ESG Ladder",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -271,8 +388,37 @@
       "instrument_id": "MYX:5225",
       "label": "IHH",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://www.nst.com.my/sports/others/2026/10/1546826/haziq-jebiwott-rule-klscm-10km-event",
+          "domain": "www.nst.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-03T08:18:22+00:00",
+          "quality": 1.0,
+          "title": "Haziq, Jebiwott rule KLSCM 10km event",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMilgFBVV95cUxOc29ia1dPcUlCNk8wOTBqd2ZuS3lPTHZYOHdxc1JIRXVtb1E5Y3pkWWt6VFZzN3QyZDNJSzJpNmxIQjVMUkRoa2oxa0MyVDJvV3BqeTdNQThQTmpKZHRxb3ZCODhSQVNVczBPTHlTSUEwTnZkYVVkSVUzNzk5cEFmTVdpZUdhTVB6M1FQNVV1Y2wxSG1oT3c?oc=5",
+          "domain": "medicalbuyer.co.in",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-03T10:25:47+00:00",
+          "quality": 0.65,
+          "title": "IHH Healthcare says all approvals were obtained for Fortis deal",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 2,
+        "polarity_mean": 0.0,
+        "sources": 2,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {

@@ -1,21 +1,25 @@
 # Digest 2026-10-03
 
-Generated 2026-10-03 00:32 UTC · slot `all` · 12762 articles in the corpus, 4914 observations, 4173 events in the fact book.
+Generated 2026-10-03 14:21 UTC · slot `all` · 12856 articles in the corpus, 4919 observations, 4173 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-10-03 www.ad-hoc-news.de — Ageas completes Maybank stake sale and Ageas stock costs EUR 73.60 versus its close [q 0.65, tone +0.0]
 
 ### Tenaga (MYX:5347)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-10-03 www.businesstoday.com.my — TNB Moving Higher Up The ESG Ladder [q 0.80, tone +0.0]
 
 ### Petronas Chemicals (MYX:5183)
 - tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
 - 2026-10-02 theedgemalaysia.com — Gas Malaysia, PETRONAS Chemicals, TXCD, Berjaya Corp, Zetrix AI, Country Heights, Lim Seong Hai, Mah Sing, Kinergy Advancement [q 0.80, tone +0.0]
 
 ### IHH (MYX:5225)
-- quiet: nothing collected for this name in the window
+- tone: 2 stories from 2 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-10-03 www.nst.com.my — Haziq, Jebiwott rule KLSCM 10km event [q 1.00, tone +0.0]
+- 2026-10-03 medicalbuyer.co.in — IHH Healthcare says all approvals were obtained for Fortis deal [q 0.65, tone +0.0]
 
 ### Press Metal (MYX:8869)
 - quiet: nothing collected for this name in the window
@@ -87,6 +91,15 @@ Generated 2026-10-03 00:32 UTC · slot `all` · 12762 articles in the corpus, 49
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 14:20 | eodhd | ok | 0 | 0 | 0 | facts 0; EODHD plan: free (2 names a day, US only, rotated); MYX:5183: deferred  |
+| 14:20 | twse_openapi | ok | 8 | 0 | 0 | facts 5;  |
+| 14:20 | jin10_flash | ok | 18 | 8 | 7 | facts 0;  |
+| 14:20 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 14:20 | nst_business | ok | 50 | 46 | 44 |  |
+| 14:20 | fmt_business | ok | 40 | 40 | 40 |  |
+| 14:20 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Petronas Chemicals, IHH, Press Metal, Genting, Maybank, Tenaga |
+| 14:20 | google_news | ok | 4 | 3 | 3 | read but empty: Petronas Chemicals, Press Metal; named the company: 3 of 3 (lowe |
+| 14:20 | gdelt | failed | 0 | 0 | 0 | no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP |
 | 00:31 | eodhd | ok | 0 | 0 | 0 | facts 0; EODHD plan: free (2 names a day, US only, rotated); XNAS:NVDA: deferred |
 | 00:31 | jin10_flash | ok | 21 | 9 | 7 | facts 0;  |
 | 00:31 | alphavantage_news | ok | 18 | 18 | 18 | facts 8; XNAS:MSFT: alphavantage quota exhausted for today: Thank you for using  |
