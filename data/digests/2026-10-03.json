@@ -1,6 +1,78 @@
 {
   "collection": [
     {
+      "at": "2026-10-03T23:49:06.525449+00:00",
+      "detail": "facts 0; EODHD plan: free (2 names a day, US only, rotated); XNAS:NVDA: deferred by the 2-a-day credit budget; next in rotation; XNAS:AAPL: outside the plan or over today's credits; XNAS:MSFT: outside the plan or over today's credits",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-03T23:49:06.455678+00:00",
+      "detail": "facts 0; ",
+      "fetched": 19,
+      "kept": 7,
+      "source": "jin10_flash",
+      "status": "ok",
+      "stored": 6
+    },
+    {
+      "at": "2026-10-03T23:49:05.580530+00:00",
+      "detail": "facts 6; XNAS:MSFT: alphavantage quota exhausted for today: Thank you for using Alpha Vantage! Please consider spreading out your free API requests more sparingly (1 request per second). You may subscribe to any of the p; XNAS:NVDA: alphavantage quota exhausted for today: Thank you for using Alpha Vantage! Please consider spreading out your free API requests more sparingly (1 request per second). You may subscribe to any of the p",
+      "fetched": 18,
+      "kept": 18,
+      "source": "alphavantage_news",
+      "status": "ok",
+      "stored": 17
+    },
+    {
+      "at": "2026-10-03T23:49:05.032177+00:00",
+      "detail": "facts 0; ",
+      "fetched": 100,
+      "kept": 94,
+      "source": "finnhub",
+      "status": "ok",
+      "stored": 73
+    },
+    {
+      "at": "2026-10-03T23:49:03.159827+00:00",
+      "detail": "facts 0; ",
+      "fetched": 0,
+      "kept": 0,
+      "source": "edgar",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-03T23:49:02.927883+00:00",
+      "detail": "named the company: 25 of 25 (lowest: Apple 1/1, Microsoft 4/4, NVIDIA 20/20)",
+      "fetched": 25,
+      "kept": 25,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 24
+    },
+    {
+      "at": "2026-10-03T23:49:02.501335+00:00",
+      "detail": "named the company: 13 of 13 (lowest: Apple 5/5, Microsoft 1/1, NVIDIA 7/7)",
+      "fetched": 13,
+      "kept": 13,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 11
+    },
+    {
+      "at": "2026-10-03T23:49:01.198250+00:00",
+      "detail": "no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked)",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "failed",
+      "stored": 0
+    },
+    {
       "at": "2026-10-03T14:20:48.335801+00:00",
       "detail": "facts 0; EODHD plan: free (2 names a day, US only, rotated); MYX:5183: deferred by the 2-a-day credit budget; next in rotation; MYX:5225: deferred by the 2-a-day credit budget; next in rotation; MYX:8869: deferred by the 2-a-day credit budget; next in rotation; MYX:3182: deferred by the 2-a-day credit budget; next in rotation; outside the free plan (US only), so not asked for: MYX:5183, MYX:5225, MYX:8869, MYX:3182. The EODHD Fundamentals plan covers KLSE and TW.; MYX:1155: EODHD free plan: US only; the Fundamentals plan covers KLSE; MYX:5347: EODHD free plan: US only; the Fundamentals plan covers KLSE",
       "fetched": 0,
@@ -155,18 +227,18 @@
     }
   ],
   "counts": {
-    "articles": 12856,
+    "articles": 12987,
     "documents": 0,
-    "escalated": 2215,
+    "escalated": 2231,
     "events": 4173,
-    "failed_sweeps": 42,
-    "linked": 8921,
-    "observations": 4919,
+    "failed_sweeps": 43,
+    "linked": 9046,
+    "observations": 4925,
     "series": 31,
-    "sweeps": 660
+    "sweeps": 668
   },
   "day": "2026-10-03",
-  "generated_at": "2026-10-03 14:21 UTC",
+  "generated_at": "2026-10-03 23:49 UTC",
   "macro": [
     {
       "change": "0.12",
@@ -442,7 +514,7 @@
       "upcoming": []
     },
     {
-      "escalated": 37,
+      "escalated": 46,
       "events": [],
       "instrument_id": "XNAS:NVDA",
       "label": "NVIDIA",
@@ -539,9 +611,9 @@
           "concept": "av_news_sentiment",
           "known_at": "2026-10-03",
           "label": "vendor sentiment",
-          "period_end": "2026-10-02",
+          "period_end": "2026-10-03",
           "source": "alphavantage_news",
-          "value": "0.34"
+          "value": "0.42"
         },
         {
           "concept": "revenue",
@@ -570,6 +642,28 @@
       ],
       "stories": [
         {
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/nvidia-nvda-center-8-billion-230622829.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-03T23:06:22+00:00",
+          "quality": 1.0,
+          "title": "Nvidia (NVDA) Is At The Center Of An $8 Billion AI Financing Shift",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/intel-intc-data-center-comeback-195750952.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-03T19:57:50+00:00",
+          "quality": 1.0,
+          "title": "Intel (INTC) Data Center Comeback: Real Recovery or Just a Supply Squeeze?",
+          "uncertainty": 0.17605633802816903
+        },
+        {
           "doc_id": "https://finance.yahoo.com/markets/stocks/articles/jim-cramer-highlights-nvidia-nvda-213323111.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
           "escalated": true,
@@ -592,83 +686,61 @@
           "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:142592716",
+          "doc_id": "finnhub:142615607",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-03T17:35:00+00:00",
+          "quality": 0.85,
+          "title": "The S&P 500 Is Not Enough: My 3-Stock Starter Portfolio for New Investors",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142613429",
+          "domain": "ChartMill",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-03T12:31:08+00:00",
+          "quality": 0.85,
+          "title": "NVIDIA (NASDAQ:NVDA) Screens as a Decent Value Stock",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142613251",
           "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-10-02T19:47:00+00:00",
+          "published_at": "2026-10-03T11:07:00+00:00",
           "quality": 0.85,
-          "title": "Nvidia puts $500 billion on the table, challenges banking as we know it",
+          "title": "Where Will Intel Stock Be in 5 Years: Comeback Story or Cautionary Tale?",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:142592719",
+          "doc_id": "finnhub:142598546",
           "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
-          "polarity": 1.0,
-          "published_at": "2026-10-02T18:52:49+00:00",
-          "quality": 0.85,
-          "title": "Investor Makes Bold Prediction: NVIDIA Could Deliver \u201c$360 Billion in Free Cash Flow\u201d Next Year",
-          "uncertainty": 0.3676470588235294
-        },
-        {
-          "doc_id": "finnhub:142592720",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
-          "polarity": 1.0,
-          "published_at": "2026-10-02T18:38:00+00:00",
-          "quality": 0.85,
-          "title": "Nvidia Defies Critics\u2014as Its Stock Nears First Record Since May",
-          "uncertainty": 0.3472222222222222
-        },
-        {
-          "doc_id": "finnhub:142593729",
-          "domain": "SeekingAlpha",
           "escalated": true,
           "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-10-02T18:00:22+00:00",
+          "polarity": 0.0,
+          "published_at": "2026-10-03T01:34:03+00:00",
           "quality": 0.85,
-          "title": "Nvidia: Competition Caps The Upside Case",
-          "uncertainty": 0.4807692307692307
-        },
-        {
-          "doc_id": "https://decrypt.co/379959/nvidia-hits-record-high-market-value-5-7-trillion?.tsrc=rss",
-          "domain": "decrypt.co",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
-          "polarity": 0.5,
-          "published_at": "2026-10-02T17:30:40+00:00",
-          "quality": 0.85,
-          "title": "Nvidia Hits Record High as Market Value Reaches $5.7 Trillion",
-          "uncertainty": 0.33783783783783783
-        },
-        {
-          "doc_id": "finnhub:142590669",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
-          "polarity": 1.0,
-          "published_at": "2026-10-02T15:47:31+00:00",
-          "quality": 0.85,
-          "title": "AMD Climbs 3% as Chip Stocks Extend Their Run; Arm Jumps 8%, NVIDIA Rises 2%",
+          "title": "Why Super Micro (SMCI) Stock Is Up Today",
           "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.667,
-        "n": 121,
-        "polarity_mean": 0.269,
-        "sources": 27,
-        "uncertainty_mean": 0.102
+        "n": 206,
+        "polarity_mean": 0.295,
+        "sources": 32,
+        "uncertainty_mean": 0.15
       },
       "upcoming": []
     },
     {
-      "escalated": 7,
+      "escalated": 14,
       "events": [],
       "instrument_id": "XNAS:AAPL",
       "label": "Apple",
@@ -765,9 +837,9 @@
           "concept": "av_news_sentiment",
           "known_at": "2026-10-03",
           "label": "vendor sentiment",
-          "period_end": "2026-10-02",
+          "period_end": "2026-10-03",
           "source": "alphavantage_news",
-          "value": "0.15"
+          "value": "0.05"
         },
         {
           "concept": "revenue",
@@ -796,6 +868,72 @@
       ],
       "stories": [
         {
+          "doc_id": "alphavantage:https://seekingalpha.com/article/4951765-skyworks-the-qorvo-deal-could-finally-change-the-investment-case",
+          "domain": "Seeking Alpha",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-03T11:47:37+00:00",
+          "quality": 0.85,
+          "title": "Skyworks Stock: The Qorvo Deal Could Finally Change The Investment Case (NASDAQ:SWKS)",
+          "uncertainty": 0.32894736842105265
+        },
+        {
+          "doc_id": "alphavantage:https://www.marketbeat.com/instant-alerts/filing-apple-inc-aapl-stock-bought-by-orgel-wealth-management-llc-2026-10-03/",
+          "domain": "MarketBeat",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-03T07:30:42+00:00",
+          "quality": 0.85,
+          "title": "Apple Inc. $AAPL Stock Bought by Orgel Wealth Management LLC",
+          "uncertainty": 0.16233766233766234
+        },
+        {
+          "doc_id": "alphavantage:https://www.marketbeat.com/instant-alerts/filing-apple-inc-aapl-stock-sold-by-denver-pwm-llc-2026-10-03/",
+          "domain": "MarketBeat",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-03T07:13:24+00:00",
+          "quality": 0.85,
+          "title": "Apple Inc. $AAPL Stock Sold by Denver PWM LLC",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "alphavantage:https://www.marketbeat.com/instant-alerts/filing-apple-inc-aapl-stock-purchased-by-bedel-financial-consulting-inc-2026-10-03/",
+          "domain": "MarketBeat",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-03T07:08:42+00:00",
+          "quality": 0.85,
+          "title": "Apple Inc. $AAPL Stock Purchased by Bedel Financial Consulting Inc.",
+          "uncertainty": 0.15625
+        },
+        {
+          "doc_id": "alphavantage:https://www.marketbeat.com/instant-alerts/filing-cmh-wealth-management-llc-cuts-stock-position-in-apple-inc-aapl-2026-10-03/",
+          "domain": "MarketBeat",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-10-03T07:08:41+00:00",
+          "quality": 0.85,
+          "title": "CMH Wealth Management LLC Cuts Stock Position in Apple Inc. $AAPL",
+          "uncertainty": 0.1506024096385542
+        },
+        {
+          "doc_id": "alphavantage:https://www.benzinga.com/markets/tech/26/10/62150820/apple-takes-aim-at-ai-agents-wants-mac-users-to-know-when-their-data-is-accessed-as-meta-tackles-muse-privacy-claims",
+          "domain": "Benzinga",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-03T03:53:18+00:00",
+          "quality": 0.85,
+          "title": "Apple Takes Aim at AI Agents, Wants Mac Users to Know When Their Data Is Accessed as Meta Tackles Muse Privacy Claims",
+          "uncertainty": 0.14367816091954022
+        },
+        {
           "doc_id": "https://decrypt.co/379959/nvidia-hits-record-high-market-value-5-7-trillion?.tsrc=rss",
           "domain": "decrypt.co",
           "escalated": true,
@@ -816,80 +954,14 @@
           "quality": 0.85,
           "title": "Apple (AAPL) Prepares A Siri Powered Smart Home Hub",
           "uncertainty": 0.0
-        },
-        {
-          "doc_id": "alphavantage:https://ca.finance.yahoo.com/news/apple-inc-aapl-trending-stock-120003870.html",
-          "domain": "Yahoo! Finance Canada",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-10-02T12:23:47+00:00",
-          "quality": 0.85,
-          "title": "Apple Inc. (AAPL) Is a Trending Stock: Facts to Know Before Betting on It",
-          "uncertainty": 0.2976190476190476
-        },
-        {
-          "doc_id": "finnhub:142588347",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": -1.0,
-          "published_at": "2026-10-02T12:16:00+00:00",
-          "quality": 0.85,
-          "title": "Jim Cramer urges buying Apple stock before foldable iPhone launch",
-          "uncertainty": 0.40322580645161293
-        },
-        {
-          "doc_id": "https://finance.yahoo.com/technology/articles/apple-says-t-iphone-18-230333132.html?.tsrc=rss",
-          "domain": "finance.yahoo.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": -1.0,
-          "published_at": "2026-10-02T23:03:33+00:00",
-          "quality": 0.8,
-          "title": "Apple Says Some AT&T iPhone 18 Pro Max Users Must Replace Phones After Service-Loss Bug",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMiogFBVV95cUxNenJoUzNEZ0p2WHQ2VWZ0N1FHdWp6eDJtX25KMEJoWWtqM00zdVY5UDV3Njh3aWhtYnpQQzVTdFZDNGl4bjJOd2hhdXlEekR3RGxpRVR1MWNNcGVFSTktUEhZSHRLSHUyc0V3RWI0cURiYlhkWlZ0UVRBc2p0YW5MSjNndXNUbHd0QkpOeXB6Wi1kNEd3cFBDU1kxbHF4ZzI3cFE?oc=5",
-          "domain": "finance.yahoo.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-10-02T20:03:07+00:00",
-          "quality": 0.8,
-          "title": "Morgan Stanley Has Strong Verdict for Apple Stock Investors",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMipAFBVV95cUxQZHFRU3FuUGFsSjdEZkg1bkVWb1RXTkVwWmRpUkFUYkh6WlRIbnQtcFVZeTRZVDE5X2JWZnBuU0FjRmd5NXFhRzlLdEVLUkdpeElzSGVfUVBkU01WUkhfVFJxM3Yzc3RWZUhiTm0zUTFCZ2VFRHktaDhsUWEwS3A0OEt1XzEyeHdqdUlhcXdJQW9nNmVneEJZclh0YzlVa2VNUzV4Ng?oc=5",
-          "domain": "www.marketbeat.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-02T21:23:16+00:00",
-          "quality": 0.65,
-          "title": "Apple (NASDAQ:AAPL) Stock Jumps 1% - What's Next?",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/apple-aapl-exceeds-market-returns-204504253.html?.tsrc=rss",
-          "domain": "finance.yahoo.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-02T20:45:04+00:00",
-          "quality": 1.0,
-          "title": "Apple (AAPL) Exceeds Market Returns: Some Facts to Consider",
-          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 27,
-        "polarity_mean": 0.056,
-        "sources": 12,
-        "uncertainty_mean": 0.112
+        "n": 48,
+        "polarity_mean": 0.115,
+        "sources": 24,
+        "uncertainty_mean": 0.115
       },
       "upcoming": [
         {
@@ -909,7 +981,7 @@
       ]
     },
     {
-      "escalated": 6,
+      "escalated": 7,
       "events": [],
       "instrument_id": "XNAS:MSFT",
       "label": "Microsoft",
@@ -1006,9 +1078,9 @@
           "concept": "av_news_sentiment",
           "known_at": "2026-10-03",
           "label": "vendor sentiment",
-          "period_end": "2026-10-02",
+          "period_end": "2026-10-03",
           "source": "alphavantage_news",
-          "value": "0.31"
+          "value": "-0.14"
         },
         {
           "concept": "revenue",
@@ -1046,6 +1118,17 @@
           "quality": 1.0,
           "title": "Can Microsoft Keep Growing Its Dividend Through the AI Spending Cycle?",
           "uncertainty": 0.0
+        },
+        {
+          "doc_id": "alphavantage:https://www.marketbeat.com/instant-alerts/filing-cmh-wealth-management-llc-cuts-stock-position-in-apple-inc-aapl-2026-10-03/",
+          "domain": "MarketBeat",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-10-03T07:08:41+00:00",
+          "quality": 0.85,
+          "title": "CMH Wealth Management LLC Cuts Stock Position in Apple Inc. $AAPL",
+          "uncertainty": 0.1506024096385542
         },
         {
           "doc_id": "https://247wallst.com/investing/2026/10/02/if-you-invest-10000-in-amd-today-heres-what-it-could-be-worth-by-2030/?.tsrc=rss",
@@ -1112,25 +1195,14 @@
           "quality": 1.0,
           "title": "Microsoft Entered the Smart Home Through Your Washing Machine, Not Your Phone",
           "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/amazon-investors-paying-aws-without-182654581.html?.tsrc=rss",
-          "domain": "finance.yahoo.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-02T18:26:54+00:00",
-          "quality": 1.0,
-          "title": "What Are Amazon Investors Paying for AWS Without Investment Gains?",
-          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.667,
-        "n": 33,
-        "polarity_mean": 0.212,
-        "sources": 12,
-        "uncertainty_mean": 0.06
+        "n": 43,
+        "polarity_mean": 0.14,
+        "sources": 16,
+        "uncertainty_mean": 0.053
       },
       "upcoming": [
         {
