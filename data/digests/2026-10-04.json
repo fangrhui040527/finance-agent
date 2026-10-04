@@ -1,6 +1,87 @@
 {
   "collection": [
     {
+      "at": "2026-10-04T14:49:30.659345+00:00",
+      "detail": "facts 0; EODHD plan: free (2 names a day, US only, rotated); MYX:8869: deferred by the 2-a-day credit budget; next in rotation; MYX:3182: deferred by the 2-a-day credit budget; next in rotation; MYX:1155: deferred by the 2-a-day credit budget; next in rotation; MYX:5347: deferred by the 2-a-day credit budget; next in rotation; outside the free plan (US only), so not asked for: MYX:1155, MYX:5347, MYX:8869, MYX:3182. The EODHD Fundamentals plan covers KLSE and TW.; MYX:5183: EODHD free plan: US only; the Fundamentals plan covers KLSE; MYX:5225: EODHD free plan: US only; the Fundamentals plan covers KLSE",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-04T14:49:30.208178+00:00",
+      "detail": "facts 0; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-04T14:49:25.369353+00:00",
+      "detail": "facts 0; ",
+      "fetched": 19,
+      "kept": 5,
+      "source": "jin10_flash",
+      "status": "ok",
+      "stored": 4
+    },
+    {
+      "at": "2026-10-04T14:49:24.363639+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-04T14:49:22.520936+00:00",
+      "detail": "",
+      "fetched": 50,
+      "kept": 49,
+      "source": "nst_business",
+      "status": "ok",
+      "stored": 48
+    },
+    {
+      "at": "2026-10-04T14:49:22.107483+00:00",
+      "detail": "",
+      "fetched": 46,
+      "kept": 46,
+      "source": "fmt_business",
+      "status": "ok",
+      "stored": 46
+    },
+    {
+      "at": "2026-10-04T14:49:21.931229+00:00",
+      "detail": "read but empty: Genting, Maybank, Tenaga, Petronas Chemicals, IHH, Press Metal",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-04T14:49:19.973506+00:00",
+      "detail": "read but empty: Press Metal; named the company: 6 of 9 (lowest: IHH 1/3, Maybank 1/2, Petronas Chemicals 1/1)",
+      "fetched": 11,
+      "kept": 9,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 5
+    },
+    {
+      "at": "2026-10-04T14:49:18.228828+00:00",
+      "detail": "no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked); deferred: Tenaga, Petronas Chemicals, IHH",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "failed",
+      "stored": 0
+    },
+    {
       "at": "2026-10-04T08:16:17.669962+00:00",
       "detail": "facts 0; ",
       "fetched": 4126,
@@ -56,18 +137,18 @@
     }
   ],
   "counts": {
-    "articles": 12987,
+    "articles": 13090,
     "documents": 0,
-    "escalated": 2231,
+    "escalated": 2232,
     "events": 4173,
-    "failed_sweeps": 43,
-    "linked": 9046,
+    "failed_sweeps": 44,
+    "linked": 9051,
     "observations": 4942,
     "series": 31,
-    "sweeps": 674
+    "sweeps": 683
   },
   "day": "2026-10-04",
-  "generated_at": "2026-10-04 08:16 UTC",
+  "generated_at": "2026-10-04 14:50 UTC",
   "macro": [
     {
       "change": "0.12",
@@ -205,8 +286,26 @@
       "instrument_id": "MYX:1155",
       "label": "Maybank",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMirwFBVV95cUxObjZOMDNZRWFMV05ZRjN4ekhNeGpNYkw0eG94ZW9QcnFnbzRoYjFaamhVMlBvMFlyVF9fX3NPRnZ4OTUyTzFjbVlwVHRTX0pwZkxCSEVyRm9wQzVIdzdzakRIMlhXbUlJTGFObXc2eEZ1bkJaMG5JaHNFUWE5cDB5VDBLbDVrajN1TnRpTzkzTnZHU1BxNG4wajE4eWxzT3QteXNqUEFOQVZhWGh0UGYw?oc=5",
+          "domain": "scanx.trade",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-04T02:37:53+00:00",
+          "quality": 0.65,
+          "title": "Suzlon Energy to attend Maybank conference on July 7",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -215,8 +314,37 @@
       "instrument_id": "MYX:5347",
       "label": "Tenaga",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://www.nst.com.my/news/regional/2026/10/1547562/man-dies-after-suspected-electric-shock-while-stealing-cable",
+          "domain": "www.nst.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-04T09:59:22+00:00",
+          "quality": 1.0,
+          "title": "Man dies after suspected electric shock while stealing cable",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMi-AFBVV95cUxOS2V2cjBWZ1pCZXhWVkliRFYwUWw2RVRncWNxYWhpdlBtbTJMdDhoQmJEYWtrQUw2UFFSWHBBSFc1NkNQVkhZZ0l0SlZFXy1RMURYaXRSRlBJOHFrM0lTY19sbWxzd2pXeEdsTURaYkx5QnBFNHdEMGtpOThCTUNpM2hzZFpGTDVkdU1PTjZrcnozVnNwSHBlb0RsZUgwTk92WFFDZGx5cjdyNGhpWXgyeXpWalExN3JOU3o2RGpWZ1EzZGtGbnhMWVkxd2VjWkRVRWlNZk5FQ2hYUlJnVFpEOTJLdHJwUS1xWlZYYWhYcDZjRVc0a0JlNA?oc=5",
+          "domain": "m.economictimes.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-04T12:32:03+00:00",
+          "quality": 0.65,
+          "title": "Shree TNB Polymers - IPO bonanza: 29 companies to list this week; GMPs signal returns of up to 59%",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 2,
+        "polarity_mean": 0.0,
+        "sources": 2,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -230,13 +358,31 @@
       "upcoming": []
     },
     {
-      "escalated": 0,
+      "escalated": 1,
       "events": [],
       "instrument_id": "MYX:5225",
       "label": "IHH",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxNdXI4VXFfdE9iei02YTZIdXd2UEJRREFuaGVBUWlnbEl0cXV0RW9JWm1EWDR3Z2h6S2o1dWtrVVI2UkZoaFRyUmJUVjJKcFFKZnpKYkFZSmZwWkQtbXNXNUJxZ2xYZGxHTUNXOFZGb0l6a1ZPTWRadHlWY3pHOHpJRVd3V0RWZWwxNzVqd1lFRFV5NS1BWkV1b3R1NEdRaC1zRWh5N0hFcDFpVjNWcnh3OV9hNE9GQzRzMmdORzJ0MW4?oc=5",
+          "domain": "propnewstime.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-04T01:00:53+00:00",
+          "quality": 0.65,
+          "title": "IHH plans to raise Fortis stake to 51 pc, expand capacity to 10,000 beds",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {

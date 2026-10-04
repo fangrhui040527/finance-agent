@@ -1,20 +1,24 @@
 # Digest 2026-10-04
 
-Generated 2026-10-04 08:16 UTC · slot `all` · 12987 articles in the corpus, 4942 observations, 4173 events in the fact book.
+Generated 2026-10-04 14:50 UTC · slot `all` · 13090 articles in the corpus, 4942 observations, 4173 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-10-04 scanx.trade — Suzlon Energy to attend Maybank conference on July 7 [q 0.65, tone +0.0]
 
 ### Tenaga (MYX:5347)
-- quiet: nothing collected for this name in the window
+- tone: 2 stories from 2 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-10-04 www.nst.com.my — Man dies after suspected electric shock while stealing cable [q 1.00, tone +0.0]
+- 2026-10-04 m.economictimes.com — Shree TNB Polymers - IPO bonanza: 29 companies to list this week; GMPs signal returns of up to 59% [q 0.65, tone +0.0]
 
 ### Petronas Chemicals (MYX:5183)
 - quiet: nothing collected for this name in the window
 
 ### IHH (MYX:5225)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 1 escalated
+- 2026-10-04 propnewstime.com — IHH plans to raise Fortis stake to 51 pc, expand capacity to 10,000 beds [q 0.65, tone +0.0] ★
 
 ### Press Metal (MYX:8869)
 - quiet: nothing collected for this name in the window
@@ -83,6 +87,15 @@ Generated 2026-10-04 08:16 UTC · slot `all` · 12987 articles in the corpus, 49
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 14:49 | eodhd | ok | 0 | 0 | 0 | facts 0; EODHD plan: free (2 names a day, US only, rotated); MYX:8869: deferred  |
+| 14:49 | twse_openapi | ok | 8 | 0 | 0 | facts 0;  |
+| 14:49 | jin10_flash | ok | 19 | 5 | 4 | facts 0;  |
+| 14:49 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 14:49 | nst_business | ok | 50 | 49 | 48 |  |
+| 14:49 | fmt_business | ok | 46 | 46 | 46 |  |
+| 14:49 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Genting, Maybank, Tenaga, Petronas Chemicals, IHH, Press Metal |
+| 14:49 | google_news | ok | 11 | 9 | 5 | read but empty: Press Metal; named the company: 6 of 9 (lowest: IHH 1/3, Maybank |
+| 14:49 | gdelt | failed | 0 | 0 | 0 | no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP |
 | 08:16 | sec_xbrl | ok | 4126 | 0 | 0 | facts 0;  |
 | 08:16 | finmind | ok | 70 | 0 | 0 | facts 4;  |
 | 08:16 | twse_openapi | ok | 8 | 0 | 0 | facts 0;  |
