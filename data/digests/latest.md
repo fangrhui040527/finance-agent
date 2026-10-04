@@ -1,6 +1,6 @@
 # Digest 2026-10-04
 
-Generated 2026-10-04 14:50 UTC · slot `all` · 13090 articles in the corpus, 4942 observations, 4173 events in the fact book.
+Generated 2026-10-04 23:57 UTC · slot `all` · 13243 articles in the corpus, 4956 observations, 4173 events in the fact book.
 
 ## The book
 
@@ -27,40 +27,43 @@ Generated 2026-10-04 14:50 UTC · slot `all` · 13090 articles in the corpus, 49
 - quiet: nothing collected for this name in the window
 
 ### NVIDIA (XNAS:NVDA)
-- tone: 46 stories from 11 sources, polarity +0.29, peak intensity 0.33, uncertainty 0.25 · 5 escalated
+- tone: 147 stories from 21 sources, polarity +0.24, peak intensity 0.67, uncertainty 0.18 · 21 escalated
+- 2026-10-04 finance.yahoo.com — Dow Jones Futures Rise; Nasdaq At Highs With Nvidia, SpaceX Buys, But Note These Risks [q 1.00, tone -1.0] ★
+- 2026-10-04 finance.yahoo.com — Nvidia’s AI Safety Push Could Strengthen Its Moat. But Is It a Stock Catalyst Yet? [q 1.00, tone +1.0] ★
 - 2026-10-03 finance.yahoo.com — Nvidia (NVDA) Is At The Center Of An $8 Billion AI Financing Shift [q 1.00, tone +1.0] ★
 - 2026-10-03 finance.yahoo.com — Intel (INTC) Data Center Comeback: Real Recovery or Just a Supply Squeeze? [q 1.00, tone +1.0] ★
-- 2026-10-03 Yahoo — The S&P 500 Is Not Enough: My 3-Stock Starter Portfolio for New Investors [q 0.85, tone +1.0] ★
-- 2026-10-03 ChartMill — NVIDIA (NASDAQ:NVDA) Screens as a Decent Value Stock [q 0.85, tone +1.0] ★
-- 2026-10-03 finance.biggo.com — Jensen Huang's Fortune Surpasses $200 Billion as Nvidia Shares Hit Record [q 0.65, tone +1.0] ★
-- 2026-10-03 Yahoo — How much Nvidia stock does CEO Jensen Huang actually own? [q 0.85, tone +0.0]
-- 2026-10-03 Yahoo — The AI Chip Revolution Wouldn’t Be Possible Without This Company [q 0.85, tone +0.0]
-- 2026-10-03 Yahoo — IonQ vs. Rigetti: Is the Quantum Rally Backed by Fundamentals, or Just Momentum? [q 0.85, tone +0.0]
-- snapshot: P/E (ttm) 29.66 (finnhub, 2026-10-03) · P/B 28.81 (finnhub, 2026-09-05) · EPS (ttm) 7.91 (finnhub, 2026-09-05) · dividend yield 0.03 (finnhub, 2026-09-05) · beta 2.26 (finnhub, 2026-10-03) · 52w high 236.54 (finnhub, 2026-09-05) · 52w low 164.27 (finnhub, 2026-09-10) · target (consensus) 338.96 (fmp, 2026-10-02) · analysts: buy 41 (finnhub, 2026-09-05) · analysts: hold 3 (finnhub, 2026-09-05) · analysts: sell 1 (finnhub, 2026-09-05) · vendor sentiment 0.42 (alphavantage_news, 2026-10-03) · revenue (last quarter) 96.22bn (sec_xbrl, 2026-08-26) · net income (last quarter) 59.69bn (sec_xbrl, 2026-08-26) · last EPS surprise % 3.82 (finnhub, 2026-09-05)
+- 2026-10-04 Yahoo — Dow Jones Futures Loom; Nasdaq At Highs With Nvidia, SpaceX Buys, But Note These Risks [q 0.85, tone -1.0] ★
+- 2026-10-04 beincrypto.com — Nvidia’s $1 Billion Option Dispute: Does This Early Advisor Have a Case? [q 0.85, tone +1.0] ★
+- 2026-10-04 Yahoo — Broadcom’s Massive $42 Billion Chip-Buying Deal with Anthropic Raises Circular Financing Worries [q 0.85, tone +1.0] ★
+- 2026-10-04 SeekingAlpha — NVDY: NVIDIA Shares Break To Record Highs, Don't Cede The Upside Now [q 0.85, tone +1.0] ★
+- snapshot: P/E (ttm) 29.23 (finnhub, 2026-10-04) · P/B 28.81 (finnhub, 2026-09-05) · EPS (ttm) 7.91 (finnhub, 2026-09-05) · dividend yield 0.03 (finnhub, 2026-09-05) · beta 2.26 (finnhub, 2026-10-04) · 52w high 237.88 (finnhub, 2026-10-04) · 52w low 164.27 (finnhub, 2026-09-10) · target (consensus) 338.96 (fmp, 2026-10-02) · analysts: buy 41 (finnhub, 2026-09-05) · analysts: hold 3 (finnhub, 2026-09-05) · analysts: sell 1 (finnhub, 2026-09-05) · vendor sentiment 0.42 (alphavantage_news, 2026-10-03) · revenue (last quarter) 96.22bn (sec_xbrl, 2026-08-26) · net income (last quarter) 59.69bn (sec_xbrl, 2026-08-26) · last EPS surprise % 3.82 (finnhub, 2026-09-05)
 
 ### Apple (XNAS:AAPL)
-- tone: 9 stories from 7 sources, polarity +0.11, peak intensity 0.33, uncertainty 0.05 · 1 escalated
+- tone: 27 stories from 16 sources, polarity +0.15, peak intensity 0.33, uncertainty 0.14 · 6 escalated
+- 2026-10-04 Yahoo — Analyst Sees 6 Million iPhone Duo Sales This Year. Why That’s Not Enough to Move AAPL Stock. [q 0.85, tone +0.0] ★
+- 2026-10-04 Yahoo — Meta vs. Microsoft: One AI Agent Has a Problem the Other Doesn’t. [q 0.85, tone +1.0] ★
+- 2026-10-04 TradingView — Apple, Meta And Jim Cramer Set the Tone for AI, iPhone and Vision Pro Moves: This Week in Apple [q 0.85, tone +1.0] ★
+- 2026-10-04 Benzinga — Apple Weekly Roundup: AI Privacy, iPhone Demand, Wearables And Restructuring - Apple (NASDAQ:AAPL) [q 0.85, tone +1.0] ★
+- 2026-10-04 Yahoo — How Supreme Court Battles Involving Apple, Exxon, and Intel Could Hit Your Portfolio [q 0.65, tone +0.0] ★
 - 2026-10-03 www.ad-hoc-news.de — Apple stock gains 1.02 percent as Morgan Stanley cuts target - ad-hoc-news.de [q 0.65, tone -1.0] ★
-- 2026-10-03 BigGo Finance — Apple Says iPhone 18 Pro Max Units That Lost AT&T Service Need Replacement, Not a Fix [q 0.85, tone +0.0]
-- 2026-10-03 Yahoo Finance — Adobe Forecasts 130% Surge in AI-Driven Retail Traffic During US Holiday Season [q 0.85, tone +1.0]
-- 2026-10-03 Yahoo Finance UK — AI Retail Referrals Set to Rise 130% as Adobe Forecasts $275.1 Billion Holiday Season [q 0.85, tone +0.0]
-- 2026-10-03 Yahoo! Finance Canada — Zacks Upgrade And Dividend Focus Could Be A Game Changer For InterDigital (IDCC) [q 0.85, tone +1.0]
-- 2026-10-03 www.fool.com — ASML Holding vs. Qualcomm: What Revenue Trends Tell Investors About These Semiconductor Industry Giants [q 0.70, tone +0.0]
-- 2026-10-03 abcnews.com — Apple CEO Tim Cook is stepping down, John Ternus set to replace him [q 0.65, tone +0.0]
-- 2026-10-03 www.ad-hoc-news.de — Qualcomm stock gains 1.53 percent as Apple deal extends into 2027 - ad-hoc-news.de [q 0.65, tone +0.0]
+- 2026-10-04 www.barchart.com — Amazon Stock Is Underperforming Amid Agentic AI Fears. How to Play AMZN Here. [q 0.85, tone +0.0]
+- 2026-10-04 Yahoo Finance — MercadoLibre vs. Uber Technologies: Which Stock Is a Better Buy in 2026? [q 0.85, tone +1.0]
 - upcoming 2026-10-29 earnings_result — Q4 2026 results after the close (finnhub)
 - upcoming 2026-10-28 earnings_result — Q4 2026 results after the close (finnhub)
-- snapshot: P/E (ttm) 37.74 (finnhub, 2026-10-03) · P/B 50.98 (finnhub, 2026-09-05) · EPS (ttm) 8.72 (finnhub, 2026-09-05) · dividend yield 0.51 (finnhub, 2026-09-05) · beta 1.11 (finnhub, 2026-10-03) · 52w high 345.34 (finnhub, 2026-09-24) · 52w low 243.42 (finnhub, 2026-09-24) · target (consensus) 341.68 (fmp, 2026-10-01) · analysts: buy 22 (finnhub, 2026-09-05) · analysts: hold 15 (finnhub, 2026-09-05) · analysts: sell 3 (finnhub, 2026-09-05) · vendor sentiment 0.05 (alphavantage_news, 2026-10-03) · revenue (last quarter) 109.42bn (sec_xbrl, 2026-07-31) · net income (last quarter) 29.79bn (sec_xbrl, 2026-07-31) · last EPS surprise % -0.89 (finnhub, 2026-09-05)
+- snapshot: P/E (ttm) 37.77 (finnhub, 2026-10-04) · P/B 50.98 (finnhub, 2026-09-05) · EPS (ttm) 8.72 (finnhub, 2026-09-05) · dividend yield 0.51 (finnhub, 2026-09-05) · beta 1.11 (finnhub, 2026-10-04) · 52w high 345.34 (finnhub, 2026-09-24) · 52w low 243.42 (finnhub, 2026-09-24) · target (consensus) 341.68 (fmp, 2026-10-01) · analysts: buy 22 (finnhub, 2026-09-05) · analysts: hold 15 (finnhub, 2026-09-05) · analysts: sell 3 (finnhub, 2026-09-05) · vendor sentiment 0.10 (alphavantage_news, 2026-10-04) · revenue (last quarter) 109.42bn (sec_xbrl, 2026-07-31) · net income (last quarter) 29.79bn (sec_xbrl, 2026-07-31) · last EPS surprise % -0.89 (finnhub, 2026-09-05)
 
 ### Microsoft (XNAS:MSFT)
-- tone: 5 stories from 4 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.03 · 0 escalated
-- 2026-10-03 finance.yahoo.com — 3 British AI Healthcare Stocks With Revenue Up To £61 Billion [q 0.85, tone -1.0]
-- 2026-10-03 finance.yahoo.com — Bessent says rising Treasury yields reflect global trend, not cause for alarm [q 0.85, tone +0.0]
-- 2026-10-03 thehustle.videonest.co — Does Your Work Throw You For a Loop, Too? [q 0.70, tone +1.0]
-- 2026-10-03 www.ad-hoc-news.de — Microsoft stock gets a USD 610 target as AI sales expand - ad-hoc-news.de [q 0.65, tone +0.0]
-- 2026-10-03 abcnews.com — Microsoft joins Apple in raising prices as fans await new 'Grand Theft Auto' game [q 0.65, tone +0.0]
+- tone: 20 stories from 11 sources, polarity +0.25, peak intensity 0.33, uncertainty 0.10 · 4 escalated
+- 2026-10-04 Yahoo — Meta vs. Microsoft: One AI Agent Has a Problem the Other Doesn’t. [q 0.85, tone +1.0] ★
+- 2026-10-04 Yahoo — Can Take Two Interactive Software (TTWO) Still Look Undervalued On Its New Xbox Deal? [q 0.85, tone +1.0] ★
+- 2026-10-04 www.ad-hoc-news.de — SAP Puts Microsoft Veteran in Charge of Eastern Europe as Buyback Nears 8.9 Million Shares [q 0.65, tone +1.0] ★
+- 2026-10-04 www.ad-hoc-news.de — Microsoft declares dividend as Microsoft stock trades at EUR 459.78 versus its EUR 459.78 close [q 0.65, tone +1.0] ★
+- 2026-10-04 247wallst.com — AI Is Burning Through More Money Than Any Technology Boom in History — Now Comes the Hard Part [q 0.85, tone +0.0]
+- 2026-10-04 finance.yahoo.com — Did CIBC’s New Senior Notes and Strong Quarter Just Shift Canadian Imperial Bank of Commerce's (TSX:CM) Investment Narrative? [q 0.85, tone +1.0]
+- 2026-10-04 Yahoo — LinkDaddy Reports 1.52M AI Crawler Requests to AI Verified Registry [q 0.85, tone +0.0]
+- 2026-10-04 Yahoo — Gary Shapiro: why trade shows matter and how to get them right [q 0.85, tone +0.0]
 - upcoming 2026-10-27 earnings_result — Q1 2027 results (finnhub)
-- snapshot: P/E (ttm) 28.69 (finnhub, 2026-10-03) · P/B 6.26 (finnhub, 2026-09-05) · EPS (ttm) 17.95 (finnhub, 2026-09-05) · dividend yield 0.79 (finnhub, 2026-09-05) · beta 1.06 (finnhub, 2026-10-03) · 52w high 553.72 (finnhub, 2026-09-05) · 52w low 349.20 (finnhub, 2026-09-05) · target (consensus) 563.50 (fmp, 2026-10-01) · analysts: buy 41 (finnhub, 2026-09-05) · analysts: hold 5 (finnhub, 2026-09-05) · analysts: sell 0 (finnhub, 2026-09-05) · vendor sentiment -0.14 (alphavantage_news, 2026-10-03) · revenue (last quarter) 90.01bn (sec_xbrl, 2026-07-29) · net income (last quarter) 35.77bn (sec_xbrl, 2026-07-29) · last EPS surprise % 9.53 (finnhub, 2026-09-05)
+- snapshot: P/E (ttm) 28.73 (finnhub, 2026-10-04) · P/B 6.26 (finnhub, 2026-09-05) · EPS (ttm) 17.95 (finnhub, 2026-09-05) · dividend yield 0.79 (finnhub, 2026-09-05) · beta 1.06 (finnhub, 2026-10-04) · 52w high 553.72 (finnhub, 2026-09-05) · 52w low 349.20 (finnhub, 2026-09-05) · target (consensus) 563.50 (fmp, 2026-10-01) · analysts: buy 41 (finnhub, 2026-09-05) · analysts: hold 5 (finnhub, 2026-09-05) · analysts: sell 0 (finnhub, 2026-09-05) · vendor sentiment -0.12 (alphavantage_news, 2026-10-04) · revenue (last quarter) 90.01bn (sec_xbrl, 2026-07-29) · net income (last quarter) 35.77bn (sec_xbrl, 2026-07-29) · last EPS surprise % 9.53 (finnhub, 2026-09-05)
 
 ## Macro
 
@@ -87,6 +90,14 @@ Generated 2026-10-04 14:50 UTC · slot `all` · 13090 articles in the corpus, 49
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 23:57 | eodhd | ok | 0 | 0 | 0 | facts 0; EODHD plan: free (2 names a day, US only, rotated); XNAS:MSFT: deferred |
+| 23:57 | jin10_flash | ok | 20 | 14 | 6 | facts 0;  |
+| 23:57 | alphavantage_news | ok | 7 | 7 | 6 | facts 4; XNAS:MSFT: alphavantage quota exhausted for today: Thank you for using  |
+| 23:57 | finnhub | ok | 124 | 110 | 91 | facts 10;  |
+| 23:57 | edgar | ok | 0 | 0 | 0 | facts 0;  |
+| 23:57 | yahoo_rss | ok | 25 | 24 | 20 | named the company: 24 of 24 (lowest: Apple 2/2, Microsoft 4/4, NVIDIA 18/18) |
+| 23:57 | google_news | ok | 34 | 32 | 30 | named the company: 28 of 32 (lowest: NVIDIA 15/19, Apple 5/5, Microsoft 8/8) |
+| 23:57 | gdelt | ok | 0 | 0 | 0 | grouped 3 names per request; 1 request; read but empty: Apple, Microsoft, NVIDIA |
 | 14:49 | eodhd | ok | 0 | 0 | 0 | facts 0; EODHD plan: free (2 names a day, US only, rotated); MYX:8869: deferred  |
 | 14:49 | twse_openapi | ok | 8 | 0 | 0 | facts 0;  |
 | 14:49 | jin10_flash | ok | 19 | 5 | 4 | facts 0;  |
