@@ -1,16 +1,21 @@
 # Digest 2026-10-06
 
-Generated 2026-10-06 01:48 UTC · slot `all` · 13718 articles in the corpus, 4970 observations, 4177 events in the fact book.
+Generated 2026-10-06 16:01 UTC · slot `all` · 13865 articles in the corpus, 4975 observations, 4177 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- quiet: nothing collected for this name in the window
+- tone: 3 stories from 3 sources, polarity -0.33, peak intensity 0.00, uncertainty 0.32 · 2 escalated
+- 2026-10-06 www.kaohooninternational.com — Maybank Expects Volatile October for Thai Stock Market, Picks AWC, DELTA and TRUE [q 0.65, tone +0.0] ★
+- 2026-10-06 www.igamingtoday.com — Maybank Cuts DigiPlus Earnings Forecasts as Player Spending Weakens [q 0.65, tone -1.0] ★
+- 2026-10-06 fundsglobalasia.com — Maybank tokenised fund expands distribution [q 0.65, tone +0.0]
 
 ### Tenaga (MYX:5347)
-- tone: 4 stories from 3 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- tone: 6 stories from 5 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
 - 2026-10-05 www.theedgemarkets.com — Zetrix AI, Pertama Digital, HeiTech Padu, Yinson, Kelington, Go Hub Capital, Citaglobal, West River, Jati Tinggi, TNB, IJM, Asteel [q 0.80, tone +0.0]
 - 2026-10-05 www.theedgemarkets.com — Jati Tinggi bags two TNB contracts worth RM15.7 mil [q 0.80, tone +0.0]
+- 2026-10-06 solarquarter.com — How TNB is Leading Malaysia's Renewable Energy Transition [q 0.65, tone +0.0]
+- 2026-10-06 www.marketscreener.com — Jati Tinggi Unit Bags MYR13 Million Deal from Tenaga Nasional [q 0.65, tone +0.0]
 - 2026-10-05 tradersunion.com — Jati Tinggi secures two TNB contracts, boosting its energy-sector order book [q 0.65, tone +0.0]
 - 2026-10-05 www.klsescreener.com — Jati Tinggi bags RM15.7mil TNB contracts for cable works [q 0.65, tone +0.0]
 
@@ -22,7 +27,8 @@ Generated 2026-10-06 01:48 UTC · slot `all` · 13718 articles in the corpus, 49
 - quiet: nothing collected for this name in the window
 
 ### Press Metal (MYX:8869)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +1.00, peak intensity 0.00, uncertainty 0.00 · 1 escalated
+- 2026-10-06 www.alcircle.com — Press Metal profit jumps 51% as Middle East aluminium curtailments lift the premiums [q 0.65, tone +1.0] ★
 
 ### Genting (MYX:3182)
 - quiet: nothing collected for this name in the window
@@ -91,6 +97,15 @@ Generated 2026-10-06 01:48 UTC · slot `all` · 13718 articles in the corpus, 49
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 16:00 | eodhd | ok | 0 | 0 | 0 | facts 0; EODHD plan: free (2 names a day, US only, rotated); MYX:5183: deferred  |
+| 16:00 | twse_openapi | ok | 8 | 0 | 0 | facts 5;  |
+| 15:59 | jin10_flash | ok | 19 | 7 | 3 | facts 0;  |
+| 15:59 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 15:59 | nst_business | ok | 50 | 50 | 48 |  |
+| 15:59 | fmt_business | ok | 50 | 50 | 50 |  |
+| 15:59 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: IHH, Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals |
+| 15:59 | google_news | ok | 54 | 52 | 46 | named the company: 8 of 52 (lowest: Genting 0/32, Maybank 3/9, Tenaga 2/6) |
+| 15:59 | gdelt | failed | 0 | 0 | 0 | no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP |
 | 01:47 | eodhd | ok | 0 | 0 | 0 | facts 0; EODHD plan: free (2 names a day, US only, rotated); XNAS:NVDA: deferred |
 | 01:47 | jin10_flash | ok | 19 | 12 | 8 | facts 0;  |
 | 01:47 | alphavantage_news | ok | 25 | 23 | 20 | facts 8; XNAS:MSFT: alphavantage quota exhausted for today: Thank you for using  |

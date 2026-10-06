@@ -1,6 +1,87 @@
 {
   "collection": [
     {
+      "at": "2026-10-06T16:00:20.140305+00:00",
+      "detail": "facts 0; EODHD plan: free (2 names a day, US only, rotated); MYX:5183: deferred by the 2-a-day credit budget; next in rotation; MYX:5225: deferred by the 2-a-day credit budget; next in rotation; MYX:8869: deferred by the 2-a-day credit budget; next in rotation; MYX:3182: deferred by the 2-a-day credit budget; next in rotation; outside the free plan (US only), so not asked for: MYX:5183, MYX:5225, MYX:8869, MYX:3182. The EODHD Fundamentals plan covers KLSE and TW.; MYX:1155: EODHD free plan: US only; the Fundamentals plan covers KLSE; MYX:5347: EODHD free plan: US only; the Fundamentals plan covers KLSE",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-06T16:00:13.631637+00:00",
+      "detail": "facts 5; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-06T15:59:40.709330+00:00",
+      "detail": "facts 0; ",
+      "fetched": 19,
+      "kept": 7,
+      "source": "jin10_flash",
+      "status": "ok",
+      "stored": 3
+    },
+    {
+      "at": "2026-10-06T15:59:39.825404+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-06T15:59:38.162790+00:00",
+      "detail": "",
+      "fetched": 50,
+      "kept": 50,
+      "source": "nst_business",
+      "status": "ok",
+      "stored": 48
+    },
+    {
+      "at": "2026-10-06T15:59:37.762408+00:00",
+      "detail": "",
+      "fetched": 50,
+      "kept": 50,
+      "source": "fmt_business",
+      "status": "ok",
+      "stored": 50
+    },
+    {
+      "at": "2026-10-06T15:59:37.553529+00:00",
+      "detail": "read but empty: IHH, Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-06T15:59:35.686008+00:00",
+      "detail": "named the company: 8 of 52 (lowest: Genting 0/32, Maybank 3/9, Tenaga 2/6)",
+      "fetched": 54,
+      "kept": 52,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 46
+    },
+    {
+      "at": "2026-10-06T15:59:33.216749+00:00",
+      "detail": "no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked); deferred: Press Metal, Genting, Maybank",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "failed",
+      "stored": 0
+    },
+    {
       "at": "2026-10-06T01:47:13.025453+00:00",
       "detail": "facts 0; EODHD plan: free (2 names a day, US only, rotated); XNAS:NVDA: deferred by the 2-a-day credit budget; next in rotation; XNAS:AAPL: outside the plan or over today's credits; XNAS:MSFT: outside the plan or over today's credits",
       "fetched": 0,
@@ -74,18 +155,18 @@
     }
   ],
   "counts": {
-    "articles": 13718,
+    "articles": 13865,
     "documents": 0,
-    "escalated": 2355,
+    "escalated": 2358,
     "events": 4177,
-    "failed_sweeps": 46,
-    "linked": 9526,
-    "observations": 4970,
+    "failed_sweeps": 47,
+    "linked": 9534,
+    "observations": 4975,
     "series": 31,
-    "sweeps": 708
+    "sweeps": 717
   },
   "day": "2026-10-06",
-  "generated_at": "2026-10-06 01:48 UTC",
+  "generated_at": "2026-10-06 16:01 UTC",
   "macro": [
     {
       "change": "0.12",
@@ -218,13 +299,53 @@
   ],
   "names": [
     {
-      "escalated": 0,
+      "escalated": 2,
       "events": [],
       "instrument_id": "MYX:1155",
       "label": "Maybank",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE5aTkx3UldEdmw1MjZqMVpuYXJVUEViZkE4VkVybWt2c1Z4bi1tNklMTDFPZmVraDlzSTJ0MjBVRms5NlUwaUgwVWpoamppZlFhblN3RDNhOXcwbkVUR2lISA?oc=5",
+          "domain": "www.kaohooninternational.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-06T04:31:04+00:00",
+          "quality": 0.65,
+          "title": "Maybank Expects Volatile October for Thai Stock Market, Picks AWC, DELTA and TRUE",
+          "uncertainty": 0.9615384615384615
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMingFBVV95cUxQUHlTUkg4WFFSRzNVQ0FYUFhwbWF1U2o4YnVQVXZORnY1WGFEYk9yblFqOEdJel9MSE9HWDhRT2hpUFkyVXQxV1ZJOUVTME9qUE1YWVhqSTFsTUxYQUNCelZGc29VZDhNZUVnNWdUVDE4aWpwcF9hTzBEREVHSW9vX09zYURHU0d6cGFrSE1WMEtpR0lMNjNVSUV1SDl6QQ?oc=5",
+          "domain": "www.igamingtoday.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-10-06T03:34:28+00:00",
+          "quality": 0.65,
+          "title": "Maybank Cuts DigiPlus Earnings Forecasts as Player Spending Weakens",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMihAFBVV95cUxNWXkxa1JLU0NPTVRIYm5VMVhtN25jT2FoMWFKVUVvOFZ4MmNkTWU4VGFWQlRoamNNeVFMeDZfSXpBaFd5eS0zU2xVWUxMejRrY19NQlRpazloLUtSdTNEOFpvZUVTOXVBZXFGM1BLOWl5c19ybU1nLXBSWFBYRHpfWTlTTkPSAYQBQVVfeXFMTVl5MWtSS1NDT01USGJuVTFYbTduY09haDFhSlVFbzhWeDJjZE1lOFRhVkJUaGpjTXlRTHg2X0l6QWhXeXktM1NsVVlMTHo0a2NfTUJUaWs5aC1LUnUzRDhab2VFUzl1QWVxRjNQSzlpeXNfcm1NZy1wUlhQWER6X1k5U05D?oc=5",
+          "domain": "fundsglobalasia.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-06T09:57:15+00:00",
+          "quality": 0.65,
+          "title": "Maybank tokenised fund expands distribution",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 3,
+        "polarity_mean": -0.333,
+        "sources": 3,
+        "uncertainty_mean": 0.321
+      },
       "upcoming": []
     },
     {
@@ -257,6 +378,28 @@
           "uncertainty": 0.0
         },
         {
+          "doc_id": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxQUFo4XzRwSnp0TllwTUJRSUE1X0ZPVklKZjdvQ1RqV2piY0t0cGpBNzc4UzZQR2dvTXJ1SUZ2cTJTZmI4bGxxT1hWOVFOOWRRM19Uck05VEhIT2ZKQkJiUTlfa0pxdGw0ZUlPaHduYUo4a2Ixa2hiOE5aNTdSZU5hWndyRm55b1RwUUtlaUctUWVhV1FrOU9fcGV0RmpIVnZWXzN2RHVJYzZOZw?oc=5",
+          "domain": "solarquarter.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-06T10:26:58+00:00",
+          "quality": 0.65,
+          "title": "How TNB is Leading Malaysia's Renewable Energy Transition",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMitAFBVV95cUxQM0hkU2JweDNQNXV2Y1dRMFVGUHQ1dXJrT3FrVlBXb0ZPVUZVSVdxZVdRdERQc1BHN2tpcVpKY1Fzei1FR01obmdsS2ZDeUM4MDdzV0lKUkRXMk9sZUpTTXhpdDctWHNkeG5PT01scXhIb0ZvQ0dCMlpyWUNBX3VLUGZ4ZDFVWFBjc1hFN2YwSkNKVHNHOFdqeVBYZmhSTDFtY212NDdYYmFPajdUaGxSTDVTalM?oc=5",
+          "domain": "www.marketscreener.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-06T03:41:13+00:00",
+          "quality": 0.65,
+          "title": "Jati Tinggi Unit Bags MYR13 Million Deal from Tenaga Nasional",
+          "uncertainty": 0.0
+        },
+        {
           "doc_id": "https://news.google.com/rss/articles/CBMilAFBVV95cUxNdGRramJCN0tHSXJJSG8yR2w2X1Y5MWZqTHkxLUN6d1M4UkNUVDdSTTBhdzJnSjVWcjVsY0gweTBhWS0yM3Q3bHpxQXNHbTdyTTlsQnBYWF9UY2JWUGxjVmdwNnl6M1dlMWdDTWtqNkpUNVB1dzR4Zi1CWjJuaTJBU0pUanVCcVUyMXlsdmNxZGlwQUNE?oc=5",
           "domain": "tradersunion.com",
           "escalated": false,
@@ -281,9 +424,9 @@
       ],
       "tone": {
         "intensity_max": 0.0,
-        "n": 4,
+        "n": 6,
         "polarity_mean": 0.0,
-        "sources": 3,
+        "sources": 5,
         "uncertainty_mean": 0.0
       },
       "upcoming": []
@@ -327,13 +470,31 @@
       "upcoming": []
     },
     {
-      "escalated": 0,
+      "escalated": 1,
       "events": [],
       "instrument_id": "MYX:8869",
       "label": "Press Metal",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMivAFBVV95cUxNX1N6M1E5d2h6bHJUNXBxbklQQW1SQ2o5cVFDaWxMY290VTFUbjhKVjRNUFpCdmtTNDZmR2xRTVRfcjIzUy1qbEMzRjFHSEozeTJTV2dIUDVJTndKU2dHMExEV3p2b1ZVNDlkcnA0c0ZVektrQ2g0UW9pMVZCd3ZiY0RXTnp2ak8yeXZCUEFkQWJsdVZNTU1yVVBHMjRDRFVZVEY4SDFvb0ZkczF0VnJJRWtCQTZZNGtZbFc4Nw?oc=5",
+          "domain": "www.alcircle.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-06T06:07:14+00:00",
+          "quality": 0.65,
+          "title": "Press Metal profit jumps 51% as Middle East aluminium curtailments lift the premiums",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 1.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
