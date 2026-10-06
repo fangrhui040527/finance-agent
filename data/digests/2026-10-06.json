@@ -1,6 +1,42 @@
 {
   "collection": [
     {
+      "at": "2026-10-06T18:33:48.226973+00:00",
+      "detail": "facts 0; ",
+      "fetched": 450,
+      "kept": 0,
+      "source": "dbnomics",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-06T18:33:45.797167+00:00",
+      "detail": "facts 0; ",
+      "fetched": 21,
+      "kept": 7,
+      "source": "jin10_flash",
+      "status": "ok",
+      "stored": 6
+    },
+    {
+      "at": "2026-10-06T18:33:44.619107+00:00",
+      "detail": "facts 27; release calendar: 'FOMC Press Release' listed on 15 days of the fortnight - a daily table, not a scheduled print; not stored as a release",
+      "fetched": 477,
+      "kept": 0,
+      "source": "fred",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-06T18:33:39.084611+00:00",
+      "detail": "facts 5; fmp /earnings is outside the plan (HTTP 402); not collected for NVDA, AAPL, MSFT",
+      "fetched": 3953,
+      "kept": 0,
+      "source": "fmp",
+      "status": "ok",
+      "stored": 0
+    },
+    {
       "at": "2026-10-06T16:00:20.140305+00:00",
       "detail": "facts 0; EODHD plan: free (2 names a day, US only, rotated); MYX:5183: deferred by the 2-a-day credit budget; next in rotation; MYX:5225: deferred by the 2-a-day credit budget; next in rotation; MYX:8869: deferred by the 2-a-day credit budget; next in rotation; MYX:3182: deferred by the 2-a-day credit budget; next in rotation; outside the free plan (US only), so not asked for: MYX:5183, MYX:5225, MYX:8869, MYX:3182. The EODHD Fundamentals plan covers KLSE and TW.; MYX:1155: EODHD free plan: US only; the Fundamentals plan covers KLSE; MYX:5347: EODHD free plan: US only; the Fundamentals plan covers KLSE",
       "fetched": 0,
@@ -155,26 +191,26 @@
     }
   ],
   "counts": {
-    "articles": 13865,
+    "articles": 13871,
     "documents": 0,
     "escalated": 2358,
-    "events": 4177,
+    "events": 4179,
     "failed_sweeps": 47,
-    "linked": 9534,
-    "observations": 4975,
+    "linked": 9536,
+    "observations": 4979,
     "series": 31,
-    "sweeps": 717
+    "sweeps": 721
   },
   "day": "2026-10-06",
-  "generated_at": "2026-10-06 16:01 UTC",
+  "generated_at": "2026-10-06 18:33 UTC",
   "macro": [
     {
-      "change": "0.12",
-      "obs_date": "2026-10-01",
+      "change": "0.02",
+      "obs_date": "2026-10-05",
       "series_id": "BAMLH0A0HYM2",
       "source": "fred",
       "title": "ICE BofA US high-yield option-adjusted spread, %",
-      "value": "3.24"
+      "value": "3.12"
     },
     {
       "change": "0",
@@ -201,36 +237,36 @@
       "value": "113.96"
     },
     {
-      "change": "-0.0133",
-      "obs_date": "2026-09-25",
+      "change": "-0.001",
+      "obs_date": "2026-10-02",
       "series_id": "DEXMAUS",
       "source": "fred",
       "title": "Malaysian ringgit per US dollar",
-      "value": "4.07"
+      "value": "4.08"
     },
     {
       "change": "0",
-      "obs_date": "2026-09-30",
+      "obs_date": "2026-10-02",
       "series_id": "DFF",
       "source": "fred",
       "title": "Federal funds effective rate, %",
       "value": "3.88"
     },
     {
-      "change": "0.03",
-      "obs_date": "2026-09-30",
+      "change": "0.04",
+      "obs_date": "2026-10-02",
       "series_id": "DGS10",
       "source": "fred",
       "title": "10-year Treasury yield, %",
-      "value": "5.29"
+      "value": "5.28"
     },
     {
-      "change": "-0.01",
-      "obs_date": "2026-09-30",
+      "change": "0.05",
+      "obs_date": "2026-10-02",
       "series_id": "DGS2",
       "source": "fred",
       "title": "2-year Treasury yield, %",
-      "value": "4.88"
+      "value": "4.83"
     },
     {
       "change": "0.4",
@@ -241,20 +277,20 @@
       "value": "137.50"
     },
     {
-      "change": "-0.2221",
-      "obs_date": "2026-09-25",
+      "change": "-0.4034",
+      "obs_date": "2026-10-02",
       "series_id": "DTWEXBGS",
       "source": "fred",
       "title": "Broad US dollar index",
-      "value": "120.33"
+      "value": "121.38"
     },
     {
-      "change": "10.54",
-      "obs_date": "2026-10-01",
+      "change": "286.45",
+      "obs_date": "2026-10-05",
       "series_id": "NASDAQCOM",
       "source": "fred",
       "title": "NASDAQ Composite, index level",
-      "value": "26,871.60"
+      "value": "27,477.31"
     },
     {
       "change": null,
@@ -265,20 +301,20 @@
       "value": "3,158.26"
     },
     {
-      "change": "14.91",
-      "obs_date": "2026-10-01",
+      "change": "51.23",
+      "obs_date": "2026-10-05",
       "series_id": "SP500",
       "source": "fred",
       "title": "S&P 500, index level",
-      "value": "7,666.45"
+      "value": "7,773.95"
     },
     {
-      "change": "0.05",
-      "obs_date": "2026-10-01",
+      "change": "0.02",
+      "obs_date": "2026-10-05",
       "series_id": "T10Y2Y",
       "source": "fred",
       "title": "10y minus 2y Treasury spread, %",
-      "value": "0.46"
+      "value": "0.47"
     },
     {
       "change": "0.1",
@@ -289,12 +325,12 @@
       "value": "4.20"
     },
     {
-      "change": "0.05",
-      "obs_date": "2026-10-01",
+      "change": "0.21",
+      "obs_date": "2026-10-05",
       "series_id": "VIXCLS",
       "source": "fred",
       "title": "CBOE VIX, index",
-      "value": "16.39"
+      "value": "15.52"
     }
   ],
   "names": [
@@ -571,11 +607,11 @@
         },
         {
           "concept": "price_target_consensus",
-          "known_at": "2026-10-02",
+          "known_at": "2026-10-06",
           "label": "target (consensus)",
           "period_end": null,
           "source": "fmp",
-          "value": "338.96"
+          "value": "339.17"
         },
         {
           "concept": "analyst_buy",
@@ -976,7 +1012,15 @@
     },
     {
       "escalated": 25,
-      "events": [],
+      "events": [
+        {
+          "kind": "rating_reiteration",
+          "source": "fmp",
+          "title": "Scotiabank maintain Sector Outperform",
+          "url": "",
+          "when": "2026-10-05T00:00:00+00:00"
+        }
+      ],
       "instrument_id": "XNAS:MSFT",
       "label": "Microsoft",
       "snapshot": [
@@ -1038,11 +1082,11 @@
         },
         {
           "concept": "price_target_consensus",
-          "known_at": "2026-10-01",
+          "known_at": "2026-10-06",
           "label": "target (consensus)",
           "period_end": null,
           "source": "fmp",
-          "value": "563.50"
+          "value": "571.76"
         },
         {
           "concept": "analyst_buy",
