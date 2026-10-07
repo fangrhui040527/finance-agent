@@ -290,7 +290,7 @@ class Corpus:
 
     # -- reads ----------------------------------------------------------------
 
-    def last_success(self, source: str) -> datetime | None:
+    def last_success(self, source: str, slots: tuple[str, ...] | None = None) -> datetime | None:
         """When this source was last read successfully - the watermark a sweep
         resumes from. A FAILED sweep deliberately does not move it: resuming
         from a failure would put the window that was never read behind us.
@@ -307,12 +307,29 @@ class Corpus:
         half-reachable is not silent. Whether half is enough is a different
         alarm reading the same column, which it could not do while every run
         was written down as `ok`.
+
+        WITH `slots`, only runs in those slots count - the watermark of a source
+        that asks different names in different slots (`catalog.covering_slots`).
+        Rows written before the slot column existed carry '' and never match.
         """
-        row = self.conn.execute(
-            "SELECT MAX(at) AS at FROM sweeps WHERE source = ? AND status IN (?, ?)",
-            (source, OK, DEGRADED),
-        ).fetchone()
+        sql = "SELECT MAX(at) AS at FROM sweeps WHERE source = ? AND status IN (?, ?)"
+        args: list = [source, OK, DEGRADED]
+        if slots is not None:
+            sql += f" AND slot IN ({','.join('?' * len(slots))})"
+            args.extend(slots)
+        row = self.conn.execute(sql, args).fetchone()
         return _dt(row["at"]) if row and row["at"] else None
+
+    def run_slots(self, source: str) -> dict[str, str]:
+        """run_id -> the slot that run collected in, for this source's sweep rows.
+
+        The facts store's `pulls` table has no slot column; a structured
+        source's slot-aware watermark joins its pulls to these rows by run_id.
+        """
+        rows = self.conn.execute(
+            "SELECT run_id, slot FROM sweeps WHERE source = ? AND slot <> ''", (source,)
+        ).fetchall()
+        return {r["run_id"]: r["slot"] for r in rows}
 
     def slot_runs(self, since: datetime, until: datetime) -> dict[str, int]:
         """How many distinct sweep RUNS each slot had over [since, until).

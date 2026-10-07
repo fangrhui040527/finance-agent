@@ -579,6 +579,32 @@ def _since_for(store_last, name: str, started: datetime, hours: int) -> datetime
     return last if last is not None else started - timedelta(hours=hours)
 
 
+def _news_since(corpus, spec: SourceSpec, slot: str, started: datetime, hours: int) -> datetime:
+    """Where a news source resumes. A per-instrument source asks different
+    names in different slots, so only a run that asked THIS slot's names read
+    the window for them (`catalog.covering_slots`); any other source reads the
+    same feed in every slot and resumes from its last read, whichever slot."""
+    if not spec.per_instrument:
+        return _since_for(corpus.last_success, spec.name, started, hours)
+    slots = catalog.covering_slots(slot)
+    return _since_for(lambda n: corpus.last_success(n, slots), spec.name, started, hours)
+
+
+def _structured_since(
+    facts, corpus, spec: SourceSpec, slot: str, started: datetime, hours: int
+) -> datetime:
+    """`_news_since` for the structured path. Its watermark is the facts
+    store's last successful pull, and `pulls` carries no slot, so a
+    per-instrument source joins its successful pulls to the sweep rows of the
+    same runs to learn which slot each one collected in."""
+    if not spec.per_instrument:
+        return _since_for(facts.last_success, spec.name, started, hours)
+    slots = set(catalog.covering_slots(slot))
+    run_slot = corpus.run_slots(spec.name)
+    reads = [at for run, at in facts.successes(spec.name).items() if run_slot.get(run) in slots]
+    return max(reads) if reads else started - timedelta(hours=hours)
+
+
 def _run_news(
     spec: SourceSpec,
     cfg,
@@ -598,7 +624,7 @@ def _run_news(
     emit,
     pause=None,
 ) -> tuple[SourceResult, list[Article]]:
-    since = _since_for(corpus.last_success, spec.name, tick(), hours)
+    since = _news_since(corpus, spec, slot, tick(), hours)
     result = SourceResult(spec.name, spec.kind, OK)
     try:
         if spec.per_instrument:
@@ -1014,13 +1040,13 @@ def _run_structured(
 ) -> tuple[SourceResult, list[Article]]:
     from knowledge.sources.base import KeyMissing, PlanExcluded, SourceError
 
-    since = _since_for(facts.last_success, spec.name, tick(), hours)
+    since = _structured_since(facts, corpus, spec, slot, tick(), hours)
     result = SourceResult(spec.name, spec.kind, OK)
     instruments = catalog.instruments_for(slot, spec, book) if spec.per_instrument else ()
     if spec.per_instrument and not instruments and spec.kind != MIXED:
         result.status = SKIPPED
         result.detail = f"no name in the book trades in slot {slot!r}"
-        facts.record_pull(run_id, spec.name, SKIPPED, detail=result.detail)
+        facts.record_pull(run_id, spec.name, SKIPPED, at=tick(), detail=result.detail)
         # AND a sweep row, like the KeyMissing skip below. `sweep_silence` reads
         # corpus.last_success and nothing else, so a source whose skip is
         # recorded only in the pulls table reads as a source that has STOPPED.
@@ -1046,7 +1072,7 @@ def _run_structured(
         if not instruments:
             result.status = SKIPPED
             result.detail = "no name in the book on a market this source covers"
-            facts.record_pull(run_id, spec.name, SKIPPED, detail=result.detail)
+            facts.record_pull(run_id, spec.name, SKIPPED, at=tick(), detail=result.detail)
             return result, []
 
     try:
@@ -1055,7 +1081,7 @@ def _run_structured(
     except KeyMissing as e:
         result.status = SKIPPED
         result.detail = str(e)
-        facts.record_pull(run_id, spec.name, SKIPPED, detail=result.detail)
+        facts.record_pull(run_id, spec.name, SKIPPED, at=tick(), detail=result.detail)
         corpus.record_sweep(
             run_id,
             spec.name,
@@ -1069,12 +1095,12 @@ def _run_structured(
     except PlanExcluded as e:
         result.status = SKIPPED
         result.detail = str(e)
-        facts.record_pull(run_id, spec.name, SKIPPED, detail=result.detail)
+        facts.record_pull(run_id, spec.name, SKIPPED, at=tick(), detail=result.detail)
         return result, []
     except SourceError as e:
         result.status = FAILED
         result.detail = str(e)
-        facts.record_pull(run_id, spec.name, FAILED, detail=result.detail)
+        facts.record_pull(run_id, spec.name, FAILED, at=tick(), detail=result.detail)
         corpus.record_sweep(
             run_id,
             spec.name,
@@ -1115,6 +1141,7 @@ def _run_structured(
         run_id,
         spec.name,
         OK,
+        at=tick(),
         fetched=pull.fetched,
         stored=stored + result.stored,
         detail=result.detail,

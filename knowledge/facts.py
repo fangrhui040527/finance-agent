@@ -419,6 +419,15 @@ class FactBook:
         ).fetchone()
         return _dt(row["at"]) if row and row["at"] else None
 
+    def successes(self, source: str) -> dict[str, datetime]:
+        """run_id -> when that run's pull of this source succeeded."""
+        rows = self.conn.execute(
+            "SELECT run_id, MAX(at) AS at FROM pulls WHERE source = ? AND status = ?"
+            " GROUP BY run_id",
+            (source, OK),
+        ).fetchall()
+        return {r["run_id"]: _dt(r["at"]) for r in rows if r["at"]}
+
     def observations(
         self,
         instrument_id: str | None = None,
