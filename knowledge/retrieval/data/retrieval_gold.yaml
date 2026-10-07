@@ -224,6 +224,11 @@ questions:
     title: Apple (AAPL)’s New Mac Mini and Studio Bet Big on On-Device AI
 - query: SPCX
   kind: lexical
+  # Judged by containment from 2026-10-07: every indexed document carrying the
+  # token counts as relevant, resolved at evaluation time. The labels below stay
+  # for drift reporting; they no longer have to be complete, and a sweep that
+  # collects another SPCX story no longer turns main red.
+  relevant_by: containment
   note: >-
     A ticker whose whole corpus is labelled, not a sample. The note used to read
     "appears nowhere else"; the 2026-09-09 us_close sweep collected a fourth

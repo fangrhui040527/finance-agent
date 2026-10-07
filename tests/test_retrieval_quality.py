@@ -428,6 +428,49 @@ def test_semantic_questions_are_never_token_checked(tmp_path):
     assert unlabelled_lexical_matches(_lexical_corpus(), case) == []
 
 
+def test_a_question_judged_by_containment_needs_no_labels_kept_complete(tmp_path):
+    """A ticker with a busy news flow is judged by containment: the newcomer
+    is relevant the moment it is indexed, without a relabel, and the
+    completeness guard has nothing to report."""
+    from knowledge.retrieval.evaluate import relevant_set, run_case, unlabelled_lexical_matches
+
+    col = _lexical_corpus()
+    case = Case(query="1155.MY", relevant=("labelled",), kind="lexical", by_containment=True)
+    assert unlabelled_lexical_matches(col, case) == []
+    assert relevant_set(col, case) >= {"labelled", "newcomer"}
+    assert "unrelated" not in relevant_set(col, case)
+    # The newcomer ties the labelled post; whichever ranks first is a hit.
+    assert run_case(col, case)["bm25"][:2] == [1, 2]
+
+
+def test_containment_applies_only_to_lexical_questions(tmp_path):
+    from knowledge.retrieval.evaluate import relevant_set
+
+    case = Case(query="1155.MY", relevant=("labelled",), kind="semantic", by_containment=True)
+    assert relevant_set(_lexical_corpus(), case) == {"labelled"}
+
+
+def test_the_gold_file_marks_a_containment_question(tmp_path):
+    gold = tmp_path / "gold.yaml"
+    gold.write_text(
+        "questions:\n"
+        "- query: SPCX\n  kind: lexical\n  relevant_by: containment\n"
+        "  relevant:\n  - doc_id: a\n    title: A\n"
+        "- query: 1155.MY\n  kind: lexical\n  relevant:\n  - doc_id: b\n",
+        encoding="utf-8",
+    )
+    spcx, maybank = load_gold(gold)
+    assert spcx.by_containment and not maybank.by_containment
+    assert spcx.relevant == ("a",)
+
+
+def test_spcx_is_judged_by_containment_in_the_shipped_gold_set():
+    """Thirteen hand relabels between 2026-09-09 and 2026-10-07, each one after
+    a sweep turned main red. Its ground truth is containment, so it says so."""
+    (spcx,) = [c for c in load_gold() if c.query == "SPCX"]
+    assert spcx.kind == "lexical" and spcx.by_containment
+
+
 def test_every_lexical_label_in_the_shipped_gold_set_is_complete():
     """The guard that keeps this from rotting again. If a collection sweep adds
     a document carrying a lexical question's tokens, this fails and names it -
