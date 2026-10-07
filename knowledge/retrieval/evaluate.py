@@ -68,6 +68,15 @@ class Case:
     #: "recall fell" and "three labelled articles aged out" look identical in
     #: a score and are opposite problems.
     titles: tuple[str, ...] = ()
+    #: A lexical question whose ground truth IS containment (`relevant_by:
+    #: containment` in the gold file): every indexed document carrying all of
+    #: its tokens counts as relevant, resolved when the evaluation runs. The
+    #: hand labels stay, for drift: a label that leaves the corpus is still
+    #: reported. Without this a ticker with a busy news flow has to be
+    #: relabelled by hand after every sweep that collects it, and until it is,
+    #: the completeness guard holds main red: SPCX was relabelled thirteen
+    #: times between 2026-09-09 and 2026-10-07.
+    by_containment: bool = False
 
 
 @dataclass
@@ -241,6 +250,29 @@ def _ranks(results: list[Chunk] | list[Hit], relevant: set[str]) -> list[int]:
     return out
 
 
+def containment(collection: Collection, query: str) -> set[str]:
+    """The ids of every indexed document carrying every token of `query`."""
+    want = set(tokenize(query))
+    if not want:
+        return set()
+    out: set[str] = set()
+    for toks, chunk in zip(collection.bm25._docs, collection.bm25._chunks, strict=True):
+        if want <= set(toks):
+            out.add(chunk.chunk_id)
+            if chunk.metadata.get("doc_id"):
+                out.add(chunk.metadata["doc_id"])
+    return out
+
+
+def relevant_set(collection: Collection, case: Case) -> set[str]:
+    """The documents that count as answering `case`: its labels, and for a
+    lexical question judged by containment, every document that contains it."""
+    relevant = set(case.relevant)
+    if case.by_containment and case.kind == "lexical":
+        relevant |= containment(collection, case.query)
+    return relevant
+
+
 def _ids(results: list[Chunk] | list[Hit]) -> set[str]:
     out: set[str] = set()
     for item in results:
@@ -261,7 +293,7 @@ def run_case(collection: Collection, case: Case, depth: int = DEPTH) -> dict[str
     scores the candidate the shipped path does NOT use, against the one it
     does, on the same questions.
     """
-    relevant = set(case.relevant)
+    relevant = relevant_set(collection, case)
     sparse = [c for c, _ in collection.bm25.search(case.query, depth)]
     dense = [c for c, _ in collection.dense(case.query, depth)]
     selected = collection.search(case.query, limit=depth, licence_exclude=None)
@@ -296,7 +328,8 @@ def unlabelled_lexical_matches(collection: Collection, case: Case) -> list[str]:
     Semantic questions are not checked at all. There the wording is chosen to
     differ from the article on purpose, so token containment says nothing.
     """
-    if case.kind != "lexical":
+    if case.kind != "lexical" or case.by_containment:
+        # Judged by containment: complete by construction, nothing to label.
         return []
     want = set(tokenize(case.query))
     if not want:
@@ -380,6 +413,7 @@ def load_gold(path: str | Path = GOLD) -> list[Case]:
                 kind=row.get("kind", "semantic"),
                 note=row.get("note", ""),
                 titles=tuple(d.get("title", "") for d in docs),
+                by_containment=row.get("relevant_by") == "containment",
             )
         )
     return out
