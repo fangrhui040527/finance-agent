@@ -295,6 +295,11 @@ questions:
     2026-10-01 self-check: a Stocktwits close wrap with the ticker in its title,
     and a Finnhub headline on Nvidia's data-centre jobs claim that carries it
     only in the body. TWENTY-SEVEN labels.
+
+    A thirteenth, found by the 2026-10-07 self-check: thirteen documents from the
+    sweeps of 2026-10-01 to 2026-10-07, which no self-check labelled while the
+    routines were stalled. Ten carry the ticker in the title and three only in
+    the body. FORTY labels.
   relevant:
   - doc_id: https://stocktwits.com/news-articles/markets/equity/s-and-p-500-dow-end-best-day-in-a-month/cZsufnBRJvu?.tsrc=rss
     title: S&P 500, Dow End Best Day In A Month On Calmer Yields As Rate Hike Bets Wane — SPCX, VSXY,
@@ -355,6 +360,32 @@ questions:
     title: "S&P 500, Dow End Lower As Investors Shrug Off Cooler-Than-Expected Inflation Data — MGM, SPCX, AAPL, TSM In Focus"
   - doc_id: finnhub:142513041
     title: "Nvidia CEO Jensen Huang: AI data center build-out could create 1 million jobs and reshape the US economy"
+  - doc_id: https://stocktwits.com/news-articles/markets/equity/spcx-stock-slips-after-hours-as-space-x-reportedly-seeks-40-b-for-nvidia-chips/cZDtlvbRBlZ?.tsrc=rss
+    title: "SPCX Stock Slips After-Hours As SpaceX Reportedly Seeks $40B For Nvidia Chips"
+  - doc_id: finnhub:142665403
+    title: "These 5 key events could be SpaceX's next big catalysts"
+  - doc_id: finnhub:142665391
+    title: "Sozzi talks SpaceX, takes a look at Nike, and chats with the Conference Board CEO"
+  - doc_id: finnhub:142655827
+    title: "Why Are Nasdaq, Dow Futures Rising Premarket? SPCX, NVDA, CEG, AMD, ORCL, NOK In Focus"
+  - doc_id: https://news.google.com/rss/articles/CBMiwAFBVV95cUxNTWNRZUhKYUdwZWNibDgzVEl0aHc4cnpaR1V5QlhLa2I1Q3dRdlFVQjFnRE45aGhzbmRkUUdiaE9mOERPM1FSTkc1NjJzVFJ3R1JXdEQyX1NmLTVWMTQxdVdkcHlaQ054QnFFWW5jVkVtM0haOEhJTXVsSElXWk9fT3NpWjA1T2J1N25EZ3ktVnhrZjZVOU44Z3JxVVBBUjVMWUZJN2FDWldtLUZpWGliRHNPbXdBVTlCWVFCZ3BMNWI?oc=5
+    title: "SPCX Stock Reclaims $165 as Upgrade and Microsoft Deal Hopes Lift Revenue Outlook"
+  - doc_id: https://stocktwits.com/news-articles/markets/equity/nasdaq-100-hits-record-highs-as-investors-shrug-off-pressure-from-soaring-yields-nvda-spcx-crml-tsla-qcom-in-focus/cZDqO2yRBjp?.tsrc=rss
+    title: "Nasdaq 100 Hits Record Highs As Investors Shrug Off Pressure From Soaring Yields — NVDA, SPCX, CRML, TSLA, QCOM In Focus"
+  - doc_id: finnhub:142637684
+    title: "Microsoft Could Be SpaceX's Next Big AI Customer: Bernstein Sees AI Revenue Surging Nearly 500%"
+  - doc_id: finnhub:142627578
+    title: "MU, HPE, AMZN, META, SPCX: Why Retail Traders Couldn’t Take Their Eyes Off These Stocks Last Week"
+  - doc_id: https://finance.yahoo.com/technology/ai/articles/jim-cramer-says-space-exploration-220205490.html?.tsrc=rss
+    title: "What Jim Cramer Says About Space Exploration Technologies’ (SPCX) Starlink and AI Opportunity"
+  - doc_id: https://stocktwits.com/news-articles/markets/equity/s-and-p-500-nasdaq-dow-end-week-higher-as-weak-jobs-report-cools-rate-hike-bets-nvda-ba-spcx-rivn-apld-in-focus/cZDjq3URBKF?.tsrc=rss
+    title: "S&P 500, Nasdaq, Dow End Week Higher As Weak Jobs Report Cools Rate Hike Bets — NVDA, BA, SPCX, RIVN, APLD In Focus"
+  - doc_id: finnhub:142592904
+    title: "SPCX Stock Climbs As Three Thursday Launches Meet Start Of Google’s $920 Million AI Pact"
+  - doc_id: finnhub:142582860
+    title: "Stocktwits Space Race Weekly: SPCX Holds Pole Position As ASTS, RKLB, PL, RDW, FLY Lose Altitude"
+  - doc_id: finnhub:142573663
+    title: "SPCX Stock Climbs Overnight: Musk Teases ‘Big Deal’ Nvidia AI Milestone — Industry Insider Flags Up To 25% Higher Power"
 - query: KeyBanc Underweight rating Apple
   kind: lexical
   note: broker plus rating word
