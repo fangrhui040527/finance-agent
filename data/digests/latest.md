@@ -1,26 +1,40 @@
 # Digest 2026-10-07
 
-Generated 2026-10-07 00:45 UTC · slot `all` · 14126 articles in the corpus, 4989 observations, 4201 events in the fact book.
+Generated 2026-10-07 13:56 UTC · slot `all` · 14275 articles in the corpus, 4994 observations, 4201 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- quiet: nothing collected for this name in the window
+- tone: 5 stories from 4 sources, polarity +0.20, peak intensity 0.00, uncertainty 0.00 · 1 escalated
+- 2026-10-07 www.ad-hoc-news.de — Malayan Banking stock carries a 6.16 percent dividend yield [q 0.65, tone +1.0] ★
+- 2026-10-07 www.thestar.com.my — Maybank, CIMB launch credit cards for everyday living costs [q 0.80, tone +0.0]
+- 2026-10-07 www.ad-hoc-news.de — Maybank holds target for Bank Rakyat Indonesia stock at IDR 3,900 [q 0.65, tone +0.0]
+- 2026-10-07 www.therakyatpost.com — Maybank Islamic Nadi Mastercard Credit Card-i Now Open for Applications Nationwide - TRP [q 0.65, tone +0.0]
+- 2026-10-06 www.khmertimeskh.com — Maybank unlocks cross-border healthcare privileges for Cambodians [q 0.65, tone +0.0]
 
 ### Tenaga (MYX:5347)
-- quiet: nothing collected for this name in the window
+- tone: 2 stories from 2 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 1 escalated
+- 2026-10-07 www.ad-hoc-news.de — Tenaga Nasional stock weighs Kenyir solar plans and lower charges [q 0.65, tone +0.0] ★
+- 2026-10-06 www.marketscreener.com — Shree TNB Polymers Limited has completed an IPO in the amount of INR 318 million. [q 0.65, tone +0.0]
 
 ### Petronas Chemicals (MYX:5183)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +1.00, peak intensity 0.00, uncertainty 0.00 · 1 escalated
+- 2026-10-07 www.ad-hoc-news.de — Petronas Chemicals stock reports stronger second-quarter profit [q 0.65, tone +1.0] ★
 
 ### IHH (MYX:5225)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +1.00, peak intensity 0.00, uncertainty 0.00 · 1 escalated
+- 2026-10-07 www.ad-hoc-news.de — IHH Healthcare stock reports 30 percent PATMI growth in Q2 [q 0.65, tone +1.0] ★
 
 ### Press Metal (MYX:8869)
 - quiet: nothing collected for this name in the window
 
 ### Genting (MYX:3182)
-- quiet: nothing collected for this name in the window
+- tone: 5 stories from 4 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-10-07 www.nst.com.my — Pahang cops still hunting prime suspect in Genting jewellery heist [q 1.00, tone +0.0]
+- 2026-10-07 www.nst.com.my — Genting heiress' RM1.6bil estate: Administrators deny enriching themselves through legal fees [q 1.00, tone +0.0]
+- 2026-10-07 www.malaymail.com — Seven suspects: Chinese national latest held as Pahang police close in on RM1.7m Genting jewellery heist [q 0.80, tone +0.0]
+- 2026-10-07 www.ad-hoc-news.de — Genting stock completes a 5 percent LNG stake sale [q 0.65, tone +0.0]
+- 2026-10-07 www.moomoo.com — 🆕 New warrants over GENTING, HIBISCS and the Hang Seng Index! [q 0.65, tone +0.0]
 
 ### NVIDIA (XNAS:NVDA)
 - tone: 98 stories from 8 sources, polarity +0.24, peak intensity 0.67, uncertainty 0.07 · 17 escalated
@@ -86,6 +100,15 @@ Generated 2026-10-07 00:45 UTC · slot `all` · 14126 articles in the corpus, 49
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 13:54 | eodhd | ok | 0 | 0 | 0 | facts 0; EODHD plan: free (2 names a day, US only, rotated); MYX:8869: deferred  |
+| 13:54 | twse_openapi | ok | 8 | 0 | 0 | facts 5;  |
+| 13:54 | jin10_flash | ok | 17 | 5 | 2 | facts 0;  |
+| 13:54 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 13:54 | nst_business | ok | 50 | 50 | 48 |  |
+| 13:54 | fmt_business | ok | 50 | 50 | 50 |  |
+| 13:54 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Tenaga, Petronas Chemicals, IHH, Press Metal, Genting, Maybank |
+| 13:54 | google_news | ok | 60 | 59 | 49 | named the company: 13 of 59 (lowest: Press Metal 0/1, Genting 3/32, Tenaga 2/7) |
+| 13:54 | gdelt | failed | 0 | 0 | 0 | no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP |
 | 00:44 | eodhd | ok | 0 | 0 | 0 | facts 0; EODHD plan: free (2 names a day, US only, rotated); XNAS:MSFT: deferred |
 | 00:44 | jin10_flash | ok | 18 | 7 | 3 | facts 0;  |
 | 00:44 | alphavantage_news | failed | 0 | 0 | 0 | alphavantage quota exhausted for today: Thank you for using Alpha Vantage! This  |

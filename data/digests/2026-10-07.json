@@ -1,6 +1,87 @@
 {
   "collection": [
     {
+      "at": "2026-10-07T13:54:56.234267+00:00",
+      "detail": "facts 0; EODHD plan: free (2 names a day, US only, rotated); MYX:8869: deferred by the 2-a-day credit budget; next in rotation; MYX:3182: deferred by the 2-a-day credit budget; next in rotation; MYX:1155: deferred by the 2-a-day credit budget; next in rotation; MYX:5347: deferred by the 2-a-day credit budget; next in rotation; outside the free plan (US only), so not asked for: MYX:1155, MYX:5347, MYX:8869, MYX:3182. The EODHD Fundamentals plan covers KLSE and TW.; MYX:5183: EODHD free plan: US only; the Fundamentals plan covers KLSE; MYX:5225: EODHD free plan: US only; the Fundamentals plan covers KLSE",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-07T13:54:56.010420+00:00",
+      "detail": "facts 5; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-07T13:54:27.540742+00:00",
+      "detail": "facts 0; ",
+      "fetched": 17,
+      "kept": 5,
+      "source": "jin10_flash",
+      "status": "ok",
+      "stored": 2
+    },
+    {
+      "at": "2026-10-07T13:54:26.577207+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-07T13:54:24.894276+00:00",
+      "detail": "",
+      "fetched": 50,
+      "kept": 50,
+      "source": "nst_business",
+      "status": "ok",
+      "stored": 48
+    },
+    {
+      "at": "2026-10-07T13:54:24.456877+00:00",
+      "detail": "",
+      "fetched": 50,
+      "kept": 50,
+      "source": "fmt_business",
+      "status": "ok",
+      "stored": 50
+    },
+    {
+      "at": "2026-10-07T13:54:24.238443+00:00",
+      "detail": "read but empty: Tenaga, Petronas Chemicals, IHH, Press Metal, Genting, Maybank",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-07T13:54:23.001077+00:00",
+      "detail": "named the company: 13 of 59 (lowest: Press Metal 0/1, Genting 3/32, Tenaga 2/7)",
+      "fetched": 60,
+      "kept": 59,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 49
+    },
+    {
+      "at": "2026-10-07T13:54:20.920139+00:00",
+      "detail": "no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked); deferred: Genting, Maybank, Tenaga",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "failed",
+      "stored": 0
+    },
+    {
       "at": "2026-10-07T00:44:49.293677+00:00",
       "detail": "facts 0; EODHD plan: free (2 names a day, US only, rotated); XNAS:MSFT: deferred by the 2-a-day credit budget; next in rotation; XNAS:NVDA: outside the plan or over today's credits; XNAS:AAPL: outside the plan or over today's credits",
       "fetched": 0,
@@ -74,18 +155,18 @@
     }
   ],
   "counts": {
-    "articles": 14126,
+    "articles": 14275,
     "documents": 0,
-    "escalated": 2417,
+    "escalated": 2421,
     "events": 4201,
-    "failed_sweeps": 50,
-    "linked": 9789,
-    "observations": 4989,
+    "failed_sweeps": 51,
+    "linked": 9803,
+    "observations": 4994,
     "series": 31,
-    "sweeps": 729
+    "sweeps": 738
   },
   "day": "2026-10-07",
-  "generated_at": "2026-10-07 00:45 UTC",
+  "generated_at": "2026-10-07 13:56 UTC",
   "macro": [
     {
       "change": "0.02",
@@ -218,43 +299,170 @@
   ],
   "names": [
     {
-      "escalated": 0,
+      "escalated": 1,
       "events": [],
       "instrument_id": "MYX:1155",
       "label": "Maybank",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiugFBVV95cUxQM25xRnA2MXZNMVFEc1AwRC1zeEkwN1R0T1k3VWRFMDJSZGtfS1VRQk85U3d4Vncyc0ppMktlMlNSbGIxUE9xSlRsS3Y5emt2YWNGMWZkYzJqMlBGZzFIMzlidko1UXVENW5OMzg5Ujc4VmpBaWt0Nkl2cE1wWGVQdHY4SFlFZ3lRYThZLUVMQ0ZrTWNDU294eHF3RGh5N0lrbVQ4cUJvck1WclV6NkpaMmtoV0w3alVwTnc?oc=5",
+          "domain": "www.ad-hoc-news.de",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-07T00:29:59+00:00",
+          "quality": 0.65,
+          "title": "Malayan Banking stock carries a 6.16 percent dividend yield",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMi0AFBVV95cUxPUUhpOEZHOURQbVFSdUZJVnhPNDJPdl82aTRsTFVwdENacmdzTjg1a1FNV1QxcWZVVG80bGlTYlRNd3FJSWx6S2x0NGI0am5iNWs1T0NhTG9zUW82ODIzSzRGTi1iSk9yWWVpajN1bWJxcUYtWkpBeHBsNEFXQTJGRkVSR3ZTR3cwaUVuTExIRFlGQWxQcWtLcVBRRWY4WHFEMklhZ3loOExvNGMzMzhzaUhtRmFEcDNUaEtORHJTQ0JEZVdnbEZMUEwwWnNubTBS?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-07T02:38:00+00:00",
+          "quality": 0.8,
+          "title": "Maybank, CIMB launch credit cards for everyday living costs",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMixwFBVV95cUxOeld1Q2pRbG5oQVZtS05FS3NuN0tCc05VSXlsOG9Cc29yU2JwOGNCYXRUZGFJZFh1R3RYQlZCdDU2eE94Q29oRnprNkcyNnFnWW42UThJYkt3UWdmQmZTeFFXSDRua1NBTHVTMnBScUowMFh1NEVrYWZhZTZtZ0pGRUsybkVkTDNLYnhTeXpJQnI5V1QzRExxcXB6c0EwdE5oWjYxTVBOSm9HZXY0YVdRM2tJX21iemc2elhvVWs4c2xHWHVEQ180?oc=5",
+          "domain": "www.ad-hoc-news.de",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-07T07:14:55+00:00",
+          "quality": 0.65,
+          "title": "Maybank holds target for Bank Rakyat Indonesia stock at IDR 3,900",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxNX2UzN19aZVppN1FaeHRMTkpnNXJHMzYzN2F4eFgwc3VJOWZUaURST2U1NHhLcHpCaTVXMFhDNmpFR0NHUlh5Mm1mSEFma1VPNjhXbG81UmluRTk5QjBuRkRnQlBmT1g3bmFFamZWbXRwTDdrUm1EOVN2SGlYV0JVYWxvYktuczMzaldwUE1VR0Z2NFdFUU5faVBWNDVESUdvcGdEalc5Z3hORFZ0Q0ZnZnBzQ1Fqb2VsZjNucWVZdndGM2xfbVFfQzF2aGdsVWJPT1Z2ag?oc=5",
+          "domain": "www.therakyatpost.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-07T06:49:10+00:00",
+          "quality": 0.65,
+          "title": "Maybank Islamic Nadi Mastercard Credit Card-i Now Open for Applications Nationwide - TRP",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxNQlM3ZW00UVFRM21RbWkxdkNERVB3Wm1zaUNfdVp0d0lram5XV1Y0Yko4ejh2MlFFZ1dTUFhSN0tOcnI1ZThnMkEzWTZ4b0F0cEZfelRkdDgyVG9ZMVNaSFNHd1ZacE83QlB6SjVDLUFhTVFERlYwd3phTktYRFh3VUNacm1aeVR0X1BJaUdBMTdOd0hQbkQ2WGF5UnlTVHBSN3N3VDNOTFA?oc=5",
+          "domain": "www.khmertimeskh.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-06T17:20:05+00:00",
+          "quality": 0.65,
+          "title": "Maybank unlocks cross-border healthcare privileges for Cambodians",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 5,
+        "polarity_mean": 0.2,
+        "sources": 4,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
-      "escalated": 0,
+      "escalated": 1,
       "events": [],
       "instrument_id": "MYX:5347",
       "label": "Tenaga",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxOTjgwRkhXMUU2LUoxUDYtbGdac3piR3V0WUxYdjZaazFpc1h5M3ZBVkE0QTVDVkJkV1VwUUMwbDFVc09zb2RwNlRydEtrd1A2d1lEYXBzVnlwRms0TUo5eDVmUjVfWkNUSE51TGc4MWlJRXZtM3ZRZUpzODBOWHhjSEZaSHRFRERoLThHQ1Z2TTVzdGlDTEF1YkVualZWRG81bXhDR2NIdlZsX3J1Y0RKZnVkcEJPcVFHSV90RnlMSjVldw?oc=5",
+          "domain": "www.ad-hoc-news.de",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-07T02:08:33+00:00",
+          "quality": 0.65,
+          "title": "Tenaga Nasional stock weighs Kenyir solar plans and lower charges",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMizgFBVV95cUxOekhfN0lGQ29PMUlXTFBoYVozb3YwaUxpQk00eUplbjFvSjlldzdYUC1fRmZfTkJRWDJsT0FBV0NET1pMZ1lKeENqZmduQTNUa21UM3ZLaENOYW5JTlhoNzZGM3MzdHFRVjk5b0ZOTWJnMEl1WkRMeFIyRHlPQkN1c3liZnlJZ3ZvLW5odjlLLUZYQU9MMnB3bnhmOHVoOGRaUEhHdXBUZ1ZGYzVPRmxobXFZLTV3N1JBek9TUnQzOXRtUERvOWhMcHdFeTQwdw?oc=5",
+          "domain": "www.marketscreener.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-06T16:36:49+00:00",
+          "quality": 0.65,
+          "title": "Shree TNB Polymers Limited has completed an IPO in the amount of INR 318 million.",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 2,
+        "polarity_mean": 0.0,
+        "sources": 2,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
-      "escalated": 0,
+      "escalated": 1,
       "events": [],
       "instrument_id": "MYX:5183",
       "label": "Petronas Chemicals",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMivwFBVV95cUxQenUyT2o0T3dpWFJZRE1UbEhCZzZ0enVyQlVFOTlQQXRwa0JnZmhldEhvWHlQRFpBZHVtenZEY1E5YkZDSG8zc0JfX3h4Y3l4UmFYMmI1OWtsMnM0dG5Nc3E5R2EwbGJPNEk2ZnNJLUxmZWF3UEFub3c0Y250WndyZ3g1UUZvYXdTWTB4Z1ZYOG1uNnZXNUx3RmxDR0x1QnRNTkRLZm45RjFoTlFuSUVVNEVEc2VhRy1maXhZTEppRQ?oc=5",
+          "domain": "www.ad-hoc-news.de",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-07T05:01:03+00:00",
+          "quality": 0.65,
+          "title": "Petronas Chemicals stock reports stronger second-quarter profit",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 1.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
-      "escalated": 0,
+      "escalated": 1,
       "events": [],
       "instrument_id": "MYX:5225",
       "label": "IHH",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxPYXRhVWxuendaY1FRV201WTdRT0tyeGdoYjZYYUlzdFNWalM1Qkpjb0xsUS11eFAzbV94RTdvMVYzNFRGV0cwOFhzWS1vczFhVGpYamd6aE1rUk9maHN3OHFwbExOYTN4a3BtV1JBNjk4YTduUzBHQnlhcW90VHUtY01iQWd3QkJUT1ZobHpKM2lpS1M0YTVjdDZJMmNyblVzaDBTV1BQR01EM3c4enU0Q2p2aGdfaVBH?oc=5",
+          "domain": "www.ad-hoc-news.de",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-07T01:51:48+00:00",
+          "quality": 0.65,
+          "title": "IHH Healthcare stock reports 30 percent PATMI growth in Q2",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 1.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -273,8 +481,70 @@
       "instrument_id": "MYX:3182",
       "label": "Genting",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://www.nst.com.my/news/regional/2026/10/1549972/pahang-cops-still-hunting-prime-suspect-genting-jewellery-heist",
+          "domain": "www.nst.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-07T12:55:31+00:00",
+          "quality": 1.0,
+          "title": "Pahang cops still hunting prime suspect in Genting jewellery heist",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://www.nst.com.my/news/nation/2026/10/1549895/genting-heiress-rm16bil-estate-administrators-deny-enriching-themselves",
+          "domain": "www.nst.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-07T11:06:04+00:00",
+          "quality": 1.0,
+          "title": "Genting heiress' RM1.6bil estate: Administrators deny enriching themselves through legal fees",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMi9wFBVV95cUxQOEVsZDNXanBXZDVnZWxLTUNZV1ZPTExSTlh5bk9QUVMxU2luX0JJdlRtb0F0VDQ2R010TnZDNkU5Ykp1R05wOXFaSkMxMGx5VWhmbmlTOTJMQjA5cy1HV0g3ZFcwTlI4UTdiT0U2d2FMU1NXRjQxSUNoRjFzWVlISTdCU2dKalFGYW5qVDNBQi1YM0ZLdjEwZTJPbTg3OGFGTmJ2czV2S3lKT1pYS1BCbDdZazFQN2JfUjBxZHU1NHloN3dYcWhJVU1va245Wl9IZFY1aWRQdmVzTlhjQ0RtSE1NUkxoZ1VxRF9UbkVEZ1o4a0RYbGhr0gH3AUFVX3lxTFA4RWxkM1dqcFdkNWdlbEtNQ1lXVk9MTFJOWHluT1BRUzFTaW5fQkl2VG1vQXRUNDZHTXROdkM2RTliSnVHTnA5cVpKQzEwbHlVaGZuaVM5MkxCMDlzLUdXSDdkVzBOUjhRN2JPRTZ3YUxTU1dGNDFJQ2hGMXNZWUhJN0JTZ0pqUUZhbmpUM0FCLVgzRkt2MTBlMk9tODc4YUZOYnZzNXZLeUpPWlhLUEJsN1lrMVA3Yl9SMHFkdTU0eWg3d1hxaElVTW9rbjlaX0hkVjVpZFB2ZXNOWGNDRG1ITU1STGhnVXFEX1RuRURnWjhrRFhsaGs?oc=5",
+          "domain": "www.malaymail.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-07T08:35:41+00:00",
+          "quality": 0.8,
+          "title": "Seven suspects: Chinese national latest held as Pahang police close in on RM1.7m Genting jewellery heist",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMirgFBVV95cUxNb2x6LXh4c1BOa0x4dzhpZmJ3SjdjMzJrUi1MV3VyT0lFbklIbER3SDZSMW5vS3R4ZDdBbjVzTU5QcHVudGJRcHBUT1VkY1B2eXRhbXFIdE5lYVdNLWhFUE1hdjRlcExxRG1ZZzctalhjQTlYUWhRZGZvWWtMV2E3cl85SV9RdVMzT3RtdmR5Zk5ibjh5VjBrT1pOUW9BX3JlWUFLUkJzQ0hoUXRDV0E?oc=5",
+          "domain": "www.ad-hoc-news.de",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-07T03:53:20+00:00",
+          "quality": 0.65,
+          "title": "Genting stock completes a 5 percent LNG stake sale",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMisAFBVV95cUxPMVViQlMxRGxVXzFDTmkydmYxQzNRdm1MWV91aWI5TzVUbE5ReDBwVmI3Z2ZlUXcyWG5oWkI5b2pMWURiSHBoLWwyc3NDQk9PSllTRXBrVmtETUVoZml1bVUyaWVyOEYtajd5YWpoN3l6TU00b1g4RGhMX2dIQUo5bm45TW9sNVpjbGJBUmxoTnlMWmhMYnQyWnhjNE1MNWVNTzgwMng1cTZCSldhRklFdg?oc=5",
+          "domain": "www.moomoo.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-07T01:29:46+00:00",
+          "quality": 0.65,
+          "title": "\ud83c\udd95 New warrants over GENTING, HIBISCS and the Hang Seng Index!",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 5,
+        "polarity_mean": 0.0,
+        "sources": 4,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
