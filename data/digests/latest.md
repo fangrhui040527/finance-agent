@@ -1,6 +1,6 @@
 # Digest 2026-10-07
 
-Generated 2026-10-07 13:56 UTC · slot `all` · 14275 articles in the corpus, 4994 observations, 4201 events in the fact book.
+Generated 2026-10-07 13:57 UTC · slot `all` · 14275 articles in the corpus, 4994 observations, 4201 events in the fact book.
 
 ## The book
 
@@ -84,22 +84,26 @@ Generated 2026-10-07 13:56 UTC · slot `all` · 14275 articles in the corpus, 49
 | US CPI, all items, index 1982-84=100 | 334.13 | 2026-08-01 | +1.318 | fred |
 | Brent crude, USD per barrel (EIA, daily) | 113.96 | 2026-09-29 | -6.01 | fred |
 | Malaysian ringgit per US dollar | 4.08 | 2026-10-02 | -0.001 | fred |
-| Federal funds effective rate, % | 3.88 | 2026-10-02 | +0 | fred |
-| 10-year Treasury yield, % | 5.28 | 2026-10-02 | +0.04 | fred |
-| 2-year Treasury yield, % | 4.83 | 2026-10-02 | +0.05 | fred |
+| Federal funds effective rate, % | 3.88 | 2026-10-05 | +0 | fred |
+| 10-year Treasury yield, % | 5.31 | 2026-10-05 | +0.03 | fred |
+| 2-year Treasury yield, % | 4.84 | 2026-10-05 | +0.01 | fred |
 | Malaysia CPI headline, index 2010=100 | 137.50 | 2026-08-01 | +0.4 | dosm_cpi |
 | Broad US dollar index | 121.38 | 2026-10-02 | -0.4034 | fred |
-| NASDAQ Composite, index level | 27,477.31 | 2026-10-05 | +286.45 | fred |
+| NASDAQ Composite, index level | 27,599.89 | 2026-10-06 | +122.58 | fred |
 | Aluminium, USD per tonne (IMF PCPS via FRED) | 3,158.26 | 2026-07-01 |  | fred |
-| S&P 500, index level | 7,773.95 | 2026-10-05 | +51.23 | fred |
-| 10y minus 2y Treasury spread, % | 0.47 | 2026-10-05 | +0.02 | fred |
+| S&P 500, index level | 7,818.93 | 2026-10-06 | +44.98 | fred |
+| 10y minus 2y Treasury spread, % | 0.48 | 2026-10-06 | +0.01 | fred |
 | US unemployment rate, % | 4.20 | 2026-09-01 | +0.1 | fred |
-| CBOE VIX, index | 15.52 | 2026-10-05 | +0.21 | fred |
+| CBOE VIX, index | 15.01 | 2026-10-06 | -0.51 | fred |
 
 ## Collection
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 13:56 | dbnomics | ok | 450 | 0 | 0 | facts 0;  |
+| 13:56 | jin10_flash | ok | 1 | 1 | 0 | facts 0;  |
+| 13:56 | fred | ok | 474 | 0 | 0 | facts 9; release calendar: 'FOMC Press Release' listed on 15 days of the fortnig |
+| 13:56 | fmp | ok | 3953 | 0 | 0 | facts 0; fmp /earnings is outside the plan (HTTP 402); not collected for NVDA, A |
 | 13:54 | eodhd | ok | 0 | 0 | 0 | facts 0; EODHD plan: free (2 names a day, US only, rotated); MYX:8869: deferred  |
 | 13:54 | twse_openapi | ok | 8 | 0 | 0 | facts 5;  |
 | 13:54 | jin10_flash | ok | 17 | 5 | 2 | facts 0;  |
