@@ -1,0 +1,230 @@
+{
+  "day": "2026-10-07",
+  "written_at": "2026-10-08T22:42:00Z",
+  "measured_session": {
+    "bursa": "2026-10-07 (^KLSE 1,633.35 -> 1,611.78)",
+    "us": "2026-10-07 (SPY 779.09 -> 777.22)"
+  },
+  "pack_built": "2026-10-08T22:33:00Z",
+  "market": {
+    "regime": "neutral",
+    "notes": [
+      "MYX:^KLSE -1.32% 1d, -2.39% 5d, lowest close since 2025-12-10; 99 cached Bursa names 32 up, 57 down, 10 flat, median -0.38%",
+      "banks led: CIMB -4.81% on 34,801,500 (9,345,700 Tue), Hong Leong Bank -6.03%, AMMB -4.48%, Public Bank -1.71%, Maybank -1.00%; glove makers gave back (Kossan -8.00%, Hartalega -4.46%, Top Glove -2.29%)",
+      "market titles (google_news, title only): foreign selling, oil and US yields (malaymail.com 05:47Z, theedgemalaysia.com 06:41Z, klsescreener.com 10:19Z); no fund-flow print in the store",
+      "XNAS:SPY -0.24% 1d, +1.91% 5d; FRED at 10-07: SP500 7801.77 (-17.16), NASDAQCOM 27538.69 (-61.2), VIXCLS 15.08 (+0.07), T10Y2Y 0.51 (+0.03), BAMLH0A0HYM2 3.09 (+0.06); DGS10 5.27, DGS2 4.79 are 10-06; Brent 125.44 at 10-06; DEXMAUS 4.081 at 10-02",
+      "no name past 1.5 sigma; every book name not_significant"
+    ]
+  },
+  "names": [
+    {
+      "instrument_id": "MYX:1155",
+      "move": {
+        "return_1d": -0.01,
+        "market_1d": -0.0132,
+        "unexplained_share": 0.2,
+        "session": "2026-10-07",
+        "note": "market -1.34% at beta 1.01, drift -0.00%, idiosyncratic +0.34%, 0.46 sigma, not_significant; closes 9.97 -> 9.87 on 19,474,600; market-driven, the banks fell together"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:5347",
+      "move": {
+        "return_1d": -0.0031,
+        "market_1d": -0.0132,
+        "unexplained_share": 0.42,
+        "session": "2026-10-07",
+        "note": "market -1.12% at beta 0.84, drift -0.02%, idiosyncratic +0.83%, 1.02 sigma, not_significant; closes 12.90 -> 12.86; one title-only row (Kenyir solar, lower charges)"
+      },
+      "causes": [],
+      "open_questions": [
+        "Tenaga fell 2.52 sigma on 09-29 with no collected row and gave back three-quarters of it on 09-30, when the utilities rallied. What, if anything, did the company, the Energy Commission or a Bursa filing publish on 09-29? `bursa_announcements` stored nothing for it. (since 2026-09-29)"
+      ],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:5183",
+      "move": {
+        "return_1d": -0.0186,
+        "market_1d": -0.0132,
+        "unexplained_share": 0.38,
+        "session": "2026-10-07",
+        "note": "market -1.10%, drift -0.05%, idiosyncratic -0.71%, 0.19 sigma, not_significant, R2 0.00; closes 4.30 -> 4.22 on 1,765,000"
+      },
+      "causes": [],
+      "open_questions": [
+        "What did the Petronas Chemicals CEO appointment (title only, 10-05 14:44Z) say, and does a Bursa filing carry it? It preceded a +4.12% session; 10-07 gave back −1.86%. (since 2026-10-06)"
+      ],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:5225",
+      "move": {
+        "return_1d": -0.0013,
+        "market_1d": -0.0132,
+        "unexplained_share": 0.47,
+        "session": "2026-10-07",
+        "note": "market -1.12% at beta 0.85, drift -0.01%, idiosyncratic +1.01%, 0.89 sigma, not_significant; closes 7.91 -> 7.90 on 6,306,800 (2.5x Tue); the 10-06 leg held; KPJ -2.72%"
+      },
+      "causes": [],
+      "open_questions": [
+        "What lifted IHH 1.69 sigma on 10-06, while the hospital peer KPJ fell 0.77%? On 10-07 the leg held (−0.13% on a −1.32% market, idiosyncratic +1.01% at 0.89 sigma) on 2.5 times Tuesday's volume, and KPJ fell 2.72%. No IHH filing or row reached the store. (since 2026-10-06)"
+      ],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:8869",
+      "move": {
+        "return_1d": 0.0014,
+        "market_1d": -0.0132,
+        "unexplained_share": 0.48,
+        "session": "2026-10-07",
+        "note": "market -1.43% at beta 1.08, drift +0.12%, idiosyncratic +1.45%, 0.94 sigma, not_significant; closes 7.19 -> 7.20 on 8,624,200; nothing collected"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:3182",
+      "move": {
+        "return_1d": -0.0217,
+        "market_1d": -0.0132,
+        "unexplained_share": 0.33,
+        "session": "2026-10-07",
+        "note": "market -1.20%, drift -0.25% (2.2 standard errors), idiosyncratic -0.72%, 0.40 sigma, not_significant; closes 1.84 -> 1.80 on 4,561,300; 5d -4.76%; LNG stake-sale row title only, no figure"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": []
+    },
+    {
+      "instrument_id": "XNAS:NVDA",
+      "move": {
+        "return_1d": -0.0074,
+        "market_1d": -0.0024,
+        "unexplained_share": 0.42,
+        "session": "2026-10-07",
+        "note": "market -0.41% at beta 1.70, drift -0.02%, idiosyncratic -0.31%, 0.17 sigma, not_significant; closes 239.24 -> 237.47; rows about SpaceX financing a $40B chip purchase"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [
+        {
+          "when": "2026-11-17",
+          "what": "earnings_result"
+        }
+      ]
+    },
+    {
+      "instrument_id": "XNAS:AAPL",
+      "move": {
+        "return_1d": 0.0091,
+        "market_1d": -0.0024,
+        "unexplained_share": 0.78,
+        "session": "2026-10-07",
+        "note": "market -0.18% at beta 0.74, drift +0.10%, idiosyncratic +0.99%, 0.67 sigma, not_significant; closes 333.63 -> 336.67; Apple and LG title names an Oct. 13 event not in the fact book"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [
+        {
+          "when": "2026-10-13",
+          "what": "event named in one title only (finnhub, 13:18Z); not in the fact book"
+        },
+        {
+          "when": "2026-10-28",
+          "what": "earnings_result"
+        },
+        {
+          "when": "2026-10-29",
+          "what": "earnings_result"
+        }
+      ]
+    },
+    {
+      "instrument_id": "XNAS:MSFT",
+      "move": {
+        "return_1d": 0.0009,
+        "market_1d": -0.0024,
+        "unexplained_share": 0.56,
+        "session": "2026-10-07",
+        "note": "market -0.21%, drift -0.08%, idiosyncratic +0.38%, 0.20 sigma, not_significant; closes 529.30 -> 529.76; Evercore ISI maintain Outperform (fmp, 10-07)"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [
+        {
+          "when": "2026-10-27",
+          "what": "earnings_result"
+        }
+      ]
+    }
+  ],
+  "machine": {
+    "on_time": "routine fired 2026-10-08T22:32Z and ran on time; no feedback pages for 10-01..10-05",
+    "wednesday": "bursa_close 20261007T135253 at 13:54Z (3h49m late); us_preopen 20261007T135624 at 13:56Z; Wednesday us_close 20261008T010008 at 01:00Z 10-08 with alphavantage_news failed and blank US 10-07 closes; those bodies replaced by the 22:34Z 10-08 fetch; dispatched us_close 20261008T223403 landed as 90498dd after the pack was built"
+  },
+  "data_quality": {
+    "failed": [
+      "gdelt: HTTP 429 on the 10-07 13:54Z bursa_close (slot deferred)",
+      "alphavantage_news: 'premium endpoint' on 10-07 00:43Z, 10-08 01:00Z and 10-08 22:34Z; monitor cadence alert 69h"
+    ],
+    "degraded": [
+      "yahoo_rss: read empty for all six Bursa names (10-07 13:54Z)",
+      "google_news Bursa 10-07 13:54Z: named the company in 13 of 59 (Press Metal 0/1, Genting 3/32, Tenaga 2/7)",
+      "gdelt US 10-08 01:00Z: read empty for Microsoft, named the company in 2 of 28",
+      "US 10-07 bars fetched 10-08 01:00Z had volume and an empty close; replaced by the 22:34Z fetch (the cache keeps one body per symbol)",
+      "^KLSE 10-08 bar in the 22:34Z fetch: empty close, volume 0",
+      "eodhd: 0 facts, 2-a-day credit budget",
+      "fact book: all six Bursa names NOTHING COLLECTED",
+      "Brent: five prints (09-30..10-06) arrived together on 10-08; DEXMAUS none after 10-02",
+      "slots_missed: 2 of 9 scheduled runs in 3d"
+    ],
+    "skipped": [
+      "fmp /earnings: outside the plan (HTTP 402)"
+    ]
+  },
+  "open_questions_carried": [
+    "What lifted IHH 1.69 sigma on 10-06, while the hospital peer KPJ fell 0.77%? On 10-07 the leg held (−0.13% on a −1.32% market, idiosyncratic +1.01% at 0.89 sigma) on 2.5 times Tuesday's volume, and KPJ fell 2.72%. No IHH filing or row reached the store. (since 2026-10-06)",
+    "What did the Petronas Chemicals CEO appointment (title only, 10-05 14:44Z) say, and does a Bursa filing carry it? It preceded a +4.12% session; 10-07 gave back −1.86%. (since 2026-10-06)",
+    "`alphavantage_news` has answered \"premium endpoint\" on all three runs since 10-06 01:47Z and is 69h past its cadence. Is the key rotated, on a different plan, or is the endpoint changed? (since 2026-10-06)",
+    "Tenaga fell 2.52 sigma on 09-29 with no collected row and gave back three-quarters of it on 09-30, when the utilities rallied. What, if anything, did the company, the Energy Commission or a Bursa filing publish on 09-29? `bursa_announcements` stored nothing for it. (since 2026-09-29)",
+    "Bank of America's note names Apple's transaction and referral revenue as the exposure. The fact book has no services or App Store line for Apple. Which filing field would size it? (since 2026-09-29)",
+    "Does an 8-K or 10-Q record NVIDIA's USD 150 billion authorization increase? (since 2026-09-28)",
+    "The fact book holds two Q4 result dates for Apple, 2026-10-28 and 2026-10-29, both from `finnhub`. Which one does the company's own calendar give? (since 2026-09-28)",
+    "On the 09-29 `us_close` run, `ask.py prices --book` took 15m16s of a 25-minute job. Does the price step need a per-feed time before a slow run loses a day's commit? (since 2026-09-28)",
+    "Does a primary statement follow the report that China may let Alibaba and ByteDance buy the RTX Pro 5500? (since 2026-09-27)",
+    "The fact book has no event kind for a court verdict, an appeal or a settlement. Where would a legal event be recorded, so that a later page can date it? (since 2026-09-26)",
+    "Microsoft's cached bar opens at 499.04 (+0.22%) on 09-25, while two rows describe a 3% rise before or at the open. Should the collector hold a second price source for the open on a day a cause is being timed? (since 2026-09-25)",
+    "The routine never commits `data/alerts.db`, so the monitor re-announces open alerts as NEW (M9). Should the routine commit the alerts store, or should it live outside git? (since 2026-09-24)",
+    "Does IHH carry the Daiichi Sankyo claim at any value in its accounts? (since 2026-09-24)",
+    "The pack measures across a blank proxy row without saying so (M3). Should the pack refuse the row, label it two-session, or scale the sigma? `^KLSE` has a blank 10-08 close in the cache tonight. (since 2026-09-23)",
+    "The fact book holds no Bursa entitlement dates. Which source carries Bursa ex-dates? (since 2026-09-23)",
+    "IHH's 09-22 session was significant alone (3.80 sigma). The one candidate, the Macquarie headline, has no body. Which source carries the note's figures? (since 2026-09-22)",
+    "A blank bar shared by a name and its proxy is labelled *correctly dated*, as if the market was shut. Should the pack check the calendar or an independent index print first? (since 2026-09-22)",
+    "The move to 260-session betas re-measured the same Monday. Which window's shares do pages compare across the change? (since 2026-09-22)",
+    "Petronas Chemicals, Press Metal and Genting: one factor or three stories? On 10-07 they read −1.86%, +0.14% and −2.17%. No Bursa sector proxy is cached. (since 2026-09-21)",
+    "Tenaga: the rows hold both readings of the IBR framework, *minimal impact* and *undermines*, as titles only. Neither has appeared since. (since 2026-09-18)",
+    "`DFF` stepped +0.25 on 2026-09-17 and the collector holds no statement for it. Where does a statement come from? (since 2026-09-20)",
+    "A short-interest weekly named Petronas Chemicals for the week to 09-18. Would Bursa's daily short-selling report give the name a body? (since 2026-09-20)",
+    "Wiring a catalyst matcher to the corpus is still open. IHH is the open case: 1.69 sigma on 10-06, held on 10-07, no row. (since 2026-09-18)",
+    "Petronas Chemicals' idiosyncratic days read *not significant* because its own sigma contains the +22.56% run. On 10-06, +4.09% read 1.08 sigma. (since 2026-09-18)",
+    "Petronas Chemicals collecting a body: which of the eleven listed sources carries a Bursa-hours story about it at all? (since 2026-09-10; folded 09-17)",
+    "The linker attached *Genting Plantations* and *Ho Wah Genting* to MYX:3182, and *Shree TNB Polymers* to Tenaga again on 10-06. How many rows per name are about other companies? (since 2026-09-17)",
+    "Which earlier pages were written from a pre-close cache? `dfc45e3` labels such rows. (since 2026-09-17)",
+    "Does a page need to state a market's non-trading day as a fact rather than infer it from blank bars? (since 2026-09-16)",
+    "Brent now has prints to 10-06: 135.51 on 10-02 (+18.0%), 125.44 on 10-06, all arriving on 10-08. The decomposition still has no commodity leg for Petronas Chemicals' feedstock. Should it have one? (since 2026-09-16)",
+    "The Bursa banks fell together on 10-07: CIMB −4.81% on 3.7 times its Tuesday volume, Hong Leong Bank −6.03%, AMMB −4.48%. The market titles name foreign selling, oil and US yields, and the store holds no bank row or fund-flow print for the day. Which source would carry Bursa's daily foreign net flow? (since 2026-10-07)"
+  ],
+  "lessons": [
+    "A price a decision was sized on should carry its fetch time, because the cache keeps one body per symbol and a later fetch replaces it. The 10-07 paper page priced the US names at 10-06 because the 01:00Z body had blank 10-07 closes; by 22:34Z that body was replaced and the blanks were gone.",
+    "A macro series with no new print is missing, not unchanged. Brent read 113.96 from 09-29 until 10-08, when five prints arrived at once, including 135.51 on 10-02. A page should say 'no print since' and not use the last value as the level."
+  ],
+  "closed": [
+    "Should the pack compute a sector leg from the cached FBM100 members? (since 2026-09-14): no source can answer it; it is a change to the pack's code, stays a proposal for the code, and stops being carried past the monitor's 21-day line"
+  ]
+}
