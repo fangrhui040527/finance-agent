@@ -1,0 +1,203 @@
+{
+  "day": "2026-10-07",
+  "written_at": "2026-10-08T06:00:00Z",
+  "phase": "ramp",
+  "week": 5,
+  "equity_usd": 1000.0,
+  "cash_usd": 1000.0,
+  "control_equity_usd": 969.7,
+  "control_return_to_date": -0.0303,
+  "drawdown": 0.0,
+  "control_drawdown": 0.0303,
+  "halted": false,
+  "marks": 24,
+  "positions": [],
+  "changes": [],
+  "control_changes": [],
+  "control_mark": {
+    "marked_on": "2026-10-07",
+    "equity_usd": 969.7,
+    "cash_usd": 602.28,
+    "positions_usd": 367.42,
+    "day_return": -0.004,
+    "note": "holdings MYX:8869 100 (close 7.20), MYX:5183 100 (4.22), MYX:3182 200 (1.80); October rebalance unchanged units, nothing pending"
+  },
+  "index_book": {
+    "mark": {
+      "marked_on": "2026-10-07",
+      "equity_usd": 993665.62,
+      "cash_usd": 598347.25,
+      "positions_usd": 395318.37,
+      "day_return": -0.0026,
+      "drawdown": 0.0063,
+      "held": 97,
+      "pending": 0
+    },
+    "cost_to_date_share_of_notional": 0.0048,
+    "since_2026_09_30": {
+      "index": -0.0063,
+      "decided": 0.0,
+      "control": -0.0105
+    },
+    "note": "the October rebalance's 49 one-lot adjustments have applied; nothing pending"
+  },
+  "caps": [
+    {
+      "cap": "largest name",
+      "value": "0.00%",
+      "limit": "25%",
+      "breached": false
+    },
+    {
+      "cap": "invested",
+      "value": "0.00%",
+      "limit": "40%",
+      "breached": false
+    },
+    {
+      "cap": "cash floor",
+      "value": "100.00%",
+      "limit": "20%",
+      "breached": false
+    },
+    {
+      "cap": "names held",
+      "value": "0",
+      "limit": "0",
+      "breached": false
+    },
+    {
+      "cap": "drawdown from peak",
+      "value": "0.00%",
+      "limit": "8% halts entries",
+      "breached": false
+    },
+    {
+      "cap": "turnover, 5 weekdays",
+      "value": "USD 0.00",
+      "limit": "USD 500.00",
+      "breached": false
+    }
+  ],
+  "prices": {
+    "bursa": "Wednesday 2026-10-07 closes",
+    "us": "2026-10-06 closes; the cache's 10-07 rows for SPY, NVDA, AAPL, MSFT carry volume and an empty close (fetched 2026-10-08T01:00Z)",
+    "fx": "4.088 MYR per USD, bnm, 2026-10-07"
+  },
+  "fundable": [
+    {
+      "instrument_id": "MYX:1155",
+      "lot_usd": 241.44,
+      "share": 0.241,
+      "round_trip": 0.0099,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:5183",
+      "lot_usd": 103.23,
+      "share": 0.103,
+      "round_trip": 0.0214,
+      "lots": 2
+    },
+    {
+      "instrument_id": "MYX:5225",
+      "lot_usd": 193.25,
+      "share": 0.193,
+      "round_trip": 0.012,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:8869",
+      "lot_usd": 176.13,
+      "share": 0.176,
+      "round_trip": 0.0131,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:3182",
+      "lot_usd": 44.03,
+      "share": 0.044,
+      "round_trip": 0.0484,
+      "lots": 5
+    },
+    {
+      "instrument_id": "XNAS:NVDA",
+      "lot_usd": 239.24,
+      "share": 0.239,
+      "round_trip": 0.0111,
+      "lots": 1,
+      "note": "the 2026-10-06 close"
+    }
+  ],
+  "over_cap": {
+    "MYX:5347": 0.315,
+    "XNAS:AAPL": 0.334,
+    "XNAS:MSFT": 0.529
+  },
+  "ledger": {
+    "mark_days": 24,
+    "gap": "no routine ran 2026-10-02..10-06 (account session limit); no paper page and no decision for those days; none backdated",
+    "late": "routine fired 2026-10-07T22:44Z, reached the session 2026-10-08T05:49Z"
+  },
+  "attribution": null,
+  "decision": {
+    "recorded": true,
+    "weights": {},
+    "all_cash": true,
+    "calendar_row": false,
+    "prediction_id": "paper-2026-10-07-allcash-21d-2b2c",
+    "grades_on": "2026-11-06",
+    "confidence": 0.55,
+    "decided_at": "2026-10-08T05:55:17Z",
+    "made_at": "2026-10-08T05:55:17Z",
+    "refusals": [],
+    "rows_read_before_deciding": true,
+    "thesis": "All cash, the twenty-second all-cash row and first decision of ramp week 5, recorded at 06:10Z on 2026-10-08 for the routine that fired at 22:44Z on 10-07 and reached the session seven hours late; no decision was recorded for 10-02 to 10-06, when no routine ran, and none is backdated. Tuesday 10-06 is decomposed on the 2026-10-06 feedback page: one fundable name moved past 1.5 sigma, IHH at 1.69 (idiosyncratic +1.87%, no_identified_catalyst), with no IHH row, a midday sector title that is a mention, and the hospital peer KPJ down 0.77%; Petronas Chemicals +4.12% read 1.08 sigma with one title-only CEO-appointment row; Maybank 0.55, Press Metal 0.06, Genting 0.50 with drift -0.26%/session at 2.3 standard errors; NVIDIA 0.42. Wednesday 10-07 is not decomposed: ^KLSE 1,633.35 to 1,611.78 (-1.32%), Maybank 9.87 (-1.00%), Petronas Chemicals 4.22 (-1.86%), IHH 7.90 (-0.13%) on 6,306,800 shares, Press Metal 7.20 (+0.14%), Genting 1.80 (-2.17%); the cache holds no 10-07 close for the US names, so NVIDIA is sized on the 10-06 close 239.24. The 10-06 us_close lost google_news (HTTP 503), gdelt (HTTP 429) and alphavantage_news (premium endpoint) together. A leg with no collected cause is not a thesis. Claim: nothing in the fundable universe beats cash over 21 sessions.",
+    "thesis_correction": "the thesis says 'recorded at 06:10Z'; the ledger's decided_at is 05:55:17Z, which is the record"
+  },
+  "stores": {
+    "decided_targets": 22,
+    "predictions": 22,
+    "index_targets": 194,
+    "control_targets": 6,
+    "index_pending": 0,
+    "control_pending": 0
+  },
+  "evidence": {
+    "feedback_page": "knowledge/feedback/2026-10-06.md (bb68e22)",
+    "notes": [
+      "Tuesday 10-06 decomposed: IHH 1.69 sigma, idiosyncratic +1.87%, no_identified_catalyst, no IHH row, KPJ -0.77%; Petronas Chemicals +4.12% at 1.08 sigma, title-only CEO row; Maybank 0.55; Press Metal 0.06; Genting 0.50 (drift -0.26%/session, 2.3 SE); NVIDIA 0.42",
+      "Wednesday 10-07 not decomposed: ^KLSE 1,633.35 -> 1,611.78 (-1.32%); Maybank 9.87, Petronas Chemicals 4.22, IHH 7.90 on 6,306,800, Press Metal 7.20, Genting 1.80, Tenaga 12.86; US 10-07 closes blank in the cache",
+      "the 10-06 us_close lost google_news (HTTP 503), gdelt (HTTP 429) and alphavantage_news (premium endpoint)"
+    ]
+  },
+  "mistakes": [
+    "paper-2026-10-01-allcash-21d-5a1e: NVIDIA closed 239.24 on 10-06 against 230.86 on 10-01, above its 1.11% round trip; if it holds at or above 239.24 through 2026-10-31 the claim fails for NVIDIA"
+  ],
+  "mistakes_checked": [
+    "no decision was recorded for 2026-10-02..10-06; a record gap, not a decision mistake",
+    "tonight's thesis states 06:10Z; decided_at is 05:55:17Z"
+  ],
+  "grades_due": [
+    {
+      "prediction_id": "paper-2026-09-11-allcash-21d-8bf9",
+      "on": "2026-10-11"
+    },
+    {
+      "prediction_id": "paper-2026-09-12-allcash-21d-1661",
+      "on": "2026-10-12"
+    },
+    {
+      "prediction_id": "paper-2026-09-13-allcash-21d-5baf",
+      "on": "2026-10-13"
+    },
+    {
+      "prediction_id": "paper-2026-09-14-allcash-21d-9d7e",
+      "on": "2026-10-14"
+    }
+  ],
+  "lessons": [
+    "A blank close is not a close: the cache's 10-07 US rows carry volume and no close; the pack priced the US names at 10-06 and said so; a decision sized on that line is sized on yesterday's price and the thesis should say so.",
+    "A stalled scheduler costs decisions, not only pages: five missed nights are five 21-day predictions that will never be graded, and the record shows a gap rather than a run of all-cash rows."
+  ]
+}
