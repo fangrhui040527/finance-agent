@@ -617,12 +617,48 @@ class ChainedFeed:
         self.source_used = None
 
     def fetched_at(self, instrument_id: str) -> datetime | None:
-        """The first feed that has this symbol cached - the one `fetch` serves from."""
+        """When the body `fetch` serves this instrument from was pulled.
+
+        Offline that is the FRESHEST cached body, not the first feed's
+        (`_freshest`); online it is the first feed holding the symbol, the one
+        an online fetch answers from.
+        """
+        from core.market.cache import offline
+
+        if offline():
+            picked = self._freshest(instrument_id, None, None)
+            return picked[0].fetched_at(instrument_id) if picked else None
         for feed in self.feeds:
             at = feed.fetched_at(instrument_id)
             if at is not None:
                 return at
         return None
+
+    def _freshest(self, instrument_id: str, start, end):
+        """(feed, series) whose cached bars reach furthest, or None.
+
+        Offline, "the first feed that answers" is the first feed that EVER
+        answered: Stooq heads the chain, and one body it cached on a day its
+        wall lifted would be served to every offline reader from then on while
+        Yahoo's row went on refreshing behind it - the nightly page and the
+        paper book marked at that day's close indefinitely, with no alert. So
+        offline every feed's cached body is read and the one with the latest
+        bar wins; ties go to the most recent fetch, then to chain order.
+        """
+        best = None
+        for rank, feed in enumerate(self.feeds):
+            try:
+                series = feed.fetch(instrument_id, start, end)
+            except PriceFeedError:
+                continue
+            raw = series.raw()
+            if not raw:
+                continue
+            at = feed.fetched_at(instrument_id)
+            key = (raw[-1].day, at.timestamp() if at else float("-inf"), -rank)
+            if best is None or key > best[0]:
+                best = (key, feed, series)
+        return (best[1], best[2]) if best else None
 
     def listed_name(self, instrument_id: str) -> str | None:
         """The first name any feed in the chain recorded for this instrument."""
@@ -634,6 +670,13 @@ class ChainedFeed:
         return None
 
     def fetch(self, instrument_id: str, start=None, end=None) -> PriceSeries:
+        from core.market.cache import offline
+
+        if offline():
+            picked = self._freshest(instrument_id, start, end)
+            if picked is not None:
+                self.source_used = picked[0].name
+                return picked[1]
         failures = []
         for feed in self.feeds:
             try:

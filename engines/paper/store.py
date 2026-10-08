@@ -677,14 +677,20 @@ class PaperStore:
         ).fetchone()
         return self._change(r) if r else None
 
-    def state(self, book: str) -> BookState:
-        """Replayed from the initial cash and every change, never stored."""
+    def state(self, book: str, end: date | None = None) -> BookState:
+        """Replayed from the initial cash and every change, never stored.
+
+        With `end`, only the changes dated on or before it: the book as it stood
+        at that session's close. A mark of an earlier session must value the
+        holdings of THAT session - re-marking Wednesday after Thursday's Bursa
+        fills used to value Thursday's positions at Wednesday's closes.
+        """
         cash = self.initial_cash(book)
         units: dict[str, int] = {}
         cost: dict[str, Decimal] = {}
         ccy: dict[str, str] = {}
         realised = Decimal(0)
-        for c in self.changes(book):
+        for c in self.changes(book, end=end):
             cash += c.cash_delta_usd
             units[c.instrument_id] = c.units_after
             cost[c.instrument_id] = c.avg_cost_after
@@ -695,7 +701,7 @@ class PaperStore:
             for iid in sorted(units)
             if units[iid] > 0
         )
-        last = self.latest_mark(book)
+        last = self.latest_mark(book, on_or_before=end)
         peak = max(last.peak_usd if last else Decimal(0), self.initial_cash(book))
         return BookState(book, cash, positions, realised, peak)
 
@@ -869,6 +875,26 @@ class PaperStore:
             args.append(on_or_before.isoformat())
         r = self.conn.execute(sql + " ORDER BY day DESC, mark_id DESC LIMIT 1", args).fetchone()
         return self._mark(r) if r else None
+
+    def peak_equity(self, book: str, on_or_before: date, excluding: tuple[date, str]) -> Decimal:
+        """The highest equity any mark of the book recorded up to a day, leaving
+        out the (day, slot) mark about to be replaced, and never below the
+        opening cash.
+
+        A replaced reading must not survive in the peak. A mid-session mark is
+        meant to be superseded by the settled close; taking the peak from the
+        row being replaced kept a 30% intraday spike in the peak forever, and
+        the book showed a drawdown it never had.
+        """
+        day, slot = excluding
+        best = self.initial_cash(book)
+        for row in self.conn.execute(
+            "SELECT equity_usd FROM marks WHERE book = ? AND day <= ? "
+            "AND NOT (day = ? AND slot = ?)",
+            (book, on_or_before.isoformat(), day.isoformat(), slot),
+        ):
+            best = max(best, _d(row["equity_usd"]))  # Decimal, not SQL's float MAX
+        return best
 
     def mark_before(self, book: str, day: date) -> MarkRow | None:
         r = self.conn.execute(
