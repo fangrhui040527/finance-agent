@@ -48,6 +48,19 @@ KINDS = {
 }
 
 
+def error_text(event: dict) -> str:
+    """The failure message an event carries, wherever the writer put it.
+
+    `Tracer.span` records a raised exception as an `error` event whose message
+    is in `data["error"]`; the event's own top-level `error` field is null on
+    disk. Readers that looked only at the top level printed "None" for every
+    real failure, while tests built from hand-written JSON passed.
+    """
+    data = event.get("data") or {}
+    found = event.get("error") or data.get("error") or data.get("reason")
+    return "" if found is None else str(found)
+
+
 def load(run_dir: Path) -> list[dict]:
     path = Path(run_dir) / "trace.jsonl"
     if not path.exists():

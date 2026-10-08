@@ -25,7 +25,15 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
 
+from core.trace.report import error_text
+
 DEBUG_ROOT = "debug"
+
+
+def _is_error(e: dict) -> bool:
+    """An error event, or any event carrying an error message (top level or data)."""
+    return e.get("kind") == "error" or bool(e.get("error") or (e.get("data") or {}).get("error"))
+
 
 #: The verdicts the attribution engine can reach. Anything else in a trace's
 #: `verdict` field is prose, and grouping by sentence reports noise as signal.
@@ -251,7 +259,7 @@ def recent_failures(runs: int = 10, db: str = "", root: str = DEBUG_ROOT) -> str
     for run in found:
         summary = _summary(run)
         events = _events(run)
-        errors = [e for e in events if e.get("kind") == "error" or e.get("error")]
+        errors = [e for e in events if _is_error(e)]
         denials = [e for e in events if e.get("kind") == "denied"]
         refusals = [e for e in events if e.get("kind") == "refusal"]
         total_errors += len(errors)
@@ -264,7 +272,7 @@ def recent_failures(runs: int = 10, db: str = "", root: str = DEBUG_ROOT) -> str
         lines.append(head)
         if errors:
             for e in errors[:5]:
-                lines.append(f"      ERROR  {e.get('name', '?')}: {str(e.get('error'))[:160]}")
+                lines.append(f"      ERROR  {e.get('name', '?')}: {error_text(e)[:160]}")
         if denials:
             names = sorted({str(e.get("name", "?")) for e in denials})
             lines.append(f"      denied {len(denials)}: {', '.join(names[:6])}")
@@ -352,11 +360,11 @@ def run_anatomy(run_id: str = "", root: str = DEBUG_ROOT) -> str:
                 f"    {s.get('ms', 0):>8.1f} ms  {s.get('kind', '?')}  {s.get('name', '?')}"
             )
 
-    errors = [e for e in events if e.get("kind") == "error" or e.get("error")]
+    errors = [e for e in events if _is_error(e)]
     if errors:
         lines += ["", "  errors"]
         for e in errors[:8]:
-            lines.append(f"    {e.get('name', '?')}: {str(e.get('error'))[:160]}")
+            lines.append(f"    {e.get('name', '?')}: {error_text(e)[:160]}")
     denied = [e for e in events if e.get("kind") == "denied"]
     if denied:
         lines += ["", "  guardrail denials (the chain working)"]
@@ -408,6 +416,7 @@ def _diff_manifests(old: dict, new: dict) -> list[str]:
             registry_hash=d.get("registry_hash", ""),
             tools_hash=d.get("tools_hash", ""),
             package_versions=d.get("package_versions", {}),
+            model_selection=d.get("model_selection", {}),
         )
 
     # old.diff(new), not the reverse: RunManifest.diff renders "self -> other",

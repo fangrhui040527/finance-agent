@@ -42,19 +42,22 @@ class RunManifest:
     registry_hash: str
     tools_hash: str
     package_versions: dict[str, str] = field(default_factory=dict)
+    #: Which model each Messages tier resolves to, the effort, the pin and the
+    #: backend - the selection, never a key. A different model writes a
+    #: different thesis from the same data, so it is part of the method.
+    model_selection: dict[str, str] = field(default_factory=dict)
 
     @property
     def manifest_hash(self) -> str:
-        payload = json.dumps(
-            {
-                "system_prompts": dict(sorted(self.system_prompt_hashes.items())),
-                "registry": self.registry_hash,
-                "tools": self.tools_hash,
-                "packages": dict(sorted(self.package_versions.items())),
-            },
-            sort_keys=True,
-        )
-        return _sha(payload)
+        body = {
+            "system_prompts": dict(sorted(self.system_prompt_hashes.items())),
+            "registry": self.registry_hash,
+            "tools": self.tools_hash,
+            "packages": dict(sorted(self.package_versions.items())),
+        }
+        if self.model_selection:
+            body["models"] = dict(sorted(self.model_selection.items()))
+        return _sha(json.dumps(body, sort_keys=True))
 
     def as_dict(self) -> dict:
         return {
@@ -63,6 +66,7 @@ class RunManifest:
             "registry_hash": self.registry_hash,
             "tools_hash": self.tools_hash,
             "package_versions": dict(sorted(self.package_versions.items())),
+            "model_selection": dict(sorted(self.model_selection.items())),
         }
 
     def diff(self, other: RunManifest) -> list[str]:
@@ -78,6 +82,10 @@ class RunManifest:
             if a != b:
                 what = "added" if a is None else "removed" if b is None else "changed"
                 out.append(f"system prompt {what}: {agent}")
+        for key in sorted(set(self.model_selection) | set(other.model_selection)):
+            a, b = self.model_selection.get(key), other.model_selection.get(key)
+            if a != b:
+                out.append(f"model selection changed: {key} {a} -> {b}")
         for pkg in sorted(set(self.package_versions) | set(other.package_versions)):
             a = self.package_versions.get(pkg)
             b = other.package_versions.get(pkg)
@@ -89,9 +97,17 @@ class RunManifest:
 def current(registry_path: str = "agents/registry.yaml") -> RunManifest:
     """The manifest for the code as imported right now."""
     from agents.learning.reflection import A15Reflection
+    from agents.synthesis.narrate import NARRATE_SYSTEM
     from mcp_server.server import S
 
-    prompts = {"a15_reflection": _sha(A15Reflection.SYSTEM)}
+    # Every system prompt handed to a model. Only the reflection prompt was
+    # here, so editing the a10 narrative prompt left the hash unchanged and
+    # run_anatomy told the operator a changed thesis "came from the DATA, not
+    # the method".
+    prompts = {
+        "a15_reflection": _sha(A15Reflection.SYSTEM),
+        "a10_narrate": _sha(NARRATE_SYSTEM),
+    }
     registry_file = Path(registry_path)
     registry_hash = (
         _sha(registry_file.read_text(encoding="utf-8")) if registry_file.exists() else "absent"
@@ -102,7 +118,35 @@ def current(registry_path: str = "agents/registry.yaml") -> RunManifest:
         registry_hash=registry_hash,
         tools_hash=tools_hash,
         package_versions=_package_versions(),
+        model_selection=_model_selection(),
     )
+
+
+def _model_selection() -> dict[str, str]:
+    """The model each tier resolves to and what chose it. Names, never secrets."""
+    import os
+
+    from core.llm.tiers import (
+        MESSAGES_TIERS,
+        MODEL_IDS,
+        ModelSelectionError,
+        effective_tier,
+        pin_source,
+        selected_effort,
+    )
+
+    out: dict[str, str] = {}
+    try:
+        for tier in MESSAGES_TIERS:
+            out[f"tier:{tier.value}"] = MODEL_IDS[effective_tier(tier)]
+        effort = selected_effort()
+        out["effort"] = effort.value if effort is not None else ""
+        out["pin"] = pin_source() or ""
+    except ModelSelectionError as e:
+        out["error"] = str(e)
+    for var in ("LLM_BACKEND", "LLM_MODEL"):
+        out[var.lower()] = os.environ.get(var, "").strip()
+    return out
 
 
 def write(directory: Path, manifest: RunManifest) -> Path:

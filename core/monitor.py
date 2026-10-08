@@ -945,7 +945,7 @@ def _price_rules(
     if not Path(path).exists():
         return []
 
-    from core.market.cache import PriceCache, looks_like_bars
+    from core.market.cache import PriceCache, last_usable_bar_day, looks_like_bars
     from core.market.calendar import SessionCalendar
     from core.market.feed import StooqFeed, YahooFeed, market_proxy_for
     from markets.registry import get as adapter_for
@@ -997,14 +997,22 @@ def _price_rules(
     finally:
         cache.close()
 
-    freshest: dict[str, tuple[date, str, str]] = {}  # canonical id -> (fetched_on, feed, symbol)
+    freshest: dict[str, tuple[date, str, str]] = {}  # canonical id -> (bar day, feed, symbol)
+    fetched: dict[str, str] = {}  # canonical id -> the fetch day of that row
     for feed_name, symbol, fetched_on, body in rows:
         feed = feeds.get(feed_name)
         if feed is None or not looks_like_bars(body):
             continue  # an error page under a symbol's name is not a price, stale or otherwise
         try:
             spelled = feed.instrument_of(symbol)
-            day = date.fromisoformat(fetched_on)
+            # The last bar the body can actually price, not the day it was
+            # fetched. A body pulled at 00:08Z Tuesday before Bursa's Tuesday
+            # close, or one whose newest row came back with a blank close (the
+            # US rows of 2026-10-07, fetched 01:00Z on the 8th), was credited
+            # with a session it does not hold: one session staler than it read,
+            # which at the book's allowance of one is the difference between
+            # an alert and silence.
+            day = last_usable_bar_day(body) or date.fromisoformat(fetched_on)
         except (TypeError, ValueError):
             continue
         canon = canonical(spelled) if spelled else None
@@ -1012,6 +1020,7 @@ def _price_rules(
             continue  # no table accounts for the symbol, so no calendar can judge it
         if canon not in freshest or freshest[canon][0] < day:
             freshest[canon] = (day, feed_name, symbol)
+            fetched[canon] = str(fetched_on)
 
     calendars: dict[str, tuple[SessionCalendar, date] | None] = {}
     stale: list[dict] = []
@@ -1042,7 +1051,8 @@ def _price_rules(
                     "feed": feed_name,
                     "role": role,
                     "market": mic,
-                    "fetched_on": day.isoformat(),
+                    "fetched_on": fetched.get(canon, ""),
+                    "last_bar": day.isoformat(),
                     "last_session": last.isoformat(),
                     "sessions_behind": behind,
                     "allowed": allowed,
@@ -1257,9 +1267,15 @@ def _trace_rules(debug_root: str, now: datetime | None = None) -> list[Alert]:
     out: list[Alert] = []
     newest = runs[0]
 
-    errors = [e for e in _events(newest) if e.get("kind") == "error" or e.get("error")]
+    errors = [
+        e
+        for e in _events(newest)
+        if e.get("kind") == "error" or e.get("error") or (e.get("data") or {}).get("error")
+    ]
     if errors:
-        first = str(errors[0].get("error", ""))[:120]
+        from core.trace.report import error_text
+
+        first = error_text(errors[0])[:120]
         out.append(
             Alert(
                 rule="run_errors",

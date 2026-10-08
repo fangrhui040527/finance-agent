@@ -21,10 +21,11 @@ def test_a_changed_prompt_changes_the_hash(monkeypatch):
     assert after.manifest_hash != before
     diff = after.diff(
         RunManifest(
-            system_prompt_hashes={"a15_reflection": "0" * 64},
+            system_prompt_hashes={**after.system_prompt_hashes, "a15_reflection": "0" * 64},
             registry_hash=after.registry_hash,
             tools_hash=after.tools_hash,
             package_versions=after.package_versions,
+            model_selection=after.model_selection,
         )
     )
     assert diff == ["system prompt changed: a15_reflection"]
