@@ -144,7 +144,8 @@ class BM25:
         self._total_len += len(toks)
         self._avg_len = self._total_len / len(self._docs)
 
-    def search(self, query: str, limit: int = 20) -> list[tuple[Chunk, float]]:
+    def search(self, query: str, limit: int | None = 20) -> list[tuple[Chunk, float]]:
+        """Every document with a positive score, best first; `limit` None keeps them all."""
         n = len(self._docs)
         if not n:
             return []
@@ -164,7 +165,7 @@ class BM25:
             if s > 0:
                 scored.append((chunk, s))
         scored.sort(key=lambda x: -x[1])
-        return scored[:limit]
+        return scored if limit is None else scored[:limit]
 
 
 class Collection:
@@ -255,14 +256,18 @@ class Collection:
         missed on any question in the gold set, so fusing it in only cost real
         hits their seats.
 
-        Still four times `limit` from BM25, and for the reason that predates
-        the fusion: the filters below run AFTER selection, so a narrow pool
-        would let one stale or link-only document spend a slot the caller asked
-        to have filled. Over-fetching is what keeps `limit` a promise about
-        results rather than about candidates.
+        THE HARD FILTERS RUN OVER EVERY SCORED DOCUMENT, not over a pool cut
+        first. The pool used to be four times `limit` by relevance across the
+        whole 120-day index, with freshness and the entity applied after: a
+        name with more than ~24 matching chunks filled the pool with older
+        stories, the fresh ones never got a seat, and `news_evidence` for IHH
+        returned one chunk and refused while five fresh, IHH-linked ones sat in
+        the index (NVIDIA: 2 of 425). BM25 already scores every document, so
+        walking the whole ranked list until `limit` survivors are found costs
+        a sort, not a scan.
         """
         hits: list[Hit] = []
-        for i, (chunk, score) in enumerate(self.bm25.search(query, limit * 4)):
+        for i, (chunk, score) in enumerate(self.bm25.search(query, None)):
             # Hard filters, not rerank hints (docs/02 section 3 property 2).
             if max_age is not None and chunk.as_of is not None:
                 if (now or datetime.now(chunk.as_of.tzinfo)) - chunk.as_of > max_age:
