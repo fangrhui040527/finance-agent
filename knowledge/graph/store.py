@@ -27,6 +27,7 @@ from __future__ import annotations
 
 import json
 import sqlite3
+from dataclasses import replace
 from datetime import date
 from pathlib import Path as FsPath
 
@@ -183,6 +184,30 @@ class GraphStore:
             ),
         )
         self.conn.commit()
+
+    def reassert(self, edge: Edge, tier: str, on: date) -> bool:
+        """Open a new interval for an edge whose every row in `tier` is closed.
+
+        `add_edge` is idempotent by (src, dst, kind, valid_from), so an edge
+        the sources assert again after `--prune` closed it hits the closed row
+        and is ignored - and the fixed `valid_from` dates of the market and
+        sector registries make that every time. The relation then stayed out
+        of every as-of traversal for good. The closed row is never reopened
+        (history is append-only and the trigger refuses it); a new row opens
+        on the day the sources asserted it again. Returns whether one did.
+        """
+        rows = self.conn.execute(
+            "SELECT valid_to FROM edges WHERE src = ? AND dst = ? AND kind = ? AND tier = ?",
+            (edge.src, edge.dst, edge.kind.value, tier),
+        ).fetchall()
+        if not rows or any(r[0] is None for r in rows):
+            return False
+        last_close = max(date.fromisoformat(r[0]) for r in rows)
+        start = max(on, last_close)
+        if edge.valid_to is not None and edge.valid_to <= start:
+            return False  # the source itself says it has ended again
+        self.add_edge(replace(edge, valid_from=start), tier=tier)
+        return True
 
     def close_edge(
         self, src: str, dst: str, kind: EdgeKind, valid_from: date | None, valid_to: date

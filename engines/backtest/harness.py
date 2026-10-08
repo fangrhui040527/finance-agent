@@ -12,6 +12,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 
 from engines.backtest.metrics import (
+    TRADING_DAYS,
     Performance,
     deflated_sharpe,
     performance,
@@ -85,13 +86,23 @@ class BacktestReport:
         return None
 
 
+def _per_period_sharpe(returns: list[float]) -> float:
+    """Mean over standard deviation of the returns as they are: no annualising."""
+    n = len(returns)
+    if n < 2:
+        return 0.0
+    mu = sum(returns) / n
+    sd = (sum((r - mu) ** 2 for r in returns) / (n - 1)) ** 0.5
+    return mu / sd if sd > 1e-12 else 0.0
+
+
 def run(
     strategy_returns: list[float],
     gross_returns: list[float],
     benchmark_returns: dict[Benchmark, list[float]],
     regimes: list[Regime] | None = None,
     n_trials: int = 1,
-    sharpe_variance: float = 0.25,
+    sharpe_variance: float | None = None,
     turnover: float = 0.0,
     n_folds: int = 5,
     label_horizon: int = 20,
@@ -124,14 +135,25 @@ def run(
             "that is what you would have had to live through"
         )
 
+    # The deflated and probabilistic Sharpe (Bailey and Lopez de Prado) scale a
+    # PER-PERIOD Sharpe by sqrt(n - 1). They were handed the annualised one, a
+    # factor of sqrt(252) too large: the z-score saturated, and the 0.95 gate
+    # passed about 47% of strategies with no edge at all. The variance across
+    # trials goes in per-period units too: `sharpe_variance` is still given in
+    # annual units, as it always was, and by default it is the sampling
+    # variance of a per-period Sharpe under the null, 1 / (T - 1).
+    per_period = _per_period_sharpe(strategy_returns)
+    t = len(strategy_returns)
+    variance = 1.0 / max(1, t - 1) if sharpe_variance is None else sharpe_variance / TRADING_DAYS
+
     return BacktestReport(
         strategy=net,
         benchmarks=bench,
         by_regime=by_regime,
         folds=folds,
         n_trials=n_trials,
-        deflated_sharpe=deflated_sharpe(net.sharpe, strategy_returns, n_trials, sharpe_variance),
-        probabilistic_sharpe=probabilistic_sharpe(net.sharpe, strategy_returns),
+        deflated_sharpe=deflated_sharpe(per_period, strategy_returns, n_trials, variance),
+        probabilistic_sharpe=probabilistic_sharpe(per_period, strategy_returns),
         gross_sharpe=gross.sharpe,
         turnover=turnover,
         notes=notes,

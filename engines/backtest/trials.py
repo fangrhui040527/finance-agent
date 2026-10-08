@@ -151,7 +151,7 @@ class TrialLedger:
         return int(cur.lastrowid or 0)
 
     def distinct_rules(self, universe: str, start_day: date, end_day: date) -> int:
-        """How many DIFFERENT configurations have been tried on exactly this experiment.
+        """How many DIFFERENT configurations have been tried on this experiment.
 
         A configuration is a rule and the session count it scored - the same
         rule over more or fewer sessions of the same window saw different
@@ -159,13 +159,26 @@ class TrialLedger:
         configuration is not a second guess at the data, and counting it
         would deflate every result for the sin of being reproducible. The
         name stays for the gate that calls it.
+
+        "This experiment" is the same universe over a window that overlaps
+        the tested one by at least `SAME_WINDOW` (intersection over union).
+        It used to be the EXACT start and end, and the gate's default window
+        is the whole price cache, which moves with every collector run: a rule
+        tried tomorrow landed on a new key and was deflated against one trial,
+        whatever had been tried on the 99.9%-overlapping window the day before.
+        Windows that barely overlap - 2010-2020 against 2015-2025 - stay apart.
         """
-        row = self.conn.execute(
-            "SELECT COUNT(*) FROM (SELECT DISTINCT rule, sessions FROM trials "
-            "WHERE universe = ? AND start_day = ? AND end_day = ?)",
-            (universe, start_day.isoformat(), end_day.isoformat()),
-        ).fetchone()
-        return int(row[0]) if row else 0
+        rows = self.conn.execute(
+            "SELECT DISTINCT rule, sessions, start_day, end_day FROM trials WHERE universe = ?",
+            (universe,),
+        ).fetchall()
+        seen = {
+            (r[0], int(r[1]))
+            for r in rows
+            if _overlap(date.fromisoformat(r[2]), date.fromisoformat(r[3]), start_day, end_day)
+            >= SAME_WINDOW
+        }
+        return len(seen)
 
     def history(self, universe: str = "", limit: int = 50) -> list[Trial]:
         sql = "SELECT * FROM trials"
@@ -193,3 +206,14 @@ class TrialLedger:
 
     def count(self) -> int:
         return int(self.conn.execute("SELECT COUNT(*) FROM trials").fetchone()[0])
+
+
+#: Intersection over union above which two windows are the same experiment.
+SAME_WINDOW = 0.8
+
+
+def _overlap(a0: date, a1: date, b0: date, b1: date) -> float:
+    """Intersection over union of two inclusive date windows, in days."""
+    inter = (min(a1, b1) - max(a0, b0)).days + 1
+    union = (max(a1, b1) - min(a0, b0)).days + 1
+    return max(0, inter) / union if union > 0 else 0.0
