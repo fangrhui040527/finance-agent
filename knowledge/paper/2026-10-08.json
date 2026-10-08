@@ -1,0 +1,229 @@
+{
+  "day": "2026-10-08",
+  "written_at": "2026-10-08T22:46:00Z",
+  "phase": "ramp",
+  "week": 5,
+  "equity_usd": 1000.0,
+  "cash_usd": 1000.0,
+  "control_equity_usd": 970.5,
+  "control_return_to_date": -0.0295,
+  "drawdown": 0.0,
+  "control_drawdown": 0.0295,
+  "halted": false,
+  "marks": 25,
+  "positions": [],
+  "changes": [],
+  "control_changes": [],
+  "control_mark": {
+    "marked_on": "2026-10-08",
+    "equity_usd": 970.5,
+    "cash_usd": 602.28,
+    "positions_usd": 368.22,
+    "day_return": 0.0008,
+    "note": "holdings MYX:8869 100 (close 7.12), MYX:5183 100 (4.26), MYX:3182 200 (1.84); nothing pending"
+  },
+  "index_book": {
+    "mark": {
+      "marked_on": "2026-10-08",
+      "equity_usd": 990096.75,
+      "cash_usd": 598347.25,
+      "positions_usd": 391749.5,
+      "day_return": -0.0036,
+      "drawdown": 0.0099,
+      "held": 97,
+      "pending": 0
+    },
+    "cost_to_date_share_of_notional": 0.0048,
+    "since_2026_09_30": {
+      "index": -0.0099,
+      "decided": 0.0,
+      "control": -0.0097
+    },
+    "note": "nothing pending"
+  },
+  "caps": [
+    {
+      "cap": "largest name",
+      "value": "0.00%",
+      "limit": "25%",
+      "breached": false
+    },
+    {
+      "cap": "invested",
+      "value": "0.00%",
+      "limit": "40%",
+      "breached": false
+    },
+    {
+      "cap": "cash floor",
+      "value": "100.00%",
+      "limit": "20%",
+      "breached": false
+    },
+    {
+      "cap": "names held",
+      "value": "0",
+      "limit": "0",
+      "breached": false
+    },
+    {
+      "cap": "drawdown from peak",
+      "value": "0.00%",
+      "limit": "8% halts entries",
+      "breached": false
+    },
+    {
+      "cap": "turnover, 5 weekdays",
+      "value": "USD 0.00",
+      "limit": "USD 500.00",
+      "breached": false
+    }
+  ],
+  "prices": {
+    "bursa": "Thursday 2026-10-08 closes; ^KLSE 10-08 bar has open 1,613.45, an empty close and volume 0",
+    "us": "Thursday 2026-10-08 closes; the 10-07 closes blank last night are now cached (NVDA 237.47, AAPL 336.67, MSFT 529.76)",
+    "fx": "4.09 MYR per USD, bnm, 2026-10-08",
+    "fetched": "2026-10-08T22:34Z"
+  },
+  "fundable": [
+    {
+      "instrument_id": "MYX:1155",
+      "lot_usd": 239.61,
+      "share": 0.24,
+      "round_trip": 0.01,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:5183",
+      "lot_usd": 104.16,
+      "share": 0.104,
+      "round_trip": 0.0212,
+      "lots": 2
+    },
+    {
+      "instrument_id": "MYX:5225",
+      "lot_usd": 192.67,
+      "share": 0.193,
+      "round_trip": 0.0121,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:8869",
+      "lot_usd": 174.08,
+      "share": 0.174,
+      "round_trip": 0.0132,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:3182",
+      "lot_usd": 44.99,
+      "share": 0.045,
+      "round_trip": 0.0474,
+      "lots": 5
+    },
+    {
+      "instrument_id": "XNAS:NVDA",
+      "lot_usd": 230.48,
+      "share": 0.23,
+      "round_trip": 0.0113,
+      "lots": 1
+    }
+  ],
+  "over_cap": {
+    "MYX:5347": 0.315,
+    "XNAS:AAPL": 0.34,
+    "XNAS:MSFT": 0.523
+  },
+  "ledger": {
+    "mark_days": 25,
+    "gap": "no routine ran 2026-10-02..10-06; no paper page and no decision for those days; none backdated",
+    "on_time": "routine fired 2026-10-08T22:32Z and ran on time"
+  },
+  "attribution": null,
+  "decision": {
+    "recorded": true,
+    "weights": {},
+    "all_cash": true,
+    "calendar_row": false,
+    "prediction_id": "paper-2026-10-08-allcash-21d-7bb6",
+    "grades_on": "2026-11-07",
+    "confidence": 0.55,
+    "decided_at": "2026-10-08T22:42:25Z",
+    "made_at": "2026-10-08T22:42:25Z",
+    "refusals": [],
+    "rows_read_before_deciding": true,
+    "thesis": "All cash, the twenty-third all-cash row and the second decision of ramp week 5. Wednesday 10-07 is decomposed on the 2026-10-07 feedback page: no book name moved past 1.5 sigma and every one reads not_significant; ^KLSE fell 1.32% to its lowest close since 2025-12-10, led by the banks (CIMB -4.81%, Hong Leong Bank -6.03%, AMMB -4.48%), and the market titles name foreign selling, oil and US yields with no fund-flow print in the store. IHH's 10-06 leg (1.69 sigma) held on 10-07 on 2.5 times Tuesday's volume; a title-only row first seen on 10-08, 'EPF lifts stake in IHH Healthcare to 13.3% via fresh share acquisitions' (tipranks.com via google_news), names a buyer but gives no dates or volumes, and no Bursa filing for it is in the store. Thursday 10-08 is not decomposed and the cached ^KLSE 10-08 bar has an empty close: Maybank 9.80 (-0.71%), Petronas Chemicals 4.26 (+0.95%), IHH 7.88 (-0.25%), Press Metal 7.12 (-1.11%), Genting 1.84 (+2.22%); NVIDIA 230.48 (-2.94%), below its 10-01 close of 230.86. alphavantage_news has failed on every run since 10-06 01:47Z. A leg with no dated cause is not a thesis. Claim: nothing in the fundable universe beats cash over 21 sessions."
+  },
+  "stores": {
+    "decided_targets": 23,
+    "predictions": 23,
+    "index_targets": 194,
+    "control_targets": 6,
+    "index_pending": 0,
+    "control_pending": 0
+  },
+  "evidence": {
+    "feedback_page": "knowledge/feedback/2026-10-07.md (ffde8c5)",
+    "past_1_5_sigma_10_07": [],
+    "thursday_closes": {
+      "MYX:1155": "9.87 -> 9.80 (-0.71%)",
+      "MYX:5183": "4.22 -> 4.26 (+0.95%)",
+      "MYX:5225": "7.90 -> 7.88 (-0.25%)",
+      "MYX:8869": "7.20 -> 7.12 (-1.11%)",
+      "MYX:3182": "1.80 -> 1.84 (+2.22%)",
+      "MYX:5347": "12.86 -> 12.90 (+0.31%)",
+      "XNAS:SPY": "777.22 -> 773.93 (-0.42%)",
+      "XNAS:NVDA": "237.47 -> 230.48 (-2.94%)",
+      "XNAS:AAPL": "336.67 -> 340.42 (+1.11%)",
+      "XNAS:MSFT": "529.76 -> 522.61 (-1.35%)"
+    },
+    "rows_since_10_08": {
+      "MYX:5225": [
+        "google_news:tipranks.com 2026-10-08T11:18Z 'EPF lifts stake in IHH Healthcare to 13.3% via fresh share acquisitions' (title only)"
+      ],
+      "MYX:1155": [
+        "google_news:ad-hoc-news.de 2026-10-08T09:06Z 'Maybank keeps Buy rating for Singtel stock at SGD 5.21'"
+      ],
+      "MYX:8869": [
+        "google_news:news.metal.com 2026-10-08T05:57Z SMM aluminium item (title only)"
+      ],
+      "MYX:5183": [],
+      "MYX:3182": [],
+      "XNAS:NVDA": "426 rows; latest escalated 'Nvidia (NVDA)'s $20 Billion Groq Deal Faces a Legal Test' (yahoo_rss 20:54Z, after the close)"
+    }
+  },
+  "mistakes": [
+    "paper-2026-10-01-allcash-21d-5a1e is no longer behind on NVIDIA: 230.48 on 10-08 against 230.86 on 10-01; since 10-01 IHH +2.34% and Petronas Chemicals +3.15% are above their round trips (1.21%, 2.12%); grades 10-31 against the control",
+    "paper-2026-10-07-allcash-21d-2b2c declined IHH as '1.69 sigma with no collected cause'; if a Bursa filing dates EPF's acquisitions to 10-06 or 10-07, that reason was a collection gap"
+  ],
+  "mistakes_checked": [
+    "paper-2026-10-01-allcash-21d-5a1e against 10-08 closes: NVIDIA 230.48 vs 230.86 on 10-01",
+    "paper-2026-10-07-allcash-21d-2b2c against the EPF row first seen 10-08 11:18Z"
+  ],
+  "grades_due": [
+    {
+      "prediction_id": "paper-2026-09-11-allcash-21d-8bf9",
+      "on": "2026-10-11"
+    },
+    {
+      "prediction_id": "paper-2026-09-12-allcash-21d-1661",
+      "on": "2026-10-12"
+    },
+    {
+      "prediction_id": "paper-2026-09-13-allcash-21d-5baf",
+      "on": "2026-10-13"
+    },
+    {
+      "prediction_id": "paper-2026-09-14-allcash-21d-9d7e",
+      "on": "2026-10-14"
+    },
+    {
+      "prediction_id": "paper-2026-09-15-allcash-21d-af55",
+      "on": "2026-10-15"
+    }
+  ],
+  "lessons": [
+    "A title that names a buyer is not a dated cause: the EPF row could explain IHH's two-session leg only once a filing gives the dates and the shares.",
+    "A blank index close leaves the marks whole but the day unmeasured: on 10-08 every Bursa name had a close and ^KLSE did not."
+  ]
+}
