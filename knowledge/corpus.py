@@ -58,6 +58,12 @@ FAILED = "failed"
 #: which is exactly what happened. See `last_success` and defect log §20.
 DEGRADED = "degraded"
 
+#: The rows that say a run READ something: ok or degraded, and not a skip (a
+#: skip is recorded `ok` with a "skipped:" detail so `sweep_silence` sees the
+#: dispatch, but it collected nothing). See `Corpus.slot_runs(successful=True)`.
+_READ_SOMETHING = " AND status IN (?, ?) AND detail NOT LIKE ?"
+_READ_SOMETHING_ARGS = [OK, DEGRADED, "skipped:%"]
+
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS articles (
     doc_id           TEXT PRIMARY KEY,
@@ -331,7 +337,9 @@ class Corpus:
         ).fetchall()
         return {r["run_id"]: r["slot"] for r in rows}
 
-    def slot_runs(self, since: datetime, until: datetime) -> dict[str, int]:
+    def slot_runs(
+        self, since: datetime, until: datetime, *, successful: bool = False
+    ) -> dict[str, int]:
         """How many distinct sweep RUNS each slot had over [since, until).
 
         Counting runs, not rows: one sweep writes a row per source, and the
@@ -346,13 +354,43 @@ class Corpus:
         days that were never owed, or owes days whose firings fall outside -
         and on a five-day window that arithmetic reported a shortfall of one on
         every daily slot for a collector that had missed nothing at all.
+
+        WITH `successful`, only runs that READ something count: at least one
+        row ok or degraded that is not a skip. A run whose every source failed -
+        a runner with no egress, every host refusing - fired, but it collected
+        nothing, and counting it closed the slot for its whole firing: the
+        at-most-once guard skipped the late cron that would have read it, and
+        the catch-up owed nothing. Whether the collector FIRED is the default
+        question; whether the slot was COLLECTED is this one.
         """
-        rows = self.conn.execute(
-            """SELECT slot, COUNT(DISTINCT run_id) AS runs FROM sweeps
-                WHERE at >= ? AND at < ? AND slot <> '' GROUP BY slot""",
-            (_iso(since), _iso(until)),
-        ).fetchall()
+        sql = "SELECT slot, COUNT(DISTINCT run_id) AS runs FROM sweeps WHERE at >= ? AND at < ?"
+        sql += " AND slot <> ''"
+        args: list = [_iso(since), _iso(until)]
+        if successful:
+            sql += _READ_SOMETHING
+            args += _READ_SOMETHING_ARGS
+        rows = self.conn.execute(sql + " GROUP BY slot", args).fetchall()
         return {r["slot"]: int(r["runs"]) for r in rows}
+
+    def slot_run_times(
+        self, since: datetime, until: datetime, *, successful: bool = True
+    ) -> dict[str, list[datetime]]:
+        """slot -> when each distinct run over [since, until) began, oldest first.
+
+        The arrival times `slots_missed` attributes to firings: a run belongs to
+        the firing before it, not to the UTC day it landed on.
+        """
+        sql = "SELECT slot, run_id, MIN(at) AS at FROM sweeps WHERE at >= ? AND at < ?"
+        sql += " AND slot <> ''"
+        args: list = [_iso(since), _iso(until)]
+        if successful:
+            sql += _READ_SOMETHING
+            args += _READ_SOMETHING_ARGS
+        rows = self.conn.execute(sql + " GROUP BY slot, run_id ORDER BY at", args).fetchall()
+        out: dict[str, list[datetime]] = {}
+        for r in rows:
+            out.setdefault(r["slot"], []).append(_dt(r["at"]))
+        return out
 
     def run_count(self, since: datetime, until: datetime) -> int:
         """Distinct sweep runs over [since, until), whatever slot they carried.

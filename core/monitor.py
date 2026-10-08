@@ -460,13 +460,20 @@ def slots_outstanding(corpus_path: str, now: datetime) -> tuple[list[str], str]:
     At the routine's usual 22:33 the window covers exactly the day's own
     firings, so nothing changes on a night that runs on time.
 
+    A run counts only if it READ something (`Corpus.slot_runs(successful=True)`):
+    a run whose every source failed fired, but the slot is still owed.
+
     Returns the slot names and, when the answer is empty for a reason worth
     printing, why. Three ways it says nothing:
 
-      * a `--slot all` run has already happened today and covered everything;
+      * a `--slot all` run landed after every due firing and covered them all;
       * the store has never recorded a slot AND something ran today, so the run
         cannot be attributed and firing again would be guessing;
       * there is genuinely nothing owed.
+
+    An `all` run settles only the firings BEFORE it. It used to settle the whole
+    UTC day: one at 08:50 left the 09:20, 12:30 and 21:15 firings owed nothing,
+    and a day that then lost all three read as complete at the nightly catch-up.
 
     A store that has never recorded a slot and saw NO run today does report the
     day's slots: "I cannot tell you which one" and "nothing ran at all" are
@@ -481,13 +488,10 @@ def slots_outstanding(corpus_path: str, now: datetime) -> tuple[list[str], str]:
     from knowledge.corpus import Corpus
 
     with Corpus(corpus_path) as corpus:
-        ran = corpus.slot_runs(day_start, now)
         total = corpus.run_count(day_start, now)
         ever = corpus.first_slot_row()
-        since_firing = {s: corpus.slot_runs(firings[s], now) for s in due}
+        since_firing = {s: corpus.slot_runs(firings[s], now, successful=True) for s in due}
 
-    if ran.get("all"):
-        return [], "a run covering every slot has already happened today"
     # A `--slot all` run after a slot's firing collected that slot's sources too.
     outstanding = [s for s in due if not (since_firing[s].get(s) or since_firing[s].get("all"))]
     if outstanding and ever is None and total:
@@ -495,7 +499,46 @@ def slots_outstanding(corpus_path: str, now: datetime) -> tuple[list[str], str]:
             f"{total} run(s) today, none recording which slot - nothing to attribute. "
             "the next sweep on a build that records slots settles this"
         )
+    if due and not outstanding and all(since_firing[s].get("all") for s in due):
+        return [], "a run covering every slot landed after each firing"
     return outstanding, ""
+
+
+def _firings(slot: str, start: datetime, end: datetime) -> list[datetime]:
+    """Every scheduled firing of `slot` over the whole UTC days [start, end)."""
+    out = []
+    day = start.date()
+    while day < end.date():
+        if day.weekday() in SLOT_WEEKDAYS[slot]:
+            out.append(datetime.combine(day, SLOT_TIMES[slot], tzinfo=UTC))
+        day += timedelta(days=1)
+    return out
+
+
+def _arrived(slot: str, runs: list[datetime], start: datetime, end: datetime) -> int:
+    """How many of the slot's firings over [start, end) a successful run answered.
+
+    A run answers the firing BEFORE it: it counts for the firing when it lands
+    in [firing, the slot's next firing). Counting by the UTC day a run landed
+    on, as this rule did to 2026-10-08, filed a us_close that arrived at 00:42
+    under the next day - so a week of on-time-but-late us_close runs read as
+    one missing, and a real miss hidden behind a previous night's late arrival
+    read as none. Each firing counts once however many runs answered it, so a
+    slot that ran twice cannot pay for one that never ran.
+    """
+    firings = _firings(slot, start, end)
+    if not firings:
+        return 0
+    # The firing after the window's last one closes its interval.
+    nxt = firings[-1] + timedelta(days=1)
+    while nxt.weekday() not in SLOT_WEEKDAYS[slot]:
+        nxt += timedelta(days=1)
+    following = firings[1:] + [nxt]
+    return sum(
+        1
+        for fired, until in zip(firings, following, strict=True)
+        if any(fired <= r < until for r in runs)
+    )
 
 
 def _slot_rules(cfg, now: datetime) -> list[Alert]:
@@ -515,8 +558,10 @@ def _slot_rules(cfg, now: datetime) -> list[Alert]:
     scale is indistinguishable from loss while you are waiting, and a rule that
     can only see a stopped collector cannot tell you either way.
 
-    Counting by whole days is what makes a late run count as the day's run: a
-    slot delayed most of a day still lands on the day it was owed.
+    Each run is attributed to the FIRING before it (`_arrived`), not to the UTC
+    day it landed on: a slot delayed most of a day, or a 21:15 us_close that
+    lands after midnight, still answers the firing it was owed for. Only runs
+    that read something count.
 
     So this rule counts instead of timing: the cron owes a known number of
     firings over the window, and the sweeps table records what arrived.
@@ -569,13 +614,13 @@ def _slot_rules(cfg, now: datetime) -> list[Alert]:
             start = datetime(first.year, first.month, first.day, tzinfo=UTC) + timedelta(days=1)
         if end - start < timedelta(days=1):
             return []
-        ran = corpus.slot_runs(start, end)
+        manual = corpus.slot_runs(start, end).get("all", 0)
+        # Arrivals up to NOW, not to `end`: the last day's 21:15 firing that
+        # lands at 00:30 this morning is that day's run, not a miss.
+        arrivals = corpus.slot_run_times(start, now, successful=True)
 
     due = slots_due(start, end)
-    manual = ran.get("all", 0)
-    # Capped per slot: a slot that fired twice in a day does not pay for
-    # another slot that never fired at all.
-    arrived = {slot: min(ran.get(slot, 0), n) for slot, n in due.items()}
+    arrived = {slot: _arrived(slot, arrivals.get(slot, []), start, end) for slot in due}
     short = sum(due.values()) - sum(arrived.values())
     if short < SLOT_SHORTFALL_MIN:
         return []

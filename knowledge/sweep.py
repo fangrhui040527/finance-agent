@@ -402,7 +402,10 @@ def _already_ran(corpus_path: str, slot: str, started: datetime) -> str:
         return ""
     since = max(slot_window_start(slot, started), started - timedelta(hours=24))
     with Corpus(corpus_path) as corpus:
-        ran = corpus.slot_runs(since, started)
+        # Runs that READ something. One whose every source failed fired but
+        # collected nothing, and a guard that counted it would skip the late
+        # cron that could still collect the slot (`Corpus.slot_runs`).
+        ran = corpus.slot_runs(since, started, successful=True)
     n = ran.get(slot, 0)
     if not n:
         return ""
@@ -699,7 +702,13 @@ def _run_news(
                 result.status = SKIPPED
                 result.detail = f"no name in the book trades in slot {slot!r}"
                 corpus.record_sweep(
-                    run_id, spec.name, since, OK, at=tick(), slot=slot, detail=result.detail
+                    run_id,
+                    spec.name,
+                    since,
+                    OK,
+                    at=tick(),
+                    slot=slot,
+                    detail=f"skipped: {result.detail}",
                 )
                 return result, []
             records, articles, notes, degraded = _news_per_instrument(
