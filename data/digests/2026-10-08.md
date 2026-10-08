@@ -1,6 +1,6 @@
 # Digest 2026-10-08
 
-Generated 2026-10-08 16:33 UTC · slot `all` · 14807 articles in the corpus, 5009 observations, 4201 events in the fact book.
+Generated 2026-10-08 18:59 UTC · slot `all` · 14816 articles in the corpus, 5009 observations, 4203 events in the fact book.
 
 ## The book
 
@@ -66,6 +66,7 @@ Generated 2026-10-08 16:33 UTC · slot `all` · 14807 articles in the corpus, 50
 - 2026-10-07 Yahoo — Alphabet Only Requires a Tiny Bit of Faith So I Keep Pulling The Trigger [q 0.85, tone +1.0] ★
 - 2026-10-07 Yahoo — Microsoft or Amazon: If I Could Only Own One for the Next 5 Years, It Would Be This One [q 0.85, tone +1.0] ★
 - 2026-10-07 Yahoo — Bad News for Microsoft: “Basically Zero” AI Use for Most Employees on Copilot [q 0.85, tone +1.0] ★
+- event 2026-10-07 rating_reiteration — Evercore ISI Group maintain Outperform (fmp)
 - upcoming 2026-10-27 earnings_result — Q1 2027 results (finnhub)
 - snapshot: P/E (ttm) 29.26 (finnhub, 2026-10-08) · P/B 6.26 (finnhub, 2026-09-05) · EPS (ttm) 17.95 (finnhub, 2026-09-05) · dividend yield 0.79 (finnhub, 2026-09-05) · beta 1.06 (finnhub, 2026-10-08) · 52w high 553.72 (finnhub, 2026-09-05) · 52w low 349.20 (finnhub, 2026-09-05) · target (consensus) 571.76 (fmp, 2026-10-06) · analysts: buy 41 (finnhub, 2026-09-05) · analysts: hold 5 (finnhub, 2026-09-05) · analysts: sell 0 (finnhub, 2026-09-05) · vendor sentiment 0.29 (alphavantage_news, 2026-10-06) · revenue (last quarter) 90.01bn (sec_xbrl, 2026-07-29) · net income (last quarter) 35.77bn (sec_xbrl, 2026-07-29) · last EPS surprise % 9.53 (finnhub, 2026-09-05)
 
@@ -73,27 +74,31 @@ Generated 2026-10-08 16:33 UTC · slot `all` · 14807 articles in the corpus, 50
 
 | series | latest | as of | change | source |
 |---|---|---|---|---|
-| ICE BofA US high-yield option-adjusted spread, % | 3.12 | 2026-10-05 | +0.02 | fred |
+| ICE BofA US high-yield option-adjusted spread, % | 3.09 | 2026-10-07 | +0.06 | fred |
 | BNM Overnight Policy Rate, % | 2.75 | 2026-09-03 | +0 | bnm_opr |
 | US CPI, all items, index 1982-84=100 | 334.13 | 2026-08-01 | +1.318 | fred |
-| Brent crude, USD per barrel (EIA, daily) | 113.96 | 2026-09-29 | -6.01 | fred |
+| Brent crude, USD per barrel (EIA, daily) | 125.44 | 2026-10-06 | -0.07 | fred |
 | Malaysian ringgit per US dollar | 4.08 | 2026-10-02 | -0.001 | fred |
-| Federal funds effective rate, % | 3.88 | 2026-10-05 | +0 | fred |
-| 10-year Treasury yield, % | 5.31 | 2026-10-05 | +0.03 | fred |
-| 2-year Treasury yield, % | 4.84 | 2026-10-05 | +0.01 | fred |
+| Federal funds effective rate, % | 3.88 | 2026-10-06 | +0 | fred |
+| 10-year Treasury yield, % | 5.27 | 2026-10-06 | -0.04 | fred |
+| 2-year Treasury yield, % | 4.79 | 2026-10-06 | -0.05 | fred |
 | Malaysia CPI headline, index 2010=100 | 137.50 | 2026-08-01 | +0.4 | dosm_cpi |
 | Broad US dollar index | 121.38 | 2026-10-02 | -0.4034 | fred |
-| NASDAQ Composite, index level | 27,599.89 | 2026-10-06 | +122.58 | fred |
+| NASDAQ Composite, index level | 27,538.69 | 2026-10-07 | -61.2 | fred |
 | Aluminium, USD per tonne (IMF PCPS via FRED) | 3,158.26 | 2026-07-01 |  | fred |
-| S&P 500, index level | 7,818.93 | 2026-10-06 | +44.98 | fred |
-| 10y minus 2y Treasury spread, % | 0.48 | 2026-10-06 | +0.01 | fred |
+| S&P 500, index level | 7,801.77 | 2026-10-07 | -17.16 | fred |
+| 10y minus 2y Treasury spread, % | 0.51 | 2026-10-07 | +0.03 | fred |
 | US unemployment rate, % | 4.20 | 2026-09-01 | +0.1 | fred |
-| CBOE VIX, index | 15.01 | 2026-10-06 | -0.51 | fred |
+| CBOE VIX, index | 15.08 | 2026-10-07 | +0.07 | fred |
 
 ## Collection
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 18:59 | dbnomics | ok | 450 | 0 | 0 | facts 0;  |
+| 18:59 | jin10_flash | ok | 20 | 10 | 9 | facts 0;  |
+| 18:59 | fred | ok | 487 | 0 | 0 | facts 15; release calendar: 'FOMC Press Release' listed on 15 days of the fortni |
+| 18:58 | fmp | ok | 3954 | 0 | 0 | facts 1; fmp /earnings is outside the plan (HTTP 402); not collected for NVDA, A |
 | 16:32 | eodhd | ok | 0 | 0 | 0 | facts 0; EODHD plan: free (2 names a day, US only, rotated); MYX:1155: deferred  |
 | 16:32 | twse_openapi | ok | 8 | 0 | 0 | facts 5;  |
 | 16:32 | jin10_flash | ok | 21 | 7 | 6 | facts 0;  |
