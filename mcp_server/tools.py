@@ -247,6 +247,53 @@ def _news_adapter(source: str, query: str):
     return adapter_for(source, query=query) if query else adapter_for(source)
 
 
+def _screened(lines: list[str], agent: str, corpus: str) -> tuple[list[str], list[str]]:
+    """The lines the RETRIEVAL rail allows, and why each other one was dropped.
+
+    Collected text reaches the model through more doors than retrieval: a live
+    `pull_news`, the digest, the fact snapshot's event titles. Each carries
+    strings anyone can get onto a public wire, and the model reading them can
+    call `log_prediction`, which writes records that cannot be deleted. Every
+    such door runs the same scan `knowledge.retrieval.pipeline.quarantine`
+    runs, line by line: drop and count, never refuse the page, so one poisoned
+    headline costs one line and not the answer.
+    """
+    from core.guardrails.defaults import default_engine
+    from core.guardrails.policy import Action, Decision, Rail
+
+    engine = default_engine()
+    kept: list[str] = []
+    dropped: list[str] = []
+    for line in lines:
+        got = engine.evaluate(
+            Action(
+                name=f"{corpus}_line",
+                rail=Rail.RETRIEVAL,
+                agent=agent,
+                payload={"corpus": corpus, "text": line},
+            )
+        )
+        if got.decision is Decision.DENY:
+            dropped.append(f"{got.policy_name}: {got.reason}")
+        else:
+            kept.append(line)
+    return kept, dropped
+
+
+def _quarantine_note(dropped: list[str]) -> str:
+    if not dropped:
+        return ""
+    return (
+        f"\n\n  quarantined {len(dropped)} line(s) the injection scan refused "
+        f"({dropped[0]}{'; ...' if len(dropped) > 1 else ''}); they are not shown"
+    )
+
+
+def _screen_text(text: str, agent: str, corpus: str) -> str:
+    kept, dropped = _screened(text.splitlines(), agent, corpus)
+    return "\n".join(kept) + _quarantine_note(dropped)
+
+
 def pull_news(source: str = "gdelt", query: str = "", hours: int = 24, limit: int = 20) -> str:
     """What a source carried in a window, and what of it reached the review queue.
 
@@ -285,10 +332,16 @@ def pull_news(source: str = "gdelt", query: str = "", hours: int = 24, limit: in
 
     articles, stats = feed.normalize(records, holdings=holdings, watchlist=watchlist)
     head = f"{feed.name}  last {hours}h" + (f"  query {query!r}" if query else "")
-    rows = "\n".join(
-        f"  {a.published_at:%Y-%m-%d %H:%M}  {a.source_domain:<24} {a.title}"
-        for a in articles[:limit]
-    )
+    # Title AND body through the scan, one article at a time; only the title
+    # is printed, but a poisoned body is a poisoned article.
+    shown, dropped = [], []
+    for a in articles[:limit]:
+        _, why = _screened([f"{a.title}\n{a.body}"], "mcp", "pull_news")
+        if why:
+            dropped += why
+            continue
+        shown.append(f"  {a.published_at:%Y-%m-%d %H:%M}  {a.source_domain:<24} {a.title}")
+    rows = "\n".join(shown)
     body = rows or "  (a quiet window, reported as one - not an error)"
     tail = ""
     if not stats.escalated:
@@ -301,7 +354,7 @@ def pull_news(source: str = "gdelt", query: str = "", hours: int = 24, limit: in
                 "\n  Both are EMPTY in config, so the gate is closed on every article "
                 "and a live feed is indistinguishable from a quiet day."
             )
-    return f"{head}\n  {stats}\n{body}{tail}"
+    return f"{head}\n  {stats}\n{body}{tail}{_quarantine_note(dropped)}"
 
 
 # --------------------------------------------------------------------------
@@ -335,7 +388,7 @@ def daily_digest(day: str = "", write: bool = False) -> str:
     # return value - and the rail belongs on both. `write_digest` gates the
     # first; without this the model could be handed a page the file was
     # refused for.
-    body = digest.to_markdown()
+    body = _screen_text(digest.to_markdown(), "collector", "digest")
     publish(default_engine(), "collector", "digest", body)
     return body
 
@@ -351,7 +404,7 @@ def fact_snapshot(instrument: str, days: int = 30) -> str:
     except ValueError as e:
         raise ToolError(str(e)) from None
     with FactBook(cfg.facts_db) as book:
-        return _snapshot(book, instrument, days=max(1, days))
+        return _screen_text(_snapshot(book, instrument, days=max(1, days)), "mcp", "facts")
 
 
 def macro_context(series: str = "", points: int = 5) -> str:

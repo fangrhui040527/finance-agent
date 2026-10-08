@@ -24,6 +24,31 @@ MAX_BODY_BYTES = 1_000_000
 REQUIRED_POST_HEADER = ("x-requested-with", "FinPlanet")
 
 
+#: The names this app answers to. `testserver` is the Host Starlette's test
+#: client sends; a browser sends it only if the user's own resolver maps that
+#: name, which no rebinding page controls.
+ALLOWED_HOSTS = frozenset({"127.0.0.1", "localhost", "::1", "testserver"})
+
+
+def _origin_host(origin: str) -> str:
+    from urllib.parse import urlsplit
+
+    return (urlsplit(origin).hostname or "").lower()
+
+
+def _refused(status: int, reason: str) -> JSONResponse:
+    return JSONResponse(
+        status_code=status,
+        content={
+            "ok": False,
+            "text": "",
+            "data": None,
+            "refusal": {"reason": reason},
+            "disclaimer": "",
+        },
+    )
+
+
 def create_app() -> FastAPI:
     from core.env import load as load_dotenv
     from core.logging import configure as configure_logging
@@ -40,9 +65,21 @@ def create_app() -> FastAPI:
 
     @app.middleware("http")
     async def guard(request: Request, call_next):
+        # THE HOST FIRST. Binding to 127.0.0.1 keeps other machines out, not
+        # other ORIGINS: a DNS-rebinding page re-points its own name at
+        # 127.0.0.1, becomes same-origin with this app, reads every GET (the
+        # capital plan, the traces) and can set the custom header below too.
+        # Its requests still carry ITS name in Host, so a Host that is not this
+        # machine is refused before anything else runs.
+        host = (request.headers.get("host") or "").rsplit(":", 1)[0].strip("[]").lower()
+        if host not in ALLOWED_HOSTS:
+            return _refused(403, f"REFUSED: Host {host or '(none)'} is not this machine")
         # A browser form cannot set a custom header; a hostile page therefore
         # cannot POST here even though we listen on localhost.
         if request.method == "POST":
+            origin = request.headers.get("origin")
+            if origin and _origin_host(origin) not in ALLOWED_HOSTS:
+                return _refused(403, f"REFUSED: a POST from {origin} is cross-site")
             name, want = REQUIRED_POST_HEADER
             if request.headers.get(name) != want:
                 return JSONResponse(
