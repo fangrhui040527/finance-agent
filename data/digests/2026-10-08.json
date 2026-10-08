@@ -1,6 +1,78 @@
 {
   "collection": [
     {
+      "at": "2026-10-08T22:34:30.023397+00:00",
+      "detail": "facts 0; EODHD plan: free (2 names a day, US only, rotated); XNAS:AAPL: deferred by the 2-a-day credit budget; next in rotation; XNAS:MSFT: outside the plan or over today's credits; XNAS:NVDA: outside the plan or over today's credits",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-08T22:34:29.624927+00:00",
+      "detail": "facts 0; ",
+      "fetched": 21,
+      "kept": 15,
+      "source": "jin10_flash",
+      "status": "ok",
+      "stored": 8
+    },
+    {
+      "at": "2026-10-08T22:34:28.220448+00:00",
+      "detail": "alphavantage quota exhausted for today: Thank you for using Alpha Vantage! This is a premium endpoint. You may subscribe to any of the premium plans at https://www.alphavantage.co/premium/ to instantl",
+      "fetched": 0,
+      "kept": 0,
+      "source": "alphavantage_news",
+      "status": "failed",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-08T22:34:23.384483+00:00",
+      "detail": "facts 0; ",
+      "fetched": 297,
+      "kept": 245,
+      "source": "finnhub",
+      "status": "ok",
+      "stored": 203
+    },
+    {
+      "at": "2026-10-08T22:34:20.716835+00:00",
+      "detail": "facts 1; ",
+      "fetched": 1,
+      "kept": 0,
+      "source": "edgar",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-08T22:34:20.427331+00:00",
+      "detail": "named the company: 37 of 37 (lowest: Apple 13/13, Microsoft 9/9, NVIDIA 15/15)",
+      "fetched": 37,
+      "kept": 37,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 32
+    },
+    {
+      "at": "2026-10-08T22:34:19.975632+00:00",
+      "detail": "named the company: 60 of 72 (lowest: Microsoft 19/24, NVIDIA 25/30, Apple 16/18)",
+      "fetched": 75,
+      "kept": 72,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 69
+    },
+    {
+      "at": "2026-10-08T22:34:18.118418+00:00",
+      "detail": "grouped 3 names per request; 1 request; read but empty: Apple, Microsoft, NVIDIA",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "ok",
+      "stored": 0
+    },
+    {
       "at": "2026-10-08T18:59:07.736632+00:00",
       "detail": "facts 0; ",
       "fetched": 450,
@@ -191,18 +263,18 @@
     }
   ],
   "counts": {
-    "articles": 14816,
+    "articles": 15128,
     "documents": 0,
-    "escalated": 2499,
-    "events": 4203,
-    "failed_sweeps": 52,
-    "linked": 10176,
+    "escalated": 2554,
+    "events": 4204,
+    "failed_sweeps": 53,
+    "linked": 10470,
     "observations": 5009,
     "series": 31,
-    "sweeps": 763
+    "sweeps": 771
   },
   "day": "2026-10-08",
-  "generated_at": "2026-10-08 18:59 UTC",
+  "generated_at": "2026-10-08 22:35 UTC",
   "macro": [
     {
       "change": "0.06",
@@ -518,7 +590,7 @@
       "upcoming": []
     },
     {
-      "escalated": 21,
+      "escalated": 56,
       "events": [],
       "instrument_id": "XNAS:NVDA",
       "label": "NVIDIA",
@@ -646,105 +718,105 @@
       ],
       "stories": [
         {
-          "doc_id": "https://www.trefis.com/articles/617835/what-are-avgo-stock-investors-betting-on/2026-10-07?.tsrc=rss",
-          "domain": "www.trefis.com",
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/nvidia-nvda-20-billion-groq-205449946.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
           "escalated": true,
           "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-10-07T22:38:41+00:00",
-          "quality": 0.85,
-          "title": "What Are AVGO Stock Investors Betting On?",
+          "polarity": -1.0,
+          "published_at": "2026-10-08T20:54:49+00:00",
+          "quality": 1.0,
+          "title": "Nvidia (NVDA)\u2019s $20 Billion Groq Deal Faces a Legal Test. Does It Matter for NVDA\u2019s Valuation?",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:142701245",
-          "domain": "Yahoo",
+          "doc_id": "https://247wallst.com/videos/nvidia-apple-and-microsoft-spell-trouble-for-index-investors/?.tsrc=rss",
+          "domain": "247wallst.com",
           "escalated": true,
           "intensity": 0.3333333333333333,
           "polarity": 0.0,
-          "published_at": "2026-10-07T21:58:28+00:00",
+          "published_at": "2026-10-08T21:54:25+00:00",
           "quality": 0.85,
-          "title": "Broadcom, Oracle, and SpaceX pursue blockbuster debt deals amid AI buildout - WSJ",
+          "title": "Nvidia, Apple, and Microsoft Spell Trouble for Index Investors",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:142700260",
+          "doc_id": "finnhub:142732056",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-08T18:54:00+00:00",
+          "quality": 0.85,
+          "title": "SpaceX's Google AI Pact Is Worth Up to $29 Billion, but Investors Shouldn't Bank on It",
+          "uncertainty": 0.3571428571428571
+        },
+        {
+          "doc_id": "finnhub:142732064",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-08T18:41:20+00:00",
+          "quality": 0.85,
+          "title": "Oracle Stock Crashes After OpenAI's Revenue Gap. Who's Next?",
+          "uncertainty": 0.4629629629629629
+        },
+        {
+          "doc_id": "finnhub:142732065",
           "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "polarity": -1.0,
-          "published_at": "2026-10-07T20:43:00+00:00",
+          "published_at": "2026-10-08T18:37:56+00:00",
           "quality": 0.85,
-          "title": "Caterpillar, Intel, TSMC, Micron, SpaceX, HPE, and More Stocks That Explain Today\u2019s Market",
+          "title": "OpenAI corrects annualized revenue figure to $50 billion",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:142699239",
+          "doc_id": "finnhub:142732091",
           "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-07T19:11:00+00:00",
-          "quality": 0.85,
-          "title": "Prediction: Micron Will Have a Larger Market Cap Than Nvidia by 2030",
-          "uncertainty": 0.4310344827586207
-        },
-        {
-          "doc_id": "finnhub:142699241",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
           "polarity": 1.0,
-          "published_at": "2026-10-07T18:43:41+00:00",
+          "published_at": "2026-10-08T17:34:00+00:00",
           "quality": 0.85,
-          "title": "Nvidia (NVDA): Is There Still Room to Run?",
+          "title": "Is Microsoft Stock a Buy After Expanding Its Nvidia Partnership?",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:142699277",
+          "doc_id": "finnhub:142730881",
           "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-07T18:09:28+00:00",
-          "quality": 0.85,
-          "title": "Sequoia, Nvidia Back Mecka AI's Robotics Push",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "finnhub:142698303",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-07T17:45:34+00:00",
-          "quality": 0.85,
-          "title": "How SpaceX's big Nvidia buy could contribute to 'structural changes' to the economy",
-          "uncertainty": 0.18115942028985504
-        },
-        {
-          "doc_id": "finnhub:142698308",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
           "polarity": 1.0,
-          "published_at": "2026-10-07T17:08:00+00:00",
+          "published_at": "2026-10-08T17:20:00+00:00",
           "quality": 0.85,
-          "title": "SpaceX Wants $40 Billion for Nvidia Chips. Here\u2019s Where the 145% Long Term Upside Sits.",
+          "title": "Nvidia and SpaceX: Top Analyst Daniel Ives Says These 2 AI Giants Have More Room to Run",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142730877",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-08T16:47:00+00:00",
+          "quality": 0.85,
+          "title": "Why Nvidia & Microsoft still matter when Treasury yields rise",
           "uncertainty": 0.0
         }
       ],
       "tone": {
-        "intensity_max": 0.333,
-        "n": 140,
-        "polarity_mean": 0.137,
-        "sources": 24,
-        "uncertainty_mean": 0.09
+        "intensity_max": 0.667,
+        "n": 309,
+        "polarity_mean": 0.213,
+        "sources": 40,
+        "uncertainty_mean": 0.095
       },
       "upcoming": []
     },
     {
-      "escalated": 13,
+      "escalated": 19,
       "events": [],
       "instrument_id": "XNAS:AAPL",
       "label": "Apple",
@@ -894,78 +966,78 @@
           "uncertainty": 0.0
         },
         {
-          "doc_id": "https://www.fool.com/coverage/charts/2026/10/07/broadcom-vs-qualcomm-rapid-growth-vs-flat-revenue/?.tsrc=rss",
-          "domain": "www.fool.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-10-07T17:20:02+00:00",
-          "quality": 0.85,
-          "title": "Broadcom vs. Qualcomm: Rapid Growth vs. Flat Revenue",
-          "uncertainty": 0.4166666666666667
-        },
-        {
-          "doc_id": "https://247wallst.com/investing/2026/10/07/apple-is-setting-the-stage-for-a-massive-windfall-that-few-understand/?.tsrc=rss",
+          "doc_id": "https://247wallst.com/videos/nvidia-apple-and-microsoft-spell-trouble-for-index-investors/?.tsrc=rss",
           "domain": "247wallst.com",
           "escalated": true,
           "intensity": 0.3333333333333333,
+          "polarity": 0.0,
+          "published_at": "2026-10-08T21:54:25+00:00",
+          "quality": 0.85,
+          "title": "Nvidia, Apple, and Microsoft Spell Trouble for Index Investors",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142730901",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
           "polarity": -1.0,
-          "published_at": "2026-10-07T14:45:22+00:00",
+          "published_at": "2026-10-08T16:00:14+00:00",
           "quality": 0.85,
-          "title": "Apple Is Setting The Stage For a Massive Windfall That Few Understand",
+          "title": "Apple\u2019s 2.5 Billion Devices Unlock a Trillion-Dollar AI Opportunity, 16% Upside Ahead",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:142694701",
+          "doc_id": "finnhub:142729687",
           "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-10-07T13:20:24+00:00",
+          "published_at": "2026-10-08T14:47:26+00:00",
           "quality": 0.85,
-          "title": "Apple\u2019s New CEO Just Sold $8.5 Million of Stock",
+          "title": "Amazon targets Apple with high-end Alexa tablets featuring Google Play apps",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:142694702",
+          "doc_id": "finnhub:142729689",
           "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-10-07T13:18:59+00:00",
+          "published_at": "2026-10-08T14:08:50+00:00",
           "quality": 0.85,
-          "title": "Apple and LG team up on 7 smart home devices ahead of Oct. 13 event",
-          "uncertainty": 0.0
+          "title": "Apple (AAPL) Stock Trades Above Fair Value On Cash Flow Estimates",
+          "uncertainty": 0.2717391304347826
         },
         {
-          "doc_id": "finnhub:142696950",
+          "doc_id": "finnhub:142729690",
           "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-07T13:13:00+00:00",
+          "polarity": 1.0,
+          "published_at": "2026-10-08T13:58:08+00:00",
           "quality": 0.85,
-          "title": "QCOM Lags Industry Year to Date: What's the Next Move for Investors?",
-          "uncertainty": 0.0
+          "title": "Apple (AAPL) Has a New Catalyst That Could Drive Its Next Upgrade Cycle",
+          "uncertainty": 0.18115942028985504
         },
         {
-          "doc_id": "https://news.google.com/rss/articles/CBMirgFBVV95cUxNWE16b0luNm8zOXFYTExtdEV4OVBxS3k4c3dfbW4ySVdfUXVwaHJCVmk1Rmt5cGJmU2RJbXdUMHZ6QTdVUWZNWFJOLTJZVmhJbElOb2pUSld6ZTNHT2NkMm9HckdPaEZXVXlDZDg5WDVYQ3V3OUtueVZYUEEyaUtfVWJ4aTZoOHpxNXVBMFQ1TEdKYmNZX04yWDBRV1N6RHdoVE1La2FLb2cwSURxX0E?oc=5",
-          "domain": "www.investors.com",
+          "doc_id": "finnhub:142730585",
+          "domain": "CNBC",
           "escalated": true,
           "intensity": 0.3333333333333333,
           "polarity": 0.0,
-          "published_at": "2026-10-07T21:54:00+00:00",
-          "quality": 0.65,
-          "title": "Stocks Sharply Off Lows As Treasury Yields Slash Gains; Apple, Micron Eye Buy Points",
+          "published_at": "2026-10-08T08:59:01+00:00",
+          "quality": 0.85,
+          "title": "First look: Amazon's new Alexa tablets",
           "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 43,
-        "polarity_mean": 0.07,
-        "sources": 21,
-        "uncertainty_mean": 0.044
+        "n": 92,
+        "polarity_mean": 0.043,
+        "sources": 31,
+        "uncertainty_mean": 0.061
       },
       "upcoming": [
         {
@@ -985,7 +1057,7 @@
       ]
     },
     {
-      "escalated": 16,
+      "escalated": 35,
       "events": [
         {
           "kind": "rating_reiteration",
@@ -1165,56 +1237,56 @@
           "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:142699277",
-          "domain": "Yahoo",
+          "doc_id": "https://247wallst.com/videos/nvidia-apple-and-microsoft-spell-trouble-for-index-investors/?.tsrc=rss",
+          "domain": "247wallst.com",
           "escalated": true,
-          "intensity": 0.0,
+          "intensity": 0.3333333333333333,
           "polarity": 0.0,
-          "published_at": "2026-10-07T18:09:28+00:00",
+          "published_at": "2026-10-08T21:54:25+00:00",
           "quality": 0.85,
-          "title": "Sequoia, Nvidia Back Mecka AI's Robotics Push",
+          "title": "Nvidia, Apple, and Microsoft Spell Trouble for Index Investors",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:142698332",
+          "doc_id": "https://247wallst.com/investing/2026/10/08/spacex-built-an-ai-business-its-best-customers-are-groks-competitors/?.tsrc=rss",
+          "domain": "247wallst.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-08T21:00:24+00:00",
+          "quality": 0.85,
+          "title": "SpaceX Built an AI Business. Its Best Customers Are Grok\u2019s Competitors.",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://qz.com/microsoft-suspended-green-card-program-h1b-visa-100826?.tsrc=rss",
+          "domain": "qz.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-10-08T20:21:28+00:00",
+          "quality": 0.85,
+          "title": "Microsoft suspended from green card program over H-1B visa abuse",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142731171",
           "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-10-07T16:45:21+00:00",
+          "polarity": -1.0,
+          "published_at": "2026-10-08T18:03:00+00:00",
           "quality": 0.85,
-          "title": "Alphabet Only Requires a Tiny Bit of Faith So I Keep Pulling The Trigger",
-          "uncertainty": 0.2777777777777778
-        },
-        {
-          "doc_id": "finnhub:142698336",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
-          "polarity": 1.0,
-          "published_at": "2026-10-07T16:45:17+00:00",
-          "quality": 0.85,
-          "title": "Microsoft or Amazon: If I Could Only Own One for the Next 5 Years, It Would Be This One",
-          "uncertainty": 0.5681818181818181
-        },
-        {
-          "doc_id": "finnhub:142698330",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-10-07T16:28:11+00:00",
-          "quality": 0.85,
-          "title": "Bad News for Microsoft: \u201cBasically Zero\u201d AI Use for Most Employees on Copilot",
-          "uncertainty": 0.1984126984126984
+          "title": "Why Microsoft\u2019s H-1B Issues Are Sending Infosys Stock to Near a Six-Year Low",
+          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 70,
-        "polarity_mean": 0.198,
-        "sources": 18,
-        "uncertainty_mean": 0.053
+        "n": 146,
+        "polarity_mean": 0.115,
+        "sources": 29,
+        "uncertainty_mean": 0.056
       },
       "upcoming": [
         {
