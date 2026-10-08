@@ -170,6 +170,14 @@ class Corpus:
             self.conn.execute(
                 "ALTER TABLE articles ADD COLUMN fetched_for TEXT NOT NULL DEFAULT ''"
             )
+        if "title_key" not in have:
+            # Rows stored before the key existed keep ''. The wire feeds serve
+            # a recent window, so a copy of an older story rarely comes back.
+            self.conn.execute("ALTER TABLE articles ADD COLUMN title_key TEXT NOT NULL DEFAULT ''")
+        self.conn.execute(
+            "CREATE INDEX IF NOT EXISTS articles_title_key ON articles(title_key) "
+            "WHERE title_key <> ''"
+        )
         sweeps = {r[1] for r in self.conn.execute("PRAGMA table_info(sweeps)")}
         if "slot" not in sweeps:
             self.conn.execute("ALTER TABLE sweeps ADD COLUMN slot TEXT NOT NULL DEFAULT ''")
@@ -214,12 +222,19 @@ class Corpus:
         """
         seen = _iso(seen_at or datetime.now(UTC))
         features = art.features
+        headline = art.title_key or ""
+        # A second key alongside the unique dup_hash: the same headline on the
+        # same day is the same story, whatever excerpt this source carried.
+        # Not a unique index - the corpus already holds such copies and its
+        # rows cannot be edited - so the check rides in the one INSERT, which
+        # SQLite runs atomically, as the unique index does for dup_hash.
         cur = self.conn.execute(
             """INSERT OR IGNORE INTO articles
                (doc_id, source, title, body, source_domain, published_at, first_seen_at,
                 language, countries_json, instruments_json, themes_json, dup_hash,
-                relevance, escalated, quality, fetched_for)
-               VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+                relevance, escalated, quality, fetched_for, title_key)
+               SELECT ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?
+               WHERE ? = '' OR NOT EXISTS (SELECT 1 FROM articles WHERE title_key = ?)""",
             (
                 art.doc_id,
                 source,
@@ -237,6 +252,9 @@ class Corpus:
                 int(bool(art.escalated)),
                 art.quality,
                 art.fetched_for or "",
+                headline,
+                headline,
+                headline,
             ),
         )
         self.conn.commit()
@@ -536,6 +554,7 @@ class Corpus:
             dup_hash=row["dup_hash"] or None,
             quality=row["quality"] if "quality" in keys else None,
             fetched_for=row["fetched_for"] if "fetched_for" in keys else "",
+            title_key=row["title_key"] if "title_key" in keys else "",
             escalated=bool(row["escalated"]) if "escalated" in keys else False,
         )
 

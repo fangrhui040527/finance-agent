@@ -22,10 +22,23 @@ from __future__ import annotations
 import hashlib
 import re
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Protocol
 
 WORD = re.compile(r"[a-z']+", re.IGNORECASE)
+
+#: The dedup tokeniser, separate from the English lexicon's WORD. One CJK or
+#: kana character is a token (those scripts put no space between words), any
+#: other run of letters or digits is one. WORD kept ASCII letters only, so every
+#: article in Chinese, Greek or Korean hashed to sha1("") and the corpus's
+#: unique index rejected each one after the first (a Greek GDELT headline held
+#: that hash from 2026-09-03), and "Q2 profit rises 5%" collided with "Q3 profit
+#: rises 9%".
+DEDUP_TOKEN = re.compile(r"[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]|[^\W_]+")
+
+#: A trailing " - The Star" or " | Reuters": the publisher Google News appends
+#: to a headline that the same story carries bare on Yahoo or Finnhub.
+_PUBLISHER_SUFFIX = re.compile(r"\s+[-|\u2013\u2014]\s+[^-|\u2013\u2014]{1,40}$")
 
 # Deliberately small, auditable lexicons. The local model is the first pass;
 # these make it inspectable and give the tests something deterministic.
@@ -265,13 +278,41 @@ def near_duplicate_hash(text: str, shingle: int = 6) -> str:
     docs/02 A4: dedup BEFORE indexing or a single syndicated story dominates
     every top-k it is remotely relevant to.
     """
-    words = [w.lower() for w in WORD.findall(text)]
+    words = _dedup_tokens(text)
+    if not words:
+        # Nothing to compare. '' is the corpus's "not computed" value, which
+        # its partial unique index exempts; a hash of nothing would be one
+        # value shared by every such article.
+        return ""
     if len(words) < shingle:
         return hashlib.sha1(" ".join(words).encode()).hexdigest()[:16]
     grams = [" ".join(words[i : i + shingle]) for i in range(len(words) - shingle + 1)]
     # Min-hash over a fixed permutation: stable, order-independent, cheap.
     best = min(hashlib.md5(g.encode()).hexdigest() for g in grams)
     return best[:16]
+
+
+def _dedup_tokens(text: str) -> list[str]:
+    return [w.lower() for w in DEDUP_TOKEN.findall(text or "")]
+
+
+def title_key(title: str, published_at: datetime, min_tokens: int = 5) -> str:
+    """One headline on one day, whatever excerpt each source carried under it.
+
+    The body min-hash keys on the cheapest shingle of title and excerpt, so the
+    same wire story with a 0-, 253- and 434-character excerpt (one Benzinga
+    story via google_news, yahoo_rss and alphavantage_news, 2026-09-22) got
+    three keys and was stored three times; 641 same-day headlines were held
+    twice or more, which inflates every "N stories from M sources" count. The
+    day is part of the key so a daily template ("KLCI ends lower") is not one
+    story forever. A headline too short to identify a story gets no key ('').
+    """
+    head = _PUBLISHER_SUFFIX.sub("", (title or "").strip())
+    words = _dedup_tokens(head)
+    if len(words) < min_tokens:
+        return ""
+    day = published_at.astimezone(UTC).date() if published_at.tzinfo else published_at.date()
+    return hashlib.sha1(f"{day.isoformat()}|{' '.join(words)}".encode()).hexdigest()[:16]
 
 
 @dataclass
@@ -307,6 +348,8 @@ class Article:
     themes: list[str] = field(default_factory=list)
     features: Features | None = None
     dup_hash: str | None = None
+    #: `title_key`: the headline-and-day key, a second dedup alongside dup_hash.
+    title_key: str = ""
     #: knowledge/news/clean.quality_score, set by the adapter. None means the
     #: article predates the score (the pre-2026-09-04 corpus) - not "unknown
     #: quality", which would be a reason to drop it.
