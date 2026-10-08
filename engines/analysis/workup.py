@@ -31,7 +31,7 @@ from engines.valuation.cost_of_capital import (
     country_of,
     load_table,
 )
-from engines.valuation.dcf import default_scenarios
+from engines.valuation.dcf import default_scenarios, terminal_growth_for
 from knowledge.graph.ids import display_names
 from knowledge.graph.ids import instrument_id as canonical_id
 from knowledge.graph.peers import PeerSet, peers_of
@@ -649,7 +649,11 @@ def _valuation(
     rate, _ = coc.discount
     if eps is not None and eps.value:
         price = (eps.value * pe.value) if pe is not None and pe.value else None
-        comps = a2.peer_multiples(book, iid, set(peer_ids), "pe_ttm", asof, price, eps.value, rate)
+        # the reverse DCF's terminal growth is the scenario DCF's, so the two agree on perpetuity
+        terminal = terminal_growth_for(coc, table, country)
+        comps = a2.peer_multiples(
+            book, iid, set(peer_ids), "pe_ttm", asof, price, eps.value, rate, terminal
+        )
         findings.extend(comps)
         summary += "; multiple in its contexts below"
     else:

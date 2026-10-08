@@ -177,7 +177,7 @@ def test_a2_contextualises_a_multiple_and_states_what_the_price_requires(real_ct
     v = a2.run("MYX:1155", "bank", 1.2, [0.8, 0.9, 1.0, 1.1, 1.5])
     assert v[0].kind == "valuation" and v[0].numbers["percentile"] == 0.8
     assert "DCF is not applicable" in v[0].caveats[0]
-    r = a2.reverse_dcf(price=100.0, current_earnings=5.0, discount=0.09)
+    r = a2.reverse_dcf(price=100.0, current_earnings=5.0, discount=0.09, terminal_growth=0.04)
     assert r[0].kind == "reverse_dcf" and 0 < r[0].numbers["implied_growth"] < 0.6
     assert a2.run("X", "bank", 1.0, [])[0].caveats == ["cannot contextualise"]
 

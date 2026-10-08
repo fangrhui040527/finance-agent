@@ -226,15 +226,15 @@ def test_no_history_means_no_context_rather_than_a_guess():
 
 def test_reverse_dcf_states_what_the_price_requires_not_what_it_is_worth():
     a2 = A2Valuation(ctx())
-    out = a2.reverse_dcf(price=100.0, current_earnings=5.0, discount=0.10)
+    out = a2.reverse_dcf(price=100.0, current_earnings=5.0, discount=0.10, terminal_growth=0.04)
     assert "already requiring" in out[0].text
     assert any("not an estimate of value" in c for c in out[0].caveats)
 
 
 def test_a_higher_price_implies_a_higher_required_growth_rate():
     a2 = A2Valuation(ctx())
-    cheap = a2.reverse_dcf(60.0, 5.0, 0.10)[0].numbers["implied_growth"]
-    dear = a2.reverse_dcf(140.0, 5.0, 0.10)[0].numbers["implied_growth"]
+    cheap = a2.reverse_dcf(60.0, 5.0, 0.10, 0.04)[0].numbers["implied_growth"]
+    dear = a2.reverse_dcf(140.0, 5.0, 0.10, 0.04)[0].numbers["implied_growth"]
     assert dear > cheap
 
 
