@@ -28,7 +28,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from decimal import ROUND_DOWN, Decimal
+from decimal import ROUND_DOWN, ROUND_UP, Decimal
 
 from core.contracts.money import BASE_CURRENCY
 from engines.risk.concentration import Limits, Position, check, effective_number_of_bets
@@ -70,6 +70,13 @@ class Candidate:
     mic: str | None = None
     fx_base_per_quote: Decimal | None = None
     round_trip_cost_at: Callable[[Decimal], Decimal] | None = None
+    #: The broker whose card `round_trip_cost_at` prices, when it is one. The
+    #: cost floor is a broker's tolerance as well as a venue's: moomoo's 0.03%
+    #: US commission alone is above the 5 bps XNAS venue floor, so testing a
+    #: broker-priced cost against the venue's floor refused every US name with
+    #: a USD 100,000,000 "minimum", and on Bursa let through positions below
+    #: the moomoo card's own floor.
+    broker: str | None = None
 
 
 @dataclass(frozen=True)
@@ -172,7 +179,11 @@ def _cap_set(
         if c.currency == BASE_CURRENCY
         else investable / (c.fx_base_per_quote or Decimal(1))
     )
-    floor = cost_floor_value(c.round_trip_cost_at, c.mic) if c.round_trip_cost_at else Decimal(0)
+    floor = (
+        cost_floor_value(c.round_trip_cost_at, c.mic, c.broker)
+        if c.round_trip_cost_at
+        else Decimal(0)
+    )
     conc = concentration_cap(pv_quote, single_name_limit)
     liq = liquidity_cap(c.adv_20d, participation)
     if c.stop_price is None:
@@ -284,7 +295,7 @@ def allocate(
         # stay under the single-name cap. Below floor/cap there is no size that
         # satisfies both, and that threshold is worth stating outright.
         floors = [
-            (cost_floor_value(c.round_trip_cost_at, c.mic), c)
+            (cost_floor_value(c.round_trip_cost_at, c.mic, c.broker), c)
             for c in candidates
             if c.round_trip_cost_at is not None
         ]
@@ -308,6 +319,7 @@ def allocate(
     # trimming cannot fix it.
     notes: list[str] = []
     breaches: list[str] = []
+    exhausted = ""
     for _ in range(MAX_TRIM_PASSES):
         positions = _positions(sized, investable)
         sub = _submatrix(corr, order, [p.instrument_id for p in positions])
@@ -315,11 +327,12 @@ def allocate(
         breaches = [str(b) for b in found]
         if not found:
             break
-        trimmed = _trim_largest(sized, positions, found)
+        trimmed = _trim_largest(sized, positions, found, investable, excluded)
         if not trimmed:
             break
     else:
-        notes.append(f"stopped after {MAX_TRIM_PASSES} trim passes")
+        exhausted = f"stopped after {MAX_TRIM_PASSES} trim passes"
+        notes.append(exhausted)
 
     if breaches:
         return Allocation(
@@ -329,6 +342,7 @@ def allocate(
             refusal=(
                 "the nominated names cannot be held together inside the limits: "
                 + "; ".join(breaches)
+                + (f" ({exhausted})" if exhausted else "")
             ),
         )
 
@@ -437,25 +451,85 @@ def _lines(sized: dict, investable: Decimal) -> tuple[Line, ...]:
     return tuple(out)
 
 
-def _trim_largest(sized: dict, positions: list[Position], breaches: list) -> bool:
-    """Remove one board lot from the heaviest position. Returns False when
-    nothing can be trimmed, which is how the caller learns to stop.
+def _in_breach(breach, positions: list[Position]) -> list[Position]:
+    """The positions the breached limit is measured over."""
+    limit, detail = getattr(breach, "limit", ""), getattr(breach, "detail", "")
+    if limit == "single_name":
+        group = [p for p in positions if p.instrument_id == detail]
+    elif limit in ("sector", "country"):
+        group = [p for p in positions if getattr(p, limit) == detail]
+    elif limit == "non_base_currency":
+        group = [p for p in positions if p.currency.upper() != BASE_CURRENCY.upper()]
+    elif limit == "correlation_cluster":
+        members = set(detail.split(","))
+        group = [p for p in positions if p.instrument_id in members]
+    else:  # hhi, heat, effective bets: the whole book
+        group = list(positions)
+    return group or list(positions)
 
-    The trimmed name takes the breached dimension as its binding cap. It was
+
+def _trim_largest(
+    sized: dict,
+    positions: list[Position],
+    breaches: list,
+    investable: Decimal = Decimal(0),
+    excluded: list | None = None,
+) -> bool:
+    """Trim the heaviest position INSIDE the first breach, by the excess.
+    Returns False when nothing can be trimmed, which is how the caller learns
+    to stop.
+
+    Inside the breach, because trimming the heaviest name in the whole book
+    fixes a sector or country breach only when that name happens to be in it:
+    five banks over the 25% sector limit next to three heavier single-name
+    tech sectors spent every pass on the tech names and ended in "cannot be
+    held together", for a book that banks at 5% each would have satisfied.
+    By the heaviest member's share of the excess, in lots, for a limit that is
+    a sum of weights, so the group is levelled in a few passes instead of two
+    hundred one-lot ones; one lot for the non-linear limits (HHI, heat,
+    effective bets), which a larger trim can overshoot.
+
+    A name trimmed to nothing, or below the cost floor it was sized against,
+    leaves the book and is recorded in `excluded` with the limit that did it.
+    The trimmed name takes the breached dimension as its binding cap: it was
     sized by a per-name cap and then cut by a portfolio one, and reporting the
-    first hides the constraint that actually decided the number - a book of six
-    Malaysian names is bounded by the 40% country limit, not by the 8%
-    single-name cap that sized each of them.
+    first hides the constraint that actually decided the number.
     """
-    heaviest = max(positions, key=lambda p: p.weight, default=None)
-    if heaviest is None:
+    if not positions or not breaches:
         return False
+    breach = breaches[0]
+    group = _in_breach(breach, positions)
+    heaviest = max(group, key=lambda p: p.weight)
     c, units, floor, binding = sized[heaviest.instrument_id]
-    if breaches:
-        binding = getattr(breaches[0], "limit", None) or binding
-    new_units = units - c.lot_size
+    binding = getattr(breach, "limit", None) or binding
+    lots = 1
+    linear = getattr(breach, "limit", "") in (
+        "single_name",
+        "sector",
+        "country",
+        "non_base_currency",
+        "correlation_cluster",
+    )
+    if linear and investable > 0:
+        # The heaviest member's SHARE of the excess: the group is levelled down
+        # over a few passes rather than one name being cut to nothing.
+        excess = Decimal(str(breach.actual - breach.allowed)) * investable / len(group)
+        lot_base = to_base(c.price * c.lot_size, c.currency, c.fx_base_per_quote)
+        if lot_base > 0:
+            lots = max(1, int((excess / lot_base).to_integral_value(rounding=ROUND_UP)))
+    new_units = units - lots * c.lot_size
+    why = ""
     if new_units <= 0:
+        why = f"trimmed to nothing by the {binding} limit"
+    elif floor > 0 and Decimal(new_units) * c.price < floor:
+        why = (
+            f"trimmed by the {binding} limit to {new_units:,} units, below the "
+            f"{c.currency} {floor:,.2f} minimum economic position"
+        )
+    if why:
         del sized[heaviest.instrument_id]
+        if excluded is not None:
+            excluded.append(Excluded(heaviest.instrument_id, why))
         return bool(sized)
     sized[heaviest.instrument_id] = (c, new_units, floor, binding)
     return True

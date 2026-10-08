@@ -141,7 +141,9 @@ def test_a_position_below_the_cost_floor_is_refused_not_shrunk():
         )
     )
     assert "NO POSITION" in out
-    assert "4,705" in out or "4,706" in out
+    # The configured broker's floor (moomoo_my, 40 bps), the one `ask.py size`
+    # applies - not the venue's 60 bps RM4,705, which was below this account's.
+    assert "9,793" in out and "moomoo_my" in out
 
 
 def test_the_single_name_cap_cannot_be_raised_past_its_bound():

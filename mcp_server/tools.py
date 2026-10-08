@@ -48,7 +48,12 @@ from core.registry.loader import load as load_registry
 from engines.attribution.decompose import MIN_OBSERVATIONS, EstimationInputs, decompose, estimate
 from engines.attribution.regression import Fit, huber_fit
 from engines.risk.concentration import Limits, Position
-from engines.sizing.caps import cost_floor_bps, cost_floor_value, to_base
+from engines.sizing.caps import (
+    cost_floor_bps,
+    cost_floor_unreachable,
+    cost_floor_value,
+    to_base,
+)
 from knowledge.pack import ESTIMATION_GAP, estimation_slice, market_fit
 from markets.brokers import cost_at
 from markets.registry import get as market_get
@@ -1090,6 +1095,56 @@ def _quoted(iid: str, close) -> Decimal:
     return (price / tick).quantize(Decimal("1"), rounding=ROUND_HALF_UP) * tick
 
 
+#: The ceiling no call may raise a single-name limit past, whatever the config
+#: says (engines/risk/concentration.Limits refuses the same at load).
+SINGLE_NAME_CEILING = Decimal("0.15")
+
+
+def _bounded_sizing_inputs(
+    cfg, risk_per_trade, single_name_limit, participation
+) -> tuple[Decimal, Decimal, Decimal]:
+    """The caller's sizing inputs, refused above the limits config cannot loosen.
+
+    These three were checked only for being positive, so a model or a web
+    caller could pass single_name_limit=1.0 and be told to put the whole
+    portfolio in one name, "bound by concentration". The server's own
+    instructions say a model driving these tools cannot size past a limit; this
+    is where that becomes true. risk_per_trade and participation are held to
+    the non-configurable HARD_BOUNDS the config loader enforces; the single-name
+    limit to the user's own `limits.single_name` (itself never above 15%), so a
+    call can tighten it but never loosen it. None means the config's value.
+    """
+    from core.config import HARD_BOUNDS
+
+    hi = {key: Decimal(str(top)) for key, _lo, top, _why in HARD_BOUNDS}
+    risk = _positive(risk_per_trade, "risk_per_trade")
+    part = _positive(participation, "participation")
+    configured = min(SINGLE_NAME_CEILING, Decimal(str(cfg.limits.single_name)))
+    name = (
+        configured
+        if single_name_limit is None
+        else _positive(single_name_limit, "single_name_limit")
+    )
+    if risk > hi["risk.risk_per_trade"]:
+        raise ToolError(
+            f"risk_per_trade {risk} is above the {hi['risk.risk_per_trade']:.0%} hard bound: "
+            "risking more than that per trade turns a normal losing streak into ruin. "
+            "The bound is not configurable."
+        )
+    if part > hi["risk.max_participation"]:
+        raise ToolError(
+            f"participation {part} is above the {hi['risk.max_participation']:.0%} hard bound: "
+            "above it you are not taking the price, you are making it."
+        )
+    if name > configured:
+        raise ToolError(
+            f"single_name_limit {name} is above the {configured:.0%} single-name cap "
+            "(config.toml limits.single_name; never above 15%). A call can tighten the cap, "
+            "never loosen it - retrying with a larger number is the thing this refuses."
+        )
+    return risk, name, part
+
+
 def _fx_base_per_quote(currency: str, cfg) -> tuple[Decimal | None, str]:
     """MYR per ONE unit of `currency`, and the sentence that says where it came from.
 
@@ -1185,6 +1240,7 @@ def _candidates(specs: list, fetch: bool = False, end=None, notes: list | None =
                 # and Candidate.round_trip_cost_at is a value-only callable -
                 # the price is known at this point and is not known downstream.
                 round_trip_cost_at=cost_at(mic, cfg.broker, price),
+                broker=cfg.broker,
             )
         )
     return out
@@ -1226,7 +1282,7 @@ def allocate_capital(
     portfolio_value: float | None = None,
     fetch: bool = False,
     as_at: str = "",
-    single_name_limit: float = 0.08,
+    single_name_limit: float | None = None,
     risk_per_trade: float = 0.0075,
     participation: float = 0.05,
 ) -> str:
@@ -1245,6 +1301,9 @@ def allocate_capital(
     from engines.sizing.allocate import allocate
 
     cfg = load_config()
+    risk_frac, name_limit, part = _bounded_sizing_inputs(
+        cfg, risk_per_trade, single_name_limit, participation
+    )
     if portfolio_value is None:
         waterfall, _ = plan_capital(cfg, context())
         if waterfall is None:
@@ -1274,9 +1333,9 @@ def allocate_capital(
         investable,
         candidates,
         limits=cfg.limits,
-        risk_per_trade=_positive(risk_per_trade, "risk_per_trade"),
-        single_name_limit=_positive(single_name_limit, "single_name_limit"),
-        participation=_positive(participation, "participation"),
+        risk_per_trade=risk_frac,
+        single_name_limit=name_limit,
+        participation=part,
     )
     fx_lines = "".join(f"\n  {n}" for n in fx_notes)
     return f"  {capital_note}{fx_lines}\n\n{result.explain()}{DISCLAIMER}"
@@ -1289,7 +1348,7 @@ def size_position(
     stop_price: float,
     adv_20d: float,
     risk_per_trade: float = 0.0075,
-    single_name_limit: float = 0.08,
+    single_name_limit: float | None = None,
     participation: float = 0.05,
     win_rate: float | None = None,
     payoff: float | None = None,
@@ -1310,9 +1369,11 @@ def size_position(
     px = _positive(price, "price")
     stop = _positive(stop_price, "stop_price")
     adv = _positive(adv_20d, "adv_20d")
-    risk_frac = _positive(risk_per_trade, "risk_per_trade")
-    name_limit = _positive(single_name_limit, "single_name_limit")
-    part = _positive(participation, "participation")
+    cfg = load_config()
+    risk_frac, name_limit, part = _bounded_sizing_inputs(
+        cfg, risk_per_trade, single_name_limit, participation
+    )
+    broker = cfg.broker
     if stop >= px:
         return (
             f"REFUSED: stop {stop} is at or above the entry {px}. "
@@ -1341,12 +1402,32 @@ def size_position(
             f"correctly bounded by whichever cap it names."
         )
 
+    # The BROKER's card, priced at this entry, as `ask.py size` does. The venue's
+    # schedule models a zero-commission US account, and sizing a moomoo account
+    # against it approved positions under that account's own cost floor.
+    from markets.brokers import schedule_for
+
+    round_trip = cost_at(mic, broker, px)
+    on_broker_terms = schedule_for(mic, broker) is not adapter.fee_schedule
+    cost_note = f"{broker} card on {mic}" if on_broker_terms else f"{mic} fee schedule"
+    floor = cost_floor_value(round_trip, mic, broker)
+    if cost_floor_unreachable(floor):
+        asymptote = schedule_for(mic, broker).round_trip_bps(Decimal("100000000"), px)
+        return (
+            f"NO POSITION: on the {cost_note} a round trip costs "
+            f"{asymptote.quantize(Decimal('0.01'))} bps at ANY size, above the "
+            f"{cost_floor_bps(mic, broker)} bps floor for {mic}. No position can pay its own "
+            f"spread here; this is a fact about the account, not about the size asked for."
+            + DISCLAIMER
+        )
+
     a13 = A13Sizing(context())
     caps, findings = a13.caps(
         portfolio_value=pv,
         stop_distance_frac=(px - stop) / px,
         adv_20d=adv,
-        round_trip_cost_at=adapter.fee_schedule.round_trip,
+        round_trip_cost_at=round_trip,
+        broker=broker,
         risk_per_trade=risk_frac,
         single_name_limit=name_limit,
         participation=part,
@@ -1359,7 +1440,6 @@ def size_position(
     binding, value = caps.binding()
     lot = adapter.lot_size(instrument)
     units = int(value / px) // lot * lot
-    floor = cost_floor_value(adapter.fee_schedule.round_trip, mic)
 
     def shown(v: Decimal) -> str:
         """Native always; MYR alongside only when it is a different number."""
@@ -1378,8 +1458,8 @@ def size_position(
     elif Decimal(units) * px < floor:
         verdict = (
             f"NO POSITION: {units:,} units is {shown(Decimal(units) * px)}, below "
-            f"the {shown(floor)} minimum economic position on {mic}. The round "
-            f"trip cannot pay for itself."
+            f"the {shown(floor)} minimum economic position on the {cost_note}. The "
+            f"round trip cannot pay for itself."
         )
     else:
         verdict = (
@@ -1424,7 +1504,7 @@ def rebalance_book(
     from_plan: bool = False,
     fetch: bool = True,
     as_at: str = "",
-    single_name_limit: float = 0.08,
+    single_name_limit: float | None = None,
     risk_per_trade: float = 0.0075,
 ) -> str:
     """What to change versus what is held, with the cost of changing it.
@@ -1442,6 +1522,9 @@ def rebalance_book(
     from engines.sizing.rebalance import rebalance as run_rebalance
 
     cfg = load_config()
+    risk_frac, name_limit, part = _bounded_sizing_inputs(
+        cfg, risk_per_trade, single_name_limit, Decimal("0.05")
+    )
     valued = [h for h in cfg.book if h.valued]
     specs = [str(n) for n in (names or [])]
     if not valued and not specs:
@@ -1473,6 +1556,18 @@ def rebalance_book(
         prices[h.id] = _quoted(h.id, bars[-1].close)
         advs[h.id] = Decimal(str(series.adv(20)))
 
+    # MYR per unit of every foreign currency the book holds, so its values are
+    # summed in one currency; a currency with no rate makes the rebalance refuse.
+    fx_rates: dict[str, Decimal] = {}
+    for h in valued:
+        currency = market_currency(mic_of(h.id))
+        if currency != BASE_CURRENCY and currency not in fx_rates:
+            rate, note = _fx_base_per_quote(currency, cfg)
+            if rate is not None:
+                fx_rates[currency] = rate
+                if note:
+                    fx_notes.append(note)
+
     investable = None
     capital_note = "capital is the book's own market value: this re-splits what is held"
     if from_plan:
@@ -1495,9 +1590,11 @@ def rebalance_book(
         advs,
         investable=investable,
         limits=cfg.limits,
-        risk_per_trade=_positive(risk_per_trade, "risk_per_trade"),
-        single_name_limit=_positive(single_name_limit, "single_name_limit"),
+        risk_per_trade=risk_frac,
+        single_name_limit=name_limit,
+        participation=part,
         broker=cfg.broker,
+        fx_rates=fx_rates,
     )
 
     shape = ""
