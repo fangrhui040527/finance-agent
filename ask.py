@@ -209,6 +209,7 @@ def cmd_why(a) -> int:
         fit=fit,
         base_currency=a.currency,
         peers=graph_peers(a.instrument, window[1]),
+        sessions=legs.bars if legs is not None else 1,
     )
     head = findings[0]
 
@@ -216,7 +217,16 @@ def cmd_why(a) -> int:
     from engines.attribution.decompose import decompose
 
     exp = decompose(
-        a.instrument, window, a.market, a.sector, {}, a.move, a.fx, fit, base_currency=a.currency
+        a.instrument,
+        window,
+        a.market,
+        a.sector,
+        {},
+        a.move,
+        a.fx,
+        fit,
+        base_currency=a.currency,
+        sessions=legs.bars if legs is not None else 1,
     )
     if synthetic:
         from mcp_server.tools import synthetic_note

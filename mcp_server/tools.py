@@ -566,6 +566,9 @@ def why_did_it_move(
 
     fit = legs.fit if legs is not None else _synthetic_fit(beta_market, beta_sector)
     sector = sector_return if sector_return is not None else 0.0
+    # A measured window is `legs.bars` sessions; a typed one is whatever the
+    # caller typed, and its synthetic sigma is illustrative either way.
+    sessions = legs.bars if legs is not None else 1
     exp = decompose(
         instrument,
         window,
@@ -576,6 +579,7 @@ def why_did_it_move(
         fx_return,
         fit,
         base_currency=currency,
+        sessions=sessions,
     )
     if legs is None:
         # `decompose` describes the synthetic fit as "betas from 250 sessions",
@@ -598,6 +602,7 @@ def why_did_it_move(
         fit=fit,
         base_currency=currency,
         peers=graph_peers(instrument, window[1]),
+        sessions=sessions,
     )
 
     if legs is not None:

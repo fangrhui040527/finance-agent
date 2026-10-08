@@ -58,6 +58,7 @@ class A9Attribution(Agent):
         source_kind: dict[str, str] | None = None,
         sector_wide: set[str] | None = None,
         base_currency: str = "MYR",
+        sessions: int = 1,
     ) -> list[Finding]:
         self._guard_tool("decompose")
         exp = decompose(
@@ -70,6 +71,7 @@ class A9Attribution(Agent):
             fx_return,
             fit,
             base_currency=base_currency,
+            sessions=sessions,
         )
 
         # The cause hunt is gated on the decomposition, not on whether the move

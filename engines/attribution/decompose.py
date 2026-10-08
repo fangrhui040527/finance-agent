@@ -155,6 +155,16 @@ def sigma_phrase(sar: float) -> str:
     )
 
 
+def window_sums(residuals: list[float], sessions: int) -> list[float]:
+    """The estimation residuals as `sessions`-long sums, so a multi-session
+    residual is ranked among its own kind. One session is the residuals as
+    they are."""
+    if sessions <= 1:
+        return list(residuals)
+    r = list(residuals)
+    return [sum(r[i : i + sessions]) for i in range(len(r) - sessions + 1)]
+
+
 def estimate(inputs: EstimationInputs) -> Fit | None:
     """docs/03 section 2.2 rule 2: below the minimum, betas are noise."""
     if len(inputs.instrument) < MIN_OBSERVATIONS:
@@ -173,7 +183,19 @@ def decompose(
     fit: Fit | None,
     base_currency: str = "MYR",
     style_names: list[str] | None = None,
+    sessions: int = 1,
 ) -> MoveExplanation:
+    """Decompose a move over `sessions` sessions against a DAILY fit.
+
+    The fit is estimated on one-session returns, so a window of N sessions is
+    tested against N sessions' worth of everything: the drift leg is N times
+    the daily alpha, the parametric statistic divides by sigma * sqrt(N), and
+    the rank test ranks the residual among the N-session sums of the estimation
+    residuals. Before 2026-10-08 a 5-session window was divided by the ONE-day
+    sigma, which inflated |SAR| by about sqrt(5): under pure noise about 27% of
+    ordinary weeks read "significant at 5%" and asked for a cause hunt.
+    """
+    sessions = max(1, int(sessions))
     # A non-finite input must never reach a verdict. Found by stress testing: a
     # NaN return produced verdict=no_identified_catalyst with unexplained=nan,
     # which renders to the user as a confident finding with "nan% unexplained".
@@ -242,6 +264,8 @@ def decompose(
         est_note += (
             " (market beta weakly identified; read the unexplained share, not the market leg)"
         )
+    if sessions > 1:
+        est_note += f"; a {sessions}-session window, tested against {sessions} sessions' sigma"
     est_note += f"; drift {fit.coefficients[0] * 100:+.3f}pp/session"
     if fit.intercept_se:
         t = abs(fit.coefficients[0]) / fit.intercept_se
@@ -256,7 +280,7 @@ def decompose(
     c_sec = b_sec * event_sector
     c_sty = sum(b_styles.get(n, 0.0) * event_styles.get(n, 0.0) for n in names)
     c_fx = total_base - realised_local
-    drift = fit.coefficients[0]
+    drift = fit.coefficients[0] * sessions
     expected = drift + c_mkt + c_sec + c_sty
     ar = realised_local - expected
 
@@ -277,9 +301,11 @@ def decompose(
     gross = sum(abs(v) for _, v, _ in contribs) or 1.0
     components = [AttributionComponent(c, v, abs(v) / gross, b) for c, v, b in contribs]
 
-    sar = ar / fit.residual_sigma if fit.residual_sigma > 1e-12 else 0.0
-    rank_z = corrado_rank_z(ar, fit.residuals)
-    rank_p = rank_p_value(ar, fit.residuals)
+    sigma = fit.residual_sigma * math.sqrt(sessions)
+    sar = ar / sigma if sigma > 1e-12 else 0.0
+    pool = window_sums(fit.residuals, sessions)
+    rank_z = corrado_rank_z(ar, pool)
+    rank_p = rank_p_value(ar, pool)
     sig = Significance(sar, rank_z, abs(sar) > PARAMETRIC_Z, rank_p < RANK_P_THRESHOLD, rank_p)
     # docs/03 section 2.3: disagreement between the two tests is itself worth
     # logging. It goes in the note, where the reader of the verdict sees it.

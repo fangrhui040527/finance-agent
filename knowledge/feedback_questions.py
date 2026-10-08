@@ -179,34 +179,90 @@ def answered(directory: str | Path = FEEDBACK_DIR) -> list[OpenQuestion]:
     )
 
 
+@dataclass
+class _Chain:
+    """One question followed across pages, whatever its wording became."""
+
+    text: str
+    tokens: set[str]
+    stamp: date | None
+    first_asked: date
+    last_carried: date
+    nights: int
+    instruments: tuple[str, ...]
+
+
 def _walk(pages: list[tuple[date, dict]]) -> dict[str, OpenQuestion]:
-    seen: dict[str, OpenQuestion] = {}
+    """Every question chain across the pages, keyed by where it began.
+
+    THE WRITER'S STAMP IS PART OF THE IDENTITY. The nightly page carries each
+    question with the date it was first asked and rewords the rest as the
+    evidence moves: "Tenaga fell 2.52 sigma with no collected row ... (since
+    2026-09-29)" became "Tenaga fell 2.52 sigma on 09-29 with no collected row
+    and gave back three-quarters of it ... (since 2026-09-29)" the next night.
+    Keyed on the exact wording, every rewording closed the old question as
+    "no longer carried" and opened a new one at one night: 142 of 190
+    "answered" questions were still being carried, and a 16-day-old question
+    read "(1 night)". A stamped question now continues the chain of the
+    previous page's question with the same stamp whose words overlap it most
+    (at least `MATCH`); an unstamped one still needs its exact text.
+    """
+    chains: list[_Chain] = []
+    by_key: dict[str, _Chain] = {}
+    prev_day: date | None = None
     for day, data in pages:
+        today: set[int] = set()
         for text, iid in _carried_questions(data):
             key = _key(text)
             if not key:
                 continue
             stamped = SINCE.search(text)
-            asked = date.fromisoformat(stamped.group(1)) if stamped else day
-            prior = seen.get(key)
-            if prior is None:
-                seen[key] = OpenQuestion(
+            stamp = date.fromisoformat(stamped.group(1)) if stamped else None
+            asked = stamp or day
+            tokens = _tokens(text)
+            chain = by_key.get(key)
+            if chain is None and stamp is not None and prev_day is not None:
+                best, best_overlap = None, 0.0
+                for c in chains:
+                    if c.stamp != stamp or c.last_carried != prev_day or id(c) in today:
+                        continue
+                    o = _overlap(tokens, c.tokens)
+                    if o >= MATCH and o > best_overlap:
+                        best, best_overlap = c, o
+                chain = best
+            if chain is None:
+                chain = _Chain(
                     text=" ".join(text.split()),
+                    tokens=tokens,
+                    stamp=stamp,
                     first_asked=min(asked, day),
                     last_carried=day,
                     nights=1,
                     instruments=(iid,) if iid else (),
                 )
-                continue
-            names = tuple(dict.fromkeys(prior.instruments + ((iid,) if iid else ())))
-            seen[key] = OpenQuestion(
-                text=prior.text,
-                first_asked=min(prior.first_asked, asked),
-                last_carried=day,
-                nights=prior.nights + 1,
-                instruments=names,
-            )
-    return seen
+                chains.append(chain)
+            elif chain.last_carried != day:  # the same question twice on one page is one night
+                chain.nights += 1
+                chain.last_carried = day
+                chain.first_asked = min(chain.first_asked, asked)
+                chain.text = " ".join(text.split())  # the newest wording is the question now
+                chain.tokens = tokens
+                chain.instruments = tuple(
+                    dict.fromkeys(chain.instruments + ((iid,) if iid else ()))
+                )
+            by_key[key] = chain
+            today.add(id(chain))
+        prev_day = day
+    return {
+        f"{c.first_asked}:{i}": OpenQuestion(
+            text=c.text,
+            first_asked=c.first_asked,
+            last_carried=c.last_carried,
+            nights=c.nights,
+            instruments=c.instruments,
+        )
+        for i, c in enumerate(chains)
+    }
 
 
 def _carried_questions(data: dict):
@@ -228,8 +284,9 @@ def _named_questions(data: dict):
 
 
 #: Token overlap above which two wordings are treated as the same question.
-#: Used ONLY by `uncarried`, where a wrong call costs a hygiene note and never
-#: a ledger row - the ledger matches on the writer's own text, not on a guess.
+#: `uncarried` uses it alone; the ledger (`_walk`) uses it only between
+#: questions that already carry the SAME since-stamp on consecutive pages, so
+#: the writer's own date does most of the matching and the words only break ties.
 MATCH = 0.5
 
 

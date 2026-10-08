@@ -21,6 +21,7 @@ Two properties of the measurement, both from docs/03:
 
 from __future__ import annotations
 
+from bisect import bisect_right
 from dataclasses import dataclass, field
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
@@ -97,6 +98,11 @@ class Move:
     #: shut: the figures are the session so far, not the session. See
     #: `_provisional_note`.
     provisional: str = ""
+    #: How many of the NAME's own sessions the "1d" return spans. More than one
+    #: when the proxy has no row for a session the name printed between the
+    #: last two common days: the return is then a k-session move, and it is
+    #: tested against k sessions' sigma rather than labelled a day.
+    span: int = 1
 
     @property
     def mis_dated(self) -> bool:
@@ -147,6 +153,8 @@ class Move:
             flag = f" **STALE NAME: this is the {self.last_day} session**"
         if self.provisional:
             flag += f" **PROVISIONAL: the {self.last_day} session so far, not the close**"
+        if self.span > 1:
+            flag += f" **SPANS {self.span} SESSIONS: the proxy has a gap**"
         return (
             f"| {self.label} ({self.instrument_id}) | {self.r1:+.2%} | {self.m1:+.2%} | "
             f"{self.r5:+.2%} | {self.m5:+.2%} | {self.verdict}"
@@ -224,16 +232,36 @@ def measure(feed, instrument_id: str, label: str, day: date, base_currency: str 
     move.mkt_last = max(closes_m) if closes_m else None
     move.sessions = len(common)
     move.dating = _dating_note(move, own_days=set(closes_i), mkt_days=set(closes_m))
+    # The "1d" return runs between the last two COMMON days. When the proxy has
+    # no row for a session the name printed in between, that is a k-session
+    # move: on 2026-09-23 ^KLSE had no 09-22 row, and IHH's +4.99% "1d" at
+    # 4.11 sigma was two sessions, the second of them flat in the cache.
+    move.span = sum(1 for d in closes_i if common[-2] < d <= common[-1])
+    if move.span > 1:
+        gaps = sorted(d for d in closes_i if common[-2] < d < common[-1])
+        note = (
+            f"SPANS {move.span} SESSIONS: {proxy} has no row for "
+            f"{', '.join(d.isoformat() for d in gaps)}, so the 1d figures run from "
+            f"{common[-2]} to {common[-1]} and are tested against {move.span} sessions' sigma"
+        )
+        move.dating = f"{move.dating}; {note}" if move.dating else note
     move.r1, move.m1 = ri[-1], rm[-1]
     move.r5, move.m5 = ci[-1] / ci[-6] - 1.0, cm[-1] / cm[-6] - 1.0
     move.currency = market_currency(mic_of(instrument_id))
     move.provisional = _provisional_note(feed, (instrument_id, proxy), move.last_day)
 
     est = estimation_slice(len(ri))
-    est_i, est_m = ri[est], rm[est]
     # ri[k] is the return INTO common[k + 1], so the window's sessions are the
-    # same slice of the days one step along.
-    est_days = common[1:][est]
+    # same slice of the days one step along. A return across a proxy gap is a
+    # two-session return, and a daily fit has no place for it: left out.
+    own_days = sorted(closes_i)
+    kept = [
+        k
+        for k in range(len(ri))[est]
+        if bisect_right(own_days, common[k + 1]) - bisect_right(own_days, common[k]) == 1
+    ]
+    est_i, est_m = [ri[k] for k in kept], [rm[k] for k in kept]
+    est_days = [common[k + 1] for k in kept]
     fit = market_fit(est_i, est_m)
     exp = decompose(
         instrument_id,
@@ -245,6 +273,7 @@ def measure(feed, instrument_id: str, label: str, day: date, base_currency: str 
         0.0,
         fit,
         base_currency=move.currency,
+        sessions=move.span,
     )
     move.verdict = exp.verdict.value
     move.unexplained = exp.unexplained_share if fit is not None else None
