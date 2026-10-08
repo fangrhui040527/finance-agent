@@ -1,6 +1,87 @@
 {
   "collection": [
     {
+      "at": "2026-10-08T16:32:30.241059+00:00",
+      "detail": "facts 0; EODHD plan: free (2 names a day, US only, rotated); MYX:1155: deferred by the 2-a-day credit budget; next in rotation; MYX:5347: deferred by the 2-a-day credit budget; next in rotation; MYX:5183: deferred by the 2-a-day credit budget; next in rotation; MYX:5225: deferred by the 2-a-day credit budget; next in rotation; outside the free plan (US only), so not asked for: MYX:1155, MYX:5347, MYX:5183, MYX:5225. The EODHD Fundamentals plan covers KLSE and TW.; MYX:8869: EODHD free plan: US only; the Fundamentals plan covers KLSE; MYX:3182: EODHD free plan: US only; the Fundamentals plan covers KLSE",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-08T16:32:29.982655+00:00",
+      "detail": "facts 5; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-08T16:32:09.395487+00:00",
+      "detail": "facts 0; ",
+      "fetched": 21,
+      "kept": 7,
+      "source": "jin10_flash",
+      "status": "ok",
+      "stored": 6
+    },
+    {
+      "at": "2026-10-08T16:32:08.401957+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-08T16:32:06.851058+00:00",
+      "detail": "",
+      "fetched": 50,
+      "kept": 50,
+      "source": "nst_business",
+      "status": "ok",
+      "stored": 47
+    },
+    {
+      "at": "2026-10-08T16:32:06.454839+00:00",
+      "detail": "",
+      "fetched": 50,
+      "kept": 50,
+      "source": "fmt_business",
+      "status": "ok",
+      "stored": 50
+    },
+    {
+      "at": "2026-10-08T16:32:06.243235+00:00",
+      "detail": "read but empty: Genting, Maybank, Tenaga, Petronas Chemicals, IHH, Press Metal",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-08T16:32:05.143731+00:00",
+      "detail": "named the company: 7 of 34 (lowest: Genting 0/4, Petronas Chemicals 0/2, Maybank 1/9)",
+      "fetched": 35,
+      "kept": 34,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 30
+    },
+    {
+      "at": "2026-10-08T16:32:03.435866+00:00",
+      "detail": "grouped 3 names per request; 2 requests; read but empty: Genting, Maybank, Tenaga, Petronas Chemicals, IHH, Press Metal",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "ok",
+      "stored": 0
+    },
+    {
       "at": "2026-10-08T01:00:42.634542+00:00",
       "detail": "facts 0; EODHD plan: free (2 names a day, US only, rotated); XNAS:AAPL: deferred by the 2-a-day credit budget; next in rotation; XNAS:MSFT: outside the plan or over today's credits; XNAS:NVDA: outside the plan or over today's credits",
       "fetched": 0,
@@ -74,18 +155,18 @@
     }
   ],
   "counts": {
-    "articles": 14674,
+    "articles": 14807,
     "documents": 0,
-    "escalated": 2498,
+    "escalated": 2499,
     "events": 4201,
     "failed_sweeps": 52,
-    "linked": 10169,
-    "observations": 5004,
+    "linked": 10176,
+    "observations": 5009,
     "series": 31,
-    "sweeps": 750
+    "sweeps": 759
   },
   "day": "2026-10-08",
-  "generated_at": "2026-10-08 01:01 UTC",
+  "generated_at": "2026-10-08 16:33 UTC",
   "macro": [
     {
       "change": "0.02",
@@ -223,18 +304,87 @@
       "instrument_id": "MYX:1155",
       "label": "Maybank",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxPeG91WnE2V1JlOHFJSGc0Y0RYUUFHdnl6V0w5WHBGQnBnVy1kbGdyZEtSYk84UHBBekFGY3NpVVFDMUk5eTJLQjRjcE1rSTdFZ1ZQQU14WkkwMGtpa2xjZG9YOGJrcFNrZ1pLQWlRWVZBYnFGM0lxNkRFeFV2WUJLOVZzalJnTThzbGRjMF9jNFRXUGZNSmljb2szbl9EeGFzendvcV9oTUxQVXgzSEdOUEJCblhYTFpo?oc=5",
+          "domain": "www.ad-hoc-news.de",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-08T09:06:11+00:00",
+          "quality": 0.65,
+          "title": "Maybank keeps Buy rating for Singtel stock at SGD 5.21",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
-      "escalated": 0,
+      "escalated": 1,
       "events": [],
       "instrument_id": "MYX:5347",
       "label": "Tenaga",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMivwFBVV95cUxOTFFwTG5wTS1OLUxTTHNpS3ZlQjV4SUdMZVdJZmRWMUtZaW1wVG5FM0pnd2s5TVJIZlROODlLRlFDQ0VQcG9FcTVaVGlqZldic2Ywa0hlYkpLU2ZCVEZjREFfQ2hycFdqOVNmd0w3c3VkdWIyODNxNzlfdWJ5aWtHV0tyS2xnV1ljSlo3WldIelNRd3d5bUxMSUVndVdlNUFnSVF2Wk5tZFFpZFFULW5VbDBZNklIYnBFTklKZ2ZOWdIBvwFBVV95cUxOTFFwTG5wTS1OLUxTTHNpS3ZlQjV4SUdMZVdJZmRWMUtZaW1wVG5FM0pnd2s5TVJIZlROODlLRlFDQ0VQcG9FcTVaVGlqZldic2Ywa0hlYkpLU2ZCVEZjREFfQ2hycFdqOVNmd0w3c3VkdWIyODNxNzlfdWJ5aWtHV0tyS2xnV1ljSlo3WldIelNRd3d5bUxMSUVndVdlNUFnSVF2Wk5tZFFpZFFULW5VbDBZNklIYnBFTklKZ2ZOWQ?oc=5",
+          "domain": "www.nst.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-08T03:16:05+00:00",
+          "quality": 0.8,
+          "title": "TNB tax claim will not lead to higher electricity tariffs, says Finance Ministry",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiugFBVV95cUxQM2FENU1hckU5dm1wSDc0cWVKZzJyRFdKUEVaMXR6czdpOThxZDg5MGhLT3RIeHVhMGF5eGF2elVwVzlsVnVlaDdaaTJ5TUs5NlNJeWtDV2ZDdktqVUtsRFpHTHpVWEI5OFB0bzN5Q1M3eFZYeW96X01EMU1ZSzNZaVA1US1hRnI0XzV0R0dSckVVeGMzdGN2NFpVSnNvZW9lRDBUbVVneHFaQ3ZfR1J4N2R4YWI2ZmxCS0HSAb8BQVVfeXFMTmpEMFZIeURPc25VcXZNZ091UGEwX2lzWWJvNGJuS2dIS1FOazNwMzhEb2FwamtVNVhfRjVSM3pQR0d0NnRQczMtLVRDMlJhemw2WjNBMUdFOENuV0l3S3JGUVJZdG9UaktZQ3JQOFRZRWFJSXF4R2t3M2JhOHU3MXdMV3J0eFpaWnVqZEdheXZDajJRQnJTcW15Z3B2dzBxdzFUSmNCMHdOLUxfMXhNZE1vbUZ1S0t6RGRWN244Z2M?oc=5",
+          "domain": "www.nst.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-08T02:18:55+00:00",
+          "quality": 0.8,
+          "title": "UUE's RM515mil orderbook seen set to grow from TNB, data centre boosts",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMitwFBVV95cUxPeHVBdWV5eWJkSjFhVEczMndCYnQwMUFzN3YxcnFPQW9WMWtoSDBmNU54dXV5TmMzTS1iblZHUnBkR2xPQUxGbFhTdnJCU3cwZHc2OTh4U0NudHNyRmFKUnhZc0xLVmdyM3lsRS04d09wb19ZaGpoQV9PSm1XNmZJTVRudFhVRUNjY1pSWXFnck4zQndOUzJaTXd2VXcxQ3FDaURPRG1WSThNc2xyWjZoYWRhS1BQMkU?oc=5",
+          "domain": "themalaysianreserve.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-08T01:46:26+00:00",
+          "quality": 0.8,
+          "title": "MoF: TNB\u2019s additional tax claim not passed on to consumers via tariffs",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMimwFBVV95cUxOV3JYSkxtWXBLSlVEdXp3WEh1UGl0SkNNUDVUb2U0M1YxajY3ZHU5NkwxQkFBXzBsQm5Tb1N4YWFyT0FaVFktZ3dEOWhzSUVwT01NSEpTLTRheHR6RUVnQ1pabWFHVXprVWhYOTNWTFh5cURCaVdrX3ZkRzh5VzY2OHhHWEpNb1JNZVd3QU81V25GVWR6bG9YY0MtQQ?oc=5",
+          "domain": "solarbytes.info",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-08T12:06:26+00:00",
+          "quality": 0.65,
+          "title": "McDonald's Malaysia expands rooftop solar programme with TNB",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 4,
+        "polarity_mean": 0.0,
+        "sources": 3,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -253,8 +403,26 @@
       "instrument_id": "MYX:5225",
       "label": "IHH",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMivwFBVV95cUxPaWZiQl8yQXZlVVZwY2NIZkJpYk9xTWpIVFcxWlVlbWtiSW1UZkdqUndkX3dUbzhleC1VQXEyeUgtMFVHUXVvN25VU1JqdlZKalMwWEw1elpvZ0ZORFFWWlRkbmhLdEI5Wmd0S21sRF9CUzhlTkVXRlNBUW1tZjJwdTV3SGd1UUJ4SnlpZE1SSnd3V0IwS2htMy11d2tqcTllVlZMRVUyQ1VsVlNNNURaQWhxZ1YtODNJM2wtb1ktNA?oc=5",
+          "domain": "www.tipranks.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-08T11:18:46+00:00",
+          "quality": 0.65,
+          "title": "EPF lifts stake in IHH Healthcare to 13.3% via fresh share acquisitions",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -263,8 +431,26 @@
       "instrument_id": "MYX:8869",
       "label": "Press Metal",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMizgFBVV95cUxORVk3UFhfaUtTOUctNksxTGpIb0lPbXlJUHRsVmVmeTZ2Wm1tRE9MeEY5VEJEVmFQVV9LZTdsSk1TenlycVFOY2NwVEowc0ZkNnM5WnlCMjM1S05EQ3ZEQkg0Vk1raUdOck5rN3BVZ3JDZWhia1ppc2QwNjVXTGRwRjJsOV94MDFOTXM1a1NXNDQwcGc2WkRxOEtFWmI0WUNlZ1ZXa3lhdkNVdmpJNTVUdmJaMWV3X3JDeWZJNVgwbHBybi1ZY0RCNXhpWXctZw?oc=5",
+          "domain": "news.metal.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-08T05:57:00+00:00",
+          "quality": 0.65,
+          "title": "[SMM Aluminum Express News] Press Metal, Southeast Asia\u2019s largest alum",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {

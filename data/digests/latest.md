@@ -1,23 +1,30 @@
 # Digest 2026-10-08
 
-Generated 2026-10-08 01:01 UTC · slot `all` · 14674 articles in the corpus, 5004 observations, 4201 events in the fact book.
+Generated 2026-10-08 16:33 UTC · slot `all` · 14807 articles in the corpus, 5009 observations, 4201 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-10-08 www.ad-hoc-news.de — Maybank keeps Buy rating for Singtel stock at SGD 5.21 [q 0.65, tone +0.0]
 
 ### Tenaga (MYX:5347)
-- quiet: nothing collected for this name in the window
+- tone: 4 stories from 3 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 1 escalated
+- 2026-10-08 www.nst.com.my — TNB tax claim will not lead to higher electricity tariffs, says Finance Ministry [q 0.80, tone +0.0] ★
+- 2026-10-08 www.nst.com.my — UUE's RM515mil orderbook seen set to grow from TNB, data centre boosts [q 0.80, tone +0.0]
+- 2026-10-08 themalaysianreserve.com — MoF: TNB’s additional tax claim not passed on to consumers via tariffs [q 0.80, tone +0.0]
+- 2026-10-08 solarbytes.info — McDonald's Malaysia expands rooftop solar programme with TNB [q 0.65, tone +0.0]
 
 ### Petronas Chemicals (MYX:5183)
 - quiet: nothing collected for this name in the window
 
 ### IHH (MYX:5225)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-10-08 www.tipranks.com — EPF lifts stake in IHH Healthcare to 13.3% via fresh share acquisitions [q 0.65, tone +0.0]
 
 ### Press Metal (MYX:8869)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-10-08 news.metal.com — [SMM Aluminum Express News] Press Metal, Southeast Asia’s largest alum [q 0.65, tone +0.0]
 
 ### Genting (MYX:3182)
 - tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
@@ -87,6 +94,15 @@ Generated 2026-10-08 01:01 UTC · slot `all` · 14674 articles in the corpus, 50
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 16:32 | eodhd | ok | 0 | 0 | 0 | facts 0; EODHD plan: free (2 names a day, US only, rotated); MYX:1155: deferred  |
+| 16:32 | twse_openapi | ok | 8 | 0 | 0 | facts 5;  |
+| 16:32 | jin10_flash | ok | 21 | 7 | 6 | facts 0;  |
+| 16:32 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 16:32 | nst_business | ok | 50 | 50 | 47 |  |
+| 16:32 | fmt_business | ok | 50 | 50 | 50 |  |
+| 16:32 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Genting, Maybank, Tenaga, Petronas Chemicals, IHH, Press Metal |
+| 16:32 | google_news | ok | 35 | 34 | 30 | named the company: 7 of 34 (lowest: Genting 0/4, Petronas Chemicals 0/2, Maybank |
+| 16:32 | gdelt | ok | 0 | 0 | 0 | grouped 3 names per request; 2 requests; read but empty: Genting, Maybank, Tenag |
 | 01:00 | eodhd | ok | 0 | 0 | 0 | facts 0; EODHD plan: free (2 names a day, US only, rotated); XNAS:AAPL: deferred |
 | 01:00 | jin10_flash | ok | 15 | 7 | 4 | facts 0;  |
 | 01:00 | alphavantage_news | failed | 0 | 0 | 0 | alphavantage quota exhausted for today: Thank you for using Alpha Vantage! This  |
