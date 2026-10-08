@@ -11,6 +11,7 @@ deduplication and provenance rule below. That is the whole integration surface.
 
 from __future__ import annotations
 
+import http.client
 import json
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
@@ -453,6 +454,9 @@ class GdeltFeed(FeedAdapter):
         except OSError as e:
             self._breaker.record_failure(e)
             raise FeedError(f"GDELT fetch failed: {e}") from e
+        except http.client.HTTPException as e:  # a reply cut off mid-body is not an OSError
+            self._breaker.record_failure(e)
+            raise FeedError(f"GDELT fetch failed: {type(e).__name__}: {e}") from e
         self._breaker.record_success()
 
         if isinstance(body, bytes):

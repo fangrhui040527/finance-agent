@@ -25,8 +25,10 @@ what waiting fixes) and a per-source `CircuitBreaker`.
 
 from __future__ import annotations
 
+import http.client
 import json
 import os
+import time
 import urllib.error
 import urllib.request
 from abc import ABC, abstractmethod
@@ -88,6 +90,23 @@ class Pull:
     #: Endpoints skipped inside an otherwise successful pull, with the reason.
     notes: list[str] = field(default_factory=list)
     requests: int = 0
+    #: PER-NAME OUTCOMES, for a collector that asks one name at a time. A
+    #: collector raises only when EVERY name fails, so before these existed a
+    #: pull that read one name of three was stored `ok`, exactly like one that
+    #: read all three: Alpha Vantage refused MSFT and NVDA on 30 of 31 runs from
+    #: 2026-09-06, and EODHD was refused on every name of 63 runs, all of them
+    #: `ok`. The sweep reads these the way it reads a news source's names
+    #: (`sweep._mostly_failed`): mostly failed is DEGRADED, every name refused
+    #: by the plan is SKIPPED.
+    asked: list[str] = field(default_factory=list)
+    #: (name, reason) for a name that was asked and could not be read.
+    failed: list[tuple[str, str]] = field(default_factory=list)
+    #: (name, reason) for a name the plan or the day's credits refused.
+    refused: list[tuple[str, str]] = field(default_factory=list)
+    #: Set when the reply could not reach back to `since`: the window between
+    #: `since` and the oldest item read was never served, so it is a hole in
+    #: the record, not a quiet stretch. Empty when the window was covered.
+    gap: str = ""
 
     @property
     def fetched(self) -> int:
@@ -107,6 +126,10 @@ class Pull:
         self.articles += other.articles
         self.notes += other.notes
         self.requests += other.requests
+        self.asked += other.asked
+        self.failed += other.failed
+        self.refused += other.refused
+        self.gap = "; ".join(g for g in (self.gap, other.gap) if g)
 
     def __str__(self) -> str:
         parts = []
@@ -129,6 +152,11 @@ class Collector(ABC):
     key_env: str | None = None
     TIMEOUT = 30
     RETRY_BASE_SECONDS = 1.0
+    #: The least time between two request STARTS. Zero for a vendor that
+    #: answers back-to-back calls; Alpha Vantage refuses a second request inside
+    #: a second, and a collector that asks one name per request meets that
+    #: limit on its second name.
+    SECONDS_BETWEEN_REQUESTS = 0.0
 
     def __init__(
         self,
@@ -143,6 +171,7 @@ class Collector(ABC):
         self._clock = clock or (lambda: datetime.now(UTC))
         self._breaker = CircuitBreaker(self.name)
         self.requests = 0
+        self._last_start: float | None = None
 
     # -- keys ------------------------------------------------------------------
 
@@ -176,6 +205,7 @@ class Collector(ABC):
             with opener(req, timeout=self.TIMEOUT) as resp:
                 return resp.read()
 
+        self._pace()
         self.requests += 1
         try:
             self._breaker.before_call()
@@ -197,6 +227,12 @@ class Collector(ABC):
         except (urllib.error.URLError, OSError) as e:
             self._breaker.record_failure(e)
             raise SourceError(f"{self.name} fetch failed: {e}") from e
+        except http.client.HTTPException as e:
+            # A reply cut off mid-body (`IncompleteRead`) or a malformed status
+            # line is not an OSError, so it used to escape every handler here
+            # and take the whole sweep down with it, exit 1, nothing committed.
+            self._breaker.record_failure(e)
+            raise SourceError(f"{self.name} fetch failed: {type(e).__name__}: {e}") from e
         self._breaker.record_success()
 
         text = body.decode("utf-8", errors="replace") if isinstance(body, bytes) else body
@@ -207,6 +243,17 @@ class Collector(ABC):
             return json.loads(text)
         except json.JSONDecodeError as e:
             raise SourceError(f"{self.name} returned malformed JSON: {stripped[:160]!r}") from e
+
+    def _pace(self) -> None:
+        """Wait out `SECONDS_BETWEEN_REQUESTS` since the previous request started."""
+        gap = self.SECONDS_BETWEEN_REQUESTS
+        now = time.monotonic()
+        if gap > 0 and self._last_start is not None:
+            owed = gap - (now - self._last_start)
+            if owed > 0:
+                (self._sleep or time.sleep)(owed)
+                now = time.monotonic()
+        self._last_start = now
 
     # -- the contract --------------------------------------------------------------
 

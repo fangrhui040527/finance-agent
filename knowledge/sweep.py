@@ -164,7 +164,7 @@ REASON_CHARS = 60
 MAX_REASONS = 3
 
 
-def _reason_note(failed) -> str:
+def _reason_note(failed, label: str = "failed") -> str:
     """`failed: HTTP Error 429: Too Many Requests (NVIDIA, Apple)`.
 
     GROUPED BY REASON, not by name, because the reason is the finding and the
@@ -184,7 +184,7 @@ def _reason_note(failed) -> str:
         key = " ".join(str(reason).split())[:REASON_CHARS] or "no reason recorded"
         by_reason.setdefault(key, []).append(name)
     shown = list(by_reason.items())[:MAX_REASONS]
-    note = "failed: " + "; ".join(f"{reason} ({', '.join(names)})" for reason, names in shown)
+    note = f"{label}: " + "; ".join(f"{reason} ({', '.join(names)})" for reason, names in shown)
     rest = len(by_reason) - len(shown)
     return note + (f"; +{rest} more" if rest > 0 else "")
 
@@ -520,28 +520,8 @@ def run_sweep(
     ):
         for spec in specs:
             t0 = tick()
-            if spec.kind == NEWS:
-                result, articles = _run_news(
-                    spec,
-                    cfg,
-                    corpus,
-                    index,
-                    holdings,
-                    watchlist,
-                    languages,
-                    book,
-                    slot,
-                    hours,
-                    limit,
-                    deadline,
-                    tick,
-                    adapter_for,
-                    run_id,
-                    emit,
-                    pause,
-                )
-            else:
-                result, articles = _run_structured(
+            try:
+                result, articles = _run_one(
                     spec,
                     cfg,
                     corpus,
@@ -554,11 +534,24 @@ def run_sweep(
                     slot,
                     hours,
                     limit,
+                    deadline,
                     tick,
+                    adapter_for,
                     collector_for,
                     run_id,
                     emit,
+                    pause,
                 )
+            except Exception as e:
+                # One source's bug or one vendor's malformed reply must not take
+                # the sources after it, or the run's commit, down with it. Before
+                # this, an `IncompleteRead` from one host ended the process with
+                # exit 1, and collect.yml commits only on 0 or 3: the day's
+                # prices, marks, grades and every source already read were
+                # discarded. Recorded as FAILED with the exception's own words,
+                # so the run exits 3 and the fault is still in plain sight.
+                # KeyboardInterrupt and SystemExit are not Exceptions and pass.
+                result, articles = _crashed(spec, e, corpus, facts, run_id, slot, t0, tick)
             result.seconds = (tick() - t0).total_seconds()
             report.results.append(result)
             fresh.extend(articles)
@@ -572,6 +565,79 @@ def run_sweep(
         report.corpus_counts = corpus.counts()
         report.facts_counts = facts.counts()
     return report
+
+
+def _run_one(
+    spec,
+    cfg,
+    corpus,
+    facts,
+    index,
+    holdings,
+    watchlist,
+    languages,
+    book,
+    slot,
+    hours,
+    limit,
+    deadline,
+    tick,
+    adapter_for,
+    collector_for,
+    run_id,
+    emit,
+    pause,
+) -> tuple[SourceResult, list[Article]]:
+    if spec.kind == NEWS:
+        return _run_news(
+            spec,
+            cfg,
+            corpus,
+            index,
+            holdings,
+            watchlist,
+            languages,
+            book,
+            slot,
+            hours,
+            limit,
+            deadline,
+            tick,
+            adapter_for,
+            run_id,
+            emit,
+            pause,
+        )
+    return _run_structured(
+        spec,
+        cfg,
+        corpus,
+        facts,
+        index,
+        holdings,
+        watchlist,
+        languages,
+        book,
+        slot,
+        hours,
+        limit,
+        tick,
+        collector_for,
+        run_id,
+        emit,
+    )
+
+
+def _crashed(
+    spec, error: Exception, corpus, facts, run_id: str, slot: str, started: datetime, tick
+) -> tuple[SourceResult, list[Article]]:
+    """A FAILED row for a source that raised something no handler expected."""
+    detail = f"crashed: {type(error).__name__}: {error}"[:DETAIL_CHARS]
+    result = SourceResult(spec.name, spec.kind, FAILED, detail=detail)
+    if spec.kind != NEWS:
+        facts.record_pull(run_id, spec.name, FAILED, at=tick(), detail=detail)
+    corpus.record_sweep(run_id, spec.name, started, FAILED, at=tick(), slot=slot, detail=detail)
+    return result, []
 
 
 def _since_for(store_last, name: str, started: datetime, hours: int) -> datetime:
@@ -666,6 +732,13 @@ def _run_news(
                 watchlist=watchlist,
                 languages=languages,
             )
+            # A fixed-length feed that no longer reaches back to `since` read
+            # its window only in part. What scrolled off is gone for good, so
+            # the run is DEGRADED, not `ok` - see `RssFeed.overflow`.
+            overflow = getattr(feed, "overflow", "")
+            if isinstance(overflow, str) and overflow:
+                result.status = DEGRADED
+                result.detail = overflow
     except FeedError as e:
         corpus.record_sweep(
             run_id, spec.name, since, FAILED, at=tick(), slot=slot, detail=str(e)[:DETAIL_CHARS]
@@ -1096,6 +1169,18 @@ def _run_structured(
         result.status = SKIPPED
         result.detail = str(e)
         facts.record_pull(run_id, spec.name, SKIPPED, at=tick(), detail=result.detail)
+        # A sweep row too, as for KeyMissing: a plan boundary is a dispatch
+        # that had nothing it was allowed to do, and `sweep_silence` reads only
+        # the sweeps table.
+        corpus.record_sweep(
+            run_id,
+            spec.name,
+            since,
+            OK,
+            at=tick(),
+            slot=slot,
+            detail=f"skipped: {result.detail[:DETAIL_CHARS]}",
+        )
         return result, []
     except SourceError as e:
         result.status = FAILED
@@ -1111,6 +1196,32 @@ def _run_structured(
             detail=result.detail[:DETAIL_CHARS],
         )
         return result, []
+
+    if pull.asked and pull.refused and len(pull.refused) >= len(pull.asked):
+        # Every name asked was refused by the plan or the day's credits. That is
+        # a skip with its reason, like a plan boundary raised before any request,
+        # not an `ok` pull with nothing in it: EODHD stored 63 of those.
+        result.status = SKIPPED
+        result.detail = _reason_note(pull.refused, "every asked name was refused")
+        facts.record_pull(run_id, spec.name, SKIPPED, at=tick(), detail=result.detail)
+        corpus.record_sweep(
+            run_id,
+            spec.name,
+            since,
+            OK,
+            at=tick(),
+            slot=slot,
+            detail=f"skipped: {result.detail}"[:DETAIL_CHARS],
+        )
+        return result, []
+    status = OK
+    unread = {n for n, _ in pull.failed} | {n for n, _ in pull.refused}
+    if pull.asked and _mostly_failed(
+        pull.failed, pull.refused, [(n, 0) for n in pull.asked if n not in unread]
+    ):
+        status = DEGRADED
+    if pull.gap:
+        status = DEGRADED
 
     stored = 0
     stored += facts.add_observations(pull.observations).stored
@@ -1136,11 +1247,17 @@ def _run_structured(
         result.filtered, result.escalated = stats.filtered, stats.escalated
     else:
         result.fetched = pull.fetched
-    result.detail = "; ".join(pull.notes)[:DETAIL_CHARS]
+    head = []
+    if status == DEGRADED and pull.asked and unread:
+        head.append(f"DEGRADED: {len(unread)} of {len(pull.asked)} names could not be read")
+    if pull.gap:
+        head.append(pull.gap)
+    result.status = status
+    result.detail = "; ".join(head + pull.notes)[:DETAIL_CHARS]
     facts.record_pull(
         run_id,
         spec.name,
-        OK,
+        status,
         at=tick(),
         fetched=pull.fetched,
         stored=stored + result.stored,
@@ -1150,7 +1267,7 @@ def _run_structured(
         run_id,
         spec.name,
         since,
-        OK,
+        status,
         at=tick(),
         slot=slot,
         fetched=result.fetched,
