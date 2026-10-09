@@ -33,9 +33,14 @@ def _cfg(**over):
     outside the case, on a clock nobody set. Each rule's own tests point at a
     store they built; every other test here sees none.
     """
+    real = load_config()
     over.setdefault("corpus_db", "tests/no-such-corpus.db")
     over.setdefault("facts_db", "tests/no-such-facts.db")
-    return replace(load_config(), **over)
+    # data/paper.db too, the fourth time: on 2026-10-09 a branch whose last
+    # mark was 10-06 tripped `paper_stale` in three cases about spend and exit
+    # codes. The paper rules' own tests build their own book.
+    over.setdefault("paper", replace(real.paper, database="tests/no-such-paper.db"))
+    return replace(real, **over)
 
 
 #: The nightly pages are tracked too, and their questions age. Every case that
