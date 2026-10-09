@@ -1,0 +1,256 @@
+{
+  "day": "2026-10-08",
+  "written_at": "2026-10-09T22:40:00Z",
+  "measured_session": {
+    "bursa": "2026-10-08 (^KLSE 1,611.78 -> 1,601.01)",
+    "us": "2026-10-08 (SPY 777.22 -> 773.93)"
+  },
+  "pack_built": "2026-10-09T22:36:00Z",
+  "market": {
+    "regime": "neutral",
+    "notes": [
+      "MYX:^KLSE -0.67% 1d, -1.80% 5d, lowest close in the cached year (last lower 1,598.47 on 2025-09-25); 99 cached Bursa names 23 up, 69 down, 7 flat, median -0.87%",
+      "banks fell again: CIMB -0.95%, Public Bank -0.87%, Hong Leong Bank -1.86%, Maybank -0.71%; titles (google_news, title only): weaker Wall Street, Kenanga cut its KLCI target, higher oil and geopolitical risks",
+      "XNAS:SPY -0.42% 1d, +1.30% 5d; FRED at 10-08: SP500 7765.36 (-36.41), NASDAQCOM 27193.34 (-345.35), VIXCLS 15.41 (+0.33), T10Y2Y 0.47 (-0.04), BAMLH0A0HYM2 3.15 (+0.06); DGS10 5.28, DGS2 4.77 are 10-07; Brent none after 10-06; DEXMAUS 4.081 at 10-02",
+      "AI names fell on a report about OpenAI's annualized revenue (cnbc.com 18:14Z), later corrected to $50 billion (finnhub 18:37Z)",
+      "one name past 1.5 sigma: Genting 1.71 sigma, no_identified_catalyst, a round trip 1.84 -> 1.80 -> 1.84"
+    ]
+  },
+  "names": [
+    {
+      "instrument_id": "MYX:3182",
+      "move": {
+        "return_1d": 0.0222,
+        "market_1d": -0.0067,
+        "unexplained_share": 0.78,
+        "session": "2026-10-08",
+        "note": "market -0.61% at beta 0.92 (R2 0.08), drift -0.25% (2.1 standard errors), idiosyncratic +3.08%, 1.71 sigma, no_identified_catalyst; closes 1.80 -> 1.84 on 4,246,400; Tuesday 1.84; Genting Malaysia +0.69%, Genting Plantations +0.17%"
+      },
+      "causes": [
+        {
+          "claim": "unknown: no collected evidence reaches it",
+          "evidence": [
+            "google_news bursa_close 2026-10-08 16:32Z: named the company in 0 of 4 Genting rows; 10-09 10:09Z: 0 of 7",
+            "google_news:ad-hoc-news.de 2026-10-07T03:53Z 'Genting stock completes a 5 percent LNG stake sale' (title only; precedes Wednesday's fall)",
+            "price_cache.db: 3182.KL 1.84 (10-06) -> 1.80 (10-07) -> 1.84 (10-08); 4715.KL +0.69%, 2291.KL +0.17% on 10-08"
+          ],
+          "chain": [
+            "a one-session round trip on a falling market; part of the leg is the -0.25%/session drift not occurring",
+            "unknown: no collected evidence reaches further"
+          ],
+          "confidence": null,
+          "confirm": "no Genting filing or row dated 10-07 or 10-08 reaches the store and Friday's close does not hold above 1.84",
+          "refute": "a Bursa announcement dated 10-07 or 10-08 (LNG stake sale consideration, a buyback, a group notice) or a broker note on the group reaches the store"
+        }
+      ],
+      "open_questions": [
+        "What lifted Genting 1.71 sigma on 10-08 (idiosyncratic +3.08%), back to Tuesday's 1.84 after Wednesday's −2.17%? No row about the company was published on 10-08; Genting Malaysia rose 0.69% and Genting Plantations 0.17%. (since 2026-10-08)"
+      ],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:5183",
+      "move": {
+        "return_1d": 0.0095,
+        "market_1d": -0.0067,
+        "unexplained_share": 0.71,
+        "session": "2026-10-08",
+        "note": "market -0.60%, drift -0.07%, idiosyncratic +1.62%, 0.43 sigma, not_significant, R2 0.00; closes 4.22 -> 4.26 on 6,526,100 (3.7x Wednesday); nothing collected"
+      },
+      "causes": [],
+      "open_questions": [
+        "What did the Petronas Chemicals CEO appointment (title only, 10-05 14:44Z) say, and does a Bursa filing carry it? It preceded a +4.12% session; 10-07 gave back −1.86% and 10-08 added +0.95% on 3.7 times Wednesday's volume. (since 2026-10-06)"
+      ],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:5347",
+      "move": {
+        "return_1d": 0.0031,
+        "market_1d": -0.0067,
+        "unexplained_share": 0.61,
+        "session": "2026-10-08",
+        "note": "market -0.55%, drift -0.02%, idiosyncratic +0.88%, 1.09 sigma, not_significant; closes 12.86 -> 12.90; MoF says TNB's additional tax claim will not raise tariffs (titles only)"
+      },
+      "causes": [],
+      "open_questions": [
+        "Tenaga fell 2.52 sigma on 09-29 with no collected row and gave back three-quarters of it on 09-30, when the utilities rallied. What, if anything, did the company, the Energy Commission or a Bursa filing publish on 09-29? `bursa_announcements` stored nothing for it. (since 2026-09-29)"
+      ],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:5225",
+      "move": {
+        "return_1d": -0.0025,
+        "market_1d": -0.0067,
+        "unexplained_share": 0.36,
+        "session": "2026-10-08",
+        "note": "market -0.57%, drift -0.01%, idiosyncratic +0.34%, 0.30 sigma, not_significant; closes 7.90 -> 7.88 on 6,609,000; EPF stake row (tipranks.com 11:18Z, title only)"
+      },
+      "causes": [],
+      "open_questions": [
+        "What lifted IHH 1.69 sigma on 10-06, while the hospital peer KPJ fell 0.77%? The leg held on 10-07 and 10-08 (−0.25% on a −0.67% market). A title-only row on 10-08 says EPF lifted its stake to 13.3% via fresh share acquisitions. Which days did EPF buy, and does a Bursa substantial-shareholder filing carry the volumes? (since 2026-10-06)"
+      ],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:8869",
+      "move": {
+        "return_1d": -0.0111,
+        "market_1d": -0.0067,
+        "unexplained_share": 0.38,
+        "session": "2026-10-08",
+        "note": "market -0.72%, drift +0.13%, idiosyncratic -0.52%, 0.34 sigma, not_significant; closes 7.20 -> 7.12 on 5,580,000"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:1155",
+      "move": {
+        "return_1d": -0.0071,
+        "market_1d": -0.0067,
+        "unexplained_share": 0.02,
+        "session": "2026-10-08",
+        "note": "market -0.68%, drift -0.01%, idiosyncratic -0.02%, 0.02 sigma; market-driven"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": []
+    },
+    {
+      "instrument_id": "XNAS:NVDA",
+      "move": {
+        "return_1d": -0.0294,
+        "market_1d": -0.0042,
+        "unexplained_share": 0.75,
+        "session": "2026-10-08",
+        "note": "market -0.72% at beta 1.69, drift -0.03%, idiosyncratic -2.19%, 1.20 sigma, not_significant; closes 237.47 -> 230.48 on 118,697,400; rows about a customer's revenue report"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [
+        {
+          "when": "2026-11-17",
+          "what": "earnings_result"
+        }
+      ]
+    },
+    {
+      "instrument_id": "XNAS:MSFT",
+      "move": {
+        "return_1d": -0.0135,
+        "market_1d": -0.0042,
+        "unexplained_share": 0.67,
+        "session": "2026-10-08",
+        "note": "market -0.37%, drift -0.08%, idiosyncratic -0.90%, 0.48 sigma, not_significant; closes 529.76 -> 522.61; green card program suspension rows (finnhub 15:23Z)"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [
+        {
+          "when": "2026-10-27",
+          "what": "earnings_result"
+        },
+        {
+          "when": "2026-10-28",
+          "what": "earnings_result"
+        }
+      ]
+    },
+    {
+      "instrument_id": "XNAS:AAPL",
+      "move": {
+        "return_1d": 0.0111,
+        "market_1d": -0.0042,
+        "unexplained_share": 0.76,
+        "session": "2026-10-08",
+        "note": "market -0.32%, drift +0.10%, idiosyncratic +1.33%, 0.91 sigma, not_significant; closes 336.67 -> 340.42"
+      },
+      "causes": [],
+      "open_questions": [
+        "The fact book holds three Q4 result dates for Apple, 2026-10-28, 10-29 and 11-02, all from `finnhub`. Which one does the company's own calendar give? (since 2026-09-28)"
+      ],
+      "watch": [
+        {
+          "when": "2026-10-13",
+          "what": "event named in one title only; not in the fact book"
+        },
+        {
+          "when": "2026-10-28",
+          "what": "earnings_result"
+        },
+        {
+          "when": "2026-10-29",
+          "what": "earnings_result"
+        },
+        {
+          "when": "2026-11-02",
+          "what": "earnings_result"
+        }
+      ]
+    }
+  ],
+  "machine": {
+    "on_time": "routine fired 2026-10-09T22:33Z and ran on time; no feedback pages for 10-01..10-05",
+    "thursday": "bursa_close 20261008T163013 at 16:32Z (6h27m late); us_preopen 20261008T185833 at 18:58Z; Thursday us_close 20261008T223403 dispatched by the 10-08 nightly at 22:34Z; ^KLSE 10-08 close blank until the 10:09Z fetch on 10-09; tonight dispatched us_close 20261009T223404, landed 976ac42 at 22:35:58Z before the pack"
+  },
+  "data_quality": {
+    "failed": [
+      "alphavantage_news: 'premium endpoint' on 10-08 01:00Z, 10-08 22:34Z and 10-09 22:34Z; monitor cadence alert 93h",
+      "gdelt: HTTP 429 on the 10-09 10:09Z and 22:34Z runs (10-09 page)"
+    ],
+    "degraded": [
+      "gdelt and yahoo_rss: read empty for all six Bursa names (10-08 16:32Z); gdelt read empty for the three US names (22:34Z)",
+      "google_news Bursa 10-08 16:32Z: named the company in 7 of 34 (Genting 0/4, Petronas Chemicals 0/2, Maybank 1/9)",
+      "^KLSE 10-08 close blank (volume 0) until the 10:09Z fetch on 10-09",
+      "eodhd: 0 facts, 2-a-day credit budget",
+      "fact book: all six Bursa names NOTHING COLLECTED",
+      "Brent no print after 10-06; DEXMAUS none after 10-02"
+    ],
+    "skipped": [
+      "fmp /earnings: outside the plan (HTTP 402)"
+    ]
+  },
+  "open_questions_carried": [
+    "What lifted Genting 1.71 sigma on 10-08 (idiosyncratic +3.08%), back to Tuesday's 1.84 after Wednesday's −2.17%? No row about the company was published on 10-08; Genting Malaysia rose 0.69% and Genting Plantations 0.17%. (since 2026-10-08)",
+    "What lifted IHH 1.69 sigma on 10-06, while the hospital peer KPJ fell 0.77%? The leg held on 10-07 and 10-08 (−0.25% on a −0.67% market). A title-only row on 10-08 says EPF lifted its stake to 13.3% via fresh share acquisitions. Which days did EPF buy, and does a Bursa substantial-shareholder filing carry the volumes? (since 2026-10-06)",
+    "What did the Petronas Chemicals CEO appointment (title only, 10-05 14:44Z) say, and does a Bursa filing carry it? It preceded a +4.12% session; 10-07 gave back −1.86% and 10-08 added +0.95% on 3.7 times Wednesday's volume. (since 2026-10-06)",
+    "`alphavantage_news` has answered \"premium endpoint\" on every run since 10-06 01:47Z and is 93h past its cadence. Is the key rotated, on a different plan, or is the endpoint changed? (since 2026-10-06)",
+    "Tenaga fell 2.52 sigma on 09-29 with no collected row and gave back three-quarters of it on 09-30, when the utilities rallied. What, if anything, did the company, the Energy Commission or a Bursa filing publish on 09-29? `bursa_announcements` stored nothing for it. (since 2026-09-29)",
+    "Bank of America's note names Apple's transaction and referral revenue as the exposure. The fact book has no services or App Store line for Apple. Which filing field would size it? (since 2026-09-29)",
+    "Does an 8-K or 10-Q record NVIDIA's USD 150 billion authorization increase? (since 2026-09-28)",
+    "The fact book holds three Q4 result dates for Apple, 2026-10-28, 10-29 and 11-02, all from `finnhub`. Which one does the company's own calendar give? (since 2026-09-28)",
+    "On the 09-29 `us_close` run, `ask.py prices --book` took 15m16s of a 25-minute job. Does the price step need a per-feed time before a slow run loses a day's commit? (since 2026-09-28)",
+    "Does a primary statement follow the report that China may let Alibaba and ByteDance buy the RTX Pro 5500? (since 2026-09-27)",
+    "The fact book has no event kind for a court verdict, an appeal or a settlement. Where would a legal event be recorded, so that a later page can date it? (since 2026-09-26)",
+    "Microsoft's cached bar opens at 499.04 (+0.22%) on 09-25, while two rows describe a 3% rise before or at the open. Should the collector hold a second price source for the open on a day a cause is being timed? (since 2026-09-25)",
+    "The routine never commits `data/alerts.db`, so the monitor re-announces open alerts as NEW (M9). Should the routine commit the alerts store, or should it live outside git? (since 2026-09-24)",
+    "Does IHH carry the Daiichi Sankyo claim at any value in its accounts? (since 2026-09-24)",
+    "The pack measures across a blank proxy row without saying so (M3). Should the pack refuse the row, label it two-session, or scale the sigma? The `^KLSE` 10-08 close was blank until 10:09Z on 10-09. (since 2026-09-23)",
+    "The fact book holds no Bursa entitlement dates. Which source carries Bursa ex-dates? (since 2026-09-23)",
+    "IHH's 09-22 session was significant alone (3.80 sigma). The one candidate, the Macquarie headline, has no body. Which source carries the note's figures? (since 2026-09-22)",
+    "A blank bar shared by a name and its proxy is labelled *correctly dated*, as if the market was shut. Should the pack check the calendar or an independent index print first? (since 2026-09-22)",
+    "The move to 260-session betas re-measured the same Monday. Which window's shares do pages compare across the change? (since 2026-09-22)",
+    "Petronas Chemicals, Press Metal and Genting: one factor or three stories? On 10-08 they read +0.95%, −1.11% and +2.22%. No Bursa sector proxy is cached. (since 2026-09-21)",
+    "Tenaga: the rows hold both readings of the IBR framework, *minimal impact* and *undermines*, as titles only. Neither has appeared since. (since 2026-09-18)",
+    "`DFF` stepped +0.25 on 2026-09-17 and the collector holds no statement for it. Where does a statement come from? (since 2026-09-20)",
+    "A short-interest weekly named Petronas Chemicals for the week to 09-18. Would Bursa's daily short-selling report give the name a body? (since 2026-09-20)",
+    "Wiring a catalyst matcher to the corpus is still open. Genting is tonight's case: 1.71 sigma, no row on the day. (since 2026-09-18)",
+    "Petronas Chemicals' idiosyncratic days read *not significant* because its own sigma contains the +22.56% run. On 10-08, +1.62% read 0.43 sigma. (since 2026-09-18)",
+    "Petronas Chemicals collecting a body: which of the eleven listed sources carries a Bursa-hours story about it at all? (since 2026-09-10; folded 09-17)",
+    "The linker attached *Genting Plantations* and *Ho Wah Genting* to MYX:3182, and *Shree TNB Polymers* to Tenaga again on 10-06. How many rows per name are about other companies? (since 2026-09-17)",
+    "Which earlier pages were written from a pre-close cache? `dfc45e3` labels such rows. (since 2026-09-17)",
+    "The Bursa banks fell together on 10-07 (CIMB −4.81% on 3.7 times its Tuesday volume, Hong Leong Bank −6.03%) and again on 10-08 (Hong Leong Bank −1.86%, CIMB −0.95%). The titles name foreign selling, oil and US yields, and a Kenanga cut to its KLCI target. Which source would carry Bursa's daily foreign net flow? (since 2026-10-07)"
+  ],
+  "lessons": [
+    "A one-session rise that undoes a one-session fall is read over both sessions before a cause is looked for: Genting 1.84 -> 1.80 -> 1.84 read 1.71 sigma on the second day alone.",
+    "A name with a significant negative drift reads an ordinary day as idiosyncratic strength: Genting's -0.25%/session drift at 2.1 standard errors makes a flat close count +0.25% as unexplained.",
+    "A blank index close may be filled a day later: the ^KLSE 10-08 close was blank until the 10:09Z fetch on 10-09, so a Bursa day decomposed before the next Bursa-hours fetch can be measured against the wrong bar."
+  ],
+  "closed": [
+    "Does a page need to state a market's non-trading day as a fact rather than infer it from blank bars? (since 2026-09-16): yes; the ^KLSE 10-08 bar was blank until 10:09Z on 10-09 and 10-08 was a session; a blank bar is a missing print until the exchange calendar says otherwise",
+    "Should the decomposition have a commodity leg for Petronas Chemicals' feedstock? (since 2026-09-16): a change to the pack's code, not a question collection can answer; Brent now arrives to 10-06; stops being carried past the monitor's 21-day line"
+  ]
+}
