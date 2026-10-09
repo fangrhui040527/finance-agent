@@ -148,12 +148,7 @@ def _by_year(s: Statements, concept: str) -> dict[date, Decimal]:
 
 def _instant_at(s: Statements, concept: str, on: date) -> Decimal | None:
     """The balance-sheet line at a fiscal year end (within a month), if stored."""
-    best = None
-    for f in s.series(concept):
-        if abs((f.period_end - on).days) <= 31 and (
-            best is None or abs((f.period_end - on).days) < abs((best.period_end - on).days)
-        ):
-            best = f
+    best = s.nearest(concept, on)
     return best.value if best else None
 
 

@@ -67,40 +67,17 @@ def analyst_book(tmp_path, monkeypatch):
                 currency="USD",
             )
         )
+    # instants only under the plain key, as sec_xbrl stores them: no `_fy` copies
     for c, v in BALANCE_T.items():
         rows.append(
             Observation(
                 "sec_xbrl", AAPL, c, FILED_T, Decimal(v), period_end=T, unit="USD", currency="USD"
             )
         )
-        rows.append(
-            Observation(
-                "sec_xbrl",
-                AAPL,
-                f"{c}_fy",
-                FILED_T,
-                Decimal(v),
-                period_end=T,
-                unit="USD",
-                currency="USD",
-            )
-        )
     for c, v in BALANCE_T1.items():
         rows.append(
             Observation(
                 "sec_xbrl", AAPL, c, FILED_T1, Decimal(v), period_end=T1, unit="USD", currency="USD"
-            )
-        )
-        rows.append(
-            Observation(
-                "sec_xbrl",
-                AAPL,
-                f"{c}_fy",
-                FILED_T1,
-                Decimal(v),
-                period_end=T1,
-                unit="USD",
-                currency="USD",
             )
         )
     for c, values in QUARTERLY.items():
