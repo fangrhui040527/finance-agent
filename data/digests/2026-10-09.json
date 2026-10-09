@@ -1,6 +1,78 @@
 {
   "collection": [
     {
+      "at": "2026-10-09T22:35:36.949923+00:00",
+      "detail": "facts 0; EODHD plan: free (2 names a day, US only, rotated); XNAS:NVDA: deferred by the 2-a-day credit budget; next in rotation; XNAS:AAPL: outside the plan or over today's credits; XNAS:MSFT: outside the plan or over today's credits",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-09T22:35:36.857729+00:00",
+      "detail": "facts 0; ",
+      "fetched": 21,
+      "kept": 6,
+      "source": "jin10_flash",
+      "status": "ok",
+      "stored": 5
+    },
+    {
+      "at": "2026-10-09T22:35:35.950386+00:00",
+      "detail": "alphavantage quota exhausted for today: Thank you for using Alpha Vantage! This is a premium endpoint. You may subscribe to any of the premium plans at https://www.alphavantage.co/premium/ to instantl",
+      "fetched": 0,
+      "kept": 0,
+      "source": "alphavantage_news",
+      "status": "failed",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-09T22:35:35.577274+00:00",
+      "detail": "facts 11; ",
+      "fetched": 336,
+      "kept": 279,
+      "source": "finnhub",
+      "status": "ok",
+      "stored": 217
+    },
+    {
+      "at": "2026-10-09T22:35:32.824287+00:00",
+      "detail": "facts 1; ",
+      "fetched": 2,
+      "kept": 0,
+      "source": "edgar",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-09T22:35:32.605803+00:00",
+      "detail": "named the company: 49 of 49 (lowest: Apple 14/14, Microsoft 16/16, NVIDIA 19/19)",
+      "fetched": 49,
+      "kept": 49,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 43
+    },
+    {
+      "at": "2026-10-09T22:35:32.080208+00:00",
+      "detail": "named the company: 135 of 153 (lowest: NVIDIA 50/62, Microsoft 28/31, Apple 57/60)",
+      "fetched": 167,
+      "kept": 153,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 145
+    },
+    {
+      "at": "2026-10-09T22:35:29.968769+00:00",
+      "detail": "no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked)",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "failed",
+      "stored": 0
+    },
+    {
       "at": "2026-10-09T18:29:08.326770+00:00",
       "detail": "facts 0; ",
       "fetched": 450,
@@ -119,18 +191,18 @@
     }
   ],
   "counts": {
-    "articles": 15241,
+    "articles": 15651,
     "documents": 0,
-    "escalated": 2554,
-    "events": 4206,
-    "failed_sweeps": 54,
-    "linked": 10472,
-    "observations": 5014,
+    "escalated": 2641,
+    "events": 4209,
+    "failed_sweeps": 56,
+    "linked": 10862,
+    "observations": 5023,
     "series": 31,
-    "sweeps": 784
+    "sweeps": 792
   },
   "day": "2026-10-09",
-  "generated_at": "2026-10-09 18:29 UTC",
+  "generated_at": "2026-10-09 22:35 UTC",
   "macro": [
     {
       "change": "0.06",
@@ -359,18 +431,18 @@
       "upcoming": []
     },
     {
-      "escalated": 21,
+      "escalated": 49,
       "events": [],
       "instrument_id": "XNAS:NVDA",
       "label": "NVIDIA",
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-10-08",
+          "known_at": "2026-10-09",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "29.73"
+          "value": "29.67"
         },
         {
           "concept": "pb",
@@ -398,7 +470,7 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-10-08",
+          "known_at": "2026-10-09",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
@@ -498,105 +570,105 @@
           "uncertainty": 0.0
         },
         {
-          "doc_id": "https://247wallst.com/videos/nvidia-apple-and-microsoft-spell-trouble-for-index-investors/?.tsrc=rss",
-          "domain": "247wallst.com",
+          "doc_id": "finnhub:142766186",
+          "domain": "Yahoo",
           "escalated": true,
-          "intensity": 0.3333333333333333,
+          "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-10-08T21:54:25+00:00",
+          "published_at": "2026-10-09T18:22:11+00:00",
           "quality": 0.85,
-          "title": "Nvidia, Apple, and Microsoft Spell Trouble for Index Investors",
+          "title": "Management Raised the Bar For NVIDIA Stock; Does The Chart Agree?",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:142732056",
+          "doc_id": "finnhub:142765149",
           "domain": "Yahoo",
           "escalated": true,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-10-08T18:54:00+00:00",
+          "intensity": 0.3333333333333333,
+          "polarity": 0.0,
+          "published_at": "2026-10-09T17:00:17+00:00",
           "quality": 0.85,
-          "title": "SpaceX's Google AI Pact Is Worth Up to $29 Billion, but Investors Shouldn't Bank on It",
-          "uncertainty": 0.3571428571428571
+          "title": "Intel Stock Is Still a Turnaround Bet. Here\u2019s What I See Ahead",
+          "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:142732064",
+          "doc_id": "finnhub:142765151",
           "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-10-08T18:41:20+00:00",
+          "published_at": "2026-10-09T16:52:00+00:00",
           "quality": 0.85,
-          "title": "Oracle Stock Crashes After OpenAI's Revenue Gap. Who's Next?",
-          "uncertainty": 0.4629629629629629
+          "title": "Prediction: This Will Be AMD's Stock Price in 1 Year",
+          "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:142732065",
+          "doc_id": "finnhub:142765144",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-09T16:30:20+00:00",
+          "quality": 0.85,
+          "title": "Nvidia Has Already Made Investors Rich. Here\u2019s Where the Stock Could Be Headed Next",
+          "uncertainty": 0.20833333333333334
+        },
+        {
+          "doc_id": "finnhub:142761464",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-09T13:34:35+00:00",
+          "quality": 0.85,
+          "title": "Nvidia and Micron stocks bounce on OpenAI $70B revenue target",
+          "uncertainty": 0.3787878787878788
+        },
+        {
+          "doc_id": "finnhub:142761465",
           "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "polarity": -1.0,
-          "published_at": "2026-10-08T18:37:56+00:00",
+          "published_at": "2026-10-09T13:25:39+00:00",
           "quality": 0.85,
-          "title": "OpenAI corrects annualized revenue figure to $50 billion",
+          "title": "Nvidia (NVDA) More Than Doubled Revenue, Yet Its Multiple Sits Below History. Bargain or Warning?",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:142732091",
+          "doc_id": "finnhub:142761467",
           "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-10-08T17:34:00+00:00",
+          "polarity": 0.0,
+          "published_at": "2026-10-09T13:00:40+00:00",
           "quality": 0.85,
-          "title": "Is Microsoft Stock a Buy After Expanding Its Nvidia Partnership?",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "finnhub:142730881",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-10-08T17:20:00+00:00",
-          "quality": 0.85,
-          "title": "Nvidia and SpaceX: Top Analyst Daniel Ives Says These 2 AI Giants Have More Room to Run",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "finnhub:142730877",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-10-08T16:47:00+00:00",
-          "quality": 0.85,
-          "title": "Why Nvidia & Microsoft still matter when Treasury yields rise",
-          "uncertainty": 0.0
+          "title": "Wall Street May Not Be Ready for What\u2019s Coming Next for NVIDIA, Micron, and SanDisk",
+          "uncertainty": 0.5357142857142857
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 104,
-        "polarity_mean": 0.25,
-        "sources": 25,
-        "uncertainty_mean": 0.092
+        "n": 293,
+        "polarity_mean": 0.13,
+        "sources": 45,
+        "uncertainty_mean": 0.107
       },
       "upcoming": []
     },
     {
-      "escalated": 5,
+      "escalated": 39,
       "events": [],
       "instrument_id": "XNAS:AAPL",
       "label": "Apple",
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-10-08",
+          "known_at": "2026-10-09",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "37.98"
+          "value": "38.25"
         },
         {
           "concept": "pb",
@@ -624,11 +696,11 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-10-08",
+          "known_at": "2026-10-09",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
-          "value": "1.10"
+          "value": "1.11"
         },
         {
           "concept": "high_52w",
@@ -713,102 +785,109 @@
       ],
       "stories": [
         {
-          "doc_id": "https://247wallst.com/videos/nvidia-apple-and-microsoft-spell-trouble-for-index-investors/?.tsrc=rss",
-          "domain": "247wallst.com",
+          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/apple-app-store-growth-improved-213848032.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
           "escalated": true,
-          "intensity": 0.3333333333333333,
-          "polarity": 0.0,
-          "published_at": "2026-10-08T21:54:25+00:00",
-          "quality": 0.85,
-          "title": "Nvidia, Apple, and Microsoft Spell Trouble for Index Investors",
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-09T21:38:48+00:00",
+          "quality": 1.0,
+          "title": "Apple\u2019s App Store Growth Improved in September. What UBS Sees Coming in October Is Harder",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:142730901",
+          "doc_id": "https://finance.yahoo.com/m/0336c994-dcfc-3939-9654-59cc45b79d4b/apple-may-be-cutting-iphone.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-10-09T19:38:00+00:00",
+          "quality": 1.0,
+          "title": "Apple May Be Cutting iPhone Production. Price Hikes Aren\u2019t the Only Reason.",
+          "uncertainty": 0.3787878787878788
+        },
+        {
+          "doc_id": "https://www.tikr.com/blog/apple-weighed-replacing-5000-applecare-employees-with-ai-and-more-cuts-are-coming?ref=yahoofinance&.tsrc=rss",
+          "domain": "www.tikr.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-10-09T19:28:14+00:00",
+          "quality": 0.85,
+          "title": "Apple Weighed Replacing \u201c5,000 AppleCare Employees\u201d With AI, and More Cuts Are Coming",
+          "uncertainty": 0.1736111111111111
+        },
+        {
+          "doc_id": "https://firstformoney.com/apple-faces-double-blow-as-shares-dip-amid-iphone-18-pro-order-cuts/?.tsrc=rss",
+          "domain": "firstformoney.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-10-09T18:12:31+00:00",
+          "quality": 0.85,
+          "title": "Apple Faces Double Blow as Shares Dip Amid iPhone 18 Pro Order Cuts",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142765169",
           "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "polarity": -1.0,
-          "published_at": "2026-10-08T16:00:14+00:00",
+          "published_at": "2026-10-09T17:29:57+00:00",
           "quality": 0.85,
-          "title": "Apple\u2019s 2.5 Billion Devices Unlock a Trillion-Dollar AI Opportunity, 16% Upside Ahead",
+          "title": "Apple cuts iPhone 18 Pro component orders amid soft demand",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:142729687",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-08T14:47:26+00:00",
-          "quality": 0.85,
-          "title": "Amazon targets Apple with high-end Alexa tablets featuring Google Play apps",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "finnhub:142729689",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-08T14:08:50+00:00",
-          "quality": 0.85,
-          "title": "Apple (AAPL) Stock Trades Above Fair Value On Cash Flow Estimates",
-          "uncertainty": 0.2717391304347826
-        },
-        {
-          "doc_id": "finnhub:142729690",
+          "doc_id": "finnhub:142765172",
           "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 1.0,
-          "published_at": "2026-10-08T13:58:08+00:00",
+          "published_at": "2026-10-09T17:10:48+00:00",
           "quality": 0.85,
-          "title": "Apple (AAPL) Has a New Catalyst That Could Drive Its Next Upgrade Cycle",
-          "uncertainty": 0.18115942028985504
+          "title": "Are You Overpaying For Microsoft Stock Versus Its Rivals?",
+          "uncertainty": 0.14367816091954022
         },
         {
-          "doc_id": "https://finance.yahoo.com/m/955f9165-6ca4-336e-9d6e-fff1a7c7f4e0/dow-jones-futures%3A-ai-stocks.html?.tsrc=rss",
-          "domain": "finance.yahoo.com",
-          "escalated": false,
+          "doc_id": "finnhub:142763984",
+          "domain": "Yahoo",
+          "escalated": true,
           "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-08T22:29:56+00:00",
-          "quality": 1.0,
-          "title": "Dow Jones Futures: AI Stocks Tumble On OpenAI News; SpaceX Move Slams Verizon, AT&T Late",
-          "uncertainty": 0.0
+          "polarity": -0.5,
+          "published_at": "2026-10-09T14:58:30+00:00",
+          "quality": 0.85,
+          "title": "Delta Slides on FY Outlook; Humana Surges on Quality Ratings | Stock Movers",
+          "uncertainty": 0.10683760683760685
         },
         {
-          "doc_id": "https://finance.yahoo.com/news/exclusive-moomoo-adds-24-7-191558163.html?.tsrc=rss",
-          "domain": "finance.yahoo.com",
-          "escalated": false,
+          "doc_id": "finnhub:142763975",
+          "domain": "Yahoo",
+          "escalated": true,
           "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-08T19:15:58+00:00",
-          "quality": 1.0,
-          "title": "Exclusive: Moomoo adds 24/7 Apple Pay, Google Pay deposits via Visa, Checkout.com",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://finance.yahoo.com/news/apple-names-veteran-steve-smith-181938506.html?.tsrc=rss",
-          "domain": "finance.yahoo.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-08T18:19:38+00:00",
-          "quality": 1.0,
-          "title": "Apple names veteran Steve Smith as new M&A chief",
+          "polarity": -1.0,
+          "published_at": "2026-10-09T14:49:36+00:00",
+          "quality": 0.85,
+          "title": "Apple Reportedly Cuts iPhone 18 Pro Orders by 15%: Price Problem or Timing Problem?",
           "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 40,
-        "polarity_mean": 0.05,
-        "sources": 16,
-        "uncertainty_mean": 0.085
+        "n": 139,
+        "polarity_mean": -0.071,
+        "sources": 41,
+        "uncertainty_mean": 0.075
       },
       "upcoming": [
+        {
+          "kind": "earnings_result",
+          "source": "finnhub",
+          "title": "Q4 2026 results after the close",
+          "url": "",
+          "when": "2026-11-02T00:00:00+00:00"
+        },
         {
           "kind": "earnings_result",
           "source": "finnhub",
@@ -826,18 +905,18 @@
       ]
     },
     {
-      "escalated": 16,
+      "escalated": 30,
       "events": [],
       "instrument_id": "XNAS:MSFT",
       "label": "Microsoft",
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-10-08",
+          "known_at": "2026-10-09",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "29.26"
+          "value": "29.41"
         },
         {
           "concept": "pb",
@@ -865,7 +944,7 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-10-08",
+          "known_at": "2026-10-09",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
@@ -954,102 +1033,109 @@
       ],
       "stories": [
         {
-          "doc_id": "https://247wallst.com/videos/nvidia-apple-and-microsoft-spell-trouble-for-index-investors/?.tsrc=rss",
-          "domain": "247wallst.com",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
-          "polarity": 0.0,
-          "published_at": "2026-10-08T21:54:25+00:00",
-          "quality": 0.85,
-          "title": "Nvidia, Apple, and Microsoft Spell Trouble for Index Investors",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://247wallst.com/investing/2026/10/08/spacex-built-an-ai-business-its-best-customers-are-groks-competitors/?.tsrc=rss",
-          "domain": "247wallst.com",
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/microsoft-vs-alphabet-ai-cloud-212027785.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
           "escalated": true,
           "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-08T21:00:24+00:00",
-          "quality": 0.85,
-          "title": "SpaceX Built an AI Business. Its Best Customers Are Grok\u2019s Competitors.",
+          "polarity": 1.0,
+          "published_at": "2026-10-09T21:20:27+00:00",
+          "quality": 1.0,
+          "title": "Microsoft vs. Alphabet: Which AI Cloud Stock Is Cheaper After the Capital Spending?",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "https://qz.com/microsoft-suspended-green-card-program-h1b-visa-100826?.tsrc=rss",
-          "domain": "qz.com",
+          "doc_id": "https://finance.yahoo.com/video/delta-cuts-outlook-microsoft-fights-h-1b-restrictions-bezos-eyes-blue-origin-ipo-192327496.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
           "escalated": true,
           "intensity": 0.0,
           "polarity": -1.0,
-          "published_at": "2026-10-08T20:21:28+00:00",
-          "quality": 0.85,
-          "title": "Microsoft suspended from green card program over H-1B visa abuse",
+          "published_at": "2026-10-09T19:13:00+00:00",
+          "quality": 1.0,
+          "title": "Delta cuts outlook, Microsoft fights H-1B restrictions, Bezos eyes Blue Origin IPO",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:142731171",
-          "domain": "Yahoo",
+          "doc_id": "https://www.thestreet.com/markets/microsoft-gets-paid-no-matter-which-ai-model-wins?.tsrc=rss",
+          "domain": "www.thestreet.com",
           "escalated": true,
           "intensity": 0.0,
-          "polarity": -1.0,
-          "published_at": "2026-10-08T18:03:00+00:00",
+          "polarity": 1.0,
+          "published_at": "2026-10-09T17:47:00+00:00",
           "quality": 0.85,
-          "title": "Why Microsoft\u2019s H-1B Issues Are Sending Infosys Stock to Near a Six-Year Low",
-          "uncertainty": 0.0
+          "title": "Microsoft gets paid no matter which AI model wins",
+          "uncertainty": 0.4166666666666667
         },
         {
-          "doc_id": "finnhub:142732091",
+          "doc_id": "finnhub:142765172",
           "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 1.0,
-          "published_at": "2026-10-08T17:34:00+00:00",
+          "published_at": "2026-10-09T17:10:48+00:00",
           "quality": 0.85,
-          "title": "Is Microsoft Stock a Buy After Expanding Its Nvidia Partnership?",
-          "uncertainty": 0.0
+          "title": "Are You Overpaying For Microsoft Stock Versus Its Rivals?",
+          "uncertainty": 0.14367816091954022
         },
         {
-          "doc_id": "finnhub:142730877",
+          "doc_id": "finnhub:142763986",
           "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 1.0,
-          "published_at": "2026-10-08T16:47:00+00:00",
+          "published_at": "2026-10-09T14:30:43+00:00",
           "quality": 0.85,
-          "title": "Why Nvidia & Microsoft still matter when Treasury yields rise",
-          "uncertainty": 0.0
+          "title": "The Market Is Underestimating What AI Could Mean for This Company",
+          "uncertainty": 0.2717391304347826
         },
         {
-          "doc_id": "finnhub:142730907",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-08T16:45:44+00:00",
-          "quality": 0.85,
-          "title": "What Wall Street\u2019s Biggest Bank Is Quietly Saying About The Biggest AI Capex Spenders",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "finnhub:142729697",
+          "doc_id": "finnhub:142761494",
           "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "polarity": -1.0,
-          "published_at": "2026-10-08T15:39:52+00:00",
+          "published_at": "2026-10-09T13:50:45+00:00",
           "quality": 0.85,
-          "title": "Microsoft Is Suspended From Green Card Program. Vance Accuses Company Of H-1B Abuse.",
+          "title": "Trump suspended Microsoft's green card program & awarded its CEO, all in the same day",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142761495",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-09T13:26:42+00:00",
+          "quality": 0.85,
+          "title": "Microsoft (MSFT) Posted 43% Azure Growth, Yet Trades Below Its Own Five-Year P/E. A Real Discount?",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142761496",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-10-09T13:00:00+00:00",
+          "quality": 0.85,
+          "title": "North Carolina woman loses $22,500 after fake Microsoft pop-up let scammers gain access to her bank accounts",
           "uncertainty": 0.0
         }
       ],
       "tone": {
-        "intensity_max": 0.333,
-        "n": 63,
-        "polarity_mean": 0.016,
-        "sources": 18,
-        "uncertainty_mean": 0.047
+        "intensity_max": 1.0,
+        "n": 141,
+        "polarity_mean": 0.103,
+        "sources": 34,
+        "uncertainty_mean": 0.056
       },
       "upcoming": [
+        {
+          "kind": "earnings_result",
+          "source": "finnhub",
+          "title": "Q1 2027 results",
+          "url": "",
+          "when": "2026-10-28T00:00:00+00:00"
+        },
         {
           "kind": "earnings_result",
           "source": "finnhub",
