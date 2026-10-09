@@ -357,7 +357,17 @@ class A2Valuation(Agent):
         p, e, d, tg = (
             Decimal(str(x)) for x in (price, current_earnings, discount, terminal_growth)
         )
-        g = implied_growth(p, e, d, tg, years)
+        try:
+            g = implied_growth(p, e, d, tg, years)
+        except ValueError as refused:
+            return [
+                Finding(
+                    self.agent_id,
+                    "reverse_dcf",
+                    f"no reverse DCF at {price:.2f}: {refused}",
+                    caveats=["a refusal, not a number: the arithmetic has no answer here"],
+                )
+            ]
         basis = (
             f"for {years} years, then {terminal_growth:.1%} a year in perpetuity, "
             f"at a {discount:.0%} discount rate"

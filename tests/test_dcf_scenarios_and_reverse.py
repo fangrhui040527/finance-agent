@@ -162,3 +162,24 @@ def test_a_price_beyond_the_solvers_range_is_none_and_the_text_names_the_end(tmp
     agent = a2.reverse_dcf(400.0, 1.0, 0.1533, 0.04)[0]
     assert "beyond the solver's range (above 60% a year)" in agent.text
     assert "implied_growth" not in agent.numbers and "60.0%" not in agent.text
+
+
+def test_a_loss_or_a_zero_price_is_refused_not_read_as_beyond_the_range(registry):
+    """Growth on a loss shrinks the present value, so the solver's ends swap and a
+    loss-maker read as needing "above 60% a year". It is refused, and says why."""
+    for price, earnings in ((Decimal(30), Decimal(-1)), (Decimal(30), Decimal(0)), (ZERO_P, ONE)):
+        with pytest.raises(ValueError, match="positive price and positive earnings"):
+            dcf.implied_growth(price, earnings, NVDA_DISCOUNT, US_TERMINAL)
+    a2 = A2Valuation(
+        AgentContext(
+            router=Router({}),
+            engine=default_engine(registry.allowlist()),
+            now=datetime(2026, 10, 8, tzinfo=UTC),
+        )
+    )
+    (finding,) = a2.reverse_dcf(30.0, -1.0, 0.1533, 0.04)
+    assert "no reverse DCF" in finding.text and "positive earnings" in finding.text
+    assert "above 60%" not in finding.text and not finding.numbers
+
+
+ZERO_P = Decimal(0)

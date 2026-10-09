@@ -144,6 +144,10 @@ def implied_growth(
     hand back its own bound, so every multiple above about 90x printed 60.0%: a price
     beyond either end is None here, and beyond_solver_range names the end.
     """
+    if base <= 0 or price <= 0:
+        # Growth on a loss shrinks the present value, so the solver's ends swap
+        # and a loss-maker read as needing more than 60% a year.
+        raise ValueError("a reverse DCF needs a positive price and positive earnings")
     lo, hi = IMPLIED_GROWTH_FLOOR, IMPLIED_GROWTH_CEILING
     # present value rises with growth, so a price outside the two ends has no root between them
     if not (
