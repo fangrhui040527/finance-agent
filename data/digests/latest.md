@@ -1,6 +1,6 @@
 # Digest 2026-10-09
 
-Generated 2026-10-09 10:10 UTC · slot `all` · 15236 articles in the corpus, 5014 observations, 4204 events in the fact book.
+Generated 2026-10-09 18:29 UTC · slot `all` · 15241 articles in the corpus, 5014 observations, 4206 events in the fact book.
 
 ## The book
 
@@ -67,27 +67,31 @@ Generated 2026-10-09 10:10 UTC · slot `all` · 15236 articles in the corpus, 50
 
 | series | latest | as of | change | source |
 |---|---|---|---|---|
-| ICE BofA US high-yield option-adjusted spread, % | 3.09 | 2026-10-07 | +0.06 | fred |
+| ICE BofA US high-yield option-adjusted spread, % | 3.15 | 2026-10-08 | +0.06 | fred |
 | BNM Overnight Policy Rate, % | 2.75 | 2026-09-03 | +0 | bnm_opr |
 | US CPI, all items, index 1982-84=100 | 334.13 | 2026-08-01 | +1.318 | fred |
 | Brent crude, USD per barrel (EIA, daily) | 125.44 | 2026-10-06 | -0.07 | fred |
 | Malaysian ringgit per US dollar | 4.08 | 2026-10-02 | -0.001 | fred |
-| Federal funds effective rate, % | 3.88 | 2026-10-06 | +0 | fred |
-| 10-year Treasury yield, % | 5.27 | 2026-10-06 | -0.04 | fred |
-| 2-year Treasury yield, % | 4.79 | 2026-10-06 | -0.05 | fred |
+| Federal funds effective rate, % | 3.88 | 2026-10-07 | +0 | fred |
+| 10-year Treasury yield, % | 5.28 | 2026-10-07 | +0.01 | fred |
+| 2-year Treasury yield, % | 4.77 | 2026-10-07 | -0.02 | fred |
 | Malaysia CPI headline, index 2010=100 | 137.50 | 2026-08-01 | +0.4 | dosm_cpi |
 | Broad US dollar index | 121.38 | 2026-10-02 | -0.4034 | fred |
-| NASDAQ Composite, index level | 27,538.69 | 2026-10-07 | -61.2 | fred |
+| NASDAQ Composite, index level | 27,193.34 | 2026-10-08 | -345.35 | fred |
 | Aluminium, USD per tonne (IMF PCPS via FRED) | 3,158.26 | 2026-07-01 |  | fred |
-| S&P 500, index level | 7,801.77 | 2026-10-07 | -17.16 | fred |
-| 10y minus 2y Treasury spread, % | 0.51 | 2026-10-07 | +0.03 | fred |
+| S&P 500, index level | 7,765.36 | 2026-10-08 | -36.41 | fred |
+| 10y minus 2y Treasury spread, % | 0.47 | 2026-10-08 | -0.04 | fred |
 | US unemployment rate, % | 4.20 | 2026-09-01 | +0.1 | fred |
-| CBOE VIX, index | 15.08 | 2026-10-07 | +0.07 | fred |
+| CBOE VIX, index | 15.41 | 2026-10-08 | +0.33 | fred |
 
 ## Collection
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 18:29 | dbnomics | ok | 450 | 0 | 0 | facts 0;  |
+| 18:29 | jin10_flash | ok | 20 | 6 | 5 | facts 0;  |
+| 18:29 | fred | ok | 495 | 0 | 0 | facts 10; release calendar: 'FOMC Press Release' listed on 15 days of the fortni |
+| 18:28 | fmp | ok | 3954 | 0 | 0 | facts 0; fmp /earnings is outside the plan (HTTP 402); not collected for NVDA, A |
 | 10:09 | eodhd | ok | 0 | 0 | 0 | facts 0; EODHD plan: free (2 names a day, US only, rotated); MYX:5183: deferred  |
 | 10:09 | twse_openapi | ok | 8 | 0 | 0 | facts 5;  |
 | 10:09 | jin10_flash | ok | 19 | 5 | 3 | facts 0;  |
