@@ -1,18 +1,100 @@
 {
-  "collection": [],
+  "collection": [
+    {
+      "at": "2026-10-09T10:09:13.552554+00:00",
+      "detail": "facts 0; EODHD plan: free (2 names a day, US only, rotated); MYX:5183: deferred by the 2-a-day credit budget; next in rotation; MYX:5225: deferred by the 2-a-day credit budget; next in rotation; MYX:8869: deferred by the 2-a-day credit budget; next in rotation; MYX:3182: deferred by the 2-a-day credit budget; next in rotation; outside the free plan (US only), so not asked for: MYX:5183, MYX:5225, MYX:8869, MYX:3182. The EODHD Fundamentals plan covers KLSE and TW.; MYX:1155: EODHD free plan: US only; the Fundamentals plan covers KLSE; MYX:5347: EODHD free plan: US only; the Fundamentals plan covers KLSE",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-09T10:09:12.931447+00:00",
+      "detail": "facts 5; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-09T10:09:07.572923+00:00",
+      "detail": "facts 0; ",
+      "fetched": 19,
+      "kept": 5,
+      "source": "jin10_flash",
+      "status": "ok",
+      "stored": 3
+    },
+    {
+      "at": "2026-10-09T10:09:06.311275+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-09T10:09:04.250427+00:00",
+      "detail": "",
+      "fetched": 50,
+      "kept": 43,
+      "source": "nst_business",
+      "status": "ok",
+      "stored": 41
+    },
+    {
+      "at": "2026-10-09T10:09:03.900369+00:00",
+      "detail": "",
+      "fetched": 50,
+      "kept": 50,
+      "source": "fmt_business",
+      "status": "ok",
+      "stored": 50
+    },
+    {
+      "at": "2026-10-09T10:09:03.709646+00:00",
+      "detail": "read but empty: Petronas Chemicals, IHH, Press Metal, Genting, Maybank, Tenaga",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-09T10:09:02.424873+00:00",
+      "detail": "read but empty: Petronas Chemicals, IHH; named the company: 1 of 14 (lowest: Genting 0/7, Press Metal 0/1, Tenaga 0/3)",
+      "fetched": 15,
+      "kept": 14,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 14
+    },
+    {
+      "at": "2026-10-09T10:09:00.716932+00:00",
+      "detail": "no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked); deferred: Petronas Chemicals, IHH, Press Metal",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "failed",
+      "stored": 0
+    }
+  ],
   "counts": {
-    "articles": 15128,
+    "articles": 15236,
     "documents": 0,
     "escalated": 2554,
     "events": 4204,
-    "failed_sweeps": 53,
-    "linked": 10470,
-    "observations": 5009,
+    "failed_sweeps": 54,
+    "linked": 10472,
+    "observations": 5014,
     "series": 31,
-    "sweeps": 771
+    "sweeps": 780
   },
   "day": "2026-10-09",
-  "generated_at": "2026-10-09 01:14 UTC",
+  "generated_at": "2026-10-09 10:10 UTC",
   "macro": [
     {
       "change": "0.06",
@@ -150,8 +232,26 @@
       "instrument_id": "MYX:1155",
       "label": "Maybank",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMioAFBVV95cUxNR3pOXzZ3NkU2N0xVMEExMG1UQzc3Q3AxbUUwbkgxVlByTUpyTjlzRy02akIwd1Z4QlM0S2gybHpncE1BMDhpdEJDZktnYkFndW9WdUw1TW9hVzBkUHZBLVhMcjdremgxMHFIOHdNeThlcXNKQUJ6VXZuVVRQQlVtQWhCcDRNT1ZpY05iZlBwT25jc1VtWVNGRDhxcWdtUlNI?oc=5",
+          "domain": "www.theedgesingapore.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-09T03:29:46+00:00",
+          "quality": 0.65,
+          "title": "Maybank downgrades Sheng Siong to \u2018hold\u2019 with lower TP",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {

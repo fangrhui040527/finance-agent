@@ -1,11 +1,12 @@
 # Digest 2026-10-09
 
-Generated 2026-10-09 01:14 UTC · slot `all` · 15128 articles in the corpus, 5009 observations, 4204 events in the fact book.
+Generated 2026-10-09 10:10 UTC · slot `all` · 15236 articles in the corpus, 5014 observations, 4204 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-10-09 www.theedgesingapore.com — Maybank downgrades Sheng Siong to ‘hold’ with lower TP [q 0.65, tone +0.0]
 
 ### Tenaga (MYX:5347)
 - tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
@@ -82,6 +83,20 @@ Generated 2026-10-09 01:14 UTC · slot `all` · 15128 articles in the corpus, 50
 | 10y minus 2y Treasury spread, % | 0.51 | 2026-10-07 | +0.03 | fred |
 | US unemployment rate, % | 4.20 | 2026-09-01 | +0.1 | fred |
 | CBOE VIX, index | 15.08 | 2026-10-07 | +0.07 | fred |
+
+## Collection
+
+| at (UTC) | source | status | fetched | kept | stored | detail |
+|---|---|---|---|---|---|---|
+| 10:09 | eodhd | ok | 0 | 0 | 0 | facts 0; EODHD plan: free (2 names a day, US only, rotated); MYX:5183: deferred  |
+| 10:09 | twse_openapi | ok | 8 | 0 | 0 | facts 5;  |
+| 10:09 | jin10_flash | ok | 19 | 5 | 3 | facts 0;  |
+| 10:09 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 10:09 | nst_business | ok | 50 | 43 | 41 |  |
+| 10:09 | fmt_business | ok | 50 | 50 | 50 |  |
+| 10:09 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Petronas Chemicals, IHH, Press Metal, Genting, Maybank, Tenaga |
+| 10:09 | google_news | ok | 15 | 14 | 14 | read but empty: Petronas Chemicals, IHH; named the company: 1 of 14 (lowest: Gen |
+| 10:09 | gdelt | failed | 0 | 0 | 0 | no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP |
 
 ---
 
