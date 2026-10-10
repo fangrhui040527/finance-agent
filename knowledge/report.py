@@ -42,7 +42,8 @@ def fact_snapshot(
         lines.append("  figures (latest period, latest vintage)")
         for concept in sorted(latest):
             o = latest[concept]
-            period = f" for {o.period_end}" if o.period_end else ""
+            # A snapshot's period_end is only the day it was read; known_at says that.
+            period = f" for {o.period_end}" if o.period_end and not o.snapshot else ""
             unit = f" {o.currency or o.unit}".rstrip()
             lines.append(
                 f"    {concept:<28} {_fmt(o.value, o.text):>14}{unit}{period}"
@@ -215,12 +216,22 @@ def macro_calendar(book: FactBook, now: datetime | None = None, days: int = 7) -
                 f"    {e.announced_at:%m-%d %H:%M}Z  {e.title}"
                 + (f"  [{'*' * int(star)}]" if isinstance(star, int) and star else "")
             )
+    # A release with no published time (FRED's) is upcoming all through its
+    # own day. Those rows were stamped 00:00 UTC until 2026-10-10, so the day's
+    # payrolls or CPI dropped out of this list at 20:00 ET the evening before
+    # and the us_preopen run an hour before the print showed nothing. The
+    # window opens at the start of today (UTC) and a row with a real time is
+    # still kept only from `now`; rows stored at 00:00 UTC are read this way
+    # until they age out, newer ones are stamped at the end of the day.
+    utc_now = (now if now.tzinfo else now.replace(tzinfo=UTC)).astimezone(UTC)
+    day_start = datetime(utc_now.year, utc_now.month, utc_now.day, tzinfo=UTC)
     coming = [
         e
         for e in book.events(
-            kind="macro_release", since=now, until=now + timedelta(days=days), limit=120
+            kind="macro_release", since=day_start, until=now + timedelta(days=days), limit=120
         )
         if e.instrument_id.startswith("MACRO:")
+        and (e.announced_at >= utc_now or e.payload.get("time"))
     ]
     if coming:
         # A title listed on most days of the window is a daily table the

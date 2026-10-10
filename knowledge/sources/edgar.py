@@ -141,16 +141,18 @@ class EdgarFilings(Collector):
                         event_id=accession,
                         instrument_id=iid,
                         kind=kind,
+                        # Public on the day it was filed; the period or trade
+                        # date it reports on goes in the payload. It sat in
+                        # effective_at until 2026-10-10, which windowed a Form 4
+                        # filed today on last week's trade date: today's
+                        # filings never reached "recent", and an as-of read
+                        # saw them days before they were made.
                         announced_at=datetime(filed.year, filed.month, filed.day, tzinfo=UTC),
-                        effective_at=(
-                            datetime(report.year, report.month, report.day, tzinfo=UTC)
-                            if report
-                            else None
-                        ),
                         title=title,
                         payload={
                             "form": form,
                             "items": items,
+                            "report_date": report.isoformat() if report else None,
                             "url": ARCHIVE.format(
                                 cik_int=int(cik), accession=accession.replace("-", ""), doc=doc
                             )

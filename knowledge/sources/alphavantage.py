@@ -15,7 +15,13 @@ granularity docs/02 A4 calls citable. It is stored two ways:
     passing);
   * per ticker per day, an observation `av_news_sentiment` (relevance-weighted
     mean of the vendor's ticker score) and `av_news_count`, so the daily
-    digest can show tone without re-reading the articles.
+    digest can show tone without re-reading the articles. Each pull reads
+    from the START of the UTC day its window opens in, so a day's aggregate
+    is over the whole day as far as that pull saw it, and a later vintage is
+    never smaller than an earlier one. Until 2026-10-10 it read from the
+    watermark: a pull that caught a day's last two stories stored "2
+    articles" for a day already stored as 28, and latest() read the 2.
+    Vintages stored before then keep what they say.
 
 The rate-limit answer is a 200 with an "Information" or "Note" field. That is
 a real failure - the day's quota is gone - and is raised as one.
@@ -24,7 +30,7 @@ a real failure - the day's quota is gone - and is raised as one.
 from __future__ import annotations
 
 from collections import defaultdict
-from datetime import datetime
+from datetime import UTC, datetime
 from decimal import Decimal
 
 from knowledge.facts import Observation, as_decimal
@@ -91,6 +97,15 @@ class AlphaVantageNews(Collector):
         by_symbol = {local_code(i).upper(): i for i in instruments}
         weighted: dict[tuple[str, str], list[tuple[Decimal, Decimal]]] = defaultdict(list)
         seen: set[str] = set()
+        # The whole of the window's first day, not its tail: the aggregate for
+        # a day is stored per pull, and a pull that saw only the day's last
+        # stories would supersede the full day's figure with them. Stories
+        # before `since` are re-read for the aggregate only, not returned.
+        since = since if since.tzinfo else since.replace(tzinfo=UTC)
+        start = since.astimezone(UTC).replace(hour=0, minute=0, second=0, microsecond=0)
+        # (instrument, day) pairs a reply may not hold all of: a reply of
+        # LIMIT stories, newest first, can stop part-way through its oldest day.
+        cut: set[tuple[str, str]] = set()
         errors: list[SourceError] = []
         pull.asked = [by_symbol[s] for s in sorted(by_symbol)]
         for symbol in sorted(by_symbol):
@@ -101,7 +116,7 @@ class AlphaVantageNews(Collector):
                         {
                             "function": "NEWS_SENTIMENT",
                             "tickers": symbol,
-                            "time_from": since.strftime("%Y%m%dT%H%M"),
+                            "time_from": start.strftime("%Y%m%dT%H%M"),
                             "limit": self.LIMIT,
                             "sort": "LATEST",
                             "apikey": key,
@@ -116,6 +131,16 @@ class AlphaVantageNews(Collector):
                 pull.notes.append(f"{by_symbol[symbol]}: {e}")
                 pull.failed.append((by_symbol[symbol], str(e)))
                 continue
+            if len(feed) >= self.LIMIT:
+                days = [
+                    p.date().isoformat()
+                    for p in (
+                        parse_datetime(i.get("time_published")) for i in feed if isinstance(i, dict)
+                    )
+                    if p is not None
+                ]
+                if days:
+                    cut.add((by_symbol[symbol], min(days)))
             for item in feed:
                 if not isinstance(item, dict) or not item.get("title"):
                     continue
@@ -138,6 +163,8 @@ class AlphaVantageNews(Collector):
                     if rel >= MIN_RELEVANCE:
                         linked.append(iid)
                         weighted[(iid, published.date().isoformat())].append((rel, score))
+                if published < since:
+                    continue  # read for the day's aggregate; the corpus had it already
                 pull.articles.append(
                     Article(
                         doc_id=f"alphavantage:{item.get('url')}",
@@ -158,6 +185,12 @@ class AlphaVantageNews(Collector):
             raise errors[0]
         today = self.today()
         for (iid, day), pairs in sorted(weighted.items()):
+            if (iid, day) in cut:
+                pull.notes.append(
+                    f"{iid}: {day} not aggregated - the reply reached its limit of "
+                    f"{self.LIMIT} stories part-way through that day"
+                )
+                continue
             total = sum(r for r, _ in pairs)
             mean = sum(r * s for r, s in pairs) / total if total else Decimal(0)
             from datetime import date as _date

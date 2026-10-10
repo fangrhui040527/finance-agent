@@ -242,9 +242,19 @@ class FmpCollector(Collector):
         ):
             value = as_decimal(row.get(key_))
             if value is not None:
+                # Dated by the day it was read: undated, a target that went
+                # 490 -> 440 -> 490 lost the second 490 as a duplicate and
+                # latest() stayed on 440 (see Observation.snapshot).
                 pull.observations.append(
                     Observation(
-                        self.name, iid, concept, known_at=today, value=value, currency="USD"
+                        self.name,
+                        iid,
+                        concept,
+                        known_at=today,
+                        value=value,
+                        currency="USD",
+                        period_end=today,
+                        snapshot=True,
                     )
                 )
 
