@@ -1,0 +1,233 @@
+{
+  "day": "2026-10-10",
+  "written_at": "2026-10-10T22:58:00Z",
+  "phase": "ramp",
+  "week": 5,
+  "equity_usd": 1000.0,
+  "cash_usd": 1000.0,
+  "control_equity_usd": 976.0,
+  "control_return_to_date": -0.024,
+  "drawdown": 0.0,
+  "control_drawdown": 0.024,
+  "halted": false,
+  "marks": 26,
+  "positions": [],
+  "changes": [],
+  "control_changes": [],
+  "control_mark": {
+    "marked_on": "2026-10-09",
+    "equity_usd": 976.0,
+    "cash_usd": 602.28,
+    "positions_usd": 373.72,
+    "day_return": 0.0057,
+    "note": "no session on Saturday; latest mark Friday 10-09; holdings MYX:8869 100 (close 7.23), MYX:5183 100 (4.28), MYX:3182 200 (1.88); nothing pending"
+  },
+  "index_book": {
+    "mark": {
+      "marked_on": "2026-10-09",
+      "equity_usd": 992619.55,
+      "cash_usd": 598347.25,
+      "positions_usd": 394272.3,
+      "day_return": 0.0025,
+      "drawdown": 0.0074,
+      "held": 97,
+      "pending": 0
+    },
+    "cost_to_date_share_of_notional": 0.0048,
+    "since_2026_09_30": {
+      "index": -0.0074,
+      "decided": 0.0,
+      "control": -0.0041
+    },
+    "note": "nothing pending"
+  },
+  "caps": [
+    {
+      "cap": "largest name",
+      "value": "0.00%",
+      "limit": "25%",
+      "breached": false
+    },
+    {
+      "cap": "invested",
+      "value": "0.00%",
+      "limit": "40%",
+      "breached": false
+    },
+    {
+      "cap": "cash floor",
+      "value": "100.00%",
+      "limit": "20%",
+      "breached": false
+    },
+    {
+      "cap": "names held",
+      "value": "0",
+      "limit": "0",
+      "breached": false
+    },
+    {
+      "cap": "drawdown from peak",
+      "value": "0.00%",
+      "limit": "8% halts entries",
+      "breached": false
+    },
+    {
+      "cap": "turnover, 5 weekdays",
+      "value": "USD 0.00",
+      "limit": "USD 500.00",
+      "breached": false
+    }
+  ],
+  "prices": {
+    "bursa": "Friday 2026-10-09 closes; ^KLSE 10-09 close 1,608.45, volume 219,220,000 after the 10-10 15:25Z fetch",
+    "us": "Friday 2026-10-09 closes",
+    "fx": "MYR 4.086 per USD (bnm, 2026-10-09)",
+    "note": "Saturday: no session in either market"
+  },
+  "fundable": [
+    {
+      "instrument_id": "MYX:1155",
+      "lot_usd": 240.09,
+      "share": 0.24,
+      "round_trip": 0.0099,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:5183",
+      "lot_usd": 104.75,
+      "share": 0.105,
+      "round_trip": 0.0211,
+      "lots": 2
+    },
+    {
+      "instrument_id": "MYX:5225",
+      "lot_usd": 193.34,
+      "share": 0.193,
+      "round_trip": 0.012,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:8869",
+      "lot_usd": 176.95,
+      "share": 0.177,
+      "round_trip": 0.013,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:3182",
+      "lot_usd": 46.01,
+      "share": 0.046,
+      "round_trip": 0.0464,
+      "lots": 5
+    },
+    {
+      "instrument_id": "XNAS:NVDA",
+      "lot_usd": 229.28,
+      "share": 0.229,
+      "round_trip": 0.0114,
+      "lots": 1
+    }
+  ],
+  "over_cap": {
+    "MYX:5347": 0.315,
+    "XNAS:AAPL": 0.337,
+    "XNAS:MSFT": 0.535
+  },
+  "ledger": {
+    "mark_days": 26,
+    "gap": "no routine ran 2026-10-02..10-06; no paper page and no decision for those days; no decision is backdated"
+  },
+  "attribution": null,
+  "decision": {
+    "recorded": true,
+    "weights": {},
+    "thesis": "All cash, the twenty-fifth all-cash row and the fourth decision of ramp week 5, recorded on Saturday 10-10 with no new session since Friday's closes. Friday 10-09 is decomposed on the 2026-10-09 feedback page: no book name moved past 1.5 sigma and every one reads not_significant; the largest legs were Apple -1.65% (1.13 sigma) on a Nikkei Asia report of iPhone 18 Pro component order cuts, Genting +2.00% (1.11) with Genting Malaysia +2.05%, and Microsoft +1.93% (1.03). Genting's RM1.25 billion rights issue was reported 11:18Z-11:55Z on 10-09, after Bursa's 09:00Z close, as titles only; its issue price, entitlement ratio and Bursa filing are not in the store, and Monday 10-12 is the first session to price it. A rights issue whose terms are unknown, on the name with the highest round trip (4.64% at one lot) and a -0.25%/session drift, gives no claim to grade. The fact book reads NOTHING COLLECTED for every Bursa name and NO DIVIDEND DATA for all six; alphavantage_news has failed on every run since 10-06 and gdelt has answered HTTP 429 since 10-09. Claim: nothing in the fundable universe beats cash over 21 sessions.",
+    "refusals": [],
+    "prediction_id": "paper-2026-10-10-allcash-21d-f51e",
+    "grades_on": "2026-11-10",
+    "made_at": "2026-10-10T22:49:51Z",
+    "horizon_counting": "exchange sessions (first claim under the 10-10 rule)"
+  },
+  "stores": {
+    "decided_targets": 25,
+    "predictions": 25,
+    "withdrawals": 0,
+    "index_targets": 194,
+    "control_targets": 6,
+    "index_pending": 0,
+    "made_at": "2026-10-10T22:49:51Z"
+  },
+  "evidence": {
+    "feedback_page": "knowledge/feedback/2026-10-09.md (7c92c8d)",
+    "past_1_5_sigma_10_09": [],
+    "largest_legs_10_09": [
+      {
+        "instrument_id": "XNAS:AAPL",
+        "idiosyncratic": -0.0165,
+        "sigma": 1.13
+      },
+      {
+        "instrument_id": "MYX:3182",
+        "idiosyncratic": 0.02,
+        "sigma": 1.11
+      },
+      {
+        "instrument_id": "XNAS:MSFT",
+        "idiosyncratic": 0.0193,
+        "sigma": 1.03
+      }
+    ],
+    "after_close": "Genting RM1.25 billion rights issue, google_news titles 11:18Z-11:55Z on 10-09, first seen 10-10 15:25Z"
+  },
+  "mistakes": [
+    "paper-2026-10-09-allcash-21d-81d7 said 'still no row' on Genting: four rows on a RM1.25 billion rights issue were published 11:18Z-11:55Z on 10-09, about 11 hours before that decision, and reached the store only at 10-10 15:25Z because no Bursa sweep ran in between.",
+    "paper-2026-10-08-allcash-21d-7bb6 listed Genting's -0.25% drift as a reason against it; Genting is 1.88 at Friday's close, below the 1.93 test (1.84 plus the 4.64% round trip), which stands to 11-07.",
+    "paper-2026-10-01-allcash-21d-5a1e is behind on two names since the 10-01 closes: IHH +2.60% (7.70 -> 7.90) and Petronas Chemicals +3.63% (4.13 -> 4.28); it grades on 10-31 against the control."
+  ],
+  "mistakes_checked": [
+    "paper-2026-10-09-allcash-21d-81d7 against the rows first seen 10-10",
+    "paper-2026-10-08-allcash-21d-7bb6 against the 10-09 close (1.88 vs the 1.93 test)",
+    "paper-2026-10-01-allcash-21d-5a1e against 10-09 closes"
+  ],
+  "grades_due": [
+    {
+      "prediction_id": "paper-2026-09-11-allcash-21d-8bf9",
+      "on": "2026-10-11"
+    },
+    {
+      "prediction_id": "paper-2026-09-12-allcash-21d-1661",
+      "on": "2026-10-12"
+    },
+    {
+      "prediction_id": "paper-2026-09-13-allcash-21d-5baf",
+      "on": "2026-10-13"
+    },
+    {
+      "prediction_id": "paper-2026-09-14-allcash-21d-9d7e",
+      "on": "2026-10-14"
+    },
+    {
+      "prediction_id": "paper-2026-09-15-allcash-21d-af55",
+      "on": "2026-10-15"
+    },
+    {
+      "prediction_id": "paper-2026-09-16-allcash-21d-3865",
+      "on": "2026-10-16"
+    },
+    {
+      "prediction_id": "paper-2026-09-17-allcash-21d-7667",
+      "on": "2026-10-17"
+    }
+  ],
+  "lessons": [
+    "A decision's store is as fresh as its last sweep for that market: rows published after a market's last sweep are absent, not non-existent.",
+    "A company event reported after the close belongs to the next session's claim, not the last one's."
+  ],
+  "dividend_boundary": {
+    "decided": "2026-10-10T15:25:31Z",
+    "control": "2026-10-10T15:25:31Z",
+    "index": "2026-10-10T15:25:31Z",
+    "note": "marks before it are not restated; no credit yet"
+  }
+}
