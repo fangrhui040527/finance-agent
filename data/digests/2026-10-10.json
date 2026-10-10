@@ -1,18 +1,100 @@
 {
-  "collection": [],
+  "collection": [
+    {
+      "at": "2026-10-10T15:25:12.112338+00:00",
+      "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-10T15:25:12.110745+00:00",
+      "detail": "facts 0; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-10T15:25:07.892584+00:00",
+      "detail": "facts 0; window not covered back to 2026-10-09 22:35Z; the oldest item read is 2026-10-10 12:10Z, so 13.6h of the window was never served",
+      "fetched": 19,
+      "kept": 17,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 17
+    },
+    {
+      "at": "2026-10-10T15:25:06.470032+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-10T15:25:04.630732+00:00",
+      "detail": "window overflow: all 50 dated items are newer than the window's start (2026-10-09 10:09Z); the oldest is 2026-10-10 16:33Z, so 22.4h scrolled off unseen",
+      "fetched": 50,
+      "kept": 49,
+      "source": "nst_business",
+      "status": "degraded",
+      "stored": 48
+    },
+    {
+      "at": "2026-10-10T15:25:04.173980+00:00",
+      "detail": "window overflow: all 50 dated items are newer than the window's start (2026-10-09 10:09Z); the oldest is 2026-10-09 14:40Z, so 4.5h scrolled off unseen",
+      "fetched": 50,
+      "kept": 50,
+      "source": "fmt_business",
+      "status": "degraded",
+      "stored": 50
+    },
+    {
+      "at": "2026-10-10T15:25:03.708691+00:00",
+      "detail": "read but empty: Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals, IHH",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-10T15:25:01.342160+00:00",
+      "detail": "read but empty: Petronas Chemicals, IHH; named the company: 18 of 34 (lowest: Maybank 1/8, Genting 5/9, Press Metal 2/3)",
+      "fetched": 35,
+      "kept": 34,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 32
+    },
+    {
+      "at": "2026-10-10T15:24:59.390435+00:00",
+      "detail": "no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked); deferred: Maybank, Tenaga, Petronas Chemicals",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "failed",
+      "stored": 0
+    }
+  ],
   "counts": {
-    "articles": 15651,
+    "articles": 15798,
     "documents": 0,
-    "escalated": 2641,
+    "escalated": 2643,
     "events": 4209,
-    "failed_sweeps": 56,
-    "linked": 10862,
+    "failed_sweeps": 57,
+    "linked": 10880,
     "observations": 5023,
     "series": 31,
-    "sweeps": 792
+    "sweeps": 801
   },
   "day": "2026-10-10",
-  "generated_at": "2026-10-10 00:51 UTC",
+  "generated_at": "2026-10-10 15:25 UTC",
   "macro": [
     {
       "change": "0.06",
@@ -150,18 +232,131 @@
       "instrument_id": "MYX:1155",
       "label": "Maybank",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://www.freemalaysiatoday.com/category/nation/2026/10/10/syed-saddiq-bella-astillah-tie-the-knot",
+          "domain": "www.freemalaysiatoday.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-10T03:59:00+00:00",
+          "quality": 1.0,
+          "title": "Syed Saddiq, Bella Astillah tie the knot",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
-      "escalated": 0,
+      "escalated": 1,
       "events": [],
       "instrument_id": "MYX:5347",
       "label": "Tenaga",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMifkFVX3lxTE91UE42bVVsSV9KaEJmcmVCRnBNelNxN0NtN3FTODFVWDY2eWR0NjJpNG5RamlvVjR3TDdZdlhOWU5ITzBza1ZCMEVmSVlUM0Y5N0VxeC1KTENWZEpjUW9LZ1pFZEp4NUlIVFZOWm5pWEtCeEpQYjFCVVlvbDZQZw?oc=5",
+          "domain": "tradersunion.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-10T01:47:24+00:00",
+          "quality": 0.65,
+          "title": "Tenaga Nasional Stock Price Prediction: Today, Tomorrow, Next Week (TENAGA/MYR)",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMigwFBVV95cUxQVjAtYzR6UkdGRnF1X3RMNzdQWWJJc1NNU0luQ2twZUtEZlFzR3dVbk1oSlN0dDlWSXpISThmY2xmekZ1M0tVNmg4aHZsWWFWX2ZOaGVkYXFiYm1iSC1jb3JxYktFVEEyalVEQnVHLXZ1UUJuNkZDYUlJNUFhMnhyTTFjTQ?oc=5",
+          "domain": "www.tradingview.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-09T16:35:14+00:00",
+          "quality": 0.65,
+          "title": "Shree TNB Polymers Limited Income Statement \u2013 BSE:SHREETNB",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMipAFBVV95cUxNNHRRaGFxLXI0ZnhvYXl6ZWJmNXBNRkxDcnBOX1dmemw2Q3MtbXlpMENaeGJWT3d0dUEtaFd1XzFNbjJVNV9waWxWZGV6Ni03cllpTkhYZ1U3ekdQZ0l5Q1QtNURjVVRvU0tFSXRZZUVWQU1kcXZkUE9XdDFpc2FZckU1bjlMaUZJaERKS1RFMWhlNDRONjF6NV9kUWVSV1BjeEdVUw?oc=5",
+          "domain": "www.edgeprop.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-09T16:33:49+00:00",
+          "quality": 0.65,
+          "title": "Budget 2027: Data-centre fund highlighted; TNB to invest RM15b in grid",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMif0FVX3lxTE5ieURIckhwLVN6ZmZheXJDNVBwY3ZTd2g2VFZGVDcxU3ZtNjJGOXl1WVFNVDhYVHV1RmU4WGxiUVpuNU5DREZiMlhISnFMdEVzZ2ppd1NFN0x4UjFhMExjSlVqRHdTWlNIUFoteGZpa1hwMEhOWGlFeGlrNkd2QVE?oc=5",
+          "domain": "www.tradingview.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-09T16:32:18+00:00",
+          "quality": 0.65,
+          "title": "Shree TNB Polymers Limited Balance Sheet \u2013 BSE:SHREETNB",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMieEFVX3lxTFB0UEVGeG5UTUZiWE8zZ0hRWWJtQU16c3RFTGhhdG9KVm5LdTN1S3ZTYkFjamVjd2JDLW05M0piYjJJeE85NmJ5RUdWRG10cHNLdzRaU3l2bFVxcERWY0lyd25CU09EVXdRSFdHcVlCOHZ6SnNsWDZGVw?oc=5",
+          "domain": "www.tradingview.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-09T16:32:13+00:00",
+          "quality": 0.65,
+          "title": "Shree TNB Polymers Limited Revenue Breakdown \u2013 BSE:SHREETNB",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiowFBVV95cUxPTDNxR0dvTzRXaWpXZkxoWHlPVTJJSTFpVldIa2w1ZVlUMlZNSDc2bFN0TEVNLUw4aUJCUGs3REZhMk1YT3RNXzlOaVdPRlgwaUpCenIxb3hJazhzbEF2YWRHT2xReGxGdVcwUmtILTFZQllxdHdoSFZmQ0VfSDl1cE44cGFsVm5Td3hrS2hVM25wQUJwbEtQWE5ucFM2OWtuVnlr?oc=5",
+          "domain": "www.tradingview.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-09T16:29:56+00:00",
+          "quality": 0.65,
+          "title": "Price to earnings forward of Shree TNB Polymers Limited \u2013 BSE:SHREETNB",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMieEFVX3lxTE5rdG85akJhZlhYLUVEQXVndUlFNjBCUWR0OEtyQnRwS21OU0FpYy1uY2tvR2NTLWU1TF83UVhqcHZUMUNIUWJFT0x6czJOWDBOUEpGX2I5MS1RUkJGc2NOX21OOVdhVm5taGhJV3h4U1NIc1lEMjFVQQ?oc=5",
+          "domain": "www.tradingview.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-09T15:50:56+00:00",
+          "quality": 0.65,
+          "title": "Shree TNB Polymers Limited Financial Statements \u2013 BSE:SHREETNB",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiigFBVV95cUxQSVdjWVdLczkxZlBDalJ4ckdKQWFQYkVGZEV3dGk4OUNPQkNFN1hEUlN4ZXp6Q2g0NlU4VEhBZEctdDRRbHFBaU9PRG1FZi0xSTRJVnE3N3ZqTDRYLWkzYlZlZ0hsWlVzRDhfT0daVTVCYUx1ZXRfZ1NGb014X0FNdUhNVEQzZkNuSVE?oc=5",
+          "domain": "www.tradingview.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-09T15:50:51+00:00",
+          "quality": 0.65,
+          "title": "Shree TNB Polymers Limited Statistics \u2013 BSE:SHREETNB",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 10,
+        "polarity_mean": 0.0,
+        "sources": 4,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -190,8 +385,37 @@
       "instrument_id": "MYX:8869",
       "label": "Press Metal",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiUEFVX3lxTFAtcXlhdFkyLTJXam5oMjFacUZIVXFMOGZ2NVFta0l2Q1RCYWZxTzBYQjhycFMtTlRzb0xBZzBmMFlLRGhtNFZGUW9CR1B3UkFh?oc=5",
+          "domain": "theedgemalaysia.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-09T16:09:57+00:00",
+          "quality": 0.8,
+          "title": "Genting, IOI Properties, PMB Technology, Press Metal, Unisem, EP Manufacturing, Astral Asia, Avangaad, Kinergy, Hektar REIT, and Ahmad Zaki",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE42UzNkMkZUbFpsOGNRVFRia2xCckhyMV9qT2E1eFV1UFBsMHlRRUFXclpKdDg0ckFzbWxVaE02QVJfdi1jeHdXZFhkdVVSeC04Y2NOR1Fsd1duZEg5RDlhOQ?oc=5",
+          "domain": "ca.finance.yahoo.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-09T16:15:29+00:00",
+          "quality": 0.65,
+          "title": "Press Metal Aluminium Holdings Berhad (PSSMF) Stock Price, News, Quote & History",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 2,
+        "polarity_mean": 0.0,
+        "sources": 2,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -200,13 +424,39 @@
       "instrument_id": "MYX:3182",
       "label": "Genting",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiUEFVX3lxTFAtcXlhdFkyLTJXam5oMjFacUZIVXFMOGZ2NVFta0l2Q1RCYWZxTzBYQjhycFMtTlRzb0xBZzBmMFlLRGhtNFZGUW9CR1B3UkFh?oc=5",
+          "domain": "theedgemalaysia.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-09T16:09:57+00:00",
+          "quality": 0.8,
+          "title": "Genting, IOI Properties, PMB Technology, Press Metal, Unisem, EP Manufacturing, Astral Asia, Avangaad, Kinergy, Hektar REIT, and Ahmad Zaki",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
       "escalated": 15,
-      "events": [],
+      "events": [
+        {
+          "kind": "insider_filing",
+          "source": "edgar",
+          "title": "4: FORM 4",
+          "url": "https://www.sec.gov/Archives/edgar/data/1045810/000119764726000011/xslF345X06/wk-form4_1791579847.xml",
+          "when": "2026-10-09T00:00:00+00:00"
+        }
+      ],
       "instrument_id": "XNAS:NVDA",
       "label": "NVIDIA",
       "snapshot": [

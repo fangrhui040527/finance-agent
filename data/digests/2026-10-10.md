@@ -1,14 +1,23 @@
 # Digest 2026-10-10
 
-Generated 2026-10-10 00:51 UTC · slot `all` · 15651 articles in the corpus, 5023 observations, 4209 events in the fact book.
+Generated 2026-10-10 15:25 UTC · slot `all` · 15798 articles in the corpus, 5023 observations, 4209 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-10-10 www.freemalaysiatoday.com — Syed Saddiq, Bella Astillah tie the knot [q 1.00, tone +0.0]
 
 ### Tenaga (MYX:5347)
-- quiet: nothing collected for this name in the window
+- tone: 10 stories from 4 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 1 escalated
+- 2026-10-10 tradersunion.com — Tenaga Nasional Stock Price Prediction: Today, Tomorrow, Next Week (TENAGA/MYR) [q 0.65, tone +0.0] ★
+- 2026-10-09 www.tradingview.com — Shree TNB Polymers Limited Income Statement – BSE:SHREETNB [q 0.65, tone +0.0]
+- 2026-10-09 www.edgeprop.my — Budget 2027: Data-centre fund highlighted; TNB to invest RM15b in grid [q 0.65, tone +0.0]
+- 2026-10-09 www.tradingview.com — Shree TNB Polymers Limited Balance Sheet – BSE:SHREETNB [q 0.65, tone +0.0]
+- 2026-10-09 www.tradingview.com — Shree TNB Polymers Limited Revenue Breakdown – BSE:SHREETNB [q 0.65, tone +0.0]
+- 2026-10-09 www.tradingview.com — Price to earnings forward of Shree TNB Polymers Limited – BSE:SHREETNB [q 0.65, tone +0.0]
+- 2026-10-09 www.tradingview.com — Shree TNB Polymers Limited Financial Statements – BSE:SHREETNB [q 0.65, tone +0.0]
+- 2026-10-09 www.tradingview.com — Shree TNB Polymers Limited Statistics – BSE:SHREETNB [q 0.65, tone +0.0]
 
 ### Petronas Chemicals (MYX:5183)
 - quiet: nothing collected for this name in the window
@@ -17,10 +26,13 @@ Generated 2026-10-10 00:51 UTC · slot `all` · 15651 articles in the corpus, 50
 - quiet: nothing collected for this name in the window
 
 ### Press Metal (MYX:8869)
-- quiet: nothing collected for this name in the window
+- tone: 2 stories from 2 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-10-09 theedgemalaysia.com — Genting, IOI Properties, PMB Technology, Press Metal, Unisem, EP Manufacturing, Astral Asia, Avangaad, Kinergy, Hektar REIT, and Ahmad Zaki [q 0.80, tone +0.0]
+- 2026-10-09 ca.finance.yahoo.com — Press Metal Aluminium Holdings Berhad (PSSMF) Stock Price, News, Quote & History [q 0.65, tone +0.0]
 
 ### Genting (MYX:3182)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-10-09 theedgemalaysia.com — Genting, IOI Properties, PMB Technology, Press Metal, Unisem, EP Manufacturing, Astral Asia, Avangaad, Kinergy, Hektar REIT, and Ahmad Zaki [q 0.80, tone +0.0]
 
 ### NVIDIA (XNAS:NVDA)
 - tone: 109 stories from 26 sources, polarity +0.10, peak intensity 0.33, uncertainty 0.12 · 15 escalated
@@ -32,6 +44,7 @@ Generated 2026-10-10 00:51 UTC · slot `all` · 15651 articles in the corpus, 50
 - 2026-10-09 Yahoo — Nvidia (NVDA) More Than Doubled Revenue, Yet Its Multiple Sits Below History. Bargain or Warning? [q 0.85, tone -1.0] ★
 - 2026-10-09 Yahoo — Wall Street May Not Be Ready for What’s Coming Next for NVIDIA, Micron, and SanDisk [q 0.85, tone +0.0] ★
 - 2026-10-09 Yahoo — An Nvidia Director Sold $947 Million of Stock Last Quarter, More Than Any Other U.S. Insider [q 0.85, tone +0.0] ★
+- event 2026-10-09 insider_filing — 4: FORM 4 (edgar)
 - snapshot: P/E (ttm) 29.67 (finnhub, 2026-10-09) · P/B 28.81 (finnhub, 2026-09-05) · EPS (ttm) 7.91 (finnhub, 2026-09-05) · dividend yield 0.03 (finnhub, 2026-09-05) · beta 2.26 (finnhub, 2026-10-09) · 52w high 243.37 (finnhub, 2026-10-08) · 52w low 164.27 (finnhub, 2026-09-10) · target (consensus) 339.17 (fmp, 2026-10-06) · analysts: buy 41 (finnhub, 2026-09-05) · analysts: hold 3 (finnhub, 2026-09-05) · analysts: sell 1 (finnhub, 2026-09-05) · vendor sentiment 0.25 (alphavantage_news, 2026-10-06) · revenue (last quarter) 96.22bn (sec_xbrl, 2026-08-26) · net income (last quarter) 59.69bn (sec_xbrl, 2026-08-26) · last EPS surprise % 3.82 (finnhub, 2026-09-05)
 
 ### Apple (XNAS:AAPL)
@@ -83,6 +96,20 @@ Generated 2026-10-10 00:51 UTC · slot `all` · 15651 articles in the corpus, 50
 | 10y minus 2y Treasury spread, % | 0.47 | 2026-10-08 | -0.04 | fred |
 | US unemployment rate, % | 4.20 | 2026-09-01 | +0.1 | fred |
 | CBOE VIX, index | 15.41 | 2026-10-08 | +0.33 | fred |
+
+## Collection
+
+| at (UTC) | source | status | fetched | kept | stored | detail |
+|---|---|---|---|---|---|---|
+| 15:25 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
+| 15:25 | twse_openapi | ok | 8 | 0 | 0 | facts 0;  |
+| 15:25 | jin10_flash | degraded | 19 | 17 | 17 | facts 0; window not covered back to 2026-10-09 22:35Z; the oldest item read is 2 |
+| 15:25 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 15:25 | nst_business | degraded | 50 | 49 | 48 | window overflow: all 50 dated items are newer than the window's start (2026-10-0 |
+| 15:25 | fmt_business | degraded | 50 | 50 | 50 | window overflow: all 50 dated items are newer than the window's start (2026-10-0 |
+| 15:25 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals, IHH |
+| 15:25 | google_news | ok | 35 | 34 | 32 | read but empty: Petronas Chemicals, IHH; named the company: 18 of 34 (lowest: Ma |
+| 15:24 | gdelt | failed | 0 | 0 | 0 | no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP |
 
 ---
 
