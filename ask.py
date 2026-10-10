@@ -1636,7 +1636,9 @@ def cmd_alerts(a) -> int:
         print(f"{len(open_now)} open:")
         for rule, r in sorted(open_now.items()):
             print(f"  [{r['severity']}] {rule}: {r['title']}")
-            print(f"      open since {r['at'][:19]}")
+            print(f"      open since {r['opened_at'][:19]}")
+            if r["state"] == "updated":
+                print(f"      updated {r['at'][:19]}: what it names changed since it opened")
     else:
         print("nothing open.")
     if rows:

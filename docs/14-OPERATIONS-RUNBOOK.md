@@ -275,7 +275,12 @@ Tell them the three rules that are not negotiable:
 traces, and records every state CHANGE to `data/alerts.db` (append-only, like
 every other record here). A rule that stays tripped writes nothing new - an
 alert repeating hourly is noise a person learns to ignore, which is worse
-than silence.
+than silence - unless what it names changed: a rule that rolls many sources,
+series or names into one alert (`sweep_silence`, `series_stale`,
+`price_stale`, `name_coverage`, `slots_missed`, `run_errors`) writes an
+`updated` event when its members or severity move, and `watch` lists it under
+UPDATED rather than NEW. `ask.py alerts` shows the latest title and the time it
+first opened.
 
 Exit codes are the interface, so a scheduler can act without parsing text:
 
@@ -300,7 +305,7 @@ The rules, all thresholds in `config.toml [monitor]` and bounded in code:
 | `price_stale` | a row in `data/price_cache.db` was fetched more than 1 session (book name, proxy) or 5 sessions (graph peer, index member) before its own market's last finished session; weekends and holidays are not counted. Only rows `ask.py prices --book` refreshes are judged (`core/market/warm.py`); a row nothing refreshes is not |
 | `open_question_stale` | a question the nightly pages carry has stood for more than 21 days |
 | `feedback_page_malformed` | a feedback page's JSON does not parse, or its question fields are not lists; the ledger skips that page instead of crashing, so its questions are missing until it is fixed |
-| `run_errors` | the newest traced run contains an error event |
+| `run_errors` | the newest traced run contains an error event; once that run is more than 30 days old with nothing traced since, a warning naming its age rather than an alert (never resolved until a newer run says so) |
 | `methodology_changed` | the manifest hash moved between the last two runs |
 
 `series_stale` reads the AGE OF THE DATA, not the health of the fetch, and it
