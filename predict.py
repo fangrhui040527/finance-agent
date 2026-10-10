@@ -19,18 +19,23 @@ from __future__ import annotations
 import argparse
 import hashlib
 import sys
-from datetime import UTC, date, datetime, timedelta
+from datetime import UTC, date, datetime
 
 from agents.learning.reflection import Horizon, Prediction, calibrate
 from agents.learning.store import DEFAULT_PATH, LearningStore
 
-SESSIONS_PER_WEEK = 5
 
+def _grade_date(instrument: str, made: datetime, horizon: Horizon) -> date:
+    """The Nth exchange session after the day the call was made, on the
+    instrument's own calendar (`core.market.calendar.instrument_horizon_end`).
 
-def _grade_date(made: datetime, horizon: Horizon) -> date:
-    """Sessions -> calendar days, roughly. Weekends are not trading days."""
-    weeks = horizon.sessions / SESSIONS_PER_WEEK
-    return (made + timedelta(days=weeks * 7)).date()
+    Until 2026-10-10 this turned sessions into calendar days at seven for every
+    five, so a 1d call logged on a Friday graded on the Sunday after zero
+    sessions. Rows logged before then keep the grade_on they were written with.
+    """
+    from core.market.calendar import instrument_horizon_end
+
+    return instrument_horizon_end(instrument, made.date(), horizon.sessions)
 
 
 def _new_id(instrument: str, made: datetime, statement: str) -> str:
@@ -46,7 +51,11 @@ def cmd_log(a) -> int:
     # reason, and each reached the operator as a traceback. `grade` already
     # prints its refusals as one line; `log` now does the same.
     try:
-        grade_on = date.fromisoformat(a.grade_on) if a.grade_on else _grade_date(made, horizon)
+        grade_on = (
+            date.fromisoformat(a.grade_on)
+            if a.grade_on
+            else _grade_date(a.instrument, made, horizon)
+        )
         p = Prediction(
             prediction_id=a.id or _new_id(a.instrument, made, a.statement),
             instrument_id=a.instrument,
@@ -134,6 +143,8 @@ def cmd_status(a) -> int:
     print(f"  logged   {n['logged']}")
     print(f"  graded   {n['graded']}")
     print(f"  pending  {n['pending']}" + (f"  ({len(overdue)} overdue)" if overdue else ""))
+    if n["withdrawn"]:
+        print(f"  withdrawn {n['withdrawn']}  (superseded; never graded)")
     print(f"  lessons  {n['lessons']} active")
 
     if len(pairs) < 30:
@@ -216,7 +227,11 @@ def cmd_reflect(a) -> int:
     with LearningStore(a.db) as store:
         wanted = set(view.prediction_ids)
         outcomes = [o for o in store.graded() if o.prediction_id in wanted]
-        instruments = store.instruments_for(list(wanted))
+        # The distinct-instrument gate counts the names behind the OUTCOMES being
+        # judged. Until 2026-10-10 it counted every linked prediction, pending
+        # ones included, so five graded calls on one bank plus two ungraded
+        # 252d calls on others passed as a lesson "across 3 instruments".
+        instruments = store.instruments_for([o.prediction_id for o in outcomes])
 
     print(f"{view.hypothesis_id}  [{view.status}]  {view.title}")
     print(f"  {view.thesis}")

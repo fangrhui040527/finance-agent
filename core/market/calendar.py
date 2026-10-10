@@ -14,7 +14,7 @@ built bare, as the tests do, still has none, which is right for a fixture.
 from __future__ import annotations
 
 import warnings
-from collections.abc import Mapping
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from datetime import UTC, date, datetime, time, timedelta, timezone, tzinfo
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
@@ -175,6 +175,64 @@ class SessionCalendar:
             if self.is_session(cur):
                 remaining -= 1
         return cur if not remaining else None
+
+
+# -- how far a horizon reaches ---------------------------------------------------------------
+
+
+def _weekdays_after(d: date, n: int) -> date:
+    cur = d
+    while n > 0:
+        cur += timedelta(days=1)
+        if cur.weekday() < 5:
+            n -= 1
+    return cur
+
+
+def horizon_end(mics: Iterable[str], day: date, sessions: int) -> date:
+    """The grading date of an `sessions`-session horizon counted from `day`.
+
+    A horizon of N is N exchange sessions after the day the call was made, on
+    the market's own calendar, holidays included. Until 2026-10-10 every
+    caller turned sessions into calendar days (`sessions / 5 * 7`), so a 1d
+    call made on a Friday graded on the Sunday after zero sessions, and the
+    paper book's 21d calls covered 19 to 22 Bursa sessions depending on the
+    weekday decided. Predictions logged before then keep the grade_on they were
+    written with; only new ones count sessions.
+
+    Several markets (a book that trades more than one, settling a claim about
+    the whole book) take the latest of their Nth sessions, so the window holds
+    at least N sessions on each. A market with no adapter counts weekdays: the
+    only calendar there is for it, and never fewer sessions than it trades.
+    """
+    if sessions < 1:
+        raise ValueError(f"a horizon is at least one session; got {sessions}")
+    from markets.registry import get as adapter_for
+
+    ends: list[date] = []
+    for mic in set(mics):
+        try:
+            calendar = adapter_for(mic).calendar
+        except (KeyError, ValueError):
+            ends.append(_weekdays_after(day, sessions))
+            continue
+        end = calendar.shift(day, sessions)
+        if end is None:
+            raise ValueError(f"{mic}: no session {sessions} after {day} within the calendar")
+        ends.append(end)
+    return max(ends) if ends else _weekdays_after(day, sessions)
+
+
+def instrument_horizon_end(instrument_id: str, day: date, sessions: int) -> date:
+    """`horizon_end` on the instrument's own exchange. An id with no market
+    prefix has no exchange, and counts weekdays."""
+    from markets.registry import mic_of
+
+    try:
+        mics = [mic_of(instrument_id)]
+    except ValueError:
+        mics = []
+    return horizon_end(mics, day, sessions)
 
 
 # -- is a bar a close yet? ------------------------------------------------------------------

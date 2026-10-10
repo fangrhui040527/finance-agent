@@ -1068,7 +1068,8 @@ def paper_report(days: int = 30, db: str = "") -> str:
             ).fetchall()
             pending = learning.db.execute(
                 "SELECT COUNT(*) FROM predictions p LEFT JOIN outcomes o USING (prediction_id) "
-                "WHERE p.agent = 'paper' AND o.prediction_id IS NULL"
+                "LEFT JOIN withdrawals w USING (prediction_id) "
+                "WHERE p.agent = 'paper' AND o.prediction_id IS NULL AND w.prediction_id IS NULL"
             ).fetchone()[0]
     except Exception:
         rows, pending = [], 0

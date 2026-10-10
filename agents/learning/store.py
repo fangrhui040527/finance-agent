@@ -66,6 +66,11 @@ CREATE TABLE IF NOT EXISTS lessons (
     supersedes            TEXT,
     evidence_json         TEXT NOT NULL DEFAULT '[]'
 );
+CREATE TABLE IF NOT EXISTS withdrawals (
+    prediction_id   TEXT PRIMARY KEY REFERENCES predictions(prediction_id),
+    withdrawn_on    TEXT NOT NULL,
+    reason          TEXT NOT NULL
+);
 CREATE INDEX IF NOT EXISTS predictions_grade_on ON predictions(grade_on);
 
 -- A prediction is written once. Editing the statement, horizon or confidence
@@ -85,6 +90,18 @@ BEGIN SELECT RAISE(ABORT, 'an outcome is graded once'); END;
 CREATE TRIGGER IF NOT EXISTS outcomes_no_delete
 BEFORE DELETE ON outcomes
 BEGIN SELECT RAISE(ABORT, 'outcomes are never deleted'); END;
+
+-- A withdrawal is an event, written once, like a grade. Added 2026-10-10: a
+-- paper decision superseded the same night left its predictions pending, so
+-- withdrawn calls were graded and a name kept in both decisions scored twice.
+-- A withdrawn prediction's status is "withdrawn": never graded, never pending,
+-- never in calibration. The prediction row itself is untouched.
+CREATE TRIGGER IF NOT EXISTS withdrawals_no_update
+BEFORE UPDATE ON withdrawals
+BEGIN SELECT RAISE(ABORT, 'a withdrawal is recorded once'); END;
+CREATE TRIGGER IF NOT EXISTS withdrawals_no_delete
+BEFORE DELETE ON withdrawals
+BEGIN SELECT RAISE(ABORT, 'withdrawals are never deleted'); END;
 
 -- A lesson is refused an UPDATE and a DELETE like a prediction is; until
 -- 2026-09-19 it was the one table here without the guard. The store's own
@@ -169,7 +186,41 @@ class LearningStore:
             ) from None
         self.db.commit()
 
+    def withdraw(self, prediction_id: str, on: date, reason: str) -> bool:
+        """Mark a logged, ungraded prediction "withdrawn": a new append-only row,
+        the prediction itself untouched. Returns False if it already was.
+
+        A withdrawn call is not the book's call. It is never graded, leaves
+        `pending()`, and is excluded from `calibration_pairs()`. Refused for a
+        prediction that is not logged or is already graded: a graded call is on
+        the record whatever came after it.
+        """
+        row = self.db.execute(
+            "SELECT o.prediction_id AS graded, w.prediction_id AS withdrawn"
+            " FROM predictions p LEFT JOIN outcomes o USING (prediction_id)"
+            " LEFT JOIN withdrawals w USING (prediction_id) WHERE p.prediction_id = ?",
+            (prediction_id,),
+        ).fetchone()
+        if row is None:
+            raise ValueError(f"{prediction_id} is not logged; there is nothing to withdraw")
+        if row["withdrawn"] is not None:
+            return False
+        if row["graded"] is not None:
+            raise ValueError(f"{prediction_id} is already graded; a grade is not withdrawn")
+        self.db.execute(
+            "INSERT INTO withdrawals VALUES (?,?,?)", (prediction_id, on.isoformat(), reason)
+        )
+        self.db.commit()
+        return True
+
+    def withdrawn(self) -> set[str]:
+        return {r[0] for r in self.db.execute("SELECT prediction_id FROM withdrawals")}
+
     def record_outcome(self, o: Outcome) -> None:
+        if self.db.execute(
+            "SELECT 1 FROM withdrawals WHERE prediction_id = ?", (o.prediction_id,)
+        ).fetchone():
+            raise ValueError(f"{o.prediction_id} was withdrawn; a withdrawn call is never graded")
         self.db.execute(
             "INSERT INTO outcomes VALUES (?,?,?,?,?,?)",
             (
@@ -199,8 +250,9 @@ class LearningStore:
 
     def pending(self) -> list[Prediction]:
         rows = self.db.execute(
-            "SELECT p.* FROM predictions p LEFT JOIN outcomes o"
-            " USING (prediction_id) WHERE o.prediction_id IS NULL"
+            "SELECT p.* FROM predictions p LEFT JOIN outcomes o USING (prediction_id)"
+            " LEFT JOIN withdrawals w USING (prediction_id)"
+            " WHERE o.prediction_id IS NULL AND w.prediction_id IS NULL"
             " ORDER BY p.grade_on"
         ).fetchall()
         return [self._to_prediction(r) for r in rows]
@@ -236,12 +288,13 @@ class LearningStore:
         direction 0 expresses no view, so it can be neither right nor wrong.
         Counting it would let a run of honest "I don't know" entries lift the
         hit rate for free - which is the opposite of what a calibration record
-        is for.
+        is for. A withdrawn prediction is excluded too: it was not the call.
         """
         rows = self.db.execute(
             "SELECT p.confidence, o.correct FROM predictions p"
             " JOIN outcomes o USING (prediction_id)"
             " WHERE p.direction != 0"
+            " AND p.prediction_id NOT IN (SELECT prediction_id FROM withdrawals)"
         ).fetchall()
         return [(r["confidence"], bool(r["correct"])) for r in rows]
 
@@ -331,8 +384,10 @@ class LearningStore:
             "logged": one("SELECT COUNT(*) FROM predictions"),
             "graded": one("SELECT COUNT(*) FROM outcomes"),
             "pending": one(
-                "SELECT COUNT(*) FROM predictions p LEFT JOIN outcomes o"
-                " USING (prediction_id) WHERE o.prediction_id IS NULL"
+                "SELECT COUNT(*) FROM predictions p LEFT JOIN outcomes o USING (prediction_id)"
+                " LEFT JOIN withdrawals w USING (prediction_id)"
+                " WHERE o.prediction_id IS NULL AND w.prediction_id IS NULL"
             ),
+            "withdrawn": one("SELECT COUNT(*) FROM withdrawals"),
             "lessons": one("SELECT COUNT(*) FROM lessons WHERE status='active'"),
         }

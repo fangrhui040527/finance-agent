@@ -1448,7 +1448,7 @@ def cmd_paper(a) -> int:
                 graded = grade_due(
                     store, cfg, feed, fx, day=day, learning=learning, dry_run=a.dry_run
                 )
-            if not graded:
+            if not graded and not graded.skipped:
                 print("nothing due: no paper prediction has reached its grading date")
                 return 0
             head = "DRY RUN - would grade" if a.dry_run else "graded"
@@ -1458,6 +1458,14 @@ def cmd_paper(a) -> int:
                 print(
                     f"  {g.prediction_id:<40} realised {g.realised:+.2%}  control {g.benchmark:+.2%}  {mark_}  {g.note}"
                 )
+            if graded.skipped:
+                # Due and not graded is not "nothing due". Exit 3 so collect.yml
+                # raises its warning; until 2026-10-10 an unpriceable name was
+                # dropped silently and the step exited 0 every night.
+                print(f"SKIPPED {len(graded.skipped)} due prediction(s), left pending:")
+                for k in graded.skipped:
+                    print(f"  {k.prediction_id:<40} {k.instrument_id}  {k.reason}")
+                return 3
             return 0
 
         if a.action == "pack":

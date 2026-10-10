@@ -357,13 +357,13 @@ def test_made_at_is_the_clock_and_the_grading_date_counts_from_the_decision_day(
     res = _decide(env, d, now=after_midnight)
     assert not res.refused and len(res.predictions) == 3
     logged = {p.prediction_id: p for p in env.learning.pending()}
-    nominal = datetime.combine(d, DECISION_NIGHT, tzinfo=UTC)
     for t in res.targets:
         assert t.decided_on == d and t.decided_at == after_midnight
         p = logged[t.prediction_id]
         assert p.made_at == after_midnight, "the row says when the call was made"
         assert p.prediction_id.startswith(f"paper-{d}-")
-        assert p.grade_on == grade_date(nominal, 21) and p.context["decided_on"] == d.isoformat()
+        assert p.grade_on == grade_date(env.cfg, t.instrument_id, d, 21)
+        assert p.context["decided_on"] == d.isoformat()
         assert "replayed_at" not in p.context
     # A replay - the horizon has already run out - keeps the nominal clock and says so
     d2 = env.week(1, 2)
@@ -374,7 +374,7 @@ def test_made_at_is_the_clock_and_the_grading_date_counts_from_the_decision_day(
     for t in res.targets:
         p = logged[t.prediction_id]
         assert p.made_at == datetime.combine(d2, DECISION_NIGHT, tzinfo=UTC)
-        assert p.grade_on == grade_date(p.made_at, 21) <= later.date()
+        assert p.grade_on == grade_date(env.cfg, t.instrument_id, d2, 21) <= later.date()
         assert p.context["replayed_at"] == later.isoformat() and t.decided_at == later
 
 

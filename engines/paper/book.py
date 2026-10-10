@@ -114,9 +114,20 @@ def fx_for(cfg, fx_db: str | None = None) -> UsdMyr:
     )
 
 
-def grade_date(made: datetime, horizon_days: int) -> date:
-    """Sessions -> calendar days, the same arithmetic predict.py uses."""
-    return (made + timedelta(days=horizon_days / 5 * 7)).date()
+def grade_date(cfg, instrument_id: str, day: date, horizon_days: int) -> date:
+    """The `horizon_days`-th session after the decision day, on the name's own
+    exchange calendar; an all-cash row's on every market the book trades, so
+    the window holds the full horizon on each (`core.market.calendar`).
+
+    Until 2026-10-10 this was calendar days at seven for every five, so a
+    "21d" call covered 19 to 22 Bursa sessions depending on the weekday it was
+    decided, and graded on a Sunday as often as not. Predictions logged before
+    then keep the grade_on they were written with; only new ones count sessions.
+    """
+    from core.market.calendar import horizon_end
+
+    mics = slot_markets(cfg, "all") if instrument_id == CASH else {mic_of(instrument_id)}
+    return horizon_end(mics, day, horizon_days)
 
 
 def current_weights(mark: MarkRow | None) -> dict[str, Decimal]:
@@ -410,10 +421,10 @@ def decide(
         # after the fact is not a horizon - so the row carries the decision
         # night as its clock and says in its context when it was written.
         nominal = datetime.combine(day, DECISION_NIGHT, tzinfo=UTC)
-        grade_on = grade_date(nominal, horizon)
-        replayed = grade_on <= now.date()
-        made = nominal if replayed else now
         for i, t in enumerate(rows):
+            grade_on = grade_date(cfg, t.instrument_id, day, horizon)
+            replayed = grade_on <= now.date()
+            made = nominal if replayed else now
             cur = current.get(t.instrument_id, Decimal(0))
             if t.reason == ALL_CASH:
                 # +1 because the claim is "this book beats the control by
@@ -488,6 +499,26 @@ def decide(
                     t.target_id, day, "superseded", f"replaced by a later decision on {day}"
                 )
             result.superseded = len(todays)
+        if supersede and learning is not None:
+            # A SUPERSEDED DECISION WITHDRAWS ITS CALLS. Until 2026-10-10 its
+            # predictions stayed pending in the learning log: the withdrawn names
+            # were graded, and a name kept in both decisions was graded twice
+            # from two reference prices, all of it in calibration. The day's
+            # earlier targets - the pending ones resolved above and an all-cash
+            # row, which is resolved the moment it is written - now mark their
+            # predictions "withdrawn" (an append-only row; the prediction is
+            # untouched): never graded, out of calibration. Rows superseded
+            # before then were not withdrawn and keep whatever grade they got.
+            replaced = todays + [t for t in recorded_today if t.reason == ALL_CASH]
+            for t in replaced:
+                if not t.prediction_id:
+                    continue
+                try:
+                    learning.withdraw(
+                        t.prediction_id, day, f"superseded by a later decision on {day}"
+                    )
+                except ValueError:
+                    pass  # graded already (a replayed day), or not in this log: it stays
         # ONE LIVE DECISION. A decision is the whole target book, so every
         # older decision still waiting for its bar is replaced by this one - for
         # the names it repeats and for the names it leaves out. Left pending,
