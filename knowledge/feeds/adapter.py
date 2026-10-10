@@ -144,10 +144,19 @@ class FeedAdapter(ABC):
             art.title_key = headline
 
             if linker is not None:
-                # A source keyed by ticker (Yahoo's feed, Finnhub's company
-                # news) arrives already attributed; the linker still reads the
-                # text so a story about two names is attached to both.
-                art.instruments = list(dict.fromkeys([*art.instruments, *linker.link(art.text)]))
+                # Attribution is what the TEXT names, and only the linker reads
+                # the text. An id a source hands in - Finnhub's company news,
+                # Alpha Vantage's ticker feed, any query keyed by ticker - says
+                # which query fetched the story, not what the story is about:
+                # until 2026-10-10 it was kept as attribution, and 2,889 of the
+                # 3,811 Finnhub "NVDA" articles never named NVIDIA ("What Has
+                # Changed About Owning Amazon Stock?" was starred under MSFT).
+                # It is kept as `fetched_for`, provenance only, as GDELT's is.
+                # Rows stored before then keep the vendor ids; the corpus is
+                # append-only and they are not rewritten.
+                if art.instruments and not art.fetched_for:
+                    art.fetched_for = art.instruments[0]
+                art.instruments = linker.link(art.text)
             if not art.instruments:
                 stats.unlinked += 1
 

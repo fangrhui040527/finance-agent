@@ -150,7 +150,9 @@ class FinnhubCollector(Collector):
                     source_domain=str(r.get("source") or "finnhub"),
                     published_at=published,
                     language="en",
-                    instruments=[iid],
+                    # The query, not the subject: 76% of the "NVDA" rows never
+                    # name NVIDIA. The adapter's linker decides attribution.
+                    fetched_for=iid,
                     themes=[str(r["category"])] if r.get("category") else [],
                 )
             )

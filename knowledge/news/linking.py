@@ -33,8 +33,16 @@ A word boundary here is "not preceded or followed by an ASCII letter or
 digit", which is stricter than `\\b`: it keeps "Apple's" and "Maybank," while
 refusing "pineapple" and "Amdocs".
 
+  * **A shorter alias never fires inside a longer alias's match** - see
+    EntityLinker.link and OTHER_NAMES. "Genting" is Genting Berhad (MYX:3182),
+    and until 2026-10-10 it also matched inside "Genting Malaysia" (MYX:4715),
+    "Genting Singapore", "Genting Plantations" and "Genting Highlands", so
+    stories about other listed companies and a mountain resort filled Genting
+    Berhad's slice of the corpus, and some were escalated.
+
 Longest alias first, as before, so "Maybank Islamic" resolves to the subsidiary
-before "Maybank" resolves to the parent.
+and the "Maybank" inside it is spent on that match, not linked to the parent.
+The parent is linked when the text names it separately.
 """
 
 from __future__ import annotations
@@ -77,6 +85,21 @@ THOROUGHFARE = (
 )
 _NOT_A_PLACE = rf"(?!\s+(?-i:(?:{'|'.join(THOROUGHFARE)}))(?!{_ASCII_WORD}))"
 
+#: Longer names that CONTAIN a book alias and name something else: the group's
+#: other listed companies and the resort named after it. Each is matched like
+#: an alias and consumes its span, so the "Genting" inside it is not Genting
+#: Berhad, but links to nothing itself - "Genting Singapore beats second-quarter
+#: expectations" was escalated as MYX:3182 news on the live corpus. A name that
+#: IS in the entity index (as "Genting Malaysia" is, MYX:4715) is linked to its
+#: own instrument instead; adding "Genting Plantations" to entities.yaml is
+#: enough to make that one link to MYX:2291.
+OTHER_NAMES = (
+    "Genting Singapore",
+    "Genting Plantations",
+    "Genting Highlands",
+    "Resorts World Genting",
+)
+
 
 def alias_pattern(surface: str) -> re.Pattern[str]:
     """The compiled matcher for one alias, per the rules in the module doc."""
@@ -109,37 +132,62 @@ class EntityLinker:
 
     def __init__(self, index: dict[str, str]) -> None:
         # Longest first so a subsidiary's longer name wins over its parent's.
+        # OTHER_NAMES ride along with no instrument (''), unless the index
+        # names them, in which case the index entry is the one kept.
+        named = {**{n: "" for n in OTHER_NAMES}, **index}
         self._entries: tuple[tuple[str, str, re.Pattern[str]], ...] = tuple(
             (surface, iid, alias_pattern(surface))
-            for surface, iid in sorted(index.items(), key=lambda kv: (-len(kv[0]), kv[0]))
+            for surface, iid in sorted(named.items(), key=lambda kv: (-len(kv[0]), kv[0]))
             if surface.strip()
         )
         self._surfaces: dict[str, list[str]] = {}
         for surface, iid, _ in self._entries:
-            self._surfaces.setdefault(iid, []).append(surface)
+            if iid:
+                self._surfaces.setdefault(iid, []).append(surface)
+
+    def _matches(self, text: str) -> list[tuple[int, int, str]]:
+        """(start, alias order, iid) for every match no longer match contains.
+
+        Aliases are tried longest first and each accepted match claims its
+        span; a shorter alias whose match overlaps a claimed span is the same
+        words read twice. Searching each alias on its own, as this did until
+        2026-10-10, linked "Genting Malaysia posts higher quarterly revenue"
+        to Genting Malaysia AND Genting Berhad. Every occurrence is checked,
+        not just the first, so "Genting Malaysia ... Genting Berhad" still
+        links both. A match of an OTHER_NAMES entry claims its span and links
+        nothing.
+        """
+        claimed: list[tuple[int, int]] = []
+        out: list[tuple[int, int, str]] = []
+        for order, (_surface, iid, pattern) in enumerate(self._entries):
+            for m in pattern.finditer(text):
+                start, end = m.span()
+                if any(start < e and s < end for s, e in claimed):
+                    continue
+                claimed.append((start, end))
+                if iid:
+                    out.append((start, order, iid))
+        return out
 
     def link(self, text: str) -> list[str]:
         """Instrument ids the text names, in order of first mention.
 
-        Ties at the same position keep alias order, which is longest-first -
-        so "Maybank Islamic" still lists the subsidiary before the parent.
+        A name inside a longer name is not a mention: "Maybank Islamic" is the
+        subsidiary alone, and the parent is listed only where the text names
+        it separately. Ties at the same position keep alias order.
         """
         first_at: dict[str, tuple[int, int]] = {}
-        for order, (_surface, iid, pattern) in enumerate(self._entries):
-            m = pattern.search(text)
-            if m is None:
-                continue
-            key = (m.start(), order)
+        for start, order, iid in self._matches(text):
+            key = (start, order)
             if iid not in first_at or key < first_at[iid]:
                 first_at[iid] = key
         return [iid for iid, _ in sorted(first_at.items(), key=lambda kv: kv[1])]
 
     def mentions(self, text: str, instrument_ids: list[str]) -> int:
-        """How many times any alias of the given instruments occurs."""
+        """How many times any alias of the given instruments occurs, counting
+        only matches no longer alias contains, the same reading as `link`."""
         wanted = set(instrument_ids)
-        return sum(
-            len(pattern.findall(text)) for _surface, iid, pattern in self._entries if iid in wanted
-        )
+        return sum(1 for _start, _order, iid in self._matches(text) if iid in wanted)
 
     def surfaces(self, instrument_id: str) -> list[str]:
         """Every alias of one instrument, longest first."""

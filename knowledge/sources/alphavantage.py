@@ -6,22 +6,25 @@ for all the names until 2026-09-05: the vendor's `tickers=A,B,C` is documented
 as articles that mention A, B and C at once, not any of them, and the nightly
 pull for three names came back with three articles on a busy Friday and none
 on a Saturday. A story that mentions two of the names comes back twice and is
-stored once, linked to both. What it adds that the other feeds do not is
-article-level, per-ticker sentiment and relevance from the vendor - the
-granularity docs/02 A4 calls citable. It is stored two ways:
+stored once, linked to whichever of them its text names. What it adds that the
+other feeds do not is article-level, per-ticker sentiment and relevance from
+the vendor - the granularity docs/02 A4 calls citable. It is stored two ways:
 
-  * the article itself, into the corpus, linked to every ticker the vendor
-    marks relevant (relevance >= 0.2 - below that the ticker is mentioned in
-    passing);
-  * per ticker per day, an observation `av_news_sentiment` (relevance-weighted
-    mean of the vendor's ticker score) and `av_news_count`, so the daily
-    digest can show tone without re-reading the articles. Each pull reads
-    from the START of the UTC day its window opens in, so a day's aggregate
-    is over the whole day as far as that pull saw it, and a later vintage is
-    never smaller than an earlier one. Until 2026-10-10 it read from the
-    watermark: a pull that caught a day's last two stories stored "2
-    articles" for a day already stored as 28, and latest() read the 2.
-    Vintages stored before then keep what they say.
+  * the article itself, into the corpus, with the ticker that fetched it as
+    `fetched_for` (provenance). It is attached to an instrument only where the
+    adapter's linker finds the company in the text: until 2026-10-10 it was
+    linked to every ticker the vendor marked relevant, and 151 of 395 "AAPL"
+    articles never named Apple;
+  * per ticker per day, over the tickers the vendor marks relevant
+    (relevance >= 0.2 - below that the ticker is mentioned in passing), an
+    observation `av_news_sentiment` (relevance-weighted mean of the vendor's
+    ticker score) and `av_news_count`, so the daily digest can show tone
+    without re-reading the articles. Each pull reads from the START of the UTC
+    day its window opens in, so a day's aggregate is over the whole day as far
+    as that pull saw it, and a later vintage is never smaller than an earlier
+    one. Until 2026-10-10 it read from the watermark: a pull that caught a
+    day's last two stories stored "2 articles" for a day already stored as 28,
+    and latest() read the 2. Vintages stored before then keep what they say.
 
 The rate-limit answer is a 200 with an "Information" or "Note" field. That is
 a real failure - the day's quota is gone - and is raised as one.
@@ -151,7 +154,6 @@ class AlphaVantageNews(Collector):
                 published = parse_datetime(item.get("time_published"))
                 if published is None:
                     continue
-                linked: list[str] = []
                 for ts in item.get("ticker_sentiment") or []:
                     if not isinstance(ts, dict):
                         continue
@@ -161,7 +163,6 @@ class AlphaVantageNews(Collector):
                     if iid is None or rel is None or score is None:
                         continue
                     if rel >= MIN_RELEVANCE:
-                        linked.append(iid)
                         weighted[(iid, published.date().isoformat())].append((rel, score))
                 if published < since:
                     continue  # read for the day's aggregate; the corpus had it already
@@ -173,7 +174,7 @@ class AlphaVantageNews(Collector):
                         source_domain=str(item.get("source_domain") or item.get("source") or ""),
                         published_at=published,
                         language="en",
-                        instruments=linked,
+                        fetched_for=by_symbol[symbol],
                         themes=[
                             str(t.get("topic"))
                             for t in item.get("topics") or []

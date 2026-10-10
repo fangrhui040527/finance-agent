@@ -161,7 +161,9 @@ def test_finnhub_types_and_dates_everything_and_drops_only_bad_rows():
     c = FinnhubCollector(key="k", clock=CLOCK, opener=router(FINNHUB))
     pull = c.collect(SINCE, ("XNAS:AAPL",), slot="us_close")
     (art,) = pull.articles
-    assert art.instruments == ["XNAS:AAPL"] and art.body.startswith("Apple said")
+    # The ticker asked for is provenance; the adapter's linker attributes.
+    assert art.instruments == [] and art.fetched_for == "XNAS:AAPL"
+    assert art.body.startswith("Apple said")
     kinds = {e.kind for e in pull.events}
     assert kinds == {"insider_sell", "earnings_result"}
     sale = next(e for e in pull.events if e.kind == "insider_sell")
@@ -480,11 +482,15 @@ AV = {
 }
 
 
-def test_alphavantage_links_only_relevant_tickers_and_aggregates_per_day():
+def test_alphavantage_aggregates_only_relevant_tickers_per_day_and_attributes_nothing():
     c = AlphaVantageNews(key="k", clock=CLOCK, opener=router({"alphavantage": AV}))
     pull = c.collect(SINCE, ("XNAS:NVDA", "XNAS:AAPL"))
     (art,) = pull.articles
-    assert art.instruments == ["XNAS:NVDA"], "AAPL at relevance 0.1 is a passing mention"
+    # The ticker that fetched it is provenance; the adapter's linker attributes.
+    assert art.instruments == [] and art.fetched_for == "XNAS:AAPL"
+    assert {o.instrument_id for o in pull.observations} == {"XNAS:NVDA"}, (
+        "AAPL at relevance 0.1 is a passing mention"
+    )
     sent = next(o for o in pull.observations if o.concept == "av_news_sentiment")
     assert sent.instrument_id == "XNAS:NVDA" and sent.value == Decimal("0.5000")
     assert sent.period_end == date(2026, 9, 3)
