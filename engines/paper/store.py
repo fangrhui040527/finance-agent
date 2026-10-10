@@ -766,6 +766,13 @@ class PaperStore:
         peak = max(last.peak_usd if last else Decimal(0), self.initial_cash(book))
         return BookState(book, cash, positions, realised, peak)
 
+    def credited_from(self, book: str) -> date | None:
+        """The book's dividend boundary if one is recorded; never writes one."""
+        row = self.conn.execute(
+            "SELECT credited_from FROM dividend_terms WHERE book = ?", (book,)
+        ).fetchone()
+        return date.fromisoformat(row["credited_from"]) if row is not None else None
+
     def dividends_from(self, book: str, recorded_at: datetime) -> date | None:
         """The first ex-date `book` is credited for; written on the first ask.
 

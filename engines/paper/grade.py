@@ -23,6 +23,8 @@ from core.market.feed import PriceFeedError
 from engines.paper.fx import UsdMyr
 from engines.paper.pricing import currency_of, last_close
 from engines.paper.store import CASH, CONTROL, DECIDED, PaperStore
+from markets.registry import get as market_get
+from markets.registry import mic_of
 
 
 @dataclass(frozen=True)
@@ -104,6 +106,10 @@ def grade_due(
             close_now, _ = last_close(feed, iid, day)
             q_now = fx.asof(day)
             now_usd = close_now / q_now.rate if ccy == "MYR" else close_now
+            paid, note = _net_dividends_usd(store, feed, fx, iid, after=ref_day, up_to=day)
+            now_usd += paid
+            if note:
+                notes.append(note)
         except PriceFeedError as e:
             out.skipped.append(
                 Skipped(p.prediction_id, iid, f"cannot price: {str(e).splitlines()[0]}")
@@ -132,6 +138,35 @@ def grade_due(
             learning.record_outcome(o)
         out.append(Graded(p.prediction_id, iid, realised, benchmark, o.correct, o.note))
     return out
+
+
+def _net_dividends_usd(
+    store: PaperStore, feed, fx: UsdMyr, iid: str, *, after: date, up_to: date
+) -> tuple[Decimal, str]:
+    """Per-share dividends ex-dated in (after, up_to], net of withholding, in USD.
+
+    Without them the name's leg was price-only while its benchmark, the control
+    book's equity, is credited dividends from 2026-10-10: every grade was biased
+    against the name by the control's net yield over the window. Only ex-dates
+    on or after the control's boundary count, so both legs follow one rule.
+    """
+    since = store.credited_from(CONTROL)
+    if since is None:
+        return Decimal(0), ""
+    try:
+        series = feed.fetch(iid, end=up_to)
+    except PriceFeedError:
+        return Decimal(0), ""
+    if getattr(series, "actions_source", None) is None:
+        return Decimal(0), f"NO DIVIDEND DATA for {iid}: graded on price alone"
+    ccy = currency_of(iid)
+    rate = market_get(mic_of(iid)).withholding("dividend", "MY")
+    total = Decimal(0)
+    for a in series.dividends():
+        if after < a.ex_date <= up_to and a.ex_date >= since:
+            net = Decimal(str(a.amount)) * (1 - rate)
+            total += net / fx.asof(a.ex_date).rate if ccy == "MYR" else net
+    return total, ""
 
 
 def _grade_all_cash(
