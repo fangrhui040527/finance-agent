@@ -765,7 +765,8 @@ def measured_legs(
     """
     bars_back = max(1, int(bars_back))
     ids = [instrument, market_proxy] + ([sector_proxy] if sector_proxy else [])
-    days, closes = aligned_closes(feed, ids, end)
+    price_only: list[str] = []
+    days, closes = aligned_closes(feed, ids, end, price_only=price_only)
     if len(days) < bars_back + 1:
         raise PriceFeedError(
             f"{' and '.join(dict.fromkeys(ids))} share {len(days)} session(s) up to "
@@ -810,6 +811,10 @@ def measured_legs(
             )
             if not sector_proxy:
                 estimation += "; sector beta fixed at 0 (no sector proxy)"
+    if price_only:
+        # Total return wherever the feed read dividends; where it did not, the
+        # leg is a price return and an ex-date drop in it reads as a move.
+        estimation += f"; NO DIVIDEND DATA for {', '.join(price_only)}: price returns"
     return MeasuredLegs(
         instrument=instrument,
         market_proxy=market_proxy,

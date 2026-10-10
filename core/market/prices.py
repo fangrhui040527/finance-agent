@@ -38,15 +38,33 @@ class CorporateAction:
 
 
 class PriceSeries:
-    """Raw bars in, adjusted bars out. The raw store is never mutated."""
+    """Raw bars in, adjusted bars out. The raw store is never mutated.
+
+    `actions_source` names the source whose dividend events were READ for this
+    series, or is None when none were. The difference matters because an empty
+    `actions` list means two things: the name paid nothing in the window, or
+    nobody asked. Until 2026-10-10 nobody ever asked - no feed passed actions,
+    so `adjusted()` was the raw series and an ex-dividend gap read as a price
+    move everywhere returns are taken. A caller that wants total return checks
+    `actions_source` and says so when it is None, instead of assuming.
+    """
 
     def __init__(
-        self, instrument_id: str, bars: list[Bar], actions: list[CorporateAction] | None = None
+        self,
+        instrument_id: str,
+        bars: list[Bar],
+        actions: list[CorporateAction] | None = None,
+        actions_source: str | None = None,
     ):
         self.instrument_id = instrument_id
         self._raw = sorted(bars, key=lambda b: b.day)
         self._days = [b.day for b in self._raw]
         self.actions = sorted(actions or [], key=lambda a: a.ex_date)
+        self.actions_source = actions_source
+
+    def dividends(self) -> list[CorporateAction]:
+        """The dividend actions this series carries, oldest first."""
+        return [a for a in self.actions if a.kind is ActionKind.DIVIDEND and a.amount > 0]
 
     def __len__(self) -> int:
         return len(self._raw)
@@ -98,7 +116,7 @@ class PriceSeries:
     def slice(self, start: date, end: date) -> PriceSeries:
         lo = bisect.bisect_left(self._days, start)
         hi = bisect.bisect_right(self._days, end)
-        return PriceSeries(self.instrument_id, self._raw[lo:hi], self.actions)
+        return PriceSeries(self.instrument_id, self._raw[lo:hi], self.actions, self.actions_source)
 
     def adv(self, n: int = 20) -> float:
         """Average daily VALUE traded over the last n bars (not share count)."""

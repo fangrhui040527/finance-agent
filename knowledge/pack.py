@@ -8,11 +8,14 @@ nothing else: the chain of *why*, what would confirm or refute each cause, what
 the evidence does not reach. Nothing in the page may be a number the pack did
 not carry, which is only enforceable if the pack carries every number.
 
-Two properties of the measurement, both from docs/03:
+Three properties of the measurement, the first and last from docs/03:
 
   * **Both legs measured, or neither.** A name's return against its market
     proxy's return over the same sessions, from the same cache. A name whose
     proxy cannot be read gets NO DATA, not a typed market leg.
+  * **Total return, or said otherwise.** Closes are adjusted for the dividends
+    the feed read (`core.market.feed.session_closes`); a leg with no dividend
+    data is a price return and its row says NO DIVIDEND DATA.
   * **Betas estimated on the window BEFORE the day.** The event day is not in
     its own estimation window. One factor - the market proxy - because no
     sector proxy is cached; the sector beta is fixed at zero and the pack says
@@ -26,8 +29,7 @@ from dataclasses import dataclass, field
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
-from core.market.bars import drop_carried_rows
-from core.market.feed import PriceFeedError, market_proxy_for
+from core.market.feed import PriceFeedError, market_proxy_for, session_closes
 from engines.attribution.decompose import (
     ESTIMATION_GAP,
     ESTIMATION_LOOKBACK,
@@ -103,6 +105,10 @@ class Move:
     #: last two common days: the return is then a k-session move, and it is
     #: tested against k sessions' sigma rather than labelled a day.
     span: int = 1
+    #: What the returns are adjusted for: a dividend that went ex inside the
+    #: 1d window, and any leg whose feed read no dividends and is therefore a
+    #: price return. See `_adjustment_note`.
+    adjustment: str = ""
 
     @property
     def mis_dated(self) -> bool:
@@ -216,8 +222,10 @@ def measure(feed, instrument_id: str, label: str, day: date, base_currency: str 
     # the index - and both pass the bar parser. Dropped before the intersection
     # so the day is missing from BOTH legs and reaches `_dating_note` as a
     # closed market, instead of printing a 0.00% session with a verdict.
-    closes_i = {b.day: b.close for b in drop_carried_rows(own.raw())}
-    closes_m = {b.day: b.close for b in drop_carried_rows(mkt.raw())}
+    # The closes are dividend-adjusted (`session_closes`): an ex-date's drop is
+    # the dividend leaving the price, not a company-specific move.
+    closes_i = session_closes(own)
+    closes_m = session_closes(mkt)
     common = sorted(set(closes_i) & set(closes_m))
     if len(common) < 6:
         move.error = f"only {len(common)} common sessions with {proxy}; need 6 for a 5-bar return"
@@ -245,6 +253,7 @@ def measure(feed, instrument_id: str, label: str, day: date, base_currency: str 
             f"{common[-2]} to {common[-1]} and are tested against {move.span} sessions' sigma"
         )
         move.dating = f"{move.dating}; {note}" if move.dating else note
+    move.adjustment = _adjustment_note((own, mkt), common[-2], common[-1])
     move.r1, move.m1 = ri[-1], rm[-1]
     move.r5, move.m5 = ci[-1] / ci[-6] - 1.0, cm[-1] / cm[-6] - 1.0
     move.currency = market_currency(mic_of(instrument_id))
@@ -303,6 +312,33 @@ def measure(feed, instrument_id: str, label: str, day: date, base_currency: str 
     move.beta = fit.coefficients[1] if fit is not None else None
     move.components = {c.component.value: c.contribution for c in exp.components}
     return move
+
+
+def _adjustment_note(legs, since: date, day: date) -> str:
+    """Say what the row's returns are adjusted for, and where they cannot be.
+
+    Returns are total return from 2026-10-10: each leg's closes are adjusted
+    for the dividends its feed read. A dividend that went ex inside the 1d
+    window is named, because it is exactly what the page would otherwise ask
+    ("is it an ex-date?"). A leg whose feed read NO dividends - Stooq prints
+    none, and a cache row fetched before 2026-10-10 was never asked - is a
+    price return, and the row says so rather than assume it paid nothing.
+    """
+    notes = []
+    for series in legs:
+        if series.actions_source is None:
+            notes.append(
+                f"NO DIVIDEND DATA for {series.instrument_id}: its returns are price returns, "
+                "and an ex-date drop would read as a move"
+            )
+            continue
+        for a in series.dividends():
+            if since < a.ex_date <= day:
+                notes.append(
+                    f"{series.instrument_id} went ex-dividend {a.amount:g} per share on "
+                    f"{a.ex_date}; the 1d return is total return, the dividend added back"
+                )
+    return "; ".join(notes)
 
 
 def _fetched_at(feed, instrument_id: str) -> datetime | None:
@@ -437,6 +473,7 @@ def build_pack(
             )
             + (f" Components: {comps}." if comps else "")
             + (f" {m.dating}." if m.dating else "")
+            + (f" {m.adjustment}." if m.adjustment else "")
             + (f" {m.provisional}." if m.provisional else "")
         )
     out.append("")
