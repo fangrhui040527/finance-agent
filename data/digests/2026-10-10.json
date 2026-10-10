@@ -1,6 +1,78 @@
 {
   "collection": [
     {
+      "at": "2026-10-10T22:46:44.260502+00:00",
+      "detail": "skipped: every asked name was refused: outside the plan or over today's credits (XNAS:NVDA, XNAS:AAPL)",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-10T22:46:43.685653+00:00",
+      "detail": "facts 0; window not covered back to 2026-10-10 15:25Z; the oldest item read is 2026-10-10 19:55Z, so 4.5h of the window was never served",
+      "fetched": 17,
+      "kept": 17,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 17
+    },
+    {
+      "at": "2026-10-10T22:46:42.888781+00:00",
+      "detail": "alphavantage refused a premium endpoint (the key's plan does not include it): Thank you for using Alpha Vantage! This is a premium endpoint. You may subscribe to any of the premium plans at https://www.alphavantage.co/premium/ to instantl",
+      "fetched": 0,
+      "kept": 0,
+      "source": "alphavantage_news",
+      "status": "failed",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-10T22:46:40.399648+00:00",
+      "detail": "facts 40; ",
+      "fetched": 137,
+      "kept": 126,
+      "source": "finnhub",
+      "status": "ok",
+      "stored": 80
+    },
+    {
+      "at": "2026-10-10T22:46:37.787019+00:00",
+      "detail": "facts 0; ",
+      "fetched": 1,
+      "kept": 0,
+      "source": "edgar",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-10T22:46:37.209331+00:00",
+      "detail": "named the company: 17 of 45 (lowest: NVIDIA 3/19, Microsoft 6/13, Apple 8/13)",
+      "fetched": 45,
+      "kept": 45,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 36
+    },
+    {
+      "at": "2026-10-10T22:46:36.489262+00:00",
+      "detail": "named the company: 76 of 85 (lowest: Microsoft 14/17, NVIDIA 39/44, Apple 23/24)",
+      "fetched": 96,
+      "kept": 85,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 79
+    },
+    {
+      "at": "2026-10-10T22:46:34.475216+00:00",
+      "detail": "no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked)",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "failed",
+      "stored": 0
+    },
+    {
       "at": "2026-10-10T15:25:12.112338+00:00",
       "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
       "fetched": 0,
@@ -83,18 +155,18 @@
     }
   ],
   "counts": {
-    "articles": 15798,
+    "articles": 16010,
     "documents": 0,
-    "escalated": 2643,
-    "events": 4209,
-    "failed_sweeps": 57,
-    "linked": 10880,
-    "observations": 5023,
+    "escalated": 2661,
+    "events": 4210,
+    "failed_sweeps": 59,
+    "linked": 10973,
+    "observations": 5062,
     "series": 31,
-    "sweeps": 801
+    "sweeps": 809
   },
   "day": "2026-10-10",
-  "generated_at": "2026-10-10 15:25 UTC",
+  "generated_at": "2026-10-10 22:46 UTC",
   "macro": [
     {
       "change": "0.06",
@@ -447,7 +519,7 @@
       "upcoming": []
     },
     {
-      "escalated": 15,
+      "escalated": 25,
       "events": [
         {
           "kind": "insider_filing",
@@ -462,15 +534,15 @@
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-10-09",
+          "known_at": "2026-10-10",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "29.67"
+          "value": "28.80"
         },
         {
           "concept": "pb",
-          "known_at": "2026-09-05",
+          "known_at": "2026-10-10",
           "label": "P/B",
           "period_end": null,
           "source": "finnhub",
@@ -478,7 +550,7 @@
         },
         {
           "concept": "eps_ttm",
-          "known_at": "2026-09-05",
+          "known_at": "2026-10-10",
           "label": "EPS (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -486,7 +558,7 @@
         },
         {
           "concept": "dividend_yield",
-          "known_at": "2026-09-05",
+          "known_at": "2026-10-10",
           "label": "dividend yield",
           "period_end": null,
           "source": "finnhub",
@@ -494,7 +566,7 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-10-09",
+          "known_at": "2026-10-10",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
@@ -502,7 +574,7 @@
         },
         {
           "concept": "high_52w",
-          "known_at": "2026-10-08",
+          "known_at": "2026-10-10",
           "label": "52w high",
           "period_end": null,
           "source": "finnhub",
@@ -510,7 +582,7 @@
         },
         {
           "concept": "low_52w",
-          "known_at": "2026-09-10",
+          "known_at": "2026-10-10",
           "label": "52w low",
           "period_end": null,
           "source": "finnhub",
@@ -583,6 +655,28 @@
       ],
       "stories": [
         {
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/amazon-amzn-wants-investors-finance-221126922.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-10T22:11:26+00:00",
+          "quality": 1.0,
+          "title": "Amazon (AMZN) Wants Investors to Finance $8 Billion of Nvidia Chips. Is AI Spending Getting Too Heavy?",
+          "uncertainty": 0.16891891891891891
+        },
+        {
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/amazon-amzn-spending-billions-ai-223346855.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-10T17:20:46+00:00",
+          "quality": 1.0,
+          "title": "Amazon (AMZN) Is Spending Billions on AI and Driver Pay. Will the Investments Pay Off?",
+          "uncertainty": 0.0
+        },
+        {
           "doc_id": "finnhub:142766186",
           "domain": "Yahoo",
           "escalated": true,
@@ -647,56 +741,34 @@
           "quality": 0.85,
           "title": "Nvidia (NVDA) More Than Doubled Revenue, Yet Its Multiple Sits Below History. Bargain or Warning?",
           "uncertainty": 0.0
-        },
-        {
-          "doc_id": "finnhub:142761467",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-09T13:00:40+00:00",
-          "quality": 0.85,
-          "title": "Wall Street May Not Be Ready for What\u2019s Coming Next for NVIDIA, Micron, and SanDisk",
-          "uncertainty": 0.5357142857142857
-        },
-        {
-          "doc_id": "finnhub:142761468",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
-          "polarity": 0.0,
-          "published_at": "2026-10-09T13:00:35+00:00",
-          "quality": 0.85,
-          "title": "An Nvidia Director Sold $947 Million of Stock Last Quarter, More Than Any Other U.S. Insider",
-          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 109,
-        "polarity_mean": 0.101,
-        "sources": 26,
-        "uncertainty_mean": 0.123
+        "n": 154,
+        "polarity_mean": 0.078,
+        "sources": 39,
+        "uncertainty_mean": 0.095
       },
       "upcoming": []
     },
     {
-      "escalated": 23,
+      "escalated": 28,
       "events": [],
       "instrument_id": "XNAS:AAPL",
       "label": "Apple",
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-10-09",
+          "known_at": "2026-10-10",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "38.25"
+          "value": "37.84"
         },
         {
           "concept": "pb",
-          "known_at": "2026-09-05",
+          "known_at": "2026-10-10",
           "label": "P/B",
           "period_end": null,
           "source": "finnhub",
@@ -704,7 +776,7 @@
         },
         {
           "concept": "eps_ttm",
-          "known_at": "2026-09-05",
+          "known_at": "2026-10-10",
           "label": "EPS (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -712,7 +784,7 @@
         },
         {
           "concept": "dividend_yield",
-          "known_at": "2026-09-05",
+          "known_at": "2026-10-10",
           "label": "dividend yield",
           "period_end": null,
           "source": "finnhub",
@@ -720,7 +792,7 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-10-09",
+          "known_at": "2026-10-10",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
@@ -728,7 +800,7 @@
         },
         {
           "concept": "high_52w",
-          "known_at": "2026-09-24",
+          "known_at": "2026-10-10",
           "label": "52w high",
           "period_end": null,
           "source": "finnhub",
@@ -736,7 +808,7 @@
         },
         {
           "concept": "low_52w",
-          "known_at": "2026-09-24",
+          "known_at": "2026-10-10",
           "label": "52w low",
           "period_end": null,
           "source": "finnhub",
@@ -809,6 +881,28 @@
       ],
       "stories": [
         {
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/back-office-agent-wave-already-150242112.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-10-10T15:02:42+00:00",
+          "quality": 1.0,
+          "title": "The Back-Office Agent Wave Is Already Redesigning Jobs in Procurement, Finance, and Accounting",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/why-apple-aapl-stock-trading-231510875.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-10-09T23:15:10+00:00",
+          "quality": 1.0,
+          "title": "Why Apple (AAPL) Stock Is Trading Lower Today",
+          "uncertainty": 0.0
+        },
+        {
           "doc_id": "https://finance.yahoo.com/markets/stocks/articles/apple-app-store-growth-improved-213848032.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
           "escalated": true,
@@ -873,36 +967,14 @@
           "quality": 0.85,
           "title": "Are You Overpaying For Microsoft Stock Versus Its Rivals?",
           "uncertainty": 0.14367816091954022
-        },
-        {
-          "doc_id": "finnhub:142763984",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": -0.5,
-          "published_at": "2026-10-09T14:58:30+00:00",
-          "quality": 0.85,
-          "title": "Delta Slides on FY Outlook; Humana Surges on Quality Ratings | Stock Movers",
-          "uncertainty": 0.10683760683760685
-        },
-        {
-          "doc_id": "finnhub:142763975",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": -1.0,
-          "published_at": "2026-10-09T14:49:36+00:00",
-          "quality": 0.85,
-          "title": "Apple Reportedly Cuts iPhone 18 Pro Orders by 15%: Price Problem or Timing Problem?",
-          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 69,
-        "polarity_mean": -0.123,
-        "sources": 32,
-        "uncertainty_mean": 0.078
+        "n": 93,
+        "polarity_mean": -0.124,
+        "sources": 33,
+        "uncertainty_mean": 0.066
       },
       "upcoming": [
         {
@@ -929,22 +1001,22 @@
       ]
     },
     {
-      "escalated": 10,
+      "escalated": 12,
       "events": [],
       "instrument_id": "XNAS:MSFT",
       "label": "Microsoft",
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-10-09",
+          "known_at": "2026-10-10",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "29.41"
+          "value": "29.27"
         },
         {
           "concept": "pb",
-          "known_at": "2026-09-05",
+          "known_at": "2026-10-10",
           "label": "P/B",
           "period_end": null,
           "source": "finnhub",
@@ -952,7 +1024,7 @@
         },
         {
           "concept": "eps_ttm",
-          "known_at": "2026-09-05",
+          "known_at": "2026-10-10",
           "label": "EPS (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -960,7 +1032,7 @@
         },
         {
           "concept": "dividend_yield",
-          "known_at": "2026-09-05",
+          "known_at": "2026-10-10",
           "label": "dividend yield",
           "period_end": null,
           "source": "finnhub",
@@ -968,7 +1040,7 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-10-09",
+          "known_at": "2026-10-10",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
@@ -976,7 +1048,7 @@
         },
         {
           "concept": "high_52w",
-          "known_at": "2026-09-05",
+          "known_at": "2026-10-10",
           "label": "52w high",
           "period_end": null,
           "source": "finnhub",
@@ -984,7 +1056,7 @@
         },
         {
           "concept": "low_52w",
-          "known_at": "2026-09-05",
+          "known_at": "2026-10-10",
           "label": "52w low",
           "period_end": null,
           "source": "finnhub",
@@ -1057,6 +1129,17 @@
       ],
       "stories": [
         {
+          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/microsoft-plus-2-elite-defensive-101209605.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-10-10T10:12:09+00:00",
+          "quality": 1.0,
+          "title": "Microsoft Plus 2 Elite Defensive Stocks",
+          "uncertainty": 0.5882352941176471
+        },
+        {
           "doc_id": "https://finance.yahoo.com/technology/ai/articles/microsoft-vs-alphabet-ai-cloud-212027785.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
           "escalated": true,
@@ -1123,17 +1206,6 @@
           "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:142761495",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-10-09T13:26:42+00:00",
-          "quality": 0.85,
-          "title": "Microsoft (MSFT) Posted 43% Azure Growth, Yet Trades Below Its Own Five-Year P/E. A Real Discount?",
-          "uncertainty": 0.0
-        },
-        {
           "doc_id": "finnhub:142761496",
           "domain": "Yahoo",
           "escalated": true,
@@ -1147,10 +1219,10 @@
       ],
       "tone": {
         "intensity_max": 1.0,
-        "n": 55,
-        "polarity_mean": 0.155,
-        "sources": 21,
-        "uncertainty_mean": 0.066
+        "n": 70,
+        "polarity_mean": 0.093,
+        "sources": 29,
+        "uncertainty_mean": 0.06
       },
       "upcoming": [
         {
