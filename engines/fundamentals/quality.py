@@ -23,10 +23,11 @@ evidence and the one thing a manufactured number can never say.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from datetime import date
 from decimal import Decimal, InvalidOperation
 
 from core.market.pointintime import Fact
-from engines.fundamentals.ratios import Statements, fillers
+from engines.fundamentals.ratios import INSTANTS, PERIOD_TOL, Statements, fillers
 
 ZERO = Decimal(0)
 ONE = Decimal(1)
@@ -76,28 +77,52 @@ def _d(a: Decimal | None, b: Decimal | None) -> Decimal | None:
 
 
 class _Years:
-    """The two most recent fiscal years' figures, t and t-1, with their facts."""
+    """The two most recent fiscal years' figures, t and t-1, with their facts.
+
+    Every line is read at the same two fiscal year ends: a flow from
+    `<concept>_fy`, a balance-sheet line from the plain key within a month of
+    the year end, which is where the collectors store it. Read as
+    `total_assets_fy`, a key no collector writes, Beneish computed for no name
+    and Piotroski stopped at 3 of 9 on the 2026-10-07 store, both blaming
+    collectors that had stored every line.
+    """
 
     def __init__(self, s: Statements) -> None:
         self.s = s
+        self.ends = s.fiscal_year_ends()[-2:]
         self.inputs: dict[str, Fact] = {}
         self.missing: list[str] = []
 
-    def pair(self, concept: str) -> tuple[Decimal | None, Decimal | None]:
-        t, t1 = self.s.latest_annual(concept), self.s.prior_annual(concept)
-        if t is None or t1 is None:
+    def _at(self, concept: str, end: date) -> Fact | None:
+        if concept in INSTANTS:
+            return self.s.balance_at(concept, end)
+        return self.s.nearest(f"{concept}_fy", end, PERIOD_TOL)
+
+    def _lack(self, concept: str) -> None:
+        if concept not in INSTANTS:
             self.missing.append(f"{concept}_fy")
+        elif self.ends or not self.s.series(concept):
+            # a stored line with no fiscal year end to read it at is not the
+            # gap: the annual flows that would date the year are, and name themselves
+            self.missing.append(concept)
+
+    def pair(self, concept: str) -> tuple[Decimal | None, Decimal | None]:
+        t = t1 = None
+        if len(self.ends) == 2:
+            t, t1 = self._at(concept, self.ends[1]), self._at(concept, self.ends[0])
+        if t is None or t1 is None:
+            self._lack(concept)
             return None, None
-        self.inputs[f"{concept}_fy@{t.period_end}"] = t
-        self.inputs[f"{concept}_fy@{t1.period_end}"] = t1
+        self.inputs[f"{t.concept}@{t.period_end}"] = t
+        self.inputs[f"{t1.concept}@{t1.period_end}"] = t1
         return t.value, t1.value
 
     def one(self, concept: str) -> Decimal | None:
-        t = self.s.latest_annual(concept)
+        t = self._at(concept, self.ends[-1]) if self.ends else None
         if t is None:
-            self.missing.append(f"{concept}_fy")
+            self._lack(concept)
             return None
-        self.inputs[f"{concept}_fy@{t.period_end}"] = t
+        self.inputs[f"{t.concept}@{t.period_end}"] = t
         return t.value
 
 
@@ -264,9 +289,9 @@ def altman_z(s: Statements, market_cap: Decimal | None, archetype: str | None = 
     cl, cli = s.balance("current_liabilities")
     re_, rei = s.balance("retained_earnings")
     tl, tli = s.balance("total_liabilities")
-    ebit, ei = s.flow("operating_income")
-    sales, si = s.flow("revenue")
-    inputs = {**tai, **cai, **cli, **rei, **tli, **ei, **si}
+    p = s.flows("operating_income", "revenue")
+    ebit, sales = p["operating_income"], p["revenue"]
+    inputs = {**tai, **cai, **cli, **rei, **tli, **p.inputs}
     wc = None if ca is None or cl is None else ca - cl
     comp: dict[str, Decimal | None] = {
         "wc_ta": _d(wc, ta),
@@ -282,11 +307,11 @@ def altman_z(s: Statements, market_cap: Decimal | None, archetype: str | None = 
         "mve_tl": ("market_cap", market_cap, "total_liabilities", tl),
         "sales_ta": ("revenue", sales, "total_assets", ta),
     }
-    missing: list[str] = []
+    missing: list[str] = [p.mismatch] if p.mismatch else []
     for key, spec in needs.items():
         if comp[key] is None:
             for name, val in zip(spec[0::2], spec[1::2]):
-                if val is None and name not in missing:
+                if val is None and name not in missing and not (p.mismatch and name in p.values):
                     missing.append(str(name))
     have = sum(1 for v in comp.values() if v is not None)
     if have < 5:
@@ -319,11 +344,18 @@ def altman_z(s: Statements, market_cap: Decimal | None, archetype: str | None = 
 
 
 def accruals(s: Statements) -> Score:
-    """Sloan's accrual ratio and the 30 percent net-income-to-cash gap."""
-    ni, nii = s.flow("net_income")
-    cfo, ci = s.flow("cash_from_operations")
-    ta, ti = s.balance("total_assets")
-    inputs = {**nii, **ci, **ti}
+    """Sloan's accrual ratio and the 30 percent net-income-to-cash gap, on one period.
+
+    Net income and operating cash flow share a period (`Statements.flows`) and
+    total assets are read at its end: NVDA's four quarters of net income to
+    2026-07-26 against its fiscal-year cash flow to 2026-01-25 flagged a 47%
+    gap where the matching year shows 14%.
+    """
+    p = s.flows("net_income", "cash_from_operations")
+    ni, cfo = p["net_income"], p["cash_from_operations"]
+    taf = s.balance_at("total_assets", p.end) if p.end else None
+    ta = taf.value if taf else None
+    inputs = {**p.inputs, **({f"{taf.concept}@{taf.period_end}": taf} if taf else {})}
     if ni is None or cfo is None:
         missing = tuple(
             c for c, v in (("net_income", ni), ("cash_from_operations", cfo)) if v is None
@@ -334,7 +366,7 @@ def accruals(s: Statements) -> Score:
             {},
             0,
             2,
-            missing,
+            (p.mismatch,) if p.mismatch else missing,
             "gap above 30% of net income is a flag",
             "not computable",
             inputs=inputs,

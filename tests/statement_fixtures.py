@@ -3,6 +3,12 @@
 Fiscal years end 31 December; the annual lines are filed mid-February, the
 quarters six weeks after they end. Every expected figure in the engine tests
 is worked from these numbers by hand.
+
+Collector-shaped: annual flows under `<concept>_fy`, balance-sheet lines
+only under the plain key at the statement date, as sec_xbrl and eodhd store
+them. The fixture used to add `<instant>_fy` copies that no collector writes,
+which is why Beneish and Piotroski passed here while computing for no stored
+name.
 """
 
 from __future__ import annotations
@@ -120,11 +126,6 @@ def us_store(
             store.add(fact(c, T, FILED_T, v, iid))
         for c, v in BALANCE_T1.items():
             store.add(fact(c, T1, FILED_T1, v, iid))
-        # annual copies of the instants the year-over-year models read
-        for c, v in BALANCE_T.items():
-            store.add(fact(f"{c}_fy", T, FILED_T, v, iid))
-        for c, v in BALANCE_T1.items():
-            store.add(fact(f"{c}_fy", T1, FILED_T1, v, iid))
     if quarterly:
         for c, values in QUARTERLY.items():
             for (end, filed), v in zip(QUARTERS, values):

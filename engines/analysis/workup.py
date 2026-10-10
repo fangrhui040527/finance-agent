@@ -31,7 +31,7 @@ from engines.valuation.cost_of_capital import (
     country_of,
     load_table,
 )
-from engines.valuation.dcf import default_scenarios
+from engines.valuation.dcf import default_scenarios, terminal_growth_for
 from knowledge.graph.ids import display_names
 from knowledge.graph.ids import instrument_id as canonical_id
 from knowledge.graph.peers import PeerSet, peers_of
@@ -63,6 +63,11 @@ ROIC_MOAT = Decimal("0.15")
 HISTORY_YEARS = 5
 DECOMPOSE_MIN_DAYS = 730
 BREAKER_REVIEW_DAYS = 90
+
+#: The finnhub snapshot of market capitalisation, in millions of US dollars
+#: (its name says so; the collector records no currency on the row).
+MARKET_CAP_CONCEPT = "market_cap_musd"
+MARKET_CAP_CURRENCY = "USD"
 
 
 def cite_label(c: Any) -> str:
@@ -148,12 +153,7 @@ def _by_year(s: Statements, concept: str) -> dict[date, Decimal]:
 
 def _instant_at(s: Statements, concept: str, on: date) -> Decimal | None:
     """The balance-sheet line at a fiscal year end (within a month), if stored."""
-    best = None
-    for f in s.series(concept):
-        if abs((f.period_end - on).days) <= 31 and (
-            best is None or abs((f.period_end - on).days) < abs((best.period_end - on).days)
-        ):
-            best = f
+    best = s.nearest(concept, on)
     return best.value if best else None
 
 
@@ -195,6 +195,28 @@ def _receivables_run(s: Statements) -> tuple[Decimal, Decimal] | None:
     if rec0 is None or rev0 is None or rec0.value <= 0 or rev0.value <= 0:
         return None
     return rec.value / rec0.value - 1, rev.value / rev0.value - 1
+
+
+def _market_cap(book: Any, s: Statements, iid: str, asof: date) -> tuple[Decimal | None, str]:
+    """The market cap knowable on `asof`, in the statements' units, or None and why.
+
+    Altman's MVE/TL divides it by total liabilities, so it must be in the same
+    currency and scale: the snapshot is millions (x 1e6 to units), and a cap in
+    one currency over liabilities in another is refused rather than divided.
+    """
+    cap = book.latest(iid, MARKET_CAP_CONCEPT, asof=asof)
+    if cap is None or cap.value is None:
+        return None, ""
+    have = cap.currency or MARKET_CAP_CURRENCY
+    _, inputs = s.balance("total_liabilities")
+    stated = {f.currency for f in inputs.values()}
+    if inputs and stated != {have}:
+        named = ", ".join(sorted(c or "an unrecorded currency" for c in stated))
+        return None, f"market cap not used: stored in {have}, total liabilities in {named}"
+    return (
+        cap.value * Decimal(1_000_000),
+        f"market cap {cap.value:,.0f}m {have} known {cap.known_at}",
+    )
 
 
 # --- the steps -----------------------------------------------------------------------------
@@ -253,16 +275,27 @@ def _comprehensibility() -> Step:
 
 
 def _quality_gate(
-    a1: A1Fundamentals, a11: A11RedTeam, s: Statements, iid: str, asof: date, sources: str
+    a1: A1Fundamentals,
+    a11: A11RedTeam,
+    book: Any,
+    s: Statements,
+    iid: str,
+    asof: date,
+    sources: str,
+    archetype: str | None,
 ) -> tuple[Step, list[Finding]]:
     n, title = STEPS[3]
-    scores = quality_report(s)
-    findings = a1.quality_scores(iid, asof)
+    # Both calls once went without the market cap or the archetype, so Altman Z
+    # was "4 of 5 components; missing market_cap" for NVDA with 24 snapshots
+    # stored, and its bank/insurer/REIT refusal never ran.
+    market_cap, cap_note = _market_cap(book, s, iid, asof)
+    scores = quality_report(s, market_cap, archetype)
+    findings = a1.quality_scores(iid, asof, market_cap, archetype)
     flags = [f.text.split(":")[0] for f in findings if f.kind == "quality_flag"]
     flag_findings = [f for f in findings if f.kind == "quality_flag"]
 
     ratios = {f.text.split(":")[0]: f for f in a1.ratio_sheet(iid, asof)[1:]}
-    checks: list[str] = []
+    checks: list[str] = [cap_note] if cap_note else []
     for name, worst, floor in (
         ("net_debt_to_ebitda", NET_DEBT_TO_EBITDA_MAX, False),
         ("interest_cover", INTEREST_COVER_MIN, True),
@@ -293,17 +326,24 @@ def _quality_gate(
         else:
             checks.append(f"receivables {_pct(rec_g)} vs revenue {_pct(rev_g)} y/y (ok)")
 
-    computable = sum(1 for sc in scores if sc.computable)
-    full = sum(1 for sc in scores if sc.computable == sc.needed)
-    missing = tuple(sorted({m for sc in scores for m in sc.missing}))
+    # A score the archetype rules out (Altman Z for a bank, insurer or REIT) is
+    # not applicable, not short of inputs: counted, it would hold a bank's gate
+    # at partial however complete its statements were.
+    refused = [sc.name for sc in scores if sc.verdict.startswith("not applicable")]
+    applicable = [sc for sc in scores if sc.name not in refused]
+    computable = sum(1 for sc in applicable if sc.computable)
+    full = sum(1 for sc in applicable if sc.computable == sc.needed)
+    missing = tuple(sorted({m for sc in applicable for m in sc.missing}))
     if computable == 0:
         status, gate = "unavailable", "unavailable"
-    elif full == len(scores):
+    elif full == len(applicable):
         status, gate = "done", "flag" if flags else "clean"
     else:
         status, gate = "partial", "flag" if flags else "clean"
-    summary = f"{full} of {len(scores)} scores fully computable; gate {gate}" + (
-        f"; {', '.join(checks)}" if checks else ""
+    summary = (
+        f"{full} of {len(applicable)} scores fully computable; gate {gate}"
+        + (f"; {', '.join(refused)} not applicable to a {archetype}" if refused else "")
+        + (f"; {', '.join(checks)}" if checks else "")
     )
     analogues: list[Finding] = []
     if flags:
@@ -609,7 +649,11 @@ def _valuation(
     rate, _ = coc.discount
     if eps is not None and eps.value:
         price = (eps.value * pe.value) if pe is not None and pe.value else None
-        comps = a2.peer_multiples(book, iid, set(peer_ids), "pe_ttm", asof, price, eps.value, rate)
+        # the reverse DCF's terminal growth is the scenario DCF's, so the two agree on perpetuity
+        terminal = terminal_growth_for(coc, table, country)
+        comps = a2.peer_multiples(
+            book, iid, set(peer_ids), "pe_ttm", asof, price, eps.value, rate, terminal
+        )
         findings.extend(comps)
         summary += "; multiple in its contexts below"
     else:
@@ -662,9 +706,47 @@ def _return_decomposition(a9: A9Attribution, book: Any, iid: str, asof: date) ->
     return Step(n, title, "partial", findings[0].text if findings else "", findings)
 
 
+def _price_query(book: Any, iid: str, asof: date, bull: str) -> tuple[str, str] | None:
+    """The latest price and whether it is above `bull`, as a query, and what the price is.
+
+    The stored close when the fact book holds one for the name; otherwise the
+    price the snapshots imply, eps_ttm x pe_ttm, as step 10 derives it. None
+    when neither is stored: a price breaker with no price to read is a wish.
+    """
+    held = book.latest(iid, "close", asof=asof)
+    if held is not None and held.value is not None:
+        return (
+            f"SELECT period_end, value_num AS price, value_num > {bull} AS above_bull "
+            f"FROM observations WHERE instrument_id = '{iid}' AND concept = 'close' "
+            "AND value_num IS NOT NULL ORDER BY period_end DESC, known_at DESC LIMIT 1",
+            "the stored close",
+        )
+    eps, pe = book.latest(iid, "eps_ttm", asof=asof), book.latest(iid, "pe_ttm", asof=asof)
+    if eps is None or eps.value is None or pe is None or pe.value is None:
+        return None
+    return (
+        f"SELECT known_at, price, price > {bull} AS above_bull FROM (SELECT p.known_at, "
+        "p.value_num * (SELECT e.value_num FROM observations e WHERE e.instrument_id = "
+        "p.instrument_id AND e.concept = 'eps_ttm' AND e.value_num IS NOT NULL AND e.known_at "
+        f"<= p.known_at ORDER BY e.known_at DESC LIMIT 1) AS price FROM observations p WHERE "
+        f"p.instrument_id = '{iid}' AND p.concept = 'pe_ttm' AND p.value_num IS NOT NULL "
+        "ORDER BY p.known_at DESC LIMIT 1)",
+        "eps_ttm x pe_ttm, no close being stored",
+    )
+
+
 def _suggest_breakers(
-    iid: str, asof: date, s: Statements, flags: list[str], vr: Any, base_growth: Decimal | None
+    book: Any,
+    iid: str,
+    asof: date,
+    s: Statements,
+    flags: list[str],
+    vr: Any,
+    base_growth: Decimal | None,
 ) -> list[Breaker]:
+    # Every query reads value_num: the observations table has value_text and
+    # value_num and no `value`, and each breaker once failed with "no such
+    # column: value", so none of them could ever fire.
     review = asof + timedelta(days=BREAKER_REVIEW_DAYS)
     out: list[Breaker] = []
     where = f"instrument_id = '{iid}'"
@@ -674,8 +756,8 @@ def _suggest_breakers(
         out.append(
             Breaker(
                 "accruals stay above 10% of assets at the next annual print",
-                f"SELECT period_end, value FROM observations WHERE {where} AND concept IN "
-                "('net_income_fy','cash_from_operations_fy','total_assets') ORDER BY period_end DESC",
+                f"SELECT concept, period_end, value_num FROM observations WHERE {where} AND concept "
+                "IN ('net_income_fy','cash_from_operations_fy','total_assets') ORDER BY period_end DESC",
                 "facts",
                 review,
             )
@@ -684,7 +766,7 @@ def _suggest_breakers(
         out.append(
             Breaker(
                 "net debt above 4x EBITDA or interest cover below 3x at the next balance sheet",
-                f"SELECT concept, period_end, value FROM observations WHERE {where} AND concept IN "
+                f"SELECT concept, period_end, value_num FROM observations WHERE {where} AND concept IN "
                 "('total_debt','cash','operating_income_fy','depreciation_fy','interest_expense_fy') "
                 "ORDER BY period_end DESC",
                 "facts",
@@ -695,27 +777,39 @@ def _suggest_breakers(
         out.append(
             Breaker(
                 f"revenue growth below {_pct(base_growth)} year on year for two quarters",
-                f"SELECT period_end, value FROM observations WHERE {where} AND concept = 'revenue' "
+                f"SELECT period_end, value_num FROM observations WHERE {where} AND concept = 'revenue' "
                 "ORDER BY period_end DESC LIMIT 8",
                 "facts",
                 review,
             )
         )
-    if vr is not None and vr.per_share.get("bull") is not None:
+    bull = vr.per_share.get("bull") if vr is not None else None
+    # A price, never pe_ttm: the query read the multiple, so a P/E near 30 stood
+    # against a bull case of 79.81 per share.
+    priced = _price_query(book, iid, asof, f"{bull:.2f}") if bull is not None else None
+    if priced is not None:
+        query, basis = priced
         out.append(
             Breaker(
-                f"price above the bull case ({vr.per_share['bull']:,.2f} per share): the range no longer holds",
-                f"SELECT known_at, value FROM observations WHERE {where} AND concept = 'pe_ttm' "
-                "ORDER BY known_at DESC LIMIT 1",
+                f"price above the bull case ({bull:,.2f} per share): the range no longer holds; "
+                f"price is {basis}",
+                query,
                 "facts",
                 review,
             )
         )
+    # Only a value a source files after `asof` for a period it already held:
+    # unscoped, two values for one period was true on day one (NVDA's 2016 10-K
+    # re-reported fiscal 2015 buybacks rounded, 813.6m to 814m, and its splits
+    # restated diluted EPS), so the breaker was broken before the thesis began.
     out.append(
         Breaker(
-            "a stored annual line is restated (two values for one period)",
-            f"SELECT concept, period_end, COUNT(DISTINCT value) AS n FROM observations WHERE {where} "
-            "AND concept LIKE '%_fy' GROUP BY concept, period_end HAVING n > 1",
+            f"a stored annual line is restated (a source files a new value for a period it held "
+            f"on {asof})",
+            "SELECT source, concept, period_end, COUNT(DISTINCT value_num) AS n FROM observations "
+            f"WHERE {where} AND concept LIKE '%_fy' GROUP BY source, concept, period_end "
+            f"HAVING MIN(known_at) <= '{asof}' AND n > COUNT(DISTINCT CASE WHEN known_at <= "
+            f"'{asof}' THEN value_num END)",
             "facts",
             review,
         )
@@ -771,7 +865,9 @@ def run_workup(
 
     steps: list[Step] = [_identity(instrument_id), _business_model(s), _comprehensibility()]
     gates = {"comprehensibility": "manual"}
-    quality, _flag_findings = _quality_gate(a1, a11, s, instrument_id, asof, sources)
+    quality, _flag_findings = _quality_gate(
+        a1, a11, book, s, instrument_id, asof, sources, archetype
+    )
     gates["quality"] = (
         "unavailable" if quality.status == "unavailable" else ("flag" if quality.flags else "clean")
     )
@@ -808,7 +904,7 @@ def run_workup(
             base = next((sc for sc in scenarios if sc.name == "base"), scenarios[0])
             base_growth = base.assumptions.growth_first_year
     flags = list(quality.flags) + list(steps[6].flags) + list(valuation.flags)
-    breakers = _suggest_breakers(instrument_id, asof, s, flags, vr, base_growth)
+    breakers = _suggest_breakers(book, instrument_id, asof, s, flags, vr, base_growth)
     steps.append(_thesis_step(breakers, gates))
 
     assert [st.n for st in steps] == [n for n, _ in STEPS]

@@ -243,13 +243,26 @@ def from_env(name: str) -> Provider:
     if preset is None:
         raise ValueError(f"unknown provider {name!r}; expected one of {', '.join(names())}")
 
-    base_url = os.environ.get(BASE_URL_ENV, "").strip() or preset.base_url
+    # LLM_BASE_URL points a preset with NO fixed host somewhere: a local Ollama
+    # on another machine, a LiteLLM or vLLM gateway. It used to override every
+    # preset, so with a per-tier split (LLM_BACKEND_REASON=groq) or the `free`
+    # chain, a hosted provider was built on that URL and its key sent there -
+    # over plain HTTP to a LAN address. A hosted preset keeps its own host.
+    override = os.environ.get(BASE_URL_ENV, "").strip()
+    base_url = (override if preset.name in RELOCATABLE else "") or preset.base_url
     if not base_url:
         raise ValueError(
             f"provider {preset.name!r} has no base URL: set {BASE_URL_ENV} to the "
             "endpoint root, the part before /chat/completions"
         )
     base_url = base_url.rstrip("/")
+    if preset.key_env and not _safe_for_a_key(base_url):
+        raise ValueError(
+            f"provider {preset.name!r} would send {preset.key_env} to {base_url}, which is "
+            "neither https nor this machine. A key sent over plain HTTP can be read by "
+            "anything on the path; serve the endpoint over https, or reach it through "
+            "localhost (an SSH tunnel)."
+        )
 
     every = os.environ.get(MODEL_ENV_ALL, "").strip()
     models: dict[Tier, str] = {}
@@ -263,6 +276,20 @@ def from_env(name: str) -> Provider:
         models[tier] = chosen
 
     return replace(preset, base_url=base_url, models=models)
+
+
+#: The presets LLM_BASE_URL may relocate: the ones with no fixed host of their own.
+RELOCATABLE = frozenset({"ollama", "openai-compatible"})
+
+_LOOPBACK = frozenset({"localhost", "127.0.0.1", "::1"})
+
+
+def _safe_for_a_key(base_url: str) -> bool:
+    """https anywhere, or any scheme to this machine."""
+    from urllib.parse import urlsplit
+
+    parts = urlsplit(base_url)
+    return parts.scheme == "https" or (parts.hostname or "") in _LOOPBACK
 
 
 def first_configured(candidates: tuple[str, ...] = AUTO_SELECTABLE) -> Provider | None:

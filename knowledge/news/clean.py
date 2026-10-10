@@ -125,10 +125,17 @@ def language_allowed(raw: str | None, allow) -> bool:
 
 # --- junk and low value --------------------------------------------------------------
 
-#: Not news about a company, whatever it mentions. Dropped before dedup.
+#: Not news about a company, whatever it mentions. Dropped before dedup, and
+#: searched in the body as well as the title, so only phrases that are never
+#: financial news belong here. "casino", "lottery" and "betting odds" were on
+#: it: Genting (MYX:3182) is a casino operator, so "Genting Malaysia wins New
+#: York casino licence" and "Budget 2027 raises casino duty" were dropped as
+#: junk, as was a Maybank results story that mentioned a lottery operator. The
+#: same was true of "coupon" (a bond's coupon), "giveaway" (a budget's
+#: giveaways) and "recipe for" (a turn of phrase, not a recipe).
 JUNK = re.compile(
-    r"\b(casino|betting odds|horoscope|lottery|4d results|toto results|giveaway|"
-    r"coupon|promo code|sweepstakes|recipe|obituar(y|ies)|sponsored content|"
+    r"\b(horoscope|4d results|toto results|coupon code|promo code|sweepstakes|"
+    r"recipe(?!\s+for\b)|obituar(y|ies)|sponsored content|"
     r"advertorial|paid partnership|press release distribution)\b",
     re.IGNORECASE,
 )

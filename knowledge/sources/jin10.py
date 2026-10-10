@@ -97,6 +97,34 @@ def beijing_to_utc(raw: Any) -> datetime | None:
     return None
 
 
+#: How far the oldest flash may sit past `since` before the difference is
+#: called a hole rather than a quiet hour. The stream runs around the clock at
+#: a few items an hour even overnight in Beijing; an hour without one is rare,
+#: and a 14-hour window answered from 15:37 is not that.
+GAP_TOLERANCE = timedelta(hours=1)
+
+
+def window_gap(since: datetime, oldest: datetime | None) -> str:
+    """The unread part of the window, or "" when the page reached back to `since`.
+
+    One request returns the newest ~20 flashes, which is 10 to 60 minutes of
+    Jin10's stream, and the slots are 3 to 15 hours apart. Every run kept what
+    was newer than `since` and was recorded `ok`, and the next run started from
+    this one, so everything between `since` and the oldest flash on the page
+    was never requested and never will be: on 2026-10-06 at 15:59Z the window
+    opened at 01:47Z and the page began at 15:37Z. Paging back with Jin10's
+    `max_time` would close the hole, at more than the one request a slot this
+    source is allowed; until that is decided, the hole is at least recorded.
+    """
+    if oldest is None or oldest - since <= GAP_TOLERANCE:
+        return ""
+    hours = (oldest - since).total_seconds() / 3600
+    return (
+        f"window not covered back to {since:%Y-%m-%d %H:%MZ}; the oldest item read is "
+        f"{oldest:%Y-%m-%d %H:%MZ}, so {hours:.1f}h of the window was never served"
+    )
+
+
 def _plain(text: Any) -> str:
     return _WS.sub(" ", _TAG.sub(" ", str(text or ""))).strip()
 
@@ -112,10 +140,13 @@ class Jin10FlashCollector(Collector):
         pull = Pull()
         payload = self.get_json(FLASH_URL, {"channel": "-8200", "vip": "1"}, headers=HEADERS)
         rows = self._rows(payload)
+        oldest: datetime | None = None
         for row in rows:
             if not isinstance(row, dict):
                 continue
             published = beijing_to_utc(row.get("time"))
+            if published is not None and (oldest is None or published < oldest):
+                oldest = published
             if published is None or published < since:
                 continue
             raw_data = row.get("data")
@@ -140,6 +171,7 @@ class Jin10FlashCollector(Collector):
                     themes=themes,
                 )
             )
+        pull.gap = window_gap(since, oldest)
         pull.requests = self.requests
         return pull
 

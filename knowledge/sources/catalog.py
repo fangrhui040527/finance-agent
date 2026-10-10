@@ -369,6 +369,29 @@ def sources_for(slot: str, enabled) -> list[SourceSpec]:
     return [s for s in CATALOG.values() if s.name in wanted and s.runs_in(slot)]
 
 
+def covering_slots(slot: str) -> tuple[str, ...]:
+    """The slots whose runs asked for every name this slot asks for.
+
+    A per-instrument source asks a different set of names in each slot -
+    google_news asks the Bursa names at `bursa_close` and the US names at
+    `us_close` - so "when was this source last read" has no single answer. A
+    window counts as read for this slot only if a run asked for this slot's
+    names over it: this slot itself, and any slot whose market set contains
+    this one's (`weekly`, `all`, and a slot over the same markets).
+
+    Keyed by the source alone, the watermark was the OTHER slot's run time,
+    and each market's news between its own collection and the other market's
+    was never requested: from 2026-09-26 the corpus held no Bursa google_news
+    item published 14:00-22:59 UTC and no US item published 23:00-09:59 UTC.
+    """
+    if slot not in SLOTS:
+        raise KeyError(f"unknown slot {slot!r}; known: {', '.join(SLOTS)}")
+    mics = SLOTS[slot]
+    if not mics:
+        return (slot,)
+    return tuple(s for s, have in SLOTS.items() if mics <= have)
+
+
 def instruments_for(slot: str, source: SourceSpec, book) -> tuple[str, ...]:
     """Which names a per-instrument source is asked for in this slot."""
     from markets.registry import mic_of

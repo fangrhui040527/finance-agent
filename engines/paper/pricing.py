@@ -45,11 +45,42 @@ def tick_for(instrument_id: str, price: Decimal) -> Decimal:
     return market_get(mic_of(instrument_id)).tick_size(price)
 
 
+#: How far before `start` to read so the first bar in a window can be compared
+#: with the session before it: a holiday filler is only a filler relative to
+#: the row it repeats. Ten calendar days spans the longest Bursa closure run.
+_LOOKBEHIND = timedelta(days=10)
+
+
 def bars(
     feed, instrument_id: str, *, start: date | None = None, end: date | None = None
 ) -> list[Bar]:
-    series = feed.fetch(instrument_id, start=start, end=end)
-    return sorted(series.raw(), key=lambda b: b.day)
+    """The instrument's cached bars on REAL sessions of its market, oldest first.
+
+    Yahoo answers a Bursa holiday with a row, not a gap: the previous close
+    carried forward on zero volume. The pack and `aligned_closes` already drop
+    those; the paper book did not, so a target decided before a holiday filled
+    at the filler row - Friday's close plus slippage, dated a day nothing
+    traded - and the bursa_close mark was stamped on the holiday. A bar is kept
+    only when the market's calendar calls its day a session and it is not a
+    carried row (`core.market.bars.drop_carried_rows`). Raises PriceFeedError
+    as the feed does when nothing is cached.
+    """
+    from core.market.bars import drop_carried_rows
+
+    series = feed.fetch(
+        instrument_id, start=start - _LOOKBEHIND if start is not None else None, end=end
+    )
+    rows = sorted(series.raw(), key=lambda b: b.day)
+    try:
+        calendar = market_get(mic_of(instrument_id)).calendar
+    except (KeyError, ValueError):
+        calendar = None
+    if calendar is not None:
+        rows = [b for b in rows if calendar.is_session(b.day)]
+    rows = drop_carried_rows(rows)
+    if start is not None:
+        rows = [b for b in rows if b.day >= start]
+    return rows
 
 
 def last_close(feed, instrument_id: str, on_or_before: date) -> tuple[Decimal, date]:

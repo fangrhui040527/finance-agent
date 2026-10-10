@@ -49,6 +49,10 @@ FACTS_DB = "data/facts.db"
 OK = "ok"
 FAILED = "failed"
 SKIPPED = "skipped"  # no key, or the plan does not include the endpoint
+#: Read, but not all of it: most of the names asked could not be read, or the
+#: reply did not reach back to the window's start. The same word and meaning
+#: as the corpus's sweep status (`knowledge.corpus.DEGRADED`).
+DEGRADED = "degraded"
 
 #: How much of a pull's detail the pulls table keeps. 2000, up from 400, for
 #: the reason knowledge/sweep.DETAIL_CHARS gives: the nightly page quotes this
@@ -414,10 +418,27 @@ class FactBook:
     # -- reads ----------------------------------------------------------------
 
     def last_success(self, source: str) -> datetime | None:
+        """When this source was last read - the watermark a sweep resumes from.
+
+        DEGRADED counts as read, for the reason `Corpus.last_success` gives: the
+        names that were reached were read for the whole window, and holding the
+        watermark back would re-ask it every run without reaching the names
+        that failed. FAILED and SKIPPED read nothing and leave it where it was.
+        """
         row = self.conn.execute(
-            "SELECT MAX(at) AS at FROM pulls WHERE source = ? AND status = ?", (source, OK)
+            "SELECT MAX(at) AS at FROM pulls WHERE source = ? AND status IN (?, ?)",
+            (source, OK, DEGRADED),
         ).fetchone()
         return _dt(row["at"]) if row and row["at"] else None
+
+    def successes(self, source: str) -> dict[str, datetime]:
+        """run_id -> when that run's pull of this source read something (ok or degraded)."""
+        rows = self.conn.execute(
+            "SELECT run_id, MAX(at) AS at FROM pulls WHERE source = ? AND status IN (?, ?)"
+            " GROUP BY run_id",
+            (source, OK, DEGRADED),
+        ).fetchall()
+        return {r["run_id"]: _dt(r["at"]) for r in rows if r["at"]}
 
     def observations(
         self,

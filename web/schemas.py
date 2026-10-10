@@ -113,9 +113,12 @@ class SizingBody(BaseModel):
     price: float
     stop_price: float
     adv_20d: float
-    risk_per_trade: float = 0.0075
-    single_name_limit: float = 0.08
-    participation: float = 0.05
+    # The same ceilings `mcp_server.tools._bounded_sizing_inputs` applies; a
+    # request past them is a 422 here before it reaches the tool. None for the
+    # single-name limit means the config's own.
+    risk_per_trade: float = Field(0.0075, gt=0, le=0.02)
+    single_name_limit: float | None = Field(None, gt=0, le=0.15)
+    participation: float = Field(0.05, gt=0, le=0.10)
     win_rate: float | None = None
     payoff: float | None = None
     n_trades: int = 0
@@ -158,9 +161,9 @@ class AllocateBody(BaseModel):
     portfolio_value: float | None = None
     fetch: bool = False
     as_at: str = ""
-    single_name_limit: float = 0.08
-    risk_per_trade: float = 0.0075
-    participation: float = 0.05
+    single_name_limit: float | None = Field(None, gt=0, le=0.15)
+    risk_per_trade: float = Field(0.0075, gt=0, le=0.02)
+    participation: float = Field(0.05, gt=0, le=0.10)
 
 
 class RebalanceBody(BaseModel):
@@ -169,5 +172,5 @@ class RebalanceBody(BaseModel):
     from_plan: bool = False
     fetch: bool = True
     as_at: str = ""
-    single_name_limit: float = 0.08
-    risk_per_trade: float = 0.0075
+    single_name_limit: float | None = Field(None, gt=0, le=0.15)
+    risk_per_trade: float = Field(0.0075, gt=0, le=0.02)

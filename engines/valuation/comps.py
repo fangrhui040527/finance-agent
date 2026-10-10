@@ -12,7 +12,8 @@ from the reverse DCF:
                 on the same date, each member's figure with its source and
                 date; a peer set below the minimum is refused, not averaged;
   growth        the growth the price already requires, from the reverse DCF,
-                when a price and an earnings base are supplied.
+                when a price, an earnings base and a terminal growth are supplied;
+                stated as beyond the solver's range, never as its bound, when it is.
 
 Peers come from the caller (slice 3 derives them from the knowledge graph);
 this module does not guess them.
@@ -24,7 +25,7 @@ from dataclasses import dataclass, field
 from datetime import date
 from decimal import Decimal
 
-from engines.valuation.dcf import implied_growth
+from engines.valuation.dcf import beyond_solver_range, implied_growth
 
 MIN_PEERS = 2
 
@@ -99,6 +100,8 @@ class ThreeContexts:
     peer_reason: str
     implied_growth: Decimal | None
     caveats: tuple[str, ...] = field(default_factory=tuple)
+    growth_basis: str = ""  # the reverse DCF's horizon and terminal growth, when it ran
+    growth_beyond: str = ""  # the end of the solver's range the required growth lies past
 
     def text(self) -> str:
         rows = []
@@ -119,7 +122,13 @@ class ThreeContexts:
         )
         if self.implied_growth is not None:
             rows.append(
-                f"  growth the price requires (reverse DCF): {self.implied_growth:.1%} a year"
+                f"  growth the price requires (reverse DCF, {self.growth_basis}): "
+                f"{self.implied_growth:.1%} a year"
+            )
+        elif self.growth_beyond:
+            rows.append(
+                f"  growth the price requires (reverse DCF, {self.growth_basis}): "
+                f"beyond the solver's range ({self.growth_beyond})"
             )
         for c in self.caveats:
             rows.append(f"  caveat: {c}")
@@ -135,8 +144,10 @@ def three_contexts(
     price: Decimal | None = None,
     earnings: Decimal | None = None,
     discount: Decimal | None = None,
+    terminal_growth: Decimal | None = None,
     years: int = 10,
 ) -> ThreeContexts:
+    """`terminal_growth` is the scenario DCF's (dcf.terminal_growth_for), not a second guess."""
     hist = own_history(book, instrument_id, concept, asof)
     current = hist[-1] if hist else None
     pct = percentile(hist, current[1]) if current and len(hist) >= 3 else None
@@ -146,12 +157,25 @@ def three_contexts(
         else (None, "no peer set supplied")
     )
     growth = None
+    basis = beyond = ""
     caveats: list[str] = []
     if price is not None and earnings is not None and discount is not None:
-        if earnings > 0 and price > 0:
-            growth = implied_growth(price, earnings, discount, years)
-        else:
+        if earnings <= 0 or price <= 0:
             caveats.append("reverse DCF needs positive price and earnings")
+        elif terminal_growth is None:
+            caveats.append(
+                "reverse DCF needs a terminal growth: neither a risk-free rate nor a long-run "
+                "growth for the country"
+            )
+        else:
+            try:
+                growth = implied_growth(price, earnings, discount, terminal_growth, years)
+            except ValueError as e:
+                caveats.append(f"reverse DCF: {e}")
+            else:
+                basis = f"{years} years, then {terminal_growth:.1%} a year in perpetuity"
+                if growth is None:
+                    beyond = beyond_solver_range(price, earnings, discount, terminal_growth, years)
     if current and len(hist) < 3:
         caveats.append(
             "the multiple's own history is short; snapshots accumulate with each collection run"
@@ -168,4 +192,6 @@ def three_contexts(
         reason,
         growth,
         tuple(caveats),
+        basis,
+        beyond,
     )

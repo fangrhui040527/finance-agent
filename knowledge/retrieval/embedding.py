@@ -128,8 +128,23 @@ TOKEN = re.compile(r"[a-z0-9][a-z0-9.\-]*", re.IGNORECASE)
 
 
 def tokenize(text: str) -> list[str]:
-    """Keeps dots and hyphens so `0011.KL` and `Q3-FY25` survive as one token."""
-    return [t.lower() for t in TOKEN.findall(text)]
+    """Keeps INTERNAL dots and hyphens so `0011.KL` and `Q3-FY25` survive as one token.
+
+    A trailing dot or hyphen is punctuation, not part of the word: the pattern
+    used to glue a sentence's full stop onto its last word, so "...raised
+    targets on Nvidia." indexed `nvidia.` and no query for Nvidia reached it.
+    A hyphenated compound also yields its parts - `nvidia-backed` is indexed
+    as itself, `nvidia` and `backed` - so the name inside it can be found.
+    """
+    out: list[str] = []
+    for raw in TOKEN.findall(text):
+        t = raw.lower().rstrip(".-")
+        if not t:
+            continue
+        out.append(t)
+        if "-" in t:
+            out += [p for p in (part.rstrip(".") for part in t.split("-")) if p and p != t]
+    return out
 
 
 def signature(

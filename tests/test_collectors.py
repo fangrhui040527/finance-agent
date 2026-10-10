@@ -17,7 +17,13 @@ import pytest
 
 from knowledge.facts import FactBook
 from knowledge.sources.alphavantage import AlphaVantageNews
-from knowledge.sources.base import KeyMissing, SourceError, parse_date, parse_datetime
+from knowledge.sources.base import (
+    KeyMissing,
+    PlanExcluded,
+    SourceError,
+    parse_date,
+    parse_datetime,
+)
 from knowledge.sources.bnm import BnmOprCollector
 from knowledge.sources.bursa import BursaAnnouncements
 from knowledge.sources.dbnomics import DbnomicsCollector
@@ -1467,13 +1473,20 @@ def test_widening_the_plan_brings_the_bursa_names_back():
     assert any(a.startswith("MYX:") for a in asked)
 
 
-def test_a_book_with_no_covered_name_still_asks_rather_than_going_silent():
-    """Falling back to the whole book matters: an empty ask would make the
-    source report `ok` having done nothing, which is the shape of a healthy
-    collector and the substance of a dead one."""
+def test_a_book_with_no_covered_name_asks_nothing_and_says_so_once():
+    """An empty ask must not report `ok` having done nothing - that is the
+    shape of a healthy collector and the substance of a dead one. This test
+    used to answer that by falling back to the whole book, and the fallback
+    asked two KLSE names the free plan always refuses on every bursa_close
+    from 2026-09-23: 61 `ok` pulls, 0 rows. Now the rotation is empty and
+    `collect` raises PlanExcluded, which the sweep records as a skip with its
+    reason (tests/test_sweep_outcomes.py)."""
     book = ("MYX:1155", "MYX:5347", "MYX:8869")
-    asked, _ = EodhdFundamentals.rotation(book, date(2026, 9, 7), "bursa_close")
-    assert asked, "no eligible name must not mean no request and no message"
+    assert EodhdFundamentals.rotation(book, date(2026, 9, 7), "bursa_close") == ([], [])
+    c = EodhdFundamentals(clock=CLOCK, opener=router({}), key="tok.12345678")
+    with pytest.raises(PlanExcluded, match="nothing was asked"):
+        c.collect(SINCE, book, slot="bursa_close")
+    assert c.requests == 0
 
 
 def test_eodhd_maps_statements_to_the_shared_keys_and_stamps_filing_dates():

@@ -44,7 +44,7 @@ def test_beneish_is_refused_below_eight_indices_and_names_what_is_missing():
             if not x.concept.startswith("receivables"):
                 partial.add(x)
     sc = beneish_m_score(Statements.from_store(partial, IID, ASOF))
-    assert sc.value is None and sc.computable == 7 and sc.missing == ("receivables_fy",)
+    assert sc.value is None and sc.computable == 7 and sc.missing == ("receivables",)
     assert "7 of 8" in sc.verdict and "uncalibrated" in sc.caveats[0]
     assert "7 of 8 inputs computable" in sc.text() and "sec_xbrl" in sc.text()
 
@@ -56,14 +56,14 @@ def test_piotroski_counts_eight_of_nine_and_reports_over_computable_signals():
         "0.5 against 0.5 is not an improvement"
     )
     assert sc.verdict == "8 of 9 computable signals"
-    thin = FactStore()
+    thin = FactStore()  # collector-shaped: annual flows as _fy, total assets under the plain key
     for c, v in (
         ("net_income_fy", 150),
-        ("total_assets_fy", 2000),
+        ("total_assets", 2000),
         ("cash_from_operations_fy", 180),
     ):
         thin.add(fact(c, date(2025, 12, 31), date(2026, 2, 15), v))
-    for c, v in (("net_income_fy", 130), ("total_assets_fy", 1800)):
+    for c, v in (("net_income_fy", 130), ("total_assets", 1800)):
         thin.add(fact(c, date(2024, 12, 31), date(2025, 2, 15), v))
     sc = piotroski_f_score(Statements.from_store(thin, IID, ASOF))
     assert sc.computable == 4 and sc.value == Decimal(4) and "not comparable" in sc.caveats[0]

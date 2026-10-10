@@ -101,6 +101,13 @@ class InjectionScanPolicy(PolicyRule):
     )
 
     def evaluate(self, action: Action) -> PolicyResult | None:
+        # Its own rails only. It used to run on OUTPUT and PUBLICATION too, so a
+        # single collected headline containing "you are now" made `publish`
+        # refuse the whole day's digest - the one-poisoned-story denial of
+        # service `quarantine` was written to prevent, applied to the page.
+        # Content on its way OUT was scanned on the way in.
+        if action.rail not in self.rails:
+            return None
         raw = str(action.payload.get("text", ""))
         text = raw.lower()
         for m in self.MARKERS:

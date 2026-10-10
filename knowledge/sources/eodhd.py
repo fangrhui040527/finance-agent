@@ -201,8 +201,14 @@ class EodhdFundamentals(Collector):
         environment variable rather than an edit here: `Plan` widens the first
         and zeroes the second, and every name is asked for every run.
         """
-        eligible = [i for i in instruments if symbol_for(i) and market_of(i) in plan_markets]
-        names = eligible or [i for i in instruments if symbol_for(i)]
+        # No fallback to the names the plan cannot serve. There was one, `eligible
+        # or every name with a symbol`, so that a slot with no US name still
+        # asked something rather than reporting `ok` having done nothing. It
+        # brought back the very defect described above: every bursa_close from
+        # 2026-09-23 asked two KLSE symbols, was refused both, and stored an
+        # `ok` pull with 0 rows - 61 of them. An empty rotation now makes
+        # `collect` raise PlanExcluded, recorded once as a skip with its reason.
+        names = [i for i in instruments if symbol_for(i) and market_of(i) in plan_markets]
         if names_per_run <= 0 or len(names) <= names_per_run:
             return names, []
         slot_ix = SLOT_ORDER.index(slot) if slot in SLOT_ORDER else 0
@@ -220,6 +226,12 @@ class EodhdFundamentals(Collector):
         asked, deferred = self.rotation(
             instruments, today, slot, plan_markets=plan.markets, names_per_run=plan.names_per_run
         )
+        if not asked:
+            raise PlanExcluded(
+                f"eodhd: no name in this slot is on the {plan.name} plan ({plan.describe()}); "
+                "nothing was asked. The EODHD Fundamentals plan covers KLSE and TW."
+            )
+        pull.asked = list(asked)
         pull.notes.append(f"EODHD plan: {plan.describe()}")
         for iid in deferred:
             pull.notes.append(
@@ -248,14 +260,15 @@ class EodhdFundamentals(Collector):
                 )
             except PlanExcluded:
                 if mic not in plan.markets:
-                    pull.notes.append(
-                        f"{iid}: EODHD free plan: US only; the Fundamentals plan covers KLSE"
-                    )
+                    reason = "EODHD free plan: US only; the Fundamentals plan covers KLSE"
                 else:
-                    pull.notes.append(f"{iid}: outside the plan or over today's credits")
+                    reason = "outside the plan or over today's credits"
+                pull.notes.append(f"{iid}: {reason}")
+                pull.refused.append((iid, reason))
                 continue
             except SourceError as e:
                 failures.append(f"{iid}: {e}")
+                pull.failed.append((iid, str(e)))
                 continue
             message = (
                 str((payload or {}).get("message") or (payload or {}).get("error") or "")
@@ -267,10 +280,12 @@ class EodhdFundamentals(Collector):
                 for w in ("limit", "exceeded", "not available", "not supported")
             ):
                 pull.notes.append(f"{iid}: EODHD said: {message[:120]}")
+                pull.refused.append((iid, f"EODHD said: {message[:120]}"))
                 continue
             rows = self._observations(iid, payload, today)
             if not rows:
                 failures.append(f"{iid}: no Financials in the reply")
+                pull.failed.append((iid, "no Financials in the reply"))
                 continue
             pull.observations.extend(rows)
         if asked and failures and len(failures) == len(asked):

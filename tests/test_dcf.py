@@ -265,9 +265,9 @@ def test_implied_growth_equals_the_valuation_agents_reverse_dcf(registry):
             now=datetime(2026, 9, 6, tzinfo=UTC),
         )
     )
-    theirs = a2.reverse_dcf(60.0, 5.0, 0.10)[0].numbers["implied_growth"]
-    ours = implied_growth(Decimal(60), Decimal(5), Decimal("0.10"))
-    assert abs(float(ours) - theirs) < 1e-6
+    theirs = a2.reverse_dcf(60.0, 5.0, 0.10, 0.04)[0].numbers["implied_growth"]
+    ours = implied_growth(Decimal(60), Decimal(5), Decimal("0.10"), Decimal("0.04"))
+    assert ours is not None and abs(float(ours) - theirs) < 1e-6
 
 
 def _coc(**over) -> CostOfCapital:
@@ -428,6 +428,7 @@ def test_peer_band_refuses_a_set_of_one_and_places_the_multiple_in_its_history(b
         Decimal(100),
         Decimal(5),
         Decimal("0.095"),
+        Decimal("0.04"),
     )
     assert tc.current == Decimal(25) and tc.history_percentile == Decimal(1)
     assert tc.peer_band is not None and tc.implied_growth is not None

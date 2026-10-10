@@ -9,6 +9,7 @@ guessed. stdlib `xml.etree` only.
 
 from __future__ import annotations
 
+import http.client
 from datetime import UTC, datetime, timedelta
 from email.utils import parsedate_to_datetime
 from urllib.parse import urlparse
@@ -86,6 +87,22 @@ class RssFeed(FeedAdapter):
     #: SOME of its items is usable and lossy; one that dates none is refused.
     undated = 0
 
+    #: Set by the last parse when the feed could not reach back to `since`:
+    #: every dated item was newer than the window's start, so whatever was
+    #: published between the two had already scrolled off. A site-wide feed
+    #: holds a fixed number of items (NST's is 50), and polled once a day it
+    #: overflows: from 2026-09-14 every nst_business run fetched exactly 50,
+    #: each batch starting 16 to 25 hours after the previous run, and the
+    #: sweep recorded `ok`. Empty when the window was covered.
+    overflow = ""
+
+    #: A feed with fewer dated items than this is not judged: a short feed
+    #: whose items all fall inside the window is more often a quiet one than a
+    #: full one, and the parse cannot tell which.
+    OVERFLOW_MIN_ITEMS = 10
+    #: How far the oldest item may sit past `since` before it is a hole.
+    OVERFLOW_TOLERANCE = timedelta(hours=1)
+
     def __init__(
         self,
         url: str,
@@ -137,6 +154,9 @@ class RssFeed(FeedAdapter):
         except (urllib.error.URLError, OSError) as e:
             self._breaker.record_failure(e)
             raise FeedError(f"{self.name} fetch failed: {e}{self._where_the_feed_moved(e)}") from e
+        except http.client.HTTPException as e:  # a reply cut off mid-body is not an OSError
+            self._breaker.record_failure(e)
+            raise FeedError(f"{self.name} fetch failed: {type(e).__name__}: {e}") from e
         self._breaker.record_success()
 
         if isinstance(body, bytes):
@@ -203,7 +223,11 @@ class RssFeed(FeedAdapter):
         out: list[RawRecord] = []
         now = datetime.now(UTC)
         self.undated = 0
+        self.overflow = ""
         usable = 0
+        dated = 0
+        oldest: datetime | None = None
+        truncated = False
         for item in items:
             row = self._item_to_row(item)
             if row is None:
@@ -215,11 +239,29 @@ class RssFeed(FeedAdapter):
                 # `now` is the one thing this must never do - see _to_article.
                 self.undated += 1
                 continue
-            if datetime.fromisoformat(published) < since:
+            when = datetime.fromisoformat(published)
+            dated += 1
+            if oldest is None or when < oldest:
+                oldest = when
+            if when < since:
                 continue
             out.append(RawRecord(self.name, row["url"], now, row))
             if len(out) >= limit:
+                truncated = True  # our own limit, not the feed's: nothing to judge
                 break
+
+        if (
+            not truncated
+            and dated >= self.OVERFLOW_MIN_ITEMS
+            and oldest is not None
+            and oldest - since > self.OVERFLOW_TOLERANCE
+        ):
+            hours = (oldest - since).total_seconds() / 3600
+            self.overflow = (
+                f"window overflow: all {dated} dated items are newer than the window's start "
+                f"({since:%Y-%m-%d %H:%MZ}); the oldest is {oldest:%Y-%m-%d %H:%MZ}, so "
+                f"{hours:.1f}h scrolled off unseen"
+            )
 
         if usable and self.undated == usable:
             raise FeedError(

@@ -11,6 +11,7 @@ deduplication and provenance rule below. That is the whole integration surface.
 
 from __future__ import annotations
 
+import http.client
 import json
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
@@ -23,6 +24,7 @@ from knowledge.news.features import (
     FeatureExtractor,
     LexiconExtractor,
     near_duplicate_hash,
+    title_key,
 )
 
 
@@ -69,6 +71,7 @@ class FeedAdapter(ABC):
     def __init__(self, extractor: FeatureExtractor | None = None) -> None:
         self.extractor = extractor or LexiconExtractor()
         self._seen: set[str] = set()
+        self._seen_titles: set[str] = set()
 
     @abstractmethod
     def _fetch_raw(self, since: datetime, limit: int) -> list[RawRecord]: ...
@@ -128,11 +131,17 @@ class FeedAdapter(ABC):
                 continue
 
             dup = near_duplicate_hash(art.text)
-            if dup in self._seen:
+            headline = title_key(art.title, art.published_at)
+            # '' means "no key could be computed" and matches nothing.
+            if (dup and dup in self._seen) or (headline and headline in self._seen_titles):
                 stats.duplicates += 1
                 continue
-            self._seen.add(dup)
+            if dup:
+                self._seen.add(dup)
+            if headline:
+                self._seen_titles.add(headline)
             art.dup_hash = dup
+            art.title_key = headline
 
             if linker is not None:
                 # A source keyed by ticker (Yahoo's feed, Finnhub's company
@@ -453,6 +462,9 @@ class GdeltFeed(FeedAdapter):
         except OSError as e:
             self._breaker.record_failure(e)
             raise FeedError(f"GDELT fetch failed: {e}") from e
+        except http.client.HTTPException as e:  # a reply cut off mid-body is not an OSError
+            self._breaker.record_failure(e)
+            raise FeedError(f"GDELT fetch failed: {type(e).__name__}: {e}") from e
         self._breaker.record_success()
 
         if isinstance(body, bytes):

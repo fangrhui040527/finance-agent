@@ -29,7 +29,7 @@ from core.config import Holding
 from core.contracts.money import BASE_CURRENCY
 from engines.risk.concentration import Limits, Position
 from engines.sizing.allocate import Allocation, Candidate, allocate
-from engines.sizing.caps import cost_floor_value
+from engines.sizing.caps import cost_floor_value, to_base
 from markets.brokers import cost_at
 
 
@@ -135,6 +135,7 @@ def _candidate(
     stop: Decimal | None,
     sector: str,
     broker: str | None = None,
+    fx_base_per_quote: Decimal | None = None,
 ) -> Candidate:
     mic, adapter, currency = _adapter(iid)
     return Candidate(
@@ -151,6 +152,8 @@ def _candidate(
         # rebalance quotes the cost of every change it proposes, so a schedule
         # that is not the one you actually pay understates every one of them.
         round_trip_cost_at=cost_at(mic, broker, price),
+        broker=broker,
+        fx_base_per_quote=fx_base_per_quote if currency != BASE_CURRENCY else None,
     )
 
 
@@ -203,8 +206,15 @@ def rebalance(
     single_name_limit: Decimal = Decimal("0.08"),
     participation: Decimal = Decimal("0.05"),
     broker: str | None = None,
+    fx_rates: Mapping[str, Decimal] | None = None,
 ) -> Rebalance:
     """Deltas between the book as held and a target split over the same names.
+
+    `fx_rates` is MYR per one unit of each foreign currency the book holds.
+    Every value, weight, turnover and cost below is in MYR; a holding priced in
+    another currency without a rate is refused, never summed as a bare number -
+    100 AAPL at USD 250 added to a MYR book as "250" read as 5% where it was
+    about 21%, and hid its breach of the single-name cap.
 
     `investable` defaults to the book's own market value: with nothing added,
     a rebalance re-splits what is already there. Supplying it means the target
@@ -229,9 +239,19 @@ def rebalance(
                 f"weighed - every weight would be wrong, not just that one",
                 notes=tuple(notes),
             )
+        currency = _adapter(h.id)[2]
+        fx = (fx_rates or {}).get(currency) if currency != BASE_CURRENCY else None
+        if currency != BASE_CURRENCY and fx is None:
+            return Rebalance(
+                Decimal(0),
+                refusal=f"{h.id} is priced in {currency} and no {BASE_CURRENCY}-per-{currency} "
+                f"rate was supplied; adding its value to {BASE_CURRENCY} as a bare number would "
+                f"misstate every weight by the exchange rate",
+                notes=tuple(notes),
+            )
         held[h.id] = Decimal(h.units or 0)
         meta[h.id] = _candidate(
-            h.id, prices[h.id], advs.get(h.id, Decimal(0)), h.stop, h.sector, broker
+            h.id, prices[h.id], advs.get(h.id, Decimal(0)), h.stop, h.sector, broker, fx
         )
 
     for c in nominated:
@@ -245,7 +265,10 @@ def rebalance(
             notes=tuple(notes),
         )
 
-    values_now = {iid: units * meta[iid].price for iid, units in held.items()}
+    def base(c: Candidate, native: Decimal) -> Decimal:
+        return native if native == 0 else to_base(native, c.currency, c.fx_base_per_quote)
+
+    values_now = {iid: base(meta[iid], units * meta[iid].price) for iid, units in held.items()}
     equity = sum(values_now.values(), Decimal(0))
     capital = investable if investable is not None else equity
     if capital <= 0:
@@ -318,18 +341,20 @@ def rebalance(
         line = by_id.get(iid)
         units_target = Decimal(line.units) if line else Decimal(0)
         value_now = values_now[iid]
-        value_target = units_target * c.price
+        value_target = base(c, units_target * c.price)
         values_target[iid] = value_target
-        trade = abs(value_target - value_now)
+        # The trade and its floor in the market's currency, where the fee card
+        # and the floor are defined; the cost reported in MYR beside the values.
+        trade = abs(units_target - units_now) * c.price
         cost = Decimal(0)
         if trade > 0 and c.round_trip_cost_at is not None:
-            cost = c.round_trip_cost_at(trade)
+            cost = base(c, c.round_trip_cost_at(trade))
 
         # A trade below the market's minimum economic position pays more in
         # spread and fees than the drift it corrects. Reporting it as a small
         # trade invites the user to make it.
         floor = (
-            cost_floor_value(c.round_trip_cost_at, c.mic)
+            cost_floor_value(c.round_trip_cost_at, c.mic, c.broker)
             if c.round_trip_cost_at is not None
             else Decimal(0)
         )
@@ -348,7 +373,7 @@ def rebalance(
             action, reason = (
                 "hold",
                 f"a {c.currency} {trade:,.2f} adjustment costs more to make than the drift "
-                f"it corrects (round trip {c.currency} {cost:,.2f}, minimum economic trade "
+                f"it corrects (round trip {BASE_CURRENCY} {cost:,.2f}, minimum economic trade "
                 f"{c.currency} {floor:,.2f})",
             )
             units_target, value_target, cost = units_now, value_now, Decimal(0)

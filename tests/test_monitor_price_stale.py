@@ -35,12 +35,21 @@ def _cfg(**over):
     return replace(load_config(), **over)
 
 
-def _cache(path: Path, rows: list[tuple[str, str, str]], body: str = CSV) -> str:
-    """A cache holding one row per (feed, symbol, fetched_on)."""
+def _bars_to(day: str) -> str:
+    """A body whose last bar is `day`: the rule judges the bars a body holds."""
+    return f"date,open,high,low,close,volume\n{day},1,2,0.5,1.5,100\n"
+
+
+def _cache(path: Path, rows: list[tuple[str, str, str]], body: str | None = None) -> str:
+    """A cache holding one row per (feed, symbol, fetched_on), each body ending on
+    its fetch day unless a body is given."""
     cache = PriceCache(path, today=lambda: "2026-09-19")
     cache.conn.executemany(
         "INSERT INTO price_csv (feed, symbol, fetched_on, body) VALUES (?,?,?,?)",
-        [(feed, symbol, day, body) for feed, symbol, day in rows],
+        [
+            (feed, symbol, day, body if body is not None else _bars_to(day))
+            for feed, symbol, day in rows
+        ],
     )
     cache.conn.commit()
     cache.close()
@@ -90,6 +99,7 @@ def test_a_stale_book_name_is_an_alert_that_names_it_and_the_next_step(tmp_path)
         "role": "book",
         "market": "XNAS",
         "fetched_on": "2026-09-16",
+        "last_bar": "2026-09-16",
         "last_session": "2026-09-18",
         "sessions_behind": 2,
         "allowed": 1,
@@ -325,3 +335,24 @@ def test_a_graph_that_will_not_load_judges_no_peers_and_still_the_book(tmp_path,
     (alert,) = _stale(_price_rules(_cfg(), SATURDAY, path))
     assert alert.severity == ALERT
     assert [r["name"] for r in alert.evidence["stale"]] == ["XNAS:NVDA"]
+
+
+def test_a_body_is_judged_by_its_last_usable_bar_not_its_fetch_day(tmp_path):
+    """2026-10-08 01:00Z: the US rows were fetched that day, but their 10-07 bar
+    came back with a blank close, so the newest close they held was 10-06. Read
+    by fetch day they were fresh; read by their bars they were a session behind,
+    and on the Friday after, two."""
+    blank_tail = (
+        "date,open,high,low,close,volume\n2026-09-16,1,2,0.5,1.5,100\n2026-09-17,1,2,0.5,,100\n"
+    )
+    path = _cache(
+        tmp_path / "p.db",
+        [("yahoo", "1155.KL", "2026-09-18"), ("yahoo", "NVDA", "2026-09-19")],
+    )
+    cache = PriceCache(path, today=lambda: "2026-09-19")
+    cache.conn.execute("UPDATE price_csv SET body = ? WHERE symbol = 'NVDA'", (blank_tail,))
+    cache.conn.commit()
+    cache.close()
+    alerts = _stale(_price_rules(_cfg(), SATURDAY, path))
+    assert alerts and "XNAS:NVDA (book, 2 sessions behind)" in alerts[0].title
+    assert alerts[0].evidence["stale"][0]["last_bar"] == "2026-09-16"

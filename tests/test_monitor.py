@@ -33,9 +33,14 @@ def _cfg(**over):
     outside the case, on a clock nobody set. Each rule's own tests point at a
     store they built; every other test here sees none.
     """
+    real = load_config()
     over.setdefault("corpus_db", "tests/no-such-corpus.db")
     over.setdefault("facts_db", "tests/no-such-facts.db")
-    return replace(load_config(), **over)
+    # data/paper.db too, the fourth time: on 2026-10-09 a branch whose last
+    # mark was 10-06 tripped `paper_stale` in three cases about spend and exit
+    # codes. The paper rules' own tests build their own book.
+    over.setdefault("paper", replace(real.paper, database="tests/no-such-paper.db"))
+    return replace(real, **over)
 
 
 #: The nightly pages are tracked too, and their questions age. Every case that
@@ -1041,11 +1046,122 @@ def test_a_slot_that_arrives_hours_late_still_counts_as_today(tmp_path):
     assert "bursa_close" not in due
 
 
-def test_a_sweep_of_everything_settles_the_whole_day(tmp_path):
+def test_a_sweep_of_everything_after_every_firing_settles_them_all(tmp_path):
     now = datetime(2026, 9, 10, 14, 0, tzinfo=UTC)
-    _ran(tmp_path / "corpus.db", "all", now - timedelta(hours=2))
+    _ran(tmp_path / "corpus.db", "all", now - timedelta(hours=1))  # 13:00, after 12:30
     due, why = _outstanding(tmp_path, now)
     assert due == [] and "every slot" in why
+
+
+def test_a_sweep_of_everything_settles_only_the_firings_before_it(tmp_path):
+    """It used to settle the whole UTC day. An all-run at 08:50 then left the
+    09:20, 12:30 and 21:15 firings owed nothing, and a day that lost all three
+    read as complete at the 22:33 catch-up - the 2026-09-07 shape the rule's own
+    docstring cites."""
+    path = tmp_path / "corpus.db"
+    _ran(path, "all", datetime(2026, 9, 10, 8, 50, tzinfo=UTC))
+    due, why = _outstanding(tmp_path, datetime(2026, 9, 10, 22, 33, tzinfo=UTC))
+    assert due == ["bursa_close", "us_preopen", "us_close"] and why == ""
+
+
+def _failed_run(path: Path, slot: str, at: datetime):
+    from knowledge.corpus import Corpus
+
+    with Corpus(path) as c:
+        for source in ("gdelt", "google_news"):
+            c.record_sweep(f"{slot}-{at.isoformat()}", source, at, "failed", at=at, slot=slot)
+
+
+def test_a_run_whose_every_source_failed_leaves_the_slot_owed(tmp_path):
+    """It fired but collected nothing. Counting it closed the firing: the late
+    cron was skipped as a repeat and the catch-up owed nothing."""
+    path = tmp_path / "corpus.db"
+    _failed_run(path, "bursa_close", datetime(2026, 9, 10, 9, 30, tzinfo=UTC))
+    due, _ = _outstanding(tmp_path, datetime(2026, 9, 10, 14, 0, tzinfo=UTC))
+    assert "bursa_close" in due
+
+    # one source that read something is enough to close it
+    from knowledge.corpus import Corpus
+
+    with Corpus(path) as c:
+        c.record_sweep(
+            "late",
+            "nst_business",
+            datetime(2026, 9, 10, 10, 0, tzinfo=UTC),
+            "ok",
+            at=datetime(2026, 9, 10, 10, 0, tzinfo=UTC),
+            slot="bursa_close",
+        )
+    due, _ = _outstanding(tmp_path, datetime(2026, 9, 10, 14, 0, tzinfo=UTC))
+    assert "bursa_close" not in due
+
+
+def test_a_skip_is_not_a_collection(tmp_path):
+    from knowledge.corpus import Corpus
+
+    path = tmp_path / "corpus.db"
+    at = datetime(2026, 9, 10, 9, 30, tzinfo=UTC)
+    with Corpus(path) as c:
+        c.record_sweep(
+            "r1",
+            "fmp",
+            at,
+            "ok",
+            at=at,
+            slot="bursa_close",
+            detail="skipped: no name in the book trades in slot 'bursa_close'",
+        )
+        c.record_sweep("r1", "gdelt", at, "failed", at=at, slot="bursa_close")
+    due, _ = _outstanding(tmp_path, datetime(2026, 9, 10, 14, 0, tzinfo=UTC))
+    assert "bursa_close" in due
+
+
+def test_the_guard_does_not_skip_a_slot_whose_earlier_run_read_nothing(tmp_path):
+    from knowledge.sweep import _already_ran
+
+    path = tmp_path / "corpus.db"
+    _failed_run(path, "us_close", datetime(2026, 9, 10, 22, 0, tzinfo=UTC))
+    assert _already_ran(str(path), "us_close", datetime(2026, 9, 10, 23, 50, tzinfo=UTC)) == ""
+    _ran(path, "us_close", datetime(2026, 9, 10, 23, 55, tzinfo=UTC))
+    assert _already_ran(str(path), "us_close", datetime(2026, 9, 11, 0, 30, tzinfo=UTC))
+
+
+def test_slots_missed_counts_a_run_against_its_firing_not_its_utc_day(tmp_path):
+    """Every us_close of the window ran, each landing at 00:30 the next UTC day.
+    Counted by arrival day, the last one fell out of the window and the first
+    day's count came from the night before it - so on 2026-10-07 the rule said
+    `us_close 2 of 3` about a slot that missed nothing."""
+    now = datetime(2026, 9, 10, 14, 0, tzinfo=UTC)  # window 09-07 .. 09-09
+    path = tmp_path / "corpus.db"
+    _full_days(path, now, 4, skip={"us_close", "us_preopen"})  # history from 09-06
+    _ran(path, "us_close", datetime(2026, 9, 6, 21, 20, tzinfo=UTC))  # the night before: on time
+    for day in (7, 8, 9):  # the window's three firings, each landing at 00:30 the next day
+        _ran(path, "us_close", datetime(2026, 9, day + 1, 0, 30, tzinfo=UTC))
+    # and two us_preopen firings truly lost: 09-08 and 09-09 (09-07 arrived)
+    _ran(path, "us_preopen", datetime(2026, 9, 7, 12, 35, tzinfo=UTC))
+    alerts = evaluate(_slot_cfg(tmp_path), db=str(_ledger(tmp_path / "led.db")), now=now)
+    missed = [a for a in alerts if a.rule == "slots_missed"]
+    assert missed, "two us_preopen firings were lost"
+    assert missed[0].evidence["arrived"]["us_close"] == 3, "every us_close firing answered"
+    assert missed[0].evidence["arrived"]["us_preopen"] == 1
+    assert "us_close 3 of 3" in missed[0].title
+
+
+def test_a_late_run_from_the_night_before_cannot_hide_a_real_miss(tmp_path):
+    """Scenario A: Sunday's us_close landed at 00:30 Monday and Monday's never ran.
+    By arrival day that was 'us_close 3 of 3'."""
+    now = datetime(2026, 9, 10, 14, 0, tzinfo=UTC)  # window Mon 09-07 .. Wed 09-09
+    path = tmp_path / "corpus.db"
+    _full_days(path, now, 4, skip={"us_close", "us_preopen"})  # history from 09-06
+    _ran(path, "us_close", datetime(2026, 9, 7, 0, 30, tzinfo=UTC))  # Sunday 09-06's firing
+    _ran(path, "us_close", datetime(2026, 9, 8, 21, 20, tzinfo=UTC))  # Tuesday's
+    _ran(path, "us_close", datetime(2026, 9, 9, 21, 20, tzinfo=UTC))  # Wednesday's
+    _ran(path, "us_preopen", datetime(2026, 9, 7, 12, 35, tzinfo=UTC))
+    _ran(path, "us_preopen", datetime(2026, 9, 8, 12, 35, tzinfo=UTC))
+    alerts = evaluate(_slot_cfg(tmp_path), db=str(_ledger(tmp_path / "led.db")), now=now)
+    missed = [a for a in alerts if a.rule == "slots_missed"]
+    assert missed and missed[0].evidence["arrived"]["us_close"] == 2
+    assert missed[0].evidence["missed"] == 2
 
 
 def test_it_refuses_to_guess_when_runs_carry_no_slot(tmp_path):

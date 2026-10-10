@@ -488,6 +488,14 @@ def decide(
                     t.target_id, day, "superseded", f"replaced by a later decision on {day}"
                 )
             result.superseded = len(todays)
+        # ONE LIVE DECISION. A decision is the whole target book, so every
+        # older decision still waiting for its bar is replaced by this one - for
+        # the names it repeats and for the names it leaves out. Left pending,
+        # Friday's, Saturday's and Sunday's books all filled at Monday's open,
+        # each against the same holding (see `_one_live_target_per_name`).
+        result.superseded += supersede_pending(
+            store, DECIDED, on=day, why=f"replaced by the decision of {day}", reasons=("decision",)
+        )
         ids = store.record_targets(rows)
         for tid, t in zip(ids, rows, strict=True):
             if t.reason == ALL_CASH:
@@ -605,7 +613,7 @@ def _exit(
     units: int,
     quote: FxQuote,
     settings: PaperSettings,
-) -> PositionChange:
+) -> PositionChange | None:
     iid = t.instrument_id
     ccy = currency_of(iid)
     mic = mic_of(iid)
@@ -614,6 +622,11 @@ def _exit(
     held = pos.units if pos else 0
     avg = pos.avg_cost if pos else Decimal(0)
     units = min(units, held)
+    if units <= 0:
+        # Nothing left to sell. Recording an `exit 0` charged the Bursa card's
+        # flat RM3 platform fee plus SST on zero consideration - a phantom trade
+        # in the cost to date - whenever a stop and a decision exit met.
+        return None
     bar_open = dec(bar.open)
     price = leg_price(bar_open, EXIT, settings.slippage_bps(mic), tick_for(iid, bar_open))
     consideration = price * units
@@ -659,7 +672,8 @@ def apply_pending(
     settings = settings_of(cfg, store)
     out: list[Applied] = []
     ready: list[tuple[TargetRow, Bar]] = []
-    for t in store.pending_targets(book):
+    live = _one_live_target_per_name(store, store.pending_targets(book), up_to, out)
+    for t in live:
         assert t.target_id is not None
         if t.phase in (OBSERVE, PRE) and t.reason == "decision":
             if up_to > t.decided_on:
@@ -668,7 +682,7 @@ def apply_pending(
                 )
                 out.append(Applied(t, "observed"))
             continue
-        bar = first_bar_after(feed, t.instrument_id, t.decided_on, up_to)
+        bar = _fill_bar(feed, t, up_to)
         if bar is None:
             if weekdays_between(t.decided_on, up_to) > EXPIRE_AFTER_WEEKDAYS:
                 store.resolve(t.target_id, up_to, "expired", "no cached bar within five weekdays")
@@ -720,6 +734,10 @@ def apply_pending(
         change = _exit(
             store, cfg, fx, book=book, t=t, bar=bar, units=-delta, quote=quote, settings=settings
         )
+        if change is None:
+            store.resolve(t.target_id, bar.day, "no_change", "nothing held to exit")
+            out.append(Applied(t, "no_change"))
+            continue
         store.record_change(change)
         store.resolve(
             t.target_id,
@@ -773,6 +791,92 @@ class PositionChangeStub:
     units = 0
 
 
+def _target_order(t: TargetRow) -> tuple:
+    at = t.decided_at if t.decided_at.tzinfo else t.decided_at.replace(tzinfo=UTC)
+    return (t.decided_on, at, t.target_id or 0)
+
+
+def _one_live_target_per_name(
+    store: PaperStore, pending: list[TargetRow], up_to: date, out: list[Applied]
+) -> list[TargetRow]:
+    """The newest pending target per instrument; the older ones resolved as superseded.
+
+    Every target is sized as `target units - held`, with `held` read before
+    any of the run's changes. Two pending targets for one name each bought the
+    whole difference: three identical weekend decisions waiting for Monday's
+    first bar would take a 21% weight to 42%, past the 25% cap and the ramp's
+    40% ceiling. `decide` and the rebalance writers now retire the older
+    targets when they write; this is the same rule at the point of use, for
+    anything already in the ledger.
+
+    One exception: a pending STOP beats a later decision for the same name.
+    `validate_targets` already refuses to target a stopped name above zero, so
+    the later decision can only be an exit too - and one exit is the trade.
+    """
+    by_name: dict[str, list[TargetRow]] = {}
+    for t in pending:
+        by_name.setdefault(t.instrument_id, []).append(t)
+    live: list[TargetRow] = []
+    for rows in by_name.values():
+        if len(rows) == 1:
+            live.append(rows[0])
+            continue
+        stops = [t for t in rows if t.reason == "stop"]
+        keep = max(stops or rows, key=_target_order)
+        for t in rows:
+            if t is keep:
+                continue
+            assert t.target_id is not None
+            why = (
+                "the pending stop exits this name"
+                if keep.reason == "stop"
+                else f"replaced by the {keep.reason} target of {keep.decided_on}"
+            )
+            store.resolve(t.target_id, up_to, "superseded", why)
+            out.append(Applied(t, "superseded", why))
+        live.append(keep)
+    return sorted(live, key=lambda t: (t.decided_on, t.target_id or 0))
+
+
+def _fill_bar(feed, t: TargetRow, up_to: date):
+    """The bar a target fills at: the first session that OPENED after the decision.
+
+    `first_bar_after(decided_on)` alone is the next calendar session, and a
+    decision recorded after that session had opened - the nightly routine
+    running at 02:42Z, after Bursa's 01:00Z open - filled at a price printed
+    before it was decided. Such a target waits for the session after.
+    """
+    bar = first_bar_after(feed, t.instrument_id, t.decided_on, up_to)
+    decided_at = t.decided_at if t.decided_at.tzinfo else t.decided_at.replace(tzinfo=UTC)
+    while bar is not None:
+        try:
+            session = market_get(mic_of(t.instrument_id)).calendar.session(bar.day)
+        except (KeyError, ValueError):
+            return bar
+        if session is None or session.open_utc() > decided_at:
+            return bar
+        bar = first_bar_after(feed, t.instrument_id, bar.day, up_to)
+    return None
+
+
+def supersede_pending(
+    store: PaperStore, book: str, *, on: date, why: str, reasons: tuple[str, ...] | None = None
+) -> int:
+    """Retire a book's pending targets before a newer set is written. Returns how many.
+
+    `reasons` limits it to those kinds (the decided book keeps a pending stop
+    through a new decision; the stop exits at the next open whatever is decided).
+    """
+    n = 0
+    for t in store.pending_targets(book):
+        if reasons is not None and t.reason not in reasons:
+            continue
+        assert t.target_id is not None
+        store.resolve(t.target_id, on, "superseded", why)
+        n += 1
+    return n
+
+
 # -- mark ------------------------------------------------------------------------------------
 
 
@@ -780,9 +884,12 @@ def mark_book(
     store: PaperStore, cfg, feed, fx: UsdMyr, *, book: str, day: date, slot: str, now: datetime
 ) -> tuple[MarkRow, list[str]]:
     settings = settings_of(cfg, store)
-    state = store.state(book)
+    # The book as it stood at THIS session's close, and the mark before it on
+    # or before this day: a slot that falls back to an earlier session must not
+    # value later fills at earlier closes, or take its peak from a later day.
+    state = store.state(book, end=day)
     quote = fx.asof(day)
-    prev = store.latest_mark(book)
+    prev = store.latest_mark(book, on_or_before=day)
     prev_close = {p["instrument_id"]: p for p in (prev.positions if prev else [])}
     problems: list[str] = []
     rows: list[dict] = []
@@ -828,7 +935,9 @@ def mark_book(
             }
         )
     equity = _cents(state.cash_usd + positions_usd)
-    peak = max(prev.peak_usd if prev else store.initial_cash(book), equity)
+    # From the marks that REMAIN: the (day, slot) reading this mark replaces is
+    # left out, so a provisional spike it carried does not outlive it.
+    peak = max(store.peak_equity(book, day, excluding=(day, slot)), equity)
     drawdown = (Decimal(1) - equity / peak) if peak > 0 else Decimal(0)
     drawdown = max(Decimal(0), drawdown).quantize(TENTH_BP)
     for r in rows:
@@ -998,6 +1107,7 @@ def index_rebalance(store: PaperStore, cfg, feed, fx: UsdMyr, *, mark_row: MarkR
         settings=settings,
     )
     if any((t.target_units or 0) > 0 for t in res.targets):
+        supersede_pending(store, INDEX, on=day, why=f"replaced by the index rebalance of {day}")
         store.record_targets(res.targets)
     else:
         # Nothing priced, nothing to hold: write nothing, so the next mark
@@ -1053,6 +1163,15 @@ def mark(
             "bar to mark from; nothing marked"
         )
         return result
+    missing = _closed_session_without_a_bar(cfg, slot, day, session, now)
+    if missing:
+        # The day traded and has closed, and the cache holds no usable bar for
+        # it - on 2026-10-05 Yahoo served Monday's row with a blank close. Marking
+        # the session before it instead replaced Friday's marks with a later
+        # reading and left Monday with no mark at all, at exit 0. Say so, exit 3,
+        # and leave the earlier session's marks alone; the next run retries.
+        result.problems.append(missing)
+        return result
     if session != day:
         result.notes.append(
             f"marked as {session}: the session of the last cached bar on or before {day} "
@@ -1084,6 +1203,8 @@ def mark(
         result.marks[book] = m
         result.problems += [f"{book}: {p}" for p in problems]
         if book == DECIDED:
+            if prior is not None and m is not prior:
+                result.notes += _withdraw_stale_stops(store, cfg, prior, m)
             result.stops = stop_checks(store, cfg, m, now)
         elif book == INDEX:
             try:
@@ -1127,9 +1248,88 @@ def mark(
                     )
                 )
             if rows:
+                supersede_pending(
+                    store, CONTROL, on=day, why=f"replaced by the control rebalance of {day}"
+                )
                 store.record_targets(rows)
             result.control_targets = rows
     return result
+
+
+#: How long after a session's close the vendor is given to serve its bar before
+#: a missing one is a problem rather than a wait. The Bursa catch-up runs 65
+#: minutes after the close and has found the day's bar every time it ran.
+BAR_GRACE = timedelta(minutes=30)
+
+
+def _closed_session_without_a_bar(
+    cfg, slot: str, day: date, session: date | None, now: datetime
+) -> str:
+    """Why the run cannot mark, or "" when it can or no closed session is owed a bar.
+
+    Owed: a session of a market the slot marks, after the newest usable bar
+    (`session`) and on or before `day`, that closed more than `BAR_GRACE` before
+    `now`. Every such day is checked, not only `day`: the us_close run that
+    lands at 01:00Z is dated the NEXT UTC day, and on 2026-10-08 that run found
+    the 10-07 US rows with blank closes and quietly re-marked 10-06. A holiday
+    is not a session, so it never alarms; a session still trading is not owed.
+    """
+    if session is None or session >= day:
+        return ""
+    for mic in slot_markets(cfg, slot):
+        try:
+            calendar = market_get(mic).calendar
+        except (KeyError, ValueError):
+            continue
+        d = session + timedelta(days=1)
+        while d <= day:
+            owed = calendar.session(d)
+            if owed is not None and owed.close_utc() + BAR_GRACE <= now:
+                return (
+                    f"{d} is a {mic} session that closed at {owed.close_utc():%Y-%m-%d %H:%M}Z "
+                    f"and the cache holds no usable bar for it on any name the {slot} slot "
+                    f"marks (the newest is {session}); nothing marked, so the {session} marks "
+                    "stay as they were. A blank close from the vendor looks like this; the "
+                    "next run retries"
+                )
+            d += timedelta(days=1)
+    return ""
+
+
+def _withdraw_stale_stops(
+    store: PaperStore, cfg, replaced: MarkRow, mark_row: MarkRow
+) -> list[str]:
+    """Withdraw stops the replaced reading raised that the new reading does not breach.
+
+    A stop is a fact about a close. When a later run of the same slot replaces
+    a provisional reading - an intraday dip that touched the line - with a
+    settled close above it, the stop raised by the dip would still sell the
+    position at the next open. It is resolved `withdrawn` instead, and says why.
+    """
+    settings = settings_of(cfg, store)
+    closes = {p["instrument_id"]: p for p in mark_row.positions if not p.get("unpriced")}
+    raised_at = (
+        replaced.marked_at if replaced.marked_at.tzinfo else replaced.marked_at.replace(tzinfo=UTC)
+    )
+    notes: list[str] = []
+    for t in store.pending_targets(DECIDED):
+        at = t.decided_at if t.decided_at.tzinfo else t.decided_at.replace(tzinfo=UTC)
+        if t.reason != "stop" or t.decided_on != replaced.day or at != raised_at:
+            continue
+        p = closes.get(t.instrument_id)
+        if p is None:
+            continue
+        close, avg = dec(p["close"]), dec(p["avg_cost"])
+        line = avg * (Decimal(1) - settings.stop_loss)
+        if close > line:
+            assert t.target_id is not None
+            why = (
+                f"re-marked: the {mark_row.slot} reading of {mark_row.day} that raised it was "
+                f"replaced, and the close {close} is above the stop line {line:.4f}"
+            )
+            store.resolve(t.target_id, mark_row.day, "withdrawn", why)
+            notes.append(f"{t.instrument_id}: stop withdrawn - {why}")
+    return notes
 
 
 def restamp_marks(store: PaperStore, feed, cfg) -> list[str]:

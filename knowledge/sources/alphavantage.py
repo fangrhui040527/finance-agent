@@ -34,18 +34,34 @@ from knowledge.sources.base import Collector, Pull, SourceError, local_code, par
 
 URL = "https://www.alphavantage.co/query"
 
-#: The vendor answers 200 with an "Information" or "Note" field for two
-#: different problems, and its quota wording also mentions the API key ("your
-#: API key ... 25 requests per day"). Quota phrasing is checked first so a
-#: spent day is not misread as a bad key, and a bad key - a configuration
-#: error, not something to wait out - is not misread as a spent day.
-_QUOTA_MARKERS = ("rate limit", "requests per day", "call frequency", "premium")
+#: The vendor answers 200 with an "Information" or "Note" field for four
+#: different problems, and its wordings overlap: the daily-quota notice also
+#: mentions "premium plans" and the caller's "API key". So the order of the
+#: checks is the classification:
+#:
+#:   1. the BURST notice ("1 request per second ... spreading out") - a
+#:      request made too soon after the last one. Nothing is spent; the next
+#:      run, paced, reads it. Until 2026-10-08 the word "premium" in it made
+#:      this read "quota exhausted for today", and a vendor that refused the
+#:      second and third name of every run for a month looked out of credits;
+#:   2. a PREMIUM ENDPOINT - the key's plan does not include the call. Waiting
+#:      does not fix it; the key or the plan has to change;
+#:   3. the day's QUOTA - spent, back tomorrow;
+#:   4. a rejected KEY - a configuration error, not something to wait out.
+_BURST_MARKERS = ("per second", "spreading out", "sparingly")
+_PREMIUM_MARKERS = ("premium endpoint",)
+_QUOTA_MARKERS = ("rate limit", "requests per day", "call frequency")
 _KEY_MARKERS = ("api key", "apikey")
 
 
 def classify_notice(text: str) -> str:
-    """What a 200-with-notice means: a spent quota, a rejected key, or neither."""
+    """What a 200-with-notice means: a burst, a premium endpoint, a spent
+    quota, a rejected key, or none of those."""
     low = text.lower()
+    if any(m in low for m in _BURST_MARKERS):
+        return "throttled (more than 1 request per second)"
+    if any(m in low for m in _PREMIUM_MARKERS):
+        return "refused a premium endpoint (the key's plan does not include it)"
     if any(m in low for m in _QUOTA_MARKERS):
         return "quota exhausted for today"
     if any(m in low for m in _KEY_MARKERS):
@@ -60,6 +76,10 @@ class AlphaVantageNews(Collector):
     name = "alphavantage_news"
     key_env = "ALPHAVANTAGE_API_KEY"
     LIMIT = 200
+    #: The free plan answers one request per second and refuses the next one
+    #: inside it with the burst notice; one name per request makes the second
+    #: name of every run that next one.
+    SECONDS_BETWEEN_REQUESTS = 1.2
 
     def collect(
         self, since: datetime, instruments: tuple[str, ...] = (), slot: str = "all"
@@ -72,6 +92,7 @@ class AlphaVantageNews(Collector):
         weighted: dict[tuple[str, str], list[tuple[Decimal, Decimal]]] = defaultdict(list)
         seen: set[str] = set()
         errors: list[SourceError] = []
+        pull.asked = [by_symbol[s] for s in sorted(by_symbol)]
         for symbol in sorted(by_symbol):
             try:
                 feed = self._feed_of(
@@ -93,6 +114,7 @@ class AlphaVantageNews(Collector):
                 # first error is raised, so a spent day is never a quiet one.
                 errors.append(e)
                 pull.notes.append(f"{by_symbol[symbol]}: {e}")
+                pull.failed.append((by_symbol[symbol], str(e)))
                 continue
             for item in feed:
                 if not isinstance(item, dict) or not item.get("title"):

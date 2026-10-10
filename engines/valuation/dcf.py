@@ -112,21 +112,66 @@ def project(
     return DcfResult("", tuple(revenues), tuple(flows), pv, pv_tv, ev, share, equity, per_share)
 
 
-def implied_growth(price: Decimal, base: Decimal, discount: Decimal, years: int = 10) -> Decimal:
-    """The constant growth for `years` that makes the present value of `base` equal `price`.
+# The reverse DCF solves for growth inside this range and says so when the answer is outside it.
+IMPLIED_GROWTH_FLOOR = Decimal("-0.20")
+IMPLIED_GROWTH_CEILING = Decimal("0.60")
 
-    The reverse DCF the valuation agent has always run, in Decimal: a statement
-    about the price, not an estimate of value.
+
+def _price_at_growth(
+    base: Decimal, growth: Decimal, discount: Decimal, terminal_growth: Decimal, years: int
+) -> Decimal:
+    """Present value of `base` growing at `growth` for `years`, then at `terminal_growth`
+    in perpetuity (a Gordon value on the year after), all of it treated as distributable."""
+    if discount <= terminal_growth:
+        raise ValueError("discount rate must exceed terminal growth; the perpetuity is undefined")
+    explicit = sum(
+        (base * (ONE + growth) ** t / (ONE + discount) ** t for t in range(1, years + 1)), ZERO
+    )
+    after = base * (ONE + growth) ** years * (ONE + terminal_growth) / (discount - terminal_growth)
+    return explicit + after / (ONE + discount) ** years
+
+
+def implied_growth(
+    price: Decimal, base: Decimal, discount: Decimal, terminal_growth: Decimal, years: int = 10
+) -> Decimal | None:
+    """The constant growth for `years`, then `terminal_growth` forever, at which the
+    present value of `base` equals `price`; None when it lies outside the solver's range.
+
+    A statement about the price, not an estimate of value. The terminal growth is the
+    one the scenario DCF uses (terminal_growth_for). Without it the ten years were all
+    the price could buy, which read NVDA at 30.21x earnings and a 15.33% discount as
+    requiring 37.8% a year where the price requires 22.2%. And the bisection used to
+    hand back its own bound, so every multiple above about 90x printed 60.0%: a price
+    beyond either end is None here, and beyond_solver_range names the end.
     """
-    lo, hi = Decimal("-0.20"), Decimal("0.60")
+    if base <= 0 or price <= 0:
+        # Growth on a loss shrinks the present value, so the solver's ends swap
+        # and a loss-maker read as needing more than 60% a year.
+        raise ValueError("a reverse DCF needs a positive price and positive earnings")
+    lo, hi = IMPLIED_GROWTH_FLOOR, IMPLIED_GROWTH_CEILING
+    # present value rises with growth, so a price outside the two ends has no root between them
+    if not (
+        _price_at_growth(base, lo, discount, terminal_growth, years)
+        <= price
+        <= _price_at_growth(base, hi, discount, terminal_growth, years)
+    ):
+        return None
     for _ in range(60):
         g = (lo + hi) / 2
-        pv = sum((base * (ONE + g) ** t / (ONE + discount) ** t for t in range(1, years + 1)), ZERO)
-        if pv < price:
+        if _price_at_growth(base, g, discount, terminal_growth, years) < price:
             lo = g
         else:
             hi = g
     return hi
+
+
+def beyond_solver_range(
+    price: Decimal, base: Decimal, discount: Decimal, terminal_growth: Decimal, years: int = 10
+) -> str:
+    """Which end of the solver's range a None from implied_growth lies past, in words."""
+    if price > _price_at_growth(base, IMPLIED_GROWTH_CEILING, discount, terminal_growth, years):
+        return f"above {IMPLIED_GROWTH_CEILING:.0%} a year"
+    return f"below {IMPLIED_GROWTH_FLOOR:.0%} a year"
 
 
 def _margin_history(s: Statements) -> list[Decimal]:
@@ -168,6 +213,22 @@ def history_of(s: Statements) -> History:
     )
 
 
+def terminal_growth_for(
+    coc: CostOfCapital, table: CostOfCapitalTable, country: str
+) -> Decimal | None:
+    """The perpetual growth every DCF here assumes: the lower of the risk-free rate and the
+    country's long-run nominal growth, held a point under the discount rate. None when
+    neither is stored."""
+    known = [x for x in (coc.rf, table.long_run_growth.get(country)) if x is not None]
+    if not known:
+        return None
+    terminal = min(known)
+    discount, _ = coc.discount
+    if discount is not None and terminal >= discount:
+        terminal = discount - Decimal("0.01")
+    return terminal
+
+
 def default_scenarios(
     s: Statements,
     coc: CostOfCapital,
@@ -186,17 +247,14 @@ def default_scenarios(
     g = cagr(s, "revenue")
     if g.value is None:
         reasons.append("no revenue compound growth computable (needs two annual revenues)")
-    ceiling = table.long_run_growth.get(country)
-    if coc.rf is None and ceiling is None:
+    terminal = terminal_growth_for(coc, table, country)
+    if terminal is None:
         reasons.append(
             "no terminal growth ceiling: neither a risk-free rate nor a long-run growth for the country"
         )
     if reasons:
         return (), tuple(reasons)
-    assert discount is not None and g.value is not None
-    terminal = min(x for x in (coc.rf, ceiling) if x is not None)
-    if terminal >= discount:
-        terminal = discount - Decimal("0.01")
+    assert discount is not None and g.value is not None and terminal is not None
     tax = coc.tax_rate if coc.tax_rate is not None else Decimal("0.21")
     reinvest = _reinvestment_history(s)
     reinvest_basis = "median (capex - depreciation) per unit of revenue growth, annual"
@@ -219,11 +277,14 @@ def default_scenarios(
             f"tax {tax:.1%} ({coc.tax_source or 'default'}), discount {discount:.2%} ({which})",
         ),
     )
-    bear = mk("bear", max(terminal, g.value / 2), margins_sorted[0])
+    # bear growth is capped at the base's: uncapped, half of NVDA's 67.1% CAGR (33.6%)
+    # out-grew both the base (25%) and the bull (30%), and the bear became the top of
+    # the range. The bull never under-grows the base; margins are ordered by the sort.
+    bear_g = max(terminal, min(g.value / 2, base_g))
+    bull_g = max(base_g, min(g.value * Decimal("1.5"), Decimal("0.30")))
+    bear = mk("bear", bear_g, margins_sorted[0])
     base = mk("base", base_g, median)
-    bull = mk(
-        "bull", max(base_g, min(g.value * Decimal("1.5"), Decimal("0.30"))), margins_sorted[-1]
-    )
+    bull = mk("bull", bull_g, margins_sorted[-1])
     return (bear, base, bull), ()
 
 

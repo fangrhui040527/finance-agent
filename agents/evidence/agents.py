@@ -338,27 +338,58 @@ class A2Valuation(Agent):
         ]
 
     def reverse_dcf(
-        self, price: float, current_earnings: float, discount: float, years: int = 10
+        self,
+        price: float,
+        current_earnings: float,
+        discount: float,
+        terminal_growth: float,
+        years: int = 10,
     ) -> list[Finding]:
-        """State what the price already REQUIRES, rather than manufacturing a value."""
+        """State what the price already REQUIRES, rather than manufacturing a value.
+
+        The arithmetic is engines.valuation.dcf.implied_growth's, terminal value
+        included. This used to keep a float copy that valued nothing after year ten
+        and returned the solver's 60% bound as though it were an answer.
+        """
         self._guard_tool("reverse_dcf")
-        lo, hi = -0.20, 0.60
-        for _ in range(60):
-            g = (lo + hi) / 2
-            pv = sum(
-                current_earnings * (1 + g) ** t / (1 + discount) ** t for t in range(1, years + 1)
+        from engines.valuation.dcf import beyond_solver_range, implied_growth
+
+        p, e, d, tg = (
+            Decimal(str(x)) for x in (price, current_earnings, discount, terminal_growth)
+        )
+        try:
+            g = implied_growth(p, e, d, tg, years)
+        except ValueError as refused:
+            return [
+                Finding(
+                    self.agent_id,
+                    "reverse_dcf",
+                    f"no reverse DCF at {price:.2f}: {refused}",
+                    caveats=["a refusal, not a number: the arithmetic has no answer here"],
+                )
+            ]
+        basis = (
+            f"for {years} years, then {terminal_growth:.1%} a year in perpetuity, "
+            f"at a {discount:.0%} discount rate"
+        )
+        if g is None:
+            text = (
+                f"at {price:.2f} the market is requiring earnings growth beyond the solver's "
+                f"range ({beyond_solver_range(p, e, d, tg, years)}) {basis}"
             )
-            if pv < price:
-                lo = g
-            else:
-                hi = g
+            numbers: dict[str, float] = {}
+        else:
+            text = (
+                f"at {price:.2f} the market is already requiring roughly {g:.1%} annual "
+                f"earnings growth {basis}"
+            )
+            numbers = {"implied_growth": float(g)}
         return [
             Finding(
                 self.agent_id,
                 "reverse_dcf",
-                f"at {price:.2f} the market is already requiring roughly {hi:.1%} annual "
-                f"earnings growth for {years} years at a {discount:.0%} discount rate",
-                numbers={"implied_growth": hi},
+                text,
+                numbers=numbers,
                 caveats=["this is what the price implies, not an estimate of value"],
             )
         ]
@@ -464,12 +495,15 @@ class A2Valuation(Agent):
         price: Decimal | None = None,
         earnings: Decimal | None = None,
         discount: Decimal | None = None,
+        terminal_growth: Decimal | None = None,
     ) -> list[Finding]:
         """The multiple in its three contexts: own history, peers, growth required."""
         self._guard_tool("peer_multiples")
         from engines.valuation.comps import three_contexts
 
-        tc = three_contexts(book, instrument_id, peers, concept, asof, price, earnings, discount)
+        tc = three_contexts(
+            book, instrument_id, peers, concept, asof, price, earnings, discount, terminal_growth
+        )
         numbers = {}
         if tc.current is not None:
             numbers["current"] = float(tc.current)

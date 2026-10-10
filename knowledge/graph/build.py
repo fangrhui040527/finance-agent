@@ -49,6 +49,8 @@ class BuildReport:
     hubs: list[str] = field(default_factory=list)
     closed: list[tuple] = field(default_factory=list)
     """Edges this build's sources stopped asserting, closed rather than deleted."""
+    reasserted: list[tuple] = field(default_factory=list)
+    """Closed edges the sources assert again, opened as a new interval."""
 
     def describe(self) -> str:
         lines = ["knowledge graph"]
@@ -68,6 +70,12 @@ class BuildReport:
                 else "none - no node is well connected enough to be a meaningless waypoint yet"
             )
         )
+        if self.reasserted:
+            lines.append(
+                f"  reasserted       {len(self.reasserted)} closed edge"
+                f"{'s' if len(self.reasserted) != 1 else ''} the sources assert again, "
+                "opened as a new interval"
+            )
         if self.closed:
             lines.append(
                 f"  closed           {len(self.closed)} edge"
@@ -99,6 +107,7 @@ def build(
     tier: str = DETERMINISTIC,
     skip_markets: bool = False,
     prune_on: date | None = None,
+    today: date | None = None,
 ) -> BuildReport:
     """Extract, validate, store.
 
@@ -130,9 +139,12 @@ def build(
         report.per_extractor[name] = (len(nodes), len(edges))
         for n in sorted(nodes, key=lambda n: n.node_id):
             store.add_node(n, tier=tier)
+    on = prune_on or today or date.today()
     for _, _, edges in collected:
         for e in sorted(edges, key=lambda e: (e.src, e.dst, e.kind.value, e.valid_from or "")):
             store.add_edge(e, tier=tier)
+            if store.reassert(e, tier, on):
+                report.reasserted.append((e.src, e.dst, e.kind.value))
 
     if prune_on is not None:
         report.closed = store.close_missing(
