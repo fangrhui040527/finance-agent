@@ -52,6 +52,7 @@ from engines.paper.store import (
     CASH,
     CONTROL,
     DECIDED,
+    DIVIDEND,
     INDEX,
     BookState,
     MarkRow,
@@ -114,9 +115,20 @@ def fx_for(cfg, fx_db: str | None = None) -> UsdMyr:
     )
 
 
-def grade_date(made: datetime, horizon_days: int) -> date:
-    """Sessions -> calendar days, the same arithmetic predict.py uses."""
-    return (made + timedelta(days=horizon_days / 5 * 7)).date()
+def grade_date(cfg, instrument_id: str, day: date, horizon_days: int) -> date:
+    """The `horizon_days`-th session after the decision day, on the name's own
+    exchange calendar; an all-cash row's on every market the book trades, so
+    the window holds the full horizon on each (`core.market.calendar`).
+
+    Until 2026-10-10 this was calendar days at seven for every five, so a
+    "21d" call covered 19 to 22 Bursa sessions depending on the weekday it was
+    decided, and graded on a Sunday as often as not. Predictions logged before
+    then keep the grade_on they were written with; only new ones count sessions.
+    """
+    from core.market.calendar import horizon_end
+
+    mics = slot_markets(cfg, "all") if instrument_id == CASH else {mic_of(instrument_id)}
+    return horizon_end(mics, day, horizon_days)
 
 
 def current_weights(mark: MarkRow | None) -> dict[str, Decimal]:
@@ -132,9 +144,120 @@ def equity_seen(store: PaperStore, book: str, before: date) -> Decimal:
 
 
 def turnover_used(store: PaperStore, book: str, on: date, sessions: int = 5) -> Decimal:
+    """Traded consideration over the last `sessions` weekdays. A dividend is not a trade."""
     start = weekdays_back(on, sessions)
     return sum(
-        (c.consideration_usd for c in store.changes(book, end=on) if c.day > start), Decimal(0)
+        (
+            c.consideration_usd
+            for c in store.changes(book, end=on)
+            if c.day > start and c.action != DIVIDEND
+        ),
+        Decimal(0),
+    )
+
+
+#: Whose withholding a dividend pays: the book's holder is a non-resident
+#: Malaysian, so `withholding("dividend", "MY")` - 0% on Bursa's single-tier
+#: dividends, 30% on US ones (markets/xkls.py, markets/xnas.py).
+HOLDER_COUNTRY = "MY"
+
+
+def credit_dividends(
+    store: PaperStore, feed, fx: UsdMyr, *, book: str, up_to: date, now: datetime
+) -> tuple[list[PositionChange], list[str]]:
+    """Credit each dividend that went ex on or before `up_to` to the units entitled to it.
+
+    Until 2026-10-10 nothing credited dividends: on every ex-date a held name's
+    close fell by the dividend and the book's equity fell with it, so both
+    books understated their return by roughly the yield (often 4-6% a year
+    on Bursa). The convention, set by the owner:
+
+      * the EX-DATE, not the pay date, and the units held at the close of the
+        session before it - a buy filled at the ex-date's open is not entitled,
+        a sell filled at that open is;
+      * net of the source market's withholding for a Malaysian holder;
+      * at the mid rate `fx.asof(ex-date)`, the rate a mark values cash at -
+        no spread is charged, because no currency is bought or sold.
+
+    Only ex-dates on or after the book's `dividends_from` boundary: marks made
+    before crediting began are not restated (engines/paper/store.DIVIDEND_TERMS).
+    A dividend already recorded for (name, ex-date) is not credited twice.
+
+    Returns the rows written and one note per held name whose feed read no
+    dividends: its cash cannot be credited, and the mark says so rather than
+    treat silence as "paid nothing".
+    """
+    since = store.dividends_from(book, now)
+    if since is None or up_to < since:
+        return [], []
+    changes = store.changes(book, end=up_to)
+    credited = {(c.instrument_id, c.day) for c in changes if c.action == DIVIDEND}
+    held_now = {p.instrument_id for p in store.state(book, end=up_to).positions}
+    names = held_now | {c.instrument_id for c in changes if c.day >= since}
+    out: list[PositionChange] = []
+    blind: list[str] = []
+    for iid in sorted(names):
+        try:
+            series = feed.fetch(iid, end=up_to)
+        except PriceFeedError:
+            continue  # unpriced: mark_book reports it
+        if getattr(series, "actions_source", None) is None:
+            if iid in held_now:
+                blind.append(iid)
+            continue
+        for a in series.dividends():
+            if not since <= a.ex_date <= up_to or (iid, a.ex_date) in credited:
+                continue
+            pos = store.state(book, end=a.ex_date - timedelta(days=1)).position(iid)
+            if pos is None or pos.units <= 0:
+                continue
+            change = _dividend(iid, pos.units, pos.avg_cost, a.ex_date, dec(a.amount), fx, book)
+            store.record_change(change)
+            credited.add((iid, a.ex_date))
+            out.append(change)
+    if not blind:
+        return out, []
+    # The index book holds a hundred names; like its fills, they are counted.
+    who = ", ".join(blind) if len(blind) <= 5 else f"{len(blind)} held names"
+    return out, [
+        f"NO DIVIDEND DATA for {who}: no dividend is credited for them, so their "
+        "return is price-only until a feed that reads dividends serves them"
+    ]
+
+
+def _dividend(
+    iid: str, units: int, avg_cost: Decimal, ex_date: date, amount: Decimal, fx: UsdMyr, book: str
+) -> PositionChange:
+    ccy = currency_of(iid)
+    quote = fx.asof(ex_date)
+    gross = amount * units
+    rate = market_get(mic_of(iid)).withholding("dividend", HOLDER_COUNTRY)
+    withheld = _cents(gross * rate)
+    return PositionChange(
+        book=book,
+        target_id=None,
+        day=ex_date,
+        instrument_id=iid,
+        currency=ccy,
+        action=DIVIDEND,
+        units_delta=0,
+        units_after=units,
+        bar_open=amount,
+        slippage_bps=0,
+        price_local=amount,
+        consideration_local=gross,
+        consideration_usd=_fine(_price_usd(gross, ccy, quote)),
+        fee_local=Decimal(0),
+        fee_usd=Decimal(0),
+        fx_rate=quote.rate if ccy == "MYR" else Decimal(1),
+        fx_date=quote.rate_date,
+        fx_source=quote.source if ccy == "MYR" else "n/a",
+        fx_spread_usd=Decimal(0),
+        slippage_usd=Decimal(0),
+        cash_delta_usd=_cents(_price_usd(gross - withheld, ccy, quote)),
+        avg_cost_after=avg_cost,
+        withholding_local=withheld,
+        withholding_usd=_fine(_price_usd(withheld, ccy, quote)),
     )
 
 
@@ -410,10 +533,10 @@ def decide(
         # after the fact is not a horizon - so the row carries the decision
         # night as its clock and says in its context when it was written.
         nominal = datetime.combine(day, DECISION_NIGHT, tzinfo=UTC)
-        grade_on = grade_date(nominal, horizon)
-        replayed = grade_on <= now.date()
-        made = nominal if replayed else now
         for i, t in enumerate(rows):
+            grade_on = grade_date(cfg, t.instrument_id, day, horizon)
+            replayed = grade_on <= now.date()
+            made = nominal if replayed else now
             cur = current.get(t.instrument_id, Decimal(0))
             if t.reason == ALL_CASH:
                 # +1 because the claim is "this book beats the control by
@@ -488,6 +611,26 @@ def decide(
                     t.target_id, day, "superseded", f"replaced by a later decision on {day}"
                 )
             result.superseded = len(todays)
+        if supersede and learning is not None:
+            # A SUPERSEDED DECISION WITHDRAWS ITS CALLS. Until 2026-10-10 its
+            # predictions stayed pending in the learning log: the withdrawn names
+            # were graded, and a name kept in both decisions was graded twice
+            # from two reference prices, all of it in calibration. The day's
+            # earlier targets - the pending ones resolved above and an all-cash
+            # row, which is resolved the moment it is written - now mark their
+            # predictions "withdrawn" (an append-only row; the prediction is
+            # untouched): never graded, out of calibration. Rows superseded
+            # before then were not withdrawn and keep whatever grade they got.
+            replaced = todays + [t for t in recorded_today if t.reason == ALL_CASH]
+            for t in replaced:
+                if not t.prediction_id:
+                    continue
+                try:
+                    learning.withdraw(
+                        t.prediction_id, day, f"superseded by a later decision on {day}"
+                    )
+                except ValueError:
+                    pass  # graded already (a replayed day), or not in this log: it stays
         # ONE LIVE DECISION. A decision is the whole target book, so every
         # older decision still waiting for its bar is replaced by this one - for
         # the names it repeats and for the names it leaves out. Left pending,
@@ -999,6 +1142,8 @@ class MarkResult:
     slot: str
     marks: dict[str, MarkRow] = field(default_factory=dict)
     applied: dict[str, list[Applied]] = field(default_factory=dict)
+    #: Dividend cash credited this run, per book (`credit_dividends`).
+    dividends: dict[str, list[PositionChange]] = field(default_factory=dict)
     stops: list[TargetRow] = field(default_factory=list)
     control_targets: list[TargetRow] = field(default_factory=list)
     #: The index book's rebalance rows, and the line that says what they left
@@ -1033,6 +1178,12 @@ class MarkResult:
                 f"positions {m.positions_usd:>9,.2f}  peak {m.peak_usd:,.2f}  drawdown {m.drawdown:.2%}"
                 f"  fx {m.fx_rate} ({m.fx_source} {m.fx_date}){flag}"
             )
+            for c in self.dividends.get(book, []):
+                lines.append(
+                    f"    dividend {c.instrument_id:<10} {c.units_after:6d} x {c.price_local} "
+                    f"{c.currency} ex {c.day}  withheld {c.withholding_local} {c.currency}"
+                    f"  cash {c.cash_delta_usd:+,.2f}"
+                )
             if book == INDEX:
                 lines += _index_applied_lines(self.applied.get(book, []))
                 continue
@@ -1185,6 +1336,10 @@ def mark(
     books = (DECIDED, CONTROL) + ((INDEX,) if index_open and day >= index_open else ())
     for book in books:
         result.applied[book] = apply_pending(store, cfg, feed, fx, book=book, up_to=day)
+        credited, blind = credit_dividends(store, feed, fx, book=book, up_to=day, now=now)
+        if credited:
+            result.dividends[book] = credited
+        result.notes += [f"{book}: {n}" for n in blind]
         prior = store.mark_for(book, day, slot)
         m, problems = mark_book(store, cfg, feed, fx, book=book, day=day, slot=slot, now=now)
         if prior is not None:

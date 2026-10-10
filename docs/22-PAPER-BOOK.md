@@ -175,10 +175,17 @@ the step's exit code.
 
 Every raised weight is logged as a `+1` prediction and every exit to zero as
 `−1`, agent `paper`, in the same log `predict.py` uses, with the horizon's
-grading date fixed at decision time. `ask.py paper grade` scores each one when
-its date comes: realised is the name's USD return from the price the book got
-(or the decision-day close in the observe weeks), benchmark is the control
-book's return over the same days, and the queue refuses anything early. The
+grading date fixed at decision time: the horizon's Nth session after the
+decision day on the name's own exchange calendar (an all-cash row: on every
+market the book trades). `ask.py paper grade` scores each one when its date
+comes: realised is the name's USD return from the close of the session before
+the fill day (or from the decision-day close in the observe weeks), benchmark
+is the control book's return over the same window, and the queue refuses
+anything early. A due prediction that cannot be priced is listed as skipped
+with its reason and the command exits 3. A decision replaced with `--supersede`
+withdraws its predictions: they are never graded and stay out of calibration.
+Predictions and grades recorded before 2026-10-10 keep the calendar-day
+horizon (seven days per five sessions) and the fill-price window they had. The
 thirty graded calls that `min_graded_for_calibration` asks for arrive around
 week ten to thirteen at three decisions a week — which is why the review sits
 at week thirteen.

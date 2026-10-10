@@ -454,7 +454,9 @@ def open_alerts(history: int = 10, alerts_db: str = "data/alerts.db") -> str:
         lines.append(f"{len(open_now)} OPEN")
         for rule, r in sorted(open_now.items()):
             lines.append(f"  [{r['severity']}] {rule}: {r['title']}")
-            lines.append(f"      open since {r['at'][:19]}")
+            lines.append(f"      open since {r['opened_at'][:19]}")
+            if r["state"] == "updated":
+                lines.append(f"      updated {r['at'][:19]}: what it names changed since it opened")
             if r["detail"]:
                 lines.append(f"      {r['detail']}")
     else:
@@ -1066,7 +1068,8 @@ def paper_report(days: int = 30, db: str = "") -> str:
             ).fetchall()
             pending = learning.db.execute(
                 "SELECT COUNT(*) FROM predictions p LEFT JOIN outcomes o USING (prediction_id) "
-                "WHERE p.agent = 'paper' AND o.prediction_id IS NULL"
+                "LEFT JOIN withdrawals w USING (prediction_id) "
+                "WHERE p.agent = 'paper' AND o.prediction_id IS NULL AND w.prediction_id IS NULL"
             ).fetchone()[0]
     except Exception:
         rows, pending = [], 0

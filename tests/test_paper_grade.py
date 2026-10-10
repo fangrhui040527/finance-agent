@@ -38,7 +38,9 @@ def test_grading_waits_for_the_horizon_then_measures_excess_over_the_control(pap
         learning=env.learning,
         now=_at(d16),
     )
-    assert not d.refused and all(p.grade_on == d16 + timedelta(days=7) for p in d.predictions)
+    # Five Bursa sessions after Monday 16 March 2026: 17, 18, 19, then Hari Raya
+    # on the 20th and its observed day on the 23rd, then 24 and 25.
+    assert not d.refused and all(p.grade_on == d16 + timedelta(days=9) for p in d.predictions)
     day = d16
     while day <= d16 + timedelta(days=9):
         if day.weekday() < 5:
@@ -55,14 +57,16 @@ def test_grading_waits_for_the_horizon_then_measures_excess_over_the_control(pap
     )
     assert sorted(g.instrument_id for g in graded) == ["MYX:5183", "MYX:8869"]
     ctl = env.store.marks(CONTROL)
+    # Both legs from the close before the fill day (d16 + 1), since 2026-10-10;
+    # this asserted the control from the fill-day mark, the window paper-6 broke.
     for g in graded:
-        assert g.note == "" or "exited" in g.note
+        assert g.note.startswith(f"applied {d16 + timedelta(days=1)}; both legs from the close")
         assert (
             abs(
                 g.benchmark
                 - float(
                     ctl[-1].equity_usd
-                    / [m for m in ctl if m.day <= d16 + timedelta(days=1)][-1].equity_usd
+                    / [m for m in ctl if m.day < d16 + timedelta(days=1)][-1].equity_usd
                     - 1
                 )
             )

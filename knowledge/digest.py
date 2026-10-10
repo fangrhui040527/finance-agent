@@ -340,7 +340,10 @@ def _name_digest(
                 "value": _fmt(o.value),
                 "known_at": o.known_at.isoformat(),
                 "source": o.source,
-                "period_end": o.period_end.isoformat() if o.period_end else None,
+                # A snapshot's period_end is the day it was read, not a period.
+                "period_end": (
+                    o.period_end.isoformat() if o.period_end and not o.snapshot else None
+                ),
             }
         )
     return nd

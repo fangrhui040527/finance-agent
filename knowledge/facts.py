@@ -72,6 +72,43 @@ DETAIL_CHARS = 2000
 #: takes an `opinions` cap for exactly this; the store itself keeps everything.
 OPINION_KINDS = frozenset({"rating_change", "rating_reiteration", "price_target"})
 
+#: Sources and kinds whose events became public the day they were FILED.
+#:
+#: Until 2026-10-10 edgar stored a filing's reportDate, and finnhub an insider
+#: trade's transactionDate, in `effective_at` - a date days to months BEFORE
+#: the filing. `events()` windows on COALESCE(effective_at, announced_at), so
+#: on 2026-10-05 the digest's last-two-days block returned 0 of the 26 AAPL
+#: Form 4s filed that day, and a read with until=2026-10-02 saw all 26 three
+#: days before they were public. The collectors now keep those dates in the
+#: payload and leave `effective_at` empty; the 180-odd rows stored before that
+#: keep their old `effective_at` on disk (the store is append-only), and these
+#: two sets are how every read windows them on the filing date instead.
+FILED_SOURCES = frozenset({"edgar", "finnhub"})
+FILED_KINDS = frozenset(
+    {
+        "filing",
+        "insider_filing",
+        "insider_buy",
+        "insider_sell",
+        "insider_award",
+        "insider_exercise",
+        "insider_tax_withholding",
+        "insider_gift",
+    }
+)
+#: Where a legacy row's past date goes on the way out, by source: the name the
+#: collector now writes it under.
+_FILED_DATE_KEY = {"edgar": "report_date", "finnhub": "trade_date"}
+#: The instant an event is windowed and ordered on. A filed record is public
+#: on `announced_at` whatever its stored `effective_at` says.
+_EVENT_WHEN = (
+    "(CASE WHEN source IN ({s}) AND kind IN ({k}) THEN announced_at"
+    " ELSE COALESCE(effective_at, announced_at) END)"
+).format(
+    s=", ".join(f"'{x}'" for x in sorted(FILED_SOURCES)),
+    k=", ".join(f"'{x}'" for x in sorted(FILED_KINDS)),
+)
+
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS observations (
     source         TEXT NOT NULL,
@@ -197,6 +234,13 @@ class Observation:
     #: which is what hid a public EPS print for 25 days - and the A1 bridge
     #: hands this to `Fact`, whose guard would otherwise refuse the row.
     forward: bool = False
+    #: A vendor's reading as of a day (a price target, a beta, a market cap),
+    #: not a reported figure: `period_end` is the day it was read, so each
+    #: day's reading has its own key. Until 2026-10-10 these rows had no
+    #: period_end, and a value returning to one stored before (MSFT targetLow
+    #: 490 -> 440 -> 490) was ignored as a duplicate, leaving latest() on 440.
+    #: Rides in `payload_json` like `forward`; `as_fact_store` leaves it out.
+    snapshot: bool = False
 
     @property
     def value_text(self) -> str:
@@ -296,7 +340,11 @@ class FactBook:
                     o.unit,
                     o.currency,
                     json.dumps(
-                        {**o.payload, "forward": True} if o.forward else o.payload,
+                        {
+                            **o.payload,
+                            **({"forward": True} if o.forward else {}),
+                            **({"snapshot": True} if o.snapshot else {}),
+                        },
                         sort_keys=True,
                         default=str,
                     ),
@@ -463,14 +511,22 @@ class FactBook:
             args.append(source)
         if where:
             sql.append("WHERE " + " AND ".join(where))
-        sql.append("ORDER BY period_end DESC, known_at DESC, concept LIMIT ?")
+        # fetched_at breaks the tie between two readings of one snapshot on one
+        # day (two sweeps, two values): the later read is the current one.
+        sql.append("ORDER BY period_end DESC, known_at DESC, concept, fetched_at DESC LIMIT ?")
         args.append(max(1, limit))
         return [self._to_observation(r) for r in self.conn.execute(" ".join(sql), args)]
 
     def latest(
         self, instrument_id: str, concept: str, asof: date | None = None
     ) -> Observation | None:
-        """The most recent period's figure, as it was knowable on `asof`."""
+        """The most recent period's figure, as it was knowable on `asof`.
+
+        For a snapshot concept that is the newest day's reading: its period_end
+        is the day it was read. A row stored before 2026-10-10 has an empty
+        period_end, which sorts below every dated one, so it is returned only
+        until the first dated reading exists.
+        """
         rows = self.observations(instrument_id, concept, asof=asof, limit=1)
         return rows[0] if rows else None
 
@@ -492,6 +548,13 @@ class FactBook:
         any read with a limit shows the opinions and loses the record. Left off
         by default - a caller reading the whole history wants the whole history
         - and set by the readers that truncate.
+
+        Windowed and ordered on when each event happened or is scheduled -
+        except a filing or an insider trade (`FILED_KINDS`), which is windowed
+        on the day it was filed, so it is never seen before it was public and a
+        filing made today is in today's window. Rows stored before 2026-10-10
+        carry the report or trade date in `effective_at`; they are read as the
+        collectors now write them (see `_to_event`), with no row rewritten.
         """
         if opinions is not None:
             # Fetch wide, then keep every record event and the newest few
@@ -511,14 +574,14 @@ class FactBook:
             where.append("kind = ?")
             args.append(kind)
         if since is not None:
-            where.append("COALESCE(effective_at, announced_at) >= ?")
+            where.append(f"{_EVENT_WHEN} >= ?")
             args.append(_iso(since))
         if until is not None:
-            where.append("COALESCE(effective_at, announced_at) <= ?")
+            where.append(f"{_EVENT_WHEN} <= ?")
             args.append(_iso(until))
         if where:
             sql.append("WHERE " + " AND ".join(where))
-        sql.append("ORDER BY COALESCE(effective_at, announced_at) DESC LIMIT ?")
+        sql.append(f"ORDER BY {_EVENT_WHEN} DESC LIMIT ?")
         args.append(max(1, limit))
         return [self._to_event(r) for r in self.conn.execute(" ".join(sql), args)]
 
@@ -602,7 +665,10 @@ class FactBook:
 
         Only observations with a numeric value AND a period end become Facts -
         a fact without a period is a snapshot, not a reported figure, and the
-        point-in-time guard needs both dates to mean anything.
+        point-in-time guard needs both dates to mean anything. A snapshot
+        stored since 2026-10-10 has a period end (the day it was read) and is
+        marked `snapshot`; it is left out for the same reason, so a price
+        target or a beta never reaches A1 as a reported figure.
 
         The `forward` label is passed through as stored and nothing is inferred
         from the dates: a row that was knowable before its period ended and
@@ -628,6 +694,9 @@ class FactBook:
                 standard = market_get(mic_of(iid)).accounting_standard
             except (KeyError, ValueError):
                 continue
+            payload = json.loads(r["payload_json"])
+            if payload.get("snapshot"):
+                continue
             store.add(
                 Fact(
                     instrument_id=iid,
@@ -638,7 +707,7 @@ class FactBook:
                     currency=r["currency"] or "",
                     accounting_standard=standard,
                     source_doc_id=f"{r['source']}:{iid}:{r['concept']}:{r['period_end']}",
-                    forward=bool(json.loads(r["payload_json"]).get("forward")),
+                    forward=bool(payload.get("forward")),
                 )
             )
         return store
@@ -652,6 +721,7 @@ class FactBook:
         # The label rides in payload_json to keep the schema; on the way out it
         # goes back to being a field, so the payload is the vendor's extras again.
         forward = bool(payload.pop("forward", False))
+        snapshot = bool(payload.pop("snapshot", False))
         return Observation(
             source=r["source"],
             instrument_id=r["instrument_id"],
@@ -664,10 +734,19 @@ class FactBook:
             currency=r["currency"],
             payload=payload,
             forward=forward,
+            snapshot=snapshot,
         )
 
     @staticmethod
     def _to_event(r: sqlite3.Row) -> EventRecord:
+        effective = _dt(r["effective_at"]) if r["effective_at"] else None
+        payload = json.loads(r["payload_json"])
+        if effective is not None and r["source"] in FILED_SOURCES and r["kind"] in FILED_KINDS:
+            # A row stored before 2026-10-10: its effective_at is the report or
+            # trade date, not a scheduled one. Handed back as the collector now
+            # writes it, so no reader shows or sorts on that date as the event's.
+            payload.setdefault(_FILED_DATE_KEY[r["source"]], effective.date().isoformat())
+            effective = None
         return EventRecord(
             source=r["source"],
             event_id=r["event_id"],
@@ -675,8 +754,8 @@ class FactBook:
             kind=r["kind"],
             announced_at=_dt(r["announced_at"]),
             title=r["title"],
-            effective_at=_dt(r["effective_at"]) if r["effective_at"] else None,
-            payload=json.loads(r["payload_json"]),
+            effective_at=effective,
+            payload=payload,
         )
 
     @staticmethod

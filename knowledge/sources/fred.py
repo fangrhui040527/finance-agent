@@ -211,7 +211,12 @@ class FredCollector(Collector):
                     event_id=f"fred:{r.get('release_id')}:{day}",
                     instrument_id="MACRO:US",
                     kind="macro_release",
-                    announced_at=datetime(day.year, day.month, day.day, tzinfo=UTC),
+                    # FRED publishes the day, not the time: stamped at the
+                    # END of it, so the release is upcoming all through its
+                    # own day and no as-of read sees it early. At 00:00 UTC
+                    # (until 2026-10-10) it left "releases, next 7 days" at
+                    # 20:00 ET the evening before it printed.
+                    announced_at=datetime(day.year, day.month, day.day, 23, 59, 59, tzinfo=UTC),
                     title=name,
                     payload={
                         "country": "US",

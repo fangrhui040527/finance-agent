@@ -23,8 +23,9 @@ So three invariants hold across every tool below:
 
 from __future__ import annotations
 
+import hashlib
 import sqlite3
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import UTC, date, datetime, timedelta
 from decimal import ROUND_HALF_UP, Decimal, InvalidOperation
 
@@ -764,7 +765,8 @@ def measured_legs(
     """
     bars_back = max(1, int(bars_back))
     ids = [instrument, market_proxy] + ([sector_proxy] if sector_proxy else [])
-    days, closes = aligned_closes(feed, ids, end)
+    price_only: list[str] = []
+    days, closes = aligned_closes(feed, ids, end, price_only=price_only)
     if len(days) < bars_back + 1:
         raise PriceFeedError(
             f"{' and '.join(dict.fromkeys(ids))} share {len(days)} session(s) up to "
@@ -809,6 +811,10 @@ def measured_legs(
             )
             if not sector_proxy:
                 estimation += "; sector beta fixed at 0 (no sector proxy)"
+    if price_only:
+        # Total return wherever the feed read dividends; where it did not, the
+        # leg is a price return and an ex-date drop in it reads as a move.
+        estimation += f"; NO DIVIDEND DATA for {', '.join(price_only)}: price returns"
     return MeasuredLegs(
         instrument=instrument,
         market_proxy=market_proxy,
@@ -2133,10 +2139,23 @@ def log_prediction(
 
     made_at = datetime.now(UTC)
     made = made_at.date()
-    # Sessions -> calendar days, same arithmetic as predict.py _grade_date.
-    grade_on = (made_at + timedelta(days=horizon.sessions / 5 * 7)).date()
+    # N exchange sessions on the instrument's own calendar, the helper
+    # predict.py uses. Until 2026-10-10 this was calendar days at seven for
+    # every five: a 1d view logged on a Friday graded on the Sunday after zero
+    # sessions. Views logged before then keep the grade_on they were written with.
+    from core.market.calendar import instrument_horizon_end
+
+    grade_on = instrument_horizon_end(instrument, made, horizon.sessions)
+    # The id carries a short hash of the view itself. Until 2026-10-10 it was
+    # instrument-date-horizon alone, so a second, different view on the same
+    # name, UTC day and horizon (the opposite direction after news, a revised
+    # thesis) collided with the first and could not be logged at all.
+    digest = hashlib.sha256(
+        f"{instrument}|{made_at.isoformat()}|{direction}|{confidence}|{thesis}".encode()
+    ).hexdigest()[:4]
+    base_id = f"{instrument}-{made}-{horizon_days}d-{digest}"
     p = Prediction(
-        prediction_id=f"{instrument}-{made}-{horizon_days}d",
+        prediction_id=base_id,
         instrument_id=instrument,
         agent="mcp",
         made_at=made_at,
@@ -2147,13 +2166,21 @@ def log_prediction(
         grade_on=grade_on,
     )
     with LearningStore(db or DEFAULT_PATH) as store:
-        try:
-            store.record(p)
-        except sqlite3.IntegrityError as e:
-            # The append-only trigger or a duplicate id refusing the write is an
-            # ANSWER. Anything else - AttributeError, disk full - used to render
-            # identically, so a code defect read as a policy refusal.
-            return f"REFUSED: {e}"
+        for attempt in range(1, 6):
+            try:
+                store.record(p)
+                break
+            except (ValueError, sqlite3.IntegrityError) as e:
+                # The append-only trigger or a duplicate id refusing the write is an
+                # ANSWER. Anything else - AttributeError, disk full - used to render
+                # identically, so a code defect read as a policy refusal.
+                # `LearningStore.record` turns the duplicate-id IntegrityError into a
+                # ValueError, which this caught nothing of until 2026-10-10: the
+                # refusal escaped as an INTERNAL_ERROR with a traceback. The same
+                # view twice in one clock tick takes a counter, not a crash.
+                if attempt == 5:
+                    return f"REFUSED: {e}"
+                p = replace(p, prediction_id=f"{base_id}-{attempt}")
         counts = store.counts()
     return (
         f"logged {p.prediction_id}\n"

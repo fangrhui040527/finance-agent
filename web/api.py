@@ -524,7 +524,10 @@ def alerts(history: int = 20) -> S.Envelope:
                     "severity": r["severity"],
                     "title": r["title"],
                     "detail": r["detail"],
-                    "since": r["at"],
+                    "since": r["opened_at"],
+                    # The title above is the latest event's; this says when the
+                    # members it names last changed, or None if they never have.
+                    "updated": r["at"] if r["state"] == "updated" else None,
                 }
                 for rule, r in sorted(open_now.items())
             ],

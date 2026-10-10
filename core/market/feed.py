@@ -30,7 +30,7 @@ from collections.abc import Callable
 from datetime import UTC, date, datetime
 
 from core.market.bars import drop_carried_rows
-from core.market.prices import Bar, PriceSeries
+from core.market.prices import ActionKind, Bar, CorporateAction, PriceSeries
 from core.net.breaker import CircuitBreaker
 
 #: Ids that name an INDEX rather than a tradable line. An index is only ever
@@ -214,7 +214,35 @@ class PriceFeed(ABC):
                 f"{self.name} returned no usable bars for {instrument_id} "
                 f"(symbol {symbol!r}) in the requested window"
             )
-        return PriceSeries(instrument_id, bars)
+        read = self.dividends(symbol)
+        if read is None:
+            return PriceSeries(instrument_id, bars)
+        # Point in time: only an ex-date on or before the last bar served. A
+        # dividend that goes ex after the read's end would otherwise scale every
+        # bar before it, and a return measured "as of" an earlier day would
+        # carry a dividend nobody could have known about on that day.
+        last = bars[-1].day
+        actions = [
+            CorporateAction(d, ActionKind.DIVIDEND, amount=a)
+            for d, a in read
+            if d <= last and a > 0
+        ]
+        return PriceSeries(instrument_id, bars, actions, actions_source=self.name)
+
+    def dividends(self, symbol: str) -> list[tuple[date, float]] | None:
+        """(ex-date, amount) this feed has READ for a symbol; None when it has not asked.
+
+        From the cache when there is one, so an offline reader sees what the
+        collector saw; else from what this process's own fetches recorded. A
+        feed that prints no dividends (Stooq's CSV has no events) answers None,
+        and the series it serves says so in `actions_source`.
+        """
+        cache = getattr(self, "cache", None)
+        if cache is not None and hasattr(cache, "dividends"):
+            held = cache.dividends(self.name, symbol)
+            if held is not None:
+                return held
+        return getattr(self, "_dividends_seen", {}).get(symbol)
 
     # -- parsing -------------------------------------------------------------
 
@@ -458,6 +486,9 @@ class YahooFeed(PriceFeed):
         self._sleep = sleep
         self._breaker = CircuitBreaker("yahoo")
         self.cache = cache
+        #: symbol -> (ex-date, amount) from this process's fetches; the cache
+        #: holds the same for every later process. See `PriceFeed.dividends`.
+        self._dividends_seen: dict[str, list[tuple[date, float]]] = {}
         #: The history one fetch asks for. RANGE unless a caller that needs
         #: less says so - the index book's hundred names are marked from the
         #: last close and never estimated over five years (ask.py prices).
@@ -496,9 +527,11 @@ class YahooFeed(PriceFeed):
     def _url(self, symbol: str) -> str:
         from urllib.parse import quote, urlencode
 
-        return (
-            f"{self.CHART_URL}{quote(symbol)}?{urlencode({'range': self.range, 'interval': '1d'})}"
-        )
+        # `events=div`: the dividends the chart's closes are NOT adjusted for.
+        # Yahoo's close is already split-adjusted, so splits are not asked for -
+        # applying them again would divide a split twice.
+        query = urlencode({"range": self.range, "interval": "1d", "events": "div"})
+        return f"{self.CHART_URL}{quote(symbol)}?{query}"
 
     def _fetch_csv(self, symbol: str) -> str:
         """JSON in, the CSV the base class validates out."""
@@ -552,11 +585,44 @@ class YahooFeed(PriceFeed):
             return "" if value is None else repr(float(value))
 
         rows = ["date,open,high,low,close,volume"]
+        days: list[date] = []
         for i, stamp in enumerate(stamps):
             day = datetime.fromtimestamp(int(stamp) + offset, tz=UTC).date()
+            days.append(day)
             cells = [cell(c, i) for c in ("open", "high", "low", "close", "volume")]
             rows.append(",".join([day.isoformat()] + cells))
+        if days:
+            self._record_dividends(symbol, result, offset, min(days), max(days))
         return "\n".join(rows) + "\n"
+
+    def _record_dividends(self, symbol: str, result: dict, offset: int, first, last) -> None:
+        """Keep the chart's dividend events beside the bars, never inside them.
+
+        Until 2026-10-10 the URL asked for none and this parser kept only the
+        quote columns, so `PriceSeries.adjusted()` had nothing to adjust by: a
+        30 sen dividend on an RM10 Bursa bank read as a -2.8% idiosyncratic
+        move on its ex-date. Yahoo omits `events` when nothing went ex in the
+        range, so an absent block is an answer (no dividends), recorded as one.
+        The ex-date is the event's own `date` stamp, dated in the exchange's
+        calendar the same way the bars are.
+        """
+        block = ((result.get("events") or {}).get("dividends")) or {}
+        found: dict[date, float] = {}
+        for key, ev in block.items() if isinstance(block, dict) else ():
+            if not isinstance(ev, dict):
+                continue
+            try:
+                stamp = int(ev.get("date") or key)
+                amount = float(ev.get("amount") or 0.0)
+            except (TypeError, ValueError):
+                continue
+            if not math.isfinite(amount) or amount <= 0:
+                continue
+            found[datetime.fromtimestamp(stamp + offset, tz=UTC).date()] = amount
+        dividends = sorted(found.items())
+        self._dividends_seen[symbol] = dividends
+        if self.cache is not None and hasattr(self.cache, "put_dividends"):
+            self.cache.put_dividends(self.name, symbol, dividends, first, last)
 
 
 #: The instrument whose bars stand for "the market" when a move is decomposed
@@ -691,8 +757,25 @@ class ChainedFeed:
         )
 
 
+def session_closes(series: PriceSeries) -> dict[date, float]:
+    """Day -> DIVIDEND-ADJUSTED close, on the sessions that traded.
+
+    Two rules, each judged on what it needs. Holiday fillers are found on the
+    RAW bars (`drop_carried_rows`), because a filler is a row equal to the one
+    before it and an adjustment factor that changes between the two would hide
+    that. The close kept for each surviving day is the adjusted one, so a
+    return across an ex-date is total return: until 2026-10-10 every return
+    taken here was the raw close's, and a Bursa bank's 30 sen dividend on an
+    RM10 share was a -2.8% "idiosyncratic" move on its ex-date. A series whose
+    feed read no dividends (`actions_source` None) adjusts by nothing, and
+    the caller says so.
+    """
+    kept = {b.day for b in drop_carried_rows(series.raw())}
+    return {b.day: b.close for b in series.adjusted() if b.day in kept}
+
+
 def aligned_closes(
-    feed, instruments: list[str], end: date | None = None
+    feed, instruments: list[str], end: date | None = None, price_only: list[str] | None = None
 ) -> tuple[list[date], dict[str, list[float]]]:
     """Closes of several instruments on the sessions they ALL printed, in order.
 
@@ -703,7 +786,10 @@ def aligned_closes(
     paired with the index's move over the PREVIOUS session and the difference
     read as a company-specific move. Intersecting the session dates first makes
     the pairing right by construction - a day only one leg printed falls out -
-    and the returned dates say which sessions were used.
+    and the returned dates say which sessions were used. The closes are
+    dividend-adjusted (`session_closes`), as the nightly pack's are; an id
+    whose feed read no dividends is appended to `price_only` when the caller
+    passes a list, so it can say its leg is a price return.
 
     Each id is fetched once and in the calling thread. The second leg of a pair
     is nearly always the cached market proxy, so a thread had nothing to buy,
@@ -714,7 +800,10 @@ def aligned_closes(
     unique = list(dict.fromkeys(instruments))
     by_day: dict[str, dict[date, float]] = {}
     for iid in unique:
-        by_day[iid] = {b.day: b.close for b in drop_carried_rows(feed.fetch(iid, end=end).raw())}
+        series = feed.fetch(iid, end=end)
+        if price_only is not None and getattr(series, "actions_source", None) is None:
+            price_only.append(iid)
+        by_day[iid] = session_closes(series)
     common = set.intersection(*(set(days) for days in by_day.values()))
     days = sorted(common)
     if not days:

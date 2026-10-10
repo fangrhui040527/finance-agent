@@ -1,6 +1,6 @@
 """The paper ledger: append-only SQLite, replayed rather than updated.
 
-Five tables, ten triggers. Nothing is ever UPDATEd or DELETEd: a target is
+Six tables, twelve triggers. Nothing is ever UPDATEd or DELETEd: a target is
 written once and *resolved* once by a row in `applications`; a position change
 is a fact about a bar; a mark is a fact about a session. The book's state at
 any moment is replayed from the initial cash and every position change since,
@@ -20,7 +20,7 @@ from __future__ import annotations
 import json
 import sqlite3
 from dataclasses import dataclass, field
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
 
@@ -124,6 +124,35 @@ CREATE TABLE IF NOT EXISTS marks (
 CREATE INDEX IF NOT EXISTS marks_book_day ON marks(book, day);
 """
 
+#: `action` on a position change that is a dividend, not a trade. From
+#: 2026-10-10 the book is total return: a dividend is credited as cash on its
+#: EX-DATE to the units held at the close before it, net of the source
+#: market's withholding for a Malaysian holder and converted at the mark's mid
+#: rate (engines/paper/book.credit_dividends). The row moves cash only -
+#: `units_delta` 0, and `state` reads neither its units nor its cost - so a
+#: dividend recorded after a later trade cannot overwrite that trade's units.
+DIVIDEND = "dividend"
+
+#: The tax a dividend row had withheld, local and USD. Added by `_migrate_changes`
+#: rather than in SCHEMA, so a ledger written before it gains the columns on
+#: its next open; every trade row, before or after, reads 0, which is true.
+_WITHHOLDING_COLUMNS = ("withholding_local", "withholding_usd")
+
+#: The first ex-date each book is credited dividends for. Written once per
+#: book, by the first run that credits dividends: the day after the book's
+#: latest mark at that moment, or its opening day if it has none. Marks made
+#: before then were price-only and are NOT restated - crediting an older
+#: ex-date would put its cash into every later mark as a one-day jump that
+#: never happened. A ledger opened after 2026-10-10 is total return from its
+#: first day.
+DIVIDEND_TERMS = """
+CREATE TABLE IF NOT EXISTS dividend_terms (
+    book           TEXT PRIMARY KEY,
+    credited_from  TEXT NOT NULL,
+    recorded_at    TEXT NOT NULL
+);
+"""
+
 #: One mark per (book, session day, slot). Created by `_migrate_marks` rather
 #: than in SCHEMA: a ledger written before the rule can hold two marks for one
 #: session, and the index has to follow the de-duplication, not precede it.
@@ -152,6 +181,10 @@ _GUARDS = {
         "position changes are never deleted: a book missing its losers is a story",
     ),
     "marks": (MARK_GUARD, "marks are never deleted"),
+    "dividend_terms": (
+        "a dividend boundary is written once: moving it restates the marks",
+        "a dividend boundary is never deleted",
+    ),
 }
 
 #: The UPDATE a table's guard lets through. Only marks have one: the upsert
@@ -256,6 +289,8 @@ class PositionChange:
     avg_cost_after: Decimal
     realised_pnl_usd: Decimal = Decimal(0)
     change_id: int | None = None
+    withholding_local: Decimal = Decimal(0)
+    withholding_usd: Decimal = Decimal(0)
 
 
 @dataclass(frozen=True)
@@ -340,7 +375,10 @@ class PaperStore:
         self.conn = sqlite3.connect(path, timeout=self.BUSY_TIMEOUT_MS / 1000)
         self.conn.row_factory = sqlite3.Row
         _enable_wal(self.conn, path, self.BUSY_TIMEOUT_MS)
-        apply_schema(self.conn, SCHEMA, *_guards_sql(), timeout_ms=self.BUSY_TIMEOUT_MS)
+        apply_schema(
+            self.conn, SCHEMA, DIVIDEND_TERMS, *_guards_sql(), timeout_ms=self.BUSY_TIMEOUT_MS
+        )
+        self._migrate_changes()
         #: Duplicate marks this open removed from a ledger written before the
         #: one-mark-per-session rule; zero on every open after the first.
         self.marks_deduplicated = self._migrate_marks()
@@ -379,6 +417,22 @@ class PaperStore:
             timeout_ms=self.BUSY_TIMEOUT_MS,
         )
         return self.conn.total_changes - before
+
+    def _migrate_changes(self) -> None:
+        """Add the withholding columns to a ledger written before dividends were credited."""
+        have = {r[1] for r in self.conn.execute("PRAGMA table_info(position_changes)")}
+        for col in _WITHHOLDING_COLUMNS:
+            if col in have:
+                continue
+            try:
+                apply_schema(
+                    self.conn,
+                    f"ALTER TABLE position_changes ADD COLUMN {col} TEXT NOT NULL DEFAULT '0';",
+                    timeout_ms=self.BUSY_TIMEOUT_MS,
+                )
+            except sqlite3.OperationalError as e:  # pragma: no cover - another process won
+                if "duplicate column" not in str(e).lower():
+                    raise
 
     @classmethod
     def open_existing(cls, path: str | Path) -> PaperStore | None:
@@ -598,8 +652,9 @@ class PaperStore:
             "INSERT INTO position_changes (book, target_id, day, instrument_id, currency, action, "
             "units_delta, units_after, bar_open, slippage_bps, price_local, consideration_local, "
             "consideration_usd, fee_local, fee_usd, fx_rate, fx_date, fx_source, fx_spread_usd, "
-            "slippage_usd, cash_delta_usd, avg_cost_after, realised_pnl_usd) "
-            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            "slippage_usd, cash_delta_usd, avg_cost_after, realised_pnl_usd, "
+            "withholding_local, withholding_usd) "
+            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
             (
                 c.book,
                 c.target_id,
@@ -624,6 +679,8 @@ class PaperStore:
                 str(c.cash_delta_usd),
                 str(c.avg_cost_after),
                 str(c.realised_pnl_usd),
+                str(c.withholding_local),
+                str(c.withholding_usd),
             ),
         )
         self.conn.commit()
@@ -655,6 +712,8 @@ class PaperStore:
             avg_cost_after=_d(r["avg_cost_after"]),
             realised_pnl_usd=_d(r["realised_pnl_usd"]),
             change_id=r["change_id"],
+            withholding_local=_d(r["withholding_local"]),
+            withholding_usd=_d(r["withholding_usd"]),
         )
 
     def changes(
@@ -692,6 +751,8 @@ class PaperStore:
         realised = Decimal(0)
         for c in self.changes(book, end=end):
             cash += c.cash_delta_usd
+            if c.action == DIVIDEND:
+                continue  # cash only; its units are the entitlement, not the holding
             units[c.instrument_id] = c.units_after
             cost[c.instrument_id] = c.avg_cost_after
             ccy[c.instrument_id] = c.currency
@@ -704,6 +765,38 @@ class PaperStore:
         last = self.latest_mark(book, on_or_before=end)
         peak = max(last.peak_usd if last else Decimal(0), self.initial_cash(book))
         return BookState(book, cash, positions, realised, peak)
+
+    def credited_from(self, book: str) -> date | None:
+        """The book's dividend boundary if one is recorded; never writes one."""
+        row = self.conn.execute(
+            "SELECT credited_from FROM dividend_terms WHERE book = ?", (book,)
+        ).fetchone()
+        return date.fromisoformat(row["credited_from"]) if row is not None else None
+
+    def dividends_from(self, book: str, recorded_at: datetime) -> date | None:
+        """The first ex-date `book` is credited for; written on the first ask.
+
+        See DIVIDEND_TERMS. None for a book this ledger does not carry.
+        """
+        row = self.conn.execute(
+            "SELECT credited_from FROM dividend_terms WHERE book = ?", (book,)
+        ).fetchone()
+        if row is not None:
+            return date.fromisoformat(row["credited_from"])
+        opened = self.book_opened_on(book)
+        if opened is None:
+            return None
+        last = self.latest_mark(book)
+        start = max(opened, last.day + timedelta(days=1)) if last else opened
+        self.conn.execute(
+            "INSERT OR IGNORE INTO dividend_terms (book, credited_from, recorded_at) VALUES (?,?,?)",
+            (book, start.isoformat(), _iso(recorded_at)),
+        )
+        self.conn.commit()
+        row = self.conn.execute(
+            "SELECT credited_from FROM dividend_terms WHERE book = ?", (book,)
+        ).fetchone()
+        return date.fromisoformat(row["credited_from"])
 
     def cost_to_date(self, book: str) -> CostDrag:
         fees = fx = slip = Decimal(0)

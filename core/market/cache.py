@@ -74,6 +74,34 @@ CREATE TABLE IF NOT EXISTS listed_name (
 );
 """
 
+#: Dividends a source printed beside a symbol's bars (Yahoo's chart
+#: `events.dividends`), one row per ex-date, kept apart from the body so the raw
+#: bars are never rewritten: the adjustment is applied at read (docs/06 section
+#: 4.1 rule 3, core/market/prices.py). `dividend_read` records that a fetch
+#: ASKED for them and over which days, because no rows means "paid nothing" only
+#: when somebody asked; a body cached before 2026-10-10 was fetched without
+#: asking, and its symbol has no `dividend_read` row until it is fetched again.
+#: Derived data like the bodies, and created by the first write, like
+#: `listed_name`, so a read-only process leaves the committed file untouched.
+_DIVIDENDS = """
+CREATE TABLE IF NOT EXISTS dividend (
+    feed     TEXT NOT NULL,
+    symbol   TEXT NOT NULL,
+    ex_date  TEXT NOT NULL,
+    amount   REAL NOT NULL,
+    seen_on  TEXT NOT NULL,
+    PRIMARY KEY (feed, symbol, ex_date)
+);
+CREATE TABLE IF NOT EXISTS dividend_read (
+    feed      TEXT NOT NULL,
+    symbol    TEXT NOT NULL,
+    first_day TEXT NOT NULL,
+    last_day  TEXT NOT NULL,
+    read_on   TEXT NOT NULL,
+    PRIMARY KEY (feed, symbol)
+);
+"""
+
 #: `fetched_on` is the day, and the day cannot say whether a market had shut.
 #: `fetched_at` is the instant, added later and therefore nullable: every row
 #: cached before this column existed reads NULL, which `price_state` reports as
@@ -327,6 +355,60 @@ class PriceCache:
             except sqlite3.OperationalError:  # no name written yet: no table either
                 return None
         return row[0] if row else None
+
+    def put_dividends(
+        self, feed: str, symbol: str, dividends: list[tuple[date, float]], first: date, last: date
+    ) -> None:
+        """Record the dividends one fetch carried for the days [first, last] it covered.
+
+        The fetch's own window is replaced, not merged: a dividend the source
+        has since withdrawn or restated goes with it. Dividends outside the
+        window - from a longer fetch earlier - are kept, because this fetch
+        could not have seen them.
+        """
+        with self._lock:
+            self.conn.executescript(_DIVIDENDS)
+            self.conn.execute(
+                "DELETE FROM dividend WHERE feed = ? AND symbol = ? AND ex_date BETWEEN ? AND ?",
+                (feed, symbol, first.isoformat(), last.isoformat()),
+            )
+            self.conn.executemany(
+                "INSERT INTO dividend (feed, symbol, ex_date, amount, seen_on) VALUES (?,?,?,?,?)"
+                " ON CONFLICT(feed, symbol, ex_date) DO UPDATE SET amount=excluded.amount,"
+                " seen_on=excluded.seen_on",
+                [(feed, symbol, d.isoformat(), float(a), self._today()) for d, a in dividends],
+            )
+            self.conn.execute(
+                "INSERT INTO dividend_read (feed, symbol, first_day, last_day, read_on)"
+                " VALUES (?,?,?,?,?) ON CONFLICT(feed, symbol) DO UPDATE SET"
+                " first_day=MIN(first_day, excluded.first_day),"
+                " last_day=MAX(last_day, excluded.last_day), read_on=excluded.read_on",
+                (feed, symbol, first.isoformat(), last.isoformat(), self._today()),
+            )
+            self.conn.commit()
+
+    def dividends(self, feed: str, symbol: str) -> list[tuple[date, float]] | None:
+        """(ex-date, amount per share) the source printed for this symbol, oldest first.
+
+        None when no fetch of this symbol has asked for dividends - not the
+        same as an empty list, which is a symbol that was asked about and paid
+        nothing in the days the fetches covered.
+        """
+        with self._lock:
+            try:
+                read = self.conn.execute(
+                    "SELECT 1 FROM dividend_read WHERE feed = ? AND symbol = ?", (feed, symbol)
+                ).fetchone()
+                if read is None:
+                    return None
+                rows = self.conn.execute(
+                    "SELECT ex_date, amount FROM dividend WHERE feed = ? AND symbol = ?"
+                    " ORDER BY ex_date",
+                    (feed, symbol),
+                ).fetchall()
+            except sqlite3.OperationalError:  # nothing written yet: no tables either
+                return None
+        return [(date.fromisoformat(d), float(a)) for d, a in rows]
 
     def prune_unusable(self) -> int:
         """Drop every cached body that is not a CSV of bars. Returns the count."""

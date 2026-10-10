@@ -161,12 +161,17 @@ def test_finnhub_types_and_dates_everything_and_drops_only_bad_rows():
     c = FinnhubCollector(key="k", clock=CLOCK, opener=router(FINNHUB))
     pull = c.collect(SINCE, ("XNAS:AAPL",), slot="us_close")
     (art,) = pull.articles
-    assert art.instruments == ["XNAS:AAPL"] and art.body.startswith("Apple said")
+    # The ticker asked for is provenance; the adapter's linker attributes.
+    assert art.instruments == [] and art.fetched_for == "XNAS:AAPL"
+    assert art.body.startswith("Apple said")
     kinds = {e.kind for e in pull.events}
     assert kinds == {"insider_sell", "earnings_result"}
     sale = next(e for e in pull.events if e.kind == "insider_sell")
     assert sale.title == "Cook Timothy sold 50,000 shares at 231.5"
-    assert sale.effective_at == datetime(2026, 8, 31, tzinfo=UTC)
+    # Public on the filing date; the trade date is payload, not effective_at
+    # (which windowed today's filings on last week's trades until 2026-10-10).
+    assert sale.announced_at == datetime(2026, 9, 2, tzinfo=UTC) and sale.effective_at is None
+    assert sale.payload["trade_date"] == "2026-08-31"
     concepts = {o.concept for o in pull.observations}
     assert {
         "eps_actual",
@@ -179,7 +184,9 @@ def test_finnhub_types_and_dates_everything_and_drops_only_bad_rows():
     assert eps.value == Decimal("1.57") and eps.period_end == date(2026, 6, 30)
     assert eps.known_at >= eps.period_end, "never knowable before the period ended"
     pe = next(o for o in pull.observations if o.concept == "pe_ttm")
-    assert pe.period_end is None, "a snapshot, not a reported figure"
+    # Dated by the day it was read, so a value that comes back is a new row;
+    # marked, so it never becomes a reported figure.
+    assert pe.snapshot and pe.period_end == NOW.date(), "a snapshot, not a reported figure"
     assert c.requests == 6
 
 
@@ -475,11 +482,15 @@ AV = {
 }
 
 
-def test_alphavantage_links_only_relevant_tickers_and_aggregates_per_day():
+def test_alphavantage_aggregates_only_relevant_tickers_per_day_and_attributes_nothing():
     c = AlphaVantageNews(key="k", clock=CLOCK, opener=router({"alphavantage": AV}))
     pull = c.collect(SINCE, ("XNAS:NVDA", "XNAS:AAPL"))
     (art,) = pull.articles
-    assert art.instruments == ["XNAS:NVDA"], "AAPL at relevance 0.1 is a passing mention"
+    # The ticker that fetched it is provenance; the adapter's linker attributes.
+    assert art.instruments == [] and art.fetched_for == "XNAS:AAPL"
+    assert {o.instrument_id for o in pull.observations} == {"XNAS:NVDA"}, (
+        "AAPL at relevance 0.1 is a passing mention"
+    )
     sent = next(o for o in pull.observations if o.concept == "av_news_sentiment")
     assert sent.instrument_id == "XNAS:NVDA" and sent.value == Decimal("0.5000")
     assert sent.period_end == date(2026, 9, 3)

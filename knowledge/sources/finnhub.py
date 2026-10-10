@@ -150,7 +150,9 @@ class FinnhubCollector(Collector):
                     source_domain=str(r.get("source") or "finnhub"),
                     published_at=published,
                     language="en",
-                    instruments=[iid],
+                    # The query, not the subject: 76% of the "NVDA" rows never
+                    # name NVIDIA. The adapter's linker decides attribution.
+                    fetched_for=iid,
                     themes=[str(r["category"])] if r.get("category") else [],
                 )
             )
@@ -197,14 +199,13 @@ class FinnhubCollector(Collector):
                     event_id=f"{symbol}:{filed}:{name}:{t.get('transactionCode')}:{change}:{traded}",
                     instrument_id=iid,
                     kind=kind,
+                    # Public the day the Form 4 was filed; the trade date is
+                    # payload, never effective_at (see edgar.py for what
+                    # that did to every window until 2026-10-10).
                     announced_at=datetime(filed.year, filed.month, filed.day, tzinfo=UTC),
-                    effective_at=(
-                        datetime(traded.year, traded.month, traded.day, tzinfo=UTC)
-                        if traded
-                        else None
-                    ),
                     title=title,
                     payload={
+                        "trade_date": traded.isoformat() if traded else None,
                         "name": name,
                         "change": str(change),
                         "price": str(price) if price is not None else None,
@@ -346,6 +347,17 @@ class FinnhubCollector(Collector):
             value = as_decimal(metric.get(key))
             if value is None:
                 continue
+            # Dated by the day it was read, so a value that returns to one
+            # stored before is a new row, not a duplicate (see
+            # Observation.snapshot).
             pull.observations.append(
-                Observation(self.name, iid, concept, known_at=today, value=value, period_end=None)
+                Observation(
+                    self.name,
+                    iid,
+                    concept,
+                    known_at=today,
+                    value=value,
+                    period_end=today,
+                    snapshot=True,
+                )
             )

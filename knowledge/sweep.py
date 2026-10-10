@@ -900,11 +900,10 @@ def _news_per_instrument(
             watchlist=watchlist,
             languages=languages,
         )
-        if spec.name in ("yahoo_rss",):
-            (iid,) = group
-            for a in arts:  # keyed by ticker: attributed even when the headline omits the name
-                if iid not in a.instruments:
-                    a.instruments.insert(0, iid)
+        # yahoo_rss is keyed by ticker, and until 2026-10-10 its ticker was
+        # inserted here as attribution even when the headline never named the
+        # company: 404 of 498 Yahoo "NVDA" rows did not. Like every per-name
+        # source it now records the query as `fetched_for` and nothing more.
         _stamp_fetched_for(arts, group)
         if len(group) == 1:
             counts.append((labels[0], len(records)))
@@ -961,9 +960,10 @@ def _groups(names, size: int) -> list[tuple[str, ...]]:
 def _stamp_fetched_for(articles: list[Article], group) -> None:
     """Record which query fetched each article. PROVENANCE, NOT ATTRIBUTION.
 
-    Every per-name source is asked for one company, so record which; only a
-    source keyed by TICKER (yahoo_rss, in the caller) may also assert it. GDELT
-    is asked a PHRASE and answers from a full-text index this corpus never
+    Every per-name source is asked for one company, so record which; none
+    asserts it, not even one keyed by TICKER (yahoo_rss, until 2026-10-10) -
+    attribution is what the adapter's linker finds in the text. GDELT is asked
+    a PHRASE and answers from a full-text index this corpus never
     sees, and 457 of the 575 GDELT articles collected to 2026-09-06 named no
     book company at all - attributing those to the name that fetched them
     would put a brothel sale in Apple's evidence. Recorded instead, so the

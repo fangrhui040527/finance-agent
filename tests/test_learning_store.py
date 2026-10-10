@@ -69,7 +69,14 @@ def test_grading_moves_a_prediction_out_of_pending(tmp_path):
     with LearningStore(path) as s:
         assert s.pending() == []
         assert len(s.graded()) == 1
-        assert s.counts() == {"logged": 1, "graded": 1, "pending": 0, "lessons": 0}
+        # "withdrawn" joined the counts on 2026-10-10 (superseded paper decisions)
+        assert s.counts() == {
+            "logged": 1,
+            "graded": 1,
+            "pending": 0,
+            "withdrawn": 0,
+            "lessons": 0,
+        }
 
 
 def test_the_original_statement_and_confidence_are_preserved_verbatim(tmp_path):

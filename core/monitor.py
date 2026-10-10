@@ -11,7 +11,13 @@ useless:
   * **State changes, not repetitions.** An alert that fires every hour for a
     week is noise a person learns to ignore, which is worse than silence. The
     log records `opened` and `resolved`; a rule that is still tripped writes
-    nothing new.
+    nothing new - unless WHAT is tripping it changed. Several rules roll many
+    sources, series or names into one alert, and one of those can recover
+    while another dies under the same open rule. That writes `updated`, keyed
+    on the members rather than the title (titles carry ages that move every
+    hour). History before 2026-10-10 has no `updated` rows: a change of
+    members before then was not recorded, and an `opened` row from then
+    describes only the members it named at the time.
   * **Append-only, like every other record here.** You cannot rewrite when an
     alert opened. Triggers, not convention.
   * **Silence is a rule.** "Nothing has run for N hours" is a condition worth
@@ -51,7 +57,7 @@ SCHEMA = """
 CREATE TABLE IF NOT EXISTS alert_events (
     rule      TEXT NOT NULL,
     at        TEXT NOT NULL,
-    state     TEXT NOT NULL,          -- opened | resolved
+    state     TEXT NOT NULL,          -- opened | updated | resolved
     severity  TEXT NOT NULL,
     title     TEXT NOT NULL,
     detail    TEXT NOT NULL DEFAULT '',
@@ -97,13 +103,29 @@ class AlertLog:
         self.db.executescript(SCHEMA)
         self.db.commit()
 
-    def open_rules(self) -> dict[str, sqlite3.Row]:
-        """rule -> its latest event, for rules whose latest event is `opened`."""
+    def open_rules(self) -> dict[str, dict]:
+        """rule -> its latest event, for rules whose latest event is `opened` or
+        `updated`, plus `opened_at`: when the current open streak began.
+
+        The latest event, not the opening one, because an `updated` row is the
+        one naming what is failing NOW - reading the `opened` row is how
+        series_stale went on naming DCOILBRENTEU weeks after it recovered while
+        PALUMUSDM, the series actually stale, was named nowhere. `opened_at` is
+        kept separately so "open since" still means since it opened, not since
+        its members last moved.
+        """
         rows = self.db.execute("SELECT * FROM alert_events ORDER BY at, rowid").fetchall()
         latest: dict[str, sqlite3.Row] = {}
+        since: dict[str, str] = {}
         for r in rows:
             latest[r["rule"]] = r
-        return {k: v for k, v in latest.items() if v["state"] == "opened"}
+            if r["state"] == "opened":
+                since[r["rule"]] = r["at"]
+        return {
+            k: {**dict(v), "opened_at": since.get(k, v["at"])}
+            for k, v in latest.items()
+            if v["state"] in ("opened", "updated")
+        }
 
     def record(self, alert: Alert, state: str, at: datetime | None = None) -> None:
         at = at or datetime.now(UTC)
@@ -1248,6 +1270,16 @@ def _paper_rules(cfg, now: datetime) -> list[Alert]:
 #: trains the person reading the list to skim past a real one.
 METHOD_CHANGE_WINDOW_DAYS = 3
 
+#: How old the newest traced run may be before an error in it is reported as
+#: unverified rather than current. `run_errors` reads the newest run in
+#: `debug/`, and traces are written only when someone runs trace_run.py, so an
+#: error in a run nobody has traced since stays the newest error forever: the
+#: hourly watch printed "still open" for it with nothing to say it was weeks
+#: old. Unlike `methodology_changed` this is a FAILURE, and nothing has shown it
+#: fixed, so past this window it is downgraded to a warning that states the
+#: run's age - never resolved.
+RUN_ERRORS_FRESH_DAYS = 30
+
 
 def _run_started(name: str) -> datetime | None:
     """The timestamp in a run id, e.g. `20260904T054544-e3b02a`."""
@@ -1266,6 +1298,8 @@ def _trace_rules(debug_root: str, now: datetime | None = None) -> list[Alert]:
         return []
     out: list[Alert] = []
     newest = runs[0]
+    now = now or datetime.now(UTC)
+    started = _run_started(newest.name)
 
     errors = [
         e
@@ -1276,21 +1310,37 @@ def _trace_rules(debug_root: str, now: datetime | None = None) -> list[Alert]:
         from core.trace.report import error_text
 
         first = error_text(errors[0])[:120]
+        age = None if started is None else now - started
+        old = age is not None and age > timedelta(days=RUN_ERRORS_FRESH_DAYS)
+        aged = "" if age is None else f", {age.days}d old"
+        if old:
+            title = (
+                f"{len(errors)} error(s) in the newest traced run {newest.name}{aged}; "
+                "nothing traced since to say whether it is fixed"
+            )
+            step = (
+                f"re-run trace_run.py to confirm it is fixed; run_anatomy('{newest.name}') "
+                "for what it was"
+            )
+        else:
+            title = f"{len(errors)} error(s) in the newest traced run {newest.name}{aged}"
+            step = f"run_anatomy('{newest.name}'), then debug/{newest.name}/ for the text"
         out.append(
             Alert(
                 rule="run_errors",
-                severity=ALERT,
-                title=f"{len(errors)} error(s) in the newest traced run {newest.name}",
+                severity=WARN if old else ALERT,
+                title=title,
                 detail=f"first: {first}",
-                next_step=f"run_anatomy('{newest.name}'), then debug/{newest.name}/ for the text",
-                evidence={"run_id": newest.name, "errors": len(errors)},
+                next_step=step,
+                evidence={
+                    "run_id": newest.name,
+                    "errors": len(errors),
+                    "age_days": None if age is None else age.days,
+                },
             )
         )
 
-    started = _run_started(newest.name)
-    fresh = started is None or (now or datetime.now(UTC)) - started <= timedelta(
-        days=METHOD_CHANGE_WINDOW_DAYS
-    )
+    fresh = started is None or now - started <= timedelta(days=METHOD_CHANGE_WINDOW_DAYS)
 
     mine = _manifest(newest) if fresh else None
     if mine:
@@ -1320,16 +1370,71 @@ def _trace_rules(debug_root: str, now: datetime | None = None) -> list[Alert]:
 # --------------------------------------------------------------------------
 
 
+def _slots_short(ev: dict) -> list[str]:
+    due, arrived = ev.get("due") or {}, ev.get("arrived") or {}
+    return [slot for slot, owed in due.items() if arrived.get(slot, 0) < owed]
+
+
+#: What each aggregating rule is failing ON, read from its evidence. Two
+#: evaluations of one of these rules with different members are different
+#: problems under the same name: sweep_silence on {twse} and then on
+#: {twse, gdelt} is a second source dying, and gdelt recovering later is a
+#: change too. Keys, never titles - a title carries "33h ago" and would differ
+#: every hour. A rule absent here writes nothing while it stays open.
+_MEMBERS = {
+    "sweep_silence": lambda ev: ev.get("sources") or [],
+    "series_stale": lambda ev: [s["series_id"] for s in ev.get("stale") or []],
+    "price_stale": lambda ev: [f"{s['market']}:{s['symbol']}" for s in ev.get("stale") or []],
+    "name_coverage": lambda ev: [n for n in str(ev.get("empty") or "").split(",") if n],
+    "slots_missed": _slots_short,
+    "run_errors": lambda ev: [ev.get("run_id")],
+}
+
+
+def _members(rule: str, evidence: dict) -> frozenset[str] | None:
+    """The member keys of an aggregating rule, or None when it has none or the
+    stored evidence is not the shape this reads (nothing is written then)."""
+    read = _MEMBERS.get(rule)
+    if read is None:
+        return None
+    try:
+        return frozenset(str(m) for m in read(evidence))
+    except (AttributeError, KeyError, TypeError):
+        return None
+
+
+def _changed(alert: Alert, row: dict) -> bool:
+    """Whether an alert still open describes a different problem from the
+    latest event recorded for it: other members, or another severity (run_errors
+    dropping to a warning when its run ages out, price_stale when its book names
+    recover and only proxies remain)."""
+    if alert.severity != row["severity"]:
+        return True
+    try:
+        stored = json.loads(row["evidence_json"] or "{}")
+    except (TypeError, ValueError):
+        return False
+    # Through JSON, as the stored side went, so a tuple or a date compares equal.
+    current = json.loads(json.dumps(alert.evidence, default=str, sort_keys=True))
+    before, now = _members(alert.rule, stored), _members(alert.rule, current)
+    return before is not None and now is not None and before != now
+
+
 @dataclass(frozen=True)
 class CheckResult:
     opened: list[Alert]
     still_open: list[Alert]
     resolved: list[str]
     checked_at: datetime
+    #: Open before and still open, but failing on different members or at
+    #: another severity. Not NEW: the rule did not open, so a scheduler keyed on
+    #: NEW is not paged twice for one stop - but not hidden in "still open"
+    #: either, which is where a second source dying used to go unnoticed.
+    updated: list[Alert] = field(default_factory=list)
 
     @property
     def any_open(self) -> bool:
-        return bool(self.opened or self.still_open)
+        return bool(self.opened or self.still_open or self.updated)
 
     def render(self) -> str:
         stamp = self.checked_at.strftime("%Y-%m-%d %H:%M UTC")
@@ -1338,6 +1443,12 @@ class CheckResult:
             lines.append("")
             lines.append(f"  {len(self.opened)} NEW:")
             lines += ["  " + a.render() for a in self.opened]
+        if self.updated:
+            lines.append("")
+            lines.append(
+                f"  {len(self.updated)} UPDATED (open before; what it names or its severity changed):"
+            )
+            lines += ["  " + a.render() for a in self.updated]
         if self.still_open:
             lines.append("")
             lines.append(f"  {len(self.still_open)} still open:")
@@ -1379,11 +1490,15 @@ def check(
 
     opened: list[Alert] = []
     still: list[Alert] = []
+    updated: list[Alert] = []
     resolved: list[str] = []
     with AlertLog(alerts_db) as log:
         already = log.open_rules()
         for rule, alert in firing.items():
-            if rule in already:
+            if rule in already and _changed(alert, already[rule]):
+                log.record(alert, "updated", at=now)
+                updated.append(alert)
+            elif rule in already:
                 still.append(alert)
             else:
                 log.record(alert, "opened", at=now)
@@ -1402,4 +1517,6 @@ def check(
                     at=now,
                 )
                 resolved.append(rule)
-    return CheckResult(opened=opened, still_open=still, resolved=resolved, checked_at=now)
+    return CheckResult(
+        opened=opened, still_open=still, resolved=resolved, checked_at=now, updated=updated
+    )
