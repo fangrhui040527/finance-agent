@@ -1,6 +1,6 @@
 # Digest 2026-10-11
 
-Generated 2026-10-11 00:15 UTC · slot `all` · 16010 articles in the corpus, 5062 observations, 4210 events in the fact book.
+Generated 2026-10-11 05:48 UTC · slot `all` · 16010 articles in the corpus, 5428 observations, 4210 events in the fact book.
 
 ## The book
 
@@ -32,7 +32,7 @@ Generated 2026-10-11 00:15 UTC · slot `all` · 16010 articles in the corpus, 50
 - 2026-10-10 Yahoo — Jim Cramer makes major SpaceX call tied to Nvidia [q 0.85, tone +0.0]
 - 2026-10-10 www.bloomberg.com — Nvidia Discusses Boosting Reflection Investment, Computing Deal [q 0.80, tone +0.0]
 - 2026-10-10 seekingalpha.com — Nvidia in talks to buy ‘open’ model startup Reflection AI: FT [q 0.80, tone +0.0]
-- snapshot: P/E (ttm) 28.80 (finnhub, 2026-10-10) · P/B 28.81 (finnhub, 2026-10-10) · EPS (ttm) 7.91 (finnhub, 2026-10-10) · dividend yield 0.03 (finnhub, 2026-10-10) · beta 2.26 (finnhub, 2026-10-10) · 52w high 243.37 (finnhub, 2026-10-10) · 52w low 164.27 (finnhub, 2026-10-10) · target (consensus) 339.17 (fmp, 2026-10-06) · analysts: buy 41 (finnhub, 2026-09-05) · analysts: hold 3 (finnhub, 2026-09-05) · analysts: sell 1 (finnhub, 2026-09-05) · vendor sentiment 0.25 (alphavantage_news, 2026-10-06) · revenue (last quarter) 96.22bn (sec_xbrl, 2026-08-26) · net income (last quarter) 59.69bn (sec_xbrl, 2026-08-26) · last EPS surprise % 3.82 (finnhub, 2026-09-05)
+- snapshot: P/E (ttm) 28.80 (finnhub, 2026-10-10) · P/B 28.81 (finnhub, 2026-10-10) · EPS (ttm) 7.91 (finnhub, 2026-10-10) · dividend yield 0.03 (finnhub, 2026-10-10) · beta 2.26 (finnhub, 2026-10-10) · 52w high 243.37 (finnhub, 2026-10-10) · 52w low 164.27 (finnhub, 2026-10-10) · target (consensus) 339.17 (fmp, 2026-10-11) · analysts: buy 41 (finnhub, 2026-09-05) · analysts: hold 3 (finnhub, 2026-09-05) · analysts: sell 1 (finnhub, 2026-09-05) · vendor sentiment 0.25 (alphavantage_news, 2026-10-06) · revenue (last quarter) 96.22bn (sec_xbrl, 2026-08-26) · net income (last quarter) 59.69bn (sec_xbrl, 2026-08-26) · last EPS surprise % 3.82 (finnhub, 2026-09-05)
 
 ### Apple (XNAS:AAPL)
 - tone: 5 stories from 3 sources, polarity -0.20, peak intensity 0.00, uncertainty 0.15 · 1 escalated
@@ -44,7 +44,7 @@ Generated 2026-10-11 00:15 UTC · slot `all` · 16010 articles in the corpus, 50
 - upcoming 2026-11-02 earnings_result — Q4 2026 results after the close (finnhub)
 - upcoming 2026-10-29 earnings_result — Q4 2026 results after the close (finnhub)
 - upcoming 2026-10-28 earnings_result — Q4 2026 results after the close (finnhub)
-- snapshot: P/E (ttm) 37.84 (finnhub, 2026-10-10) · P/B 50.98 (finnhub, 2026-10-10) · EPS (ttm) 8.72 (finnhub, 2026-10-10) · dividend yield 0.51 (finnhub, 2026-10-10) · beta 1.11 (finnhub, 2026-10-10) · 52w high 345.34 (finnhub, 2026-10-10) · 52w low 243.42 (finnhub, 2026-10-10) · target (consensus) 341.68 (fmp, 2026-10-01) · analysts: buy 22 (finnhub, 2026-09-05) · analysts: hold 15 (finnhub, 2026-09-05) · analysts: sell 3 (finnhub, 2026-09-05) · vendor sentiment -0.23 (alphavantage_news, 2026-10-06) · revenue (last quarter) 109.42bn (sec_xbrl, 2026-07-31) · net income (last quarter) 29.79bn (sec_xbrl, 2026-07-31) · last EPS surprise % -0.89 (finnhub, 2026-09-05)
+- snapshot: P/E (ttm) 37.84 (finnhub, 2026-10-10) · P/B 50.98 (finnhub, 2026-10-10) · EPS (ttm) 8.72 (finnhub, 2026-10-10) · dividend yield 0.51 (finnhub, 2026-10-10) · beta 1.11 (finnhub, 2026-10-10) · 52w high 345.34 (finnhub, 2026-10-10) · 52w low 243.42 (finnhub, 2026-10-10) · target (consensus) 341.68 (fmp, 2026-10-11) · analysts: buy 22 (finnhub, 2026-09-05) · analysts: hold 15 (finnhub, 2026-09-05) · analysts: sell 3 (finnhub, 2026-09-05) · vendor sentiment -0.23 (alphavantage_news, 2026-10-06) · revenue (last quarter) 109.42bn (sec_xbrl, 2026-07-31) · net income (last quarter) 29.79bn (sec_xbrl, 2026-07-31) · last EPS surprise % -0.89 (finnhub, 2026-09-05)
 
 ### Microsoft (XNAS:MSFT)
 - tone: 6 stories from 5 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 2 escalated
@@ -56,7 +56,7 @@ Generated 2026-10-11 00:15 UTC · slot `all` · 16010 articles in the corpus, 50
 - 2026-10-10 247wallst.com — Trump Administration Brings The Hammer Down On Microsoft After Vance Said The Company Laid Off "6,000 American Workers" While Getting 6,300 H-1B Visas For Foreign Workers [q 0.65, tone +0.0]
 - upcoming 2026-10-28 earnings_result — Q1 2027 results (finnhub)
 - upcoming 2026-10-27 earnings_result — Q1 2027 results (finnhub)
-- snapshot: P/E (ttm) 29.27 (finnhub, 2026-10-10) · P/B 6.26 (finnhub, 2026-10-10) · EPS (ttm) 17.95 (finnhub, 2026-10-10) · dividend yield 0.79 (finnhub, 2026-10-10) · beta 1.06 (finnhub, 2026-10-10) · 52w high 553.72 (finnhub, 2026-10-10) · 52w low 349.20 (finnhub, 2026-10-10) · target (consensus) 571.76 (fmp, 2026-10-06) · analysts: buy 41 (finnhub, 2026-09-05) · analysts: hold 5 (finnhub, 2026-09-05) · analysts: sell 0 (finnhub, 2026-09-05) · vendor sentiment 0.29 (alphavantage_news, 2026-10-06) · revenue (last quarter) 90.01bn (sec_xbrl, 2026-07-29) · net income (last quarter) 35.77bn (sec_xbrl, 2026-07-29) · last EPS surprise % 9.53 (finnhub, 2026-09-05)
+- snapshot: P/E (ttm) 29.27 (finnhub, 2026-10-10) · P/B 6.26 (finnhub, 2026-10-10) · EPS (ttm) 17.95 (finnhub, 2026-10-10) · dividend yield 0.79 (finnhub, 2026-10-10) · beta 1.06 (finnhub, 2026-10-10) · 52w high 553.72 (finnhub, 2026-10-10) · 52w low 349.20 (finnhub, 2026-10-10) · target (consensus) 572.42 (fmp, 2026-10-11) · analysts: buy 41 (finnhub, 2026-09-05) · analysts: hold 5 (finnhub, 2026-09-05) · analysts: sell 0 (finnhub, 2026-09-05) · vendor sentiment 0.29 (alphavantage_news, 2026-10-06) · revenue (last quarter) 90.01bn (sec_xbrl, 2026-07-29) · net income (last quarter) 35.77bn (sec_xbrl, 2026-07-29) · last EPS surprise % 9.53 (finnhub, 2026-09-05)
 
 ## Macro
 
@@ -78,6 +78,17 @@ Generated 2026-10-11 00:15 UTC · slot `all` · 16010 articles in the corpus, 50
 | 10y minus 2y Treasury spread, % | 0.47 | 2026-10-08 | -0.04 | fred |
 | US unemployment rate, % | 4.20 | 2026-09-01 | +0.1 | fred |
 | CBOE VIX, index | 15.41 | 2026-10-08 | +0.33 | fred |
+
+## Collection
+
+| at (UTC) | source | status | fetched | kept | stored | detail |
+|---|---|---|---|---|---|---|
+| 05:48 | sec_xbrl | ok | 4424 | 0 | 0 | facts 331;  |
+| 05:48 | finmind | ok | 70 | 0 | 0 | facts 5;  |
+| 05:48 | twse_openapi | ok | 8 | 0 | 0 | facts 0;  |
+| 05:48 | dbnomics | ok | 450 | 0 | 0 | facts 0;  |
+| 05:48 | fmp | ok | 3978 | 0 | 0 | facts 30; fmp /earnings is outside the plan (HTTP 402); not collected for NVDA,  |
+| 05:48 | dosm_cpi | ok | 36 | 0 | 0 | facts 0;  |
 
 ---
 

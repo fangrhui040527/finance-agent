@@ -1,5 +1,60 @@
 {
-  "collection": [],
+  "collection": [
+    {
+      "at": "2026-10-11T05:48:53.235414+00:00",
+      "detail": "facts 331; ",
+      "fetched": 4424,
+      "kept": 0,
+      "source": "sec_xbrl",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-11T05:48:52.167179+00:00",
+      "detail": "facts 5; ",
+      "fetched": 70,
+      "kept": 0,
+      "source": "finmind",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-11T05:48:50.237643+00:00",
+      "detail": "facts 0; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-11T05:48:45.738365+00:00",
+      "detail": "facts 0; ",
+      "fetched": 450,
+      "kept": 0,
+      "source": "dbnomics",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-11T05:48:43.207322+00:00",
+      "detail": "facts 30; fmp /earnings is outside the plan (HTTP 402); not collected for NVDA, AAPL, MSFT; fmp /income-statement is outside the plan (HTTP 402); not collected for NVDA, AAPL, MSFT; fmp /cash-flow-statement is outside the plan (HTTP 402); not collected for NVDA, AAPL, MSFT; fmp /balance-sheet-statement is outside the plan (HTTP 402); not collected for NVDA, AAPL, MSFT",
+      "fetched": 3978,
+      "kept": 0,
+      "source": "fmp",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-11T05:48:42.189791+00:00",
+      "detail": "facts 0; ",
+      "fetched": 36,
+      "kept": 0,
+      "source": "dosm_cpi",
+      "status": "ok",
+      "stored": 0
+    }
+  ],
   "counts": {
     "articles": 16010,
     "documents": 0,
@@ -7,12 +62,12 @@
     "events": 4210,
     "failed_sweeps": 59,
     "linked": 10973,
-    "observations": 5062,
+    "observations": 5428,
     "series": 31,
-    "sweeps": 809
+    "sweeps": 815
   },
   "day": "2026-10-11",
-  "generated_at": "2026-10-11 00:15 UTC",
+  "generated_at": "2026-10-11 05:48 UTC",
   "macro": [
     {
       "change": "0.06",
@@ -268,7 +323,7 @@
         },
         {
           "concept": "price_target_consensus",
-          "known_at": "2026-10-06",
+          "known_at": "2026-10-11",
           "label": "target (consensus)",
           "period_end": null,
           "source": "fmp",
@@ -494,7 +549,7 @@
         },
         {
           "concept": "price_target_consensus",
-          "known_at": "2026-10-01",
+          "known_at": "2026-10-11",
           "label": "target (consensus)",
           "period_end": null,
           "source": "fmp",
@@ -709,11 +764,11 @@
         },
         {
           "concept": "price_target_consensus",
-          "known_at": "2026-10-06",
+          "known_at": "2026-10-11",
           "label": "target (consensus)",
           "period_end": null,
           "source": "fmp",
-          "value": "571.76"
+          "value": "572.42"
         },
         {
           "concept": "analyst_buy",
