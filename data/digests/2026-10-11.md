@@ -1,14 +1,16 @@
 # Digest 2026-10-11
 
-Generated 2026-10-11 05:48 UTC · slot `all` · 16010 articles in the corpus, 5428 observations, 4210 events in the fact book.
+Generated 2026-10-11 15:44 UTC · slot `all` · 16121 articles in the corpus, 5428 observations, 4210 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.96 · 0 escalated
+- 2026-10-11 agbrief.com — Maybank warns Genting Berhad may need more equity funding after $306M rights issue [q 0.65, tone +0.0]
 
 ### Tenaga (MYX:5347)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-10-10 www.tradingview.com — Average basic shares outstanding of Shree TNB Polymers Limited – BSE:SHREETNB [q 0.65, tone +0.0]
 
 ### Petronas Chemicals (MYX:5183)
 - quiet: nothing collected for this name in the window
@@ -17,10 +19,13 @@ Generated 2026-10-11 05:48 UTC · slot `all` · 16010 articles in the corpus, 54
 - quiet: nothing collected for this name in the window
 
 ### Press Metal (MYX:8869)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-10-11 www.smartkarma.com — Bursa Short Interest Weekly (Oct 9th): CIMB, Press Metal, Gamuda, AMMB, Pentamaster [q 0.65, tone +0.0]
 
 ### Genting (MYX:3182)
-- quiet: nothing collected for this name in the window
+- tone: 2 stories from 2 sources, polarity -0.50, peak intensity 0.00, uncertainty 0.48 · 1 escalated
+- 2026-10-11 asgam.com — Genting Bhd proposes US$306 million rights issue to cut debt, with Lim family backing - IAG [q 0.65, tone -1.0] ★
+- 2026-10-11 agbrief.com — Maybank warns Genting Berhad may need more equity funding after $306M rights issue [q 0.65, tone +0.0]
 
 ### NVIDIA (XNAS:NVDA)
 - tone: 17 stories from 12 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.07 · 5 escalated
@@ -83,6 +88,15 @@ Generated 2026-10-11 05:48 UTC · slot `all` · 16010 articles in the corpus, 54
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 15:44 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
+| 15:44 | twse_openapi | ok | 8 | 0 | 0 | facts 0;  |
+| 15:44 | jin10_flash | degraded | 17 | 17 | 17 | facts 0; window not covered back to 2026-10-10 22:46Z; the oldest item read is 2 |
+| 15:44 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 15:44 | nst_business | degraded | 50 | 49 | 46 | window overflow: all 50 dated items are newer than the window's start (2026-10-1 |
+| 15:44 | fmt_business | ok | 39 | 39 | 37 |  |
+| 15:44 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals, IHH |
+| 15:44 | google_news | ok | 15 | 14 | 11 | read but empty: Petronas Chemicals; named the company: 6 of 14 (lowest: IHH 0/3, |
+| 15:44 | gdelt | failed | 0 | 0 | 0 | no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP |
 | 05:48 | sec_xbrl | ok | 4424 | 0 | 0 | facts 331;  |
 | 05:48 | finmind | ok | 70 | 0 | 0 | facts 5;  |
 | 05:48 | twse_openapi | ok | 8 | 0 | 0 | facts 0;  |

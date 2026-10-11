@@ -1,6 +1,87 @@
 {
   "collection": [
     {
+      "at": "2026-10-11T15:44:16.472466+00:00",
+      "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-11T15:44:16.470789+00:00",
+      "detail": "facts 0; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-11T15:44:11.776163+00:00",
+      "detail": "facts 0; window not covered back to 2026-10-10 22:46Z; the oldest item read is 2026-10-11 14:35Z, so 15.8h of the window was never served",
+      "fetched": 17,
+      "kept": 17,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 17
+    },
+    {
+      "at": "2026-10-11T15:44:10.719904+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-11T15:44:08.892385+00:00",
+      "detail": "window overflow: all 50 dated items are newer than the window's start (2026-10-10 15:25Z); the oldest is 2026-10-11 17:29Z, so 18.1h scrolled off unseen",
+      "fetched": 50,
+      "kept": 49,
+      "source": "nst_business",
+      "status": "degraded",
+      "stored": 46
+    },
+    {
+      "at": "2026-10-11T15:44:08.299545+00:00",
+      "detail": "",
+      "fetched": 39,
+      "kept": 39,
+      "source": "fmt_business",
+      "status": "ok",
+      "stored": 37
+    },
+    {
+      "at": "2026-10-11T15:44:08.000109+00:00",
+      "detail": "read but empty: Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals, IHH",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-11T15:44:06.850617+00:00",
+      "detail": "read but empty: Petronas Chemicals; named the company: 6 of 14 (lowest: IHH 0/3, Maybank 1/5, Genting 2/3)",
+      "fetched": 15,
+      "kept": 14,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 11
+    },
+    {
+      "at": "2026-10-11T15:44:04.862944+00:00",
+      "detail": "no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked); deferred: Petronas Chemicals, IHH, Press Metal",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "failed",
+      "stored": 0
+    },
+    {
       "at": "2026-10-11T05:48:53.235414+00:00",
       "detail": "facts 331; ",
       "fetched": 4424,
@@ -56,18 +137,18 @@
     }
   ],
   "counts": {
-    "articles": 16010,
+    "articles": 16121,
     "documents": 0,
-    "escalated": 2661,
+    "escalated": 2662,
     "events": 4210,
-    "failed_sweeps": 59,
-    "linked": 10973,
+    "failed_sweeps": 60,
+    "linked": 10978,
     "observations": 5428,
     "series": 31,
-    "sweeps": 815
+    "sweeps": 824
   },
   "day": "2026-10-11",
-  "generated_at": "2026-10-11 05:48 UTC",
+  "generated_at": "2026-10-11 15:44 UTC",
   "macro": [
     {
       "change": "0.06",
@@ -205,8 +286,26 @@
       "instrument_id": "MYX:1155",
       "label": "Maybank",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxNYVFPbXQ3REZiRGg5M0JBTVpOX1NqZ1ZHRlZwU0hycHdsdHZ2b1psVG4zUmc4a21wOUNfWGJ1ZGx3eXNkWUJsYm5PZ2RiZm9QaUhzMzl0VVJPc0lpSDhaQTgyZ2N6QXVCZVJqWnpCZlgta09ZS0NyaUNwTXVndEJnN19SU05ZZHBQUndiUGU0TmoxYW0wdFZmYzNmcklrdV9qM25DTUNHSnpidy1zYlZHUjVWMnRQSTlfLVNF?oc=5",
+          "domain": "agbrief.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-11T10:36:27+00:00",
+          "quality": 0.65,
+          "title": "Maybank warns Genting Berhad may need more equity funding after $306M rights issue",
+          "uncertainty": 0.9615384615384615
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.962
+      },
       "upcoming": []
     },
     {
@@ -215,8 +314,26 @@
       "instrument_id": "MYX:5347",
       "label": "Tenaga",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMipAFBVV95cUxNMTY2bktEZ0NVbTA5d1htQ1I4UFUtMEw1dlV3ZDM1eUQwcGVpWjFEck13NDNwVjFjVGp1UkRDV2NndUVha2lRRDlDbmVvb2FqRDFWdW8wY3J3eHhfS0ZZVFhSMzEwNm9rMlJ5eUotTWZ4azRjVXB2ME9xNHpvTzNrY2tEYnpqbEVSaU40OW1JRXhJUkpMM0RDZzQzLUhEMjR1bElsdQ?oc=5",
+          "domain": "www.tradingview.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-10T20:14:08+00:00",
+          "quality": 0.65,
+          "title": "Average basic shares outstanding of Shree TNB Polymers Limited \u2013 BSE:SHREETNB",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -245,18 +362,65 @@
       "instrument_id": "MYX:8869",
       "label": "Press Metal",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMisgFBVV95cUxOdjBXNUdVSGIyYVRBX21tdExzdHkxcGFSVERkNHBHVnQ1QVZfaC03ZGVKVGVRTDBVZzRuT0YxbHdFalk1dC1xLWk5SjBGYVNpcUN6aHFGS0JCZmVFNVBCcW9UQnd6ZDNfRWtSWjIydl9LRVA1MEp6bHVGR3pMai1VM1FmNzdDQzBhR1A4ZENQRDE3VGJ4d3dMdGMyclM2My1IM3hURTR4TG9HMVRKVUNmd0RB?oc=5",
+          "domain": "www.smartkarma.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-11T08:23:58+00:00",
+          "quality": 0.65,
+          "title": "Bursa Short Interest Weekly (Oct 9th): CIMB, Press Metal, Gamuda, AMMB, Pentamaster",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
-      "escalated": 0,
+      "escalated": 1,
       "events": [],
       "instrument_id": "MYX:3182",
       "label": "Genting",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiswFBVV95cUxPTDRzaXZZMGRFSDU1ZURDbTktczNrdlNRU2tYM1VlZlZPeUN0eGJjN2lUTUp5WGRyRXUzTW9vNTJ6anJvZmJVb1BCendjZWFVbGI0OXIzRmx6ZnVJNjFlUUxTTjVJaFNMUENNQUhJZkFDNDRWXy1CdjgwdXJPTmVoY3NYalZJQUgzMHdqcGc4ZWpGNmx5elM4OUR3LUVXVnEwNGJYZ0F1MGFrNHNyWFZhWTNKNA?oc=5",
+          "domain": "asgam.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-10-11T07:20:55+00:00",
+          "quality": 0.65,
+          "title": "Genting Bhd proposes US$306 million rights issue to cut debt, with Lim family backing - IAG",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxNYVFPbXQ3REZiRGg5M0JBTVpOX1NqZ1ZHRlZwU0hycHdsdHZ2b1psVG4zUmc4a21wOUNfWGJ1ZGx3eXNkWUJsYm5PZ2RiZm9QaUhzMzl0VVJPc0lpSDhaQTgyZ2N6QXVCZVJqWnpCZlgta09ZS0NyaUNwTXVndEJnN19SU05ZZHBQUndiUGU0TmoxYW0wdFZmYzNmcklrdV9qM25DTUNHSnpidy1zYlZHUjVWMnRQSTlfLVNF?oc=5",
+          "domain": "agbrief.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-11T10:36:27+00:00",
+          "quality": 0.65,
+          "title": "Maybank warns Genting Berhad may need more equity funding after $306M rights issue",
+          "uncertainty": 0.9615384615384615
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 2,
+        "polarity_mean": -0.5,
+        "sources": 2,
+        "uncertainty_mean": 0.481
+      },
       "upcoming": []
     },
     {
