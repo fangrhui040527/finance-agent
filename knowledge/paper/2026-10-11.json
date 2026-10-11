@@ -1,0 +1,232 @@
+{
+  "day": "2026-10-11",
+  "written_at": "2026-10-11T22:58:00Z",
+  "phase": "ramp",
+  "week": 5,
+  "equity_usd": 1000.0,
+  "cash_usd": 1000.0,
+  "control_equity_usd": 976.0,
+  "control_return_to_date": -0.024,
+  "drawdown": 0.0,
+  "control_drawdown": 0.024,
+  "halted": false,
+  "marks": 26,
+  "positions": [],
+  "changes": [],
+  "control_changes": [],
+  "control_mark": {
+    "marked_on": "2026-10-09",
+    "equity_usd": 976.0,
+    "cash_usd": 602.28,
+    "positions_usd": 373.72,
+    "day_return": 0.0057,
+    "note": "no session on Sunday; latest mark Friday 10-09; holdings MYX:8869 100 (7.23), MYX:5183 100 (4.28), MYX:3182 200 (1.88); nothing pending"
+  },
+  "index_book": {
+    "mark": {
+      "marked_on": "2026-10-09",
+      "equity_usd": 992619.55,
+      "cash_usd": 598347.25,
+      "positions_usd": 394272.3,
+      "day_return": 0.0025,
+      "drawdown": 0.0074,
+      "held": 97,
+      "pending": 0
+    },
+    "cost_to_date_share_of_notional": 0.0048,
+    "since_2026_09_30": {
+      "index": -0.0074,
+      "decided": 0.0,
+      "control": -0.0041
+    },
+    "note": "nothing pending"
+  },
+  "caps": [
+    {
+      "cap": "largest name",
+      "value": "0.00%",
+      "limit": "25%",
+      "breached": false
+    },
+    {
+      "cap": "invested",
+      "value": "0.00%",
+      "limit": "40%",
+      "breached": false
+    },
+    {
+      "cap": "cash floor",
+      "value": "100.00%",
+      "limit": "20%",
+      "breached": false
+    },
+    {
+      "cap": "names held",
+      "value": "0",
+      "limit": "0",
+      "breached": false
+    },
+    {
+      "cap": "drawdown from peak",
+      "value": "0.00%",
+      "limit": "8% halts entries",
+      "breached": false
+    },
+    {
+      "cap": "turnover, 5 weekdays",
+      "value": "USD 0.00",
+      "limit": "USD 500.00",
+      "breached": false
+    }
+  ],
+  "prices": {
+    "bursa": "Friday 2026-10-09 closes; ^KLSE 10-09 close 1,608.45, volume 219,220,000 after the 10-10 15:25Z fetch",
+    "us": "Friday 2026-10-09 closes",
+    "fx": "MYR 4.086 per USD (bnm, 2026-10-09)",
+    "note": "Sunday: no session in either market"
+  },
+  "fundable": [
+    {
+      "instrument_id": "MYX:1155",
+      "lot_usd": 240.09,
+      "share": 0.24,
+      "round_trip": 0.0099,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:5183",
+      "lot_usd": 104.75,
+      "share": 0.105,
+      "round_trip": 0.0211,
+      "lots": 2
+    },
+    {
+      "instrument_id": "MYX:5225",
+      "lot_usd": 193.34,
+      "share": 0.193,
+      "round_trip": 0.012,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:8869",
+      "lot_usd": 176.95,
+      "share": 0.177,
+      "round_trip": 0.013,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:3182",
+      "lot_usd": 46.01,
+      "share": 0.046,
+      "round_trip": 0.0464,
+      "lots": 5
+    },
+    {
+      "instrument_id": "XNAS:NVDA",
+      "lot_usd": 229.28,
+      "share": 0.229,
+      "round_trip": 0.0114,
+      "lots": 1
+    }
+  ],
+  "over_cap": {
+    "MYX:5347": 0.315,
+    "XNAS:AAPL": 0.337,
+    "XNAS:MSFT": 0.535
+  },
+  "ledger": {
+    "mark_days": 26,
+    "gap": "no routine ran 2026-10-02..10-06; no paper page and no decision for those days; no decision is backdated"
+  },
+  "attribution": null,
+  "decision": {
+    "recorded": true,
+    "weights": {},
+    "thesis": "All cash, the twenty-sixth all-cash row and the fifth decision of ramp week 5, recorded on Sunday 10-11 with no session since Friday's closes. Saturday 10-10 has no session; the 2026-10-10 feedback page re-measures Friday with every verdict not_significant. No row on Genting, Petronas Chemicals, IHH or Press Metal is dated 10-10, and Genting's RM1.25 billion rights issue (reported after the 10-09 close, titles only) still has no terms or Bursa filing in the store; Monday 10-12 is the first session to price it and the iPhone 18 Pro order-cut reports. The first graded claim, paper-2026-09-11-allcash-21d-8bf9, scored correct: the decided book +0.00% against the control's -2.40% over its window. One grade is not a calibration. The fact book reads NOTHING COLLECTED and NO DIVIDEND DATA for every Bursa name; alphavantage_news and gdelt have failed on every run since 10-06 and 10-09. Claim: nothing in the fundable universe beats cash over 21 sessions.",
+    "refusals": [],
+    "prediction_id": "paper-2026-10-11-allcash-21d-071b",
+    "grades_on": "2026-11-10",
+    "made_at": "2026-10-11T22:48:37Z",
+    "horizon_counting": "exchange sessions"
+  },
+  "stores": {
+    "decided_targets": 26,
+    "predictions": 26,
+    "outcomes": 1,
+    "withdrawals": 0,
+    "index_targets": 194,
+    "control_targets": 6,
+    "index_pending": 0,
+    "made_at": "2026-10-11T22:48:37Z"
+  },
+  "evidence": {
+    "feedback_page": "knowledge/feedback/2026-10-10.md (8213913)",
+    "session": "none on 2026-10-10; Friday re-measured, all not_significant",
+    "rows_10_10": {
+      "MYX:3182": 0,
+      "MYX:5183": 0,
+      "MYX:5225": 0,
+      "MYX:8869": 0,
+      "MYX:1155": "1 (attribution error)",
+      "XNAS:NVDA": 46
+    }
+  },
+  "mistakes": [
+    "paper-2026-10-09-allcash-21d-81d7 said 'still no row' on Genting while four rights-issue rows had been published 11 hours earlier; no new evidence since.",
+    "paper-2026-10-08-allcash-21d-7bb6: Genting is 1.88 at Friday's close, below the 1.93 test, which stands to 11-07.",
+    "paper-2026-10-01-allcash-21d-5a1e is behind on two names since the 10-01 closes: IHH +2.60% and Petronas Chemicals +3.63%; it grades on 10-31 against the control."
+  ],
+  "mistakes_checked": [
+    "paper-2026-10-09-allcash-21d-81d7",
+    "paper-2026-10-08-allcash-21d-7bb6 against the 10-09 close",
+    "paper-2026-10-01-allcash-21d-5a1e against 10-09 closes"
+  ],
+  "grades_due": [
+    {
+      "prediction_id": "paper-2026-09-12-allcash-21d-1661",
+      "on": "2026-10-12"
+    },
+    {
+      "prediction_id": "paper-2026-09-13-allcash-21d-5baf",
+      "on": "2026-10-13"
+    },
+    {
+      "prediction_id": "paper-2026-09-14-allcash-21d-9d7e",
+      "on": "2026-10-14"
+    },
+    {
+      "prediction_id": "paper-2026-09-15-allcash-21d-af55",
+      "on": "2026-10-15"
+    },
+    {
+      "prediction_id": "paper-2026-09-16-allcash-21d-3865",
+      "on": "2026-10-16"
+    },
+    {
+      "prediction_id": "paper-2026-09-17-allcash-21d-7667",
+      "on": "2026-10-17"
+    },
+    {
+      "prediction_id": "paper-2026-09-18-allcash-21d-667a",
+      "on": "2026-10-18"
+    }
+  ],
+  "lessons": [
+    "An all-cash claim graded against a losing control scores correct without any name being judged; calibration needs claims that name something."
+  ],
+  "dividend_boundary": {
+    "decided": "2026-10-10T15:25:31Z",
+    "control": "2026-10-10T15:25:31Z",
+    "index": "2026-10-10T15:25:31Z",
+    "note": "marks before it are not restated; no credit yet"
+  },
+  "graded": [
+    {
+      "prediction_id": "paper-2026-09-11-allcash-21d-8bf9",
+      "graded_on": "2026-10-11",
+      "realised": 0.0,
+      "benchmark": -0.024,
+      "correct": true
+    }
+  ]
+}
