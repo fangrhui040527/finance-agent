@@ -1,0 +1,242 @@
+{
+  "day": "2026-10-12",
+  "written_at": "2026-10-12T22:58:00Z",
+  "phase": "ramp",
+  "week": 5,
+  "equity_usd": 1000.0,
+  "cash_usd": 1000.0,
+  "control_equity_usd": 954.23,
+  "control_return_to_date": -0.0458,
+  "drawdown": 0.0,
+  "control_drawdown": 0.0458,
+  "halted": false,
+  "marks": 27,
+  "positions": [],
+  "changes": [],
+  "control_changes": [],
+  "control_mark": {
+    "marked_on": "2026-10-12",
+    "equity_usd": 954.23,
+    "cash_usd": 602.28,
+    "positions_usd": 351.95,
+    "day_return": -0.0223,
+    "note": "holdings MYX:8869 100 (7.22), MYX:5183 100 (4.25), MYX:3182 200 (1.45, from 1.88); nothing pending"
+  },
+  "index_book": {
+    "mark": {
+      "marked_on": "2026-10-12",
+      "equity_usd": 989359.86,
+      "cash_usd": 598347.25,
+      "positions_usd": 391012.61,
+      "day_return": -0.0033,
+      "drawdown": 0.0106,
+      "held": 97,
+      "pending": 0
+    },
+    "cost_to_date_share_of_notional": 0.0048,
+    "since_2026_09_30": {
+      "index": -0.0106,
+      "decided": 0.0,
+      "control": -0.0263
+    },
+    "note": "nothing pending"
+  },
+  "caps": [
+    {
+      "cap": "largest name",
+      "value": "0.00%",
+      "limit": "25%",
+      "breached": false
+    },
+    {
+      "cap": "invested",
+      "value": "0.00%",
+      "limit": "40%",
+      "breached": false
+    },
+    {
+      "cap": "cash floor",
+      "value": "100.00%",
+      "limit": "20%",
+      "breached": false
+    },
+    {
+      "cap": "names held",
+      "value": "0",
+      "limit": "0",
+      "breached": false
+    },
+    {
+      "cap": "drawdown from peak",
+      "value": "0.00%",
+      "limit": "8% halts entries",
+      "breached": false
+    },
+    {
+      "cap": "turnover, 5 weekdays",
+      "value": "USD 0.00",
+      "limit": "USD 500.00",
+      "breached": false
+    }
+  ],
+  "prices": {
+    "bursa": "Monday 2026-10-12 closes (10:09Z fetch); ^KLSE 1,618.01 with volume 0",
+    "us": "Monday 2026-10-12 closes (22:46Z fetch)",
+    "fx": "MYR 4.083 per USD (bnm, 2026-10-12)"
+  },
+  "fundable": [
+    {
+      "instrument_id": "MYX:1155",
+      "lot_usd": 243.69,
+      "share": 0.244,
+      "round_trip": 0.0098,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:5183",
+      "lot_usd": 104.09,
+      "share": 0.104,
+      "round_trip": 0.0212,
+      "lots": 2
+    },
+    {
+      "instrument_id": "MYX:5225",
+      "lot_usd": 193.49,
+      "share": 0.193,
+      "round_trip": 0.012,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:8869",
+      "lot_usd": 176.83,
+      "share": 0.177,
+      "round_trip": 0.013,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:3182",
+      "lot_usd": 35.51,
+      "share": 0.036,
+      "round_trip": 0.0598,
+      "lots": 7
+    },
+    {
+      "instrument_id": "XNAS:NVDA",
+      "lot_usd": 226.32,
+      "share": 0.226,
+      "round_trip": 0.0115,
+      "lots": 1
+    }
+  ],
+  "over_cap": {
+    "MYX:5347": 0.319,
+    "XNAS:AAPL": 0.341,
+    "XNAS:MSFT": 0.541
+  },
+  "ledger": {
+    "mark_days": 26,
+    "gap": "no routine ran 2026-10-02..10-06; no paper page and no decision for those days; no decision is backdated"
+  },
+  "attribution": null,
+  "decision": {
+    "recorded": true,
+    "weights": {},
+    "thesis": "All cash, the twenty-seventh all-cash row and the sixth decision of ramp week 5. Monday 10-12 is not yet decomposed (the 2026-10-12 feedback page is tomorrow's). The cached closes: Genting 1.88 -> 1.45 (-22.87%) on 90,366,100 shares and Genting Malaysia 1.49 -> 1.23 (-17.45%), the first session after the RM1.25 billion rights-issue reports; the titles say limit down, an IDSS suspension and the largest fall since 1998, and a CIMB estimate of 18% earnings dilution, all google_news titles without terms. ^KLSE +0.59% to 1,618.01 with volume 0 on the bar. The control book, which holds 200 Genting, fell 2.23% to USD 954.23. A post-announcement fall whose terms are still unknown is a claim about the issue price, not the company; Genting's round trip at one lot is now 5.98%. Maybank +1.43%, Tenaga +1.24%; NVIDIA -1.29%, Apple +1.29%, Microsoft +1.14%. Two all-cash claims are graded, both correct against a losing control. Claim: nothing in the fundable universe beats cash over 21 sessions.",
+    "refusals": [],
+    "prediction_id": "paper-2026-10-12-allcash-21d-a3c9",
+    "grades_on": "2026-11-11",
+    "made_at": "2026-10-12T22:48:39Z",
+    "horizon_counting": "exchange sessions"
+  },
+  "stores": {
+    "decided_targets": 27,
+    "predictions": 27,
+    "outcomes": 2,
+    "index_targets": 194,
+    "control_targets": 6,
+    "index_pending": 0,
+    "made_at": "2026-10-12T22:48:39Z"
+  },
+  "evidence": {
+    "feedback_page": "knowledge/feedback/2026-10-11.md (6254cc0); 10-12 not yet decomposed",
+    "moves_10_12": {
+      "MYX:3182": -0.2287,
+      "MYX:4715": -0.1745,
+      "MYX:1155": 0.0143,
+      "MYX:5347": 0.0124,
+      "MYX:5183": -0.007,
+      "MYX:5225": 0.0,
+      "MYX:8869": -0.0014,
+      "MYX:^KLSE": 0.0059,
+      "XNAS:NVDA": -0.0129,
+      "XNAS:AAPL": 0.0129,
+      "XNAS:MSFT": 0.0114,
+      "XNAS:SPY": -0.0006
+    },
+    "genting_rows": "google_news titles 10-12 01:47Z-04:09Z: limit down, IDSS suspension, largest fall since 1998, CIMB 18% dilution; no terms"
+  },
+  "mistakes": [
+    "paper-2026-10-08-allcash-21d-7bb6 listed Genting's drift as a reason against it; Genting closed 1.45 on 10-12, the reason held for a cause the page could not have seen.",
+    "paper-2026-10-09-allcash-21d-81d7 and paper-2026-10-10-allcash-21d-f51e named Genting's round trip and unknown terms as reasons against it; one lot from Friday's 1.88 would have lost 22.87% on 10-12.",
+    "The control's -2.23% on 10-12 is a passive holding through an announced dilution; it is the benchmark the all-cash claims grade against."
+  ],
+  "mistakes_checked": [
+    "paper-2026-10-08-allcash-21d-7bb6 against the 10-12 close",
+    "paper-2026-10-09-allcash-21d-81d7",
+    "paper-2026-10-10-allcash-21d-f51e"
+  ],
+  "grades_due": [
+    {
+      "prediction_id": "paper-2026-09-13-allcash-21d-5baf",
+      "on": "2026-10-13"
+    },
+    {
+      "prediction_id": "paper-2026-09-14-allcash-21d-9d7e",
+      "on": "2026-10-14"
+    },
+    {
+      "prediction_id": "paper-2026-09-15-allcash-21d-af55",
+      "on": "2026-10-15"
+    },
+    {
+      "prediction_id": "paper-2026-09-16-allcash-21d-3865",
+      "on": "2026-10-16"
+    },
+    {
+      "prediction_id": "paper-2026-09-17-allcash-21d-7667",
+      "on": "2026-10-17"
+    },
+    {
+      "prediction_id": "paper-2026-09-18-allcash-21d-667a",
+      "on": "2026-10-18"
+    },
+    {
+      "prediction_id": "paper-2026-09-19-allcash-21d-b7bd",
+      "on": "2026-10-19"
+    }
+  ],
+  "lessons": [
+    "An announced cash call can move a name more in one session than its fitted distribution allows; a sigma fitted on ordinary days says nothing about a day the share count changes.",
+    "A passive control that holds the affected name makes every all-cash claim look right that day; read those grades as the control's loss, not a finding about names."
+  ],
+  "dividend_boundary": {
+    "decided": "2026-10-10T15:25:31Z",
+    "control": "2026-10-10T15:25:31Z",
+    "index": "2026-10-10T15:25:31Z",
+    "note": "marks before it are not restated; no credit yet"
+  },
+  "graded": [
+    {
+      "prediction_id": "paper-2026-09-11-allcash-21d-8bf9",
+      "realised": 0.0,
+      "benchmark": -0.024,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-12-allcash-21d-1661",
+      "realised": 0.0,
+      "benchmark": -0.024,
+      "correct": true
+    }
+  ]
+}
