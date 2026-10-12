@@ -1,18 +1,100 @@
 {
-  "collection": [],
+  "collection": [
+    {
+      "at": "2026-10-12T10:09:10.315573+00:00",
+      "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-12T10:09:10.314458+00:00",
+      "detail": "facts 3; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-12T10:08:29.795341+00:00",
+      "detail": "facts 0; window not covered back to 2026-10-11 22:46Z; the oldest item read is 2026-10-12 09:55Z, so 11.1h of the window was never served",
+      "fetched": 19,
+      "kept": 19,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 19
+    },
+    {
+      "at": "2026-10-12T10:08:28.639704+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-12T10:08:26.681846+00:00",
+      "detail": "window overflow: all 50 dated items are newer than the window's start (2026-10-11 15:44Z); the oldest is 2026-10-12 14:33Z, so 14.8h scrolled off unseen",
+      "fetched": 50,
+      "kept": 49,
+      "source": "nst_business",
+      "status": "degraded",
+      "stored": 48
+    },
+    {
+      "at": "2026-10-12T10:08:26.349090+00:00",
+      "detail": "",
+      "fetched": 48,
+      "kept": 48,
+      "source": "fmt_business",
+      "status": "ok",
+      "stored": 48
+    },
+    {
+      "at": "2026-10-12T10:08:25.971874+00:00",
+      "detail": "read but empty: Tenaga, Petronas Chemicals, IHH, Press Metal, Genting, Maybank",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-12T10:08:24.472373+00:00",
+      "detail": "named the company: 18 of 39 (lowest: IHH 0/2, Petronas Chemicals 0/1, Press Metal 0/1)",
+      "fetched": 42,
+      "kept": 39,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 30
+    },
+    {
+      "at": "2026-10-12T10:08:22.318825+00:00",
+      "detail": "no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked); deferred: Tenaga, Petronas Chemicals, IHH",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "failed",
+      "stored": 0
+    }
+  ],
   "counts": {
-    "articles": 16344,
+    "articles": 16489,
     "documents": 0,
-    "escalated": 2684,
+    "escalated": 2691,
     "events": 4211,
-    "failed_sweeps": 62,
-    "linked": 11093,
-    "observations": 5467,
+    "failed_sweeps": 63,
+    "linked": 11115,
+    "observations": 5470,
     "series": 31,
-    "sweeps": 832
+    "sweeps": 841
   },
   "day": "2026-10-12",
-  "generated_at": "2026-10-12 00:32 UTC",
+  "generated_at": "2026-10-12 10:10 UTC",
   "macro": [
     {
       "change": "0.06",
@@ -145,13 +227,64 @@
   ],
   "names": [
     {
-      "escalated": 0,
+      "escalated": 2,
       "events": [],
       "instrument_id": "MYX:1155",
       "label": "Maybank",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMivwFBVV95cUxPUWQ2VzdDUTRBV3pHZ2I2X0paeUJkMUs2XzhuQ3U1T2xabmJoNnQ4T0ZSRG44VUM2OGppTEV3OU5LNGVTeERCaXROSVlkMFQydlVYSzl3TWhmVlBScGpFZ1lNNEVhZjlBQ1N1UHZtNDh0bkt6cGdNZWhGTGdkZVZWTk41eDdsMy1qTjFDWGdMUWRXTEEydFp6YUtUbi1nbmtkQlBKb3NvWTJPQm0wUkZDdmVXaWlDVHJuQmFPR1BVbw?oc=5",
+          "domain": "www.straitstimes.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-10-12T04:45:00+00:00",
+          "quality": 0.8,
+          "title": "Sheng Siong shares fall 3% after Maybank downgrade, target price cut",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMinwFBVV95cUxPODJjN25hRGZRbWY5VTRMSWdwYjRUeGxhdUJuR0JseEZ4cTNiTWNFTmw5M1BuWl9LT1dMYW1WekZZUG1vRC1FZllMejRNbHhlcFZrV1hHdTVpWGFpMTBoYlhfcWFDRUxXcnUwbmxRZFNqWExUckZKQzRvc2c5bTJDclNqUFl4LXFTTF83R3hjMnZCWk12YkgxNHdWUWdZVE0?oc=5",
+          "domain": "www.briefasia.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-10-12T04:19:53+00:00",
+          "quality": 0.65,
+          "title": "Sheng Siong Stock Drops 3% as Maybank Cuts Rating Amid Fading Voucher Boost",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMirAFBVV95cUxOeFBMOGZnaEJLa2dlZTg2dTZHUmk1OFNNemE4M0gzZnRlV2FtVEo4U2ZaZjBLUnlCbGpPbElTdkdjMmxIQmNxVkxvNEx6RzQzRm9KSWxyZW5KeW5WRWZGSnRROVctRkx6ZE1hcW1kTkJFTnM1MlZMcGtLcTl5ZnFxRk9oNEpRZGpBTl9WUGNuUGZldnJNTnhJZEdxeGxHWnJLTDlUa1lXYnc4QUF5?oc=5",
+          "domain": "www.ad-hoc-news.de",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-12T07:15:05+00:00",
+          "quality": 0.65,
+          "title": "Maybank set SGD 5.21 target for Singtel stock - ad-hoc-news.de",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiogFBVV95cUxNZTFtbzNQYllTaVFhbXVhaHJWOExrTXhSbWhGN2owWXVhalEzRjUzaHdmVHFCeHFFWTVVTzBWR2cySV9tM3g2TDlxcFg1WUIwa2RkcWlSV2RkSjJlZzhMYXRoNUpXV2NOWHhuMjE4SG5hWVYxSnJ4SjRybkRBeTg0bVYxSThGZlZsNGFIMDVJc2psMEdfS254eHNzVXZWWTVBVmc?oc=5",
+          "domain": "www.ggrasia.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-12T01:20:44+00:00",
+          "quality": 0.65,
+          "title": "GEN Bhd downgraded by Maybank as casino group flags US$306mln rights issuance",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 4,
+        "polarity_mean": -0.5,
+        "sources": 4,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -160,8 +293,70 @@
       "instrument_id": "MYX:5347",
       "label": "Tenaga",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://www.nst.com.my/news/regional/2026/10/1553749/tnb-links-fatal-kota-tinggi-substation-incident-vandalism",
+          "domain": "www.nst.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-12T08:16:07+00:00",
+          "quality": 1.0,
+          "title": "TNB links fatal Kota Tinggi substation incident to vandalism",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://www.freemalaysiatoday.com/category/nation/2026/10/12/don-t-burden-nation-s-golden-geese-with-political-decisions-says-hamzah",
+          "domain": "www.freemalaysiatoday.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-12T07:19:00+00:00",
+          "quality": 1.0,
+          "title": "Don\u2019t burden nation\u2019s \u2018golden geese\u2019 with political decisions, says Hamzah",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://www.nst.com.my/news/regional/2026/10/1553690/man-found-dead-near-tnb-substation-kota-tinggi",
+          "domain": "www.nst.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-12T06:50:24+00:00",
+          "quality": 1.0,
+          "title": "Man found dead near TNB substation in Kota Tinggi",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxNMjNBV08tQmZyTWloUlpDTDVoaDVIQ05valRVVlUxMUstRVFzTk5hd2VacnB0elVkYTJsdklnb1lDbDJWQ0J6QmJCQWxmaUNUQnZEWkNub0hsLWxRb3daSlpiaV9KejJlUU5aZUlsT3pfRjhSV0szTTRHazk0WFo4Vmo5R0dxM3BY?oc=5",
+          "domain": "www.cnbctv18.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-12T07:24:00+00:00",
+          "quality": 0.65,
+          "title": "Shree TNB Polymers Ltd. Share Price Live Today",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiYkFVX3lxTE9hRU9kSjJyUTBvNV9UYi15ejVfRDBNQklXeF9IdEVjM2Vpdllid19nSHVKOEtJbHk4UWxuT3Y0LVNoUnNrRzZhUzNfMEF3SWx4VGpGWXpGaFBmaUNMamU0TUxR?oc=5",
+          "domain": "techgraph.co",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-12T02:43:17+00:00",
+          "quality": 0.65,
+          "title": "Shree TNB Polymers (SHREETNB) Share/Stock Price Live, BSE",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 5,
+        "polarity_mean": 0.0,
+        "sources": 4,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -195,13 +390,108 @@
       "upcoming": []
     },
     {
-      "escalated": 0,
+      "escalated": 4,
       "events": [],
       "instrument_id": "MYX:3182",
       "label": "Genting",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMivgFBVV95cUxPbmNNNHBXSmp3ejdCUFRIanUtcUdUNktzMEJYMjN3QTZZVWdDV084U1dyQ2RSeHBYUjRhVFl4SENPTkhSTUM4Yms4RHZGSVhWR1lDLUxHXzEtQWRPbzAzUlhKcmdZeldNcDRhdk5PdFQ5YmhsWFpKdkg4WWdmQXk4TUZKQ2pDY1BuMjFuTktnUFRJS2ZzTjlLdDZMVkNtUnQwc2F5YUxBYUpJanVKcG1zZXAwcGJjaHZKZDUySGlR0gHDAUFVX3lxTFBoOWJ6MEZIQ0tfd0YyMmZwQXBTaW5FQTNMZG5sS1lWb2ozNUk0VTlmbC0ycWhhT29KXzNPalBvVklnR1J1X1YwUFRZeUEzcllpa0J4Z0FZMF9zYUJ4SWl1bGxkR00zWXNxcnFCVGt1QkxPWGJUbkxRaVZScTBPNEhVLWI0MEtlR1FGM1JwZnQ2aWMzaE93TUM4UDFlelpwT0MxdkVJeC03VnBhcTVFS25GVEVjTEJLLXkyUThxN1EwWFRfTQ?oc=5",
+          "domain": "www.nst.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-10-12T05:36:06+00:00",
+          "quality": 0.8,
+          "title": "Genting's RM1.25bil rights issue to cut debt, but earnings dilution looms",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMitAFBVV95cUxNQnZjSGU1cVp6NlVJVjVISGRueFZjV1ljS2hOQXBKc2phVDBWZWJBMG9uVmNvTHdmWDhjdHRzV0VFcXJOTmx5MHNTSnZZSG8zdTNxX2F1cTZRWjZRcGhiV00wMXhYZWRIb1NyLW1QUUxaT3J2S2lSU0pwLWV2OXJFUGNoM2tLbkdXWWF4aGhnWjRXOHl6M1RPQ0JsbG9XX3F0WFgzeXpVUm1qMTdCWmdSTDlkaGQ?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-10-12T03:36:00+00:00",
+          "quality": 0.8,
+          "title": "Genting share price decline prompts IDSS suspension",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMi2gFBVV95cUxOR0V1VGVOUlA4WkdtT05ScHowR3M5STlkS1pBV2pnV2kyNTZUTnFNUndHU3ZyVU5UeF9TanJrdlpwZk1LM1VjNElHTkxLMEV0enN1TTNENW56WVp1cjVWWldLWE1lLWZrNE5oaHhRbGtlQ3RwTWg5SHVmak53SUtKd3N0cHBleF92dGpUN3FvSlFyLTJpeVVQSFpYTlhPOWVtWW5hNF9kamtYNXB2NjFETWRVdzAwSl84MGJzV3Q5X0xMNkdXcGxxWjZNQWVCR29aMXVHWGVzUEdGUQ?oc=5",
+          "domain": "e.vnexpress.net",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "polarity": 0.0,
+          "published_at": "2026-10-12T07:17:08+00:00",
+          "quality": 0.65,
+          "title": "Shares of Malaysian billionaire Lim Kok Thay's Genting slump to near 2-decade low",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMipAFBVV95cUxPbFpwMWJ2c0NKYkk5TWVlWmlGVGhUXzNNR1JseGdVRER6U2pvYWZvWF9wc0Z3Q3lUdzUwNDRVVjRPQ0RDUGtSaEhzLV93OU42Vnd0NjRvUk1iVmpjNWpZREJacG4ta3Rwd3I5Q1VvUHRGMnBtczFyY1N3Z3ZHbmVxd3pZVXNoTnZmNG1XVU5vbVpEZHQ3VWVRSlpTQ3B6SWpfMmVnTw?oc=5",
+          "domain": "www.moomoo.com",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "polarity": 0.0,
+          "published_at": "2026-10-12T03:26:06+00:00",
+          "quality": 0.65,
+          "title": "Genting Shares Fall Sharply After Right Issue Announcement",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxOOVpxUjBVbWQ4bHExNkFtUkx1THlBWmtUcVI0cGZCTUVzSlJpekstQjBRUkNCV2ttWUhZRHZkVUxqMEVWcU1pRDdFREhVMC1YUlI2N1FGXzVmX0E2YzZudnBtSlZTaEFDUHZrWmdEbkdSbVlWWFN0VFR4U19keGtiUE01S2tZTTAzVkZiMTVXRVJ2dkF0aGxfRkNwdW1DaDZ6VEdlOE1ndm1OQknSAasBQVVfeXFMTWtsTkxmZlkyanA1UVUwS0RCaDB1YnplaEs4QU1TOVU1U0RfdTVEMm5OTHI4LWFXUG9zR1FIMkFrS20zY2prVWZQakp1czRrSVpZbjdwazh1OEdlZmY0UDRGRXhXYlhxTmc4ajZvQVJDZmlRNVFfRVpCYXlrSkFTRUJpcGgtTi0yeUpkeEN5YlNzRF84WktFbVZ0andlM3phQ0Q5MVVDMlBjd2ZF?oc=5",
+          "domain": "www.scmp.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-12T04:09:16+00:00",
+          "quality": 0.8,
+          "title": "Shares in Malaysia\u2019s Genting tumble by most in 28 years",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMitAFBVV95cUxPbWVETjhTRnc0eUM0UkI4UlMtX3MyMkJqZzVyZThMeXRhaVU1cjU3WFVKa1BtNDMtNzNjcVNwX3ZMTk9YUTB0bHdlcS1QMFExSFoyNk9qcElVVkpiQTVQZ0RZZFpiOER3STc1Tm5nbkt2UEl4M0dXNXN2Vnp6RjlTbTJNMzRmSklJdjd0dXc3WjdybWhGcm00TUhRUUx3OUFxdV9GZkNsYW1aNFVPM0g2U3plMTPSAbQBQVVfeXFMT21lRE44U0Z3NHlDNFJCOFJTLV9zMjJCamc1cmU4THl0YWlVNXI1N1hVSmtQbTQzLTczY3FTcF92TE5PWFEwdGx3ZXEtUDBRMUhaMjZPanBJVVZKYkE1UGdEWWRaYjhEd0k3NU5uZ25LdlBJeDNHVzVzdlZ6ekY5U20yTTM0ZkpJSXY3dHV3N1o3cm1oRnJtNE1IUVFMdzlBcXVfRmZDbGFtWjRVTzNINlN6ZTEz?oc=5",
+          "domain": "www.nst.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-12T03:42:33+00:00",
+          "quality": 0.8,
+          "title": "Genting shares hit limit down, prompt IDSS suspension",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMivgFBVV95cUxQZ2xyWllCcDFjT25ZQ19jUzBrcHFsRF9KN245Y0JxUnNrU056TUxpS2pqcGRCcDU5aHlJOWhaVW1RLUMxNFdpbC1GMngwZFZCRlYwNEZEdFcydmtfSDdvSGRfTlF0WkVmRWJTZnl0dFFmR3NoX2QzVzhkVU1ha25pTkNuWUdjVzh6Ql9MemtzVGlqekJLeDU4eUw1bDNyaVpVQmtORjA0Z0JNQWhzV2JOR2NJVlBmQVRPODNGRjZR?oc=5",
+          "domain": "www.freemalaysiatoday.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-12T03:38:13+00:00",
+          "quality": 0.8,
+          "title": "Genting shares tumble most since 1998 on rights issue plan",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxNUTNDY2RGOXl2OG9HWEtUN2lHc0tsSE0yRk9MZlQ3SVNDVDFqWXJwX2d5VzA0UlMtM0p5bXRnMm8xQV9acXRZWmhaMlF2cnl4MkNBTnBpbzA3aXRRdWU2VFc2VFhVeXM1S0diVkN1RXdwM0JYdlAycjhuQVpjSWVCdzVHMHN1aUowMlhTd1FKV3pNQVkxcjh5d19hZnUxOXBQZ1pXYXVYV0ZVZzJCRVpmZlhPZ092S0tJWHlR?oc=5",
+          "domain": "www.businesstoday.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-12T02:20:03+00:00",
+          "quality": 0.8,
+          "title": "Genting\u2019s RM1.25 Billion Rights Issue Could Dilute Earnings By 18%, Says CIMB",
+          "uncertainty": 1.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.333,
+        "n": 12,
+        "polarity_mean": -0.167,
+        "sources": 10,
+        "uncertainty_mean": 0.083
+      },
       "upcoming": []
     },
     {
@@ -679,7 +969,7 @@
       ]
     },
     {
-      "escalated": 3,
+      "escalated": 4,
       "events": [],
       "instrument_id": "XNAS:MSFT",
       "label": "Microsoft",
@@ -807,6 +1097,17 @@
       ],
       "stories": [
         {
+          "doc_id": "https://www.nst.com.my/world/world/2026/10/1553796/microsoft-president-says-milk-faces-more-regulation-ai",
+          "domain": "www.nst.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-10-12T09:26:26+00:00",
+          "quality": 1.0,
+          "title": "Microsoft president says milk faces more regulation than AI",
+          "uncertainty": 0.0
+        },
+        {
           "doc_id": "https://finance.yahoo.com/technology/articles/could-microsoft-msft-green-card-160836706.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
           "escalated": true,
@@ -882,25 +1183,14 @@
           "quality": 0.65,
           "title": "Microsoft Is Taking AI Beyond the Data Center, But Its Surface Business Is Just a Small Piece of the Pie",
           "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMi7AFBVV95cUxPd2RqSmxfYnAtM1BnODlnUm43QkppMERULTFwVnlxa3hBbEE0TGtTVS1ZaEd6dnJYNXVFWF9sZ0tDUjNZaGNGbGE2Z2xfdTQzbUVVUzBueC11VGVIN1MwN3dyNURVc0tOeHhYNjJmZXZUVHkwY0FNLUNOWVdDbnRmdWY2eEFXUnFicGtoR0MzVnpISjhhaHJYNnJ0bFV1Zl8wNVllb2ZsQXVyM0xQdjhQY2xCM1puWU9Db3A3ZFRVVm11WWRGWERzdlh0Qngzd2tHWUxFSDcyUlFRZnZsTFdUdnJFN1dndnZ4d2ZsZg?oc=5",
-          "domain": "www.ad-hoc-news.de",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-11T12:41:22+00:00",
-          "quality": 0.65,
-          "title": "Microsoft's Decision-1 Bets on Structured Choices Over Chat as Xbox Spins Up XP Unit - ad-hoc-news.de",
-          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 8,
-        "polarity_mean": -0.125,
-        "sources": 7,
-        "uncertainty_mean": 0.034
+        "n": 9,
+        "polarity_mean": -0.222,
+        "sources": 8,
+        "uncertainty_mean": 0.03
       },
       "upcoming": [
         {
