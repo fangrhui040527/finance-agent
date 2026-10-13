@@ -1,14 +1,23 @@
 # Digest 2026-10-13
 
-Generated 2026-10-13 02:35 UTC · slot `all` · 16904 articles in the corpus, 5521 observations, 4212 events in the fact book.
+Generated 2026-10-13 10:09 UTC · slot `all` · 17059 articles in the corpus, 5526 observations, 4212 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- quiet: nothing collected for this name in the window
+- tone: 7 stories from 6 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-10-13 theedgemalaysia.com — Insider Moves: Pavilion Real Estate Investment Trust, Talam Transform Bhd, Sunway Healthcare Holdings Bhd, Malayan Banking Bhd [q 0.80, tone +0.0]
+- 2026-10-13 www.businesstoday.com.my — Stock Today: Maybank Rises 0.70% After EPF Trims Stake [q 0.80, tone +0.0]
+- 2026-10-13 www.thestar.com.my — Maybank AM offers investors access to Nasdaq equity income fund [q 0.80, tone +0.0]
+- 2026-10-13 www.businesstoday.com.my — Maybank’s Nasdaq Fund Surpasses RM100 Million AUM In 2 Months [q 0.80, tone +0.0]
+- 2026-10-13 tradersunion.com — Bursa Malaysia filings show stake changes at Pavilion REIT, Talam Transform, Sunway Healthcare and Maybank [q 0.65, tone +0.0]
+- 2026-10-13 www.minichart.com.sg — Maybank Starts Frasers Log. & Comm. Trust at BUY With SGD1.00 Target Price [q 0.65, tone +0.0]
+- 2026-10-13 www.igamingtoday.com — Genting Bhd Rights Issue Draws Maybank Sell Call [q 0.65, tone +0.0]
 
 ### Tenaga (MYX:5347)
-- quiet: nothing collected for this name in the window
+- tone: 2 stories from 2 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-10-12 theedgemalaysia.com — E5: Govt in talk with TNB, regulator on 2027 electricity subsidy measures [q 0.80, tone +0.0]
+- 2026-10-13 m.economictimes.com — Shree TNB Polymers Yearly results, Financial Summary [q 0.65, tone +0.0]
 
 ### Petronas Chemicals (MYX:5183)
 - quiet: nothing collected for this name in the window
@@ -20,7 +29,15 @@ Generated 2026-10-13 02:35 UTC · slot `all` · 16904 articles in the corpus, 55
 - quiet: nothing collected for this name in the window
 
 ### Genting (MYX:3182)
-- quiet: nothing collected for this name in the window
+- tone: 8 stories from 8 sources, polarity -0.25, peak intensity 0.33, uncertainty 0.33 · 5 escalated
+- 2026-10-13 theedgemalaysia.com — Genting may need to sell non-core assets to avert a credit-rating downgrade — CreditSights [q 0.80, tone -1.0] ★
+- 2026-10-13 www.businesstoday.com.my — Genting's RM1.25 Billion Rights Issue Positive For Credit Profile But Downgrade Risks Remain, CreditSights [q 0.80, tone -1.0] ★
+- 2026-10-13 www.moomoo.com — Genting Rights Issue Likely to Win Shareholder Approval -- Market Talk [q 0.65, tone +1.0] ★
+- 2026-10-13 tradersunion.com — Genting may need to sell non-core assets to avoid a credit rating downgrade [q 0.65, tone -1.0] ★
+- 2026-10-12 focusgn.com — Genting shares plunge as debt-reduction plan draws criticism [q 0.65, tone +0.0] ★
+- 2026-10-12 www.thestar.com.my — Genting loses RM1.6bil in market value after cash call [q 0.80, tone +0.0]
+- 2026-10-13 www.ggrasia.com — Genting Bhd asset sales key despite US$306mln rights issue: CreditSights [q 0.65, tone +0.0]
+- 2026-10-13 www.igamingtoday.com — Genting Bhd Rights Issue Draws Maybank Sell Call [q 0.65, tone +0.0]
 
 ### NVIDIA (XNAS:NVDA)
 - tone: 55 stories from 30 sources, polarity +0.06, peak intensity 0.33, uncertainty 0.05 · 16 escalated
@@ -84,6 +101,20 @@ Generated 2026-10-13 02:35 UTC · slot `all` · 16904 articles in the corpus, 55
 | 10y minus 2y Treasury spread, % | 0.44 | 2026-10-09 | -0.03 | fred |
 | US unemployment rate, % | 4.20 | 2026-09-01 | +0.1 | fred |
 | CBOE VIX, index | 14.84 | 2026-10-09 | -0.57 | fred |
+
+## Collection
+
+| at (UTC) | source | status | fetched | kept | stored | detail |
+|---|---|---|---|---|---|---|
+| 10:08 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
+| 10:08 | twse_openapi | ok | 8 | 0 | 0 | facts 5;  |
+| 10:07 | jin10_flash | degraded | 20 | 18 | 17 | facts 0; window not covered back to 2026-10-12 22:46Z; the oldest item read is 2 |
+| 10:07 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 10:07 | nst_business | degraded | 50 | 50 | 50 | window overflow: all 50 dated items are newer than the window's start (2026-10-1 |
+| 10:07 | fmt_business | degraded | 50 | 50 | 50 | window overflow: all 50 dated items are newer than the window's start (2026-10-1 |
+| 10:07 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Tenaga, Petronas Chemicals, IHH, Press Metal, Genting, Maybank |
+| 10:07 | google_news | ok | 45 | 41 | 36 | named the company: 24 of 41 (lowest: Petronas Chemicals 0/1, Press Metal 0/1, Te |
+| 10:07 | gdelt | ok | 2 | 2 | 2 | grouped 3 names per request; 2 requests; read but empty: IHH, Press Metal, Genti |
 
 ---
 

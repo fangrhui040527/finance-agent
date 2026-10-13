@@ -1,18 +1,100 @@
 {
-  "collection": [],
+  "collection": [
+    {
+      "at": "2026-10-13T10:08:21.410986+00:00",
+      "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-13T10:08:21.409453+00:00",
+      "detail": "facts 5; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-13T10:07:36.121063+00:00",
+      "detail": "facts 0; window not covered back to 2026-10-12 22:46Z; the oldest item read is 2026-10-13 09:52Z, so 11.1h of the window was never served",
+      "fetched": 20,
+      "kept": 18,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 17
+    },
+    {
+      "at": "2026-10-13T10:07:34.486568+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-13T10:07:32.416990+00:00",
+      "detail": "window overflow: all 50 dated items are newer than the window's start (2026-10-12 10:08Z); the oldest is 2026-10-13 15:14Z, so 21.1h scrolled off unseen",
+      "fetched": 50,
+      "kept": 50,
+      "source": "nst_business",
+      "status": "degraded",
+      "stored": 50
+    },
+    {
+      "at": "2026-10-13T10:07:32.018211+00:00",
+      "detail": "window overflow: all 50 dated items are newer than the window's start (2026-10-12 10:08Z); the oldest is 2026-10-12 16:04Z, so 5.9h scrolled off unseen",
+      "fetched": 50,
+      "kept": 50,
+      "source": "fmt_business",
+      "status": "degraded",
+      "stored": 50
+    },
+    {
+      "at": "2026-10-13T10:07:31.654543+00:00",
+      "detail": "read but empty: Tenaga, Petronas Chemicals, IHH, Press Metal, Genting, Maybank",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-13T10:07:30.243466+00:00",
+      "detail": "named the company: 24 of 41 (lowest: Petronas Chemicals 0/1, Press Metal 0/1, Tenaga 5/12)",
+      "fetched": 45,
+      "kept": 41,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 36
+    },
+    {
+      "at": "2026-10-13T10:07:28.331878+00:00",
+      "detail": "grouped 3 names per request; 2 requests; read but empty: IHH, Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals; named the company: 0 of 2 (lowest: IHH + Press Metal + Genting 0/1, Maybank + Tenaga + Petronas Chemicals 0/1)",
+      "fetched": 2,
+      "kept": 2,
+      "source": "gdelt",
+      "status": "ok",
+      "stored": 2
+    }
+  ],
   "counts": {
-    "articles": 16904,
+    "articles": 17059,
     "documents": 0,
-    "escalated": 2747,
+    "escalated": 2753,
     "events": 4212,
     "failed_sweeps": 65,
-    "linked": 11331,
-    "observations": 5521,
+    "linked": 11353,
+    "observations": 5526,
     "series": 31,
-    "sweeps": 853
+    "sweeps": 862
   },
   "day": "2026-10-13",
-  "generated_at": "2026-10-13 02:35 UTC",
+  "generated_at": "2026-10-13 10:09 UTC",
   "macro": [
     {
       "change": "0.06",
@@ -150,8 +232,92 @@
       "instrument_id": "MYX:1155",
       "label": "Maybank",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE1VVmJ1d1JpdFJqcjFnTmVVOGdOaU9DRFFYcTJxQmcxSHhhdzVXeDdVTjNyTlk4UXdOY2tIOVdSam9zUmRPZDJKa05OMDBIdDhq?oc=5",
+          "domain": "theedgemalaysia.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-13T06:00:00+00:00",
+          "quality": 0.8,
+          "title": "Insider Moves: Pavilion Real Estate Investment Trust, Talam Transform Bhd, Sunway Healthcare Holdings Bhd, Malayan Banking Bhd",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMingFBVV95cUxPWGoyaVRTYTBObGtuMkNYbnk5N3pKNWlvTWxtcWJlZm9ocC1WbDhRdlBlZ2J1NVhoOUZubVJRSExjTG9qMUNBVF8xVWdRT3NFNk9DenRLNE1pRnAxWWVua2tEX0xlSFQyeW5GcXR5Y0RFZ0JEMFVMVEItLWdtZERaLXFnX29pdkhEeXkyZ1hBUlV6OXZqeFJiZUZZaU5PQQ?oc=5",
+          "domain": "www.businesstoday.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-13T03:27:43+00:00",
+          "quality": 0.8,
+          "title": "Stock Today: Maybank Rises 0.70% After EPF Trims Stake",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxONXJVcHpZVmVRUGprbm4tT2VjdFA5VW4xVHllMjNrS3hnMjR4U25ONWJfVG1sOUdrc1RldXFXMnZCMHBVemNCaVk3cmJRR1JnaFRNNU1kbVJtT0J0ZW93bm1HMVhEck1TcEhpZC1wNmEwSEV5RFJzeXlySDRReklUUFVzMUtYd1l0Z21pSzFVM1pfSWZhcDNLTkNnSWRuNlR1R3h0QUZCVFVLamQ2UnVlS0Z5bG1UWHlYM3VFQS00TlBOUQ?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-13T03:10:00+00:00",
+          "quality": 0.8,
+          "title": "Maybank AM offers investors access to Nasdaq equity income fund",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxPYXVmNlpjbHFzTzlPYmJhV3N1VmRaMncyTnctSDJGX19BVlpCbWRXRnBya1M2a2FrVVM3QUl3bXpoX0lySks5RXpYaDdGdEdzd01icF9HNlJGZklNZXN4NGVOOFZZX3p3LWtwZ194Y2xnZnJFSGZ1Rmx5SnFEYjU5Nm9SLUVzQTFjTk9KZXdqZm5PODI1VXZla1FHSkJhNWpVTHJ6WV9ST1o?oc=5",
+          "domain": "www.businesstoday.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-13T02:35:59+00:00",
+          "quality": 0.8,
+          "title": "Maybank\u2019s Nasdaq Fund Surpasses RM100 Million AUM In 2 Months",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxNenRuanFsRm5rdU80dGhTSkN1OHQzSWhfZ1I4UXZ4VGFqOFBGNkFZcUdDMF9UZFRUN2hMQ2tMX2JsT2pYekIzTkQ2RnVzeTJiSmZ5SjczMU9uVEFZOXZDWTFHQnFFSzBRX3F5dUg1TkFReVJRWGFxak1lLWcxMnVkNVZjUzZ4TnZhc2FUY2lBWGRkWERuNmU1aFdwcTBWc0kzLUktaWNHU2taV0ZoMmswRmQxa01sMzFj?oc=5",
+          "domain": "tradersunion.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-13T06:11:51+00:00",
+          "quality": 0.65,
+          "title": "Bursa Malaysia filings show stake changes at Pavilion REIT, Talam Transform, Sunway Healthcare and Maybank",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMisAFBVV95cUxONEZqbG0ybWNEYXc2QzZMY2dmbXdzd1BFQjVDY0xJN2x5UklrZFA5QklHckpia2V3emNyakJ3X0RMOElCRlJ6Nm54dUJfVDdWeG8xLWFPZ3dnVW5MN2FmZ3FSdG9rMUI4eHNiaGtHSC1FOWZxbGZLSkR3U2plLTNRNTdDa01yNUJ5eDdTaDNxLS0wc2NiaTRibGlWTGt0cUd2OC1jSTFNeFVRMWhHZ0wxNw?oc=5",
+          "domain": "www.minichart.com.sg",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-13T03:00:00+00:00",
+          "quality": 0.65,
+          "title": "Maybank Starts Frasers Log. & Comm. Trust at BUY With SGD1.00 Target Price",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMihAFBVV95cUxQRFR6R0FPeVJFSXl0elZJNzZ1V0JrWHlqakhuSElFWUt2dFhlNVZ5Z0Q1dHVDQWF2dDJzd1lIOEtvUnpVRFl4aXJ4TjlWLWpteHhsSC10aWN2dkt2aXdRakZPS1F0bDkzSzZBTlVWYkxKTnUzSEI1SU8xeXFDSHRnc1RwcXE?oc=5",
+          "domain": "www.igamingtoday.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-13T02:28:22+00:00",
+          "quality": 0.65,
+          "title": "Genting Bhd Rights Issue Draws Maybank Sell Call",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 7,
+        "polarity_mean": 0.0,
+        "sources": 6,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -160,8 +326,37 @@
       "instrument_id": "MYX:5347",
       "label": "Tenaga",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiaEFVX3lxTFBqV3RXZFVjTXZzckd6RUFYY1hpOFdlZ096UkJDT2VEajluelVSbVpJSFA2RlVYTlpiUXBxRl8weVpDT05MWHU3ZExLUkI0bXpqWFhsUWJjYVYxU05WeG5kYzU2bXFRRWhK?oc=5",
+          "domain": "theedgemalaysia.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-12T13:09:28+00:00",
+          "quality": 0.8,
+          "title": "E5: Govt in talk with TNB, regulator on 2027 electricity subsidy measures",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMigwFBVV95cUxQSlV6aWpxc3dhcVExWFpMMUlJZklNMExhU3lRaldKWnFJVXZSOEt5aTF4Vkh5YlJ3ZnpVTk1HT1BwVWVKcEZuVGVzUWlYeHB1bVdxZk9hWXRvSVg0aWM4VEhUeF9BNS1JYllZNjM4SVB3dUdEOVhUMjhHbWtWcTNxVnVrWQ?oc=5",
+          "domain": "m.economictimes.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-13T08:23:17+00:00",
+          "quality": 0.65,
+          "title": "Shree TNB Polymers Yearly results, Financial Summary",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 2,
+        "polarity_mean": 0.0,
+        "sources": 2,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -195,13 +390,108 @@
       "upcoming": []
     },
     {
-      "escalated": 0,
+      "escalated": 5,
       "events": [],
       "instrument_id": "MYX:3182",
       "label": "Genting",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE5BU2tLSzlkczJuYkhab0ZpaWdIeW4yUVprcjNsRkJRZHBya3JiVVZReWhoZjRiaDJmajREeEw1bUpIWE5VRTFGS0RvM3VJR3FS?oc=5",
+          "domain": "theedgemalaysia.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-10-13T02:54:37+00:00",
+          "quality": 0.8,
+          "title": "Genting may need to sell non-core assets to avert a credit-rating downgrade \u2014 CreditSights",
+          "uncertainty": 0.8333333333333334
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMi4wFBVV95cUxQWkFWMWc2WHdnYzVLQTcxa3Y1RkxkQU5tWEc2LXhtaXlKVXhXazZlNzR3TkRab3BCeEpEY2dkc2ZjZ25sUkg2NHhEMkdTc05ZR1huQ1VlVm00R2NseDFwVDhSTFc3dU5SRWttZ1BaOGRyVlR5Tl9qYllSQjFKQ0Q0ZmQxTHQ1V1JMcjlzZklPb2RDRFQ3RXVmTWtRdzRRV0RCaEQ4RmY4WDNrQnFaWndaNEVjVzR1U3dDLWdwZFBPRzNOMVFiNVZOS0sydWFXLXlaTFZtY3RFWVlLNFdPVWROX29mZw?oc=5",
+          "domain": "www.businesstoday.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-10-13T02:47:34+00:00",
+          "quality": 0.8,
+          "title": "Genting's RM1.25 Billion Rights Issue Positive For Credit Profile But Downgrade Risks Remain, CreditSights",
+          "uncertainty": 0.8928571428571428
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMisAFBVV95cUxOcGUzbXhCYmkxWnVqaVdFcElXVGt2cXBVWHNFVzBSS2ktLXRmMm5HMDI4Y1Fody1rbTQtVS1qUjhSTmhLRDBZZlotMW9wRGVqb2RpMENrcU84RnlESkgwTzZYNExiUFN6VWhwRFRhZEdMckZxOWJIcWVKaXNlZ3ZvRVg2WWk5b1VRWnQyaTFiXzlaQnFmem43bnNBRnNoVjVRS2VHeXlNRFk5NF84WS1FeA?oc=5",
+          "domain": "www.moomoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-13T03:25:12+00:00",
+          "quality": 0.65,
+          "title": "Genting Rights Issue Likely to Win Shareholder Approval -- Market Talk",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMilgFBVV95cUxPd2RwR2tOU0Vjd2VaQ05vS0ZNSXF4LTVxeVNnaU5tdnpTV3UxWnZ4UWdpZVVVLWw5UFZKWTloWTlpSGpkSXZULVE0S2dES216Y2ExUTdUX2hUN2tLYVpLZnZ3V002NUhycEtSaE1McG9Wc2ZBZTlBVEdlbG9DVGUzZEJwSHhFSGdpaG8xeEE5TkVxU2FSalE?oc=5",
+          "domain": "tradersunion.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-10-13T03:11:37+00:00",
+          "quality": 0.65,
+          "title": "Genting may need to sell non-core assets to avoid a credit rating downgrade",
+          "uncertainty": 0.8928571428571428
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMid0FVX3lxTE1vU01rX0I4NVNBM2NuOXl2M3JXUWNEYl9ud0paTmJLLUczNG5IRXkzU2xpbDF5SlRpTXpqeHBRVWFpNUlxQmFEV0RseTU3RnJ3SE04cHBmcVlvQ20xdmRIazVTcWlMU0NCSkZocEl2NXhyZmp5dENr?oc=5",
+          "domain": "focusgn.com",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "polarity": 0.0,
+          "published_at": "2026-10-12T13:59:08+00:00",
+          "quality": 0.65,
+          "title": "Genting shares plunge as debt-reduction plan draws criticism",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMitAFBVV95cUxPSUkza0U2SGFRSFRZYXRJaHExaHEyTC1VVEhWNU5BZFBXdGZXRGotLUpiRERVU3J3bWp2cW9fT0VsWDJfZm4xZ1Y3QlgzYmFucXRmdG1ROC1FQWgyc0ZfaGd0R1lBcGNvZWlJaU9qTnFybllvaUxFeXUzZnJoTUloZHUtb2VJd2UzM1k0Q28xMUJmTHBPU0diSnRiVHZBU3NhRnNJaS1PWTdKUXRKNzhmOGxqekI?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-12T23:24:29+00:00",
+          "quality": 0.8,
+          "title": "Genting loses RM1.6bil in market value after cash call",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMimgFBVV95cUxOWmFnQWQxWEI2U0FXWmZYTnZSbFJVakZxdndhZlN5dy1nZ1owSmRzTTloZEVUb1BKSWI4RjNyUWpWQTRqR1IzamJ6VFFQa0hvZjdHZEZIU0toNFd4Y2xLZmlLeTdMRjczdkFwNFhVbEV6R2lUaERPRUxNS2xOaGFuMUdPb0VlZDQzMDM4eWswdWhVNEo2MnJud1NR?oc=5",
+          "domain": "www.ggrasia.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-13T09:04:26+00:00",
+          "quality": 0.65,
+          "title": "Genting Bhd asset sales key despite US$306mln rights issue: CreditSights",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMihAFBVV95cUxQRFR6R0FPeVJFSXl0elZJNzZ1V0JrWHlqakhuSElFWUt2dFhlNVZ5Z0Q1dHVDQWF2dDJzd1lIOEtvUnpVRFl4aXJ4TjlWLWpteHhsSC10aWN2dkt2aXdRakZPS1F0bDkzSzZBTlVWYkxKTnUzSEI1SU8xeXFDSHRnc1RwcXE?oc=5",
+          "domain": "www.igamingtoday.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-13T02:28:22+00:00",
+          "quality": 0.65,
+          "title": "Genting Bhd Rights Issue Draws Maybank Sell Call",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.333,
+        "n": 8,
+        "polarity_mean": -0.25,
+        "sources": 8,
+        "uncertainty_mean": 0.327
+      },
       "upcoming": []
     },
     {
