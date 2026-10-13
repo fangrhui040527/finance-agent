@@ -1,6 +1,42 @@
 {
   "collection": [
     {
+      "at": "2026-10-13T19:28:53.956219+00:00",
+      "detail": "facts 0; ",
+      "fetched": 450,
+      "kept": 0,
+      "source": "dbnomics",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-13T19:28:51.317290+00:00",
+      "detail": "facts 0; window not covered back to 2026-10-13 10:07Z; the oldest item read is 2026-10-13 18:33Z, so 8.4h of the window was never served",
+      "fetched": 18,
+      "kept": 18,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 18
+    },
+    {
+      "at": "2026-10-13T19:28:50.319741+00:00",
+      "detail": "facts 6; release calendar: 'FOMC Press Release' listed on 15 days of the fortnight - a daily table, not a scheduled print; not stored as a release",
+      "fetched": 462,
+      "kept": 0,
+      "source": "fred",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-13T19:28:18.866463+00:00",
+      "detail": "facts 12; fmp /earnings is outside the plan (HTTP 402); not collected for NVDA, AAPL, MSFT",
+      "fetched": 3955,
+      "kept": 0,
+      "source": "fmp",
+      "status": "ok",
+      "stored": 0
+    },
+    {
       "at": "2026-10-13T10:08:21.410986+00:00",
       "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
       "fetched": 0,
@@ -83,26 +119,26 @@
     }
   ],
   "counts": {
-    "articles": 17059,
+    "articles": 17077,
     "documents": 0,
     "escalated": 2753,
-    "events": 4212,
+    "events": 4213,
     "failed_sweeps": 65,
     "linked": 11353,
-    "observations": 5526,
+    "observations": 5538,
     "series": 31,
-    "sweeps": 862
+    "sweeps": 866
   },
   "day": "2026-10-13",
-  "generated_at": "2026-10-13 10:09 UTC",
+  "generated_at": "2026-10-13 19:28 UTC",
   "macro": [
     {
-      "change": "0.06",
-      "obs_date": "2026-10-08",
+      "change": "0",
+      "obs_date": "2026-10-12",
       "series_id": "BAMLH0A0HYM2",
       "source": "fred",
       "title": "ICE BofA US high-yield option-adjusted spread, %",
-      "value": "3.15"
+      "value": "3.11"
     },
     {
       "change": "0",
@@ -177,12 +213,12 @@
       "value": "121.38"
     },
     {
-      "change": "172.83",
-      "obs_date": "2026-10-09",
+      "change": "-120.27",
+      "obs_date": "2026-10-12",
       "series_id": "NASDAQCOM",
       "source": "fred",
       "title": "NASDAQ Composite, index level",
-      "value": "27,366.17"
+      "value": "27,245.90"
     },
     {
       "change": null,
@@ -193,12 +229,12 @@
       "value": "3,158.26"
     },
     {
-      "change": "46.18",
-      "obs_date": "2026-10-09",
+      "change": "-4.3",
+      "obs_date": "2026-10-12",
       "series_id": "SP500",
       "source": "fred",
       "title": "S&P 500, index level",
-      "value": "7,811.54"
+      "value": "7,807.24"
     },
     {
       "change": "-0.03",
@@ -217,12 +253,12 @@
       "value": "4.20"
     },
     {
-      "change": "-0.57",
-      "obs_date": "2026-10-09",
+      "change": "0.37",
+      "obs_date": "2026-10-12",
       "series_id": "VIXCLS",
       "source": "fred",
       "title": "CBOE VIX, index",
-      "value": "14.84"
+      "value": "15.21"
     }
   ],
   "names": [
@@ -558,7 +594,7 @@
         },
         {
           "concept": "price_target_consensus",
-          "known_at": "2026-10-12",
+          "known_at": "2026-10-13",
           "label": "target (consensus)",
           "period_end": null,
           "source": "fmp",
@@ -792,7 +828,7 @@
         },
         {
           "concept": "price_target_consensus",
-          "known_at": "2026-10-12",
+          "known_at": "2026-10-13",
           "label": "target (consensus)",
           "period_end": null,
           "source": "fmp",
@@ -1040,7 +1076,7 @@
         },
         {
           "concept": "price_target_consensus",
-          "known_at": "2026-10-12",
+          "known_at": "2026-10-13",
           "label": "target (consensus)",
           "period_end": null,
           "source": "fmp",
