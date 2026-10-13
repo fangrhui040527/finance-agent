@@ -1,6 +1,78 @@
 {
   "collection": [
     {
+      "at": "2026-10-13T22:46:24.437146+00:00",
+      "detail": "skipped: every asked name was refused: outside the plan or over today's credits (XNAS:NVDA, XNAS:AAPL)",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-13T22:46:23.918434+00:00",
+      "detail": "facts 0; window not covered back to 2026-10-13 19:28Z; the oldest item read is 2026-10-13 21:39Z, so 2.2h of the window was never served",
+      "fetched": 20,
+      "kept": 20,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 20
+    },
+    {
+      "at": "2026-10-13T22:46:22.624269+00:00",
+      "detail": "alphavantage refused a premium endpoint (the key's plan does not include it): Thank you for using Alpha Vantage! This is a premium endpoint. You may subscribe to any of the premium plans at https://www.alphavantage.co/premium/ to instantl",
+      "fetched": 0,
+      "kept": 0,
+      "source": "alphavantage_news",
+      "status": "failed",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-13T22:46:20.123436+00:00",
+      "detail": "facts 39; ",
+      "fetched": 314,
+      "kept": 276,
+      "source": "finnhub",
+      "status": "ok",
+      "stored": 192
+    },
+    {
+      "at": "2026-10-13T22:46:15.181232+00:00",
+      "detail": "facts 1; ",
+      "fetched": 1,
+      "kept": 0,
+      "source": "edgar",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-13T22:46:14.797503+00:00",
+      "detail": "named the company: 19 of 47 (lowest: NVIDIA 2/17, Microsoft 5/15, Apple 12/15)",
+      "fetched": 47,
+      "kept": 47,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 35
+    },
+    {
+      "at": "2026-10-13T22:46:14.092285+00:00",
+      "detail": "named the company: 182 of 192 (lowest: NVIDIA 71/76, Microsoft 39/41, Apple 72/75)",
+      "fetched": 212,
+      "kept": 192,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 174
+    },
+    {
+      "at": "2026-10-13T22:46:11.394791+00:00",
+      "detail": "no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked)",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "failed",
+      "stored": 0
+    },
+    {
       "at": "2026-10-13T19:28:53.956219+00:00",
       "detail": "facts 0; ",
       "fetched": 450,
@@ -119,18 +191,18 @@
     }
   ],
   "counts": {
-    "articles": 17077,
+    "articles": 17498,
     "documents": 0,
-    "escalated": 2753,
-    "events": 4213,
-    "failed_sweeps": 65,
-    "linked": 11353,
-    "observations": 5538,
+    "escalated": 2808,
+    "events": 4214,
+    "failed_sweeps": 67,
+    "linked": 11598,
+    "observations": 5577,
     "series": 31,
-    "sweeps": 866
+    "sweeps": 874
   },
   "day": "2026-10-13",
-  "generated_at": "2026-10-13 19:28 UTC",
+  "generated_at": "2026-10-13 22:46 UTC",
   "macro": [
     {
       "change": "0",
@@ -531,22 +603,30 @@
       "upcoming": []
     },
     {
-      "escalated": 16,
-      "events": [],
+      "escalated": 33,
+      "events": [
+        {
+          "kind": "insider_filing",
+          "source": "edgar",
+          "title": "4/A: FORM 4/A",
+          "url": "https://www.sec.gov/Archives/edgar/data/1045810/000215218826000007/xslF345X06/wk-form4a_1791925767.xml",
+          "when": "2026-10-13T00:00:00+00:00"
+        }
+      ],
       "instrument_id": "XNAS:NVDA",
       "label": "NVIDIA",
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-10-12",
+          "known_at": "2026-10-13",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "28.65"
+          "value": "28.46"
         },
         {
           "concept": "pb",
-          "known_at": "2026-10-12",
+          "known_at": "2026-10-13",
           "label": "P/B",
           "period_end": null,
           "source": "finnhub",
@@ -554,7 +634,7 @@
         },
         {
           "concept": "eps_ttm",
-          "known_at": "2026-10-12",
+          "known_at": "2026-10-13",
           "label": "EPS (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -562,7 +642,7 @@
         },
         {
           "concept": "dividend_yield",
-          "known_at": "2026-10-12",
+          "known_at": "2026-10-13",
           "label": "dividend yield",
           "period_end": null,
           "source": "finnhub",
@@ -570,7 +650,7 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-10-12",
+          "known_at": "2026-10-13",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
@@ -578,7 +658,7 @@
         },
         {
           "concept": "high_52w",
-          "known_at": "2026-10-12",
+          "known_at": "2026-10-13",
           "label": "52w high",
           "period_end": null,
           "source": "finnhub",
@@ -586,7 +666,7 @@
         },
         {
           "concept": "low_52w",
-          "known_at": "2026-10-12",
+          "known_at": "2026-10-13",
           "label": "52w low",
           "period_end": null,
           "source": "finnhub",
@@ -681,83 +761,83 @@
           "uncertainty": 0.13736263736263735
         },
         {
-          "doc_id": "finnhub:142824449",
+          "doc_id": "finnhub:142848527",
           "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-10-12T20:15:00+00:00",
+          "published_at": "2026-10-13T13:00:00+00:00",
           "quality": 0.85,
-          "title": "Navitas Collaborates with NVIDIA on 800 V-to-12 V Power Delivery Board for Next-Generation AI Infrastructure",
+          "title": "Bot Auto taps Lenovo, Nvidia, pegs autonomy hardware at $50,000",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:142824063",
-          "domain": "SeekingAlpha",
+          "doc_id": "finnhub:142848531",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-13T13:00:00+00:00",
+          "quality": 0.85,
+          "title": "Bot Auto Selects Lenovo AD1 built on NVIDIA Hyperion to Scale Driverless Trucking",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142848529",
+          "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 1.0,
-          "published_at": "2026-10-12T16:27:00+00:00",
+          "published_at": "2026-10-13T12:38:00+00:00",
           "quality": 0.85,
-          "title": "The Silicon Giant's Dilemma: Decoding NVDA's Hidden Valuation Edge",
+          "title": "NVIDIA Begins Vera Rubin Production: Can It Extend NVDA's AI Lead?",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:142821478",
+          "doc_id": "finnhub:142847351",
           "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
-          "polarity": 0.3333333333333333,
-          "published_at": "2026-10-12T15:16:00+00:00",
-          "quality": 0.85,
-          "title": "Nvidia Falls Back From Record Highs. Its Stock Chart Offers a Warning.",
-          "uncertainty": 0.3571428571428571
-        },
-        {
-          "doc_id": "finnhub:142819775",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-12T13:30:15+00:00",
-          "quality": 0.85,
-          "title": "Microsoft unveils the Maia 300, its latest AI chip",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMijAFBVV95cUxOejVzVFN5MzdQZlAybkJUWldaVW5Db2lsbUZZeHF6MW9mdkxVYl9JSE5iZFpmV1R2NlhiWmw3a0M4RFRjNW9uV0V0OVZqSXRYUDBRamZCdk5EYmZpMFlwbzZPVUFJc2ZvZ0RmVXJodEJoMHRwZkFjVk5uVC1OS3dpdmZRSnQtX2hncndRQQ?oc=5",
-          "domain": "www.barrons.com",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
-          "polarity": 0.0,
-          "published_at": "2026-10-12T20:18:00+00:00",
-          "quality": 0.8,
-          "title": "Nvidia Falls Back From Record High. Its Stock Chart Offers a Warning.",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMimgFBVV95cUxPNW4xOGIycUVCVV9Rdml5YXUtUW96TGFhUjdORk1INEQ0eWdZUzYyM1gzQjRuTnFpS3o4TmZsam9pV0pVNUFnaEY1amprMmRQbFhqWEdhaW1YYTg5ZzdQR0hPc1p5Y1k2Zk96UTBLMTNlLWozZWVuZWZHUmRMclRxUGhneEtaYzhqOEpQRENrU04wYlRBZUw3VWln?oc=5",
-          "domain": "finance.yahoo.com",
           "escalated": true,
           "intensity": 0.3333333333333333,
           "polarity": 1.0,
-          "published_at": "2026-10-12T12:53:44+00:00",
-          "quality": 0.8,
-          "title": "Nvidia Nears $6 Trillion Market Cap as Relentless AI Chip Demand Powers Record Growth",
+          "published_at": "2026-10-13T10:20:00+00:00",
+          "quality": 0.85,
+          "title": "Nvidia Stock Slips. How Broadcom and Microsoft Are Shaking the Chip Sector.",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142842960",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "polarity": 0.0,
+          "published_at": "2026-10-13T09:00:07+00:00",
+          "quality": 0.85,
+          "title": "Every major Nvidia customer is now a competitor as Microsoft reveals new Maia chip",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142835906",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "polarity": 1.0,
+          "published_at": "2026-10-13T05:50:00+00:00",
+          "quality": 0.85,
+          "title": "Abishai Financial Asia Reports S&P 500 Tech-Led Advance",
           "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 55,
-        "polarity_mean": 0.061,
-        "sources": 30,
-        "uncertainty_mean": 0.054
+        "n": 143,
+        "polarity_mean": 0.072,
+        "sources": 41,
+        "uncertainty_mean": 0.061
       },
       "upcoming": []
     },
     {
-      "escalated": 15,
+      "escalated": 36,
       "events": [
         {
           "kind": "rating_reiteration",
@@ -772,15 +852,15 @@
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-10-12",
+          "known_at": "2026-10-13",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "38.11"
+          "value": "38.44"
         },
         {
           "concept": "pb",
-          "known_at": "2026-10-12",
+          "known_at": "2026-10-13",
           "label": "P/B",
           "period_end": null,
           "source": "finnhub",
@@ -788,7 +868,7 @@
         },
         {
           "concept": "eps_ttm",
-          "known_at": "2026-10-12",
+          "known_at": "2026-10-13",
           "label": "EPS (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -796,7 +876,7 @@
         },
         {
           "concept": "dividend_yield",
-          "known_at": "2026-10-12",
+          "known_at": "2026-10-13",
           "label": "dividend yield",
           "period_end": null,
           "source": "finnhub",
@@ -804,7 +884,7 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-10-12",
+          "known_at": "2026-10-13",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
@@ -812,7 +892,7 @@
         },
         {
           "concept": "high_52w",
-          "known_at": "2026-10-12",
+          "known_at": "2026-10-13",
           "label": "52w high",
           "period_end": null,
           "source": "finnhub",
@@ -820,7 +900,7 @@
         },
         {
           "concept": "low_52w",
-          "known_at": "2026-10-12",
+          "known_at": "2026-10-13",
           "label": "52w low",
           "period_end": null,
           "source": "finnhub",
@@ -893,6 +973,17 @@
       ],
       "stories": [
         {
+          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/apple-aapl-home-push-puts-181152273.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-13T18:11:52+00:00",
+          "quality": 1.0,
+          "title": "Apple (AAPL) Home Push Puts Its Valuation Premium Back In Focus",
+          "uncertainty": 0.0
+        },
+        {
           "doc_id": "https://finance.yahoo.com/video/apple-plans-compete-home-power-184214442.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
           "escalated": true,
@@ -904,89 +995,78 @@
           "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:142821515",
+          "doc_id": "https://www.independent.co.uk/tech/homeview-apple-europe-eu-siri-ai-b3066085.html?.tsrc=rss",
+          "domain": "www.independent.co.uk",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-13T19:27:45+00:00",
+          "quality": 0.85,
+          "title": "HomeView: Apple won\u2019t sell its latest new product in Europe \u2013 for this reason",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142854221",
+          "domain": "SeekingAlpha",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-13T17:35:27+00:00",
+          "quality": 0.85,
+          "title": "Apple's Next Stop: $6 Trillion Market In 2 Years",
+          "uncertainty": 0.3787878787878788
+        },
+        {
+          "doc_id": "finnhub:142851050",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-13T14:21:52+00:00",
+          "quality": 0.85,
+          "title": "Don't think Apple will own the universe 10 years from now",
+          "uncertainty": 0.2232142857142857
+        },
+        {
+          "doc_id": "finnhub:142851052",
           "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-10-12T14:07:00+00:00",
+          "published_at": "2026-10-13T13:56:37+00:00",
           "quality": 0.85,
-          "title": "One quiet Apple supplier may be cashing in where no one expects",
-          "uncertainty": 0.6756756756756757
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMinwFBVV95cUxPNFNEUmpfRG1nV3o1QVFLUXNZN0hVb2pCc3RuaF9wbWtGYkgtRXNva3R3LVRudmNiRUstM2ZEZHE4N1A3bWxVMWktd19pZGFiRDQzcTVrclRiYWVPTXQ0Wm54LV9oZHg3Wlp6dDBGQkVUcTF2WlVJUGwtX25pdnhBcFhJWWh2WnlCcmFyTjcteEpaMnpNY0pZQ1ZRNURvX0k?oc=5",
-          "domain": "www.cnbc.com",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
-          "polarity": 1.0,
-          "published_at": "2026-10-12T20:10:10+00:00",
-          "quality": 0.8,
-          "title": "Apple gains smartphone share as stock nears record high",
+          "title": "Apple debuts HomeView hub, its smart home product line",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "https://news.google.com/rss/articles/CBMimgFBVV95cUxQejFjd3RvY3M2MXVoMTgtR04tMHJwVlMwMU9VdjVmM1RhelJOUm8zdnZoMWhkQlhpUlRGamhZcVBIQXN3dXBCVE9oRGJIMXZlRFpoN0Q3YjF4elMtc3Y4Z2o4WEY0OFRBeWNtZlFrZjRzSVhVZWhMRnpoRzd4d2QzZnI2a2F5SVhsTnhvSGpFUGNBOEkyTkREaDVR?oc=5",
-          "domain": "finance.yahoo.com",
-          "escalated": true,
-          "intensity": 0.6666666666666666,
-          "polarity": 1.0,
-          "published_at": "2026-10-12T19:32:55+00:00",
-          "quality": 0.8,
-          "title": "Apple Stock Nears Record High As iPhone Market Share Hits 22% Despite 20% Smartphone Market Slump",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMimwFBVV95cUxPRHl6d2J6cUR1Qjgxckg0UjRLOEZyTEhxaC0tbnNOWDdYX3lfR2h3QVQ2TGdNVi1WTEhxSXVaOTl6R2ZqREJRSGs5ekdtZkxjSkhVMkxkRGVMX3NlcDd2MFVrejU0ZG9zTTBma3V6bXcxU0d5OXN4WjAwdVM0alFpLXFFcTUyZHBpUzBWdnFpUkxGcGFXN3BIZGxodw?oc=5",
-          "domain": "finance.yahoo.com",
+          "doc_id": "finnhub:142848551",
+          "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-10-12T14:39:20+00:00",
-          "quality": 0.8,
-          "title": "Apple (AAPL) Faces iPhone Demand Pressure. Can Its Growth Justify the Premium?",
+          "polarity": 0.0,
+          "published_at": "2026-10-13T13:01:00+00:00",
+          "quality": 0.85,
+          "title": "Apple announces the next generation of HomePod mini with support for Siri AI, beautiful new colors, and rich sound",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "https://news.google.com/rss/articles/CBMisgFBVV95cUxOYThMbTRGU3FTcjRuMl9GZnlUZlF4Wm50RURxSHZuTThwczY5RFVQNVJMTjlETzVhUjFQNVpMTGVNZC1LSnhNVnNxekFjOE1NejdMSExqdkJBNkd3T2F4Xy1MUVV1djhQSlpDN25RWXVrbkgzQm9FQ0xpdGlNQ3JobGhPTW1Ldm1Mbkl6b2RBdzY5cC1NNzZIUU5DbmNJaVNreDI1ZlNfd05uZm8waUNqRWpR?oc=5",
-          "domain": "appleinsider.com",
+          "doc_id": "finnhub:142851057",
+          "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
-          "polarity": -1.0,
-          "published_at": "2026-10-12T22:02:00+00:00",
-          "quality": 0.65,
-          "title": "Apple & Samsung dominate the smartphone market amid decline",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMiugFBVV95cUxNd01ZVXRkVGZ5U0RHTmM0RXJfNlpwdTFXX1Zyb0JIbzdTUXM2X24yNDhveXY5cWdqMEFVa1BReUNEOWN4QVZZeFJQaTVMN1ZTSWluZ3J5YXJGYzZMc3MzUGlxRmNCVTBpRHJaRnJtVFo2eUdORVRrdWtweHFhRGJVenFKSGZJcm5NaDhNRDhGMkNIbURuTEoxRWxaamt3RGk3aFB2clY4cjhJYjVMbWhxeVdOQW95RVlYNWc?oc=5",
-          "domain": "www.marketbeat.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-10-12T21:09:12+00:00",
-          "quality": 0.65,
-          "title": "Apple (NASDAQ:AAPL) Stock Jumps 1.3% Following Analyst Upgrade",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMikwFBVV95cUxQTk5hMk11cTJXODZ4eWhZOG9uLXpSckVGUlM5aGtxdEFETUtnTE5NVDh0Mk91NHN3RGtxX2xaNTlCbmVVaWN4SmJEZ2F4eXZFWlh2SnFMVFVzNjhwbEl1cnpHZ0FxMTlOaHQ1WTdjWUp5NFd3OWhBamZ2Ni1QS3Q2dEpvSGtpdG90ekRMX2VKN01oVU0?oc=5",
-          "domain": "www.thestreet.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": -1.0,
-          "published_at": "2026-10-12T19:52:29+00:00",
-          "quality": 0.65,
-          "title": "Apple cuts iPhone 18 Pro orders as AI raises the bill",
+          "polarity": 0.0,
+          "published_at": "2026-10-13T13:00:00+00:00",
+          "quality": 0.85,
+          "title": "Sauce Labs Announces Support for Apple's Foldable iPhone Duo, Bringing AURA Test Authoring and Execution to Dual-Screen Apps",
           "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.667,
-        "n": 42,
-        "polarity_mean": 0.143,
-        "sources": 24,
-        "uncertainty_mean": 0.116
+        "n": 138,
+        "polarity_mean": 0.116,
+        "sources": 61,
+        "uncertainty_mean": 0.086
       },
       "upcoming": [
         {
@@ -1013,22 +1093,22 @@
       ]
     },
     {
-      "escalated": 20,
+      "escalated": 40,
       "events": [],
       "instrument_id": "XNAS:MSFT",
       "label": "Microsoft",
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-10-12",
+          "known_at": "2026-10-13",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "29.71"
+          "value": "29.99"
         },
         {
           "concept": "pb",
-          "known_at": "2026-10-12",
+          "known_at": "2026-10-13",
           "label": "P/B",
           "period_end": null,
           "source": "finnhub",
@@ -1036,7 +1116,7 @@
         },
         {
           "concept": "eps_ttm",
-          "known_at": "2026-10-12",
+          "known_at": "2026-10-13",
           "label": "EPS (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -1044,7 +1124,7 @@
         },
         {
           "concept": "dividend_yield",
-          "known_at": "2026-10-12",
+          "known_at": "2026-10-13",
           "label": "dividend yield",
           "period_end": null,
           "source": "finnhub",
@@ -1052,7 +1132,7 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-10-12",
+          "known_at": "2026-10-13",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
@@ -1060,7 +1140,7 @@
         },
         {
           "concept": "high_52w",
-          "known_at": "2026-10-12",
+          "known_at": "2026-10-13",
           "label": "52w high",
           "period_end": null,
           "source": "finnhub",
@@ -1068,7 +1148,7 @@
         },
         {
           "concept": "low_52w",
-          "known_at": "2026-10-12",
+          "known_at": "2026-10-13",
           "label": "52w low",
           "period_end": null,
           "source": "finnhub",
@@ -1174,67 +1254,67 @@
           "uncertainty": 0.21551724137931036
         },
         {
-          "doc_id": "finnhub:142824477",
+          "doc_id": "finnhub:142852354",
           "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
-          "polarity": -1.0,
-          "published_at": "2026-10-12T17:45:16+00:00",
+          "polarity": 1.0,
+          "published_at": "2026-10-13T15:11:32+00:00",
           "quality": 0.85,
-          "title": "Microsoft Goes All-In On Its Own AI Chips",
+          "title": "Microsoft Surface GM on New AI PCs, 5G Devices and Surface Innovation",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:142821519",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
-          "polarity": 1.0,
-          "published_at": "2026-10-12T15:30:43+00:00",
-          "quality": 0.85,
-          "title": "If You Invest $500 a Month in Microsoft Starting Now, This is What You\u2019d Have in 2030",
-          "uncertainty": 0.40322580645161293
-        },
-        {
-          "doc_id": "finnhub:142819775",
+          "doc_id": "finnhub:142848554",
           "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-10-12T13:30:15+00:00",
+          "published_at": "2026-10-13T13:31:38+00:00",
           "quality": 0.85,
-          "title": "Microsoft unveils the Maia 300, its latest AI chip",
+          "title": "Claude Was Right About Microsoft (MSFT): Can The Stock Keep Rising?",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:142819785",
+          "doc_id": "finnhub:142848556",
           "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-10-12T13:00:00+00:00",
+          "published_at": "2026-10-13T13:00:00+00:00",
           "quality": 0.85,
-          "title": "Microsoft Unveils New Maia AI Chips. What to Know.",
+          "title": "Workday to Bring Sana Everywhere Employees Work, Including Claude, Gemini Enterprise, Microsoft Copilot, Slack, and Teams",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "https://news.google.com/rss/articles/CBMimgFBVV95cUxObl9KakpiakRtRjZYQmUtVzlmTXg3OHNmN0RZOWNHNGxfSHR0dlVQMHlRYVozOGdlMmVmYnd5alFjR2REbS1Rbk1fdWY4bmxLX3Rfa3hSV2tDem1BVHV5QjVzZUlsazU5VXlLUXVBdlh5MktmM1VoVDBmM01FYVBwNkwzdFlWZ0dHM01rZzc5djlrTW9aX1o3Xy1R?oc=5",
-          "domain": "seekingalpha.com",
+          "doc_id": "finnhub:142848559",
+          "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 1.0,
-          "published_at": "2026-10-12T18:54:22+00:00",
-          "quality": 0.8,
-          "title": "Why Microsoft's AI Growth Story Justifies A Strong Buy (NASDAQ:MSFT)",
+          "published_at": "2026-10-13T12:37:49+00:00",
+          "quality": 0.85,
+          "title": "Latest News In Cloud AI - Park Place Expands Microsoft Cloud Services to North America",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142848561",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-13T10:30:00+00:00",
+          "quality": 0.85,
+          "title": "Microsoft unveils Maia 300 AI chip, plans multi-GW deployment from 2027 on",
           "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 52,
-        "polarity_mean": 0.019,
-        "sources": 26,
-        "uncertainty_mean": 0.086
+        "n": 108,
+        "polarity_mean": 0.111,
+        "sources": 40,
+        "uncertainty_mean": 0.06
       },
       "upcoming": [
         {
