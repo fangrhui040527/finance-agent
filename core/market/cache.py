@@ -153,6 +153,54 @@ def last_dated_row(body: str) -> date | None:
     return None
 
 
+def _usable_lines(body: str) -> dict[date, str]:
+    """Each usable bar's day, mapped to its own CSV line under the body's header."""
+    from core.market.feed import PriceFeed, PriceFeedError
+
+    lines = (body or "").strip().splitlines()
+    out: dict[date, str] = {}
+    for line in lines[1:]:
+        try:
+            bars = PriceFeed.parse(lines[0] + "\n" + line)
+        except PriceFeedError:
+            continue
+        if bars:
+            out[bars[0].day] = line
+    return out
+
+
+def _keep_settled_days(held: str, fresh: str) -> str:
+    """The fresh body, with any settled day it blanks or drops taken from the held one.
+
+    On 2026-10-13 at 02:34 UTC a refetch during Tuesday's Bursa session came back
+    with Monday's row blank and a Tuesday row for the session so far. Its last
+    usable bar moved forward, so `put` took it whole and Monday's settled closes
+    left the cache. A day the held body had settled, and the fresh body has no
+    usable row for inside its own span, is restored from the held body. A day
+    the fresh body does price is left as it has it: a revised close is news, a
+    blank one is not.
+    """
+    header = (fresh or "").strip().splitlines()[:1]
+    if header != (held or "").strip().splitlines()[:1]:
+        return fresh  # different columns: no line can be moved across safely
+    held_days = _usable_lines(held)
+    fresh_days = _usable_lines(fresh)
+    if not held_days or not fresh_days:
+        return fresh
+    first = min(fresh_days)
+    missing = {d: line for d, line in held_days.items() if d >= first and d not in fresh_days}
+    if not missing:
+        return fresh
+    rows: dict[date, str] = {}
+    for line in fresh.strip().splitlines()[1:]:
+        try:
+            rows[date.fromisoformat(line.split(",", 1)[0].strip()[:10])] = line
+        except ValueError:
+            continue
+    rows.update(missing)
+    return "\n".join(header + [rows[d] for d in sorted(rows)]) + "\n"
+
+
 def is_mid_session(body: str) -> bool:
     """Whether the body ends in a row the bar parser will not take.
 
@@ -300,6 +348,7 @@ class PriceCache:
                 fresh = last_usable_bar_day(body)
                 if held is not None and (fresh is None or fresh < held):
                     return row[0]
+                body = _keep_settled_days(row[0], body)
             self.conn.execute(
                 "INSERT INTO price_csv (feed, symbol, fetched_on, fetched_at, body)"
                 " VALUES (?,?,?,?,?)"

@@ -73,3 +73,36 @@ def test_the_feed_prices_from_the_held_body_when_the_refetch_regresses(tmp_path,
     series = feed.fetch("XNAS:NVDA")
     assert str(series.raw()[-1].day) == "2026-09-28"
     assert float(series.raw()[-1].close) == 228.86
+
+
+# 2026-10-13, 02:34 UTC: the us_close collector refetched the Bursa names while
+# Tuesday's session was trading. Yahoo answered with Monday's row blank and a
+# Tuesday row carrying the session so far. The last usable bar moved FORWARD, so
+# the guard above let it in, and Monday's settled close (Genting 1.45, on the
+# day it fell 22.87%) left the cache. The control book was re-marked for Monday
+# at Friday's close, and its 10-12 mark rose from USD 954.23 to 976.27.
+KL_HEAD = "date,open,high,low,close,volume\n"
+KL_FRI = "2026-10-09,1.84,1.89,1.83,1.88,2689500\n"
+KL_MON = "2026-10-12,1.73,1.75,1.44,1.45,90366100\n"
+KL_MON_BLANK = "2026-10-12,,,,,\n"
+KL_TUE_PART = "2026-10-13,1.45,1.50,1.44,1.48,8674200\n"
+
+
+def test_a_refetch_that_blanks_a_settled_day_keeps_that_day(tmp_path):
+    cache, clock = _cache(tmp_path, now="2026-10-12T10:09:00+00:00")
+    cache.put("yahoo", "3182.KL", KL_HEAD + KL_FRI + KL_MON)
+    clock["now"] = "2026-10-13T02:34:00+00:00"
+    stored = cache.put("yahoo", "3182.KL", KL_HEAD + KL_FRI + KL_MON_BLANK + KL_TUE_PART)
+    bars = {b.day.isoformat(): float(b.close) for b in YahooFeed.parse(stored)}
+    assert bars["2026-10-12"] == 1.45, "Monday's settled close survives the refetch"
+    assert bars["2026-10-13"] == 1.48, "the fresh body's own rows are kept"
+    assert _held(cache, "3182.KL")[0] == stored
+
+
+def test_a_fresh_value_for_a_settled_day_wins_over_the_held_one(tmp_path):
+    """Only a blank or missing row is filled from the held body; a revised close is news."""
+    cache, clock = _cache(tmp_path, now="2026-10-12T10:09:00+00:00")
+    cache.put("yahoo", "3182.KL", KL_HEAD + KL_FRI + KL_MON)
+    clock["now"] = "2026-10-13T10:09:00+00:00"
+    revised = KL_HEAD + KL_FRI + "2026-10-12,1.73,1.75,1.44,1.46,90366100\n" + KL_TUE_PART
+    assert cache.put("yahoo", "3182.KL", revised) == revised
