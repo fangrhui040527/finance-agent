@@ -1,0 +1,260 @@
+{
+  "day": "2026-10-13",
+  "written_at": "2026-10-13T22:58:00Z",
+  "phase": "ramp",
+  "week": 6,
+  "equity_usd": 1000.0,
+  "cash_usd": 1000.0,
+  "control_equity_usd": 955.93,
+  "control_return_to_date": -0.0441,
+  "drawdown": 0.0,
+  "control_drawdown": 0.0441,
+  "halted": false,
+  "marks": 28,
+  "positions": [],
+  "changes": [],
+  "control_changes": [],
+  "control_mark": {
+    "marked_on": "2026-10-13",
+    "equity_usd": 955.93,
+    "cash_usd": 602.28,
+    "positions_usd": 353.65,
+    "day_return": -0.0208,
+    "day_return_note": "measured from the 02:35Z 10-12 mark priced at Friday's closes; against mark 157 (954.23) the change is +0.18%",
+    "note": "holdings MYX:8869 100 (7.25), MYX:5183 100 (4.32), MYX:3182 200 (1.44)"
+  },
+  "index_book": {
+    "mark": {
+      "marked_on": "2026-10-13",
+      "equity_usd": 987456.64,
+      "cash_usd": 598556.5,
+      "positions_usd": 388900.14,
+      "day_return": -0.0055,
+      "day_return_note": "from the 02:35Z 10-12 mark; against 989,359.86 the change is -0.19%",
+      "drawdown": 0.0125,
+      "held": 97,
+      "pending": 0
+    },
+    "cost_to_date_share_of_notional": 0.0048,
+    "since_2026_09_30": {
+      "index": -0.0125,
+      "decided": 0.0,
+      "control": -0.0246
+    },
+    "dividends": [
+      {
+        "instrument_id": "MYX:6888",
+        "units": 10200,
+        "per_share_myr": "0.055",
+        "cash_usd": 137.3
+      },
+      {
+        "instrument_id": "MYX:2836",
+        "units": 1400,
+        "per_share_myr": "0.21",
+        "cash_usd": 71.95
+      }
+    ],
+    "note": "first dividend credits since the 10-10 boundary; cash +209.25"
+  },
+  "caps": [
+    {
+      "cap": "largest name",
+      "value": "0.00%",
+      "limit": "25%",
+      "breached": false
+    },
+    {
+      "cap": "invested",
+      "value": "0.00%",
+      "limit": "40%",
+      "breached": false
+    },
+    {
+      "cap": "cash floor",
+      "value": "100.00%",
+      "limit": "20%",
+      "breached": false
+    },
+    {
+      "cap": "names held",
+      "value": "0",
+      "limit": "0",
+      "breached": false
+    },
+    {
+      "cap": "drawdown from peak",
+      "value": "0.00%",
+      "limit": "8% halts entries",
+      "breached": false
+    },
+    {
+      "cap": "turnover, 5 weekdays",
+      "value": "USD 0.00",
+      "limit": "USD 500.00",
+      "breached": false
+    }
+  ],
+  "prices": {
+    "bursa": "Tuesday 2026-10-13 closes (10:08Z fetch); 10-12 Bursa rows blank in the cache; ^KLSE 1,623.35 with volume 0",
+    "us": "Tuesday 2026-10-13 closes (22:46Z fetch)",
+    "fx": "MYR 4.086 per USD (bnm, 2026-10-13)"
+  },
+  "fundable": [
+    {
+      "instrument_id": "MYX:1155",
+      "lot_usd": 243.76,
+      "share": 0.244,
+      "round_trip": 0.0098,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:5183",
+      "lot_usd": 105.73,
+      "share": 0.106,
+      "round_trip": 0.0209,
+      "lots": 2
+    },
+    {
+      "instrument_id": "MYX:5225",
+      "lot_usd": 195.3,
+      "share": 0.195,
+      "round_trip": 0.0119,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:8869",
+      "lot_usd": 177.44,
+      "share": 0.177,
+      "round_trip": 0.013,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:3182",
+      "lot_usd": 35.24,
+      "share": 0.035,
+      "round_trip": 0.0602,
+      "lots": 7
+    },
+    {
+      "instrument_id": "XNAS:NVDA",
+      "lot_usd": 228.52,
+      "share": 0.229,
+      "round_trip": 0.0114,
+      "lots": 1
+    }
+  ],
+  "over_cap": {
+    "MYX:5347": 0.319,
+    "XNAS:AAPL": 0.341,
+    "XNAS:MSFT": 0.543
+  },
+  "ledger": {
+    "mark_days": 26,
+    "gap": "no routine ran 2026-10-02..10-06; no paper page and no decision for those days; no decision is backdated"
+  },
+  "attribution": null,
+  "decision": {
+    "recorded": true,
+    "weights": {},
+    "thesis": "All cash, the twenty-eighth all-cash row and the first decision of ramp week 6. The 2026-10-12 feedback page could not decompose any Bursa name: the cached 10-12 Bursa rows are blank since the 02:34Z refetch on 10-13 (STALE NAME in the pack), so Monday's closes come only from the 2026-10-12 paper page and paper.db mark 157. Genting fell 1.88 -> 1.45 (-22.87%) on the RM1.25 billion rights issue reported after the 10-09 close and closed 1.44 on 10-13; the issue price, entitlement ratio and Bursa filing are still not in the store, and its round trip at one lot is 6.02%. Tuesday 10-13 closes: Maybank 9.96, Petronas Chemicals 4.32, IHH 7.98, Press Metal 7.25, ^KLSE 1,623.35 with volume 0; NVIDIA 228.52 (+0.97%), Apple 341.27, Microsoft 543.45; SPY -0.01%. The US names were not significant on 10-12 (0.63 to 0.85 sigma). A price store that has lost a settled session for every Bursa name is not one to size a Bursa claim on. Three all-cash claims graded, all correct against a control that holds Genting. Claim: nothing in the fundable universe beats cash over 21 sessions.",
+    "refusals": [],
+    "prediction_id": "paper-2026-10-13-allcash-21d-8010",
+    "grades_on": "2026-11-12",
+    "made_at": "2026-10-13T22:48:57Z",
+    "horizon_counting": "exchange sessions"
+  },
+  "stores": {
+    "decided_targets": 28,
+    "predictions": 28,
+    "outcomes": 3,
+    "index_targets": 194,
+    "control_targets": 6,
+    "index_pending": 0,
+    "made_at": "2026-10-13T22:48:57Z"
+  },
+  "evidence": {
+    "feedback_page": "knowledge/feedback/2026-10-12.md (e9713c7)",
+    "bursa_10_12": "not decomposed: STALE NAME, cached rows blank",
+    "closes_10_13": {
+      "MYX:3182": 1.44,
+      "MYX:4715": 1.25,
+      "MYX:1155": 9.96,
+      "MYX:5347": 13.04,
+      "MYX:5183": 4.32,
+      "MYX:5225": 7.98,
+      "MYX:8869": 7.25,
+      "MYX:^KLSE": 1623.35,
+      "XNAS:NVDA": 228.52,
+      "XNAS:AAPL": 341.27,
+      "XNAS:MSFT": 543.45
+    }
+  },
+  "mistakes": [
+    "paper-2026-10-12-allcash-21d-a3c9 read the control's -2.23% on 10-12 from mark 157, which stands; the pack's -2.08% for 10-13 is measured from the 02:35Z mark priced at Friday's closes and does not.",
+    "paper-2026-10-08-allcash-21d-7bb6's test (Genting above 1.93 before 11-07) is further away at 1.44.",
+    "paper-2026-10-01-allcash-21d-5a1e is behind on IHH (+3.64%) and Petronas Chemicals (+4.60%) since the 10-01 closes; it grades on 10-31."
+  ],
+  "mistakes_checked": [
+    "paper-2026-10-12-allcash-21d-a3c9",
+    "paper-2026-10-08-allcash-21d-7bb6 against 1.44",
+    "paper-2026-10-01-allcash-21d-5a1e against 10-13 closes"
+  ],
+  "grades_due": [
+    {
+      "prediction_id": "paper-2026-09-14-allcash-21d-9d7e",
+      "on": "2026-10-14"
+    },
+    {
+      "prediction_id": "paper-2026-09-15-allcash-21d-af55",
+      "on": "2026-10-15"
+    },
+    {
+      "prediction_id": "paper-2026-09-16-allcash-21d-3865",
+      "on": "2026-10-16"
+    },
+    {
+      "prediction_id": "paper-2026-09-17-allcash-21d-7667",
+      "on": "2026-10-17"
+    },
+    {
+      "prediction_id": "paper-2026-09-18-allcash-21d-667a",
+      "on": "2026-10-18"
+    },
+    {
+      "prediction_id": "paper-2026-09-19-allcash-21d-b7bd",
+      "on": "2026-10-19"
+    },
+    {
+      "prediction_id": "paper-2026-09-20-allcash-21d-dbaf",
+      "on": "2026-10-20"
+    }
+  ],
+  "lessons": [
+    "A day return is only as good as the previous day's last mark: a later mark of the same day written from worse data passes its error to every return measured from it.",
+    "A dividend credit is a position change with no trade: reading cash changes as trading would misread them."
+  ],
+  "dividend_boundary": {
+    "decided": "2026-10-10T15:25:31Z",
+    "control": "2026-10-10T15:25:31Z",
+    "index": "2026-10-10T15:25:31Z",
+    "note": "marks before it are not restated; no credit yet"
+  },
+  "graded": [
+    {
+      "prediction_id": "paper-2026-09-11-allcash-21d-8bf9",
+      "benchmark": -0.024,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-12-allcash-21d-1661",
+      "benchmark": -0.024,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-13-allcash-21d-5baf",
+      "benchmark": -0.0237,
+      "correct": true
+    }
+  ]
+}
