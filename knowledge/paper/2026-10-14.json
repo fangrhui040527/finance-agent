@@ -1,0 +1,261 @@
+{
+  "day": "2026-10-14",
+  "written_at": "2026-10-14T22:58:00Z",
+  "phase": "ramp",
+  "week": 6,
+  "equity_usd": 1000.0,
+  "cash_usd": 1000.0,
+  "control_equity_usd": 956.97,
+  "control_return_to_date": -0.043,
+  "drawdown": 0.0,
+  "control_drawdown": 0.043,
+  "halted": false,
+  "marks": 29,
+  "positions": [],
+  "changes": [],
+  "control_changes": [],
+  "control_mark": {
+    "marked_on": "2026-10-14",
+    "equity_usd": 956.97,
+    "cash_usd": 602.28,
+    "positions_usd": 354.69,
+    "day_return": 0.0011,
+    "note": "holdings MYX:8869 100 (7.21), MYX:5183 100 (4.43), MYX:3182 200 (1.42)"
+  },
+  "index_book": {
+    "mark": {
+      "marked_on": "2026-10-14",
+      "equity_usd": 989508.86,
+      "cash_usd": 598621.17,
+      "positions_usd": 390887.69,
+      "day_return": 0.0021,
+      "drawdown": 0.0105,
+      "held": 97,
+      "pending": 0
+    },
+    "cost_to_date_share_of_notional": 0.0048,
+    "since_2026_09_30": {
+      "index": -0.0105,
+      "decided": 0.0,
+      "control": -0.0235
+    },
+    "dividends": [
+      {
+        "instrument_id": "MYX:5296",
+        "units": 13200,
+        "per_share_myr": "0.02",
+        "cash_usd": 64.67
+      }
+    ],
+    "note": "one dividend credit; nothing pending"
+  },
+  "caps": [
+    {
+      "cap": "largest name",
+      "value": "0.00%",
+      "limit": "25%",
+      "breached": false
+    },
+    {
+      "cap": "invested",
+      "value": "0.00%",
+      "limit": "40%",
+      "breached": false
+    },
+    {
+      "cap": "cash floor",
+      "value": "100.00%",
+      "limit": "20%",
+      "breached": false
+    },
+    {
+      "cap": "names held",
+      "value": "0",
+      "limit": "0",
+      "breached": false
+    },
+    {
+      "cap": "drawdown from peak",
+      "value": "0.00%",
+      "limit": "8% halts entries",
+      "breached": false
+    },
+    {
+      "cap": "turnover, 5 weekdays",
+      "value": "USD 0.00",
+      "limit": "USD 500.00",
+      "breached": false
+    }
+  ],
+  "prices": {
+    "bursa": "Wednesday 2026-10-14 closes (10:09Z fetch); 10-12 rows restored on 10-14",
+    "us": "Wednesday 2026-10-14 closes (22:46Z fetch)",
+    "fx": "MYR 4.0825 per USD (bnm, 2026-10-14)"
+  },
+  "fundable": [
+    {
+      "instrument_id": "MYX:1155",
+      "lot_usd": 244.46,
+      "share": 0.244,
+      "round_trip": 0.0098,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:5183",
+      "lot_usd": 108.51,
+      "share": 0.109,
+      "round_trip": 0.0204,
+      "lots": 2
+    },
+    {
+      "instrument_id": "MYX:5225",
+      "lot_usd": 196.2,
+      "share": 0.196,
+      "round_trip": 0.0119,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:8869",
+      "lot_usd": 176.61,
+      "share": 0.177,
+      "round_trip": 0.0131,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:3182",
+      "lot_usd": 34.78,
+      "share": 0.035,
+      "round_trip": 0.061,
+      "lots": 7
+    },
+    {
+      "instrument_id": "XNAS:NVDA",
+      "lot_usd": 221.3,
+      "share": 0.221,
+      "round_trip": 0.0117,
+      "lots": 1
+    }
+  ],
+  "over_cap": {
+    "MYX:5347": 0.318,
+    "XNAS:AAPL": 0.343,
+    "XNAS:MSFT": 0.534
+  },
+  "ledger": {
+    "mark_days": 26,
+    "gap": "no routine ran 2026-10-02..10-06; no paper page and no decision for those days; no decision is backdated"
+  },
+  "attribution": null,
+  "decision": {
+    "recorded": true,
+    "weights": {},
+    "thesis": "All cash, the twenty-ninth all-cash row and the second decision of ramp week 6. Tuesday 10-13 is decomposed on the 2026-10-13 feedback page: no book name moved past 1.5 sigma and every one reads not_significant. Monday 10-12 is re-measured there now that the cache holds its Bursa rows again: Genting -22.87%, idiosyncratic -23.17% at 12.90 sigma, the day after the RM1.25 billion rights issue was reported; the issue price, entitlement ratio and Bursa filing are still not in the store, and Genting closed 1.42 on 10-14 with a 6.10% round trip at one lot. Wednesday 10-14 is not decomposed: Petronas Chemicals 4.43, IHH 8.01, Maybank 9.98, Tenaga 12.98, Press Metal 7.21; NVIDIA 221.30. Four all-cash claims are graded, all correct against a control that holds Genting; the 09-14 grade (control -4.41%) carries the Genting fall. No name carries a dated, collected cause the store can grade. Claim: nothing in the fundable universe beats cash over 21 sessions.",
+    "refusals": [],
+    "prediction_id": "paper-2026-10-14-allcash-21d-a9b4",
+    "grades_on": "2026-11-13",
+    "made_at": "2026-10-14T22:49:11Z",
+    "horizon_counting": "exchange sessions"
+  },
+  "stores": {
+    "decided_targets": 29,
+    "predictions": 29,
+    "outcomes": 4,
+    "index_targets": 194,
+    "control_targets": 6,
+    "index_pending": 0,
+    "made_at": "2026-10-14T22:49:11Z"
+  },
+  "evidence": {
+    "feedback_page": "knowledge/feedback/2026-10-13.md (1205ade)",
+    "remeasured_10_12": {
+      "MYX:3182": {
+        "idiosyncratic": -0.2317,
+        "sigma": 12.9
+      }
+    },
+    "closes_10_14": {
+      "MYX:3182": 1.42,
+      "MYX:5183": 4.43,
+      "MYX:5225": 8.01,
+      "MYX:1155": 9.98,
+      "MYX:5347": 12.98,
+      "MYX:8869": 7.21,
+      "MYX:^KLSE": 1627.72,
+      "XNAS:NVDA": 221.3,
+      "XNAS:AAPL": 342.96,
+      "XNAS:MSFT": 533.69,
+      "XNAS:SPY": 769.6
+    }
+  },
+  "mistakes": [
+    "paper-2026-10-13-allcash-21d-8010 called the store unable to size a Bursa claim because Monday's rows were blank; the rows returned at 00:17Z-00:33Z on 10-14, and Monday read 12.90 sigma for Genting and not_significant for the other five.",
+    "paper-2026-10-01-allcash-21d-5a1e is behind on IHH (+4.03%) and Petronas Chemicals (+7.26%) since the 10-01 closes; it grades on 10-31.",
+    "paper-2026-10-08-allcash-21d-7bb6's test (Genting above 1.93 before 11-07) stands at 1.42."
+  ],
+  "mistakes_checked": [
+    "paper-2026-10-13-allcash-21d-8010",
+    "paper-2026-10-01-allcash-21d-5a1e against 10-14 closes",
+    "paper-2026-10-08-allcash-21d-7bb6 against 1.42"
+  ],
+  "grades_due": [
+    {
+      "prediction_id": "paper-2026-09-15-allcash-21d-af55",
+      "on": "2026-10-15"
+    },
+    {
+      "prediction_id": "paper-2026-09-16-allcash-21d-3865",
+      "on": "2026-10-16"
+    },
+    {
+      "prediction_id": "paper-2026-09-17-allcash-21d-7667",
+      "on": "2026-10-17"
+    },
+    {
+      "prediction_id": "paper-2026-09-18-allcash-21d-667a",
+      "on": "2026-10-18"
+    },
+    {
+      "prediction_id": "paper-2026-09-19-allcash-21d-b7bd",
+      "on": "2026-10-19"
+    },
+    {
+      "prediction_id": "paper-2026-09-20-allcash-21d-dbaf",
+      "on": "2026-10-20"
+    },
+    {
+      "prediction_id": "paper-2026-09-21-allcash-21d-c04f",
+      "on": "2026-10-21"
+    }
+  ],
+  "lessons": [
+    "A reason that depends on the store's state expires with that state; a decision that cites the store's condition should name the time it read it."
+  ],
+  "dividend_boundary": {
+    "decided": "2026-10-10T15:25:31Z",
+    "control": "2026-10-10T15:25:31Z",
+    "index": "2026-10-10T15:25:31Z",
+    "note": "marks before it are not restated; no credit yet"
+  },
+  "graded": [
+    {
+      "prediction_id": "paper-2026-09-11-allcash-21d-8bf9",
+      "benchmark": -0.024,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-12-allcash-21d-1661",
+      "benchmark": -0.024,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-13-allcash-21d-5baf",
+      "benchmark": -0.0237,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-14-allcash-21d-9d7e",
+      "benchmark": -0.0441,
+      "correct": true
+    }
+  ]
+}
