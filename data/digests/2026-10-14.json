@@ -1,18 +1,100 @@
 {
-  "collection": [],
+  "collection": [
+    {
+      "at": "2026-10-14T10:09:10.932208+00:00",
+      "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-14T10:09:10.930719+00:00",
+      "detail": "facts 5; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-14T10:08:38.965564+00:00",
+      "detail": "facts 0; window not covered back to 2026-10-13 22:46Z; the oldest item read is 2026-10-14 09:51Z, so 11.1h of the window was never served",
+      "fetched": 19,
+      "kept": 19,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 19
+    },
+    {
+      "at": "2026-10-14T10:08:37.762155+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-14T10:08:35.809399+00:00",
+      "detail": "window overflow: all 50 dated items are newer than the window's start (2026-10-13 10:07Z); the oldest is 2026-10-14 15:43Z, so 21.6h scrolled off unseen",
+      "fetched": 50,
+      "kept": 48,
+      "source": "nst_business",
+      "status": "degraded",
+      "stored": 46
+    },
+    {
+      "at": "2026-10-14T10:08:35.255953+00:00",
+      "detail": "window overflow: all 50 dated items are newer than the window's start (2026-10-13 10:07Z); the oldest is 2026-10-13 13:44Z, so 3.6h scrolled off unseen",
+      "fetched": 50,
+      "kept": 50,
+      "source": "fmt_business",
+      "status": "degraded",
+      "stored": 50
+    },
+    {
+      "at": "2026-10-14T10:08:34.968873+00:00",
+      "detail": "read but empty: Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals, IHH",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-14T10:08:33.878358+00:00",
+      "detail": "named the company: 15 of 50 (lowest: Press Metal 0/1, Tenaga 1/9, Maybank 3/12)",
+      "fetched": 50,
+      "kept": 50,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 40
+    },
+    {
+      "at": "2026-10-14T10:08:31.793620+00:00",
+      "detail": "no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked); deferred: Maybank, Tenaga, Petronas Chemicals",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "failed",
+      "stored": 0
+    }
+  ],
   "counts": {
-    "articles": 17498,
+    "articles": 17653,
     "documents": 0,
     "escalated": 2808,
     "events": 4214,
-    "failed_sweeps": 67,
-    "linked": 11598,
-    "observations": 5577,
+    "failed_sweeps": 68,
+    "linked": 11610,
+    "observations": 5582,
     "series": 31,
-    "sweeps": 874
+    "sweeps": 883
   },
   "day": "2026-10-14",
-  "generated_at": "2026-10-14 00:34 UTC",
+  "generated_at": "2026-10-14 10:10 UTC",
   "macro": [
     {
       "change": "0",
@@ -150,8 +232,26 @@
       "instrument_id": "MYX:1155",
       "label": "Maybank",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxPaGU3VVp6bjd4UThJS3JGc3MzdWtuR1RLbkZQeUNtYTd5WkxqMEJEQW4xcXVhN2hTTUlLcUR4UUk4VjJmMXJFTkZnVHNRS2ZlMzNYS0dpcEZKX1lxZTZXYVJuY20tU1Bza1pQem5acE1CTkFndGVnQnN4NW9GMUlITEcwc2Zjd1Z1UF92V1hoSzg1MEpqdXktX3kwdVNuWTRlX1BEM3U5Qy1zNkpUa1ZpS21DY1dfeTZ0NWpkYzhMYlMwMFE?oc=5",
+          "domain": "www.ad-hoc-news.de",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-13T12:34:37+00:00",
+          "quality": 0.65,
+          "title": "Maybank keeps IDR 3,900 target for Bank Rakyat Indonesia stock - ad-hoc-news.de",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -170,8 +270,26 @@
       "instrument_id": "MYX:5183",
       "label": "Petronas Chemicals",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMi4gFBVV95cUxQdFhYSnpYWmo4b3gzS2VTMkItQVJNMlNvVjZGU0hfS1JNQmNtNUp5dlYzNDNSQlhhWUJmbV9QOENMaVNtYXZINGpaaEhuSGMxUFd5dlA3ei1la0hPUkNxQTVxQ1BycnJkaE9QdkhMM0RKallvbXFEZ1JPc3JZZ2lPR1BlN29BOXFENUxLc2Q0ZlhpRnk2V25iVjEweFJpVEhNeXdHNXUxenh2ME1MTHlZZ0stdy13UGFyMmZ6YTRjZzVCTk05MlV6TUtHN2VDNnplUXRwTW80VVlhT0cxRHByd0hR?oc=5",
+          "domain": "www.ad-hoc-news.de",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-14T05:04:39+00:00",
+          "quality": 0.65,
+          "title": "Petronas Chemicals signs 20-year methanol deal: what it means for Petronas Chemicals stock - ad-hoc-news.de",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -180,8 +298,59 @@
       "instrument_id": "MYX:5225",
       "label": "IHH",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE1abm5vRlpJLXlPOVZyM3hJODBRZFg1UTZxM3Y4ajJIOGRSWTF6ekFHYkMxSGRLRlV4TkdpRjNGazhXWVYxTWozQnVTRGdHQnBW?oc=5",
+          "domain": "theedgemalaysia.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-14T03:52:16+00:00",
+          "quality": 0.8,
+          "title": "IHH said to join race for TPG\u2019s Malaysian hospitals",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMilAFBVV95cUxOWDFuQ21SNUtkLW4wWXIweEc2TXc2OUlrVFM3WXNLVDhOLW9UOGlYRzJyeGdIRUtMUjZjNXFyVXFHU0JJTzlDTkc4S3BMV2xQdEd2M3FDaXRndFd5NFNTOXB6ZkZoQ1V0eXNnS215cU9lWHh0eGhDckN5Um5ZSnh4T1JtX2NLcGFMV3dqc2pBdUw5T0pI?oc=5",
+          "domain": "www.businesstoday.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-14T00:08:06+00:00",
+          "quality": 0.8,
+          "title": "Stock Picks: IHH Healthcare And Bursa Malaysia",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMipAFBVV95cUxNS1pJSlBWdV9vRDZ4RHVmSFM4YmI3Mk80aUNaWHlxMFRwU01rd29KdURpR05BMy1xWmt1WmN0d0dSbW8zRWgyelpBV015X2dRY2VVckdFLXVucy1nVmZBMGwxTEFEc2ZwUWdVTVc2Znc1N0NiQS1LVS16UzYxQzg3SmIteEw4M0dmcGpqWktfRlFkZVB1aGFjdEFwUlRORV9UX3dIZg?oc=5",
+          "domain": "tradersunion.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-14T04:11:39+00:00",
+          "quality": 0.65,
+          "title": "IHH Healthcare considers bidding for TPG-owned Malaysian hospital assets",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMitAFBVV95cUxPME1FbU5wcFh3aE5iNGVqQnZjLTRoRG5KSER6YXpQUEJlOWFISmNvT3U1ZWhwNXFjZ2R5Ykw5dTMzOWxObVRyOXk1cl93MlRzVnFJU1VpSlJKRFRWa2d4bk53amhlRm9sbnNlYzVONXVSM0Nub21rSnVnMldtSnRGb3VjSTM4cU1IdkJIdm0wSkpvSTl1ZGhvZWNSeW5KejVDeUZSOERsOFk3N1N6U0VnRUpKM0Q?oc=5",
+          "domain": "www.ad-hoc-news.de",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-14T01:36:42+00:00",
+          "quality": 0.65,
+          "title": "CIMB names IHH Healthcare stock a top pick at MYR 10.30 - ad-hoc-news.de",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 4,
+        "polarity_mean": 0.0,
+        "sources": 4,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -200,8 +369,37 @@
       "instrument_id": "MYX:3182",
       "label": "Genting",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMingJBVV95cUxOMUN4cmJUOGR5X1JhcEFHbXpkVW4zdnB2dFI0M0JtRXU2RXNFZTl5Ui0tLVU2MlNCZWZSVVZWMHBwRkpvVDNnSUFsRF85cW5mWXc0MUZIWXFWc1c3U0pzRkVoRFZIWWFSVmhoVEl2cHlRdU9OemkzN2ZqTEVzSGY1Wnl6eWRxUDlfSFVPWENHd0sydmd1eF9Jc2ZzcnNjb2h2SnhaLUFwajJiRUVsR2czQXdkVnZlaEJTVm9WTS0wbnBIQko5RlIxTHVob2w2SExaSE5IUnV3cXZ6SmtWRUtnR015NGdHckdTTUotcktkd0s4ZDFOa05xQ0wzQXpaelVpZWxKdU9VbzlKOVdkY3VLbVdWT0dyMkpmamRfS3R3?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-13T23:41:00+00:00",
+          "quality": 0.8,
+          "title": "Trading ideas: Sime Darby, Genting, Zetrix, Critical, Kelington, Lianson, Land 33, Pantech, Binasat, CTOS, Censof, AHB, Jati Tinggi, RedPlanet, NWE",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMitAFBVV95cUxNckRnaTZSYmpoRmt2T2RnZEx0V2luX0ZHbFV0MGhwTHNkTldNTGE1cEZBZl8xS2lUYXNzS2U2bmRRV09ydkxMVnFnWTRKbHQwQU4yRlNrUTQ3MHRTVklDNnhuUEI2X2VFWHYwczRrZjRRN0ZFSUtIQmhBWTF4cGxyYW9tWGRHV295WjBBa3FNZUVNVU9fQ0c0ZFRlZS1hejIzTTRWUWlQRGJWVERQa2xlYTJHNW0?oc=5",
+          "domain": "asgam.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-13T20:36:58+00:00",
+          "quality": 0.65,
+          "title": "CreditSights: Genting Bhd rights issue a positive but small step towards deleveraging - IAG",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 2,
+        "polarity_mean": 0.0,
+        "sources": 2,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {

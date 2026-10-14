@@ -1,26 +1,34 @@
 # Digest 2026-10-14
 
-Generated 2026-10-14 00:34 UTC · slot `all` · 17498 articles in the corpus, 5577 observations, 4214 events in the fact book.
+Generated 2026-10-14 10:10 UTC · slot `all` · 17653 articles in the corpus, 5582 observations, 4214 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-10-13 www.ad-hoc-news.de — Maybank keeps IDR 3,900 target for Bank Rakyat Indonesia stock - ad-hoc-news.de [q 0.65, tone +0.0]
 
 ### Tenaga (MYX:5347)
 - quiet: nothing collected for this name in the window
 
 ### Petronas Chemicals (MYX:5183)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-10-14 www.ad-hoc-news.de — Petronas Chemicals signs 20-year methanol deal: what it means for Petronas Chemicals stock - ad-hoc-news.de [q 0.65, tone +0.0]
 
 ### IHH (MYX:5225)
-- quiet: nothing collected for this name in the window
+- tone: 4 stories from 4 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-10-14 theedgemalaysia.com — IHH said to join race for TPG’s Malaysian hospitals [q 0.80, tone +0.0]
+- 2026-10-14 www.businesstoday.com.my — Stock Picks: IHH Healthcare And Bursa Malaysia [q 0.80, tone +0.0]
+- 2026-10-14 tradersunion.com — IHH Healthcare considers bidding for TPG-owned Malaysian hospital assets [q 0.65, tone +0.0]
+- 2026-10-14 www.ad-hoc-news.de — CIMB names IHH Healthcare stock a top pick at MYR 10.30 - ad-hoc-news.de [q 0.65, tone +0.0]
 
 ### Press Metal (MYX:8869)
 - quiet: nothing collected for this name in the window
 
 ### Genting (MYX:3182)
-- quiet: nothing collected for this name in the window
+- tone: 2 stories from 2 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-10-13 www.thestar.com.my — Trading ideas: Sime Darby, Genting, Zetrix, Critical, Kelington, Lianson, Land 33, Pantech, Binasat, CTOS, Censof, AHB, Jati Tinggi, RedPlanet, NWE [q 0.80, tone +0.0]
+- 2026-10-13 asgam.com — CreditSights: Genting Bhd rights issue a positive but small step towards deleveraging - IAG [q 0.65, tone +0.0]
 
 ### NVIDIA (XNAS:NVDA)
 - tone: 47 stories from 18 sources, polarity +0.09, peak intensity 0.33, uncertainty 0.07 · 11 escalated
@@ -84,6 +92,20 @@ Generated 2026-10-14 00:34 UTC · slot `all` · 17498 articles in the corpus, 55
 | 10y minus 2y Treasury spread, % | 0.44 | 2026-10-09 | -0.03 | fred |
 | US unemployment rate, % | 4.20 | 2026-09-01 | +0.1 | fred |
 | CBOE VIX, index | 15.21 | 2026-10-12 | +0.37 | fred |
+
+## Collection
+
+| at (UTC) | source | status | fetched | kept | stored | detail |
+|---|---|---|---|---|---|---|
+| 10:09 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
+| 10:09 | twse_openapi | ok | 8 | 0 | 0 | facts 5;  |
+| 10:08 | jin10_flash | degraded | 19 | 19 | 19 | facts 0; window not covered back to 2026-10-13 22:46Z; the oldest item read is 2 |
+| 10:08 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 10:08 | nst_business | degraded | 50 | 48 | 46 | window overflow: all 50 dated items are newer than the window's start (2026-10-1 |
+| 10:08 | fmt_business | degraded | 50 | 50 | 50 | window overflow: all 50 dated items are newer than the window's start (2026-10-1 |
+| 10:08 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals, IHH |
+| 10:08 | google_news | ok | 50 | 50 | 40 | named the company: 15 of 50 (lowest: Press Metal 0/1, Tenaga 1/9, Maybank 3/12) |
+| 10:08 | gdelt | failed | 0 | 0 | 0 | no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP |
 
 ---
 
