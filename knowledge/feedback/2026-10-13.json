@@ -1,0 +1,251 @@
+{
+  "day": "2026-10-13",
+  "written_at": "2026-10-14T22:58:00Z",
+  "measured_session": {
+    "bursa": "2026-10-13 (^KLSE 1,618.01 -> 1,623.34)",
+    "us": "2026-10-13 (SPY -0.01%)"
+  },
+  "pack_built": "2026-10-14T22:47:00Z",
+  "remeasured": {
+    "day": "2026-10-12",
+    "how": "ask.py pack --date 2026-10-12 on 2026-10-14 after the cache regained the 10-12 Bursa rows",
+    "MYX:3182": {
+      "return_1d": -0.2287,
+      "market_1d": 0.0059,
+      "idiosyncratic": -0.2317,
+      "sigma": 12.9,
+      "unexplained_share": 0.97,
+      "verdict": "no_identified_catalyst (no matcher run)"
+    },
+    "others": "Maybank 58%, Tenaga 61%, Petronas Chemicals 68%, IHH 50%, Press Metal 54% unexplained, all not_significant"
+  },
+  "market": {
+    "regime": "neutral",
+    "notes": [
+      "MYX:^KLSE +0.33%, -0.61% 5d; 99 Bursa names 36 up, 51 down, 12 flat, median -0.12%; banks up (CIMB +2.74%, RHB +1.53%)",
+      "XNAS:SPY -0.01%; CPIAUCSL 336.30 for September (+2.167)",
+      "no book name past 1.5 sigma"
+    ]
+  },
+  "names": [
+    {
+      "instrument_id": "MYX:5183",
+      "move": {
+        "return_1d": 0.0165,
+        "market_1d": 0.0033,
+        "unexplained_share": 0.81,
+        "session": "2026-10-13",
+        "note": "market +0.29%, drift -0.03%, idiosyncratic +1.39%, 0.37 sigma, not_significant, R2 0.00; 4.25 -> 4.32 on 8,850,300; nothing collected"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:5225",
+      "move": {
+        "return_1d": 0.0101,
+        "market_1d": 0.0033,
+        "unexplained_share": 0.71,
+        "session": "2026-10-13",
+        "note": "market +0.29%, drift -0.01%, idiosyncratic +0.74%, 0.65 sigma, not_significant; EPF 13.4% row after the close"
+      },
+      "causes": [],
+      "open_questions": [
+        "What lifted IHH 1.69 sigma on 10-06, while the hospital peer KPJ fell 0.77%? Title-only rows now say EPF raised its stake to 13.4% via a 3-million-share purchase (tipranks.com, 10-13 10:44Z). Which days did EPF buy, and does a Bursa substantial-shareholder filing carry them? (since 2026-10-06)"
+      ],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:3182",
+      "move": {
+        "return_1d": -0.0069,
+        "market_1d": 0.0033,
+        "unexplained_share": 0.58,
+        "session": "2026-10-13",
+        "note": "market +0.30%, drift -0.24%, idiosyncratic -0.75%, 0.42 sigma, not_significant; 1.45 -> 1.44; 10-12 re-measured: -22.87%, idiosyncratic -23.17%, 12.90 sigma, no_identified_catalyst (no matcher run)"
+      },
+      "causes": [],
+      "open_questions": [
+        "Genting's RM1.25 billion rights issue (reported 10-09 after the close; the stock fell 22.87% on 10-12, 12.90 sigma re-measured on 10-14). Rows on 10-13 add a CreditSights view that non-core asset sales may be needed to avert a downgrade, a Maybank sell call, and the CEO buying shares (after the close), all titles only. The issue price, entitlement ratio and Bursa filing are still not in the store. (since 2026-10-09)"
+      ],
+      "watch": [
+        {
+          "when": "pending",
+          "what": "rights issue terms and Bursa filing"
+        }
+      ]
+    },
+    {
+      "instrument_id": "MYX:1155",
+      "move": {
+        "return_1d": 0.001,
+        "market_1d": 0.0033,
+        "unexplained_share": 0.41,
+        "session": "2026-10-13",
+        "note": "market +0.33%, idiosyncratic -0.24%, 0.34 sigma; market-driven"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:5347",
+      "move": {
+        "return_1d": 0.0,
+        "market_1d": 0.0033,
+        "unexplained_share": 0.5,
+        "session": "2026-10-13",
+        "note": "market +0.26%, idiosyncratic -0.27%, 0.33 sigma, not_significant"
+      },
+      "causes": [],
+      "open_questions": [
+        "The linker still attaches *Shree TNB Polymers* to Tenaga after the 10-10 rule: *Average basic shares outstanding of Shree TNB Polymers Limited – BSE:SHREETNB* (tradingview.com, 10-10 20:14Z) is linked to MYX:5347, because the alias TNB is named in the text. A rule that matches a short alias inside another company's name cannot tell them apart. Does the alias list need an exclusion for Shree TNB, or does TNB need to be a whole-name match? (since 2026-09-17)"
+      ],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:8869",
+      "move": {
+        "return_1d": 0.0042,
+        "market_1d": 0.0033,
+        "unexplained_share": 0.12,
+        "session": "2026-10-13",
+        "note": "market +0.35%, drift +0.13%, idiosyncratic -0.07%, 0.04 sigma; market-driven"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": []
+    },
+    {
+      "instrument_id": "XNAS:NVDA",
+      "move": {
+        "return_1d": 0.0097,
+        "market_1d": -0.0001,
+        "unexplained_share": 0.96,
+        "session": "2026-10-13",
+        "note": "market -0.02%, drift -0.03%, idiosyncratic +1.02%, 0.56 sigma, not_significant"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [
+        {
+          "when": "2026-11-17",
+          "what": "earnings_result"
+        }
+      ]
+    },
+    {
+      "instrument_id": "XNAS:MSFT",
+      "move": {
+        "return_1d": 0.0043,
+        "market_1d": -0.0001,
+        "unexplained_share": 0.84,
+        "session": "2026-10-13",
+        "note": "0.28 sigma, not_significant"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [
+        {
+          "when": "2026-10-27",
+          "what": "earnings_result"
+        },
+        {
+          "when": "2026-10-28",
+          "what": "earnings_result"
+        }
+      ]
+    },
+    {
+      "instrument_id": "XNAS:AAPL",
+      "move": {
+        "return_1d": 0.0009,
+        "market_1d": -0.0001,
+        "unexplained_share": 0.1,
+        "session": "2026-10-13",
+        "note": "0.01 sigma; market-driven; 340.97 -> 341.27"
+      },
+      "causes": [],
+      "open_questions": [
+        "**Apple's opening gap.** The 10-09 open at 331.70 (−2.56%) followed a Nikkei Asia report of iPhone 18 Pro component order cuts. It closed 340.97 on 10-12 and 341.27 on 10-13, above the 340.42 refute line, with no company or supplier statement in the store. Does one arrive before the results? (since 2026-10-09)"
+      ],
+      "watch": [
+        {
+          "when": "2026-10-28",
+          "what": "earnings_result"
+        },
+        {
+          "when": "2026-10-29",
+          "what": "earnings_result"
+        },
+        {
+          "when": "2026-11-02",
+          "what": "earnings_result"
+        }
+      ]
+    }
+  ],
+  "machine": {
+    "on_time": "routine fired 2026-10-14T22:44Z and ran on time; no feedback pages for 10-01..10-05",
+    "tuesday": "bursa_close 20261013T100655 at 10:09Z (Bursa catch-up), gdelt ok once; second bursa_close 78beb72 at 16:58Z; us_preopen 20261013T192816; us_close 20261013T224447 dispatched by the 10-13 nightly; 00:17Z 10-14 refetch restored the 10-12 Bursa rows; tonight dispatched us_close, landed 58f126b at 22:47:10Z"
+  },
+  "data_quality": {
+    "failed": [
+      "alphavantage_news: 'premium endpoint' on every run since 10-10; monitor cadence alert 213h",
+      "gdelt: HTTP 429 on 10-13 22:46Z (ok at 10:07Z); monitor cadence alert 37h"
+    ],
+    "degraded": [
+      "nst_business, fmt_business: window overflow (10:07Z)",
+      "jin10_flash: window not covered (three runs)",
+      "yahoo_rss: read empty for all six Bursa names",
+      "fact book: all six Bursa names NOTHING COLLECTED"
+    ],
+    "skipped": [
+      "fmp /earnings: outside the plan",
+      "eodhd: free plan; names asked refused"
+    ]
+  },
+  "open_questions_carried": [
+    "Genting's RM1.25 billion rights issue (reported 10-09 after the close; the stock fell 22.87% on 10-12, 12.90 sigma re-measured on 10-14). Rows on 10-13 add a CreditSights view that non-core asset sales may be needed to avert a downgrade, a Maybank sell call, and the CEO buying shares (after the close), all titles only. The issue price, entitlement ratio and Bursa filing are still not in the store. (since 2026-10-09)",
+    "**Apple's opening gap.** The 10-09 open at 331.70 (−2.56%) followed a Nikkei Asia report of iPhone 18 Pro component order cuts. It closed 340.97 on 10-12 and 341.27 on 10-13, above the 340.42 refute line, with no company or supplier statement in the store. Does one arrive before the results? (since 2026-10-09)",
+    "`nst_business` timestamps ahead of the clock. On 10-10 it reported an oldest item at 16:33Z from a sweep that ran at 15:24Z, and on 10-11 an oldest item at 17:29Z from a sweep at 15:44Z. Is the adapter reading Malaysian time as UTC? If so, every `nst_business` time on these pages is 8 hours late. (since 2026-10-10)",
+    "What lifted Genting 1.71 sigma on 10-08 (idiosyncratic +3.08%), back to Tuesday's 1.84 after Wednesday's −2.17%? No row about the company was published on 10-08. It closed 1.88 on 10-09, with Genting Malaysia +2.05%. The rights issue reported after the 10-09 close is the first company row since 10-07. A pre-announcement leg is a hypothesis the store cannot test. (since 2026-10-08)",
+    "What lifted IHH 1.69 sigma on 10-06, while the hospital peer KPJ fell 0.77%? Title-only rows now say EPF raised its stake to 13.4% via a 3-million-share purchase (tipranks.com, 10-13 10:44Z). Which days did EPF buy, and does a Bursa substantial-shareholder filing carry them? (since 2026-10-06)",
+    "What did the Petronas Chemicals CEO appointment (title only, 10-05 14:44Z) say, and does a Bursa filing carry it? It preceded a +4.12% session; the name is 4.28 on 10-09. (since 2026-10-06)",
+    "`alphavantage_news` answered \"premium endpoint\" from 10-06 01:47Z to 10-08, \"quota exhausted for today\" on 10-09, and \"premium endpoint\" on every run since 10-10. It is 213h past its cadence. Is the key rotated, on a different plan, or is the endpoint changed? (since 2026-10-06)",
+    "Tenaga fell 2.52 sigma on 09-29 with no collected row and gave back three-quarters of it on 09-30, when the utilities rallied. What, if anything, did the company, the Energy Commission or a Bursa filing publish on 09-29? `bursa_announcements` stored nothing for it. (since 2026-09-29)",
+    "Bank of America's note names Apple's transaction and referral revenue as the exposure. The fact book has no services or App Store line for Apple. Which filing field would size it? (since 2026-09-29)",
+    "Does an 8-K or 10-Q record NVIDIA's USD 150 billion authorization increase? (since 2026-09-28)",
+    "The fact book holds three Q4 result dates for Apple, 2026-10-28, 10-29 and 11-02, all from `finnhub`. Which one does the company's own calendar give? (since 2026-09-28)",
+    "On the 09-29 `us_close` run, `ask.py prices --book` took 15m16s of a 25-minute job. Does the price step need a per-feed time before a slow run loses a day's commit? (since 2026-09-28)",
+    "Does a primary statement follow the report that China may let Alibaba and ByteDance buy the RTX Pro 5500? (since 2026-09-27)",
+    "The fact book has no event kind for a court verdict, an appeal or a settlement. Where would a legal event be recorded, so that a later page can date it? (since 2026-09-26)",
+    "Microsoft's cached bar opens at 499.04 (+0.22%) on 09-25, while two rows describe a 3% rise before or at the open. Should the collector hold a second price source for the open on a day a cause is being timed? (since 2026-09-25)",
+    "The routine never commits `data/alerts.db` (M9). The monitor now reports a changed open alert as UPDATED, but an unchanged one restored from git still reads as NEW. Should the routine commit the alerts store, or should it live outside git? (since 2026-09-24)",
+    "Does IHH carry the Daiichi Sankyo claim at any value in its accounts? (since 2026-09-24)",
+    "The pack measures across a blank proxy row without saying so (M3). Should the pack refuse the row, label it two-session, or scale the sigma? The `^KLSE` 10-09 volume was 0 until 15:25Z on 10-10. (since 2026-09-23)",
+    "The fact book holds no Bursa entitlement dates. Which source carries Bursa ex-dates? The pack now prints NO DIVIDEND DATA for all six Bursa names. (since 2026-09-23)",
+    "IHH's 09-22 session was significant alone (3.80 sigma). The one candidate, the Macquarie headline, has no body. Which source carries the note's figures? (since 2026-09-22)",
+    "A blank bar shared by a name and its proxy is labelled *correctly dated*, as if the market was shut. Should the pack check the calendar or an independent index print first? (since 2026-09-22)",
+    "The move to 260-session betas re-measured the same Monday. Which window's shares do pages compare across the change? (since 2026-09-22)",
+    "Petronas Chemicals, Press Metal and Genting: one factor or three stories? On 10-09 they read +0.47%, +1.54% and +2.17%. No Bursa sector proxy is cached. (since 2026-09-21)",
+    "Tenaga: the rows hold both readings of the IBR framework, *minimal impact* and *undermines*, as titles only. Neither has appeared since. (since 2026-09-18)",
+    "`DFF` stepped +0.25 on 2026-09-17 and the collector holds no statement for it. Where does a statement come from? (since 2026-09-20)",
+    "A short-interest weekly named Petronas Chemicals for the week to 09-18. Would Bursa's daily short-selling report give the name a body? (since 2026-09-20)",
+    "Wiring a catalyst matcher to the corpus is still open. Genting's 10-09 rights issue is the case for a matcher that compares a row's time with the session's close. (since 2026-09-18)",
+    "Petronas Chemicals' idiosyncratic days read *not significant* because its own sigma contains the +22.56% run. (since 2026-09-18)",
+    "Petronas Chemicals collecting a body: which of the eleven listed sources carries a Bursa-hours story about it at all? (since 2026-09-10; folded 09-17)",
+    "The linker still attaches *Shree TNB Polymers* to Tenaga after the 10-10 rule: *Average basic shares outstanding of Shree TNB Polymers Limited – BSE:SHREETNB* (tradingview.com, 10-10 20:14Z) is linked to MYX:5347, because the alias TNB is named in the text. A rule that matches a short alias inside another company's name cannot tell them apart. Does the alias list need an exclusion for Shree TNB, or does TNB need to be a whole-name match? (since 2026-09-17)",
+    "Which earlier pages were written from a pre-close cache? `dfc45e3` labels such rows. (since 2026-09-17)",
+    "The Bursa banks fell together on 10-07 and 10-08 and steadied on 10-09 (Hong Leong Bank +1.80%, CIMB 0.00%). The titles name foreign selling, oil and US yields. Which source would carry Bursa's daily foreign net flow? (since 2026-10-07)",
+    "`fmt_business` linked *Syed Saddiq, Bella Astillah tie the knot* (freemalaysiatoday.com, 10-10 03:59Z) to Maybank. Which word in its text did the linker read as the company? (since 2026-10-10)"
+  ],
+  "lessons": [
+    "A pack built while a feed has withdrawn a bar can be rebuilt once the bar returns; a page should say whether a gap is the market's or the feed's.",
+    "A verdict of no_identified_catalyst from a pack with no matcher is a prompt, not a finding."
+  ],
+  "closed": [
+    "Yahoo now serves the 10-12 Bursa bars blank. The 10:09Z fetch on 10-12 held Monday's closes (Genting 1.45); the 02:34Z fetch on 10-13 and every fetch since return the row blank, and the cache took the blank body. Only `paper.db` (mark 157) and the 2026-10-12 paper page keep Monday's Bursa closes. Will Yahoo restore the row, and does a second Bursa price source exist to fill it? PR #90 keeps a settled day the cache already holds. (since 2026-10-13) Answered 10-14: the 00:21Z-00:33Z fetches on 10-14 return the 10-12 rows again (Genting 1.45), and the cache holds them; PR #90 (merged 10-14) keeps a settled day when a later fetch blanks it."
+  ]
+}
