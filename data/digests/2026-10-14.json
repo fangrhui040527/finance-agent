@@ -1,6 +1,78 @@
 {
   "collection": [
     {
+      "at": "2026-10-14T22:46:50.567198+00:00",
+      "detail": "skipped: every asked name was refused: outside the plan or over today's credits (XNAS:MSFT, XNAS:NVDA)",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-14T22:46:50.020739+00:00",
+      "detail": "facts 0; window not covered back to 2026-10-14 17:31Z; the oldest item read is 2026-10-14 21:41Z, so 4.2h of the window was never served",
+      "fetched": 19,
+      "kept": 19,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 19
+    },
+    {
+      "at": "2026-10-14T22:46:48.567865+00:00",
+      "detail": "alphavantage refused a premium endpoint (the key's plan does not include it): Thank you for using Alpha Vantage! This is a premium endpoint. You may subscribe to any of the premium plans at https://www.alphavantage.co/premium/ to instantl",
+      "fetched": 0,
+      "kept": 0,
+      "source": "alphavantage_news",
+      "status": "failed",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-14T22:46:46.136512+00:00",
+      "detail": "facts 39; ",
+      "fetched": 306,
+      "kept": 253,
+      "source": "finnhub",
+      "status": "ok",
+      "stored": 175
+    },
+    {
+      "at": "2026-10-14T22:46:44.025313+00:00",
+      "detail": "facts 1; ",
+      "fetched": 2,
+      "kept": 0,
+      "source": "edgar",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-14T22:46:43.875134+00:00",
+      "detail": "named the company: 19 of 45 (lowest: NVIDIA 5/16, Microsoft 8/17, Apple 6/12)",
+      "fetched": 47,
+      "kept": 45,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 27
+    },
+    {
+      "at": "2026-10-14T22:46:43.326464+00:00",
+      "detail": "named the company: 174 of 192 (lowest: Apple 70/78, NVIDIA 66/73, Microsoft 38/41)",
+      "fetched": 208,
+      "kept": 192,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 178
+    },
+    {
+      "at": "2026-10-14T22:46:40.834186+00:00",
+      "detail": "no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked)",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "failed",
+      "stored": 0
+    },
+    {
       "at": "2026-10-14T17:31:54.075743+00:00",
       "detail": "facts 0; ",
       "fetched": 450,
@@ -119,18 +191,18 @@
     }
   ],
   "counts": {
-    "articles": 17672,
+    "articles": 18071,
     "documents": 0,
-    "escalated": 2808,
-    "events": 4215,
-    "failed_sweeps": 68,
-    "linked": 11610,
-    "observations": 5594,
+    "escalated": 2853,
+    "events": 4216,
+    "failed_sweeps": 70,
+    "linked": 11837,
+    "observations": 5633,
     "series": 31,
-    "sweeps": 887
+    "sweeps": 895
   },
   "day": "2026-10-14",
-  "generated_at": "2026-10-14 17:31 UTC",
+  "generated_at": "2026-10-14 22:47 UTC",
   "macro": [
     {
       "change": "0.05",
@@ -439,7 +511,7 @@
       "upcoming": []
     },
     {
-      "escalated": 11,
+      "escalated": 27,
       "events": [
         {
           "kind": "insider_filing",
@@ -454,15 +526,15 @@
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-10-13",
+          "known_at": "2026-10-14",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "28.46"
+          "value": "28.14"
         },
         {
           "concept": "pb",
-          "known_at": "2026-10-13",
+          "known_at": "2026-10-14",
           "label": "P/B",
           "period_end": null,
           "source": "finnhub",
@@ -470,7 +542,7 @@
         },
         {
           "concept": "eps_ttm",
-          "known_at": "2026-10-13",
+          "known_at": "2026-10-14",
           "label": "EPS (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -478,7 +550,7 @@
         },
         {
           "concept": "dividend_yield",
-          "known_at": "2026-10-13",
+          "known_at": "2026-10-14",
           "label": "dividend yield",
           "period_end": null,
           "source": "finnhub",
@@ -486,7 +558,7 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-10-13",
+          "known_at": "2026-10-14",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
@@ -494,7 +566,7 @@
         },
         {
           "concept": "high_52w",
-          "known_at": "2026-10-13",
+          "known_at": "2026-10-14",
           "label": "52w high",
           "period_end": null,
           "source": "finnhub",
@@ -502,7 +574,7 @@
         },
         {
           "concept": "low_52w",
-          "known_at": "2026-10-13",
+          "known_at": "2026-10-14",
           "label": "52w low",
           "period_end": null,
           "source": "finnhub",
@@ -575,6 +647,72 @@
       ],
       "stories": [
         {
+          "doc_id": "https://finance.yahoo.com/video/nvidia-anthropic-weigh-ai-safeguards-214011623.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-14T21:40:11+00:00",
+          "quality": 1.0,
+          "title": "Nvidia, Anthropic Weigh In On AI Safeguards",
+          "uncertainty": 0.23584905660377356
+        },
+        {
+          "doc_id": "finnhub:142885073",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-10-14T14:20:34+00:00",
+          "quality": 0.85,
+          "title": "Can Navitas Semiconductor (NVTS) Turn NVIDIA-Aligned 800V AI Power Designs Into Durable Competitive Advantage?",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142880932",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-14T11:00:00+00:00",
+          "quality": 0.85,
+          "title": "Alpha Compute Signs Binding GPU Contract, Leasing ALPHA-03 cluster under Four-Year, $81.7 Million Agreement in its Missouri Superintelligence Factory",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142883593",
+          "domain": "SeekingAlpha",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-14T10:06:57+00:00",
+          "quality": 0.85,
+          "title": "Nvidia: The $235 Billion Bullish Signal Investors Are Missing",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142882239",
+          "domain": "SeekingAlpha",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-14T09:30:00+00:00",
+          "quality": 0.85,
+          "title": "Nvidia's Valuation Is Becoming Absurdly Cheap",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142863141",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-14T02:00:00+00:00",
+          "quality": 0.85,
+          "title": "Compal Accelerates Time-to-AI with Next-Generation NVIDIA Platforms at OCP Global Summit 2026",
+          "uncertainty": 0.0
+        },
+        {
           "doc_id": "finnhub:142848527",
           "domain": "Yahoo",
           "escalated": true,
@@ -595,100 +733,34 @@
           "quality": 0.85,
           "title": "Bot Auto Selects Lenovo AD1 built on NVIDIA Hyperion to Scale Driverless Trucking",
           "uncertainty": 0.0
-        },
-        {
-          "doc_id": "finnhub:142848529",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-10-13T12:38:00+00:00",
-          "quality": 0.85,
-          "title": "NVIDIA Begins Vera Rubin Production: Can It Extend NVDA's AI Lead?",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMinwFBVV95cUxPVzJQMUV0dW9jNk5DT25zVmlTcUhKdzZwN04tcmFKTFlwM3FFYlU2V2htYmtwSVZhRTY3VmE4MFRELXRzUnQ0ODNoQ0RqWk9Lb2JzZjhWc0dLWUMwWTlJMFJ3eHpmNGN0QTVSbUZqaEI1cDNxN0lTdWpqcUlDWXpLOHc3LU80cXg2eVBfZzQ2TWd1S2wzZXlTQmhBZlpCNDg?oc=5",
-          "domain": "finance.yahoo.com",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
-          "polarity": 1.0,
-          "published_at": "2026-10-13T16:48:24+00:00",
-          "quality": 0.8,
-          "title": "How Rare Is Nvidia's Record Profit Margin?",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMihAFBVV95cUxOSTVOSDRXZ1JURlNOZ0lPOEpSVmo0bXlzaDMzNHlYa0xRVGdDY05MU19hMFg4Zzg4THF4bjRJemtNVmdjbmxVVUpSdjRSVnlIT2Z5Q1I5bndteG9wVTlXdVZkbF94b2NBbjFFWTM3UldBUy1NeExiajNZNHRicDBkcUh1cWk?oc=5",
-          "domain": "seekingalpha.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-10-13T13:36:19+00:00",
-          "quality": 0.8,
-          "title": "Nvidia: The Buyback Is The Opportunity (NASDAQ:NVDA)",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMimgFBVV95cUxNak0zNjQwcVJ4UC14VDVWc0tPRGxVVjNaRUd5NGpWSDJIWXlwb0E3QVB0X2dULVR5YjRUOGtOeDg3Z3FqNXN1akNfdVlleW9Sak9JdmowR0lBQk9vNUY1bEpsaTJYMVc0YXdRUG8tOFEwZkdpVm5NTU5yeXJ5ZEI2eEd0b0hhdU5Qd1BKX0JQQk9VX2JKMFNtT3VR?oc=5",
-          "domain": "finance.yahoo.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-10-13T12:09:16+00:00",
-          "quality": 0.8,
-          "title": "Nvidia Corp (NVDA): Jensen Huang\u2019s Visionary Leadership Drives Long-Term AI Growth",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMipwFBVV95cUxPQ0lGVUlxTXpUSTVwbExWRkhxQ1NvZE5feHZ2ODhsZ1h5a1VNNEc3VXdZSXFVN3ZBeWQ4ZUlpcXFVWG9jU2FSVDJlbmdsTDZnNlhrRkxqVGFfWDlwUmlmdmc5aW83enc1endMZEpBd3ljUTEyR0tMV2diUWdiLUpFOE9iWTRtQ0FHdjRSOGFHa1RyMkllaENTc3RuRndyMUIzTlhWUWx6dw?oc=5",
-          "domain": "www.gurufocus.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-13T19:04:18+00:00",
-          "quality": 0.65,
-          "title": "NVIDIA Plans $2 Billion Investment in Europe Amid AI Concerns (N",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMipAFBVV95cUxOeUs1WklwSHd1TTktT3hTY09oT1RrazNjUFFVdl9LOTFzVzlsdVU2aVVHMVlwRUF4YWdYZ3lNcU1rc2hfakh0WE1tcTM4bS1yM2VVY2Jpaml4eHVyemJTOGxQODB3VDlERGJXUldkRHp4YktZQl9RZFRSbHhNbnF2aWsyM1d0YnB2eTdtUEt1VVhwZFd0YldUNDZHV24zVXRRNTdlTg?oc=5",
-          "domain": "247wallst.com",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
-          "polarity": 0.0,
-          "published_at": "2026-10-13T17:00:00+00:00",
-          "quality": 0.65,
-          "title": "Nvidia Stock Has a Massive AI Tailwind. Here\u2019s the Bull Case",
-          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 47,
-        "polarity_mean": 0.085,
-        "sources": 18,
-        "uncertainty_mean": 0.074
+        "n": 130,
+        "polarity_mean": 0.062,
+        "sources": 33,
+        "uncertainty_mean": 0.078
       },
       "upcoming": []
     },
     {
-      "escalated": 17,
+      "escalated": 27,
       "events": [],
       "instrument_id": "XNAS:AAPL",
       "label": "Apple",
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-10-13",
+          "known_at": "2026-10-14",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "38.44"
+          "value": "38.83"
         },
         {
           "concept": "pb",
-          "known_at": "2026-10-13",
+          "known_at": "2026-10-14",
           "label": "P/B",
           "period_end": null,
           "source": "finnhub",
@@ -696,7 +768,7 @@
         },
         {
           "concept": "eps_ttm",
-          "known_at": "2026-10-13",
+          "known_at": "2026-10-14",
           "label": "EPS (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -704,7 +776,7 @@
         },
         {
           "concept": "dividend_yield",
-          "known_at": "2026-10-13",
+          "known_at": "2026-10-14",
           "label": "dividend yield",
           "period_end": null,
           "source": "finnhub",
@@ -712,23 +784,23 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-10-13",
+          "known_at": "2026-10-14",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
-          "value": "1.10"
+          "value": "1.11"
         },
         {
           "concept": "high_52w",
-          "known_at": "2026-10-13",
+          "known_at": "2026-10-14",
           "label": "52w high",
           "period_end": null,
           "source": "finnhub",
-          "value": "345.34"
+          "value": "348.15"
         },
         {
           "concept": "low_52w",
-          "known_at": "2026-10-13",
+          "known_at": "2026-10-14",
           "label": "52w low",
           "period_end": null,
           "source": "finnhub",
@@ -801,6 +873,17 @@
       ],
       "stories": [
         {
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/gene-munster-warns-apple-sell-180026699.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-10-14T18:00:26+00:00",
+          "quality": 1.0,
+          "title": "Gene Munster Warns Apple Can Sell Millions of iPhones and Still Lose the AI Game as Users Could Lock Into Muse and Grok",
+          "uncertainty": 0.5859375
+        },
+        {
           "doc_id": "https://finance.yahoo.com/markets/stocks/articles/apple-aapl-home-push-puts-181152273.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
           "escalated": true,
@@ -809,6 +892,28 @@
           "published_at": "2026-10-13T18:11:52+00:00",
           "quality": 1.0,
           "title": "Apple (AAPL) Home Push Puts Its Valuation Premium Back In Focus",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142883812",
+          "domain": "Benzinga",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-14T05:58:52+00:00",
+          "quality": 0.85,
+          "title": "Investigating Apple's Standing In Technology Hardware, Storage & Peripherals Industry Compared To Competitors",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142863143",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-14T02:57:33+00:00",
+          "quality": 0.85,
+          "title": "Why Did AAPL, BMBL, BP Stocks Rise To 52-Week Highs Today?",
           "uncertainty": 0.0
         },
         {
@@ -854,47 +959,14 @@
           "quality": 0.85,
           "title": "Apple debuts HomeView hub, its smart home product line",
           "uncertainty": 0.0
-        },
-        {
-          "doc_id": "finnhub:142848551",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-13T13:01:00+00:00",
-          "quality": 0.85,
-          "title": "Apple announces the next generation of HomePod mini with support for Siri AI, beautiful new colors, and rich sound",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "finnhub:142851057",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-13T13:00:00+00:00",
-          "quality": 0.85,
-          "title": "Sauce Labs Announces Support for Apple's Foldable iPhone Duo, Bringing AURA Test Authoring and Execution to Dual-Screen Apps",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "finnhub:142848543",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-13T12:57:00+00:00",
-          "quality": 0.85,
-          "title": "Apple unveils the new Apple TV 4K, supercharged by Siri AI",
-          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 79,
-        "polarity_mean": 0.089,
-        "sources": 43,
-        "uncertainty_mean": 0.074
+        "n": 157,
+        "polarity_mean": 0.051,
+        "sources": 66,
+        "uncertainty_mean": 0.089
       },
       "upcoming": [
         {
@@ -921,8 +993,15 @@
       ]
     },
     {
-      "escalated": 13,
+      "escalated": 30,
       "events": [
+        {
+          "kind": "insider_filing",
+          "source": "edgar",
+          "title": "4: STATEMENT OF CHANGES IN BENEFICIAL OWNERSHIP OF SECURITIES",
+          "url": "https://www.sec.gov/Archives/edgar/data/789019/000078901926000226/xslF345X06/form4.xml",
+          "when": "2026-10-14T00:00:00+00:00"
+        },
         {
           "kind": "rating_reiteration",
           "source": "fmp",
@@ -936,15 +1015,15 @@
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-10-13",
+          "known_at": "2026-10-14",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "29.99"
+          "value": "30.17"
         },
         {
           "concept": "pb",
-          "known_at": "2026-10-13",
+          "known_at": "2026-10-14",
           "label": "P/B",
           "period_end": null,
           "source": "finnhub",
@@ -952,7 +1031,7 @@
         },
         {
           "concept": "eps_ttm",
-          "known_at": "2026-10-13",
+          "known_at": "2026-10-14",
           "label": "EPS (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -960,7 +1039,7 @@
         },
         {
           "concept": "dividend_yield",
-          "known_at": "2026-10-13",
+          "known_at": "2026-10-14",
           "label": "dividend yield",
           "period_end": null,
           "source": "finnhub",
@@ -968,7 +1047,7 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-10-13",
+          "known_at": "2026-10-14",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
@@ -976,7 +1055,7 @@
         },
         {
           "concept": "high_52w",
-          "known_at": "2026-10-13",
+          "known_at": "2026-10-14",
           "label": "52w high",
           "period_end": null,
           "source": "finnhub",
@@ -984,7 +1063,7 @@
         },
         {
           "concept": "low_52w",
-          "known_at": "2026-10-13",
+          "known_at": "2026-10-14",
           "label": "52w low",
           "period_end": null,
           "source": "finnhub",
@@ -1057,6 +1136,28 @@
       ],
       "stories": [
         {
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/marvell-technology-mrvl-forms-security-181743183.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-14T18:17:43+00:00",
+          "quality": 1.0,
+          "title": "Marvell Technology (MRVL) Forms Security Group And Unveils Six Channel AI Memory",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:142882538",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-14T12:00:00+00:00",
+          "quality": 0.85,
+          "title": "PRG Partners with Devsinc to Build the Digital Foundation for Scalable Growth with Microsoft Dynamics 365",
+          "uncertainty": 0.0
+        },
+        {
           "doc_id": "finnhub:142852354",
           "domain": "Yahoo",
           "escalated": true,
@@ -1101,56 +1202,34 @@
           "uncertainty": 0.0
         },
         {
-          "doc_id": "https://news.google.com/rss/articles/CBMigAFBVV95cUxQZEFZTmFHRjcwTnFrcnVwYW1kSkRXUkFod1VGc3VNZVpyMVR1Tml5blZFTmduem1ONU9hejBjVlgtdzhXR1R4Z0hzSEhXRjNlU05FOXFidXp3UkY1SjJRdUhXX0pnS2pqcVhyUkR1LXdnNWZ3c000aUVRbnRPMDdnRw?oc=5",
-          "domain": "www.barrons.com",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
-          "polarity": 1.0,
-          "published_at": "2026-10-13T20:56:00+00:00",
-          "quality": 0.8,
-          "title": "Microsoft Stock Reaches a Record High. How It Suddenly Became an AI Winner.",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMigwFBVV95cUxNNFYtaHNrMzcyYW5RMHlsZG9nUk53aGxqZmRSVnlCWncwaXNVaVNXdWo4OXZoMThPWHgxRmVQMjVPemc4U1h2MXNCSTY1dE1vU2xJRDB5M0ZfcWMwRUpfUDZCMG9nVFNReEZJdll6ZEhGNVU3bEF0b3FtbzZuQVdmeWZxZw?oc=5",
-          "domain": "www.barrons.com",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
-          "polarity": 1.0,
-          "published_at": "2026-10-13T14:03:00+00:00",
-          "quality": 0.8,
-          "title": "Microsoft Stock Heads for a Record High With More AI Upside Ahead",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMitAFBVV95cUxObWMzYUIxQVBkOTF1dHpZNGlwRmN4cnR5R3Y4UXZtc09UY2RwQ2xuTE5mSExGRjJ2QmpFd0tMOVVNRGNlNmlqc08wYkdhdEdZVG1NaTZFUGtJV1FzWjM1QUlCblJZODZrNDRWQjE0VHNEdG9GMUFYUGt4bWpkVDNwS2kxa1VueGtzVURTUE1uSEN3cEY0M0xpRjJvUG1YRjJIU19OUHcxazVuUG1mUmpEdm10OU8?oc=5",
+          "doc_id": "https://news.google.com/rss/articles/CBMixgFBVV95cUxQWHZTSUU3T3ExSWpLWWRXWGYtdldIRFB1TTVnbnJaUjhCSlFQQUh4RXlNMFh6VUpuREdRc0RiWnIzVmx2eFdBMjMzeFZ1RXZvRm9SenJscFFfS3pkQWZVMmRWT0pIRnFkSGNHbHc1T3d1RFF3MkZHVXR6V1A5QlctU09mZDlqVE5zMDZ2dGtQeVhVTGYyeC05ZzJvTnlFZXhGYW1fUkNwdUxET2JfVzJfdWJTUTdERVZjWUFNQVh3M1JOOUJ5LUE?oc=5",
           "domain": "www.bloomberg.com",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
-          "polarity": 1.0,
-          "published_at": "2026-10-13T13:56:44+00:00",
-          "quality": 0.8,
-          "title": "Microsoft Eyes First Record in Nearly a Year as AI Rally Builds",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMimwFBVV95cUxNcGt6b1hnSE9LUUlLX3otOFAzbjBCbjNEWHJPYk8tZWZQN1BkN0pobU13RllvMDhLODJ4dEFxZ3NOc2pvaDFzXzNqLWdQZkpQRWZjV2xGZkZRS2tHbkZaQ2Z3d2x4R2hyZnNTdnhSN3hNWE1TLWk0VHFTOWE1LTF4UWVVeUJ0V1o2N0VSc045M0hHV3lPUXZmenlNVQ?oc=5",
-          "domain": "finance.yahoo.com",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-10-13T12:54:43+00:00",
+          "published_at": "2026-10-14T17:19:42+00:00",
           "quality": 0.8,
-          "title": "Microsoft Reveals Next-Gen Maia 300 Custom AI Chip For Widespread Deployment",
+          "title": "Microsoft Shows the AI Bubble Will Grow Bigger",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMingFBVV95cUxNN3ZkS0tValNDZ3prQnZ0b2huZkViaExPbk5VU0xkeGdXMWRzbksyRnk3OC1iQlJfVjMwdXVpY1g5V3FISUFtV1FJRl9Rc0pQVWRzckF4SDhDRm9kbTAzMVE3YVJpeExSQXY4Q0RrN3c2SFhiYTNneHcya010NUxlQXBOblR3TEdvWkEwdEpieElTRHhSanIyVkZnWUFhUQ?oc=5",
+          "domain": "seekingalpha.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-10-14T04:42:11+00:00",
+          "quality": 0.8,
+          "title": "Microsoft\u2019s Azure chief seeks at least 20% cost cuts - report (MSFT:NASDAQ)",
           "uncertainty": 0.0
         }
       ],
       "tone": {
-        "intensity_max": 0.333,
-        "n": 33,
-        "polarity_mean": 0.212,
-        "sources": 21,
-        "uncertainty_mean": 0.0
+        "intensity_max": 0.667,
+        "n": 79,
+        "polarity_mean": 0.215,
+        "sources": 41,
+        "uncertainty_mean": 0.047
       },
       "upcoming": [
         {
