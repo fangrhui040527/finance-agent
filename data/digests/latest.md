@@ -1,6 +1,6 @@
 # Digest 2026-10-15
 
-Generated 2026-10-15 17:17 UTC · slot `all` · 18257 articles in the corpus, 5650 observations, 4220 events in the fact book.
+Generated 2026-10-15 22:47 UTC · slot `all` · 18665 articles in the corpus, 5689 observations, 4223 events in the fact book.
 
 ## The book
 
@@ -44,46 +44,48 @@ Generated 2026-10-15 17:17 UTC · slot `all` · 18257 articles in the corpus, 56
 - 2026-10-14 tradersunion.com — Genting details use of RM1.25 billion rights issue for interest costs and debt repayment [q 0.65, tone +0.0]
 
 ### NVIDIA (XNAS:NVDA)
-- tone: 42 stories from 18 sources, polarity -0.02, peak intensity 0.00, uncertainty 0.13 · 8 escalated
+- tone: 124 stories from 35 sources, polarity -0.05, peak intensity 0.33, uncertainty 0.09 · 24 escalated
+- 2026-10-15 finance.yahoo.com — Cisco (CSCO) Backs A New 400G Optical Standard For AI Data Centers [q 1.00, tone +0.0] ★
 - 2026-10-14 finance.yahoo.com — Nvidia, Anthropic Weigh In On AI Safeguards [q 1.00, tone +0.0] ★
+- 2026-10-15 Yahoo — Cadence Design Systems (CDNS) Deepens AI Chip Design Partnership Work [q 0.85, tone +0.0] ★
+- 2026-10-15 Yahoo — Nvidia's Huang Signals CoreWeave Financials Improving, With Decreasing Cost Of Capital [q 0.85, tone -1.0] ★
+- 2026-10-15 SeekingAlpha — Micron: Sentiment-Driven Correction Doesn't Impact Allocation Appeal (Buy Reaffirmed) [q 0.85, tone +1.0] ★
 - 2026-10-14 Yahoo — Can Navitas Semiconductor (NVTS) Turn NVIDIA-Aligned 800V AI Power Designs Into Durable Competitive Advantage? [q 0.85, tone -1.0] ★
-- 2026-10-14 entarabi.com — Corning Stock (GLW): AI Growth, Amazon and NVIDIA Deals, and Valuation Risks [q 0.65, tone +1.0] ★
-- 2026-10-14 qz.com — Nvidia CEO Jensen Huang would cut off unsafe AI developers [q 0.65, tone -1.0] ★
-- 2026-10-14 simplywall.st — Is Marvell Technology (MRVL) Overvalued As AI Revenue Targets And Nvidia Backing Rise? [q 0.65, tone +0.0] ★
-- 2026-10-14 www.moomoo.com — Caterpillar, NVIDIA Corp. Share Losses Contribute To Dow's Nearly 150-Point Drop [q 0.65, tone -1.0] ★
-- 2026-10-14 www.fool.com — Broadcom vs. Nvidia: If I Could Only Own One for the Next 5 Years, It Would Be This One [q 0.65, tone +0.0] ★
-- 2026-10-14 247wallst.com — Nvidia’s Aggressive Buyback Expansion is a Flashing Green Light [q 0.65, tone +1.0] ★
-- snapshot: P/E (ttm) 28.14 (finnhub, 2026-10-14) · P/B 28.81 (finnhub, 2026-10-14) · EPS (ttm) 7.91 (finnhub, 2026-10-14) · dividend yield 0.03 (finnhub, 2026-10-14) · beta 2.25 (finnhub, 2026-10-14) · 52w high 243.37 (finnhub, 2026-10-14) · 52w low 164.27 (finnhub, 2026-10-14) · target (consensus) 339.17 (fmp, 2026-10-15) · analysts: buy 41 (finnhub, 2026-09-05) · analysts: hold 3 (finnhub, 2026-09-05) · analysts: sell 1 (finnhub, 2026-09-05) · vendor sentiment 0.25 (alphavantage_news, 2026-10-06) · revenue (last quarter) 96.22bn (sec_xbrl, 2026-08-26) · net income (last quarter) 59.69bn (sec_xbrl, 2026-08-26) · last EPS surprise % 3.82 (finnhub, 2026-09-05)
+- 2026-10-15 finance.yahoo.com — Nvidia CEO Jensen Huang addresses CoreWeave stock plunge: 'I'm optimistic' [q 0.80, tone +0.0] ★
+- 2026-10-15 finance.yahoo.com — Nvidia CEO Jensen Huang will speak about CoreWeave's business when he wants to: Analyst [q 0.80, tone +0.0] ★
+- snapshot: P/E (ttm) 26.88 (finnhub, 2026-10-15) · P/B 28.81 (finnhub, 2026-10-15) · EPS (ttm) 7.91 (finnhub, 2026-10-15) · dividend yield 0.03 (finnhub, 2026-10-15) · beta 2.26 (finnhub, 2026-10-15) · 52w high 243.37 (finnhub, 2026-10-15) · 52w low 164.27 (finnhub, 2026-10-15) · target (consensus) 339.17 (fmp, 2026-10-15) · analysts: buy 41 (finnhub, 2026-09-05) · analysts: hold 3 (finnhub, 2026-09-05) · analysts: sell 1 (finnhub, 2026-09-05) · vendor sentiment 0.25 (alphavantage_news, 2026-10-06) · revenue (last quarter) 96.22bn (sec_xbrl, 2026-08-26) · net income (last quarter) 59.69bn (sec_xbrl, 2026-08-26) · last EPS surprise % 3.82 (finnhub, 2026-09-05)
 
 ### Apple (XNAS:AAPL)
-- tone: 38 stories from 27 sources, polarity +0.03, peak intensity 0.33, uncertainty 0.12 · 4 escalated
+- tone: 119 stories from 44 sources, polarity +0.06, peak intensity 0.33, uncertainty 0.10 · 23 escalated
 - 2026-10-14 finance.yahoo.com — Gene Munster Warns Apple Can Sell Millions of iPhones and Still Lose the AI Game as Users Could Lock Into Muse and Grok [q 1.00, tone -1.0] ★
-- 2026-10-14 pluang.com — Apple hits $5 trillion market cap amid strong i... [q 0.65, tone +1.0] ★
-- 2026-10-14 247wallst.com — Apple Just Passed $5 Trillion. Here’s What Comes Next. [q 0.65, tone +0.0] ★
-- 2026-10-14 www.kucoin.com — Apple stock reaches intraday record as HomeView launch sparks focus on AI strategy. [q 0.65, tone +1.0] ★
-- 2026-10-14 finance.yahoo.com — Global X Investments Canada Inc. Closes the Market [q 1.00, tone +0.0]
-- 2026-10-14 Yahoo — Apple is finally taking the smart home seriously [q 0.85, tone +0.0]
-- 2026-10-14 CNBC — OpenAI escalates trade secret fight with Apple [q 0.85, tone +0.0]
-- 2026-10-14 finance.yahoo.com — Apple doubled the price of its TV streaming box from $150 to $300, and even the company's hardcore fans are furious [q 0.80, tone +0.0]
+- 2026-10-15 CNBC — Apple and Meta team up to make Muse AI model run on Mac computers [q 0.85, tone +0.0] ★
+- 2026-10-15 Yahoo — If You Invest $1,000 in Apple Today, Here’s What It Could Be Worth by 2030 [q 0.85, tone +1.0] ★
+- 2026-10-15 Yahoo — The Home Agent Subscription: Parsing the Fine Print on Apple and Meta’s Metered Services [q 0.85, tone +0.0] ★
+- 2026-10-15 SeekingAlpha — Apple Has A Consumer Problem Nobody Talks About [q 0.85, tone +1.0] ★
+- 2026-10-15 SeekingAlpha — Apple Wins The AI Ecosystem Story As It Retests 2026 Peaks [q 0.85, tone +1.0] ★
+- 2026-10-15 Yahoo — Is Netflix Stock Worth More Than Its Competitors? [q 0.85, tone -1.0] ★
+- 2026-10-15 finance.yahoo.com — Could a Meta-Apple AI team-up restart the iPhone upgrade cycle? [q 0.80, tone +1.0] ★
+- event 2026-10-15 insider_filing — 4: FORM 4 (edgar)
 - upcoming 2026-11-02 earnings_result — Q4 2026 results after the close (finnhub)
 - upcoming 2026-10-29 earnings_result — Q4 2026 results after the close (finnhub)
 - upcoming 2026-10-28 earnings_result — Q4 2026 results after the close (finnhub)
-- snapshot: P/E (ttm) 38.83 (finnhub, 2026-10-14) · P/B 50.98 (finnhub, 2026-10-14) · EPS (ttm) 8.72 (finnhub, 2026-10-14) · dividend yield 0.51 (finnhub, 2026-10-14) · beta 1.11 (finnhub, 2026-10-14) · 52w high 348.15 (finnhub, 2026-10-14) · 52w low 243.42 (finnhub, 2026-10-14) · target (consensus) 341.68 (fmp, 2026-10-15) · analysts: buy 22 (finnhub, 2026-09-05) · analysts: hold 15 (finnhub, 2026-09-05) · analysts: sell 3 (finnhub, 2026-09-05) · vendor sentiment -0.23 (alphavantage_news, 2026-10-06) · revenue (last quarter) 109.42bn (sec_xbrl, 2026-07-31) · net income (last quarter) 29.79bn (sec_xbrl, 2026-07-31) · last EPS surprise % -0.89 (finnhub, 2026-09-05)
+- snapshot: P/E (ttm) 38.73 (finnhub, 2026-10-15) · P/B 50.98 (finnhub, 2026-10-15) · EPS (ttm) 8.72 (finnhub, 2026-10-15) · dividend yield 0.51 (finnhub, 2026-10-15) · beta 1.11 (finnhub, 2026-10-15) · 52w high 348.15 (finnhub, 2026-10-15) · 52w low 243.42 (finnhub, 2026-10-15) · target (consensus) 341.68 (fmp, 2026-10-15) · analysts: buy 22 (finnhub, 2026-09-05) · analysts: hold 15 (finnhub, 2026-09-05) · analysts: sell 3 (finnhub, 2026-09-05) · vendor sentiment -0.23 (alphavantage_news, 2026-10-06) · revenue (last quarter) 109.42bn (sec_xbrl, 2026-07-31) · net income (last quarter) 29.79bn (sec_xbrl, 2026-07-31) · last EPS surprise % -0.89 (finnhub, 2026-09-05)
 
 ### Microsoft (XNAS:MSFT)
-- tone: 28 stories from 20 sources, polarity +0.25, peak intensity 0.33, uncertainty 0.10 · 10 escalated
+- tone: 86 stories from 41 sources, polarity +0.22, peak intensity 0.33, uncertainty 0.09 · 30 escalated
 - 2026-10-14 finance.yahoo.com — Marvell Technology (MRVL) Forms Security Group And Unveils Six Channel AI Memory [q 1.00, tone +1.0] ★
+- 2026-10-15 Yahoo — Proofpoint MSP Platform Introduces New Capabilities to Support Secure AI Adoption for Organizations Using Microsoft 365 [q 0.85, tone +0.0] ★
+- 2026-10-15 Yahoo — Microsoft (MSFT), Why Is It Back In The Spotlight? [q 0.85, tone +1.0] ★
+- 2026-10-15 Yahoo — Veeam Intelligent ResOps for Microsoft 365 Helps Customers Safely Use AI, Cut Storage Costs, and Recover With Precision [q 0.85, tone -1.0] ★
+- 2026-10-15 Yahoo — Hornetsecurity by Proofpoint introduces new capabilities to support secure AI adoption for organisations using Microsoft 365 [q 0.85, tone +0.0] ★
+- 2026-10-15 SeekingAlpha — Wedgewood Partners Q3 2026 Portfolio Activity [q 0.85, tone +1.0] ★
 - 2026-10-14 Yahoo — PRG Partners with Devsinc to Build the Digital Foundation for Scalable Growth with Microsoft Dynamics 365 [q 0.85, tone +1.0] ★
-- 2026-10-14 www.bloomberg.com — Microsoft Shows the AI Bubble Will Grow Bigger [q 0.80, tone +0.0] ★
-- 2026-10-14 www.tipranks.com — Microsoft Stock (NASDAQ:MSFT) Slips With a New Patch Record [q 0.65, tone +1.0] ★
-- 2026-10-14 tradersunion.com — Microsoft stock forecast: Consolidation expected between near-term support and resistance [q 0.65, tone +0.0] ★
-- 2026-10-14 www.saasrise.com — Microsoft Hits $4T as Azure, SaaS Surge [q 0.65, tone +1.0] ★
-- 2026-10-14 www.yakimaherald.com — Microsoft stock hits record high as company spends big on AI - Yakima Herald-Republic [q 0.65, tone +1.0] ★
-- 2026-10-14 kalkine.ca — Why Did Microsoft (NASDAQ:MSFT) Reach a Reported Record After a 50% Rally? [q 0.65, tone +1.0] ★
+- 2026-10-15 finance.yahoo.com — Microsoft can justify higher valuation as AI demand drives Azure growth, UBS says [q 0.80, tone +1.0] ★
+- event 2026-10-15 insider_filing — 4: STATEMENT OF CHANGES IN BENEFICIAL OWNERSHIP OF SECURITIES (edgar)
 - event 2026-10-14 insider_filing — 4: STATEMENT OF CHANGES IN BENEFICIAL OWNERSHIP OF SECURITIES (edgar)
 - upcoming 2026-10-28 earnings_result — Q1 2027 results (finnhub)
 - upcoming 2026-10-27 earnings_result — Q1 2027 results (finnhub)
-- snapshot: P/E (ttm) 30.17 (finnhub, 2026-10-14) · P/B 6.26 (finnhub, 2026-10-14) · EPS (ttm) 17.95 (finnhub, 2026-10-14) · dividend yield 0.79 (finnhub, 2026-10-14) · beta 1.06 (finnhub, 2026-10-14) · 52w high 553.72 (finnhub, 2026-10-14) · 52w low 349.20 (finnhub, 2026-10-14) · target (consensus) 591.58 (fmp, 2026-10-15) · analysts: buy 41 (finnhub, 2026-09-05) · analysts: hold 5 (finnhub, 2026-09-05) · analysts: sell 0 (finnhub, 2026-09-05) · vendor sentiment 0.29 (alphavantage_news, 2026-10-06) · revenue (last quarter) 90.01bn (sec_xbrl, 2026-07-29) · net income (last quarter) 35.77bn (sec_xbrl, 2026-07-29) · last EPS surprise % 9.53 (finnhub, 2026-09-05)
+- snapshot: P/E (ttm) 29.76 (finnhub, 2026-10-15) · P/B 6.26 (finnhub, 2026-10-15) · EPS (ttm) 17.95 (finnhub, 2026-10-15) · dividend yield 0.79 (finnhub, 2026-10-15) · beta 1.06 (finnhub, 2026-10-15) · 52w high 553.72 (finnhub, 2026-10-15) · 52w low 349.20 (finnhub, 2026-10-15) · target (consensus) 591.58 (fmp, 2026-10-15) · analysts: buy 41 (finnhub, 2026-09-05) · analysts: hold 5 (finnhub, 2026-09-05) · analysts: sell 0 (finnhub, 2026-09-05) · vendor sentiment 0.29 (alphavantage_news, 2026-10-06) · revenue (last quarter) 90.01bn (sec_xbrl, 2026-07-29) · net income (last quarter) 35.77bn (sec_xbrl, 2026-07-29) · last EPS surprise % 9.53 (finnhub, 2026-09-05)
 
 ## Macro
 
@@ -110,6 +112,14 @@ Generated 2026-10-15 17:17 UTC · slot `all` · 18257 articles in the corpus, 56
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 22:47 | eodhd | ok | 0 | 0 | 0 | skipped: every asked name was refused: outside the plan or over today's credits  |
+| 22:47 | jin10_flash | degraded | 19 | 19 | 18 | facts 0; window not covered back to 2026-10-15 17:17Z; the oldest item read is 2 |
+| 22:47 | alphavantage_news | failed | 0 | 0 | 0 | alphavantage refused a premium endpoint (the key's plan does not include it): Th |
+| 22:46 | finnhub | ok | 313 | 265 | 184 | facts 40;  |
+| 22:46 | edgar | ok | 3 | 0 | 0 | facts 2;  |
+| 22:46 | yahoo_rss | ok | 50 | 50 | 28 | named the company: 18 of 50 (lowest: NVIDIA 3/19, Microsoft 7/15, Apple 8/16) |
+| 22:46 | google_news | ok | 221 | 195 | 178 | named the company: 174 of 195 (lowest: NVIDIA 60/73, Apple 70/75, Microsoft 44/4 |
+| 22:46 | gdelt | failed | 0 | 0 | 0 | no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP |
 | 17:17 | dbnomics | ok | 450 | 0 | 0 | facts 0;  |
 | 17:17 | jin10_flash | degraded | 19 | 19 | 19 | facts 0; window not covered back to 2026-10-15 14:12Z; the oldest item read is 2 |
 | 17:17 | fred | ok | 482 | 0 | 0 | facts 12; release calendar: 'FOMC Press Release' listed on 15 days of the fortni |
