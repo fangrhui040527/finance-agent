@@ -1,0 +1,250 @@
+{
+  "day": "2026-10-15",
+  "written_at": "2026-10-15T22:58:00Z",
+  "phase": "ramp",
+  "week": 6,
+  "equity_usd": 1000.0,
+  "cash_usd": 1000.0,
+  "control_equity_usd": 953.37,
+  "control_return_to_date": -0.0466,
+  "drawdown": 0.0,
+  "control_drawdown": 0.0466,
+  "halted": false,
+  "marks": 30,
+  "positions": [],
+  "changes": [],
+  "control_changes": [],
+  "control_mark": {
+    "marked_on": "2026-10-15",
+    "equity_usd": 953.37,
+    "cash_usd": 602.28,
+    "positions_usd": 351.09,
+    "day_return": -0.0038,
+    "note": "holdings MYX:8869 100 (7.17), MYX:5183 100 (4.26), MYX:3182 200 (1.45)"
+  },
+  "index_book": {
+    "mark": {
+      "marked_on": "2026-10-15",
+      "equity_usd": 986918.38,
+      "cash_usd": 598729.46,
+      "positions_usd": 388188.92,
+      "day_return": -0.0026,
+      "drawdown": 0.0131,
+      "held": 97,
+      "pending": 0
+    },
+    "cost_to_date_share_of_notional": 0.0048,
+    "since_2026_09_30": {
+      "index": -0.0131,
+      "decided": 0.0,
+      "control": -0.0272
+    },
+    "dividends": [
+      {
+        "instrument_id": "MYX:5139",
+        "units": 3400,
+        "per_share_myr": "0.13",
+        "cash_usd": 108.29
+      }
+    ],
+    "note": "one dividend credit; nothing pending"
+  },
+  "caps": [
+    {
+      "cap": "largest name",
+      "value": "0.00%",
+      "limit": "25%",
+      "breached": false
+    },
+    {
+      "cap": "invested",
+      "value": "0.00%",
+      "limit": "40%",
+      "breached": false
+    },
+    {
+      "cap": "cash floor",
+      "value": "100.00%",
+      "limit": "20%",
+      "breached": false
+    },
+    {
+      "cap": "names held",
+      "value": "0",
+      "limit": "0",
+      "breached": false
+    },
+    {
+      "cap": "drawdown from peak",
+      "value": "0.00%",
+      "limit": "8% halts entries",
+      "breached": false
+    },
+    {
+      "cap": "turnover, 5 weekdays",
+      "value": "USD 0.00",
+      "limit": "USD 500.00",
+      "breached": false
+    }
+  ],
+  "prices": {
+    "bursa": "Thursday 2026-10-15 closes (14:12Z cron fetch); ^KLSE 1,623.70 with volume 0",
+    "us": "Thursday 2026-10-15 closes (22:47Z fetch)",
+    "fx": "MYR 4.0815 per USD (bnm, 2026-10-15)"
+  },
+  "fundable": [
+    {
+      "instrument_id": "MYX:1155",
+      "lot_usd": 246.97,
+      "share": 0.247,
+      "round_trip": 0.0117,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:5183",
+      "lot_usd": 104.37,
+      "share": 0.104,
+      "round_trip": 0.0212,
+      "lots": 2
+    },
+    {
+      "instrument_id": "MYX:5225",
+      "lot_usd": 195.52,
+      "share": 0.196,
+      "round_trip": 0.0119,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:8869",
+      "lot_usd": 175.67,
+      "share": 0.176,
+      "round_trip": 0.0131,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:3182",
+      "lot_usd": 35.53,
+      "share": 0.036,
+      "round_trip": 0.0598,
+      "lots": 7
+    },
+    {
+      "instrument_id": "XNAS:NVDA",
+      "lot_usd": 217.23,
+      "share": 0.217,
+      "round_trip": 0.0119,
+      "lots": 1
+    }
+  ],
+  "over_cap": {
+    "MYX:5347": 0.318,
+    "XNAS:AAPL": 0.342,
+    "XNAS:MSFT": 0.539
+  },
+  "ledger": {
+    "mark_days": 26,
+    "gap": "no routine ran 2026-10-02..10-06; no paper page and no decision for those days; no decision is backdated"
+  },
+  "attribution": null,
+  "decision": {
+    "recorded": true,
+    "weights": {},
+    "thesis": "All cash, the thirtieth all-cash row and the third decision of ramp week 6. Wednesday 10-14 is decomposed on the 2026-10-14 feedback page: no book name moved past 1.5 sigma; NVIDIA's -3.16% was 59% market (beta 1.70 on a -1.08% SPY, titles naming the September CPI print); Petronas Chemicals +2.55% (0.61 sigma) on a title-only methanol-deal row. Thursday 10-15 is not decomposed: Petronas Chemicals 4.43 -> 4.26 (-3.84%), giving back Wednesday; Genting 1.42 -> 1.45 (+2.11%) after its Bursa-query reply (a 25-30% rights discount, RM280 million for financing costs; the exact price and ratio are still not in the store); NVIDIA 221.30 -> 217.23 (-1.84%). Five all-cash claims are graded, all correct against a control that holds Genting. A name that gives back a not-significant gain the next session carries no claim to grade. Claim: nothing in the fundable universe beats cash over 21 sessions.",
+    "refusals": [],
+    "prediction_id": "paper-2026-10-15-allcash-21d-8274",
+    "grades_on": "2026-11-16",
+    "made_at": "2026-10-15T22:49:15Z",
+    "horizon_counting": "exchange sessions"
+  },
+  "stores": {
+    "decided_targets": 30,
+    "predictions": 30,
+    "outcomes": 5,
+    "index_targets": 194,
+    "control_targets": 6,
+    "index_pending": 0,
+    "made_at": "2026-10-15T22:49:15Z"
+  },
+  "evidence": {
+    "feedback_page": "knowledge/feedback/2026-10-14.md (40b2bf1)",
+    "closes_10_15": {
+      "MYX:5183": 4.26,
+      "MYX:3182": 1.45,
+      "MYX:4715": 1.28,
+      "MYX:1155": 10.08,
+      "MYX:5225": 7.98,
+      "MYX:8869": 7.17,
+      "MYX:5347": 12.98,
+      "MYX:^KLSE": 1623.7,
+      "XNAS:NVDA": 217.23,
+      "XNAS:AAPL": 342.0,
+      "XNAS:MSFT": 539.44,
+      "XNAS:SPY": 771.79
+    },
+    "late_routine": "Bursa catch-up fired 10:06Z, delivered 22:44Z"
+  },
+  "mistakes": [
+    "paper-2026-10-14-allcash-21d-a9b4 named Petronas Chemicals' run since 10-01 (+7.26%) as one with no collected cause; it gave back -3.84% on 10-15 and the run is now +3.15%.",
+    "paper-2026-10-01-allcash-21d-5a1e is behind on IHH (+3.64%) and Petronas Chemicals (+3.15%) since the 10-01 closes; it grades on 10-31.",
+    "paper-2026-10-08-allcash-21d-7bb6's test (Genting above 1.93 before 11-07) stands at 1.45."
+  ],
+  "mistakes_checked": [
+    "paper-2026-10-14-allcash-21d-a9b4",
+    "paper-2026-10-01-allcash-21d-5a1e against 10-15 closes",
+    "paper-2026-10-08-allcash-21d-7bb6 against 1.45"
+  ],
+  "grades_due": [
+    {
+      "prediction_id": "paper-2026-09-16-allcash-21d-3865",
+      "on": "2026-10-16"
+    },
+    {
+      "prediction_id": "paper-2026-09-17-allcash-21d-7667",
+      "on": "2026-10-17"
+    },
+    {
+      "prediction_id": "paper-2026-09-18-allcash-21d-667a",
+      "on": "2026-10-18"
+    },
+    {
+      "prediction_id": "paper-2026-09-19-allcash-21d-b7bd",
+      "on": "2026-10-19"
+    }
+  ],
+  "lessons": [
+    "A not-significant run reverses as readily as it extends: a run of ordinary days is a path, not a cause."
+  ],
+  "dividend_boundary": {
+    "decided": "2026-10-10T15:25:31Z",
+    "control": "2026-10-10T15:25:31Z",
+    "index": "2026-10-10T15:25:31Z",
+    "note": "marks before it are not restated; no credit yet"
+  },
+  "graded": [
+    {
+      "prediction_id": "paper-2026-09-11-allcash-21d-8bf9",
+      "benchmark": -0.024,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-12-allcash-21d-1661",
+      "benchmark": -0.024,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-13-allcash-21d-5baf",
+      "benchmark": -0.0237,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-14-allcash-21d-9d7e",
+      "benchmark": -0.0441,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-15-allcash-21d-af55",
+      "benchmark": -0.0466,
+      "correct": true
+    }
+  ]
+}
