@@ -1,0 +1,260 @@
+{
+ "day": "2026-10-16",
+ "written_at": "2026-10-16T22:58:00Z",
+ "phase": "ramp",
+ "week": 6,
+ "equity_usd": 1000.0,
+ "cash_usd": 1000.0,
+ "control_equity_usd": 938.39,
+ "control_return_to_date": -0.0616,
+ "drawdown": 0.0,
+ "control_drawdown": 0.0616,
+ "halted": false,
+ "marks": 31,
+ "positions": [],
+ "changes": [],
+ "control_changes": [],
+ "control_mark": {
+  "marked_on": "2026-10-16",
+  "equity_usd": 938.39,
+  "cash_usd": 602.28,
+  "positions_usd": 336.11,
+  "day_return": -0.0157,
+  "note": "holdings MYX:8869 100 (6.50), MYX:5183 100 (4.32), MYX:3182 200 (1.45); Press Metal -9.34% is most of the day"
+ },
+ "index_book": {
+  "mark": {
+   "marked_on": "2026-10-16",
+   "equity_usd": 986345.25,
+   "cash_usd": 598729.46,
+   "positions_usd": 387615.79,
+   "day_return": -0.0006,
+   "drawdown": 0.0137,
+   "held": 97,
+   "pending": 0
+  },
+  "cost_to_date_share_of_notional": 0.0048,
+  "since_2026_09_30": {
+   "index": -0.0137,
+   "decided": 0.0,
+   "control": -0.0425
+  },
+  "dividends": [],
+  "note": "no change; nothing pending"
+ },
+ "caps": [
+  {
+   "cap": "largest name",
+   "value": "0.00%",
+   "limit": "25%",
+   "breached": false
+  },
+  {
+   "cap": "invested",
+   "value": "0.00%",
+   "limit": "40%",
+   "breached": false
+  },
+  {
+   "cap": "cash floor",
+   "value": "100.00%",
+   "limit": "20%",
+   "breached": false
+  },
+  {
+   "cap": "names held",
+   "value": "0",
+   "limit": "0",
+   "breached": false
+  },
+  {
+   "cap": "drawdown from peak",
+   "value": "0.00%",
+   "limit": "8% halts entries",
+   "breached": false
+  },
+  {
+   "cap": "turnover, 5 weekdays",
+   "value": "USD 0.00",
+   "limit": "USD 500.00",
+   "breached": false
+  }
+ ],
+ "prices": {
+  "bursa": "Friday 2026-10-16 closes (10:09Z catch-up fetch); ^KLSE 1,607.76 with volume 0",
+  "us": "Friday 2026-10-16 closes (22:46Z fetch)",
+  "fx": "MYR 4.082 per USD (bnm, 2026-10-16)"
+ },
+ "fundable": [
+  {
+   "instrument_id": "MYX:1155",
+   "lot_usd": 244.73,
+   "share": 0.245,
+   "round_trip": 0.0098,
+   "lots": 1
+  },
+  {
+   "instrument_id": "MYX:5183",
+   "lot_usd": 105.83,
+   "share": 0.106,
+   "round_trip": 0.0209,
+   "lots": 2
+  },
+  {
+   "instrument_id": "MYX:5225",
+   "lot_usd": 195.98,
+   "share": 0.196,
+   "round_trip": 0.0119,
+   "lots": 1
+  },
+  {
+   "instrument_id": "MYX:8869",
+   "lot_usd": 159.24,
+   "share": 0.159,
+   "round_trip": 0.0143,
+   "lots": 1
+  },
+  {
+   "instrument_id": "MYX:3182",
+   "lot_usd": 35.52,
+   "share": 0.036,
+   "round_trip": 0.0598,
+   "lots": 7
+  },
+  {
+   "instrument_id": "XNAS:NVDA",
+   "lot_usd": 214.13,
+   "share": 0.214,
+   "round_trip": 0.012,
+   "lots": 1
+  }
+ ],
+ "over_cap": {
+  "MYX:5347": 0.318,
+  "XNAS:AAPL": 0.343,
+  "XNAS:MSFT": 0.529
+ },
+ "ledger": {
+  "mark_days": 26,
+  "gap": "no routine ran 2026-10-02..10-06; no paper page and no decision for those days; no decision is backdated"
+ },
+ "attribution": null,
+ "decision": {
+  "recorded": true,
+  "weights": {},
+  "thesis": "All cash, the thirty-first all-cash row and the fourth decision of ramp week 6. Thursday 10-15 is decomposed on the 2026-10-15 feedback page: one book name moved past 1.5 sigma, Maybank +1.00% (1.81 sigma, no_identified_catalyst) on half Wednesday's volume against falling bank peers, with every row in the session window a Maybank Securities note on another company; it closed 9.99 on 10-16, giving back nearly all of it. Petronas Chemicals -3.84% (0.94 sigma) and Genting +2.11% (1.44, the first session after its Bursa-query reply) read not_significant; NVIDIA -1.84% (1.27) on titles about CoreWeave's financing. Friday 10-16 is not decomposed: Press Metal 7.17 -> 6.50 (-9.34%) on 50,250,300 shares with one title-only earnings-projection row, and ^KLSE -0.98%. A significant leg with no row that has already reversed, and an undecomposed fall with no cause, give no claim to grade. Claim: nothing in the fundable universe beats cash over 21 sessions.",
+  "refusals": [],
+  "prediction_id": "paper-2026-10-16-allcash-21d-2b02",
+  "grades_on": "2026-11-17",
+  "made_at": "2026-10-16T22:51:32Z",
+  "horizon_counting": "exchange sessions"
+ },
+ "stores": {
+  "decided_targets": 31,
+  "predictions": 31,
+  "outcomes": 6,
+  "index_targets": 194,
+  "control_targets": 6,
+  "index_pending": 0,
+  "made_at": "2026-10-16T22:51:32Z"
+ },
+ "evidence": {
+  "feedback_page": "knowledge/feedback/2026-10-15.md (039d25c)",
+  "closes_10_16": {
+   "MYX:8869": 6.5,
+   "MYX:5183": 4.32,
+   "MYX:3182": 1.45,
+   "MYX:1155": 9.99,
+   "MYX:5225": 8.0,
+   "MYX:5347": 13.0,
+   "MYX:^KLSE": 1607.76,
+   "XNAS:NVDA": 214.13,
+   "XNAS:AAPL": 343.46,
+   "XNAS:MSFT": 529.05,
+   "XNAS:SPY": 763.25
+  },
+  "press_metal": "7.17 -> 6.50 on 50,250,300 (10-15: 12,000,600), low 6.32; one title-only row (theborneopost.com 08:08Z)",
+  "catch_up": "fired 10:06Z on time; bursa_close landed 88ee6b9 at 10:10Z"
+ },
+ "mistakes": [
+  "paper-2026-10-15-allcash-21d-8274 read the all-cash grades as correct against a control that holds Genting; the control's -1.57% on 10-16 came from Press Metal (7.17 -> 6.50) with Genting unchanged at 1.45.",
+  "paper-2026-10-01-allcash-21d-5a1e is behind on IHH (+3.90%, 7.70 -> 8.00) and Petronas Chemicals (+4.60%, 4.13 -> 4.32) since the 10-01 closes; it grades on 10-31.",
+  "paper-2026-10-08-allcash-21d-7bb6's test (Genting above 1.93 before 11-07) stands at 1.45."
+ ],
+ "mistakes_checked": [
+  "paper-2026-10-15-allcash-21d-8274 against the 10-16 control mark",
+  "paper-2026-10-01-allcash-21d-5a1e against 10-16 closes",
+  "paper-2026-10-08-allcash-21d-7bb6 against 1.45"
+ ],
+ "grades_due": [
+  {
+   "prediction_id": "paper-2026-09-17-allcash-21d-7667",
+   "on": "2026-10-17"
+  },
+  {
+   "prediction_id": "paper-2026-09-18-allcash-21d-667a",
+   "on": "2026-10-18"
+  },
+  {
+   "prediction_id": "paper-2026-09-19-allcash-21d-b7bd",
+   "on": "2026-10-19"
+  },
+  {
+   "prediction_id": "paper-2026-09-20-allcash-21d-dbaf",
+   "on": "2026-10-20"
+  },
+  {
+   "prediction_id": "paper-2026-09-21-allcash-21d-c04f",
+   "on": "2026-10-21"
+  },
+  {
+   "prediction_id": "paper-2026-09-22-allcash-21d-33c5",
+   "on": "2026-10-22"
+  },
+  {
+   "prediction_id": "paper-2026-09-23-allcash-21d-b999",
+   "on": "2026-10-23"
+  }
+ ],
+ "lessons": [
+  "A control book's loss belongs to its holdings one at a time; a grade against the control measures those names, not the decided book's reading."
+ ],
+ "dividend_boundary": {
+  "decided": "2026-10-10T15:25:31Z",
+  "control": "2026-10-10T15:25:31Z",
+  "index": "2026-10-10T15:25:31Z",
+  "note": "marks before it are not restated; no credit to the decided or control book yet"
+ },
+ "graded": [
+  {
+   "prediction_id": "paper-2026-09-11-allcash-21d-8bf9",
+   "benchmark": -0.024,
+   "correct": true
+  },
+  {
+   "prediction_id": "paper-2026-09-12-allcash-21d-1661",
+   "benchmark": -0.024,
+   "correct": true
+  },
+  {
+   "prediction_id": "paper-2026-09-13-allcash-21d-5baf",
+   "benchmark": -0.0237,
+   "correct": true
+  },
+  {
+   "prediction_id": "paper-2026-09-14-allcash-21d-9d7e",
+   "benchmark": -0.0441,
+   "correct": true
+  },
+  {
+   "prediction_id": "paper-2026-09-15-allcash-21d-af55",
+   "benchmark": -0.0466,
+   "correct": true
+  },
+  {
+   "prediction_id": "paper-2026-09-16-allcash-21d-3865",
+   "benchmark": -0.0616,
+   "correct": true
+  }
+ ]
+}
