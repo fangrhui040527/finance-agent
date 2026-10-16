@@ -1,6 +1,6 @@
 # Digest 2026-10-16
 
-Generated 2026-10-16 10:10 UTC · slot `all` · 18809 articles in the corpus, 5694 observations, 4223 events in the fact book.
+Generated 2026-10-16 16:53 UTC · slot `all` · 18828 articles in the corpus, 5706 observations, 4228 events in the fact book.
 
 ## The book
 
@@ -43,7 +43,7 @@ Generated 2026-10-16 10:10 UTC · slot `all` · 18809 articles in the corpus, 56
 - 2026-10-15 finance.yahoo.com — Nvidia CEO Jensen Huang will speak about CoreWeave's business when he wants to: Analyst [q 0.80, tone +0.0] ★
 - 2026-10-15 www.gurufocus.com — NVIDIA (NVDA) Faces Decline Amid AI Developments and Market Shif [q 0.65, tone -1.0] ★
 - 2026-10-15 www.tradingview.com — Nvidia Stocks Fall 3.0% With Cash Conversion in Focus After Baird's Warning [q 0.65, tone -1.0] ★
-- snapshot: P/E (ttm) 26.88 (finnhub, 2026-10-15) · P/B 28.81 (finnhub, 2026-10-15) · EPS (ttm) 7.91 (finnhub, 2026-10-15) · dividend yield 0.03 (finnhub, 2026-10-15) · beta 2.26 (finnhub, 2026-10-15) · 52w high 243.37 (finnhub, 2026-10-15) · 52w low 164.27 (finnhub, 2026-10-15) · target (consensus) 339.17 (fmp, 2026-10-15) · analysts: buy 41 (finnhub, 2026-09-05) · analysts: hold 3 (finnhub, 2026-09-05) · analysts: sell 1 (finnhub, 2026-09-05) · vendor sentiment 0.25 (alphavantage_news, 2026-10-06) · revenue (last quarter) 96.22bn (sec_xbrl, 2026-08-26) · net income (last quarter) 59.69bn (sec_xbrl, 2026-08-26) · last EPS surprise % 3.82 (finnhub, 2026-09-05)
+- snapshot: P/E (ttm) 26.88 (finnhub, 2026-10-15) · P/B 28.81 (finnhub, 2026-10-15) · EPS (ttm) 7.91 (finnhub, 2026-10-15) · dividend yield 0.03 (finnhub, 2026-10-15) · beta 2.26 (finnhub, 2026-10-15) · 52w high 243.37 (finnhub, 2026-10-15) · 52w low 164.27 (finnhub, 2026-10-15) · target (consensus) 339.17 (fmp, 2026-10-16) · analysts: buy 41 (finnhub, 2026-09-05) · analysts: hold 3 (finnhub, 2026-09-05) · analysts: sell 1 (finnhub, 2026-09-05) · vendor sentiment 0.25 (alphavantage_news, 2026-10-06) · revenue (last quarter) 96.22bn (sec_xbrl, 2026-08-26) · net income (last quarter) 59.69bn (sec_xbrl, 2026-08-26) · last EPS surprise % 3.82 (finnhub, 2026-09-05)
 
 ### Apple (XNAS:AAPL)
 - tone: 46 stories from 21 sources, polarity +0.07, peak intensity 0.33, uncertainty 0.11 · 11 escalated
@@ -59,7 +59,7 @@ Generated 2026-10-16 10:10 UTC · slot `all` · 18809 articles in the corpus, 56
 - upcoming 2026-11-02 earnings_result — Q4 2026 results after the close (finnhub)
 - upcoming 2026-10-29 earnings_result — Q4 2026 results after the close (finnhub)
 - upcoming 2026-10-28 earnings_result — Q4 2026 results after the close (finnhub)
-- snapshot: P/E (ttm) 38.73 (finnhub, 2026-10-15) · P/B 50.98 (finnhub, 2026-10-15) · EPS (ttm) 8.72 (finnhub, 2026-10-15) · dividend yield 0.51 (finnhub, 2026-10-15) · beta 1.11 (finnhub, 2026-10-15) · 52w high 348.15 (finnhub, 2026-10-15) · 52w low 243.42 (finnhub, 2026-10-15) · target (consensus) 341.68 (fmp, 2026-10-15) · analysts: buy 22 (finnhub, 2026-09-05) · analysts: hold 15 (finnhub, 2026-09-05) · analysts: sell 3 (finnhub, 2026-09-05) · vendor sentiment -0.23 (alphavantage_news, 2026-10-06) · revenue (last quarter) 109.42bn (sec_xbrl, 2026-07-31) · net income (last quarter) 29.79bn (sec_xbrl, 2026-07-31) · last EPS surprise % -0.89 (finnhub, 2026-09-05)
+- snapshot: P/E (ttm) 38.73 (finnhub, 2026-10-15) · P/B 50.98 (finnhub, 2026-10-15) · EPS (ttm) 8.72 (finnhub, 2026-10-15) · dividend yield 0.51 (finnhub, 2026-10-15) · beta 1.11 (finnhub, 2026-10-15) · 52w high 348.15 (finnhub, 2026-10-15) · 52w low 243.42 (finnhub, 2026-10-15) · target (consensus) 341.68 (fmp, 2026-10-16) · analysts: buy 22 (finnhub, 2026-09-05) · analysts: hold 15 (finnhub, 2026-09-05) · analysts: sell 3 (finnhub, 2026-09-05) · vendor sentiment -0.23 (alphavantage_news, 2026-10-06) · revenue (last quarter) 109.42bn (sec_xbrl, 2026-07-31) · net income (last quarter) 29.79bn (sec_xbrl, 2026-07-31) · last EPS surprise % -0.89 (finnhub, 2026-09-05)
 
 ### Microsoft (XNAS:MSFT)
 - tone: 43 stories from 23 sources, polarity +0.26, peak intensity 0.33, uncertainty 0.09 · 16 escalated
@@ -72,35 +72,41 @@ Generated 2026-10-16 10:10 UTC · slot `all` · 18809 articles in the corpus, 56
 - 2026-10-15 www.ad-hoc-news.de — Microsoft's Cyber Takedown and Visa Fight Take Center Stage as Stock Hovers Near Record - ad-hoc-news.de [q 0.65, tone +1.0] ★
 - 2026-10-15 scanx.trade — Microsoft Q1FY27 Results: Analysts eye Azure growth, Copilot adoption [q 0.65, tone +1.0] ★
 - event 2026-10-15 insider_filing — 4: STATEMENT OF CHANGES IN BENEFICIAL OWNERSHIP OF SECURITIES (edgar)
+- event 2026-10-15 rating_reiteration — TD Cowen maintain Buy (fmp)
+- event 2026-10-15 rating_reiteration — Mizuho maintain Outperform (fmp)
 - upcoming 2026-10-28 earnings_result — Q1 2027 results (finnhub)
 - upcoming 2026-10-27 earnings_result — Q1 2027 results (finnhub)
-- snapshot: P/E (ttm) 29.76 (finnhub, 2026-10-15) · P/B 6.26 (finnhub, 2026-10-15) · EPS (ttm) 17.95 (finnhub, 2026-10-15) · dividend yield 0.79 (finnhub, 2026-10-15) · beta 1.06 (finnhub, 2026-10-15) · 52w high 553.72 (finnhub, 2026-10-15) · 52w low 349.20 (finnhub, 2026-10-15) · target (consensus) 591.58 (fmp, 2026-10-15) · analysts: buy 41 (finnhub, 2026-09-05) · analysts: hold 5 (finnhub, 2026-09-05) · analysts: sell 0 (finnhub, 2026-09-05) · vendor sentiment 0.29 (alphavantage_news, 2026-10-06) · revenue (last quarter) 90.01bn (sec_xbrl, 2026-07-29) · net income (last quarter) 35.77bn (sec_xbrl, 2026-07-29) · last EPS surprise % 9.53 (finnhub, 2026-09-05)
+- snapshot: P/E (ttm) 29.76 (finnhub, 2026-10-15) · P/B 6.26 (finnhub, 2026-10-15) · EPS (ttm) 17.95 (finnhub, 2026-10-15) · dividend yield 0.79 (finnhub, 2026-10-15) · beta 1.06 (finnhub, 2026-10-15) · 52w high 553.72 (finnhub, 2026-10-15) · 52w low 349.20 (finnhub, 2026-10-15) · target (consensus) 591.58 (fmp, 2026-10-16) · analysts: buy 41 (finnhub, 2026-09-05) · analysts: hold 5 (finnhub, 2026-09-05) · analysts: sell 0 (finnhub, 2026-09-05) · vendor sentiment 0.29 (alphavantage_news, 2026-10-06) · revenue (last quarter) 90.01bn (sec_xbrl, 2026-07-29) · net income (last quarter) 35.77bn (sec_xbrl, 2026-07-29) · last EPS surprise % 9.53 (finnhub, 2026-09-05)
 
 ## Macro
 
 | series | latest | as of | change | source |
 |---|---|---|---|---|
-| ICE BofA US high-yield option-adjusted spread, % | 3.25 | 2026-10-14 | +0.09 | fred |
+| ICE BofA US high-yield option-adjusted spread, % | 3.23 | 2026-10-15 | -0.02 | fred |
 | BNM Overnight Policy Rate, % | 2.75 | 2026-09-03 | +0 | bnm_opr |
 | US CPI, all items, index 1982-84=100 | 336.30 | 2026-09-01 | +2.167 | fred |
-| Brent crude, USD per barrel (EIA, daily) | 125.44 | 2026-10-06 | -0.07 | fred |
+| Brent crude, USD per barrel (EIA, daily) | 126.55 | 2026-10-14 | +0.77 | fred |
 | Malaysian ringgit per US dollar | 4.08 | 2026-10-09 | -0.006 | fred |
-| Federal funds effective rate, % | 3.88 | 2026-10-13 | +0 | fred |
-| 10-year Treasury yield, % | 5.21 | 2026-10-13 | -0.03 | fred |
-| 2-year Treasury yield, % | 4.79 | 2026-10-13 | -0.01 | fred |
+| Federal funds effective rate, % | 3.88 | 2026-10-14 | +0 | fred |
+| 10-year Treasury yield, % | 5.19 | 2026-10-14 | -0.02 | fred |
+| 2-year Treasury yield, % | 4.82 | 2026-10-14 | +0.03 | fred |
 | Malaysia CPI headline, index 2010=100 | 137.50 | 2026-08-01 | +0.4 | dosm_cpi |
 | Broad US dollar index | 121.60 | 2026-10-09 | +0.1554 | fred |
-| NASDAQ Composite, index level | 26,692.87 | 2026-10-14 | -511.51 | fred |
+| NASDAQ Composite, index level | 26,713.03 | 2026-10-15 | +20.16 | fred |
 | Aluminium, USD per tonne (IMF PCPS via FRED) | 3,158.26 | 2026-07-01 |  | fred |
-| S&P 500, index level | 7,718.94 | 2026-10-14 | -86.51 | fred |
-| 10y minus 2y Treasury spread, % | 0.37 | 2026-10-14 | -0.05 | fred |
+| S&P 500, index level | 7,744.06 | 2026-10-15 | +25.12 | fred |
+| 10y minus 2y Treasury spread, % | 0.33 | 2026-10-15 | -0.04 | fred |
 | US unemployment rate, % | 4.20 | 2026-09-01 | +0.1 | fred |
-| CBOE VIX, index | 16.87 | 2026-10-14 | +1.6 | fred |
+| CBOE VIX, index | 16.46 | 2026-10-15 | -0.41 | fred |
 
 ## Collection
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 16:53 | dbnomics | ok | 450 | 0 | 0 | facts 0;  |
+| 16:53 | jin10_flash | degraded | 21 | 21 | 19 | facts 0; window not covered back to 2026-10-16 10:08Z; the oldest item read is 2 |
+| 16:53 | fred | ok | 494 | 0 | 0 | facts 16; release calendar: 'FOMC Press Release' listed on 15 days of the fortni |
+| 16:52 | fmp | ok | 3959 | 0 | 0 | facts 15; fmp /earnings is outside the plan (HTTP 402); not collected for NVDA,  |
 | 10:09 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
 | 10:09 | twse_openapi | ok | 8 | 0 | 0 | facts 5;  |
 | 10:08 | jin10_flash | degraded | 17 | 17 | 17 | facts 0; window not covered back to 2026-10-15 22:47Z; the oldest item read is 2 |
