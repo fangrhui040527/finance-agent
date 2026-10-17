@@ -191,6 +191,22 @@ def test_a_low_above_the_open_is_dropped():
     assert len(StooqFeed(opener=_opener(body)).fetch("XNAS:NVDA")) == 3
 
 
+def test_a_high_a_rounding_under_the_open_is_widened_not_dropped():
+    """Yahoo's SPY 2026-10-16 bar: high 773.23 under an open of 773.24. Dropping
+    it lost the session, and the pack called three US names MIS-DATED."""
+    body = CSV + "2026-01-07,773.24,773.23,760.64,763.25,63538029\n"
+    bars = StooqFeed(opener=_opener(body)).fetch("XNAS:NVDA").raw()
+    assert len(bars) == 4
+    last = bars[-1]
+    assert (last.open, last.high, last.low, last.close) == (773.24, 773.24, 760.64, 763.25)
+
+
+def test_a_low_a_rounding_over_the_close_is_widened_not_dropped():
+    body = CSV + "2026-01-07,10.60,10.70,10.56,10.55,1000\n"  # low 10.56 over close 10.55
+    bars = StooqFeed(opener=_opener(body)).fetch("XNAS:NVDA").raw()
+    assert len(bars) == 4 and bars[-1].low == 10.55
+
+
 def test_a_zero_or_negative_price_is_dropped():
     body = CSV + "2026-01-07,0,0,0,0,1000\n"
     assert len(StooqFeed(opener=_opener(body)).fetch("XNAS:NVDA")) == 3

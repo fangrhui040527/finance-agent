@@ -43,6 +43,12 @@ from core.net.breaker import CircuitBreaker
 #: this module, applied to the one case the suffix tables cannot express.
 INDEX_IDS: frozenset[str] = frozenset({"MYX:^KLSE"})
 
+#: How far a bar's high may sit under its open or close (or its low over them)
+#: and still be a rounding, widened to the body, rather than a corrupt row.
+#: 0.5%: one tick on a ringgit-priced Bursa share (0.005 on 1.00), and five
+#: hundred times the cent SPY's 2026-10-16 high missed by. See `_row_to_bar`.
+OHLC_ROUNDING = 0.005
+
 
 class PriceFeedError(RuntimeError):
     """The source could not be reached or answered with something unusable."""
@@ -320,10 +326,21 @@ class PriceFeed(ABC):
         # logic both assume high >= max(open, close) >= min(open, close) >= low.
         if vals["high"] < vals["low"]:
             return None
-        if vals["high"] < max(vals["open"], vals["close"]):
-            return None
-        if vals["low"] > min(vals["open"], vals["close"]):
-            return None
+        # A high or low that misses the body by a rounding is widened to it,
+        # not taken as corruption. Yahoo served SPY's 2026-10-16 bar with its
+        # high at 773.23 under an open of 773.24 - one cent in 773 - and
+        # dropping the row cost the session, not the high: the pack read SPY
+        # as never having printed 10-16 and labelled all three US names
+        # MIS-DATED. Past the tolerance the bar stays refused.
+        top, bottom = max(vals["open"], vals["close"]), min(vals["open"], vals["close"])
+        if vals["high"] < top:
+            if vals["high"] < top * (1 - OHLC_ROUNDING):
+                return None
+            vals["high"] = top
+        if vals["low"] > bottom:
+            if vals["low"] > bottom * (1 + OHLC_ROUNDING):
+                return None
+            vals["low"] = bottom
 
         return Bar(day, vals["open"], vals["high"], vals["low"], vals["close"], volume)
 
