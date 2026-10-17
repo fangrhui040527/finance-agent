@@ -6,6 +6,8 @@ import random
 from dataclasses import dataclass
 from datetime import UTC, date, datetime, timedelta
 
+import pytest
+
 from core.market.bars import drop_carried_rows
 from core.market.feed import PriceFeedError, market_proxy_for
 from core.market.prices import Bar, PriceSeries
@@ -148,6 +150,65 @@ def test_the_pack_carries_every_section_and_writes_where_told(tmp_path):
     )
 
 
+def test_a_story_line_carries_its_doc_id_and_utc_time_and_truncates_only_a_unique_key(tmp_path):
+    """M7. The feedback contract asks every cause to point at its story by
+    `doc_id`, and the pack's story lines printed none - nor any time, while the
+    pages time each row against the close - so the writer read corpus.db by hand
+    every night. A long key is cut to SHORT_ID_CHARS only when no other row in
+    the WHOLE corpus begins the same way: here the twin of one story was
+    published a month earlier, outside the digest's window, and still keeps it
+    whole."""
+    from knowledge.corpus import SHORT_ID_CHARS, Corpus
+    from knowledge.news.features import Article
+
+    head = "https://news.google.com/rss/articles/CBMi" + "A" * 40  # > 64 shared characters
+    unique = "https://news.google.com/rss/articles/CBMi" + "Q" * 60 + "?oc=5"
+    rows = [
+        (unique, "Maybank prices a sukuk", datetime(2026, 9, 4, 7, 44, 56, tzinfo=UTC)),
+        (head + "one?oc=5", "Maybank names a new CFO", datetime(2026, 9, 4, 10, 5, tzinfo=UTC)),
+        (head + "two?oc=5", "Maybank last month", datetime(2026, 8, 4, 9, 0, tzinfo=UTC)),
+        ("finnhub:142921318", "Maybank short key", datetime(2026, 9, 3, 23, 30, tzinfo=UTC)),
+    ]
+    corpus_db = str(tmp_path / "c.db")
+    with Corpus(corpus_db) as c:
+        for doc_id, title, at in rows:
+            c.add(
+                Article(doc_id, title, "", "example.com", at, instruments=["MYX:1155"]),
+                "fixture",
+                seen_at=NOW,
+            )
+    text = build_pack(
+        Cfg(watchlist=("MYX:1155",)),
+        DAY,
+        corpus_path=corpus_db,
+        facts_path=str(tmp_path / "f.db"),
+        feed=FakeFeed(),
+        now=NOW,
+        previous_dir=None,
+    )
+    line = {
+        r[1]: next(x for x in text.splitlines() if r[1] in x)
+        for r in rows
+        if r[2] > NOW - timedelta(days=2)
+    }
+    cut = unique[:SHORT_ID_CHARS] + "…"
+    assert line["Maybank prices a sukuk"].startswith("- 2026-09-04 07:44Z example.com — ")
+    assert line["Maybank prices a sukuk"].endswith(f" · doc_id `{cut}`")
+    # The shared prefix would resolve to two rows, so the key is printed whole.
+    assert line["Maybank names a new CFO"].startswith("- 2026-09-04 10:05Z ")
+    assert line["Maybank names a new CFO"].endswith(f" · doc_id `{head}one?oc=5`")
+    # A key no longer than the cut is never cut; the date is the UTC one.
+    assert line["Maybank short key"].startswith("- 2026-09-03 23:30Z ")
+    assert line["Maybank short key"].endswith(" · doc_id `finnhub:142921318`")
+    assert f"the first {SHORT_ID_CHARS} characters of the only key" in text
+    with Corpus(corpus_db) as c:  # the cut resolves to exactly the story it names
+        hits = c.conn.execute(
+            "SELECT doc_id FROM articles WHERE substr(doc_id, 1, ?) = ?",
+            (SHORT_ID_CHARS, cut.rstrip("…")),
+        ).fetchall()
+    assert [h[0] for h in hits] == [unique]
+
+
 def test_previous_pages_are_listed_newest_three_before_the_day(tmp_path):
     fb = tmp_path / "fb"
     fb.mkdir()
@@ -224,7 +285,20 @@ def test_a_proxy_that_did_not_print_makes_the_row_mis_dated_and_says_so():
     assert "MIS-DATED" in m.row()
 
 
-def test_a_market_that_was_simply_shut_is_correctly_dated_not_flagged():
+@pytest.fixture
+def bursa_shut_on_day(monkeypatch):
+    """DAY made a Bursa closure. 2026-09-04 is an ordinary Friday on the real
+    calendar, and a day neither leg printed is a holiday only when the exchange
+    calendar says the market was shut - the bars cannot say it (M3)."""
+    from markets import registry
+    from markets.holidays import closures
+    from markets.xkls import XKLS
+
+    shut = XKLS(holidays=closures("XKLS").holidays | {DAY})
+    monkeypatch.setitem(registry._CACHE, "XKLS", shut)
+
+
+def test_a_market_that_was_simply_shut_is_correctly_dated_not_flagged(bursa_shut_on_day):
     """Both legs quiet is a holiday, not a fault; only a silent fallback is."""
     m = measure(GappyFeed(blank=("MYX:^KLSE", "MYX:1155")), "MYX:1155", "Maybank", DAY)
     assert not m.error and not m.mis_dated and not m.stale
@@ -244,6 +318,101 @@ def test_a_name_that_did_not_print_when_its_market_did_is_stale_not_a_holiday():
     assert f"every figure in this row is the {m.last_day} session" in m.dating
     assert "correctly dated" not in m.dating
     assert "**STALE NAME: this is the 2026-09-03 session**" in m.row()
+
+
+# --- M3: a row blank or missing on a day the exchange calendar calls a session ---
+THU_BEFORE = DAY - timedelta(days=1)
+
+
+@dataclass
+class HoleFeed(FakeFeed):
+    """FakeFeed with the (id, day) rows in `holes` taken out of the series."""
+
+    holes: tuple = ()
+
+    def fetch(self, iid, start=None, end=None):
+        s = super().fetch(iid, start=start, end=end)
+        gone = {d for i, d in self.holes if i == iid}
+        return PriceSeries(iid, [b for b in s.raw() if b.day not in gone])
+
+
+def test_a_blank_bar_both_legs_share_on_a_calendar_session_is_not_correctly_dated():
+    """2026-09-22, 22:44Z: Tuesday's US bars were blank for the names and SPY
+    alike, and the pack called the rows *correctly dated* to Monday - a market
+    holiday - while its own macro table printed SP500 for Tuesday. 2026-09-04 is
+    a Bursa session on the calendar, so a day neither leg has is a hole in the
+    cache, whether the vendor left the row out or wrote it as a filler."""
+    for feed in (GappyFeed(blank=("MYX:^KLSE", "MYX:1155")), HolidayFeed()):
+        m = measure(feed, "MYX:1155", "Maybank", DAY)
+        assert not m.error and m.last_day == THU_BEFORE and not m.mis_dated and not m.stale
+        assert "correctly dated" not in m.dating
+        assert m.blank and m.blank_days == (DAY,)
+        assert m.dating.startswith(
+            "BLANK SESSION: 2026-09-04 is a session on the XKLS calendar, but neither "
+            "MYX:1155 nor MYX:^KLSE has a usable bar for it"
+        )
+        assert "every figure in this row is the 2026-09-03 session, not 2026-09-04" in m.dating
+        assert "**BLANK SESSION: this is the 2026-09-03 session**" in m.row()
+
+
+def test_a_1d_row_across_a_session_both_legs_left_blank_is_two_sessions():
+    """The 1d return runs between the last two COMMON days, and the span was
+    counted on the name's own rows - so a session missing from BOTH legs made a
+    two-session move read as a day, tested against one day's sigma."""
+    feed = HoleFeed(holes=(("MYX:1155", THU_BEFORE), ("MYX:^KLSE", THU_BEFORE)))
+    m = measure(feed, "MYX:1155", "Maybank", DAY)
+    assert not m.error and m.last_day == DAY
+    assert m.span == 2 and "2-session window" in m.estimation
+    assert (
+        "SPANS 2 SESSIONS: neither leg has a usable row for 2026-09-03, a session on the "
+        "XKLS calendar, so the 1d figures run from 2026-09-02 to 2026-09-04" in m.dating
+    )
+    assert "**SPANS 2 SESSIONS: both legs are blank on a session**" in m.row()
+    assert not m.blank, "the day asked for printed; the hole is inside the 1d window"
+
+
+def test_a_1d_row_across_a_blank_in_the_name_alone_is_two_sessions():
+    """The other side of the proxy gap. Maybank's 10-12 row came back blank from
+    the 10-13 refetches while ^KLSE printed it, so the 10-13 "1d" was 10-09 ->
+    10-13 for both legs, labelled a day."""
+    m = measure(HoleFeed(holes=(("MYX:1155", THU_BEFORE),)), "MYX:1155", "Maybank", DAY)
+    assert not m.error and m.last_day == DAY
+    assert m.span == 2 and "2-session window" in m.estimation
+    assert "SPANS 2 SESSIONS: MYX:1155 has no row for 2026-09-03" in m.dating
+    assert "**SPANS 2 SESSIONS: the name has a gap**" in m.row()
+
+
+def test_a_day_both_legs_lack_on_a_calendar_holiday_is_one_session(monkeypatch):
+    """The calendar is asked, not assumed: across a real closure there is one session."""
+    from markets import registry
+    from markets.holidays import closures
+    from markets.xkls import XKLS
+
+    shut = XKLS(holidays=closures("XKLS").holidays | {THU_BEFORE})
+    monkeypatch.setitem(registry._CACHE, "XKLS", shut)
+    feed = HoleFeed(holes=(("MYX:1155", THU_BEFORE), ("MYX:^KLSE", THU_BEFORE)))
+    m = measure(feed, "MYX:1155", "Maybank", DAY)
+    assert not m.error and m.last_day == DAY
+    assert m.span == 1 and "SPANS" not in m.row() and not m.blank
+
+
+def test_a_zero_volume_proxy_bar_whose_prices_moved_is_its_session_not_a_blank():
+    """Yahoo's ^KLSE bar for the day it is fetched always carries volume 0 (the
+    10-16 bar read 0 at 10:09Z): that alone is not a blank row."""
+
+    class ZeroVolume(FakeFeed):
+        def fetch(self, iid, start=None, end=None):
+            s = super().fetch(iid, start=start, end=end)
+            if iid != "MYX:^KLSE":
+                return s
+            *rest, last = s.raw()
+            return PriceSeries(
+                iid, [*rest, Bar(last.day, last.open, last.high, last.low, last.close, 0)]
+            )
+
+    m = measure(ZeroVolume(), "MYX:1155", "Maybank", DAY)
+    assert not m.error and m.last_day == DAY and m.span == 1 and not m.blank
+    assert "BLANK" not in m.row() and "SPANS" not in m.row()
 
 
 @dataclass
@@ -357,7 +526,9 @@ class HolidayFeed(FakeFeed):
         return PriceSeries(iid, bars + [filler])
 
 
-def test_a_holiday_the_vendor_wrote_as_a_row_is_no_session_not_a_flat_verdict():
+def test_a_holiday_the_vendor_wrote_as_a_row_is_no_session_not_a_flat_verdict(
+    bursa_shut_on_day,
+):
     m = measure(HolidayFeed(), "MYX:1155", "Maybank", DAY)
     assert not m.error
     assert m.last_day == DAY - timedelta(days=1), "Thursday, the last session that traded"
