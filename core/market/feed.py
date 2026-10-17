@@ -357,6 +357,15 @@ def _rounding(price: float) -> float:
     return max(OHLC_ROUNDING_CENTS, price * OHLC_ROUNDING_SHARE) + 1e-9
 
 
+def _clock() -> float:
+    """Seconds, for a request's time budget. A seam: a test that hangs a fake
+    host advances it rather than sleeping, because Windows' monotonic clock
+    ticks every 15.6 ms and read a 50 ms sleep as under 50 ms."""
+    import time
+
+    return time.monotonic()
+
+
 def _guarded_read(source, symbol, breaker, opener, req, timeout, sleep) -> str:
     """Transport with retry and a per-feed circuit breaker.
 
@@ -373,7 +382,6 @@ def _guarded_read(source, symbol, breaker, opener, req, timeout, sleep) -> str:
     collector job that commits nothing if it is killed. A failure that answers
     fast (a reset, a 503) is still retried as before.
     """
-    import time
     import urllib.error
 
     from core.net.breaker import CircuitOpen
@@ -383,13 +391,11 @@ def _guarded_read(source, symbol, breaker, opener, req, timeout, sleep) -> str:
         with opener(req, timeout=timeout) as resp:
             return resp.read()
 
-    started = time.monotonic()
+    started = _clock()
     kwargs = {"sleep": sleep} if sleep is not None else {}
     try:
         breaker.before_call()
-        body = with_retry(
-            _transport, retryable=lambda _e: time.monotonic() - started < timeout, **kwargs
-        )
+        body = with_retry(_transport, retryable=lambda _e: _clock() - started < timeout, **kwargs)
     except CircuitOpen as e:
         raise PriceFeedError(str(e)) from e
     except urllib.error.HTTPError as e:

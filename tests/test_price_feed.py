@@ -114,19 +114,43 @@ def test_a_host_that_hangs_costs_one_timeout_per_request_not_three(monkeypatch):
     three times at 30 s each - 91.5 s a name with the backoff, and five names
     before the breaker opens. On 2026-09-29 the collector's price step took
     15m16s of a 25-minute job. The request, not the attempt, is bounded now."""
-    import time
+    import core.market.feed as feed_mod
 
     asked = []
+    now = [1000.0]
 
     def hang(req, timeout=None):
+        # The hang is the clock moving by the whole timeout, not a real sleep:
+        # a real one read as 49 ms on Windows' 15.6 ms clock and let a retry in.
         asked.append(timeout)
-        time.sleep(timeout)
+        now[0] += timeout
         raise TimeoutError("timed out")
 
-    monkeypatch.setattr(StooqFeed, "TIMEOUT", 0.05)
+    monkeypatch.setattr(feed_mod, "_clock", lambda: now[0])
+    monkeypatch.setattr(StooqFeed, "TIMEOUT", 30)
     with pytest.raises(PriceFeedError, match="fetch failed"):
         StooqFeed(opener=hang, sleep=lambda s: None).fetch("XNAS:NVDA")
-    assert asked == [0.05], "no second attempt once the request has used its timeout"
+    assert asked == [30], "no second attempt once the request has used its timeout"
+
+
+def test_a_timeout_that_answers_fast_is_still_retried_inside_the_budget(monkeypatch):
+    """The budget stops retries only once it is spent: a socket that gives up
+    after 2 s of a 30 s request is asked again, as before."""
+    import core.market.feed as feed_mod
+
+    asked = []
+    now = [1000.0]
+
+    def flaky(req, timeout=None):
+        asked.append(timeout)
+        now[0] += 2
+        raise TimeoutError("timed out")
+
+    monkeypatch.setattr(feed_mod, "_clock", lambda: now[0])
+    monkeypatch.setattr(StooqFeed, "TIMEOUT", 30)
+    with pytest.raises(PriceFeedError, match="fetch failed"):
+        StooqFeed(opener=flaky, sleep=lambda s: None).fetch("XNAS:NVDA")
+    assert len(asked) == 3, asked
 
 
 def test_a_failure_that_answers_fast_is_still_retried():
