@@ -263,7 +263,7 @@ def measure(feed, instrument_id: str, label: str, day: date, base_currency: str 
     move.mkt_last = max(closes_m) if closes_m else None
     move.sessions = len(common)
     days_i, days_m = set(closes_i), set(closes_m)
-    calendar = _exchange_calendar(instrument_id)
+    calendar = _exchange_calendar(instrument_id, day)
     move.blank_days = tuple(
         d
         for d in _calendar_sessions(calendar, move.last_day, day)
@@ -278,7 +278,9 @@ def measure(feed, instrument_id: str, label: str, day: date, base_currency: str 
     # cannot see a session missing from the NAME - Maybank's blank 10-12 row
     # from the 10-13 refetches made its 10-13 "1d" the 10-09 -> 10-13 move -
     # nor one missing from both legs.
-    printed = {d for d in days_i if common[-2] < d <= common[-1]}
+    # Either leg's rows: a day only the proxy printed is a session the NAME
+    # missed, and without a calendar to ask it is the only sign of one.
+    printed = {d for d in days_i | days_m if common[-2] < d <= common[-1]}
     spanned = printed | set(_calendar_sessions(calendar, common[-2], common[-1]))
     move.span = len(spanned)
     if move.span > 1:
@@ -432,13 +434,15 @@ def _provisional_note(feed, legs: tuple[str, ...], day: date) -> str:
     )
 
 
-def _exchange_calendar(instrument_id: str):
+def _exchange_calendar(instrument_id: str, through: date):
     """The session calendar of the name's exchange, or None when there is none
-    to trust.
+    to trust through `through`.
 
     A calendar is only worth asking once it has been handed its closures: one
     with no table in `markets/holidays.py` is a weekday filter, and would call
-    every holiday a blank session. None means "cannot say", and the pack then
+    every holiday a blank session. Nor past the day its table expires: Bursa's
+    2027 holidays are not entered yet, and a 2027 Chinese New Year read off it
+    would be a "blank session". None means "cannot say", and the pack then
     falls back to what the bars alone show, as it always did.
     """
     from markets.holidays import closures
@@ -449,7 +453,8 @@ def _exchange_calendar(instrument_id: str):
         calendar = adapter_for(mic).calendar
     except (KeyError, ValueError):
         return None
-    return calendar if closures(mic).expires is not None else None
+    expires = closures(mic).expires
+    return calendar if expires is not None and through <= expires else None
 
 
 def _days(days) -> str:
@@ -504,7 +509,7 @@ def _dating_note(move: Move, *, own_days: set[date], mkt_days: set[date], calend
     checked = (
         f": the {mic} calendar has no session in between"
         if calendar is not None
-        else f", on the bars alone (no holiday table for {mic} to check them against)"
+        else f", on the bars alone (no holiday table for {mic} covers {asked} to check them against)"
     )
     return (
         f"no session for {move.instrument_id} or {move.proxy} after {last}; the figures are "

@@ -637,3 +637,28 @@ def test_the_facts_block_lists_the_ex_dates_the_price_feed_read(tmp_path):
     # A feed that read no actions says so rather than implying none were paid.
     nvidia = facts.split("XNAS:NVDA: what the collector holds")[1].split("```")[0]
     assert "NO DIVIDEND DATA: the feed read no dividends for this name" in nvidia
+
+
+def test_a_holiday_table_past_its_expiry_is_not_asked(monkeypatch):
+    """Bursa's table expires with 2026 and its 2027 holidays are not entered: a
+    2027 Chinese New Year read off it would be a BLANK SESSION. Past the expiry
+    the pack falls back to the bars, and says so."""
+    from markets import holidays
+
+    monkeypatch.setitem(holidays.EXPIRES, "XKLS", DAY - timedelta(days=1))
+    m = measure(GappyFeed(blank=("MYX:^KLSE", "MYX:1155")), "MYX:1155", "Maybank", DAY)
+    assert not m.error and m.last_day == THU_BEFORE
+    assert not m.blank and m.blank_days == ()
+    assert "on the bars alone (no holiday table for XKLS covers 2026-09-04" in m.dating
+
+
+def test_without_a_calendar_a_day_only_the_proxy_printed_still_spans_two_sessions(monkeypatch):
+    """With no calendar to ask, the proxy's own rows are the only sign that the
+    name missed a session in its 1d window; counting the name's rows alone read
+    the two-session move as a day."""
+    from markets import holidays
+
+    monkeypatch.delitem(holidays.EXPIRES, "XKLS")  # no table at all: nothing to ask
+    m = measure(HoleFeed(holes=(("MYX:1155", THU_BEFORE),)), "MYX:1155", "Maybank", DAY)
+    assert not m.error and m.last_day == DAY
+    assert m.span == 2 and "SPANS 2 SESSIONS: MYX:1155 has no row for 2026-09-03" in m.dating
