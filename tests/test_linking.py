@@ -233,6 +233,17 @@ def test_a_short_alias_inside_another_companys_name_is_not_the_company():
         assert link_entities(headline, INDEX) == [], headline
 
 
+def test_an_all_caps_headline_gets_the_same_exclusions():
+    """Some feeds set whole titles in capitals ("MHTC AND MAYBANK PARTNER TO
+    BRING MALAYSIA HEALTHCARE...", 2026-10-15), and an alias matches ALL CAPS,
+    so the words that exclude it must too."""
+    assert link_entities("SHREE TNB POLYMERS LIMITED LISTS ON BSE", INDEX) == []
+    assert link_entities("WEDDING AT MENARA MERDEKA MAYBANK", INDEX) == []
+    # Still the company in capitals, as in Title Case.
+    assert link_entities("TNB SHARES RISE ON TARIFF NEWS", INDEX) == ["MYX:5347"]
+    assert link_entities("FIRE DRILL AT MENARA MAYBANK", INDEX) == ["MYX:1155"]
+
+
 def test_the_same_short_alias_still_links_where_it_is_the_company():
     """Real TNB rows from the same corpus, each with a capitalised word beside
     the acronym, plus the company named separately from the other one."""

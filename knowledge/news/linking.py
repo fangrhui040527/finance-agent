@@ -108,8 +108,11 @@ _NOT_A_PLACE = rf"(?!\s+(?-i:(?:{'|'.join(THOROUGHFARE)}))(?!{_ASCII_WORD}))"
 #: Measured over the 19,330 stored rows to 2026-10-16: this fires once, on the
 #: wedding.
 MALAY_BUILDING = ("Menara", "Wisma", "Bangunan", "Kompleks")
+#: Title Case or ALL CAPS, as a headline sets it ("AT MENARA MERDEKA MAYBANK"),
+#: never lowercase - the same reading the aliases themselves get.
+_BUILDING_NOUNS = "|".join(MALAY_BUILDING + tuple(w.upper() for w in MALAY_BUILDING))
 _IN_A_BUILDING_NAME = re.compile(
-    rf"(?<!{_ASCII_WORD})(?:{'|'.join(MALAY_BUILDING)})(?:\s+[A-Z0-9][\w'’-]*){{1,2}}\s+\Z"
+    rf"(?<!{_ASCII_WORD})(?:{_BUILDING_NOUNS})(?:\s+[A-Z0-9][\w'’-]*){{1,2}}\s+\Z"
 )
 
 #: A SHORT alias followed by one of these is the first word of ANOTHER
@@ -140,7 +143,9 @@ CORPORATE_SUFFIX = (
     "Ltd",
     "Pvt",
 )
-_NOT_ANOTHER_COMPANY = rf"(?!\s+(?:{'|'.join(CORPORATE_SUFFIX)})(?!{_ASCII_WORD}))"
+#: Title Case or ALL CAPS: "SHREE TNB POLYMERS LIMITED" is the same company.
+_SUFFIXES = "|".join(CORPORATE_SUFFIX + tuple(w.upper() for w in CORPORATE_SUFFIX))
+_NOT_ANOTHER_COMPANY = rf"(?!\s+(?:{_SUFFIXES})(?!{_ASCII_WORD}))"
 
 #: Longer names that CONTAIN a book alias and name something else: the group's
 #: other listed companies and the resort named after it. Each is matched like
