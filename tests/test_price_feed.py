@@ -207,6 +207,13 @@ def test_a_low_a_rounding_over_the_close_is_widened_not_dropped():
     assert len(bars) == 4 and bars[-1].low == 10.55
 
 
+def test_a_high_well_under_the_open_is_still_dropped_as_in_progress():
+    """SPY mid-session on 2026-09-08: open 772.01 over a high of 769.70. That is
+    how an unfinished row looks, and refusing it keeps it out of the cache."""
+    body = CSV + "2026-01-07,772.01,769.70,767.26,767.29,2948758\n"
+    assert len(StooqFeed(opener=_opener(body)).fetch("XNAS:NVDA")) == 3
+
+
 def test_a_zero_or_negative_price_is_dropped():
     body = CSV + "2026-01-07,0,0,0,0,1000\n"
     assert len(StooqFeed(opener=_opener(body)).fetch("XNAS:NVDA")) == 3

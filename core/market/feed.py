@@ -44,10 +44,15 @@ from core.net.breaker import CircuitBreaker
 INDEX_IDS: frozenset[str] = frozenset({"MYX:^KLSE"})
 
 #: How far a bar's high may sit under its open or close (or its low over them)
-#: and still be a rounding, widened to the body, rather than a corrupt row.
-#: 0.5%: one tick on a ringgit-priced Bursa share (0.005 on 1.00), and five
-#: hundred times the cent SPY's 2026-10-16 high missed by. See `_row_to_bar`.
-OHLC_ROUNDING = 0.005
+#: and still be a rounding, widened to the body, rather than a row to refuse:
+#: one cent, the finest increment either market quotes, or 0.02% of the price,
+#: whichever is larger. Deliberately tight. A high under the open is also what
+#: Yahoo's IN-PROGRESS row looks like - SPY on 2026-09-08 read open 772.01,
+#: high 769.70 mid-session, 0.30% apart - and refusing that row is how the
+#: price cache knows the session is not over (tests/test_perf_shapes.py). The
+#: settled SPY bar of 2026-10-16 missed by the cent: 773.23 under 773.24.
+OHLC_ROUNDING_CENTS = 0.01
+OHLC_ROUNDING_SHARE = 0.0002
 
 
 class PriceFeedError(RuntimeError):
@@ -327,22 +332,29 @@ class PriceFeed(ABC):
         if vals["high"] < vals["low"]:
             return None
         # A high or low that misses the body by a rounding is widened to it,
-        # not taken as corruption. Yahoo served SPY's 2026-10-16 bar with its
-        # high at 773.23 under an open of 773.24 - one cent in 773 - and
-        # dropping the row cost the session, not the high: the pack read SPY
-        # as never having printed 10-16 and labelled all three US names
-        # MIS-DATED. Past the tolerance the bar stays refused.
+        # not taken as corruption. Yahoo served SPY's settled 2026-10-16 bar
+        # with its high at 773.23 under an open of 773.24, and dropping the
+        # row cost the session, not the high: the pack read SPY as never having
+        # printed 10-16 and labelled all three US names MIS-DATED. Past the
+        # rounding (OHLC_ROUNDING_*) the row is refused as before - which is
+        # also how a mid-session row is kept out of the cache.
         top, bottom = max(vals["open"], vals["close"]), min(vals["open"], vals["close"])
         if vals["high"] < top:
-            if vals["high"] < top * (1 - OHLC_ROUNDING):
+            if top - vals["high"] > _rounding(top):
                 return None
             vals["high"] = top
         if vals["low"] > bottom:
-            if vals["low"] > bottom * (1 + OHLC_ROUNDING):
+            if vals["low"] - bottom > _rounding(bottom):
                 return None
             vals["low"] = bottom
 
         return Bar(day, vals["open"], vals["high"], vals["low"], vals["close"], volume)
+
+
+def _rounding(price: float) -> float:
+    """The most a high or low may miss the body by and still be a rounding."""
+    # The 1e-9 absorbs binary floating point: 773.24 - 773.23 is 0.00999...97.
+    return max(OHLC_ROUNDING_CENTS, price * OHLC_ROUNDING_SHARE) + 1e-9
 
 
 def _guarded_read(source, symbol, breaker, opener, req, timeout, sleep) -> str:
