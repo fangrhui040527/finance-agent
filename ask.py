@@ -337,16 +337,39 @@ def _index_feed(feed):
     return YahooFeed(cache=cache, range_=INDEX_RANGE)
 
 
-def _prices_index(feed, members: list[str], already: set[str]) -> tuple[int, int, list[str]]:
-    """Fetch the index members the book loop did not; (cached, asked, failed ids)."""
+#: How long `prices --book` keeps STARTING fetches. The step sits between the
+#: sweep (which stops starting requests at SWEEP_DEADLINE_SECONDS) and the
+#: commit inside a 25-minute job, and a job killed by that cap commits nothing:
+#: on 2026-09-29 the step took 15m16s of it. Past the budget the names not yet
+#: asked are skipped and listed; the book and its proxies are asked first, so
+#: they are the last to go. One fetch already in flight finishes - each request
+#: is bounded by its feed's TIMEOUT (`_guarded_read`), two feeds at most.
+PRICES_BUDGET_SECONDS = 240
+
+
+def _prices_clock() -> float:
+    """Seconds, for the budget. A seam, so a test can make a fetch slow."""
+    import time
+
+    return time.monotonic()
+
+
+def _prices_index(
+    feed, members: list[str], already: set[str], deadline: float | None = None
+) -> tuple[int, int, list[str], list[str]]:
+    """Fetch the index members the book loop did not; (cached, asked, failed, skipped ids)."""
     import time
 
     todo = [i for i in members if i not in already]
     if not todo:
-        return 0, 0, []
+        return 0, 0, [], []
     idx = _index_feed(feed)
     failed: list[str] = []
+    skipped: list[str] = []
     for iid in todo:
+        if deadline is not None and _prices_clock() >= deadline:
+            skipped.append(iid)
+            continue
         before = idx.fetched_at(iid)
         try:
             idx.fetch(iid)
@@ -355,7 +378,8 @@ def _prices_index(feed, members: list[str], already: set[str]) -> tuple[int, int
             print(f"  {iid:<14} FAILED  {str(e).splitlines()[0][:120]}  (index)", file=sys.stderr)
         if idx.fetched_at(iid) != before or iid in failed:
             time.sleep(INDEX_FETCH_PAUSE)
-    return len(todo) - len(failed), len(todo), failed
+    asked = len(todo) - len(skipped)
+    return asked - len(failed), asked, failed, skipped
 
 
 def _prices_book(a) -> int:
@@ -369,7 +393,8 @@ def _prices_book(a) -> int:
     workup and comps read their bars from the same cache, and until
     2026-09-19 nothing refetched them: sixteen peer rows sat two and three
     weeks behind the book beside them. Exit 3 if any name could not be
-    fetched; the others are still cached.
+    fetched, or was not reached inside PRICES_BUDGET_SECONDS; the others are
+    still cached.
     """
     from core.market.feed import market_proxy_for
 
@@ -396,8 +421,13 @@ def _prices_book(a) -> int:
 
     names = book + proxies + list(peers)
     failed = 0
+    skipped: list[str] = []
     feed = _feed()
+    deadline = _prices_clock() + PRICES_BUDGET_SECONDS
     for iid in names:
+        if _prices_clock() >= deadline:
+            skipped.append(iid)
+            continue
         try:
             series = feed.fetch(iid)
         except PriceFeedError as e:
@@ -411,9 +441,15 @@ def _prices_book(a) -> int:
             f"  via {feed.source_used}{tag}"
         )
     print(
-        f"  {'cached':<14} {len(names) - failed} of {len(names)}"
+        f"  {'cached':<14} {len(names) - failed - len(skipped)} of {len(names)}"
         f"  ({len(book)} book, {len(proxies)} proxies, {len(peers)} peers)"
     )
+    if skipped:
+        print(
+            f"  {'skipped':<14} {len(skipped)} not asked: the {PRICES_BUDGET_SECONDS}s budget "
+            f"was spent: {', '.join(skipped)}",
+            file=sys.stderr,
+        )
     # The index book's members, once the ledger has opened it. After the book
     # so every name the book loop fetched at full history is a cache hit here.
     # Their failures are printed and counted apart and do not set the exit
@@ -425,13 +461,21 @@ def _prices_book(a) -> int:
         print(f"  {'index':<14} skipped: {type(e).__name__}: {e}", file=sys.stderr)
         members = []
     if members:
-        cached, asked, index_failed = _prices_index(feed, members, set(names))
+        cached, asked, index_failed, index_skipped = _prices_index(
+            feed, members, set(names), deadline
+        )
         tail = f"; failed: {', '.join(index_failed)}" if index_failed else ""
         print(
             f"  {'index':<14} {cached} of {asked} members not already above cached"
             f" ({len(members)} in the universe, range {INDEX_RANGE}){tail}"
         )
-    return 3 if failed else 0
+        if index_skipped:
+            print(
+                f"  {'index':<14} {len(index_skipped)} members not asked: the "
+                f"{PRICES_BUDGET_SECONDS}s budget was spent: {', '.join(index_skipped)}",
+                file=sys.stderr,
+            )
+    return 3 if failed or skipped else 0
 
 
 # --- thesis and its red team ---------------------------------------------

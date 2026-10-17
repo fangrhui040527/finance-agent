@@ -142,6 +142,18 @@ def test_a_stopped_upstream_reads_ended_not_stale():
     assert "STALE" not in label
 
 
+def test_freds_copy_of_imf_pcps_reads_ended_from_the_2026_10_17_probe():
+    """PALUMUSDM and its PCPS siblings on FRED stopped together at 2026-07; the
+    monitor reopened "past its cadence" on it every night with nothing to do."""
+    from knowledge.sources.freshness import ENDED, has_resumed
+
+    assert age_label("PALUMUSDM", date(2026, 7, 1), date(2026, 10, 17)) == "108d ENDED 2026-07"
+    assert ENDED["PALUMUSDM"].checked_on == date(2026, 10, 17)
+    # A print past July is the upstream coming back, and is said loudly.
+    assert has_resumed("PALUMUSDM", date(2026, 8, 1))
+    assert not has_resumed("PALUMUSDM", date(2026, 7, 1))
+
+
 def test_the_probe_verdict_matches_what_the_collector_last_stored():
     """The recorded last period is the API's answer. If a later run stores a
     newer point these dates are wrong, which `has_resumed` is there to catch."""

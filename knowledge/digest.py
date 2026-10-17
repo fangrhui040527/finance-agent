@@ -104,7 +104,13 @@ class Digest:
             default=str,
         )
 
-    def to_markdown(self) -> str:
+    def to_markdown(self, refs: dict[str, str] | None = None) -> str:
+        """The page. `refs` (doc_id -> how to cite it, `Corpus.short_ids`) is
+        the feedback pack's: given it, each story line also carries its
+        publication time in UTC and its corpus key, because the nightly page
+        cites a cause by `doc_id` and times it against the close, and a line
+        with neither sent the writer to corpus.db by hand. The published
+        digest leaves both out and reads as it always has."""
         out = [f"# Digest {self.day}", ""]
         out.append(
             f"Generated {self.generated_at} · slot `{self.slot}` · "
@@ -130,9 +136,15 @@ class Digest:
                 star = " ★" if s["escalated"] else ""
                 # None: stored before the quality score existed, not "worthless".
                 q = "–" if s["quality"] is None else f"{s['quality']:.2f}"
+                when, cite = s["published_at"][:10], ""
+                if refs is not None:
+                    at = datetime.fromisoformat(s["published_at"])
+                    at = (at if at.tzinfo else at.replace(tzinfo=UTC)).astimezone(UTC)
+                    when = f"{at:%Y-%m-%d %H:%M}Z"
+                    cite = f" · doc_id `{refs.get(s['doc_id'], s['doc_id'])}`"
                 out.append(
-                    f"- {s['published_at'][:10]} {s['domain']} — {s['title']} "
-                    f"[q {q}, tone {s['polarity']:+.1f}]{star}"
+                    f"- {when} {s['domain']} — {s['title']} "
+                    f"[q {q}, tone {s['polarity']:+.1f}]{star}{cite}"
                 )
             for e in n.events:
                 out.append(f"- event {e['when'][:10]} {e['kind']} — {e['title']} ({e['source']})")
@@ -233,7 +245,16 @@ def build_digest(
         ]
         for iid in book:
             forms = {iid, canonical(iid) or iid}
-            mine = [a for a in articles if forms & set(a.instruments)]
+            # A bank named only as the AUTHOR of a broker's note on another
+            # company is linked - it is mentioned - but the note is not news
+            # about the bank: on 2026-10-15 six of Maybank's eight rows here
+            # were Maybank Securities / IB calls on other names. Read from the
+            # text now, like the gate below, so stored rows obey it too.
+            mine = [
+                a
+                for a in articles
+                if forms & set(a.instruments) and not forms & linker.authored(a.text)
+            ]
             digest.names.append(
                 _name_digest(iid, mine, facts, now, linker, extractor, top_n, set(book))
             )

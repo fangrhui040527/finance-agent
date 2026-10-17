@@ -103,6 +103,27 @@ def test_the_same_members_with_a_new_age_write_nothing(tmp_path, monkeypatch):
     assert _states(adb) == ["opened"]
 
 
+def test_an_alert_in_the_committed_log_is_still_open_in_the_next_fresh_clone(tmp_path, monkeypatch):
+    """M9: the collector now runs `watch` and commits data/alerts.db. That makes
+    NEW mean "first seen" for the nightly routine only if the FILE carries what
+    the run recorded once `watch` exits - the log is in WAL mode, and a row left
+    in a -wal journal is a row git never sees. The routine's clone is the
+    committed file and nothing else; its own writes are thrown away with it."""
+    import shutil
+
+    runner = tmp_path / "runner" / "alerts.db"
+    first = _check(monkeypatch, str(runner), _silence("gdelt"), T0)
+    assert [a.rule for a in first.opened] == ["sweep_silence"]
+    for night in (1, 2):  # two nights, each from the committed copy alone
+        clone = tmp_path / f"clone{night}" / "alerts.db"
+        clone.parent.mkdir()
+        shutil.copyfile(runner, clone)
+        at = T0 + timedelta(days=night)
+        seen = _check(monkeypatch, str(clone), _silence("gdelt", hours=33 + 24 * night), at)
+        assert seen.opened == [] and [a.rule for a in seen.still_open] == ["sweep_silence"]
+        assert "NEW" not in seen.render()
+
+
 def test_every_reader_shows_the_latest_title(tmp_path, monkeypatch, capsys):
     import ask
     from mcp_server.observability import open_alerts

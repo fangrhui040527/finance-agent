@@ -124,6 +124,19 @@ RSS_SOURCES: dict[str, tuple[str, str]] = {
 }
 
 
+#: Feeds that read past their first page: name -> (pages, parameter, first
+#: page number). Only what a runner probe has shown serving OLDER items on the
+#: second page. NST's site feed holds 50 items, about four hours of the paper,
+#: and the Bursa sweeps are most of a day apart: every sweep from 2026-09-14
+#: overflowed, 16.8h unseen on 2026-10-16. The 2026-10-17 bursa-feeds-probe
+#: read `/feed?paged=2` as 50 further items reaching 10.2h further back (and
+#: `?page=1` as the first page again: WordPress, counted from 1). FMT is not
+#: here: its `paged` and `page` forms both serve the first page again.
+PAGED: dict[str, tuple[int, str, int]] = {
+    "nst_business": (3, "paged", 1),
+}
+
+
 def is_news_source(name: str) -> bool:
     return name in FACTORIES or name in RSS_SOURCES
 
@@ -134,6 +147,9 @@ def adapter_for(name: str, **kwargs) -> FeedAdapter:
         return FACTORIES[name](**kwargs)
     if name in RSS_SOURCES:
         url, trust = RSS_SOURCES[name]
+        if name in PAGED and "pages" not in kwargs:
+            pages, param, first = PAGED[name]
+            kwargs = {**kwargs, "pages": pages, "page_param": param, "first_page": first}
         return RssFeed(url, name=name, trust=trust, **kwargs)
     known = sorted(list(FACTORIES) + list(RSS_SOURCES))
     raise UnknownSource(
