@@ -388,7 +388,11 @@ def _guarded_read(source, symbol, breaker, opener, req, timeout, sleep) -> str:
     from core.net.retry import with_retry
 
     def _transport() -> bytes:
-        with opener(req, timeout=timeout) as resp:
+        # Each attempt gets what is LEFT of the request's timeout, not all of
+        # it again: an attempt that starts at 29 s of 30 is bounded at 1 s,
+        # so a request costs about its timeout however its attempts fall.
+        left = max(timeout - (_clock() - started), 0.001)
+        with opener(req, timeout=left) as resp:
             return resp.read()
 
     started = _clock()

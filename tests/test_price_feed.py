@@ -150,7 +150,8 @@ def test_a_timeout_that_answers_fast_is_still_retried_inside_the_budget(monkeypa
     monkeypatch.setattr(StooqFeed, "TIMEOUT", 30)
     with pytest.raises(PriceFeedError, match="fetch failed"):
         StooqFeed(opener=flaky, sleep=lambda s: None).fetch("XNAS:NVDA")
-    assert len(asked) == 3, asked
+    # Each attempt is handed what is left of the 30 s, not 30 s again.
+    assert asked == [30, 28, 26], asked
 
 
 def test_a_failure_that_answers_fast_is_still_retried():
