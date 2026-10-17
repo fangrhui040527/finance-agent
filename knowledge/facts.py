@@ -109,6 +109,37 @@ _EVENT_WHEN = (
     k=", ".join(f"'{x}'" for x in sorted(FILED_KINDS)),
 )
 
+#: The day an observation is knowable, as every read windows, orders and returns it.
+#:
+#: A derived row - a quarter sec_xbrl computes because nobody reported it - is
+#: knowable no earlier than the last of its inputs. The collector has dated it
+#: so since 2026-10-08 and names each input with its filed date. Before that a
+#: fourth quarter (FY - Q1..Q3) took the 10-K's date and the newest version of
+#: each quarter, and the store kept those rows: on 2026-10-17, 6 of its 309 were
+#: dated before their last quarter was filed - MSFT's FY25 Q4 depreciation
+#: (6.3B) "known" 2025-07-30 from quarters filed up to 2026-04-29 among them
+#: (facts-valuation-3). The store is append-only and ignores a value it already
+#: holds, so re-collecting never moves them; the stamp is corrected where it is
+#: read, as `_EVENT_WHEN` does for legacy filings. A row naming its inputs is
+#: knowable on the latest of their filed dates. A legacy fourth quarter names
+#: none, and is knowable on the latest known_at among the quarters the run that
+#: computed it held: same source, name and concept, period ending in the 300
+#: days before its own (the collector's window), fetched no later than it was.
+#: That run read the newest of each, so that is the day its value could first
+#: be computed - the 10-K day itself for the other 303.
+_OBS_KNOWN = """(CASE
+    WHEN json_extract(o.payload_json, '$.derived') IS NULL THEN o.known_at
+    WHEN json_extract(o.payload_json, '$.inputs') IS NOT NULL THEN MAX(o.known_at, COALESCE(
+        (SELECT MAX(json_extract(i.value, '$.filed'))
+         FROM json_each(o.payload_json, '$.inputs') AS i), o.known_at))
+    WHEN json_extract(o.payload_json, '$.derived') = 'FY - Q1..Q3' THEN MAX(o.known_at, COALESCE(
+        (SELECT MAX(q.known_at) FROM observations q
+         WHERE q.source = o.source AND q.instrument_id = o.instrument_id
+           AND q.concept = o.concept AND q.period_end < o.period_end
+           AND q.period_end >= date(o.period_end, '-300 days')
+           AND q.fetched_at <= o.fetched_at), o.known_at))
+    ELSE o.known_at END)"""
+
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS observations (
     source         TEXT NOT NULL,
@@ -496,7 +527,7 @@ class FactBook:
         source: str | None = None,
         limit: int = 500,
     ) -> list[Observation]:
-        sql, where, args = ["SELECT * FROM observations"], [], []
+        sql, where, args = [f"SELECT *, {_OBS_KNOWN} AS knowable FROM observations o"], [], []
         if instrument_id is not None:
             where.append("instrument_id = ?")
             args.append(instrument_id)
@@ -504,7 +535,7 @@ class FactBook:
             where.append("concept = ?")
             args.append(concept)
         if asof is not None:
-            where.append("known_at <= ?")
+            where.append(f"{_OBS_KNOWN} <= ?")
             args.append(asof.isoformat())
         if source is not None:
             where.append("source = ?")
@@ -513,7 +544,7 @@ class FactBook:
             sql.append("WHERE " + " AND ".join(where))
         # fetched_at breaks the tie between two readings of one snapshot on one
         # day (two sweeps, two values): the later read is the current one.
-        sql.append("ORDER BY period_end DESC, known_at DESC, concept, fetched_at DESC LIMIT ?")
+        sql.append("ORDER BY period_end DESC, knowable DESC, concept, fetched_at DESC LIMIT ?")
         args.append(max(1, limit))
         return [self._to_observation(r) for r in self.conn.execute(" ".join(sql), args)]
 
@@ -681,10 +712,13 @@ class FactBook:
 
         store = FactStore()
         wanted = set(instrument_ids) if instrument_ids else None
-        sql = "SELECT * FROM observations WHERE period_end <> '' AND value_num IS NOT NULL"
+        sql = (
+            f"SELECT *, {_OBS_KNOWN} AS knowable FROM observations o"
+            " WHERE period_end <> '' AND value_num IS NOT NULL"
+        )
         args: list = []
         if asof is not None:
-            sql += " AND known_at <= ?"
+            sql += f" AND {_OBS_KNOWN} <= ?"
             args.append(asof.isoformat())
         for r in self.conn.execute(sql, args):
             iid = r["instrument_id"]
@@ -702,7 +736,7 @@ class FactBook:
                     instrument_id=iid,
                     concept=r["concept"],
                     period_end=date.fromisoformat(r["period_end"]),
-                    known_at=date.fromisoformat(r["known_at"]),
+                    known_at=date.fromisoformat(r["knowable"]),
                     value=Decimal(r["value_text"]),
                     currency=r["currency"] or "",
                     accounting_standard=standard,
@@ -726,7 +760,8 @@ class FactBook:
             source=r["source"],
             instrument_id=r["instrument_id"],
             concept=r["concept"],
-            known_at=date.fromisoformat(r["known_at"]),
+            # `_OBS_KNOWN`: the stored stamp, or a derived row's last input's.
+            known_at=date.fromisoformat(r["knowable"]),
             value=value,
             text="" if value is not None else r["value_text"],
             period_end=date.fromisoformat(r["period_end"]) if r["period_end"] else None,
