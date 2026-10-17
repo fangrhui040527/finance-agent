@@ -1,6 +1,6 @@
 # Digest 2026-10-17
 
-Generated 2026-10-17 13:01 UTC · slot `all` · 19476 articles in the corpus, 5750 observations, 4231 events in the fact book.
+Generated 2026-10-17 22:43 UTC · slot `all` · 19683 articles in the corpus, 5789 observations, 4233 events in the fact book.
 
 ## The book
 
@@ -36,34 +36,35 @@ Generated 2026-10-17 13:01 UTC · slot `all` · 19476 articles in the corpus, 57
 - 2026-10-16 tradersunion.com — Genting steps up share purchases as the price nears a two-decade low [q 0.65, tone +0.0]
 
 ### NVIDIA (XNAS:NVDA)
-- tone: 45 stories from 24 sources, polarity +0.04, peak intensity 0.67, uncertainty 0.04 · 8 escalated
+- tone: 88 stories from 32 sources, polarity +0.01, peak intensity 0.67, uncertainty 0.06 · 15 escalated
+- 2026-10-17 Yahoo — What Danaher Stock's AI Lab Push Means For Shareholders [q 0.85, tone +0.0] ★
+- 2026-10-17 Yahoo — What Akamai Technologies (AKAM)'s Cloud Customer Wins Mean For Shareholders [q 0.85, tone +1.0] ★
+- 2026-10-17 Yahoo — CoreWeave Stock Faces A Debt Funding Test [q 0.85, tone -1.0] ★
+- 2026-10-16 Yahoo — Applied Materials (AMAT) Opened Its $5 Billion EPIC Center [q 0.85, tone +0.0] ★
 - 2026-10-16 Yahoo — CoreWeave, Nebius, and Neoclouds Sink as Market Fear Index Closes in on ‘Extreme Fear’ [q 0.85, tone -0.3] ★
 - 2026-10-16 247wallst.com — The Next Stock Market Crash Could Start With Just 3 Companies [q 0.85, tone +1.0] ★
 - 2026-10-16 Yahoo — CoreWeave Stock Rally Fizzles Despite ARK's Wood, Nvidia Support [q 0.85, tone -1.0] ★
 - 2026-10-16 Yahoo — SANGRIX Sets November 2026 Delivery Schedule for 128 NVIDIA Blackwell B300 GPUs in Malaysia [q 0.85, tone +0.0] ★
-- 2026-10-16 www.barrons.com — Why Nvidia Stock Can Defy the Broader Chip Sector Slump [q 0.80, tone +0.0] ★
-- 2026-10-16 www.tikr.com — Germany Confirms Its Nvidia AI Deal: Will Any of Huang’s $2 Billion Europe Pledge Land in Berlin? [q 0.65, tone +0.0] ★
-- 2026-10-16 www.tradingkey.com — Nvidia Stock Price Forecast: Jensen Huang Says AI Chip Demand Is Strong, Dan Ives Sees Selloff as Buying Opportunity; Can the Stock Return to an Uptrend? [q 0.65, tone +1.0] ★
-- 2026-10-16 www.stocktitan.net — NVIDIA’s AI model matched or beat rivals on six of seven measures in Navan’s tests. [q 0.65, tone +1.0] ★
-- snapshot: P/E (ttm) 26.88 (finnhub, 2026-10-16) · P/B 28.81 (finnhub, 2026-10-16) · EPS (ttm) 7.91 (finnhub, 2026-10-16) · dividend yield 0.03 (finnhub, 2026-10-16) · beta 2.26 (finnhub, 2026-10-16) · 52w high 243.37 (finnhub, 2026-10-16) · 52w low 164.27 (finnhub, 2026-10-16) · target (consensus) 339.17 (fmp, 2026-10-16) · analysts: buy 41 (finnhub, 2026-09-05) · analysts: hold 3 (finnhub, 2026-09-05) · analysts: sell 1 (finnhub, 2026-09-05) · vendor sentiment 0.25 (alphavantage_news, 2026-10-06) · revenue (last quarter) 96.22bn (sec_xbrl, 2026-08-26) · net income (last quarter) 59.69bn (sec_xbrl, 2026-08-26) · last EPS surprise % 3.82 (finnhub, 2026-09-05)
+- snapshot: P/E (ttm) 26.88 (finnhub, 2026-10-17) · P/B 28.81 (finnhub, 2026-10-17) · EPS (ttm) 7.91 (finnhub, 2026-10-17) · dividend yield 0.03 (finnhub, 2026-10-17) · beta 2.26 (finnhub, 2026-10-17) · 52w high 243.37 (finnhub, 2026-10-17) · 52w low 164.27 (finnhub, 2026-10-17) · target (consensus) 339.17 (fmp, 2026-10-16) · analysts: buy 41 (finnhub, 2026-09-05) · analysts: hold 3 (finnhub, 2026-09-05) · analysts: sell 1 (finnhub, 2026-09-05) · vendor sentiment 0.25 (alphavantage_news, 2026-10-06) · revenue (last quarter) 96.22bn (sec_xbrl, 2026-08-26) · net income (last quarter) 59.69bn (sec_xbrl, 2026-08-26) · last EPS surprise % 3.82 (finnhub, 2026-09-05)
 
 ### Apple (XNAS:AAPL)
-- tone: 63 stories from 36 sources, polarity +0.10, peak intensity 0.33, uncertainty 0.04 · 12 escalated
+- tone: 101 stories from 47 sources, polarity +0.04, peak intensity 0.33, uncertainty 0.05 · 19 escalated
 - 2026-10-16 247wallst.com — The Next Stock Market Crash Could Start With Just 3 Companies [q 0.85, tone +1.0] ★
 - 2026-10-16 Yahoo — iPhone Duo in Short Supply After Shipments Slip Into 2027 [q 0.85, tone +1.0] ★
 - 2026-10-16 Yahoo — We are Only 'Third Inning Relative to this AI Game,' Says Dan Ives [q 0.85, tone +0.0] ★
+- 2026-10-17 finance.yahoo.com — Apple bets on the same Siri AI technology with new HomeView device that led to a $250M settlement for iPhone users [q 0.80, tone -1.0] ★
+- 2026-10-17 finance.yahoo.com — Apple Hit a Record Close Ahead of Its November 2 Report. Here’s What Charging for Extra Siri AI Could Mean for the Stock [q 0.80, tone +1.0] ★
+- 2026-10-17 www.investing.com — Will Starlink Mobile matter for Apple? [q 0.80, tone +0.0] ★
+- 2026-10-16 finance.yahoo.com — Prediction: Alphabet Will Be a Larger Company Than Apple by the End of 2027 [q 0.80, tone +0.0] ★
 - 2026-10-16 www.barrons.com — Apple iPhone Duo Preorders Are Off to a Strong Start. That’s a Win for the Stock. [q 0.80, tone +1.0] ★
-- 2026-10-16 www.fool.com — Stock Market Today, Oct. 16: Apple Edges Higher on iPhone Duo Preorder Surge [q 0.65, tone +1.0] ★
-- 2026-10-16 www.cbsnews.com — iPhone Duo already backordered until 2027 as pre-order sales soar [q 0.65, tone +1.0] ★
-- 2026-10-16 247wallst.com — Apple and Samsung Are Nearly Tied as Global Phone Shipments Collapse [q 0.65, tone +0.0] ★
-- 2026-10-16 www.forbes.com — Apple Pay Arrives In India A Decade Late, In A Market UPI Already Won [q 0.65, tone +1.0] ★
 - upcoming 2026-11-02 earnings_result — Q4 2026 results after the close (finnhub)
 - upcoming 2026-10-29 earnings_result — Q4 2026 results after the close (finnhub)
 - upcoming 2026-10-28 earnings_result — Q4 2026 results after the close (finnhub)
-- snapshot: P/E (ttm) 38.83 (finnhub, 2026-10-16) · P/B 50.98 (finnhub, 2026-10-16) · EPS (ttm) 8.72 (finnhub, 2026-10-16) · dividend yield 0.51 (finnhub, 2026-10-16) · beta 1.11 (finnhub, 2026-10-16) · 52w high 348.15 (finnhub, 2026-10-16) · 52w low 243.42 (finnhub, 2026-10-16) · target (consensus) 341.68 (fmp, 2026-10-16) · analysts: buy 22 (finnhub, 2026-09-05) · analysts: hold 15 (finnhub, 2026-09-05) · analysts: sell 3 (finnhub, 2026-09-05) · vendor sentiment -0.23 (alphavantage_news, 2026-10-06) · revenue (last quarter) 109.42bn (sec_xbrl, 2026-07-31) · net income (last quarter) 29.79bn (sec_xbrl, 2026-07-31) · last EPS surprise % -0.89 (finnhub, 2026-09-05)
+- snapshot: P/E (ttm) 38.83 (finnhub, 2026-10-17) · P/B 50.98 (finnhub, 2026-10-17) · EPS (ttm) 8.72 (finnhub, 2026-10-17) · dividend yield 0.51 (finnhub, 2026-10-17) · beta 1.11 (finnhub, 2026-10-17) · 52w high 348.15 (finnhub, 2026-10-17) · 52w low 243.42 (finnhub, 2026-10-17) · target (consensus) 341.68 (fmp, 2026-10-16) · analysts: buy 22 (finnhub, 2026-09-05) · analysts: hold 15 (finnhub, 2026-09-05) · analysts: sell 3 (finnhub, 2026-09-05) · vendor sentiment -0.23 (alphavantage_news, 2026-10-06) · revenue (last quarter) 109.42bn (sec_xbrl, 2026-07-31) · net income (last quarter) 29.79bn (sec_xbrl, 2026-07-31) · last EPS surprise % -0.89 (finnhub, 2026-09-05)
 
 ### Microsoft (XNAS:MSFT)
-- tone: 40 stories from 28 sources, polarity +0.12, peak intensity 0.33, uncertainty 0.11 · 12 escalated
+- tone: 58 stories from 33 sources, polarity +0.10, peak intensity 0.33, uncertainty 0.08 · 16 escalated
+- 2026-10-17 SeekingAlpha — ClearBridge Large Cap Growth ESG Strategy Q3 2026 Portfolio Update [q 0.85, tone +1.0] ★
 - 2026-10-16 247wallst.com — The Next Stock Market Crash Could Start With Just 3 Companies [q 0.85, tone +1.0] ★
 - 2026-10-16 SeekingAlpha — If AI Crumbles, Microsoft Wins [q 0.85, tone +1.0] ★
 - 2026-10-16 Yahoo — NiSource Expands Microsoft Power Deal, Projects $1.75B In Customer Savings [q 0.85, tone +0.0] ★
@@ -71,10 +72,9 @@ Generated 2026-10-17 13:01 UTC · slot `all` · 19476 articles in the corpus, 57
 - 2026-10-16 seekingalpha.com — If AI Crumbles, Microsoft Wins (NASDAQ:MSFT) [q 0.80, tone +1.0] ★
 - 2026-10-16 finance.yahoo.com — Strong Azure Results Powered Microsoft Corporation’s (MSFT) Rally [q 0.80, tone +1.0] ★
 - 2026-10-16 www.reuters.com — UK competition regulator targets Microsoft's business software grip [q 0.80, tone +0.0] ★
-- 2026-10-16 www.moomoo.com — Dow Drops 131 Points On Losses For Salesforce, Microsoft Shares [q 0.65, tone -1.0] ★
 - upcoming 2026-10-28 earnings_result — Q1 2027 results (finnhub)
 - upcoming 2026-10-27 earnings_result — Q1 2027 results (finnhub)
-- snapshot: P/E (ttm) 29.76 (finnhub, 2026-10-16) · P/B 6.26 (finnhub, 2026-10-16) · EPS (ttm) 17.95 (finnhub, 2026-10-16) · dividend yield 0.79 (finnhub, 2026-10-16) · beta 1.06 (finnhub, 2026-10-16) · 52w high 553.72 (finnhub, 2026-10-16) · 52w low 349.20 (finnhub, 2026-10-16) · target (consensus) 591.58 (fmp, 2026-10-16) · analysts: buy 41 (finnhub, 2026-09-05) · analysts: hold 5 (finnhub, 2026-09-05) · analysts: sell 0 (finnhub, 2026-09-05) · vendor sentiment 0.29 (alphavantage_news, 2026-10-06) · revenue (last quarter) 90.01bn (sec_xbrl, 2026-07-29) · net income (last quarter) 35.77bn (sec_xbrl, 2026-07-29) · last EPS surprise % 9.53 (finnhub, 2026-09-05)
+- snapshot: P/E (ttm) 29.76 (finnhub, 2026-10-17) · P/B 6.26 (finnhub, 2026-10-17) · EPS (ttm) 17.95 (finnhub, 2026-10-17) · dividend yield 0.79 (finnhub, 2026-10-17) · beta 1.06 (finnhub, 2026-10-17) · 52w high 553.72 (finnhub, 2026-10-17) · 52w low 349.20 (finnhub, 2026-10-17) · target (consensus) 591.58 (fmp, 2026-10-16) · analysts: buy 41 (finnhub, 2026-09-05) · analysts: hold 5 (finnhub, 2026-09-05) · analysts: sell 0 (finnhub, 2026-09-05) · vendor sentiment 0.29 (alphavantage_news, 2026-10-06) · revenue (last quarter) 90.01bn (sec_xbrl, 2026-07-29) · net income (last quarter) 35.77bn (sec_xbrl, 2026-07-29) · last EPS surprise % 9.53 (finnhub, 2026-09-05)
 
 ## Macro
 
@@ -101,6 +101,14 @@ Generated 2026-10-17 13:01 UTC · slot `all` · 19476 articles in the corpus, 57
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 22:42 | eodhd | ok | 0 | 0 | 0 | skipped: every asked name was refused: outside the plan or over today's credits  |
+| 22:42 | jin10_flash | degraded | 19 | 19 | 19 | facts 0; window not covered back to 2026-10-17 13:00Z; the oldest item read is 2 |
+| 22:42 | alphavantage_news | failed | 0 | 0 | 0 | alphavantage refused a premium endpoint (the key's plan does not include it): Th |
+| 22:42 | finnhub | ok | 134 | 117 | 64 | facts 41;  |
+| 22:42 | edgar | ok | 0 | 0 | 0 | facts 0;  |
+| 22:42 | yahoo_rss | ok | 46 | 46 | 24 | named the company: 20 of 46 (lowest: NVIDIA 3/19, Microsoft 3/8, Apple 14/19) |
+| 22:42 | google_news | ok | 135 | 117 | 100 | named the company: 100 of 117 (lowest: Microsoft 20/27, NVIDIA 40/47, Apple 40/4 |
+| 22:42 | gdelt | failed | 0 | 0 | 0 | no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP |
 | 13:00 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
 | 13:00 | twse_openapi | ok | 8 | 0 | 0 | facts 5;  |
 | 13:00 | jin10_flash | degraded | 16 | 16 | 16 | facts 0; window not covered back to 2026-10-16 22:46Z; the oldest item read is 2 |
