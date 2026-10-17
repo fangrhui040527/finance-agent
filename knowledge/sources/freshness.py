@@ -190,6 +190,17 @@ ENDED: dict[str, Ended] = {
     for sid in sids
 }
 
+#: The 2026-10-17 runner probe (.github/scripts/macro_alternatives_probe.py):
+#: FRED's copies of IMF PCPS stop together at 2026-07 - PALUMUSDM, and its
+#: siblings POILBREUSDM and PNGASJPUSDM, each read 108 days old - three
+#: releases past the ~80 days a healthy PCPS series reaches (MONTHLY above).
+#: Which one stopped, the IMF or FRED's ingestion of it, the probe cannot
+#: tell, and it does not change the answer: nothing already wired carries the
+#: aluminium price live. The World Bank Pink Sheet does, as an XLSX the
+#: collector cannot read yet. Brent never needed this: DCOILBRENTEU is the
+#: EIA's own daily series and read 3 days old the same morning.
+ENDED["PALUMUSDM"] = Ended(date(2026, 7, 1), "IMF/PCPS via FRED", _FROZEN, date(2026, 10, 17))
+
 
 def ended(series_id: str) -> Ended | None:
     """The stopped-upstream verdict for this series, or None if it still runs."""
