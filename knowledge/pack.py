@@ -631,6 +631,7 @@ def build_pack(
         for iid in book_ids:
             out.append("```")
             out.append(fact_snapshot(book, iid, now=now, days=7))
+            out.append(_dividends_held(feed, iid, day))
             out.append("```")
             out.append("")
         read_only: tuple[str, ...] = tuple(getattr(cfg, "read_only", None) or ())
@@ -651,6 +652,39 @@ def build_pack(
         out += [f"- knowledge/feedback/{p}" for p in prev] or ["- none yet"]
         out.append("")
     return "\n".join(out)
+
+
+#: How many of a name's ex-dates the facts block lists, newest first.
+DIVIDENDS_LISTED = 3
+
+
+def _dividends_held(feed, instrument_id: str, day: date) -> str:
+    """The ex-dates the PRICE feed read for a name, under its fact-book block.
+
+    The fact book holds nothing for a Bursa name - no free source there sends
+    figures or entitlement dates, so its block reads NOTHING COLLECTED - and
+    every page from 2026-09-23 carried the question "which source carries
+    Bursa ex-dates?". One already did: the price feed reads each name's
+    dividends with its bars (Yahoo's chart actions, `dividend` in
+    price_cache.db), and the move rows and the paper book's dividend credits
+    use them, but the facts block never showed them, so the page could not see
+    an ex-date inside a window it was explaining. Only ex-dates on or before
+    `day`: what the pack measures is what was knowable then.
+    """
+    head = f"\n  dividends the price feed read (ex-date, per share; newest {DIVIDENDS_LISTED})"
+    try:
+        series = feed.fetch(instrument_id, end=day)
+    except PriceFeedError as e:
+        return f"{head}\n    cannot read: {str(e).splitlines()[0][:120]}"
+    source = getattr(series, "actions_source", None)
+    if source is None:
+        return f"{head}\n    NO DIVIDEND DATA: the feed read no dividends for this name"
+    held = [a for a in series.dividends() if a.ex_date <= day][-DIVIDENDS_LISTED:]
+    if not held:
+        return f"{head}\n    none in the {source} history held for this name"
+    ccy = market_currency(mic_of(instrument_id))
+    rows = [f"    {a.ex_date}  {a.amount:g} {ccy}  ({source})" for a in reversed(held)]
+    return "\n".join([head, *rows])
 
 
 def write_pack(text: str, day: date, root: str | Path = PACK_DIR) -> Path:

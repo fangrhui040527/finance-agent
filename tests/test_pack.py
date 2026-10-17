@@ -593,3 +593,47 @@ def test_a_nasdaq_name_is_measured_in_its_own_currency_and_says_the_myr_leg_is_n
     assert local.currency == "MYR" and "leg not measured" not in local.estimation
     paper = measure(FakeFeed(), "XNAS:NVDA", "NVIDIA", DAY, "USD")  # the USD paper book
     assert "leg not measured" not in paper.estimation
+
+
+class DividendFeed(FakeFeed):
+    """FakeFeed whose MYX:1155 series carries Yahoo-read dividends, one of them
+    after the pack's day, and whose NVIDIA series was read with no actions."""
+
+    def fetch(self, iid, start=None, end=None):
+        from core.market.prices import ActionKind, CorporateAction
+
+        s = super().fetch(iid, start, end)
+        if iid == "MYX:1155":
+            acts = [
+                CorporateAction(date(2025, 9, 11), ActionKind.DIVIDEND, amount=0.30),
+                CorporateAction(date(2026, 3, 12), ActionKind.DIVIDEND, amount=0.33),
+                CorporateAction(date(2026, 8, 20), ActionKind.DIVIDEND, amount=0.31),
+                CorporateAction(date(2026, 9, 23), ActionKind.DIVIDEND, amount=0.32),
+            ]
+            return PriceSeries(iid, s.raw(), acts, actions_source="yahoo")
+        return s
+
+
+def test_the_facts_block_lists_the_ex_dates_the_price_feed_read(tmp_path):
+    # The fact book is empty for a Bursa name, and printed NOTHING COLLECTED
+    # while the price cache held its ex-dates; the page could not see them.
+    text = build_pack(
+        Cfg(),
+        DAY,
+        corpus_path=str(tmp_path / "c.db"),
+        facts_path=str(tmp_path / "f.db"),
+        feed=DividendFeed(),
+        now=NOW,
+        previous_dir=None,
+    )
+    facts = text.split("## Facts, per name")[1]
+    maybank = facts.split("MYX:1155: what the collector holds")[1].split("```")[0]
+    assert "dividends the price feed read" in maybank
+    assert "2026-08-20  0.31 MYR  (yahoo)" in maybank
+    assert "2026-03-12  0.33 MYR  (yahoo)" in maybank
+    # Newest first, at most three, and nothing after the pack's day.
+    assert maybank.index("2026-08-20") < maybank.index("2026-03-12") < maybank.index("2025-09-11")
+    assert "2026-09-23" not in maybank
+    # A feed that read no actions says so rather than implying none were paid.
+    nvidia = facts.split("XNAS:NVDA: what the collector holds")[1].split("```")[0]
+    assert "NO DIVIDEND DATA: the feed read no dividends for this name" in nvidia
