@@ -69,6 +69,7 @@ jobs:
     runs-on: ubuntu-latest
     # SWEEP_DEADLINE_SECONDS stops new requests at 10 minutes so the run always
     # reaches the commit step; a job killed by this cap commits nothing at all.
+    # The price step has its own budget and cap for the same reason (below).
     timeout-minutes: 25
     defaults:
       run:
@@ -190,8 +191,17 @@ jobs:
       # not cost the sweep its commit - but non-fatal is not silent. Each one
       # writes a ::warning:: annotation when it exits non-zero, so a failure
       # shows on the run's summary page instead of in a log nobody opens.
+      #
+      # It also has a time limit of its own, because on 2026-09-29 it took
+      # 15m16s of the job's 25. `prices --book` stops starting fetches after
+      # PRICES_BUDGET_SECONDS (4 minutes) and lists what it did not reach, and
+      # each request is bounded by its feed's timeout; the step cap below is
+      # the backstop for a request that trickles past both, and
+      # continue-on-error lets the job go on to the commit if it is hit.
       - name: Cache the day's prices
         if: steps.slot.outputs.slot == 'bursa_close' || steps.slot.outputs.slot == 'us_close' || steps.slot.outputs.slot == 'all'
+        timeout-minutes: 8
+        continue-on-error: true
         run: |
           set +e
           uv run python ask.py prices --book

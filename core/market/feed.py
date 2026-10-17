@@ -336,7 +336,15 @@ def _guarded_read(source, symbol, breaker, opener, req, timeout, sleep) -> str:
     coverage, not an outage - and neither NoData nor an unmappable symbol
     ever trips the breaker. The Stooq HTML wall arrives as a 200, so it is
     handled at parse level and deliberately never retried here.
+
+    `timeout` bounds the REQUEST, not only each attempt: no retry starts once
+    the attempts so far have used it. urlopen's timeout is per socket wait, so
+    a host that hangs cost 3 x 30 s and the backoff, 91.5 s a name - and the
+    breaker opens only after five such failures, 7.6 minutes into a 25-minute
+    collector job that commits nothing if it is killed. A failure that answers
+    fast (a reset, a 503) is still retried as before.
     """
+    import time
     import urllib.error
 
     from core.net.breaker import CircuitOpen
@@ -346,10 +354,13 @@ def _guarded_read(source, symbol, breaker, opener, req, timeout, sleep) -> str:
         with opener(req, timeout=timeout) as resp:
             return resp.read()
 
+    started = time.monotonic()
     kwargs = {"sleep": sleep} if sleep is not None else {}
     try:
         breaker.before_call()
-        body = with_retry(_transport, **kwargs)
+        body = with_retry(
+            _transport, retryable=lambda _e: time.monotonic() - started < timeout, **kwargs
+        )
     except CircuitOpen as e:
         raise PriceFeedError(str(e)) from e
     except urllib.error.HTTPError as e:

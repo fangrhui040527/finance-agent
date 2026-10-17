@@ -109,6 +109,33 @@ def test_transport_failure_raises():
         StooqFeed(opener=open_).fetch("XNAS:NVDA")
 
 
+def test_a_host_that_hangs_costs_one_timeout_per_request_not_three(monkeypatch):
+    """urlopen's timeout is per socket wait, so a host that hangs was asked
+    three times at 30 s each - 91.5 s a name with the backoff, and five names
+    before the breaker opens. On 2026-09-29 the collector's price step took
+    15m16s of a 25-minute job. The request, not the attempt, is bounded now."""
+    import time
+
+    asked = []
+
+    def hang(req, timeout=None):
+        asked.append(timeout)
+        time.sleep(timeout)
+        raise TimeoutError("timed out")
+
+    monkeypatch.setattr(StooqFeed, "TIMEOUT", 0.05)
+    with pytest.raises(PriceFeedError, match="fetch failed"):
+        StooqFeed(opener=hang, sleep=lambda s: None).fetch("XNAS:NVDA")
+    assert asked == [0.05], "no second attempt once the request has used its timeout"
+
+
+def test_a_failure_that_answers_fast_is_still_retried():
+    from tests.conftest import scripted_opener
+
+    opener = scripted_opener([ConnectionResetError("reset by peer"), CSV])
+    assert len(StooqFeed(opener=opener, sleep=lambda s: None).fetch("XNAS:NVDA")) == 3
+
+
 def test_a_404_is_a_coverage_fact_not_an_outage():
     """404 used to collapse into the same error as a 503, so a symbol the
     source does not carry was indistinguishable from the source being down."""

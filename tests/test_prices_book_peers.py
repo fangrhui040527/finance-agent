@@ -104,6 +104,49 @@ def test_a_broken_graph_costs_the_peers_and_not_the_book(scripted, monkeypatch, 
     assert "cached         4 of 4" in captured.out
 
 
+class _Slow(_Scripted):
+    """Every fetch costs `seconds` on the clock the price step's budget reads."""
+
+    def __init__(self, clock: list[float], seconds: float) -> None:
+        super().__init__()
+        self.clock, self.seconds = clock, seconds
+
+    def fetch(self, iid, start=None, end=None):
+        self.clock[0] += self.seconds
+        return super().fetch(iid, start, end)
+
+    def fetched_at(self, iid):
+        return None
+
+
+def test_a_slow_feed_spends_the_budget_and_what_is_left_is_skipped_and_listed(monkeypatch, capsys):
+    """On 2026-09-29 `prices --book` took 15m16s of the collector's 25-minute
+    job, and a job killed at its cap commits nothing. The step stops starting
+    fetches once PRICES_BUDGET_SECONDS is spent; the book and proxies go first,
+    so they are the last to be dropped, and what was not asked is named."""
+    clock = [0.0]
+    book_feed, index_feed = _Slow(clock, 100.0), _Slow(clock, 100.0)
+    monkeypatch.setattr(ask, "_feed", lambda: ChainedFeed([book_feed]))
+    monkeypatch.setattr(
+        ask, "load_config", lambda: replace(load_config(), watchlist=BOOK, holdings=())
+    )
+    monkeypatch.setattr(ask, "_peer_lookup", lambda: None)
+    monkeypatch.setattr(ask, "_index_members", lambda cfg: ["MYX:7113", "MYX:7277"])
+    monkeypatch.setattr(ask, "_index_feed", lambda feed: index_feed)
+    monkeypatch.setattr(ask, "_prices_clock", lambda: clock[0])
+    assert ask.PRICES_BUDGET_SECONDS == 240
+    assert ask.main(["prices", "--book"]) == 3, "a name not reached is a name not cached"
+    out, err = capsys.readouterr()
+    # Started at 0, 100 and 200 seconds; at 300 the budget is spent.
+    assert book_feed.asked == ["MYX:1155", "XNAS:NVDA", "MYX:^KLSE"]
+    assert index_feed.asked == []
+    assert "cached         3 of 4  (2 book, 2 proxies, 0 peers)" in out
+    assert "skipped        1 not asked: the 240s budget was spent: XNAS:SPY" in err
+    assert (
+        "index          2 members not asked: the 240s budget was spent: MYX:7113, MYX:7277" in err
+    )
+
+
 def test_the_lookup_is_the_graph_when_one_is_built_and_none_when_it_is_not(tmp_path, monkeypatch):
     monkeypatch.setattr("knowledge.graph.build.DEFAULT_DB", str(tmp_path / "no-graph.db"))
     assert ask._peer_lookup() is None
