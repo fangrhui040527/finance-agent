@@ -257,10 +257,15 @@ class RssFeed(FeedAdapter):
             and oldest - since > self.OVERFLOW_TOLERANCE
         ):
             hours = (oldest - since).total_seconds() / 3600
+            # Both ends in UTC before they are printed with a "Z". `oldest` keeps
+            # the offset the feed dated it in, and NST dates +0800: the
+            # 2026-10-16 10:08Z sweep reported its oldest item at "14:58Z", six
+            # hours in the future, when the stored article said 06:58Z. The
+            # subtraction above was always right; only the label lied.
             self.overflow = (
                 f"window overflow: all {dated} dated items are newer than the window's start "
-                f"({since:%Y-%m-%d %H:%MZ}); the oldest is {oldest:%Y-%m-%d %H:%MZ}, so "
-                f"{hours:.1f}h scrolled off unseen"
+                f"({since.astimezone(UTC):%Y-%m-%d %H:%MZ}); the oldest is "
+                f"{oldest.astimezone(UTC):%Y-%m-%d %H:%MZ}, so {hours:.1f}h scrolled off unseen"
             )
 
         if usable and self.undated == usable:

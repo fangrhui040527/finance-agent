@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import http.client
 import json
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime, timedelta, timezone
 from email.utils import format_datetime
 
 import pytest
@@ -384,6 +384,31 @@ def test_a_full_fixed_length_feed_that_starts_after_the_window_opened_overflowed
     )
     assert len(feed.fetch(since)) == 50
     assert feed.overflow.startswith("window overflow") and "15.6h scrolled off" in feed.overflow
+
+
+def test_the_overflow_note_prints_utc_whatever_offset_the_feed_dates_in():
+    """NST dates its items +0800. The note formatted each time with its own
+    offset and a literal "Z", so the 2026-10-16 10:08Z sweep reported "the
+    oldest is 2026-10-16 14:58Z" - six hours in the future - while the stored
+    article said 06:58Z, which is right. The hours were always right; only the
+    printed times were wrong. The window's start is given in Malaysian time
+    here too, so both ends of the note are shown to be converted."""
+    myt = timezone(timedelta(hours=8))
+    since = datetime(2026, 10, 15, 22, 12, tzinfo=myt)  # 14:12Z
+    oldest = datetime(2026, 10, 16, 14, 58, tzinfo=myt)  # 06:58Z
+    items = [oldest + timedelta(minutes=4 * i) for i in range(50)]
+    body = _rss(items)
+    assert "+0800" in body, "the fixture must date its items the way NST does"
+    feed = RssFeed(
+        "https://www.nst.com.my/feed",
+        name="nst_business",
+        opener=lambda req, timeout=None: FakeResponse(body),
+        sleep=lambda s: None,
+    )
+    feed.fetch(since)
+    assert "window's start (2026-10-15 14:12Z)" in feed.overflow, feed.overflow
+    assert "the oldest is 2026-10-16 06:58Z" in feed.overflow, feed.overflow
+    assert "16.8h scrolled off" in feed.overflow, feed.overflow
 
 
 def test_a_feed_that_reaches_back_past_the_window_did_not_overflow():
