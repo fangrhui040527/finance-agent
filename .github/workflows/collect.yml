@@ -249,6 +249,29 @@ jobs:
           fi
           exit 0
 
+      # The monitor, here, so data/alerts.db is committed beside the stores it
+      # judged. NEW means "first seen" only if the log it is diffed against is
+      # the last run's, and until this step nothing that commits ever ran
+      # `watch`: the nightly routine runs it in a fresh clone and commits only
+      # its pages, so every night started from an alerts.db whose newest event
+      # is from 2026-09-23, and an unchanged price_stale was announced NEW for
+      # weeks. Last of the
+      # writers, so it reads the sweep, the price cache, the paper marks and
+      # the digest this run will push. Offline: it reads the stores and asks no
+      # host. Exit 1 only says something is open - that is the report, not a
+      # fault - so only 2, the check itself failing, is annotated.
+      - name: Run the monitor
+        env:
+          FINPLANET_OFFLINE: "1"
+        run: |
+          set +e
+          uv run python ask.py watch
+          code=$?
+          if [ "$code" -eq 2 ]; then
+            echo "::warning title=monitor did not run::ask.py watch exited 2; data/alerts.db does not record this run, so the next watch diffs against an older one"
+          fi
+          exit 0
+
       - name: What the stores hold now
         run: |
           uv run python -c "
@@ -268,7 +291,7 @@ jobs:
           # One at a time, skipping any that is not there: `git add` on a
           # missing path is fatal, and one store missing must never cost the
           # others their day.
-          for path in data/corpus.db data/graph.db data/fx.db data/facts.db data/price_cache.db data/digests data/paper.db data/learning.db knowledge/paper; do
+          for path in data/corpus.db data/graph.db data/fx.db data/facts.db data/price_cache.db data/digests data/paper.db data/learning.db data/alerts.db knowledge/paper; do
             if [ -e "$path" ]; then
               git add "$path"
             else
