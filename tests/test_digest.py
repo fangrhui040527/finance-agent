@@ -392,3 +392,49 @@ def test_the_publication_rail_still_runs_on_a_skipped_write(tmp_path, one_days_s
 
     write_digest(_render(one_days_stores, "23:23"), root)
     assert seen, "the rail was skipped along with the write"
+
+
+def test_a_broker_note_by_a_book_bank_is_not_listed_as_news_about_the_bank(tmp_path):
+    """2026-10-15: six of Maybank's eight digest rows were Maybank Securities /
+    Maybank IB research on OTHER companies, two of them starred. The rows stay
+    linked to MYX:1155 - the bank is named - but a name's page lists news about
+    the name, and the bank is only the author of these. The rule is applied
+    here, at read time, like the gate, so stored rows obey it too."""
+    from knowledge.news.features import Article, LexiconExtractor
+
+    now = datetime(2026, 10, 15, 21, 0, tzinfo=UTC)
+    ex = LexiconExtractor()
+    path = tmp_path / "corpus.db"
+    rows = (
+        (
+            "a",
+            "Grab Holdings Keeps BUY Rating as Maybank Cuts Target Price to USD4.42",
+            ["MYX:1155"],
+        ),
+        ("b", "Have Singapore banks fallen enough? Maybank Securities weighs in", ["MYX:1155"]),
+        ("c", "Maybank keeps THB 75.00 target for Airports of Thailand stock", ["MYX:1155"]),
+        ("d", "Maybank keeps SELL on Genting, cuts target price", ["MYX:1155", "MYX:3182"]),
+        ("e", "Maybank profit rose on wider margins", ["MYX:1155"]),
+    )
+    with Corpus(path) as c:
+        for doc_id, title, ids in rows:
+            art = Article(
+                doc_id=doc_id,
+                title=title,
+                body="",
+                source_domain="example.com",
+                published_at=now - timedelta(hours=1),
+                instruments=ids,
+                quality=0.65,
+            )
+            art.features = ex.extract(art.text, ["Maybank", "Genting"])
+            c.add(art, source="fixture", seen_at=now)
+
+    cfg = Cfg(watchlist=("MYX:1155", "MYX:3182"), corpus_db=str(path))
+    d = build_digest(cfg, now=now, corpus_path=str(path), facts_path=str(tmp_path / "f.db"))
+    maybank, genting = d.names
+    assert [s["title"] for s in maybank.stories] == ["Maybank profit rose on wider margins"]
+    assert maybank.tone["n"] == 1 and maybank.escalated == 1
+    assert [s["title"] for s in genting.stories] == [
+        "Maybank keeps SELL on Genting, cuts target price"
+    ], "the note's subject still gets it"

@@ -192,6 +192,127 @@ def test_the_thoroughfare_list_excludes_what_companies_name_after_themselves():
     assert link_entities("Apple Park welcomed developers this week", INDEX) == ["XNAS:AAPL"]
 
 
+def test_a_building_named_in_malay_order_is_not_the_company():
+    """In the corpus on 2026-10-10, fmt_business: the only Maybank in the row
+    is the venue in the body, and it was linked to MYX:1155. Malay puts the
+    generic noun FIRST, so THOROUGHFARE's look at the following word never saw
+    it."""
+    wedding = (
+        "Syed Saddiq, Bella Astillah tie the knot. The marriage was solemnised by "
+        "ex-religious minister Zulkifli Mohamad al-Bakri at Menara Merdeka Maybank."
+    )
+    assert link_entities(wedding, INDEX) == []
+    assert link_entities("Wedding held at Wisma Merdeka Tenaga Nasional", INDEX) == []
+
+
+def test_the_companys_own_tower_in_malay_still_links_as_maybank_tower_does():
+    """'Menara Maybank' is Maybank Tower, which THOROUGHFARE deliberately keeps:
+    only a tower named something ELSE that carries the alias is excluded."""
+    assert link_entities("Maybank AGM held at Menara Maybank", INDEX) == ["MYX:1155"]
+    assert link_entities("Fire drill at Menara Maybank", INDEX) == ["MYX:1155"]
+    assert link_entities("Menara Merdeka Maybank wedding; Maybank shares rose", INDEX) == [
+        "MYX:1155"
+    ]
+
+
+# --- a short alias inside another company's name is not the company -----------------
+
+
+def test_a_short_alias_inside_another_companys_name_is_not_the_company():
+    """In the corpus from 2026-09-24: 21 rows on Shree TNB Polymers, an Indian
+    BSE listing, linked to Tenaga because "TNB" sits inside its name - the last
+    one stored on 10-11, after the 10-10 span rule, which only spends an alias
+    inside a longer name somebody LISTED."""
+    for headline in (
+        "Average basic shares outstanding of Shree TNB Polymers Limited – BSE:SHREETNB",
+        "Shree TNB Polymers IPO Day 1 Subscription Status 25 Sep 2026",
+        "Shree TNB Polymers Ltd. IPO: Check Issue Date, Price, Subscription",
+        "Shree TNB Polymers (SHREETNB) Share/Stock Price Live, BSE",
+        "AMD Industries Ltd board approves results",
+    ):
+        assert link_entities(headline, INDEX) == [], headline
+
+
+def test_the_same_short_alias_still_links_where_it_is_the_company():
+    """Real TNB rows from the same corpus, each with a capitalised word beside
+    the acronym, plus the company named separately from the other one."""
+    for headline in (
+        "How TNB Electron is plugging Malaysia's EV gap",
+        "Stock Picks: TNB And SP Setia",
+        "Policy Intervention Could Undermine TNB And IBR Framework",
+        "TNB Bill Relief: Anwar announces AFA exemptions",
+        "Shree TNB Polymers lists in Mumbai while TNB shares rose",
+    ):
+        assert link_entities(headline, INDEX) == ["MYX:5347"], headline
+    assert link_entities("AIA Excluding Individual IHH Consultants From Panel", INDEX) == [
+        "MYX:5225"
+    ]
+
+
+# --- a bank's broker arm writing about another company -----------------------------
+
+BANKS = {**INDEX, "CIMB": "MYX:1023", "Genting": "MYX:3182", "IHH Healthcare": "MYX:5225"}
+
+
+def test_a_bank_writing_a_broker_note_is_its_author_not_its_subject():
+    """Six of Maybank's eight digest rows on 2026-10-15 were research notes by
+    Maybank Securities / Maybank IB about other companies. Linked - the bank is
+    named - but as the note's author: `authored` says so."""
+    linker = EntityLinker(BANKS)
+    for headline in (
+        "Maybank kept IDR 3,800 target for Merdeka Copper Gold stock - ad-hoc-news.de",
+        "Maybank keeps THB 75.00 target for Airports of Thailand stock",
+        "Maybank holds target for Bank Rakyat Indonesia stock at IDR 3,900",
+        "Grab Holdings Keeps BUY Rating as Maybank Cuts Target Price to USD4.42",
+        "Sheng Siong shares fall 3% after Maybank downgrade, target price cut",
+        "GEN Bhd downgraded by Maybank as casino group flags rights issuance",
+        "Maybank IB upgrades SD Guthrie to ‘buy’ post sell-off",
+        "Maybank Keeps BUY on ISOTeam, Cuts TP to S$0.09 After FY26 Miss",
+        "Billions in foreign capital not Vietnam’s biggest gain: Maybank Securities CEO",
+        "Have Singapore banks fallen enough? Maybank Securities weighs in",
+        "Corporate Malaysia could face tougher second-half, Maybank IB cautions",
+        "SD Guthrie selldown driven by overreaction. Maybank Investment Bank says the market",
+    ):
+        assert "MYX:1155" in linker.link(headline), "still linked: a mention is kept"
+        assert linker.authored(headline) == {"MYX:1155"}, headline
+
+
+def test_the_research_rule_generalises_to_any_linked_bank_and_keeps_the_subject():
+    linker = EntityLinker(BANKS)
+    text = 'CIMB keeps "Buy" call on TNB, RM15.90 target'
+    assert linker.link(text) == ["MYX:1023", "MYX:5347"]
+    assert linker.authored(text) == {"MYX:1023"}
+    text = "Maybank keeps SELL on Genting, cuts target price after the rights issue"
+    assert linker.authored(text) == {"MYX:1155"}
+
+
+def test_news_about_the_bank_itself_is_not_a_broker_note():
+    linker = EntityLinker(BANKS)
+    for headline in (
+        "Maybank profit rose on wider margins",
+        "Maybank sets RM80bil sustainable finance target for 2030",
+        "Maybank keeps AAA rating from RAM",
+        "Maybank lifts golf tourism",
+        "Maybank Securities fined by regulator over trade reporting lapses",
+        "Maybank kept IDR 3,800 target for Merdeka Copper Gold; Maybank shares rose 1%",
+        "S&P cuts Maybank rating outlook to negative",
+    ):
+        assert linker.authored(headline) == set(), headline
+
+
+def test_a_company_a_broker_rates_is_the_subject_not_the_author():
+    """Both were stored rows. The call is ON the named company here: the note
+    names no other company for it to be about."""
+    linker = EntityLinker(BANKS)
+    for headline in (
+        "IHH Healthcare maintains Buy, target price lowered to RM9.06",
+        "Apple upgraded to Buy as price hikes offset memory costs",
+        "Suppliers slide as Apple cuts iPhone production target for China",
+    ):
+        assert linker.link(headline), headline
+        assert linker.authored(headline) == set(), headline
+
+
 # --- the escalation gate needs materiality, not just a mention ----------------------
 
 
