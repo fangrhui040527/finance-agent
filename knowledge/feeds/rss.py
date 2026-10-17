@@ -103,6 +103,12 @@ class RssFeed(FeedAdapter):
     #: How far the oldest item may sit past `since` before it is a hole.
     OVERFLOW_TOLERANCE = timedelta(hours=1)
 
+    #: The most pages one fetch may read, whatever a feed asks for. NST's site
+    #: feed is 50 items, about 3.2 hours of its output, and the Bursa slots are
+    #: most of a day apart, so even five pages may not cover a window - which
+    #: the overflow note then says. A ceiling, not a default: see `pages`.
+    MAX_PAGES = 5
+
     def __init__(
         self,
         url: str,
@@ -111,6 +117,9 @@ class RssFeed(FeedAdapter):
         opener=None,
         sleep=None,
         extractor: FeatureExtractor | None = None,
+        pages: int = 1,
+        page_param: str = "paged",
+        first_page: int = 1,
     ) -> None:
         super().__init__(extractor)
         host = urlparse(url).netloc
@@ -122,10 +131,87 @@ class RssFeed(FeedAdapter):
         self._opener = opener
         self._sleep = sleep
         self._breaker = CircuitBreaker(self.name)
+        # Paging is OPT-IN, per feed, and one page unless a feed asks. Whether a
+        # publisher's feed pages at all, and in which convention - WordPress
+        # counts `paged` from 1, Drupal counts `page` from 0 - can only be read
+        # off the publisher, and a site that ignores the parameter answers with
+        # its first page again. So no registry entry turns this on until
+        # .github/scripts/bursa_feeds_probe.py has shown a second page of OLDER
+        # items from a runner; this environment cannot reach the hosts.
+        self.pages = max(1, min(int(pages), self.MAX_PAGES))
+        self.page_param = page_param
+        self.first_page = first_page
 
     # -- transport -----------------------------------------------------------
 
     def _fetch_raw(self, since: datetime, limit: int) -> list[RawRecord]:
+        if since.tzinfo is None:
+            since = since.replace(tzinfo=UTC)
+        out = self._parse(self._read(self.url), since, limit)
+        if self.pages == 1:
+            return out
+
+        # Further pages only while the window is still open at the bottom, and
+        # never past `self.pages`. The overflow is judged over every page read
+        # so far, not page by page: a short last page is "too few items to
+        # judge" on its own, and judging it alone would call the window covered
+        # when it was not. A page that brings no item the earlier pages did not
+        # is a site ignoring the parameter, or the end of its archive; either
+        # way the next page would be the same answer again. Whatever is still
+        # unread after the last page stays in `overflow`: degraded, not `ok`.
+        gap = self.overflow
+        known = {r.external_id for r in out}
+        links = set(self._links)
+        undated, dated, oldest = self.undated, self._dated, self._oldest
+        read = 1
+        while gap and read < self.pages and len(out) < limit:
+            page = read + 1
+            try:
+                more = self._parse(
+                    self._read(self._page_url(read), diagnose=False), since, limit - len(out)
+                )
+            except FeedError as e:
+                # The pages already read are kept: a 404 on page two says nothing
+                # about page one, and failing the whole fetch would turn a
+                # partial read into none.
+                gap += f"; page {page} could not be read: {e}"
+                break
+            read = page
+            undated += self.undated
+            if not self._links - links:
+                gap += (
+                    f"; page {page} added nothing new, so this feed does not page "
+                    f"by `{self.page_param}`"
+                )
+                break
+            links |= self._links
+            dated += self._dated
+            if self._oldest is not None and (oldest is None or self._oldest < oldest):
+                oldest = self._oldest
+            for rec in more:
+                if rec.external_id not in known:
+                    known.add(rec.external_id)
+                    out.append(rec)
+            gap = "" if self._truncated else self._overflow_note(since, dated, oldest)
+        else:
+            if gap and read == self.pages:
+                gap += f"; read {read} pages, the most this feed may"
+        self.overflow = gap
+        self.undated = undated
+        return out
+
+    def _page_url(self, index: int) -> str:
+        """Page `index` (0 is the feed itself) in the feed's own convention.
+
+        Appended rather than re-encoded, so a registered URL carrying its own
+        query string is sent exactly as a person registered it."""
+        sep = "&" if urlparse(self.url).query else "?"
+        return f"{self.url}{sep}{self.page_param}={self.first_page + index}"
+
+    def _read(self, url: str, diagnose: bool = True) -> str:
+        """One page's body as text. `diagnose` asks the site where its feeds
+        are on a 404; a later page that 404s is a feed that does not page that
+        way, not a feed that moved, so it is not asked there."""
         import urllib.error
         import urllib.request
 
@@ -134,7 +220,7 @@ class RssFeed(FeedAdapter):
 
         opener = self._opener or urllib.request.urlopen
         req = urllib.request.Request(
-            self.url,
+            url,
             headers={
                 "User-Agent": "finplanet-analyst-mind/0.1 (personal research)",
                 "Accept": "application/rss+xml, application/atom+xml, application/xml, text/xml",
@@ -153,7 +239,8 @@ class RssFeed(FeedAdapter):
             raise FeedError(str(e)) from e
         except (urllib.error.URLError, OSError) as e:
             self._breaker.record_failure(e)
-            raise FeedError(f"{self.name} fetch failed: {e}{self._where_the_feed_moved(e)}") from e
+            moved = self._where_the_feed_moved(e) if diagnose else ""
+            raise FeedError(f"{self.name} fetch failed: {e}{moved}") from e
         except http.client.HTTPException as e:  # a reply cut off mid-body is not an OSError
             self._breaker.record_failure(e)
             raise FeedError(f"{self.name} fetch failed: {type(e).__name__}: {e}") from e
@@ -161,7 +248,7 @@ class RssFeed(FeedAdapter):
 
         if isinstance(body, bytes):
             body = body.decode("utf-8", errors="replace")
-        return self._parse(body, since, limit)
+        return body
 
     def _where_the_feed_moved(self, error) -> str:
         """On a 404, ask the SITE where its feeds are, and say so in the error.
@@ -224,6 +311,9 @@ class RssFeed(FeedAdapter):
         now = datetime.now(UTC)
         self.undated = 0
         self.overflow = ""
+        # Every usable item on the page, in the window or not: how `_fetch_raw`
+        # tells a page of older items from the first page served again.
+        self._links: set[str] = set()
         usable = 0
         dated = 0
         oldest: datetime | None = None
@@ -233,6 +323,7 @@ class RssFeed(FeedAdapter):
             if row is None:
                 continue
             usable += 1
+            self._links.add(row["url"])
             published = row.get("published_at")
             if published is None:
                 # An item with no date is not an item published NOW. Dating it
@@ -250,23 +341,10 @@ class RssFeed(FeedAdapter):
                 truncated = True  # our own limit, not the feed's: nothing to judge
                 break
 
-        if (
-            not truncated
-            and dated >= self.OVERFLOW_MIN_ITEMS
-            and oldest is not None
-            and oldest - since > self.OVERFLOW_TOLERANCE
-        ):
-            hours = (oldest - since).total_seconds() / 3600
-            # Both ends in UTC before they are printed with a "Z". `oldest` keeps
-            # the offset the feed dated it in, and NST dates +0800: the
-            # 2026-10-16 10:08Z sweep reported its oldest item at "14:58Z", six
-            # hours in the future, when the stored article said 06:58Z. The
-            # subtraction above was always right; only the label lied.
-            self.overflow = (
-                f"window overflow: all {dated} dated items are newer than the window's start "
-                f"({since.astimezone(UTC):%Y-%m-%d %H:%MZ}); the oldest is "
-                f"{oldest.astimezone(UTC):%Y-%m-%d %H:%MZ}, so {hours:.1f}h scrolled off unseen"
-            )
+        # This page's tallies, which `_fetch_raw` adds up across pages.
+        self._dated, self._oldest, self._truncated = dated, oldest, truncated
+        if not truncated:  # our own limit, not the feed's: nothing to judge
+            self.overflow = self._overflow_note(since, dated, oldest)
 
         if usable and self.undated == usable:
             raise FeedError(
@@ -276,6 +354,25 @@ class RssFeed(FeedAdapter):
                 f"Refused rather than ingested: {_excerpt(text)}"
             )
         return out
+
+    def _overflow_note(self, since: datetime, dated: int, oldest: datetime | None) -> str:
+        """The part of the window the items read never reached, or "" if they
+        reached back to `since` or are too few to judge."""
+        if dated < self.OVERFLOW_MIN_ITEMS or oldest is None:
+            return ""
+        if oldest - since <= self.OVERFLOW_TOLERANCE:
+            return ""
+        hours = (oldest - since).total_seconds() / 3600
+        # Both ends in UTC before they are printed with a "Z". `oldest` keeps
+        # the offset the feed dated it in, and NST dates +0800: the 2026-10-16
+        # 10:08Z sweep reported its oldest item at "14:58Z", six hours in the
+        # future, when the stored article said 06:58Z. The subtraction above
+        # was always right; only the label lied.
+        return (
+            f"window overflow: all {dated} dated items are newer than the window's start "
+            f"({since.astimezone(UTC):%Y-%m-%d %H:%MZ}); the oldest is "
+            f"{oldest.astimezone(UTC):%Y-%m-%d %H:%MZ}, so {hours:.1f}h scrolled off unseen"
+        )
 
     def _item_to_row(self, item) -> dict | None:
         """One <item>/<entry> to a plain payload dict, or None if unusable."""
