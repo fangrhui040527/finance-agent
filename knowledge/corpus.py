@@ -58,6 +58,13 @@ FAILED = "failed"
 #: which is exactly what happened. See `last_success` and defect log §20.
 DEGRADED = "degraded"
 
+#: How much of a long doc_id a page prints (`Corpus.short_ids`). Every Google
+#: News key opens with the same ~50 characters - host, path and the token's
+#: fixed header - and the 4,745 held on 2026-10-17 are told apart by the 57th
+#: at the latest; 64 leaves margin beyond that. Path-shaped keys that need
+#: more are printed whole.
+SHORT_ID_CHARS = 64
+
 #: The rows that say a run READ something: ok or degraded, and not a skip (a
 #: skip is recorded `ok` with a "skipped:" detail so `sweep_silence` sees the
 #: dispatch, but it collected nothing). See `Corpus.slot_runs(successful=True)`.
@@ -493,6 +500,40 @@ class Corpus:
             # exactly. LIKE treats `_` and `%` as wildcards, so an id carrying
             # either would over-match there and is caught here.
             out = [a for a in out if instrument in a.instruments]
+        return out
+
+    def short_ids(self, doc_ids, length: int = SHORT_ID_CHARS) -> dict[str, str]:
+        """doc_id -> how a page can cite it: whole, or its first `length`
+        characters and an ellipsis when no other row in the corpus starts so.
+
+        WHY. The feedback contract asks for every cause to point at its story
+        by `doc_id`, and the pack printed none, so each night the writer read
+        corpus.db by hand for the ids. The key is the corpus's own, not a new
+        one: a Google News key is ~280 characters, and a hash would be short
+        but resolvable only by hashing every row. A prefix is resolvable by
+        `substr(doc_id, 1, length)`, and is printed only once that query is
+        shown to return exactly one row - checked against the whole corpus,
+        not the day's window, because the page outlives the window. The form
+        depends on the key alone, so the same story reads the same on every
+        night's pack; if a later row ever shared the prefix, the key would be
+        printed whole from then on rather than ambiguously.
+        """
+        ids = list(dict.fromkeys(doc_ids))
+        out = {d: d for d in ids}
+        prefixes = {d: d[:length] for d in ids if len(d) > length}
+        if not prefixes:
+            return out
+        wanted = sorted(set(prefixes.values()))
+        marks = ",".join("?" * len(wanted))
+        rows = self.conn.execute(
+            f"SELECT substr(doc_id, 1, ?) AS p, count(*) AS n FROM articles"
+            f" WHERE substr(doc_id, 1, ?) IN ({marks}) GROUP BY p",
+            [length, length, *wanted],
+        ).fetchall()
+        held = {r["p"]: r["n"] for r in rows}
+        for d, p in prefixes.items():
+            if held.get(p) == 1:
+                out[d] = p + "…"
         return out
 
     def count_for_instrument(self, instrument_id: str, since: datetime | None = None) -> int:

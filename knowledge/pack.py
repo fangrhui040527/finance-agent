@@ -38,6 +38,7 @@ from engines.attribution.decompose import (
     decompose,
 )
 from engines.attribution.regression import Fit, huber_fit
+from knowledge.corpus import SHORT_ID_CHARS, Corpus
 from knowledge.digest import build_digest
 from knowledge.facts import FactBook
 from knowledge.report import fact_snapshot, macro_context
@@ -516,7 +517,16 @@ def build_pack(
     digest = build_digest(
         cfg, day, slot="pack", corpus_path=corpus_path, facts_path=facts_path, now=now
     )
-    out.append(digest.to_markdown())
+    with Corpus(corpus_path or cfg.corpus_db) as corpus:
+        refs = corpus.short_ids(s["doc_id"] for n in digest.names for s in n.stories)
+    out += [
+        "Each story line below carries its publication time in UTC and its corpus key: "
+        f"cite it as the `doc_id`. A key ending in … is the first {SHORT_ID_CHARS} "
+        f"characters of the only key in the corpus that begins with them "
+        f"(`substr(doc_id, 1, {SHORT_ID_CHARS})`).",
+        "",
+    ]
+    out.append(digest.to_markdown(refs=refs))
     out.append("")
 
     out += ["## Facts, per name (last 7 days of events; latest figures)", ""]

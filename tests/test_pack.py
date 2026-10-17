@@ -148,6 +148,65 @@ def test_the_pack_carries_every_section_and_writes_where_told(tmp_path):
     )
 
 
+def test_a_story_line_carries_its_doc_id_and_utc_time_and_truncates_only_a_unique_key(tmp_path):
+    """M7. The feedback contract asks every cause to point at its story by
+    `doc_id`, and the pack's story lines printed none - nor any time, while the
+    pages time each row against the close - so the writer read corpus.db by hand
+    every night. A long key is cut to SHORT_ID_CHARS only when no other row in
+    the WHOLE corpus begins the same way: here the twin of one story was
+    published a month earlier, outside the digest's window, and still keeps it
+    whole."""
+    from knowledge.corpus import SHORT_ID_CHARS, Corpus
+    from knowledge.news.features import Article
+
+    head = "https://news.google.com/rss/articles/CBMi" + "A" * 40  # > 64 shared characters
+    unique = "https://news.google.com/rss/articles/CBMi" + "Q" * 60 + "?oc=5"
+    rows = [
+        (unique, "Maybank prices a sukuk", datetime(2026, 9, 4, 7, 44, 56, tzinfo=UTC)),
+        (head + "one?oc=5", "Maybank names a new CFO", datetime(2026, 9, 4, 10, 5, tzinfo=UTC)),
+        (head + "two?oc=5", "Maybank last month", datetime(2026, 8, 4, 9, 0, tzinfo=UTC)),
+        ("finnhub:142921318", "Maybank short key", datetime(2026, 9, 3, 23, 30, tzinfo=UTC)),
+    ]
+    corpus_db = str(tmp_path / "c.db")
+    with Corpus(corpus_db) as c:
+        for doc_id, title, at in rows:
+            c.add(
+                Article(doc_id, title, "", "example.com", at, instruments=["MYX:1155"]),
+                "fixture",
+                seen_at=NOW,
+            )
+    text = build_pack(
+        Cfg(watchlist=("MYX:1155",)),
+        DAY,
+        corpus_path=corpus_db,
+        facts_path=str(tmp_path / "f.db"),
+        feed=FakeFeed(),
+        now=NOW,
+        previous_dir=None,
+    )
+    line = {
+        r[1]: next(x for x in text.splitlines() if r[1] in x)
+        for r in rows
+        if r[2] > NOW - timedelta(days=2)
+    }
+    cut = unique[:SHORT_ID_CHARS] + "…"
+    assert line["Maybank prices a sukuk"].startswith("- 2026-09-04 07:44Z example.com — ")
+    assert line["Maybank prices a sukuk"].endswith(f" · doc_id `{cut}`")
+    # The shared prefix would resolve to two rows, so the key is printed whole.
+    assert line["Maybank names a new CFO"].startswith("- 2026-09-04 10:05Z ")
+    assert line["Maybank names a new CFO"].endswith(f" · doc_id `{head}one?oc=5`")
+    # A key no longer than the cut is never cut; the date is the UTC one.
+    assert line["Maybank short key"].startswith("- 2026-09-03 23:30Z ")
+    assert line["Maybank short key"].endswith(" · doc_id `finnhub:142921318`")
+    assert f"the first {SHORT_ID_CHARS} characters of the only key" in text
+    with Corpus(corpus_db) as c:  # the cut resolves to exactly the story it names
+        hits = c.conn.execute(
+            "SELECT doc_id FROM articles WHERE substr(doc_id, 1, ?) = ?",
+            (SHORT_ID_CHARS, cut.rstrip("…")),
+        ).fetchall()
+    assert [h[0] for h in hits] == [unique]
+
+
 def test_previous_pages_are_listed_newest_three_before_the_day(tmp_path):
     fb = tmp_path / "fb"
     fb.mkdir()
