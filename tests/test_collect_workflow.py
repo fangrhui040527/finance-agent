@@ -42,8 +42,14 @@ def test_the_monitor_runs_after_every_writer_and_its_log_is_committed_with_the_s
     for writer in ("Sweep", "Cache the day's prices", "Mark the paper book", "Write the digest"):
         assert names.index(writer) < watch < commit, writer
     step = steps[watch]
-    assert "if" not in step, "every run commits, so every run records the monitor's state"
+    # On exactly the commit's condition: a log the run throws away would only
+    # make the next watch diff against an older state.
+    assert step.get("if") == steps[commit].get("if"), (step.get("if"), steps[commit].get("if"))
     assert step["run"].lstrip().startswith("set +e") and step["run"].rstrip().endswith("exit 0")
+    # A watch that could not finish leaves a partial log; it is put back, not
+    # committed as the next run's baseline.
+    failed = step["run"].split('"$code" -eq 2', 1)[1].split("fi", 1)[0]
+    assert "git checkout -- data/alerts.db" in failed
     added = steps[commit]["run"].split("for path in", 1)[1].split(";", 1)[0].split()
     assert "data/alerts.db" in added
 

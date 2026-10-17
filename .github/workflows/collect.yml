@@ -260,7 +260,15 @@ jobs:
       # the digest this run will push. Offline: it reads the stores and asks no
       # host. Exit 1 only says something is open - that is the report, not a
       # fault - so only 2, the check itself failing, is annotated.
+      #
+      # Only when the commit step below will run, on the same condition: a
+      # monitor whose log is thrown away with the run would only make the next
+      # one diff against an older state. And a watch that exits 2 may have
+      # recorded some rules and not others (each event commits on its own), so
+      # its partial log is put back to the committed one rather than becoming
+      # the next run's baseline.
       - name: Run the monitor
+        if: steps.sweep.outputs.code == '0' || steps.sweep.outputs.code == '3'
         env:
           FINPLANET_OFFLINE: "1"
         run: |
@@ -268,7 +276,8 @@ jobs:
           uv run python ask.py watch
           code=$?
           if [ "$code" -eq 2 ]; then
-            echo "::warning title=monitor did not run::ask.py watch exited 2; data/alerts.db does not record this run, so the next watch diffs against an older one"
+            git checkout -- data/alerts.db 2>/dev/null || true
+            echo "::warning title=monitor did not run::ask.py watch exited 2; its partial data/alerts.db was put back, so the next watch diffs against the last complete run"
           fi
           exit 0
 
