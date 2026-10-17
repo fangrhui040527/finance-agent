@@ -10,6 +10,7 @@ guessed. stdlib `xml.etree` only.
 from __future__ import annotations
 
 import http.client
+from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
 from email.utils import parsedate_to_datetime
 from urllib.parse import urlparse
@@ -141,6 +142,10 @@ class RssFeed(FeedAdapter):
         self.pages = max(1, min(int(pages), self.MAX_PAGES))
         self.page_param = page_param
         self.first_page = first_page
+        #: Asked before each page after the first: True once the sweep's own
+        #: deadline has passed (knowledge/sweep.py sets it), so a later page is
+        #: never what runs a sweep past SWEEP_DEADLINE_SECONDS. None: no limit.
+        self.stop_paging: Callable[[], bool] | None = None
 
     # -- transport -----------------------------------------------------------
 
@@ -175,6 +180,9 @@ class RssFeed(FeedAdapter):
         read = 1
         while gap and read < self.pages and len(out) < limit:
             page = read + 1
+            if self.stop_paging is not None and self.stop_paging():
+                gap += f"; page {page} not asked: the sweep's deadline had passed"
+                break
             try:
                 more = self._parse(
                     self._read(self._page_url(read), diagnose=False), since, limit - len(out)

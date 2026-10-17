@@ -567,6 +567,56 @@ def test_nst_reads_three_pages_and_fmt_one_as_the_probe_found():
     assert fmt.pages == 1
 
 
+def test_a_paging_feed_asks_no_page_once_told_to_stop():
+    opener = _pages(_page(1), _page(2), _page(3))
+    feed = _nst(opener, pages=3)
+    feed.stop_paging = lambda: True
+    records = feed.fetch(PAGE_SINCE)
+    assert opener.asked == ["https://www.nst.com.my/feed"] and len(records) == 50
+    assert "16.8h scrolled off" in feed.overflow, feed.overflow
+    assert "page 2 not asked: the sweep's deadline had passed" in feed.overflow
+
+
+def test_the_sweep_deadline_stops_a_feeds_later_pages(stores):
+    """A first page read across the sweep's deadline is kept, and no further
+    page is started after it: the deadline that stops new requests stops pages."""
+    from knowledge.sweep import SWEEP_DEADLINE_SECONDS
+
+    now = [NOW]
+    inner = _pages(_page(1), _page(2), _page(3))
+
+    def slow(req, timeout=None):
+        now[0] = NOW + timedelta(seconds=SWEEP_DEADLINE_SECONDS + 1)  # page one ran long
+        return inner(req, timeout)
+
+    def adapters(name, **kw):
+        return RssFeed(
+            "https://www.nst.com.my/feed",
+            name=name,
+            opener=slow,
+            sleep=lambda s: None,
+            pages=3,
+        )
+
+    corpus_db, facts_db = stores
+    run_sweep(
+        Cfg(sources=("nst_business",)),
+        "bursa_close",
+        corpus_path=corpus_db,
+        facts_path=facts_db,
+        link_graph=False,
+        adapter_for=adapters,
+        entity_index=INDEX,
+        clock=lambda: now[0],
+        log=lambda m: None,
+        force=True,
+    )
+    assert inner.asked == ["https://www.nst.com.my/feed"], inner.asked
+    sweeps, _ = _rows(stores, "nst_business")
+    assert sweeps[0]["status"] == "degraded"
+    assert "page 2 not asked: the sweep's deadline had passed" in sweeps[0]["detail"]
+
+
 def test_an_overflowing_site_feed_makes_the_run_degraded(stores):
     newest = NOW - timedelta(minutes=9)
     items = [newest - timedelta(minutes=7 * i) for i in range(50)]

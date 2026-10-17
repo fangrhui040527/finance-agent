@@ -733,6 +733,10 @@ def _run_news(
                 result.status = DEGRADED
         else:
             feed = adapter_for(spec.name)
+            # A paging feed (NST) asks this before each page after the first,
+            # so the deadline that stops new requests stops its pages too.
+            if deadline is not None and hasattr(feed, "stop_paging"):
+                feed.stop_paging = lambda: tick() >= deadline
             records = feed.fetch(since, limit=limit)
             articles, stats = feed.normalize(
                 records,
