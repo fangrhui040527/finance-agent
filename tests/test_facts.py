@@ -129,6 +129,119 @@ def test_text_observations_survive_the_round_trip(book):
     assert o.value is None and o.text == "amc"
 
 
+# --- a derived row is knowable no earlier than its inputs -------------------------
+#
+# Each test fails on the reads before 2026-10-17, which windowed every row on its
+# stored known_at. Six fourth quarters stored before 2026-10-08 carry the 10-K's
+# date although a quarter they were computed from was filed later, and the store
+# is append-only, so the read is where the stamp is corrected.
+
+MSFT = "XNAS:MSFT"
+LEGACY_RUN = datetime(2026, 9, 6, 12, 48, tzinfo=UTC)
+Q4 = {"derived": "FY - Q1..Q3", "fp": "Q4", "form": "10-K", "tag": "Depreciation"}
+
+
+def xbrl(concept: str, period: date, known: date, value: str, **payload) -> Observation:
+    return Observation(
+        "sec_xbrl",
+        MSFT,
+        concept,
+        known,
+        Decimal(value),
+        period_end=period,
+        unit="USD",
+        currency="USD",
+        payload={"tag": "Depreciation", **payload},
+    )
+
+
+def test_a_legacy_fourth_quarter_is_knowable_when_its_last_quarter_was_filed(book):
+    # MSFT's FY25 depreciation as the 2026-09-06 run stored it: 22.0B for the year in
+    # the 10-K of 2025-07-30, its three quarters filed only as FY26 comparatives, and
+    # the Q4 of 6.3B stamped with the 10-K's date and naming no inputs.
+    q4_end = date(2025, 6, 30)
+    book.add_observations(
+        [
+            xbrl("depreciation_fy", q4_end, date(2025, 7, 30), "22000"),
+            xbrl("depreciation", date(2024, 9, 30), date(2025, 10, 29), "4700"),
+            xbrl("depreciation", date(2024, 12, 31), date(2026, 1, 28), "5200"),
+            xbrl("depreciation", date(2025, 3, 31), date(2026, 4, 29), "5800"),
+            xbrl("depreciation", q4_end, date(2025, 7, 30), "6300", **Q4),
+        ],
+        fetched_at=LEGACY_RUN,
+    )
+    assert book.latest(MSFT, "depreciation", asof=date(2025, 8, 15)) is None, (
+        "nothing public on 2025-08-15 implied 6.3B"
+    )
+    assert [o.value for o in book.observations(MSFT, asof=date(2026, 4, 28))] == [
+        Decimal(22000),
+        Decimal(5200),
+        Decimal(4700),
+    ]
+    row = book.latest(MSFT, "depreciation", asof=date(2026, 4, 29))
+    assert row is not None and row.value == Decimal(6300) and row.known_at == date(2026, 4, 29)
+
+    store = book.as_fact_store([MSFT])
+    assert store.as_known_at(MSFT, "depreciation", date(2026, 4, 28), q4_end) is None
+    fact = store.as_known_at(MSFT, "depreciation", date(2026, 4, 29), q4_end)
+    assert fact is not None and fact.known_at == date(2026, 4, 29)
+    early = book.as_fact_store([MSFT], asof=date(2026, 4, 28))
+    assert early.as_known_at(MSFT, "depreciation", date(2026, 10, 17), q4_end) is None
+
+    (stored,) = book.conn.execute(
+        "SELECT known_at FROM observations WHERE concept = 'depreciation' AND period_end = ?",
+        (q4_end.isoformat(),),
+    ).fetchone()
+    assert stored == "2025-07-30", "the row on disk is untouched; only the read moves"
+
+
+def test_a_legacy_fourth_quarter_keeps_the_10k_date_when_its_quarters_came_first(book):
+    # 303 of the 309 legacy rows: every quarter was filed before the 10-K, so the
+    # 10-K's date was right. A quarter restated in a later run was not what that
+    # run read, and must not move the row either.
+    q4_end = date(2024, 6, 30)
+    book.add_observations(
+        [
+            xbrl("depreciation_fy", q4_end, date(2024, 7, 30), "20000"),
+            xbrl("depreciation", date(2023, 9, 30), date(2023, 10, 24), "4500"),
+            xbrl("depreciation", date(2023, 12, 31), date(2024, 1, 30), "5000"),
+            xbrl("depreciation", date(2024, 3, 31), date(2024, 4, 25), "5100"),
+            xbrl("depreciation", q4_end, date(2024, 7, 30), "5400", **Q4),
+        ],
+        fetched_at=LEGACY_RUN,
+    )
+    book.add_observations(
+        [xbrl("depreciation", date(2023, 12, 31), date(2026, 10, 1), "4900")],
+        fetched_at=LEGACY_RUN + timedelta(days=35),
+    )
+    row = book.latest(MSFT, "depreciation", asof=date(2024, 7, 30))
+    assert row is not None and row.value == Decimal(5400) and row.known_at == date(2024, 7, 30)
+    fact = book.as_fact_store([MSFT]).as_known_at(MSFT, "depreciation", date(2024, 7, 30), q4_end)
+    assert fact is not None and fact.value == Decimal(5400)
+
+
+def test_a_derived_row_that_names_its_inputs_is_never_knowable_before_them(book):
+    inputs = [
+        {"span": "6M", "end": "2024-12-31", "value": "250", "filed": "2025-01-29"},
+        {"span": "3M", "end": "2024-09-30", "value": "100", "filed": "2025-10-29"},
+    ]
+    book.add_observations(
+        [
+            xbrl(
+                "cash_from_operations",
+                date(2024, 12, 31),
+                date(2025, 1, 29),
+                "150",
+                derived="6M - 3M",
+                inputs=inputs,
+            )
+        ]
+    )
+    assert book.latest(MSFT, "cash_from_operations", asof=date(2025, 10, 28)) is None
+    row = book.latest(MSFT, "cash_from_operations")
+    assert row is not None and row.known_at == date(2025, 10, 29)
+
+
 # --- series are vintaged ----------------------------------------------------------
 
 
