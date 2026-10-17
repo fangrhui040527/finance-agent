@@ -539,6 +539,34 @@ def test_a_page_that_cannot_be_read_keeps_the_pages_that_were():
     assert "page 2 could not be read" in feed.overflow and "404" in feed.overflow
 
 
+def test_a_page_that_does_not_join_the_one_before_is_a_hole_and_is_said():
+    """NST, 2026-10-17: page one ran back to 04:48Z, `?paged=2` started at
+    23:01Z the night before. Reaching the window's start at the bottom is not
+    coverage when 5.8 hours in the middle were served by neither page."""
+    first = _page(1)  # four minutes an item, back to 2026-10-16 06:58Z
+    top = first[-1] - timedelta(hours=6)
+    second = [top - timedelta(minutes=20 * i) for i in range(50)]  # past the window
+    opener = _pages(first, second)
+    feed = _nst(opener, pages=3)
+    records = feed.fetch(PAGE_SINCE)
+    assert len(opener.asked) == 2, opener.asked  # the bottom is covered: no third page
+    assert "scrolled off" not in feed.overflow, feed.overflow
+    assert feed.overflow == (
+        "page 2 starts 6.0h before page 1 ends (2026-10-16 00:58Z under 2026-10-16 06:58Z): "
+        "the items between were served by neither"
+    ), feed.overflow
+    assert len(records) == 50 + sum(1 for t in second if t >= PAGE_SINCE)
+
+
+def test_nst_reads_three_pages_and_fmt_one_as_the_probe_found():
+    from knowledge.feeds.registry import adapter_for
+
+    nst, fmt = adapter_for("nst_business"), adapter_for("fmt_business")
+    assert (nst.pages, nst.page_param, nst.first_page) == (3, "paged", 1)
+    assert nst._page_url(1) == "https://www.nst.com.my/feed?paged=2"
+    assert fmt.pages == 1
+
+
 def test_an_overflowing_site_feed_makes_the_run_degraded(stores):
     newest = NOW - timedelta(minutes=9)
     items = [newest - timedelta(minutes=7 * i) for i in range(50)]

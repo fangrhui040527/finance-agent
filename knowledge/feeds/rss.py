@@ -159,7 +159,16 @@ class RssFeed(FeedAdapter):
         # is a site ignoring the parameter, or the end of its archive; either
         # way the next page would be the same answer again. Whatever is still
         # unread after the last page stays in `overflow`: degraded, not `ok`.
+        #
+        # A page's items must also JOIN the page before it. On the 2026-10-17
+        # runner probe NST's first page ran 04:48Z-08:59Z and `?paged=2` ran
+        # 12:51Z-23:01Z the day before - a cached page, by the look of it, and
+        # 5.8 hours of items served by neither. Judged at the bottom alone, two
+        # pages would have read "covered" over that hole. So a page whose newest
+        # item is more than OVERFLOW_TOLERANCE older than the last page's oldest
+        # is named in `overflow` too: its items are kept, and the hole is said.
         gap = self.overflow
+        holes: list[str] = []
         known = {r.external_id for r in out}
         links = set(self._links)
         undated, dated, oldest = self.undated, self._dated, self._oldest
@@ -186,6 +195,15 @@ class RssFeed(FeedAdapter):
                 break
             links |= self._links
             dated += self._dated
+            if oldest is not None and self._newest is not None:
+                apart = oldest - self._newest
+                if apart > self.OVERFLOW_TOLERANCE:
+                    holes.append(
+                        f"page {page} starts {apart.total_seconds() / 3600:.1f}h before page "
+                        f"{read - 1} ends ({self._newest.astimezone(UTC):%Y-%m-%d %H:%MZ} under "
+                        f"{oldest.astimezone(UTC):%Y-%m-%d %H:%MZ}): the items between were "
+                        "served by neither"
+                    )
             if self._oldest is not None and (oldest is None or self._oldest < oldest):
                 oldest = self._oldest
             for rec in more:
@@ -196,7 +214,7 @@ class RssFeed(FeedAdapter):
         else:
             if gap and read == self.pages:
                 gap += f"; read {read} pages, the most this feed may"
-        self.overflow = gap
+        self.overflow = "; ".join(x for x in (gap, *holes) if x)
         self.undated = undated
         return out
 
@@ -317,6 +335,7 @@ class RssFeed(FeedAdapter):
         usable = 0
         dated = 0
         oldest: datetime | None = None
+        newest: datetime | None = None
         truncated = False
         for item in items:
             row = self._item_to_row(item)
@@ -334,6 +353,8 @@ class RssFeed(FeedAdapter):
             dated += 1
             if oldest is None or when < oldest:
                 oldest = when
+            if newest is None or when > newest:
+                newest = when
             if when < since:
                 continue
             out.append(RawRecord(self.name, row["url"], now, row))
@@ -342,7 +363,7 @@ class RssFeed(FeedAdapter):
                 break
 
         # This page's tallies, which `_fetch_raw` adds up across pages.
-        self._dated, self._oldest, self._truncated = dated, oldest, truncated
+        self._dated, self._oldest, self._newest, self._truncated = dated, oldest, newest, truncated
         if not truncated:  # our own limit, not the feed's: nothing to judge
             self.overflow = self._overflow_note(since, dated, oldest)
 
