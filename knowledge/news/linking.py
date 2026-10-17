@@ -27,7 +27,12 @@ The rule set here is small and deliberate, and every branch has a test:
 
   * **No ASCII alias matches when a thoroughfare word follows it** - see
     THOROUGHFARE. "Maybank Highway" is a road in Charleston, and the story about
-    it closing was linked to Malayan Banking and escalated as bank news.
+    it closing was linked to Malayan Banking and escalated as bank news. Malay
+    puts the noun first, so a Malay building name is read from the other side -
+    see MALAY_BUILDING.
+
+  * **No short alias matches when a corporate suffix follows it** - see
+    CORPORATE_SUFFIX. "Shree TNB Polymers" is an Indian listing, not Tenaga.
 
 A word boundary here is "not preceded or followed by an ASCII letter or
 digit", which is stricter than `\\b`: it keeps "Apple's" and "Maybank," while
@@ -39,6 +44,12 @@ refusing "pineapple" and "Amdocs".
     "Genting Singapore", "Genting Plantations" and "Genting Highlands", so
     stories about other listed companies and a mountain resort filled Genting
     Berhad's slice of the corpus, and some were escalated.
+
+  * **A bank named as the AUTHOR of a broker's note is still linked**, and
+    `EntityLinker.authored` says it is only the author - see `_writes_the_note`.
+    "Maybank keeps THB 75.00 target for Airports of Thailand stock" mentions the
+    bank and is news about the airport operator; the digest reads the
+    difference.
 
 Longest alias first, as before, so "Maybank Islamic" resolves to the subsidiary
 and the "Maybank" inside it is spent on that match, not linked to the parent.
@@ -85,6 +96,52 @@ THOROUGHFARE = (
 )
 _NOT_A_PLACE = rf"(?!\s+(?-i:(?:{'|'.join(THOROUGHFARE)}))(?!{_ASCII_WORD}))"
 
+#: Malay names a building generic-noun FIRST - "Menara" (tower), "Wisma",
+#: "Bangunan" (building), "Kompleks" - so THOROUGHFARE, which reads the word
+#: AFTER an alias, never sees one. "The marriage was solemnised ... at Menara
+#: Merdeka Maybank" (fmt_business, 2026-10-10, a wedding) was linked to MYX:1155
+#: on that last word alone. An alias preceded by one of these AND another name
+#: word is the tail of that building's name. Directly after the noun it is NOT
+#: excluded: "Menara Maybank" is Maybank Tower, the company's own building,
+#: which THOROUGHFARE keeps for the reason it keeps "Tower". A story about the
+#: company held at the venue names the company again and is linked on that.
+#: Measured over the 19,330 stored rows to 2026-10-16: this fires once, on the
+#: wedding.
+MALAY_BUILDING = ("Menara", "Wisma", "Bangunan", "Kompleks")
+_IN_A_BUILDING_NAME = re.compile(
+    rf"(?<!{_ASCII_WORD})(?:{'|'.join(MALAY_BUILDING)})(?:\s+[A-Z0-9][\w'’-]*){{1,2}}\s+\Z"
+)
+
+#: A SHORT alias followed by one of these is the first word of ANOTHER
+#: company's registered name: "Shree TNB Polymers Limited" (BSE:SHREETNB) is an
+#: Indian IPO, and 21 rows about it were linked to Tenaga (MYX:5347) from
+#: 2026-09-24. The 2026-10-10 span rule did not stop them - it spends an alias
+#: inside a longer name only when somebody LISTED that name, and nobody lists
+#: every company whose initials collide with a book name. Three or four capitals
+#: are cheap to share ("AMD Industries" is another BSE listing); a full name is
+#: rarely reused, and where one is, OTHER_NAMES lists it.
+#:
+#: Matched case-sensitively, like THOROUGHFARE. Left out on purpose: the words
+#: a company names its OWN arms and legal form with - "IHH Healthcare", "CIMB
+#: Group", "CIMB Securities", "MISC Bhd", "TNB Electron", "IHH Consultants"
+#: (its panel doctors) - which are the company, or are in the index already.
+#: "Preceded by another proper noun" ("Shree TNB") is NOT a rule here, though it
+#: was the first idea: in Title Case headlines the true mentions look the same -
+#: "Why AMD", "How TNB Electron", "Could Undermine TNB And" - 79 of them in the
+#: stored rows. Measured over the 19,330 stored rows to 2026-10-16: an acronym
+#: alias is followed by one of these 21 times, every one Shree TNB Polymers.
+CORPORATE_SUFFIX = (
+    "Polymers",
+    "Plastics",
+    "Industries",
+    "Textiles",
+    "Pharma",
+    "Limited",
+    "Ltd",
+    "Pvt",
+)
+_NOT_ANOTHER_COMPANY = rf"(?!\s+(?:{'|'.join(CORPORATE_SUFFIX)})(?!{_ASCII_WORD}))"
+
 #: Longer names that CONTAIN a book alias and name something else: the group's
 #: other listed companies and the resort named after it. Each is matched like
 #: an alias and consumes its span, so the "Genting" inside it is not Genting
@@ -100,6 +157,100 @@ OTHER_NAMES = (
     "Resorts World Genting",
 )
 
+# --- a bank named as the AUTHOR of a broker's note -------------------------------
+#
+# A bank's broking arm publishes calls on other companies, and the press names
+# the bank: on 2026-10-15 six of Maybank's eight digest rows were Maybank
+# Securities / Maybank IB notes on Merdeka Copper Gold, Grab, Airports of
+# Thailand, Vietnam's market and Singapore's banks, two of them starred. The
+# bank IS named, so the row stays linked - retrieval, the graph's mention edges
+# and per-source coverage read mentions - but it is not news about the bank.
+# `EntityLinker.authored` names the ids a text mentions ONLY in these shapes,
+# and the digest leaves such a row off that name's page. The shapes are
+# broker vocabulary, not a list of banks, so they apply to any linked name
+# ("CIMB keeps 'Buy' call on TNB" is CIMB's note and Tenaga's news).
+#
+# A broker's OUTPUT, in forms a company's own news does not take: a call, or a
+# price target - "target price", "TP", an amount in a currency. Never a bare
+# "target" or "rating": "Maybank sets RM80bil sustainable finance target for
+# 2030" and "Maybank keeps AAA rating" are the bank's own. Earnings forecasts
+# are left out for the same reason ("cuts loan growth forecast"), at the cost
+# of "Maybank cuts DigiPlus forecasts" still reading as Maybank news.
+#
+# And the call must be ON ANOTHER NAMED COMPANY - a capitalised name between
+# the verb and the call, or "on/for <Name>" after it. Without that the name
+# before the verb is the one being rated: "IHH Healthcare maintains Buy,
+# target price lowered" and "Apple upgraded to Buy" were both stored rows.
+_ARM = r"(?:Securities|IBG?|Investment\s+Bank(?:ing)?(?:\s+(?:Bhd|Berhad))?|Kim\s+Eng|Research)"
+_ACTS = (
+    r"(?i:keeps?|kept|maintains?|cuts?|raises?|lifts?|holds?|sets?|starts?"
+    r"|initiates?|reiterates?|upgrades?|downgrades?|lowers?|trims?|slash(?:es)?)"
+)
+_RATINGS = r"(?i:buy|hold|sell|outperform|underperform|neutral)"
+#: A recommendation: BUY, 'buy', "at buy", "to hold", "Buy rating", "Sell call".
+_RECOMMENDS = (
+    r"(?:\b(?:BUY|HOLD|SELL|OUTPERFORM|UNDERPERFORM|NEUTRAL)\b"
+    rf"|['‘\"“]{_RATINGS}['’\"”]"
+    rf"|\b(?i:at|to)\s+{_RATINGS}\b"
+    r"|\b(?i:buy|hold|sell)['’\"”]?\s+(?i:rating|call)\b)"
+)
+_PRICE_TARGET = (
+    r"(?:\b(?i:target\s+price|price\s+target)\b|\bTP\b"
+    r"|(?:\b[A-Z]{3}\s?|RM|S\$|US\$|\$)\d[\d,]*(?:\.\d+)?\s+(?i:target)\b)"
+)
+#: Another company's name: capitalised words, not a recommendation itself.
+_OTHER_NAME = r"(?!(?i:buy|hold|sell)\b)[A-Z][\w&'’-]*"
+#: Within one clause: a full stop ends it unless a digit or letter follows
+#: ("THB 75.00 target").
+_CLAUSE = r"(?:[^.?!;]|\.(?=\S))"
+#: A bare "target" counts only as a target for a STOCK: "Maybank holds target
+#: for Bank Rakyat Indonesia stock".
+_STOCK_TARGET = rf"\b(?i:target)(?=\s+for\s+{_CLAUSE}{{1,60}}?\s+(?i:stock|shares)\b)"
+#: "Maybank keeps Singtel at buy", "Maybank IB upgrades SD Guthrie to 'buy'",
+#: "Maybank Maintains Frencken BUY" (the company, then the call), and
+#: "Maybank Keeps BUY on ISOTeam", "Maybank keeps Buy rating for Singtel",
+#: "Maybank kept IDR 3,800 target for Merdeka Copper Gold stock" (the call,
+#: then the company).
+_BANK_MAKES_A_CALL = re.compile(
+    rf"\A(?:\s+{_ARM})?\s+{_ACTS}\b"
+    rf"(?:\s+{_OTHER_NAME}{_CLAUSE}{{0,50}}?(?:{_RECOMMENDS}|{_PRICE_TARGET})"
+    rf"|{_CLAUSE}{{0,30}}?(?:{_RECOMMENDS}|{_PRICE_TARGET}|{_STOCK_TARGET})\s+(?i:on|for)\s+[A-Z])"
+)
+#: "Grab Holdings Keeps BUY Rating as Maybank Cuts Target Price": the call is
+#: on the company named before "as".
+_AS_OR_AFTER = re.compile(r"\b(?i:as|after)\s+\Z")
+_BANK_REVISES = re.compile(
+    rf"\A(?:\s+{_ARM})?\s+{_ACTS}\b{_CLAUSE}{{0,30}}?(?:{_RECOMMENDS}|{_PRICE_TARGET}|\b(?i:rating|call)\b)"
+)
+#: "GEN Bhd downgraded by Maybank", "Marco Polo Marine Keeps BUY at Maybank".
+_RATED_BY = re.compile(
+    r"(?:\b(?i:upgraded|downgraded|initiated|rated)\s+by|\b(?:BUY|HOLD|SELL)\s+(?i:at|from))\s+\Z"
+)
+#: "Maybank Securities weighs in", "Maybank IB cautions", "Maybank Investment
+#: Bank says": the research arm giving a view.
+_ARM_SPEAKS = re.compile(
+    rf"\A\s+{_ARM}(?:\s+(?i:CEO|chief\s+executive|economists?|analysts?))?"
+    r"\s+(?i:weighs\s+in|says|said|sees|expects|expecting|cautions|warns|believes)\b"
+)
+#: "...from market status upgrade: Maybank Securities CEO", "... — Maybank IB":
+#: the arm signing the headline.
+_SIGNED = re.compile(r"[:\-–—]\s*\Z")
+_ARM_SIGNS = re.compile(
+    rf"\A\s+{_ARM}(?:\s+(?i:CEO|economists?|analysts?))?\s*(?:\Z|[?!]|\.(?:\s|\Z))"
+)
+
+
+def _writes_the_note(text: str, start: int, end: int) -> bool:
+    """Is the alias at text[start:end] the author of a broker's call or view?"""
+    before, after = text[max(0, start - 40) : start], text[end : end + 160]
+    return bool(
+        _BANK_MAKES_A_CALL.match(after)
+        or _ARM_SPEAKS.match(after)
+        or (_AS_OR_AFTER.search(before) and _BANK_REVISES.match(after))
+        or _RATED_BY.search(before)
+        or (_SIGNED.search(before) and _ARM_SIGNS.match(after))
+    )
+
 
 def alias_pattern(surface: str) -> re.Pattern[str]:
     """The compiled matcher for one alias, per the rules in the module doc."""
@@ -113,7 +264,8 @@ def alias_pattern(surface: str) -> re.Pattern[str]:
     bounded = rf"(?<!{_ASCII_WORD}){{}}(?!{_ASCII_WORD}){_NOT_A_PLACE}"
     is_one_word = " " not in surface
     if is_one_word and surface.isupper() and len(surface) <= ACRONYM_MAX_CHARS:
-        return re.compile(bounded.format(escaped))  # case-sensitive acronym
+        # case-sensitive acronym, and not the first word of another company
+        return re.compile(bounded.format(escaped) + _NOT_ANOTHER_COMPANY)
     if is_one_word and surface[0].isupper() and surface[1:].islower() and surface.isalpha():
         # Titlecase proper noun: Titlecase or ALL CAPS, never lowercase. An
         # inflectional tail of up to two lowercase letters is allowed on names
@@ -145,8 +297,8 @@ class EntityLinker:
             if iid:
                 self._surfaces.setdefault(iid, []).append(surface)
 
-    def _matches(self, text: str) -> list[tuple[int, int, str]]:
-        """(start, alias order, iid) for every match no longer match contains.
+    def _matches(self, text: str) -> list[tuple[int, int, int, str]]:
+        """(start, end, alias order, iid) for every match no longer match contains.
 
         Aliases are tried longest first and each accepted match claims its
         span; a shorter alias whose match overlaps a claimed span is the same
@@ -155,18 +307,21 @@ class EntityLinker:
         to Genting Malaysia AND Genting Berhad. Every occurrence is checked,
         not just the first, so "Genting Malaysia ... Genting Berhad" still
         links both. A match of an OTHER_NAMES entry claims its span and links
-        nothing.
+        nothing, and so does one that ends a Malay building's name.
         """
         claimed: list[tuple[int, int]] = []
-        out: list[tuple[int, int, str]] = []
+        out: list[tuple[int, int, int, str]] = []
         for order, (_surface, iid, pattern) in enumerate(self._entries):
             for m in pattern.finditer(text):
                 start, end = m.span()
                 if any(start < e and s < end for s, e in claimed):
                     continue
                 claimed.append((start, end))
-                if iid:
-                    out.append((start, order, iid))
+                # Checked here, not in alias_pattern: the name words between
+                # "Menara" and the alias vary in number, and a lookbehind
+                # cannot.
+                if iid and not _IN_A_BUILDING_NAME.search(text, max(0, start - 80), start):
+                    out.append((start, end, order, iid))
         return out
 
     def link(self, text: str) -> list[str]:
@@ -177,7 +332,7 @@ class EntityLinker:
         it separately. Ties at the same position keep alias order.
         """
         first_at: dict[str, tuple[int, int]] = {}
-        for start, order, iid in self._matches(text):
+        for start, _end, order, iid in self._matches(text):
             key = (start, order)
             if iid not in first_at or key < first_at[iid]:
                 first_at[iid] = key
@@ -187,7 +342,21 @@ class EntityLinker:
         """How many times any alias of the given instruments occurs, counting
         only matches no longer alias contains, the same reading as `link`."""
         wanted = set(instrument_ids)
-        return sum(1 for _start, _order, iid in self._matches(text) if iid in wanted)
+        return sum(1 for _start, _end, _order, iid in self._matches(text) if iid in wanted)
+
+    def authored(self, text: str) -> set[str]:
+        """Linked ids the text names ONLY as the author of a broker's note.
+
+        "Maybank keeps THB 75.00 target for Airports of Thailand stock" is
+        linked to MYX:1155 by `link` and returned here: it mentions the bank,
+        and it is news about Airports of Thailand. One mention in any other
+        role ("...; Maybank shares rose 1%") and the id is not returned. See
+        the shapes above `_writes_the_note`.
+        """
+        only: dict[str, bool] = {}
+        for start, end, _order, iid in self._matches(text):
+            only[iid] = only.get(iid, True) and _writes_the_note(text, start, end)
+        return {iid for iid, yes in only.items() if yes}
 
     def surfaces(self, instrument_id: str) -> list[str]:
         """Every alias of one instrument, longest first."""

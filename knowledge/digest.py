@@ -233,7 +233,16 @@ def build_digest(
         ]
         for iid in book:
             forms = {iid, canonical(iid) or iid}
-            mine = [a for a in articles if forms & set(a.instruments)]
+            # A bank named only as the AUTHOR of a broker's note on another
+            # company is linked - it is mentioned - but the note is not news
+            # about the bank: on 2026-10-15 six of Maybank's eight rows here
+            # were Maybank Securities / IB calls on other names. Read from the
+            # text now, like the gate below, so stored rows obey it too.
+            mine = [
+                a
+                for a in articles
+                if forms & set(a.instruments) and not forms & linker.authored(a.text)
+            ]
             digest.names.append(
                 _name_digest(iid, mine, facts, now, linker, extractor, top_n, set(book))
             )
