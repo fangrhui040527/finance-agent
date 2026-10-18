@@ -1,6 +1,78 @@
 {
   "collection": [
     {
+      "at": "2026-10-18T22:43:05.363398+00:00",
+      "detail": "skipped: every asked name was refused: outside the plan or over today's credits (XNAS:AAPL, XNAS:MSFT)",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-18T22:43:05.125284+00:00",
+      "detail": "facts 0; window not covered back to 2026-10-18 13:20Z; the oldest item read is 2026-10-18 21:30Z, so 8.2h of the window was never served",
+      "fetched": 16,
+      "kept": 16,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 15
+    },
+    {
+      "at": "2026-10-18T22:43:03.912364+00:00",
+      "detail": "alphavantage refused a premium endpoint (the key's plan does not include it): Thank you for using Alpha Vantage! This is a premium endpoint. You may subscribe to any of the premium plans at https://www.alphavantage.co/premium/ to instantl",
+      "fetched": 0,
+      "kept": 0,
+      "source": "alphavantage_news",
+      "status": "failed",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-18T22:43:01.399782+00:00",
+      "detail": "facts 39; ",
+      "fetched": 114,
+      "kept": 103,
+      "source": "finnhub",
+      "status": "ok",
+      "stored": 64
+    },
+    {
+      "at": "2026-10-18T22:42:58.235172+00:00",
+      "detail": "facts 0; ",
+      "fetched": 0,
+      "kept": 0,
+      "source": "edgar",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-18T22:42:58.116348+00:00",
+      "detail": "named the company: 17 of 36 (lowest: NVIDIA 5/20, Apple 5/7, Microsoft 7/9)",
+      "fetched": 36,
+      "kept": 36,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 20
+    },
+    {
+      "at": "2026-10-18T22:42:57.326001+00:00",
+      "detail": "named the company: 94 of 108 (lowest: Microsoft 21/25, Apple 34/39, NVIDIA 39/44)",
+      "fetched": 115,
+      "kept": 108,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 87
+    },
+    {
+      "at": "2026-10-18T22:42:55.326726+00:00",
+      "detail": "grouped 3 names per request; 1 request; named the company: 16 of 139 (lowest: Apple + Microsoft + NVIDIA 16/139)",
+      "fetched": 250,
+      "kept": 139,
+      "source": "gdelt",
+      "status": "ok",
+      "stored": 139
+    },
+    {
       "at": "2026-10-18T13:20:46.133517+00:00",
       "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
       "fetched": 0,
@@ -137,18 +209,18 @@
     }
   ],
   "counts": {
-    "articles": 19892,
+    "articles": 20217,
     "documents": 0,
-    "escalated": 2978,
+    "escalated": 3003,
     "events": 4236,
-    "failed_sweeps": 78,
-    "linked": 12443,
-    "observations": 5822,
+    "failed_sweeps": 79,
+    "linked": 12550,
+    "observations": 5861,
     "series": 31,
-    "sweeps": 969
+    "sweeps": 977
   },
   "day": "2026-10-18",
-  "generated_at": "2026-10-18 13:21 UTC",
+  "generated_at": "2026-10-18 22:43 UTC",
   "macro": [
     {
       "change": "-0.02",
@@ -359,22 +431,22 @@
       "upcoming": []
     },
     {
-      "escalated": 0,
+      "escalated": 12,
       "events": [],
       "instrument_id": "XNAS:NVDA",
       "label": "NVIDIA",
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-10-17",
+          "known_at": "2026-10-18",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "26.88"
+          "value": "26.76"
         },
         {
           "concept": "pb",
-          "known_at": "2026-10-17",
+          "known_at": "2026-10-18",
           "label": "P/B",
           "period_end": null,
           "source": "finnhub",
@@ -382,7 +454,7 @@
         },
         {
           "concept": "eps_ttm",
-          "known_at": "2026-10-17",
+          "known_at": "2026-10-18",
           "label": "EPS (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -390,7 +462,7 @@
         },
         {
           "concept": "dividend_yield",
-          "known_at": "2026-10-17",
+          "known_at": "2026-10-18",
           "label": "dividend yield",
           "period_end": null,
           "source": "finnhub",
@@ -398,15 +470,15 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-10-17",
+          "known_at": "2026-10-18",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
-          "value": "2.26"
+          "value": "2.27"
         },
         {
           "concept": "high_52w",
-          "known_at": "2026-10-17",
+          "known_at": "2026-10-18",
           "label": "52w high",
           "period_end": null,
           "source": "finnhub",
@@ -414,7 +486,7 @@
         },
         {
           "concept": "low_52w",
-          "known_at": "2026-10-17",
+          "known_at": "2026-10-18",
           "label": "52w low",
           "period_end": null,
           "source": "finnhub",
@@ -487,100 +559,100 @@
       ],
       "stories": [
         {
-          "doc_id": "https://finance.yahoo.com/economy/policy/articles/apple-nvidia-gave-25m-trumps-150000953.html?.tsrc=rss",
+          "doc_id": "https://finance.yahoo.com/media-advertising/articles/meta-earnings-puts-adobe-stock-201147047.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
-          "escalated": false,
+          "escalated": true,
           "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-10-17T15:00:00+00:00",
+          "published_at": "2026-10-18T20:11:47+00:00",
           "quality": 1.0,
-          "title": "Apple, Nvidia each gave $25M to Trump's White House ballroom \u2014 but the president's own name is nowhere on the donor list",
-          "uncertainty": 0.2840909090909091
+          "title": "Meta Earnings Puts Adobe Stock And AI Ad Software Names In Focus",
+          "uncertainty": 0.13440860215053763
         },
         {
-          "doc_id": "https://news.google.com/rss/articles/CBMikwFBVV95cUxONVRSbXJ5dXFLUk1KSlVmWkV4aUsyZERTdGw2MUtmWnB0NWUtMmlZLXJKVWNOTTgxV2tqdUtsUWRXQ2FYSU5vaDRob2ZTRlJ0OWtxUTJNOW44SWttLTNwR0FBR0lJZC1FWl9sd3lqSWNDUnBTRy1BRktlNTRONHJVNXZBQ3Fyb01Hb2NMTERaQ1NOSW8?oc=5",
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/does-broadcom-avgo-face-ai-160933871.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-17T22:11:05+00:00",
-          "quality": 0.8,
-          "title": "Nvidia vs. AMD: Which AI Business Has More Room for Margins to Fall?",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "polarity": 1.0,
+          "published_at": "2026-10-18T16:09:33+00:00",
+          "quality": 1.0,
+          "title": "What Does Broadcom (AVGO) Face As AI Chip Supply Turns Into A Bottleneck?",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "https://news.google.com/rss/articles/CBMilgFBVV95cUxOSmRzOE1YSUFRVVg0bC16VmpoSldEcEJOTDdhR3JHUUU3NlpIYzJ6eU1KR3hPZmFuR0czUHFidzBVOVJhSmUzVkhFeW03aS02RHN5bXZSc0JtQ3lNeG1ESklUVmg3bmowOFdqUUpzbnNBLWd4MGV0SE1LdFh6NWJaUmt4Z1ZiUmZQREVIMEtPRHFwQnRiRWc?oc=5",
-          "domain": "finance.yahoo.com",
-          "escalated": false,
+          "doc_id": "finnhub:142971162",
+          "domain": "Yahoo",
+          "escalated": true,
           "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-10-17T22:10:27+00:00",
-          "quality": 0.8,
-          "title": "Nvidia vs. AMD: Which Business Is More Exposed to a Data-Center Slowdown?",
+          "published_at": "2026-10-18T05:15:01+00:00",
+          "quality": 0.85,
+          "title": "Why Is Advanced Micro Devices (AMD) Gaining Ground In AI Infrastructure?",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "https://news.google.com/rss/articles/CBMimAFBVV95cUxNZ0RqY1JjcXVtOWFoM2F2ZmRINWluWTJqV2UyQU5UaldWN1ozeDhrMHV0X280WWIzYlU5dTVRUTFwbDB1OXJZc3ZHeU9zRWhMOV90dlZYQkFyR0ViSXRRbTQxbjFDQ1MwNXlrTTh6Vld2clBiS256VlR4UkNKUTRWbUZjcjBSTWZBZ1pWZ3ZRa1MydEQ3cHowaA?oc=5",
-          "domain": "finance.yahoo.com",
-          "escalated": false,
+          "doc_id": "finnhub:142966395",
+          "domain": "Yahoo",
+          "escalated": true,
           "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-10-17T17:35:13+00:00",
-          "quality": 0.8,
-          "title": "Nvidia (NVDA) Trades Far Below Its Usual Multiple, Is Customer Debt the Real Risk?",
-          "uncertainty": 0.8928571428571428
+          "published_at": "2026-10-18T00:30:13+00:00",
+          "quality": 0.85,
+          "title": "Elon Musk Says Jensen Huang 'Rocks' as SpaceX, Nvidia Team Up on AI Data Centers in Space: \u2018Far Better Than Almost Anyone Expects\u2019",
+          "uncertainty": 0.1984126984126984
         },
         {
-          "doc_id": "https://news.google.com/rss/articles/CBMiswFBVV95cUxOVkY3aEhBc0FxcVMwX3BianlVdFM0bm5tbUNqYklzbHpkU0ozMWV3RmhmS1owVmUwRmswOFlvUkVyVkgwUm9jbk9kRjZTdlR5bmNpUlVXTFNWZVdBeGJIWFB6ajNFRGhGbzJqSUV0dDlRTmw5MmlnTGVNb2lYVWZWSFFSTmlQS3VPM1Q5SzVBdU9YVUNGYzJMYWRrREEtM0U1YnJsM0REWjczRHc0VXFWRUN2MA?oc=5",
-          "domain": "seekingalpha.com",
-          "escalated": false,
+          "doc_id": "https://news.google.com/rss/articles/CBMi0AFBVV95cUxQLVd3RU5QdzNwZHd0cUNCbUQxM3B6M2JOTXZZbEE4b3Y4czkxSjBuNklIRXU2S1VyRld6WTlRQUdlZkN3TGNRcng5cjR6ZEViNXNqcHh2RnlRU2hWVXRPUVFjVXRvd2FaaTVkd002aUk4WHlEQ2wxTGk3alF5S0FUTGNMUXF2dV9QUjk4eThjcWVPaVBLYzc2c0NUaUN4UUVMcVZTSERiMDE5VXp0NDdoVFpuS2E0TGZoUnBrRTExcnZDRlJia1VNcU40SUxQcE1y?oc=5",
+          "domain": "www.reuters.com",
+          "escalated": true,
           "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-10-17T12:00:20+00:00",
+          "published_at": "2026-10-18T12:09:43+00:00",
           "quality": 0.8,
-          "title": "Marvell and Nvidia outlooks provide buying opportunities during downturn: GF",
+          "title": "Samsung to use TSMC technology for Nvidia's next-generation memory chips, Seoul newspaper reports",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxOZWdyelVVdFphcEhBYkNMNTVxRnRieWJzNXVlWnhmSUl1MWZkcF9idk1qSEtIcllIMUVMd0hxalVQalR4MzlyQnFyejJ6cXdUSEJTdlZaWi0tTnNacGVQalRlbk5vdTZIcUo2c05FUjVJYlMtZnJNbktqVnJMeDR2R0VWSHM0V18wc0JGMnZQY2RTQURJTndiRF9NVk9SY3l2cXR3MjZBMWhCbEZiTENKTjViejdBbWFXSFcxbnB1V3M5cHpESnpxbw?oc=5",
-          "domain": "www.desmoinesregister.com",
-          "escalated": false,
+          "doc_id": "https://news.google.com/rss/articles/CBMimAFBVV95cUxPZy1fWTFkNkhqWEpoWkVLdVN2Y1FXeVowMnpqTnltNk1WcGJZYzRvdnJmbXdoWnJWaXk0Um5pSUdkQ1lGN2N1cHAwVXNmNHFpVFA5NGptY2ZKTkwxNm9HaTRmUEJYWURpRXVzU2JCWkF5SnpfM09fZ3FQa1pPc1JDcUJPbFBQZWhIXzc0V2FHNWhOQkd1SzRjVA?oc=5",
+          "domain": "www.fool.com",
+          "escalated": true,
           "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-17T18:54:57+00:00",
+          "polarity": -1.0,
+          "published_at": "2026-10-18T22:12:37+00:00",
           "quality": 0.65,
-          "title": "Monetize360: AI Factory Monetization Now Available on NVIDIA DSX Air",
+          "title": "The Bond Market Is Sending a Warning to Nvidia Shareholders",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "https://news.google.com/rss/articles/CBMikgFBVV95cUxOaGstRGFLTlV4Yk5ic3FHQmdNY3dYVEY3ZThXa2dZU3RNN2NZVUZzWmRUWXFIcFNLSUZ2TVJ0SEViM0pOdWlaQzZxOFY0UnFMalN0Y3JWTlhmSFFPY2E1d0pkb05YOXp4VGlnWm9xV3RsODNPT3dvekNqT1B0OWNfYjhrZkl4b0N6cHJMcHpNYmc1dw?oc=5",
-          "domain": "www.tikr.com",
-          "escalated": false,
+          "doc_id": "gdelt:https://econotimes.com/NVIDIA-Expects-70-Fiscal-2028-Revenue-Growth-as-Supply-Limits-Persist-1756139",
+          "domain": "econotimes.com",
+          "escalated": true,
           "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-17T16:30:00+00:00",
+          "polarity": 1.0,
+          "published_at": "2026-10-18T18:15:00+00:00",
           "quality": 0.65,
-          "title": "Nvidia Stock Is Up 13% This Year. Where Does the Stock Stand Now?",
-          "uncertainty": 0.0
+          "title": "NVIDIA Expects 70% Fiscal 2028 Revenue Growth as Supply Limits Persist",
+          "uncertainty": 1.0
         },
         {
-          "doc_id": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxPa1BKNUhzOEJNbWNqS0NjUE9RZlc2SzhzMkNwSHNmMHc0SHZIWl9iR3R4c2pSMTBlSU00bzlUVndXVGFmWlIzM3paX1ZBX2kySkJ2b3FCUGpSNDdpN3VSaTA5N0ZESnlMMmtLd01QVHpCTkJ4LWdvMDNYQ2IzblNyenJsVDFQWEQ1THcwclZBeUNBWXlGYTYyME5sSUFxQ3hrQXJMUGxRQW4zanlhYjYzNFQxY1ZtREhPdjNiX3ZZUlNPdW8?oc=5",
-          "domain": "www.marketbeat.com",
-          "escalated": false,
+          "doc_id": "gdelt:https://www.tomshardware.com/pc-components/gpus/amd-cards-now-run-all-dlss-features-thanks-to-one-developers-project-plans-to-match-native-nvidia-gpu-performance",
+          "domain": "tomshardware.com",
+          "escalated": true,
           "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-10-17T15:21:07+00:00",
+          "published_at": "2026-10-18T17:45:00+00:00",
           "quality": 0.65,
-          "title": "953,424 NVIDIA Corporation $NVDA Shares Sold by ICONIQ Capital LLC",
+          "title": "Modder brings full Nvidia DLSS 5 suite to three generations of AMD gaming GPUs plans to match native Nvidia GPU performance",
           "uncertainty": 0.0
         }
       ],
       "tone": {
-        "intensity_max": 0.0,
-        "n": 22,
-        "polarity_mean": 0.0,
-        "sources": 9,
-        "uncertainty_mean": 0.144
+        "intensity_max": 0.333,
+        "n": 66,
+        "polarity_mean": 0.03,
+        "sources": 27,
+        "uncertainty_mean": 0.116
       },
       "upcoming": [
         {
@@ -593,22 +665,22 @@
       ]
     },
     {
-      "escalated": 3,
+      "escalated": 11,
       "events": [],
       "instrument_id": "XNAS:AAPL",
       "label": "Apple",
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-10-17",
+          "known_at": "2026-10-18",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "38.83"
+          "value": "38.88"
         },
         {
           "concept": "pb",
-          "known_at": "2026-10-17",
+          "known_at": "2026-10-18",
           "label": "P/B",
           "period_end": null,
           "source": "finnhub",
@@ -616,7 +688,7 @@
         },
         {
           "concept": "eps_ttm",
-          "known_at": "2026-10-17",
+          "known_at": "2026-10-18",
           "label": "EPS (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -624,7 +696,7 @@
         },
         {
           "concept": "dividend_yield",
-          "known_at": "2026-10-17",
+          "known_at": "2026-10-18",
           "label": "dividend yield",
           "period_end": null,
           "source": "finnhub",
@@ -632,15 +704,15 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-10-17",
+          "known_at": "2026-10-18",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
-          "value": "1.11"
+          "value": "1.10"
         },
         {
           "concept": "high_52w",
-          "known_at": "2026-10-17",
+          "known_at": "2026-10-18",
           "label": "52w high",
           "period_end": null,
           "source": "finnhub",
@@ -648,7 +720,7 @@
         },
         {
           "concept": "low_52w",
-          "known_at": "2026-10-17",
+          "known_at": "2026-10-18",
           "label": "52w low",
           "period_end": null,
           "source": "finnhub",
@@ -721,6 +793,17 @@
       ],
       "stories": [
         {
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/does-broadcom-avgo-face-ai-160933871.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "polarity": 1.0,
+          "published_at": "2026-10-18T16:09:33+00:00",
+          "quality": 1.0,
+          "title": "What Does Broadcom (AVGO) Face As AI Chip Supply Turns Into A Bottleneck?",
+          "uncertainty": 0.0
+        },
+        {
           "doc_id": "https://finance.yahoo.com/technology/ai/articles/apple-bets-same-siri-ai-183000417.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
           "escalated": true,
@@ -743,78 +826,67 @@
           "uncertainty": 0.5434782608695652
         },
         {
-          "doc_id": "https://news.google.com/rss/articles/CBMiowFBVV95cUxPVHREVEFRVFlmYVZGZ2RRVkZkYmlEUmFUTzZqVnFnMnV2cEN1ZldSWHQxMTJESHdnSGtIelp6Nmd0VU1RZ2htV3RqZHNxaDA5RU0waTJBZzZEeUk1QWZzRE9qdnNjbXQ1RGlvdDc2cGNZVVhjRDJvajhXMzZhaVdQQTk1OVVSYjA5OHM4REVNYWU0eXVLWG1sSFoxZGxvVXd3UDhB0gGoAUFVX3lxTFBRbHNGNnpUbkdxaDNzWmNnVl95ajNMZjg5SkNkWDRmdVdCaV9DT0lJZUVSMWR1ZEpsX2kyOWZ6bGdkdUo0aFlMcWNEYlpLWFJoWjBYMF90X0RvYlZJQXBreHlMUTNLREgzZnZsSVYtNlVXMEx2ZmJ4VGlaMF9zallxX1RWYm83Uk11anJQdFRTVmdKbVNkYlB3YkxJbHJKZ2VHdjV3ZGUwNg?oc=5",
-          "domain": "simplywall.st",
+          "doc_id": "https://news.google.com/rss/articles/CBMizAFBVV95cUxQZlpaM3JzRkx5UlA3aXVsTGd4N0FYN25iY000cUlrb1Vlb015RE5GQzFYQWN3R05DSnl6WlVvWGFhN2NQVFZCR2JmV19ab2lfcEd3b09oNnE5NmFTSTFvdTVkeHE4NGtTS0pNV0VyTmszaXA2eUxLZ3JBUGpmTjJqdHJpQnlZYnZzQmxLaHY5a252ZFhlVVNCTFk3ODdWUDFzNnZpTHg1eUdPX19uVkhWeFRtNXhnalFTOVotMUM5ZE1zQmJCR0J0RHQ1cGbSAdIBQVVfeXFMT3ptMGphb1ZJTDJuc3hCVlFkRjZHYW9pdkgyemI2SlBYbW5LcDhmZGNzU2dpZ0hZR0FzNk8zMmpIeXh4SU1hek5PTHN4ZWJTWHpCZVlSdlYtQ3lNUkFNU1FINFZnaUgwdGVRNktwWHZqYlZlV2Q3MHBHWlVSa1dsNm5sWkwwdWszR0NlUzZLTS1iRkRXV0oycng2dnRxZ2RrbU1EZC16M3VWel9LVXAyRVhHQUxNRC1GUFhKcnlkTjVyUE8zczBJTUp4WWJzdG1OdkVn?oc=5",
+          "domain": "www.theapplepost.com",
           "escalated": true,
           "intensity": 0.0,
           "polarity": -1.0,
-          "published_at": "2026-10-17T21:47:45+00:00",
+          "published_at": "2026-10-18T20:00:00+00:00",
           "quality": 0.65,
-          "title": "Missed Apple's Gain? Here's What Holders Saw",
+          "title": "Apple Store staff reportedly warning customers not to expect iPhone Duo walk-in stock",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "https://finance.yahoo.com/technology/ai/articles/microsoft-msft-facing-fresh-regulatory-191124990.html?.tsrc=rss",
-          "domain": "finance.yahoo.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-17T19:11:24+00:00",
-          "quality": 1.0,
-          "title": "Microsoft (MSFT) Is Facing Fresh Regulatory Pressure",
-          "uncertainty": 0.3205128205128205
-        },
-        {
-          "doc_id": "https://finance.yahoo.com/economy/policy/articles/apple-nvidia-gave-25m-trumps-150000953.html?.tsrc=rss",
-          "domain": "finance.yahoo.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-17T15:00:00+00:00",
-          "quality": 1.0,
-          "title": "Apple, Nvidia each gave $25M to Trump's White House ballroom \u2014 but the president's own name is nowhere on the donor list",
-          "uncertainty": 0.2840909090909091
-        },
-        {
-          "doc_id": "finnhub:142960253",
-          "domain": "Yahoo",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-17T12:00:51+00:00",
-          "quality": 0.85,
-          "title": "Apple, Salesforce Lead Five Stocks Near Buy Points",
+          "doc_id": "https://news.google.com/rss/articles/CBMi3wFBVV95cUxNME11cGtjc0dPZDBkbkhxYkxaUFkwdktZbGpzY1VkZjBISlRWZ24tSDVMSExoSDJ4eGptcGdOampzZTkzR0p0dTBZWHNqRlJnS0l3VkVkY19DakttMVVkMEVlUmtCOWYxRXE4Y0ItN2tONGxJbGVnZXI2SzRMRnFBUHFBYXBYcFdyb0tSSEI3WURreEdwbHBhMnhHZ0FaWlRaVFViZno0Q2U1T09IZWlkYVRNUUc2N2g5cWROdHBleEpLa1FDUW44bmVUTnFsNndDTDVOT3ppSXlXejBQYV9B?oc=5",
+          "domain": "247wallst.com",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "polarity": 1.0,
+          "published_at": "2026-10-18T18:00:00+00:00",
+          "quality": 0.65,
+          "title": "Apple Keeps Hitting Record Highs. Bitcoin Hasn\u2019t Set One All Year. Which Is the Better Buy?",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "https://news.google.com/rss/articles/CBMilwFBVV95cUxPSHQ1UHRkT280bVY3b0JMLXhDSXBHSVlBTlMzbk9KdGdPaWZMYlduUzQ2dmhvNWJtX3BzazJIYkZ0N2JFc2NMYm5LaFVfTl9RVVlLdVo0UE1wRGdfZFBlT1RsclBES1NRZEpoTDBWbmcySGtGdzBJa2poOWVXX0pGd1dDNHJNSjF4MjFOaVRKb0ktNVAzNmsw?oc=5",
-          "domain": "finance.yahoo.com",
-          "escalated": false,
+          "doc_id": "gdelt:https://9to5mac.com/2026/10/18/apples-next-homeview-could-debut-as-soon-as-next-year-with-a-robotic-arm-report/",
+          "domain": "9to5mac.com",
+          "escalated": true,
           "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-10-17T15:49:02+00:00",
-          "quality": 0.8,
-          "title": "$10,000 Invested in Apple Could Be Worth This Much by 2031",
-          "uncertainty": 1.0
+          "published_at": "2026-10-18T16:45:00+00:00",
+          "quality": 0.65,
+          "title": "Apple next HomeView could debut as soon as next year with a robotic arm: report",
+          "uncertainty": 0.8333333333333334
         },
         {
-          "doc_id": "https://news.google.com/rss/articles/CBMilAFBVV95cUxQU3hfbDdVdWtQZ3JLX29yMVdiVnJJTExEMWxiVWZRM2pFdU13UFlkRzEzX3J2SDI5d1FzU2ljcjZpRjlEb1VtRFlvc1NfMVZJUnI5aThGcmE5cnNpazNidWRMT2c3RlV0STd1bEpDendfQmRIUVJyanRlM2loT1JNaTUxRE45M2tvcWpSSXZOM1B3SlFH?oc=5",
-          "domain": "www.cbsnews.com",
-          "escalated": false,
+          "doc_id": "https://news.google.com/rss/articles/CBMioAFBVV95cUxQSEozaXNnU2x0WTNxRjRPNGNXZkdzNEJPOGlUV3VYZk0wd1QxaG5icEExTVBiaFU2ekxnNUYxTmhldmVEbGZFZkVhRDlNYkFzMGptRVVSaDAtLU9YdzJ3NTNPR0pYaUE2bzJxTkNDakhKQTh4T09aMkU4OFZ3RlotSjBTRmw3SlN0eXJCVW5lZGVHZkVaQ1BCX3dhd1hqQVBa?oc=5",
+          "domain": "www.benzinga.com",
+          "escalated": true,
           "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-10-17T18:44:00+00:00",
+          "published_at": "2026-10-18T11:00:17+00:00",
           "quality": 0.65,
-          "title": "Laura McIntosh - Making Apple Things! part 1",
+          "title": "Apple News: iPhone Duo Demand, $5 Trillion Valuation And China AI Plans - Apple (NASDAQ:AAPL)",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMilAFBVV95cUxPWDVRb2FrV3ZSYzNvc18taHNQZlZqV3pYRnV6SURCYk1RTFlhdVZRemt6RDRQM0RLWmxTc3hvQUI4ZGJkcFhrb3oxYTJza2EtenRqaWNLTG9nQzgxM1RHT1dLZUtyYzNDRUdsa3hISThMSGhBdS1sRkpEdHNBb25OUmd1ZzlsWmRWQkp5TnNTeTU1clJ2?oc=5",
+          "domain": "beinsure.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-18T10:30:14+00:00",
+          "quality": 0.65,
+          "title": "Apple (NASDAQ: AAPL) stock forecast: Wall Street analysts split on AAPL\u2019s upside",
           "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 21,
-        "polarity_mean": -0.048,
-        "sources": 12,
-        "uncertainty_mean": 0.102
+        "n": 57,
+        "polarity_mean": 0.0,
+        "sources": 31,
+        "uncertainty_mean": 0.058
       },
       "upcoming": [
         {
@@ -841,22 +913,22 @@
       ]
     },
     {
-      "escalated": 1,
+      "escalated": 8,
       "events": [],
       "instrument_id": "XNAS:MSFT",
       "label": "Microsoft",
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-10-17",
+          "known_at": "2026-10-18",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "29.76"
+          "value": "29.37"
         },
         {
           "concept": "pb",
-          "known_at": "2026-10-17",
+          "known_at": "2026-10-18",
           "label": "P/B",
           "period_end": null,
           "source": "finnhub",
@@ -864,7 +936,7 @@
         },
         {
           "concept": "eps_ttm",
-          "known_at": "2026-10-17",
+          "known_at": "2026-10-18",
           "label": "EPS (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -872,7 +944,7 @@
         },
         {
           "concept": "dividend_yield",
-          "known_at": "2026-10-17",
+          "known_at": "2026-10-18",
           "label": "dividend yield",
           "period_end": null,
           "source": "finnhub",
@@ -880,7 +952,7 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-10-17",
+          "known_at": "2026-10-18",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
@@ -888,7 +960,7 @@
         },
         {
           "concept": "high_52w",
-          "known_at": "2026-10-17",
+          "known_at": "2026-10-18",
           "label": "52w high",
           "period_end": null,
           "source": "finnhub",
@@ -896,7 +968,7 @@
         },
         {
           "concept": "low_52w",
-          "known_at": "2026-10-17",
+          "known_at": "2026-10-18",
           "label": "52w low",
           "period_end": null,
           "source": "finnhub",
@@ -969,6 +1041,83 @@
       ],
       "stories": [
         {
+          "doc_id": "https://news.google.com/rss/articles/CBMixgFBVV95cUxOWTBUN0taVjl0VDZIVkJXYlNQaVNNcnEyWWp6RTV4OVIyQnRWR2VYamh4bUU1RmNfZkFVUGI3SFM3OWdPWUJhNzVGSm9SN21qa05XcVBmbzVNZkpSakM2enYtRndOMHM1ek9wb0c3VVA0TEJaZ244R1R3aXNuQVVrN0ttQkJhcG5sTHJmYlczNGpkc29XaC1FbVE2SnhqMXNtNkNobTB2Nk5tdHpSc2JlVDlPaFdCVTJJMmVkLW5uTl9jeXBwVHc?oc=5",
+          "domain": "www.pymnts.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-18T17:05:26+00:00",
+          "quality": 0.65,
+          "title": "Microsoft Faces Tougher UK Antitrust Oversight as Regulator Targets Software and AI Dominance",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiWkFVX3lxTE9UdmdCNkdNeGp0RmNGVEdWczBXYVRuZ0wtbWNOWlNCOUhxd0RLWEllQ1hoQS1LaEdkbVp4a0l1b3k3cGNCbHYyQlUtRGNRdHo0VjFDZ3FLX2U0QQ?oc=5",
+          "domain": "www.tokenpost.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-18T12:39:55+00:00",
+          "quality": 0.65,
+          "title": "Microsoft Analysts Lift Price Targets to $600-$675 Before Oct. 28 Results",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMihwFBVV95cUxNdEc0NUg1SkZuXzYwYnc1cWIxWnRyeXVzTUpLRkdvcDJmUHV4MThmaDN6dFZUSGVhQ1BLcWoyWlVlZEo2VGthSlR0Nmt5blhEaUg1dGtGeUlfeTNPa1hHNEVWbGthM1RoU1hTNE1Odm1LdmJfRERfYTNKZXJtQUVIWEEzejNIcHM?oc=5",
+          "domain": "www.fool.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-18T09:23:00+00:00",
+          "quality": 0.65,
+          "title": "Where Will Microsoft Stock Be in 2030?",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMihgFBVV95cUxONFdKellkeTFYb2hMVTRjc3Nkb3hIU3QzRTlBUGxUV0tKUEhqaFBreWliYXZ0ekNwSDhqSV9pV3VvdENNSENEbWJ1eERSQXp1UWg4VEM2SjYxN1RGUTV1LUdqaHk2bzZ4SWtxOU95UmI1TDlBOEtua2tvNjY0b2JjYXJVZlB6UQ?oc=5",
+          "domain": "tech-insider.org",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-18T05:26:53+00:00",
+          "quality": 0.65,
+          "title": "UK CMA Targets Microsoft\u2019s Copilot Grip: 20M Users [2026] - https://tech-insider.org/",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMi1gFBVV95cUxPaF9pM0tpSHRxU3cyUjR3cng0bElLN09DQlR0QmJLZkptZ3FSUDQwZG9BR3lCdGtyckdjenRQYjR3V2pFdFZsSjJ5aldIM1RiTXFDZjlzTy1XckdramlEZ0pSSmpNdG1jbktESU9JR25wVWQycHNWVnIxY183blRURzU2Q0l0SHlwcXRQNW9xdmcwRkJWWFlzeVBNVUpIcFYyVWVWQWxUc0lWTVpGVE5LejExUjJfcUVBT0NMel96ckpyWDVuSUdXX0FpLUlmekhRTi1YSUpB?oc=5",
+          "domain": "www.tradingkey.com",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "polarity": 0.0,
+          "published_at": "2026-10-18T01:39:16+00:00",
+          "quality": 0.65,
+          "title": "Microsoft (MSFT) Surged 8% After Earnings - Azure Hit 43%, Copilot 30M Seats, Capex Steady",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMi0AFBVV95cUxNR3ZBWnNicHhiTHRWNWRqdGlvU1dvaTh5WldIZE1DcmN5SHc3TVRDLS0xaE8tOWlRMHJBeHhhbl9IMTRaSW55RWtjYlBuaUJGTENzQlUxdWg4OWVRZ0w2SlRqOEJQbFkxZkZpYWJyWnUwUDhaenBxakxnYWt4U0dsdmF5eVpVeXp4N21oTlBNLVk5QXphOFF0RFRQQk1KUVo2bjVJSXJhSTIwNHdWdnJYVVByVl95cGpiUHA0cUE4b25ZaGFSaVUxUFQ5WnNaSUtE?oc=5",
+          "domain": "www.tradingkey.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-18T00:21:11+00:00",
+          "quality": 0.65,
+          "title": "Microsoft's Azure Turbo: Beat on Revenue and Earnings, Raised Growth Guidance, Stock Jumped 15%",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMivgFBVV95cUxOT3ZMc3JqbnRla0FJLXNWR1lxVUJ5eEE2NXdtRkZaRTAzdGRyb2MxaWNUZmRGMHpaclNzSzhtRTFETkROQlRCa2JZTFFzaWxLZ05oSkVXYUdqZ2FFZ3NXcHB5a2E2Zk1QSEprVEVmSU5UZ2hCS3U2NGlEbExneWpyTm1mMWZTNjlxcmRkMWZsU01Ecm5lMGFLMVdSaGdGZGh5V0JQUE9ubnZwNjh0bGFWUHQtaXZJUlNUaVdpYXlB?oc=5",
+          "domain": "www.tradingkey.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-17T23:03:20+00:00",
+          "quality": 0.65,
+          "title": "Microsoft Stock Breaks $513 as Azure and Copilot Growth Support MSFT",
+          "uncertainty": 0.0
+        },
+        {
           "doc_id": "https://news.google.com/rss/articles/CBMi-wFBVV95cUxQVVdtNlFxUHBVbHZtR25iTTlxS2ZYUVBjOVR3TXgzSzExWWhzOFpVWmRHN2VzT2hhMVc3Ui00UC1kRzJBN1NuaXpUaHNCZ2d2cTN2ejJWQ1RKRzVKUUxGV2tXMU5ET1BPTXQzY3dFX3hCMkg1NmxrTDc3VlRSTm5tUWdfUVZaWnBaZG1ZWER4b2o3QUxyS3hrd1NiQjc2Ty1jdmRwVjQ0Z0RpVVBIY2VKMGY3c3NtbU9CbkQ0TElDajBhMmU3ekRSUlV0eW53SnU4VG5WRE9KNFNoNkJWWFp3VkRFX0pnOFEwMTh3RTFNMW9wZnRkZ3ZsNkYyUQ?oc=5",
           "domain": "www.ad-hoc-news.de",
           "escalated": true,
@@ -978,91 +1127,14 @@
           "quality": 0.65,
           "title": "Microsoft's AI Ambitions Face a Double Test: Rising Borrowing Costs and a UK Market-Status Probe - ad-hoc-news.de",
           "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://finance.yahoo.com/technology/ai/articles/microsoft-msft-facing-fresh-regulatory-191124990.html?.tsrc=rss",
-          "domain": "finance.yahoo.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-17T19:11:24+00:00",
-          "quality": 1.0,
-          "title": "Microsoft (MSFT) Is Facing Fresh Regulatory Pressure",
-          "uncertainty": 0.3205128205128205
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMiowFBVV95cUxNRjNNMm5lNWtWTmwwNkVVTG9wOUJBTVJqaU05ajg5Vm51Y05hRDlKcHdOVWhoVUlKYlBheV9zVHMtMVN1SXBIRHl5VkZHTzlnbUZ0a01IRUZNeDUwWVByUXEtOVV4b21kc3VWU1NwYUxxZWhUZ1g3aUgtc0k3dkFXRVo2aDNnZUZhYjN5MUVOeDEyaHV2YmhjMExKRnZSZkZWQmZB?oc=5",
-          "domain": "finance.yahoo.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-17T14:36:00+00:00",
-          "quality": 0.8,
-          "title": "Here's How Microsoft's $175 Billion in Capital Expenditures Is Hurting Its Business",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMixAFBVV95cUxPLTMwOU43MWxrVmtqcjAyOC1MbXp3RGJTekdPYkVzNktCMHhOcDU5UW9XR3VBYkt5NzhuVlZ0Rmc2NVJialJyVWVaUWNENzdwNFBzdENFdkF4RW5zS0lybGRTQnBQNXN6bUdGOFplaWJzODJESWRXUk5hSUZlLU5tLVd1eU1VbTJFbnViZU1VMnFFQXpQRXhxRHFkcGRzb2hId093R1NGMEpIRVhvRG5jMFpTbE15dmZJdHVSR09sSEZyOC1F?oc=5",
-          "domain": "www.marketwatch.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-17T12:01:00+00:00",
-          "quality": 0.8,
-          "title": "Microsoft, Shopify and 3 more AI stocks that are favorite Wall Street earnings plays",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxNdVpsTzN3SjNEdG9lTVdHYVJHZXhDOUs2TkFlSjV6S0d6R3BnT2pBdGZJUlE5YzFzZnlJRzM3S3ZuZGJJYkhkZzI5Qk9Db1NjTGpwWTZGTU1BYzMyVTRoSGhuMjBpdW9Db2VvM0c4QzJsTVJZVUFEVnBlLUdxWUJaaUJTNlFfcWd6dG9VTjNLV3ZKQ2JsSU5GWHJzaUNMWmwxenJuWi1JUzMwckdyV1l6ZHAtbUI2cjJn0gG-AUFVX3lxTFBORjd3OUVKcFpBTEU0VV9udm9RelZ3aEowNWtvLXlUWnVzS0ZQNG9lWURCNEYzQjhNYmJWYXFqYUdBTXRFOWdGWEl4dklNVnA4SzlwMVNlX3V6VjBBSGZ3Y2R6TU5fY2JjLVNveEhuXzZGQlEyMDF4djQ1RnBvT2dSR2wzMnlRSTZRbE1vakNOUXEzaGd5LVoydWZ4aFJUdTdhYm9pakxiUFlJaWY0RXJ2V1VzMFJwUm82YTh2M3c?oc=5",
-          "domain": "simplywall.st",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-17T20:36:14+00:00",
-          "quality": 0.65,
-          "title": "Microsoft (MSFT) Secures 1,100 MW Indiana Power Deal",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMi3wFBVV95cUxPN0lLZHVBSWVPTE1rUGVROFFxdXRseDlBUnhxRTA0N3BCYy1JbjVVVzZkS0Zjb1NORmJhVGlibnhZajNwZURwVS16eEN6alF5UGxhc21YZW5OaGE0RkFJaGNTRFVZbkdwR09xRG5wSUNMSUxGSERXS2VwZWl0RWhhU2VaUmFHVXFLcy1NV2ZGaG5DQld6T3VLbFJZWjFnNEVJZm5BdG42LW1oNWVQV2duQl83eTJZc2g4NWNLZWt4dlV0TWJ0MVVfLVFZSXpGWWJkTFJENTZIWC1sdkc1Yy1Z?oc=5",
-          "domain": "www.ad-hoc-news.de",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-17T17:50:59+00:00",
-          "quality": 0.65,
-          "title": "Microsoft's AI Spending Under the Microscope as UK Weighs Strategic Status - ad-hoc-news.de",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMi3AFBVV95cUxQY1FMS25PTHdhY3VjeTJFOUtLcGlKUkZVT0MwU1h3N1pzcW5iMUtsZTJYSDFPZHp1OWJLWGF5RE9yZEdkZUNRTDl2bUVKS0RMLWduZkh6bV9Cd01Jc25JTXlHa25Ucm5iblZSRVpUSkpZNnZJT29wdHRTSzNJVXRkTmdfc19BdG1mblkxZnRTN2lVeE5TUVVybXlHZ2hiTFRrUHpKZnRGSmJGU0JlcUtRT1BEcktYXzV3T3p4LXVPRnFMTDlUYWVDeG9WeGN6X1VRS0d2MzBCMDJPVHU3?oc=5",
-          "domain": "www.ad-hoc-news.de",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-17T14:51:45+00:00",
-          "quality": 0.65,
-          "title": "Microsoft's AI Buildout Meets a Two-Front Test: UK Scrutiny and a Jittery Tech Tape - ad-hoc-news.de",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMibEFVX3lxTE4wcDFQc0RfS1pzV2o3UXZaUFhFekR6UHp4dXpac3BtdG5mUWxGTGZiclFGTzNPdmNxUHJQWWpvQUhKSGkzdGxxNXlBLUJIOGtBU2VLVlZTSG0zZTJJekhKOVZ3cE9lbUJtdkNFdA?oc=5",
-          "domain": "media.unisba.ac.id",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-17T14:14:18+00:00",
-          "quality": 0.65,
-          "title": "Microsoft Rallies On Earnings As Meta Slides With AI In Focus | The Pulse 7/30/2026 Jackson Olson (2cL40b7vra)",
-          "uncertainty": 0.0
         }
       ],
       "tone": {
-        "intensity_max": 0.0,
-        "n": 9,
-        "polarity_mean": -0.111,
-        "sources": 6,
-        "uncertainty_mean": 0.036
+        "intensity_max": 0.333,
+        "n": 34,
+        "polarity_mean": 0.029,
+        "sources": 22,
+        "uncertainty_mean": 0.043
       },
       "upcoming": [
         {
