@@ -38,6 +38,7 @@ from engines.attribution.decompose import (
     decompose,
 )
 from engines.attribution.regression import Fit, huber_fit
+from knowledge.corpus import SHORT_ID_CHARS, Corpus
 from knowledge.digest import build_digest
 from knowledge.facts import FactBook
 from knowledge.report import fact_snapshot, macro_context
@@ -100,11 +101,16 @@ class Move:
     #: shut: the figures are the session so far, not the session. See
     #: `_provisional_note`.
     provisional: str = ""
-    #: How many of the NAME's own sessions the "1d" return spans. More than one
-    #: when the proxy has no row for a session the name printed between the
-    #: last two common days: the return is then a k-session move, and it is
-    #: tested against k sessions' sigma rather than labelled a day.
+    #: How many exchange sessions the "1d" return spans. More than one when a
+    #: session between the last two common days has no row in one leg or in
+    #: both: the return is then a k-session move, and it is tested against k
+    #: sessions' sigma rather than labelled a day.
     span: int = 1
+    #: Which leg the extra sessions are missing from, for the row's flag.
+    span_cause: str = ""
+    #: Sessions on the exchange calendar after `last_day`, up to the day asked
+    #: for, that NEITHER leg has a usable bar for. See `blank`.
+    blank_days: tuple[date, ...] = ()
     #: What the returns are adjusted for: a dividend that went ex inside the
     #: 1d window, and any leg whose feed read no dividends and is therefore a
     #: price return. See `_adjustment_note`.
@@ -149,6 +155,21 @@ class Move:
             and not self.mis_dated
         )
 
+    @property
+    def blank(self) -> bool:
+        """The exchange held a session this measurement does not include, and
+        neither leg has a bar for it.
+
+        The case `_dating_note` used to call "correctly dated": with no later
+        row in either leg it took the market to have been shut, and a blank
+        bar the two share looks exactly like that. On 2026-09-22 the 22:44Z
+        build did it to the three US rows - Tuesday's bars were blank for the
+        names and SPY alike - while the same pack's macro table printed SP500
+        for 09-22, and the 22:46Z refetch showed Tuesday traded. Only the
+        exchange calendar can tell a closure from a blank, so it is asked.
+        """
+        return bool(self.blank_days) and not self.mis_dated and not self.stale
+
     def row(self) -> str:
         if self.error:
             return f"| {self.label} ({self.instrument_id}) | NO DATA | | | | {self.error[:90]} |"
@@ -157,10 +178,12 @@ class Move:
             flag = f" **MIS-DATED: this is the {self.last_day} session**"
         elif self.stale:
             flag = f" **STALE NAME: this is the {self.last_day} session**"
+        elif self.blank:
+            flag = f" **BLANK SESSION: this is the {self.last_day} session**"
         if self.provisional:
             flag += f" **PROVISIONAL: the {self.last_day} session so far, not the close**"
         if self.span > 1:
-            flag += f" **SPANS {self.span} SESSIONS: the proxy has a gap**"
+            flag += f" **SPANS {self.span} SESSIONS: {self.span_cause or 'a leg has a gap'}**"
         return (
             f"| {self.label} ({self.instrument_id}) | {self.r1:+.2%} | {self.m1:+.2%} | "
             f"{self.r5:+.2%} | {self.m5:+.2%} | {self.verdict}"
@@ -239,17 +262,48 @@ def measure(feed, instrument_id: str, label: str, day: date, base_currency: str 
     move.own_last = max(closes_i) if closes_i else None
     move.mkt_last = max(closes_m) if closes_m else None
     move.sessions = len(common)
-    move.dating = _dating_note(move, own_days=set(closes_i), mkt_days=set(closes_m))
-    # The "1d" return runs between the last two COMMON days. When the proxy has
-    # no row for a session the name printed in between, that is a k-session
-    # move: on 2026-09-23 ^KLSE had no 09-22 row, and IHH's +4.99% "1d" at
-    # 4.11 sigma was two sessions, the second of them flat in the cache.
-    move.span = sum(1 for d in closes_i if common[-2] < d <= common[-1])
+    days_i, days_m = set(closes_i), set(closes_m)
+    calendar = _exchange_calendar(instrument_id, day)
+    move.blank_days = tuple(
+        d
+        for d in _calendar_sessions(calendar, move.last_day, day)
+        if d not in days_i and d not in days_m
+    )
+    move.dating = _dating_note(move, own_days=days_i, mkt_days=days_m, calendar=calendar)
+    # The "1d" return runs between the last two COMMON days. When a session in
+    # between has no row in one leg, that is a k-session move: on 2026-09-23
+    # ^KLSE had no 09-22 row, and IHH's +4.99% "1d" at 4.11 sigma was two
+    # sessions, the second of them flat in the cache. Counted on the exchange
+    # calendar as well as on the name's own rows, because the name's rows
+    # cannot see a session missing from the NAME - Maybank's blank 10-12 row
+    # from the 10-13 refetches made its 10-13 "1d" the 10-09 -> 10-13 move -
+    # nor one missing from both legs.
+    # Either leg's rows: a day only the proxy printed is a session the NAME
+    # missed, and without a calendar to ask it is the only sign of one.
+    printed = {d for d in days_i | days_m if common[-2] < d <= common[-1]}
+    spanned = printed | set(_calendar_sessions(calendar, common[-2], common[-1]))
+    move.span = len(spanned)
     if move.span > 1:
-        gaps = sorted(d for d in closes_i if common[-2] < d < common[-1])
+        inner = sorted(d for d in spanned if d < common[-1])
+        no_proxy = [d for d in inner if d in days_i]
+        no_name = [d for d in inner if d in days_m]
+        neither = [d for d in inner if d not in days_i and d not in days_m]
+        gaps, causes = [], []
+        if no_proxy:
+            gaps.append(f"{proxy} has no row for {_days(no_proxy)}")
+            causes.append("the proxy has a gap")
+        if no_name:
+            gaps.append(f"{instrument_id} has no row for {_days(no_name)}")
+            causes.append("the name has a gap")
+        if neither:
+            gaps.append(
+                f"neither leg has a usable row for {_days(neither)}, a session on the "
+                f"{mic_of(instrument_id)} calendar"
+            )
+            causes.append("both legs are blank on a session")
+        move.span_cause = " and ".join(causes)
         note = (
-            f"SPANS {move.span} SESSIONS: {proxy} has no row for "
-            f"{', '.join(d.isoformat() for d in gaps)}, so the 1d figures run from "
+            f"SPANS {move.span} SESSIONS: {'; '.join(gaps)}, so the 1d figures run from "
             f"{common[-2]} to {common[-1]} and are tested against {move.span} sessions' sigma"
         )
         move.dating = f"{move.dating}; {note}" if move.dating else note
@@ -380,17 +434,53 @@ def _provisional_note(feed, legs: tuple[str, ...], day: date) -> str:
     )
 
 
-def _dating_note(move: Move, *, own_days: set[date], mkt_days: set[date]) -> str:
+def _exchange_calendar(instrument_id: str, through: date):
+    """The session calendar of the name's exchange, or None when there is none
+    to trust through `through`.
+
+    A calendar is only worth asking once it has been handed its closures: one
+    with no table in `markets/holidays.py` is a weekday filter, and would call
+    every holiday a blank session. Nor past the day its table expires: Bursa's
+    2027 holidays are not entered yet, and a 2027 Chinese New Year read off it
+    would be a "blank session". None means "cannot say", and the pack then
+    falls back to what the bars alone show, as it always did.
+    """
+    from markets.holidays import closures
+    from markets.registry import get as adapter_for
+
+    try:
+        mic = mic_of(instrument_id)
+        calendar = adapter_for(mic).calendar
+    except (KeyError, ValueError):
+        return None
+    expires = closures(mic).expires
+    return calendar if expires is not None and through <= expires else None
+
+
+def _days(days) -> str:
+    return ", ".join(d.isoformat() for d in days)
+
+
+def _calendar_sessions(calendar, after: date | None, through: date | None) -> list[date]:
+    """The calendar's sessions in (after, through]; none without a calendar."""
+    if calendar is None or after is None or through is None or through <= after:
+        return []
+    return [s.day for s in calendar.sessions_between(after + timedelta(days=1), through)]
+
+
+def _dating_note(move: Move, *, own_days: set[date], mkt_days: set[date], calendar=None) -> str:
     """Say, in one line, which day this measurement is really about and why.
 
     A fallback to an earlier session is not itself a fault - markets close. The
-    fault is a SILENT fallback, and the three cases have different cures: a
+    fault is a SILENT fallback, and the four cases have different cures: a
     quiet market needs nothing, a proxy that did not print needs a different
-    proxy or a stated refusal, and a name that did not print while its market
-    did is halted or its feed has stopped and wants looking at. They are told
-    apart here so the page cannot confuse them. The holiday reading is the
-    last resort, reached only when NEITHER leg has a later session; the note
-    used to reach it whenever the name lacked one.
+    proxy or a stated refusal, a name that did not print while its market
+    did is halted or its feed has stopped and wants looking at, and a session
+    neither leg has a bar for is a hole in the cache, not a holiday. They are
+    told apart here so the page cannot confuse them. The holiday reading is the
+    last resort, reached only when NEITHER leg has a later session and the
+    exchange calendar has none either; the note used to reach it on the bars
+    alone, so a blank bar both legs shared read as the market being shut.
     """
     asked, last = move.asked_for, move.last_day
     if asked is None or last is None or last >= asked:
@@ -408,9 +498,22 @@ def _dating_note(move: Move, *, own_days: set[date], mkt_days: set[date]) -> str
             f"STALE NAME: {move.proxy} printed {', '.join(d.isoformat() for d in proxy_only)} "
             f"but {move.instrument_id} did not; every figure in this row is the {last} session"
         )
+    mic = mic_of(move.instrument_id)
+    if move.blank_days:
+        return (
+            f"BLANK SESSION: {_days(move.blank_days)} is a session "
+            f"on the {mic} calendar, but neither {move.instrument_id} nor {move.proxy} has a "
+            f"usable bar for it (missing, blank or a carried filler), so every figure in this "
+            f"row is the {last} session, not {asked}"
+        )
+    checked = (
+        f": the {mic} calendar has no session in between"
+        if calendar is not None
+        else f", on the bars alone (no holiday table for {mic} covers {asked} to check them against)"
+    )
     return (
         f"no session for {move.instrument_id} or {move.proxy} after {last}; the figures are "
-        f"correctly dated to the last session on or before {asked}"
+        f"correctly dated to the last session on or before {asked}{checked}"
     )
 
 
@@ -516,7 +619,16 @@ def build_pack(
     digest = build_digest(
         cfg, day, slot="pack", corpus_path=corpus_path, facts_path=facts_path, now=now
     )
-    out.append(digest.to_markdown())
+    with Corpus(corpus_path or cfg.corpus_db) as corpus:
+        refs = corpus.short_ids(s["doc_id"] for n in digest.names for s in n.stories)
+    out += [
+        "Each story line below carries its publication time in UTC and its corpus key: "
+        f"cite it as the `doc_id`. A key ending in … is the first {SHORT_ID_CHARS} "
+        f"characters of the only key in the corpus that begins with them "
+        f"(`substr(doc_id, 1, {SHORT_ID_CHARS})`).",
+        "",
+    ]
+    out.append(digest.to_markdown(refs=refs))
     out.append("")
 
     out += ["## Facts, per name (last 7 days of events; latest figures)", ""]
@@ -524,6 +636,7 @@ def build_pack(
         for iid in book_ids:
             out.append("```")
             out.append(fact_snapshot(book, iid, now=now, days=7))
+            out.append(_dividends_held(feed, iid, day))
             out.append("```")
             out.append("")
         read_only: tuple[str, ...] = tuple(getattr(cfg, "read_only", None) or ())
@@ -544,6 +657,39 @@ def build_pack(
         out += [f"- knowledge/feedback/{p}" for p in prev] or ["- none yet"]
         out.append("")
     return "\n".join(out)
+
+
+#: How many of a name's ex-dates the facts block lists, newest first.
+DIVIDENDS_LISTED = 3
+
+
+def _dividends_held(feed, instrument_id: str, day: date) -> str:
+    """The ex-dates the PRICE feed read for a name, under its fact-book block.
+
+    The fact book holds nothing for a Bursa name - no free source there sends
+    figures or entitlement dates, so its block reads NOTHING COLLECTED - and
+    every page from 2026-09-23 carried the question "which source carries
+    Bursa ex-dates?". One already did: the price feed reads each name's
+    dividends with its bars (Yahoo's chart actions, `dividend` in
+    price_cache.db), and the move rows and the paper book's dividend credits
+    use them, but the facts block never showed them, so the page could not see
+    an ex-date inside a window it was explaining. Only ex-dates on or before
+    `day`: what the pack measures is what was knowable then.
+    """
+    head = f"\n  dividends the price feed read (ex-date, per share; newest {DIVIDENDS_LISTED})"
+    try:
+        series = feed.fetch(instrument_id, end=day)
+    except PriceFeedError as e:
+        return f"{head}\n    cannot read: {str(e).splitlines()[0][:120]}"
+    source = getattr(series, "actions_source", None)
+    if source is None:
+        return f"{head}\n    NO DIVIDEND DATA: the feed read no dividends for this name"
+    held = [a for a in series.dividends() if a.ex_date <= day][-DIVIDENDS_LISTED:]
+    if not held:
+        return f"{head}\n    none in the {source} history held for this name"
+    ccy = market_currency(mic_of(instrument_id))
+    rows = [f"    {a.ex_date}  {a.amount:g} {ccy}  ({source})" for a in reversed(held)]
+    return "\n".join([head, *rows])
 
 
 def write_pack(text: str, day: date, root: str | Path = PACK_DIR) -> Path:

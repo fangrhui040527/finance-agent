@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import http.client
 import json
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime, timedelta, timezone
 from email.utils import format_datetime
 
 import pytest
@@ -363,11 +363,11 @@ def test_a_jin10_gap_makes_the_run_degraded(stores):
     assert pulls[0]["status"] == "degraded" and report.exit_code == 3
 
 
-def _rss(items: list[datetime]) -> str:
+def _rss(items: list[datetime], start: int = 0) -> str:
     body = "".join(
         f"<item><title>Story {i}</title><link>https://www.nst.com.my/{i}</link>"
         f"<pubDate>{format_datetime(when)}</pubDate></item>"
-        for i, when in enumerate(items)
+        for i, when in enumerate(items, start)
     )
     return f'<?xml version="1.0"?><rss version="2.0"><channel>{body}</channel></rss>'
 
@@ -386,6 +386,31 @@ def test_a_full_fixed_length_feed_that_starts_after_the_window_opened_overflowed
     assert feed.overflow.startswith("window overflow") and "15.6h scrolled off" in feed.overflow
 
 
+def test_the_overflow_note_prints_utc_whatever_offset_the_feed_dates_in():
+    """NST dates its items +0800. The note formatted each time with its own
+    offset and a literal "Z", so the 2026-10-16 10:08Z sweep reported "the
+    oldest is 2026-10-16 14:58Z" - six hours in the future - while the stored
+    article said 06:58Z, which is right. The hours were always right; only the
+    printed times were wrong. The window's start is given in Malaysian time
+    here too, so both ends of the note are shown to be converted."""
+    myt = timezone(timedelta(hours=8))
+    since = datetime(2026, 10, 15, 22, 12, tzinfo=myt)  # 14:12Z
+    oldest = datetime(2026, 10, 16, 14, 58, tzinfo=myt)  # 06:58Z
+    items = [oldest + timedelta(minutes=4 * i) for i in range(50)]
+    body = _rss(items)
+    assert "+0800" in body, "the fixture must date its items the way NST does"
+    feed = RssFeed(
+        "https://www.nst.com.my/feed",
+        name="nst_business",
+        opener=lambda req, timeout=None: FakeResponse(body),
+        sleep=lambda s: None,
+    )
+    feed.fetch(since)
+    assert "window's start (2026-10-15 14:12Z)" in feed.overflow, feed.overflow
+    assert "the oldest is 2026-10-16 06:58Z" in feed.overflow, feed.overflow
+    assert "16.8h scrolled off" in feed.overflow, feed.overflow
+
+
 def test_a_feed_that_reaches_back_past_the_window_did_not_overflow():
     since = datetime(2026, 10, 6, 9, 0, tzinfo=UTC)
     newest = datetime(2026, 10, 6, 15, 50, tzinfo=UTC)
@@ -398,6 +423,198 @@ def test_a_feed_that_reaches_back_past_the_window_did_not_overflow():
     )
     feed.fetch(since)
     assert feed.overflow == ""
+
+
+def _pages(*pages: list[datetime], ignore_param: bool = False, broken: int = 0):
+    """An opener serving `pages` by `?paged=N`, recording every URL asked for.
+
+    `ignore_param` serves the first page whatever is asked, as a site that does
+    not page does; `broken` answers that page number with a 404."""
+    import urllib.error
+
+    asked: list[str] = []
+    bodies = [_rss(p, start=50 * k) for k, p in enumerate(pages)]
+
+    def opener(req, timeout=None):
+        asked.append(req.full_url)
+        n = int(req.full_url.rsplit("paged=", 1)[1]) if "paged=" in req.full_url else 1
+        if n == broken:
+            raise urllib.error.HTTPError(req.full_url, 404, "Not Found", {}, None)
+        if ignore_param or n > len(bodies):
+            return FakeResponse(bodies[0])
+        return FakeResponse(bodies[n - 1])
+
+    opener.asked = asked  # type: ignore[attr-defined]
+    return opener
+
+
+def _nst(opener, pages: int = 1):
+    return RssFeed(
+        "https://www.nst.com.my/feed",
+        name="nst_business",
+        opener=opener,
+        sleep=lambda s: None,
+        pages=pages,
+    )
+
+
+#: A 20-hour window, and 50 items to a page at four minutes apiece: one page
+#: reaches 3.3h back and leaves 16.8h unread, as NST's /feed did on 2026-10-16.
+PAGE_SINCE = datetime(2026, 10, 15, 14, 12, tzinfo=UTC)
+PAGE_NEWEST = datetime(2026, 10, 16, 10, 14, tzinfo=UTC)
+
+
+def _page(n: int, minutes: int = 4) -> list[datetime]:
+    top = PAGE_NEWEST - timedelta(minutes=minutes * 50 * (n - 1))
+    return [top - timedelta(minutes=minutes * i) for i in range(50)]
+
+
+def test_a_feed_that_opts_in_reads_further_pages_until_the_window_is_covered():
+    """At 20 minutes an item, two pages reach back past the window's start: the
+    second is asked for, the third is not, and nothing scrolled off unseen."""
+    opener = _pages(_page(1, 20), _page(2, 20), _page(3, 20))
+    feed = _nst(opener, pages=3)
+    records = feed.fetch(PAGE_SINCE)
+    assert opener.asked == ["https://www.nst.com.my/feed", "https://www.nst.com.my/feed?paged=2"]
+    assert feed.overflow == "", feed.overflow
+    oldest = min(datetime.fromisoformat(r.payload["published_at"]) for r in records)
+    assert oldest >= PAGE_SINCE and len(records) == len({r.external_id for r in records})
+    assert len(records) == 50 + sum(1 for t in _page(2, 20) if t >= PAGE_SINCE)
+
+
+def test_a_feed_that_does_not_opt_in_still_reads_one_page_and_says_what_it_lost():
+    opener = _pages(_page(1), _page(2))
+    feed = _nst(opener)
+    feed.fetch(PAGE_SINCE)
+    assert opener.asked == ["https://www.nst.com.my/feed"]
+    assert "16.8h scrolled off" in feed.overflow, feed.overflow
+
+
+def test_paging_stops_at_its_ceiling_and_the_rest_is_still_an_overflow():
+    """Asking for more pages than the ceiling gets the ceiling. Five pages at
+    four minutes an item still end 3.4h short of a 20-hour window, and the run
+    is still degraded: a bounded read that did not cover the window says so."""
+    opener = _pages(*[_page(n) for n in range(1, 9)])
+    feed = _nst(opener, pages=99)
+    records = feed.fetch(PAGE_SINCE)
+    assert len(opener.asked) == RssFeed.MAX_PAGES == 5, opener.asked
+    assert len(records) == 250
+    assert feed.overflow.startswith("window overflow"), feed.overflow
+    assert "3.4h scrolled off" in feed.overflow and "read 5 pages" in feed.overflow
+
+
+def test_a_short_last_page_does_not_pass_for_a_covered_window():
+    """Five items are too few to judge on their own, so a page judged alone
+    would call the window covered. Judged with the page before it, 16.4h of
+    the window is still unread, and the note says so."""
+    opener = _pages(_page(1), _page(2)[:5])
+    feed = _nst(opener, pages=2)
+    records = feed.fetch(PAGE_SINCE)
+    assert len(records) == 55 and len(opener.asked) == 2, opener.asked
+    assert "all 55 dated items" in feed.overflow, feed.overflow
+    assert "16.4h scrolled off" in feed.overflow, feed.overflow
+
+
+def test_paging_stops_when_a_page_adds_nothing_new():
+    """A site that ignores the parameter answers page two with page one. That
+    is one wasted request, not four, and the overflow stands."""
+    opener = _pages(_page(1), _page(2), ignore_param=True)
+    feed = _nst(opener, pages=5)
+    records = feed.fetch(PAGE_SINCE)
+    assert len(opener.asked) == 2, opener.asked
+    assert len(records) == 50
+    assert "16.8h scrolled off" in feed.overflow, feed.overflow
+    assert "page 2 added nothing new" in feed.overflow, feed.overflow
+
+
+def test_a_page_that_cannot_be_read_keeps_the_pages_that_were():
+    """Page two answering 404 says nothing about page one, which was read: its
+    items are kept, the run stays degraded, and the note says which page
+    failed, rather than one bad page turning a partial read into none."""
+    opener = _pages(_page(1), _page(2), broken=2)
+    feed = _nst(opener, pages=3)
+    records = feed.fetch(PAGE_SINCE)
+    assert len(records) == 50 and len(opener.asked) == 2, opener.asked
+    assert "16.8h scrolled off" in feed.overflow, feed.overflow
+    assert "page 2 could not be read" in feed.overflow and "404" in feed.overflow
+
+
+def test_a_page_that_does_not_join_the_one_before_is_a_hole_and_is_said():
+    """NST, 2026-10-17: page one ran back to 04:48Z, `?paged=2` started at
+    23:01Z the night before. Reaching the window's start at the bottom is not
+    coverage when 5.8 hours in the middle were served by neither page."""
+    first = _page(1)  # four minutes an item, back to 2026-10-16 06:58Z
+    top = first[-1] - timedelta(hours=6)
+    second = [top - timedelta(minutes=20 * i) for i in range(50)]  # past the window
+    opener = _pages(first, second)
+    feed = _nst(opener, pages=3)
+    records = feed.fetch(PAGE_SINCE)
+    assert len(opener.asked) == 2, opener.asked  # the bottom is covered: no third page
+    assert "scrolled off" not in feed.overflow, feed.overflow
+    assert feed.overflow == (
+        "page 2 starts 6.0h before page 1 ends (2026-10-16 00:58Z under 2026-10-16 06:58Z): "
+        "the items between were served by neither"
+    ), feed.overflow
+    assert len(records) == 50 + sum(1 for t in second if t >= PAGE_SINCE)
+
+
+def test_nst_reads_three_pages_and_fmt_one_as_the_probe_found():
+    from knowledge.feeds.registry import adapter_for
+
+    nst, fmt = adapter_for("nst_business"), adapter_for("fmt_business")
+    assert (nst.pages, nst.page_param, nst.first_page) == (3, "paged", 1)
+    assert nst._page_url(1) == "https://www.nst.com.my/feed?paged=2"
+    assert fmt.pages == 1
+
+
+def test_a_paging_feed_asks_no_page_once_told_to_stop():
+    opener = _pages(_page(1), _page(2), _page(3))
+    feed = _nst(opener, pages=3)
+    feed.stop_paging = lambda: True
+    records = feed.fetch(PAGE_SINCE)
+    assert opener.asked == ["https://www.nst.com.my/feed"] and len(records) == 50
+    assert "16.8h scrolled off" in feed.overflow, feed.overflow
+    assert "page 2 not asked: the sweep's deadline had passed" in feed.overflow
+
+
+def test_the_sweep_deadline_stops_a_feeds_later_pages(stores):
+    """A first page read across the sweep's deadline is kept, and no further
+    page is started after it: the deadline that stops new requests stops pages."""
+    from knowledge.sweep import SWEEP_DEADLINE_SECONDS
+
+    now = [NOW]
+    inner = _pages(_page(1), _page(2), _page(3))
+
+    def slow(req, timeout=None):
+        now[0] = NOW + timedelta(seconds=SWEEP_DEADLINE_SECONDS + 1)  # page one ran long
+        return inner(req, timeout)
+
+    def adapters(name, **kw):
+        return RssFeed(
+            "https://www.nst.com.my/feed",
+            name=name,
+            opener=slow,
+            sleep=lambda s: None,
+            pages=3,
+        )
+
+    corpus_db, facts_db = stores
+    run_sweep(
+        Cfg(sources=("nst_business",)),
+        "bursa_close",
+        corpus_path=corpus_db,
+        facts_path=facts_db,
+        link_graph=False,
+        adapter_for=adapters,
+        entity_index=INDEX,
+        clock=lambda: now[0],
+        log=lambda m: None,
+        force=True,
+    )
+    assert inner.asked == ["https://www.nst.com.my/feed"], inner.asked
+    sweeps, _ = _rows(stores, "nst_business")
+    assert sweeps[0]["status"] == "degraded"
+    assert "page 2 not asked: the sweep's deadline had passed" in sweeps[0]["detail"]
 
 
 def test_an_overflowing_site_feed_makes_the_run_degraded(stores):

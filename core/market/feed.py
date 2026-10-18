@@ -43,6 +43,17 @@ from core.net.breaker import CircuitBreaker
 #: this module, applied to the one case the suffix tables cannot express.
 INDEX_IDS: frozenset[str] = frozenset({"MYX:^KLSE"})
 
+#: How far a bar's high may sit under its open or close (or its low over them)
+#: and still be a rounding, widened to the body, rather than a row to refuse:
+#: one cent, the finest increment either market quotes, or 0.02% of the price,
+#: whichever is larger. Deliberately tight. A high under the open is also what
+#: Yahoo's IN-PROGRESS row looks like - SPY on 2026-09-08 read open 772.01,
+#: high 769.70 mid-session, 0.30% apart - and refusing that row is how the
+#: price cache knows the session is not over (tests/test_perf_shapes.py). The
+#: settled SPY bar of 2026-10-16 missed by the cent: 773.23 under 773.24.
+OHLC_ROUNDING_CENTS = 0.01
+OHLC_ROUNDING_SHARE = 0.0002
+
 
 class PriceFeedError(RuntimeError):
     """The source could not be reached or answered with something unusable."""
@@ -320,12 +331,39 @@ class PriceFeed(ABC):
         # logic both assume high >= max(open, close) >= min(open, close) >= low.
         if vals["high"] < vals["low"]:
             return None
-        if vals["high"] < max(vals["open"], vals["close"]):
-            return None
-        if vals["low"] > min(vals["open"], vals["close"]):
-            return None
+        # A high or low that misses the body by a rounding is widened to it,
+        # not taken as corruption. Yahoo served SPY's settled 2026-10-16 bar
+        # with its high at 773.23 under an open of 773.24, and dropping the
+        # row cost the session, not the high: the pack read SPY as never having
+        # printed 10-16 and labelled all three US names MIS-DATED. Past the
+        # rounding (OHLC_ROUNDING_*) the row is refused as before - which is
+        # also how a mid-session row is kept out of the cache.
+        top, bottom = max(vals["open"], vals["close"]), min(vals["open"], vals["close"])
+        if vals["high"] < top:
+            if top - vals["high"] > _rounding(top):
+                return None
+            vals["high"] = top
+        if vals["low"] > bottom:
+            if vals["low"] - bottom > _rounding(bottom):
+                return None
+            vals["low"] = bottom
 
         return Bar(day, vals["open"], vals["high"], vals["low"], vals["close"], volume)
+
+
+def _rounding(price: float) -> float:
+    """The most a high or low may miss the body by and still be a rounding."""
+    # The 1e-9 absorbs binary floating point: 773.24 - 773.23 is 0.00999...97.
+    return max(OHLC_ROUNDING_CENTS, price * OHLC_ROUNDING_SHARE) + 1e-9
+
+
+def _clock() -> float:
+    """Seconds, for a request's time budget. A seam: a test that hangs a fake
+    host advances it rather than sleeping, because Windows' monotonic clock
+    ticks every 15.6 ms and read a 50 ms sleep as under 50 ms."""
+    import time
+
+    return time.monotonic()
 
 
 def _guarded_read(source, symbol, breaker, opener, req, timeout, sleep) -> str:
@@ -336,6 +374,13 @@ def _guarded_read(source, symbol, breaker, opener, req, timeout, sleep) -> str:
     coverage, not an outage - and neither NoData nor an unmappable symbol
     ever trips the breaker. The Stooq HTML wall arrives as a 200, so it is
     handled at parse level and deliberately never retried here.
+
+    `timeout` bounds the REQUEST, not only each attempt: no retry starts once
+    the attempts so far have used it. urlopen's timeout is per socket wait, so
+    a host that hangs cost 3 x 30 s and the backoff, 91.5 s a name - and the
+    breaker opens only after five such failures, 7.6 minutes into a 25-minute
+    collector job that commits nothing if it is killed. A failure that answers
+    fast (a reset, a 503) is still retried as before.
     """
     import urllib.error
 
@@ -343,13 +388,18 @@ def _guarded_read(source, symbol, breaker, opener, req, timeout, sleep) -> str:
     from core.net.retry import with_retry
 
     def _transport() -> bytes:
-        with opener(req, timeout=timeout) as resp:
+        # Each attempt gets what is LEFT of the request's timeout, not all of
+        # it again: an attempt that starts at 29 s of 30 is bounded at 1 s,
+        # so a request costs about its timeout however its attempts fall.
+        left = max(timeout - (_clock() - started), 0.001)
+        with opener(req, timeout=left) as resp:
             return resp.read()
 
+    started = _clock()
     kwargs = {"sleep": sleep} if sleep is not None else {}
     try:
         breaker.before_call()
-        body = with_retry(_transport, **kwargs)
+        body = with_retry(_transport, retryable=lambda _e: _clock() - started < timeout, **kwargs)
     except CircuitOpen as e:
         raise PriceFeedError(str(e)) from e
     except urllib.error.HTTPError as e:

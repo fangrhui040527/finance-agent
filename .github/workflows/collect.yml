@@ -69,6 +69,7 @@ jobs:
     runs-on: ubuntu-latest
     # SWEEP_DEADLINE_SECONDS stops new requests at 10 minutes so the run always
     # reaches the commit step; a job killed by this cap commits nothing at all.
+    # The price step has its own budget and cap for the same reason (below).
     timeout-minutes: 25
     defaults:
       run:
@@ -190,8 +191,17 @@ jobs:
       # not cost the sweep its commit - but non-fatal is not silent. Each one
       # writes a ::warning:: annotation when it exits non-zero, so a failure
       # shows on the run's summary page instead of in a log nobody opens.
+      #
+      # It also has a time limit of its own, because on 2026-09-29 it took
+      # 15m16s of the job's 25. `prices --book` stops starting fetches after
+      # PRICES_BUDGET_SECONDS (4 minutes) and lists what it did not reach, and
+      # each request is bounded by its feed's timeout; the step cap below is
+      # the backstop for a request that trickles past both, and
+      # continue-on-error lets the job go on to the commit if it is hit.
       - name: Cache the day's prices
         if: steps.slot.outputs.slot == 'bursa_close' || steps.slot.outputs.slot == 'us_close' || steps.slot.outputs.slot == 'all'
+        timeout-minutes: 8
+        continue-on-error: true
         run: |
           set +e
           uv run python ask.py prices --book
@@ -239,6 +249,38 @@ jobs:
           fi
           exit 0
 
+      # The monitor, here, so data/alerts.db is committed beside the stores it
+      # judged. NEW means "first seen" only if the log it is diffed against is
+      # the last run's, and until this step nothing that commits ever ran
+      # `watch`: the nightly routine runs it in a fresh clone and commits only
+      # its pages, so every night started from an alerts.db whose newest event
+      # is from 2026-09-23, and an unchanged price_stale was announced NEW for
+      # weeks. Last of the
+      # writers, so it reads the sweep, the price cache, the paper marks and
+      # the digest this run will push. Offline: it reads the stores and asks no
+      # host. Exit 1 only says something is open - that is the report, not a
+      # fault - so only 2, the check itself failing, is annotated.
+      #
+      # Only when the commit step below will run, on the same condition: a
+      # monitor whose log is thrown away with the run would only make the next
+      # one diff against an older state. And a watch that exits 2 may have
+      # recorded some rules and not others (each event commits on its own), so
+      # its partial log is put back to the committed one rather than becoming
+      # the next run's baseline.
+      - name: Run the monitor
+        if: steps.sweep.outputs.code == '0' || steps.sweep.outputs.code == '3'
+        env:
+          FINPLANET_OFFLINE: "1"
+        run: |
+          set +e
+          uv run python ask.py watch
+          code=$?
+          if [ "$code" -eq 2 ]; then
+            git checkout -- data/alerts.db 2>/dev/null || true
+            echo "::warning title=monitor did not run::ask.py watch exited 2; its partial data/alerts.db was put back, so the next watch diffs against the last complete run"
+          fi
+          exit 0
+
       - name: What the stores hold now
         run: |
           uv run python -c "
@@ -258,7 +300,7 @@ jobs:
           # One at a time, skipping any that is not there: `git add` on a
           # missing path is fatal, and one store missing must never cost the
           # others their day.
-          for path in data/corpus.db data/graph.db data/fx.db data/facts.db data/price_cache.db data/digests data/paper.db data/learning.db knowledge/paper; do
+          for path in data/corpus.db data/graph.db data/fx.db data/facts.db data/price_cache.db data/digests data/paper.db data/learning.db data/alerts.db knowledge/paper; do
             if [ -e "$path" ]; then
               git add "$path"
             else

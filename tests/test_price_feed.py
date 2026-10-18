@@ -109,6 +109,58 @@ def test_transport_failure_raises():
         StooqFeed(opener=open_).fetch("XNAS:NVDA")
 
 
+def test_a_host_that_hangs_costs_one_timeout_per_request_not_three(monkeypatch):
+    """urlopen's timeout is per socket wait, so a host that hangs was asked
+    three times at 30 s each - 91.5 s a name with the backoff, and five names
+    before the breaker opens. On 2026-09-29 the collector's price step took
+    15m16s of a 25-minute job. The request, not the attempt, is bounded now."""
+    import core.market.feed as feed_mod
+
+    asked = []
+    now = [1000.0]
+
+    def hang(req, timeout=None):
+        # The hang is the clock moving by the whole timeout, not a real sleep:
+        # a real one read as 49 ms on Windows' 15.6 ms clock and let a retry in.
+        asked.append(timeout)
+        now[0] += timeout
+        raise TimeoutError("timed out")
+
+    monkeypatch.setattr(feed_mod, "_clock", lambda: now[0])
+    monkeypatch.setattr(StooqFeed, "TIMEOUT", 30)
+    with pytest.raises(PriceFeedError, match="fetch failed"):
+        StooqFeed(opener=hang, sleep=lambda s: None).fetch("XNAS:NVDA")
+    assert asked == [30], "no second attempt once the request has used its timeout"
+
+
+def test_a_timeout_that_answers_fast_is_still_retried_inside_the_budget(monkeypatch):
+    """The budget stops retries only once it is spent: a socket that gives up
+    after 2 s of a 30 s request is asked again, as before."""
+    import core.market.feed as feed_mod
+
+    asked = []
+    now = [1000.0]
+
+    def flaky(req, timeout=None):
+        asked.append(timeout)
+        now[0] += 2
+        raise TimeoutError("timed out")
+
+    monkeypatch.setattr(feed_mod, "_clock", lambda: now[0])
+    monkeypatch.setattr(StooqFeed, "TIMEOUT", 30)
+    with pytest.raises(PriceFeedError, match="fetch failed"):
+        StooqFeed(opener=flaky, sleep=lambda s: None).fetch("XNAS:NVDA")
+    # Each attempt is handed what is left of the 30 s, not 30 s again.
+    assert asked == [30, 28, 26], asked
+
+
+def test_a_failure_that_answers_fast_is_still_retried():
+    from tests.conftest import scripted_opener
+
+    opener = scripted_opener([ConnectionResetError("reset by peer"), CSV])
+    assert len(StooqFeed(opener=opener, sleep=lambda s: None).fetch("XNAS:NVDA")) == 3
+
+
 def test_a_404_is_a_coverage_fact_not_an_outage():
     """404 used to collapse into the same error as a 503, so a symbol the
     source does not carry was indistinguishable from the source being down."""
@@ -161,6 +213,29 @@ def test_a_high_below_the_close_is_dropped():
 
 def test_a_low_above_the_open_is_dropped():
     body = CSV + "2026-01-07,9.50,10.20,9.90,10.10,1000\n"  # open below low
+    assert len(StooqFeed(opener=_opener(body)).fetch("XNAS:NVDA")) == 3
+
+
+def test_a_high_a_rounding_under_the_open_is_widened_not_dropped():
+    """Yahoo's SPY 2026-10-16 bar: high 773.23 under an open of 773.24. Dropping
+    it lost the session, and the pack called three US names MIS-DATED."""
+    body = CSV + "2026-01-07,773.24,773.23,760.64,763.25,63538029\n"
+    bars = StooqFeed(opener=_opener(body)).fetch("XNAS:NVDA").raw()
+    assert len(bars) == 4
+    last = bars[-1]
+    assert (last.open, last.high, last.low, last.close) == (773.24, 773.24, 760.64, 763.25)
+
+
+def test_a_low_a_rounding_over_the_close_is_widened_not_dropped():
+    body = CSV + "2026-01-07,10.60,10.70,10.56,10.55,1000\n"  # low 10.56 over close 10.55
+    bars = StooqFeed(opener=_opener(body)).fetch("XNAS:NVDA").raw()
+    assert len(bars) == 4 and bars[-1].low == 10.55
+
+
+def test_a_high_well_under_the_open_is_still_dropped_as_in_progress():
+    """SPY mid-session on 2026-09-08: open 772.01 over a high of 769.70. That is
+    how an unfinished row looks, and refusing it keeps it out of the cache."""
+    body = CSV + "2026-01-07,772.01,769.70,767.26,767.29,2948758\n"
     assert len(StooqFeed(opener=_opener(body)).fetch("XNAS:NVDA")) == 3
 
 

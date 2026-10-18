@@ -24,6 +24,12 @@ WHAT THIS DOES. For each outlet, in order:
      - the question that matters - how many carry a DATE. Bernama's registered
      feed is the reason that is separate: it answered, with items, and dated
      none of them, which is useless to a collector that windows by time.
+  4. REACH per URL: the newest and the oldest dated item, in UTC, and the
+     hours between them. A feed that holds a fixed number of items covers only
+     as far back as those items reach, and from 2026-09-14 every nst_business
+     sweep overflowed its window with all 50 items dated (16.8h unseen on
+     2026-10-16; fmt_business 1.6h). Which URL fixes that - a second page, or
+     a business-only feed whose 50 items reach further - is read off the span.
 
 Read-only, keyless, stores nothing. Manual: it is a diagnostic, and the answer
 changes when a publisher redesigns, not hourly.
@@ -37,6 +43,7 @@ import sys
 import urllib.error
 import urllib.parse
 import urllib.request
+from datetime import UTC, datetime
 from email.utils import parsedate_to_datetime
 from xml.etree import ElementTree
 
@@ -74,6 +81,17 @@ OUTLETS: dict[str, tuple[tuple[str, ...], tuple[str, ...]]] = {
             "https://www.nst.com.my/rss/business",
             "https://www.nst.com.my/feed",
             "https://www.nst.com.my/rss.xml",
+            # The registered /feed is 50 site-wide items, about 3.2 hours of
+            # NST, and the Bursa slots are most of a day apart. Its second
+            # page in the WordPress form (`paged`, from 1) and the Drupal one
+            # (`page`, from 0); a page that repeats the first page's newest
+            # item is a site ignoring the parameter.
+            "https://www.nst.com.my/feed?paged=2",
+            "https://www.nst.com.my/feed?page=1",
+            # A business-only feed: 50 items of one section reach back further
+            # than 50 of the whole site.
+            "https://www.nst.com.my/business/feed",
+            "https://www.nst.com.my/feed/business",
         ),
     ),
     "bernama_business": (
@@ -92,6 +110,16 @@ OUTLETS: dict[str, tuple[tuple[str, ...], tuple[str, ...]]] = {
         (
             "https://www.freemalaysiatoday.com/category/business/feed/",
             "https://www.freemalaysiatoday.com/feed/",
+            # The registered feed, asked for directly rather than only when the
+            # homepage advertises it, and its second page in the WordPress and
+            # the plain 1-based forms: it overflows by an hour or two a sweep.
+            "https://www.freemalaysiatoday.com/feeds/rss/headlines",
+            "https://www.freemalaysiatoday.com/feeds/rss/headlines?paged=2",
+            "https://www.freemalaysiatoday.com/feeds/rss/headlines?page=2",
+            # The business category above, paged, and the narrower sections.
+            "https://www.freemalaysiatoday.com/category/business/feed/?paged=2",
+            "https://www.freemalaysiatoday.com/feeds/rss/business",
+            "https://www.freemalaysiatoday.com/category/business/local-business/feed/",
         ),
     ),
 }
@@ -136,6 +164,11 @@ def dated_items(body: bytes) -> tuple[int, int, str]:
     A feed whose items carry no date cannot be windowed - the collector asks
     for the last N hours - so it is not usable however many items it has. That
     is exactly what Bernama's registered feed did on 2026-09-04.
+
+    The note names the newest and the oldest item and the hours between, in
+    UTC. It named only the newest until 2026-10-17, as a local time with its
+    offset cut off - NST's +0800 read eight hours wrong - and the newest alone
+    cannot tell a feed that covers a day from one that covers three hours.
     """
     try:
         root = ElementTree.fromstring(body)  # noqa: S314 - read once, never stored
@@ -145,7 +178,7 @@ def dated_items(body: bytes) -> tuple[int, int, str]:
     if not items:
         return 0, 0, "parses, but carries no items"
     dated = 0
-    newest = ""
+    times: list[datetime] = []
     for it in items:
         raw = ""
         for tag in ("pubDate", "{http://purl.org/dc/elements/1.1/}date", "published", "updated"):
@@ -159,11 +192,26 @@ def dated_items(body: bytes) -> tuple[int, int, str]:
             continue
         dated += 1
         try:
-            when = parsedate_to_datetime(raw).isoformat()
+            when = parsedate_to_datetime(raw)  # RFC 822, as RSS dates
         except (TypeError, ValueError):
-            when = raw
-        newest = max(newest, when)
-    return len(items), dated, (f"newest {newest[:19]}" if newest else "NOTHING DATED")
+            try:
+                when = datetime.fromisoformat(raw.replace("Z", "+00:00"))  # Atom, dc:date
+            except ValueError:
+                continue  # dated, in a form this cannot place in time
+        if when.tzinfo is None:
+            when = when.replace(tzinfo=UTC)
+        times.append(when.astimezone(UTC))
+    if not dated:
+        return len(items), 0, "NOTHING DATED"
+    if not times:
+        return len(items), dated, "dated, but in no form this can read"
+    newest, oldest = max(times), min(times)
+    hours = (newest - oldest).total_seconds() / 3600
+    return (
+        len(items),
+        dated,
+        f"newest {newest:%Y-%m-%d %H:%MZ}, oldest {oldest:%Y-%m-%d %H:%MZ} ({hours:.1f}h)",
+    )
 
 
 def probe_url(url: str) -> str:

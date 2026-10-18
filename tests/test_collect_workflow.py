@@ -28,6 +28,32 @@ def test_runs_never_overlap_and_the_one_working_is_never_cancelled():
     assert group["cancel-in-progress"] is False
 
 
+def test_the_monitor_runs_after_every_writer_and_its_log_is_committed_with_the_sweep():
+    """M9. `watch` diffs against data/alerts.db, and the only thing that ran it
+    was the nightly routine, in a fresh clone that commits its pages and not the
+    log - so every night started from a store whose newest event was from
+    2026-09-23, and an alert unchanged for weeks read NEW every night. The
+    collector commits the stores; the log has to go with them, written after
+    them, and a run with something open must not fail the job."""
+    steps = _workflow()["jobs"]["sweep"]["steps"]
+    names = [s.get("name", "") for s in steps]
+    watch = next(i for i, s in enumerate(steps) if "ask.py watch" in str(s.get("run", "")))
+    commit = names.index("Commit what was collected")
+    for writer in ("Sweep", "Cache the day's prices", "Mark the paper book", "Write the digest"):
+        assert names.index(writer) < watch < commit, writer
+    step = steps[watch]
+    # On exactly the commit's condition: a log the run throws away would only
+    # make the next watch diff against an older state.
+    assert step.get("if") == steps[commit].get("if"), (step.get("if"), steps[commit].get("if"))
+    assert step["run"].lstrip().startswith("set +e") and step["run"].rstrip().endswith("exit 0")
+    # A watch that could not finish leaves a partial log; it is put back, not
+    # committed as the next run's baseline.
+    failed = step["run"].split('"$code" -eq 2', 1)[1].split("fi", 1)[0]
+    assert "git checkout -- data/alerts.db" in failed
+    added = steps[commit]["run"].split("for path in", 1)[1].split(";", 1)[0].split()
+    assert "data/alerts.db" in added
+
+
 def test_a_queued_run_checks_out_the_branch_head_not_the_event_commit():
     """On 2026-09-23 a bursa_close run dispatched behind us_close checked out
     dc6e822, the commit its event carried, collected for two minutes, and could

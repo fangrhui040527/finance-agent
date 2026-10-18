@@ -14,6 +14,10 @@ Each test fails on the code before 2026-10-08:
     depreciation (6.3B) read as known on 2025-07-30 although its quarters were
     first filed between 2025-10-29 and 2026-04-29, and the Q4 the 10-K day
     could compute was never stored (facts-valuation-3).
+
+The capex test fails on the code before 2026-10-17, which read capex from the
+PP&E tag alone: NVIDIA's last figure under it is the quarter to 2020-07-26, so
+the fact book printed a six-year-old capex beside a current cash flow.
 """
 
 from __future__ import annotations
@@ -195,6 +199,67 @@ def test_a_fourth_quarter_from_quarters_filed_after_the_10k_is_dated_by_the_last
     assert early.series("depreciation") == [], "nothing public on 2025-08-15 implied 6.3B"
     fy = early.latest_annual("depreciation")
     assert fy is not None and fy.value == Decimal(22000)
+
+
+def test_capex_follows_a_filer_onto_the_productive_assets_tag_one_row_a_period(tmp_path):
+    # NVDA's shape: the PP&E tag in the 10-Qs up to the quarter to 2020-07-26, the
+    # productive-assets tag in every 10-K and every 10-Q after it, and the newer
+    # 10-Qs repeat the old quarters under the new tag as comparatives. AAPL's
+    # shape rides along: a filer with both tags for a period keeps the PP&E one.
+    ppe = "PaymentsToAcquirePropertyPlantAndEquipment"
+    productive = "PaymentsToAcquireProductiveAssets"
+    fy21, fy26, fy27 = "2020-01-27", "2025-01-27", "2026-01-26"
+    obs = _collect(
+        NVDA,
+        {
+            ppe: {
+                "units": {
+                    "USD": [
+                        _fact(fy21, "2020-04-26", 155, "2020-05-21", fy=2021),
+                        _fact(fy21, "2020-07-26", 372, "2020-08-19", fy=2021, fp="Q2"),
+                    ]
+                }
+            },
+            productive: {
+                "units": {
+                    "USD": [
+                        _fact(fy21, "2020-04-26", 155, "2021-05-26", fy=2022),
+                        _fact(fy26, "2025-04-27", 1227, "2025-05-28"),
+                        _fact(fy26, "2025-07-27", 2122, "2025-08-27", fp="Q2"),
+                        _fact(fy26, "2025-10-26", 3758, "2025-11-19", fp="Q3"),
+                        _fact(fy26, "2026-01-25", 6042, "2026-02-25", "10-K", fp="FY"),
+                        _fact(fy27, "2026-04-26", 1900, "2026-05-20", fy=2027),
+                        _fact(fy27, "2026-07-26", 4000, "2026-08-26", fy=2027, fp="Q2"),
+                    ]
+                }
+            },
+        },
+    )
+    q = _rows(obs, "capex")
+    latest = max(q)
+    assert latest == date(2026, 7, 26), f"capex stops at {latest}: the newer tag is not read"
+    assert list(q[latest]) == [Decimal(2100)]
+    assert q[latest][Decimal(2100)].payload["tag"] == productive
+    assert _rows(obs, "capex_fy")[date(2026, 1, 25)].keys() == {Decimal(6042)}
+    old = q[date(2020, 4, 26)]
+    assert list(old) == [Decimal(155)], "one row per period, never one per tag"
+    first = old[Decimal(155)]
+    assert first.payload["tag"] == ppe and first.known_at == date(2020, 5, 21)
+    _dated_by_last_input(obs)
+
+    s = _statements(tmp_path, NVDA, obs, date(2026, 10, 6))
+    ttm, inputs = s.ttm("capex")
+    assert ttm == Decimal(1636 + 2284 + 1900 + 2100), "Q3 and Q4 FY26, Q1 and Q2 FY27"
+    assert max(inputs) == "capex@2026-07-26"
+
+    both = _collect(
+        "XNAS:AAPL",
+        {
+            ppe: {"units": {"USD": [_fact("2025-12-28", "2026-03-28", 1971, "2026-05-01")]}},
+            productive: {"units": {"USD": [_fact("2025-12-28", "2026-03-28", 2050, "2026-05-01")]}},
+        },
+    )
+    assert {o.value for o in both if o.concept == "capex"} == {Decimal(1971)}
 
 
 def test_restated_inputs_make_later_rows_and_never_backdate_the_restated_figure(tmp_path):

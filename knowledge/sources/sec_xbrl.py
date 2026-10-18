@@ -57,7 +57,14 @@ CONCEPTS: dict[str, tuple[str, ...]] = {
     "net_income": ("NetIncomeLoss",),
     "eps_diluted": ("EarningsPerShareDiluted",),
     "cash_from_operations": ("NetCashProvidedByUsedInOperatingActivities",),
-    "capex": ("PaymentsToAcquirePropertyPlantAndEquipment",),
+    # NVIDIA's cash-flow line is "purchases related to property and equipment and
+    # intangible assets", which us-gaap tags PaymentsToAcquireProductiveAssets. Its
+    # 10-Qs used the PP&E tag only up to the quarter to 2020-07-26 and its 10-Ks
+    # never did, so with that tag alone the fact book's NVDA capex stopped there
+    # (217m, knowable 2020-08-19), held no annual row, and TTM capex - so free
+    # cash flow and both capex ratios - was None. Second, so a filer that tags
+    # both keeps its PP&E figure for every period, one row a period either way.
+    "capex": ("PaymentsToAcquirePropertyPlantAndEquipment", "PaymentsToAcquireProductiveAssets"),
     "depreciation": (
         "DepreciationDepletionAndAmortization",
         "DepreciationAndAmortization",
