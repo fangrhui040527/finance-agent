@@ -1,0 +1,260 @@
+{
+  "day": "2026-10-18",
+  "written_at": "2026-10-18T22:56:00Z",
+  "phase": "ramp",
+  "week": 6,
+  "equity_usd": 1000.0,
+  "cash_usd": 1000.0,
+  "control_equity_usd": 938.39,
+  "control_return_to_date": -0.0616,
+  "drawdown": 0.0,
+  "control_drawdown": 0.0616,
+  "halted": false,
+  "marks": 31,
+  "positions": [],
+  "changes": [],
+  "control_changes": [],
+  "control_mark": {
+    "marked_on": "2026-10-16",
+    "equity_usd": 938.39,
+    "cash_usd": 602.28,
+    "positions_usd": 336.11,
+    "day_return": -0.0157,
+    "note": "holdings MYX:8869 100 (6.50), MYX:5183 100 (4.32), MYX:3182 200 (1.45); unchanged since Friday"
+  },
+  "index_book": {
+    "mark": {
+      "marked_on": "2026-10-16",
+      "equity_usd": 986345.25,
+      "cash_usd": 598729.46,
+      "positions_usd": 387615.79,
+      "day_return": -0.0006,
+      "drawdown": 0.0137,
+      "held": 97,
+      "pending": 0
+    },
+    "cost_to_date_share_of_notional": 0.0048,
+    "since_2026_09_30": {
+      "index": -0.0137,
+      "decided": 0.0,
+      "control": -0.0425
+    },
+    "dividends": [],
+    "note": "no change; nothing pending"
+  },
+  "caps": [
+    {
+      "cap": "largest name",
+      "value": "0.00%",
+      "limit": "25%",
+      "breached": false
+    },
+    {
+      "cap": "invested",
+      "value": "0.00%",
+      "limit": "40%",
+      "breached": false
+    },
+    {
+      "cap": "cash floor",
+      "value": "100.00%",
+      "limit": "20%",
+      "breached": false
+    },
+    {
+      "cap": "names held",
+      "value": "0",
+      "limit": "0",
+      "breached": false
+    },
+    {
+      "cap": "drawdown from peak",
+      "value": "0.00%",
+      "limit": "8% halts entries",
+      "breached": false
+    },
+    {
+      "cap": "turnover, 5 weekdays",
+      "value": "USD 0.00",
+      "limit": "USD 500.00",
+      "breached": false
+    }
+  ],
+  "prices": {
+    "bursa": "no session on Sunday 2026-10-18; Friday 2026-10-16 closes",
+    "us": "no session on Sunday 2026-10-18; Friday 2026-10-16 closes",
+    "fx": "MYR 4.082 per USD (bnm, 2026-10-16)"
+  },
+  "fundable": [
+    {
+      "instrument_id": "MYX:1155",
+      "lot_usd": 244.73,
+      "share": 0.245,
+      "round_trip": 0.0098,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:5183",
+      "lot_usd": 105.83,
+      "share": 0.106,
+      "round_trip": 0.0209,
+      "lots": 2
+    },
+    {
+      "instrument_id": "MYX:5225",
+      "lot_usd": 195.98,
+      "share": 0.196,
+      "round_trip": 0.0119,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:8869",
+      "lot_usd": 159.24,
+      "share": 0.159,
+      "round_trip": 0.0143,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:3182",
+      "lot_usd": 35.52,
+      "share": 0.036,
+      "round_trip": 0.0598,
+      "lots": 7
+    },
+    {
+      "instrument_id": "XNAS:NVDA",
+      "lot_usd": 214.13,
+      "share": 0.214,
+      "round_trip": 0.012,
+      "lots": 1
+    }
+  ],
+  "over_cap": {
+    "MYX:5347": 0.318,
+    "XNAS:AAPL": 0.343,
+    "XNAS:MSFT": 0.529
+  },
+  "ledger": {
+    "mark_days": 26,
+    "gap": "no routine ran 2026-10-02..10-06; no paper page and no decision for those days; no decision is backdated"
+  },
+  "attribution": null,
+  "decision": {
+    "recorded": true,
+    "weights": {},
+    "thesis": "All cash, the thirty-third all-cash row and the sixth decision of ramp week 6, recorded on Sunday 10-18 with no new session since Friday's closes. The 2026-10-17 feedback page finds no session to decompose and no new evidence on the book: no row about Press Metal was published from Friday 12:00Z to the 10-18 22:42Z sweep, so its 5.43-sigma fall on 10-16 (idiosyncratic -8.42%) still has no collected cause; Tenaga's Saturday rows are an operational fire with supply restored, and Genting's one row is commentary without the rights issue's terms. Monday 10-19 is the first session that can confirm or refute the Press Metal reading. Eight all-cash claims are graded, all correct, against a control at -6.16%. Claim: nothing in the fundable universe beats cash over 21 sessions.",
+    "horizon": 21,
+    "confidence": 0.55,
+    "prediction_id": "paper-2026-10-18-allcash-21d-a632",
+    "grades_on": "2026-11-17",
+    "refusals": []
+  },
+  "stores": {
+    "decided_targets": 33,
+    "predictions": 33,
+    "outcomes": 8,
+    "index_targets": 194,
+    "control_targets": 6,
+    "index_pending": 0,
+    "made_at": "2026-10-18T22:49:20Z"
+  },
+  "evidence": {
+    "feedback_page": "knowledge/feedback/2026-10-17.md (06d25e8)",
+    "press_metal": "no row about the company from 2026-10-16 12:00Z to the 2026-10-18 22:42Z sweep; 10-16 fall 5.43 sigma, idiosyncratic -8.42%, cause not in the store",
+    "tenaga": "three title-only rows on the 10-16 Johor substation fire; supply restored",
+    "genting": "one title-only commentary row; no rights-issue terms",
+    "sunday": "no session; marks are Friday's",
+    "note": "first paper page on the merged PR #91 code (7b6d7bc)"
+  },
+  "mistakes": [
+    "paper-2026-10-16-allcash-21d-2b02 filed Press Metal's -9.34% as not decomposed; decomposed it is 5.43 sigma and significant at 5%, cause still not in the store after two days of collection.",
+    "paper-2026-10-01-allcash-21d-5a1e is behind on IHH (+3.90%) and Petronas Chemicals (+4.60%) since the 10-01 closes; it grades on 10-31.",
+    "paper-2026-10-08-allcash-21d-7bb6's test (Genting above 1.93 before 11-07) stands at 1.45."
+  ],
+  "mistakes_checked": [
+    "paper-2026-10-17-allcash-21d-30d1 against the 2026-10-17 feedback page: no new mistake",
+    "paper-2026-10-17-allcash-21d-30d1 grade date 2026-11-17 against learning.db",
+    "paper-2026-10-17-allcash-21d-30d1 graded count (seven on 10-17; eight on 10-18)"
+  ],
+  "grades_due": [
+    {
+      "prediction_id": "paper-2026-09-19-allcash-21d-b7bd",
+      "on": "2026-10-19"
+    },
+    {
+      "prediction_id": "paper-2026-09-20-allcash-21d-dbaf",
+      "on": "2026-10-20"
+    },
+    {
+      "prediction_id": "paper-2026-09-21-allcash-21d-c04f",
+      "on": "2026-10-21"
+    },
+    {
+      "prediction_id": "paper-2026-09-22-allcash-21d-33c5",
+      "on": "2026-10-22"
+    },
+    {
+      "prediction_id": "paper-2026-09-23-allcash-21d-b999",
+      "on": "2026-10-23"
+    },
+    {
+      "prediction_id": "paper-2026-09-24-allcash-21d-e5b2",
+      "on": "2026-10-24"
+    },
+    {
+      "prediction_id": "paper-2026-09-25-allcash-21d-468d",
+      "on": "2026-10-25"
+    }
+  ],
+  "lessons": [
+    "A decision with no new observation behind it is a repeat, not a fresh test: weekend all-cash rows on the same Friday closes are graded by the same next session."
+  ],
+  "dividend_boundary": {
+    "decided": "2026-10-10T15:25:31Z",
+    "control": "2026-10-10T15:25:31Z",
+    "index": "2026-10-10T15:25:31Z",
+    "note": "marks before it are not restated; no credit to the decided or control book yet"
+  },
+  "graded": [
+    {
+      "prediction_id": "paper-2026-09-11-allcash-21d-8bf9",
+      "benchmark": -0.024,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-12-allcash-21d-1661",
+      "benchmark": -0.024,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-13-allcash-21d-5baf",
+      "benchmark": -0.0237,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-14-allcash-21d-9d7e",
+      "benchmark": -0.0441,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-15-allcash-21d-af55",
+      "benchmark": -0.0466,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-16-allcash-21d-3865",
+      "benchmark": -0.0616,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-17-allcash-21d-7667",
+      "benchmark": -0.0616,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-18-allcash-21d-667a",
+      "benchmark": -0.0616,
+      "correct": true
+    }
+  ]
+}
