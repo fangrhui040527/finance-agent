@@ -1,11 +1,12 @@
 # Digest 2026-10-18
 
-Generated 2026-10-18 05:50 UTC · slot `all` · 19683 articles in the corpus, 5822 observations, 4236 events in the fact book.
+Generated 2026-10-18 13:21 UTC · slot `all` · 19892 articles in the corpus, 5822 observations, 4236 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.78 · 1 escalated
+- 2026-10-17 www.ad-hoc-news.de — Results due November 3: Maybank expects THB 13.4 billion for Advanced Info Service stock - ad-hoc-news.de [q 0.65, tone +0.0] ★
 
 ### Tenaga (MYX:5347)
 - quiet: nothing collected for this name in the window
@@ -89,6 +90,15 @@ Generated 2026-10-18 05:50 UTC · slot `all` · 19683 articles in the corpus, 58
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 13:20 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
+| 13:20 | twse_openapi | ok | 8 | 0 | 0 | facts 0;  |
+| 13:20 | jin10_flash | degraded | 16 | 14 | 13 | facts 0; window not covered back to 2026-10-17 22:42Z; the oldest item read is 2 |
+| 13:20 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 13:20 | nst_business | degraded | 149 | 147 | 142 | page 2 starts 3.9h before page 1 ends (2026-10-18 04:25Z under 2026-10-18 08:18Z |
+| 13:20 | fmt_business | ok | 47 | 47 | 47 |  |
+| 13:20 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals, IHH |
+| 13:20 | google_news | ok | 8 | 8 | 7 | read but empty: Press Metal, Petronas Chemicals; named the company: 4 of 8 (lowe |
+| 13:20 | gdelt | failed | 0 | 0 | 0 | no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP |
 | 05:50 | sec_xbrl | ok | 4423 | 0 | 0 | facts 0;  |
 | 05:50 | finmind | ok | 70 | 0 | 0 | facts 5;  |
 | 05:50 | twse_openapi | ok | 8 | 0 | 0 | facts 0;  |

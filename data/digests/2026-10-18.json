@@ -1,6 +1,87 @@
 {
   "collection": [
     {
+      "at": "2026-10-18T13:20:46.133517+00:00",
+      "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-18T13:20:46.132330+00:00",
+      "detail": "facts 0; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-18T13:20:41.855175+00:00",
+      "detail": "facts 0; window not covered back to 2026-10-17 22:42Z; the oldest item read is 2026-10-18 11:57Z, so 13.2h of the window was never served",
+      "fetched": 16,
+      "kept": 14,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 13
+    },
+    {
+      "at": "2026-10-18T13:20:40.685988+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-18T13:20:39.045589+00:00",
+      "detail": "page 2 starts 3.9h before page 1 ends (2026-10-18 04:25Z under 2026-10-18 08:18Z): the items between were served by neither",
+      "fetched": 149,
+      "kept": 147,
+      "source": "nst_business",
+      "status": "degraded",
+      "stored": 142
+    },
+    {
+      "at": "2026-10-18T13:20:37.070998+00:00",
+      "detail": "",
+      "fetched": 47,
+      "kept": 47,
+      "source": "fmt_business",
+      "status": "ok",
+      "stored": 47
+    },
+    {
+      "at": "2026-10-18T13:20:36.757737+00:00",
+      "detail": "read but empty: Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals, IHH",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-18T13:20:35.848713+00:00",
+      "detail": "read but empty: Press Metal, Petronas Chemicals; named the company: 4 of 8 (lowest: Genting 0/1, IHH 0/2, Tenaga 1/2)",
+      "fetched": 8,
+      "kept": 8,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 7
+    },
+    {
+      "at": "2026-10-18T13:20:34.227455+00:00",
+      "detail": "no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked); deferred: Press Metal, Genting, Maybank",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "failed",
+      "stored": 0
+    },
+    {
       "at": "2026-10-18T05:50:32.844628+00:00",
       "detail": "facts 0; ",
       "fetched": 4423,
@@ -56,18 +137,18 @@
     }
   ],
   "counts": {
-    "articles": 19683,
+    "articles": 19892,
     "documents": 0,
-    "escalated": 2977,
+    "escalated": 2978,
     "events": 4236,
-    "failed_sweeps": 77,
-    "linked": 12440,
+    "failed_sweeps": 78,
+    "linked": 12443,
     "observations": 5822,
     "series": 31,
-    "sweeps": 960
+    "sweeps": 969
   },
   "day": "2026-10-18",
-  "generated_at": "2026-10-18 05:50 UTC",
+  "generated_at": "2026-10-18 13:21 UTC",
   "macro": [
     {
       "change": "-0.02",
@@ -200,13 +281,31 @@
   ],
   "names": [
     {
-      "escalated": 0,
+      "escalated": 1,
       "events": [],
       "instrument_id": "MYX:1155",
       "label": "Maybank",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMi3wFBVV95cUxNY1hWUTVZZUVxOXQ1X0NMZzdYaW5GdHhsbTYwQTFtYzVtSkdyMTAwRzE3XzFaSVE3d0kwdHc0STVrWU8tLW5FZE5YME92dFNrb2NjX2RUWlJoRkhseHdFcWRfTFVtMTE0VWhub21lYXdCWTRMbVJialcySncydVFGYmtfQkdjUjhVYjNZVi1fbk4tc2VsZHlOS3Z2NzhTUWdZMk1yZG9NZEJ6VmNsZ1UwRVdfQlBJVVVxTUFiZGdWVDZrdDcwdmlNZmszemdMbzExSkpZMWNCOFp4SzI4ZWZr?oc=5",
+          "domain": "www.ad-hoc-news.de",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-17T19:41:59+00:00",
+          "quality": 0.65,
+          "title": "Results due November 3: Maybank expects THB 13.4 billion for Advanced Info Service stock - ad-hoc-news.de",
+          "uncertainty": 0.78125
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.781
+      },
       "upcoming": []
     },
     {
