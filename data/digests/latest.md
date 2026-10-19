@@ -1,6 +1,6 @@
 # Digest 2026-10-19
 
-Generated 2026-10-19 18:50 UTC · slot `all` · 20454 articles in the corpus, 5873 observations, 4237 events in the fact book.
+Generated 2026-10-19 22:42 UTC · slot `all` · 20982 articles in the corpus, 5912 observations, 4239 events in the fact book.
 
 ## The book
 
@@ -31,47 +31,49 @@ Generated 2026-10-19 18:50 UTC · slot `all` · 20454 articles in the corpus, 58
 - 2026-10-19 www.klsescreener.com — Trading ideas: Public Bank, RHB, Genting, IOIPG, Zetrix, MNRB, Cape EMS, Cosmos, ISF, E&O, Turiya, Oasis Harvest [q 0.65, tone +0.0]
 
 ### NVIDIA (XNAS:NVDA)
-- tone: 21 stories from 15 sources, polarity +0.05, peak intensity 0.33, uncertainty 0.11 · 7 escalated
+- tone: 114 stories from 41 sources, polarity +0.10, peak intensity 0.33, uncertainty 0.10 · 29 escalated
 - 2026-10-18 finance.yahoo.com — Meta Earnings Puts Adobe Stock And AI Ad Software Names In Focus [q 1.00, tone +0.0] ★
 - 2026-10-18 finance.yahoo.com — What Does Broadcom (AVGO) Face As AI Chip Supply Turns Into A Bottleneck? [q 1.00, tone +1.0] ★
-- 2026-10-18 www.reuters.com — Samsung to use TSMC technology for Nvidia's next-generation memory chips, Seoul newspaper reports [q 0.80, tone +0.0] ★
-- 2026-10-18 www.fool.com — The Bond Market Is Sending a Warning to Nvidia Shareholders [q 0.65, tone -1.0] ★
-- 2026-10-18 econotimes.com — NVIDIA Expects 70% Fiscal 2028 Revenue Growth as Supply Limits Persist [q 0.65, tone +1.0] ★
-- 2026-10-18 tomshardware.com — Modder brings full Nvidia DLSS 5 suite to three generations of AMD gaming GPUs plans to match native Nvidia GPU performance [q 0.65, tone +0.0] ★
-- 2026-10-18 www.kucoin.com — Next Week’s Macro Outlook: Fed Enters Pre-FOMC Silence, Nvidia’s GTC Berlin, Meta and Tesla Earnings in Focus [q 0.65, tone +0.0] ★
-- 2026-10-18 finance.yahoo.com — NVIDIA And 2 Other Fast Growing Stocks To Own [q 0.80, tone +0.0]
+- 2026-10-19 Yahoo — NVIDIA's Price Implies Less Growth Than Its History [q 0.85, tone +1.0] ★
+- 2026-10-19 www.tikr.com — Third Wheel: Microsoft’s AI Chips Are “Nowhere Close” to NVIDIA or Google per Analyst [q 0.85, tone +0.0] ★
+- 2026-10-19 Yahoo — Martin Shkreli Warns on Quantum Stocks: “They’ll Never Beat an NVIDIA Machine” [q 0.85, tone +1.0] ★
+- 2026-10-19 SeekingAlpha — Nvidia: Financial Risks Behind AI Expansion [q 0.85, tone +1.0] ★
+- 2026-10-19 Yahoo — 3D Chips (3D IC) - Global Strategic Business Report: 3D Chips Stack Up as AI Workloads Push the Market towards $45.2Bn [q 0.85, tone +0.0] ★
+- 2026-10-19 Yahoo — What Does BlackRock (BLK) Joining A $500 Billion AI Funding Push Mean? [q 0.85, tone +0.0] ★
 - upcoming 2026-11-17 earnings_result — Q3 2027 results after the close (finnhub)
-- snapshot: P/E (ttm) 26.76 (finnhub, 2026-10-18) · P/B 28.81 (finnhub, 2026-10-18) · EPS (ttm) 7.91 (finnhub, 2026-10-18) · dividend yield 0.03 (finnhub, 2026-10-18) · beta 2.27 (finnhub, 2026-10-18) · 52w high 243.37 (finnhub, 2026-10-18) · 52w low 164.27 (finnhub, 2026-10-18) · target (consensus) 339.17 (fmp, 2026-10-19) · analysts: buy 41 (finnhub, 2026-09-05) · analysts: hold 3 (finnhub, 2026-09-05) · analysts: sell 1 (finnhub, 2026-09-05) · vendor sentiment 0.25 (alphavantage_news, 2026-10-06) · revenue (last quarter) 96.22bn (sec_xbrl, 2026-08-26) · net income (last quarter) 59.69bn (sec_xbrl, 2026-08-26) · last EPS surprise % 3.82 (finnhub, 2026-09-05)
+- snapshot: P/E (ttm) 26.76 (finnhub, 2026-10-19) · P/B 28.81 (finnhub, 2026-10-19) · EPS (ttm) 7.91 (finnhub, 2026-10-19) · dividend yield 0.03 (finnhub, 2026-10-19) · beta 2.27 (finnhub, 2026-10-19) · 52w high 243.37 (finnhub, 2026-10-19) · 52w low 164.27 (finnhub, 2026-10-19) · target (consensus) 339.17 (fmp, 2026-10-19) · analysts: buy 41 (finnhub, 2026-09-05) · analysts: hold 3 (finnhub, 2026-09-05) · analysts: sell 1 (finnhub, 2026-09-05) · vendor sentiment 0.25 (alphavantage_news, 2026-10-06) · revenue (last quarter) 96.22bn (sec_xbrl, 2026-08-26) · net income (last quarter) 59.69bn (sec_xbrl, 2026-08-26) · last EPS surprise % 3.82 (finnhub, 2026-09-05)
 
 ### Apple (XNAS:AAPL)
-- tone: 19 stories from 18 sources, polarity +0.05, peak intensity 0.33, uncertainty 0.04 · 4 escalated
+- tone: 99 stories from 57 sources, polarity +0.03, peak intensity 0.33, uncertainty 0.06 · 25 escalated
 - 2026-10-18 finance.yahoo.com — What Does Broadcom (AVGO) Face As AI Chip Supply Turns Into A Bottleneck? [q 1.00, tone +1.0] ★
-- 2026-10-18 www.theapplepost.com — Apple Store staff reportedly warning customers not to expect iPhone Duo walk-in stock [q 0.65, tone -1.0] ★
-- 2026-10-18 247wallst.com — Apple Keeps Hitting Record Highs. Bitcoin Hasn’t Set One All Year. Which Is the Better Buy? [q 0.65, tone +1.0] ★
-- 2026-10-18 9to5mac.com — Apple next HomeView could debut as soon as next year with a robotic arm: report [q 0.65, tone +0.0] ★
-- 2026-10-18 www.thestreet.com — Apple’s employees warn iPhone buyers [q 0.65, tone +0.0]
-- 2026-10-18 fool.com — The $5 Trillion Club: Which Is the Better Stock to Own, Apple or Nvidia? [q 0.65, tone +0.0]
-- 2026-10-18 www.mt.co.kr — Apple CEO: Rivals' Foldable Phones Look 'Cheap and Crude'... A Shot at Samsung? [IT Story] [q 0.65, tone +0.0]
-- 2026-10-18 www.theapplepost.com — Gurman says Apple made a ‘major mistake’ launching iPhone Duo pre-orders so early [q 0.65, tone +0.0]
+- 2026-10-19 Yahoo — Analyst says iPhone 18 demand weakness is "intensifying" [q 0.85, tone -1.0] ★
+- 2026-10-19 Yahoo — Germany Digital Health Market Size, Share, Trends, and Forecast, 2026-2033 | DiGA Reimbursement, AI, mHealth, and Telehealth Unlock Growth Opportunities [q 0.85, tone +1.0] ★
+- 2026-10-19 www.barrons.com — Apple Stock Escaped the AI Downturn. Now It Faces a 27% Plunge, Says Analyst. [q 0.80, tone +0.0] ★
+- 2026-10-19 finance.yahoo.com — Apple Confirms October 28 ‘Pro And Tell’ Event — First Touchscreen MacBook Pro Expected [q 0.80, tone +0.0] ★
+- 2026-10-19 finance.yahoo.com — If Apple Cuts iPhone Units in 2027, This Stock Could Be a Big Loser [q 0.80, tone -1.0] ★
+- 2026-10-19 finance.yahoo.com — Apple stock is at a record high — but is it warranted given slowing iPhone 18 demand? [q 0.80, tone +1.0] ★
+- 2026-10-19 www.investing.com — KeyBanc reiterates Apple stock Underweight on upgrade concerns [q 0.80, tone +1.0] ★
+- event 2026-10-19 insider_filing — 4: FORM 4 (edgar)
+- event 2026-10-19 insider_filing — 4: FORM 4 (edgar)
 - upcoming 2026-11-02 earnings_result — Q4 2026 results after the close (finnhub)
 - upcoming 2026-10-29 earnings_result — Q4 2026 results after the close (finnhub)
 - upcoming 2026-10-28 earnings_result — Q4 2026 results after the close (finnhub)
-- snapshot: P/E (ttm) 38.88 (finnhub, 2026-10-18) · P/B 50.98 (finnhub, 2026-10-18) · EPS (ttm) 8.72 (finnhub, 2026-10-18) · dividend yield 0.51 (finnhub, 2026-10-18) · beta 1.10 (finnhub, 2026-10-18) · 52w high 348.15 (finnhub, 2026-10-18) · 52w low 243.42 (finnhub, 2026-10-18) · target (consensus) 343.88 (fmp, 2026-10-19) · analysts: buy 22 (finnhub, 2026-09-05) · analysts: hold 15 (finnhub, 2026-09-05) · analysts: sell 3 (finnhub, 2026-09-05) · vendor sentiment -0.23 (alphavantage_news, 2026-10-06) · revenue (last quarter) 109.42bn (sec_xbrl, 2026-07-31) · net income (last quarter) 29.79bn (sec_xbrl, 2026-07-31) · last EPS surprise % -0.89 (finnhub, 2026-09-05)
+- snapshot: P/E (ttm) 38.88 (finnhub, 2026-10-19) · P/B 50.98 (finnhub, 2026-10-19) · EPS (ttm) 8.72 (finnhub, 2026-10-19) · dividend yield 0.51 (finnhub, 2026-10-19) · beta 1.10 (finnhub, 2026-10-19) · 52w high 348.15 (finnhub, 2026-10-19) · 52w low 243.42 (finnhub, 2026-10-19) · target (consensus) 343.88 (fmp, 2026-10-19) · analysts: buy 22 (finnhub, 2026-09-05) · analysts: hold 15 (finnhub, 2026-09-05) · analysts: sell 3 (finnhub, 2026-09-05) · vendor sentiment -0.23 (alphavantage_news, 2026-10-06) · revenue (last quarter) 109.42bn (sec_xbrl, 2026-07-31) · net income (last quarter) 29.79bn (sec_xbrl, 2026-07-31) · last EPS surprise % -0.89 (finnhub, 2026-09-05)
 
 ### Microsoft (XNAS:MSFT)
-- tone: 14 stories from 13 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.01 · 2 escalated
-- 2026-10-18 www.pymnts.com — Microsoft Faces Tougher UK Antitrust Oversight as Regulator Targets Software and AI Dominance [q 0.65, tone +0.0] ★
-- 2026-10-18 www.tokenpost.com — Microsoft Analysts Lift Price Targets to $600-$675 Before Oct. 28 Results [q 0.65, tone +0.0] ★
-- 2026-10-18 finance.yahoo.com — Some Investors Are Questioning the AI Trade. Microsoft Is Bucking the Trend [q 0.80, tone +0.0]
-- 2026-10-18 bbc.co.uk — Microsoft pulls out of Nscale Essex AI data centre [q 0.80, tone +0.0]
-- 2026-10-18 seekingalpha.com — Microsoft exits Nscale U.K. data center deal as IPO pressures mount (MSFT:NASDAQ) [q 0.80, tone +0.0]
-- 2026-10-18 foreignpolicyjournal.com — UBS Raises Microsoft (NASDAQ: MSFT) Price Target To $675, Calls Stock Valuation Not Stretched [q 0.65, tone +0.0]
-- 2026-10-18 stocksdownunder.com — Microsoft (NASDAQ:MSFT) Pulls Out of UK AI Data Centre Deal Amid Power Delays [q 0.65, tone +0.0]
-- 2026-10-18 afr.com — Microsoft axes major Nscale deal in blow to Australian AI entrepreneur [q 0.65, tone +0.0]
+- tone: 83 stories from 46 sources, polarity +0.08, peak intensity 0.33, uncertainty 0.08 · 26 escalated
+- 2026-10-19 www.benzinga.com — Microsoft Walks Away From AI Data Center Deal, but SemiAnalysis Predicts 50-GW Boom in 2027 [q 0.85, tone +0.0] ★
+- 2026-10-19 www.tikr.com — Third Wheel: Microsoft’s AI Chips Are “Nowhere Close” to NVIDIA or Google per Analyst [q 0.85, tone +0.0] ★
+- 2026-10-19 Yahoo — What Wall Street Expects from The Q3 Cloud and Infrastructure Scorecard: Microsoft Vs. Amazon [q 0.85, tone +1.0] ★
+- 2026-10-19 Yahoo — New ESW Guide Explains Copilot Studio Agent Pricing and the Controls to Set First [q 0.85, tone +0.0] ★
+- 2026-10-19 Yahoo — Neoclouds: Goldman Sachs Upgrades CoreWeave. Microsoft Shelves Nscale Project. [q 0.85, tone +1.0] ★
+- 2026-10-19 Yahoo — Microsoft vs. Amazon: Is AMZN’s AI Growth Being Undervalued by Investors? [q 0.85, tone +1.0] ★
+- 2026-10-19 Yahoo — eMemory/PUFsecurity Showcases OCP S.A.F.E.-Approved PUFrt at OCP Global Summit, Strengthening AI Data Center Security with Caliptra [q 0.85, tone +1.0] ★
+- 2026-10-19 Yahoo — GTIA Launches Managed Intelligence Alliance to Help IT Service Providers Deliver AI to SMBs at Scale [q 0.85, tone +0.0] ★
 - event 2026-10-19 rating_reiteration — Bernstein maintain Outperform (fmp)
 - upcoming 2026-10-28 earnings_result — Q1 2027 results (finnhub)
 - upcoming 2026-10-27 earnings_result — Q1 2027 results (finnhub)
-- snapshot: P/E (ttm) 29.37 (finnhub, 2026-10-18) · P/B 6.26 (finnhub, 2026-10-18) · EPS (ttm) 17.95 (finnhub, 2026-10-18) · dividend yield 0.79 (finnhub, 2026-10-18) · beta 1.06 (finnhub, 2026-10-18) · 52w high 553.72 (finnhub, 2026-10-18) · 52w low 349.20 (finnhub, 2026-10-18) · target (consensus) 591.67 (fmp, 2026-10-19) · analysts: buy 41 (finnhub, 2026-09-05) · analysts: hold 5 (finnhub, 2026-09-05) · analysts: sell 0 (finnhub, 2026-09-05) · vendor sentiment 0.29 (alphavantage_news, 2026-10-06) · revenue (last quarter) 90.01bn (sec_xbrl, 2026-07-29) · net income (last quarter) 35.77bn (sec_xbrl, 2026-07-29) · last EPS surprise % 9.53 (finnhub, 2026-09-05)
+- snapshot: P/E (ttm) 29.37 (finnhub, 2026-10-19) · P/B 6.26 (finnhub, 2026-10-19) · EPS (ttm) 17.95 (finnhub, 2026-10-19) · dividend yield 0.79 (finnhub, 2026-10-19) · beta 1.06 (finnhub, 2026-10-19) · 52w high 553.72 (finnhub, 2026-10-19) · 52w low 349.20 (finnhub, 2026-10-19) · target (consensus) 591.67 (fmp, 2026-10-19) · analysts: buy 41 (finnhub, 2026-09-05) · analysts: hold 5 (finnhub, 2026-09-05) · analysts: sell 0 (finnhub, 2026-09-05) · vendor sentiment 0.29 (alphavantage_news, 2026-10-06) · revenue (last quarter) 90.01bn (sec_xbrl, 2026-07-29) · net income (last quarter) 35.77bn (sec_xbrl, 2026-07-29) · last EPS surprise % 9.53 (finnhub, 2026-09-05)
 
 ## Macro
 
@@ -98,6 +100,14 @@ Generated 2026-10-19 18:50 UTC · slot `all` · 20454 articles in the corpus, 58
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 22:41 | eodhd | ok | 0 | 0 | 0 | skipped: every asked name was refused: outside the plan or over today's credits  |
+| 22:41 | jin10_flash | degraded | 19 | 19 | 17 | facts 0; window not covered back to 2026-10-19 18:50Z; the oldest item read is 2 |
+| 22:41 | alphavantage_news | failed | 0 | 0 | 0 | alphavantage refused a premium endpoint (the key's plan does not include it): Th |
+| 22:41 | finnhub | ok | 259 | 237 | 146 | facts 39;  |
+| 22:41 | edgar | ok | 2 | 0 | 0 | facts 2;  |
+| 22:41 | yahoo_rss | ok | 52 | 52 | 29 | named the company: 17 of 52 (lowest: NVIDIA 3/20, Microsoft 4/15, Apple 10/17) |
+| 22:41 | google_news | ok | 223 | 204 | 186 | named the company: 174 of 204 (lowest: Apple 63/76, Microsoft 49/59, NVIDIA 62/6 |
+| 22:41 | gdelt | ok | 250 | 151 | 150 | grouped 3 names per request; 1 request; named the company: 28 of 151 (lowest: Ap |
 | 18:50 | dbnomics | ok | 450 | 0 | 0 | facts 0;  |
 | 18:50 | jin10_flash | degraded | 20 | 20 | 20 | facts 0; window not covered back to 2026-10-19 10:09Z; the oldest item read is 2 |
 | 18:50 | fred | ok | 455 | 0 | 0 | facts 7; release calendar: fred fetch failed: The read operation timed out |
