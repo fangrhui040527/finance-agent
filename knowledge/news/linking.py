@@ -34,6 +34,13 @@ The rule set here is small and deliberate, and every branch has a test:
   * **No short alias matches when a corporate suffix follows it** - see
     CORPORATE_SUFFIX. "Shree TNB Polymers" is an Indian listing, not Tenaga.
 
+  * **No alias matches inside a fund's name** - see _IN_A_FUNDS_NAME. "FAST
+    Maybank ACI Opp ... (0P0001STK3)" is a fund's quote page, not the bank.
+
+  * **Stored links are re-read by these rules** - see EntityLinker.recheck. A
+    link is written when a row is stored, and a rule added later would
+    otherwise never reach the rows before it.
+
 A word boundary here is "not preceded or followed by an ASCII letter or
 digit", which is stricter than `\\b`: it keeps "Apple's" and "Maybank," while
 refusing "pineapple" and "Amdocs".
@@ -59,6 +66,7 @@ The parent is linked when the text names it separately.
 from __future__ import annotations
 
 import re
+from collections.abc import Iterable
 from functools import lru_cache
 
 _ASCII_WORD = r"[A-Za-z0-9]"
@@ -147,6 +155,19 @@ CORPORATE_SUFFIX = (
 _SUFFIXES = "|".join(CORPORATE_SUFFIX + tuple(w.upper() for w in CORPORATE_SUFFIX))
 _NOT_ANOTHER_COMPANY = rf"(?!\s+(?:{_SUFFIXES})(?!{_ASCII_WORD}))"
 
+#: A fund's quote page names the FUND, and a fund is often named after the bank
+#: that runs or sells it: "Fidelity FAST Maybank ACI OppAMCDIST(G)$ (0P0001STK3)
+#: Interactive Stock Chart" (ca.finance.yahoo.com, 2026-10-16) was linked to
+#: MYX:1155. Such a page closes the name with the fund's own identifier in
+#: parentheses - a Morningstar id ("0P" and eight more) or a mutual-fund code
+#: ending ".MF" - and an alias that identifier closes within the same name is a
+#: word of the fund's name. News ABOUT the bank's funds ("Maybank's Nasdaq Fund
+#: Surpasses RM100 Million AUM", "Maybank Tokenises SGD Money Market Fund")
+#: carries no identifier and stays linked. Measured over the 12,846 linked rows
+#: to 2026-10-20: this fires on 3, all fund quote pages.
+_FUND_ID = r"\((?:0P[0-9A-Z]{8}|[A-Z0-9]{6,16}\.MF)\)"
+_IN_A_FUNDS_NAME = re.compile(rf"\A[^.!?;\n]{{0,60}}?\s{_FUND_ID}")
+
 #: Longer names that CONTAIN a book alias and name something else: the group's
 #: other listed companies and the resort named after it. Each is matched like
 #: an alias and consumes its span, so the "Genting" inside it is not Genting
@@ -211,15 +232,29 @@ _CLAUSE = r"(?:[^.?!;]|\.(?=\S))"
 #: A bare "target" counts only as a target for a STOCK: "Maybank holds target
 #: for Bank Rakyat Indonesia stock".
 _STOCK_TARGET = rf"\b(?i:target)(?=\s+for\s+{_CLAUSE}{{1,60}}?\s+(?i:stock|shares)\b)"
+#: A figure a bank "expects" for ANOTHER company's stock: "Results due November
+#: 3: Maybank expects THB 13.4 billion for Advanced Info Service stock"
+#: (ad-hoc-news.de, 2026-10-17) is Maybank's research on a Thai company, and it
+#: stayed on Maybank's page. These are forecast verbs, which a bank uses of
+#: itself too ("Maybank expects loan growth of 5%"), so they count only with an
+#: amount in a currency followed by "for <Name> ... stock/shares" - the words
+#: that say whose stock the figure is for.
+_FORECASTS = r"(?i:expects?|sees?|forecasts?|projects?)"
+_STOCK_FIGURE = (
+    r"(?:\b[A-Z]{3}\s?|RM|S\$|US\$|\$)\d[\d,]*(?:\.\d+)?(?:\s*(?i:billion|million|bn|mil|mn)\b)?"
+    rf"(?=\s+for\s+[A-Z]{_CLAUSE}{{0,60}}?\s+(?i:stock|shares)\b)"
+)
 #: "Maybank keeps Singtel at buy", "Maybank IB upgrades SD Guthrie to 'buy'",
 #: "Maybank Maintains Frencken BUY" (the company, then the call), and
 #: "Maybank Keeps BUY on ISOTeam", "Maybank keeps Buy rating for Singtel",
 #: "Maybank kept IDR 3,800 target for Merdeka Copper Gold stock" (the call,
-#: then the company).
+#: then the company), and "Maybank expects THB 13.4 billion for Advanced Info
+#: Service stock" (a figure for another company's stock).
 _BANK_MAKES_A_CALL = re.compile(
-    rf"\A(?:\s+{_ARM})?\s+{_ACTS}\b"
+    rf"\A(?:\s+{_ARM})?\s+(?:{_ACTS}\b"
     rf"(?:\s+{_OTHER_NAME}{_CLAUSE}{{0,50}}?(?:{_RECOMMENDS}|{_PRICE_TARGET})"
     rf"|{_CLAUSE}{{0,30}}?(?:{_RECOMMENDS}|{_PRICE_TARGET}|{_STOCK_TARGET})\s+(?i:on|for)\s+[A-Z])"
+    rf"|{_FORECASTS}\b{_CLAUSE}{{0,30}}?{_STOCK_FIGURE}\s+for\s+[A-Z])"
 )
 #: "Grab Holdings Keeps BUY Rating as Maybank Cuts Target Price": the call is
 #: on the company named before "as".
@@ -257,8 +292,13 @@ def _writes_the_note(text: str, start: int, end: int) -> bool:
     )
 
 
-def alias_pattern(surface: str) -> re.Pattern[str]:
-    """The compiled matcher for one alias, per the rules in the module doc."""
+def alias_pattern(surface: str, *, bare: bool = False) -> re.Pattern[str]:
+    """The compiled matcher for one alias, per the rules in the module doc.
+
+    `bare` leaves out the exclusions that read the words after it (a
+    thoroughfare, a corporate suffix): it answers "is the alias written here
+    at all", which `EntityLinker.recheck` needs to tell an excluded mention
+    from no mention."""
     surface = surface.strip()
     if not surface:
         raise ValueError("an empty alias matches everything and nothing")
@@ -266,11 +306,12 @@ def alias_pattern(surface: str) -> re.Pattern[str]:
     if _NON_ASCII.search(surface):
         return re.compile(escaped, re.IGNORECASE)
 
-    bounded = rf"(?<!{_ASCII_WORD}){{}}(?!{_ASCII_WORD}){_NOT_A_PLACE}"
+    not_a_place = "" if bare else _NOT_A_PLACE
+    bounded = rf"(?<!{_ASCII_WORD}){{}}(?!{_ASCII_WORD}){not_a_place}"
     is_one_word = " " not in surface
     if is_one_word and surface.isupper() and len(surface) <= ACRONYM_MAX_CHARS:
         # case-sensitive acronym, and not the first word of another company
-        return re.compile(bounded.format(escaped) + _NOT_ANOTHER_COMPANY)
+        return re.compile(bounded.format(escaped) + ("" if bare else _NOT_ANOTHER_COMPANY))
     if is_one_word and surface[0].isupper() and surface[1:].islower() and surface.isalpha():
         # Titlecase proper noun: Titlecase or ALL CAPS, never lowercase. An
         # inflectional tail of up to two lowercase letters is allowed on names
@@ -301,6 +342,9 @@ class EntityLinker:
         for surface, iid, _ in self._entries:
             if iid:
                 self._surfaces.setdefault(iid, []).append(surface)
+        self._bare: tuple[tuple[str, re.Pattern[str]], ...] = tuple(
+            (iid, alias_pattern(surface, bare=True)) for surface, iid, _ in self._entries if iid
+        )
 
     def _matches(self, text: str) -> list[tuple[int, int, int, str]]:
         """(start, end, alias order, iid) for every match no longer match contains.
@@ -312,7 +356,8 @@ class EntityLinker:
         to Genting Malaysia AND Genting Berhad. Every occurrence is checked,
         not just the first, so "Genting Malaysia ... Genting Berhad" still
         links both. A match of an OTHER_NAMES entry claims its span and links
-        nothing, and so does one that ends a Malay building's name.
+        nothing, and so does one that ends a Malay building's name or is a
+        word of a fund's name.
         """
         claimed: list[tuple[int, int]] = []
         out: list[tuple[int, int, int, str]] = []
@@ -323,9 +368,13 @@ class EntityLinker:
                     continue
                 claimed.append((start, end))
                 # Checked here, not in alias_pattern: the name words between
-                # "Menara" and the alias vary in number, and a lookbehind
-                # cannot.
-                if iid and not _IN_A_BUILDING_NAME.search(text, max(0, start - 80), start):
+                # "Menara" and the alias, or between the alias and a fund's
+                # identifier, vary in number, and a lookaround cannot.
+                if (
+                    iid
+                    and not _IN_A_BUILDING_NAME.search(text, max(0, start - 80), start)
+                    and not _IN_A_FUNDS_NAME.match(text[end : end + 80])
+                ):
                     out.append((start, end, order, iid))
         return out
 
@@ -342,6 +391,26 @@ class EntityLinker:
             if iid not in first_at or key < first_at[iid]:
                 first_at[iid] = key
         return [iid for iid, _ in sorted(first_at.items(), key=lambda kv: kv[1])]
+
+    def recheck(self, text: str, stored: Iterable[str]) -> list[str]:
+        """The stored links this linker would still make, in stored order.
+
+        A row's links are written once, when it is stored, and the corpus is
+        append-only, so an exclusion added later never reaches the rows before
+        it: 22 *Shree TNB Polymers* rows stored before 2026-10-18 still put an
+        Indian listing on Tenaga's page after that day's merge excluded it. An
+        id is dropped when the text writes one of its aliases and no mention
+        survives today's rules. An id whose alias the text never writes is
+        kept: until 2026-10-10 a vendor's ticker was stored as the link, and
+        whether those rows are about the company is not a question the rules
+        here can answer from the text.
+        """
+        stored = list(stored)
+        if not stored:
+            return []
+        linked = set(self.link(text))
+        written = {iid for iid, pattern in self._bare if pattern.search(text)}
+        return [iid for iid in stored if iid in linked or iid not in written]
 
     def mentions(self, text: str, instrument_ids: list[str]) -> int:
         """How many times any alias of the given instruments occurs, counting

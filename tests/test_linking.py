@@ -260,6 +260,33 @@ def test_the_same_short_alias_still_links_where_it_is_the_company():
     ]
 
 
+# --- a fund named after the bank is not the bank -----------------------------------
+
+
+def test_a_funds_quote_page_is_not_the_bank_that_names_the_fund():
+    """All three were stored rows linked to MYX:1155. Each is a fund's quote
+    page, and the fund's own identifier closes its name: a Morningstar id
+    ("0P" and eight more) or a mutual-fund code ending ".MF"."""
+    for headline in (
+        "Fidelity FAST Maybank ACI OppAMCDIST(G)$ (0P0001STK3) Interactive Stock Chart",
+        "FAST Maybank ACI Opp A-MINCOME(G)-USD (0P0001STJZ) Stock Forum & Discussion",
+        "$Maybank Retail Money Market-I Fund (MYU0100A2266.MF)$",
+    ):
+        assert link_entities(headline, INDEX) == [], headline
+
+
+def test_news_about_the_banks_funds_still_links_to_the_bank():
+    """Stored rows too: a story about the bank's fund business carries no fund
+    identifier, and a quote page that also names the bank elsewhere keeps it."""
+    for headline in (
+        "Maybank’s Nasdaq Fund Surpasses RM100 Million AUM In 2 Months",
+        "Maybank Tokenises SGD Money Market Fund on Synthesys",
+        "Maybank shares rose (0P0001STK3 fund page links below). Analysts cheered",
+        "FAST Maybank ACI Opp (0P0001STJZ) chart; Maybank shares rose 1%",
+    ):
+        assert link_entities(headline, INDEX) == ["MYX:1155"], headline
+
+
 # --- a bank's broker arm writing about another company -----------------------------
 
 BANKS = {**INDEX, "CIMB": "MYX:1023", "Genting": "MYX:3182", "IHH Healthcare": "MYX:5225"}
@@ -297,6 +324,33 @@ def test_the_research_rule_generalises_to_any_linked_bank_and_keeps_the_subject(
     assert linker.authored(text) == {"MYX:1155"}
 
 
+def test_a_figure_a_bank_expects_for_another_companys_stock_is_its_note():
+    """2026-10-17, stored on the merged code and still on Maybank's page: the
+    bank's research on a Thai telecom. A forecast verb counts only with an
+    amount followed by "for <Name> ... stock", which names whose stock it is."""
+    linker = EntityLinker(BANKS)
+    for headline in (
+        "Results due November 3: Maybank expects THB 13.4 billion for Advanced Info "
+        "Service stock - ad-hoc-news.de",
+        "Maybank sees USD 4.42 for Grab stock",
+        "Maybank Securities forecasts S$1.20 for Sheng Siong shares",
+    ):
+        assert "MYX:1155" in linker.link(headline), headline
+        assert linker.authored(headline) == {"MYX:1155"}, headline
+
+
+def test_a_bank_forecasting_its_own_business_is_not_a_broker_note():
+    linker = EntityLinker(BANKS)
+    for headline in (
+        "Maybank expects loan growth of 5% in 2026",
+        "Maybank expects RM2 billion for its Islamic arm",
+        "Maybank sees RM10 billion in new green financing for SMEs",
+        "Maybank expects RM1.2 billion for Islamic banking expansion",
+        "Maybank expects THB 13.4 billion for Advanced Info Service stock; Maybank shares rose",
+    ):
+        assert linker.authored(headline) == set(), headline
+
+
 def test_news_about_the_bank_itself_is_not_a_broker_note():
     linker = EntityLinker(BANKS)
     for headline in (
@@ -322,6 +376,57 @@ def test_a_company_a_broker_rates_is_the_subject_not_the_author():
     ):
         assert linker.link(headline), headline
         assert linker.authored(headline) == set(), headline
+
+
+# --- stored links, read by today's rules --------------------------------------------
+
+
+def test_a_stored_link_the_rules_now_exclude_is_dropped_on_recheck():
+    """A link is written once, when the row is stored. All of these were stored
+    rows whose link a rule added later excludes; on 2026-10-17 the digest still
+    listed the Shree TNB row under Tenaga after the rule had merged."""
+    linker = EntityLinker({**INDEX, "Genting": "MYX:3182"})
+    for text, stored in (
+        ("Half Yearly Results, Half yearly Earnings for Shree TNB Polymers", ["MYX:5347"]),
+        ("Is Genting Singapore Becoming a Better Dividend Stock?", ["MYX:3182"]),
+        ("Maybank Highway at Main Road closed after crash", ["MYX:1155"]),
+        ("Wedding held at Menara Merdeka Maybank", ["MYX:1155"]),
+        (
+            "Fidelity FAST Maybank ACI OppAMCDIST(G)$ (0P0001STK3) Interactive Stock Chart",
+            ["MYX:1155"],
+        ),
+    ):
+        assert linker.recheck(text, stored) == [], text
+
+
+def test_recheck_keeps_what_the_rules_still_link_in_stored_order():
+    linker = EntityLinker(INDEX)
+    text = "Shree TNB Polymers lists in Mumbai while TNB and Maybank shares rose"
+    assert linker.recheck(text, ["MYX:1155", "MYX:5347"]) == ["MYX:1155", "MYX:5347"]
+    assert linker.recheck(text, []) == []
+    # Only the excluded id goes; the other stays where it was.
+    text = "Shree TNB Polymers IPO; Maybank shares rose"
+    assert linker.recheck(text, ["MYX:5347", "MYX:1155"]) == ["MYX:1155"]
+
+
+def test_recheck_keeps_a_stored_link_the_text_never_writes():
+    """Until 2026-10-10 a vendor's ticker was stored as the link ("What Has
+    Changed About Owning Amazon Stock?" under MSFT). The rules read what the
+    text names, so a row that never writes the alias is not theirs to judge."""
+    linker = EntityLinker(INDEX)
+    assert linker.recheck("What Has Changed About Owning Amazon Stock?", ["XNAS:MSFT"]) == [
+        "XNAS:MSFT"
+    ]
+    assert linker.recheck("Malaysian utilities rally on tariff review", ["MYX:5347"]) == [
+        "MYX:5347"
+    ]
+
+
+def test_an_excluded_alias_in_capitals_or_cjk_is_still_recognised_as_written():
+    linker = EntityLinker(INDEX)
+    assert linker.recheck("SHREE TNB POLYMERS LIMITED LISTS ON BSE", ["MYX:5347"]) == []
+    # A CJK alias has no exclusions, so a stored CJK link always stands.
+    assert linker.recheck("英伟达股价上涨", ["XNAS:NVDA"]) == ["XNAS:NVDA"]
 
 
 # --- the escalation gate needs materiality, not just a mention ----------------------
