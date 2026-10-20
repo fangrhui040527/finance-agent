@@ -21,7 +21,7 @@ from __future__ import annotations
 
 import json
 import re
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
@@ -208,6 +208,16 @@ def _norm_title(t: str) -> str:
     return " ".join(t.lower().split())[:80]
 
 
+def _relinked(a: Article, linker) -> Article:
+    """The article with its stored links read by today's linker rules.
+
+    Features scored for the old links go with them, so the gate scores the row
+    again on the names it is linked to now. (A row read from the corpus carries
+    none - they are not stored - but an article built in memory might.)"""
+    ids = linker.recheck(a.text, a.instruments)
+    return a if ids == list(a.instruments) else replace(a, instruments=ids, features=None)
+
+
 def build_digest(
     cfg,
     day: date | None = None,
@@ -236,8 +246,19 @@ def build_digest(
         Corpus(corpus_path or cfg.corpus_db) as corpus,
         FactBook(facts_path or getattr(cfg, "facts_db", "data/facts.db")) as facts,
     ):
+        # A row's links are as old as the row, and the corpus is append-only,
+        # so an exclusion added later never reached the rows before it: on
+        # 2026-10-17 the merged linker no longer linked Shree TNB Polymers to
+        # Tenaga, and the page still listed the one stored that morning. Read
+        # by today's rules, the 12,846 linked rows to 2026-10-20 lose 41
+        # links, every one on a row the linker now excludes: Shree TNB (22),
+        # Genting rows about Genting Malaysia, Singapore, Plantations,
+        # Highlands or Resorts World Genting, stored before 2026-10-10 (14),
+        # the Maybank Highway crash, the Menara Merdeka wedding and three
+        # fund pages.
+        # See EntityLinker.recheck.
         articles = [
-            a
+            _relinked(a, linker)
             for a in corpus.articles(
                 published_since=start - WINDOW_BEFORE, limit=20_000, min_quality=min_quality
             )

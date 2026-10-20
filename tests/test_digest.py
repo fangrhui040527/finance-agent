@@ -438,3 +438,89 @@ def test_a_broker_note_by_a_book_bank_is_not_listed_as_news_about_the_bank(tmp_p
     assert [s["title"] for s in genting.stories] == [
         "Maybank keeps SELL on Genting, cuts target price"
     ], "the note's subject still gets it"
+
+
+def test_a_stored_link_a_later_rule_excludes_is_not_on_the_names_page(tmp_path):
+    """A link is written when the row is stored, and the corpus is append-only.
+    On 2026-10-17 the digest still listed *Half Yearly Results ... for Shree TNB
+    Polymers* under Tenaga, stored that morning before the rule excluding it
+    merged. The page reads stored links by today's rules, as it reads the gate."""
+    from knowledge.news.features import Article, LexiconExtractor
+
+    now = datetime(2026, 10, 17, 21, 0, tzinfo=UTC)
+    ex = LexiconExtractor()
+    path = tmp_path / "corpus.db"
+    rows = (
+        ("a", "Half Yearly Results, Half yearly Earnings for Shree TNB Polymers", ["MYX:5347"]),
+        ("b", "TNB restores power within 77 minutes after Johor substation fire", ["MYX:5347"]),
+        ("c", "Is Genting Singapore Becoming a Better Dividend Stock?", ["MYX:3182"]),
+        (
+            "d",
+            "Fidelity FAST Maybank ACI OppAMCDIST(G)$ (0P0001STK3) Interactive Stock Chart",
+            ["MYX:1155"],
+        ),
+        ("e", "Maybank profit rose on wider margins", ["MYX:1155"]),
+        # A vendor's ticker stored as the link: the text never names the
+        # company, and that is not a question the linker's rules decide.
+        ("f", "Malaysian utilities rally on tariff review", ["MYX:5347"]),
+    )
+    with Corpus(path) as c:
+        for doc_id, title, ids in rows:
+            art = Article(
+                doc_id=doc_id,
+                title=title,
+                body="",
+                source_domain="example.com",
+                published_at=now - timedelta(hours=1),
+                instruments=ids,
+                quality=0.8,
+            )
+            art.features = ex.extract(art.text, ["Tenaga", "Genting", "Maybank"])
+            c.add(art, source="fixture", seen_at=now)
+
+    cfg = Cfg(watchlist=("MYX:5347", "MYX:3182", "MYX:1155"), corpus_db=str(path))
+    d = build_digest(cfg, now=now, corpus_path=str(path), facts_path=str(tmp_path / "f.db"))
+    pages = {n.instrument_id: sorted(s["title"] for s in n.stories) for n in d.names}
+    assert pages["MYX:5347"] == [
+        "Malaysian utilities rally on tariff review",
+        "TNB restores power within 77 minutes after Johor substation fire",
+    ]
+    assert pages["MYX:3182"] == []
+    assert pages["MYX:1155"] == ["Maybank profit rose on wider margins"]
+    with Corpus(path) as c:
+        stored = {a.doc_id: a.instruments for a in c.articles(limit=10)}
+    assert stored["a"] == ["MYX:5347"], "the stored row is not rewritten"
+
+
+def test_a_relinked_article_is_scored_again_on_its_current_links():
+    """Features scored for links a recheck drops go with them, so the gate
+    reads the row on what it names now (Sourcery on #92). Rows read from the
+    corpus carry no features; an article built in memory may."""
+    from knowledge.digest import _relinked
+    from knowledge.news.features import Article, LexiconExtractor
+    from knowledge.news.linking import EntityLinker
+
+    linker = EntityLinker({"TNB": "MYX:5347", "Maybank": "MYX:1155"})
+    stale = Article(
+        doc_id="a",
+        title="Shree TNB Polymers IPO subscribed 1.05x",
+        body="",
+        source_domain="example.com",
+        published_at=datetime(2026, 9, 29, tzinfo=UTC),
+        instruments=["XNAS:MSFT", "MYX:5347"],
+    )
+    stale.features = LexiconExtractor().extract(stale.text, ["TNB"])
+    fresh = _relinked(stale, linker)
+    assert fresh.instruments == ["XNAS:MSFT"]
+    assert fresh.features is None, "the old score is not carried to the new links"
+    assert stale.instruments == ["XNAS:MSFT", "MYX:5347"], "the stored row is not mutated"
+
+    kept = Article(
+        doc_id="b",
+        title="Maybank profit rose",
+        body="",
+        source_domain="example.com",
+        published_at=datetime(2026, 9, 29, tzinfo=UTC),
+        instruments=["MYX:1155"],
+    )
+    assert _relinked(kept, linker) is kept
