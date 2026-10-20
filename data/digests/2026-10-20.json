@@ -1,18 +1,100 @@
 {
-  "collection": [],
+  "collection": [
+    {
+      "at": "2026-10-20T10:08:59.548837+00:00",
+      "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-20T10:08:59.547455+00:00",
+      "detail": "facts 5; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-20T10:08:51.131927+00:00",
+      "detail": "facts 0; window not covered back to 2026-10-19 22:41Z; the oldest item read is 2026-10-20 09:53Z, so 11.2h of the window was never served",
+      "fetched": 20,
+      "kept": 20,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 20
+    },
+    {
+      "at": "2026-10-20T10:08:49.714652+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-20T10:08:47.477375+00:00",
+      "detail": "window overflow: all 150 dated items are newer than the window's start (2026-10-19 10:09Z); the oldest is 2026-10-19 15:45Z, so 5.6h scrolled off unseen; read 3 pages, the most this feed may; page 2 starts 2.9h before page 1 ends (2026-10-20 04:53Z under 2026-10-20 07:48Z): the items between were served by neither",
+      "fetched": 150,
+      "kept": 142,
+      "source": "nst_business",
+      "status": "degraded",
+      "stored": 137
+    },
+    {
+      "at": "2026-10-20T10:08:45.287654+00:00",
+      "detail": "window overflow: all 50 dated items are newer than the window's start (2026-10-19 10:09Z); the oldest is 2026-10-19 14:35Z, so 4.4h scrolled off unseen",
+      "fetched": 50,
+      "kept": 50,
+      "source": "fmt_business",
+      "status": "degraded",
+      "stored": 50
+    },
+    {
+      "at": "2026-10-20T10:08:44.964679+00:00",
+      "detail": "read but empty: Genting, Maybank, Tenaga, Petronas Chemicals, IHH, Press Metal",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-20T10:08:43.396162+00:00",
+      "detail": "read but empty: Petronas Chemicals; named the company: 17 of 35 (lowest: Tenaga 1/6, Genting 1/4, Maybank 7/16)",
+      "fetched": 39,
+      "kept": 35,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 31
+    },
+    {
+      "at": "2026-10-20T10:08:41.499947+00:00",
+      "detail": "no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked); deferred: Tenaga, Petronas Chemicals, IHH",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "failed",
+      "stored": 0
+    }
+  ],
   "counts": {
-    "articles": 20982,
+    "articles": 21220,
     "documents": 0,
-    "escalated": 3070,
+    "escalated": 3076,
     "events": 4239,
-    "failed_sweeps": 81,
-    "linked": 12829,
-    "observations": 5912,
+    "failed_sweeps": 82,
+    "linked": 12846,
+    "observations": 5917,
     "series": 31,
-    "sweeps": 998
+    "sweeps": 1007
   },
   "day": "2026-10-20",
-  "generated_at": "2026-10-20 00:20 UTC",
+  "generated_at": "2026-10-20 10:10 UTC",
   "macro": [
     {
       "change": "0.08",
@@ -145,13 +227,64 @@
   ],
   "names": [
     {
-      "escalated": 0,
+      "escalated": 1,
       "events": [],
       "instrument_id": "MYX:1155",
       "label": "Maybank",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxQeUh1LUpFWkp0ZlVQNVNEWnFua0hreFdwcnBkSmRfV2FjY2RLaXhsYkJEZFphdXdlamFmYXN1OVZYR09iUmYxNzNwcGhJVHFwZEZZb1RqU0VQdm9PTlJoTWNMQzl5YzdVM3JRY3pUaVVGQUlmZ0FpMUxhbjM3VTlkOUdFaFBmLVJnb2oyUFV4b19uOE9NVzI3VEQycmtHVGRpeGZaR0dtVzZfZ2ctdFNsSW5FdEN5WlQ1bld3VzJsN2xsUXFVVGlCTVA4UEFTakViMVVacw?oc=5",
+          "domain": "www.ad-hoc-news.de",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-19T23:01:08+00:00",
+          "quality": 0.65,
+          "title": "Mitra Keluarga targets 10% growth. Maybank rates Mitra Keluarga stock Buy - ad-hoc-news.de",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://www.nst.com.my/business/corporate/2026/10/1559475/maybank-taps-ai-strengthen-regional-banking-resilience",
+          "domain": "www.nst.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-20T02:26:45+00:00",
+          "quality": 1.0,
+          "title": "Maybank taps AI to strengthen regional banking resilience",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMingFBVV95cUxPcW0yUXg0Q1d6WVNLZEdiT091X08tSnNlZDY5Z0FZdlpHakd0STFSQnlteDZwUS1FVFNtRG4weW13Rjdna2U3Zk1KejBzaV9HZm1mbmNTLXBlbkViVVptRGZnRU8xU3didjd1RDJfajRmcG11VUpLTEdjMjV0SlVCMXVXbk92UVU2cFVkUzBmRW16cXVnZGVIWkFmbVFFUQ?oc=5",
+          "domain": "fintechnews.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-20T02:37:13+00:00",
+          "quality": 0.65,
+          "title": "Maybank Taps ServiceNow AI to Monitor Banking Systems Across Three Markets",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiygFBVV95cUxNWkQtWG85NXRQb01XR1pSQmlRaXY5bHdwYXVOdmQtaTdqaUh4LXk3WWtyNWFRd3hlZWVqNUExSEJDUHV4cnNtZzBLV3RsbFVyUk1KZEU0bWlLSW9DTUVFWjAyQWJldlY3UW94MkpiMVlQTmx3TG9JUjJXSWtla3pnTm8ta19vZnF2ejFSM29OYWVNXzNIZHNaQ2x6dFVOdm04TWUxbV9qWUJpTXg5T2RVdHBKTURuX1lWTTZPbmdYUUVPSEI5REZVLUdB?oc=5",
+          "domain": "www.ad-hoc-news.de",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-19T22:12:46+00:00",
+          "quality": 0.65,
+          "title": "Maybank issues MYR 2.50 billion Islamic bonds for Malayan Banking stock - ad-hoc-news.de",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 4,
+        "polarity_mean": 0.25,
+        "sources": 3,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -160,8 +293,26 @@
       "instrument_id": "MYX:5347",
       "label": "Tenaga",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMi8gFBVV95cUxQOGczMDJIZjYxYlVsc3BhWUtHaDROM19lQmFZODNoakRXZzJ0QzJtUVByajVyNmtscmxXUzF4OFBqT2x1WEh1OHAwUXdvWC1MWEJKUmNvN3RZMndCMEg1Y01GdFF0NS1iZFZYZjd1dm9aXzdPczZpUEdhTHVheGlhLVZsLUJUcFFUT1d2Ry1wM2l0UzZFaXExQjFlSURvT3RSYnR3ZFlucGUyR0ZabklYOUtXUGFCTmRfMENYTkZYWkZnWXA2SHMzRVVDV0lKbGFXTlRIeTZHUjRDWEdiTkF0a3gyVDI5aHNoMHg2TVdvUzJ4Zw?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-20T00:11:00+00:00",
+          "quality": 0.8,
+          "title": "Trading ideas: CAB, TNB, IHH, Duopharma, Zetrix, Mi, GDB, Jati, Cosmos, MMAG, LYC, MBSB, Toyo, Eonmetall, KIP REIT",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -180,18 +331,98 @@
       "instrument_id": "MYX:5225",
       "label": "IHH",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMi8gFBVV95cUxQOGczMDJIZjYxYlVsc3BhWUtHaDROM19lQmFZODNoakRXZzJ0QzJtUVByajVyNmtscmxXUzF4OFBqT2x1WEh1OHAwUXdvWC1MWEJKUmNvN3RZMndCMEg1Y01GdFF0NS1iZFZYZjd1dm9aXzdPczZpUEdhTHVheGlhLVZsLUJUcFFUT1d2Ry1wM2l0UzZFaXExQjFlSURvT3RSYnR3ZFlucGUyR0ZabklYOUtXUGFCTmRfMENYTkZYWkZnWXA2SHMzRVVDV0lKbGFXTlRIeTZHUjRDWEdiTkF0a3gyVDI5aHNoMHg2TVdvUzJ4Zw?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-20T00:11:00+00:00",
+          "quality": 0.8,
+          "title": "Trading ideas: CAB, TNB, IHH, Duopharma, Zetrix, Mi, GDB, Jati, Cosmos, MMAG, LYC, MBSB, Toyo, Eonmetall, KIP REIT",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiUEFVX3lxTFBkcjBzMlN3d2RPNWxUbFV6dWhHcTc4aEdzbV8yRWlwRVIwdnFCN2tFU0cza0Z3b1JubXF6cjdXaHJtT1RBY0w3UHpSNk1rLWQ0?oc=5",
+          "domain": "theedgemalaysia.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-19T15:16:48+00:00",
+          "quality": 0.8,
+          "title": "Zetrix AI, Toyo Ventures, Mi Technovation, IHH Healthcare, Duopharma, LYC Healthcare, KIP REIT, GDB, MMAG, Jati Tinggi, Cosmos Technology, Eonmetall",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMitgFBVV95cUxPYnBMYkFlNEhVbWEwSUNYN21fWnRHaVZkOFFtMmlxclJiZy1qYUFiQ2lGb0lFS2RKX1RNSFJPdlhJSzFxckFnRnhnQ0oxRVFUWkJtZkdHXzRTSVk2TlZ0MVZNdjFSZzkwLWx6Rkx6TG1OY0RnMmJhN0dmdGw4VV9qcHpYdW5uVzdHVlZDU3U4LTNhSUJZRGtVZmdvOWhNbWNvYVNkNHpNeGh5OEx6N1lmdEZBU3dLUdIBuwFBVV95cUxOaFZ4bVNyOWx0YkxaSlVBNWdPb25XcDNaU01CUEdEREtvaEl5QnNPa01XQ002eElpLVN3Q0xfSl9kTTZYVlgybFpnYmU3Z1ByZHBVNXpFRC05cGNuSWFiQThFb1Q2NDlRTnZPYVgxcEdZVzJYbVRtZ1ExNXhVcTJDendoamg2ZjNMZU03VWkyWTFPX1B4Vjc2YzQtemhBOG83N2dXMl9Ob3BkUjlEUWJHV2Y1WjdCcy1TSEJZ?oc=5",
+          "domain": "www.nst.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-19T13:05:25+00:00",
+          "quality": 0.8,
+          "title": "IHH Healthcare Malaysia expands Gleneagles Hospital Johor with Afiniti Wellness acquisition",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMirwFBVV95cUxQQmJOM2NEY29GZjhwMldqeU5fVmhVSzJmVFR5VzlXN0pMVXlWWWRmWmtBc2ZGT2NGLXdfY2lXTFFrNVgwUmFtVFUwcjdTUWRWX25iRUppWEtJanNja1AtUjFEaF94RVZISTIyN2w1TmRfZklIZk4weUs0MWI5T01fWEdFTVd2eGFtRXZHYnJIeE1QUUVub0RiWHMySDFnYWZBOG51MUdXaVA3VmJlR3hn?oc=5",
+          "domain": "www.edgeprop.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-20T02:17:39+00:00",
+          "quality": 0.65,
+          "title": "IHH to retrofit Afiniti Wellness for planned 18-acre Medini healthcare campus",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMizwFBVV95cUxQcFJFdFVRZV9qa1lWdTFTWnZrWHpHeWNDaktnRFQ2eC1tbXJhWTFneWcwNGYtY21DZGpGWFJPUzZvNkJ1bEdoRHFxRS1UZWxPeWNpa2pPREpJUVZWelhSRGMzdkJtWEZETmlzamNKM2w4YjRLcV9TSDBiSDBZMnc4ZWgwajVsU3E1ck02Q25SdGpwNzRMUDBUbE9FWUlqeWlwQndFbDVwMkdUMnJnRkdCWi13czFVaVFxMmlZNF9kSDBVTGJoUi1SeTZwdWhmbEU?oc=5",
+          "domain": "www.ad-hoc-news.de",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-19T22:14:22+00:00",
+          "quality": 0.65,
+          "title": "IHH Healthcare acquires Afiniti site: what it means for IHH Healthcare stock - ad-hoc-news.de",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 5,
+        "polarity_mean": 0.0,
+        "sources": 5,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
-      "escalated": 0,
+      "escalated": 1,
       "events": [],
       "instrument_id": "MYX:8869",
       "label": "Press Metal",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiugFBVV95cUxPYnFObDExTnV3SGNmcTRhOXk0cmFvNmJEOFl2ci1nWXVyZFNmUGVLeERVTGJDR0s1dGhpNDktT2hOcEswUnJQbWJkOU42SVJMS0xQRVhVaTI1ZWFEMTF2cFJPbERPM2N1eDMybWtoVV9DbXBYTnpJeFpZZXZuSDZpS1o2ZlFKQ2k3WDAwMDNVczg4VXRkWUhiZFB0SFdkOURKTkdmT1R6S29paW1MME9ZZ1FCUWdsRWZTS2c?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-19T23:59:08+00:00",
+          "quality": 0.8,
+          "title": "Self-sufficiency in alumina profit driver for Press Metal",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 1.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -200,8 +431,26 @@
       "instrument_id": "MYX:3182",
       "label": "Genting",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMi3gFBVV95cUxNUDh0bktrcExaSVNiU0ZNeVZMZnUxYTFBekY2U185b25udUctS19WMnNfMzJvOWcyQVh1M2RDQjVqaEJCb1BUQlR4Q1kwRGlUWXYtdWFWMjg4TmExdGZpTjZBdU14SkRYQXptbjRLZHB5UWQzQ01YalB6MjdyQXZsbW03N2FNVXhzTGNpcW9tVlFrbTBDdXBOSnBrSXpueFpBbWl4cVlfdVhoVmlqVjZWOS1qcE82SHlUbkotSV9oNHFpMUZyNHdKSzZwRkd0UDV1MWJFMmZIOGpub0F2dmc?oc=5",
+          "domain": "www.ad-hoc-news.de",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-19T23:48:53+00:00",
+          "quality": 0.65,
+          "title": "Genting chairman bought 422,500 shares: CIMB sees 17 percent dilution for Genting stock - ad-hoc-news.de",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {

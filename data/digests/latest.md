@@ -1,26 +1,38 @@
 # Digest 2026-10-20
 
-Generated 2026-10-20 00:20 UTC · slot `all` · 20982 articles in the corpus, 5912 observations, 4239 events in the fact book.
+Generated 2026-10-20 10:10 UTC · slot `all` · 21220 articles in the corpus, 5917 observations, 4239 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- quiet: nothing collected for this name in the window
+- tone: 4 stories from 3 sources, polarity +0.25, peak intensity 0.00, uncertainty 0.00 · 1 escalated
+- 2026-10-19 www.ad-hoc-news.de — Mitra Keluarga targets 10% growth. Maybank rates Mitra Keluarga stock Buy - ad-hoc-news.de [q 0.65, tone +1.0] ★
+- 2026-10-20 www.nst.com.my — Maybank taps AI to strengthen regional banking resilience [q 1.00, tone +0.0]
+- 2026-10-20 fintechnews.my — Maybank Taps ServiceNow AI to Monitor Banking Systems Across Three Markets [q 0.65, tone +0.0]
+- 2026-10-19 www.ad-hoc-news.de — Maybank issues MYR 2.50 billion Islamic bonds for Malayan Banking stock - ad-hoc-news.de [q 0.65, tone +0.0]
 
 ### Tenaga (MYX:5347)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-10-20 www.thestar.com.my — Trading ideas: CAB, TNB, IHH, Duopharma, Zetrix, Mi, GDB, Jati, Cosmos, MMAG, LYC, MBSB, Toyo, Eonmetall, KIP REIT [q 0.80, tone +0.0]
 
 ### Petronas Chemicals (MYX:5183)
 - quiet: nothing collected for this name in the window
 
 ### IHH (MYX:5225)
-- quiet: nothing collected for this name in the window
+- tone: 5 stories from 5 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-10-20 www.thestar.com.my — Trading ideas: CAB, TNB, IHH, Duopharma, Zetrix, Mi, GDB, Jati, Cosmos, MMAG, LYC, MBSB, Toyo, Eonmetall, KIP REIT [q 0.80, tone +0.0]
+- 2026-10-19 theedgemalaysia.com — Zetrix AI, Toyo Ventures, Mi Technovation, IHH Healthcare, Duopharma, LYC Healthcare, KIP REIT, GDB, MMAG, Jati Tinggi, Cosmos Technology, Eonmetall [q 0.80, tone +0.0]
+- 2026-10-19 www.nst.com.my — IHH Healthcare Malaysia expands Gleneagles Hospital Johor with Afiniti Wellness acquisition [q 0.80, tone +0.0]
+- 2026-10-20 www.edgeprop.my — IHH to retrofit Afiniti Wellness for planned 18-acre Medini healthcare campus [q 0.65, tone +0.0]
+- 2026-10-19 www.ad-hoc-news.de — IHH Healthcare acquires Afiniti site: what it means for IHH Healthcare stock - ad-hoc-news.de [q 0.65, tone +0.0]
 
 ### Press Metal (MYX:8869)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +1.00, peak intensity 0.00, uncertainty 0.00 · 1 escalated
+- 2026-10-19 www.thestar.com.my — Self-sufficiency in alumina profit driver for Press Metal [q 0.80, tone +1.0] ★
 
 ### Genting (MYX:3182)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-10-19 www.ad-hoc-news.de — Genting chairman bought 422,500 shares: CIMB sees 17 percent dilution for Genting stock - ad-hoc-news.de [q 0.65, tone +0.0]
 
 ### NVIDIA (XNAS:NVDA)
 - tone: 66 stories from 30 sources, polarity +0.15, peak intensity 0.33, uncertainty 0.10 · 15 escalated
@@ -87,6 +99,20 @@ Generated 2026-10-20 00:20 UTC · slot `all` · 20982 articles in the corpus, 59
 | 10y minus 2y Treasury spread, % | 0.35 | 2026-10-16 | +0.02 | fred |
 | US unemployment rate, % | 4.20 | 2026-09-01 | +0.1 | fred |
 | CBOE VIX, index | 19.99 | 2026-10-16 | +3.53 | fred |
+
+## Collection
+
+| at (UTC) | source | status | fetched | kept | stored | detail |
+|---|---|---|---|---|---|---|
+| 10:08 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
+| 10:08 | twse_openapi | ok | 8 | 0 | 0 | facts 5;  |
+| 10:08 | jin10_flash | degraded | 20 | 20 | 20 | facts 0; window not covered back to 2026-10-19 22:41Z; the oldest item read is 2 |
+| 10:08 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 10:08 | nst_business | degraded | 150 | 142 | 137 | window overflow: all 150 dated items are newer than the window's start (2026-10- |
+| 10:08 | fmt_business | degraded | 50 | 50 | 50 | window overflow: all 50 dated items are newer than the window's start (2026-10-1 |
+| 10:08 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Genting, Maybank, Tenaga, Petronas Chemicals, IHH, Press Metal |
+| 10:08 | google_news | ok | 39 | 35 | 31 | read but empty: Petronas Chemicals; named the company: 17 of 35 (lowest: Tenaga  |
+| 10:08 | gdelt | failed | 0 | 0 | 0 | no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP |
 
 ---
 
