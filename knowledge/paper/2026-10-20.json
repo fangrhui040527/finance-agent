@@ -1,0 +1,326 @@
+{
+  "day": "2026-10-20",
+  "written_at": "2026-10-20T22:58:00Z",
+  "phase": "full",
+  "week": 7,
+  "equity_usd": 1000.0,
+  "cash_usd": 1000.0,
+  "control_equity_usd": 947.57,
+  "control_return_to_date": -0.0524,
+  "drawdown": 0.0,
+  "control_drawdown": 0.0524,
+  "halted": false,
+  "marks": 33,
+  "positions": [],
+  "changes": [],
+  "control_changes": [
+    {
+      "kind": "rebalance_written",
+      "decided_on": "2026-10-20",
+      "targets": {
+        "MYX:3182": 200,
+        "MYX:5183": 100,
+        "MYX:5225": 100,
+        "MYX:8869": 100,
+        "XNAS:NVDA": 1
+      },
+      "applies": "each market's next open"
+    }
+  ],
+  "control_mark": {
+    "marked_on": "2026-10-20",
+    "equity_usd": 947.57,
+    "cash_usd": 602.28,
+    "positions_usd": 345.29,
+    "day_return": 0.0035,
+    "note": "holdings MYX:8869 100 (6.75), MYX:5183 100 (4.49), MYX:3182 200 (1.43); week-7 rebalance adds IHH 100 and NVDA 1 at the next open"
+  },
+  "index_book": {
+    "mark": {
+      "marked_on": "2026-10-20",
+      "equity_usd": 982360.3,
+      "cash_usd": 598938.67,
+      "positions_usd": 383421.63,
+      "day_return": -0.0012,
+      "drawdown": 0.0176,
+      "held": 97,
+      "pending": 97
+    },
+    "cost_to_date_share_of_notional": 0.0048,
+    "since_2026_09_30": {
+      "index": -0.0176,
+      "decided": 0.0,
+      "control": -0.0331
+    },
+    "dividends": [
+      {
+        "instrument_id": "MYX:5285",
+        "per_share_myr": 0.1118,
+        "units": 2700,
+        "usd": 73.92
+      }
+    ],
+    "note": "week-7 rebalance written: 97 targets pending"
+  },
+  "caps": [
+    {
+      "cap": "largest name",
+      "value": "0.00%",
+      "limit": "25%",
+      "breached": false
+    },
+    {
+      "cap": "invested",
+      "value": "0.00%",
+      "limit": "80%",
+      "breached": false
+    },
+    {
+      "cap": "cash floor",
+      "value": "100.00%",
+      "limit": "20%",
+      "breached": false
+    },
+    {
+      "cap": "names held",
+      "value": "0",
+      "limit": "0",
+      "breached": false
+    },
+    {
+      "cap": "drawdown from peak",
+      "value": "0.00%",
+      "limit": "8% halts entries",
+      "breached": false
+    },
+    {
+      "cap": "turnover, 5 weekdays",
+      "value": "USD 0.00",
+      "limit": "USD 500.00",
+      "breached": false
+    }
+  ],
+  "prices": {
+    "bursa": "Tuesday 2026-10-20 closes, settled",
+    "us": "Tuesday 2026-10-20 closes, settled",
+    "fx": "MYR 4.0835 per USD (bnm, 2026-10-20)"
+  },
+  "fundable": [
+    {
+      "instrument_id": "MYX:1155",
+      "lot_usd": 243.66,
+      "share": 0.244,
+      "round_trip": 0.0098,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:5183",
+      "lot_usd": 109.95,
+      "share": 0.11,
+      "round_trip": 0.0202,
+      "lots": 2
+    },
+    {
+      "instrument_id": "MYX:5225",
+      "lot_usd": 193.71,
+      "share": 0.194,
+      "round_trip": 0.012,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:8869",
+      "lot_usd": 165.3,
+      "share": 0.165,
+      "round_trip": 0.0139,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:3182",
+      "lot_usd": 35.02,
+      "share": 0.035,
+      "round_trip": 0.0606,
+      "lots": 7
+    },
+    {
+      "instrument_id": "XNAS:NVDA",
+      "lot_usd": 216.47,
+      "share": 0.216,
+      "round_trip": 0.0119,
+      "lots": 1
+    }
+  ],
+  "over_cap": {
+    "MYX:5347": 0.32,
+    "XNAS:AAPL": 0.34,
+    "XNAS:MSFT": 0.532
+  },
+  "ledger": {
+    "mark_days": 26,
+    "gap": "no routine ran 2026-10-02..10-06; no paper page and no decision for those days; no decision is backdated"
+  },
+  "attribution": null,
+  "decision": {
+    "recorded": true,
+    "weights": {},
+    "thesis": "All cash, the thirty-fifth all-cash row and the first decision of week 7, the first under full caps (invested up to 80%). The wider cap changes what may be held, not the evidence. The 2026-10-19 feedback page decomposes Monday: Press Metal rose 2.77% at 2.23 sigma (idiosyncratic +3.44%) the session after its 5.43-sigma fall, with one candidate cause, an RHB Research buying-opportunity view published at 08:02Z late in the session, unweighed, and cost-side rows naming falling aluminium prices that the store cannot check (no aluminium price after 2026-07). It closed 6.75 on Tuesday. Every other book name read not_significant on Monday; IHH's Afiniti Wellness acquisition was reported after Monday's close with no price. Ten all-cash claims are graded, all correct, against a control at -5.24%. Claim: nothing in the fundable universe beats cash over 21 sessions.",
+    "horizon": 21,
+    "confidence": 0.55,
+    "prediction_id": "paper-2026-10-20-allcash-21d-ee1f",
+    "grades_on": "2026-11-19",
+    "refusals": []
+  },
+  "stores": {
+    "decided_targets": 35,
+    "predictions": 35,
+    "outcomes": 10,
+    "index_targets": 291,
+    "control_targets": 11,
+    "index_pending": 97,
+    "made_at": "2026-10-20T22:46:52Z"
+  },
+  "evidence": {
+    "feedback_page": "knowledge/feedback/2026-10-19.md (f7f0c1c)",
+    "press_metal": "10-19 +2.77% at 2.23 sigma, idiosyncratic +3.44%, on 17,169,700; candidate (unweighed): RHB Research buying-opportunity view at 08:02Z; cost-side rows cannot be checked (no aluminium price after 2026-07); 6.75 on 10-20",
+    "ihh": "Afiniti Wellness acquisition reported after the 10-19 close, no price",
+    "phase": "week 7, full caps from 10-20"
+  },
+  "mistakes": [
+    "paper-2026-10-16-allcash-21d-2b02 filed Press Metal's -9.34% as not decomposed; decomposed it is 5.43 sigma and significant at 5%; its cause is still not in the store.",
+    "paper-2026-10-01-allcash-21d-5a1e is behind on IHH (+2.73%, 7.70 -> 7.91) and Petronas Chemicals (+8.72%, 4.13 -> 4.49) since the 10-01 closes; it grades on 10-31.",
+    "paper-2026-10-08-allcash-21d-7bb6's test (Genting above 1.93 before 11-07) stands at 1.43."
+  ],
+  "mistakes_checked": [
+    "paper-2026-10-19-allcash-21d-1a60: cost-side rows after the 10-16 fall (holds)",
+    "paper-2026-10-19-allcash-21d-1a60: Monday undecomposed; decomposed, Press Metal 2.23 sigma with an unweighed cause - the decision did not rest on it",
+    "paper-2026-10-19-allcash-21d-1a60 grade date 2026-11-18"
+  ],
+  "grades_due": [
+    {
+      "prediction_id": "paper-2026-09-21-allcash-21d-c04f",
+      "on": "2026-10-21"
+    },
+    {
+      "prediction_id": "paper-2026-09-22-allcash-21d-33c5",
+      "on": "2026-10-22"
+    },
+    {
+      "prediction_id": "paper-2026-09-23-allcash-21d-b999",
+      "on": "2026-10-23"
+    },
+    {
+      "prediction_id": "paper-2026-09-24-allcash-21d-e5b2",
+      "on": "2026-10-24"
+    },
+    {
+      "prediction_id": "paper-2026-09-25-allcash-21d-468d",
+      "on": "2026-10-25"
+    },
+    {
+      "prediction_id": "paper-2026-09-26-allcash-21d-cf74",
+      "on": "2026-10-26"
+    },
+    {
+      "prediction_id": "paper-2026-09-27-allcash-21d-9d18",
+      "on": "2026-10-27"
+    }
+  ],
+  "lessons": [
+    "A higher cap is permission, not evidence: week 7 raised the invested limit to 80% and changed nothing the decision rests on."
+  ],
+  "dividend_boundary": {
+    "decided": "2026-10-10T15:25:31Z",
+    "control": "2026-10-10T15:25:31Z",
+    "index": "2026-10-10T15:25:31Z",
+    "note": "marks before it are not restated; no credit to the decided or control book yet"
+  },
+  "graded": [
+    {
+      "prediction_id": "paper-2026-09-11-allcash-21d-8bf9",
+      "benchmark": -0.024,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-12-allcash-21d-1661",
+      "benchmark": -0.024,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-13-allcash-21d-5baf",
+      "benchmark": -0.0237,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-14-allcash-21d-9d7e",
+      "benchmark": -0.0441,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-15-allcash-21d-af55",
+      "benchmark": -0.0466,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-16-allcash-21d-3865",
+      "benchmark": -0.0616,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-17-allcash-21d-7667",
+      "benchmark": -0.0616,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-18-allcash-21d-667a",
+      "benchmark": -0.0616,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-19-allcash-21d-b7bd",
+      "benchmark": -0.0557,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-20-allcash-21d-dbaf",
+      "benchmark": -0.0557,
+      "correct": true
+    }
+  ],
+  "closes": {
+    "MYX:1155": [
+      9.9,
+      9.95
+    ],
+    "MYX:5347": [
+      12.98,
+      13.06
+    ],
+    "MYX:5183": [
+      4.4,
+      4.49
+    ],
+    "MYX:5225": [
+      7.9,
+      7.91
+    ],
+    "MYX:8869": [
+      6.68,
+      6.75
+    ],
+    "MYX:3182": [
+      1.44,
+      1.43
+    ],
+    "XNAS:NVDA": [
+      217.09,
+      216.47
+    ],
+    "XNAS:AAPL": [
+      342.94,
+      339.5
+    ],
+    "XNAS:MSFT": [
+      533.52,
+      531.87
+    ]
+  }
+}
