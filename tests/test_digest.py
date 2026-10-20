@@ -490,3 +490,37 @@ def test_a_stored_link_a_later_rule_excludes_is_not_on_the_names_page(tmp_path):
     with Corpus(path) as c:
         stored = {a.doc_id: a.instruments for a in c.articles(limit=10)}
     assert stored["a"] == ["MYX:5347"], "the stored row is not rewritten"
+
+
+def test_a_relinked_article_is_scored_again_on_its_current_links():
+    """Features scored for links a recheck drops go with them, so the gate
+    reads the row on what it names now (Sourcery on #92). Rows read from the
+    corpus carry no features; an article built in memory may."""
+    from knowledge.digest import _relinked
+    from knowledge.news.features import Article, LexiconExtractor
+    from knowledge.news.linking import EntityLinker
+
+    linker = EntityLinker({"TNB": "MYX:5347", "Maybank": "MYX:1155"})
+    stale = Article(
+        doc_id="a",
+        title="Shree TNB Polymers IPO subscribed 1.05x",
+        body="",
+        source_domain="example.com",
+        published_at=datetime(2026, 9, 29, tzinfo=UTC),
+        instruments=["XNAS:MSFT", "MYX:5347"],
+    )
+    stale.features = LexiconExtractor().extract(stale.text, ["TNB"])
+    fresh = _relinked(stale, linker)
+    assert fresh.instruments == ["XNAS:MSFT"]
+    assert fresh.features is None, "the old score is not carried to the new links"
+    assert stale.instruments == ["XNAS:MSFT", "MYX:5347"], "the stored row is not mutated"
+
+    kept = Article(
+        doc_id="b",
+        title="Maybank profit rose",
+        body="",
+        source_domain="example.com",
+        published_at=datetime(2026, 9, 29, tzinfo=UTC),
+        instruments=["MYX:1155"],
+    )
+    assert _relinked(kept, linker) is kept

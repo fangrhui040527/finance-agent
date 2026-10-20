@@ -283,6 +283,10 @@ def test_news_about_the_banks_funds_still_links_to_the_bank():
         "Maybank Tokenises SGD Money Market Fund on Synthesys",
         "Maybank shares rose (0P0001STK3 fund page links below). Analysts cheered",
         "FAST Maybank ACI Opp (0P0001STJZ) chart; Maybank shares rose 1%",
+        # Near an identifier is not inside a fund's name: a lowercase word
+        # between them ends the name (Sourcery on #92).
+        "Maybank launches Asia Income Fund (0P0001ABCD) for retail investors",
+        "Maybank says its new fund (MYU0100A2266.MF) drew RM100 million",
     ):
         assert link_entities(headline, INDEX) == ["MYX:1155"], headline
 
@@ -334,6 +338,9 @@ def test_a_figure_a_bank_expects_for_another_companys_stock_is_its_note():
         "Service stock - ad-hoc-news.de",
         "Maybank sees USD 4.42 for Grab stock",
         "Maybank Securities forecasts S$1.20 for Sheng Siong shares",
+        # The Malaysian press often spaces the currency from the figure.
+        "Maybank expects RM 5.20 for Gamuda shares",
+        "Maybank keeps RM 14.60 target for Tenaga Nasional stock",
     ):
         assert "MYX:1155" in linker.link(headline), headline
         assert linker.authored(headline) == {"MYX:1155"}, headline
@@ -347,6 +354,8 @@ def test_a_bank_forecasting_its_own_business_is_not_a_broker_note():
         "Maybank sees RM10 billion in new green financing for SMEs",
         "Maybank expects RM1.2 billion for Islamic banking expansion",
         "Maybank expects THB 13.4 billion for Advanced Info Service stock; Maybank shares rose",
+        # Its own stock: the second mention is not in an author's shape.
+        "Maybank expects RM10 billion for Maybank shares",
     ):
         assert linker.authored(headline) == set(), headline
 

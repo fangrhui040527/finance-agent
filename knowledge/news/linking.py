@@ -165,8 +165,15 @@ _NOT_ANOTHER_COMPANY = rf"(?!\s+(?:{_SUFFIXES})(?!{_ASCII_WORD}))"
 #: Surpasses RM100 Million AUM", "Maybank Tokenises SGD Money Market Fund")
 #: carries no identifier and stays linked. Measured over the 12,846 linked rows
 #: to 2026-10-20: this fires on 3, all fund quote pages.
+#:
+#: Being NEAR an identifier is not enough: "Maybank launches Asia Income Fund
+#: (0P0001ABCD) for retail investors" is the bank's own news. The alias and the
+#: identifier must be one name - every word between them starts with a capital,
+#: a digit or a symbol, as "ACI", "OppAMCDIST(G)$", "A-MINCOME(G)-USD" and
+#: "Market-I" do - so a lowercase word between them ends the name.
 _FUND_ID = r"\((?:0P[0-9A-Z]{8}|[A-Z0-9]{6,16}\.MF)\)"
-_IN_A_FUNDS_NAME = re.compile(rf"\A[^.!?;\n]{{0,60}}?\s{_FUND_ID}")
+_FUND_NAME_WORD = r"[A-Z0-9$&(][^\s]*"
+_IN_A_FUNDS_NAME = re.compile(rf"\A(?:\s+{_FUND_NAME_WORD}){{0,8}}?\s+{_FUND_ID}")
 
 #: Longer names that CONTAIN a book alias and name something else: the group's
 #: other listed companies and the resort named after it. Each is matched like
@@ -220,9 +227,12 @@ _RECOMMENDS = (
     rf"|\b(?i:at|to)\s+{_RATINGS}\b"
     r"|\b(?i:buy|hold|sell)['’\"”]?\s+(?i:rating|call)\b)"
 )
+#: An amount in a currency, the code or symbol touching the digits or one space
+#: away: "THB 75.00", "RM14.60", "RM 14.60", "S$0.09", "US$ 4.42".
+_AMOUNT = r"(?:\b[A-Z]{3}|RM|S\$|US\$|\$)\s?\d[\d,]*(?:\.\d+)?"
 _PRICE_TARGET = (
     r"(?:\b(?i:target\s+price|price\s+target)\b|\bTP\b"
-    r"|(?:\b[A-Z]{3}\s?|RM|S\$|US\$|\$)\d[\d,]*(?:\.\d+)?\s+(?i:target)\b)"
+    rf"|{_AMOUNT}\s+(?i:target)\b)"
 )
 #: Another company's name: capitalised words, not a recommendation itself.
 _OTHER_NAME = r"(?!(?i:buy|hold|sell)\b)[A-Z][\w&'’-]*"
@@ -241,7 +251,7 @@ _STOCK_TARGET = rf"\b(?i:target)(?=\s+for\s+{_CLAUSE}{{1,60}}?\s+(?i:stock|share
 #: that say whose stock the figure is for.
 _FORECASTS = r"(?i:expects?|sees?|forecasts?|projects?)"
 _STOCK_FIGURE = (
-    r"(?:\b[A-Z]{3}\s?|RM|S\$|US\$|\$)\d[\d,]*(?:\.\d+)?(?:\s*(?i:billion|million|bn|mil|mn)\b)?"
+    rf"{_AMOUNT}(?:\s*(?i:billion|million|bn|mil|mn)\b)?"
     rf"(?=\s+for\s+[A-Z]{_CLAUSE}{{0,60}}?\s+(?i:stock|shares)\b)"
 )
 #: "Maybank keeps Singtel at buy", "Maybank IB upgrades SD Guthrie to 'buy'",
