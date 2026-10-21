@@ -1,0 +1,235 @@
+{
+  "day": "2026-10-20",
+  "written_at": "2026-10-21T22:58:00Z",
+  "measured_session": {
+    "bursa": "2026-10-20",
+    "us": "2026-10-20"
+  },
+  "pack_built": "2026-10-21T22:42:00Z",
+  "market": {
+    "regime": "neutral",
+    "notes": [
+      "MYX:^KLSE +0.24% (1,595.75 -> 1,599.58) on 173,352,500; 99 Bursa names: 35 up, 45 down, 19 flat, median 0.00%",
+      "XNAS:SPY +0.34% (766.48 -> 769.05)",
+      "every book name not_significant; no 10-20 macro print in the store yet"
+    ]
+  },
+  "names": [
+    {
+      "instrument_id": "MYX:1155",
+      "move": {
+        "return_1d": 0.0051,
+        "market_1d": 0.0024,
+        "unexplained_share": 0.51,
+        "session": "2026-10-20",
+        "note": "market +0.24%, idiosyncratic +0.26%, 0.37 sigma, not_significant; 9.90 -> 9.95; ServiceNow operations contract rows, no figure"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:5347",
+      "move": {
+        "return_1d": 0.0062,
+        "market_1d": 0.0024,
+        "unexplained_share": 0.66,
+        "session": "2026-10-20",
+        "note": "market +0.19%, idiosyncratic +0.41%, 0.51 sigma, not_significant; 12.98 -> 13.06"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:5183",
+      "move": {
+        "return_1d": 0.0205,
+        "market_1d": 0.0024,
+        "unexplained_share": 0.87,
+        "session": "2026-10-20",
+        "note": "market +0.21%, idiosyncratic +1.89%, 0.50 sigma, not_significant; 4.40 -> 4.49; nothing collected"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": []
+    },
+    {
+      "instrument_id": "MYX:5225",
+      "move": {
+        "return_1d": 0.0013,
+        "market_1d": 0.0024,
+        "unexplained_share": 0.22,
+        "session": "2026-10-20",
+        "note": "market +0.21%, idiosyncratic -0.06%, 0.06 sigma; market-driven; 7.90 -> 7.91; first session after the Afiniti Wellness acquisition report"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [
+        {
+          "when": "open",
+          "what": "Bursa filing with the Afiniti Wellness price"
+        }
+      ]
+    },
+    {
+      "instrument_id": "MYX:8869",
+      "move": {
+        "return_1d": 0.0105,
+        "market_1d": 0.0024,
+        "unexplained_share": 0.63,
+        "session": "2026-10-20",
+        "note": "market +0.26%, drift +0.13%, idiosyncratic +0.66%, 0.42 sigma, not_significant; 6.68 -> 6.75 on 10,311,900; Monday's leg held"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [
+        {
+          "when": "2026-10-21",
+          "what": "whether the rebound holds; RHB note body or time"
+        }
+      ]
+    },
+    {
+      "instrument_id": "MYX:3182",
+      "move": {
+        "return_1d": -0.0069,
+        "market_1d": 0.0024,
+        "unexplained_share": 0.6,
+        "session": "2026-10-20",
+        "note": "market +0.21%, drift -0.24%, idiosyncratic -0.67%, 0.37 sigma, not_significant; 1.44 -> 1.43"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [
+        {
+          "when": "open",
+          "what": "rights issue price, entitlement ratio and filing"
+        }
+      ]
+    },
+    {
+      "instrument_id": "XNAS:NVDA",
+      "move": {
+        "return_1d": -0.0029,
+        "market_1d": 0.0034,
+        "unexplained_share": 0.59,
+        "session": "2026-10-20",
+        "note": "market +0.57% at beta 1.69, idiosyncratic -0.84%, 0.46 sigma; 217.09 -> 216.47"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [
+        {
+          "when": "2026-11-17",
+          "what": "earnings_result"
+        }
+      ]
+    },
+    {
+      "instrument_id": "XNAS:AAPL",
+      "move": {
+        "return_1d": -0.01,
+        "market_1d": 0.0034,
+        "unexplained_share": 0.81,
+        "session": "2026-10-20",
+        "note": "market +0.25%, idiosyncratic -1.32%, 0.92 sigma, not_significant; 342.94 -> 339.50; Loop Capital downgrade to Hold (fmp 10-20)"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [
+        {
+          "when": "2026-10-28",
+          "what": "earnings_result (or 10-29, 11-02)"
+        }
+      ]
+    },
+    {
+      "instrument_id": "XNAS:MSFT",
+      "move": {
+        "return_1d": -0.0031,
+        "market_1d": 0.0034,
+        "unexplained_share": 0.59,
+        "session": "2026-10-20",
+        "note": "market +0.30%, idiosyncratic -0.54%, 0.29 sigma; 533.52 -> 531.87; UK data-centre withdrawal row after the close"
+      },
+      "causes": [],
+      "open_questions": [],
+      "watch": [
+        {
+          "when": "2026-10-27",
+          "what": "earnings_result (or 10-28)"
+        }
+      ]
+    }
+  ],
+  "machine": {
+    "on_time": "routine fired 2026-10-21T22:40Z and ran on time; no feedback pages for 10-01..10-05",
+    "tuesday": "bursa_close 20261020T100716 (catch-up) a479c5d 10:10:05Z; us_preopen cron d27da85 17:26Z; us_close 20261020T224059 045983e 22:42:57Z; cron bursa_close 14:19Z (4f705a2) and us_close 23:51Z (667dde0) refreshed marks only",
+    "wednesday": "self-check 05:48Z DEGRADED, 3,011 tests on 667dde0; bursa_close 20261021T100831 (catch-up) ee1432f 10:11:35Z, week-7 rebalances filled; us_preopen cron 129b595 17:35Z with fred failed on every series (non-JSON HTML)",
+    "tonight": "sweep --due named us_close; dispatched once at 22:41:17Z, landed b1e49e7 at 22:42:25Z before the pack"
+  },
+  "data_quality": {
+    "failed": [
+      "alphavantage_news: 'premium endpoint' on every run since 10-10; monitor cadence alert 381h",
+      "gdelt: HTTP 429 on 10-20 10:08Z and 22:42Z; ok 10-21 10:10Z (partial) and 22:41Z",
+      "fred: every series failed at 10-21 17:35Z ('returned non-JSON: <!doctype html>')"
+    ],
+    "degraded": [
+      "nst_business and fmt_business: window overflow (10-20 and 10-21 10:0xZ)",
+      "jin10_flash: window not covered (every run)",
+      "yahoo_rss: read empty for all six Bursa names",
+      "fact book: all six Bursa names NOTHING COLLECTED",
+      "broker-note rule misses 'Maybank rates Mitra Keluarga stock Buy'"
+    ],
+    "skipped": [
+      "eodhd: free plan; names asked refused",
+      "fmp /earnings: outside the plan (HTTP 402)"
+    ]
+  },
+  "monitor": {
+    "at": "2026-10-21T22:43Z",
+    "still_open": [
+      "past its own cadence: alphavantage_news (381h ago, allowed 30h)",
+      "13 question(s) carried over 21 days; oldest 31d"
+    ],
+    "not_open": [
+      "gdelt cadence (answered 10-21 10:10Z)",
+      "slots_missed"
+    ]
+  },
+  "open_questions_carried": [
+    "Genting's RM1.25 billion rights issue (reported 10-09 after the close; −22.87% on 10-12 at 12.90 sigma). In reply to a Bursa query (rows after the 10-14 close, titles only) the company *defends a 25%-30% rights issue discount* and earmarks RM280 million of the working-capital portion for interest costs. After the 10-16 close: *Genting chairman buys more shares as stock nears two-decade low* (theedgemalaysia.com, 12:01Z). On 10-17: *Genting loses its lustre* (theedgemalaysia.com, 00:39Z), title only. On 10-19, titles only: *Genting Share Price Dives 24% In Last 10 Days As Rights Issue Raises Cash Flow Concerns* (businesstoday.com.my, 04:21Z) and, after the close, *Genting chairman bought 422,500 shares: CIMB sees 17 percent dilution for Genting stock* (ad-hoc-news.de, 23:48Z). The exact issue price, entitlement ratio and the filing itself are still not in the store. (since 2026-10-09)",
+    "**Apple's opening gap.** The 10-09 open at 331.70 (−2.56%) followed a Nikkei Asia report of iPhone 18 Pro component order cuts. It closed 343.46 on 10-16, above the 340.42 refute line, on rows that iPhone Duo pre-orders sold out; no company or supplier statement on the order cuts is in the store. Does one arrive before the results? (since 2026-10-09)",
+    "What lifted Genting 1.71 sigma on 10-08 (idiosyncratic +3.08%), back to Tuesday's 1.84 after Wednesday's −2.17%? No row about the company was published on 10-08. It closed 1.88 on 10-09, with Genting Malaysia +2.05%. The rights issue reported after the 10-09 close is the first company row since 10-07. A pre-announcement leg is a hypothesis the store cannot test. (since 2026-10-08)",
+    "What lifted IHH 1.69 sigma on 10-06, while the hospital peer KPJ fell 0.77%? Title-only rows say EPF raised its stake to 13.4% via a 3-million-share purchase (10-13), that IHH is *said to join the race for TPG's Malaysian hospitals* (theedgemalaysia.com, 10-14 03:52Z) and that *IHH eyes TPG's Malaysian hospital assets for sale* (thestar.com.my, 10-14 23:04Z). After the 10-19 close IHH was reported acquiring Afiniti Wellness for the Gleneagles Hospital Johor expansion (theedgemarkets.com, 10:45Z), a different deal. On 10-20, the first session after it, IHH moved 0.06 sigma (market-driven). Which days did EPF buy, and does a Bursa filing carry them or the bid? (since 2026-10-06)",
+    "What did the Petronas Chemicals CEO appointment (title only, 10-05 14:44Z) say, and does a Bursa filing carry it? A second title-only row on 10-14 (ad-hoc-news.de, 05:04Z) reports a 20-year methanol deal; the name is +7.26% since 10-01 on days that each read not_significant. Does a filing give the deal's counterparty and terms? (since 2026-10-06)",
+    "Tenaga fell 2.52 sigma on 09-29 with no collected row and gave back three-quarters of it on 09-30, when the utilities rallied. What, if anything, did the company, the Energy Commission or a Bursa filing publish on 09-29? `bursa_announcements` stored nothing for it. (since 2026-09-29)",
+    "Bank of America's note names Apple's transaction and referral revenue as the exposure. The fact book has no services or App Store line for Apple. Which filing field would size it? (since 2026-09-29)",
+    "Does an 8-K or 10-Q record NVIDIA's USD 150 billion authorization increase? (since 2026-09-28)",
+    "The fact book holds three Q4 result dates for Apple, 2026-10-28, 10-29 and 11-02, all from `finnhub`. A 10-17 title, *Apple Hit a Record Close Ahead of Its November 2 Report* (finance.yahoo.com, 14:48Z), gives 11-02; it is a press title, not the company's calendar. Which one does the company's own calendar give? (since 2026-09-28)",
+    "Does a primary statement follow the report that China may let Alibaba and ByteDance buy the RTX Pro 5500? (since 2026-09-27)",
+    "The fact book has no event kind for a court verdict, an appeal or a settlement. Where would a legal event be recorded, so that a later page can date it? (since 2026-09-26)",
+    "Microsoft's cached bar opens at 499.04 (+0.22%) on 09-25, while two rows describe a 3% rise before or at the open. Should the collector hold a second price source for the open on a day a cause is being timed? (since 2026-09-25)",
+    "Does IHH carry the Daiichi Sankyo claim at any value in its accounts? (since 2026-09-24)",
+    "IHH's 09-22 session was significant alone (3.80 sigma). The one candidate, the Macquarie headline, has no body. Which source carries the note's figures? (since 2026-09-22)",
+    "The move to 260-session betas re-measured the same Monday. Which window's shares do pages compare across the change? (since 2026-09-22)",
+    "Petronas Chemicals, Press Metal and Genting: one factor or three stories? On 10-09 they read +0.47%, +1.54% and +2.17%. No Bursa sector proxy is cached. (since 2026-09-21)",
+    "Tenaga: the rows hold both readings of the IBR framework, *minimal impact* and *undermines*, as titles only. Neither has appeared since. (since 2026-09-18)",
+    "`DFF` stepped +0.25 on 2026-09-17 and the collector holds no statement for it. Where does a statement come from? (since 2026-09-20)",
+    "A short-interest weekly named Petronas Chemicals for the week to 09-18. Would Bursa's daily short-selling report give the name a body? (since 2026-09-20)",
+    "Wiring a catalyst matcher to the corpus is still open. Genting's 10-09 rights issue is the case for a matcher that compares a row's time with the session's close. (since 2026-09-18)",
+    "Petronas Chemicals' idiosyncratic days read *not significant* because its own sigma contains the +22.56% run. (since 2026-09-18)",
+    "Petronas Chemicals collecting a body: which of the eleven listed sources carries a Bursa-hours story about it at all? (since 2026-09-10; folded 09-17)",
+    "The Bursa banks fell together on 10-07 and 10-08 and steadied on 10-09 (Hong Leong Bank +1.80%, CIMB 0.00%). The titles name foreign selling, oil and US yields. Which source would carry Bursa's daily foreign net flow? (since 2026-10-07)",
+    "**A scheduled routine reached the session 12h38m late.** The Bursa catch-up fired at 10:06Z on 10-15 and was delivered at 22:44Z, so no catch-up ran that day; the 14:10Z cron `bursa_close` collected the Bursa close instead. On 10-16 it fired at 10:06:04Z and was read 28 seconds later. Is a late delivery visible anywhere but this page? (since 2026-10-15)",
+    "What lifted Maybank 1.81 sigma on 10-15 (idiosyncratic +1.25%, 9.98 → 10.08 on 6,664,300 shares, half Wednesday's 13,701,400), while Public Bank −0.21%, CIMB −0.27%, RHB −0.68% and Hong Leong Bank −1.12% fell? Every Maybank row in the session window is Maybank Securities research on another company. It closed 9.99 on 10-16 (0.12 sigma, market-driven), giving the leg back. (since 2026-10-15)",
+    "What took Press Metal down 9.34% at 5.43 sigma on 10-16 (idiosyncratic −8.42%, 7.17 → 6.50 on 50,249,300 shares against Thursday's 12,000,600, low 6.32)? The one row in the session is an earnings-projection analysis; the two broker notes (AmInvestment Buy at MYR8.50, Affin Hwang cut to Hold at MYR7.70) were published after the close. No row about the company was published from Friday 12:00Z to Sunday's end; the first rows since the fall arrived Monday 10-19 from 03:18Z (tomorrow's page). On Monday 10-19 it rose 2.77% at 2.23 sigma (idiosyncratic +3.44%, 6.50 -> 6.68 on 17,169,700 shares), still under 7.17. The first rows since the fall name a cost side - *Press Metal faces earnings pressure from falling aluminium prices, rising costs* (nst.com.my, 10-19 03:18Z) - and an RHB Research view that the sell-off is a buying opportunity (theborneopost.com, 08:02Z); all after the fall, titles only, and the store holds no aluminium price after 2026-07 to check them against. It held at 6.75 on 10-20 (0.42 sigma). Does a Bursa filing, a block-trade record or a note timed before 09:00Z reach the store? (since 2026-10-16)",
+    "*Mitra Keluarga targets 10% growth. Maybank rates Mitra Keluarga stock Buy* (ad-hoc-news.de, 10-19 23:01Z) stays on Maybank's page on the merged code: 'rates' is not among the broker-note rule's verbs and 'stock Buy' in Title Case is not one of its recommendation forms. The same site has now used 'keeps ... target for', 'sets ... target for', 'expects ... for' and 'rates ... stock Buy'. Should the rule read that site's templates as a family rather than one verb at a time? (since 2026-10-19)",
+    "FRED answered the 10-21 17:35Z `us_preopen` with a web page on every series ('fred returned non-JSON: <!doctype html>...'). Was it an outage, a changed endpoint or a key problem, and does Thursday's fetch recover? (since 2026-10-20)"
+  ],
+  "lessons": [
+    "A reported acquisition with no price is not yet news the stock can price: IHH moved 0.06 sigma, market-driven, on the first session after its Afiniti Wellness deal was reported."
+  ],
+  "closed": []
+}
