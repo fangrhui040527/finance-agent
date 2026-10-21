@@ -1,0 +1,353 @@
+{
+  "day": "2026-10-21",
+  "written_at": "2026-10-21T22:58:00Z",
+  "phase": "full",
+  "week": 7,
+  "equity_usd": 1000.0,
+  "cash_usd": 1000.0,
+  "control_equity_usd": 946.71,
+  "control_return_to_date": -0.0533,
+  "drawdown": 0.0,
+  "control_drawdown": 0.0533,
+  "halted": false,
+  "marks": 34,
+  "positions": [],
+  "changes": [],
+  "control_changes": [
+    {
+      "action": "open",
+      "instrument_id": "MYX:5225",
+      "units": 100,
+      "price_myr": 7.92,
+      "fee_usd": 1.16,
+      "fx_spread_usd": 0.98,
+      "slippage_usd": 0.25,
+      "cash_usd": -196.26
+    },
+    {
+      "action": "no_change",
+      "instrument_id": "MYX:3182",
+      "weight": 0.0739,
+      "reason": "target equals the held units"
+    },
+    {
+      "action": "no_change",
+      "instrument_id": "MYX:5183",
+      "weight": 0.116,
+      "reason": "target equals the held units"
+    },
+    {
+      "action": "no_change",
+      "instrument_id": "MYX:8869",
+      "weight": 0.1744,
+      "reason": "target equals the held units"
+    },
+    {
+      "action": "skipped",
+      "instrument_id": "XNAS:NVDA",
+      "weight": 0.2291,
+      "reason": "cash floor"
+    }
+  ],
+  "control_mark": {
+    "marked_on": "2026-10-21",
+    "equity_usd": 946.71,
+    "cash_usd": 406.02,
+    "positions_usd": 540.69,
+    "day_return": -0.0009,
+    "note": "holdings MYX:8869 100 (6.86), MYX:5183 100 (4.40), MYX:3182 200 (1.43), MYX:5225 100 (7.94); NVDA skipped at the cash floor"
+  },
+  "index_book": {
+    "mark": {
+      "marked_on": "2026-10-21",
+      "equity_usd": 981721.55,
+      "cash_usd": 202801.59,
+      "positions_usd": 778919.96,
+      "day_return": -0.0007,
+      "drawdown": 0.0183,
+      "held": 97,
+      "pending": 1
+    },
+    "cost_to_date_share_of_notional": 0.0096,
+    "since_2026_09_30": {
+      "index": -0.0183,
+      "decided": 0.0,
+      "control": -0.034
+    },
+    "dividends": [],
+    "rebalance": {
+      "adds": 96,
+      "fees_usd": 736.81,
+      "fx_spread_usd": 1980.69,
+      "slippage_usd": 2077.33,
+      "cash_usd": -396137.08
+    },
+    "note": "week-7 rebalance filled; 1 pending"
+  },
+  "caps": [
+    {
+      "cap": "largest name",
+      "value": "0.00%",
+      "limit": "25%",
+      "breached": false
+    },
+    {
+      "cap": "invested",
+      "value": "0.00%",
+      "limit": "80%",
+      "breached": false
+    },
+    {
+      "cap": "cash floor",
+      "value": "100.00%",
+      "limit": "20%",
+      "breached": false
+    },
+    {
+      "cap": "names held",
+      "value": "0",
+      "limit": "0",
+      "breached": false
+    },
+    {
+      "cap": "drawdown from peak",
+      "value": "0.00%",
+      "limit": "8% halts entries",
+      "breached": false
+    },
+    {
+      "cap": "turnover, 5 weekdays",
+      "value": "USD 0.00",
+      "limit": "USD 500.00",
+      "breached": false
+    }
+  ],
+  "prices": {
+    "bursa": "Wednesday 2026-10-21 closes, settled",
+    "us": "Wednesday 2026-10-21 closes, settled",
+    "fx": "MYR 4.08 per USD (bnm, 2026-10-21)"
+  },
+  "fundable": [
+    {
+      "instrument_id": "MYX:1155",
+      "lot_usd": 243.87,
+      "share": 0.244,
+      "round_trip": 0.0098,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:5183",
+      "lot_usd": 107.84,
+      "share": 0.108,
+      "round_trip": 0.0206,
+      "lots": 2
+    },
+    {
+      "instrument_id": "MYX:5225",
+      "lot_usd": 194.61,
+      "share": 0.195,
+      "round_trip": 0.012,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:8869",
+      "lot_usd": 168.14,
+      "share": 0.168,
+      "round_trip": 0.0137,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:3182",
+      "lot_usd": 35.05,
+      "share": 0.035,
+      "round_trip": 0.0606,
+      "lots": 7
+    },
+    {
+      "instrument_id": "XNAS:NVDA",
+      "lot_usd": 221.97,
+      "share": 0.222,
+      "round_trip": 0.0117,
+      "lots": 1
+    }
+  ],
+  "over_cap": {
+    "MYX:5347": 0.318,
+    "XNAS:AAPL": 0.344,
+    "XNAS:MSFT": 0.533
+  },
+  "ledger": {
+    "mark_days": 26,
+    "gap": "no routine ran 2026-10-02..10-06; no paper page and no decision for those days; no decision is backdated"
+  },
+  "attribution": null,
+  "decision": {
+    "recorded": true,
+    "weights": {},
+    "thesis": "All cash, the thirty-sixth all-cash row and the second decision of week 7 under full caps. The 2026-10-20 feedback page finds every book name not_significant on Tuesday: Press Metal held Monday's 2.23-sigma rebound at 0.42 sigma with its one candidate cause (an RHB view at 08:02Z) still without a body or a time, IHH moved 0.06 sigma (market-driven) on the first session after its Afiniti Wellness acquisition was reported without a price, and Apple's -1.00% on a Loop Capital downgrade to Hold read 0.92 sigma. No name carries a measured, sourced reason to expect it to beat cash over 21 sessions. Eleven all-cash claims are graded, all correct, against a control at -5.33%. Claim: nothing in the fundable universe beats cash over 21 sessions.",
+    "horizon": 21,
+    "confidence": 0.55,
+    "prediction_id": "paper-2026-10-21-allcash-21d-2c51",
+    "grades_on": "2026-11-20",
+    "refusals": []
+  },
+  "stores": {
+    "decided_targets": 36,
+    "predictions": 36,
+    "outcomes": 11,
+    "index_targets": 291,
+    "control_targets": 11,
+    "index_pending": 1,
+    "made_at": "2026-10-21T22:44:51Z"
+  },
+  "evidence": {
+    "feedback_page": "knowledge/feedback/2026-10-20.md (6baff6a)",
+    "tuesday": "every book name not_significant; Press Metal 0.42 sigma held Monday's rebound; IHH 0.06 sigma after the Afiniti report; Apple 0.92 sigma with a Loop Capital downgrade",
+    "phase": "week 7, full caps"
+  },
+  "mistakes": [
+    "paper-2026-10-20-allcash-21d-ee1f's page said the control's week-7 rebalance adds IHH and NVIDIA; on 10-21 the ledger skipped XNAS:NVDA (22.91%) at the 20% cash floor and added IHH only.",
+    "paper-2026-10-16-allcash-21d-2b02 filed Press Metal's -9.34% as not decomposed; decomposed it is 5.43 sigma and significant at 5%; its cause is still not in the store.",
+    "paper-2026-10-01-allcash-21d-5a1e is behind on IHH (+3.12%, 7.70 -> 7.94) and Petronas Chemicals (+6.54%, 4.13 -> 4.40) since the 10-01 closes; it grades on 10-31.",
+    "paper-2026-10-08-allcash-21d-7bb6's test (Genting above 1.93 before 11-07) stands at 1.43."
+  ],
+  "mistakes_checked": [
+    "paper-2026-10-20-allcash-21d-ee1f: control rebalance fills against the ledger (NVDA skipped - a mistake)",
+    "paper-2026-10-20-allcash-21d-ee1f: IHH deal without a price (0.06 sigma on 10-20, holds)",
+    "paper-2026-10-20-allcash-21d-ee1f grade date 2026-11-19"
+  ],
+  "grades_due": [
+    {
+      "prediction_id": "paper-2026-09-22-allcash-21d-33c5",
+      "on": "2026-10-22"
+    },
+    {
+      "prediction_id": "paper-2026-09-23-allcash-21d-b999",
+      "on": "2026-10-23"
+    },
+    {
+      "prediction_id": "paper-2026-09-24-allcash-21d-e5b2",
+      "on": "2026-10-24"
+    },
+    {
+      "prediction_id": "paper-2026-09-25-allcash-21d-468d",
+      "on": "2026-10-25"
+    },
+    {
+      "prediction_id": "paper-2026-09-26-allcash-21d-cf74",
+      "on": "2026-10-26"
+    },
+    {
+      "prediction_id": "paper-2026-09-27-allcash-21d-9d18",
+      "on": "2026-10-27"
+    },
+    {
+      "prediction_id": "paper-2026-09-28-allcash-21d-111e",
+      "on": "2026-10-28"
+    }
+  ],
+  "lessons": [
+    "A rebalance target is not a fill until the caps have seen it at the open: the control's NVIDIA target was refused at the cash floor."
+  ],
+  "dividend_boundary": {
+    "decided": "2026-10-10T15:25:31Z",
+    "control": "2026-10-10T15:25:31Z",
+    "index": "2026-10-10T15:25:31Z",
+    "note": "marks before it are not restated; no credit to the decided or control book yet"
+  },
+  "graded": [
+    {
+      "prediction_id": "paper-2026-09-11-allcash-21d-8bf9",
+      "benchmark": -0.024,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-12-allcash-21d-1661",
+      "benchmark": -0.024,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-13-allcash-21d-5baf",
+      "benchmark": -0.0237,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-14-allcash-21d-9d7e",
+      "benchmark": -0.0441,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-15-allcash-21d-af55",
+      "benchmark": -0.0466,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-16-allcash-21d-3865",
+      "benchmark": -0.0616,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-17-allcash-21d-7667",
+      "benchmark": -0.0616,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-18-allcash-21d-667a",
+      "benchmark": -0.0616,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-19-allcash-21d-b7bd",
+      "benchmark": -0.0557,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-20-allcash-21d-dbaf",
+      "benchmark": -0.0557,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-21-allcash-21d-c04f",
+      "benchmark": -0.0533,
+      "correct": true
+    }
+  ],
+  "closes": {
+    "MYX:1155": [
+      9.95,
+      9.95
+    ],
+    "MYX:5347": [
+      13.06,
+      12.98
+    ],
+    "MYX:5183": [
+      4.49,
+      4.4
+    ],
+    "MYX:5225": [
+      7.91,
+      7.94
+    ],
+    "MYX:8869": [
+      6.75,
+      6.86
+    ],
+    "MYX:3182": [
+      1.43,
+      1.43
+    ],
+    "XNAS:NVDA": [
+      216.47,
+      221.97
+    ],
+    "XNAS:AAPL": [
+      339.5,
+      343.99
+    ],
+    "XNAS:MSFT": [
+      531.87,
+      532.95
+    ]
+  }
+}
