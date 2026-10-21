@@ -1,81 +1,75 @@
-# Digest 2026-10-20
+# Digest 2026-10-21
 
-Generated 2026-10-20 22:42 UTC · slot `all` · 21636 articles in the corpus, 5989 observations, 4241 events in the fact book.
+Generated 2026-10-21 10:11 UTC · slot `all` · 21897 articles in the corpus, 5994 observations, 4241 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- tone: 4 stories from 3 sources, polarity +0.25, peak intensity 0.00, uncertainty 0.00 · 1 escalated
-- 2026-10-19 www.ad-hoc-news.de — Mitra Keluarga targets 10% growth. Maybank rates Mitra Keluarga stock Buy - ad-hoc-news.de [q 0.65, tone +1.0] ★
-- 2026-10-20 www.nst.com.my — Maybank taps AI to strengthen regional banking resilience [q 1.00, tone +0.0]
-- 2026-10-20 fintechnews.my — Maybank Taps ServiceNow AI to Monitor Banking Systems Across Three Markets [q 0.65, tone +0.0]
-- 2026-10-19 www.ad-hoc-news.de — Maybank issues MYR 2.50 billion Islamic bonds for Malayan Banking stock - ad-hoc-news.de [q 0.65, tone +0.0]
+- tone: 6 stories from 5 sources, polarity +0.17, peak intensity 0.00, uncertainty 0.00 · 1 escalated
+- 2026-10-21 www.kaohooninternational.com — Maybank Predicts Earnings Recovery for Thai Oil in 3Q26 as Mideast Conflicts Drive Refining Margins [q 0.65, tone +1.0] ★
+- 2026-10-21 www.kaohooninternational.com — Maybank Rates ‘Hold’ on GPSC as Heightened Gas Prices Pressure Earnings [q 0.65, tone +0.0]
+- 2026-10-21 www.marketscreener.com — Malayan Banking: Maybank enhances Resilience Operations Centre capabilities with ServiceNow to power always-on banking across Southeast Asia [q 0.65, tone +0.0]
+- 2026-10-20 tradersunion.com — ServiceNow stock rallies as buyer support follows AI Passport rollout and Maybank partnership [q 0.65, tone +0.0]
+- 2026-10-20 www.minichart.com.sg — Ho Hup’s Maybank Winding-Up Petition Adjourned to 18 November 2026 [q 0.65, tone +0.0]
+- 2026-10-20 www.ad-hoc-news.de — ServiceNow's Maybank Win and Analyst Upgrades Face the Same October Reckoning - ad-hoc-news.de [q 0.65, tone +0.0]
 
 ### Tenaga (MYX:5347)
-- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
-- 2026-10-20 www.thestar.com.my — Trading ideas: CAB, TNB, IHH, Duopharma, Zetrix, Mi, GDB, Jati, Cosmos, MMAG, LYC, MBSB, Toyo, Eonmetall, KIP REIT [q 0.80, tone +0.0]
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 1 escalated
+- 2026-10-21 www.nst.com.my — MRT Corp and TNB explore green rail solutions, to start with RTS Link [q 1.00, tone +0.0] ★
 
 ### Petronas Chemicals (MYX:5183)
 - quiet: nothing collected for this name in the window
 
 ### IHH (MYX:5225)
-- tone: 5 stories from 5 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
-- 2026-10-20 www.thestar.com.my — Trading ideas: CAB, TNB, IHH, Duopharma, Zetrix, Mi, GDB, Jati, Cosmos, MMAG, LYC, MBSB, Toyo, Eonmetall, KIP REIT [q 0.80, tone +0.0]
-- 2026-10-19 theedgemalaysia.com — Zetrix AI, Toyo Ventures, Mi Technovation, IHH Healthcare, Duopharma, LYC Healthcare, KIP REIT, GDB, MMAG, Jati Tinggi, Cosmos Technology, Eonmetall [q 0.80, tone +0.0]
-- 2026-10-19 www.nst.com.my — IHH Healthcare Malaysia expands Gleneagles Hospital Johor with Afiniti Wellness acquisition [q 0.80, tone +0.0]
-- 2026-10-20 www.edgeprop.my — IHH to retrofit Afiniti Wellness for planned 18-acre Medini healthcare campus [q 0.65, tone +0.0]
-- 2026-10-19 www.ad-hoc-news.de — IHH Healthcare acquires Afiniti site: what it means for IHH Healthcare stock - ad-hoc-news.de [q 0.65, tone +0.0]
+- tone: 2 stories from 2 sources, polarity +0.50, peak intensity 0.00, uncertainty 0.00 · 1 escalated
+- 2026-10-20 www.thestar.com.my — Johor acquisition to lift IHH Healthcare’s profit [q 0.80, tone +1.0] ★
+- 2026-10-21 focusmalaysia.my — Decarbonisation emerges as key priority for private healthcare operators; IHH, KPJ, Sunway [q 0.65, tone +0.0]
 
 ### Press Metal (MYX:8869)
-- tone: 1 stories from 1 sources, polarity +1.00, peak intensity 0.00, uncertainty 0.00 · 1 escalated
-- 2026-10-19 www.thestar.com.my — Self-sufficiency in alumina profit driver for Press Metal [q 0.80, tone +1.0] ★
+- quiet: nothing collected for this name in the window
 
 ### Genting (MYX:3182)
-- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
-- 2026-10-19 www.ad-hoc-news.de — Genting chairman bought 422,500 shares: CIMB sees 17 percent dilution for Genting stock - ad-hoc-news.de [q 0.65, tone +0.0]
+- quiet: nothing collected for this name in the window
 
 ### NVIDIA (XNAS:NVDA)
-- tone: 138 stories from 48 sources, polarity +0.13, peak intensity 0.33, uncertainty 0.08 · 29 escalated
-- 2026-10-20 Yahoo — 3 British Founder Led Stocks With Earnings Growth Up To 72% [q 0.85, tone +1.0] ★
-- 2026-10-20 Yahoo — GoodRx Holdings And 2 Penny Stocks With Strong Balance Sheets [q 0.85, tone +1.0] ★
-- 2026-10-20 Yahoo — Bitmine Immersion Technologies And 2 Top Growth Stocks To Watch [q 0.85, tone +1.0] ★
-- 2026-10-20 Yahoo — Super Micro (SMCI) Won Over $60 Billion in Orders, Is the Discount Deserved? [q 0.85, tone +1.0] ★
-- 2026-10-20 Yahoo — Nvidia vs. AMD: Who Can Afford the Next Jump in Research Spending? [q 0.85, tone +1.0] ★
-- 2026-10-20 Yahoo — Nvidia vs. TSMC: Which Business Depends Less on Picking the Winning AI Chip? [q 0.85, tone +0.0] ★
-- 2026-10-19 Yahoo — NVIDIA's Price Implies Less Growth Than Its History [q 0.85, tone +1.0] ★
-- 2026-10-19 www.tikr.com — Third Wheel: Microsoft’s AI Chips Are “Nowhere Close” to NVIDIA or Google per Analyst [q 0.85, tone +0.0] ★
+- tone: 41 stories from 24 sources, polarity +0.05, peak intensity 0.33, uncertainty 0.09 · 4 escalated
+- 2026-10-20 finance.yahoo.com — Nvidia Faces a New Threat as Amazon Targets Its Biggest AI Advantage [q 0.80, tone +0.0] ★
+- 2026-10-20 finance.yahoo.com — Nvidia Raises Stakes With Massive New AI Investment [q 0.80, tone +0.0] ★
+- 2026-10-20 finance.yahoo.com — NVIDIA Keeps Falling and Wall Street Won’t Move Its Target. Is It Time To Buy? [q 0.80, tone +1.0] ★
+- 2026-10-20 www.tokenpost.com — Arete’s $369 NVIDIA Share Target Excludes Binance Futures Contract [q 0.65, tone +1.0] ★
+- 2026-10-20 finance.yahoo.com — Personal AI Launches MODEL‐4, Building Personal Intelligence Directly Into the Network [q 1.00, tone +0.0]
+- 2026-10-20 Yahoo — Investors pledge 230 billion euros at German summit: Merz [q 0.85, tone +0.0]
+- 2026-10-20 Yahoo — What Do Tencent Holdings (SEHK:700) Chip Orders Mean For Its AI Push? [q 0.85, tone +0.0]
+- 2026-10-20 Yahoo — llm-d 1.0 Advances Open, Cost-Efficient AI Inference for Production Scale [q 0.85, tone +0.0]
 - upcoming 2026-11-17 earnings_result — Q3 2027 results after the close (finnhub)
 - snapshot: P/E (ttm) 26.76 (finnhub, 2026-10-20) · P/B 28.81 (finnhub, 2026-10-20) · EPS (ttm) 7.91 (finnhub, 2026-10-20) · dividend yield 0.03 (finnhub, 2026-10-20) · beta 2.27 (finnhub, 2026-10-20) · 52w high 243.37 (finnhub, 2026-10-20) · 52w low 164.27 (finnhub, 2026-10-20) · target (consensus) 339.17 (fmp, 2026-10-20) · analysts: buy 41 (finnhub, 2026-10-20) · analysts: hold 2 (finnhub, 2026-10-20) · analysts: sell 1 (finnhub, 2026-10-20) · vendor sentiment 0.25 (alphavantage_news, 2026-10-06) · revenue (last quarter) 96.22bn (sec_xbrl, 2026-08-26) · net income (last quarter) 59.69bn (sec_xbrl, 2026-08-26) · last EPS surprise % 3.82 (finnhub, 2026-09-05)
 
 ### Apple (XNAS:AAPL)
-- tone: 132 stories from 59 sources, polarity -0.01, peak intensity 0.33, uncertainty 0.05 · 38 escalated
+- tone: 46 stories from 33 sources, polarity -0.02, peak intensity 0.00, uncertainty 0.02 · 12 escalated
 - 2026-10-20 finance.yahoo.com — How major US stock indexes fared Tuesday 10/20/2026 [q 1.00, tone +1.0] ★
-- 2026-10-20 CNBC — Cramer’s Stop Trading: Apple [q 0.85, tone +0.0] ★
-- 2026-10-20 CNBC — How options traders can go long on Apple for less [q 0.85, tone +1.0] ★
-- 2026-10-20 Benzinga — Comparing Apple With Industry Competitors In Technology Hardware, Storage & Peripherals Industry [q 0.85, tone +0.0] ★
-- 2026-10-19 Yahoo — Analyst says iPhone 18 demand weakness is "intensifying" [q 0.85, tone -1.0] ★
 - 2026-10-20 finance.yahoo.com — Apple Bets $100 Million on U.S. Titanium Supply for Its Next iPhones [q 0.80, tone +0.0] ★
 - 2026-10-20 finance.yahoo.com — Apple Expected to Report Fiscal Q4 Results In Line With Consensus, UBS Says [q 0.80, tone +0.0] ★
 - 2026-10-20 www.barrons.com — Apple Stock Is the Best Performer in the Mag 7. An Analyst Downgrade Signals It’s Time to Pump the Brakes. [q 0.80, tone -1.0] ★
+- 2026-10-20 www.tradingview.com — Apple Stock Just Got a Shocking Downgrade Over iPhone Demand [q 0.65, tone -1.0] ★
+- 2026-10-20 pluang.com — Apple faces margin pressure and slowing iPhone growth ahead of earnings report. [q 0.65, tone +1.0] ★
+- 2026-10-20 www.tokenpost.com — Loop Capital Cuts Apple to Hold on Weaker 2027 iPhone Shipment View [q 0.65, tone -1.0] ★
+- 2026-10-20 www.gadgetreview.com — Loop Capital Cuts Apple Target to $330 as 13 Million iPhones Stay Missing [q 0.65, tone -1.0] ★
 - event 2026-10-20 rating_change — Loop Capital downgrade Hold (from Buy) (fmp)
-- event 2026-10-19 insider_filing — 4: FORM 4 (edgar)
-- event 2026-10-19 insider_filing — 4: FORM 4 (edgar)
 - upcoming 2026-11-02 earnings_result — Q4 2026 results after the close (finnhub)
 - upcoming 2026-10-29 earnings_result — Q4 2026 results after the close (finnhub)
 - upcoming 2026-10-28 earnings_result — Q4 2026 results after the close (finnhub)
 - snapshot: P/E (ttm) 38.79 (finnhub, 2026-10-20) · P/B 50.98 (finnhub, 2026-10-20) · EPS (ttm) 8.72 (finnhub, 2026-10-20) · dividend yield 0.51 (finnhub, 2026-10-20) · beta 1.10 (finnhub, 2026-10-20) · 52w high 348.15 (finnhub, 2026-10-20) · 52w low 243.42 (finnhub, 2026-10-20) · target (consensus) 340.14 (fmp, 2026-10-20) · analysts: buy 20 (finnhub, 2026-10-20) · analysts: hold 14 (finnhub, 2026-10-20) · analysts: sell 3 (finnhub, 2026-10-20) · vendor sentiment -0.23 (alphavantage_news, 2026-10-06) · revenue (last quarter) 109.42bn (sec_xbrl, 2026-07-31) · net income (last quarter) 29.79bn (sec_xbrl, 2026-07-31) · last EPS surprise % -0.89 (finnhub, 2026-09-05)
 
 ### Microsoft (XNAS:MSFT)
-- tone: 90 stories from 38 sources, polarity +0.11, peak intensity 0.33, uncertainty 0.10 · 27 escalated
+- tone: 36 stories from 18 sources, polarity +0.06, peak intensity 0.00, uncertainty 0.05 · 9 escalated
 - 2026-10-20 finance.yahoo.com — Microsoft (MSFT) Withdraws From UK AI Data Center Project [q 1.00, tone +0.0] ★
 - 2026-10-20 finance.yahoo.com — The non-gamer CEO racing to save Microsoft’s Xbox [q 1.00, tone -1.0] ★
 - 2026-10-20 Yahoo — Will AI Data Center Launches Change Marvell Stock Narrative [q 0.85, tone +0.0] ★
 - 2026-10-20 Yahoo — Splashtop Agentic Packr Automates App Packaging for Microsoft Intune [q 0.85, tone -1.0] ★
 - 2026-10-20 Yahoo — Elite Extends Elite Intelligence to Claude and Microsoft Copilot, Bringing Trusted Financial Context into the AI Experiences Law Firms Already Use [q 0.85, tone +0.0] ★
-- 2026-10-20 Yahoo — NiSource (NI) Stock Looks Overvalued Against Its Dividend Outlook [q 0.85, tone +1.0] ★
-- 2026-10-19 www.benzinga.com — Microsoft Walks Away From AI Data Center Deal, but SemiAnalysis Predicts 50-GW Boom in 2027 [q 0.85, tone +0.0] ★
-- 2026-10-19 www.tikr.com — Third Wheel: Microsoft’s AI Chips Are “Nowhere Close” to NVIDIA or Google per Analyst [q 0.85, tone +0.0] ★
-- event 2026-10-19 rating_reiteration — Bernstein maintain Outperform (fmp)
+- 2026-10-20 finance.yahoo.com — Will Microsoft (MSFT) Beat Estimates Again in Its Next Earnings Report? [q 0.80, tone +1.0] ★
+- 2026-10-20 pluang.com — $1,000 in Microsoft 10 years ago grew to $10,00... [q 0.65, tone +1.0] ★
+- 2026-10-20 ng.investing.com — BMO Capital raises Microsoft stock price target on Azure growth By Investing.com [q 0.65, tone +1.0] ★
 - upcoming 2026-10-28 earnings_result — Q1 2027 results (finnhub)
 - upcoming 2026-10-27 earnings_result — Q1 2027 results (finnhub)
 - snapshot: P/E (ttm) 29.52 (finnhub, 2026-10-20) · P/B 6.26 (finnhub, 2026-10-20) · EPS (ttm) 17.95 (finnhub, 2026-10-20) · dividend yield 0.79 (finnhub, 2026-10-20) · beta 1.06 (finnhub, 2026-10-20) · 52w high 553.72 (finnhub, 2026-10-20) · 52w low 349.20 (finnhub, 2026-10-20) · target (consensus) 595.21 (fmp, 2026-10-20) · analysts: buy 40 (finnhub, 2026-10-20) · analysts: hold 3 (finnhub, 2026-10-20) · analysts: sell 0 (finnhub, 2026-10-20) · vendor sentiment 0.29 (alphavantage_news, 2026-10-06) · revenue (last quarter) 90.01bn (sec_xbrl, 2026-07-29) · net income (last quarter) 35.77bn (sec_xbrl, 2026-07-29) · last EPS surprise % 9.53 (finnhub, 2026-09-05)
@@ -105,27 +99,15 @@ Generated 2026-10-20 22:42 UTC · slot `all` · 21636 articles in the corpus, 59
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
-| 22:42 | eodhd | ok | 0 | 0 | 0 | skipped: every asked name was refused: outside the plan or over today's credits  |
-| 22:42 | jin10_flash | degraded | 18 | 18 | 16 | facts 0; window not covered back to 2026-10-20 17:26Z; the oldest item read is 2 |
-| 22:42 | alphavantage_news | failed | 0 | 0 | 0 | alphavantage refused a premium endpoint (the key's plan does not include it): Th |
-| 22:42 | finnhub | ok | 293 | 271 | 182 | facts 60;  |
-| 22:42 | edgar | ok | 2 | 0 | 0 | facts 0;  |
-| 22:42 | yahoo_rss | ok | 50 | 50 | 33 | named the company: 16 of 50 (lowest: NVIDIA 1/19, Apple 6/13, Microsoft 9/18) |
-| 22:42 | google_news | ok | 199 | 182 | 167 | named the company: 167 of 182 (lowest: Microsoft 36/40, NVIDIA 60/66, Apple 71/7 |
-| 22:42 | gdelt | failed | 0 | 0 | 0 | no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP |
-| 17:26 | dbnomics | ok | 450 | 0 | 0 | facts 0;  |
-| 17:26 | jin10_flash | degraded | 20 | 19 | 18 | facts 0; window not covered back to 2026-10-20 10:08Z; the oldest item read is 2 |
-| 17:26 | fred | ok | 472 | 0 | 0 | facts 18; release calendar: 'FOMC Press Release' listed on 15 days of the fortni |
-| 17:26 | fmp | ok | 3964 | 0 | 0 | facts 13; fmp /earnings is outside the plan (HTTP 402); not collected for NVDA,  |
-| 10:08 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
-| 10:08 | twse_openapi | ok | 8 | 0 | 0 | facts 5;  |
-| 10:08 | jin10_flash | degraded | 20 | 20 | 20 | facts 0; window not covered back to 2026-10-19 22:41Z; the oldest item read is 2 |
-| 10:08 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
-| 10:08 | nst_business | degraded | 150 | 142 | 137 | window overflow: all 150 dated items are newer than the window's start (2026-10- |
-| 10:08 | fmt_business | degraded | 50 | 50 | 50 | window overflow: all 50 dated items are newer than the window's start (2026-10-1 |
-| 10:08 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Genting, Maybank, Tenaga, Petronas Chemicals, IHH, Press Metal |
-| 10:08 | google_news | ok | 39 | 35 | 31 | read but empty: Petronas Chemicals; named the company: 17 of 35 (lowest: Tenaga  |
-| 10:08 | gdelt | failed | 0 | 0 | 0 | no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP |
+| 10:10 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
+| 10:10 | twse_openapi | ok | 8 | 0 | 0 | facts 5;  |
+| 10:10 | jin10_flash | degraded | 20 | 19 | 18 | facts 0; window not covered back to 2026-10-20 22:42Z; the oldest item read is 2 |
+| 10:10 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 10:10 | nst_business | degraded | 150 | 145 | 141 | window overflow: all 150 dated items are newer than the window's start (2026-10- |
+| 10:10 | fmt_business | degraded | 50 | 50 | 50 | window overflow: all 50 dated items are newer than the window's start (2026-10-2 |
+| 10:10 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Genting, Maybank, Tenaga, Petronas Chemicals, IHH, Press Metal |
+| 10:10 | google_news | ok | 30 | 29 | 23 | read but empty: Press Metal; named the company: 11 of 29 (lowest: Genting 0/4, P |
+| 10:10 | gdelt | ok | 46 | 32 | 29 | grouped 3 names per request; 2 requests (HTTP 429 on request 2: the rest of the  |
 
 ---
 
