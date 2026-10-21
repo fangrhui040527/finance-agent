@@ -1,6 +1,78 @@
 {
   "collection": [
     {
+      "at": "2026-10-21T22:41:59.013605+00:00",
+      "detail": "skipped: every asked name was refused: outside the plan or over today's credits (XNAS:AAPL, XNAS:MSFT)",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-21T22:41:58.682903+00:00",
+      "detail": "facts 0; window not covered back to 2026-10-21 17:35Z; the oldest item read is 2026-10-21 21:49Z, so 4.2h of the window was never served",
+      "fetched": 19,
+      "kept": 19,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 16
+    },
+    {
+      "at": "2026-10-21T22:41:57.596319+00:00",
+      "detail": "alphavantage refused a premium endpoint (the key's plan does not include it): Thank you for using Alpha Vantage! This is a premium endpoint. You may subscribe to any of the premium plans at https://www.alphavantage.co/premium/ to instantl",
+      "fetched": 0,
+      "kept": 0,
+      "source": "alphavantage_news",
+      "status": "failed",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-21T22:41:55.088026+00:00",
+      "detail": "facts 39; ",
+      "fetched": 304,
+      "kept": 274,
+      "source": "finnhub",
+      "status": "ok",
+      "stored": 190
+    },
+    {
+      "at": "2026-10-21T22:41:50.414965+00:00",
+      "detail": "facts 1; ",
+      "fetched": 1,
+      "kept": 0,
+      "source": "edgar",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-21T22:41:49.818446+00:00",
+      "detail": "named the company: 17 of 44 (lowest: NVIDIA 2/13, Microsoft 4/14, Apple 11/17)",
+      "fetched": 44,
+      "kept": 44,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 26
+    },
+    {
+      "at": "2026-10-21T22:41:49.085178+00:00",
+      "detail": "named the company: 164 of 184 (lowest: Microsoft 40/49, Apple 52/59, NVIDIA 72/76)",
+      "fetched": 205,
+      "kept": 184,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 165
+    },
+    {
+      "at": "2026-10-21T22:41:46.396047+00:00",
+      "detail": "grouped 3 names per request; 1 request; named the company: 28 of 166 (lowest: Apple + Microsoft + NVIDIA 28/166)",
+      "fetched": 250,
+      "kept": 166,
+      "source": "gdelt",
+      "status": "ok",
+      "stored": 164
+    },
+    {
       "at": "2026-10-21T17:35:07.662145+00:00",
       "detail": "facts 0; ",
       "fetched": 450,
@@ -119,18 +191,18 @@
     }
   ],
   "counts": {
-    "articles": 21913,
+    "articles": 22474,
     "documents": 0,
-    "escalated": 3126,
-    "events": 4244,
-    "failed_sweeps": 85,
-    "linked": 13079,
-    "observations": 6006,
+    "escalated": 3192,
+    "events": 4245,
+    "failed_sweeps": 86,
+    "linked": 13344,
+    "observations": 6045,
     "series": 31,
-    "sweeps": 1032
+    "sweeps": 1040
   },
   "day": "2026-10-21",
-  "generated_at": "2026-10-21 17:35 UTC",
+  "generated_at": "2026-10-21 22:42 UTC",
   "macro": [
     {
       "change": "-0.02",
@@ -443,22 +515,22 @@
       "upcoming": []
     },
     {
-      "escalated": 4,
+      "escalated": 38,
       "events": [],
       "instrument_id": "XNAS:NVDA",
       "label": "NVIDIA",
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-10-20",
+          "known_at": "2026-10-21",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "26.76"
+          "value": "27.49"
         },
         {
           "concept": "pb",
-          "known_at": "2026-10-20",
+          "known_at": "2026-10-21",
           "label": "P/B",
           "period_end": null,
           "source": "finnhub",
@@ -466,7 +538,7 @@
         },
         {
           "concept": "eps_ttm",
-          "known_at": "2026-10-20",
+          "known_at": "2026-10-21",
           "label": "EPS (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -474,7 +546,7 @@
         },
         {
           "concept": "dividend_yield",
-          "known_at": "2026-10-20",
+          "known_at": "2026-10-21",
           "label": "dividend yield",
           "period_end": null,
           "source": "finnhub",
@@ -482,15 +554,15 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-10-20",
+          "known_at": "2026-10-21",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
-          "value": "2.27"
+          "value": "2.26"
         },
         {
           "concept": "high_52w",
-          "known_at": "2026-10-20",
+          "known_at": "2026-10-21",
           "label": "52w high",
           "period_end": null,
           "source": "finnhub",
@@ -498,7 +570,7 @@
         },
         {
           "concept": "low_52w",
-          "known_at": "2026-10-20",
+          "known_at": "2026-10-21",
           "label": "52w low",
           "period_end": null,
           "source": "finnhub",
@@ -571,100 +643,100 @@
       ],
       "stories": [
         {
-          "doc_id": "https://news.google.com/rss/articles/CBMinwFBVV95cUxQUXM0UWg2emk3RnpYZGlWWnR3bkRvMTBpSHZRbVVqcnROMGFpSHI1OHBuN0Y2OG9fTEhpa0hNS29VczVpb1hrWk9uenVOd1FhNnhQSTZydmgyVmNTLXNJNlhsZXNCS0lURHcxZ1FDdzFETHBuMGpFNVk3QTVxbXNoMGJCUWxDRk8zZHhleW1fanUzQmVkQ0pQWXNRNVFLZ2M?oc=5",
-          "domain": "finance.yahoo.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-20T19:20:57+00:00",
-          "quality": 0.8,
-          "title": "Nvidia Faces a New Threat as Amazon Targets Its Biggest AI Advantage",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMimwFBVV95cUxON2tJaVJDQnJ5TWFzSkRjRjQtQnZxT0VGbTJOWWtCNnFqR2ZMbzVrdWFfZnRIbzE5LWFBdW5fcUVZUjdrX2s4SXdHV0dMVTNCaVVLcE5xQjQ2dEFhb2hiRms1aFRsMXA5YmFEMnAwQktxdXE4UmFCZTk3TWxEWDR3QlFSTUJEQmlna0JGeTh4d3A5dUhoWGtaOGxHMA?oc=5",
-          "domain": "finance.yahoo.com",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
-          "polarity": 0.0,
-          "published_at": "2026-10-20T15:16:09+00:00",
-          "quality": 0.8,
-          "title": "Nvidia Raises Stakes With Massive New AI Investment",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMingFBVV95cUxQdXdRTEZ3b2xDdW96M2hORTVLZkcweW5wcHh1NWpZWWg5SWU0QU1PYkNpYl9HV2JXcExUUl9tWnQyX0VHU3RoMVZmWk9PUHRFbENVVlMwQmNrdzF1ZkZzOWpkNTR2a3pDSFVJQnc5aHpPbWF6aERzUVFJWFhTbmRoOVMzckIxQXJzbEtseU1BVlQ4cGpCZWZfV0tQQ3FzQQ?oc=5",
-          "domain": "finance.yahoo.com",
+          "doc_id": "https://beincrypto.com/lbank-nvidia-stock-trading-crypto-exchange/?.tsrc=rss",
+          "domain": "beincrypto.com",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 1.0,
-          "published_at": "2026-10-20T12:00:11+00:00",
-          "quality": 0.8,
-          "title": "NVIDIA Keeps Falling and Wall Street Won\u2019t Move Its Target. Is It Time To Buy?",
+          "published_at": "2026-10-21T21:39:43+00:00",
+          "quality": 0.85,
+          "title": "Crypto Exchanges Want Your Next Stock Trade in 2027",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "https://news.google.com/rss/articles/CBMiWkFVX3lxTFB2Rk1oZGVPQkVtMkFod0tmNlZFRWdPOFVPejRsY3JPSUFGQ042c19ELU9TbGF4ZG44MDE1T3JUSl9tNnFjLWo1dXc2RUZjbTVoRjNpODNxeTJHZw?oc=5",
-          "domain": "www.tokenpost.com",
+          "doc_id": "finnhub:143070512",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-21T17:30:00+00:00",
+          "quality": 0.85,
+          "title": "How Nvidia's OpenShell is securing the next generation of AI agents: Jensen Huang",
+          "uncertainty": 0.26595744680851063
+        },
+        {
+          "doc_id": "finnhub:143069871",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-21T15:42:00+00:00",
+          "quality": 0.85,
+          "title": "Absolute Security Integrates Autonomous Cyber Resilience into the NVIDIA DGX Station AI Supercomputer",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:143069878",
+          "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 1.0,
-          "published_at": "2026-10-20T19:16:43+00:00",
-          "quality": 0.65,
-          "title": "Arete\u2019s $369 NVIDIA Share Target Excludes Binance Futures Contract",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://finance.yahoo.com/technology/ai/articles/personal-ai-launches-model-4-170900737.html?.tsrc=rss",
-          "domain": "finance.yahoo.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-20T17:09:00+00:00",
-          "quality": 1.0,
-          "title": "Personal AI Launches MODEL\u20104, Building Personal Intelligence Directly Into the Network",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "finnhub:143028735",
-          "domain": "Yahoo",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-20T15:14:35+00:00",
+          "published_at": "2026-10-21T15:19:10+00:00",
           "quality": 0.85,
-          "title": "Investors pledge 230 billion euros at German summit: Merz",
+          "title": "CrowdStrike Gains 3.6% on Expanded NVIDIA AI Agent Security Deal: \u201cSetting the Standard\u201d",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:143028736",
+          "doc_id": "finnhub:143067248",
           "domain": "Yahoo",
-          "escalated": false,
+          "escalated": true,
           "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-10-20T15:12:10+00:00",
+          "published_at": "2026-10-21T13:48:00+00:00",
           "quality": 0.85,
-          "title": "What Do Tencent Holdings (SEHK:700) Chip Orders Mean For Its AI Push?",
-          "uncertainty": 0.28735632183908044
+          "title": "Advantech Advances Autonomous Industrial AI with AI Factory Brain and Physical AI at NVIDIA GTC Berlin 2026",
+          "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:143022641",
+          "doc_id": "finnhub:143061640",
           "domain": "Yahoo",
-          "escalated": false,
+          "escalated": true,
           "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-10-20T12:00:00+00:00",
+          "published_at": "2026-10-21T11:56:18+00:00",
           "quality": 0.85,
-          "title": "llm-d 1.0 Advances Open, Cost-Efficient AI Inference for Production Scale",
+          "title": "AI will 'amplify your capabilities': Jensen Huang",
           "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:143061624",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-10-21T11:36:39+00:00",
+          "quality": 0.85,
+          "title": "Nvidia's Jensen Huang wants to build AI factories in weeks, not months",
+          "uncertainty": 0.1736111111111111
+        },
+        {
+          "doc_id": "finnhub:143068297",
+          "domain": "Benzinga",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-21T09:22:13+00:00",
+          "quality": 0.85,
+          "title": "Amadeus And NVIDIA Sign MoU To Accelerate AI-Powered Flight Search And Optimize Computing Efficiency",
+          "uncertainty": 0.26595744680851063
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 41,
-        "polarity_mean": 0.049,
-        "sources": 24,
-        "uncertainty_mean": 0.091
+        "n": 170,
+        "polarity_mean": 0.088,
+        "sources": 43,
+        "uncertainty_mean": 0.068
       },
       "upcoming": [
         {
@@ -677,7 +749,7 @@
       ]
     },
     {
-      "escalated": 12,
+      "escalated": 30,
       "events": [
         {
           "kind": "rating_change",
@@ -699,15 +771,15 @@
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-10-20",
+          "known_at": "2026-10-21",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "38.79"
+          "value": "38.53"
         },
         {
           "concept": "pb",
-          "known_at": "2026-10-20",
+          "known_at": "2026-10-21",
           "label": "P/B",
           "period_end": null,
           "source": "finnhub",
@@ -715,7 +787,7 @@
         },
         {
           "concept": "eps_ttm",
-          "known_at": "2026-10-20",
+          "known_at": "2026-10-21",
           "label": "EPS (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -723,7 +795,7 @@
         },
         {
           "concept": "dividend_yield",
-          "known_at": "2026-10-20",
+          "known_at": "2026-10-21",
           "label": "dividend yield",
           "period_end": null,
           "source": "finnhub",
@@ -731,15 +803,15 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-10-20",
+          "known_at": "2026-10-21",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
-          "value": "1.10"
+          "value": "1.11"
         },
         {
           "concept": "high_52w",
-          "known_at": "2026-10-20",
+          "known_at": "2026-10-21",
           "label": "52w high",
           "period_end": null,
           "source": "finnhub",
@@ -747,7 +819,7 @@
         },
         {
           "concept": "low_52w",
-          "known_at": "2026-10-20",
+          "known_at": "2026-10-21",
           "label": "52w low",
           "period_end": null,
           "source": "finnhub",
@@ -820,6 +892,17 @@
       ],
       "stories": [
         {
+          "doc_id": "https://finance.yahoo.com/m/e4d4b4d0-03a9-309a-9f54-ff256bcadac0/apple%E2%80%99s-iphone-supply-chain.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-21T14:19:00+00:00",
+          "quality": 1.0,
+          "title": "Apple\u2019s iPhone Supply Chain Risk Spells Trouble for This Semiconductor Stock",
+          "uncertainty": 0.3571428571428571
+        },
+        {
           "doc_id": "https://finance.yahoo.com/markets/world-indices/articles/major-us-stock-indexes-fared-202506799.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
           "escalated": true,
@@ -828,6 +911,39 @@
           "published_at": "2026-10-20T20:25:06+00:00",
           "quality": 1.0,
           "title": "How major US stock indexes fared Tuesday 10/20/2026",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://unchainedcrypto.com/kazakhstans-aifc-regulator-turns-to-apple-and-google-to-enforce-coinbase-htx-injunctions/?.tsrc=rss",
+          "domain": "unchainedcrypto.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-21T20:42:00+00:00",
+          "quality": 0.85,
+          "title": "Kazakhstan\u2019s AIFC Regulator Turns to Apple and Google to Enforce Coinbase, HTX Injunctions",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:143062999",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-21T11:00:18+00:00",
+          "quality": 0.85,
+          "title": "Meta Muse Wants to Run Your Life, and Analyst Says the Winner Will Be Whoever You Trust \u2018With Their Card and Their Habits\u2019",
+          "uncertainty": 0.23809523809523808
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMimAFBVV95cUxNTnR3a3hSZXhqc0RvbzZhNHJqWkVFbTlwUExXalBycFA0SWt2dHZCUXZBcW15blI2dGdPN3ZqYmF4dFhDc2tBTWdVaGJVYmZnQmdPZkx4VHdFVmNnRm01ZGNfNVoySW9vcmtMYko2UmhsdFlJWDkzWTNSQWg0RXpaUmQwS2wyaGloamJyaG9DNjRDWVprOWQ3Uw?oc=5",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "polarity": 0.0,
+          "published_at": "2026-10-21T11:30:02+00:00",
+          "quality": 0.8,
+          "title": "Prediction: Apple Will Soar After Oct. 28",
           "uncertainty": 0.0
         },
         {
@@ -862,58 +978,14 @@
           "quality": 0.8,
           "title": "Apple Stock Is the Best Performer in the Mag 7. An Analyst Downgrade Signals It\u2019s Time to Pump the Brakes.",
           "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMivAFBVV95cUxORW1ZeVVGUTZiM2tnQm5xYUFyUFNiNHhwbWxKSTBPa2xUR1RvcEtVRFFjQ0pZVFZDMW1HbHpQOUNXN3MxUzc2LTlQRU50Y3ZhR0lyWU5PaEMzeHljZG9OanVQQ3FpNnlyY0JsLXVob2FUOTg5S1M1MDdrckhpaHc0ODFsTWllU001M2V4TWN4UnBZOXVSMnhUQ19BTEpaYS15WVFidzRTTExFV1R1UUhGa3FueUxMSllwYm9abw?oc=5",
-          "domain": "www.tradingview.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": -1.0,
-          "published_at": "2026-10-20T19:20:14+00:00",
-          "quality": 0.65,
-          "title": "Apple Stock Just Got a Shocking Downgrade Over iPhone Demand",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMipwFBVV95cUxQVTZ2OVBPWmNDc3FwSThlcXZ6X1lSOV9KVWItaTZzTEo5UXdHSkdiVUZOTlltek96aXluOVFtT0dZaXNFUkdhZGdSVlpMdUh2MUZ5ampHODhBUzhWa2JIeG5aUXc1cXhibDBUNDNJUm9CejR0bFBmbnY5RHRTWV9tUTJMbnBQYTl3SHdjbUNlVHNGWjNiWnMzWTd5X0VLRk5uN2RJSlhHUQ?oc=5",
-          "domain": "pluang.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-10-20T19:16:53+00:00",
-          "quality": 0.65,
-          "title": "Apple faces margin pressure and slowing iPhone growth ahead of earnings report.",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMiWkFVX3lxTE41ZTIzZ3diOGlGbjNucUlVdTZNN0o4ZU9RelZxWDkyZTdrWW9LbV84aVg0ZHZlczFBZnBxV1gwVmU3aVVQbmRWODB3eU91cHdBb2JfZW5BSzU3QQ?oc=5",
-          "domain": "www.tokenpost.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": -1.0,
-          "published_at": "2026-10-20T17:28:53+00:00",
-          "quality": 0.65,
-          "title": "Loop Capital Cuts Apple to Hold on Weaker 2027 iPhone Shipment View",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMiowFBVV95cUxPZjF6R3UzWFRWNExjRW1HeE1rNW5aUURIQmJ4WGFQeWVFdWZlSjZHQ1d3T2pqaVZQVlhfSjRJNU5GbWwwbkdTOHdGWnpuN2ZSTTRfNDRxZ3lTelZDRk9uODRUSGxaTkVpSmN4cXFxR0ZHV1czalY0aXh2RExRR2VHX1I1Nklqb0xkcmJ5dmtmZHBfdjhzMjlhd09RRnlNMk5vT01R?oc=5",
-          "domain": "www.gadgetreview.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": -1.0,
-          "published_at": "2026-10-20T17:17:51+00:00",
-          "quality": 0.65,
-          "title": "Loop Capital Cuts Apple Target to $330 as 13 Million iPhones Stay Missing",
-          "uncertainty": 0.0
         }
       ],
       "tone": {
-        "intensity_max": 0.0,
-        "n": 46,
-        "polarity_mean": -0.022,
-        "sources": 33,
-        "uncertainty_mean": 0.021
+        "intensity_max": 0.333,
+        "n": 117,
+        "polarity_mean": 0.026,
+        "sources": 67,
+        "uncertainty_mean": 0.037
       },
       "upcoming": [
         {
@@ -940,8 +1012,15 @@
       ]
     },
     {
-      "escalated": 9,
+      "escalated": 24,
       "events": [
+        {
+          "kind": "filing",
+          "source": "edgar",
+          "title": "DEF 14A: DEF 14A",
+          "url": "https://www.sec.gov/Archives/edgar/data/789019/000119312526427849/d61756ddef14a.htm",
+          "when": "2026-10-21T00:00:00+00:00"
+        },
         {
           "kind": "rating_reiteration",
           "source": "fmp",
@@ -962,15 +1041,15 @@
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-10-20",
+          "known_at": "2026-10-21",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "29.52"
+          "value": "29.39"
         },
         {
           "concept": "pb",
-          "known_at": "2026-10-20",
+          "known_at": "2026-10-21",
           "label": "P/B",
           "period_end": null,
           "source": "finnhub",
@@ -978,7 +1057,7 @@
         },
         {
           "concept": "eps_ttm",
-          "known_at": "2026-10-20",
+          "known_at": "2026-10-21",
           "label": "EPS (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -986,7 +1065,7 @@
         },
         {
           "concept": "dividend_yield",
-          "known_at": "2026-10-20",
+          "known_at": "2026-10-21",
           "label": "dividend yield",
           "period_end": null,
           "source": "finnhub",
@@ -994,7 +1073,7 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-10-20",
+          "known_at": "2026-10-21",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
@@ -1002,7 +1081,7 @@
         },
         {
           "concept": "high_52w",
-          "known_at": "2026-10-20",
+          "known_at": "2026-10-21",
           "label": "52w high",
           "period_end": null,
           "source": "finnhub",
@@ -1010,7 +1089,7 @@
         },
         {
           "concept": "low_52w",
-          "known_at": "2026-10-20",
+          "known_at": "2026-10-21",
           "label": "52w low",
           "period_end": null,
           "source": "finnhub",
@@ -1105,6 +1184,50 @@
           "uncertainty": 0.3205128205128205
         },
         {
+          "doc_id": "finnhub:143063298",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-21T11:42:00+00:00",
+          "quality": 0.85,
+          "title": "Oracle vs. Microsoft: Which Is the Better AI Cloud Stock to Own for the Next 5 Years?",
+          "uncertainty": 0.2976190476190476
+        },
+        {
+          "doc_id": "finnhub:143057167",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "polarity": 1.0,
+          "published_at": "2026-10-21T09:08:00+00:00",
+          "quality": 0.85,
+          "title": "Edge AI Software Market Size, Share, Trends, and Global Forecast to 2032 | Generative AI Moves to the Device, Sending Edge AI Software Toward $120 Billion",
+          "uncertainty": 0.13020833333333334
+        },
+        {
+          "doc_id": "finnhub:143057168",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "polarity": 1.0,
+          "published_at": "2026-10-21T09:07:00+00:00",
+          "quality": 0.85,
+          "title": "Agentic AI Market Size, Share, Trends, and Global Forecast to 2033 | Companies Move From Copilots to Autonomous Agents, Fueling a $206 Billion Market",
+          "uncertainty": 0.1404494382022472
+        },
+        {
+          "doc_id": "finnhub:143055661",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-21T07:00:00+00:00",
+          "quality": 0.85,
+          "title": "Microsoft Word used to monitor blackout risk",
+          "uncertainty": 0.33783783783783783
+        },
+        {
           "doc_id": "finnhub:143028768",
           "domain": "Yahoo",
           "escalated": true,
@@ -1125,58 +1248,14 @@
           "quality": 0.85,
           "title": "Splashtop Agentic Packr Automates App Packaging for Microsoft Intune",
           "uncertainty": 0.1582278481012658
-        },
-        {
-          "doc_id": "finnhub:143028765",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-20T14:02:00+00:00",
-          "quality": 0.85,
-          "title": "Elite Extends Elite Intelligence to Claude and Microsoft Copilot, Bringing Trusted Financial Context into the AI Experiences Law Firms Already Use",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMiogFBVV95cUxNcW10MmRRSDR3QVY2dG9ITTRZb3J6aFhMaGZ5anVteGZQd3h2YzFjS2ZTS0ZCdnJxZ0xvUDA1bDYyX3BaYnBjbnRkN2ZfMG5wbi1FWGFweUFkaDZleTV6T212aGF6TTNtR19xTnRNTU12dzZLNUZTNm5oSi1qbC1kUm5oREtTR1dHbmdBQ21ENGJZZmlPdVJ2NVpDR29mVzJZcUE?oc=5",
-          "domain": "finance.yahoo.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-10-20T15:10:02+00:00",
-          "quality": 0.8,
-          "title": "Will Microsoft (MSFT) Beat Estimates Again in Its Next Earnings Report?",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxNWm83ZF8yZU9INy1vMXp1Z1FoVnEtSHpxaFB5RU1UUkxTMThmUDJuVm0xN3VQdmMtRFVTUzM0R1p1VEVCZGYwNVR5SVFFOUFpWk4yUzBoSEN6WVFsQUJpZVNBeDJ2b3RkOTQ5MFFzUEFKb2ZZbzYxdjIxbGZVZ2thNmlqVEdvT3BrdkE4c29xLUdiaFRwTjM3ZkJKV09VQVRjdGd3eXpnY0g?oc=5",
-          "domain": "pluang.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-10-20T18:35:07+00:00",
-          "quality": 0.65,
-          "title": "$1,000 in Microsoft 10 years ago grew to $10,00...",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxObUlFWlB2TmRRYzU3RlZ2QUtSS1lmd0NOSHpYTHMzNFRGZ1R5MVhlVUREc0JCalVsQU13OWR6Ri1UakVkcTRiN3VVSHB2RkhQd2xHUVFaSnNMcDUwTXh6dDMzZldvMll2VDhZaGVuRjc0ZFRXRHhOdDB1RERXTDFXaVdBeTh3QVJqbnZGdmFlRmIzWnNKanFfdVRYQXJYamt0QkhjTVBIN1d5VW9zMlF6YzB1ZFJ2eEE4Tm4zN3FaaFptdw?oc=5",
-          "domain": "ng.investing.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-10-20T16:32:39+00:00",
-          "quality": 0.65,
-          "title": "BMO Capital raises Microsoft stock price target on Azure growth By Investing.com",
-          "uncertainty": 0.0
         }
       ],
       "tone": {
-        "intensity_max": 0.0,
-        "n": 36,
-        "polarity_mean": 0.056,
-        "sources": 18,
-        "uncertainty_mean": 0.05
+        "intensity_max": 0.333,
+        "n": 89,
+        "polarity_mean": 0.124,
+        "sources": 36,
+        "uncertainty_mean": 0.074
       },
       "upcoming": [
         {
