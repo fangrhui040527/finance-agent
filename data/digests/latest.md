@@ -1,6 +1,6 @@
 # Digest 2026-10-21
 
-Generated 2026-10-21 10:11 UTC · slot `all` · 21897 articles in the corpus, 5994 observations, 4241 events in the fact book.
+Generated 2026-10-21 17:35 UTC · slot `all` · 21913 articles in the corpus, 6006 observations, 4244 events in the fact book.
 
 ## The book
 
@@ -42,7 +42,7 @@ Generated 2026-10-21 10:11 UTC · slot `all` · 21897 articles in the corpus, 59
 - 2026-10-20 Yahoo — What Do Tencent Holdings (SEHK:700) Chip Orders Mean For Its AI Push? [q 0.85, tone +0.0]
 - 2026-10-20 Yahoo — llm-d 1.0 Advances Open, Cost-Efficient AI Inference for Production Scale [q 0.85, tone +0.0]
 - upcoming 2026-11-17 earnings_result — Q3 2027 results after the close (finnhub)
-- snapshot: P/E (ttm) 26.76 (finnhub, 2026-10-20) · P/B 28.81 (finnhub, 2026-10-20) · EPS (ttm) 7.91 (finnhub, 2026-10-20) · dividend yield 0.03 (finnhub, 2026-10-20) · beta 2.27 (finnhub, 2026-10-20) · 52w high 243.37 (finnhub, 2026-10-20) · 52w low 164.27 (finnhub, 2026-10-20) · target (consensus) 339.17 (fmp, 2026-10-20) · analysts: buy 41 (finnhub, 2026-10-20) · analysts: hold 2 (finnhub, 2026-10-20) · analysts: sell 1 (finnhub, 2026-10-20) · vendor sentiment 0.25 (alphavantage_news, 2026-10-06) · revenue (last quarter) 96.22bn (sec_xbrl, 2026-08-26) · net income (last quarter) 59.69bn (sec_xbrl, 2026-08-26) · last EPS surprise % 3.82 (finnhub, 2026-09-05)
+- snapshot: P/E (ttm) 26.76 (finnhub, 2026-10-20) · P/B 28.81 (finnhub, 2026-10-20) · EPS (ttm) 7.91 (finnhub, 2026-10-20) · dividend yield 0.03 (finnhub, 2026-10-20) · beta 2.27 (finnhub, 2026-10-20) · 52w high 243.37 (finnhub, 2026-10-20) · 52w low 164.27 (finnhub, 2026-10-20) · target (consensus) 339.17 (fmp, 2026-10-21) · analysts: buy 41 (finnhub, 2026-10-20) · analysts: hold 2 (finnhub, 2026-10-20) · analysts: sell 1 (finnhub, 2026-10-20) · vendor sentiment 0.25 (alphavantage_news, 2026-10-06) · revenue (last quarter) 96.22bn (sec_xbrl, 2026-08-26) · net income (last quarter) 59.69bn (sec_xbrl, 2026-08-26) · last EPS surprise % 3.82 (finnhub, 2026-09-05)
 
 ### Apple (XNAS:AAPL)
 - tone: 46 stories from 33 sources, polarity -0.02, peak intensity 0.00, uncertainty 0.02 · 12 escalated
@@ -55,10 +55,11 @@ Generated 2026-10-21 10:11 UTC · slot `all` · 21897 articles in the corpus, 59
 - 2026-10-20 www.tokenpost.com — Loop Capital Cuts Apple to Hold on Weaker 2027 iPhone Shipment View [q 0.65, tone -1.0] ★
 - 2026-10-20 www.gadgetreview.com — Loop Capital Cuts Apple Target to $330 as 13 Million iPhones Stay Missing [q 0.65, tone -1.0] ★
 - event 2026-10-20 rating_change — Loop Capital downgrade Hold (from Buy) (fmp)
+- event 2026-10-20 rating_reiteration — MoffettNathanson maintain Neutral (fmp)
 - upcoming 2026-11-02 earnings_result — Q4 2026 results after the close (finnhub)
 - upcoming 2026-10-29 earnings_result — Q4 2026 results after the close (finnhub)
 - upcoming 2026-10-28 earnings_result — Q4 2026 results after the close (finnhub)
-- snapshot: P/E (ttm) 38.79 (finnhub, 2026-10-20) · P/B 50.98 (finnhub, 2026-10-20) · EPS (ttm) 8.72 (finnhub, 2026-10-20) · dividend yield 0.51 (finnhub, 2026-10-20) · beta 1.10 (finnhub, 2026-10-20) · 52w high 348.15 (finnhub, 2026-10-20) · 52w low 243.42 (finnhub, 2026-10-20) · target (consensus) 340.14 (fmp, 2026-10-20) · analysts: buy 20 (finnhub, 2026-10-20) · analysts: hold 14 (finnhub, 2026-10-20) · analysts: sell 3 (finnhub, 2026-10-20) · vendor sentiment -0.23 (alphavantage_news, 2026-10-06) · revenue (last quarter) 109.42bn (sec_xbrl, 2026-07-31) · net income (last quarter) 29.79bn (sec_xbrl, 2026-07-31) · last EPS surprise % -0.89 (finnhub, 2026-09-05)
+- snapshot: P/E (ttm) 38.79 (finnhub, 2026-10-20) · P/B 50.98 (finnhub, 2026-10-20) · EPS (ttm) 8.72 (finnhub, 2026-10-20) · dividend yield 0.51 (finnhub, 2026-10-20) · beta 1.10 (finnhub, 2026-10-20) · 52w high 348.15 (finnhub, 2026-10-20) · 52w low 243.42 (finnhub, 2026-10-20) · target (consensus) 340.14 (fmp, 2026-10-21) · analysts: buy 20 (finnhub, 2026-10-20) · analysts: hold 14 (finnhub, 2026-10-20) · analysts: sell 3 (finnhub, 2026-10-20) · vendor sentiment -0.23 (alphavantage_news, 2026-10-06) · revenue (last quarter) 109.42bn (sec_xbrl, 2026-07-31) · net income (last quarter) 29.79bn (sec_xbrl, 2026-07-31) · last EPS surprise % -0.89 (finnhub, 2026-09-05)
 
 ### Microsoft (XNAS:MSFT)
 - tone: 36 stories from 18 sources, polarity +0.06, peak intensity 0.00, uncertainty 0.05 · 9 escalated
@@ -70,9 +71,11 @@ Generated 2026-10-21 10:11 UTC · slot `all` · 21897 articles in the corpus, 59
 - 2026-10-20 finance.yahoo.com — Will Microsoft (MSFT) Beat Estimates Again in Its Next Earnings Report? [q 0.80, tone +1.0] ★
 - 2026-10-20 pluang.com — $1,000 in Microsoft 10 years ago grew to $10,00... [q 0.65, tone +1.0] ★
 - 2026-10-20 ng.investing.com — BMO Capital raises Microsoft stock price target on Azure growth By Investing.com [q 0.65, tone +1.0] ★
+- event 2026-10-21 rating_reiteration — Guggenheim maintain Buy (fmp)
+- event 2026-10-20 rating_reiteration — BMO Capital maintain Outperform (fmp)
 - upcoming 2026-10-28 earnings_result — Q1 2027 results (finnhub)
 - upcoming 2026-10-27 earnings_result — Q1 2027 results (finnhub)
-- snapshot: P/E (ttm) 29.52 (finnhub, 2026-10-20) · P/B 6.26 (finnhub, 2026-10-20) · EPS (ttm) 17.95 (finnhub, 2026-10-20) · dividend yield 0.79 (finnhub, 2026-10-20) · beta 1.06 (finnhub, 2026-10-20) · 52w high 553.72 (finnhub, 2026-10-20) · 52w low 349.20 (finnhub, 2026-10-20) · target (consensus) 595.21 (fmp, 2026-10-20) · analysts: buy 40 (finnhub, 2026-10-20) · analysts: hold 3 (finnhub, 2026-10-20) · analysts: sell 0 (finnhub, 2026-10-20) · vendor sentiment 0.29 (alphavantage_news, 2026-10-06) · revenue (last quarter) 90.01bn (sec_xbrl, 2026-07-29) · net income (last quarter) 35.77bn (sec_xbrl, 2026-07-29) · last EPS surprise % 9.53 (finnhub, 2026-09-05)
+- snapshot: P/E (ttm) 29.52 (finnhub, 2026-10-20) · P/B 6.26 (finnhub, 2026-10-20) · EPS (ttm) 17.95 (finnhub, 2026-10-20) · dividend yield 0.79 (finnhub, 2026-10-20) · beta 1.06 (finnhub, 2026-10-20) · 52w high 553.72 (finnhub, 2026-10-20) · 52w low 349.20 (finnhub, 2026-10-20) · target (consensus) 595.21 (fmp, 2026-10-21) · analysts: buy 40 (finnhub, 2026-10-20) · analysts: hold 3 (finnhub, 2026-10-20) · analysts: sell 0 (finnhub, 2026-10-20) · vendor sentiment 0.29 (alphavantage_news, 2026-10-06) · revenue (last quarter) 90.01bn (sec_xbrl, 2026-07-29) · net income (last quarter) 35.77bn (sec_xbrl, 2026-07-29) · last EPS surprise % 9.53 (finnhub, 2026-09-05)
 
 ## Macro
 
@@ -99,6 +102,10 @@ Generated 2026-10-21 10:11 UTC · slot `all` · 21897 articles in the corpus, 59
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 17:35 | dbnomics | ok | 450 | 0 | 0 | facts 0;  |
+| 17:35 | jin10_flash | degraded | 17 | 17 | 16 | facts 0; window not covered back to 2026-10-21 10:10Z; the oldest item read is 2 |
+| 17:35 | fred | failed | 0 | 0 | 0 | every series failed. First: DFF: fred returned non-JSON: '<!doctype html>\n<html |
+| 17:35 | fmp | ok | 3967 | 0 | 0 | facts 15; fmp /earnings is outside the plan (HTTP 402); not collected for NVDA,  |
 | 10:10 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
 | 10:10 | twse_openapi | ok | 8 | 0 | 0 | facts 5;  |
 | 10:10 | jin10_flash | degraded | 20 | 19 | 18 | facts 0; window not covered back to 2026-10-20 22:42Z; the oldest item read is 2 |

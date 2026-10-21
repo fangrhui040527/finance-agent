@@ -1,6 +1,42 @@
 {
   "collection": [
     {
+      "at": "2026-10-21T17:35:07.662145+00:00",
+      "detail": "facts 0; ",
+      "fetched": 450,
+      "kept": 0,
+      "source": "dbnomics",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-21T17:35:05.660010+00:00",
+      "detail": "facts 0; window not covered back to 2026-10-21 10:10Z; the oldest item read is 2026-10-21 16:43Z, so 6.6h of the window was never served",
+      "fetched": 17,
+      "kept": 17,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 16
+    },
+    {
+      "at": "2026-10-21T17:35:03.456604+00:00",
+      "detail": "every series failed. First: DFF: fred returned non-JSON: '<!doctype html>\\n<html lang=\"en\">\\n<head>\\n    <title>Site Maintenance | St. Louis Fed<</title>\\n    <link href=\"https://fonts.googleapis.com/css?family=Open+Sans:3'",
+      "fetched": 0,
+      "kept": 0,
+      "source": "fred",
+      "status": "failed",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-21T17:35:01.682016+00:00",
+      "detail": "facts 15; fmp /earnings is outside the plan (HTTP 402); not collected for NVDA, AAPL, MSFT",
+      "fetched": 3967,
+      "kept": 0,
+      "source": "fmp",
+      "status": "ok",
+      "stored": 0
+    },
+    {
       "at": "2026-10-21T10:10:28.916081+00:00",
       "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
       "fetched": 0,
@@ -83,18 +119,18 @@
     }
   ],
   "counts": {
-    "articles": 21897,
+    "articles": 21913,
     "documents": 0,
     "escalated": 3126,
-    "events": 4241,
-    "failed_sweeps": 84,
+    "events": 4244,
+    "failed_sweeps": 85,
     "linked": 13079,
-    "observations": 5994,
+    "observations": 6006,
     "series": 31,
-    "sweeps": 1028
+    "sweeps": 1032
   },
   "day": "2026-10-21",
-  "generated_at": "2026-10-21 10:11 UTC",
+  "generated_at": "2026-10-21 17:35 UTC",
   "macro": [
     {
       "change": "-0.02",
@@ -470,7 +506,7 @@
         },
         {
           "concept": "price_target_consensus",
-          "known_at": "2026-10-20",
+          "known_at": "2026-10-21",
           "label": "target (consensus)",
           "period_end": null,
           "source": "fmp",
@@ -649,6 +685,13 @@
           "title": "Loop Capital downgrade Hold (from Buy)",
           "url": "",
           "when": "2026-10-20T00:00:00+00:00"
+        },
+        {
+          "kind": "rating_reiteration",
+          "source": "fmp",
+          "title": "MoffettNathanson maintain Neutral",
+          "url": "",
+          "when": "2026-10-20T00:00:00+00:00"
         }
       ],
       "instrument_id": "XNAS:AAPL",
@@ -712,7 +755,7 @@
         },
         {
           "concept": "price_target_consensus",
-          "known_at": "2026-10-20",
+          "known_at": "2026-10-21",
           "label": "target (consensus)",
           "period_end": null,
           "source": "fmp",
@@ -898,7 +941,22 @@
     },
     {
       "escalated": 9,
-      "events": [],
+      "events": [
+        {
+          "kind": "rating_reiteration",
+          "source": "fmp",
+          "title": "Guggenheim maintain Buy",
+          "url": "",
+          "when": "2026-10-21T00:00:00+00:00"
+        },
+        {
+          "kind": "rating_reiteration",
+          "source": "fmp",
+          "title": "BMO Capital maintain Outperform",
+          "url": "",
+          "when": "2026-10-20T00:00:00+00:00"
+        }
+      ],
       "instrument_id": "XNAS:MSFT",
       "label": "Microsoft",
       "snapshot": [
@@ -960,7 +1018,7 @@
         },
         {
           "concept": "price_target_consensus",
-          "known_at": "2026-10-20",
+          "known_at": "2026-10-21",
           "label": "target (consensus)",
           "period_end": null,
           "source": "fmp",
