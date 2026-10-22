@@ -110,20 +110,58 @@ ROUTING: dict[TaskClass, Tier] = {
     TaskClass.EMBED_TEXT: Tier.EMBED,
 }
 
-# USD per million tokens, first-party API rates (docs/08 section 4).
-#
-# These are paired with MODEL_IDS below and must be changed together. BALANCED
-# was billed at $3/$15 - Sonnet 4.6's rate - while MODEL_IDS already pointed at
-# Sonnet 5, which is $2/$10. Nothing failed: every cost, every budget check and
-# every ledger row was simply 50% too high, and the daily budget refused
-# questions it could afford.
-PRICING_USD: dict[Tier, tuple[Decimal, Decimal]] = {
-    Tier.REASON: (Decimal("5.00"), Decimal("25.00")),  # claude-opus-5
-    Tier.BALANCED: (Decimal("2.00"), Decimal("10.00")),  # claude-sonnet-5
-    Tier.CHEAP: (Decimal("1.00"), Decimal("5.00")),  # claude-haiku-4-5
-    Tier.EMBED: (Decimal("0.05"), Decimal("0")),
-    Tier.LOCAL: (Decimal("0"), Decimal("0")),
+
+@dataclass(frozen=True)
+class Rates:
+    """One model's first-party price card, USD per million tokens.
+
+    Keyed by MODEL, not by tier: a tier is a role and the model behind it
+    changes, and a price that followed the role billed BALANCED at Sonnet 4.6's
+    $3/$15 for weeks after the role had moved to Sonnet 5 at $2/$10 - every
+    cost, budget check and ledger row 50% high, and the daily budget refusing
+    questions it could afford. Cache reads and writes are stated per model
+    because the ratio is not constant (Opus 5.5 reads at 0.05x, older models at
+    0.1x). `long_above` is Haiku 5.5's step: a request whose input, cached or
+    not, exceeds it is billed whole at the long rates.
+    """
+
+    input: Decimal
+    output: Decimal
+    cache_read: Decimal
+    cache_write: Decimal
+    long_above: int | None = None
+    long_input: Decimal | None = None
+    long_output: Decimal | None = None
+
+
+def _r(*values: str, long_above: int | None = None, long: tuple[str, str] | None = None) -> Rates:
+    i, o, cr, cw = (Decimal(v) for v in values)
+    if long is None:
+        return Rates(i, o, cr, cw)
+    return Rates(i, o, cr, cw, long_above, Decimal(long[0]), Decimal(long[1]))
+
+
+#: The models this system has called or may call. Earlier generations stay so a
+#: ledger row written against them can still be priced and reported.
+MODEL_RATES: dict[str, Rates] = {
+    "claude-opus-5-5": _r("4.00", "20.00", "0.20", "5.00"),
+    # The cache read is $0.20 in the bundled API notes and $0.10 on the live
+    # pricing page; the higher figure is kept, because a cap that counts low is
+    # the direction of error that spends money nobody approved.
+    "claude-sonnet-5-5": _r("2.00", "10.00", "0.20", "2.50"),
+    "claude-haiku-5-5": _r(
+        "0.10", "0.50", "0.01", "0.125", long_above=100_000, long=("0.50", "2.50")
+    ),
+    "claude-opus-5": _r("5.00", "25.00", "0.50", "6.25"),
+    "claude-sonnet-5": _r("2.00", "10.00", "0.20", "2.50"),
+    "claude-haiku-4-5": _r("1.00", "5.00", "0.10", "1.25"),
 }
+
+#: The server-side web search tool: $10 per 1,000 searches, on top of tokens.
+#: A search that errors is not billed (the API says so), and the count the
+#: response reports - `usage.server_tool_use.web_search_requests` - is of
+#: searches run, so it is what is charged here.
+WEB_SEARCH_USD = Decimal("0.01")
 
 MODEL_IDS: dict[Tier, str] = {
     Tier.REASON: "claude-opus-5",
@@ -131,6 +169,18 @@ MODEL_IDS: dict[Tier, str] = {
     Tier.CHEAP: "claude-haiku-4-5",
     Tier.EMBED: "text-embedding-3-small",
     Tier.LOCAL: "finbert-local",
+}
+
+# USD per million tokens, first-party API rates (docs/08 section 4), as an
+# (input, output) pair per tier - DERIVED from the model each tier resolves to,
+# so the two tables cannot drift apart again.
+PRICING_USD: dict[Tier, tuple[Decimal, Decimal]] = {
+    **{
+        t: (MODEL_RATES[MODEL_IDS[t]].input, MODEL_RATES[MODEL_IDS[t]].output)
+        for t in (Tier.REASON, Tier.BALANCED, Tier.CHEAP)
+    },
+    Tier.EMBED: (Decimal("0.05"), Decimal("0")),
+    Tier.LOCAL: (Decimal("0"), Decimal("0")),
 }
 
 
@@ -159,8 +209,11 @@ class Usage:
 
     input_tokens: int
     output_tokens: int
-    cached_input_tokens: int = 0  # cache_read_input_tokens, billed at 0.1x
-    cache_write_tokens: int = 0  # cache_creation_input_tokens, billed at 1.25x
+    cached_input_tokens: int = 0  # cache_read_input_tokens, the model's cache-read rate
+    cache_write_tokens: int = 0  # cache_creation_input_tokens, its cache-write rate
+    #: `usage.server_tool_use.web_search_requests`: searches the server tool
+    #: ran, each billed at WEB_SEARCH_USD on top of the tokens.
+    web_search_requests: int = 0
 
 
 @dataclass(frozen=True)
@@ -457,20 +510,82 @@ CACHE_MIN_FLOOR = 512
 CACHE_MIN_CEILING = 4096
 
 
-def cost_usd(tier: Tier, usage: Usage, pricing: tuple[Decimal, Decimal] | None = None) -> Decimal:
-    """Fresh input at the base rate, reads at a tenth, writes at a quarter over.
+def cost_usd(
+    tier: Tier,
+    usage: Usage,
+    pricing: tuple[Decimal, Decimal] | None = None,
+    model_id: str | None = None,
+) -> Decimal:
+    """What one call cost, in USD.
 
     `pricing` is the (input, output) USD-per-million pair the BACKEND declares
     for this call, when it is not on the first-party table: a free provider
-    passes zero. None bills at the tier's own rate, as before.
+    passes zero, and reads and writes scale its input rate. Otherwise the call
+    is priced on the card of the model that answered (`model_id`, or the one
+    the tier resolves to) - cache reads, writes and Haiku 5.5's long-prompt
+    step included - plus WEB_SEARCH_USD per server-side search.
 
     Every term is clamped at zero, so the sum can never be negative whatever a
     malformed usage block says.
     """
-    in_rate, out_rate = pricing if pricing is not None else PRICING_USD[tier]
     million = Decimal(1_000_000)
-    fresh = Decimal(max(usage.input_tokens, 0)) / million * in_rate
-    cached = Decimal(max(usage.cached_input_tokens, 0)) / million * in_rate * CACHE_READ_MULTIPLIER
-    written = Decimal(max(usage.cache_write_tokens, 0)) / million * in_rate * CACHE_WRITE_MULTIPLIER
-    out = Decimal(max(usage.output_tokens, 0)) / million * out_rate
-    return fresh + cached + written + out
+    fresh_n = Decimal(max(usage.input_tokens, 0))
+    read_n = Decimal(max(usage.cached_input_tokens, 0))
+    write_n = Decimal(max(usage.cache_write_tokens, 0))
+    out_n = Decimal(max(usage.output_tokens, 0))
+    searches = Decimal(max(usage.web_search_requests, 0)) * WEB_SEARCH_USD
+    rates = None if pricing is not None else MODEL_RATES.get(model_id or MODEL_IDS[tier])
+    if rates is None:
+        in_rate, out_rate = pricing if pricing is not None else PRICING_USD[tier]
+        return (
+            fresh_n / million * in_rate
+            + read_n / million * in_rate * CACHE_READ_MULTIPLIER
+            + write_n / million * in_rate * CACHE_WRITE_MULTIPLIER
+            + out_n / million * out_rate
+            + searches
+        )
+    in_rate, out_rate, read_rate, write_rate = (
+        rates.input,
+        rates.output,
+        rates.cache_read,
+        rates.cache_write,
+    )
+    if rates.long_above is not None and fresh_n + read_n + write_n > rates.long_above:
+        scale = (rates.long_input or rates.input) / rates.input
+        in_rate, read_rate, write_rate = in_rate * scale, read_rate * scale, write_rate * scale
+        out_rate = rates.long_output or rates.output
+    return (
+        fresh_n / million * in_rate
+        + read_n / million * read_rate
+        + write_n / million * write_rate
+        + out_n / million * out_rate
+        + searches
+    )
+
+
+def worst_case_usd(
+    model_id: str,
+    input_tokens: int,
+    max_tokens: int,
+    *,
+    searches: int = 0,
+) -> Decimal:
+    """The most one call can cost, to reserve against a budget BEFORE it is made.
+
+    A check of what has already been spent lets the last call overshoot by its
+    whole cost; this is that cost, priced as if every input token were fresh
+    (cache writes aside, the dearest way to be billed) and every output token
+    used, at the long-prompt rate when the input could cross the step."""
+    rates = MODEL_RATES.get(model_id)
+    if rates is None:
+        return Decimal(0)
+    in_rate, out_rate = rates.input, rates.output
+    if rates.long_above is not None and input_tokens > rates.long_above:
+        in_rate, out_rate = rates.long_input or in_rate, rates.long_output or out_rate
+    million = Decimal(1_000_000)
+    write_rate = rates.cache_write * (in_rate / rates.input)
+    return (
+        Decimal(max(input_tokens, 0)) / million * max(in_rate, write_rate)
+        + Decimal(max(max_tokens, 0)) / million * out_rate
+        + Decimal(max(searches, 0)) * WEB_SEARCH_USD
+    )
