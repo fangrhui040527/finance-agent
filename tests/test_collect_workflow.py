@@ -179,14 +179,10 @@ def test_web_evidence_runs_after_the_prices_and_marks_before_the_digest_with_the
 def test_no_workflow_exports_the_paid_key_from_all_secret():
     """Only the evidence step asks keys_from_blob for ANTHROPIC_API_KEY, and it
     does not write GITHUB_ENV; every other reader gets everything but it."""
-    import glob
-
-    import yaml
-
     askers = []
-    for path in sorted(glob.glob(".github/workflows/*.yml")):
-        with open(path, encoding="utf-8") as fh:
-            wf = yaml.safe_load(fh)
+    for wf_path in sorted(Path(".github/workflows").glob("*.yml")):
+        path = wf_path.as_posix()  # one spelling on every OS
+        wf = yaml.safe_load(wf_path.read_text(encoding="utf-8"))
         for job in wf.get("jobs", {}).values():
             for s in job.get("steps", []):
                 run = str(s.get("run", ""))
