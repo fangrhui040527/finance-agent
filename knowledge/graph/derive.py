@@ -373,15 +373,38 @@ def ready(graph: str | Path, corpus: str | Path | None = None) -> bool:
 
         stores.ensure(corpus)
         if _pinned is not None and _pinned != inputs_key():
-            _sync_in_a_fresh_process()
+            if _behind(graph, corpus):
+                _sync_in_a_fresh_process()
         else:
             sync(graph, corpus)
     return graph.exists() and not vacant(graph)
 
 
+def _behind(graph: Path, corpus: Path) -> bool:
+    """Is there anything for a derivation to do? Cheap: the stamp against the
+    inputs and the corpus's last row. A long-lived process asks before it
+    spawns a fresh one, so after one change to the inputs it does not spawn
+    one on every read for the rest of its life."""
+    stamp = _read_stamp(graph)
+    if not graph.exists() or stamp is None or stamp.get("inputs") != inputs_key():
+        return True
+    try:
+        con = _corpus(corpus)
+    except DeriveError:
+        return True
+    try:
+        mark = _watermark(con)
+        return not _holds(con, stamp) or (
+            mark is not None and mark.rowid > int(stamp.get("corpus_rowid") or 0)
+        )
+    finally:
+        con.close()
+
+
 def _sync_in_a_fresh_process() -> None:
     """The inputs changed under a long-lived process: derive in one that loads
-    them. `ask.py stores graph` works on the repository's own paths."""
+    them. `ask.py stores graph` works on the repository's own paths, which are
+    the only ones such a process (the MCP server) reads the graph from."""
     import subprocess
     import sys
 

@@ -103,6 +103,7 @@ def test_a_run_that_cannot_push_leaves_its_commit_on_a_rescue_branch():
     # Every way out but a push reaches it: a failing fetch or reset exits the
     # step under `bash -e`, so the trap is set before any of them can.
     assert after.index("trap keep ERR") < after.index("git pull --rebase")
+    assert "trap 'keep; exit 1' INT TERM" in after  # cancelled, or out of time
     gave_up = run.split("for attempt in 1 2 3", 1)[1].split("done", 1)[1]
     assert gave_up.split("keep", 1)[1].strip().endswith("exit 1")
     # A push rejected after a clean rebase falls through to the retry loop
@@ -127,5 +128,8 @@ def test_a_store_not_published_fails_the_job_after_the_commit():
 def test_ci_proves_the_committed_parts_reassemble_the_committed_corpus():
     ci = yaml.safe_load((WORKFLOW.parent / "ci.yml").read_text(encoding="utf-8"))
     runs = [str(s.get("run", "")) for s in ci["jobs"]["test"]["steps"]]
-    assert any("ask.py stores verify --whole" in r for r in runs)
+    verify = next(i for i, r in enumerate(runs) if "ask.py stores verify --whole" in r)
+    # Before the tests: one that opens the corpus applies a new migration to the
+    # checked-out file, and this compares the committed bytes.
+    assert verify < next(i for i, r in enumerate(runs) if "pytest" in r)
     assert any(r.count("ask.py stores graph --out") == 2 for r in runs)

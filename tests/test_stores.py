@@ -371,3 +371,49 @@ def test_the_committed_parts_reassemble_to_their_manifest():
     m = stores.verify(corpus)
     assert all(p["bytes"] <= stores.PART_BYTES for p in m.parts)
     assert all(p["bytes"] < stores.REFUSE_BYTES for p in m.parts)
+
+
+def test_a_journal_beside_a_file_that_is_not_a_database_is_moved_with_it(db):
+    """SQLite opening a file that is not a database still opens its -wal, and
+    on close checkpoints the journal into the file and unlinks it. So nothing
+    here connects to such a file: it and its journal are renamed together."""
+    stores.split(db, part_bytes=SMALL)
+    c = Corpus(db)
+    c.add(_article(5151, "Only in the journal"), "fixture")
+    wal = db.with_name(db.name + "-wal").read_bytes()
+    c.close()
+    pointer = b"version https://git-lfs.github.com/spec/v1\n"
+    db.write_bytes(pointer)
+    db.with_name(db.name + "-wal").write_bytes(wal)
+    assert stores.state(db).name == stores.CONFLICT
+    assert stores.ensure(db).name == stores.CONFLICT
+    assert db.with_name(db.name + "-wal").read_bytes() == wal, "classifying it kept the journal"
+    stores.assemble(db, replace=True)
+    aside = next(
+        p for p in db.parent.iterdir() if p.name.startswith("corpus.local-") and p.suffix == ".db"
+    )
+    assert aside.read_bytes() == pointer
+    assert aside.with_name(aside.name + "-wal").read_bytes() == wal
+
+
+def test_a_write_between_the_decision_and_the_replace_is_never_overwritten(db, monkeypatch):
+    """The lock keeps two assemblers apart; it does not stop a Corpus writer.
+    A row committed after the file was judged stale makes it busy, not lost."""
+    stores.split(db, part_bytes=SMALL)
+    other = _publish_elsewhere(db, 10, 600)
+    _pull(db, other)
+    real = stores._release
+
+    def a_writer_gets_in_first(path):
+        _corpus(db, 1, start=7000)
+        real(path)
+
+    monkeypatch.setattr(stores, "_release", a_writer_gets_in_first)
+    with pytest.raises(stores.StoreBusy, match="written to"):
+        stores.assemble(db)
+    monkeypatch.undo()
+    con = sqlite3.connect(db)
+    try:
+        assert con.execute("SELECT 1 FROM articles WHERE doc_id = 'doc-07000'").fetchone()
+    finally:
+        con.close()

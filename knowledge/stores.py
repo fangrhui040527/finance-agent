@@ -341,10 +341,25 @@ def _holds(con: sqlite3.Connection, tips: dict[str, dict]) -> bool:
     return True
 
 
+_HEADER = b"SQLite format 3\x00"
+
+
+def _is_sqlite(path: Path) -> bool:
+    """From the bytes, before any connection: SQLite opening a file that is not
+    a database still opens its -wal, and on close checkpoints the journal into
+    the file and unlinks it - the rows in it go with it."""
+    try:
+        with path.open("rb") as f:
+            return f.read(len(_HEADER)) == _HEADER
+    except OSError:
+        return False
+
+
 def _connect(db: Path) -> sqlite3.Connection:
-    con = sqlite3.connect(str(db), timeout=10)
-    con.execute("PRAGMA query_only = 1")
-    return con
+    """Read-only, by the URI: a classification must never checkpoint, recover
+    or unlink anyone's journal on close, which a read-write connection does
+    even under `PRAGMA query_only`."""
+    return sqlite3.connect(f"{db.resolve().as_uri()}?mode=ro", uri=True, timeout=10)
 
 
 # -- the lock ----------------------------------------------------------------
@@ -358,9 +373,13 @@ def _locked(db: Path, seconds: float | None = None) -> Iterator[None]:
     stale, and the slower one's replace lands on the faster one's file after
     that one had already written to it."""
     lock = _side(db, ".lock")
-    lock.parent.mkdir(parents=True, exist_ok=True)
     deadline = time.monotonic() + (LOCK_SECONDS if seconds is None else seconds)
-    with lock.open("a+b") as f:
+    try:
+        lock.parent.mkdir(parents=True, exist_ok=True)
+        handle = lock.open("a+b")
+    except OSError as e:  # a read-only checkout: busy, which ensure reports and goes on
+        raise StoreBusy(f"{lock} cannot be opened: {e}") from e
+    with handle as f:
         if os.name == "nt":  # pragma: no cover - exercised on the windows CI cell
             import msvcrt
 
@@ -448,6 +467,12 @@ def _classify(db: Path, m: Manifest, *, keep: bool = False) -> tuple[State, Path
         return State(MISSING, f"{db} is not assembled"), None
     if not wal and _db_sha(db) == m.sha256:
         return State(CURRENT, f"{len(m.parts)} parts, {m.bytes:,} bytes"), None
+    if not _is_sqlite(db):
+        return State(
+            CONFLICT,
+            f"{db} is not a database (an LFS pointer, a partial copy?). "
+            "`ask.py stores assemble --replace` moves it and its journal aside",
+        ), None
     try:
         con = _connect(db)
         try:
@@ -653,6 +678,8 @@ def _release(db: Path) -> None:
             if side.exists():
                 side.unlink()
         return
+    if not _is_sqlite(db):
+        return  # not a database: nothing of SQLite's holds it, and no connection may touch its journal
     try:
         con = sqlite3.connect(str(db), timeout=10)
         try:
@@ -660,13 +687,23 @@ def _release(db: Path) -> None:
         finally:
             con.close()
     except sqlite3.DatabaseError:
-        return  # not a database: nothing of SQLite's holds it
+        return
     for suffix in ("-wal", "-shm"):
         side = _side(db, suffix)
         if side.exists():
             raise StoreBusy(
                 f"{side} is still there after a clean close: another process has {db} open"
             )
+
+
+def _signature(db: Path) -> tuple | None:
+    """What a committed write would have changed by the time `_release` has
+    folded any journal into the file: its size and mtime. (Not the -wal: a
+    read-only connection may leave an empty one, and `_release` removes it.)"""
+    if not db.exists():
+        return None
+    st = db.stat()
+    return (st.st_size, st.st_mtime_ns)
 
 
 def _move_aside(db: Path) -> Path:
@@ -692,14 +729,24 @@ def assemble(db: str | Path, *, replace: bool = False) -> State:
     version holds every row it does. A file that is ahead is left alone (its
     rows are the next split's). A conflict raises; with `replace=True` the local
     file and its journal are moved to `<stem>.local-<UTC>.db` first and the
-    move is reported, so nothing is ever deleted to make room. Decided and done
-    under a lock, so a second process cannot write between the two.
+    move is reported, so nothing is ever deleted to make room.
+
+    A file that needs nothing is answered without the lock (every command asks).
+    One that needs writing is decided again under the lock, so a second process
+    cannot judge the same file stale and replace the first one's writes; and
+    the file must be unchanged since that decision when it is replaced - a
+    writer that committed in between (the lock does not stop a Corpus) makes it
+    busy, not overwritten.
     """
     db = Path(db)
     m = read_manifest(db)
     if m is None:
         raise StoreError(f"no manifest at {manifest_path(db)}; {db} is not carried as parts")
+    first = _classify(db, m)[0]
+    if first.name in (CURRENT, AHEAD):
+        return first
     with _locked(db):
+        seen = _signature(db)
         now, built = _classify(db, m, keep=True)
         if now.name in (CURRENT, AHEAD):
             return now
@@ -709,9 +756,12 @@ def assemble(db: str | Path, *, replace: bool = False) -> State:
                 if not replace:
                     raise StoreConflict(now.detail)
                 aside = _move_aside(db)
+                seen = _signature(db)
             if built is None:
                 built = _build(db, m)
             _release(db)
+            if _signature(db) != seen:
+                raise StoreBusy(f"{db} was written to while it was being assembled; left as it is")
             try:
                 os.replace(built, db)
             except PermissionError as e:  # Windows: another process has it open
