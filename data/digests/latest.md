@@ -1,14 +1,22 @@
 # Digest 2026-10-22
 
-Generated 2026-10-22 00:01 UTC · slot `all` · 22474 articles in the corpus, 6045 observations, 4245 events in the fact book.
+Generated 2026-10-22 10:10 UTC · slot `all` · 22726 articles in the corpus, 6050 observations, 4245 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- quiet: nothing collected for this name in the window
+- tone: 5 stories from 5 sources, polarity +0.20, peak intensity 0.00, uncertainty 0.00 · 3 escalated
+- 2026-10-22 www.businesstoday.com.my — Funding Cost, Bond Market Volatility Weighs On Maybank’s Earnings Growth [q 0.80, tone +1.0] ★
+- 2026-10-22 www.ad-hoc-news.de — Fitch keeps Medco at BB- and Maybank targets Medco Energi stock at IDR 2,500 [q 0.65, tone +0.0] ★
+- 2026-10-21 www.moomoo.com — INARI-HG (MAYBANK INVESTMENT BANK BHD) Stock Price, Chart, and Forecast [q 0.65, tone +0.0] ★
+- 2026-10-22 mb.com.ph — Maybank Women Eco-Weavers (MWEW) launches second Weaving Training Center in the Philippines [q 0.65, tone +0.0]
+- 2026-10-22 www.minichart.com.sg — Why Keppel’s SGD3.7b Asset Monetisation Keeps Maybank at BUY [q 0.65, tone +0.0]
 
 ### Tenaga (MYX:5347)
-- quiet: nothing collected for this name in the window
+- tone: 3 stories from 2 sources, polarity +0.67, peak intensity 0.00, uncertainty 0.23 · 2 escalated
+- 2026-10-22 www.thestar.com.my — Kerjaya Prospek consortium secures RM568.2mil TNB contract [q 0.80, tone +1.0] ★
+- 2026-10-22 www.businesstoday.com.my — Kerjaya Prospek Bags RM568 Million TNB Substation Contract In Terengganu [q 0.80, tone +1.0] ★
+- 2026-10-22 www.thestar.com.my — Trading ideas: Sunway Healthcare, Encorp, AME REIT, SkyeChip, TNB, Tien Wah, ES Sunlogy, Pantech, Revenue IF, CLMT, Mudajaya [q 0.80, tone +0.0]
 
 ### Petronas Chemicals (MYX:5183)
 - quiet: nothing collected for this name in the window
@@ -20,7 +28,8 @@ Generated 2026-10-22 00:01 UTC · slot `all` · 22474 articles in the corpus, 60
 - quiet: nothing collected for this name in the window
 
 ### Genting (MYX:3182)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-10-21 commercialobserver.com — Genting Lands $500M to Refi Mixed - Use Omni Center in Miami [q 0.65, tone +0.0]
 
 ### NVIDIA (XNAS:NVDA)
 - tone: 62 stories from 23 sources, polarity +0.13, peak intensity 0.00, uncertainty 0.10 · 13 escalated
@@ -86,6 +95,20 @@ Generated 2026-10-22 00:01 UTC · slot `all` · 22474 articles in the corpus, 60
 | 10y minus 2y Treasury spread, % | 0.38 | 2026-10-19 | +0.03 | fred |
 | US unemployment rate, % | 4.20 | 2026-09-01 | +0.1 | fred |
 | CBOE VIX, index | 18.44 | 2026-10-19 | -1.55 | fred |
+
+## Collection
+
+| at (UTC) | source | status | fetched | kept | stored | detail |
+|---|---|---|---|---|---|---|
+| 10:09 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
+| 10:09 | twse_openapi | ok | 8 | 0 | 0 | facts 5;  |
+| 10:08 | jin10_flash | degraded | 20 | 19 | 19 | facts 0; window not covered back to 2026-10-21 22:41Z; the oldest item read is 2 |
+| 10:08 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 10:08 | nst_business | degraded | 150 | 147 | 143 | window overflow: all 150 dated items are newer than the window's start (2026-10- |
+| 10:08 | fmt_business | degraded | 50 | 50 | 50 | window overflow: all 50 dated items are newer than the window's start (2026-10-2 |
+| 10:08 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Petronas Chemicals, IHH, Press Metal, Genting, Maybank, Tenaga |
+| 10:08 | google_news | ok | 43 | 43 | 35 | read but empty: Petronas Chemicals; named the company: 11 of 43 (lowest: IHH 0/3 |
+| 10:08 | gdelt | ok | 5 | 5 | 5 | grouped 3 names per request; 2 requests (HTTP 429 on request 2: the rest of the  |
 
 ---
 

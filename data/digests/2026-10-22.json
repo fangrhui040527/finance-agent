@@ -1,18 +1,100 @@
 {
-  "collection": [],
+  "collection": [
+    {
+      "at": "2026-10-22T10:09:01.498913+00:00",
+      "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-22T10:09:01.497323+00:00",
+      "detail": "facts 5; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-22T10:08:56.248013+00:00",
+      "detail": "facts 0; window not covered back to 2026-10-21 22:41Z; the oldest item read is 2026-10-22 10:00Z, so 11.3h of the window was never served",
+      "fetched": 20,
+      "kept": 19,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 19
+    },
+    {
+      "at": "2026-10-22T10:08:55.149634+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-22T10:08:53.259087+00:00",
+      "detail": "window overflow: all 150 dated items are newer than the window's start (2026-10-21 10:10Z); the oldest is 2026-10-21 13:46Z, so 3.6h scrolled off unseen; read 3 pages, the most this feed may; page 2 starts 3.3h before page 1 ends (2026-10-22 03:40Z under 2026-10-22 06:56Z): the items between were served by neither",
+      "fetched": 150,
+      "kept": 147,
+      "source": "nst_business",
+      "status": "degraded",
+      "stored": 143
+    },
+    {
+      "at": "2026-10-22T10:08:49.305679+00:00",
+      "detail": "window overflow: all 50 dated items are newer than the window's start (2026-10-21 10:10Z); the oldest is 2026-10-21 12:52Z, so 2.7h scrolled off unseen",
+      "fetched": 50,
+      "kept": 50,
+      "source": "fmt_business",
+      "status": "degraded",
+      "stored": 50
+    },
+    {
+      "at": "2026-10-22T10:08:48.896426+00:00",
+      "detail": "read but empty: Petronas Chemicals, IHH, Press Metal, Genting, Maybank, Tenaga",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-22T10:08:47.010855+00:00",
+      "detail": "read but empty: Petronas Chemicals; named the company: 11 of 43 (lowest: IHH 0/3, Press Metal 0/4, Genting 1/7)",
+      "fetched": 43,
+      "kept": 43,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 35
+    },
+    {
+      "at": "2026-10-22T10:08:44.837629+00:00",
+      "detail": "grouped 3 names per request; 2 requests (HTTP 429 on request 2: the rest of the slot is deferred, not asked); read but empty: IHH, Press Metal; failed: GDELT fetch failed: HTTP Error 429: Too Many Requests (Maybank, Tenaga, Petronas Chemicals); named the company: 1 of 5 (lowest: IHH + Press Metal + Genting 1/5)",
+      "fetched": 5,
+      "kept": 5,
+      "source": "gdelt",
+      "status": "ok",
+      "stored": 5
+    }
+  ],
   "counts": {
-    "articles": 22474,
+    "articles": 22726,
     "documents": 0,
-    "escalated": 3192,
+    "escalated": 3197,
     "events": 4245,
     "failed_sweeps": 86,
-    "linked": 13344,
-    "observations": 6045,
+    "linked": 13356,
+    "observations": 6050,
     "series": 31,
-    "sweeps": 1040
+    "sweeps": 1049
   },
   "day": "2026-10-22",
-  "generated_at": "2026-10-22 00:01 UTC",
+  "generated_at": "2026-10-22 10:10 UTC",
   "macro": [
     {
       "change": "-0.02",
@@ -145,23 +227,125 @@
   ],
   "names": [
     {
-      "escalated": 0,
+      "escalated": 3,
       "events": [],
       "instrument_id": "MYX:1155",
       "label": "Maybank",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMitgFBVV95cUxNOTFpb2J2S3gyQkxUa2hKY2xjQlFlNzRaZU9uZUx3T3F2S29DOUdmSUlKM3gyYWZoVGRRU2pDUHhLOGFuUGUyTHh3MUxKdHdaNEM2QmtxbjdsSUQ3MFl1MjNlakpnN1I2VUhST29VcmlQNDJCTHZmNFVrN3NueUg2RXRNVW5QcEVSdGJZdGJXZkhkbFJxTjZDXzNrak5FTTFRNVJzVlJoMXpnNHVoLUFycERmWE5NUQ?oc=5",
+          "domain": "www.businesstoday.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-22T02:05:42+00:00",
+          "quality": 0.8,
+          "title": "Funding Cost, Bond Market Volatility Weighs On Maybank\u2019s Earnings Growth",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxQZE9IYnpkS0E5TTRKaXEtVF9yWkdrN29hNHp0RnlOVlJVOHNmUGR3LVRhbG4yV1RueERzb1BVdVBFWmdlbTZpV3JLeW5sQ3oxeU5Ea3FuZ1dRZ3dCUkFvTnotaFQ1V21tek0tTGVNLS1vQ2Fqbmx6ZFZvbVhRNVQ2bVVGR0dneXNIcUIwVVUyWFZTM2ZwMEV2NVdiMXNyVjJXcXhjbmxFMjI1bHRHbmJ4MzJfbnBWSDE5VlEtQjBoY3A3Q1VaRVBqYjV0R1M0enAyMFRPVQ?oc=5",
+          "domain": "www.ad-hoc-news.de",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-22T07:09:28+00:00",
+          "quality": 0.65,
+          "title": "Fitch keeps Medco at BB- and Maybank targets Medco Energi stock at IDR 2,500",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiXkFVX3lxTE5wSzVUUlJDRVpiQ1pqc18tcURWM3JxaWJQN0ZKQ2hYT1daUXBKV1hfbXgzZjJGcG52Mk9sTms1MG5SamJoYzRTb0ljaDdWMkxZUko4UTJuVzRGOGxNWVE?oc=5",
+          "domain": "www.moomoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-21T15:51:01+00:00",
+          "quality": 0.65,
+          "title": "INARI-HG (MAYBANK INVESTMENT BANK BHD) Stock Price, Chart, and Forecast",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiugFBVV95cUxPRXBmYWFaeENPZjNqcFN0dUhnX3V4WlYwa0F6ekZYMnZGN08yaDBUckc3LWJtOG1UVnQ2RGdPVG1DcXdvY05qaGo5QVdoRXptajJ6Tk5mOXE0QVlHbHZGSE9UVTI1MHR0ODRpSlJqc2trTHRYSWF5N2p1ZmdrSmtpQURCU09uV0tldldvTzA5Z2tIMFZxWjN3MmE2Z01YTXd0eHFyWUZlZ2EwZFFxVUFFcHR6X29sbHdQZmc?oc=5",
+          "domain": "mb.com.ph",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-22T01:31:57+00:00",
+          "quality": 0.65,
+          "title": "Maybank Women Eco-Weavers (MWEW) launches second Weaving Training Center in the Philippines",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiogFBVV95cUxPNWJZN2pMR1RENVR2bFY4akVrdXc5RURnd3F2UjhLcGVlcE5OYWVTRkw5RGw3dXcxejd4ZU50bnBkQi1rY1hEcXlrak1URkJVVUVmVnFjVklSdWJLYVppUVowRTIydTRfaHlNbThjNTJrRFVqMTlfaFlLTGNfMjJvNnJuQVAtaWxQWGxaaU1raHZHcVFrM2hJblByeG1VNlg3UlE?oc=5",
+          "domain": "www.minichart.com.sg",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-22T01:26:00+00:00",
+          "quality": 0.65,
+          "title": "Why Keppel\u2019s SGD3.7b Asset Monetisation Keeps Maybank at BUY",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 5,
+        "polarity_mean": 0.2,
+        "sources": 5,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
-      "escalated": 0,
+      "escalated": 2,
       "events": [],
       "instrument_id": "MYX:5347",
       "label": "Tenaga",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiugFBVV95cUxPQjBzZmpWWWJ6bXhXU1J6dlZCNVdiRi1tbmE5SHB3dHo3WVZvZldOTjhsb3dfVDB4MGxnRnVqUzNETXJXYWR4NnAyMnVVOGxFQm9vTWNMQk03U1ZxczhnRmhIX2xNallxbE1ucTUwLTVkMlFRQk5sVURmNU4xc2VhWW0yZThPcW5oRExOSC1QZEhONzZHOTVhNDRmNHltdmJRaEZTcVZmUkQwMGw2T1RqWTBVb1RUSFhfbEE?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-22T09:55:00+00:00",
+          "quality": 0.8,
+          "title": "Kerjaya Prospek consortium secures RM568.2mil TNB contract",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxNVkh5QXg5MWhqbkY4M09ZRVpoR3FGQlRZb29Rb2RRU3RPSXExSFc3dG5Bd0E5TVJWbHktenI4X3lvMHZBNi1IZk9HU1Q1c3gwNDY5Z0VkbTJfVTJMaGg5eE5BSXFrZ3dtbldkY3ZOT3kwX1Qybkd6cmRkQ0d2M3d2aU1uYjQ1cmk0WlUzamhaeUJYckEwTE9GYUFuNmo2N01zQld0R0lVS0J0c3F3a2xpaUZYWlFiZ3NX?oc=5",
+          "domain": "www.businesstoday.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-22T09:54:20+00:00",
+          "quality": 0.8,
+          "title": "Kerjaya Prospek Bags RM568 Million TNB Substation Contract In Terengganu",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMihAJBVV95cUxOdEVLdU5ZRThtUzVab3FlcUVIa0Q4dFdZSm5IcmhVMmFuV0FsX1c0LTdWTGoxbE9BS0t3NkxUMzdRODlFOXpGeF93cTVqcnJCWGo2cjQycVJhcHJwdmdBenU2UEN6eXZtS0tUTDJva3NhMXdHdUZQMHZ4RU1hOUZtTGVtQV83dXJZOE1FUXdRMjdhNkhYZHFkUlN5ekpQYUd4MWVJTGZKbm84SEQ0MFNDLVE0RGJyVlJpR2UzV3Bmck91dlNsemprVFpfQWNnYTNhZFpnSk4zQ2V0ZnlkSDZIR0FlbmJ1SHlOd3ptaC1uZ1RFVUtxZ255X0xtZC1SLXBNc2RxMQ?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-22T00:37:00+00:00",
+          "quality": 0.8,
+          "title": "Trading ideas: Sunway Healthcare, Encorp, AME REIT, SkyeChip, TNB, Tien Wah, ES Sunlogy, Pantech, Revenue IF, CLMT, Mudajaya",
+          "uncertainty": 0.6944444444444444
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 3,
+        "polarity_mean": 0.667,
+        "sources": 2,
+        "uncertainty_mean": 0.231
+      },
       "upcoming": []
     },
     {
@@ -200,8 +384,26 @@
       "instrument_id": "MYX:3182",
       "label": "Genting",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "gdelt:https://commercialobserver.com/2026/10/genting-miami-omni-center-wells-fargo/",
+          "domain": "commercialobserver.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-21T23:00:00+00:00",
+          "quality": 0.65,
+          "title": "Genting Lands $500M to Refi Mixed - Use Omni Center in Miami",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
