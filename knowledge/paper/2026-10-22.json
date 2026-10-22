@@ -1,0 +1,328 @@
+{
+ "day": "2026-10-22",
+ "written_at": "2026-10-22T22:55:00Z",
+ "phase": "full",
+ "week": 7,
+ "equity_usd": 1000.0,
+ "cash_usd": 1000.0,
+ "control_equity_usd": 947.91,
+ "control_return_to_date": -0.0521,
+ "drawdown": 0.0,
+ "control_drawdown": 0.0521,
+ "halted": false,
+ "marks": 35,
+ "positions": [],
+ "changes": [],
+ "control_changes": [],
+ "control_mark": {
+  "marked_on": "2026-10-22",
+  "equity_usd": 947.91,
+  "cash_usd": 406.02,
+  "positions_usd": 541.89,
+  "day_return": 0.0013,
+  "note": "no change; holdings as left by the 10-21 week-7 rebalance (MYX:8869, MYX:5183, MYX:3182, MYX:5225)"
+ },
+ "index_book": {
+  "mark": {
+   "marked_on": "2026-10-22",
+   "equity_usd": 980129.95,
+   "cash_usd": 198608.4,
+   "positions_usd": 781521.55,
+   "day_return": -0.0016,
+   "drawdown": 0.0199,
+   "held": 97,
+   "pending": 0
+  },
+  "cost_to_date_share_of_notional": 0.0097,
+  "since_2026_09_30": {
+   "index": -0.0199,
+   "decided": 0.0,
+   "control": -0.0328
+  },
+  "dividends": [
+   {
+    "count": 1
+   }
+  ],
+  "changes": {
+   "add": 1,
+   "dividend": 1,
+   "fees_usd": 7.95,
+   "fx_spread_usd": 21.35,
+   "slippage_usd": 7.84,
+   "cash_usd": -4193.19
+  },
+  "note": "the last pending week-7 target filled; 0 pending"
+ },
+ "caps": [
+  {
+   "cap": "largest name",
+   "value": "0.00%",
+   "limit": "25%",
+   "breached": false
+  },
+  {
+   "cap": "invested",
+   "value": "0.00%",
+   "limit": "80%",
+   "breached": false
+  },
+  {
+   "cap": "cash floor",
+   "value": "100.00%",
+   "limit": "20%",
+   "breached": false
+  },
+  {
+   "cap": "names held",
+   "value": "0",
+   "limit": "0",
+   "breached": false
+  },
+  {
+   "cap": "drawdown from peak",
+   "value": "0.00%",
+   "limit": "8% halts entries",
+   "breached": false
+  },
+  {
+   "cap": "turnover, 5 weekdays",
+   "value": "USD 0.00",
+   "limit": "USD 500.00",
+   "breached": false
+  }
+ ],
+ "prices": {
+  "bursa": "Thursday 2026-10-22 closes",
+  "us": "Thursday 2026-10-22 closes (tonight's us_close, 8bcb76f)",
+  "fx": "MYR 4.082 per USD (bnm, 2026-10-22)"
+ },
+ "fundable": [
+  {
+   "instrument_id": "MYX:1155",
+   "lot_usd": 244.24,
+   "share": 0.244,
+   "round_trip": 0.0098,
+   "lots": 1
+  },
+  {
+   "instrument_id": "MYX:5183",
+   "lot_usd": 110.0,
+   "share": 0.11,
+   "round_trip": 0.0202,
+   "lots": 2
+  },
+  {
+   "instrument_id": "MYX:5225",
+   "lot_usd": 195.74,
+   "share": 0.196,
+   "round_trip": 0.0119,
+   "lots": 1
+  },
+  {
+   "instrument_id": "MYX:8869",
+   "lot_usd": 170.01,
+   "share": 0.17,
+   "round_trip": 0.0135,
+   "lots": 1
+  },
+  {
+   "instrument_id": "MYX:3182",
+   "lot_usd": 33.07,
+   "share": 0.033,
+   "round_trip": 0.0641,
+   "lots": 7
+  },
+  {
+   "instrument_id": "XNAS:NVDA",
+   "lot_usd": 212.21,
+   "share": 0.212,
+   "round_trip": 0.0121,
+   "lots": 1
+  }
+ ],
+ "over_cap": {
+  "MYX:5347": 0.324,
+  "XNAS:AAPL": 0.348,
+  "XNAS:MSFT": 0.521
+ },
+ "ledger": {
+  "mark_days": 26,
+  "gap": "no routine ran 2026-10-02..10-06; no paper page and no decision for those days; no decision is backdated"
+ },
+ "attribution": null,
+ "decision": {
+  "recorded": true,
+  "weights": {},
+  "thesis": "All cash, the thirty-seventh all-cash row and the third decision of week 7 under full caps. The 2026-10-21 feedback page finds every book name not_significant on Wednesday: Press Metal rose a third session (+1.63%, 0.86 sigma, to 6.86) with nothing collected about it, Petronas Chemicals gave back Tuesday's rise (-2.00%, 0.56 sigma) with nothing collected, and NVIDIA's +2.54% read 0.93 sigma with GTC Berlin partner rows that state no figure for it. Thursday's closes (Genting -5.59% to 1.35, NVIDIA -4.40%) are not yet decomposed. No name carries a measured, sourced reason to expect it to beat cash over 21 sessions. Twelve all-cash claims are graded, all correct, against a control at -5.21%. Claim: nothing in the fundable universe beats cash over 21 sessions.",
+  "horizon": 21,
+  "confidence": 0.55,
+  "prediction_id": "paper-2026-10-22-allcash-21d-b718",
+  "grades_on": "2026-11-23",
+  "refusals": []
+ },
+ "stores": {
+  "decided_targets": 37,
+  "predictions": 37,
+  "outcomes": 12,
+  "index_targets": 291,
+  "control_targets": 11,
+  "index_pending": 0,
+  "made_at": "2026-10-22T22:48:30Z"
+ },
+ "evidence": {
+  "feedback_page": "knowledge/feedback/2026-10-21.md (b7987e0)",
+  "wednesday": "every book name not_significant; Press Metal 0.86 sigma, third session up, nothing collected; Petronas Chemicals 0.56 sigma, nothing collected; NVIDIA 0.93 sigma, mostly the market's",
+  "thursday_closes": "Genting -5.59% and NVIDIA -4.40% on 10-22, undecomposed",
+  "phase": "week 7, full caps"
+ },
+ "mistakes": [
+  "paper-2026-10-16-allcash-21d-2b02 filed Press Metal's -9.34% as not decomposed; decomposed it is 5.43 sigma and significant at 5%; its cause is still not in the store; 6.94 tonight against 7.17.",
+  "paper-2026-10-01-allcash-21d-5a1e is behind on IHH (+3.77%, 7.70 -> 7.99) and Petronas Chemicals (+8.72%, 4.13 -> 4.49) since the 10-01 closes; it grades on 10-31.",
+  "paper-2026-10-08-allcash-21d-7bb6's test (Genting above 1.93 before 11-07) stands at 1.35."
+ ],
+ "mistakes_checked": [
+  "paper-2026-10-21-allcash-21d-2c51: the 10-21 correction (control added IHH only; NVDA refused at the cash floor) holds in tonight's ledger",
+  "paper-2026-10-21-allcash-21d-2c51: Press Metal's rise without a sourced cause (0.86 sigma on 10-21, holds)",
+  "paper-2026-10-21-allcash-21d-2c51 grade date 2026-11-20"
+ ],
+ "grades_due": [
+  {
+   "prediction_id": "paper-2026-09-23-allcash-21d-b999",
+   "on": "2026-10-23"
+  },
+  {
+   "prediction_id": "paper-2026-09-24-allcash-21d-e5b2",
+   "on": "2026-10-24"
+  },
+  {
+   "prediction_id": "paper-2026-09-25-allcash-21d-468d",
+   "on": "2026-10-25"
+  },
+  {
+   "prediction_id": "paper-2026-09-26-allcash-21d-cf74",
+   "on": "2026-10-26"
+  },
+  {
+   "prediction_id": "paper-2026-09-27-allcash-21d-9d18",
+   "on": "2026-10-27"
+  },
+  {
+   "prediction_id": "paper-2026-09-28-allcash-21d-111e",
+   "on": "2026-10-28"
+  },
+  {
+   "prediction_id": "paper-2026-09-29-allcash-21d-7831",
+   "on": "2026-10-29"
+  }
+ ],
+ "lessons": [
+  "A day's largest moves belong to the page that decomposes them, not to the decision made the same night: Genting -5.59% and NVIDIA -4.40% were recorded here as closes, and the decision rests on the last decomposed day."
+ ],
+ "dividend_boundary": {
+  "decided": "2026-10-10T15:25:31Z",
+  "control": "2026-10-10T15:25:31Z",
+  "index": "2026-10-10T15:25:31Z",
+  "note": "marks before it are not restated; no credit to the decided or control book yet"
+ },
+ "graded": [
+  {
+   "prediction_id": "paper-2026-09-11-allcash-21d-8bf9",
+   "benchmark": -0.024,
+   "correct": true
+  },
+  {
+   "prediction_id": "paper-2026-09-12-allcash-21d-1661",
+   "benchmark": -0.024,
+   "correct": true
+  },
+  {
+   "prediction_id": "paper-2026-09-13-allcash-21d-5baf",
+   "benchmark": -0.0237,
+   "correct": true
+  },
+  {
+   "prediction_id": "paper-2026-09-14-allcash-21d-9d7e",
+   "benchmark": -0.0441,
+   "correct": true
+  },
+  {
+   "prediction_id": "paper-2026-09-15-allcash-21d-af55",
+   "benchmark": -0.0466,
+   "correct": true
+  },
+  {
+   "prediction_id": "paper-2026-09-16-allcash-21d-3865",
+   "benchmark": -0.0616,
+   "correct": true
+  },
+  {
+   "prediction_id": "paper-2026-09-17-allcash-21d-7667",
+   "benchmark": -0.0616,
+   "correct": true
+  },
+  {
+   "prediction_id": "paper-2026-09-18-allcash-21d-667a",
+   "benchmark": -0.0616,
+   "correct": true
+  },
+  {
+   "prediction_id": "paper-2026-09-19-allcash-21d-b7bd",
+   "benchmark": -0.0557,
+   "correct": true
+  },
+  {
+   "prediction_id": "paper-2026-09-20-allcash-21d-dbaf",
+   "benchmark": -0.0557,
+   "correct": true
+  },
+  {
+   "prediction_id": "paper-2026-09-21-allcash-21d-c04f",
+   "benchmark": -0.0533,
+   "correct": true
+  },
+  {
+   "prediction_id": "paper-2026-09-22-allcash-21d-33c5",
+   "benchmark": -0.0533,
+   "correct": true
+  }
+ ],
+ "closes": {
+  "MYX:1155": [
+   9.95,
+   9.97
+  ],
+  "MYX:5347": [
+   12.98,
+   13.24
+  ],
+  "MYX:5183": [
+   4.4,
+   4.49
+  ],
+  "MYX:5225": [
+   7.94,
+   7.99
+  ],
+  "MYX:8869": [
+   6.86,
+   6.94
+  ],
+  "MYX:3182": [
+   1.43,
+   1.35
+  ],
+  "XNAS:NVDA": [
+   221.97,
+   212.21
+  ],
+  "XNAS:AAPL": [
+   343.99,
+   348.22
+  ],
+  "XNAS:MSFT": [
+   532.95,
+   521.08
+  ]
+ }
+}
