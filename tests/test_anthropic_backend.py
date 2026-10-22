@@ -57,7 +57,7 @@ def test_blank_key_is_treated_as_missing():
 
 def test_a_prebuilt_client_skips_the_key_check():
     b = _backend([reply("hi")])
-    text, _ = b.complete("claude-sonnet-5", "q", None)
+    text, _ = b.complete("claude-sonnet-5-5", "q", None)
     assert text == "hi"
 
 
@@ -74,21 +74,21 @@ def test_nonsense_bounds_are_refused():
 def test_text_and_usage_come_back_off_the_wire():
     text, usage = _backend(
         [reply("answer", usage={"input_tokens": 120, "output_tokens": 45})]
-    ).complete("claude-sonnet-5", "q", None)
+    ).complete("claude-sonnet-5-5", "q", None)
     assert text == "answer"
     assert usage == Usage(120, 45)
 
 
 def test_multiple_text_blocks_are_joined():
     msg = reply(content=[{"type": "text", "text": "a"}, {"type": "text", "text": "b"}])
-    text, _ = _backend([msg]).complete("claude-sonnet-5", "q", None)
+    text, _ = _backend([msg]).complete("claude-sonnet-5-5", "q", None)
     assert text == "ab"
 
 
 def test_non_text_blocks_are_skipped_not_stringified():
     thinking = SimpleNamespace(type="thinking", thinking="hmm", text=None)
     msg = reply(content=[thinking, {"type": "text", "text": "real"}])
-    text, _ = _backend([msg]).complete("claude-sonnet-5", "q", None)
+    text, _ = _backend([msg]).complete("claude-sonnet-5-5", "q", None)
     assert text == "real"
 
 
@@ -101,16 +101,48 @@ def test_cache_reads_are_reported_so_cost_is_not_overstated():
             "cache_creation_input_tokens": 7,
         }
     )
-    _, usage = _backend([msg]).complete("claude-sonnet-5", "q", None)
+    _, usage = _backend([msg]).complete("claude-sonnet-5-5", "q", None)
     assert usage.cached_input_tokens == 100
     assert usage.cache_write_tokens == 7
     assert usage.input_tokens == 20  # the UNCACHED remainder, never re-derived
 
 
+def test_web_searches_are_read_off_server_tool_use_so_they_are_billed():
+    """Each server-side search bills $0.01 on top of the tokens. A call that
+    searched and was ledgered at zero searches under-reports exactly the spend
+    the monthly cap exists to bound."""
+    from decimal import Decimal
+
+    from core.llm.tiers import WEB_SEARCH_USD, cost_usd
+
+    msg = reply(usage={"input_tokens": 1000, "output_tokens": 200, "web_search_requests": 3})
+    _, usage = _backend([msg]).complete("claude-sonnet-5-5", "q", None)
+    assert usage.web_search_requests == 3
+    no_search = Usage(1000, 200)
+    assert cost_usd(Tier.BALANCED, usage) - cost_usd(Tier.BALANCED, no_search) == (
+        3 * WEB_SEARCH_USD
+    )
+    assert 3 * WEB_SEARCH_USD == Decimal("0.03")
+
+
+def test_no_server_tool_block_means_no_searches():
+    """Absent is the ordinary case - a call that used no server tool carries no
+    `server_tool_use` at all - and it reads as zero, never as an error."""
+    _, usage = _backend([reply()]).complete("claude-sonnet-5-5", "q", None)
+    assert usage.web_search_requests == 0
+    bare = SimpleNamespace(
+        content=[SimpleNamespace(type="text", text="x")],
+        usage=SimpleNamespace(input_tokens=5, output_tokens=1),
+        stop_reason="end_turn",
+    )
+    _, usage = _backend([bare]).complete("claude-sonnet-5-5", "q", None)
+    assert usage == Usage(5, 1)
+
+
 def test_a_response_with_no_usage_raises_rather_than_ledgering_zero():
     msg = SimpleNamespace(content=[], usage=None, stop_reason="end_turn")
     with pytest.raises(BackendError, match="no usage"):
-        _backend([msg]).complete("claude-sonnet-5", "q", None)
+        _backend([msg]).complete("claude-sonnet-5-5", "q", None)
 
 
 def test_non_numeric_usage_raises():
@@ -125,12 +157,12 @@ def test_non_numeric_usage_raises():
         stop_reason="end_turn",
     )
     with pytest.raises(BackendError, match="not numeric"):
-        _backend([bad]).complete("claude-sonnet-5", "q", None)
+        _backend([bad]).complete("claude-sonnet-5-5", "q", None)
 
 
 def test_empty_text_raises_because_silence_is_not_an_answer():
     with pytest.raises(BackendError, match="no text block"):
-        _backend([reply("")]).complete("claude-sonnet-5", "q", None)
+        _backend([reply("")]).complete("claude-sonnet-5-5", "q", None)
 
 
 # --- stop reasons carry their spend -------------------------------------------
@@ -141,14 +173,14 @@ def test_max_tokens_stop_reason_raises_rather_than_returning_half_a_thesis():
         "half", stop_reason="max_tokens", usage={"input_tokens": 900, "output_tokens": 4096}
     )
     with pytest.raises(Truncated) as exc:
-        _backend([msg]).complete("claude-opus-5", "q", None)
+        _backend([msg]).complete("claude-opus-5-5", "q", None)
     assert exc.value.usage == Usage(900, 4096)
 
 
 def test_refusal_is_surfaced_not_returned_as_an_answer():
     msg = reply("", stop_reason="refusal", usage={"input_tokens": 30, "output_tokens": 2})
     with pytest.raises(Declined, match="declined") as exc:
-        _backend([msg]).complete("claude-opus-5", "q", None)
+        _backend([msg]).complete("claude-opus-5-5", "q", None)
     assert isinstance(exc.value, BackendError) and exc.value.usage == Usage(30, 2)
 
 
@@ -156,7 +188,7 @@ def test_a_refusal_names_its_category_when_the_api_does():
     msg = reply("", stop_reason="refusal", usage={"input_tokens": 3, "output_tokens": 1})
     msg.stop_details = SimpleNamespace(type="refusal", category="cyber", explanation="no")
     with pytest.raises(Declined) as exc:
-        _backend([msg]).complete("claude-opus-5", "q", None)
+        _backend([msg]).complete("claude-opus-5-5", "q", None)
     assert exc.value.category == "cyber" and exc.value.explanation == "no"
 
 
@@ -165,7 +197,7 @@ def test_a_refusal_names_its_category_when_the_api_does():
 
 def test_request_carries_the_system_prompt_as_a_cacheable_block():
     fake = FakeAnthropic([reply()])
-    _backend(client=fake).complete("claude-sonnet-5", "q", "you are terse")
+    _backend(client=fake).complete("claude-sonnet-5-5", "q", "you are terse")
     sent = fake.calls[0]
     assert sent["system"] == [
         {"type": "text", "text": "you are terse", "cache_control": {"type": "ephemeral"}}
@@ -175,13 +207,13 @@ def test_request_carries_the_system_prompt_as_a_cacheable_block():
 
 def test_system_is_omitted_entirely_when_absent():
     fake = FakeAnthropic([reply()])
-    _backend(client=fake).complete("claude-sonnet-5", "q", None)
+    _backend(client=fake).complete("claude-sonnet-5-5", "q", None)
     assert "system" not in fake.calls[0]
 
 
 def test_max_tokens_is_sent_and_configurable():
     fake = FakeAnthropic([reply()])
-    _backend(client=fake, max_tokens=777).complete("claude-sonnet-5", "q", None)
+    _backend(client=fake, max_tokens=777).complete("claude-sonnet-5-5", "q", None)
     assert fake.calls[0]["max_tokens"] == 777
 
 
@@ -190,7 +222,7 @@ def test_the_profile_shapes_the_request_per_tier():
 
     fake = FakeAnthropic([reply()])
     _backend(client=fake).complete(
-        "claude-sonnet-5", "q", None, profile=REQUEST_PROFILES[Tier.BALANCED]
+        "claude-sonnet-5-5", "q", None, profile=REQUEST_PROFILES[Tier.BALANCED]
     )
     sent = fake.calls[0]
     assert sent["thinking"] == {"type": "adaptive"}
@@ -199,17 +231,42 @@ def test_the_profile_shapes_the_request_per_tier():
     assert sent["method"] == "create"
 
 
-def test_the_cheap_profile_sends_no_thinking_or_effort():
-    """Haiku 4.5 rejects thinking/effort with a 400; the profile must not guess."""
+def test_the_cheap_profile_sends_adaptive_thinking_at_low_effort_and_never_a_budget():
+    """Haiku 5.5 takes adaptive thinking and an effort level, and rejects the
+    older `budget_tokens` form with a 400; the profile must not guess."""
     from core.llm.tiers import REQUEST_PROFILES
 
     fake = FakeAnthropic([reply()])
     _backend(client=fake).complete(
-        "claude-haiku-4-5", "q", None, profile=REQUEST_PROFILES[Tier.CHEAP]
+        "claude-haiku-5-5", "q", None, profile=REQUEST_PROFILES[Tier.CHEAP]
     )
     sent = fake.calls[0]
-    assert "thinking" not in sent and "output_config" not in sent
-    assert sent["max_tokens"] == 1024
+    assert sent["thinking"] == {"type": "adaptive"}
+    assert "budget_tokens" not in sent["thinking"]
+    assert sent["output_config"] == {"effort": "low"}
+    assert sent["max_tokens"] == 4096
+
+
+@pytest.mark.parametrize("effort", [None, "low", "medium", "high", "xhigh", "max"])
+@pytest.mark.parametrize("tier", [Tier.REASON, Tier.BALANCED, Tier.CHEAP])
+def test_no_request_carries_a_parameter_the_current_models_reject(monkeypatch, tier, effort):
+    """`budget_tokens` is a 400 on every 5.5 model, and from API version
+    2026-10-21 so are `temperature`, `top_p` and `top_k` on every model. None
+    of them may reach the wire from any tier at any effort."""
+    from core.llm.tiers import profile_for
+
+    if effort is None:
+        monkeypatch.delenv("FINPLANET_EFFORT", raising=False)
+    else:
+        monkeypatch.setenv("FINPLANET_EFFORT", effort)
+    fake = FakeAnthropic([reply()])
+    _backend(client=fake).complete("claude-sonnet-5-5", "q", "sys", profile=profile_for(tier))
+    sent = fake.calls[0]
+    assert sent["thinking"] == {"type": "adaptive"}
+    assert sent["output_config"]["effort"] == (effort or profile_for(tier).effort)
+    for banned in ("temperature", "top_p", "top_k"):
+        assert banned not in sent
+    assert "budget_tokens" not in str(sent)
 
 
 def test_the_reason_profile_streams():
@@ -217,7 +274,7 @@ def test_the_reason_profile_streams():
 
     fake = FakeAnthropic([reply("long answer")])
     text, _ = _backend(client=fake).complete(
-        "claude-opus-5", "q", None, profile=REQUEST_PROFILES[Tier.REASON]
+        "claude-opus-5-5", "q", None, profile=REQUEST_PROFILES[Tier.REASON]
     )
     assert text == "long answer"
     assert fake.calls[0]["method"] == "stream"
@@ -225,7 +282,7 @@ def test_the_reason_profile_streams():
 
 def test_request_id_is_kept_for_the_trace():
     b = _backend([reply(request_id="req_abc123")])
-    b.complete("claude-sonnet-5", "q", None)
+    b.complete("claude-sonnet-5-5", "q", None)
     assert b.last_request_id == "req_abc123"
 
 
@@ -235,14 +292,14 @@ def test_request_id_is_kept_for_the_trace():
 def test_bad_key_raises_auth_and_is_not_retried():
     fake = FakeAnthropic([http_status_error(401)])
     with pytest.raises(AuthError):
-        _backend(client=fake).complete("claude-sonnet-5", "q", None)
+        _backend(client=fake).complete("claude-sonnet-5-5", "q", None)
     assert len(fake.calls) == 1
 
 
 def test_a_400_is_permanent_and_not_retried():
     fake = FakeAnthropic([http_status_error(400)])
     with pytest.raises(BackendError):
-        _backend(client=fake).complete("claude-sonnet-5", "q", None)
+        _backend(client=fake).complete("claude-sonnet-5-5", "q", None)
     assert len(fake.calls) == 1
 
 
@@ -250,13 +307,13 @@ def test_a_400_is_permanent_and_not_retried():
 def test_transient_statuses_are_retried_then_raised(status):
     fake = FakeAnthropic([http_status_error(status)] * 3)
     with pytest.raises(TransientError):
-        _backend(client=fake, max_attempts=3).complete("claude-sonnet-5", "q", None)
+        _backend(client=fake, max_attempts=3).complete("claude-sonnet-5-5", "q", None)
     assert len(fake.calls) == 3
 
 
 def test_a_retry_that_succeeds_returns_the_answer():
     fake = FakeAnthropic([http_status_error(529), reply("recovered")])
-    text, _ = _backend(client=fake).complete("claude-sonnet-5", "q", None)
+    text, _ = _backend(client=fake).complete("claude-sonnet-5-5", "q", None)
     assert text == "recovered"
     assert len(fake.calls) == 2
 
@@ -271,7 +328,7 @@ def test_backoff_is_exponential_and_bounded():
             max_attempts=3,
             sleep=waits.append,
             jitter=lambda lo, hi: 1.0,
-        ).complete("claude-sonnet-5", "q", None)
+        ).complete("claude-sonnet-5-5", "q", None)
     assert waits == [1.0, 2.0]
 
 
@@ -288,7 +345,7 @@ def test_backoff_is_jittered_so_clients_do_not_reconverge():
         fake = FakeAnthropic([http_status_error(529)] * 3)
         with pytest.raises(TransientError):
             _backend(client=fake, max_attempts=3, sleep=waits.append).complete(
-                "claude-sonnet-5", "q", None
+                "claude-sonnet-5-5", "q", None
             )
         curves.append(tuple(waits))
     assert len(set(curves)) > 1, f"identical curve every time: {curves[0]}"
@@ -301,7 +358,7 @@ def test_backoff_is_jittered_so_clients_do_not_reconverge():
 def test_an_unreachable_host_is_transient():
     fake = FakeAnthropic([connection_error()] * 2)
     with pytest.raises(TransientError, match="unreachable"):
-        _backend(client=fake, max_attempts=2).complete("claude-sonnet-5", "q", None)
+        _backend(client=fake, max_attempts=2).complete("claude-sonnet-5-5", "q", None)
 
 
 # --- backend_from_env ---------------------------------------------------------
@@ -382,12 +439,13 @@ def test_the_capped_call_bills_at_haiku_rates_and_names_haiku(monkeypatch, tmp_p
     led = ProvenanceLedger(tmp_path / "l.db")
     client = InferenceClient(EchoBackend(), default_engine({"a1": {"llm_complete"}}), led)
     done = client.complete("a1", TaskClass.THESIS_SYNTHESIS, "x" * 400)
-    assert done.model_id == "claude-haiku-4-5"
+    assert done.model_id == "claude-haiku-5-5"
     assert done.tier.value == "cheap"
     row = list(led.calls())[0]
-    assert row["model_id"] == "claude-haiku-4-5" and row["tier"] == "cheap"
-    # Haiku's input rate is $1/MTok; 100 tokens of fresh input ~ $0.0001.
-    assert Decimal(row["cost_usd"]) < Decimal("0.001")
+    assert row["model_id"] == "claude-haiku-5-5" and row["tier"] == "cheap"
+    # Haiku 5.5 is $0.10/$0.50 per MTok: Echo's 100 input and 20 output tokens
+    # are $0.00001 each. At Opus 5.5's $4/$20 the same call is 40x that.
+    assert Decimal(row["cost_usd"]) == Decimal("0.00002")
 
 
 # --- identity-linked keys ---------------------------------------------------------
@@ -448,7 +506,7 @@ def test_a_missing_workspace_is_an_auth_error_not_a_bad_request():
     )
     be = _backend(script=[err])
     with pytest.raises(AuthError, match="ANTHROPIC_WORKSPACE_ID"):
-        be.complete("claude-haiku-4-5", "q", None)
+        be.complete("claude-haiku-5-5", "q", None)
 
 
 def test_the_workspace_400_is_not_retried():
@@ -469,7 +527,7 @@ def test_the_workspace_400_is_not_retried():
     client = FakeAnthropic([err(), reply()])
     be = AnthropicBackend(client=client, sleep=lambda _s: None)
     with pytest.raises(AuthError):
-        be.complete("claude-haiku-4-5", "q", None)
+        be.complete("claude-haiku-5-5", "q", None)
     assert len(client.calls) == 1, "a workspace fault must fail on the first attempt"
 
 

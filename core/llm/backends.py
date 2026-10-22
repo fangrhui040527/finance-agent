@@ -30,7 +30,8 @@ purpose, hold for the free-provider one too, and each is pinned by tests:
     different model that might answer.
 
 The system prompt is sent as a `cache_control` block: it is the part that
-repeats call after call, and a cache read bills at a tenth of fresh input.
+repeats call after call, and a cache read bills at a tenth of fresh input or
+less (a twentieth on Opus 5.5).
 """
 
 from __future__ import annotations
@@ -213,17 +214,13 @@ class AnthropicBackend:
                 {"type": "text", "text": system, "cache_control": {"type": "ephemeral"}}
             ]
         if profile is not None:
-            # Haiku 4.5 rejects adaptive thinking and `effort` with a 400, and
-            # takes the older budgeted form instead; the Opus/Sonnet 5 family is
-            # the other way round. `tiers.profile_for` knows which model takes
-            # what and the two forms are mutually exclusive by construction.
-            # Nothing here guesses.
-            if profile.thinking_budget is not None:
-                params["thinking"] = {
-                    "type": "enabled",
-                    "budget_tokens": profile.thinking_budget,
-                }
-            elif profile.adaptive_thinking:
+            # Every model this calls (the 5.5 family) takes adaptive thinking
+            # and `output_config.effort`, and returns a 400 for the older
+            # `{type: "enabled", budget_tokens}` form - so that form is never
+            # built here. Nor are `temperature`/`top_p`/`top_k`: from API
+            # version 2026-10-21 each is a 400 on every model. `tiers.profile_for`
+            # decides the shape; nothing here guesses.
+            if profile.adaptive_thinking:
                 params["thinking"] = {"type": "adaptive"}
             if profile.effort:
                 params["output_config"] = {"effort": profile.effort}
@@ -341,15 +338,22 @@ class AnthropicBackend:
         raw_usage = getattr(message, "usage", None)
         if raw_usage is None:
             raise BackendError("Anthropic response carries no usage; cost cannot be ledgered")
+        # Server-side web searches bill per search (tiers.WEB_SEARCH_USD) on top
+        # of the tokens. The block is absent on a call that used no server tool,
+        # and absent means none - but a call that searched and was ledgered at
+        # zero searches would under-report exactly the spend a monthly cap is for.
+        server_tools = getattr(raw_usage, "server_tool_use", None)
         try:
             usage = Usage(
                 input_tokens=int(raw_usage.input_tokens or 0),
                 output_tokens=int(raw_usage.output_tokens or 0),
-                # Priced at 10% of base input in tiers.cost_usd. Dropping it does
-                # not under-report cost, it OVER-reports it, and an inflated spend
-                # trips the budget rail early - a wrong refusal, not a wrong bill.
+                # Priced at the model's cache-read rate in tiers.cost_usd. Dropping
+                # it does not under-report cost, it OVER-reports it, and an
+                # inflated spend trips the budget rail early - a wrong refusal,
+                # not a wrong bill.
                 cached_input_tokens=int(getattr(raw_usage, "cache_read_input_tokens", 0) or 0),
                 cache_write_tokens=int(getattr(raw_usage, "cache_creation_input_tokens", 0) or 0),
+                web_search_requests=int(getattr(server_tools, "web_search_requests", 0) or 0),
             )
         except (TypeError, ValueError) as e:
             raise BackendError(f"Anthropic usage is not numeric: {raw_usage!r}") from e

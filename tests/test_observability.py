@@ -80,9 +80,9 @@ def test_bad_windows_are_refused(tmp_path):
 def _ledger_with_calls(path: Path) -> ProvenanceLedger:
     led = ProvenanceLedger(path)
     for tier, model, latency in (
-        (Tier.CHEAP, "claude-haiku-4-5", 100.0),
-        (Tier.CHEAP, "claude-haiku-4-5", 200.0),
-        (Tier.REASON, "claude-opus-5", 3000.0),
+        (Tier.CHEAP, "claude-haiku-5-5", 100.0),
+        (Tier.CHEAP, "claude-haiku-5-5", 200.0),
+        (Tier.REASON, "claude-opus-5-5", 3000.0),
     ):
         led.record_call(
             agent="a10_thesis",
@@ -101,7 +101,7 @@ def test_operating_report_shows_spend_models_latency_and_cache(tmp_path):
     _ledger_with_calls(tmp_path / "l.db").close()
     out = O.operating_report(days=7, db=str(tmp_path / "l.db"))
     assert "model calls        3" in out
-    assert "claude-haiku-4-5" in out and "claude-opus-5" in out
+    assert "claude-haiku-5-5" in out and "claude-opus-5-5" in out
     assert "p50" in out and "p95" in out
     assert "30 read" in out  # 3 calls x 10 cached tokens
     assert "budget" in out
@@ -125,13 +125,13 @@ def test_the_cap_is_disclosed_in_the_report(tmp_path, monkeypatch):
     monkeypatch.setenv("FINPLANET_CHEAP", "1")
     out = O.operating_report(days=7, db=str(tmp_path / "l.db"))
     assert "selection in force" in out
-    assert "claude-haiku-4-5" in out
+    assert "claude-haiku-5-5" in out
 
     monkeypatch.delenv("FINPLANET_CHEAP")
     monkeypatch.setenv("FINPLANET_MODEL", "opus")
     monkeypatch.setenv("FINPLANET_EFFORT", "max")
     out = O.operating_report(days=7, db=str(tmp_path / "l.db"))
-    assert "claude-opus-5" in out
+    assert "claude-opus-5-5" in out
     assert "max" in out
 
 

@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import anthropic
 import httpx2
-from anthropic.types import Message, TextBlock
+from anthropic.types import Message, ServerToolUsage, TextBlock
 from anthropic.types import Usage as AUsage
 
 _REQ = httpx2.Request("POST", "https://api.anthropic.com/v1/messages")
@@ -18,13 +18,17 @@ _REQ = httpx2.Request("POST", "https://api.anthropic.com/v1/messages")
 def reply(
     text: str = "Margins compressed on funding cost.",
     *,
-    model: str = "claude-sonnet-5",
+    model: str = "claude-sonnet-5-5",
     stop_reason: str = "end_turn",
     usage: dict | None = None,
     content: list | None = None,
     request_id: str = "req_test",
 ) -> Message:
     u = usage or {"input_tokens": 120, "output_tokens": 45}
+    # `web_search_requests` in the dict becomes `usage.server_tool_use`, as the
+    # API reports a call that ran the server-side web search tool; absent, the
+    # block is absent, as on every call that used no server tool.
+    searches = u.get("web_search_requests")
     msg = Message.model_construct(
         id="msg_test",
         type="message",
@@ -46,6 +50,13 @@ def reply(
             output_tokens=u.get("output_tokens", 0),
             cache_read_input_tokens=u.get("cache_read_input_tokens"),
             cache_creation_input_tokens=u.get("cache_creation_input_tokens"),
+            server_tool_use=(
+                None
+                if searches is None
+                else ServerToolUsage.model_construct(
+                    web_search_requests=searches, web_fetch_requests=0
+                )
+            ),
         ),
     )
     msg._request_id = request_id

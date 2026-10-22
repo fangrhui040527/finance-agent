@@ -27,6 +27,11 @@ from pathlib import Path
 #: knowledge/ so the inference client (core) does not import the knowledge layer.
 EVIDENCE_TABLE = "evidence_searches"
 
+#: The share of the monthly cap at which `doctor` and the monitor start saying
+#: so (the monitor's ALERT is at the cap itself). One number, read by both, so
+#: a preflight and a scheduled check cannot disagree about the same month.
+MONTHLY_WARN_FRACTION = Decimal("0.85")
+
 
 def month_start(now: datetime | None = None) -> datetime:
     """00:00 UTC on the first of `now`'s month: the window a monthly cap covers."""

@@ -3,9 +3,9 @@
 Two rules, both load-bearing:
 
   * **Haiku or nothing.** Every live call this suite makes resolves to
-    `claude-haiku-4-5`. The model is pinned here rather than requested, so a
-    tier table that starts routing somewhere more expensive fails the audit
-    instead of quietly billing for it.
+    `claude-haiku-5-5`, the model the product's CHEAP tier calls. The model is
+    pinned here rather than requested, so a tier table that starts routing
+    somewhere more expensive fails the audit instead of quietly billing for it.
   * **The cap is checked before sending, not after.** A budget that is
     reconciled afterwards is a receipt, not a limit. `guard()` prices the
     request's worst case against what has already been spent and raises rather
@@ -21,11 +21,12 @@ from dataclasses import dataclass, field
 from decimal import Decimal
 
 #: The only model this suite is permitted to call.
-CHEAP_MODEL = "claude-haiku-4-5"
+CHEAP_MODEL = "claude-haiku-5-5"
 
-#: USD per million tokens for that model, first-party rates.
-IN_RATE = Decimal("1.00")
-OUT_RATE = Decimal("5.00")
+#: USD per million tokens for that model, first-party rates (prompts up to
+#: 100K tokens; nothing this suite sends is near the long-prompt step).
+IN_RATE = Decimal("0.10")
+OUT_RATE = Decimal("0.50")
 CACHE_READ_MULT = Decimal("0.1")
 CACHE_WRITE_MULT = Decimal("1.25")
 MILLION = Decimal(1_000_000)

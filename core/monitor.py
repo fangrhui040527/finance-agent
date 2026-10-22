@@ -202,6 +202,8 @@ def evaluate(
                 )
             )
 
+        out.extend(_month_spend_rules(cfg, led, now))
+
         latencies = led.latencies_between(day_ago, now)
         if latencies:
             ordered = sorted(latencies)
@@ -263,6 +265,50 @@ def evaluate(
     out.extend(_paper_rules(cfg, now))
     out.extend(_trace_rules(debug_root, now))
     return out
+
+
+def _month_spend_rules(cfg, ledger, now: datetime) -> list[Alert]:
+    """`spend_month`: month-to-date USD against the owner's monthly cap.
+
+    `spend_24h` watches a rolling day in ringgit; this watches the calendar
+    month in dollars, which is the unit and the window the owner's limit on the
+    API key is stated in. The sources are the ones the client's own cap reads
+    (`spend.month_to_date_usd`): the committed evidence spend in the corpus
+    plus this ledger, so the monitor and the refusal cannot disagree about
+    the same month. WARN at `spend.MONTHLY_WARN_FRACTION` of the cap, ALERT at
+    the cap - at which point calls are already being refused. No cap, no rule;
+    `doctor` is where an absent cap is reported.
+    """
+    from core.llm import spend
+
+    cap = getattr(cfg, "monthly_budget_usd", None)
+    if cap is None or Decimal(str(cap)) <= 0:
+        return []
+    cap = Decimal(str(cap))
+    spent = spend.month_to_date_usd(ledger, getattr(cfg, "corpus_db", None), now=now)
+    share = spent / cap
+    if share < spend.MONTHLY_WARN_FRACTION:
+        return []
+    month = spend.month_start(now)
+    return [
+        Alert(
+            rule="spend_month",
+            severity=ALERT if spent >= cap else WARN,
+            title=f"month-to-date spend USD {spent:.2f} is {share:.0%} of the "
+            f"USD {cap:.2f} monthly cap",
+            detail=f"since {month:%Y-%m-%d} 00:00 UTC, committed evidence spend plus this "
+            f"ledger; warned at {spend.MONTHLY_WARN_FRACTION:.0%}, and at the cap every call "
+            "whose worst case would cross it is refused, not downgraded",
+            next_step="operating_report to see which agent and model spent it; the cap "
+            "resets on the 1st, and raising [budget] monthly_usd is the owner's decision, "
+            "not the system's",
+            evidence={
+                "spent_usd": str(spent),
+                "cap_usd": str(cap),
+                "month": f"{month:%Y-%m}",
+            },
+        )
+    ]
 
 
 #: The longest gap each collection slot can legitimately leave between two

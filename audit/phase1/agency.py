@@ -117,7 +117,7 @@ def s3_agent_writable_stores_are_append_only() -> Check:
                 agent="a10_thesis",
                 task_class=TaskClass.THESIS_SYNTHESIS,
                 tier=Tier.CHEAP,
-                model_id="claude-haiku-4-5",
+                model_id="claude-haiku-5-5",
                 prompt="an audit row",
                 usage=Usage(input_tokens=10, output_tokens=5),
             )

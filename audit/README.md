@@ -40,4 +40,4 @@ any of that. It covers what nothing else does:
 Phase 2 is opt-in twice: `EVAL_LIVE=1` **and** a key present. Every live call
 goes through `audit/_support/budget.py`, which refuses to send a request that
 would take the run past `EVAL_MAX_USD` (default `0.05`) and pins the model to
-`claude-haiku-4-5`. A run that cannot afford a call skips it and says so.
+`claude-haiku-5-5`. A run that cannot afford a call skips it and says so.
