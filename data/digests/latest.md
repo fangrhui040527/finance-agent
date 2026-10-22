@@ -1,6 +1,6 @@
 # Digest 2026-10-22
 
-Generated 2026-10-22 10:10 UTC · slot `all` · 22726 articles in the corpus, 6050 observations, 4245 events in the fact book.
+Generated 2026-10-22 17:31 UTC · slot `all` · 22741 articles in the corpus, 6062 observations, 4248 events in the fact book.
 
 ## The book
 
@@ -42,7 +42,7 @@ Generated 2026-10-22 10:10 UTC · slot `all` · 22726 articles in the corpus, 60
 - 2026-10-21 www.investing.com — Goldman Sachs reiterates Nvidia stock rating on AI deployment outlook [q 0.80, tone +0.0] ★
 - 2026-10-21 finance.yahoo.com — NVIDIA and Micron Alone Now Contribute 36% of S&P 500 Earnings Growth as Historic Market Concentration Grows [q 0.80, tone +1.0] ★
 - upcoming 2026-11-17 earnings_result — Q3 2027 results after the close (finnhub)
-- snapshot: P/E (ttm) 27.49 (finnhub, 2026-10-21) · P/B 28.81 (finnhub, 2026-10-21) · EPS (ttm) 7.91 (finnhub, 2026-10-21) · dividend yield 0.03 (finnhub, 2026-10-21) · beta 2.26 (finnhub, 2026-10-21) · 52w high 243.37 (finnhub, 2026-10-21) · 52w low 164.27 (finnhub, 2026-10-21) · target (consensus) 339.17 (fmp, 2026-10-21) · analysts: buy 41 (finnhub, 2026-10-20) · analysts: hold 2 (finnhub, 2026-10-20) · analysts: sell 1 (finnhub, 2026-10-20) · vendor sentiment 0.25 (alphavantage_news, 2026-10-06) · revenue (last quarter) 96.22bn (sec_xbrl, 2026-08-26) · net income (last quarter) 59.69bn (sec_xbrl, 2026-08-26) · last EPS surprise % 3.82 (finnhub, 2026-09-05)
+- snapshot: P/E (ttm) 27.49 (finnhub, 2026-10-21) · P/B 28.81 (finnhub, 2026-10-21) · EPS (ttm) 7.91 (finnhub, 2026-10-21) · dividend yield 0.03 (finnhub, 2026-10-21) · beta 2.26 (finnhub, 2026-10-21) · 52w high 243.37 (finnhub, 2026-10-21) · 52w low 164.27 (finnhub, 2026-10-21) · target (consensus) 339.17 (fmp, 2026-10-22) · analysts: buy 41 (finnhub, 2026-10-20) · analysts: hold 2 (finnhub, 2026-10-20) · analysts: sell 1 (finnhub, 2026-10-20) · vendor sentiment 0.25 (alphavantage_news, 2026-10-06) · revenue (last quarter) 96.22bn (sec_xbrl, 2026-08-26) · net income (last quarter) 59.69bn (sec_xbrl, 2026-08-26) · last EPS surprise % 3.82 (finnhub, 2026-09-05)
 
 ### Apple (XNAS:AAPL)
 - tone: 49 stories from 37 sources, polarity +0.08, peak intensity 0.33, uncertainty 0.06 · 11 escalated
@@ -57,7 +57,7 @@ Generated 2026-10-22 10:10 UTC · slot `all` · 22726 articles in the corpus, 60
 - upcoming 2026-11-02 earnings_result — Q4 2026 results after the close (finnhub)
 - upcoming 2026-10-29 earnings_result — Q4 2026 results after the close (finnhub)
 - upcoming 2026-10-28 earnings_result — Q4 2026 results after the close (finnhub)
-- snapshot: P/E (ttm) 38.53 (finnhub, 2026-10-21) · P/B 50.98 (finnhub, 2026-10-21) · EPS (ttm) 8.72 (finnhub, 2026-10-21) · dividend yield 0.51 (finnhub, 2026-10-21) · beta 1.11 (finnhub, 2026-10-21) · 52w high 348.15 (finnhub, 2026-10-21) · 52w low 243.42 (finnhub, 2026-10-21) · target (consensus) 340.14 (fmp, 2026-10-21) · analysts: buy 20 (finnhub, 2026-10-20) · analysts: hold 14 (finnhub, 2026-10-20) · analysts: sell 3 (finnhub, 2026-10-20) · vendor sentiment -0.23 (alphavantage_news, 2026-10-06) · revenue (last quarter) 109.42bn (sec_xbrl, 2026-07-31) · net income (last quarter) 29.79bn (sec_xbrl, 2026-07-31) · last EPS surprise % -0.89 (finnhub, 2026-09-05)
+- snapshot: P/E (ttm) 38.53 (finnhub, 2026-10-21) · P/B 50.98 (finnhub, 2026-10-21) · EPS (ttm) 8.72 (finnhub, 2026-10-21) · dividend yield 0.51 (finnhub, 2026-10-21) · beta 1.11 (finnhub, 2026-10-21) · 52w high 348.15 (finnhub, 2026-10-21) · 52w low 243.42 (finnhub, 2026-10-21) · target (consensus) 340.14 (fmp, 2026-10-22) · analysts: buy 20 (finnhub, 2026-10-20) · analysts: hold 14 (finnhub, 2026-10-20) · analysts: sell 3 (finnhub, 2026-10-20) · vendor sentiment -0.23 (alphavantage_news, 2026-10-06) · revenue (last quarter) 109.42bn (sec_xbrl, 2026-07-31) · net income (last quarter) 29.79bn (sec_xbrl, 2026-07-31) · last EPS surprise % -0.89 (finnhub, 2026-09-05)
 
 ### Microsoft (XNAS:MSFT)
 - tone: 34 stories from 20 sources, polarity +0.06, peak intensity 0.33, uncertainty 0.12 · 8 escalated
@@ -73,33 +73,37 @@ Generated 2026-10-22 10:10 UTC · slot `all` · 22726 articles in the corpus, 60
 - event 2026-10-21 rating_reiteration — Guggenheim maintain Buy (fmp)
 - upcoming 2026-10-28 earnings_result — Q1 2027 results (finnhub)
 - upcoming 2026-10-27 earnings_result — Q1 2027 results (finnhub)
-- snapshot: P/E (ttm) 29.39 (finnhub, 2026-10-21) · P/B 6.26 (finnhub, 2026-10-21) · EPS (ttm) 17.95 (finnhub, 2026-10-21) · dividend yield 0.79 (finnhub, 2026-10-21) · beta 1.06 (finnhub, 2026-10-21) · 52w high 553.72 (finnhub, 2026-10-21) · 52w low 349.20 (finnhub, 2026-10-21) · target (consensus) 595.21 (fmp, 2026-10-21) · analysts: buy 40 (finnhub, 2026-10-20) · analysts: hold 3 (finnhub, 2026-10-20) · analysts: sell 0 (finnhub, 2026-10-20) · vendor sentiment 0.29 (alphavantage_news, 2026-10-06) · revenue (last quarter) 90.01bn (sec_xbrl, 2026-07-29) · net income (last quarter) 35.77bn (sec_xbrl, 2026-07-29) · last EPS surprise % 9.53 (finnhub, 2026-09-05)
+- snapshot: P/E (ttm) 29.39 (finnhub, 2026-10-21) · P/B 6.26 (finnhub, 2026-10-21) · EPS (ttm) 17.95 (finnhub, 2026-10-21) · dividend yield 0.79 (finnhub, 2026-10-21) · beta 1.06 (finnhub, 2026-10-21) · 52w high 553.72 (finnhub, 2026-10-21) · 52w low 349.20 (finnhub, 2026-10-21) · target (consensus) 595.21 (fmp, 2026-10-22) · analysts: buy 40 (finnhub, 2026-10-20) · analysts: hold 3 (finnhub, 2026-10-20) · analysts: sell 0 (finnhub, 2026-10-20) · vendor sentiment 0.29 (alphavantage_news, 2026-10-06) · revenue (last quarter) 90.01bn (sec_xbrl, 2026-07-29) · net income (last quarter) 35.77bn (sec_xbrl, 2026-07-29) · last EPS surprise % 9.53 (finnhub, 2026-09-05)
 
 ## Macro
 
 | series | latest | as of | change | source |
 |---|---|---|---|---|
-| ICE BofA US high-yield option-adjusted spread, % | 3.29 | 2026-10-19 | -0.02 | fred |
+| ICE BofA US high-yield option-adjusted spread, % | 3.27 | 2026-10-21 | -0.06 | fred |
 | BNM Overnight Policy Rate, % | 2.75 | 2026-09-03 | +0 | bnm_opr |
 | US CPI, all items, index 1982-84=100 | 336.30 | 2026-09-01 | +2.167 | fred |
-| Brent crude, USD per barrel (EIA, daily) | 126.55 | 2026-10-14 | +0.77 | fred |
+| Brent crude, USD per barrel (EIA, daily) | 115.22 | 2026-10-20 | -3.6 | fred |
 | Malaysian ringgit per US dollar | 4.08 | 2026-10-16 | -0.0009 | fred |
-| Federal funds effective rate, % | 3.88 | 2026-10-16 | +0 | fred |
-| 10-year Treasury yield, % | 5.09 | 2026-10-16 | -0.01 | fred |
-| 2-year Treasury yield, % | 4.74 | 2026-10-16 | -0.03 | fred |
+| Federal funds effective rate, % | 3.88 | 2026-10-20 | +0 | fred |
+| 10-year Treasury yield, % | 5.12 | 2026-10-20 | -0.03 | fred |
+| 2-year Treasury yield, % | 4.79 | 2026-10-20 | +0.02 | fred |
 | Malaysia CPI headline, index 2010=100 | 137.50 | 2026-08-01 | +0.4 | dosm_cpi |
 | Broad US dollar index | 121.40 | 2026-10-16 | -0.1645 | fred |
-| NASDAQ Composite, index level | 26,430.89 | 2026-10-19 | +290.86 | fred |
+| NASDAQ Composite, index level | 26,702.86 | 2026-10-21 | +278.04 | fred |
 | Aluminium, USD per tonne (IMF PCPS via FRED) | 3,158.26 | 2026-07-01 |  | fred |
-| S&P 500, index level | 7,690.73 | 2026-10-19 | +31.29 | fred |
-| 10y minus 2y Treasury spread, % | 0.38 | 2026-10-19 | +0.03 | fred |
+| S&P 500, index level | 7,757.17 | 2026-10-21 | +44.6 | fred |
+| 10y minus 2y Treasury spread, % | 0.32 | 2026-10-21 | -0.01 | fred |
 | US unemployment rate, % | 4.20 | 2026-09-01 | +0.1 | fred |
-| CBOE VIX, index | 18.44 | 2026-10-19 | -1.55 | fred |
+| CBOE VIX, index | 16.68 | 2026-10-21 | -0.63 | fred |
 
 ## Collection
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 17:31 | dbnomics | ok | 450 | 0 | 0 | facts 0;  |
+| 17:31 | jin10_flash | degraded | 18 | 18 | 15 | facts 0; window not covered back to 2026-10-22 10:08Z; the oldest item read is 2 |
+| 17:31 | fred | ok | 484 | 0 | 0 | facts 25; release calendar: 'FOMC Press Release' listed on 15 days of the fortni |
+| 17:31 | fmp | ok | 3967 | 0 | 0 | facts 12; fmp /earnings is outside the plan (HTTP 402); not collected for NVDA,  |
 | 10:09 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
 | 10:09 | twse_openapi | ok | 8 | 0 | 0 | facts 5;  |
 | 10:08 | jin10_flash | degraded | 20 | 19 | 19 | facts 0; window not covered back to 2026-10-21 22:41Z; the oldest item read is 2 |

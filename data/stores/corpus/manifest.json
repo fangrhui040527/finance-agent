@@ -1,0 +1,72 @@
+{
+ "bytes": 17489920,
+ "file": "corpus.db",
+ "format": 1,
+ "page_size": 4096,
+ "part_bytes": 16777216,
+ "parts": [
+  {
+   "bytes": 16777216,
+   "name": "part-000",
+   "sha256": "a3c63147956106e4aa7c1d9a34e5817ca223af0b323b56abb5876fd203c858dd"
+  },
+  {
+   "bytes": 712704,
+   "name": "part-001",
+   "sha256": "1934b861f957c927f0294d3400e254f5e947e3165c03e100400cd3f006f5db64"
+  }
+ ],
+ "rows": {
+  "articles": 22741,
+  "sweeps": 1053
+ },
+ "sha256": "afb3bbec99d9f5eb6c899fe704660f6a238b9ec1cf2c5d32d8f1b1e0a8a3c93e",
+ "tips": {
+  "articles": {
+   "columns": {
+    "body": "9670faa67488911f",
+    "countries_json": "727e34856737c342",
+    "doc_id": "f1784a956139ddce",
+    "dup_hash": "2d6cd69ea6561dc7",
+    "escalated": "5feceb66ffc86f38",
+    "fetched_for": "12ae32cb1ec02d01",
+    "first_seen_at": "646785a72163989d",
+    "instruments_json": "b3283bf184bb082f",
+    "language": "26ab4b495289822b",
+    "published_at": "ddaabfe52cf8c85c",
+    "quality": "973b372a514f91db",
+    "relevance": "8aed642bf5118b9d",
+    "source": "6c2d515a3e6b4f90",
+    "source_domain": "76cde1362ba439a1",
+    "themes_json": "b3283bf184bb082f",
+    "title": "4516a1a09dbc0e8b",
+    "title_key": "c5feaf361c2225b2"
+   },
+   "rowid": 22741
+  },
+  "sweeps": {
+   "columns": {
+    "at": "8134a5b6489b5465",
+    "detail": "a8b00e80ae474bfa",
+    "duplicates": "5feceb66ffc86f38",
+    "escalated": "5feceb66ffc86f38",
+    "fetched": "83151157c10d85af",
+    "kept": "5feceb66ffc86f38",
+    "run_id": "2055fdc520906967",
+    "since": "995c483ae041a556",
+    "slot": "af6d817330933ec6",
+    "source": "5cb11d0efa2e5b3d",
+    "status": "c48b5b1a9776c846",
+    "stored": "5feceb66ffc86f38",
+    "unlinked": "5feceb66ffc86f38"
+   },
+   "rowid": 1053
+  }
+ },
+ "triggers": [
+  "articles_no_delete",
+  "articles_no_update",
+  "sweeps_no_delete",
+  "sweeps_no_update"
+ ]
+}
