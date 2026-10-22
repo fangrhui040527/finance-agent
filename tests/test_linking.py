@@ -346,6 +346,37 @@ def test_a_figure_a_bank_expects_for_another_companys_stock_is_its_note():
         assert linker.authored(headline) == {"MYX:1155"}, headline
 
 
+def test_more_broker_templates_read_as_the_banks_note():
+    """Four stored rows the rule missed until 2026-10-22, each Maybank's research
+    on another company: a rating set after the stock, a 'Rates' verb, a forecast
+    then the call in one clause, and a name abbreviated with full stops."""
+    linker = EntityLinker(BANKS)
+    for headline in (
+        "Mitra Keluarga targets 10% growth. Maybank rates Mitra Keluarga stock Buy - ad-hoc-news.de",
+        "Maybank Rates ‘Hold’ on GPSC as Heightened Gas Prices Pressure Earnings",
+        "Maybank Forecasts Robust 4Q26 Recovery for ADVANC, Maintains ‘Buy’ With THB387 Target",
+        "Maybank Starts Frasers Log. & Comm. Trust at BUY With SGD1.00 Target Price",
+    ):
+        assert "MYX:1155" in linker.link(headline), headline
+        assert linker.authored(headline) == {"MYX:1155"}, headline
+
+
+def test_rates_as_a_noun_and_the_banks_own_plans_stay_its_news():
+    """'rates' is also the noun the bank's own news uses, and a forecast without
+    a call on another company is the bank's view of itself."""
+    linker = EntityLinker(BANKS)
+    for headline in (
+        "Maybank rates unchanged as BNM holds OPR",
+        "Maybank Rates Rise; Stock Buy Seen by Analysts",
+        "Maybank forecasts loan growth for 2027, keeps dividend payout",
+        "Maybank buyback: Maybank stock buyback approved",
+        "Would I Buy Maybank at 6.4% Dividend Yield Now?",
+        # Ambiguous: a sell call BY Maybank, or ON it - left as Maybank news.
+        "Genting Bhd Rights Issue Draws Maybank Sell Call",
+    ):
+        assert linker.authored(headline) == set(), headline
+
+
 def test_a_bank_forecasting_its_own_business_is_not_a_broker_note():
     linker = EntityLinker(BANKS)
     for headline in (

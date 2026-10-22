@@ -64,6 +64,10 @@ class Server:
     version: str
     instructions: str = ""
     tools: dict[str, Tool] = field(default_factory=dict)
+    #: Run before every tool call. The server's main() sets it to bring the
+    #: stores git carries as parts up to the last pull (knowledge/stores.py):
+    #: the process lives for a whole session, across pulls it never sees.
+    before_call: Callable[[], None] | None = None
 
     def tool(self, name: str, description: str, schema: dict):
         def register(fn):
@@ -133,6 +137,8 @@ class Server:
             raise ToolError(f"arguments must be an object, got {type(args).__name__}")
 
         _check_required(tool, args)
+        if self.before_call is not None:
+            self.before_call()
         try:
             text = tool.fn(**args)
         except ToolError:

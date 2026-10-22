@@ -4,6 +4,15 @@
 # writes the day's digest, and records the attempt - success or failure - in
 # the sweeps and pulls tables.
 #
+# GitHub warns on a file over 50 MiB and refuses a push with one over 100 MiB,
+# and data/corpus.db grows about half a megabyte a day. So the commit step also
+# writes the corpus as fixed 16 MiB parts (data/stores/corpus/, `ask.py stores
+# split`), which no amount of collection makes larger; for now the whole file
+# is committed beside them, until the parts have been shown to reassemble it on
+# real runs. The size check in that step unstages any store at 95 MiB, so the
+# rest of a run's collection still lands, and a run that cannot push leaves its
+# commit on a rescue/ branch instead of on a runner that is thrown away.
+#
 # It runs HERE rather than on the dev machine for one reason: news expires.
 # The GDELT window is recent-only, and free-tier quotas are per day, so a day
 # nothing collects is a day that cannot be fetched later. A laptop collects
@@ -293,20 +302,51 @@ jobs:
           "
 
       - name: Commit what was collected
+        id: commit
         if: steps.sweep.outputs.code == '0' || steps.sweep.outputs.code == '3'
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # The corpus as parts (knowledge/stores.py). It refuses - and writes
+          # nothing - rather than publish a corpus with fewer rows than the last
+          # one, a WAL it could not checkpoint, or parts that do not concatenate
+          # back to the file. A refusal costs this run its parts, not the rest
+          # of its collection; the job is failed at the end so it is seen.
+          split_failed=0
+          if ! uv run python ask.py stores split; then
+            git checkout -- data/stores 2>/dev/null || true
+            git clean -fdq -- data/stores 2>/dev/null || true
+            split_failed=1
+            echo "::error title=corpus not split::ask.py stores split refused; data/stores was put back and the rest of the collection is committed without it"
+          fi
+          echo "split_failed=$split_failed" >> "$GITHUB_OUTPUT"
           # One at a time, skipping any that is not there: `git add` on a
           # missing path is fatal, and one store missing must never cost the
           # others their day.
-          for path in data/corpus.db data/graph.db data/fx.db data/facts.db data/price_cache.db data/digests data/paper.db data/learning.db data/alerts.db knowledge/paper; do
+          for path in data/corpus.db data/graph.db data/stores data/fx.db data/facts.db data/price_cache.db data/digests data/paper.db data/learning.db data/alerts.db knowledge/paper; do
             if [ -e "$path" ]; then
               git add "$path"
             else
               echo "no $path yet - skipping it"
             fi
           done
+          # GitHub refuses a whole push over one file of 100 MiB, so a store at
+          # 95 MiB is unstaged and named: the other stores still land. 45 MiB
+          # is a warning, months ahead at today's growth. A part never reaches
+          # either; this is for the stores that are still whole files.
+          too_big=0
+          while IFS= read -r -d '' f; do
+            [ -f "$f" ] || continue
+            size=$(wc -c < "$f")
+            if [ "$size" -ge 99614720 ]; then
+              git reset -q -- "$f"
+              too_big=1
+              echo "::error title=store too large to push::$f is $size bytes; GitHub refuses files over 100 MiB, so it was left out of this commit. See docs/14-OPERATIONS-RUNBOOK.md, Large stores."
+            elif [ "$size" -ge 47185920 ]; then
+              echo "::warning title=store nearing GitHub's limit::$f is $size bytes; GitHub warns at 50 MiB and refuses 100 MiB. See docs/14-OPERATIONS-RUNBOOK.md, Large stores."
+            fi
+          done < <(git diff --cached --name-only -z)
+          echo "too_big=$too_big" >> "$GITHUB_OUTPUT"
           if git diff --cached --quiet; then
             echo "nothing new to commit"
             exit 0
@@ -314,14 +354,37 @@ jobs:
           # [skip ci]: a data commit; ten test jobs to validate a row of news is waste.
           git commit -m "chore(corpus): the $(date -u +%Y-%m-%d) ${{ steps.slot.outputs.slot }} sweep [skip ci]"
           ours="$(git rev-parse HEAD)"
+          # From here on, any way out of this step but a push lands the commit
+          # on a rescue/ branch first: the runner is thrown away with
+          # everything on it. A failing fetch or reset exits the step under
+          # `bash -e` as surely as the give-up below, so a trap covers both,
+          # and a cancellation or the job's time limit (SIGINT, SIGTERM) too.
+          # The attempt number keeps a re-run's branch from colliding.
+          rescue="rescue/collect-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT:-1}"
+          rescued=0
+          keep() {
+            [ "$rescued" = 1 ] && return 0
+            rescued=1
+            if git push origin "$ours:refs/heads/$rescue"; then
+              echo "::error title=sweep not pushed::the day's collection is in commit $ours, pushed to branch $rescue; merge its rows by hand, or dispatch the slot again."
+            else
+              echo "::error title=sweep not pushed::branch $rescue could not be pushed either. The day's collection is in commit $ours on this runner only; dispatch the slot again."
+            fi
+          }
+          trap keep ERR
+          trap 'keep; exit 1' INT TERM
           # Another slot, or the nightly Routine (which commits data/paper.db
           # and data/learning.db), may have pushed while this one ran; rebase
           # our one data commit onto it rather than fail the push.
           # --autostash: the sweep leaves stores it did not stage (a cache file)
           # modified in the tree, and a rebase refuses to start over them.
           if git pull --rebase --autostash origin "${GITHUB_REF_NAME}"; then
-            git push
-            exit 0
+            if git push; then
+              exit 0
+            fi
+            # Rejected after a clean rebase: the branch moved again, or the
+            # host failed. The loop below re-applies the commit on a fresh fetch.
+            echo "push rejected after a clean rebase; re-applying on a fresh fetch"
           fi
           # The rebase stopped - on this repository that means a binary
           # conflict on a data/*.db both sides changed. This line used to be
@@ -334,7 +397,7 @@ jobs:
           # is the same commit rebased; one that conflicts is a real conflict,
           # and the retry is for the race where a third push lands between
           # our fetch and our push, not for wishing the conflict away.
-          git rebase --abort || true
+          git rebase --abort 2>/dev/null || true
           for attempt in 1 2 3; do
             git fetch origin "${GITHUB_REF_NAME}"
             # FETCH_HEAD is what that fetch brought, whatever refspec the
@@ -352,7 +415,10 @@ jobs:
             git cherry-pick --abort || true
             echo "::error title=data commit conflicts with ${GITHUB_REF_NAME}::attempt $attempt of 3: this run's commit $ours conflicts on: ${conflicted}"
           done
-          echo "::error title=sweep not pushed::gave up after 3 attempts. The day's collection is in commit $ours on this runner only; fetch it from the run's logs and re-apply by hand, or dispatch the slot again."
+          # Gave up after 3 attempts. The stores are whole files plus parts;
+          # re-applying the rescued commit is a merge of rows, by hand, not a
+          # cherry-pick (docs/14, Large stores).
+          keep
           exit 1
 
       # Exit 3 is "a source was degraded": part of the day was collected and
@@ -373,4 +439,15 @@ jobs:
         run: |
           echo "sweep exited ${{ steps.sweep.outputs.code }}, fx exited ${{ steps.fx.outputs.code || 'n/a' }}"
           echo "  2 = could not run (config, slot or adapter)"
+          exit 1
+
+      # Not in the commit step, so that step can still push whatever else the
+      # run collected: a corpus that was not split, or a store left out at 95
+      # MiB, is a fault someone must see on the run, not a log line. Last, so
+      # failing here cannot skip the degraded warning or the fx check above.
+      - name: Fail if a store was not published
+        if: steps.commit.outputs.split_failed == '1' || steps.commit.outputs.too_big == '1'
+        run: |
+          echo "split_failed=${{ steps.commit.outputs.split_failed }} too_big=${{ steps.commit.outputs.too_big }}"
+          echo "see the commit step's annotations, and docs/14-OPERATIONS-RUNBOOK.md, Large stores"
           exit 1

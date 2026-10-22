@@ -21,7 +21,7 @@ from __future__ import annotations
 
 import json
 import re
-from dataclasses import asdict, dataclass, field, replace
+from dataclasses import asdict, dataclass, field
 from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
@@ -209,13 +209,11 @@ def _norm_title(t: str) -> str:
 
 
 def _relinked(a: Article, linker) -> Article:
-    """The article with its stored links read by today's linker rules.
+    """The article with its stored links read by today's linker rules
+    (`knowledge.news.linking.relinked`, which the graph's rebuild shares)."""
+    from knowledge.news.linking import relinked
 
-    Features scored for the old links go with them, so the gate scores the row
-    again on the names it is linked to now. (A row read from the corpus carries
-    none - they are not stored - but an article built in memory might.)"""
-    ids = linker.recheck(a.text, a.instruments)
-    return a if ids == list(a.instruments) else replace(a, instruments=ids, features=None)
+    return relinked(a, linker)
 
 
 def build_digest(

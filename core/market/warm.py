@@ -30,11 +30,10 @@ def graph_lookup() -> Callable[[str, date], set[str]] | None:
     An unbuilt graph reads as "not built" - which `graph_peers` alone cannot
     say: it answers an empty set for that and for a name with no peers alike.
     """
-    from pathlib import Path
-
+    from knowledge.graph import derive
     from knowledge.graph.build import DEFAULT_DB
 
-    if not Path(DEFAULT_DB).exists():
+    if not derive.ready(DEFAULT_DB):
         return None
     from mcp_server.tools import graph_peers
 

@@ -108,6 +108,7 @@ def build(
     skip_markets: bool = False,
     prune_on: date | None = None,
     today: date | None = None,
+    summarize: bool = True,
 ) -> BuildReport:
     """Extract, validate, store.
 
@@ -115,6 +116,10 @@ def build(
     dated that day. Without it a deleted curated row stays asserted forever;
     with it, only this tier is touched - a semantic tier's edges survive a
     deterministic rebuild, which is what the tier column is for.
+
+    `summarize=False` skips the report's counts and hubs, which load the whole
+    graph: once per sweep is nothing, once per batch of a 22,000-row rebuild is
+    most of its time.
     """
     from knowledge.graph.extractors.market_registry import MarketsExtractor
 
@@ -151,12 +156,25 @@ def build(
             tier, [e for _, _, edges in collected for e in edges], prune_on
         )
 
+    if not summarize:
+        return report
     counts = store.counts()
     report.nodes, report.edges = counts["nodes"], counts["edges"]
     report.citable = counts["citable"]
     graph = store.load()
     report.hubs = sorted(graph.hubs())
     return report
+
+
+def link_articles(store: GraphStore, articles, tier: str = DETERMINISTIC) -> None:
+    """Stored articles into the event layer, with their companies' markets.
+
+    The one path both a sweep and a rebuild from the corpus take
+    (knowledge/graph/derive.py), so linking as you go and rebuilding from
+    scratch cannot disagree about what an article put in the graph."""
+    from knowledge.graph.extractors.gdelt import GdeltExtractor
+
+    build(store, extractors=[GdeltExtractor(articles)], tier=tier, summarize=False)
 
 
 def main(argv=None) -> int:
@@ -185,6 +203,20 @@ def main(argv=None) -> int:
     args = ap.parse_args(argv)
 
     path = Path(args.db if args.db != DEFAULT_DB or not args.code else CODE_DB)
+    from knowledge.graph import derive
+
+    if derive.derived(path) or (not args.code and derive.wanted(path, path.with_name("corpus.db"))):
+        # Its stamp says which corpus row it was derived to; a spine build or a
+        # prune here would change it behind that stamp's back (a prune closes
+        # every market edge the spine does not assert, events' companies too).
+        # And where it is not built yet but should be derived, a spine-only file
+        # here would be a graph with no stamp, which nothing then takes over.
+        print(
+            f"{path} is rebuilt from the corpus (knowledge/graph/derive.py) and is not "
+            "built here. `python ask.py stores graph` brings it up to date.",
+            file=sys.stderr,
+        )
+        return 2
     if args.rebuild and path.exists():
         path.unlink()
     with GraphStore(path) as store:

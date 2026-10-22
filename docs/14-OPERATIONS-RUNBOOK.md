@@ -710,6 +710,128 @@ Then read it from anywhere: `ask.py alerts` on the command line, the
 app. An empty history means no rule has been EVALUATED - not that none would
 fire.
 
+## Large stores: GitHub's file limits (2026-10-22)
+
+GitHub warns on a file over 50 MiB and **refuses a push** holding one over 100
+MiB. On 2026-10-22 `data/graph.db` was 20.2 MB and `data/corpus.db` 17.5 MB,
+each growing about half a megabyte a day and accelerating (more rows, not bigger
+ones: NST paged three deep from 10-18, jin10 from 10-12). At that rate the
+warning arrives mid-to-late December and the refusal between February and
+April 2027. The refusal is not a warning on the run: `git push` fails, the retry
+loop fails three times, and the day's collection stays on a runner that is then
+thrown away - every day after, too.
+
+Measured on copies of the real stores, and rejected:
+
+- **Git LFS.** Every version is stored whole: ~72 MB a day for these two
+  against a 10 GiB quota that cannot be reclaimed, and Actions checkouts spend
+  the 10 GiB bandwidth. Over it, checkouts get pointer files and the sweep
+  crashes on "file is not a database".
+- **Monthly partition files.** Dedup is one INSERT against one file's keys, the
+  sweeps watermarks read all history, and pages resolve doc_ids with one
+  `substr` query; ATTACH is capped at 10 files in this build.
+- **Shrinking in place** (hashed doc_ids, compressed bodies, WITHOUT ROWID).
+  It rewrites rows the triggers forbid touching, breaks ~989 cited doc_ids,
+  and moves the warning from December to January at best.
+
+**What is done instead.** Two moves, and no row is touched:
+
+1. **The corpus is committed as fixed 16 MiB parts** plus a manifest
+   (`data/stores/corpus/`, `knowledge/stores.py`). `ask.py stores split` writes
+   them in the collector's commit step; `ask.py stores assemble` concatenates
+   them back into the one `data/corpus.db` every reader opens, byte for byte.
+   More data is more parts, never a bigger file. Split refuses - before it
+   writes a byte - a file that does not hold every row of the last published
+   version, a lost append-only trigger, a WAL it cannot checkpoint, or a file
+   that fails quick_check; it reads the parts back before it replaces the
+   manifest. Git's deltas still work across part versions: ~0.15 MB per
+   version, what the whole file costs today.
+2. **The graph is rebuilt from the corpus** (`knowledge/graph/derive.py`):
+   ~17 s, byte-identical twice, and every derived node and edge is in the
+   committed graph. What the committed graph has that a rebuild does not is the
+   point: 2,542 events for stories the corpus refused as already held (the
+   sweep linked every normalised article; it now links only what the corpus
+   kept), and links today's linker rules exclude (each row is read through
+   `EntityLinker.recheck`, as the digest reads it).
+
+**Phase 1 (now): both, beside the whole files.** The collector commits
+`data/corpus.db`, `data/graph.db` AND the parts. CI proves on every code push
+that the parts reassemble the committed corpus (`ask.py stores verify
+--whole`) and that the graph rebuilds twice identically. Nothing reads the
+parts yet.
+
+**Phase 2 (after the parts have reassembled the corpus on real runs): stop
+committing the two whole files.** The collector's path list drops
+`data/corpus.db` and `data/graph.db`, `.gitignore` takes them, and the commit
+step untracks them (`git rm --cached`) in its own serialized commit, so no run
+in flight can meet a modify/delete conflict. The last committed graph is tagged
+`stores/graph-db-final` before it goes. From then on:
+
+- every `ask.py` command, and every MCP tool call, assembles the corpus first
+  when a pull moved the parts and the local file is missing or untouched (one
+  `stat` when nothing changed);
+- a graph reader that finds no graph derives it (`graph_peers`, `peer_set`,
+  `explain_path`, `prices --book`, `watch`) instead of answering "not built";
+- the sweep brings a derived graph up to the corpus from a watermark rather
+  than linking its own batch.
+
+**The local file's state** is decided by which version holds which rows -
+never by a stamp, never by a row count. Every table is append-only and its
+rowids only grow, so one version holds every row of another exactly when it
+holds the other's last row of each table, at the same rowid, with the same
+values. The manifest records those tips.
+
+| state | means | `ensure` / `assemble` does |
+|---|---|---|
+| current | exactly the manifest's file | nothing |
+| ahead | holds every row of the manifest's version, and more (a sweep's rows), or the same rows in other bytes (a column a migration added) | nothing; the next split publishes them |
+| stale | the manifest's version holds every row the local file does, and more: a pull | reassembles |
+| missing | no file, or 0 bytes | assembles |
+| conflict | each holds rows the other lacks; or the file is not a database; or a -wal with frames sits beside a missing file | `ensure` leaves it and says so; `assemble` refuses; `assemble --replace` moves the file and its journal to `corpus.local-<UTC>.db` and assembles - never deletes |
+
+The same check guards the other direction: **split refuses a file that does
+not hold every row of the last published version**, whatever its row counts.
+That is the case the size check could cause while the whole file is still
+committed: the whole file left out of one commit, the next run sweeping onto
+the older copy - its counts catch up within a day, its tip rows never do. At
+the start of that next run the check reads the checked-out file as stale, and
+`ensure` (which every `ask.py` command runs first) assembles the newer parts
+over it before the sweep writes anything.
+
+Deciding and replacing happen under a lock (`data/corpus.db.lock`), so two
+commands started together after a pull cannot both judge the file stale and
+replace each other's writes. A -wal left by a writer that died is never paired
+with a newly assembled file: SQLite would replay one database's pages into
+another. The stamp beside the file (`data/corpus.db.stamp.json`) only caches
+its sha256 against size and mtime; nothing decides from it.
+
+A corpus missing where its parts exist raises instead of opening: SQLite
+would create an empty database, and a sweep reading its own history from it
+would refetch a slot it already ran.
+
+**The size check in the commit step** warns at 45 MiB and, at 95 MiB, unstages
+that one file so the rest of the run's collection still lands; the job's last
+step fails it so it is seen. Once the commit exists, every way out of the step
+but a push - three rejected attempts, a fetch that fails, a push rejected after
+a clean rebase - first pushes the commit to `rescue/collect-<run id>-<attempt>`,
+instead of leaving the day on the runner. Re-applying it is a merge of rows by
+hand: the stores are binary.
+
+**The phase-2 change, when it is made**, is: drop `data/corpus.db` and
+`data/graph.db` from the commit step's path list and untrack them there
+(`git rm --cached --ignore-unmatch`), add both to `.gitignore`, tag the last
+committed graph `stores/graph-db-final`, add an `ask.py stores assemble` step
+to ci.yml before the tests (today the tests assemble it as a side effect, and
+`verify --whole` then only compares the parts with themselves), and add
+`python ask.py stores assemble` after each `git pull` in the three routines'
+prompts. A graph reader whose derivation fails raises rather than answering
+"no peers": an empty answer would read as a real one.
+
+**What the change does not cover.** `paper.db` (1 MB, +40-53 KiB a day, all of
+it index-book marks) and `facts.db` (4.7 MB, +20-35 KiB a day) are still whole
+files; at today's rates the first reaches 50 MiB in 2029. `price_cache.db` is
+bounded (it upserts). The 45 MiB warning will name either one long before.
+
 ## Reading a capped sweep row (2026-09-08)
 
 GDELT asks about three names a run, not the whole book. A sweep row for it now

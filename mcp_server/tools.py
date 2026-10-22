@@ -1874,13 +1874,12 @@ def cite_label(c) -> str:
 
 def _open_graph():
     """The built entity graph and its evidence lookup, or (None, None) without one."""
-    from pathlib import Path as _P
-
+    from knowledge.graph import derive
     from knowledge.graph.build import DEFAULT_DB
     from knowledge.graph.evidence import CuratedCorpus
     from knowledge.graph.store import GraphStore
 
-    if not _P(DEFAULT_DB).exists():
+    if not derive.ready(DEFAULT_DB):
         return None, None
     with GraphStore(DEFAULT_DB) as store:
         g = store.load()
@@ -2241,6 +2240,10 @@ def explain_path(a: str, b: str, asof: str = "", db: str = "") -> str:
     from knowledge.graph.store import GraphStore
 
     path_db = db or DEFAULT_DB
+    if path_db == DEFAULT_DB:
+        from knowledge.graph import derive
+
+        derive.ready(path_db)
     if path_db != ":memory:" and not _P(path_db).exists():
         return (
             f"REFUSED: no graph at {path_db}. Build it with `make graph` "

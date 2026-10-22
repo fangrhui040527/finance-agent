@@ -562,7 +562,7 @@ def run_sweep(
 
         if fresh and link_graph:
             try:
-                report.graph = _link_graph(fresh, graph_db)
+                report.graph = _link_graph(fresh, graph_db, corpus_path or cfg.corpus_db)
             except Exception as e:  # the graph is downstream; a bad edge must not lose the sweep
                 report.graph = f"not linked: {type(e).__name__}: {e}"
         report.corpus_counts = corpus.counts()
@@ -791,7 +791,10 @@ def _run_news(
         escalated=result.escalated,
         detail=result.detail,
     )
-    return result, articles
+    # What the corpus KEPT. Every normalised article went to the graph until
+    # 2026-10-22, the ones the corpus refused as already held too: 2,542 of
+    # the graph's 15,898 events were second copies of a story it held.
+    return result, stored.added
 
 
 def _news_per_instrument(
@@ -1245,6 +1248,7 @@ def _run_structured(
     result.requests = pull.requests
 
     articles: list[Article] = []
+    added: list[Article] = []
     if pull.articles:
         feed = PreparedFeed(spec.name, pull.articles)
         articles, stats = feed.normalize(
@@ -1255,6 +1259,7 @@ def _run_structured(
             languages=languages,
         )
         kept = corpus.add_all(articles, spec.name)
+        added = kept.added
         result.fetched, result.kept, result.stored = stats.fetched, stats.kept, kept.stored
         result.duplicates, result.unlinked = kept.duplicates, stats.unlinked
         result.filtered, result.escalated = stats.filtered, stats.escalated
@@ -1291,7 +1296,7 @@ def _run_structured(
         escalated=result.escalated,
         detail=(f"facts {stored}; " + result.detail)[:DETAIL_CHARS],
     )
-    return result, articles
+    return result, added
 
 
 def _mic_in(iid: str, markets) -> bool:
@@ -1303,15 +1308,22 @@ def _mic_in(iid: str, markets) -> bool:
         return False
 
 
-def _link_graph(articles, graph_db: str) -> str:
-    """Attach this sweep's articles to the companies they name. Never pruned."""
-    from knowledge.graph.build import build
-    from knowledge.graph.extractors.gdelt import GdeltExtractor
+def _link_graph(articles, graph_db: str, corpus_db: str) -> str:
+    """Attach this sweep's stored articles to the companies they name. Never pruned.
+
+    A graph rebuilt from the corpus (knowledge/graph/derive.py) is brought up
+    to it instead: the same rows, read the same way, so linking as the sweep
+    goes and rebuilding later give one graph. A graph something else wrote -
+    the committed one, while git still carries it - is linked into as before."""
+    from knowledge.graph import derive
+    from knowledge.graph.build import link_articles
     from knowledge.graph.store import GraphStore
 
+    if derive.wanted(graph_db, corpus_db):
+        return derive.sync(graph_db, corpus_db)
     with GraphStore(graph_db) as store:
         before = store.counts()
-        build(store, extractors=[GdeltExtractor(articles)])
+        link_articles(store, articles)
         after = store.counts()
     return (
         f"+{after['nodes'] - before['nodes']} nodes  "
