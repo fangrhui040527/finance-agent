@@ -6,6 +6,22 @@ the cleaning and distribution done by an open-weight model I do not pay for?*
 
 **Yes, and most of it was already true.** What was missing was one backend.
 
+> **Since October 2026 the owner runs reasoning on the API key instead.**
+> Everything this process sends to a model - the three Messages tiers behind
+> `InferenceClient`, and the web evidence ingest's searches - now goes to the
+> Anthropic API on the owner's key, on the current models (Opus 5.5, Sonnet
+> 5.5, Haiku 5.5), under a **hard cap of USD 50 a calendar month**
+> (`config.toml [budget] monthly_usd`; docs/08 §4.7). A call whose worst case
+> would cross the cap is refused and says so; nothing is downgraded to fit.
+>
+> Two things are unchanged and are **not billed to the key**: the nightly
+> Claude Code routine (docs/20) and interactive research in your own Claude
+> session both reason on your Claude plan, as in section 1. The free providers
+> below stay wired and selectable - `LLM_BACKEND=groq`, or one tier with
+> `LLM_BACKEND_CHEAP=groq` - and a tier on one is priced at zero and reserves
+> nothing against the cap. The rest of this document describes that option as
+> it was built for month one.
+
 ## 1. Where the reasoning already runs
 
 docs/15 and docs/20 put the reasoning on the operator's Claude session, not on
@@ -14,7 +30,7 @@ an API key held by this repository:
 | Reasoning | Runs on | Costs |
 |---|---|---|
 | Interactive research — you ask, Claude calls the MCP tools | your Claude session (Max plan) | nothing per token |
-| The nightly feedback page (docs/20) | a scheduled Claude Routine | nothing per token |
+| The nightly feedback page (docs/20) | a scheduled Claude Code routine, on your Claude plan | nothing per token, and nothing on the API key |
 | The engines — attribution, sizing, caps, refusals | this process, deterministic | nothing |
 
 That covers "the reasoning will be done by you". Claude reads what the
@@ -66,7 +82,7 @@ backend   OpenAICompatibleBackend
 reason    groq (GROQ_API_KEY is set and ANTHROPIC_API_KEY is not, free tier): reason=openai/gpt-oss-120b balanced=openai/gpt-oss-20b cheap=openai/gpt-oss-20b; ...
   reason    openai/gpt-oss-120b      max 16000, effort dial not sent to this provider
   balanced  openai/gpt-oss-20b       max 8000, effort dial not sent to this provider
-  cheap     openai/gpt-oss-20b       max 1024, effort dial not sent to this provider
+  cheap     openai/gpt-oss-20b       max 4096, effort dial not sent to this provider
 ```
 
 Selection precedence, the same rule as before with one more rung:
@@ -125,7 +141,7 @@ LLM_MODEL=openai/gpt-oss-120b           # every tier
   the provider's model for it. Callers still cannot pick a tier or a model.
 - The guardrail chain, the budget rail, the ledger. Every call is enforced,
   every call is recorded — under the model that answered (`openai/gpt-oss-20b`,
-  not `claude-haiku-4-5`), at the price it cost, which is zero. `operating_report`
+  not `claude-haiku-5-5`), at the price it cost, which is zero. `operating_report`
   shows the models actually called.
 - Refusal semantics. `finish_reason=content_filter` is a `Declined` carrying
   its usage; `finish_reason=length` is a `Truncated`, never half an answer.
@@ -135,9 +151,9 @@ LLM_MODEL=openai/gpt-oss-120b           # every tier
 
 **Changes**
 
-- **The effort dial is not sent.** `FINPLANET_EFFORT` and the thinking
-  budget are Anthropic parameters; no free endpoint takes them by that name
-  and an unknown parameter is a 400 on most. Only the output cap from the
+- **The effort dial is not sent.** `FINPLANET_EFFORT` (`output_config.effort`)
+  and adaptive thinking are Anthropic parameters; no free endpoint takes them
+  by that name and an unknown parameter is a 400 on most. Only the output cap from the
   request profile reaches the wire, and `ask.py backend` says so per tier.
 - **No prompt caching.** The system prompt is sent as a plain system message.
   Cached tokens are read back when a provider reports them and split out of
@@ -158,6 +174,9 @@ LLM_MODEL=openai/gpt-oss-120b           # every tier
   before blaming the pipeline.
 
 ## 6. The month-one shape, and after
+
+(The current plan is the one at the top: reasoning on the API key under the
+USD 50 cap. What follows is how to put a tier back on a free provider.)
 
 Month one, keyless on the Anthropic side:
 
@@ -180,9 +199,9 @@ LLM_BACKEND_CHEAP=groq      # reason and balanced stay on Claude
 
 ```
 backend   SplitBackend
-  reason    claude-opus-5            AnthropicBackend, effort high, max 16000, streamed
-  balanced  claude-sonnet-5          AnthropicBackend, effort medium, max 8000
-  cheap     openai/gpt-oss-20b       OpenAICompatibleBackend, max 1024, effort dial not sent to this provider
+  reason    claude-opus-5-5          AnthropicBackend, effort high, max 16000, streamed
+  balanced  claude-sonnet-5-5        AnthropicBackend, effort medium, max 8000
+  cheap     openai/gpt-oss-20b       OpenAICompatibleBackend, max 4096, effort dial not sent to this provider
 ```
 
 Each tier's calls land on their own backend and their own price. Two tiers

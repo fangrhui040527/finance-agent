@@ -253,7 +253,7 @@ def cmd_reflect(a) -> int:
 
         from core.config import load as _load_config
         from core.llm.backends import backend_from_env
-        from core.llm.client import EchoBackend, InferenceClient
+        from core.llm.client import BudgetExceeded, EchoBackend, InferenceClient
         from core.provenance.ledger import ProvenanceLedger
 
         backend, reason = backend_from_env()
@@ -266,8 +266,14 @@ def cmd_reflect(a) -> int:
             engine,
             ProvenanceLedger(cfg.provenance_db),
             daily_budget_myr=_D(str(cfg.daily_budget_myr)),
+            monthly_budget_usd=cfg.monthly_budget_usd,
+            corpus_path=cfg.corpus_db,
         )
-        parsed, done = a15.second_opinion(client, view.title, outcomes)
+        try:
+            parsed, done = a15.second_opinion(client, view.title, outcomes)
+        except BudgetExceeded as e:
+            print(f"  (no second opinion: refused by the spend cap - {e})")
+            return 0
         if done.refused:
             print(f"  model refused: {done.refusal_reason}")
         elif parsed is not None:

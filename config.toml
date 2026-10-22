@@ -200,6 +200,21 @@ per_question_myr = 5.0
 # Budgets are windowed over the last 24 hours, not lifetime.
 daemon_daily_myr = 10.0
 
+# The owner's hard limit on the Anthropic API key, in US dollars per calendar
+# month (00:00 UTC on the 1st to the end of the month), across every process
+# that spends on it. Every model call reserves its worst case - full output at
+# the model's own rate, every search at $0.01 - and is REFUSED, and says so,
+# when month-to-date spend plus that reservation would pass this. Never
+# downgraded to fit. Month-to-date is the committed evidence spend in the
+# corpus plus the local ledger; a call made on a machine whose ledger is never
+# committed is the one thing this cannot see, so set the same limit as the
+# workspace spend limit in the Anthropic Console as the backstop (docs/08).
+monthly_usd = 50
+# The share of monthly_usd the web evidence ingest (server-side web search,
+# knowledge/evidence/) may spend; the rest stays for reasoning. A sub-cap, so
+# it can never exceed monthly_usd.
+evidence_monthly_usd = 10
+
 
 [provenance]
 # Every model call: agent, task class, tier, tokens, cost, and the run that made

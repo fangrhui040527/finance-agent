@@ -7,15 +7,17 @@ can tell you which is the better trade for a given question.
 
 The negative cases are the point of this file:
 
-  * Haiku 4.5 must NEVER receive `output_config.effort` or adaptive thinking -
-    both are a 400, and a 400 mid-plan is a plan the supervisor already budgeted
-    for. It gets the older budgeted form instead, so the same five levels reach
-    it in the one shape it accepts.
-  * A thinking budget must sit strictly INSIDE the output cap. A budget that
-    equals or exceeds max_tokens buys thinking that is then truncated: the spend
-    is real and the answer is an exception.
+  * No model may receive `thinking.budget_tokens`. Every model the tiers call
+    (Opus, Sonnet and Haiku 5.5) returns a 400 for it, and a 400 mid-plan is a
+    plan the supervisor already budgeted for. All three take adaptive thinking
+    and `output_config.effort`, so the five levels reach each of them in the
+    one shape they all accept - Haiku included, which once needed a budget.
+  * A higher effort gets an output cap it fits inside. Thinking that outruns
+    max_tokens is truncated: the spend is real and the answer is an exception.
   * An unreadable selection fails at startup. A typo that silently selected Opus
-    would be found on the invoice, not on the screen.
+    would be found on the invoice, not on the screen. So does a versioned id of
+    a model nothing calls any more: `claude-haiku-4-5` resolving to Haiku 5.5
+    would read as one model and bill as another.
   * The defaults do not move. Nothing set means exactly what it meant before.
 """
 
@@ -24,8 +26,9 @@ from __future__ import annotations
 import pytest
 
 from core.llm.tiers import (
-    CHEAP_EFFORT_BUDGET,
+    EFFORT_MAX_TOKENS,
     EFFORT_ORDER,
+    EFFORT_TIERS,
     MESSAGES_TIERS,
     MODEL_IDS,
     REQUEST_PROFILES,
@@ -81,77 +84,70 @@ def test_with_nothing_set_the_profiles_are_the_default_table():
         assert effective_tier(tier) is tier
 
 
-# --- effort on the models that take it -------------------------------------------
+# --- effort, on every model ------------------------------------------------------
+
+
+def test_every_messages_tier_takes_an_effort_level():
+    """Haiku 4.5 was the exception and had to be routed around; the 5.5 models
+    are not. A tier missing here would have its selection silently dropped."""
+    assert set(EFFORT_TIERS) == set(MESSAGES_TIERS)
 
 
 @pytest.mark.parametrize("effort", [e.value for e in EFFORT_ORDER])
-@pytest.mark.parametrize("tier", [Tier.REASON, Tier.BALANCED])
-def test_opus_and_sonnet_take_all_five_effort_levels(monkeypatch, effort, tier):
+@pytest.mark.parametrize("tier", [Tier.REASON, Tier.BALANCED, Tier.CHEAP])
+def test_all_three_models_take_all_five_effort_levels(monkeypatch, effort, tier):
     monkeypatch.setenv("FINPLANET_EFFORT", effort)
     shape = profile_for(tier)
     assert shape.effort == effort
     assert shape.adaptive_thinking is True
-    assert shape.thinking_budget is None, "the two thinking forms are exclusive"
+    assert not hasattr(shape, "thinking_budget"), "the budgeted form is a 400 on every 5.5 model"
 
 
-def test_a_bigger_effort_gets_a_bigger_cap_to_land_in(monkeypatch):
+@pytest.mark.parametrize("tier", [Tier.REASON, Tier.BALANCED, Tier.CHEAP])
+def test_a_bigger_effort_gets_a_bigger_cap_to_land_in(monkeypatch, tier):
     """Raising effort without raising max_tokens buys thinking that is truncated.
     Truncated raises AND carries the usage, so the spend is real and the answer
     is not - the most expensive shape a request can have."""
     caps = []
     for effort in EFFORT_ORDER:
         monkeypatch.setenv("FINPLANET_EFFORT", effort.value)
-        caps.append(profile_for(Tier.REASON).max_tokens)
+        caps.append(profile_for(tier).max_tokens)
+        assert profile_for(tier).max_tokens >= EFFORT_MAX_TOKENS[effort]
     assert caps == sorted(caps), f"cap must not fall as effort rises: {caps}"
     monkeypatch.setenv("FINPLANET_EFFORT", "max")
-    assert profile_for(Tier.REASON).stream, "a 64k cap on a non-streaming call can time out"
+    assert profile_for(tier).stream, "a 64k cap on a non-streaming call can time out"
 
 
-# --- Haiku, the model with no effort parameter -----------------------------------
+# --- Haiku 5.5: the same dial as the others ---------------------------------------
 
 
-@pytest.mark.parametrize("effort", [e.value for e in EFFORT_ORDER])
-def test_haiku_never_receives_effort_or_adaptive_thinking(monkeypatch, effort):
-    """Haiku 4.5 returns a 400 for both. Whatever is selected, the cheap tier's
-    request must not carry either one."""
-    monkeypatch.setenv("FINPLANET_EFFORT", effort)
-    shape = profile_for(Tier.CHEAP)
-    assert shape.effort is None
-    assert shape.adaptive_thinking is False
+def test_haiku_defaults_to_low_effort_with_adaptive_thinking():
+    """Stated, not left to the model: Haiku 5.5's own default is `medium`, and
+    the cheap tier's work - triage, tagging, routing - is the work `low` is for."""
+    shape = REQUEST_PROFILES[Tier.CHEAP]
+    assert shape == RequestProfile(max_tokens=4096, adaptive_thinking=True, effort="low")
 
 
 @pytest.mark.parametrize("effort", list(EFFORT_ORDER))
-def test_haiku_gets_the_same_five_levels_as_a_thinking_budget(monkeypatch, effort):
-    """The dial reaches all three models. Dropping it on the floor for Haiku
-    would make the setting decoration on the tier most likely to be running."""
+def test_haiku_receives_the_selected_effort_as_an_effort(monkeypatch, effort):
+    """The dial reaches all three models in the same form. Translating it into a
+    thinking budget for Haiku, as Haiku 4.5 needed, would now be a 400 on every
+    cheap call - the tier most likely to be running."""
     monkeypatch.setenv("FINPLANET_EFFORT", effort.value)
     shape = profile_for(Tier.CHEAP)
-    assert shape.thinking_budget == CHEAP_EFFORT_BUDGET[effort][0]
-    assert 1024 <= shape.thinking_budget < shape.max_tokens
-
-
-def test_the_cheap_budget_table_is_ordered_and_inside_its_caps():
-    budgets = [CHEAP_EFFORT_BUDGET[e][0] for e in EFFORT_ORDER]
-    assert budgets == sorted(budgets)
-    for effort, (budget, cap) in CHEAP_EFFORT_BUDGET.items():
-        assert budget < cap, f"{effort.value}: budget {budget} must fit inside cap {cap}"
+    assert shape.effort == effort.value
+    assert shape.adaptive_thinking is True
+    assert shape.max_tokens == max(4096, EFFORT_MAX_TOKENS[effort])
 
 
 # --- the profile refuses to express an impossible request ------------------------
 
 
-def test_a_profile_cannot_carry_both_thinking_forms():
-    with pytest.raises(ValueError, match="cannot be combined"):
-        RequestProfile(max_tokens=8000, adaptive_thinking=True, thinking_budget=2048)
-    with pytest.raises(ValueError, match="cannot be combined"):
-        RequestProfile(max_tokens=8000, effort="high", thinking_budget=2048)
-
-
-def test_a_thinking_budget_must_fit_inside_the_output_cap():
-    with pytest.raises(ValueError, match="under max_tokens"):
-        RequestProfile(max_tokens=2048, thinking_budget=2048)
-    with pytest.raises(ValueError, match="at least 1024"):
-        RequestProfile(max_tokens=8000, thinking_budget=512)
+def test_a_profile_has_no_way_to_carry_a_thinking_budget():
+    """Not validated away - absent. A field that could hold a budget is a 400
+    waiting for a live call to find it."""
+    with pytest.raises(TypeError):
+        RequestProfile(max_tokens=8000, thinking_budget=2048)  # type: ignore[call-arg]
 
 
 def test_a_profile_cannot_carry_an_effort_the_api_does_not_have():
@@ -166,11 +162,14 @@ def test_a_profile_cannot_carry_an_effort_the_api_does_not_have():
     "written,expected",
     [
         ("haiku", Tier.CHEAP),
-        ("claude-haiku-4-5", Tier.CHEAP),
+        ("haiku-5-5", Tier.CHEAP),
+        ("claude-haiku-5-5", Tier.CHEAP),
         ("sonnet", Tier.BALANCED),
-        ("claude-sonnet-5", Tier.BALANCED),
+        ("sonnet-5-5", Tier.BALANCED),
+        ("claude-sonnet-5-5", Tier.BALANCED),
         ("opus", Tier.REASON),
-        ("claude-opus-5", Tier.REASON),
+        ("opus-5-5", Tier.REASON),
+        ("claude-opus-5-5", Tier.REASON),
         ("OPUS", Tier.REASON),
     ],
 )
@@ -183,6 +182,28 @@ def test_every_legal_spelling_reaches_one_model(monkeypatch, written, expected):
         assert effective_tier(tier) is expected
 
 
+@pytest.mark.parametrize(
+    "stale",
+    ["claude-haiku-4-5", "haiku-4-5", "claude-sonnet-5", "sonnet-5", "claude-opus-5", "opus-5"],
+)
+def test_a_previous_generation_id_is_refused_not_remapped(monkeypatch, stale):
+    """An exact id must name the model actually called. Accepting
+    `claude-haiku-4-5` and calling Haiku 5.5 would be a selection that reads as
+    one model and bills as another; refusing it at startup is the loud
+    direction of that mistake."""
+    monkeypatch.setenv("FINPLANET_MODEL", stale)
+    with pytest.raises(ModelSelectionError, match="unknown FINPLANET_MODEL"):
+        pinned_tier()
+
+
+def test_every_exact_alias_names_the_model_its_tier_calls():
+    from core.llm.tiers import MODEL_ALIASES
+
+    for written, tier in MODEL_ALIASES.items():
+        if written.startswith("claude-"):
+            assert MODEL_IDS[tier] == written, f"{written} would call {MODEL_IDS[tier]}"
+
+
 def test_a_pin_never_touches_the_non_messages_tiers(monkeypatch):
     monkeypatch.setenv("FINPLANET_MODEL", "opus")
     assert effective_tier(Tier.EMBED) is Tier.EMBED
@@ -193,19 +214,21 @@ def test_price_moves_with_the_model_not_with_the_task_class(monkeypatch):
     """The ledger must record what was truly spent. A pin that moved the model
     and left the price would over-bill a Haiku run at Opus rates and trip the
     budget rail early - a wrong refusal, and an unexplainable invoice."""
-    million = Usage(input_tokens=1_000_000, output_tokens=0)
+    # 100K input: at, not over, Haiku 5.5's long-prompt step, so both models
+    # bill at their base rates - Opus 5.5 at $4 per million, Haiku 5.5 at $0.10.
+    usage = Usage(input_tokens=100_000, output_tokens=0)
     monkeypatch.setenv("FINPLANET_MODEL", "haiku")
-    on_haiku = cost_usd(effective_tier(Tier.REASON), million)
+    on_haiku = cost_usd(effective_tier(Tier.REASON), usage)
     monkeypatch.setenv("FINPLANET_MODEL", "opus")
-    on_opus = cost_usd(effective_tier(Tier.REASON), million)
-    assert on_opus == on_haiku * 5
+    on_opus = cost_usd(effective_tier(Tier.REASON), usage)
+    assert on_opus == on_haiku * 40
 
 
 def test_the_legacy_cheap_flag_still_means_haiku(monkeypatch):
     monkeypatch.setenv("FINPLANET_CHEAP", "1")
     assert pinned_tier() is Tier.CHEAP
     assert cheap_capped()
-    assert MODEL_IDS[effective_tier(Tier.REASON)] == "claude-haiku-4-5"
+    assert MODEL_IDS[effective_tier(Tier.REASON)] == "claude-haiku-5-5"
 
 
 def test_a_named_model_outranks_the_legacy_flag(monkeypatch):
@@ -215,7 +238,7 @@ def test_a_named_model_outranks_the_legacy_flag(monkeypatch):
     monkeypatch.setenv("FINPLANET_MODEL", "sonnet")
     assert pinned_tier() is Tier.BALANCED
     assert not cheap_capped()
-    assert "claude-sonnet-5" in selection_note()
+    assert "claude-sonnet-5-5" in selection_note()
 
 
 # --- junk fails loudly -----------------------------------------------------------
@@ -242,9 +265,11 @@ def test_a_selection_is_never_silent(monkeypatch):
     monkeypatch.setenv("FINPLANET_MODEL", "haiku")
     monkeypatch.setenv("FINPLANET_EFFORT", "low")
     note = selection_note()
-    assert "claude-haiku-4-5" in note
-    assert "low" in note
-    assert "thinking budget" in note
+    assert "claude-haiku-5-5" in note
+    assert "effort low" in note
+    # Haiku 5.5 takes the effort as an effort; a note still describing a
+    # thinking budget would be disclosing a request that is never sent.
+    assert "thinking budget" not in note
 
 
 def test_the_backend_command_names_the_model_and_the_reasoning(monkeypatch, capsys):
@@ -253,9 +278,9 @@ def test_the_backend_command_names_the_model_and_the_reasoning(monkeypatch, caps
     monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-ant-not-real")
     assert ask.main(["--model", "sonnet", "--effort", "xhigh", "backend"]) == 0
     out = capsys.readouterr().out
-    assert "claude-sonnet-5" in out
+    assert "claude-sonnet-5-5" in out
     assert "effort xhigh" in out
-    assert "pinned from claude-opus-5" in out
+    assert "pinned from claude-opus-5-5" in out
 
 
 def test_the_backend_command_refuses_a_junk_selection(monkeypatch, capsys):
@@ -294,10 +319,11 @@ def test_the_client_sends_the_resolved_shape_not_the_default_table(monkeypatch):
         daily_budget_myr=None,
     )
     client.complete("a4", TaskClass.THESIS_SYNTHESIS, "why did it move")
-    assert sent["model"] == "claude-haiku-4-5"
+    assert sent["model"] == "claude-haiku-5-5"
     assert sent["profile"] == profile_for(Tier.CHEAP)
-    assert sent["profile"].thinking_budget == CHEAP_EFFORT_BUDGET[Effort.HIGH][0]
-    assert sent["profile"].effort is None
+    assert sent["profile"].effort == Effort.HIGH.value
+    assert sent["profile"].adaptive_thinking is True
+    assert sent["profile"].max_tokens == EFFORT_MAX_TOKENS[Effort.HIGH]
 
 
 # --- the disclosure names the variable that actually caused the pin ----------------

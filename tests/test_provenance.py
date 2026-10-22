@@ -16,15 +16,16 @@ def test_call_is_recorded_with_both_currencies():
         "a10",
         TaskClass.THESIS_SYNTHESIS,
         Tier.REASON,
-        "claude-opus-5",
+        "claude-opus-5-5",
         "prompt",
         Usage(1_000_000, 0),
     )
-    assert rec.cost_usd == Decimal("5.00")
+    # Opus 5.5 input is $4 per million tokens.
+    assert rec.cost_usd == Decimal("4.00")
     # The constant, not a literal: the rate is a fact about the world that
     # moves, and a test restating it becomes a second place to update. Same
     # rule test_config.py already applies to the loader.
-    assert rec.cost_myr == Decimal("5.00") * DEFAULT_FX_MYR_PER_USD
+    assert rec.cost_myr == Decimal("4.00") * DEFAULT_FX_MYR_PER_USD
 
 
 def test_ledger_rejects_update():

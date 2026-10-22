@@ -249,6 +249,13 @@ Tell them the three rules that are not negotiable:
   and names misconceptions. It does not replace reading.
 - **Costs are planning estimates** at RM 4.15/USD, not measured bills. The
   provenance ledger records actuals from day one — compare monthly.
+- **The monthly cap sees what is recorded, not everything.** `[budget]
+  monthly_usd` (USD 50) is enforced before every call against the committed
+  evidence spend in `data/corpus.db` plus the ledger of the process making the
+  call. A call made on another machine whose ledger is never committed is
+  invisible to it. Set the same figure as the workspace spend limit in the
+  Anthropic Console: that limit is enforced by the API itself and is the
+  backstop for what this one cannot see.
 
 ---
 
@@ -295,6 +302,7 @@ The rules, all thresholds in `config.toml [monitor]` and bounded in code:
 | rule | fires when |
 |---|---|
 | `spend_24h` | 24h spend crosses `spend_fraction` of the daily budget |
+| `spend_month` | month-to-date USD (committed evidence spend in the corpus plus the local ledger, from 00:00 UTC on the 1st) reaches 85% of `[budget] monthly_usd` (warn) or the cap itself (alert - calls are being refused by then); no cap, no rule |
 | `latency_p95` | p95 latency over 24h exceeds `p95_latency_ms` |
 | `dropped_claims` | claims dropped for want of a citation exceed `dropped_claim_rate` |
 | `silence` | no model calls in `silence_hours`, on a ledger that HAS run before (0 = off) |

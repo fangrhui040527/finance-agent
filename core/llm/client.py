@@ -19,12 +19,15 @@ from typing import Protocol
 
 from core.guardrails.policy import Action, PolicyEngine, Rail
 from core.llm.tiers import (
+    MODEL_RATES,
+    PRICING_USD,
     TaskClass,
     Tier,
     Usage,
     effective_tier,
     profile_for,
     route,
+    worst_case_usd,
 )
 from core.provenance.ledger import DEFAULT_FX_MYR_PER_USD, ProvenanceLedger
 
@@ -97,7 +100,31 @@ def BackendError_for_parse(schema, text: str, cause=None):
     )
 
 
+def input_estimate(prompt: str, system: str | None) -> int:
+    """Input tokens a call is reserved for before it is made: a third of the
+    characters (denser than the usual quarter, so the estimate errs high) plus
+    a little for the message framing. Only a reservation - the ledger records
+    what the API actually counted."""
+    return (len(prompt) + len(system or "")) // 3 + 64
+
+
 class InferenceClient:
+    """The one way a model is called. Two spend rails, checked before each call:
+
+    * `daily_budget_myr` over a rolling window (24h by default) of this
+      process's ledger - the interactive guard it has always been.
+    * `monthly_budget_usd`, the owner's hard monthly limit on the API key:
+      month-to-date USD (`spend.month_to_date_usd`: the committed evidence
+      spend in `corpus_path` plus this ledger) PLUS the most this call can cost
+      (`tiers.worst_case_usd`) must stay within it. Reserving the call's worst
+      case, not checking what is already spent, is what makes it a cap: a
+      spent-only check lets the last call overshoot by its whole cost.
+
+    Either one refuses the call with `BudgetExceeded` before anything is sent.
+    Neither downgrades the model or the effort to fit; a cheaper answer to a
+    question nobody asked to have cheapened is not the answer that was asked for.
+    """
+
     def __init__(
         self,
         backend: Backend,
@@ -106,6 +133,9 @@ class InferenceClient:
         daily_budget_myr: Decimal | None = None,
         fx_rate: Decimal = DEFAULT_FX_MYR_PER_USD,
         budget_window: timedelta = timedelta(days=1),
+        *,
+        monthly_budget_usd: Decimal | None = None,
+        corpus_path: str | None = None,
     ) -> None:
         self.backend = backend
         self.engine = engine
@@ -113,6 +143,8 @@ class InferenceClient:
         self.daily_budget_myr = daily_budget_myr
         self.fx_rate = fx_rate
         self.budget_window = budget_window
+        self.monthly_budget_usd = monthly_budget_usd
+        self.corpus_path = corpus_path
 
     def complete(
         self, agent: str, task: TaskClass, prompt: str, system: str | None = None
@@ -121,7 +153,7 @@ class InferenceClient:
 
         tier = effective_tier(route(task))  # callers never choose this; the cheap cap may lower it
         # Through the backend, not MODEL_IDS: a free provider answers with its
-        # own model, and the row that says "claude-haiku-4-5" for a call Llama
+        # own model, and the row that says "claude-haiku-5-5" for a call Llama
         # answered is the row that makes every operating report a fiction.
         model_id = model_of(self.backend, tier)
         # profile_for, not REQUEST_PROFILES: the table is the default shape and
@@ -154,6 +186,11 @@ class InferenceClient:
                     f"{self.budget_window} (spent RM {spent:.2f}); "
                     "plan truncated and disclosed, not downgraded silently"
                 )
+
+        if self.monthly_budget_usd is not None:
+            self._check_monthly(
+                self.monthly_budget_usd, tier, model_id, prompt, system, profile.max_tokens
+            )
 
         t0 = time.perf_counter()
         try:
@@ -234,6 +271,51 @@ class InferenceClient:
             rec.cost_myr,
             request_id=getattr(self.backend, "last_request_id", None),
         )
+
+    def reservation_usd(
+        self, tier: Tier, model_id: str, prompt: str, system: str | None, max_tokens: int
+    ) -> Decimal:
+        """The most this call can cost, in USD, before it is made.
+
+        On the model's own price card (`tiers.worst_case_usd`) when the backend
+        declares no rate of its own; at the declared rate when it does, so a
+        free provider reserves nothing. A Claude id missing from the card is
+        reserved at the tier's rate rather than at zero - a reservation that
+        reads low is the direction of error that spends money nobody approved.
+        """
+        from core.llm.backends import pricing_of
+
+        estimate = input_estimate(prompt, system)
+        declared = pricing_of(self.backend, tier)
+        if declared is None and model_id in MODEL_RATES:
+            return worst_case_usd(model_id, estimate, max_tokens)
+        in_rate, out_rate = declared if declared is not None else PRICING_USD[tier]
+        million = Decimal(1_000_000)
+        return Decimal(estimate) / million * in_rate + Decimal(max_tokens) / million * out_rate
+
+    def _check_monthly(
+        self,
+        cap: Decimal,
+        tier: Tier,
+        model_id: str,
+        prompt: str,
+        system: str | None,
+        max_tokens: int,
+    ) -> None:
+        """Refuse a call whose worst case would carry the month past the cap."""
+        from core.llm import spend
+
+        spent = spend.month_to_date_usd(self.ledger, self.corpus_path)
+        reserve = self.reservation_usd(tier, model_id, prompt, system, max_tokens)
+        if spent + reserve > cap:
+            raise BudgetExceeded(
+                f"monthly cap USD {cap:.2f} would be exceeded: month-to-date USD "
+                f"{spent:.4f} plus this call's reservation USD {reserve:.4f} "
+                f"({model_id}, at most {max_tokens} output tokens) is USD "
+                f"{spent + reserve:.4f}. The call is refused and disclosed, not "
+                "downgraded to a cheaper model or a lower effort; the cap resets "
+                "at 00:00 UTC on the first of the month (config.toml [budget] monthly_usd)"
+            )
 
     def complete_structured(
         self,

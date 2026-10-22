@@ -33,7 +33,7 @@ def _ledger(path: Path, rows: list[dict]) -> Path:
             agent=r.get("agent", "a10_thesis"),
             task_class=TaskClass.THESIS_SYNTHESIS,
             tier=r.get("tier", Tier.CHEAP),
-            model_id=r.get("model", "claude-haiku-4-5"),
+            model_id=r.get("model", "claude-haiku-5-5"),
             prompt="p",
             usage=Usage(
                 input_tokens=r.get("in", 100),

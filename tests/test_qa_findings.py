@@ -209,7 +209,7 @@ def test_retry_after_seconds_are_honoured_on_a_429():
     waits: list[float] = []
     fake, calls = _flaky(429, {"Retry-After": "3"}, then=_reply("later"))
     text, _ = AnthropicBackend(client=fake, max_attempts=3, sleep=waits.append).complete(
-        "claude-opus-5", "q", None
+        "claude-opus-5-5", "q", None
     )
     assert text == "later" and len(calls) == 2
     assert waits == [3.0], "the server said when; the client must not guess"
@@ -220,7 +220,7 @@ def test_retry_after_is_capped_so_a_hostile_header_cannot_park_a_call():
     fake, _ = _flaky(429, {"retry-after": "600"})
     with pytest.raises(TransientError):
         AnthropicBackend(client=fake, max_attempts=2, sleep=waits.append).complete(
-            "claude-opus-5", "q", None
+            "claude-opus-5-5", "q", None
         )
     assert waits == [60.0]
 
@@ -239,7 +239,7 @@ def test_a_non_numeric_retry_after_falls_back_to_exponential_backoff():
             max_attempts=3,
             sleep=waits.append,
             jitter=lambda lo, hi: 1.0,
-        ).complete("claude-opus-5", "q", None)
+        ).complete("claude-opus-5-5", "q", None)
     assert waits == [1.0, 2.0]
 
 
@@ -250,7 +250,7 @@ def test_a_numeric_retry_after_is_obeyed_exactly_and_never_jittered():
         fake, _ = _flaky(429, {"retry-after": "7"})
         with pytest.raises(TransientError):
             AnthropicBackend(client=fake, max_attempts=2, sleep=waits.append).complete(
-                "claude-opus-5", "q", None
+                "claude-opus-5-5", "q", None
             )
         assert waits == [7.0]
 
@@ -278,7 +278,7 @@ def test_a_truncated_answer_carries_the_usage_it_cost():
         "half", stop_reason="max_tokens", usage={"input_tokens": 900, "output_tokens": 4096}
     )
     with pytest.raises(Truncated) as exc:
-        _sdk_backend([msg]).complete("claude-opus-5", "q", None)
+        _sdk_backend([msg]).complete("claude-opus-5-5", "q", None)
     assert exc.value.usage == Usage(900, 4096)
 
 
@@ -287,7 +287,7 @@ def test_a_refusal_carries_the_usage_it_cost():
 
     msg = _reply("", stop_reason="refusal", usage={"input_tokens": 30, "output_tokens": 2})
     with pytest.raises(Declined, match="declined") as exc:
-        _sdk_backend([msg]).complete("claude-opus-5", "q", None)
+        _sdk_backend([msg]).complete("claude-opus-5-5", "q", None)
     assert isinstance(exc.value, BackendError) and exc.value.usage == Usage(30, 2)
 
 
@@ -341,7 +341,7 @@ def test_a_call_that_raised_is_still_traced_with_its_error(tmp_path):
 # ---------------------------------------------------------------- 4. caching and its price
 def test_the_system_prompt_is_sent_as_a_cacheable_block():
     fake = FakeAnthropic([_reply()])
-    _sdk_backend(client=fake).complete("claude-opus-5", "q", "you are terse")
+    _sdk_backend(client=fake).complete("claude-opus-5-5", "q", "you are terse")
     assert fake.calls[0]["system"] == [
         {"type": "text", "text": "you are terse", "cache_control": {"type": "ephemeral"}}
     ]
@@ -356,7 +356,7 @@ def test_cache_writes_are_parsed_from_the_usage_block():
             "cache_creation_input_tokens": 640,
         }
     )
-    _, usage = _sdk_backend([msg]).complete("claude-opus-5", "q", None)
+    _, usage = _sdk_backend([msg]).complete("claude-opus-5-5", "q", None)
     assert usage.cache_write_tokens == 640
 
 

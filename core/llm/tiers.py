@@ -3,9 +3,9 @@
 docs/01 section 9: four tiers routed by task class, never by habit. No agent
 imports a vendor SDK directly - everything goes through complete() here.
 
-docs/08 section 4.6: routing everything to the reasoning tier costs 3.4x for no
-quality gain (RM 6,300/year). That is why the routing table lives here and is not
-left to each agent's discretion.
+docs/08 section 4.6: routing everything to the reasoning tier costs 5x for no
+quality gain (RM 5,700/year at the 5.5 rates). That is why the routing table
+lives here and is not left to each agent's discretion.
 """
 
 from __future__ import annotations
@@ -163,10 +163,13 @@ MODEL_RATES: dict[str, Rates] = {
 #: searches run, so it is what is charged here.
 WEB_SEARCH_USD = Decimal("0.01")
 
+#: The model each Messages tier calls: the current (5.5) generation. A change
+#: here moves the price with it (PRICING_USD below is derived), and the exact
+#: ids in MODEL_ALIASES must follow, because an exact id names the model called.
 MODEL_IDS: dict[Tier, str] = {
-    Tier.REASON: "claude-opus-5",
-    Tier.BALANCED: "claude-sonnet-5",
-    Tier.CHEAP: "claude-haiku-4-5",
+    Tier.REASON: "claude-opus-5-5",
+    Tier.BALANCED: "claude-sonnet-5-5",
+    Tier.CHEAP: "claude-haiku-5-5",
     Tier.EMBED: "text-embedding-3-small",
     Tier.LOCAL: "finbert-local",
 }
@@ -220,54 +223,40 @@ class Usage:
 class RequestProfile:
     """How a request is SHAPED for the model a tier resolves to.
 
-    Haiku 4.5 rejects `output_config.effort` and `thinking: {type: "adaptive"}`
-    with a 400; the Opus/Sonnet 5 family wants adaptive thinking and an effort
-    level, and long generations should stream so they cannot die on an HTTP idle
-    timeout. The table below is the single place that knowledge lives - the
-    backend never guesses.
-
-    `thinking_budget` is the Haiku-shaped dial: that model takes the older
-    `{type: "enabled", budget_tokens: N}` form instead of an effort level, so
-    the same five-level control reaches all three models without either one
-    being sent a parameter it rejects. The two thinking forms are mutually
-    exclusive by construction - sending both is a 400, and a profile that could
-    express it would be a bug waiting for a live call to find.
+    All three Messages models are the 5.5 generation now, and they share one
+    request surface: adaptive thinking plus `output_config.effort`. The older
+    `thinking: {type: "enabled", budget_tokens: N}` form is a 400 on every one
+    of them - Haiku 5.5 included, which is why the budget dial Haiku 4.5 needed
+    is gone rather than kept for a model nothing calls. Sampling parameters
+    (`temperature`, `top_p`, `top_k`) are a 400 on every model from API version
+    2026-10-21, so a profile has no field for them. Long generations stream so
+    they cannot die on an HTTP idle timeout. This dataclass and the table below
+    are the single place that knowledge lives - the backend never guesses.
     """
 
     max_tokens: int
     adaptive_thinking: bool = False
     effort: str | None = None
     stream: bool = False
-    thinking_budget: int | None = None
 
     def __post_init__(self) -> None:
-        if self.thinking_budget is not None:
-            if self.adaptive_thinking or self.effort:
-                raise ValueError(
-                    "thinking_budget is the pre-4.6 form and cannot be combined with "
-                    "adaptive thinking or an effort level; one model, one dial"
-                )
-            if self.thinking_budget < 1024:
-                raise ValueError(
-                    f"thinking budget must be at least 1024 tokens, got {self.thinking_budget}"
-                )
-            if self.thinking_budget >= self.max_tokens:
-                raise ValueError(
-                    f"thinking budget {self.thinking_budget} must be under max_tokens "
-                    f"{self.max_tokens}; the budget is spent INSIDE the output cap"
-                )
         if self.effort is not None and self.effort not in _EFFORT_VALUES:
             raise ValueError(
                 f"unknown effort {self.effort!r}; expected one of {', '.join(_EFFORT_VALUES)}"
             )
 
 
+#: Every effort is stated rather than left to the model's default, because the
+#: defaults differ by model and moved with 5.5 - Opus 5.5 and Haiku 5.5 default
+#: to `medium`, Sonnet 5.5 to `high` - and a profile that relied on one would
+#: change what it buys the day the model behind the tier changes.
 REQUEST_PROFILES: dict[Tier, RequestProfile] = {
     Tier.REASON: RequestProfile(
         max_tokens=16000, adaptive_thinking=True, effort="high", stream=True
     ),
     Tier.BALANCED: RequestProfile(max_tokens=8000, adaptive_thinking=True, effort="medium"),
-    Tier.CHEAP: RequestProfile(max_tokens=1024),
+    # Triage, tagging, routing: `low`, under Haiku 5.5's own `medium` default.
+    Tier.CHEAP: RequestProfile(max_tokens=4096, adaptive_thinking=True, effort="low"),
     Tier.EMBED: RequestProfile(max_tokens=1),
     Tier.LOCAL: RequestProfile(max_tokens=1),
 }
@@ -277,18 +266,23 @@ REQUEST_PROFILES: dict[Tier, RequestProfile] = {
 #: the exact model id resolve to the same tier, because the two get used
 #: interchangeably in practice and a system that accepts one spelling and
 #: silently ignores the other is the `MYX`/`XKLS` defect again.
+#:
+#: A VERSIONED name must name the model actually called. `claude-haiku-4-5`
+#: resolving to a tier that calls Haiku 5.5 would be a selection that reads as
+#: one model and bills as another, so the previous generation's ids and short
+#: names are refused (loudly, at startup) rather than quietly remapped.
 MODEL_ALIASES: dict[str, Tier] = {
     "haiku": Tier.CHEAP,
-    "haiku-4-5": Tier.CHEAP,
-    "claude-haiku-4-5": Tier.CHEAP,
+    "haiku-5-5": Tier.CHEAP,
+    "claude-haiku-5-5": Tier.CHEAP,
     "cheap": Tier.CHEAP,
     "sonnet": Tier.BALANCED,
-    "sonnet-5": Tier.BALANCED,
-    "claude-sonnet-5": Tier.BALANCED,
+    "sonnet-5-5": Tier.BALANCED,
+    "claude-sonnet-5-5": Tier.BALANCED,
     "balanced": Tier.BALANCED,
     "opus": Tier.REASON,
-    "opus-5": Tier.REASON,
-    "claude-opus-5": Tier.REASON,
+    "opus-5-5": Tier.REASON,
+    "claude-opus-5-5": Tier.REASON,
     "reason": Tier.REASON,
 }
 
@@ -296,20 +290,10 @@ MODEL_ALIASES: dict[str, Tier] = {
 #: pinned, capped or given an effort level.
 MESSAGES_TIERS: tuple[Tier, ...] = (Tier.REASON, Tier.BALANCED, Tier.CHEAP)
 
-#: Tiers whose model accepts `output_config.effort`. Haiku 4.5 does not - it
-#: returns a 400 - which is why CHEAP is absent here and gets a budget instead.
-EFFORT_TIERS: tuple[Tier, ...] = (Tier.REASON, Tier.BALANCED)
-
-#: Effort -> (thinking budget, output cap) for Haiku 4.5, the one model here
-#: with no effort parameter. The budget is spent INSIDE the cap, so the two
-#: move together; a table is the only honest way to hold that.
-CHEAP_EFFORT_BUDGET: dict[Effort, tuple[int, int]] = {
-    Effort.LOW: (1024, 3072),
-    Effort.MEDIUM: (2048, 4608),
-    Effort.HIGH: (4096, 8192),
-    Effort.XHIGH: (8192, 12288),
-    Effort.MAX: (16000, 20000),
-}
+#: Tiers whose model accepts `output_config.effort`: every Messages tier, now
+#: that CHEAP is Haiku 5.5. (Haiku 4.5 returned a 400 for an effort level and
+#: needed a thinking budget instead; nothing here calls it any more.)
+EFFORT_TIERS: tuple[Tier, ...] = (Tier.REASON, Tier.BALANCED, Tier.CHEAP)
 
 #: The output cap an effort level needs to land in on an effort-taking model.
 #: Raising effort without raising the cap buys thinking that is then truncated:
@@ -429,27 +413,19 @@ def profile_for(tier: Tier) -> RequestProfile:
     nothing is selected, and what the tests pin. This is the resolved view,
     and it is the only shape the client should send.
 
-    Three model-shaped facts live here and nowhere else:
+    Two model-shaped facts live here and nowhere else:
 
-      * Opus 5 and Sonnet 5 take `output_config.effort` at all five levels.
-      * Haiku 4.5 takes no effort parameter at all. Its dial is the older
-        `thinking.budget_tokens`, so the five levels reach it in the one form
-        it accepts rather than being quietly dropped on the floor.
+      * Opus 5.5, Sonnet 5.5 and Haiku 5.5 all take adaptive thinking and
+        `output_config.effort` at all five levels, so one path serves every
+        Messages tier. None takes `thinking.budget_tokens` (a 400), and none is
+        ever sent it.
       * A higher effort needs a bigger output cap to land in, and a big cap
         needs to stream.
     """
     base = REQUEST_PROFILES[tier]
     effort = selected_effort()
-    if effort is None or tier not in MESSAGES_TIERS:
+    if effort is None or tier not in EFFORT_TIERS:
         return base
-
-    if tier is Tier.CHEAP:
-        budget, cap = CHEAP_EFFORT_BUDGET[effort]
-        return RequestProfile(
-            max_tokens=cap,
-            thinking_budget=budget,
-            stream=cap >= STREAM_ABOVE_MAX_TOKENS,
-        )
 
     cap = max(base.max_tokens, EFFORT_MAX_TOKENS[effort])
     return RequestProfile(
@@ -474,12 +450,6 @@ def selection_note() -> str:
         parts.append(f"every Messages tier pinned to {MODEL_IDS[pin]} ({pin_source()})")
     if effort is not None:
         parts.append(f"effort {effort.value} (FINPLANET_EFFORT)")
-        if pin is None or pin is Tier.CHEAP:
-            budget = CHEAP_EFFORT_BUDGET[effort][0]
-            parts.append(
-                f"on Haiku 4.5 that is a {budget}-token thinking budget, "
-                "because it takes no effort parameter"
-            )
     # No colons. `ask.py` labels the narrative with `reason.split(":")[0]` to cut
     # the explanatory tail off the echo reason, so a colon in here truncates the
     # disclosure mid-sentence - the label stops exactly where it starts saying

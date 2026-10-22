@@ -693,7 +693,7 @@ def s_feeds():
         expect_raises(
             f"backend: {label} raises",
             BackendError,
-            lambda m=msg: sdk_backend([m]).complete("claude-opus-5", "q", None),
+            lambda m=msg: sdk_backend([m]).complete("claude-opus-5-5", "q", None),
             why="A silent stub answer is indistinguishable from a real one.",
         )
 
@@ -705,7 +705,7 @@ def s_feeds():
     expect_raises(
         "backend: truncation raises rather than returning half a thesis",
         Truncated,
-        lambda: sdk_backend([trunc]).complete("claude-opus-5", "q", None),
+        lambda: sdk_backend([trunc]).complete("claude-opus-5-5", "q", None),
         why="docs/08 8: truncation is disclosed, never silent.",
     )
 
@@ -713,7 +713,7 @@ def s_feeds():
     flaky_client = FakeAnthropic([http_status_error(500)] * 5)
     try:
         AnthropicBackend(client=flaky_client, max_attempts=3, sleep=lambda _: None).complete(
-            "claude-opus-5", "q", None
+            "claude-opus-5-5", "q", None
         )
     except BackendError:
         pass

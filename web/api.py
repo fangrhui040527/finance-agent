@@ -91,11 +91,6 @@ def backend() -> S.Envelope:
                         if effort_reaches(b, effective_tier(tier))
                         else None
                     ),
-                    "thinking_budget": (
-                        profile_for(effective_tier(tier)).thinking_budget
-                        if effort_reaches(b, effective_tier(tier))
-                        else None
-                    ),
                     "max_tokens": profile_for(effective_tier(tier)).max_tokens,
                 }
                 for tier in models
@@ -122,6 +117,12 @@ def config() -> S.Envelope:
             "risk_per_trade": str(cfg.risk_per_trade),
             "daily_budget_myr": str(cfg.daily_budget_myr),
             "daemon_budget_myr": str(cfg.daemon_budget_myr),
+            "monthly_budget_usd": (
+                str(cfg.monthly_budget_usd) if cfg.monthly_budget_usd is not None else None
+            ),
+            "evidence_budget_usd": (
+                str(cfg.evidence_budget_usd) if cfg.evidence_budget_usd is not None else None
+            ),
             "single_name": str(cfg.limits.single_name),
             "min_effective_bets": str(cfg.limits.min_effective_bets),
             "portfolio_heat": str(cfg.limits.portfolio_heat),
@@ -325,7 +326,7 @@ def _narrative(body: S.ThesisBody) -> dict:
     from core.config import load as load_config
     from core.guardrails.policy import Action, PolicyViolation, Rail
     from core.llm.backends import backend_from_env
-    from core.llm.client import InferenceClient
+    from core.llm.client import BudgetExceeded, InferenceClient
     from core.provenance.ledger import ProvenanceLedger
 
     ctx = T.context()
@@ -346,8 +347,15 @@ def _narrative(body: S.ThesisBody) -> dict:
         ctx.engine,
         ProvenanceLedger(cfg.provenance_db),
         daily_budget_myr=Decimal(str(cfg.daily_budget_myr)),
+        monthly_budget_usd=cfg.monthly_budget_usd,
+        corpus_path=cfg.corpus_db,
     )
-    done = narrate_thesis(client, th, challenges)
+    try:
+        done = narrate_thesis(client, th, challenges)
+    except BudgetExceeded as e:
+        # The spend rails refused the call before it was made; said as such,
+        # never a 500 and never a cheaper model's answer in its place.
+        return {"refused": True, "reason": str(e), "backend": type(backend_obj).__name__}
     if done.refused:
         return {
             "refused": True,

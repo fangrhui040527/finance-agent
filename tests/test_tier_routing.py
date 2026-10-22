@@ -7,12 +7,14 @@ import pytest
 from core.llm.tiers import (
     MODEL_IDS,
     PRICING_USD,
+    WEB_SEARCH_USD,
     TaskClass,
     Tier,
     TierRoutingError,
     Usage,
     cost_usd,
     route,
+    worst_case_usd,
 )
 
 
@@ -50,17 +52,17 @@ def test_every_tier_has_a_model_id():
 
 
 def test_cost_arithmetic():
-    # 1M input + 1M output on the reason tier = $5 + $25
-    assert cost_usd(Tier.REASON, Usage(1_000_000, 1_000_000)) == Decimal("30.00")
+    # 1M input + 1M output on the reason tier (Opus 5.5) = $4 + $20
+    assert cost_usd(Tier.REASON, Usage(1_000_000, 1_000_000)) == Decimal("24.00")
 
 
 #: Each priced tier's first-party rate, USD per million tokens, paired with the
 #: model ID it is the rate FOR. Changing a model without its price, or a price
 #: without its model, fails here.
 EXPECTED_RATES: dict[Tier, tuple[str, Decimal, Decimal]] = {
-    Tier.REASON: ("claude-opus-5", Decimal("5.00"), Decimal("25.00")),
-    Tier.BALANCED: ("claude-sonnet-5", Decimal("2.00"), Decimal("10.00")),
-    Tier.CHEAP: ("claude-haiku-4-5", Decimal("1.00"), Decimal("5.00")),
+    Tier.REASON: ("claude-opus-5-5", Decimal("4.00"), Decimal("20.00")),
+    Tier.BALANCED: ("claude-sonnet-5-5", Decimal("2.00"), Decimal("10.00")),
+    Tier.CHEAP: ("claude-haiku-5-5", Decimal("0.10"), Decimal("0.50")),
 }
 
 
@@ -124,8 +126,31 @@ def test_cached_input_bills_at_ten_percent():
 
 
 def test_misrouting_everything_to_reason_is_measurably_worse():
-    """docs/08 section 4.6: the 3.4x claim, asserted rather than asserted-in-prose."""
+    """docs/08 section 4.6: the misrouting claim, asserted rather than asserted-in-prose.
+    On the cheap-tier work alone it is far worse than the 5x of the whole bill:
+    Haiku 5.5 is a fortieth of Opus 5.5's rate. Priced as one request, this
+    month-sized aggregate crosses Haiku's long-prompt step and is still 8x."""
     cheap_work = Usage(11_200_000, 2_300_000)
     tiered = cost_usd(Tier.CHEAP, cheap_work)
     misrouted = cost_usd(Tier.REASON, cheap_work)
     assert misrouted > tiered * 4
+
+
+def test_a_web_search_bills_ten_dollars_a_thousand_on_top_of_the_tokens():
+    """The server-side search fee is per search, not per token, so a call that
+    searched costs more than its tokens say - by exactly this much."""
+    assert WEB_SEARCH_USD * 1000 == Decimal("10")
+    plain = cost_usd(Tier.CHEAP, Usage(1_000, 100))
+    searched = cost_usd(Tier.CHEAP, Usage(1_000, 100, web_search_requests=4))
+    assert searched - plain == Decimal("0.04")
+
+
+def test_the_reservation_is_the_most_a_call_can_cost():
+    """What the monthly cap reserves before a call: every input token fresh and
+    every output token used, at the model's own rate. An Opus 5.5 call of 3,000
+    input tokens with a 16,000-token cap reserves $0.015 + $0.32 (input priced
+    at the dearer cache-write rate, the worst way an input token can bill)."""
+    reserve = worst_case_usd("claude-opus-5-5", 3_000, 16_000)
+    assert reserve == Decimal("3000") / 1_000_000 * Decimal("5.00") + Decimal("0.32")
+    spent = cost_usd(Tier.REASON, Usage(3_000, 16_000), model_id="claude-opus-5-5")
+    assert spent <= reserve

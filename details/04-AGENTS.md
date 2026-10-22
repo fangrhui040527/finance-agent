@@ -73,13 +73,18 @@ Callers declare a `TaskClass`; the tier is derived.
 
 | Tier | Model | Input / output USD per Mtok | Used for |
 |---|---|---|---|
-| `REASON` | `claude-opus-5` | 5.00 / 25.00 | thesis synthesis, red team, hard attribution, deep reflection |
-| `BALANCED` | `claude-sonnet-5` | 2.00 / 10.00 | fundamentals, valuation, catalyst, macro, sector, flow, risk, ad-hoc, daily brief, breaker sweep |
-| `CHEAP` | `claude-haiku-4-5` | 1.00 / 5.00 | intent routing, news triage, entity tagging |
+| `REASON` | `claude-opus-5-5` | 4.00 / 20.00 | thesis synthesis, red team, hard attribution, deep reflection |
+| `BALANCED` | `claude-sonnet-5-5` | 2.00 / 10.00 | fundamentals, valuation, catalyst, macro, sector, flow, risk, ad-hoc, daily brief, breaker sweep |
+| `CHEAP` | `claude-haiku-5-5` | 0.10 / 0.50 | intent routing, news triage, entity tagging |
 | `EMBED` | `text-embedding-3-small` | 0.05 / 0 | retrieval |
 | `LOCAL` | `finbert-local` | 0 / 0 | on-device classification |
 
-Cached input bills at roughly 10% of base input, handled in `cost_usd()`.
+Rates are per model (`MODEL_RATES`), and each tier's price follows the model it
+calls. Cache reads bill at the model's own read rate (Opus 5.5 $0.20, a
+twentieth of input; Sonnet 5.5 and Haiku 5.5 a tenth); Haiku 5.5 bills a
+request over 100K input tokens at $0.50 / $2.50; a server-side web search adds
+$0.01. All handled in `cost_usd()`. Every call is also held to the USD 50
+monthly cap (`config.toml [budget] monthly_usd`) before it is made.
 
 Twenty-two task classes route into five tiers. `route()` raises
 `TierRoutingError` for an unregistered class rather than falling back to a
