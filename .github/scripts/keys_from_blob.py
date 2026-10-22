@@ -32,6 +32,13 @@ token was one the old pattern could already match.
 
 Nothing is printed for a name it is not sure about, and no value is ever
 written to stderr: the summary there names the names.
+
+THE PAID KEY IS PRINTED ONLY WHEN ASKED FOR. Every workflow's reader loop
+writes what this prints to $GITHUB_ENV, which reaches every later step's
+processes. ANTHROPIC_API_KEY is recognised (so its token is never taken for
+another name) but printed only with `--only ANTHROPIC_API_KEY`, which the one
+step that spends it - collect.yml's web evidence step - passes. A run with the
+key in its environment bills it, on a runner whose ledger is thrown away.
 """
 
 from __future__ import annotations
@@ -93,6 +100,9 @@ MUST: dict[str, re.Pattern[str]] = {
 TOKEN = re.compile(r"[A-Za-z0-9_\-]{16,}|[0-9a-fA-F]{10,}\.[0-9a-fA-F]{6,}")
 NAMES = tuple(name for name, _ in LABELS)
 
+#: Recognised, but printed only on request (`--only NAME`).
+OPT_IN = ("ANTHROPIC_API_KEY",)
+
 
 def recognise(blob: str) -> dict[str, str]:
     """The keys the blob carries, by their environment-variable name."""
@@ -129,19 +139,31 @@ def recognise(blob: str) -> dict[str, str]:
 
 
 def main(argv: list[str]) -> int:
-    var = argv[1] if len(argv) > 1 else "ALL_SECRET"
+    args = list(argv[1:])
+    only: str | None = None
+    if "--only" in args:
+        i = args.index("--only")
+        if i + 1 >= len(args) or args[i + 1] not in NAMES:
+            sys.stderr.write(f"--only needs one of: {', '.join(NAMES)}\n")
+            return 2
+        only = args[i + 1]
+        del args[i : i + 2]
+    var = args[0] if args else "ALL_SECRET"
     blob = os.environ.get(var, "")
     if not blob.strip():
         sys.stderr.write(f"{var} is empty or unset\n")
         return 0
     found = recognise(blob)
-    for name in NAMES:
+    printed = (only,) if only else tuple(n for n in NAMES if n not in OPT_IN)
+    for name in printed:
         if name in found:
             sys.stdout.write(f"{name}={found[name]}\n")
     missing = [n for n in NAMES if n not in found]
+    held = [n for n in OPT_IN if n in found and n not in printed]
     sys.stderr.write(
         f"{var}: recognised {', '.join(n for n in NAMES if n in found) or 'nothing'}"
         + (f"; not found: {', '.join(missing)}" if missing else "")
+        + (f"; not printed (ask with --only): {', '.join(held)}" if held else "")
         + "\n"
     )
     return 0

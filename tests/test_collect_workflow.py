@@ -167,3 +167,30 @@ def test_web_evidence_runs_after_the_prices_and_marks_before_the_digest_with_the
     from knowledge.evidence.web import DEADLINE_SECONDS
 
     assert step["timeout-minutes"] * 60 >= DEADLINE_SECONDS + 120
+    # And the job's own cap holds every step's bound: cancelled while the
+    # evidence step waits on a paid search, the job never commits its record.
+    from knowledge.sweep import SWEEP_DEADLINE_SECONDS
+
+    job = _workflow()["jobs"]["sweep"]
+    bounded = sum(s.get("timeout-minutes", 0) for s in steps)
+    assert job["timeout-minutes"] >= bounded + SWEEP_DEADLINE_SECONDS / 60 + 4
+
+
+def test_no_workflow_exports_the_paid_key_from_all_secret():
+    """Only the evidence step asks keys_from_blob for ANTHROPIC_API_KEY, and it
+    does not write GITHUB_ENV; every other reader gets everything but it."""
+    import glob
+
+    import yaml
+
+    askers = []
+    for path in sorted(glob.glob(".github/workflows/*.yml")):
+        with open(path, encoding="utf-8") as fh:
+            wf = yaml.safe_load(fh)
+        for job in wf.get("jobs", {}).values():
+            for s in job.get("steps", []):
+                run = str(s.get("run", ""))
+                if "keys_from_blob.py" in run and "--only ANTHROPIC_API_KEY" in run:
+                    askers.append((path, s.get("name")))
+                    assert "GITHUB_ENV" not in run
+    assert askers == [(".github/workflows/collect.yml", "Search the web for unexplained moves")]

@@ -749,8 +749,11 @@ as the search location), through `core/llm/websearch.py`. A paused turn is
 resumed once, never more. A refusal is recorded and never re-routed. Each leg
 has 180 s, the SDK never retries (a retried timeout is a second paid turn),
 and no leg starts unless it can finish inside the run's 8-minute deadline; the
-collector step allows 11 minutes, so a billed search is never killed before it
-is recorded.
+collector step allows 11 minutes and the job 35 (the sum of its steps' bounds),
+so a billed search is never killed before it is recorded. A request the API
+refuses before running it (429, 5xx, 529) is retried twice inside the
+deadline; one that may have run with no response seen (a read timeout, a
+dropped connection) is priced at its reserve and not sent again.
 
 **What is kept.** One corpus row per page the model cited: its title, the
 passages cited, its own date (`page_age`; an undated page is not stored, never
@@ -789,8 +792,9 @@ searched.
 **What it needs.** `ANTHROPIC_API_KEY` as a repository secret (or in
 ALL_SECRET, labelled "anthropic"/"claude" or recognised by its `sk-ant-api`
 prefix; a Claude Code OAuth or Admin token is never taken for it). The key
-reaches the evidence step alone: the ALL_SECRET reader does not export it, and
-the evidence step reads the blob itself. Without it the step lists the
+reaches the evidence step alone: `keys_from_blob.py` prints it only when asked
+(`--only ANTHROPIC_API_KEY`), so no workflow's ALL_SECRET reader exports it,
+and the evidence step reads the blob itself. Without it the step lists the
 qualifying moves and records nothing. An identity-linked key needs
 `ANTHROPIC_WORKSPACE_ID` (a repository secret too); it is sent as the
 `anthropic-workspace-id` header, and a workspace 400 stops the run after one

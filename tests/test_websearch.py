@@ -243,3 +243,95 @@ def test_the_client_names_the_workspace_and_never_retries(monkeypatch):
     assert WebSearch("m").client is not None
     assert seen["default_headers"] == {"anthropic-workspace-id": "wrkspc_test"}
     assert seen["max_retries"] == 0
+
+
+def _sdk_seam(handler):
+    """A WebSearch on the real SDK client, over a transport that fails as told."""
+    import anthropic
+    from anthropic._base_client import httpx2
+
+    client = anthropic.Anthropic(
+        api_key="test-not-a-key",
+        max_retries=0,
+        timeout=5,
+        http_client=httpx2.Client(transport=httpx2.MockTransport(handler)),
+    )
+    return WebSearch("claude-opus-5-5", client=client), httpx2
+
+
+def test_a_connection_dropped_after_the_request_went_out_is_counted_as_lost():
+    """The server may have run the turn and billed it; the SDK raises
+    APIConnectionError, not a timeout, and that is no proof of 'nothing billed'."""
+    from anthropic._base_client import httpx2
+
+    def dropped(req):
+        req.read()
+        raise httpx2.RemoteProtocolError("Server disconnected without sending a response")
+
+    seam, _ = _sdk_seam(dropped)
+    a = seam.search("s", "p")
+    assert a.lost_legs == 1 and a.incomplete
+
+
+def test_a_request_that_never_reached_the_server_raises_unbilled():
+    import anthropic
+    import pytest
+    from anthropic._base_client import httpx2
+
+    def refused(req):
+        raise httpx2.ConnectError("connection refused")
+
+    seam, _ = _sdk_seam(refused)
+    with pytest.raises(anthropic.APIConnectionError):
+        seam.search("s", "p")
+
+
+class _Refused(Exception):
+    """What the SDK raises for a status the API answers instead of a turn."""
+
+    def __init__(self, status):
+        super().__init__(f"{status}")
+        self.status_code = status
+
+
+def test_a_continuation_the_api_refused_before_running_is_retried_and_completes():
+    first = _response([SEARCH, RESULTS], stop="pause_turn", usage=_usage(1000, 100, 1))
+    client = Client(first, _Refused(529), _response([ANSWER]))
+
+    def create(**kw):
+        client.calls.append(kw)
+        r = client.responses.pop(0)
+        if isinstance(r, Exception):
+            raise r
+        return r
+
+    client.create = create  # type: ignore[method-assign]
+    slept: list[float] = []
+    a = WebSearch("claude-opus-5-5", client=client, sleep=slept.append).search("s", "p")
+    assert not a.incomplete and a.sources and slept == [2.0]
+    assert len(client.calls) == 3
+
+
+def test_a_refused_request_is_not_retried_past_the_deadline_or_forever():
+    import pytest
+
+    first = _response([SEARCH, RESULTS], stop="pause_turn")
+    client = Client(first, _Refused(529))
+
+    def create(**kw):
+        client.calls.append(kw)
+        r = client.responses.pop(0) if client.responses else _Refused(529)
+        if isinstance(r, Exception):
+            raise r
+        return r
+
+    client.create = create  # type: ignore[method-assign]
+    late = WebSearch("m", client=client, timeout=180.0, sleep=lambda s: None).search(
+        "s", "p", deadline=181.0, clock=lambda: 0.0
+    )
+    assert late.incomplete and len(client.calls) == 2, "no retry that cannot finish in time"
+
+    always = Client()
+    always.create = lambda **kw: (_ for _ in ()).throw(_Refused(503))  # type: ignore[method-assign]
+    with pytest.raises(_Refused):
+        WebSearch("m", client=always, sleep=lambda s: None).search("s", "p")

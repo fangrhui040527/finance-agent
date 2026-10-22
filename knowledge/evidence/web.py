@@ -86,10 +86,11 @@ LOOKBACK_SESSIONS = 3
 #: The most names searched for one market's session, by |SAR|: 3 was the most
 #: that cleared 1.96 on any one day in the six months measured.
 PER_MARKET_SESSION = 3
-#: And per run, with a deadline, inside the collector's 25-minute job: no leg
-#: of a search starts unless its whole timeout (websearch.TIMEOUT) fits before
-#: the deadline, and the collect.yml step's timeout-minutes (11) is this plus
-#: startup and margin.
+#: And per run, with a deadline: no leg of a search starts unless its whole
+#: timeout (websearch.TIMEOUT) fits before the deadline, and the collect.yml
+#: step's timeout-minutes (11) is this plus startup and margin. The job's own
+#: limit (35) is the sum of its steps' limits, so the job is never cancelled
+#: while this step waits on a billed leg.
 PER_RUN = 4
 DEADLINE_SECONDS = 480
 
@@ -250,19 +251,24 @@ def _earnings_sessions(calendar, e) -> set[date]:
 _QUARTER = re.compile(r"\bQ[1-4]\s+\d{4}\b", re.IGNORECASE)
 
 
-def _current_dates(rows) -> list:
-    """One earnings row per (source, quarter): the date announced LAST. The
-    calendars move a tentative date and the store keeps every date it was
-    shown (append-only, one row per date), so only the newest stands."""
-    best: dict[tuple[str, str], object] = {}
+def _current_dates(rows, sightings=None) -> list:
+    """One earnings row per (source, quarter): the date the calendar listed
+    LAST. The calendars move a tentative date and the store keeps every date
+    it was shown (append-only, one row per date, first seen in announced_at);
+    a date listed again after a detour is in `sightings` (FactBook.last_seen),
+    so a date that moved away and came back is current again."""
+    sightings = sightings or {}
+    best: dict[tuple[str, str], tuple[datetime, object]] = {}
     for e in rows:
         m = _QUARTER.search(str(getattr(e, "title", "") or ""))
-        group = (str(getattr(e, "source", "")), m.group(0).upper() if m else "")
-        seen = getattr(e, "announced_at", None)
+        source = str(getattr(e, "source", ""))
+        group = (source, m.group(0).upper() if m else "")
+        first = getattr(e, "announced_at", None) or datetime.min.replace(tzinfo=UTC)
+        seen = max(first, sightings.get((source, str(getattr(e, "event_id", ""))), first))
         prior = best.get(group)
-        if prior is None or (seen and seen > (getattr(prior, "announced_at", None) or seen)):
-            best[group] = e
-    return list(best.values())
+        if prior is None or seen > prior[0]:
+            best[group] = (seen, e)
+    return [e for _, e in best.values()]
 
 
 def _structured_cause(
@@ -283,7 +289,9 @@ def _structured_cause(
         rows = book.events(
             instrument_id, kind="earnings_result", since=until - wide, until=until + wide
         )
-        for e in _current_dates(rows):
+        seen = getattr(book, "last_seen", None)
+        sightings = seen([(e.source, e.event_id) for e in rows]) if seen else {}
+        for e in _current_dates(rows, sightings):
             if session in _earnings_sessions(calendar, e):
                 return "earnings_result"
         rest = ("rating_change",)
@@ -425,6 +433,8 @@ def read_page_age(page_age: str, retrieved: datetime, tz: tzinfo = UTC) -> PageD
 
 
 def _read(raw: str, retrieved: datetime, tz: tzinfo) -> PageDate | None:
+    # The page's words go into the stored note; parentheses would end it.
+    raw = raw.replace("(", "").replace(")", "").strip()
     m = _RELATIVE.search(raw)
     if m:
         n, unit = int(m.group(1)), m.group(2).lower()
@@ -480,8 +490,20 @@ def _clean_url(url: str) -> str:
     return urlunsplit((parts.scheme, parts.netloc.lower(), parts.path, parts.query, ""))
 
 
-#: How a stored body says its page is dated by day alone (the pack reads it).
+#: How a stored body says its page is dated by day alone (`stated_day`).
 DAY_ONLY = "day only"
+_STATED = re.compile(r"\(page dated (\d{4}-\d{2}-\d{2})[^()]*, " + DAY_ONLY + r"\)\s*$")
+
+
+def stated_day(body: str | None) -> str | None:
+    """The calendar day a web row's page gave, when it gave no time; else None.
+
+    Printed in place of the stored stamp, which is the END of that day in the
+    market's timezone (capped at retrieval): its UTC date can be the next day
+    (a New York page) or the day before (a Kuala Lumpur page found before the
+    local day ended), and its time is not the page's."""
+    m = _STATED.search(body or "")
+    return m.group(1) if m else None
 
 
 def _articles(answer, trigger: Trigger, retrieved: datetime):
@@ -885,11 +907,15 @@ def for_pack(corpus, instrument_id: str, since: datetime) -> tuple[list[dict], l
     the evidence for that move."""
     if not corpus.has_table("evidence_searches"):
         return [], []
+    # Every attempt that counts as searched (`searched_keys`): a billed
+    # `error` too, or the page would say no search happened for a move that
+    # will never be searched again.
     attempts = [
         dict(r)
         for r in corpus.conn.execute(
             "SELECT * FROM evidence_searches WHERE instrument = ? AND at >= ? "
-            "AND outcome IN ({}) ORDER BY at".format(",".join("?" * len(SEARCHED))),
+            "AND (outcome IN ({}) OR searches > 0 OR CAST(cost_usd AS REAL) > 0) "
+            "ORDER BY at".format(",".join("?" * len(SEARCHED))),
             (instrument_id, since.isoformat(), *SEARCHED),
         ).fetchall()
     ]

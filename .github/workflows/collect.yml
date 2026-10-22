@@ -78,8 +78,13 @@ jobs:
     runs-on: ubuntu-latest
     # SWEEP_DEADLINE_SECONDS stops new requests at 10 minutes so the run always
     # reaches the commit step; a job killed by this cap commits nothing at all.
-    # The price step has its own budget and cap for the same reason (below).
-    timeout-minutes: 25
+    # The price step has its own budget and cap for the same reason (below),
+    # and so does the web evidence step. This cap must be at least the sum of
+    # those bounds - setup ~1, sweep 10 plus requests in flight ~1, prices 8,
+    # web evidence 11, digest, monitor and commit ~2 - or it can cancel the
+    # job while the evidence step waits on a search it has already paid for,
+    # and the commit that records that spend never runs.
+    timeout-minutes: 35
     defaults:
       run:
         shell: bash
@@ -281,7 +286,7 @@ jobs:
         run: |
           set +e
           if [ -z "$ANTHROPIC_API_KEY" ] && [ -n "$ALL_SECRET" ]; then
-            ANTHROPIC_API_KEY=$(python3 .github/scripts/keys_from_blob.py ALL_SECRET 2>/dev/null | sed -n 's/^ANTHROPIC_API_KEY=//p')
+            ANTHROPIC_API_KEY=$(python3 .github/scripts/keys_from_blob.py ALL_SECRET --only ANTHROPIC_API_KEY 2>/dev/null | sed -n 's/^ANTHROPIC_API_KEY=//p')
             if [ -n "$ANTHROPIC_API_KEY" ]; then
               echo "::add-mask::$ANTHROPIC_API_KEY"
               echo "ANTHROPIC_API_KEY: taken from ALL_SECRET"

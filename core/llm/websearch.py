@@ -27,12 +27,16 @@ top_p, top_k or a thinking budget: the current models reject all four.
 WHAT A FAILURE COSTS. Each leg (the first call, the continuation) is a billed
 server-side turn the moment it starts. So a failed continuation does not
 throw away the first leg: the answer comes back `incomplete`, with that leg's
-usage, queries and sources, for the caller to record. A leg that TIMED OUT may
-have been billed in full with no usage ever seen; it is counted in
-`lost_legs`, for the caller to price at its worst case. The SDK's retries are
-off (`max_retries=0`): a retried timeout is a second paid turn, and whether to
-pay for one is the next run's decision, made after this one is recorded. A
-failure of the FIRST leg that is not a timeout raises - nothing was billed.
+usage, queries and sources, for the caller to record. A leg whose request may
+have reached the server with no response seen - a read timeout, a dropped
+connection (`backends.possibly_billed`) - may have been billed in full; it is
+counted in `lost_legs`, for the caller to price at its worst case. The SDK's
+retries are off (`max_retries=0`): a re-sent timeout is a second paid turn,
+and whether to pay for one is the next run's decision, made after this one is
+recorded. What IS retried here, inside the caller's deadline, is a status the
+API returns instead of running the turn (429, 5xx, 529 overloaded): refused
+before any work, so free to repeat. A failure of the FIRST leg that cannot
+have been billed raises.
 """
 
 from __future__ import annotations
@@ -55,6 +59,9 @@ CONTINUATIONS = 1
 #: is the whole turn. A three-search turn at effort medium measured well under
 #: a minute; a leg that writes all 8,000 output tokens is the slow case.
 TIMEOUT = 180.0
+
+#: Retries of a request the API refused before running it (REFUSED_STATUSES).
+RETRIES = 2
 
 
 @dataclass(frozen=True)
@@ -135,6 +142,7 @@ class WebSearch:
         user_location: dict | None = None,
         client=None,
         timeout: float = TIMEOUT,
+        sleep=time.sleep,
     ) -> None:
         self.model_id = model_id
         self.max_uses = max_uses
@@ -142,6 +150,7 @@ class WebSearch:
         self.max_tokens = max_tokens
         self.user_location = user_location
         self.timeout = timeout
+        self._sleep = sleep
         # Any: the SDK's own client, or a test double with `messages.create`.
         # The request is built from plain dicts, as the API documents it.
         self._client: Any = client
@@ -174,7 +183,9 @@ class WebSearch:
                 answer.errors.append("continuation not started: the run's deadline")
                 break
             try:
-                response = self.client.messages.create(
+                response = self._create(
+                    deadline,
+                    clock,
                     model=self.model_id,
                     max_tokens=self.max_tokens,
                     system=system,
@@ -183,12 +194,12 @@ class WebSearch:
                     output_config={"effort": self.effort},
                 )
             except Exception as e:
-                from core.llm.backends import timed_out as _timed_out
+                from core.llm.backends import possibly_billed
 
-                timed_out = _timed_out(e)
-                if attempt == 0 and not timed_out:
-                    raise  # refused before any work: nothing billed
-                answer.lost_legs += int(timed_out)
+                billed = possibly_billed(e)
+                if attempt == 0 and not billed:
+                    raise  # never reached the server, or refused there: nothing billed
+                answer.lost_legs += int(billed)
                 answer.incomplete = True
                 leg = "continuation" if attempt else "request"
                 answer.errors.append(f"{leg} failed: {type(e).__name__}")
@@ -215,6 +226,25 @@ class WebSearch:
         cited = {s.url for s in answer.sources}
         answer.uncited = {u: v for u, v in answer.uncited.items() if u not in cited}
         return answer
+
+    def _create(self, deadline: float | None, clock, **request):
+        """One leg, re-sent only when the API refused it before running it,
+        and only while a retry and its whole timeout still fit the deadline."""
+        from core.llm.backends import REFUSED_STATUSES, RETRY_AFTER_CAP
+
+        for retry in range(RETRIES + 1):
+            try:
+                return self.client.messages.create(**request)
+            except Exception as e:
+                status = getattr(e, "status_code", None)
+                if status not in REFUSED_STATUSES or retry == RETRIES:
+                    raise
+                wait = _retry_after(e) or 2.0 * 2**retry
+                wait = min(wait, RETRY_AFTER_CAP)
+                if deadline is not None and clock() + wait + self.timeout > deadline:
+                    raise
+                self._sleep(wait)
+        raise AssertionError("unreachable")  # pragma: no cover
 
     def _read(self, blocks, answer: SearchAnswer) -> None:
         # This leg's results. A continuation cites results an EARLIER leg
@@ -268,3 +298,12 @@ class WebSearch:
             else:
                 known[url] = Source(url, title or titles.get(url, ""), age, tuple(snippets))
         answer.sources = list(known.values())
+
+
+def _retry_after(e: Exception) -> float | None:
+    headers = getattr(getattr(e, "response", None), "headers", None)
+    try:
+        seconds = float(str(headers.get("retry-after")).strip()) if headers else 0.0
+    except ValueError:
+        return None
+    return seconds if seconds > 0 else None

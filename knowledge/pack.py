@@ -718,15 +718,12 @@ def _web_evidence(cfg, corpus_path, book_ids, names, now: datetime) -> list[str]
 
 
 def _web_row(r: dict, refs: dict, indent: str = "") -> str:
-    """One stored web evidence row. A page dated by its day alone says so,
-    rather than print the end-of-day stamp it is stored at as if a time."""
-    from knowledge.evidence.web import DAY_ONLY
+    """One stored web evidence row. A page dated by its day alone prints that
+    day, rather than the end-of-day stamp it is stored at as if a time."""
+    from knowledge.evidence.web import stated_day
 
-    when = (
-        f"{r['published_at'][:10]} (date only)"
-        if f", {DAY_ONLY})" in (r.get("body") or "")
-        else f"{r['published_at'][:16]}Z"
-    )
+    day = stated_day(r.get("body"))
+    when = f"{day} (date only)" if day else f"{r['published_at'][:16]}Z"
     return (
         f"{indent}- {when} {r['title']} ({r['source_domain']}) "
         f"`{refs.get(r['doc_id'], r['doc_id'])}`"

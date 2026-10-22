@@ -145,12 +145,29 @@ def anthropic_client(*, api_key: str | None = None, max_retries: int, timeout: f
     return anthropic.Anthropic(max_retries=max_retries, timeout=timeout, **extra)
 
 
-def timed_out(e: Exception) -> bool:
-    """The SDK gave up waiting. The server may still have run - and billed - the
-    turn, so a caller that counts money cannot read this as 'nothing happened'."""
+#: Transport failures from BEFORE the request reached the server: the
+#: connection was never made, or the body never finished going out. Named by
+#: class name because the SDK's transport (httpx2 in SDK 1.x) is not httpx.
+_UNSENT = ("ConnectError", "ConnectTimeout", "PoolTimeout", "WriteError", "WriteTimeout")
+
+#: Statuses the API returns INSTEAD of running a turn: refused before any
+#: work, so retrying costs nothing. The set the backend's own loop retries.
+REFUSED_STATUSES = frozenset({429, 500, 502, 503, 529})
+
+
+def possibly_billed(e: Exception) -> bool:
+    """The request may have reached the server and run - and been billed - with
+    no response ever seen: a read timeout, a dropped connection, a reset. A
+    caller that counts money cannot read that as 'nothing happened'. A failure
+    from before the request was sent is not; nor is an HTTP error status (the
+    API answered, so whatever it billed it said). An unknown cause counts as
+    billed: a cap that guessed low is no cap."""
     import anthropic
 
-    return isinstance(e, anthropic.APITimeoutError)
+    if not isinstance(e, anthropic.APIConnectionError):  # includes APITimeoutError
+        return False
+    cause = e.__cause__ or e.__context__
+    return type(cause).__name__ not in _UNSENT
 
 
 def workspace_refused(e: Exception) -> bool:

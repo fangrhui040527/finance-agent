@@ -171,3 +171,15 @@ def test_a_claude_code_oauth_or_admin_token_is_never_taken_for_the_api_key():
     found = blob.recognise(f"claude code oauth token: {oauth}\nanthropic key: {ANTHROPIC}\n")
     assert found["ANTHROPIC_API_KEY"] == ANTHROPIC
     assert "ANTHROPIC_API_KEY" not in blob.recognise(f"{oauth}\n{admin}\n")
+
+
+def test_the_paid_key_is_printed_only_when_asked_for(monkeypatch, capsys):
+    """Every workflow's reader loop exports what this prints to $GITHUB_ENV,
+    where every later step's processes would bill it."""
+    monkeypatch.setenv("ALL_SECRET", f"anthropic: {ANTHROPIC}\nfred: {FRED}\n")
+    assert blob.main(["keys_from_blob.py", "ALL_SECRET"]) == 0
+    out, err = capsys.readouterr()
+    assert out == f"FRED_API_KEY={FRED}\n" and ANTHROPIC not in err
+    assert "not printed (ask with --only): ANTHROPIC_API_KEY" in err
+    assert blob.main(["keys_from_blob.py", "ALL_SECRET", "--only", "ANTHROPIC_API_KEY"]) == 0
+    assert capsys.readouterr().out == f"ANTHROPIC_API_KEY={ANTHROPIC}\n"

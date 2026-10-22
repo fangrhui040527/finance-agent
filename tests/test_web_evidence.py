@@ -559,6 +559,10 @@ def test_a_fault_after_a_paid_search_still_records_the_bill(stores, moves, monke
     assert first.attempts[0].outcome == "error" and first.attempts[0].cost_usd > 0
     _run(stores, searcher, monkeypatch)
     assert len(searcher.prompts) == 1
+    # And the page shows it: a move never searched again is not "not searched".
+    with Corpus(stores.corpus_db) as c:
+        attempts, _ = web.for_pack(c, "MYX:3182", NOW - timedelta(days=1))
+    assert [a["outcome"] for a in attempts] == ["error"]
 
 
 def test_no_search_starts_that_could_not_finish_before_the_deadline(stores, moves, monkeypatch):
@@ -687,3 +691,71 @@ def test_the_pack_shows_each_row_under_the_search_that_found_it(stores, moves, m
     lines = _web_evidence(stores, stores.corpus_db, ("MYX:3182",), {}, NOW + timedelta(hours=1))
     at = next(i for i, ln in enumerate(lines) if "for the 2026-10-22 move" in ln)
     assert lines[at + 1].startswith("  - 2026-10-22 (date only) Genting falls")
+
+
+def test_an_earnings_date_that_moved_away_and_back_is_current_again(moves, tmp_path):
+    """10-20, then 10-21, then 10-20 again: the store cannot add a row for a
+    date it already holds, so the re-listing is a sighting, and 10-20 is the
+    date - its after-close report explains 10-21, not 10-22."""
+    from knowledge.facts import FactBook
+
+    for day in (date(2026, 10, 20), date(2026, 10, 21), date(2026, 10, 22)):
+        moves[("XNAS:NVDA", day)] = _move("XNAS:NVDA", day, 3.0)
+    a = _earnings(
+        "XNAS:NVDA",
+        date(2026, 10, 20),
+        "Q3 2027 results after the close",
+        datetime(2026, 9, 1, tzinfo=UTC),
+    )
+    b = _earnings("XNAS:NVDA", date(2026, 10, 21), "Q3 2027 results after the close",
+                  datetime(2026, 10, 1, tzinfo=UTC))  # fmt: skip
+    with FactBook(tmp_path / "facts.db") as book:
+        book.add_events([a, b])
+        assert book.last_seen([("finnhub", a.event_id)]) == {}, "no table until a re-listing"
+        book.add_events([a], fetched_at=datetime(2026, 10, 10, tzinfo=UTC))
+        found, notes = web.candidates(
+            Cfg(watchlist=("XNAS:NVDA",)), NOW + timedelta(hours=12), feed=None, facts=book
+        )
+    assert {t.key for t in found} == {"XNAS:NVDA|2026-10-20", "XNAS:NVDA|2026-10-22"}
+    assert any("2026-10-21" in n and "earnings_result" in n for n in notes)
+
+
+@pytest.mark.parametrize(
+    "mic, age, now, day",
+    [
+        # New York's end of 10-22 is 03:59Z on the 23rd: still the 22nd's page.
+        ("XNAS", "October 22, 2026", datetime(2026, 10, 23, 9, 20, tzinfo=UTC), "2026-10-22"),
+        # Kuala Lumpur's 23rd, found at 05:20 local: capped at retrieval on the
+        # 22nd UTC, still the 23rd's page.
+        ("XKLS", "October 23, 2026", NOW, "2026-10-23"),
+        ("XKLS", "3 days ago", NOW, "2026-10-20"),
+    ],
+)
+def test_a_day_only_page_is_shown_as_the_day_it_gave(mic, age, now, day):
+    t = web.Trigger("X:Y", "Y", mic, date(2026, 10, 22), now, None, 0.0, 0.0, 3.0, 0.0)
+    src = Source("https://example.com/y", "Y falls", age, ("Y fell",))
+    arts, _, day_only = web._articles(_answer(src), t, now)
+    assert web.stated_day(arts[0].body) == day and arts[0].doc_id in day_only
+
+
+def test_a_page_age_in_parentheses_still_states_its_day():
+    t = web.Trigger("X:Y", "Y", "XKLS", date(2026, 10, 22), NOW, None, 0.0, 0.0, 3.0, 0.0)
+    src = Source("https://example.com/y", "Y", "(2 days ago)", ("Y fell",))
+    arts, _, _ = web._articles(_answer(src), t, NOW)
+    assert web.stated_day(arts[0].body) == "2026-10-21"
+
+
+def test_the_digest_prints_a_day_only_web_row_as_its_day(stores, moves, monkeypatch):
+    from knowledge.digest import build_digest
+
+    d = date(2026, 10, 22)
+    moves[("MYX:3182", d)] = _move("MYX:3182", d, -3.19)
+    _run(stores, Searcher(_answer(DATED)), monkeypatch)
+    digest = build_digest(
+        stores, d, corpus_path=stores.corpus_db, facts_path=stores.facts_db, now=NOW
+    )
+    with Corpus(stores.corpus_db) as c:
+        refs = c.short_ids(["web_search:" + DATED.url.split("#")[0]])
+    page = digest.to_markdown(refs=refs)
+    line = next(ln for ln in page.splitlines() if "Genting falls on rights issue" in ln)
+    assert line.startswith("- 2026-10-22 (date only) "), line
