@@ -146,9 +146,18 @@ def anthropic_client(*, api_key: str | None = None, max_retries: int, timeout: f
 
 
 #: Transport failures from BEFORE the request reached the server: the
-#: connection was never made, or the body never finished going out. Named by
-#: class name because the SDK's transport (httpx2 in SDK 1.x) is not httpx.
-_UNSENT = ("ConnectError", "ConnectTimeout", "PoolTimeout", "WriteError", "WriteTimeout")
+#: connection was never made (a proxy that refused CONNECT, a URL scheme the
+#: client cannot speak), or the body never finished going out. Named by class
+#: name because the SDK's transport (httpx2 in SDK 1.x) is not httpx.
+_UNSENT = (
+    "ConnectError",
+    "ConnectTimeout",
+    "PoolTimeout",
+    "ProxyError",
+    "UnsupportedProtocol",
+    "WriteError",
+    "WriteTimeout",
+)
 
 #: Statuses the API returns INSTEAD of running a turn: refused before any
 #: work, so retrying costs nothing. The set the backend's own loop retries.

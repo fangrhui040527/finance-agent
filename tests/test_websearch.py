@@ -274,16 +274,21 @@ def test_a_connection_dropped_after_the_request_went_out_is_counted_as_lost():
 
 
 def test_a_request_that_never_reached_the_server_raises_unbilled():
+    """Refused at connect, by a proxy that would not CONNECT, or for a scheme
+    the client cannot speak: nothing reached the API, so nothing is charged
+    and the next run may try."""
     import anthropic
     import pytest
     from anthropic._base_client import httpx2
 
-    def refused(req):
-        raise httpx2.ConnectError("connection refused")
+    for unsent in (httpx2.ConnectError, httpx2.ProxyError, httpx2.UnsupportedProtocol):
 
-    seam, _ = _sdk_seam(refused)
-    with pytest.raises(anthropic.APIConnectionError):
-        seam.search("s", "p")
+        def refused(req, unsent=unsent):
+            raise unsent("not sent")
+
+        seam, _ = _sdk_seam(refused)
+        with pytest.raises(anthropic.APIConnectionError):
+            seam.search("s", "p")
 
 
 class _Refused(Exception):

@@ -738,11 +738,18 @@ def test_a_day_only_page_is_shown_as_the_day_it_gave(mic, age, now, day):
     assert web.stated_day(arts[0].body) == day and arts[0].doc_id in day_only
 
 
-def test_a_page_age_in_parentheses_still_states_its_day():
+@pytest.mark.parametrize(
+    "age", ["(2 days ago)", "2 days ago\uff08updated\uff09", "2 days ago &#40;approx&#41;"]
+)
+def test_a_page_age_with_brackets_of_any_form_still_states_its_day(age):
+    """Read from the STORED form: normalisation turns a fullwidth or
+    entity-encoded bracket into one that would end the note."""
+    from knowledge.news.clean import normalise_text
+
     t = web.Trigger("X:Y", "Y", "XKLS", date(2026, 10, 22), NOW, None, 0.0, 0.0, 3.0, 0.0)
-    src = Source("https://example.com/y", "Y", "(2 days ago)", ("Y fell",))
+    src = Source("https://example.com/y", "Y", age, ("Y fell",))
     arts, _, _ = web._articles(_answer(src), t, NOW)
-    assert web.stated_day(arts[0].body) == "2026-10-21"
+    assert web.stated_day(normalise_text(arts[0].body)) == "2026-10-21"
 
 
 def test_the_digest_prints_a_day_only_web_row_as_its_day(stores, moves, monkeypatch):

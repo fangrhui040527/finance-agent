@@ -441,11 +441,14 @@ def _read(raw: str, retrieved: datetime, tz: tzinfo) -> PageDate | None:
         when = retrieved - timedelta(**{f"{unit}s": n})
         if unit in ("minute", "hour"):
             return PageDate(when, False, f"{when:%Y-%m-%d %H:%M}Z, given as {raw!r}")
+        # The day alone: the page's own words would go through the stored
+        # form's normalisation, which can turn a fullwidth or entity-encoded
+        # bracket into one that ends the note `stated_day` reads.
         day = when.astimezone(tz).date()
-        return PageDate(_day_end(day, tz, retrieved), True, f"{day}, given as {raw!r}")
+        return PageDate(_day_end(day, tz, retrieved), True, f"{day}")
     if raw.lower() == "yesterday":
         day = (retrieved.astimezone(tz) - timedelta(days=1)).date()
-        return PageDate(_day_end(day, tz, retrieved), True, f"{day}, given as {raw!r}")
+        return PageDate(_day_end(day, tz, retrieved), True, f"{day}")
     day: date | None = None
     try:
         parsed = datetime.fromisoformat(raw.replace("Z", "+00:00"))
