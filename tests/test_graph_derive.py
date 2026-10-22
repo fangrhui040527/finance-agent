@@ -159,11 +159,14 @@ def _built(corpus: Path, out: Path) -> Path:
 
 
 def test_a_graph_this_module_did_not_write_is_never_taken_over(corpus, tmp_path):
+    from knowledge.graph.build import build
+
     graph = tmp_path / "data" / "graph.db"
-    with GraphStore(graph):
-        pass
+    with GraphStore(graph) as store:
+        build(store, summarize=False)  # a spine, as `make graph` or git leaves it
     before = _sha(graph)
-    assert not derive.wanted(graph, corpus)
+    stores.split(corpus)
+    assert not derive.vacant(graph) and not derive.wanted(graph, corpus)
     with pytest.raises(derive.DeriveError, match="not derived here"):
         derive.sync(graph, corpus)
     assert _sha(graph) == before
@@ -225,3 +228,87 @@ def test_a_sweep_links_what_the_corpus_kept_and_not_its_refusals(tmp_path):
     docs = {r[0] for r in con.execute("SELECT source_doc_id FROM edges WHERE kind = 'affects'")}
     con.close()
     assert docs == {"x1"}
+
+
+def test_a_graph_path_away_from_the_governed_corpus_is_never_derived(corpus, tmp_path):
+    """A test pointing the default graph at a tmp path must keep hearing "not
+    built" - not get a full graph of whatever corpus the checkout holds."""
+    stores.split(corpus)
+    elsewhere = tmp_path / "b" / "graph.db"
+    assert not derive.wanted(elsewhere, corpus)
+    assert derive.ready(elsewhere, corpus) is False
+    assert not elsewhere.exists()
+    # ...and with no corpus named, a graph is derived only from the one beside it.
+    assert derive.ready(elsewhere) is False
+
+
+def test_an_empty_graph_file_beside_a_governed_corpus_is_derived_not_served(corpus):
+    """One hand query on a missing path leaves a 0-byte file; GraphStore on it
+    an empty schema. Either, read as a graph, answers every peer question with
+    nothing - so it is treated as absent, as a 0-byte corpus is."""
+    stores.split(corpus)
+    graph = corpus.with_name("graph.db")
+    graph.write_bytes(b"")
+    assert derive.vacant(graph) and derive.wanted(graph, corpus)
+    assert derive.ready(graph, corpus) is True
+    assert derive.derived(graph) and _events(graph)
+
+    other = corpus.parent.parent / "x" / "data"
+    other.mkdir(parents=True)
+    with GraphStore(other / "graph.db"):
+        pass
+    assert derive.vacant(other / "graph.db")
+
+
+def test_make_graph_refuses_the_default_graph_where_it_should_be_derived(
+    corpus, tmp_path, monkeypatch, capsys
+):
+    """Before any reader derived it, `make graph` would write a spine with no
+    stamp, which nothing then takes over: the news layer never arrives."""
+    from knowledge.graph.build import main
+
+    stores.split(corpus)
+    monkeypatch.chdir(tmp_path)
+    assert main(["--db", "data/graph.db"]) == 2
+    assert "stores graph" in capsys.readouterr().err
+    assert not (tmp_path / "data" / "graph.db").exists()
+    # A spine anywhere else is still the spine.
+    assert main(["--db", str(tmp_path / "spine.db")]) == 0
+
+
+def test_a_process_that_outlived_a_change_to_the_inputs_derives_in_a_fresh_one(corpus, monkeypatch):
+    """The MCP server lives across pulls. Deriving in it would stamp the new
+    inputs on the rules it loaded before them."""
+    stores.split(corpus)
+    graph = corpus.with_name("graph.db")
+    handed = []
+    monkeypatch.setattr(derive, "_pinned", "inputs this process loaded long ago")
+    monkeypatch.setattr(derive, "_sync_in_a_fresh_process", lambda: handed.append(1))
+    monkeypatch.setattr(derive, "sync", lambda *a, **k: pytest.fail("derived in-process"))
+    derive.ready(graph, corpus)
+    assert handed == [1]
+
+
+def test_a_rebuild_moves_an_orphaned_journal_aside_instead_of_reading_through_it(corpus):
+    graph = corpus.with_name("graph.db")
+    derive.sync(graph, corpus)
+    con = sqlite3.connect(graph)
+    con.execute("PRAGMA wal_autocheckpoint = 0")
+    con.execute(
+        "INSERT INTO nodes (node_id, kind, label, metadata_json, tier) "
+        "VALUES ('X:orphan', 'Company', 'x', '{}', 'deterministic')"
+    )
+    con.commit()
+    wal = graph.with_name(graph.name + "-wal").read_bytes()
+    con.close()
+    graph.unlink()
+    derive.stamp_path(graph).unlink()
+    graph.with_name(graph.name + "-wal").write_bytes(wal)
+    assert "rebuilt" in derive.sync(graph, corpus)
+    con = sqlite3.connect(graph)
+    try:
+        assert con.execute("PRAGMA quick_check").fetchone()[0] == "ok"
+        assert con.execute("SELECT 1 FROM nodes WHERE node_id = 'X:orphan'").fetchone() is None
+    finally:
+        con.close()
+    assert any("local-" in p.name and p.name.endswith("-wal") for p in graph.parent.iterdir())

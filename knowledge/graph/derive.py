@@ -65,8 +65,16 @@ _INPUT_GLOBS = (
     "knowledge/graph/*.py",
     "knowledge/graph/extractors/*.py",
     "knowledge/news/linking.py",
-    "markets/registry.py",
+    "knowledge/news/features.py",
+    "knowledge/corpus.py",
+    "markets/*.py",
 )
+
+#: The inputs this PROCESS loaded, when it lives long enough to outlast a pull
+#: (the MCP server: `pin_inputs`). Its modules and caches are the old ones; a
+#: derivation run in it would stamp the new key on the old rules, and no later
+#: process would ever correct it. Such a process hands the work to a fresh one.
+_pinned: str | None = None
 
 
 class DeriveError(RuntimeError):
@@ -89,10 +97,36 @@ def derived(graph: str | Path) -> bool:
     return stamp_path(graph).exists()
 
 
+def vacant(graph: str | Path) -> bool:
+    """A graph file with no stamp and nothing in it: what `sqlite3.connect` on a
+    missing path leaves, or a GraphStore opened on one. Treated as absent, as a
+    0-byte corpus is - otherwise one stray query makes a graph nothing derives."""
+    graph = Path(graph)
+    if not graph.exists() or derived(graph):
+        return False
+    if graph.stat().st_size == 0:
+        return True
+    try:
+        con = sqlite3.connect(f"{graph.resolve().as_uri()}?mode=ro", uri=True, timeout=10)
+        try:
+            have = {r[0] for r in con.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+            if not {"nodes", "edges"} <= have:
+                return not have
+            return not any(
+                con.execute(f"SELECT 1 FROM {t} LIMIT 1").fetchone() for t in ("nodes", "edges")
+            )
+        finally:
+            con.close()
+    except sqlite3.DatabaseError:
+        return False  # not ours to judge; left alone
+
+
 def wanted(graph: str | Path, corpus: str | Path) -> bool:
     """Should this graph be derived here? Yes when it already is, or when there
-    is no graph and git carries the corpus as parts (so no graph is coming from
-    git either). A graph file with no stamp is never taken over."""
+    is no graph BESIDE a corpus git carries as parts (so no graph is coming from
+    git either). A graph file with no stamp and rows in it is never taken over,
+    and neither is a graph path somewhere else: a test pointing the default at
+    a tmp path must keep hearing "not built", not get the repository's corpus."""
     from knowledge import stores
 
     graph = Path(graph)
@@ -100,16 +134,30 @@ def wanted(graph: str | Path, corpus: str | Path) -> bool:
         return False
     if derived(graph):
         return True
-    return not graph.exists() and stores.governed(corpus)
+    if graph.resolve().parent != Path(corpus).resolve().parent:
+        return False
+    return (not graph.exists() or vacant(graph)) and stores.governed(corpus)
 
 
 def inputs_key(root: Path = ROOT) -> str:
+    from core.config import CONFIG_ENV
+
     h = hashlib.sha256(f"derive {DERIVE_VERSION}\n".encode())
+    pinned = os.environ.get(CONFIG_ENV, "").strip()
+    paths = [Path(pinned)] if pinned and Path(pinned).is_file() else []
     for pattern in _INPUT_GLOBS:
-        for path in sorted(root.glob(pattern)):
-            h.update(path.relative_to(root).as_posix().encode() + b"\0")
-            h.update(hashlib.sha256(path.read_bytes()).digest())
+        paths += sorted(root.glob(pattern))
+    for path in paths:
+        name = path.relative_to(root).as_posix() if path.is_relative_to(root) else str(path)
+        h.update(name.encode() + b"\0")
+        h.update(hashlib.sha256(path.read_bytes()).digest())
     return h.hexdigest()
+
+
+def pin_inputs() -> None:
+    """Called by a process that lives across pulls, before it derives anything."""
+    global _pinned
+    _pinned = inputs_key()
 
 
 def _read_stamp(graph: Path) -> dict | None:
@@ -207,11 +255,15 @@ def build_from_corpus(corpus: str | Path, out: str | Path, cfg=None) -> Watermar
 
 
 def _foreign_tiers(graph: Path) -> int:
+    if graph.stat().st_size == 0:
+        return 0
     con = sqlite3.connect(f"{graph.resolve().as_uri()}?mode=ro", uri=True, timeout=10)
     try:
+        have = {r[0] for r in con.execute("SELECT name FROM sqlite_master WHERE type='table'")}
         return sum(
             con.execute(f"SELECT count(*) FROM {t} WHERE tier <> ?", (DETERMINISTIC,)).fetchone()[0]
             for t in ("nodes", "edges")
+            if t in have
         )
     finally:
         con.close()
@@ -221,8 +273,10 @@ def rebuild(graph: str | Path, corpus: str | Path, cfg=None) -> str:
     """Full rebuild beside the graph, then swap it in.
 
     Refuses to replace a graph that holds rows of another tier: a model tier's
-    edges are not derivable from the corpus and would be lost."""
-    from knowledge.stores import _release
+    edges are not derivable from the corpus and would be lost. A -wal left by a
+    process that died with the old graph open is moved aside with it - a new
+    file beside it would be read through it."""
+    from knowledge import stores
 
     graph = Path(graph)
     if graph.exists() and _foreign_tiers(graph):
@@ -231,16 +285,26 @@ def rebuild(graph: str | Path, corpus: str | Path, cfg=None) -> str:
         )
     key = inputs_key()
     tmp = graph.with_name(graph.name + f".building-{os.getpid()}")
-    for side in (tmp, tmp.with_name(tmp.name + "-wal"), tmp.with_name(tmp.name + "-shm")):
-        if side.exists():
-            side.unlink()
+    stores._remove(tmp)
     try:
         mark = build_from_corpus(corpus, tmp, cfg=cfg)
-        _release(graph)
-        os.replace(tmp, graph)
+        con = sqlite3.connect(str(tmp))
+        try:
+            check = con.execute("PRAGMA quick_check").fetchone()[0]
+        finally:
+            con.close()
+        if check != "ok":
+            raise DeriveError(f"{tmp}: quick_check says {check!r}; not swapping it in")
+        try:
+            stores._release(graph)
+        except stores.StoreConflict:
+            stores._move_aside(graph)
+        try:
+            os.replace(tmp, graph)
+        except PermissionError as e:  # Windows: another process has it open
+            raise stores.StoreBusy(f"{graph} could not be replaced: {e}") from e
     except BaseException:
-        if tmp.exists():
-            tmp.unlink()
+        stores._remove(tmp)
         raise
     _write_stamp(graph, key, mark)
     with GraphStore(graph) as store:
@@ -249,9 +313,19 @@ def rebuild(graph: str | Path, corpus: str | Path, cfg=None) -> str:
 
 
 def sync(graph: str | Path, corpus: str | Path, cfg=None) -> str:
-    """Bring a derived graph up to the corpus. Never touches an underived one."""
+    """Bring a derived graph up to the corpus. Never touches an underived one.
+
+    One process at a time: the decision (rebuild, link from the watermark, or
+    nothing) and the write are made under the graph's lock."""
+    from knowledge import stores
+
     graph = Path(graph)
-    if graph.exists() and not derived(graph):
+    with stores._locked(graph):
+        return _sync(graph, corpus, cfg)
+
+
+def _sync(graph: Path, corpus: str | Path, cfg=None) -> str:
+    if graph.exists() and not derived(graph) and not vacant(graph):
         raise DeriveError(
             f"{graph} was not derived here (no {stamp_path(graph).name}); leaving it alone"
         )
@@ -292,13 +366,34 @@ def ready(graph: str | Path, corpus: str | Path | None = None) -> bool:
     once git no longer carries the graph that answer would be wrong every time,
     so a derivable graph is derived rather than reported missing. A derivation
     that fails raises - an empty answer would look like a real one."""
-    from knowledge.corpus import CORPUS_DB
-
     graph = Path(graph)
-    corpus = Path(corpus or CORPUS_DB)
+    corpus = Path(corpus) if corpus else graph.with_name("corpus.db")
     if wanted(graph, corpus):
         from knowledge import stores
 
         stores.ensure(corpus)
-        sync(graph, corpus)
-    return graph.exists()
+        if _pinned is not None and _pinned != inputs_key():
+            _sync_in_a_fresh_process()
+        else:
+            sync(graph, corpus)
+    return graph.exists() and not vacant(graph)
+
+
+def _sync_in_a_fresh_process() -> None:
+    """The inputs changed under a long-lived process: derive in one that loads
+    them. `ask.py stores graph` works on the repository's own paths."""
+    import subprocess
+    import sys
+
+    done = subprocess.run(
+        [sys.executable, "ask.py", "stores", "graph"],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        timeout=900,
+    )
+    if done.returncode != 0:
+        raise DeriveError(
+            f"`ask.py stores graph` exited {done.returncode}: "
+            + (done.stderr or done.stdout).strip()[-500:]
+        )

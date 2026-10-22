@@ -32,11 +32,20 @@ Why not the alternatives, measured on copies of the real stores (2026-10-22):
     the triggers forbid touching, and buys weeks: the 50 MiB date moves from
     December to January at best.
 
-The local file's state is decided against a stamp written beside it
-(`<db>.stamp.json`), never by counting rows: a file that has local writes and
-a file that is merely old can hold the same number of rows. A local file this
-module did not write and cannot account for is never overwritten; with
-`replace=True` it is moved aside, never deleted.
+WHICH VERSION HOLDS WHICH ROWS decides everything, never a stamp and never a
+row count. Every table is append-only and its rowids only grow, so a version
+holds every row of another exactly when it holds the other's LAST row of each
+table at the same rowid with the same values - its tip. The manifest records
+the tips of the version it describes. That is how:
+
+  - a split refuses a file that does not hold every row already published
+    (the collector working on an older file than its parts describe, after the
+    size check left the whole file out of a commit, would otherwise publish a
+    corpus missing the run before it - row counts catch up within a day);
+  - a pull is told from a revert: replacing the local file is allowed only
+    when the manifest's version holds every row the local file does;
+  - a local file written to since (a sweep's rows, a migration's column) is
+    never overwritten; with `replace=True` it is moved aside, never deleted.
 
 See docs/14-OPERATIONS-RUNBOOK.md, "Large stores".
 """
@@ -48,7 +57,10 @@ import json
 import os
 import re
 import sqlite3
-from dataclasses import dataclass
+import time
+from collections.abc import Iterator
+from contextlib import contextmanager
+from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -73,6 +85,9 @@ MANIFEST = "manifest.json"
 FORMAT = 1
 _PART = re.compile(r"part-(\d{3})")
 
+#: How long a second process waits for the first to finish assembling.
+LOCK_SECONDS = 120
+
 # The states a local file can be in against its manifest.
 UNGOVERNED = "ungoverned"
 """No manifest: this store is not carried as parts, and nothing here applies."""
@@ -81,11 +96,12 @@ MISSING = "missing"
 CURRENT = "current"
 """The file is exactly what the manifest describes."""
 AHEAD = "ahead"
-"""Written to locally since it was last current: a sweep's rows, not yet split."""
+"""Holds every row the manifest's version does, and more (a sweep's rows, not
+yet split) or the same rows in other bytes (a migration's column)."""
 STALE = "stale"
-"""Untouched since it was last current, and the manifest has moved on: a pull."""
+"""The manifest's version holds every row the local file does, and more: a pull."""
 CONFLICT = "conflict"
-"""Neither: local writes on an older version, or a file nothing here wrote."""
+"""Each holds rows the other lacks, or the local file is not a database."""
 
 
 class StoreError(RuntimeError):
@@ -93,7 +109,7 @@ class StoreError(RuntimeError):
 
 
 class StoreConflict(StoreError):
-    """The local file holds what neither the manifest nor the stamp accounts for."""
+    """The local file holds rows the manifest's version does not."""
 
 
 class StoreBusy(StoreError):
@@ -111,6 +127,8 @@ class Manifest:
     parts: tuple[dict, ...]
     rows: dict[str, int]
     triggers: tuple[str, ...]
+    tips: dict[str, dict] = field(default_factory=dict)
+    """Per table, the last row: {"rowid": n, "columns": {name: sha256[:16]}}."""
 
     def to_json(self) -> str:
         return (
@@ -124,6 +142,7 @@ class Manifest:
                     "part_bytes": self.part_bytes,
                     "parts": list(self.parts),
                     "rows": self.rows,
+                    "tips": self.tips,
                     "triggers": list(self.triggers),
                 },
                 indent=1,
@@ -146,6 +165,7 @@ class Manifest:
             parts=tuple(d["parts"]),
             rows={k: int(v) for k, v in d["rows"].items()},
             triggers=tuple(d["triggers"]),
+            tips=dict(d.get("tips") or {}),
         )
 
 
@@ -177,6 +197,10 @@ def stamp_path(db: str | Path) -> Path:
     return db.with_name(db.name + ".stamp.json")
 
 
+def _side(db: Path, suffix: str) -> Path:
+    return db.with_name(db.name + suffix)
+
+
 def governed(db: str | Path) -> bool:
     """True when git carries this store as parts. A path of ':memory:' never is."""
     return str(db) != ":memory:" and manifest_path(db).exists()
@@ -196,7 +220,7 @@ def _manifest(db: Path) -> Manifest:
     return m
 
 
-# -- hashing and the stamp ---------------------------------------------------
+# -- hashing -----------------------------------------------------------------
 
 
 def _sha256_file(path: Path) -> str:
@@ -208,45 +232,33 @@ def _sha256_file(path: Path) -> str:
 
 
 def _wal_bytes(db: Path) -> int:
-    wal = db.with_name(db.name + "-wal")
+    wal = _side(db, "-wal")
     return wal.stat().st_size if wal.exists() else 0
 
 
-def _read_stamp(db: Path) -> dict | None:
-    path = stamp_path(db)
+def _db_sha(db: Path) -> str:
+    """The file's sha256, cached in the stamp against size and mtime.
+
+    Hashing 17 MB costs ~40 ms; the stamp makes the common case (nothing
+    changed since the last command) a single stat. It is a cache and nothing
+    else - no decision reads it - and it is written only when the file did not
+    change while it was being hashed."""
+    before = db.stat()
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
+        stamp = json.loads(stamp_path(db).read_text(encoding="utf-8"))
     except (OSError, ValueError):
-        return None
-
-
-def _write_stamp(db: Path, manifest_sha: str, db_sha: str) -> None:
-    st = db.stat()
-    _atomic_write(
-        stamp_path(db),
-        json.dumps(
-            {
-                "manifest_sha256": manifest_sha,
-                "db_sha256": db_sha,
-                "size": st.st_size,
-                "mtime_ns": st.st_mtime_ns,
-            },
-            indent=1,
-            sort_keys=True,
-        ).encode("utf-8")
-        + b"\n",
-    )
-
-
-def _db_sha(db: Path, stamp: dict | None) -> str:
-    """The file's sha256, from the stamp when size and mtime say it is unchanged.
-
-    Hashing 17 MB costs ~40 ms, paid once per process at most; the stamp makes
-    the common case (nothing changed since the last command) a single stat."""
-    st = db.stat()
-    if stamp and stamp.get("size") == st.st_size and stamp.get("mtime_ns") == st.st_mtime_ns:
+        stamp = {}
+    if stamp.get("size") == before.st_size and stamp.get("mtime_ns") == before.st_mtime_ns:
         return stamp["db_sha256"]
-    return _sha256_file(db)
+    sha = _sha256_file(db)
+    after = db.stat()
+    if (after.st_size, after.st_mtime_ns) == (before.st_size, before.st_mtime_ns):
+        body = {"db_sha256": sha, "size": after.st_size, "mtime_ns": after.st_mtime_ns}
+        try:
+            _atomic_write(stamp_path(db), (json.dumps(body, sort_keys=True) + "\n").encode())
+        except OSError:
+            pass  # a read-only checkout still answers; it just hashes again next time
+    return sha
 
 
 def _atomic_write(path: Path, data: bytes) -> None:
@@ -259,41 +271,245 @@ def _atomic_write(path: Path, data: bytes) -> None:
     os.replace(tmp, path)
 
 
+def _value_sha(value) -> str:
+    if isinstance(value, bytes):
+        raw = b"b" + value
+    else:
+        raw = json.dumps(value).encode("utf-8")
+    return hashlib.sha256(raw).hexdigest()[:16]
+
+
+# -- tips: which version holds which rows ------------------------------------
+
+
+def _tables(con: sqlite3.Connection) -> list[str]:
+    return [
+        r[0]
+        for r in con.execute(
+            "SELECT name FROM sqlite_master WHERE type='table' "
+            "AND name NOT LIKE 'sqlite_%' ORDER BY name"
+        )
+    ]
+
+
+def _columns(con: sqlite3.Connection, table: str) -> list[str]:
+    return [r[1] for r in con.execute(f'PRAGMA table_info("{table}")')]
+
+
+def _tips(con: sqlite3.Connection) -> dict[str, dict]:
+    """Each table's last row, by rowid, as per-column hashes."""
+    out = {}
+    for t in _tables(con):
+        cols = _columns(con, t)
+        quoted = ", ".join(f'"{c}"' for c in cols)
+        row = con.execute(
+            f'SELECT rowid, {quoted} FROM "{t}" ORDER BY rowid DESC LIMIT 1'
+        ).fetchone()
+        if row is None:
+            out[t] = {"rowid": 0, "columns": {}}
+        else:
+            out[t] = {
+                "rowid": row[0],
+                "columns": {c: _value_sha(v) for c, v in zip(cols, row[1:], strict=True)},
+            }
+    return out
+
+
+def _holds(con: sqlite3.Connection, tips: dict[str, dict]) -> bool:
+    """Does this database hold every row the version with these tips held?
+
+    Append-only tables whose rowids only grow: holding the tip row - same
+    rowid, same values in every column both versions have - is holding every
+    row before it. Columns one side lacks are a migration, not a row."""
+    have = set(_tables(con))
+    for table, tip in tips.items():
+        if not tip.get("rowid"):
+            continue
+        if table not in have:
+            return False
+        common = [c for c in _columns(con, table) if c in tip["columns"]]
+        if not common:
+            return False
+        quoted = ", ".join(f'"{c}"' for c in common)
+        row = con.execute(
+            f'SELECT {quoted} FROM "{table}" WHERE rowid = ?', (tip["rowid"],)
+        ).fetchone()
+        if row is None:
+            return False
+        if any(_value_sha(v) != tip["columns"][c] for c, v in zip(common, row, strict=True)):
+            return False
+    return True
+
+
+def _connect(db: Path) -> sqlite3.Connection:
+    con = sqlite3.connect(str(db), timeout=10)
+    con.execute("PRAGMA query_only = 1")
+    return con
+
+
+# -- the lock ----------------------------------------------------------------
+
+
+@contextmanager
+def _locked(db: Path, seconds: float | None = None) -> Iterator[None]:
+    """One process at a time decides about and replaces `db`.
+
+    Without it, two commands started together after a pull both judge the file
+    stale, and the slower one's replace lands on the faster one's file after
+    that one had already written to it."""
+    lock = _side(db, ".lock")
+    lock.parent.mkdir(parents=True, exist_ok=True)
+    deadline = time.monotonic() + (LOCK_SECONDS if seconds is None else seconds)
+    with lock.open("a+b") as f:
+        if os.name == "nt":  # pragma: no cover - exercised on the windows CI cell
+            import msvcrt
+
+            while True:
+                try:
+                    f.seek(0)
+                    msvcrt.locking(f.fileno(), msvcrt.LK_NBLCK, 1)
+                    break
+                except OSError:
+                    if time.monotonic() > deadline:
+                        raise StoreBusy(f"{lock} is held by another process") from None
+                    time.sleep(0.1)
+            try:
+                yield
+            finally:
+                f.seek(0)
+                msvcrt.locking(f.fileno(), msvcrt.LK_UNLCK, 1)
+        else:
+            import fcntl
+
+            while True:
+                try:
+                    fcntl.flock(f.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+                    break
+                except OSError:
+                    if time.monotonic() > deadline:
+                        raise StoreBusy(f"{lock} is held by another process") from None
+                    time.sleep(0.1)
+            try:
+                yield
+            finally:
+                fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+
+
 # -- state -------------------------------------------------------------------
 
 
+def _build(db: Path, m: Manifest) -> Path:
+    """The manifest's file, concatenated beside `db` and verified. The caller
+    either swaps it in or removes it."""
+    out = parts_dir(db)
+    tmp = _side(db, f".assembling-{os.getpid()}")
+    h = hashlib.sha256()
+    total = 0
+    try:
+        with tmp.open("wb") as f:
+            for p in m.parts:
+                path = out / p["name"]
+                if not path.exists():
+                    raise StoreError(f"{path}: missing")
+                data = path.read_bytes()
+                if len(data) != p["bytes"] or hashlib.sha256(data).hexdigest() != p["sha256"]:
+                    raise StoreError(f"{path}: does not match the manifest")
+                h.update(data)
+                total += len(data)
+                f.write(data)
+            f.flush()
+            os.fsync(f.fileno())
+        if total != m.bytes or h.hexdigest() != m.sha256:
+            raise StoreError(f"{out}: the parts do not concatenate to the manifest's file")
+    except BaseException:
+        _remove(tmp)
+        raise
+    return tmp
+
+
+def _remove(path: Path) -> None:
+    for p in (path, _side(path, "-wal"), _side(path, "-shm")):
+        if p.exists():
+            p.unlink()
+
+
+def _classify(db: Path, m: Manifest, *, keep: bool = False) -> tuple[State, Path | None]:
+    """The state, and - when `keep` and the manifest's file had to be built to
+    decide - that file, so the caller can swap it in rather than build it twice."""
+    wal = _wal_bytes(db)
+    if not db.exists() or db.stat().st_size == 0:
+        if wal:
+            return State(
+                CONFLICT,
+                f"{_side(db, '-wal')} holds {wal:,} bytes of a database that is not there. "
+                "A new file beside it would be read through it and corrupted; "
+                "`ask.py stores assemble --replace` moves it aside first",
+            ), None
+        return State(MISSING, f"{db} is not assembled"), None
+    if not wal and _db_sha(db) == m.sha256:
+        return State(CURRENT, f"{len(m.parts)} parts, {m.bytes:,} bytes"), None
+    try:
+        con = _connect(db)
+        try:
+            if _holds(con, m.tips):
+                return State(
+                    AHEAD,
+                    "holds every row of the manifest's version"
+                    + (" and more" if _counts(con) != m.rows else ", in other bytes")
+                    + "; `ask.py stores split` publishes it",
+                ), None
+            local = _tips(con)
+        finally:
+            con.close()
+    except sqlite3.DatabaseError as e:
+        return State(CONFLICT, f"{db} cannot be read as a database ({e})"), None
+    built = _build(db, m)
+    try:
+        con = _connect(built)
+        try:
+            newer = _holds(con, local)
+        finally:
+            con.close()
+    except BaseException:
+        _remove(built)
+        raise
+    if newer:
+        if keep:
+            return State(STALE, "the manifest's version holds every row it does, and more"), built
+        _remove(built)
+        return State(STALE, "the manifest's version holds every row it does, and more"), None
+    _remove(built)
+    return State(
+        CONFLICT,
+        f"{db} and the manifest's version each hold rows the other lacks. "
+        "`ask.py stores assemble --replace` moves it aside and assembles the manifest's",
+    ), None
+
+
+def _counts(con: sqlite3.Connection) -> dict[str, int]:
+    return {t: con.execute(f'SELECT count(*) FROM "{t}"').fetchone()[0] for t in _tables(con)}
+
+
 def state(db: str | Path) -> State:
-    """Where the local file stands against the manifest. Reads, never writes."""
+    """Where the local file stands against the manifest. Changes no row."""
     db = Path(db)
     m = read_manifest(db)
     if m is None:
         return State(UNGOVERNED)
-    if not db.exists() or db.stat().st_size == 0:
-        return State(MISSING, f"{db} is not assembled")
-    stamp = _read_stamp(db)
-    touched_wal = _wal_bytes(db) > 0
-    sha = _db_sha(db, stamp)
-    if sha == m.sha256 and not touched_wal:
-        return State(CURRENT, f"{len(m.parts)} parts, {m.bytes:,} bytes")
-    if stamp and stamp.get("manifest_sha256") == m.sha256:
-        return State(AHEAD, "written to since it was assembled; `ask.py stores split` publishes it")
-    if stamp and stamp.get("db_sha256") == sha and not touched_wal:
-        return State(STALE, "untouched since it was last current; the manifest has moved on")
-    return State(
-        CONFLICT,
-        f"{db} matches neither the manifest nor the last version this checkout saw. "
-        "`ask.py stores assemble --replace` moves it aside and assembles the manifest's",
-    )
+    return _classify(db, m)[0]
 
 
 # -- split -------------------------------------------------------------------
 
 
-def _inspect(db: Path) -> tuple[int, dict[str, int], tuple[str, ...]]:
+def _inspect(
+    db: Path,
+) -> tuple[int, dict[str, int], tuple[str, ...], dict[str, dict], sqlite3.Connection]:
     """Checkpoint the WAL into the file and read what the manifest records.
 
     A row still in the -wal is not in the file's bytes; splitting before the
-    checkpoint would publish a corpus without it."""
+    checkpoint would publish a corpus without it. Returns the open connection,
+    query-only, so the caller can check descent against the last manifest."""
     con = sqlite3.connect(str(db), timeout=10)
     try:
         busy, _log, _done = con.execute("PRAGMA wal_checkpoint(TRUNCATE)").fetchone()
@@ -302,38 +518,34 @@ def _inspect(db: Path) -> tuple[int, dict[str, int], tuple[str, ...]]:
         check = con.execute("PRAGMA quick_check").fetchone()[0]
         if check != "ok":
             raise StoreError(f"{db}: quick_check says {check!r}; not publishing it")
+        con.execute("PRAGMA query_only = 1")
         page_size = con.execute("PRAGMA page_size").fetchone()[0]
-        tables = [
-            r[0]
-            for r in con.execute(
-                "SELECT name FROM sqlite_master WHERE type='table' "
-                "AND name NOT LIKE 'sqlite_%' ORDER BY name"
-            )
-        ]
-        rows = {t: con.execute(f'SELECT count(*) FROM "{t}"').fetchone()[0] for t in tables}
+        rows = _counts(con)
         triggers = tuple(
             r[0]
             for r in con.execute(
                 "SELECT name FROM sqlite_master WHERE type='trigger' ORDER BY name"
             )
         )
-    finally:
+        tips = _tips(con)
+    except sqlite3.DatabaseError as e:
         con.close()
-    if _wal_bytes(db):
-        raise StoreBusy(
-            f"{db}: its -wal is not empty after a checkpoint; another connection is open"
-        )
-    return page_size, rows, triggers
+        raise StoreError(f"{db}: {e}; not publishing it") from e
+    except BaseException:
+        con.close()
+        raise
+    return page_size, rows, triggers, tips, con
 
 
 def split(db: str | Path, *, part_bytes: int = PART_BYTES) -> Manifest:
     """Write `db` as parts plus a manifest. Refuses rather than publish less.
 
     Refused, with nothing written: a WAL that will not checkpoint, a file that
-    fails quick_check, a table with fewer rows than the last manifest says, an
-    append-only trigger the last manifest recorded and the file no longer has.
-    The parts are verified to concatenate back to the file before the manifest
-    is replaced, and a part whose bytes did not change is not rewritten.
+    fails quick_check, a file that does not hold every row of the last
+    published version (its tips), an append-only trigger the last manifest
+    recorded and the file no longer has. Every refusal comes before the first
+    byte is written; a part whose bytes did not change is not rewritten, and
+    the manifest is replaced last, after the parts on disk are read back.
     """
     db = Path(db)
     if not db.exists() or db.stat().st_size == 0:
@@ -341,22 +553,35 @@ def split(db: str | Path, *, part_bytes: int = PART_BYTES) -> Manifest:
     if part_bytes <= 0 or part_bytes % 4096:
         raise StoreError(f"part size {part_bytes} is not a positive multiple of 4096")
     prior = read_manifest(db)
-    page_size, rows, triggers = _inspect(db)
-    if prior is not None:
-        fewer = {t: (rows.get(t, 0), n) for t, n in prior.rows.items() if rows.get(t, 0) < n}
-        if fewer:
-            raise StoreError(
-                f"{db}: fewer rows than the last published version "
-                + ", ".join(f"{t} {now} < {was}" for t, (now, was) in sorted(fewer.items()))
-                + "; an append-only store never shrinks, so this file is not the corpus"
-            )
-        lost = sorted(set(prior.triggers) - set(triggers))
-        if lost:
-            raise StoreError(f"{db}: append-only triggers missing: {', '.join(lost)}")
-
-    data = db.read_bytes()
+    page_size, rows, triggers, tips, con = _inspect(db)
+    try:
+        if prior is not None:
+            fewer = {t: (rows.get(t, 0), n) for t, n in prior.rows.items() if rows.get(t, 0) < n}
+            if fewer:
+                raise StoreError(
+                    f"{db}: fewer rows than the last published version "
+                    + ", ".join(f"{t} {now} < {was}" for t, (now, was) in sorted(fewer.items()))
+                    + "; an append-only store never shrinks, so this file is not the corpus"
+                )
+            if not _holds(con, prior.tips):
+                raise StoreError(
+                    f"{db} does not hold every row of the last published version (its last "
+                    "rows differ), so it was not built on it. Publishing it would drop the "
+                    "rows only the parts hold; `ask.py stores` says which version is which"
+                )
+            lost = sorted(set(prior.triggers) - set(triggers))
+            if lost:
+                raise StoreError(f"{db}: append-only triggers missing: {', '.join(lost)}")
+        data = db.read_bytes()
+    finally:
+        con.close()
+    if _wal_bytes(db):
+        raise StoreBusy(
+            f"{db}: its -wal is not empty after a checkpoint; another connection is open"
+        )
     whole = hashlib.sha256(data).hexdigest()
     chunks = [data[i : i + part_bytes] for i in range(0, len(data), part_bytes)]
+
     out = parts_dir(db)
     out.mkdir(parents=True, exist_ok=True)
     parts = []
@@ -390,9 +615,9 @@ def split(db: str | Path, *, part_bytes: int = PART_BYTES) -> Manifest:
         parts=tuple(parts),
         rows=rows,
         triggers=triggers,
+        tips=tips,
     )
     _atomic_write(manifest_path(db), manifest.to_json().encode("utf-8"))
-    _write_stamp(db, whole, whole)
     return manifest
 
 
@@ -402,42 +627,42 @@ def split(db: str | Path, *, part_bytes: int = PART_BYTES) -> Manifest:
 def verify(db: str | Path) -> Manifest:
     """Every part matches the manifest and they concatenate to its sha256."""
     db = Path(db)
-    m = read_manifest(db)
-    if m is None:
-        raise StoreError(f"no manifest at {manifest_path(db)}")
-    out = parts_dir(db)
-    h = hashlib.sha256()
-    total = 0
-    for p in m.parts:
-        path = out / p["name"]
-        if not path.exists():
-            raise StoreError(f"{path}: missing")
-        data = path.read_bytes()
-        if len(data) != p["bytes"] or hashlib.sha256(data).hexdigest() != p["sha256"]:
-            raise StoreError(f"{path}: does not match the manifest")
-        h.update(data)
-        total += len(data)
-    if total != m.bytes or h.hexdigest() != m.sha256:
-        raise StoreError(f"{out}: the parts do not concatenate to the manifest's file")
+    m = _manifest(db)
+    _remove(_build(db, m))
     return m
 
 
 def _release(db: Path) -> None:
-    """Make sure no connection holds `db` before its bytes are replaced.
+    """Make sure nothing else holds `db`, or its journal, before replacing it.
 
-    Opening and closing a connection lets SQLite remove its own -wal and -shm
-    when it is the last one. If they are still there afterwards, someone else
-    has the file open - a reader that, on its own close, would checkpoint into
-    or delete the journal of a file it no longer describes."""
-    if not db.exists():
+    Opening and closing a connection lets SQLite fold its own -wal into the
+    file and remove the -wal and -shm when it is the last one. If they are
+    still there afterwards, someone else has the file open - a reader that, on
+    its own close, would checkpoint into or delete the journal of a file it no
+    longer describes. Where the file itself is gone, a -wal with frames in it
+    belongs to nothing that can be asked, and a new file beside it would be
+    read through it: refused, never deleted."""
+    if not db.exists() or db.stat().st_size == 0:
+        if _wal_bytes(db):
+            raise StoreConflict(
+                f"{_side(db, '-wal')} holds frames of a database that is not there; "
+                "`ask.py stores assemble --replace` moves it aside"
+            )
+        for suffix in ("-wal", "-shm"):
+            side = _side(db, suffix)
+            if side.exists():
+                side.unlink()
         return
-    con = sqlite3.connect(str(db), timeout=10)
     try:
-        con.execute("PRAGMA wal_checkpoint(TRUNCATE)")
-    finally:
-        con.close()
+        con = sqlite3.connect(str(db), timeout=10)
+        try:
+            con.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+        finally:
+            con.close()
+    except sqlite3.DatabaseError:
+        return  # not a database: nothing of SQLite's holds it
     for suffix in ("-wal", "-shm"):
-        side = db.with_name(db.name + suffix)
+        side = _side(db, suffix)
         if side.exists():
             raise StoreBusy(
                 f"{side} is still there after a clean close: another process has {db} open"
@@ -445,56 +670,57 @@ def _release(db: Path) -> None:
 
 
 def _move_aside(db: Path) -> Path:
-    stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
+    """The local file and its journal, renamed together. Never deleted."""
+    stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%S%fZ")
     aside = db.with_name(f"{db.stem}.local-{stamp}{db.suffix}")
-    _release(db)
-    os.replace(db, aside)
+    if db.exists() and db.stat().st_size:
+        try:
+            _release(db)
+        except StoreConflict:
+            pass
+    for suffix in ("", "-wal", "-shm"):
+        src = _side(db, suffix)
+        if src.exists():
+            os.replace(src, _side(aside, suffix))
     return aside
 
 
 def assemble(db: str | Path, *, replace: bool = False) -> State:
-    """Make `db` the file the manifest describes, if that is safe to do.
+    """Make `db` the file the manifest describes, if that loses nothing.
 
-    Writes only when the file is missing, empty or stale. A file that is ahead
-    is left alone (its rows are the next split's). A conflict raises; with
-    `replace=True` the local file is moved to `<stem>.local-<UTC>.db` first and
-    the move is reported, so nothing is ever deleted to make room.
+    Writes only when the file is missing, empty, or stale - the manifest's
+    version holds every row it does. A file that is ahead is left alone (its
+    rows are the next split's). A conflict raises; with `replace=True` the local
+    file and its journal are moved to `<stem>.local-<UTC>.db` first and the
+    move is reported, so nothing is ever deleted to make room. Decided and done
+    under a lock, so a second process cannot write between the two.
     """
     db = Path(db)
-    now = state(db)
-    if now.name == UNGOVERNED:
+    m = read_manifest(db)
+    if m is None:
         raise StoreError(f"no manifest at {manifest_path(db)}; {db} is not carried as parts")
-    if now.name in (CURRENT, AHEAD):
-        if now.name == CURRENT:
-            m = _manifest(db)
-            _write_stamp(db, m.sha256, m.sha256)
-        return now
-    aside = None
-    if now.name == CONFLICT:
-        if not replace:
-            raise StoreConflict(now.detail)
-        aside = _move_aside(db)
-
-    m = verify(db)
-    tmp = db.with_name(db.name + f".assembling-{os.getpid()}")
-    h = hashlib.sha256()
-    with tmp.open("wb") as f:
-        for p in m.parts:
-            data = (parts_dir(db) / p["name"]).read_bytes()
-            h.update(data)
-            f.write(data)
-        f.flush()
-        os.fsync(f.fileno())
-    if h.hexdigest() != m.sha256:
-        tmp.unlink()
-        raise StoreError(f"{tmp}: assembled bytes do not match the manifest")
-    try:
-        _release(db)
-    except StoreBusy:
-        tmp.unlink()
-        raise
-    os.replace(tmp, db)
-    _write_stamp(db, m.sha256, m.sha256)
+    with _locked(db):
+        now, built = _classify(db, m, keep=True)
+        if now.name in (CURRENT, AHEAD):
+            return now
+        aside = None
+        try:
+            if now.name == CONFLICT:
+                if not replace:
+                    raise StoreConflict(now.detail)
+                aside = _move_aside(db)
+            if built is None:
+                built = _build(db, m)
+            _release(db)
+            try:
+                os.replace(built, db)
+            except PermissionError as e:  # Windows: another process has it open
+                raise StoreBusy(f"{db} could not be replaced: {e}") from e
+        except BaseException:
+            if built is not None:
+                _remove(built)
+            raise
+        _db_sha(db)
     detail = f"{len(m.parts)} parts, {m.bytes:,} bytes, {sum(m.rows.values()):,} rows"
     if aside is not None:
         detail += f"; the local file was moved to {aside}"
@@ -504,31 +730,22 @@ def assemble(db: str | Path, *, replace: bool = False) -> State:
 def ensure(db: str | Path, *, log=None) -> State:
     """The quiet version, for an entry point: assemble when missing or stale.
 
-    Never raises for a conflict - the command goes on against the local file,
-    exactly as it would have before parts existed - but says so, because a
-    reader on a file nobody can account for is the thing worth knowing about.
-    A part that does not match its manifest still raises: that is damage, not
-    drift."""
+    Never raises for a conflict or a busy file - the command goes on against
+    the local file, exactly as it would have before parts existed - but says
+    so, because a reader on a file nobody can account for is the thing worth
+    knowing about. A part that does not match its manifest still raises: that
+    is damage, not drift."""
     db = Path(db)
     if not governed(db):
         return State(UNGOVERNED)
-    now = state(db)
-    if now.name in (MISSING, STALE):
-        return assemble(db)
-    if now.name == CURRENT:
-        # A pull that brought the file and its manifest together (while the
-        # whole file is still committed beside its parts) leaves an old stamp;
-        # refreshed, a later local write reads as AHEAD rather than CONFLICT.
-        m = _manifest(db)
-        st, stamp = db.stat(), _read_stamp(db) or {}
-        if (stamp.get("manifest_sha256"), stamp.get("size"), stamp.get("mtime_ns")) != (
-            m.sha256,
-            st.st_size,
-            st.st_mtime_ns,
-        ):
-            _write_stamp(db, m.sha256, m.sha256)
+    try:
+        now = assemble(db)
+    except StoreConflict as e:
+        now = State(CONFLICT, str(e))
+    except StoreBusy as e:
+        now = State(CONFLICT, f"not assembled: {e}")
     if now.name == CONFLICT and log is not None:
-        log(f"warning: {now.detail}")
+        log(f"warning: {db} is {now}")
     return now
 
 

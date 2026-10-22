@@ -43,6 +43,7 @@ package-lock.json
 #    this checkout last saw, a corpus moved aside rather than overwritten, a
 #    file mid-assembly. Never the same on two machines, never evidence.
 data/*.stamp.json
+data/*.lock
 data/*.local-*.db
 data/*.assembling-*
 data/*.building-*

@@ -1896,6 +1896,10 @@ def cmd_stores(a) -> int:
 
     if action in ("assemble", "graph"):
         try:
+            if action == "graph":
+                # As a reader would: the corpus first, so a checkout that holds
+                # only its parts can still build the graph from it.
+                stores.ensure(corpus, log=lambda msg: print(msg, file=sys.stderr))
             if a.out:
                 derive.build_from_corpus(corpus, a.out)
                 print(f"graph: built {a.out} from {corpus}")
@@ -1903,7 +1907,8 @@ def cmd_stores(a) -> int:
                 print(f"{GRAPH_DB}: {derive.sync(GRAPH_DB, corpus)}")
             else:
                 print(
-                    f"{GRAPH_DB}: not derived here - git carries it"
+                    f"{GRAPH_DB}: not derived here (it has rows and no "
+                    f"{derive.stamp_path(GRAPH_DB).name}): built by git or `make graph`"
                     if Path(GRAPH_DB).exists()
                     else f"{GRAPH_DB}: absent, and {corpus} is not carried as parts"
                 )
@@ -1929,7 +1934,7 @@ def cmd_stores(a) -> int:
             + ("" if fresh else "; its inputs changed, the next read rebuilds it")
         )
     elif Path(GRAPH_DB).exists():
-        print(f"{GRAPH_DB:24} not derived here - git carries it")
+        print(f"{GRAPH_DB:24} not derived here (no stamp): built by git or `make graph`")
     else:
         print(f"{GRAPH_DB:24} absent")
     for path, size in stores.oversized():

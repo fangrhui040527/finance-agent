@@ -899,6 +899,11 @@ def main(argv=None) -> int:
     _configure_logging()
     argv = sys.argv[1:] if argv is None else argv
     S.before_call = _bring_the_stores_up
+    # This process outlives pulls. What it derives must be derived by the code
+    # it loaded, or handed to a fresh process (knowledge/graph/derive.py).
+    from knowledge.graph import derive
+
+    derive.pin_inputs()
     if "--selftest" in argv:
         return selftest()
     if "--list" in argv:

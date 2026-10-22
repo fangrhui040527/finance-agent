@@ -63,7 +63,7 @@ def test_split_then_assemble_gives_back_the_same_bytes(db):
     assert {"articles_no_update", "articles_no_delete"} <= set(m.triggers)
 
     db.unlink()
-    stores.stamp_path(db).unlink()
+    stores.stamp_path(db).unlink(missing_ok=True)
     assert stores.state(db).name == stores.MISSING
     done = stores.assemble(db)
     assert done.name == "assembled"
@@ -138,17 +138,8 @@ def test_a_tampered_part_is_refused_and_nothing_is_replaced(db):
 
 def test_a_pull_that_moved_the_parts_reassembles_an_untouched_file(db):
     stores.split(db, part_bytes=SMALL)
-    # Elsewhere (the collector), the corpus grew and was split again.
-    other = db.parent.parent / "elsewhere" / "data" / "corpus.db"
-    other.parent.mkdir(parents=True)
-    other.write_bytes(db.read_bytes())
-    _corpus(other, 50, start=500)
-    stores.split(other, part_bytes=SMALL)
-    # "git pull": the parts and manifest change, the local file does not.
-    for p in stores.parts_dir(db).iterdir():
-        p.unlink()
-    for p in stores.parts_dir(other).iterdir():
-        (stores.parts_dir(db) / p.name).write_bytes(p.read_bytes())
+    other = _publish_elsewhere(db, 50, 500)
+    _pull(db, other)  # the parts and manifest change, the local file does not
     assert stores.state(db).name == stores.STALE
     assert stores.ensure(db).name == "assembled"
     assert _sha(db) == _sha(other)
@@ -166,15 +157,8 @@ def test_local_writes_on_the_current_version_are_ahead_and_kept(db):
 
 def test_local_writes_on_an_old_version_conflict_and_are_moved_aside_never_deleted(db):
     stores.split(db, part_bytes=SMALL)
-    other = db.parent.parent / "elsewhere" / "data" / "corpus.db"
-    other.parent.mkdir(parents=True)
-    other.write_bytes(db.read_bytes())
-    _corpus(other, 50, start=500)
-    stores.split(other, part_bytes=SMALL)
-    for p in stores.parts_dir(db).iterdir():
-        p.unlink()
-    for p in stores.parts_dir(other).iterdir():
-        (stores.parts_dir(db) / p.name).write_bytes(p.read_bytes())
+    other = _publish_elsewhere(db, 50, 500)
+    _pull(db, other)
     # ...and this checkout wrote rows of its own meanwhile.
     _corpus(db, 3, start=700)
     local = _sha(db)
@@ -194,13 +178,136 @@ def test_local_writes_on_an_old_version_conflict_and_are_moved_aside_never_delet
     assert _sha(db) == _sha(other)
 
 
-def test_a_file_without_a_stamp_that_differs_is_a_conflict_not_stale(db):
-    """Counting rows cannot tell an old file from a diverged one; only the stamp
-    says this checkout saw the file as current and has not touched it since."""
+def _publish_elsewhere(db: Path, rows: int, start: int) -> Path:
+    """What the collector does: the same corpus, grown and split, then pulled."""
+    other = db.parent.parent / f"elsewhere-{start}" / "data" / "corpus.db"
+    other.parent.mkdir(parents=True)
+    other.write_bytes(db.read_bytes())
+    _corpus(other, rows, start=start)
+    stores.split(other, part_bytes=SMALL)
+    return other
+
+
+def _pull(db: Path, other: Path) -> None:
+    for p in stores.parts_dir(db).iterdir():
+        p.unlink()
+    for p in stores.parts_dir(other).iterdir():
+        (stores.parts_dir(db) / p.name).write_bytes(p.read_bytes())
+
+
+def test_a_manifest_moved_back_never_costs_the_local_file_its_rows(db):
+    """A split written locally and then discarded (`git checkout -- data/stores`)
+    leaves the manifest OLDER than the file. A stamp could not tell that from a
+    pull; which version holds which rows can."""
     stores.split(db, part_bytes=SMALL)
-    stores.stamp_path(db).unlink()
-    _corpus(db, 2, start=800)
+    published = {p.name: p.read_bytes() for p in stores.parts_dir(db).iterdir()}
+    _corpus(db, 5, start=900)
+    stores.split(db, part_bytes=SMALL)
+    for name, data in published.items():  # the revert
+        (stores.parts_dir(db) / name).write_bytes(data)
+    local = _sha(db)
+    assert stores.state(db).name == stores.AHEAD
+    stores.ensure(db)
+    assert _sha(db) == local
+
+
+def test_a_file_that_does_not_hold_the_published_rows_is_never_published(db, tmp_path):
+    """The collector worked on an older file than its parts describe (the size
+    check had left the whole file out of the last commit). Row counts catch up
+    within a day; the tip rows never do."""
+    old = db.read_bytes()
+    stores.split(db, part_bytes=SMALL)
+    _corpus(db, 30, start=1000)  # run N: published as parts
+    stores.split(db, part_bytes=SMALL)
+    published = stores.manifest_path(db).read_bytes()
+    db.write_bytes(old)  # run N+1 checks out the whole file from before run N
+    _corpus(db, 35, start=2000)
+    with pytest.raises(stores.StoreError, match="does not hold every row"):
+        stores.split(db, part_bytes=SMALL)
+    assert stores.manifest_path(db).read_bytes() == published
+
+
+def test_a_whole_file_older_than_its_parts_is_reassembled_before_anyone_writes(db):
+    """The same state, seen from the start of the next run: the manifest's
+    version holds every row the checked-out file does, so it is stale - and
+    ensure, which every command runs first, assembles the parts over it."""
+    old = db.read_bytes()
+    stores.split(db, part_bytes=SMALL)
+    _corpus(db, 30, start=1000)
+    stores.split(db, part_bytes=SMALL)
+    newer = _sha(db)
+    db.write_bytes(old)
+    assert stores.state(db).name == stores.STALE
+    assert stores.ensure(db).name == "assembled"
+    assert _sha(db) == newer
+
+
+def test_a_local_migration_is_not_a_conflict_once_the_collector_has_it_too(db):
+    """A column added on first open (Corpus._migrate) changes the bytes, not the
+    rows. When the parts that carry it arrive, the local file is stale, not a
+    conflict that would pin the checkout to an old corpus for good."""
+    stores.split(db, part_bytes=SMALL)
+    other = db.parent.parent / "collector" / "data" / "corpus.db"
+    other.parent.mkdir(parents=True)
+    other.write_bytes(db.read_bytes())
+    for path in (db, other):
+        con = sqlite3.connect(path)
+        con.execute("ALTER TABLE articles ADD COLUMN later TEXT NOT NULL DEFAULT ''")
+        con.commit()
+        con.close()
+    assert stores.state(db).name == stores.AHEAD, "same rows, other bytes"
+    _corpus(other, 10, start=3000)
+    stores.split(other, part_bytes=SMALL)
+    _pull(db, other)
+    assert stores.state(db).name == stores.STALE
+    stores.ensure(db)
+    assert _sha(db) == _sha(other)
+
+
+def test_an_orphaned_wal_beside_a_missing_corpus_is_never_paired_with_a_new_file(db):
+    """A writer killed mid-session leaves a -wal with frames. Deleting the file
+    to have it reassembled would put the new file beside that journal, and the
+    next open would replay a different database's pages into it."""
+    stores.split(db, part_bytes=SMALL)
+    c = Corpus(db)
+    c.add(_article(4242, "Written and never checkpointed"), "fixture")
+    wal = db.with_name(db.name + "-wal").read_bytes()
+    c.close()
+    db.unlink()
+    db.with_name(db.name + "-wal").write_bytes(wal)
     assert stores.state(db).name == stores.CONFLICT
+    assert stores.ensure(db).name == stores.CONFLICT
+    assert not db.exists()
+    done = stores.assemble(db, replace=True)
+    assert "moved to" in done.detail
+    kept = [p for p in db.parent.iterdir() if p.name.endswith(".db-wal") and "local-" in p.name]
+    assert len(kept) == 1 and kept[0].read_bytes() == wal, "the journal is kept, not deleted"
+    con = sqlite3.connect(db)
+    try:
+        assert con.execute("PRAGMA quick_check").fetchone()[0] == "ok"
+    finally:
+        con.close()
+
+
+def test_a_local_file_that_is_not_a_database_conflicts_and_is_moved_aside(db):
+    stores.split(db, part_bytes=SMALL)
+    published = stores.read_manifest(db).sha256
+    db.write_bytes(b"version https://git-lfs.github.com/spec/v1\n" * 200)
+    assert stores.state(db).name == stores.CONFLICT
+    stores.assemble(db, replace=True)
+    assert _sha(db) == published
+    assert any(p.name.startswith("corpus.local-") for p in db.parent.iterdir())
+
+
+def test_assembly_waits_for_the_lock_and_gives_up_loudly(db, monkeypatch):
+    stores.split(db, part_bytes=SMALL)
+    db.unlink()
+    monkeypatch.setattr(stores, "LOCK_SECONDS", 0.3)
+    with stores._locked(db):
+        with pytest.raises(stores.StoreBusy):
+            stores.assemble(db)
+        assert stores.ensure(db).name == stores.CONFLICT
+    assert stores.ensure(db).name == "assembled"
 
 
 def test_an_empty_file_counts_as_missing(db):
@@ -233,13 +340,8 @@ def test_an_ungoverned_corpus_behaves_exactly_as_before(tmp_path):
 
 def test_a_store_held_open_elsewhere_is_not_replaced(db):
     stores.split(db, part_bytes=SMALL)
-    other = db.parent.parent / "elsewhere" / "data" / "corpus.db"
-    other.parent.mkdir(parents=True)
-    other.write_bytes(db.read_bytes())
-    _corpus(other, 20, start=500)
-    stores.split(other, part_bytes=SMALL)
-    for p in stores.parts_dir(other).iterdir():
-        (stores.parts_dir(db) / p.name).write_bytes(p.read_bytes())
+    other = _publish_elsewhere(db, 20, 500)
+    _pull(db, other)
     reader = sqlite3.connect(db)
     reader.execute("PRAGMA journal_mode=WAL")
     reader.execute("BEGIN")

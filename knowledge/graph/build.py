@@ -203,12 +203,15 @@ def main(argv=None) -> int:
     args = ap.parse_args(argv)
 
     path = Path(args.db if args.db != DEFAULT_DB or not args.code else CODE_DB)
+    from knowledge.corpus import CORPUS_DB
     from knowledge.graph import derive
 
-    if derive.derived(path):
+    if derive.derived(path) or (not args.code and derive.wanted(path, CORPUS_DB)):
         # Its stamp says which corpus row it was derived to; a spine build or a
         # prune here would change it behind that stamp's back (a prune closes
         # every market edge the spine does not assert, events' companies too).
+        # And where it is not built yet but should be derived, a spine-only file
+        # here would be a graph with no stamp, which nothing then takes over.
         print(
             f"{path} is rebuilt from the corpus (knowledge/graph/derive.py) and is not "
             "built here. `python ask.py stores graph` brings it up to date.",

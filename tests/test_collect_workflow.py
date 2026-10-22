@@ -95,10 +95,20 @@ def test_a_run_that_cannot_push_leaves_its_commit_on_a_rescue_branch():
     """The runner is thrown away with everything on it. Until 2026-10-22 a run
     that gave up left the day's collection there."""
     run = _commit_step()["run"]
+    after = run.split('ours="$(git rev-parse HEAD)"', 1)[1]
+    keep = after.split("keep() {", 1)[1].split("\n          }", 1)[0]
+    assert 'git push origin "$ours:refs/heads/$rescue"' in keep
+    # A re-run keeps the run id; the attempt keeps its branch from colliding.
+    assert 'rescue="rescue/collect-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT' in after
+    # Every way out but a push reaches it: a failing fetch or reset exits the
+    # step under `bash -e`, so the trap is set before any of them can.
+    assert after.index("trap keep ERR") < after.index("git pull --rebase")
     gave_up = run.split("for attempt in 1 2 3", 1)[1].split("done", 1)[1]
-    assert 'git push origin "$ours:refs/heads/$rescue"' in gave_up
-    assert "rescue/collect-${GITHUB_RUN_ID}" in gave_up
-    assert gave_up.rstrip().endswith("exit 1")
+    assert gave_up.split("keep", 1)[1].strip().endswith("exit 1")
+    # A push rejected after a clean rebase falls through to the retry loop
+    # instead of ending the step with the commit on the runner.
+    rebased = run.split('if git pull --rebase --autostash origin "${GITHUB_REF_NAME}"; then', 1)[1]
+    assert rebased.lstrip().startswith("if git push; then")
 
 
 def test_a_store_not_published_fails_the_job_after_the_commit():
@@ -106,6 +116,9 @@ def test_a_store_not_published_fails_the_job_after_the_commit():
     names = [s.get("name", "") for s in steps]
     fail = names.index("Fail if a store was not published")
     assert names.index("Commit what was collected") < fail
+    # Last: a failing step skips every step after it, and the degraded warning
+    # and the fx check must still run.
+    assert fail == len(steps) - 1
     cond = steps[fail]["if"]
     assert "steps.commit.outputs.split_failed" in cond and "steps.commit.outputs.too_big" in cond
     assert _commit_step()["id"] == "commit"

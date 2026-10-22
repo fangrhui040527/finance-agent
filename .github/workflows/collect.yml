@@ -354,14 +354,35 @@ jobs:
           # [skip ci]: a data commit; ten test jobs to validate a row of news is waste.
           git commit -m "chore(corpus): the $(date -u +%Y-%m-%d) ${{ steps.slot.outputs.slot }} sweep [skip ci]"
           ours="$(git rev-parse HEAD)"
+          # From here on, any way out of this step but a push lands the commit
+          # on a rescue/ branch first: the runner is thrown away with
+          # everything on it. A failing fetch or reset exits the step under
+          # `bash -e` as surely as the give-up below, so a trap covers both.
+          # The attempt number keeps a re-run's branch from colliding.
+          rescue="rescue/collect-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT:-1}"
+          rescued=0
+          keep() {
+            [ "$rescued" = 1 ] && return 0
+            rescued=1
+            if git push origin "$ours:refs/heads/$rescue"; then
+              echo "::error title=sweep not pushed::the day's collection is in commit $ours, pushed to branch $rescue; merge its rows by hand, or dispatch the slot again."
+            else
+              echo "::error title=sweep not pushed::branch $rescue could not be pushed either. The day's collection is in commit $ours on this runner only; dispatch the slot again."
+            fi
+          }
+          trap keep ERR
           # Another slot, or the nightly Routine (which commits data/paper.db
           # and data/learning.db), may have pushed while this one ran; rebase
           # our one data commit onto it rather than fail the push.
           # --autostash: the sweep leaves stores it did not stage (a cache file)
           # modified in the tree, and a rebase refuses to start over them.
           if git pull --rebase --autostash origin "${GITHUB_REF_NAME}"; then
-            git push
-            exit 0
+            if git push; then
+              exit 0
+            fi
+            # Rejected after a clean rebase: the branch moved again, or the
+            # host failed. The loop below re-applies the commit on a fresh fetch.
+            echo "push rejected after a clean rebase; re-applying on a fresh fetch"
           fi
           # The rebase stopped - on this repository that means a binary
           # conflict on a data/*.db both sides changed. This line used to be
@@ -374,7 +395,7 @@ jobs:
           # is the same commit rebased; one that conflicts is a real conflict,
           # and the retry is for the race where a third push lands between
           # our fetch and our push, not for wishing the conflict away.
-          git rebase --abort || true
+          git rebase --abort 2>/dev/null || true
           for attempt in 1 2 3; do
             git fetch origin "${GITHUB_REF_NAME}"
             # FETCH_HEAD is what that fetch brought, whatever refspec the
@@ -392,26 +413,10 @@ jobs:
             git cherry-pick --abort || true
             echo "::error title=data commit conflicts with ${GITHUB_REF_NAME}::attempt $attempt of 3: this run's commit $ours conflicts on: ${conflicted}"
           done
-          # The runner is thrown away with everything on it, so the commit is
-          # pushed where nothing else writes before the job gives up. Its
-          # stores are whole files; re-applying them is a merge of rows, by
-          # hand, not a cherry-pick (docs/14, Large stores).
-          rescue="rescue/collect-${GITHUB_RUN_ID}"
-          if git push origin "$ours:refs/heads/$rescue"; then
-            echo "::error title=sweep not pushed::gave up after 3 attempts. The day's collection is in commit $ours, pushed to branch $rescue; merge its rows by hand, or dispatch the slot again."
-          else
-            echo "::error title=sweep not pushed::gave up after 3 attempts, and branch $rescue could not be pushed either. The day's collection is in commit $ours on this runner only; dispatch the slot again."
-          fi
-          exit 1
-
-      # Not in the commit step, so that step can still push whatever else the
-      # run collected: a corpus that was not split, or a store left out at 95
-      # MiB, is a fault someone must see on the run, not a log line.
-      - name: Fail if a store was not published
-        if: steps.commit.outputs.split_failed == '1' || steps.commit.outputs.too_big == '1'
-        run: |
-          echo "split_failed=${{ steps.commit.outputs.split_failed }} too_big=${{ steps.commit.outputs.too_big }}"
-          echo "see the commit step's annotations, and docs/14-OPERATIONS-RUNBOOK.md, Large stores"
+          # Gave up after 3 attempts. The stores are whole files plus parts;
+          # re-applying the rescued commit is a merge of rows, by hand, not a
+          # cherry-pick (docs/14, Large stores).
+          keep
           exit 1
 
       # Exit 3 is "a source was degraded": part of the day was collected and
@@ -432,4 +437,15 @@ jobs:
         run: |
           echo "sweep exited ${{ steps.sweep.outputs.code }}, fx exited ${{ steps.fx.outputs.code || 'n/a' }}"
           echo "  2 = could not run (config, slot or adapter)"
+          exit 1
+
+      # Not in the commit step, so that step can still push whatever else the
+      # run collected: a corpus that was not split, or a store left out at 95
+      # MiB, is a fault someone must see on the run, not a log line. Last, so
+      # failing here cannot skip the degraded warning or the fx check above.
+      - name: Fail if a store was not published
+        if: steps.commit.outputs.split_failed == '1' || steps.commit.outputs.too_big == '1'
+        run: |
+          echo "split_failed=${{ steps.commit.outputs.split_failed }} too_big=${{ steps.commit.outputs.too_big }}"
+          echo "see the commit step's annotations, and docs/14-OPERATIONS-RUNBOOK.md, Large stores"
           exit 1
