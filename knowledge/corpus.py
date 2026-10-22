@@ -37,7 +37,7 @@ from __future__ import annotations
 
 import json
 import sqlite3
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
@@ -46,7 +46,9 @@ from knowledge.news.features import Article
 from knowledge.redact import scrub
 
 #: Tracked in git like every other database here - see .gitignore, which keeps
-#: out secrets and derived files and nothing else. This one is neither.
+#: out secrets and derived files and nothing else. This one is neither. Git
+#: carries it as fixed-size parts beside the whole file (knowledge/stores.py),
+#: so no committed file grows toward GitHub's 100 MiB limit.
 CORPUS_DB = "data/corpus.db"
 
 OK = "ok"
@@ -136,6 +138,10 @@ class StoreStats:
 
     stored: int = 0
     duplicates: int = 0
+    added: list[Article] = field(default_factory=list)
+    """The articles this call stored, in order. What the graph links: a story
+    the corpus refused as already held is not a second event (see
+    knowledge/graph/derive.py)."""
 
     def __str__(self) -> str:
         return f"stored {self.stored}, already held {self.duplicates}"
@@ -150,6 +156,21 @@ def _dt(raw: str) -> datetime:
     return parsed if parsed.tzinfo else parsed.replace(tzinfo=UTC)
 
 
+def _refuse_an_unassembled_corpus(path: Path) -> None:
+    """sqlite3.connect on a missing path creates an EMPTY database, and every
+    reader would then answer as though nothing had ever been collected - a sweep
+    would even refetch a slot it already ran, since its own history is in here.
+    Where git carries this corpus as parts (knowledge/stores.py), a missing file
+    is one nobody assembled; say so instead of starting a new corpus."""
+    from knowledge import stores
+
+    if (not path.exists() or path.stat().st_size == 0) and stores.governed(path):
+        raise stores.StoreError(
+            f"{path} is not assembled; git carries it as parts in "
+            f"{stores.parts_dir(path)}. Run `python ask.py stores assemble`."
+        )
+
+
 class Corpus:
     """The article store. One connection, opened per process, closed explicitly."""
 
@@ -158,6 +179,7 @@ class Corpus:
     def __init__(self, path: str | Path = CORPUS_DB) -> None:
         path = str(path)
         if path != ":memory:":
+            _refuse_an_unassembled_corpus(Path(path))
             Path(path).parent.mkdir(parents=True, exist_ok=True)
         self.conn = sqlite3.connect(path, timeout=self.BUSY_TIMEOUT_MS / 1000)
         self.conn.row_factory = sqlite3.Row
@@ -272,6 +294,7 @@ class Corpus:
         for art in articles:
             if self.add(art, source, seen_at):
                 stats.stored += 1
+                stats.added.append(art)
             else:
                 stats.duplicates += 1
         return stats

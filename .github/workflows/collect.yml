@@ -4,6 +4,15 @@
 # writes the day's digest, and records the attempt - success or failure - in
 # the sweeps and pulls tables.
 #
+# GitHub warns on a file over 50 MiB and refuses a push with one over 100 MiB,
+# and data/corpus.db grows about half a megabyte a day. So the commit step also
+# writes the corpus as fixed 16 MiB parts (data/stores/corpus/, `ask.py stores
+# split`), which no amount of collection makes larger; for now the whole file
+# is committed beside them, until the parts have been shown to reassemble it on
+# real runs. The size check in that step unstages any store at 95 MiB, so the
+# rest of a run's collection still lands, and a run that cannot push leaves its
+# commit on a rescue/ branch instead of on a runner that is thrown away.
+#
 # It runs HERE rather than on the dev machine for one reason: news expires.
 # The GDELT window is recent-only, and free-tier quotas are per day, so a day
 # nothing collects is a day that cannot be fetched later. A laptop collects
@@ -293,20 +302,51 @@ jobs:
           "
 
       - name: Commit what was collected
+        id: commit
         if: steps.sweep.outputs.code == '0' || steps.sweep.outputs.code == '3'
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # The corpus as parts (knowledge/stores.py). It refuses - and writes
+          # nothing - rather than publish a corpus with fewer rows than the last
+          # one, a WAL it could not checkpoint, or parts that do not concatenate
+          # back to the file. A refusal costs this run its parts, not the rest
+          # of its collection; the job is failed at the end so it is seen.
+          split_failed=0
+          if ! uv run python ask.py stores split; then
+            git checkout -- data/stores 2>/dev/null || true
+            git clean -fdq -- data/stores 2>/dev/null || true
+            split_failed=1
+            echo "::error title=corpus not split::ask.py stores split refused; data/stores was put back and the rest of the collection is committed without it"
+          fi
+          echo "split_failed=$split_failed" >> "$GITHUB_OUTPUT"
           # One at a time, skipping any that is not there: `git add` on a
           # missing path is fatal, and one store missing must never cost the
           # others their day.
-          for path in data/corpus.db data/graph.db data/fx.db data/facts.db data/price_cache.db data/digests data/paper.db data/learning.db data/alerts.db knowledge/paper; do
+          for path in data/corpus.db data/graph.db data/stores data/fx.db data/facts.db data/price_cache.db data/digests data/paper.db data/learning.db data/alerts.db knowledge/paper; do
             if [ -e "$path" ]; then
               git add "$path"
             else
               echo "no $path yet - skipping it"
             fi
           done
+          # GitHub refuses a whole push over one file of 100 MiB, so a store at
+          # 95 MiB is unstaged and named: the other stores still land. 45 MiB
+          # is a warning, months ahead at today's growth. A part never reaches
+          # either; this is for the stores that are still whole files.
+          too_big=0
+          while IFS= read -r -d '' f; do
+            [ -f "$f" ] || continue
+            size=$(wc -c < "$f")
+            if [ "$size" -ge 99614720 ]; then
+              git reset -q -- "$f"
+              too_big=1
+              echo "::error title=store too large to push::$f is $size bytes; GitHub refuses files over 100 MiB, so it was left out of this commit. See docs/14-OPERATIONS-RUNBOOK.md, Large stores."
+            elif [ "$size" -ge 47185920 ]; then
+              echo "::warning title=store nearing GitHub's limit::$f is $size bytes; GitHub warns at 50 MiB and refuses 100 MiB. See docs/14-OPERATIONS-RUNBOOK.md, Large stores."
+            fi
+          done < <(git diff --cached --name-only -z)
+          echo "too_big=$too_big" >> "$GITHUB_OUTPUT"
           if git diff --cached --quiet; then
             echo "nothing new to commit"
             exit 0
@@ -352,7 +392,26 @@ jobs:
             git cherry-pick --abort || true
             echo "::error title=data commit conflicts with ${GITHUB_REF_NAME}::attempt $attempt of 3: this run's commit $ours conflicts on: ${conflicted}"
           done
-          echo "::error title=sweep not pushed::gave up after 3 attempts. The day's collection is in commit $ours on this runner only; fetch it from the run's logs and re-apply by hand, or dispatch the slot again."
+          # The runner is thrown away with everything on it, so the commit is
+          # pushed where nothing else writes before the job gives up. Its
+          # stores are whole files; re-applying them is a merge of rows, by
+          # hand, not a cherry-pick (docs/14, Large stores).
+          rescue="rescue/collect-${GITHUB_RUN_ID}"
+          if git push origin "$ours:refs/heads/$rescue"; then
+            echo "::error title=sweep not pushed::gave up after 3 attempts. The day's collection is in commit $ours, pushed to branch $rescue; merge its rows by hand, or dispatch the slot again."
+          else
+            echo "::error title=sweep not pushed::gave up after 3 attempts, and branch $rescue could not be pushed either. The day's collection is in commit $ours on this runner only; dispatch the slot again."
+          fi
+          exit 1
+
+      # Not in the commit step, so that step can still push whatever else the
+      # run collected: a corpus that was not split, or a store left out at 95
+      # MiB, is a fault someone must see on the run, not a log line.
+      - name: Fail if a store was not published
+        if: steps.commit.outputs.split_failed == '1' || steps.commit.outputs.too_big == '1'
+        run: |
+          echo "split_failed=${{ steps.commit.outputs.split_failed }} too_big=${{ steps.commit.outputs.too_big }}"
+          echo "see the commit step's annotations, and docs/14-OPERATIONS-RUNBOOK.md, Large stores"
           exit 1
 
       # Exit 3 is "a source was degraded": part of the day was collected and

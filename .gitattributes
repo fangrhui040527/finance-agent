@@ -11,3 +11,10 @@
 *.md   text eol=lf
 *.html text eol=lf
 Makefile text eol=lf
+
+# The corpus as git carries it (knowledge/stores.py). A part after the first
+# has no SQLite header, so nothing marks it binary but this line - and a text
+# conversion on a Windows checkout would corrupt it. The manifest has one
+# writer; a merge that combined two of them would describe neither.
+data/stores/*/part-* binary
+data/stores/*/manifest.json text eol=lf -merge

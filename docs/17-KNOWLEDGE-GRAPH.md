@@ -296,6 +296,32 @@ both orders.
 
 ---
 
+### Rebuilt from the corpus, not carried (2026-10-22)
+
+The news layer is a function of the corpus: one Event per linked article, one
+INFERRED `affects` edge per company it names, born closed after
+`EVENT_VALID_DAYS`. `knowledge/graph/derive.py` rebuilds the whole graph - the
+spine above, then every linked corpus row - in ~17 s, byte-identical twice, and
+keeps it current incrementally from a watermark (`data/graph.db.stamp.json`:
+the inputs' hash and the last corpus row linked). A change to the code, the
+yaml or config.toml changes the inputs' hash and rebuilds it; so does a corpus
+that is no longer the one it was derived from.
+
+Two things differ from the graph the sweep built by linking as it went, both on
+purpose. The sweep linked every normalised article, including the ones the
+corpus refused as already held: 2,542 of 15,898 events on 2026-10-22 were
+second copies of a story, and every hub was ~16% heavier than the news. It now
+links only what the corpus kept (`StoreStats.added`). And each row is read
+through `EntityLinker.recheck` - the rule the digest applies - so a link today's
+rules exclude (22 *Shree TNB Polymers* rows on Tenaga) leaves the graph as it
+left the page.
+
+A graph file with no stamp is one something else wrote - the committed one,
+while git still carries it - and nothing replaces it unasked. `make graph`
+refuses a derived graph: a spine build or a prune would change it behind its
+stamp. Rows of another tier are not derivable, so a rebuild refuses to replace a
+graph holding any. See docs/14-OPERATIONS-RUNBOOK.md, "Large stores".
+
 ## 9. Hubs — degree, not kind
 
 ```python

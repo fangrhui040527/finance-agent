@@ -58,6 +58,27 @@ make graph-report  # ask.py graph --report
 
 Both builds are byte-reproducible; CI builds each twice and runs `cmp`.
 
+## The stores git carries as parts
+
+```bash
+python ask.py stores            # where data/corpus.db stands against its parts
+python ask.py stores split      # write data/stores/corpus/ from the corpus (the collector does)
+python ask.py stores assemble   # the corpus from its parts, then the derived graph
+python ask.py stores assemble --replace   # over a local corpus nothing accounts for; moved aside, never deleted
+python ask.py stores verify --whole       # parts match the manifest, and the local file is exactly it
+python ask.py stores graph      # bring a derived data/graph.db up to the corpus
+python ask.py stores graph --out /tmp/g.db   # a full rebuild into a new file (CI runs it twice and compares)
+```
+
+GitHub refuses a push holding a file over 100 MiB. The collector commits the
+corpus as fixed 16 MiB parts plus a manifest (`knowledge/stores.py`), so no
+committed file grows toward the limit; every reader still opens one
+`data/corpus.db`. Every other `ask.py` command, and every MCP tool call,
+assembles it first when a pull moved the parts and the local file is missing or
+untouched. The graph is rebuilt from the corpus (`knowledge/graph/derive.py`)
+wherever git does not carry it; `make graph` builds the spine only, and refuses
+a derived graph. See docs/14-OPERATIONS-RUNBOOK.md, "Large stores".
+
 ## Configuration
 
 ```bash
@@ -215,8 +236,8 @@ it — and what the nightly feedback routine reasons over.
 `news` prints one source and forgets it, which is right for a person checking a
 feed by hand. `sweep` is the scheduled sibling and the one that makes a month of
 watching add up to something: it resumes each source from its last **successful**
-sweep, writes what it finds to `data/corpus.db`, links the articles into
-`data/graph.db`, and records the attempt either way.
+sweep, writes what it finds to `data/corpus.db`, links the articles the corpus
+kept into `data/graph.db`, and records the attempt either way.
 
 Three things it does that the interactive path cannot:
 

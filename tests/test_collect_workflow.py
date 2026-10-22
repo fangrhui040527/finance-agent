@@ -61,3 +61,58 @@ def test_a_queued_run_checks_out_the_branch_head_not_the_event_commit():
     steps = _workflow()["jobs"]["sweep"]["steps"]
     checkout = next(s for s in steps if str(s.get("uses", "")).startswith("actions/checkout"))
     assert checkout.get("with", {}).get("ref") == "${{ github.ref_name }}"
+
+
+def _commit_step() -> dict:
+    steps = _workflow()["jobs"]["sweep"]["steps"]
+    return next(s for s in steps if s.get("name") == "Commit what was collected")
+
+
+def test_the_corpus_is_split_into_parts_before_anything_is_staged():
+    """GitHub refuses a push holding a file over 100 MiB, and the corpus grows
+    about half a megabyte a day. Its parts (knowledge/stores.py) are committed
+    beside it; a refused split puts data/stores back and the rest still lands."""
+    run = _commit_step()["run"]
+    split = run.index("ask.py stores split")
+    assert split < run.index("for path in")
+    refused = run[split:].split("fi", 1)[0]
+    assert "git checkout -- data/stores" in refused and "split_failed=1" in refused
+    added = run.split("for path in", 1)[1].split(";", 1)[0].split()
+    # The whole file stays committed beside its parts until they have been
+    # shown to reassemble it on real runs; the graph too, until it is rebuilt.
+    assert {"data/stores", "data/corpus.db", "data/graph.db"} <= set(added)
+
+
+def test_a_store_at_the_size_github_refuses_is_left_out_and_the_rest_still_lands():
+    run = _commit_step()["run"]
+    sizes = run.split("too_big=0", 1)[1].split('echo "too_big=', 1)[0]
+    assert "99614720" in sizes and "47185920" in sizes  # 95 and 45 MiB
+    assert 'git reset -q -- "$f"' in sizes.split("99614720", 1)[1].split("elif", 1)[0]
+    assert run.index("too_big=0") < run.index("git commit -m")
+
+
+def test_a_run_that_cannot_push_leaves_its_commit_on_a_rescue_branch():
+    """The runner is thrown away with everything on it. Until 2026-10-22 a run
+    that gave up left the day's collection there."""
+    run = _commit_step()["run"]
+    gave_up = run.split("for attempt in 1 2 3", 1)[1].split("done", 1)[1]
+    assert 'git push origin "$ours:refs/heads/$rescue"' in gave_up
+    assert "rescue/collect-${GITHUB_RUN_ID}" in gave_up
+    assert gave_up.rstrip().endswith("exit 1")
+
+
+def test_a_store_not_published_fails_the_job_after_the_commit():
+    steps = _workflow()["jobs"]["sweep"]["steps"]
+    names = [s.get("name", "") for s in steps]
+    fail = names.index("Fail if a store was not published")
+    assert names.index("Commit what was collected") < fail
+    cond = steps[fail]["if"]
+    assert "steps.commit.outputs.split_failed" in cond and "steps.commit.outputs.too_big" in cond
+    assert _commit_step()["id"] == "commit"
+
+
+def test_ci_proves_the_committed_parts_reassemble_the_committed_corpus():
+    ci = yaml.safe_load((WORKFLOW.parent / "ci.yml").read_text(encoding="utf-8"))
+    runs = [str(s.get("run", "")) for s in ci["jobs"]["test"]["steps"]]
+    assert any("ask.py stores verify --whole" in r for r in runs)
+    assert any(r.count("ask.py stores graph --out") == 2 for r in runs)

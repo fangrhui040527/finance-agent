@@ -472,6 +472,22 @@ def _cached(items: tuple[tuple[str, str], ...]) -> EntityLinker:
     return EntityLinker(dict(items))
 
 
+def relinked(article, linker: EntityLinker):
+    """The article with its stored links read by today's linker rules.
+
+    Features scored for the old links go with them, so a caller that scores the
+    row scores it again on the names it is linked to now. (A row read from the
+    corpus carries none - they are not stored - but an article built in memory
+    might.) The digest and the graph's rebuild both read stored rows this way,
+    so the two cannot disagree about who a story names."""
+    from dataclasses import replace
+
+    ids = linker.recheck(article.text, article.instruments)
+    if ids == list(article.instruments):
+        return article
+    return replace(article, instruments=ids, features=None)
+
+
 def linker_for(index: dict[str, str]) -> EntityLinker:
     """A linker for this index, compiled once per distinct index."""
     return _cached(tuple(sorted(index.items())))

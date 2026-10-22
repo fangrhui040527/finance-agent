@@ -100,10 +100,30 @@ def run_checks(offline: bool = False) -> list[CheckResult]:
         CheckResult(
             "graph",
             OK if graph.exists() else WARN,
-            str(graph) if graph.exists() else "data/graph.db absent - run `make graph`",
+            str(graph)
+            if graph.exists()
+            else "data/graph.db absent - `python ask.py stores graph` rebuilds it from the "
+            "corpus where git carries the corpus as parts, `make graph` builds the spine",
             "multi-hop exposure claims",
         )
     )
+
+    # -- the corpus as git carries it, and anything nearing GitHub's file limit
+    from knowledge import stores
+
+    corpus = Path("data/corpus.db")
+    st = stores.state(corpus)
+    big = stores.oversized("data")
+    if big:
+        status = WARN
+        detail = "; ".join(f"{p} {n / 2**20:.1f} MiB" for p, n in big) + (
+            " - GitHub warns at 50 MiB and refuses a push over 100 MiB"
+        )
+    elif st.name in (stores.UNGOVERNED, stores.CURRENT, stores.AHEAD):
+        status, detail = OK, f"{corpus} {st}"
+    else:
+        status, detail = WARN, f"{corpus} {st}. `python ask.py stores` says more"
+    out.append(CheckResult("stores", status, detail, "the corpus every reader opens"))
 
     # -- .env: loaded, or deliberately skipped?
     from pathlib import Path as _P

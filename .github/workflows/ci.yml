@@ -184,6 +184,27 @@ jobs:
       # The code graph is a maintainer's tool, but it parses every file in the
       # repository - so a build failure here is a syntax error somewhere, and
       # the reproducibility guarantee has to hold for it too, on every OS.
+      # The collector commits the corpus as parts beside the whole file
+      # (knowledge/stores.py). Until the whole file stops being committed,
+      # every checkout can prove the parts reassemble it, byte for byte.
+      - name: The corpus parts reassemble the committed corpus
+        run: |
+          if [ -f data/stores/corpus/manifest.json ]; then
+            uv run python ask.py stores verify --whole
+          else
+            echo "no parts committed yet - the collector's first split writes them"
+          fi
+
+      # The graph git will stop carrying is rebuilt from the corpus
+      # (knowledge/graph/derive.py); a rebuild that is not reproducible is one
+      # whose changes cannot be reviewed. ~20 s, so once per run, not per cell.
+      - name: The graph rebuilds from the corpus, twice, identically
+        if: matrix.os == 'ubuntu-latest' && matrix.python == '3.11'
+        run: |
+          uv run python ask.py stores graph --out "${{ runner.temp }}/derived-a.db"
+          uv run python ask.py stores graph --out "${{ runner.temp }}/derived-b.db"
+          uv run python -c "import sys;a,b=[open(p,'rb').read() for p in sys.argv[1:]];sys.exit(a!=b)" "${{ runner.temp }}/derived-a.db" "${{ runner.temp }}/derived-b.db"
+
       - name: Codebase graph builds, twice, identically
         run: |
           uv run python -m knowledge.graph.build --code --db "${{ runner.temp }}/code-a.db" --rebuild

@@ -1852,6 +1852,91 @@ def cmd_rebalance(a) -> int:
     return 0
 
 
+def cmd_stores(a) -> int:
+    """The stores git carries as parts, and the graph rebuilt from the corpus.
+
+    Exit 0 when done; 2 when the corpus was refused or did not verify (nothing
+    replaced); 3 when the corpus is fine and the graph could not be built."""
+    import json
+    import sqlite3
+    from pathlib import Path
+
+    from knowledge import stores
+    from knowledge.graph import derive
+    from knowledge.graph.build import DEFAULT_DB as GRAPH_DB
+
+    corpus = load_config().corpus_db
+    action = a.action or "status"
+    try:
+        if action == "split":
+            m = stores.split(corpus)
+            print(
+                f"split {corpus}: {len(m.parts)} parts, {m.bytes:,} bytes, "
+                + ", ".join(f"{t} {n:,}" for t, n in sorted(m.rows.items()))
+                + f"\n  -> {stores.manifest_path(corpus)}"
+            )
+            return 0
+        if action == "verify":
+            m = stores.verify(corpus)
+            print(f"verified {stores.parts_dir(corpus)}: {len(m.parts)} parts -> {m.sha256[:16]}")
+            if a.whole:
+                st = stores.state(corpus)
+                print(f"  {corpus}: {st}")
+                if st.name != stores.CURRENT:
+                    return 2
+            return 0
+        if action == "assemble":
+            if stores.governed(corpus):
+                print(f"{corpus}: {stores.assemble(corpus, replace=a.replace)}")
+            else:
+                print(f"{corpus}: not carried as parts (no {stores.manifest_path(corpus)})")
+    except stores.StoreError as e:
+        print(f"stores {action}: {e}", file=sys.stderr)
+        return 2
+
+    if action in ("assemble", "graph"):
+        try:
+            if a.out:
+                derive.build_from_corpus(corpus, a.out)
+                print(f"graph: built {a.out} from {corpus}")
+            elif derive.wanted(GRAPH_DB, corpus):
+                print(f"{GRAPH_DB}: {derive.sync(GRAPH_DB, corpus)}")
+            else:
+                print(
+                    f"{GRAPH_DB}: not derived here - git carries it"
+                    if Path(GRAPH_DB).exists()
+                    else f"{GRAPH_DB}: absent, and {corpus} is not carried as parts"
+                )
+        except (derive.DeriveError, stores.StoreError, OSError, sqlite3.Error) as e:
+            print(f"graph not built: {type(e).__name__}: {e}", file=sys.stderr)
+            return 3
+        return 0
+
+    # status
+    st = stores.state(corpus)
+    print(f"{corpus:24} {st}")
+    m = stores.read_manifest(corpus)
+    if m is not None:
+        print(
+            f"{'':24} manifest: {len(m.parts)} parts of at most {m.part_bytes // 2**20} MiB, "
+            + ", ".join(f"{t} {n:,}" for t, n in sorted(m.rows.items()))
+        )
+    if derive.derived(GRAPH_DB):
+        stamp = json.loads(derive.stamp_path(GRAPH_DB).read_text(encoding="utf-8"))
+        fresh = stamp.get("inputs") == derive.inputs_key()
+        print(
+            f"{GRAPH_DB:24} derived to corpus row {stamp.get('corpus_rowid')}"
+            + ("" if fresh else "; its inputs changed, the next read rebuilds it")
+        )
+    elif Path(GRAPH_DB).exists():
+        print(f"{GRAPH_DB:24} not derived here - git carries it")
+    else:
+        print(f"{GRAPH_DB:24} absent")
+    for path, size in stores.oversized():
+        print(f"WARNING {path}: {size / 2**20:.1f} MiB - GitHub warns at 50 MiB, refuses 100")
+    return 1 if st.name in (stores.CONFLICT, stores.MISSING) else 0
+
+
 def cmd_doctor(a) -> int:
     from core.doctor import FAIL, render, run_checks
 
@@ -2117,12 +2202,20 @@ def _graph(db: str | None):
     """Load the built graph, or explain how to build it. Never guesses."""
     from pathlib import Path as _P
 
+    from knowledge.graph import derive
     from knowledge.graph.build import DEFAULT_DB
     from knowledge.graph.store import GraphStore
 
     path = db or DEFAULT_DB
+    if path == DEFAULT_DB:
+        derive.ready(path, load_config().corpus_db)
     if path != ":memory:" and not _P(path).exists():
-        print(f"no graph at {path}. Build it first:\n\n    make graph\n", file=sys.stderr)
+        print(
+            f"no graph at {path}. Build it first:\n\n    make graph\n\n"
+            "(the spine only; where git carries the corpus as parts, "
+            "`python ask.py stores graph` rebuilds the whole graph from it)",
+            file=sys.stderr,
+        )
         return None, None
     store = GraphStore(path)
     return store, store.load()
@@ -2817,6 +2910,30 @@ def main(argv=None) -> int:
     cp = sub.add_parser("capital", help="how much may be invested at all, from [capital]")
     cp.set_defaults(fn=cmd_capital)
 
+    st = sub.add_parser(
+        "stores", help="the corpus as git carries it (parts), and the graph rebuilt from it"
+    )
+    st.add_argument(
+        "action",
+        nargs="?",
+        choices=["status", "split", "assemble", "verify", "graph"],
+        help="status (default) | split: write data/stores/ from the corpus | "
+        "assemble: the corpus from data/stores/, then the graph | "
+        "verify: the parts against their manifest | graph: bring the derived graph up",
+    )
+    st.add_argument(
+        "--replace",
+        action="store_true",
+        help="assemble over a local corpus nothing accounts for, moving it aside first",
+    )
+    st.add_argument(
+        "--whole",
+        action="store_true",
+        help="verify: also require the local corpus to be exactly the manifest's",
+    )
+    st.add_argument("--out", help="graph: build a full graph into this new file instead")
+    st.set_defaults(fn=cmd_stores)
+
     dr = sub.add_parser("doctor", help="preflight: what this installation can actually do")
     dr.add_argument("--offline", action="store_true", help="skip the two network probes")
     dr.set_defaults(fn=cmd_doctor)
@@ -2843,7 +2960,35 @@ def main(argv=None) -> int:
         except ModelSelectionError as e:
             print(f"{e}", file=sys.stderr)
             return 2
+    if a.cmd not in ("stores", "doctor"):
+        code = _bring_the_stores_up()
+        if code:
+            return code
     return a.fn(a)
+
+
+def _bring_the_stores_up() -> int:
+    """Before any command: a corpus git carries as parts is assembled when a
+    pull moved the parts and the local file is missing or untouched. A local
+    file nothing can account for is left as it is and named (the command runs
+    against it, as it would have before parts existed); damaged parts stop the
+    command, exit 2, because every answer after them would be built on a file
+    that is not the corpus. `stores` and `doctor` are how you look at that
+    state, so they skip this."""
+    from knowledge import stores
+
+    try:
+        path = load_config().corpus_db
+    except Exception:  # a broken config is the command's to report, not this
+        from knowledge.corpus import CORPUS_DB as path
+    try:
+        st = stores.ensure(path, log=lambda msg: print(msg, file=sys.stderr))
+    except stores.StoreError as e:
+        print(f"stores: {e}\n  see `python ask.py stores`", file=sys.stderr)
+        return 2
+    if st.name == "assembled":
+        print(f"stores: assembled {path} ({st.detail})", file=sys.stderr)
+    return 0
 
 
 if __name__ == "__main__":

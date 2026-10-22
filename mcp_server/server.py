@@ -877,6 +877,18 @@ def _anchor_to_the_repository() -> None:
         os.chdir(ROOT)
 
 
+def _bring_the_stores_up() -> None:
+    """Assemble a corpus git carries as parts when the last pull moved them.
+
+    Cheap when nothing changed (one stat against the stamp). A local file
+    nothing can account for is left alone and named on stderr, which is the
+    server's log, never the JSON-RPC wire."""
+    from knowledge import stores
+    from knowledge.corpus import CORPUS_DB
+
+    stores.ensure(CORPUS_DB, log=_eprint)
+
+
 def main(argv=None) -> int:
     _anchor_to_the_repository()
 
@@ -886,6 +898,7 @@ def main(argv=None) -> int:
     _load_dotenv()
     _configure_logging()
     argv = sys.argv[1:] if argv is None else argv
+    S.before_call = _bring_the_stores_up
     if "--selftest" in argv:
         return selftest()
     if "--list" in argv:
