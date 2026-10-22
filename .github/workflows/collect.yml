@@ -142,6 +142,7 @@ jobs:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
           EODHD_API_KEY: ${{ secrets.EODHD_API_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
           if [ -z "$ALL_SECRET" ]; then
             echo "ALL_SECRET is not set; the named secrets are in use"
@@ -241,6 +242,36 @@ jobs:
           code=$?
           if [ "$code" -ne 0 ]; then
             echo "::warning title=predictions not graded::ask.py paper grade exited $code"
+          fi
+          exit 0
+
+      # Web evidence (knowledge/evidence/web.py): for a book name whose
+      # session moved beyond 1.96 sigma with the decomposition saying a
+      # company-specific cause is warranted, ask Claude with web search what
+      # explains it, and keep each page it cites as a corpus row. After the
+      # price cache and the marks, because the trigger is measured from the
+      # bars just cached; before the digest and the commit, so its rows are
+      # committed with the sweep. A session is searched once it has been shut
+      # for 6 hours, so a Bursa day is searched at that day's us_close and a
+      # US day at the next bursa_close. Every attempt and its cost is a row
+      # in the corpus, which is also the month's spend record, checked against
+      # config.toml [budget] before each search. The key goes to this step
+      # only. Non-fatal like its neighbours: no key, no move, a refused search
+      # or an API fault costs this step, never the commit.
+      - name: Search the web for unexplained moves
+        if: (steps.slot.outputs.slot == 'bursa_close' || steps.slot.outputs.slot == 'us_close' || steps.slot.outputs.slot == 'all') && (steps.sweep.outputs.code == '0' || steps.sweep.outputs.code == '3')
+        timeout-minutes: 6
+        continue-on-error: true
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY || env.ANTHROPIC_API_KEY }}
+          ANTHROPIC_WORKSPACE_ID: ${{ secrets.ANTHROPIC_WORKSPACE_ID }}
+          FINPLANET_OFFLINE: "1"
+        run: |
+          set +e
+          uv run python ask.py evidence
+          code=$?
+          if [ "$code" -ne 0 ]; then
+            echo "::warning title=web evidence not searched::ask.py evidence exited $code; see the step log"
           fi
           exit 0
 

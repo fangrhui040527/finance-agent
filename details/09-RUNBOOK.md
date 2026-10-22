@@ -79,6 +79,22 @@ untouched. The graph is rebuilt from the corpus (`knowledge/graph/derive.py`)
 wherever git does not carry it; `make graph` builds the spine only, and refuses
 a derived graph. See docs/14-OPERATIONS-RUNBOOK.md, "Large stores".
 
+## Web evidence for unexplained moves
+
+```bash
+python ask.py evidence --dry-run   # which moves qualify, what is already searched; searches nothing
+python ask.py evidence             # search them (needs ANTHROPIC_API_KEY); the collector runs this
+```
+
+A book name's session qualifies when the decomposition says a company-specific
+cause is warranted and the abnormal return is beyond 1.96 sigma, once its
+close is six hours old. Claude (`claude-opus-5-5`) searches the web
+(server-side `web_search`, at most 3 searches), and each page it cites becomes
+a corpus row, source `web_search`, doc_id `web_search:<url>`, dated by the
+page's own date. Every attempt and its cost is a row in `evidence_searches`
+in data/corpus.db, the record the month's budget is read from
+(config.toml [budget]). See docs/14-OPERATIONS-RUNBOOK.md, "Web evidence".
+
 ## Configuration
 
 ```bash

@@ -133,3 +133,26 @@ def test_ci_proves_the_committed_parts_reassemble_the_committed_corpus():
     # checked-out file, and this compares the committed bytes.
     assert verify < next(i for i, r in enumerate(runs) if "pytest" in r)
     assert any(r.count("ask.py stores graph --out") == 2 for r in runs)
+
+
+def test_web_evidence_runs_after_the_prices_and_marks_before_the_digest_with_the_key_alone():
+    """The trigger is measured from the bars the price step cached, and its rows
+    must be committed with the sweep, so it sits between the two. The key goes
+    to this step and to the ALL_SECRET reader, nowhere else; and the step can
+    never cost the run its commit."""
+    steps = _workflow()["jobs"]["sweep"]["steps"]
+    names = [s.get("name", "") for s in steps]
+    ev = names.index("Search the web for unexplained moves")
+    assert names.index("Mark the paper book") < ev < names.index("Write the digest")
+    assert ev < names.index("Commit what was collected")
+    step = steps[ev]
+    assert "ask.py evidence" in step["run"]
+    assert step.get("continue-on-error") is True and step.get("timeout-minutes")
+    assert step["run"].lstrip().startswith("set +e") and step["run"].rstrip().endswith("exit 0")
+    assert "steps.sweep.outputs.code" in step["if"]
+    assert step["env"]["FINPLANET_OFFLINE"] == "1"
+    with_key = [s.get("name") for s in steps if "ANTHROPIC_API_KEY" in (s.get("env") or {})]
+    assert set(with_key) == {
+        "Keys from ALL_SECRET, when the named secrets are not set",
+        "Search the web for unexplained moves",
+    }

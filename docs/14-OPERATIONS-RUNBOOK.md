@@ -710,6 +710,62 @@ Then read it from anywhere: `ask.py alerts` on the command line, the
 app. An empty history means no rule has been EVALUATED - not that none would
 fire.
 
+## Web evidence: searching for what the feeds missed (2026-10-22)
+
+On 2026-10-16 Press Metal fell 9.34%, an idiosyncratic move of 5.43 sigma, and
+the nightly page could only say "no collected evidence reaches it". RHB's
+explanation (falling aluminium prices, carbon anode costs, US inflation) was
+on the open web and nowhere in the store. `ask.py evidence`
+(`knowledge/evidence/web.py`) goes and looks, for exactly those moves.
+
+**Which moves.** A book name's session, measured by the same decomposition the
+pack prints, when the verdict is `no_identified_catalyst` (a company-specific
+cause is warranted) and |SAR| > 1.96, and the row is clean (not mis-dated,
+stale, blank or provisional). Over 2026-04-22..10-22 that fired 76 times in
+1,125 name-sessions, about 13 a month. A US session the fact book already
+holds an earnings result or a rating change for is not searched. At most 3
+names per market session (largest first) and 4 per run.
+
+**When.** Once the session's close is 6 hours old (the notes that explain a
+move arrive after it) and while it is among the last 3 sessions. A Bursa day
+is searched at that day's us_close slot, a US day at the next bursa_close;
+both before the 22:30Z routine writes the page.
+
+**How.** One Messages call to `claude-opus-5-5` with Anthropic's server-side
+`web_search_20260209` tool (`max_uses` 3, effort medium, the market's country
+as the search location), through `core/llm/websearch.py`. A paused turn is
+resumed once, never more. A refusal is recorded and never re-routed.
+
+**What is kept.** One corpus row per page the model cited: its title, the
+passages cited, its own date (`page_age`; an undated page is not stored, never
+dated by when it was found), `first_seen_at` = when it was retrieved, `query`
+= what was searched, `fetched_for` = the name, doc_id `web_search:<url>`. Each
+row passes the injection scan before it is stored (the corpus is append-only),
+then the same cleaning and linking as every source. Retrieval cites these rows
+at the WEB_SEARCH trust tier with a caveat. The model's own summary is not
+evidence; it is kept, scanned, on the attempt's record as a pointer. The pack
+prints a "Web evidence" section listing each name's attempts and rows by the
+move searched for.
+
+**What it costs, and the cap.** Measured estimate: about USD 0.29 a move
+(3 searches at USD 0.01, ~44k input tokens at $4/M, ~4k output at $20/M), so
+~USD 4-7 a month at the measured trigger rate. Every attempt is a row in
+`evidence_searches` in data/corpus.db - committed by the collector, so it is
+the month's spend record across every run (a runner's own ledger is thrown
+away). Before each search the most it could cost (USD ~1.13: 150k input
+tokens, two full outputs, six searches) is reserved against two caps in
+config.toml [budget]: `evidence_monthly_usd` (10) and `monthly_usd` (50, all
+reasoning). If either would be crossed the search is not made, and a `budget`
+row says so. A move already searched is never searched again; a failed call
+(nothing billed) is retried by the next run.
+
+**What it needs.** `ANTHROPIC_API_KEY` as a repository secret (or in
+ALL_SECRET, labelled "anthropic"/"claude" or recognised by its `sk-ant-`
+prefix). Without it the step lists the qualifying moves and records nothing.
+As a backstop the cap in code cannot provide - a call from a machine whose
+corpus is never committed - set a monthly spend limit on the key's workspace
+in the Anthropic Console (`ANTHROPIC_WORKSPACE_ID` is passed through).
+
 ## Large stores: GitHub's file limits (2026-10-22)
 
 GitHub warns on a file over 50 MiB and **refuses a push** holding one over 100

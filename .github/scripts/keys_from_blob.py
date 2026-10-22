@@ -51,6 +51,9 @@ LABELS: tuple[tuple[str, re.Pattern[str]], ...] = (
     # a pasted blob, not by the variable, because nobody writes
     # "EMBEDDING_API_KEY" beside the key they just copied.
     ("EMBEDDING_API_KEY", re.compile(r"open\s*router|\bembed(ding)?\b|nemotron", re.I)),
+    # The web evidence step (knowledge/evidence/web.py) calls Claude with web
+    # search; named by the vendor or the model, as a person writes it.
+    ("ANTHROPIC_API_KEY", re.compile(r"anthropic|\bclaude\b", re.I)),
 )
 
 SHAPES: tuple[tuple[str, re.Pattern[str]], ...] = (
@@ -67,6 +70,9 @@ SHAPES: tuple[tuple[str, re.Pattern[str]], ...] = (
     # OpenRouter prefixes every key `sk-or-v1-` and follows it with 64 hex
     # characters. Distinctive enough to recognise unlabelled.
     ("EMBEDDING_API_KEY", re.compile(r"^sk-or-v1-[0-9a-f]{64}$")),
+    # Anthropic prefixes every key `sk-ant-` (`sk-ant-api03-...`): recognisable
+    # unlabelled, and never confused with OpenRouter's `sk-or-`.
+    ("ANTHROPIC_API_KEY", re.compile(r"^sk-ant-[A-Za-z0-9_\-]{20,}$")),
 )
 
 #: What counts as a token worth examining. Two alternatives, because vendors

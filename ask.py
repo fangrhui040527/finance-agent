@@ -1942,6 +1942,31 @@ def cmd_stores(a) -> int:
     return 1 if st.name in (stores.CONFLICT, stores.MISSING) else 0
 
 
+def cmd_evidence(a) -> int:
+    """Web evidence for moves the stored news cannot explain (knowledge/evidence/web.py).
+
+    Exit 0 when the run finished, whatever it found; 2 when it could not run.
+    A search that failed is a recorded row, not an exit code: the collector
+    must still commit what the others found."""
+    from knowledge.evidence import web
+
+    try:
+        report = web.run(
+            load_config(),
+            dry_run=a.dry_run,
+            log=lambda msg: print(msg, file=sys.stderr),
+        )
+    except Exception as e:  # noqa: BLE001 - the step reports, the job goes on
+        from knowledge.redact import scrub
+
+        print(f"evidence could not run: {type(e).__name__}: {scrub(str(e))}", file=sys.stderr)
+        return 2
+    print(report.text())
+    if a.dry_run and report.triggers:
+        print("  (dry run: nothing searched)")
+    return 0
+
+
 def cmd_doctor(a) -> int:
     from core.doctor import FAIL, render, run_checks
 
@@ -2938,6 +2963,14 @@ def main(argv=None) -> int:
     )
     st.add_argument("--out", help="graph: build a full graph into this new file instead")
     st.set_defaults(fn=cmd_stores)
+
+    ev = sub.add_parser("evidence", help="search the web for moves the stored news cannot explain")
+    ev.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="list the moves that qualify and what is already searched; search nothing",
+    )
+    ev.set_defaults(fn=cmd_evidence)
 
     dr = sub.add_parser("doctor", help="preflight: what this installation can actually do")
     dr.add_argument("--offline", action="store_true", help="skip the two network probes")

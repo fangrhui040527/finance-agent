@@ -147,3 +147,17 @@ def test_the_dotted_token_does_not_disturb_the_other_shapes():
     claimed as one of the five undotted keys."""
     got = blob.recognise(f"{EODHD}\n{FRED}\n{FINNHUB}\n")
     assert got == {"EODHD_API_KEY": EODHD, "FRED_API_KEY": FRED, "FINNHUB_API_KEY": FINNHUB}
+
+
+ANTHROPIC = "sk-ant-api03-" + "SyntheticNotARealKeyForTheTests0000000000"
+
+
+def test_an_anthropic_key_is_found_by_label_and_by_its_prefix():
+    """The web evidence step's key (knowledge/evidence/web.py), by the vendor's
+    name, by the model's, or unlabelled by its `sk-ant-` prefix - and never
+    taken for the OpenRouter embedder's `sk-or-` key."""
+    assert blob.recognise(f"ANTHROPIC_API_KEY={ANTHROPIC}\n")["ANTHROPIC_API_KEY"] == ANTHROPIC
+    assert blob.recognise(f"claude: {ANTHROPIC}\n")["ANTHROPIC_API_KEY"] == ANTHROPIC
+    found = blob.recognise(f"some keys\n{ANTHROPIC}\n{FRED}\n")
+    assert found["ANTHROPIC_API_KEY"] == ANTHROPIC
+    assert "EMBEDDING_API_KEY" not in found
