@@ -161,3 +161,13 @@ def test_an_anthropic_key_is_found_by_label_and_by_its_prefix():
     found = blob.recognise(f"some keys\n{ANTHROPIC}\n{FRED}\n")
     assert found["ANTHROPIC_API_KEY"] == ANTHROPIC
     assert "EMBEDDING_API_KEY" not in found
+
+
+def test_a_claude_code_oauth_or_admin_token_is_never_taken_for_the_api_key():
+    """Sent as x-api-key it is refused, every run, and a correctly labelled
+    key on a later line would never be used."""
+    oauth = "sk-ant-oat01-" + "SyntheticOAuthTokenNotAKey000000000000"
+    admin = "sk-ant-admin01-" + "SyntheticAdminKeyNotAKey0000000000000"
+    found = blob.recognise(f"claude code oauth token: {oauth}\nanthropic key: {ANTHROPIC}\n")
+    assert found["ANTHROPIC_API_KEY"] == ANTHROPIC
+    assert "ANTHROPIC_API_KEY" not in blob.recognise(f"{oauth}\n{admin}\n")

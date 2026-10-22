@@ -545,10 +545,15 @@ def worst_case_usd(
     A check of what has already been spent lets the last call overshoot by its
     whole cost; this is that cost, priced as if every input token were fresh
     (cache writes aside, the dearest way to be billed) and every output token
-    used, at the long-prompt rate when the input could cross the step."""
+    used, at the long-prompt rate when the input could cross the step.
+
+    A model with no price card raises: a reservation that read zero would
+    leave a cap checking only what was already spent, and the call would
+    overshoot it by its whole cost. (`InferenceClient.reservation_usd` asks
+    only for ids on the card and reserves the rest at the tier's rate.)"""
     rates = MODEL_RATES.get(model_id)
     if rates is None:
-        return Decimal(0)
+        raise ValueError(f"no price card for {model_id!r} in MODEL_RATES: cannot reserve for it")
     in_rate, out_rate = rates.input, rates.output
     if rates.long_above is not None and input_tokens > rates.long_above:
         in_rate, out_rate = rates.long_input or in_rate, rates.long_output or out_rate

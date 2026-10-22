@@ -696,22 +696,41 @@ def _web_evidence(cfg, corpus_path, book_ids, names, now: datetime) -> list[str]
             found = True
             label = names.get(canonical(iid) or iid) or iid
             lines.append(f"**{label}** ({iid})")
+            refs = corpus.short_ids(r["doc_id"] for r in rows)
+            # Each row under the search that found it: a row is first seen at
+            # the instant its attempt was recorded (both are the retrieval).
+            shown: set[str] = set()
             for a in attempts:
                 lines.append(
                     f"- searched {a['at'][:16]}Z for the {a['session']} move "
                     f"({a['sar']:+.2f} sigma): {a['outcome']}, {a['stored']} stored, "
                     f"USD {Decimal(a['cost_usd']):.4f}. {a['detail']}"
                 )
-            refs = corpus.short_ids(r["doc_id"] for r in rows)
-            for r in rows:
-                lines.append(
-                    f"- {r['published_at'][:16]}Z {r['title']} ({r['source_domain']}) "
-                    f"`{refs.get(r['doc_id'], r['doc_id'])}`"
-                )
+                for r in rows:
+                    if r["first_seen_at"] == a["at"]:
+                        lines.append(_web_row(r, refs, "  "))
+                        shown.add(r["doc_id"])
+            lines += [_web_row(r, refs) for r in rows if r["doc_id"] not in shown]
             lines.append("")
     if not found:
         lines += [f"None in the last {WEB_EVIDENCE_DAYS} days.", ""]
     return lines
+
+
+def _web_row(r: dict, refs: dict, indent: str = "") -> str:
+    """One stored web evidence row. A page dated by its day alone says so,
+    rather than print the end-of-day stamp it is stored at as if a time."""
+    from knowledge.evidence.web import DAY_ONLY
+
+    when = (
+        f"{r['published_at'][:10]} (date only)"
+        if f", {DAY_ONLY})" in (r.get("body") or "")
+        else f"{r['published_at'][:16]}Z"
+    )
+    return (
+        f"{indent}- {when} {r['title']} ({r['source_domain']}) "
+        f"`{refs.get(r['doc_id'], r['doc_id'])}`"
+    )
 
 
 #: How many of a name's ex-dates the facts block lists, newest first.

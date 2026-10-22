@@ -91,9 +91,12 @@ cause is warranted and the abnormal return is beyond 1.96 sigma, once its
 close is six hours old. Claude (`claude-opus-5-5`) searches the web
 (server-side `web_search`, at most 3 searches), and each page it cites becomes
 a corpus row, source `web_search`, doc_id `web_search:<url>`, dated by the
-page's own date. Every attempt and its cost is a row in `evidence_searches`
-in data/corpus.db, the record the month's budget is read from
-(config.toml [budget]). See docs/14-OPERATIONS-RUNBOOK.md, "Web evidence".
+page's own date (a date with no time: the end of that day in the market's
+timezone). Every attempt and its cost is a row in `evidence_searches` in
+data/corpus.db, the record the month's budget is read from (config.toml
+[budget]), with this machine's own ledger added to the monthly total. The run
+starts no search leg that cannot finish inside 8 minutes. See
+docs/14-OPERATIONS-RUNBOOK.md, "Web evidence".
 
 ## Configuration
 

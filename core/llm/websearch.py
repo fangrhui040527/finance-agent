@@ -23,10 +23,21 @@ continuation gets a fresh `max_uses`, so an unbounded loop would be an
 unbounded bill. A refusal is an answer (`refused`), never re-routed to another
 model (core/llm/backends.py, commitment 6). Nothing here sends temperature,
 top_p, top_k or a thinking budget: the current models reject all four.
+
+WHAT A FAILURE COSTS. Each leg (the first call, the continuation) is a billed
+server-side turn the moment it starts. So a failed continuation does not
+throw away the first leg: the answer comes back `incomplete`, with that leg's
+usage, queries and sources, for the caller to record. A leg that TIMED OUT may
+have been billed in full with no usage ever seen; it is counted in
+`lost_legs`, for the caller to price at its worst case. The SDK's retries are
+off (`max_retries=0`): a retried timeout is a second paid turn, and whether to
+pay for one is the next run's decision, made after this one is recorded. A
+failure of the FIRST leg that is not a timeout raises - nothing was billed.
 """
 
 from __future__ import annotations
 
+import time
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -39,6 +50,11 @@ TOOL_TYPE = "web_search_20260209"
 #: Continuations of a paused turn. Each gets its own `max_uses`, so this is what
 #: bounds the searches one call can run: max_uses x (1 + CONTINUATIONS).
 CONTINUATIONS = 1
+
+#: Seconds one leg may take, end to end: the request is not streamed, so this
+#: is the whole turn. A three-search turn at effort medium measured well under
+#: a minute; a leg that writes all 8,000 output tokens is the slow case.
+TIMEOUT = 180.0
 
 
 @dataclass(frozen=True)
@@ -66,6 +82,11 @@ class SearchAnswer:
     refusal: str = ""
     usage: Usage = field(default_factory=lambda: Usage(0, 0))
     request_ids: list[str] = field(default_factory=list)
+    #: The turn ended before the model wrote its answer: a continuation that
+    #: failed, timed out or did not fit the caller's deadline.
+    incomplete: bool = False
+    #: Legs that timed out: billed or not, their usage was never seen.
+    lost_legs: int = 0
 
 
 def _add(a: Usage, b: Usage) -> Usage:
@@ -113,7 +134,7 @@ class WebSearch:
         max_tokens: int = 8000,
         user_location: dict | None = None,
         client=None,
-        timeout: float = 120.0,
+        timeout: float = TIMEOUT,
     ) -> None:
         self.model_id = model_id
         self.max_uses = max_uses
@@ -128,9 +149,9 @@ class WebSearch:
     @property
     def client(self) -> Any:
         if self._client is None:
-            import anthropic
+            from core.llm.backends import anthropic_client
 
-            self._client = anthropic.Anthropic(max_retries=2, timeout=self.timeout)
+            self._client = anthropic_client(max_retries=0, timeout=self.timeout)
         return self._client
 
     def tools(self) -> list[dict]:
@@ -139,19 +160,39 @@ class WebSearch:
             tool["user_location"] = {"type": "approximate", **self.user_location}
         return [tool]
 
-    def search(self, system: str, prompt: str) -> SearchAnswer:
+    def search(
+        self, system: str, prompt: str, *, deadline: float | None = None, clock=time.monotonic
+    ) -> SearchAnswer:
+        """`deadline` is a `clock()` reading: a leg is started only when its
+        whole timeout fits before it, so the caller's time bound holds."""
         answer = SearchAnswer(self.model_id)
         messages: list[dict] = [{"role": "user", "content": prompt}]
         tools = self.tools()
         for attempt in range(1 + CONTINUATIONS):
-            response = self.client.messages.create(
-                model=self.model_id,
-                max_tokens=self.max_tokens,
-                system=system,
-                messages=messages,
-                tools=tools,
-                output_config={"effort": self.effort},
-            )
+            if attempt and deadline is not None and clock() + self.timeout > deadline:
+                answer.incomplete = True
+                answer.errors.append("continuation not started: the run's deadline")
+                break
+            try:
+                response = self.client.messages.create(
+                    model=self.model_id,
+                    max_tokens=self.max_tokens,
+                    system=system,
+                    messages=messages,
+                    tools=tools,
+                    output_config={"effort": self.effort},
+                )
+            except Exception as e:
+                from core.llm.backends import timed_out as _timed_out
+
+                timed_out = _timed_out(e)
+                if attempt == 0 and not timed_out:
+                    raise  # refused before any work: nothing billed
+                answer.lost_legs += int(timed_out)
+                answer.incomplete = True
+                leg = "continuation" if attempt else "request"
+                answer.errors.append(f"{leg} failed: {type(e).__name__}")
+                break
             answer.usage = _add(answer.usage, _usage(getattr(response, "usage", None)))
             rid = getattr(response, "_request_id", None)
             if rid:
@@ -176,6 +217,9 @@ class WebSearch:
         return answer
 
     def _read(self, blocks, answer: SearchAnswer) -> None:
+        # This leg's results. A continuation cites results an EARLIER leg
+        # returned - the server resumes where it stopped and does not send
+        # them again - so a cited url is looked up in both.
         results: dict[str, tuple[str, str]] = {}
         cited: dict[str, list[str]] = {}
         titles: dict[str, str] = {}
@@ -212,9 +256,11 @@ class WebSearch:
                         if _field(c, "title"):
                             titles.setdefault(url, str(_field(c, "title")))
         answer.text = (answer.text + "".join(texts)).strip()
+        for url, meta in results.items():
+            answer.uncited.setdefault(url, meta)
         known = {s.url: s for s in answer.sources}
         for url, snippets in cited.items():
-            title, age = results.get(url, (titles.get(url, ""), ""))
+            title, age = results.get(url) or answer.uncited.get(url) or (titles.get(url, ""), "")
             prior = known.get(url)
             if prior is not None:
                 merged = tuple(dict.fromkeys((*prior.cited, *snippets)))
@@ -222,5 +268,3 @@ class WebSearch:
             else:
                 known[url] = Source(url, title or titles.get(url, ""), age, tuple(snippets))
         answer.sources = list(known.values())
-        for url, meta in results.items():
-            answer.uncited.setdefault(url, meta)

@@ -70,10 +70,19 @@ SHAPES: tuple[tuple[str, re.Pattern[str]], ...] = (
     # OpenRouter prefixes every key `sk-or-v1-` and follows it with 64 hex
     # characters. Distinctive enough to recognise unlabelled.
     ("EMBEDDING_API_KEY", re.compile(r"^sk-or-v1-[0-9a-f]{64}$")),
-    # Anthropic prefixes every key `sk-ant-` (`sk-ant-api03-...`): recognisable
-    # unlabelled, and never confused with OpenRouter's `sk-or-`.
-    ("ANTHROPIC_API_KEY", re.compile(r"^sk-ant-[A-Za-z0-9_\-]{20,}$")),
+    # An Anthropic Messages key is `sk-ant-api03-...`: recognisable unlabelled,
+    # and never confused with OpenRouter's `sk-or-`. Not any `sk-ant-`: a
+    # Claude Code OAuth token (`sk-ant-oat01-`) or an Admin key
+    # (`sk-ant-admin01-`) would be sent as x-api-key and refused, every run.
+    ("ANTHROPIC_API_KEY", re.compile(r"^sk-ant-api\d\d-[A-Za-z0-9_\-]{20,}$")),
 )
+
+#: A labelled token must still be this, or the label is passed over and a
+#: later line may supply the key: "claude code oauth token: sk-ant-oat01-..."
+#: carries a label this name answers to and a token it cannot use.
+MUST: dict[str, re.Pattern[str]] = {
+    "ANTHROPIC_API_KEY": re.compile(r"^sk-ant-api\d\d-"),
+}
 
 #: What counts as a token worth examining. Two alternatives, because vendors
 #: do not agree on the shape of a key: the long unbroken run most of them use,
@@ -102,6 +111,8 @@ def recognise(blob: str) -> dict[str, str]:
             if tok is None or tok.group(0).upper() in NAMES:
                 continue
             value = tok.group(0)
+            if name in MUST and not MUST[name].match(value):
+                continue
             found[name] = value
             claimed.add(value)
             break

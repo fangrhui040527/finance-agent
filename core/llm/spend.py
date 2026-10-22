@@ -47,24 +47,35 @@ def ledger_usd_since(ledger, since: datetime) -> Decimal:
     return sum((Decimal(r[0]) for r in rows), Decimal(0))
 
 
+def ledger_usd_at(ledger_path: str | Path, since: datetime) -> Decimal:
+    """`ledger_usd_since` for a ledger named by its path, read-only: a missing
+    file or table is zero, and nothing is created - opening a ProvenanceLedger
+    would create the file and apply its schema just to read a sum."""
+    return _sum_since(ledger_path, "llm_calls", since)
+
+
 def committed_usd_since(corpus_path: str | Path, since: datetime) -> Decimal:
     """USD the evidence ingest recorded in the committed corpus since `since`.
 
     Read-only; a corpus without the table (before the first search) is zero. A
     file that cannot be read raises: a cap that quietly read zero would be no
     cap at all."""
-    path = Path(corpus_path)
-    if str(corpus_path) == ":memory:" or not path.exists() or path.stat().st_size == 0:
+    return _sum_since(corpus_path, EVIDENCE_TABLE, since)
+
+
+def _sum_since(db_path: str | Path, table: str, since: datetime) -> Decimal:
+    path = Path(db_path)
+    if str(db_path) == ":memory:" or not path.exists() or path.stat().st_size == 0:
         return Decimal(0)
     con = sqlite3.connect(f"{path.resolve().as_uri()}?mode=ro", uri=True, timeout=10)
     try:
         have = con.execute(
-            "SELECT 1 FROM sqlite_master WHERE type='table' AND name=?", (EVIDENCE_TABLE,)
+            "SELECT 1 FROM sqlite_master WHERE type='table' AND name=?", (table,)
         ).fetchone()
         if not have:
             return Decimal(0)
         rows = con.execute(
-            f"SELECT cost_usd FROM {EVIDENCE_TABLE} WHERE at >= ?", (since.isoformat(),)
+            f"SELECT cost_usd FROM {table} WHERE at >= ?", (since.isoformat(),)
         ).fetchall()
     finally:
         con.close()

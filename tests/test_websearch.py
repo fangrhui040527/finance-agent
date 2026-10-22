@@ -151,6 +151,8 @@ def test_a_paused_turn_is_resumed_once_with_the_same_tools_and_the_bill_is_summe
     assert [s.url for s in a.sources] == [
         "https://www.theborneopost.com/2026/10/19/rhb-press-metal/"
     ]
+    # The continuation cites what the FIRST leg returned: its date survives.
+    assert a.sources[0].page_age == "October 19, 2026"
 
 
 def test_a_turn_that_pauses_again_is_not_resumed_a_second_time():
@@ -175,3 +177,69 @@ def test_a_search_is_billed_per_search_on_top_of_the_tokens():
     ).search("s", "p")
     # 10k in at $4/M + 1k out at $20/M + 3 searches at $0.01
     assert cost_usd(Tier.REASON, a.usage, model_id="claude-opus-5-5") == Decimal("0.09")
+
+
+def test_a_failed_continuation_keeps_the_first_legs_bill_and_finds():
+    first = _response([SEARCH, RESULTS], stop="pause_turn", usage=_usage(1000, 100, 1))
+
+    class Failing(Client):
+        def create(self, **kw):
+            self.calls.append(kw)
+            if len(self.calls) == 2:
+                raise RuntimeError("overloaded")
+            return self.responses.pop(0)
+
+    a = WebSearch("claude-opus-5-5", client=Failing(first)).search("s", "p")
+    assert a.incomplete and a.usage.web_search_requests == 1 and a.queries
+    assert a.errors == ["continuation failed: RuntimeError"] and a.lost_legs == 0
+
+
+def test_a_first_leg_that_fails_before_any_work_raises():
+    import pytest
+
+    class Down(Client):
+        def create(self, **kw):
+            raise RuntimeError("connection refused")
+
+    with pytest.raises(RuntimeError):
+        WebSearch("m", client=Down()).search("s", "p")
+
+
+def test_a_leg_that_times_out_is_counted_as_lost_not_free():
+    import anthropic
+    import httpx
+
+    class Slow(Client):
+        def create(self, **kw):
+            raise anthropic.APITimeoutError(request=httpx.Request("POST", "https://x"))
+
+    a = WebSearch("m", client=Slow()).search("s", "p")
+    assert a.lost_legs == 1 and a.incomplete and a.usage.input_tokens == 0
+
+
+def test_a_continuation_that_cannot_finish_before_the_deadline_is_not_started():
+    first = _response([SEARCH, RESULTS], stop="pause_turn")
+    client = Client(first, _response([ANSWER]))
+    a = WebSearch("m", client=client, timeout=180.0).search(
+        "s", "p", deadline=100.0, clock=lambda: 0.0
+    )
+    assert len(client.calls) == 1 and a.incomplete
+    assert a.errors == ["continuation not started: the run's deadline"]
+
+
+def test_the_client_names_the_workspace_and_never_retries(monkeypatch):
+    """An identity-linked key gets a 400 without the header (backends.py); and
+    an SDK retry of a timed-out search is a second paid turn."""
+    import anthropic
+
+    seen: dict = {}
+
+    def spy(**kwargs):
+        seen.update(kwargs)
+        return object()
+
+    monkeypatch.setattr(anthropic, "Anthropic", spy)
+    monkeypatch.setenv("ANTHROPIC_WORKSPACE_ID", "wrkspc_test")
+    assert WebSearch("m").client is not None
+    assert seen["default_headers"] == {"anthropic-workspace-id": "wrkspc_test"}
+    assert seen["max_retries"] == 0

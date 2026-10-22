@@ -138,8 +138,8 @@ def test_ci_proves_the_committed_parts_reassemble_the_committed_corpus():
 def test_web_evidence_runs_after_the_prices_and_marks_before_the_digest_with_the_key_alone():
     """The trigger is measured from the bars the price step cached, and its rows
     must be committed with the sweep, so it sits between the two. The key goes
-    to this step and to the ALL_SECRET reader, nowhere else; and the step can
-    never cost the run its commit."""
+    to this step, nowhere else; and the step can never cost the run its
+    commit."""
     steps = _workflow()["jobs"]["sweep"]["steps"]
     names = [s.get("name", "") for s in steps]
     ev = names.index("Search the web for unexplained moves")
@@ -152,7 +152,18 @@ def test_web_evidence_runs_after_the_prices_and_marks_before_the_digest_with_the
     assert "steps.sweep.outputs.code" in step["if"]
     assert step["env"]["FINPLANET_OFFLINE"] == "1"
     with_key = [s.get("name") for s in steps if "ANTHROPIC_API_KEY" in (s.get("env") or {})]
-    assert set(with_key) == {
-        "Keys from ALL_SECRET, when the named secrets are not set",
-        "Search the web for unexplained moves",
-    }
+    assert with_key == ["Search the web for unexplained moves"]
+    # The blob reader exports through GITHUB_ENV, which reaches every later
+    # step: it must pass the Anthropic key over, and the evidence step reads
+    # the blob itself and drops it before anything runs.
+    reader = steps[names.index("Keys from ALL_SECRET, when the named secrets are not set")]
+    assert '"$name" = "ANTHROPIC_API_KEY"' in reader["run"]
+    assert reader["run"].index("ANTHROPIC_API_KEY") < reader["run"].index("GITHUB_ENV")
+    assert "keys_from_blob.py ALL_SECRET" in step["run"] and "unset ALL_SECRET" in step["run"]
+    assert step["run"].index("unset ALL_SECRET") < step["run"].index("ask.py evidence")
+    assert "GITHUB_ENV" not in step["run"]
+    # Long enough for the run's deadline and startup: a search is never killed
+    # mid-call with its bill unrecorded (knowledge/evidence/web.py).
+    from knowledge.evidence.web import DEADLINE_SECONDS
+
+    assert step["timeout-minutes"] * 60 >= DEADLINE_SECONDS + 120

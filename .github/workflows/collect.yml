@@ -142,13 +142,19 @@ jobs:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
           EODHD_API_KEY: ${{ secrets.EODHD_API_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
           if [ -z "$ALL_SECRET" ]; then
             echo "ALL_SECRET is not set; the named secrets are in use"
             exit 0
           fi
           python3 .github/scripts/keys_from_blob.py ALL_SECRET | while IFS='=' read -r name value; do
+            # Exported here, a key reaches every later step's processes. The
+            # Anthropic key is read from the blob by the web evidence step
+            # itself, so it reaches that step alone.
+            if [ "$name" = "ANTHROPIC_API_KEY" ]; then
+              echo "$name: found; read by the web evidence step alone"
+              continue
+            fi
             if [ -n "${!name}" ]; then
               echo "$name: set under its own name; the blob's copy is ignored"
               continue
@@ -256,18 +262,33 @@ jobs:
       # US day at the next bursa_close. Every attempt and its cost is a row
       # in the corpus, which is also the month's spend record, checked against
       # config.toml [budget] before each search. The key goes to this step
-      # only. Non-fatal like its neighbours: no key, no move, a refused search
-      # or an API fault costs this step, never the commit.
+      # only - from its own secret, or read here from ALL_SECRET, which is
+      # then dropped before anything runs. The run starts no search leg that
+      # cannot finish inside DEADLINE_SECONDS (8 min, knowledge/evidence/
+      # web.py); the limit below is that plus startup, so a billed search is
+      # never killed before it is recorded. Non-fatal like its neighbours: no
+      # key, no move, a refused search or an API fault costs this step, never
+      # the commit.
       - name: Search the web for unexplained moves
         if: (steps.slot.outputs.slot == 'bursa_close' || steps.slot.outputs.slot == 'us_close' || steps.slot.outputs.slot == 'all') && (steps.sweep.outputs.code == '0' || steps.sweep.outputs.code == '3')
-        timeout-minutes: 6
+        timeout-minutes: 11
         continue-on-error: true
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY || env.ANTHROPIC_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ALL_SECRET: ${{ secrets.ALL_SECRET }}
           ANTHROPIC_WORKSPACE_ID: ${{ secrets.ANTHROPIC_WORKSPACE_ID }}
           FINPLANET_OFFLINE: "1"
         run: |
           set +e
+          if [ -z "$ANTHROPIC_API_KEY" ] && [ -n "$ALL_SECRET" ]; then
+            ANTHROPIC_API_KEY=$(python3 .github/scripts/keys_from_blob.py ALL_SECRET 2>/dev/null | sed -n 's/^ANTHROPIC_API_KEY=//p')
+            if [ -n "$ANTHROPIC_API_KEY" ]; then
+              echo "::add-mask::$ANTHROPIC_API_KEY"
+              echo "ANTHROPIC_API_KEY: taken from ALL_SECRET"
+            fi
+            export ANTHROPIC_API_KEY
+          fi
+          unset ALL_SECRET
           uv run python ask.py evidence
           code=$?
           if [ "$code" -ne 0 ]; then

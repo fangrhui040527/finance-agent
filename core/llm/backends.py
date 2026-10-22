@@ -124,6 +124,44 @@ class Declined(Billed):
 RETRY_AFTER_CAP = 60.0
 
 
+def anthropic_client(*, api_key: str | None = None, max_retries: int, timeout: float):
+    """The SDK client every Messages caller here builds: AnthropicBackend, and
+    the web search seam (core/llm/websearch.py).
+
+    An identity-linked key is scoped to a workspace and the API refuses every
+    request that does not name one - a 400 before the model is reached, on all
+    five effort levels, for the same reason. The header is sent when
+    ANTHROPIC_WORKSPACE_ID is set and omitted when it is not, because a plain
+    key rejects a workspace it does not have. One place, so a second caller
+    cannot be built without it."""
+    import anthropic  # imported here, lazily, so echo never loads it
+
+    extra: dict[str, Any] = {}
+    workspace = os.environ.get("ANTHROPIC_WORKSPACE_ID", "").strip()
+    if workspace:
+        extra["default_headers"] = {"anthropic-workspace-id": workspace}
+    if api_key is not None:
+        extra["api_key"] = api_key
+    return anthropic.Anthropic(max_retries=max_retries, timeout=timeout, **extra)
+
+
+def timed_out(e: Exception) -> bool:
+    """The SDK gave up waiting. The server may still have run - and billed - the
+    turn, so a caller that counts money cannot read this as 'nothing happened'."""
+    import anthropic
+
+    return isinstance(e, anthropic.APITimeoutError)
+
+
+def workspace_refused(e: Exception) -> bool:
+    """A 400 that says the key needs ANTHROPIC_WORKSPACE_ID: a credential fault,
+    not a malformed request."""
+    return (
+        getattr(e, "status_code", None) == 400
+        and "anthropic-workspace-id" in str(getattr(e, "message", e)).lower()
+    )
+
+
 class AnthropicBackend:
     """Anthropic Messages API behind the `Backend` protocol, via the official SDK.
 
@@ -173,24 +211,10 @@ class AnthropicBackend:
                 "entrypoint loads that file; an exported variable wins over it), "
                 "or pass EchoBackend explicitly if you meant to run without a model."
             )
-        import anthropic  # the ONE import site; lazy so echo never loads it
-
-        # An identity-linked key is scoped to a workspace and the API refuses
-        # every request that does not name one - a 400 before the model is
-        # reached, on all five effort levels, for the same reason. The header is
-        # sent when ANTHROPIC_WORKSPACE_ID is set and omitted when it is not,
-        # because a plain key rejects a workspace it does not have.
-        workspace = os.environ.get("ANTHROPIC_WORKSPACE_ID", "").strip()
-        self.workspace_id = workspace or None
-        extra: dict[str, Any] = {}
-        if workspace:
-            extra["default_headers"] = {"anthropic-workspace-id": workspace}
-
+        self.workspace_id = os.environ.get("ANTHROPIC_WORKSPACE_ID", "").strip() or None
         # max_retries=0: the retry loop below owns backoff, so retry-after
         # capping and sleep injection stay testable and disclosed.
-        self._client = anthropic.Anthropic(
-            api_key=key, max_retries=0, timeout=self.TIMEOUT, **extra
-        )
+        self._client = anthropic_client(api_key=key, max_retries=0, timeout=self.TIMEOUT)
 
     # -- the seam -----------------------------------------------------------
 
@@ -256,7 +280,7 @@ class AnthropicBackend:
                 if e.status_code in (500, 502, 503, 529):
                     last = TransientError(f"Anthropic returned {e.status_code}: {e.message}")
                     retry_after = self._retry_after(e)
-                elif e.status_code == 400 and "anthropic-workspace-id" in str(e.message).lower():
+                elif workspace_refused(e):
                     # Neither transient nor a prompt problem: the credential is
                     # incomplete. Left as a generic 400 it reads as "the request
                     # was malformed" and sends the operator to look at the
