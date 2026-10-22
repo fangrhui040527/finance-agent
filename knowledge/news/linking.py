@@ -216,7 +216,7 @@ OTHER_NAMES = (
 # target price lowered" and "Apple upgraded to Buy" were both stored rows.
 _ARM = r"(?:Securities|IBG?|Investment\s+Bank(?:ing)?(?:\s+(?:Bhd|Berhad))?|Kim\s+Eng|Research)"
 _ACTS = (
-    r"(?i:keeps?|kept|maintains?|cuts?|raises?|lifts?|holds?|sets?|starts?"
+    r"(?i:keeps?|kept|maintains?|cuts?|raises?|lifts?|holds?|sets?|starts?|rates?"
     r"|initiates?|reiterates?|upgrades?|downgrades?|lowers?|trims?|slash(?:es)?)"
 )
 _RATINGS = r"(?i:buy|hold|sell|outperform|underperform|neutral)"
@@ -237,8 +237,9 @@ _PRICE_TARGET = (
 #: Another company's name: capitalised words, not a recommendation itself.
 _OTHER_NAME = r"(?!(?i:buy|hold|sell)\b)[A-Z][\w&'’-]*"
 #: Within one clause: a full stop ends it unless a digit or letter follows
-#: ("THB 75.00 target").
-_CLAUSE = r"(?:[^.?!;]|\.(?=\S))"
+#: ("THB 75.00 target") or it closes a short capitalised abbreviation inside a
+#: name ("Maybank Starts Frasers Log. & Comm. Trust at BUY").
+_CLAUSE = r"(?:\b[A-Z][a-z]{1,4}\.(?=\s)|[^.?!;]|\.(?=\S))"
 #: A bare "target" counts only as a target for a STOCK: "Maybank holds target
 #: for Bank Rakyat Indonesia stock".
 _STOCK_TARGET = rf"\b(?i:target)(?=\s+for\s+{_CLAUSE}{{1,60}}?\s+(?i:stock|shares)\b)"
@@ -254,6 +255,15 @@ _STOCK_FIGURE = (
     rf"{_AMOUNT}(?:\s*(?i:billion|million|bn|mil|mn)\b)?"
     rf"(?=\s+for\s+[A-Z]{_CLAUSE}{{0,60}}?\s+(?i:stock|shares)\b)"
 )
+#: A rating set after the stock it rates, in Title Case: "Maybank rates Mitra
+#: Keluarga stock Buy" (ad-hoc-news.de, 2026-10-19).
+_STOCK_RATED = rf"\b(?i:stock|shares)\s+{_RATINGS}\b"
+#: A forecast for one company, then the call in the same clause: "Maybank
+#: Forecasts Robust 4Q26 Recovery for ADVANC, Maintains 'Buy' With THB387 Target".
+_FORECAST_THEN_CALL = (
+    rf"{_FORECASTS}\b{_CLAUSE}{{0,60}}?\s+for\s+[A-Z]{_CLAUSE}{{0,30}}?,?\s+{_ACTS}\s+"
+    rf"(?:{_RECOMMENDS}|{_PRICE_TARGET})"
+)
 #: "Maybank keeps Singtel at buy", "Maybank IB upgrades SD Guthrie to 'buy'",
 #: "Maybank Maintains Frencken BUY" (the company, then the call), and
 #: "Maybank Keeps BUY on ISOTeam", "Maybank keeps Buy rating for Singtel",
@@ -262,9 +272,10 @@ _STOCK_FIGURE = (
 #: Service stock" (a figure for another company's stock).
 _BANK_MAKES_A_CALL = re.compile(
     rf"\A(?:\s+{_ARM})?\s+(?:{_ACTS}\b"
-    rf"(?:\s+{_OTHER_NAME}{_CLAUSE}{{0,50}}?(?:{_RECOMMENDS}|{_PRICE_TARGET})"
+    rf"(?:\s+{_OTHER_NAME}{_CLAUSE}{{0,50}}?(?:{_RECOMMENDS}|{_PRICE_TARGET}|{_STOCK_RATED})"
     rf"|{_CLAUSE}{{0,30}}?(?:{_RECOMMENDS}|{_PRICE_TARGET}|{_STOCK_TARGET})\s+(?i:on|for)\s+[A-Z])"
-    rf"|{_FORECASTS}\b{_CLAUSE}{{0,30}}?{_STOCK_FIGURE}\s+for\s+[A-Z])"
+    rf"|{_FORECASTS}\b{_CLAUSE}{{0,30}}?{_STOCK_FIGURE}\s+for\s+[A-Z]"
+    rf"|{_FORECAST_THEN_CALL})"
 )
 #: "Grab Holdings Keeps BUY Rating as Maybank Cuts Target Price": the call is
 #: on the company named before "as".
