@@ -59,7 +59,7 @@ def test_split_then_assemble_gives_back_the_same_bytes(db):
     assert len(m.parts) > 2, "a toy corpus should be several parts at this size"
     assert all(p["bytes"] == SMALL for p in m.parts[:-1])
     assert 0 < m.parts[-1]["bytes"] <= SMALL
-    assert m.rows == {"articles": 200, "sweeps": 1, "evidence_searches": 0}
+    assert m.rows == {"articles": 200, "sweeps": 1}
     assert {"articles_no_update", "articles_no_delete"} <= set(m.triggers)
 
     db.unlink()

@@ -226,6 +226,7 @@ def test_the_budget_is_reserved_before_a_search_and_a_search_that_could_cross_it
     d = date(2026, 10, 22)
     moves[("MYX:3182", d)] = _move("MYX:3182", d, -3.19)
     with Corpus(stores.corpus_db) as c:
+        c.ensure_evidence_table()
         c.conn.execute(
             "INSERT INTO evidence_searches (key, instrument, session, at, cost_usd, outcome) "
             "VALUES ('X|2026-10-01', 'X', '2026-10-01', ?, '9.50', 'stored')",
@@ -255,7 +256,9 @@ def test_no_key_means_nothing_searched_nothing_recorded(stores, moves, monkeypat
     report = web.run(stores, NOW, feed=object(), clock=lambda: NOW)
     assert any("no ANTHROPIC_API_KEY" in n for n in report.notes)
     with Corpus(stores.corpus_db) as c:
-        assert c.conn.execute("SELECT count(*) FROM evidence_searches").fetchone()[0] == 0
+        assert not c.has_table("evidence_searches") or (
+            c.conn.execute("SELECT count(*) FROM evidence_searches").fetchone()[0] == 0
+        )
 
 
 def test_the_evidence_record_is_append_only(stores, moves, monkeypatch):
@@ -294,3 +297,25 @@ def test_the_pack_lists_a_names_searches_and_rows_by_the_move(stores, moves, mon
     assert "for the 2026-10-22 move (-3.19 sigma): stored, 1 stored" in lines
     assert "Genting falls on rights issue pricing (www.thestar.com.my)" in lines
     assert "MYX:1155" not in lines
+
+
+def test_reading_the_corpus_never_rewrites_it(tmp_path):
+    """Opening is reading. The evidence table and the query column arrive with
+    the first write that needs them: a migration on open rewrote the tracked
+    file in every checkout that only read it, and the nightly worktree's next
+    `git pull` refused to overwrite it."""
+    import hashlib
+
+    path = tmp_path / "corpus.db"
+    with Corpus(path) as c:
+        c.record_sweep("r", "fixture", NOW, "ok")
+    before = hashlib.sha256(path.read_bytes()).hexdigest()
+    with Corpus(path) as c:
+        c.articles(limit=10)
+        assert web.searched_keys(c) == set()
+        assert web.for_pack(c, "MYX:3182", NOW) == ([], [])
+    assert hashlib.sha256(path.read_bytes()).hexdigest() == before
+    # A run that made the table but stored no page: the pack still reads it.
+    with Corpus(path) as c:
+        c.ensure_evidence_table()
+        assert web.for_pack(c, "MYX:3182", NOW) == ([], [])

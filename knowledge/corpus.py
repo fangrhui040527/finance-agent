@@ -127,7 +127,10 @@ BEGIN SELECT RAISE(ABORT, 'a sweep that happened is not editable'); END;
 CREATE TRIGGER IF NOT EXISTS sweeps_no_delete
 BEFORE DELETE ON sweeps
 BEGIN SELECT RAISE(ABORT, 'sweep history is append-only: a failed month must stay a failed month'); END;
+"""
 
+
+EVIDENCE_SCHEMA = """
 -- One row per web evidence attempt (knowledge/evidence/web.py): which move it
 -- was for, what it asked, what it cost and what it kept. Here, in the store
 -- the collector commits, because it is also the month's spend record - a
@@ -230,10 +233,6 @@ class Corpus:
             self.conn.execute(
                 "ALTER TABLE articles ADD COLUMN fetched_for TEXT NOT NULL DEFAULT ''"
             )
-        if "query" not in have:
-            # What a web evidence search asked (knowledge/evidence/web.py).
-            # Empty for every other source, which is asked no question.
-            self.conn.execute("ALTER TABLE articles ADD COLUMN query TEXT NOT NULL DEFAULT ''")
         if "title_key" not in have:
             # Rows stored before the key existed keep ''. The wire feeds serve
             # a recent window, so a copy of an older story rarely comes back.
@@ -277,6 +276,37 @@ class Corpus:
 
     # -- writes ---------------------------------------------------------------
 
+    def _ensure_query_column(self) -> None:
+        """The `query` column (what a web evidence search asked), added by the
+        first WRITE that needs it rather than on open. Opening is reading: a
+        migration on open rewrote the tracked file in every checkout that
+        merely read it - the nightly worktree among them, whose next
+        `git pull` then refused to overwrite it."""
+        if getattr(self, "_has_query", False):
+            return
+        have = {r[1] for r in self.conn.execute("PRAGMA table_info(articles)")}
+        if "query" not in have:
+            self.conn.execute("ALTER TABLE articles ADD COLUMN query TEXT NOT NULL DEFAULT ''")
+            self.conn.commit()
+        self._has_query = True
+
+    def ensure_evidence_table(self) -> None:
+        """Create `evidence_searches` for the web evidence ingest, which calls
+        this before its first write; readers find no table and read nothing.
+        The `query` column comes with it: the pack reads attempts and rows
+        together, and a run whose searches stored nothing still made the table."""
+        self._ensure_query_column()
+        self.conn.executescript(EVIDENCE_SCHEMA)
+        self.conn.commit()
+
+    def has_table(self, name: str) -> bool:
+        return (
+            self.conn.execute(
+                "SELECT 1 FROM sqlite_master WHERE type='table' AND name=?", (name,)
+            ).fetchone()
+            is not None
+        )
+
     def add(self, art: Article, source: str, seen_at: datetime | None = None) -> bool:
         """Store one article. False means the corpus already held it.
 
@@ -285,6 +315,7 @@ class Corpus:
         index decides, once, inside the database.
         """
         seen = _iso(seen_at or datetime.now(UTC))
+        self._ensure_query_column()
         features = art.features
         headline = art.title_key or ""
         # A second key alongside the unique dup_hash: the same headline on the

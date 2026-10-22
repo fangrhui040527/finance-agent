@@ -104,10 +104,15 @@ def test_spend_under_the_fraction_is_quiet(tmp_path):
 
 
 def _evidence(path: Path, rows: list[tuple[datetime, str]]) -> Path:
+    # The real table, as the web evidence ingest's corpus has it.
+    from knowledge.corpus import Corpus
+
+    with Corpus(path) as c:
+        c.ensure_evidence_table()
     con = sqlite3.connect(path)
-    con.execute("CREATE TABLE evidence_searches (at TEXT NOT NULL, cost_usd TEXT NOT NULL)")
     con.executemany(
-        "INSERT INTO evidence_searches (at, cost_usd) VALUES (?, ?)",
+        "INSERT INTO evidence_searches (key, instrument, session, at, cost_usd, outcome) "
+        "VALUES ('X|d', 'X', 'd', ?, ?, 'stored')",
         [(at.isoformat(), usd) for at, usd in rows],
     )
     con.commit()

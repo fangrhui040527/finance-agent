@@ -350,6 +350,8 @@ def _screen(engine, text: str) -> str | None:
 
 
 def searched_keys(corpus) -> set[str]:
+    if not corpus.has_table("evidence_searches"):
+        return set()
     rows = corpus.conn.execute("SELECT key, outcome, searches FROM evidence_searches").fetchall()
     return {r[0] for r in rows if r[1] in SEARCHED or int(r[2] or 0) > 0}
 
@@ -357,6 +359,8 @@ def searched_keys(corpus) -> set[str]:
 def evidence_month_usd(corpus, now: datetime) -> Decimal:
     from core.llm.spend import month_start
 
+    if not corpus.has_table("evidence_searches"):
+        return Decimal(0)
     rows = corpus.conn.execute(
         "SELECT cost_usd FROM evidence_searches WHERE at >= ?", (month_start(now).isoformat(),)
     ).fetchall()
@@ -487,6 +491,7 @@ def run(
             )
             return report
 
+        corpus.ensure_evidence_table()
         index = entity_index()
         holdings, watchlist = set(cfg.holdings), set(cfg.watchlist)
         languages = tuple(getattr(cfg, "languages", ()) or ())
@@ -614,6 +619,8 @@ def for_pack(corpus, instrument_id: str, since: datetime) -> tuple[list[dict], l
     the nightly page reads under the name's move, by the move searched for and
     not by publication time - a page dated before the digest's window is still
     the evidence for that move."""
+    if not corpus.has_table("evidence_searches"):
+        return [], []
     attempts = [
         dict(r)
         for r in corpus.conn.execute(
