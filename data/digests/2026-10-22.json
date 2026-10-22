@@ -1,6 +1,78 @@
 {
   "collection": [
     {
+      "at": "2026-10-22T22:42:17.563750+00:00",
+      "detail": "skipped: every asked name was refused: outside the plan or over today's credits (XNAS:NVDA, XNAS:AAPL)",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-22T22:42:17.224768+00:00",
+      "detail": "facts 0; window not covered back to 2026-10-22 17:31Z; the oldest item read is 2026-10-22 21:30Z, so 4.0h of the window was never served",
+      "fetched": 14,
+      "kept": 14,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 13
+    },
+    {
+      "at": "2026-10-22T22:42:16.033025+00:00",
+      "detail": "alphavantage refused a premium endpoint (the key's plan does not include it): Thank you for using Alpha Vantage! This is a premium endpoint. You may subscribe to any of the premium plans at https://www.alphavantage.co/premium/ to instantl",
+      "fetched": 0,
+      "kept": 0,
+      "source": "alphavantage_news",
+      "status": "failed",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-22T22:42:13.516249+00:00",
+      "detail": "facts 39; ",
+      "fetched": 267,
+      "kept": 238,
+      "source": "finnhub",
+      "status": "ok",
+      "stored": 164
+    },
+    {
+      "at": "2026-10-22T22:42:09.261940+00:00",
+      "detail": "facts 1; ",
+      "fetched": 2,
+      "kept": 0,
+      "source": "edgar",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-22T22:42:08.772919+00:00",
+      "detail": "named the company: 13 of 53 (lowest: NVIDIA 1/20, Microsoft 6/18, Apple 6/15)",
+      "fetched": 53,
+      "kept": 53,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 41
+    },
+    {
+      "at": "2026-10-22T22:42:07.995283+00:00",
+      "detail": "named the company: 129 of 147 (lowest: Apple 53/62, Microsoft 31/35, NVIDIA 45/50)",
+      "fetched": 166,
+      "kept": 147,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 132
+    },
+    {
+      "at": "2026-10-22T22:42:05.430760+00:00",
+      "detail": "no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked)",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "failed",
+      "stored": 0
+    },
+    {
       "at": "2026-10-22T17:31:36.970654+00:00",
       "detail": "facts 0; ",
       "fetched": 450,
@@ -119,18 +191,18 @@
     }
   ],
   "counts": {
-    "articles": 22741,
+    "articles": 23091,
     "documents": 0,
-    "escalated": 3197,
-    "events": 4248,
-    "failed_sweeps": 86,
-    "linked": 13356,
-    "observations": 6062,
+    "escalated": 3242,
+    "events": 4249,
+    "failed_sweeps": 88,
+    "linked": 13533,
+    "observations": 6101,
     "series": 31,
-    "sweeps": 1053
+    "sweeps": 1061
   },
   "day": "2026-10-22",
-  "generated_at": "2026-10-22 17:31 UTC",
+  "generated_at": "2026-10-22 22:42 UTC",
   "macro": [
     {
       "change": "-0.06",
@@ -443,22 +515,22 @@
       "upcoming": []
     },
     {
-      "escalated": 13,
+      "escalated": 41,
       "events": [],
       "instrument_id": "XNAS:NVDA",
       "label": "NVIDIA",
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-10-21",
+          "known_at": "2026-10-22",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "27.49"
+          "value": "27.73"
         },
         {
           "concept": "pb",
-          "known_at": "2026-10-21",
+          "known_at": "2026-10-22",
           "label": "P/B",
           "period_end": null,
           "source": "finnhub",
@@ -466,7 +538,7 @@
         },
         {
           "concept": "eps_ttm",
-          "known_at": "2026-10-21",
+          "known_at": "2026-10-22",
           "label": "EPS (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -474,7 +546,7 @@
         },
         {
           "concept": "dividend_yield",
-          "known_at": "2026-10-21",
+          "known_at": "2026-10-22",
           "label": "dividend yield",
           "period_end": null,
           "source": "finnhub",
@@ -482,7 +554,7 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-10-21",
+          "known_at": "2026-10-22",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
@@ -490,7 +562,7 @@
         },
         {
           "concept": "high_52w",
-          "known_at": "2026-10-21",
+          "known_at": "2026-10-22",
           "label": "52w high",
           "period_end": null,
           "source": "finnhub",
@@ -498,7 +570,7 @@
         },
         {
           "concept": "low_52w",
-          "known_at": "2026-10-21",
+          "known_at": "2026-10-22",
           "label": "52w low",
           "period_end": null,
           "source": "finnhub",
@@ -571,100 +643,100 @@
       ],
       "stories": [
         {
-          "doc_id": "https://beincrypto.com/lbank-nvidia-stock-trading-crypto-exchange/?.tsrc=rss",
-          "domain": "beincrypto.com",
+          "doc_id": "finnhub:143103603",
+          "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-10-21T21:39:43+00:00",
+          "polarity": -1.0,
+          "published_at": "2026-10-22T19:47:00+00:00",
           "quality": 0.85,
-          "title": "Crypto Exchanges Want Your Next Stock Trade in 2027",
+          "title": "Vertiv, Nvidia target 10-week cut in AI power, cooling setup",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:143070512",
+          "doc_id": "finnhub:143103067",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "polarity": -1.0,
+          "published_at": "2026-10-22T17:33:38+00:00",
+          "quality": 0.85,
+          "title": "Oil Climbs Above $111 as AI Stocks Slide, Dragging the S&P 500 and Global Markets With Them",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:143103072",
           "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-10-21T17:30:00+00:00",
+          "published_at": "2026-10-22T17:25:49+00:00",
           "quality": 0.85,
-          "title": "How Nvidia's OpenShell is securing the next generation of AI agents: Jensen Huang",
-          "uncertainty": 0.26595744680851063
+          "title": "Could Intel be the next trillion-dollar company?",
+          "uncertainty": 0.13440860215053763
         },
         {
-          "doc_id": "finnhub:143069871",
+          "doc_id": "finnhub:143102328",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "polarity": -1.0,
+          "published_at": "2026-10-22T15:26:34+00:00",
+          "quality": 0.85,
+          "title": "Tech stocks fall as Nvidia boss warns of AI funding slowdown",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:143102336",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-10-22T15:12:17+00:00",
+          "quality": 0.85,
+          "title": "Adobe (ADBE) Gains AI Momentum On A Narrative That Still Sees Value",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:143099947",
           "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-10-21T15:42:00+00:00",
+          "published_at": "2026-10-22T13:00:00+00:00",
           "quality": 0.85,
-          "title": "Absolute Security Integrates Autonomous Cyber Resilience into the NVIDIA DGX Station AI Supercomputer",
+          "title": "CariGenetics Partners with DNAnexus to Launch First Caribbean Collaborative Genomics Research Infrastructure with NVIDIA",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "finnhub:143069878",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-10-21T15:19:10+00:00",
-          "quality": 0.85,
-          "title": "CrowdStrike Gains 3.6% on Expanded NVIDIA AI Agent Security Deal: \u201cSetting the Standard\u201d",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "finnhub:143067248",
+          "doc_id": "finnhub:143099952",
           "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-10-21T13:48:00+00:00",
+          "published_at": "2026-10-22T13:00:00+00:00",
           "quality": 0.85,
-          "title": "Advantech Advances Autonomous Industrial AI with AI Factory Brain and Physical AI at NVIDIA GTC Berlin 2026",
+          "title": "Inertial Labs, a VIAVI Solutions Company, Accelerates Complex Alt-PNT and Guidance Systems Design with Programmable INS Development Platform",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "https://news.google.com/rss/articles/CBMipAFBVV95cUxNUkh0cWdpYzlpZ0RLeWhSY3N2MU80NFVnODQ5VDQ0d05IdW5HQlZ6MGhxc0RhN3B6ZmVTdFBxUUNjdkdOa19RR09qUUktRW55dVVFaUFoVlZ2SHVPVDFBTTlVODNEeW5HbXhqOHJWdHZCQlE0WjZYSEhwWno1Y0tPUnNFby10Q2pDRUVnakpYekp1NEJMVjcyRTR0Q0dCZ21XN0lyUg?oc=5",
-          "domain": "finance.yahoo.com",
+          "doc_id": "finnhub:143099040",
+          "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-10-21T21:38:34+00:00",
-          "quality": 0.8,
-          "title": "Nvidia Targets AI's Biggest Bottlenecks With New Deals",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxOMHZ2MXhTb0h4cGZqV0VZWWVuNlJWdWp6N1F5UmFDV2VtSEllS2llVkpCcmhhN0lTQTlVRmdfcTZWXzFyeTYyZm9lSTcyZjBKWkFOdlFSaGNiMHVWZWxYd1NKSGhmZWVrQV9BU29KZDRENlhGWW5PR0h3UF81bDlCbkpfR0dKUlg0TWh1OVJ5bnE5RTRqSnRGOGlJSldYdmc0MGJMQk05YlRNMTgydWtDMmJRTTZ6dkdBWjdMcldxLTh3bzVhOEhyYQ?oc=5",
-          "domain": "www.investing.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-21T17:01:17+00:00",
-          "quality": 0.8,
-          "title": "Goldman Sachs reiterates Nvidia stock rating on AI deployment outlook",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMioAFBVV95cUxPMlpwS09yNVNtb3BpTFBfVWVVQVJ5T2lXSTRYRWR1d0NFM0hORVYwU2N6b2R0RnJkT2FqRVptTXpWTUt2WnVVT1EtbUlnTWZyYnM5NTFWRThiN2NHNVJ2SEJVTFFDSkRZalRiRlVoVFhPY0ZKampxV05oMHcxaUd1RmN5Vk12R3NoazQ3SjJzRDZpTHFVLS0wV0F3emRzODd2?oc=5",
-          "domain": "finance.yahoo.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-10-21T16:01:47+00:00",
-          "quality": 0.8,
-          "title": "NVIDIA and Micron Alone Now Contribute 36% of S&P 500 Earnings Growth as Historic Market Concentration Grows",
+          "published_at": "2026-10-22T12:02:00+00:00",
+          "quality": 0.85,
+          "title": "Zadara Achieves NVIDIA AI Cloud Ready Validation and Will Showcase its AI-Optimized Platform at NVIDIA GTC Berlin 2026",
           "uncertainty": 0.0
         }
       ],
       "tone": {
-        "intensity_max": 0.0,
-        "n": 62,
-        "polarity_mean": 0.129,
-        "sources": 23,
-        "uncertainty_mean": 0.1
+        "intensity_max": 0.333,
+        "n": 140,
+        "polarity_mean": 0.075,
+        "sources": 39,
+        "uncertainty_mean": 0.096
       },
       "upcoming": [
         {
@@ -677,22 +749,30 @@
       ]
     },
     {
-      "escalated": 11,
-      "events": [],
+      "escalated": 21,
+      "events": [
+        {
+          "kind": "insider_filing",
+          "source": "edgar",
+          "title": "4: FORM 4",
+          "url": "https://www.sec.gov/Archives/edgar/data/320193/000114036126040540/xslF345X06/form4.xml",
+          "when": "2026-10-22T00:00:00+00:00"
+        }
+      ],
       "instrument_id": "XNAS:AAPL",
       "label": "Apple",
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-10-21",
+          "known_at": "2026-10-22",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "38.53"
+          "value": "39.02"
         },
         {
           "concept": "pb",
-          "known_at": "2026-10-21",
+          "known_at": "2026-10-22",
           "label": "P/B",
           "period_end": null,
           "source": "finnhub",
@@ -700,7 +780,7 @@
         },
         {
           "concept": "eps_ttm",
-          "known_at": "2026-10-21",
+          "known_at": "2026-10-22",
           "label": "EPS (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -708,7 +788,7 @@
         },
         {
           "concept": "dividend_yield",
-          "known_at": "2026-10-21",
+          "known_at": "2026-10-22",
           "label": "dividend yield",
           "period_end": null,
           "source": "finnhub",
@@ -716,7 +796,7 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-10-21",
+          "known_at": "2026-10-22",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
@@ -724,7 +804,7 @@
         },
         {
           "concept": "high_52w",
-          "known_at": "2026-10-21",
+          "known_at": "2026-10-22",
           "label": "52w high",
           "period_end": null,
           "source": "finnhub",
@@ -732,7 +812,7 @@
         },
         {
           "concept": "low_52w",
-          "known_at": "2026-10-21",
+          "known_at": "2026-10-22",
           "label": "52w low",
           "period_end": null,
           "source": "finnhub",
@@ -805,6 +885,17 @@
       ],
       "stories": [
         {
+          "doc_id": "https://finance.yahoo.com/technology/articles/resideo-announces-expected-q1-software-201100727.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-22T20:11:00+00:00",
+          "quality": 1.0,
+          "title": "Resideo Announces Expected Q1 Software Update to Honeywell Home Smart Thermostats for Compatibility with Apple HomeView",
+          "uncertainty": 0.16447368421052633
+        },
+        {
           "doc_id": "https://finance.yahoo.com/m/e4d4b4d0-03a9-309a-9f54-ff256bcadac0/apple%E2%80%99s-iphone-supply-chain.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
           "escalated": true,
@@ -814,6 +905,28 @@
           "quality": 1.0,
           "title": "Apple\u2019s iPhone Supply Chain Risk Spells Trouble for This Semiconductor Stock",
           "uncertainty": 0.3571428571428571
+        },
+        {
+          "doc_id": "finnhub:143099963",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-22T11:30:27+00:00",
+          "quality": 0.85,
+          "title": "Meta Muse Wants to Run Your Life, and Analyst Says the Winner Will Be Whoever You Trust \u2018With Their Card and Their Habits\u2019",
+          "uncertainty": 0.1953125
+        },
+        {
+          "doc_id": "finnhub:143101815",
+          "domain": "Benzinga",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-22T05:58:59+00:00",
+          "quality": 0.85,
+          "title": "Investigating Apple's Standing In Technology Hardware, Storage & Peripherals Industry Compared To Competitors",
+          "uncertainty": 0.0
         },
         {
           "doc_id": "https://unchainedcrypto.com/kazakhstans-aifc-regulator-turns-to-apple-and-google-to-enforce-coinbase-htx-injunctions/?.tsrc=rss",
@@ -827,78 +940,45 @@
           "uncertainty": 0.0
         },
         {
-          "doc_id": "https://news.google.com/rss/articles/CBMipgFBVV95cUxQUzBEZzBtWHhNdnh0cmdLTWJFX2F3cnk2ODlVaW1GdE9IbDNaNXdLUlphUGhQUWxuWlVpWmpYWWd0WXJsOU5Wc2ZLSG9FR0VaaHhvY0o3UHVaX0g1OUpJVlM2YnltVW9NUWM4SUk4ZDBPWFc1Uzg2c3JYNlFSdzBiY2pUM0J0Q29NOFBPMjZnSmthZlRZNkhlZTJKOVpjbFc0ZjBEbVBB?oc=5",
-          "domain": "www.marketbeat.com",
+          "doc_id": "https://news.google.com/rss/articles/CBMilAFBVV95cUxNVF9YOU8tcEZKMnBfYTdzRVdvU3g2NExVVmlENFhwUjJqWVEyWURQTXBqcF9ZWi1VVFZjR1hDV3lkbUpFeEFLZGdLRy0tb3kwT0p1Zmd3c3ZvWXM0MmZob2x6UWZGeUpROGhOZ2s3cXpIY2hWOUJYamFreWplM0xWT24zQV9uRGt0NEZVNVdScUhNZERI?oc=5",
+          "domain": "finance.yahoo.com",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-10-21T21:29:09+00:00",
-          "quality": 0.65,
-          "title": "Apple (NASDAQ:AAPL) Stock Jumps 1.3% - What's Next?",
-          "uncertainty": 0.0
+          "published_at": "2026-10-22T16:14:15+00:00",
+          "quality": 0.8,
+          "title": "Apple (AAPL) Stock Could Be 25% Overvalued Despite New Device Launch Plans",
+          "uncertainty": 1.0
         },
         {
-          "doc_id": "gdelt:https://macdailynews.com/2026/10/21/apple-will-have-limited-iphone-duo-units-available-in-retail-stores-on-friday/",
-          "domain": "macdailynews.com",
+          "doc_id": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxOYVA5NWF0UG5PMXNfcUNFZXFfVkx1bkRTWGRscXBzMHZVV1JnV2lvMk9wYV9YOUFkN0VQMGF3d1VUZktHNjR4N3JFZjBfeVhLcWZJM3lRd0hibDZON2oyd3dmUjdKcTlrNWM1RHlsbmxIbmZaX0VKR21hQnZjTXhKTDlnZk5va2VVLWZoWXpDUUhRalZzMEhSQS04RElxZUZNSHhEWmE5LXM0WjZJQjRWWS1GdjZKQXFPaDdzZ3pTSHZDR2FYTEp0TnB0VnktYUdsXzhZ?oc=5",
+          "domain": "www.investing.com",
           "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-21T20:45:00+00:00",
-          "quality": 0.65,
-          "title": "Apple will have limited iPhone Duo units available in retail stores on Friday",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "gdelt:https://macdailynews.com/2026/10/21/iphone-duo-gains-apple-pencil-support-next-week-with-ios-27-2/",
-          "domain": "macdailynews.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-21T20:45:00+00:00",
-          "quality": 0.65,
-          "title": "iPhone Duo gains Apple Pencil support next week with iOS 27.2",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMiTkFVX3lxTFBzTFkyeDZraFRwRmxsOUdSc1dEWFpiY3ItVGg1bkVvVEROaWY4SFVmeGZEZjlOa3JUakhlY2lyTFd6T1RmVTNqSFhaMjdQQQ?oc=5",
-          "domain": "appleosophy.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-21T20:20:37+00:00",
-          "quality": 0.65,
-          "title": "Apple Says iPhone Duo Walk-In Stock Will Be Limited on Launch Day",
-          "uncertainty": 0.0
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMisAFBVV95cUxQRGJQbUotc2hITWRpMC1RQkxrMEljdURuX243bnBPZmZEOXpLVXZaVldVcnJ2WFVnaEJvdkprLVctb2VvYmpLOHpqQnl3Wk9QdnBvWV9pa0VBN2l6WVhIRHVzRWdkUzJMQjVLeXYwTnVwVzFtYkkycGJ4MWxkSjJHVUpzUEtPa1d1a0xRMDVqRVRNVkkyMVAyZF9CdVhCbWlyNjlLaUx5aEFpR1FWSHBxWA?oc=5",
-          "domain": "www.macworld.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-21T16:36:37+00:00",
-          "quality": 0.65,
-          "title": "If you want an iPhone Duo, Apple will have \u2018limited\u2019 stock in stores",
-          "uncertainty": 0.9615384615384615
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxPYkhxRTBhQnM3X3A0VDhrZDc0MWxWZmsyVXAzbkI1UGw2ZURPSXJlQ1YwNWx4UTlIRXFQV2w0T3NMSExPSDBEVnRJWFBWSGtvUDc2NEtqR3hNUFRGUnZBbm5iMzVnUEJwVTV0amZrTzJ4R25vUEhKak9jaFN5cHg4UkU4SGVBT0V2SV96Nmx3NUVlMFB2M20wemRGUFhuZE1OMDZIVTNGUzQ?oc=5",
-          "domain": "9to5mac.com",
-          "escalated": true,
-          "intensity": 0.0,
+          "intensity": 0.3333333333333333,
           "polarity": 1.0,
-          "published_at": "2026-10-21T15:58:00+00:00",
+          "published_at": "2026-10-22T14:32:56+00:00",
+          "quality": 0.8,
+          "title": "iPhone Duo preorder surge prompts Apple to raise shipment targets, DigiTimes says",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMie0FVX3lxTE5mS0Z1ZFF2bERvLUpRbU5LY3BaRU5sTS1HbEdGWWlYelNqY1pZeVUxVldaZDRjbDlBQ3haRlpDZHBIc256UFAwU2FMNUktckh6TGhocXlVdXE0REJOR1hJWC10RWptT2d6V2VaNVYtLXpyaGZNckNpMG9uNA?oc=5",
+          "domain": "www.cbsnews.com",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "polarity": 0.0,
+          "published_at": "2026-10-22T14:36:53+00:00",
           "quality": 0.65,
-          "title": "Here\u2019s where Apple says iPhone Duo will (and won\u2019t) be available for walk-ins",
+          "title": "Apple's iPhone Duo is already backordered until 2027 as pre-order sales soar",
           "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 49,
-        "polarity_mean": 0.082,
-        "sources": 37,
-        "uncertainty_mean": 0.063
+        "n": 100,
+        "polarity_mean": 0.06,
+        "sources": 66,
+        "uncertainty_mean": 0.062
       },
       "upcoming": [
         {
@@ -925,7 +1005,7 @@
       ]
     },
     {
-      "escalated": 8,
+      "escalated": 15,
       "events": [
         {
           "kind": "filing",
@@ -947,15 +1027,15 @@
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-10-21",
+          "known_at": "2026-10-22",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "29.39"
+          "value": "29.41"
         },
         {
           "concept": "pb",
-          "known_at": "2026-10-21",
+          "known_at": "2026-10-22",
           "label": "P/B",
           "period_end": null,
           "source": "finnhub",
@@ -963,7 +1043,7 @@
         },
         {
           "concept": "eps_ttm",
-          "known_at": "2026-10-21",
+          "known_at": "2026-10-22",
           "label": "EPS (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -971,7 +1051,7 @@
         },
         {
           "concept": "dividend_yield",
-          "known_at": "2026-10-21",
+          "known_at": "2026-10-22",
           "label": "dividend yield",
           "period_end": null,
           "source": "finnhub",
@@ -979,7 +1059,7 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-10-21",
+          "known_at": "2026-10-22",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
@@ -987,7 +1067,7 @@
         },
         {
           "concept": "high_52w",
-          "known_at": "2026-10-21",
+          "known_at": "2026-10-22",
           "label": "52w high",
           "period_end": null,
           "source": "finnhub",
@@ -995,7 +1075,7 @@
         },
         {
           "concept": "low_52w",
-          "known_at": "2026-10-21",
+          "known_at": "2026-10-22",
           "label": "52w low",
           "period_end": null,
           "source": "finnhub",
@@ -1068,6 +1148,17 @@
       ],
       "stories": [
         {
+          "doc_id": "https://news.google.com/rss/articles/CBMinwFBVV95cUxQV0dLdDBXQzBZTkhHc1c5NndxeDVIN0RUSXU3NzZQVExSLWg1OHRaVmtKMU5NUmhVOXlmd0ZEaVluVDR5Qy1LbWkyemlYbnJSMWhyU2ZucnhmWkJaOU9SbkVUYkdOanFDTWJmcUlRcVBDdXU5NVN2bzJpZEV3WEZnUGl6MkVlb2paTTFEVHlSSW05Qmo0Y1gtN2xLNER5em8?oc=5",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-22T15:30:56+00:00",
+          "quality": 0.8,
+          "title": "Microsoft Stock Could Be Closer to Its Next Big Breakout Than Investors Think",
+          "uncertainty": 0.9615384615384615
+        },
+        {
           "doc_id": "https://news.google.com/rss/articles/CBMilwFBVV95cUxOa3VxRTBKT2lyc3dYSXFhN3dUVnNpd3otam5DTThZYXh3NFFaNEJ2MGJIeHpsNkRUYUM4VUZBNUw2VEt0UjgxdVdSbFR2X08zd01IZERQSmRIYU9DTkwtLVgtUnpUSzlfMTVMYUVHbHhRTzVYaU85YW1IaG5fY09Edmt4N2FnWnF1dVlYeWwtYTRnR1c4TlVZ?oc=5",
           "domain": "finance.yahoo.com",
           "escalated": true,
@@ -1112,56 +1203,45 @@
           "uncertainty": 0.8928571428571428
         },
         {
-          "doc_id": "finnhub:143071147",
-          "domain": "Yahoo",
+          "doc_id": "https://news.google.com/rss/articles/CBMiogFBVV95cUxONEIybmlhd2xSMU5SaVRNbE5zNGdKdWlrT1FCYTctNzFWbV9US2VlVjNHM1RfcFpRa0Z6MG5fM2JzU0F4RkptLU90NUlBQkxHUEtHQVdSd1JjWXAzYTFUOV9sb3g5NXVnZDhOczlidmdvZkZUOFZpSm5BaGR2NlVwcHVPX2xjeFpVSTdkVUhrdDBUdXdwYXhOb0VLTmhfZ04yQ3c?oc=5",
+          "domain": "startupfortune.com",
           "escalated": true,
           "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-21T17:08:21+00:00",
+          "polarity": 1.0,
+          "published_at": "2026-10-22T20:25:27+00:00",
           "quality": 0.65,
-          "title": "Microsoft and Alphabet opt out of tokenized stocks in latest blow to ambitious plan from OKK and NYSE parent firm",
+          "title": "Microsoft beat every earnings number and investors sold the stock anyway",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "https://news.google.com/rss/articles/CBMinwFBVV95cUxQb1ViSmVheTN1bUZJajVrOXRvSGNhYlczaExNUEhLZW0yYzRtbEt5UzVLTjY0Ukx2TFJVODUxbWJ6NXhQRHhWOTBnRkpWc2RFSzBnaW42NUNUbkpRcDVEbDdBMGx5VnJhV2cyUF9XNEJzVGFsMVdiUWFwNFRSUXJxRExFeEViWlZPaHBuaTVLRzFiVXFadTJTWjFTWmlBQzA?oc=5",
+          "doc_id": "https://news.google.com/rss/articles/CBMiigFBVV95cUxNMzVzQUVrMzZ5dm9wRi1iZVhrYXU0TnFOeWNwc0E2LXlGX2xZOTZMMEpwM1Vxai00b3dfWGdZbzlmTnJrU1NKRnIwSEROMy1hWUFiTXMxUHdibnhjdTFIdEdRclR5a3F1aFRDS1ViWjlkQkx2TERSYUFmWEZWR2V6Y05raFlDbjM0bmc?oc=5",
           "domain": "pluang.com",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 1.0,
-          "published_at": "2026-10-21T16:57:48+00:00",
+          "published_at": "2026-10-22T15:52:08+00:00",
           "quality": 0.65,
-          "title": "$5,000 in Microsoft stock could grow to $9,089 in 5 years amid strong AI and cloud growth.",
-          "uncertainty": 0.8928571428571428
-        },
-        {
-          "doc_id": "https://news.google.com/rss/articles/CBMif0FVX3lxTE1laHYzS1E1Mkc1OUxoMTQ4TFBZd2M4N29feURpLU9SX25Pdkd6X2hGYm5reU5DVV95dWpVTUFPLTdGMF8xaVBOalpXSFJqajlKQWVVMHpWS2xHYVJ1TkdTNUVwTlN5Q2ptTVBDcUJvR0JSa3ZqTHk4aTE1cllxZGc?oc=5",
-          "domain": "pluang.com",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
-          "polarity": 0.0,
-          "published_at": "2026-10-21T15:05:26+00:00",
-          "quality": 0.65,
-          "title": "Microsoft's earnings soar 31% while stock lags, prompting continued investor buying despite high capital spending.",
+          "title": "Microsoft stock nears breakout with strong Azure demand and bullish Wall Street outlook.",
           "uncertainty": 0.0
         },
         {
-          "doc_id": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxQNkpBZ2ttbUtBQkJ4bGg5UU1LNUprMi1wWjRXTHRENWE0SjRaVTNOY29YVFF0RHFLM1hVakJyS3BMYncwWmZRMnNVbDNiWmtXTGxxXzYxdnZsYndoek5SRlVtdlJ0MWVFQ0wtV3VIdlJnbmV4UWU0VlF0aXprazdmd1Z1VUlLbEowUHJpaTdHQUNoTThnbjVHZHA1YVZIbE5PcDZjZ21nbG5ndw?oc=5",
-          "domain": "247wallst.com",
+          "doc_id": "https://news.google.com/rss/articles/CBMi3gFBVV95cUxQVEg0NWp0dDgyam1sRnAyb2t5OVNQQXdCWTh1QmhiR3dlUXBmX1NLOWJTcEVEWjUyR1U2N3RHR2xtbWg2bVBGU1lyeFNHNHJIaDUwSk9yazg3dHRxSnR0a1RSSjZwSFY2QWtZWUlnS0FIbDhNX2hnem9aZjRQZlRqMXZMeTNoeWRsYTBRa3g1RlMtdXdzbUc4OXpXTWotbDlnbW52NXpiemN2Umt4c19rcFF3cFI1ZWsxM0h6bU9XZmhSejNfTzI3QkdHb3cwV2tjV3ZYa2hCZThZSlpDOVHSAeYBQVVfeXFMTm0wa2NsRUNSWEtjdWdlbjdHSXRHRGRjOG9TOXBaMnhsb2MxUG44M3hGYkVGTXpUbUNiT01oTGtMazYtUnQ0aDVPT2Jtc0o3QnN6a2VMX2QwRFMyYnlHYnlCN2xSaExhTGtic0dWdVkxdHZ5TndsSy1XV0xINzQwRnN6dG4yVnJYVTdvRC1hNXZwbWNuejRpd1pFY2FTLWctY0UxU1ZMN2tRSDg5Q2htSFpuczVtOXVlQmx1WDFtVndsb21tbWlZWklKSkpYb2F6ZXF0Z3lRa2ppS3RqS01HZXBsRXV4TEE?oc=5",
+          "domain": "www.ndtvprofit.com",
           "escalated": true,
           "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-21T15:00:00+00:00",
+          "polarity": -1.0,
+          "published_at": "2026-10-22T14:13:02+00:00",
           "quality": 0.65,
-          "title": "What Will $5,000 Invested in Microsoft Stock Be Worth in 5 Years?",
+          "title": "Microsoft Says Chinese Hackers Used AI Tool To Breach ConnectWise, Target Hundreds Of Organisations",
           "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 34,
-        "polarity_mean": 0.059,
-        "sources": 20,
-        "uncertainty_mean": 0.115
+        "n": 72,
+        "polarity_mean": 0.042,
+        "sources": 36,
+        "uncertainty_mean": 0.113
       },
       "upcoming": [
         {
