@@ -273,8 +273,8 @@ def test_a_cheap_override_puts_the_free_model_behind_triage_and_leaves_the_thesi
     backend, reason = backend_from_env()
     assert isinstance(backend, SplitBackend)
     models = models_by_tier(backend)
-    assert models[Tier.REASON] == "claude-opus-5"
-    assert models[Tier.BALANCED] == "claude-sonnet-5"
+    assert models[Tier.REASON] == "claude-opus-5-5"
+    assert models[Tier.BALANCED] == "claude-sonnet-5-5"
     assert models[Tier.CHEAP] == "openai/gpt-oss-20b"
     assert models[Tier.EMBED] == MODEL_IDS[Tier.EMBED]
     assert (
@@ -364,8 +364,8 @@ def test_split_dispatches_by_model_id_and_refuses_a_stranger():
     split = SplitBackend({Tier.REASON: echo, Tier.BALANCED: echo, Tier.CHEAP: free})
     text, _ = split.complete("openai/gpt-oss-20b", "q", None)
     assert text == "from groq" and split.last_request_id == "chatcmpl-1"
-    text, _ = split.complete("claude-opus-5", "q", None)
-    assert text.startswith("[claude-opus-5]")
+    text, _ = split.complete("claude-opus-5-5", "q", None)
+    assert text.startswith("[claude-opus-5-5]")
     with pytest.raises(BackendError, match="no backend in the split"):
         split.complete("gpt-9", "q", None)
     assert split.model_for(Tier.EMBED) is None and split.name_for(Tier.EMBED) == "SplitBackend"
@@ -407,9 +407,9 @@ def test_under_the_split_each_tier_lands_on_its_own_backend_and_price():
     triage = client.complete("a4", TaskClass.NEWS_TRIAGE, "tag this")
     thesis = client.complete("a4", TaskClass.THESIS_SYNTHESIS, "x" * 400)
     assert triage.model_id == "openai/gpt-oss-20b" and triage.cost_myr == 0
-    assert thesis.model_id == "claude-opus-5" and thesis.cost_myr > 0
+    assert thesis.model_id == "claude-opus-5-5" and thesis.cost_myr > 0
     rows = list(led.calls())
-    assert [r["model_id"] for r in rows] == ["openai/gpt-oss-20b", "claude-opus-5"]
+    assert [r["model_id"] for r in rows] == ["openai/gpt-oss-20b", "claude-opus-5-5"]
 
 
 def test_structured_output_survives_a_thinking_model():
@@ -432,7 +432,7 @@ def test_structured_output_survives_a_thinking_model():
 
 
 def test_model_of_and_pricing_of_fall_back_to_the_claude_table():
-    assert model_of(EchoBackend(), Tier.REASON) == "claude-opus-5"
+    assert model_of(EchoBackend(), Tier.REASON) == "claude-opus-5-5"
     assert pricing_of(EchoBackend(), Tier.REASON) is None
     assert models_by_tier(EchoBackend()) == MODEL_IDS
     assert backend_name(EchoBackend()) == "EchoBackend"
@@ -453,7 +453,7 @@ def test_ask_backend_shows_the_free_models_and_that_effort_does_not_reach_them(c
     monkeypatch.setenv("GROQ_API_KEY", "gsk_x")
     code, out = _run(["backend"], capsys)
     assert code == 0
-    assert "OpenAICompatibleBackend" in out and "claude-haiku-4-5" not in out
+    assert "OpenAICompatibleBackend" in out and "claude-haiku-5-5" not in out
     assert "openai/gpt-oss-20b" in out and "effort dial not sent" in out
 
 
@@ -463,8 +463,8 @@ def test_ask_backend_shows_which_backend_answers_each_tier_under_a_split(capsys,
     monkeypatch.setenv("LLM_BACKEND_CHEAP", "groq")
     code, out = _run(["backend"], capsys)
     assert code == 0 and "SplitBackend" in out
-    assert "claude-opus-5" in out and "openai/gpt-oss-20b" in out
-    assert "OpenAICompatibleBackend, max 1024" in out
+    assert "claude-opus-5-5" in out and "openai/gpt-oss-20b" in out
+    assert "OpenAICompatibleBackend, max 4096" in out
 
 
 def test_ask_backend_use_a_provider_without_its_key_exits_three(capsys, monkeypatch):
@@ -494,7 +494,7 @@ def test_web_backend_reports_the_free_models_per_tier(tmp_path, monkeypatch):
     assert body["data"]["backend"] == "OpenAICompatibleBackend"
     cheap = body["data"]["tiers"]["cheap"]
     assert cheap["model"] == "openai/gpt-oss-20b" and cheap["backend"] == "OpenAICompatibleBackend"
-    assert cheap["effort"] is None and cheap["max_tokens"] == 1024
+    assert cheap["effort"] is None and cheap["max_tokens"] == 4096
     assert body["data"]["tiers"]["embed"]["model"] == MODEL_IDS[Tier.EMBED]
 
 
@@ -508,10 +508,14 @@ def test_doctor_does_not_warn_about_a_spend_cap_on_a_free_provider(monkeypatch):
     assert "priced at zero" in by_name["spend-cap"].message
 
 
-def test_doctor_still_warns_about_the_spend_cap_on_anthropic(monkeypatch):
+def test_doctor_reports_the_monthly_cap_on_anthropic(monkeypatch):
+    """On a billed backend the check names the owner's monthly cap and how much
+    of it the month has used - the number that decides the next refusal - in
+    place of the old advice to pin every tier to Haiku. (When the cap is unset
+    or nearly spent it warns: tests/test_monthly_cap.py.)"""
     from core.doctor import run_checks
 
     monkeypatch.setenv("ANTHROPIC_API_KEY", KEY)
     by_name = {c.name: c for c in run_checks(offline=True)}
-    assert by_name["spend-cap"].status == "warn"
-    assert "each tier's own rate" in by_name["spend-cap"].message
+    assert "USD 50.00 monthly cap" in by_name["spend-cap"].message
+    assert "priced at zero" not in by_name["spend-cap"].message

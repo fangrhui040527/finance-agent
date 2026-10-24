@@ -64,7 +64,7 @@ def _ledger(path: Path, calls: int = 3, latency: float = 100.0, cost_scale: int 
             agent="a10_thesis",
             task_class=TaskClass.THESIS_SYNTHESIS,
             tier=Tier.REASON,
-            model_id="claude-opus-5",
+            model_id="claude-opus-5-5",
             prompt="p",
             usage=Usage(input_tokens=cost_scale * 1000, output_tokens=cost_scale * 100),
             fx_rate=Decimal("4.15"),
@@ -94,6 +94,105 @@ def test_spend_under_the_fraction_is_quiet(tmp_path):
         _cfg(alert_spend_fraction=Decimal("0.9")), db=str(db), debug_root=str(tmp_path / "none")
     )
     assert not [a for a in alerts if a.rule == "spend_24h"]
+
+
+# --- spend_month: the owner's monthly cap, in dollars ------------------------------
+#
+# Read from the same two places the client's cap reads (core/llm/spend.py): the
+# committed evidence spend in the corpus, plus the ledger. Each case builds its
+# own corpus holding only the table the rule reads.
+
+
+def _evidence(path: Path, rows: list[tuple[datetime, str]]) -> Path:
+    # The real table, as the web evidence ingest's corpus has it.
+    from knowledge.corpus import Corpus
+
+    with Corpus(path) as c:
+        c.ensure_evidence_table()
+    con = sqlite3.connect(path)
+    con.executemany(
+        "INSERT INTO evidence_searches (key, instrument, session, at, cost_usd, outcome) "
+        "VALUES ('X|d', 'X', 'd', ?, ?, 'stored')",
+        [(at.isoformat(), usd) for at, usd in rows],
+    )
+    con.commit()
+    con.close()
+    return path
+
+
+#: Mid-month, so "this month" and "last month" are both unambiguous.
+MID_MONTH = datetime(2026, 10, 15, 12, 0, tzinfo=UTC)
+
+
+def _month_alerts(tmp_path: Path, rows, cap: str | None = "50", now: datetime = MID_MONTH):
+    empty = tmp_path / "e.db"
+    ProvenanceLedger(empty).close()
+    cfg = _cfg(
+        corpus_db=str(_evidence(tmp_path / "corpus.db", rows)),
+        monthly_budget_usd=None if cap is None else Decimal(cap),
+    )
+    alerts = evaluate(cfg, db=str(empty), debug_root=str(tmp_path / "none"), now=now)
+    return [a for a in alerts if a.rule == "spend_month"]
+
+
+def test_month_to_date_past_85_percent_of_the_cap_is_a_warning(tmp_path):
+    hits = _month_alerts(tmp_path, [(datetime(2026, 10, 3, tzinfo=UTC), "43.00")])
+    assert hits and hits[0].severity == "warn"
+    assert "86%" in hits[0].title and "USD 50.00 monthly cap" in hits[0].title
+    assert hits[0].next_step  # every alert names a next step
+    assert hits[0].evidence["month"] == "2026-10"
+
+
+def test_month_to_date_at_the_cap_is_an_alert(tmp_path):
+    """By then calls are being refused; the operator should hear it from here,
+    not from the first refusal."""
+    hits = _month_alerts(tmp_path, [(datetime(2026, 10, 3, tzinfo=UTC), "50.00")])
+    assert hits and hits[0].severity == ALERT
+
+
+def test_month_to_date_under_85_percent_is_quiet(tmp_path):
+    assert not _month_alerts(tmp_path, [(datetime(2026, 10, 3, tzinfo=UTC), "42.00")])
+
+
+def test_last_months_spend_is_not_this_months(tmp_path):
+    rows = [
+        (datetime(2026, 9, 30, 23, 59, 59, tzinfo=UTC), "500.00"),
+        (datetime(2026, 10, 1, 0, 0, tzinfo=UTC), "5.00"),
+    ]
+    assert not _month_alerts(tmp_path, rows)
+
+
+def test_the_ledger_counts_toward_the_month_too(tmp_path):
+    db = tmp_path / "l.db"
+    led = ProvenanceLedger(db)
+    led.record_call(
+        agent="a10_thesis",
+        task_class=TaskClass.THESIS_SYNTHESIS,
+        tier=Tier.REASON,
+        model_id="claude-opus-5-5",
+        prompt="p",
+        usage=Usage(input_tokens=2_000_000, output_tokens=0),  # USD 8.00 at Opus 5.5
+        fx_rate=Decimal("4.15"),
+        at=datetime(2026, 10, 10, tzinfo=UTC),
+    )
+    led.close()
+    cfg = _cfg(
+        corpus_db=str(
+            _evidence(tmp_path / "corpus.db", [(datetime(2026, 10, 3, tzinfo=UTC), "35.00")])
+        ),
+        monthly_budget_usd=Decimal("50"),
+    )
+    alerts = evaluate(cfg, db=str(db), debug_root=str(tmp_path / "none"), now=MID_MONTH)
+    hits = [a for a in alerts if a.rule == "spend_month"]
+    assert hits and "USD 43.00" in hits[0].title
+
+
+def test_no_monthly_cap_means_no_monthly_rule(tmp_path):
+    assert not _month_alerts(tmp_path, [(datetime(2026, 10, 3, tzinfo=UTC), "900.00")], cap=None)
+
+
+def test_the_shipped_config_watches_a_fifty_dollar_month():
+    assert load_config().monthly_budget_usd == Decimal("50")
 
 
 def test_slow_calls_open_a_latency_alert(tmp_path):
@@ -139,7 +238,7 @@ def test_silence_is_a_rule_but_only_once_something_has_run(tmp_path):
         agent="a10_thesis",
         task_class=TaskClass.THESIS_SYNTHESIS,
         tier=Tier.CHEAP,
-        model_id="claude-haiku-4-5",
+        model_id="claude-haiku-5-5",
         prompt="p",
         usage=Usage(input_tokens=10, output_tokens=5),
         fx_rate=Decimal("4.15"),

@@ -30,7 +30,8 @@ purpose, hold for the free-provider one too, and each is pinned by tests:
     different model that might answer.
 
 The system prompt is sent as a `cache_control` block: it is the part that
-repeats call after call, and a cache read bills at a tenth of fresh input.
+repeats call after call, and a cache read bills at a tenth of fresh input or
+less (a twentieth on Opus 5.5).
 """
 
 from __future__ import annotations
@@ -123,6 +124,70 @@ class Declined(Billed):
 RETRY_AFTER_CAP = 60.0
 
 
+def anthropic_client(*, api_key: str | None = None, max_retries: int, timeout: float):
+    """The SDK client every Messages caller here builds: AnthropicBackend, and
+    the web search seam (core/llm/websearch.py).
+
+    An identity-linked key is scoped to a workspace and the API refuses every
+    request that does not name one - a 400 before the model is reached, on all
+    five effort levels, for the same reason. The header is sent when
+    ANTHROPIC_WORKSPACE_ID is set and omitted when it is not, because a plain
+    key rejects a workspace it does not have. One place, so a second caller
+    cannot be built without it."""
+    import anthropic  # imported here, lazily, so echo never loads it
+
+    extra: dict[str, Any] = {}
+    workspace = os.environ.get("ANTHROPIC_WORKSPACE_ID", "").strip()
+    if workspace:
+        extra["default_headers"] = {"anthropic-workspace-id": workspace}
+    if api_key is not None:
+        extra["api_key"] = api_key
+    return anthropic.Anthropic(max_retries=max_retries, timeout=timeout, **extra)
+
+
+#: Transport failures from BEFORE the request reached the server: the
+#: connection was never made (a proxy that refused CONNECT, a URL scheme the
+#: client cannot speak), or the body never finished going out. Named by class
+#: name because the SDK's transport (httpx2 in SDK 1.x) is not httpx.
+_UNSENT = (
+    "ConnectError",
+    "ConnectTimeout",
+    "PoolTimeout",
+    "ProxyError",
+    "UnsupportedProtocol",
+    "WriteError",
+    "WriteTimeout",
+)
+
+#: Statuses the API returns INSTEAD of running a turn: refused before any
+#: work, so retrying costs nothing. The set the backend's own loop retries.
+REFUSED_STATUSES = frozenset({429, 500, 502, 503, 529})
+
+
+def possibly_billed(e: Exception) -> bool:
+    """The request may have reached the server and run - and been billed - with
+    no response ever seen: a read timeout, a dropped connection, a reset. A
+    caller that counts money cannot read that as 'nothing happened'. A failure
+    from before the request was sent is not; nor is an HTTP error status (the
+    API answered, so whatever it billed it said). An unknown cause counts as
+    billed: a cap that guessed low is no cap."""
+    import anthropic
+
+    if not isinstance(e, anthropic.APIConnectionError):  # includes APITimeoutError
+        return False
+    cause = e.__cause__ or e.__context__
+    return type(cause).__name__ not in _UNSENT
+
+
+def workspace_refused(e: Exception) -> bool:
+    """A 400 that says the key needs ANTHROPIC_WORKSPACE_ID: a credential fault,
+    not a malformed request."""
+    return (
+        getattr(e, "status_code", None) == 400
+        and "anthropic-workspace-id" in str(getattr(e, "message", e)).lower()
+    )
+
+
 class AnthropicBackend:
     """Anthropic Messages API behind the `Backend` protocol, via the official SDK.
 
@@ -172,24 +237,10 @@ class AnthropicBackend:
                 "entrypoint loads that file; an exported variable wins over it), "
                 "or pass EchoBackend explicitly if you meant to run without a model."
             )
-        import anthropic  # the ONE import site; lazy so echo never loads it
-
-        # An identity-linked key is scoped to a workspace and the API refuses
-        # every request that does not name one - a 400 before the model is
-        # reached, on all five effort levels, for the same reason. The header is
-        # sent when ANTHROPIC_WORKSPACE_ID is set and omitted when it is not,
-        # because a plain key rejects a workspace it does not have.
-        workspace = os.environ.get("ANTHROPIC_WORKSPACE_ID", "").strip()
-        self.workspace_id = workspace or None
-        extra: dict[str, Any] = {}
-        if workspace:
-            extra["default_headers"] = {"anthropic-workspace-id": workspace}
-
+        self.workspace_id = os.environ.get("ANTHROPIC_WORKSPACE_ID", "").strip() or None
         # max_retries=0: the retry loop below owns backoff, so retry-after
         # capping and sleep injection stay testable and disclosed.
-        self._client = anthropic.Anthropic(
-            api_key=key, max_retries=0, timeout=self.TIMEOUT, **extra
-        )
+        self._client = anthropic_client(api_key=key, max_retries=0, timeout=self.TIMEOUT)
 
     # -- the seam -----------------------------------------------------------
 
@@ -213,17 +264,13 @@ class AnthropicBackend:
                 {"type": "text", "text": system, "cache_control": {"type": "ephemeral"}}
             ]
         if profile is not None:
-            # Haiku 4.5 rejects adaptive thinking and `effort` with a 400, and
-            # takes the older budgeted form instead; the Opus/Sonnet 5 family is
-            # the other way round. `tiers.profile_for` knows which model takes
-            # what and the two forms are mutually exclusive by construction.
-            # Nothing here guesses.
-            if profile.thinking_budget is not None:
-                params["thinking"] = {
-                    "type": "enabled",
-                    "budget_tokens": profile.thinking_budget,
-                }
-            elif profile.adaptive_thinking:
+            # Every model this calls (the 5.5 family) takes adaptive thinking
+            # and `output_config.effort`, and returns a 400 for the older
+            # `{type: "enabled", budget_tokens}` form - so that form is never
+            # built here. Nor are `temperature`/`top_p`/`top_k`: from API
+            # version 2026-10-21 each is a 400 on every model. `tiers.profile_for`
+            # decides the shape; nothing here guesses.
+            if profile.adaptive_thinking:
                 params["thinking"] = {"type": "adaptive"}
             if profile.effort:
                 params["output_config"] = {"effort": profile.effort}
@@ -259,7 +306,7 @@ class AnthropicBackend:
                 if e.status_code in (500, 502, 503, 529):
                     last = TransientError(f"Anthropic returned {e.status_code}: {e.message}")
                     retry_after = self._retry_after(e)
-                elif e.status_code == 400 and "anthropic-workspace-id" in str(e.message).lower():
+                elif workspace_refused(e):
                     # Neither transient nor a prompt problem: the credential is
                     # incomplete. Left as a generic 400 it reads as "the request
                     # was malformed" and sends the operator to look at the
@@ -341,15 +388,22 @@ class AnthropicBackend:
         raw_usage = getattr(message, "usage", None)
         if raw_usage is None:
             raise BackendError("Anthropic response carries no usage; cost cannot be ledgered")
+        # Server-side web searches bill per search (tiers.WEB_SEARCH_USD) on top
+        # of the tokens. The block is absent on a call that used no server tool,
+        # and absent means none - but a call that searched and was ledgered at
+        # zero searches would under-report exactly the spend a monthly cap is for.
+        server_tools = getattr(raw_usage, "server_tool_use", None)
         try:
             usage = Usage(
                 input_tokens=int(raw_usage.input_tokens or 0),
                 output_tokens=int(raw_usage.output_tokens or 0),
-                # Priced at 10% of base input in tiers.cost_usd. Dropping it does
-                # not under-report cost, it OVER-reports it, and an inflated spend
-                # trips the budget rail early - a wrong refusal, not a wrong bill.
+                # Priced at the model's cache-read rate in tiers.cost_usd. Dropping
+                # it does not under-report cost, it OVER-reports it, and an
+                # inflated spend trips the budget rail early - a wrong refusal,
+                # not a wrong bill.
                 cached_input_tokens=int(getattr(raw_usage, "cache_read_input_tokens", 0) or 0),
                 cache_write_tokens=int(getattr(raw_usage, "cache_creation_input_tokens", 0) or 0),
+                web_search_requests=int(getattr(server_tools, "web_search_requests", 0) or 0),
             )
         except (TypeError, ValueError) as e:
             raise BackendError(f"Anthropic usage is not numeric: {raw_usage!r}") from e

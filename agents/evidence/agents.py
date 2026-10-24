@@ -669,6 +669,17 @@ class A4NewsNarrative(Agent):
             if "uncertainty" in numbers:
                 uncertainty.append(numbers["uncertainty"])
             domains.add(domain)
+            # A page the web evidence ingest found (knowledge/evidence/web.py)
+            # is cited at the web tier, not as curated news: nobody chose that
+            # publisher as a source, a search engine did.
+            web = c.chunk_id.startswith("web_search:")
+            caveats = (
+                ["a mention, not a cause: the story names the company"]
+                if numbers.get("relevance", 1.0) < 0.75
+                else []
+            )
+            if web:
+                caveats.append("found by a web search for a move, not collected from a feed")
             out.append(
                 Finding(
                     self.agent_id,
@@ -679,17 +690,13 @@ class A4NewsNarrative(Agent):
                             "kb_news",
                             c.chunk_id,
                             c.text[:60],
-                            TrustTier.CURATED_NEWS,
+                            TrustTier.WEB_SEARCH if web else TrustTier.CURATED_NEWS,
                             c.as_of or self.ctx.now,
                         )
                     ],
                     numbers=numbers,
                     as_of=c.as_of,
-                    caveats=(
-                        ["a mention, not a cause: the story names the company"]
-                        if numbers.get("relevance", 1.0) < 0.75
-                        else []
-                    ),
+                    caveats=caveats,
                 )
             )
         if out and polarity:

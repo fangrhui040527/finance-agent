@@ -133,3 +133,60 @@ def test_ci_proves_the_committed_parts_reassemble_the_committed_corpus():
     # checked-out file, and this compares the committed bytes.
     assert verify < next(i for i, r in enumerate(runs) if "pytest" in r)
     assert any(r.count("ask.py stores graph --out") == 2 for r in runs)
+
+
+def test_web_evidence_runs_after_the_prices_and_marks_before_the_digest_with_the_key_alone():
+    """The trigger is measured from the bars the price step cached, and its rows
+    must be committed with the sweep, so it sits between the two. The key goes
+    to this step, nowhere else; and the step can never cost the run its
+    commit."""
+    steps = _workflow()["jobs"]["sweep"]["steps"]
+    names = [s.get("name", "") for s in steps]
+    ev = names.index("Search the web for unexplained moves")
+    assert names.index("Mark the paper book") < ev < names.index("Write the digest")
+    assert ev < names.index("Commit what was collected")
+    step = steps[ev]
+    assert "ask.py evidence" in step["run"]
+    assert step.get("continue-on-error") is True and step.get("timeout-minutes")
+    assert step["run"].lstrip().startswith("set +e") and step["run"].rstrip().endswith("exit 0")
+    assert "steps.sweep.outputs.code" in step["if"]
+    assert step["env"]["FINPLANET_OFFLINE"] == "1"
+    with_key = [s.get("name") for s in steps if "ANTHROPIC_API_KEY" in (s.get("env") or {})]
+    assert with_key == ["Search the web for unexplained moves"]
+    # The blob reader exports through GITHUB_ENV, which reaches every later
+    # step: it must pass the Anthropic key over, and the evidence step reads
+    # the blob itself and drops it before anything runs.
+    reader = steps[names.index("Keys from ALL_SECRET, when the named secrets are not set")]
+    assert '"$name" = "ANTHROPIC_API_KEY"' in reader["run"]
+    assert reader["run"].index("ANTHROPIC_API_KEY") < reader["run"].index("GITHUB_ENV")
+    assert "keys_from_blob.py ALL_SECRET" in step["run"] and "unset ALL_SECRET" in step["run"]
+    assert step["run"].index("unset ALL_SECRET") < step["run"].index("ask.py evidence")
+    assert "GITHUB_ENV" not in step["run"]
+    # Long enough for the run's deadline and startup: a search is never killed
+    # mid-call with its bill unrecorded (knowledge/evidence/web.py).
+    from knowledge.evidence.web import DEADLINE_SECONDS
+
+    assert step["timeout-minutes"] * 60 >= DEADLINE_SECONDS + 120
+    # And the job's own cap holds every step's bound: cancelled while the
+    # evidence step waits on a paid search, the job never commits its record.
+    from knowledge.sweep import SWEEP_DEADLINE_SECONDS
+
+    job = _workflow()["jobs"]["sweep"]
+    bounded = sum(s.get("timeout-minutes", 0) for s in steps)
+    assert job["timeout-minutes"] >= bounded + SWEEP_DEADLINE_SECONDS / 60 + 4
+
+
+def test_no_workflow_exports_the_paid_key_from_all_secret():
+    """Only the evidence step asks keys_from_blob for ANTHROPIC_API_KEY, and it
+    does not write GITHUB_ENV; every other reader gets everything but it."""
+    askers = []
+    for wf_path in sorted(Path(".github/workflows").glob("*.yml")):
+        path = wf_path.as_posix()  # one spelling on every OS
+        wf = yaml.safe_load(wf_path.read_text(encoding="utf-8"))
+        for job in wf.get("jobs", {}).values():
+            for s in job.get("steps", []):
+                run = str(s.get("run", ""))
+                if "keys_from_blob.py" in run and "--only ANTHROPIC_API_KEY" in run:
+                    askers.append((path, s.get("name")))
+                    assert "GITHUB_ENV" not in run
+    assert askers == [(".github/workflows/collect.yml", "Search the web for unexplained moves")]

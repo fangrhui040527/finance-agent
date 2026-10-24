@@ -171,7 +171,7 @@ def test_every_report_is_written_and_carries_the_sensitivity_banner(tmp_path):
                 cost_myr="0.01",
                 input_tokens=5,
                 output_tokens=2,
-                model_id="claude-opus-5",
+                model_id="claude-opus-5-5",
                 tier="reason",
             )
             emit("denied", "place_order", rail="tool", rule="no_execution", reason="one-way door")

@@ -1,6 +1,6 @@
 # 08 — Cost breakdown
 
-Every figure was checked in August 2026 and every one of them moves. Re-verify before committing to a subscription.
+Every figure was checked in August 2026, and the model rates in section 4 again in October 2026; every one of them moves. Re-verify before committing to a subscription.
 
 **Currency.** Costs are shown in **Malaysian Ringgit (RM)**, because that is what leaves your account. Vendors bill in USD, so the USD figure is kept alongside — that is the number on the invoice, and the RM number is what the card actually charges.
 
@@ -78,31 +78,44 @@ Those are real and worth paying for. But they are worth paying **T0 prices** for
 
 ## 4. LLM and embeddings — the token math
 
-Model rates (first-party API, Aug 2026), converted at RM 4.15/USD:
+Model rates (first-party API, October 2026), converted at RM 4.15/USD. Every Messages tier is on the current 5.5 generation, called on the owner's Anthropic API key:
 
-| Tier | Model | Input RM/MTok | Output RM/MTok | *(USD)* |
-|---|---|---|---|---|
-| `reason` | Claude Opus 5 | RM 20.75 | RM 103.75 | *$5 / $25* |
-| `balanced` | Claude Sonnet 5 | RM 8.30 | RM 41.50 | *$2 / $10* |
-| `cheap` | Claude Haiku 4.5 | RM 4.15 | RM 20.75 | *$1 / $5* |
-| `embed` | third-party embeddings | RM 0.08–0.75 | — | *$0.02–0.18* |
-| `local` | FinBERT + cross-encoder | RM 0 marginal | — | — |
+| Tier | Model | Input RM/MTok | Output RM/MTok | *(USD)* | Cache read *(USD)* |
+|---|---|---|---|---|---|
+| `reason` | Claude Opus 5.5 (`claude-opus-5-5`) | RM 16.60 | RM 83.00 | *$4 / $20* | *$0.20* |
+| `balanced` | Claude Sonnet 5.5 (`claude-sonnet-5-5`) | RM 8.30 | RM 41.50 | *$2 / $10* | *$0.20* |
+| `cheap` | Claude Haiku 5.5 (`claude-haiku-5-5`) | RM 0.42 | RM 2.08 | *$0.10 / $0.50* | *$0.01* |
+| `embed` | third-party embeddings | RM 0.08–0.75 | — | *$0.02–0.18* | — |
+| `local` | FinBERT + cross-encoder | RM 0 marginal | — | — | — |
+
+Two prices are not per token:
+
+- **Haiku 5.5's long-prompt step.** A request whose input (cached or not) exceeds 100K tokens is billed whole at **$0.50 / $2.50** - five times the rate above. Triage calls are a few thousand tokens and never reach it.
+- **Server-side web search: $10 per 1,000 searches** (RM 0.0415 a search), on top of the tokens the results add to the prompt. The API reports searches run in `usage.server_tool_use.web_search_requests`; the ledger prices each at $0.01 (`core/llm/tiers.py WEB_SEARCH_USD`).
+
+The rates live in `core/llm/tiers.py MODEL_RATES`, keyed by model id, and each tier's price is derived from the model it calls - so a model change cannot leave a stale price behind. The previous generation (Opus 5 $5/$25, Sonnet 5 $2/$10, Haiku 4.5 $1/$5) stays in that table only so ledger rows written against it can still be priced.
+
+All three 5.5 models think adaptively and take an effort level; none takes a fixed thinking budget. Thinking is billed as output, so the output columns below assume the default efforts (`reason` high, `balanced` medium, `cheap` low) and run higher if `FINPLANET_EFFORT` raises them.
 
 ### 4.1 T1 workload assumptions
 
 60-instrument watchlist · 12 holdings · ~250 news articles/day surviving the rule + FinBERT filter · 8 deep workups/month · 60 "why did it move" queries/month · 150 ad-hoc queries/month · 30 daily briefs.
 
-### 4.2 Cheap tier — Haiku 4.5
+### 4.2 Cheap tier — Haiku 5.5
 
 | Task | Volume/month | In (MTok) | Out (MTok) | Cost |
 |---|---|---|---|---|
-| Intent routing + classification | 200 calls | 0.20 | 0.02 | RM 1.25 |
-| News triage, tagging, dedup adjudication | 7,500 articles | 9.00 | 1.88 | RM 76.28 |
-| Ingest normalisation tail | — | 2.00 | 0.40 | RM 16.60 |
-| **Subtotal** | | **11.20** | **2.30** | **RM 94** *($22.68)* |
-| *with Batch API on news triage (−50%)* | | | | **≈ RM 56** *($13.50)* |
+| Intent routing + classification | 200 calls | 0.20 | 0.02 | RM 0.12 |
+| News triage, tagging, dedup adjudication | 7,500 articles | 9.00 | 1.88 | RM 7.64 |
+| Ingest normalisation tail | — | 2.00 | 0.40 | RM 1.66 |
+| **Subtotal** | | **11.20** | **2.30** | **RM 9.42** *($2.27)* |
+| *with Batch API on news triage (−50%)* | | | | **≈ RM 5.60** *($1.35)* |
 
-### 4.3 Balanced tier — Sonnet 5
+Haiku 5.5 is a tenth of Haiku 4.5's price, which turns the cheap tier from a line the size of the other two into a rounding error.
+
+### 4.3 Balanced tier — Sonnet 5.5
+
+Sonnet 5.5 is priced as Sonnet 5 was, so these figures stand.
 
 | Task | Volume/month | In (MTok) | Out (MTok) | Cost |
 |---|---|---|---|---|
@@ -114,15 +127,15 @@ Model rates (first-party API, Aug 2026), converted at RM 4.15/USD:
 | **Subtotal before caching** | | **6.58** | **0.75** | **RM 86** *($20.66)* |
 | *with prompt caching on stable prefixes* | | | | **≈ RM 66** *($15.98)* |
 
-### 4.4 Reason tier — Opus 5
+### 4.4 Reason tier — Opus 5.5
 
 | Task | Volume/month | In (MTok) | Out (MTok) | Cost |
 |---|---|---|---|---|
-| Thesis synthesis (A10) | 8 | 0.48 | 0.06 | RM 16.60 |
-| Red team (A11) | 8 | 0.40 | 0.05 | RM 13.28 |
-| Hard attribution cases (A9 escalation) | 15 | 0.60 | 0.06 | RM 18.68 |
-| Monthly reflection + calibration deep pass | 4 | 0.32 | 0.04 | RM 10.79 |
-| **Subtotal** | | **1.80** | **0.21** | **RM 59** *($14.30)* |
+| Thesis synthesis (A10) | 8 | 0.48 | 0.06 | RM 12.95 |
+| Red team (A11) | 8 | 0.40 | 0.05 | RM 10.79 |
+| Hard attribution cases (A9 escalation) | 15 | 0.60 | 0.06 | RM 14.94 |
+| Monthly reflection + calibration deep pass | 4 | 0.32 | 0.04 | RM 8.63 |
+| **Subtotal** | | **1.80** | **0.21** | **RM 47** *($11.40)* |
 
 ### 4.5 Embeddings
 
@@ -140,23 +153,35 @@ Embeddings are close to free and reranking is free if run locally. **Do not pay 
 
 | | Monthly |
 |---|---|
-| Cheap (batched) | RM 56 |
+| Cheap (batched) | RM 5.60 |
 | Balanced (cached) | RM 66 |
-| Reason | RM 59 |
+| Reason | RM 47 |
 | Embeddings ongoing | RM 2 |
-| **Total** | **≈ RM 183** *($44)* |
+| **Total** | **≈ RM 121** *($29)* |
 | One-off backfill | ~RM 353 *($85)* |
+
+The summary in section 1 was drawn up at the August 2026 rates (RM 183 of LLM at T1); at the 5.5 rates the same workload is about RM 121, so read that line as an upper bound.
 
 **The same workload with everything routed to the reasoning tier:**
 
 | | Tiered | All-Opus |
 |---|---|---|
-| Cheap-tier work (11.2M in / 2.3M out) | RM 56 | RM 470 |
-| Balanced-tier work (6.58M in / 0.75M out) | RM 66 | RM 214 |
-| Reason-tier work | RM 59 | RM 59 |
-| **Total** | **RM 183** | **RM 743** |
+| Cheap-tier work (11.2M in / 2.3M out) | RM 5.60 | RM 377 |
+| Balanced-tier work (6.58M in / 0.75M out) | RM 66 | RM 171 |
+| Reason-tier work | RM 47 | RM 47 |
+| **Total** | **RM 119** | **RM 595** |
 
-**4.1× the cost for no additional quality** — classification and tagging do not get better on a reasoning model. This is the single highest-leverage cost control in the system, and it is why tier routing lives at the inference choke point rather than being left to each agent's discretion. **RM 560/month, or RM 6,720/year, is the price of getting it wrong.**
+**5.0× the cost for no additional quality** — classification and tagging do not get better on a reasoning model. This is the single highest-leverage cost control in the system, and it is why tier routing lives at the inference choke point rather than being left to each agent's discretion. **RM 476/month, or RM 5,712/year, is the price of getting it wrong.**
+
+### 4.7 The hard monthly cap: USD 50
+
+The owner's limit on the API key is **USD 50 a calendar month** (`config.toml [budget] monthly_usd`), across everything that spends on it: reasoning on all three tiers and the web evidence ingest, which has a **USD 10** share of it (`evidence_monthly_usd`) - at $10 per 1,000 searches, that share is at most 1,000 searches a month before their tokens.
+
+It is enforced before every call, not reconciled after. `InferenceClient` adds the month-to-date spend (the committed evidence spend in `data/corpus.db` plus the local ledger) to the most the next call can cost - every input token at the model's dearest input rate, the whole output cap used - and **refuses** the call, saying so, when that would pass USD 50. It never downgrades the model or the effort to fit. The 24-hour ringgit rail (`daily_myr`) still applies alongside it.
+
+What it cannot see: a call made on a machine whose ledger is never committed. Set the same USD 50 as the workspace spend limit in the Anthropic Console, which the API enforces itself, as the backstop. `ask.py doctor` reports the month so far and warns from 85%; `ask.py watch` raises `spend_month` at 85% (warn) and 100% (alert).
+
+The T1 workload above is about USD 29 a month at these rates, inside the cap with room for evidence searches. A month of heavy `FINPLANET_EFFORT=max` reasoning is not, and the cap is what stops it.
 
 ---
 

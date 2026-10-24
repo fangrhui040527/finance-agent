@@ -595,7 +595,7 @@ def _narrate(ctx, thesis, challenges) -> int:
     from core.guardrails.policy import Action, PolicyViolation, Rail
     from core.guardrails.publish import publish, sign
     from core.llm.backends import backend_from_env
-    from core.llm.client import InferenceClient
+    from core.llm.client import BudgetExceeded, InferenceClient
     from core.provenance.ledger import ProvenanceLedger
 
     backend, reason = backend_from_env()
@@ -605,8 +605,17 @@ def _narrate(ctx, thesis, challenges) -> int:
         ctx.engine,
         ProvenanceLedger(cfg.provenance_db),
         daily_budget_myr=Decimal(str(cfg.daily_budget_myr)),
+        monthly_budget_usd=cfg.monthly_budget_usd,
+        corpus_path=cfg.corpus_db,
     )
-    done = narrate_thesis(client, thesis, challenges)
+    try:
+        done = narrate_thesis(client, thesis, challenges)
+    except BudgetExceeded as e:
+        # Refused before the call, by the spend rails - not by the model, and
+        # not quietly answered by a cheaper one instead.
+        print(f"\nnarrative refused by the spend cap: {e}")
+        print("  (the analysis above stands; only the prose is missing)")
+        return 0
     if done.refused:
         print(f"\nnarrative refused by the model: {done.refusal_reason}")
         print("  (the analysis above stands; only the prose is missing)")
@@ -1942,6 +1951,31 @@ def cmd_stores(a) -> int:
     return 1 if st.name in (stores.CONFLICT, stores.MISSING) else 0
 
 
+def cmd_evidence(a) -> int:
+    """Web evidence for moves the stored news cannot explain (knowledge/evidence/web.py).
+
+    Exit 0 when the run finished, whatever it found; 2 when it could not run.
+    A search that failed is a recorded row, not an exit code: the collector
+    must still commit what the others found."""
+    from knowledge.evidence import web
+
+    try:
+        report = web.run(
+            load_config(),
+            dry_run=a.dry_run,
+            log=lambda msg: print(msg, file=sys.stderr),
+        )
+    except Exception as e:  # noqa: BLE001 - the step reports, the job goes on
+        from knowledge.redact import scrub
+
+        print(f"evidence could not run: {type(e).__name__}: {scrub(str(e))}", file=sys.stderr)
+        return 2
+    print(report.text())
+    if a.dry_run and report.triggers:
+        print("  (dry run: nothing searched)")
+    return 0
+
+
 def cmd_doctor(a) -> int:
     from core.doctor import FAIL, render, run_checks
 
@@ -1988,9 +2022,7 @@ def cmd_backend(a) -> int:
             if not effort_reaches(backend, landed):
                 how = f"max {shape.max_tokens}, effort dial not sent to this provider"
             else:
-                if shape.thinking_budget is not None:
-                    how = f"thinking budget {shape.thinking_budget}"
-                elif shape.effort:
+                if shape.effort:
                     how = f"effort {shape.effort}"
                 else:
                     how = "no thinking"
@@ -2009,7 +2041,7 @@ def cmd_backend(a) -> int:
         print("  spend at each tier's own rate.")
     if selected_effort() is None:
         print("  effort unset: each tier keeps its own default (reason high, balanced")
-        print("  medium, cheap none). --effort low|medium|high|xhigh|max overrides it.")
+        print("  medium, cheap low). --effort low|medium|high|xhigh|max overrides it.")
     return 0
 
 
@@ -2449,8 +2481,8 @@ def main(argv=None) -> int:
             metavar="LEVEL",
             default=default,
             help="how hard the model thinks: low | medium | high | xhigh | max. "
-            "On Haiku 4.5, which takes no effort parameter, this becomes a "
-            "thinking budget of the matching size.",
+            "Every Messages tier (Opus, Sonnet and Haiku 5.5) takes it as "
+            "output_config.effort; a higher level also raises the output cap.",
         )
 
     _selection(ap, suppress=False)
@@ -2938,6 +2970,14 @@ def main(argv=None) -> int:
     )
     st.add_argument("--out", help="graph: build a full graph into this new file instead")
     st.set_defaults(fn=cmd_stores)
+
+    ev = sub.add_parser("evidence", help="search the web for moves the stored news cannot explain")
+    ev.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="list the moves that qualify and what is already searched; search nothing",
+    )
+    ev.set_defaults(fn=cmd_evidence)
 
     dr = sub.add_parser("doctor", help="preflight: what this installation can actually do")
     dr.add_argument("--offline", action="store_true", help="skip the two network probes")

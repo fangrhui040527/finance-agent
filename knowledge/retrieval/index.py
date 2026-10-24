@@ -44,6 +44,10 @@ from knowledge.retrieval.pipeline import Router
 #: headlines, which the in-process index handles in well under a second.
 NEWS_WINDOW_DAYS = 120
 
+#: The most corpus rows one index is built from: three times the 120-day
+#: window at today's heaviest collection rate (~838 rows on 2026-10-21).
+RETRIEVAL_ROW_CAP = 300_000
+
 #: The licence tier of what the sweep stores: a publisher's own headline and
 #: summary, as carried in its feed. Quotable with attribution; not a scraped
 #: body, which would be `link_only` and never emitted.
@@ -278,7 +282,13 @@ def build_router(
             from knowledge.graph.extractors.gdelt import entity_index
 
             index = entity_index()
-        articles = corpus.articles(since=now - window, limit=50_000)
+        # The cap is a guard against a runaway store, not a working limit. It
+        # was 50,000, and the corpus takes 500-800 rows a day: the 120-day
+        # window would have passed it around 2026-12-03, and `articles` keeps
+        # the newest by PUBLICATION, so the oldest weeks - and a page the web
+        # evidence ingest found today about a story from last month - would
+        # have left retrieval without a word.
+        articles = corpus.articles(since=now - window, limit=RETRIEVAL_ROW_CAP)
         filled["kb_news"] = news_collection(articles, index)
     if "kb_lessons" not in filled and (feedback_dir is not None or paper_dir is not None):
         col = Collection("kb_lessons")

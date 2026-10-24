@@ -365,6 +365,9 @@ class Article:
     #: name; asserting the company would put "Bunny Ranch Brothel Empire Up for
     #: Sale" in Apple's evidence, which is the fetch talking, not the article.
     fetched_for: str = ""
+    #: What a web evidence search asked, for an article it found
+    #: (knowledge/evidence/web.py). No other source is asked a question.
+    query: str = ""
 
     @property
     def text(self) -> str:

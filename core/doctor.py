@@ -187,35 +187,7 @@ def run_checks(offline: bool = False) -> list[CheckResult]:
             "narrative output (numbers are engine-computed either way)",
         )
     )
-    from decimal import Decimal
-
-    from core.llm.backends import pricing_of
-    from core.llm.tiers import MESSAGES_TIERS, cheap_capped, selection_note
-
-    note = selection_note()
-    zero = (Decimal(0), Decimal(0))
-    if all(pricing_of(backend, tier) == zero for tier in MESSAGES_TIERS):
-        # A free provider on every Messages tier: there is no rate to cap, and
-        # warning "bills at each tier's own rate" here would send the operator
-        # to pin a model that already costs nothing (docs/21).
-        out.append(
-            CheckResult(
-                "spend-cap",
-                OK,
-                "every Messages tier priced at zero on the free provider"
-                + (f"; {note}" if note else ""),
-                "spend",
-            )
-        )
-    else:
-        out.append(
-            CheckResult(
-                "spend-cap",
-                OK if cheap_capped() else WARN,
-                note or "no model pin - live calls bill at each tier's own rate",
-                "spend",
-            )
-        )
+    out.append(spend_cap(cfg, backend))
 
     # -- debug retention
     debug = Path(os.environ.get("FINPLANET_DEBUG_DIR", "debug"))
@@ -270,6 +242,100 @@ def run_checks(offline: bool = False) -> list[CheckResult]:
                 out.append(CheckResult(name, WARN, f"unreachable: {e}", impact))
 
     return out
+
+
+def month_to_date_usd(cfg, now=None):
+    """This month's USD spend: the committed evidence spend in `cfg.corpus_db`
+    plus the local provenance ledger at `cfg.provenance_db`.
+
+    The ledger is opened only if it exists - a preflight that created the file
+    it was asked about would report on a ledger of its own making - and read
+    through `spend.month_to_date_usd`, the same function the client's cap uses.
+    """
+    from types import SimpleNamespace
+
+    from core.llm import spend
+
+    path = Path(cfg.provenance_db)
+    con = None
+    ledger = None
+    if str(cfg.provenance_db) != ":memory:" and path.is_file() and path.stat().st_size > 0:
+        con = sqlite3.connect(path, timeout=10)
+        has = con.execute(
+            "SELECT 1 FROM sqlite_master WHERE type='table' AND name='llm_calls'"
+        ).fetchone()
+        if has:
+            ledger = SimpleNamespace(conn=con)
+    try:
+        return spend.month_to_date_usd(ledger, cfg.corpus_db, now=now)
+    finally:
+        if con is not None:
+            con.close()
+
+
+def spend_cap(cfg, backend=None, now=None) -> CheckResult:
+    """The owner's monthly USD cap, and how much of it this month has used.
+
+    WARN when no cap is set - the rolling 24h rail alone lets a month add up to
+    thirty of them - or when month-to-date has reached
+    `spend.MONTHLY_WARN_FRACTION` of it, so the operator hears about the cap
+    before the first refusal rather than from it. The model pin and effort,
+    when set, are still named: they decide how fast the month is spent.
+    """
+    from decimal import Decimal
+
+    from core.llm import spend
+    from core.llm.backends import pricing_of
+    from core.llm.tiers import MESSAGES_TIERS, selection_note
+
+    impact = "spend (the hard monthly limit on the API key)"
+    notes: list[str] = []
+    zero = (Decimal(0), Decimal(0))
+    free = backend is not None and all(pricing_of(backend, tier) == zero for tier in MESSAGES_TIERS)
+    if free:
+        # Nothing on the reasoning path bills, so an absent cap is not a risk
+        # worth a warning there (docs/21); the month is still reported.
+        notes.append("every Messages tier priced at zero on the free provider")
+    note = selection_note()
+    if note:
+        notes.append(note)
+    tail = "".join(f"; {n}" for n in notes)
+
+    month = spend.month_start(now)
+    try:
+        spent = month_to_date_usd(cfg, now=now)
+    except (sqlite3.Error, OSError, ArithmeticError) as e:
+        return CheckResult(
+            "spend-cap", WARN, f"month-to-date spend cannot be read: {e}{tail}", impact
+        )
+
+    cap = cfg.monthly_budget_usd
+    if cap is None:
+        return CheckResult(
+            "spend-cap",
+            OK if free else WARN,
+            f"no monthly cap ([budget] monthly_usd unset) - USD {spent:.2f} spent since "
+            f"{month:%Y-%m-%d} and nothing stops the next call but the 24h rail{tail}",
+            impact,
+        )
+    share = spent / cap
+    evidence = cfg.evidence_budget_usd
+    sub = f", evidence sub-cap USD {evidence:.2f}" if evidence is not None else ""
+    near = share >= spend.MONTHLY_WARN_FRACTION
+    return CheckResult(
+        "spend-cap",
+        WARN if near else OK,
+        f"USD {spent:.2f} of the USD {cap:.2f} monthly cap spent since {month:%Y-%m-%d} "
+        f"({share:.0%}{sub})"
+        + (
+            f" - past {spend.MONTHLY_WARN_FRACTION:.0%}; calls are refused once the next "
+            "one's worst case would cross the cap"
+            if near
+            else ""
+        )
+        + tail,
+        impact,
+    )
 
 
 def render(results: list[CheckResult]) -> str:

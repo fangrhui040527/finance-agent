@@ -147,3 +147,39 @@ def test_the_dotted_token_does_not_disturb_the_other_shapes():
     claimed as one of the five undotted keys."""
     got = blob.recognise(f"{EODHD}\n{FRED}\n{FINNHUB}\n")
     assert got == {"EODHD_API_KEY": EODHD, "FRED_API_KEY": FRED, "FINNHUB_API_KEY": FINNHUB}
+
+
+ANTHROPIC = "sk-ant-api03-" + "SyntheticNotARealKeyForTheTests0000000000"
+
+
+def test_an_anthropic_key_is_found_by_label_and_by_its_prefix():
+    """The web evidence step's key (knowledge/evidence/web.py), by the vendor's
+    name, by the model's, or unlabelled by its `sk-ant-` prefix - and never
+    taken for the OpenRouter embedder's `sk-or-` key."""
+    assert blob.recognise(f"ANTHROPIC_API_KEY={ANTHROPIC}\n")["ANTHROPIC_API_KEY"] == ANTHROPIC
+    assert blob.recognise(f"claude: {ANTHROPIC}\n")["ANTHROPIC_API_KEY"] == ANTHROPIC
+    found = blob.recognise(f"some keys\n{ANTHROPIC}\n{FRED}\n")
+    assert found["ANTHROPIC_API_KEY"] == ANTHROPIC
+    assert "EMBEDDING_API_KEY" not in found
+
+
+def test_a_claude_code_oauth_or_admin_token_is_never_taken_for_the_api_key():
+    """Sent as x-api-key it is refused, every run, and a correctly labelled
+    key on a later line would never be used."""
+    oauth = "sk-ant-oat01-" + "SyntheticOAuthTokenNotAKey000000000000"
+    admin = "sk-ant-admin01-" + "SyntheticAdminKeyNotAKey0000000000000"
+    found = blob.recognise(f"claude code oauth token: {oauth}\nanthropic key: {ANTHROPIC}\n")
+    assert found["ANTHROPIC_API_KEY"] == ANTHROPIC
+    assert "ANTHROPIC_API_KEY" not in blob.recognise(f"{oauth}\n{admin}\n")
+
+
+def test_the_paid_key_is_printed_only_when_asked_for(monkeypatch, capsys):
+    """Every workflow's reader loop exports what this prints to $GITHUB_ENV,
+    where every later step's processes would bill it."""
+    monkeypatch.setenv("ALL_SECRET", f"anthropic: {ANTHROPIC}\nfred: {FRED}\n")
+    assert blob.main(["keys_from_blob.py", "ALL_SECRET"]) == 0
+    out, err = capsys.readouterr()
+    assert out == f"FRED_API_KEY={FRED}\n" and ANTHROPIC not in err
+    assert "not printed (ask with --only): ANTHROPIC_API_KEY" in err
+    assert blob.main(["keys_from_blob.py", "ALL_SECRET", "--only", "ANTHROPIC_API_KEY"]) == 0
+    assert capsys.readouterr().out == f"ANTHROPIC_API_KEY={ANTHROPIC}\n"

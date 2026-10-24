@@ -130,6 +130,40 @@ BEGIN SELECT RAISE(ABORT, 'sweep history is append-only: a failed month must sta
 """
 
 
+EVIDENCE_SCHEMA = """
+-- One row per web evidence attempt (knowledge/evidence/web.py): which move it
+-- was for, what it asked, what it cost and what it kept. Here, in the store
+-- the collector commits, because it is also the month's spend record - a
+-- runner's own ledger dies with the runner - and the record of which moves
+-- were already searched, so a re-run never pays twice for one.
+CREATE TABLE IF NOT EXISTS evidence_searches (
+    key         TEXT NOT NULL,
+    instrument  TEXT NOT NULL,
+    session     TEXT NOT NULL,
+    at          TEXT NOT NULL,
+    model       TEXT NOT NULL DEFAULT '',
+    sar         REAL,
+    r1          REAL,
+    idio        REAL,
+    queries     TEXT NOT NULL DEFAULT '[]',
+    searches    INTEGER NOT NULL DEFAULT 0,
+    input_tokens  INTEGER NOT NULL DEFAULT 0,
+    output_tokens INTEGER NOT NULL DEFAULT 0,
+    cost_usd    TEXT NOT NULL DEFAULT '0',
+    outcome     TEXT NOT NULL,
+    stored      INTEGER NOT NULL DEFAULT 0,
+    detail      TEXT NOT NULL DEFAULT ''
+);
+CREATE INDEX IF NOT EXISTS evidence_searches_key ON evidence_searches(key);
+CREATE TRIGGER IF NOT EXISTS evidence_searches_no_update
+BEFORE UPDATE ON evidence_searches
+BEGIN SELECT RAISE(ABORT, 'a search that was paid for is not editable'); END;
+CREATE TRIGGER IF NOT EXISTS evidence_searches_no_delete
+BEFORE DELETE ON evidence_searches
+BEGIN SELECT RAISE(ABORT, 'the evidence search record is append-only: it is also the spend record'); END;
+"""
+
+
 @dataclass
 class StoreStats:
     """What one source contributed. `stored` is the only number that grew the
@@ -242,6 +276,37 @@ class Corpus:
 
     # -- writes ---------------------------------------------------------------
 
+    def _ensure_query_column(self) -> None:
+        """The `query` column (what a web evidence search asked), added by the
+        first WRITE that needs it rather than on open. Opening is reading: a
+        migration on open rewrote the tracked file in every checkout that
+        merely read it - the nightly worktree among them, whose next
+        `git pull` then refused to overwrite it."""
+        if getattr(self, "_has_query", False):
+            return
+        have = {r[1] for r in self.conn.execute("PRAGMA table_info(articles)")}
+        if "query" not in have:
+            self.conn.execute("ALTER TABLE articles ADD COLUMN query TEXT NOT NULL DEFAULT ''")
+            self.conn.commit()
+        self._has_query = True
+
+    def ensure_evidence_table(self) -> None:
+        """Create `evidence_searches` for the web evidence ingest, which calls
+        this before its first write; readers find no table and read nothing.
+        The `query` column comes with it: the pack reads attempts and rows
+        together, and a run whose searches stored nothing still made the table."""
+        self._ensure_query_column()
+        self.conn.executescript(EVIDENCE_SCHEMA)
+        self.conn.commit()
+
+    def has_table(self, name: str) -> bool:
+        return (
+            self.conn.execute(
+                "SELECT 1 FROM sqlite_master WHERE type='table' AND name=?", (name,)
+            ).fetchone()
+            is not None
+        )
+
     def add(self, art: Article, source: str, seen_at: datetime | None = None) -> bool:
         """Store one article. False means the corpus already held it.
 
@@ -250,6 +315,7 @@ class Corpus:
         index decides, once, inside the database.
         """
         seen = _iso(seen_at or datetime.now(UTC))
+        self._ensure_query_column()
         features = art.features
         headline = art.title_key or ""
         # A second key alongside the unique dup_hash: the same headline on the
@@ -261,8 +327,8 @@ class Corpus:
             """INSERT OR IGNORE INTO articles
                (doc_id, source, title, body, source_domain, published_at, first_seen_at,
                 language, countries_json, instruments_json, themes_json, dup_hash,
-                relevance, escalated, quality, fetched_for, title_key)
-               SELECT ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?
+                relevance, escalated, quality, fetched_for, title_key, query)
+               SELECT ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?
                WHERE ? = '' OR NOT EXISTS (SELECT 1 FROM articles WHERE title_key = ?)""",
             (
                 art.doc_id,
@@ -282,6 +348,7 @@ class Corpus:
                 art.quality,
                 art.fetched_for or "",
                 headline,
+                art.query or "",
                 headline,
                 headline,
             ),
@@ -620,6 +687,7 @@ class Corpus:
             fetched_for=row["fetched_for"] if "fetched_for" in keys else "",
             title_key=row["title_key"] if "title_key" in keys else "",
             escalated=bool(row["escalated"]) if "escalated" in keys else False,
+            query=row["query"] if "query" in keys else "",
         )
 
     # -- lifecycle ------------------------------------------------------------

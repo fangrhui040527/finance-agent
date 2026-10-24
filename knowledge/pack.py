@@ -27,6 +27,7 @@ from __future__ import annotations
 from bisect import bisect_right
 from dataclasses import dataclass, field
 from datetime import UTC, date, datetime, timedelta
+from decimal import Decimal
 from pathlib import Path
 
 from core.market.feed import PriceFeedError, market_proxy_for, session_closes
@@ -83,6 +84,10 @@ class Move:
     sessions: int = 0
     beta: float | None = None
     verdict: str = ""
+    #: The standardised abnormal return - the "sigma" the reason text prints -
+    #: as a number, so code can act on it (knowledge/evidence/web.py) rather
+    #: than parse a sentence. None when there is no estimate.
+    sar: float | None = None
     unexplained: float | None = None
     reason: str = ""
     estimation: str = ""
@@ -339,6 +344,8 @@ def measure(feed, instrument_id: str, label: str, day: date, base_currency: str 
         sessions=move.span,
     )
     move.verdict = exp.verdict.value
+    if exp.significance is not None:
+        move.sar = exp.significance.standardised_ar
     move.unexplained = exp.unexplained_share if fit is not None else None
     move.reason = exp.reason
     if exp.verdict is Verdict.NO_IDENTIFIED_CATALYST:
@@ -630,6 +637,7 @@ def build_pack(
     ]
     out.append(digest.to_markdown(refs=refs))
     out.append("")
+    out += _web_evidence(cfg, corpus_path or cfg.corpus_db, book_ids, names, now)
 
     out += ["## Facts, per name (last 7 days of events; latest figures)", ""]
     with FactBook(facts_path or getattr(cfg, "facts_db", "data/facts.db")) as book:
@@ -657,6 +665,69 @@ def build_pack(
         out += [f"- knowledge/feedback/{p}" for p in prev] or ["- none yet"]
         out.append("")
     return "\n".join(out)
+
+
+#: How far back the pack lists web evidence attempts: the ingest searches a
+#: session up to three sessions after it, so a weekend plus a holiday fits.
+WEB_EVIDENCE_DAYS = 5
+
+
+def _web_evidence(cfg, corpus_path, book_ids, names, now: datetime) -> list[str]:
+    """What the web evidence ingest searched for each name, and what it kept.
+
+    Listed by the MOVE searched for, not by publication time: the digest above
+    windows on when a story was published, and the page that explains a
+    Thursday move may be dated Wednesday or Friday. Each kept row carries its
+    own date and its doc_id; the model's summary is a pointer, not evidence."""
+    from knowledge.evidence.web import for_pack
+    from knowledge.graph.ids import instrument_id as canonical
+
+    since = now - timedelta(days=WEB_EVIDENCE_DAYS)
+    lines = [
+        "## Web evidence (searched for the moves above that the stored news did not explain)",
+        "",
+    ]
+    found = False
+    with Corpus(corpus_path) as corpus:
+        for iid in book_ids:
+            attempts, rows = for_pack(corpus, iid, since)
+            if not attempts and not rows:
+                continue
+            found = True
+            label = names.get(canonical(iid) or iid) or iid
+            lines.append(f"**{label}** ({iid})")
+            refs = corpus.short_ids(r["doc_id"] for r in rows)
+            # Each row under the search that found it: a row is first seen at
+            # the instant its attempt was recorded (both are the retrieval).
+            shown: set[str] = set()
+            for a in attempts:
+                lines.append(
+                    f"- searched {a['at'][:16]}Z for the {a['session']} move "
+                    f"({a['sar']:+.2f} sigma): {a['outcome']}, {a['stored']} stored, "
+                    f"USD {Decimal(a['cost_usd']):.4f}. {a['detail']}"
+                )
+                for r in rows:
+                    if r["first_seen_at"] == a["at"]:
+                        lines.append(_web_row(r, refs, "  "))
+                        shown.add(r["doc_id"])
+            lines += [_web_row(r, refs) for r in rows if r["doc_id"] not in shown]
+            lines.append("")
+    if not found:
+        lines += [f"None in the last {WEB_EVIDENCE_DAYS} days.", ""]
+    return lines
+
+
+def _web_row(r: dict, refs: dict, indent: str = "") -> str:
+    """One stored web evidence row. A page dated by its day alone prints that
+    day, rather than the end-of-day stamp it is stored at as if a time."""
+    from knowledge.evidence.web import stated_day
+
+    day = stated_day(r.get("body"))
+    when = f"{day} (date only)" if day else f"{r['published_at'][:16]}Z"
+    return (
+        f"{indent}- {when} {r['title']} ({r['source_domain']}) "
+        f"`{refs.get(r['doc_id'], r['doc_id'])}`"
+    )
 
 
 #: How many of a name's ex-dates the facts block lists, newest first.

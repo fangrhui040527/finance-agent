@@ -219,6 +219,26 @@ BEGIN SELECT RAISE(ABORT, 'a record you can prune proves nothing: {t} is append-
 """
 
 
+#: When a calendar listed an earnings date it had already listed. `events`
+#: keeps one row per date, first seen in announced_at (append-only, INSERT OR
+#: IGNORE), so a date that moved away and came back would otherwise look
+#: superseded by the detour. Read by the web evidence ingest to know which date
+#: is current (knowledge/evidence/web.py `_current_dates`). Created by the first
+#: write that needs it, never on open: opening is reading, and a migration on
+#: open rewrites the committed file in every checkout that only reads it.
+SIGHTINGS = """
+CREATE TABLE IF NOT EXISTS event_sightings (
+    source    TEXT NOT NULL,
+    event_id  TEXT NOT NULL,
+    seen_at   TEXT NOT NULL,
+    PRIMARY KEY (source, event_id, seen_at)
+);
+""" + _GUARDS.format(t="event_sightings")
+
+#: The event kinds whose re-listings are recorded.
+SIGHTED_KINDS = ("earnings_result",)
+
+
 def _iso(dt: datetime) -> str:
     return (dt if dt.tzinfo else dt.replace(tzinfo=UTC)).astimezone(UTC).isoformat()
 
@@ -390,6 +410,7 @@ class FactBook:
     def add_events(self, rows, fetched_at: datetime | None = None) -> StoreStats:
         stats = StoreStats()
         at = _iso(fetched_at or datetime.now(UTC))
+        sighted = False
         for e in rows:
             cur = self.conn.execute(
                 """INSERT OR IGNORE INTO events
@@ -410,8 +431,35 @@ class FactBook:
             )
             stats.stored += cur.rowcount == 1
             stats.duplicates += cur.rowcount != 1
+            if cur.rowcount != 1 and e.kind in SIGHTED_KINDS:
+                if not sighted:
+                    self.conn.executescript(SIGHTINGS)
+                    sighted = True
+                self.conn.execute(
+                    "INSERT OR IGNORE INTO event_sightings (source, event_id, seen_at) "
+                    "VALUES (?,?,?)",
+                    (e.source, e.event_id, at),
+                )
         self.conn.commit()
         return stats
+
+    def last_seen(self, keys) -> dict[tuple[str, str], datetime]:
+        """(source, event_id) -> the last time a calendar listed it AGAIN, for
+        the keys that have one. Empty before the first re-listing was stored."""
+        have = self.conn.execute(
+            "SELECT 1 FROM sqlite_master WHERE type='table' AND name='event_sightings'"
+        ).fetchone()
+        out: dict[tuple[str, str], datetime] = {}
+        if not have:
+            return out
+        for source, event_id in dict.fromkeys(keys):
+            row = self.conn.execute(
+                "SELECT max(seen_at) FROM event_sightings WHERE source = ? AND event_id = ?",
+                (source, event_id),
+            ).fetchone()
+            if row and row[0]:
+                out[(source, event_id)] = _dt(row[0])
+        return out
 
     def add_series(self, rows, fetched_at: datetime | None = None) -> StoreStats:
         stats = StoreStats()
