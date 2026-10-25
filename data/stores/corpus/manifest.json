@@ -8,19 +8,19 @@
   {
    "bytes": 16777216,
    "name": "part-000",
-   "sha256": "4dbdb5a551da52e8b93c661bd25004af3d5641c51b89e77ad193b8a756e84480"
+   "sha256": "09f82366b8bb861bb74e0f1cf1f072e57d2e8f90166395ef658d3d97388272d6"
   },
   {
    "bytes": 1994752,
    "name": "part-001",
-   "sha256": "fd8bdee0a3b209768ae685f65b0f815043da65a468046af7a909c652aa0fdc65"
+   "sha256": "92e8f1f49c61b70583fc071ea565451794bda023981dc1262d4c26f2a2cfafd3"
   }
  ],
  "rows": {
   "articles": 24270,
-  "sweeps": 1099
+  "sweeps": 1105
  },
- "sha256": "b9ae6ac66906a31c6e17e3b5506c8ef916d4ff1068dbe4b5f8c21e468df0b496",
+ "sha256": "35e1c117f643ca67c2230660dd7ddc514ec4f4a09633fb3b34573515c56bffff",
  "tips": {
   "articles": {
    "columns": {
@@ -46,21 +46,21 @@
   },
   "sweeps": {
    "columns": {
-    "at": "0328c938e0463a9b",
-    "detail": "ebbccfc5a2fd93f4",
+    "at": "75add77782b5615f",
+    "detail": "4574280147e01410",
     "duplicates": "5feceb66ffc86f38",
     "escalated": "5feceb66ffc86f38",
-    "fetched": "5feceb66ffc86f38",
+    "fetched": "9430301e26927415",
     "kept": "5feceb66ffc86f38",
-    "run_id": "1c65735272cecedc",
-    "since": "46db37111a7acb64",
-    "slot": "d723b4470d3dd091",
-    "source": "498e32fbfe5cd256",
+    "run_id": "c90c391a2ad04b37",
+    "since": "bdf8e933609b8bff",
+    "slot": "abc95b719e8599d6",
+    "source": "3f05b03abfa4f4bd",
     "status": "c48b5b1a9776c846",
     "stored": "5feceb66ffc86f38",
     "unlinked": "5feceb66ffc86f38"
    },
-   "rowid": 1099
+   "rowid": 1105
   }
  },
  "triggers": [
