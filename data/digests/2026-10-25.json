@@ -1,6 +1,87 @@
 {
   "collection": [
     {
+      "at": "2026-10-25T13:45:05.877391+00:00",
+      "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-25T13:45:05.875687+00:00",
+      "detail": "facts 0; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-25T13:45:01.853930+00:00",
+      "detail": "facts 0; window not covered back to 2026-10-24 22:41Z; the oldest item read is 2026-10-25 11:26Z, so 12.7h of the window was never served",
+      "fetched": 16,
+      "kept": 16,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 15
+    },
+    {
+      "at": "2026-10-25T13:45:00.643009+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-25T13:44:58.985506+00:00",
+      "detail": "page 2 starts 3.5h before page 1 ends (2026-10-25 04:44Z under 2026-10-25 08:16Z): the items between were served by neither",
+      "fetched": 150,
+      "kept": 148,
+      "source": "nst_business",
+      "status": "degraded",
+      "stored": 140
+    },
+    {
+      "at": "2026-10-25T13:44:55.410812+00:00",
+      "detail": "",
+      "fetched": 45,
+      "kept": 45,
+      "source": "fmt_business",
+      "status": "ok",
+      "stored": 45
+    },
+    {
+      "at": "2026-10-25T13:44:54.973123+00:00",
+      "detail": "read but empty: IHH, Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-25T13:44:53.889915+00:00",
+      "detail": "read but empty: Petronas Chemicals; named the company: 4 of 38 (lowest: IHH 0/1, Press Metal 0/1, Maybank 1/31)",
+      "fetched": 38,
+      "kept": 38,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 38
+    },
+    {
+      "at": "2026-10-25T13:44:51.951256+00:00",
+      "detail": "no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked); deferred: Tenaga, Petronas Chemicals, IHH",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "failed",
+      "stored": 0
+    },
+    {
       "at": "2026-10-25T05:49:24.646407+00:00",
       "detail": "facts 25; ",
       "fetched": 4387,
@@ -56,18 +137,18 @@
     }
   ],
   "counts": {
-    "articles": 24270,
+    "articles": 24508,
     "documents": 0,
     "escalated": 3316,
     "events": 4254,
-    "failed_sweeps": 91,
-    "linked": 13851,
+    "failed_sweeps": 92,
+    "linked": 13857,
     "observations": 6254,
     "series": 31,
-    "sweeps": 1105
+    "sweeps": 1114
   },
   "day": "2026-10-25",
-  "generated_at": "2026-10-25 05:49 UTC",
+  "generated_at": "2026-10-25 13:49 UTC",
   "macro": [
     {
       "change": "0.13",
@@ -205,8 +286,26 @@
       "instrument_id": "MYX:1155",
       "label": "Maybank",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMieEFVX3lxTE9tRk1sRUx2bmhuOThMTTZCT2I3V0s5QnQxenAwWmlUcl9OdjNXQ2FRZzRyNHFTSTBNUDR6NDVmcW9WZjE1WDNseEprTFdWaWZfQUVrSXlJbDRLV0Z2UXpTLUt2c2VEaG9lOVAtV2tLRWxrZ09oQjdNTQ?oc=5",
+          "domain": "www.tradingview.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-24T22:52:47+00:00",
+          "quality": 0.65,
+          "title": "Malayan Banking Bhd. Estimates \u2013 MYX:MAYBANK",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -215,8 +314,37 @@
       "instrument_id": "MYX:5347",
       "label": "Tenaga",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMivAFBVV95cUxPZDFlUktOMVdsM0JhaGl4VUlrSGRrbDhOeXFRLUdXZWw1bUplUnAxZWZvUTVYWVNxX0hfVjlxaFVFZEYyd1pPS2YyTnVkLVRTbVA4UXZJUmRGMnY3WUkwZDlrVUVLQVdYV1czYS1wTENadTd4dUVKZ2tCekI1SHV5bWRNaXlMZEl5SE1FUXdJd3hZb3d0TUlENTFxY2haT1k5V2tlTDgyYjAwalExY2VfaVJyYnY0b1k1TmU0bg?oc=5",
+          "domain": "www.ad-hoc-news.de",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-25T01:49:03+00:00",
+          "quality": 0.65,
+          "title": "UOB keeps Tenaga Nasional stock at hold with MYR 14.60 target - ad-hoc-news.de",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMikwFBVV95cUxPeU45T3dhbVcxbldxbFJTN1N3XzMwcG9JZnBGdnp4RjZ1b3V2QXNaSG9QZHV0MmlrTTVEcHR2ZjVlRnM3VVpHOVA5eXMxeGVUOG1QWXhVc2NJOXVIMUtUcWRzMW9NazB0R3dteG5YX05KMmIzN0xRWG5Ja01oMWJ2bERjSkV5QVp0a0V2a3QtY1drR0U?oc=5",
+          "domain": "www.tradingview.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-24T18:09:54+00:00",
+          "quality": 0.65,
+          "title": "Issuance/retirement of stock (net) of Nha Be Steel JSC \u2013 UPCOM:TNB",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 2,
+        "polarity_mean": 0.0,
+        "sources": 2,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -255,8 +383,26 @@
       "instrument_id": "MYX:3182",
       "label": "Genting",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMizgFBVV95cUxPRnRXSlg0WXI2OTVJQlFLQ1FmMWNMdlJZdWozdXBmMmQzX19vam9qMHcwRW1rUGJBdmhZVVRIQWpLUVpHSVJLbWdmQzBDdjJqUnZwdGVBZHgtZDhrYW5wZzZWeHhRNW16SnMxQ0xSMUtuUVRwLWJrOFhRd1JqdUhBdTdESWZyQjlFcmZuU2pNYlk2WFhLelVFUGk2RWZxVWpqNkNqUkNvanB4Q19sOEhHb0VzaDMtUU9qcHVtQ1BCcVdkNkg1VE1Uck5xZFk0Zw?oc=5",
+          "domain": "www.ad-hoc-news.de",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-25T00:42:00+00:00",
+          "quality": 0.65,
+          "title": "Genting earmarks MYR 280 million for costs: what it means for Genting stock - ad-hoc-news.de",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {

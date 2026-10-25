@@ -1,14 +1,17 @@
 # Digest 2026-10-25
 
-Generated 2026-10-25 05:49 UTC · slot `all` · 24270 articles in the corpus, 6254 observations, 4254 events in the fact book.
+Generated 2026-10-25 13:49 UTC · slot `all` · 24508 articles in the corpus, 6254 observations, 4254 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-10-24 www.tradingview.com — Malayan Banking Bhd. Estimates – MYX:MAYBANK [q 0.65, tone +0.0]
 
 ### Tenaga (MYX:5347)
-- quiet: nothing collected for this name in the window
+- tone: 2 stories from 2 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-10-25 www.ad-hoc-news.de — UOB keeps Tenaga Nasional stock at hold with MYR 14.60 target - ad-hoc-news.de [q 0.65, tone +0.0]
+- 2026-10-24 www.tradingview.com — Issuance/retirement of stock (net) of Nha Be Steel JSC – UPCOM:TNB [q 0.65, tone +0.0]
 
 ### Petronas Chemicals (MYX:5183)
 - quiet: nothing collected for this name in the window
@@ -20,7 +23,8 @@ Generated 2026-10-25 05:49 UTC · slot `all` · 24270 articles in the corpus, 62
 - quiet: nothing collected for this name in the window
 
 ### Genting (MYX:3182)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-10-25 www.ad-hoc-news.de — Genting earmarks MYR 280 million for costs: what it means for Genting stock - ad-hoc-news.de [q 0.65, tone +0.0]
 
 ### NVIDIA (XNAS:NVDA)
 - tone: 15 stories from 7 sources, polarity +0.07, peak intensity 0.00, uncertainty 0.09 · 4 escalated
@@ -89,6 +93,15 @@ Generated 2026-10-25 05:49 UTC · slot `all` · 24270 articles in the corpus, 62
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 13:45 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
+| 13:45 | twse_openapi | ok | 8 | 0 | 0 | facts 0;  |
+| 13:45 | jin10_flash | degraded | 16 | 16 | 15 | facts 0; window not covered back to 2026-10-24 22:41Z; the oldest item read is 2 |
+| 13:45 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 13:44 | nst_business | degraded | 150 | 148 | 140 | page 2 starts 3.5h before page 1 ends (2026-10-25 04:44Z under 2026-10-25 08:16Z |
+| 13:44 | fmt_business | ok | 45 | 45 | 45 |  |
+| 13:44 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: IHH, Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals |
+| 13:44 | google_news | ok | 38 | 38 | 38 | read but empty: Petronas Chemicals; named the company: 4 of 38 (lowest: IHH 0/1, |
+| 13:44 | gdelt | failed | 0 | 0 | 0 | no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP |
 | 05:49 | sec_xbrl | ok | 4387 | 0 | 0 | facts 25;  |
 | 05:49 | finmind | ok | 69 | 0 | 0 | facts 4;  |
 | 05:49 | twse_openapi | ok | 8 | 0 | 0 | facts 0;  |
