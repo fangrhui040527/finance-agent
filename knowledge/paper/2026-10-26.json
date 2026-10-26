@@ -1,0 +1,329 @@
+{
+  "day": "2026-10-26",
+  "written_at": "2026-10-26T22:53:00Z",
+  "phase": "full",
+  "week": 7,
+  "equity_usd": 1000.0,
+  "cash_usd": 1000.0,
+  "control_equity_usd": 944.94,
+  "control_return_to_date": -0.0551,
+  "drawdown": 0.0,
+  "control_drawdown": 0.0551,
+  "halted": false,
+  "marks": 37,
+  "positions": [],
+  "changes": [],
+  "control_changes": [],
+  "control_mark": {
+    "marked_on": "2026-10-26",
+    "equity_usd": 944.94,
+    "cash_usd": 406.02,
+    "positions_usd": 538.92,
+    "day_return": -0.0003,
+    "note": "no change; holdings as left by the 10-21 week-7 rebalance"
+  },
+  "index_book": {
+    "mark": {
+      "marked_on": "2026-10-26",
+      "equity_usd": 983821.3,
+      "cash_usd": 198608.4,
+      "positions_usd": 785212.9,
+      "day_return": 0.0031,
+      "drawdown": 0.0162,
+      "held": 97,
+      "pending": 0
+    },
+    "cost_to_date_share_of_notional": 0.0097,
+    "since_2026_09_30": {
+      "index": -0.0162,
+      "decided": 0.0,
+      "control": -0.0358
+    },
+    "dividends": [],
+    "changes": {},
+    "note": "no change"
+  },
+  "caps": [
+    {
+      "cap": "largest name",
+      "value": "0.00%",
+      "limit": "25%",
+      "breached": false
+    },
+    {
+      "cap": "invested",
+      "value": "0.00%",
+      "limit": "80%",
+      "breached": false
+    },
+    {
+      "cap": "cash floor",
+      "value": "100.00%",
+      "limit": "20%",
+      "breached": false
+    },
+    {
+      "cap": "names held",
+      "value": "0",
+      "limit": "0",
+      "breached": false
+    },
+    {
+      "cap": "drawdown from peak",
+      "value": "0.00%",
+      "limit": "8% halts entries",
+      "breached": false
+    },
+    {
+      "cap": "turnover, 5 weekdays",
+      "value": "USD 0.00",
+      "limit": "USD 500.00",
+      "breached": false
+    }
+  ],
+  "prices": {
+    "bursa": "Monday 2026-10-26 closes (Bursa catch-up, 0e9da87)",
+    "us": "Monday 2026-10-26 closes (tonight's us_close, a1e1ecc)",
+    "fx": "MYR 4.086 per USD (bnm, 2026-10-26)"
+  },
+  "fundable": [
+    {
+      "instrument_id": "MYX:1155",
+      "lot_usd": 244.25,
+      "share": 0.244,
+      "round_trip": 0.0098,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:5183",
+      "lot_usd": 111.85,
+      "share": 0.112,
+      "round_trip": 0.0199,
+      "lots": 2
+    },
+    {
+      "instrument_id": "MYX:5225",
+      "lot_usd": 191.87,
+      "share": 0.192,
+      "round_trip": 0.0121,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:8869",
+      "lot_usd": 165.2,
+      "share": 0.165,
+      "round_trip": 0.0139,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:3182",
+      "lot_usd": 35.0,
+      "share": 0.035,
+      "round_trip": 0.0606,
+      "lots": 7
+    },
+    {
+      "instrument_id": "XNAS:NVDA",
+      "lot_usd": 216.0,
+      "share": 0.216,
+      "round_trip": 0.0119,
+      "lots": 1
+    }
+  ],
+  "over_cap": {
+    "MYX:5347": 0.325,
+    "XNAS:AAPL": 0.344,
+    "XNAS:MSFT": 0.533
+  },
+  "ledger": {
+    "mark_days": 26,
+    "gap": "no routine ran 2026-10-02..10-06; no paper page and no decision for those days; no decision is backdated"
+  },
+  "attribution": null,
+  "decision": {
+    "recorded": true,
+    "weights": {},
+    "thesis": "All cash, the forty-first all-cash row and the seventh decision of week 7 under full caps. Monday 10-26 is the first session since Friday and is not yet decomposed: Genting +4.38% (1.37 to 1.43), Petronas Chemicals -1.72%, Press Metal +0.30% to 6.75 on a Bursa proxy at -0.45%; Apple -1.10% after the weekend's order-cut title, NVIDIA +2.39% and Microsoft +1.54% on SPY +0.71%. The 2026-10-25 feedback page is a no-session Sunday: titles only, a UOB hold on Tenaga, most Apple results-date titles pointing to 11-02 since 10-07, Microsoft previews placing results on 10-28. Press Metal's 2.19-sigma fall on 10-23 is still unexplained and Genting's rights terms are still not in the store. No name carries a measured, sourced reason to expect it to beat cash over 21 sessions. Sixteen all-cash claims are graded, all correct, against a control at -5.51%. Claim: nothing in the fundable universe beats cash over 21 sessions.",
+    "horizon": 21,
+    "confidence": 0.55,
+    "prediction_id": "paper-2026-10-26-allcash-21d-67b8",
+    "grades_on": "2026-11-25",
+    "refusals": []
+  },
+  "stores": {
+    "decided_targets": 41,
+    "predictions": 41,
+    "outcomes": 16,
+    "index_targets": 291,
+    "control_targets": 11,
+    "index_pending": 0,
+    "made_at": "2026-10-26T22:51:10Z"
+  },
+  "evidence": {
+    "feedback_pages": "knowledge/feedback/2026-10-24.md (62122d5), knowledge/feedback/2026-10-25.md (49df15e)",
+    "weekend": "no sessions; titles only: Jefferies-attributed Apple order cuts, most Apple results-date titles pointing to 11-02 since 10-07, Microsoft previews placing results on 10-28, a UOB hold on Tenaga, UPCOM:TNB mis-links",
+    "monday": "undecomposed: Genting +4.38%, Petronas Chemicals -1.72%, Press Metal +0.30% on ^KLSE -0.45%; Apple -1.10%, NVIDIA +2.39%, Microsoft +1.54% on SPY +0.71%",
+    "friday": "Press Metal -3.03% at 2.19 sigma (parametric only), unexplained",
+    "phase": "week 7, full caps"
+  },
+  "mistakes": [
+    "paper-2026-10-16-allcash-21d-2b02 filed Press Metal's -9.34% as not decomposed; decomposed it is 5.43 sigma and significant at 5%; its cause is still not in the store; 6.75 tonight against 7.17.",
+    "paper-2026-10-01-allcash-21d-5a1e is behind on IHH (+1.82%, 7.70 -> 7.84) and Petronas Chemicals (+10.65%, 4.13 -> 4.57) since the 10-01 closes; it grades on 10-31.",
+    "paper-2026-10-08-allcash-21d-7bb6's test (Genting above 1.93 before 11-07) stands at 1.43."
+  ],
+  "mistakes_checked": [
+    "paper-2026-10-25-allcash-21d-46fb: Monday as the first session to read the weekend's rows; it was, and the thesis claimed nothing about Monday's moves (holds)",
+    "paper-2026-10-25-allcash-21d-46fb grade date 2026-11-24"
+  ],
+  "grades_due": [
+    {
+      "prediction_id": "paper-2026-09-27-allcash-21d-9d18",
+      "on": "2026-10-27"
+    },
+    {
+      "prediction_id": "paper-2026-09-28-allcash-21d-111e",
+      "on": "2026-10-28"
+    },
+    {
+      "prediction_id": "paper-2026-09-29-allcash-21d-7831",
+      "on": "2026-10-29"
+    },
+    {
+      "prediction_id": "paper-2026-09-30-allcash-21d-ee21",
+      "on": "2026-10-30"
+    },
+    {
+      "prediction_id": "paper-2026-10-01-allcash-21d-5a1e",
+      "on": "2026-10-31"
+    }
+  ],
+  "lessons": [
+    "A large move on the first session after a weekend of titles is measured before it is read: Genting's +4.38% and Apple's -1.10% followed weekend titles about each name, and neither is decomposed tonight."
+  ],
+  "dividend_boundary": {
+    "decided": "2026-10-10T15:25:31Z",
+    "control": "2026-10-10T15:25:31Z",
+    "index": "2026-10-10T15:25:31Z",
+    "note": "marks before it are not restated; no credit to the decided or control book yet"
+  },
+  "graded": [
+    {
+      "prediction_id": "paper-2026-09-11-allcash-21d-8bf9",
+      "benchmark": -0.024,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-12-allcash-21d-1661",
+      "benchmark": -0.024,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-13-allcash-21d-5baf",
+      "benchmark": -0.0237,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-14-allcash-21d-9d7e",
+      "benchmark": -0.0441,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-15-allcash-21d-af55",
+      "benchmark": -0.0466,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-16-allcash-21d-3865",
+      "benchmark": -0.0616,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-17-allcash-21d-7667",
+      "benchmark": -0.0616,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-18-allcash-21d-667a",
+      "benchmark": -0.0616,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-19-allcash-21d-b7bd",
+      "benchmark": -0.0557,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-20-allcash-21d-dbaf",
+      "benchmark": -0.0557,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-21-allcash-21d-c04f",
+      "benchmark": -0.0533,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-22-allcash-21d-33c5",
+      "benchmark": -0.0533,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-23-allcash-21d-b999",
+      "benchmark": -0.0469,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-24-allcash-21d-e5b2",
+      "benchmark": -0.0446,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-25-allcash-21d-468d",
+      "benchmark": -0.0433,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-26-allcash-21d-cf74",
+      "benchmark": -0.0435,
+      "correct": true
+    }
+  ],
+  "closes": {
+    "MYX:1155": [
+      10.06,
+      9.98
+    ],
+    "MYX:5347": [
+      13.3,
+      13.28
+    ],
+    "MYX:5183": [
+      4.65,
+      4.57
+    ],
+    "MYX:5225": [
+      7.9,
+      7.84
+    ],
+    "MYX:8869": [
+      6.73,
+      6.75
+    ],
+    "MYX:3182": [
+      1.37,
+      1.43
+    ],
+    "XNAS:NVDA": [
+      210.96,
+      216.0
+    ],
+    "XNAS:AAPL": [
+      347.73,
+      343.91
+    ],
+    "XNAS:MSFT": [
+      524.51,
+      532.6
+    ]
+  }
+}
