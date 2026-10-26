@@ -13,7 +13,7 @@ dependencies = [
   "pyyaml>=6.0",
   # The model seam. Engines and tests never import it; EchoBackend keeps
   # everything offline. Lazy-imported inside AnthropicBackend only.
-  "anthropic>=1.0,<2",
+  "anthropic>=1.0,<3",
   # The web surface (web/). Loopback only; nothing else imports these.
   "fastapi>=0.115",
   "uvicorn>=0.30",
