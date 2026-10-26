@@ -1,0 +1,1259 @@
+{
+  "collection": [
+    {
+      "at": "2026-10-26T10:11:21.383856+00:00",
+      "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-26T10:11:21.382312+00:00",
+      "detail": "facts 0; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-26T10:11:16.830934+00:00",
+      "detail": "facts 0; window not covered back to 2026-10-25 22:41Z; the oldest item read is 2026-10-26 09:52Z, so 11.2h of the window was never served",
+      "fetched": 16,
+      "kept": 16,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 15
+    },
+    {
+      "at": "2026-10-26T10:11:15.785638+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-26T10:11:13.711991+00:00",
+      "detail": "window overflow: all 150 dated items are newer than the window's start (2026-10-25 13:44Z); the oldest is 2026-10-25 16:15Z, so 2.5h scrolled off unseen; read 3 pages, the most this feed may; page 2 starts 3.1h before page 1 ends (2026-10-26 04:07Z under 2026-10-26 07:12Z): the items between were served by neither",
+      "fetched": 150,
+      "kept": 148,
+      "source": "nst_business",
+      "status": "degraded",
+      "stored": 140
+    },
+    {
+      "at": "2026-10-26T10:11:10.097303+00:00",
+      "detail": "",
+      "fetched": 46,
+      "kept": 46,
+      "source": "fmt_business",
+      "status": "ok",
+      "stored": 46
+    },
+    {
+      "at": "2026-10-26T10:11:09.552202+00:00",
+      "detail": "read but empty: Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals, IHH",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-26T10:11:08.692372+00:00",
+      "detail": "named the company: 20 of 65 (lowest: Petronas Chemicals 0/3, Genting 1/7, Maybank 6/25)",
+      "fetched": 65,
+      "kept": 65,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 55
+    },
+    {
+      "at": "2026-10-26T10:11:05.861263+00:00",
+      "detail": "no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked); deferred: Petronas Chemicals, IHH, Press Metal",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "failed",
+      "stored": 0
+    }
+  ],
+  "counts": {
+    "articles": 25112,
+    "documents": 0,
+    "escalated": 3337,
+    "events": 4254,
+    "failed_sweeps": 94,
+    "linked": 14020,
+    "observations": 6293,
+    "series": 31,
+    "sweeps": 1131
+  },
+  "day": "2026-10-26",
+  "generated_at": "2026-10-26 10:12 UTC",
+  "macro": [
+    {
+      "change": "0.13",
+      "obs_date": "2026-10-22",
+      "series_id": "BAMLH0A0HYM2",
+      "source": "fred",
+      "title": "ICE BofA US high-yield option-adjusted spread, %",
+      "value": "3.40"
+    },
+    {
+      "change": "0",
+      "obs_date": "2026-09-03",
+      "series_id": "BNM:OPR",
+      "source": "bnm_opr",
+      "title": "BNM Overnight Policy Rate, %",
+      "value": "2.75"
+    },
+    {
+      "change": "2.167",
+      "obs_date": "2026-09-01",
+      "series_id": "CPIAUCSL",
+      "source": "fred",
+      "title": "US CPI, all items, index 1982-84=100",
+      "value": "336.30"
+    },
+    {
+      "change": "-3.6",
+      "obs_date": "2026-10-20",
+      "series_id": "DCOILBRENTEU",
+      "source": "fred",
+      "title": "Brent crude, USD per barrel (EIA, daily)",
+      "value": "115.22"
+    },
+    {
+      "change": "-0.0009",
+      "obs_date": "2026-10-16",
+      "series_id": "DEXMAUS",
+      "source": "fred",
+      "title": "Malaysian ringgit per US dollar",
+      "value": "4.08"
+    },
+    {
+      "change": "0",
+      "obs_date": "2026-10-21",
+      "series_id": "DFF",
+      "source": "fred",
+      "title": "Federal funds effective rate, %",
+      "value": "3.88"
+    },
+    {
+      "change": "0.01",
+      "obs_date": "2026-10-21",
+      "series_id": "DGS10",
+      "source": "fred",
+      "title": "10-year Treasury yield, %",
+      "value": "5.13"
+    },
+    {
+      "change": "0.02",
+      "obs_date": "2026-10-21",
+      "series_id": "DGS2",
+      "source": "fred",
+      "title": "2-year Treasury yield, %",
+      "value": "4.81"
+    },
+    {
+      "change": "0.1",
+      "obs_date": "2026-09-01",
+      "series_id": "DOSM:CPI_HEADLINE",
+      "source": "dosm_cpi",
+      "title": "Malaysia CPI headline, index 2010=100",
+      "value": "137.60"
+    },
+    {
+      "change": "-0.1645",
+      "obs_date": "2026-10-16",
+      "series_id": "DTWEXBGS",
+      "source": "fred",
+      "title": "Broad US dollar index",
+      "value": "121.40"
+    },
+    {
+      "change": "-694",
+      "obs_date": "2026-10-22",
+      "series_id": "NASDAQCOM",
+      "source": "fred",
+      "title": "NASDAQ Composite, index level",
+      "value": "26,008.86"
+    },
+    {
+      "change": "32.9329",
+      "obs_date": "2026-09-01",
+      "series_id": "PALUMUSDM",
+      "source": "fred",
+      "title": "Aluminium, USD per tonne (IMF PCPS via FRED)",
+      "value": "3,283.05"
+    },
+    {
+      "change": "44.6",
+      "obs_date": "2026-10-21",
+      "series_id": "SP500",
+      "source": "fred",
+      "title": "S&P 500, index level",
+      "value": "7,757.17"
+    },
+    {
+      "change": "-0.01",
+      "obs_date": "2026-10-22",
+      "series_id": "T10Y2Y",
+      "source": "fred",
+      "title": "10y minus 2y Treasury spread, %",
+      "value": "0.31"
+    },
+    {
+      "change": "0.1",
+      "obs_date": "2026-09-01",
+      "series_id": "UNRATE",
+      "source": "fred",
+      "title": "US unemployment rate, %",
+      "value": "4.20"
+    },
+    {
+      "change": "2.35",
+      "obs_date": "2026-10-22",
+      "series_id": "VIXCLS",
+      "source": "fred",
+      "title": "CBOE VIX, index",
+      "value": "19.03"
+    }
+  ],
+  "names": [
+    {
+      "escalated": 0,
+      "events": [],
+      "instrument_id": "MYX:1155",
+      "label": "Maybank",
+      "snapshot": [],
+      "stories": [
+        {
+          "doc_id": "https://www.nst.com.my/business/corporate/2026/10/1563895/maybank-dbs-back-us6bil-johor-renewable-energy-project",
+          "domain": "www.nst.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-26T07:22:03+00:00",
+          "quality": 1.0,
+          "title": "Maybank, DBS back US$6bil Johor renewable energy project",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE9IVkdVUVdzbTVUcVViZjRycFFzb1VBNEg4RTNib19xVzcyOXdKYXBjdFBkSVdrU0RkdGhXTThWRTVzcHJaZXN4ODRTdUoxS2JS?oc=5",
+          "domain": "theedgemalaysia.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-26T07:52:12+00:00",
+          "quality": 0.8,
+          "title": "Maybank, DBS Bank, World Bank unit to develop financing framework for US$6 bil Johor-Singapore renewable energy project",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxQMnVtVWU2ZFhTSGFIUVdPVFNsYXAybzJNS3VCWkRMN2xJb1NfY2VoYU1SRWo5S19wTFZrbXVlTlBtWW90Y2pwQkU2WGJjUG9MNEpZUFZYZzJSZ3hEemJWNWVUaHdONGpEYXV2RWVsU1NiMjRTTWdEVzVFWGdqcTB3dklnbTJxc01xeXlPbDdWdlhhbDdOc3B2X3RQeDR5VTNPMXYxS09GWV9KVkNGei16LWkxZmYzb1M4TUNBbXBLajE5NWxEc2lKYQ?oc=5",
+          "domain": "www.businesstimes.com.sg",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-26T07:32:00+00:00",
+          "quality": 0.8,
+          "title": "DBS, Maybank, IFC to collaborate on funding Johor-Singapore renewable energy project",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMi1wFBVV95cUxNLXpIa0puT1BSMkxWNFlIT2FJXzFjdFNvcEU0VFJIeGllbGtRV21FVGFWX2x1VDVFUXk4TnppV3YxUnR0OGJxOUhSUG1yUlprcndrY3dCNURtRVlPcVlOYlJBNXp1dVB2dU9uNzNGZ21fOFU1WE9XVVRUSnF6cmtXT0lpQVR4SkUyc2F4X1g2RHI1azBBRmNMc19PQnc0by0xMU0xY0tkVHFLT3hfY19ickhZUTJKSVF4UWgzNGxDeDNzWkdlcFNnNEl0YjF0andyR3F2a2NDWQ?oc=5",
+          "domain": "www.businesstoday.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-26T06:09:43+00:00",
+          "quality": 0.8,
+          "title": "Maybank, DBS And IFC Join Forces To Advance US$6 Billion Johor-Singapore Renewable Energy Project",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMidkFVX3lxTE5qZ1dCdjZxX204R1hqVmMybFF6VnRhYmpjdkkwY1FPVVZPWm1wZnlOVmV2OWhzaUR6bG93a09naTBEdWpmaUc3NXEzVTRabEtnaW1kaWNVaUVxVVQ5dGZiMEYySDBjbW96SlFMMWVHOFBzRGRlaVE?oc=5",
+          "domain": "finance.biggo.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-26T08:05:00+00:00",
+          "quality": 0.65,
+          "title": "DBS, Maybank and IFC Team Up on $6 Billion Johor-Singapore Clean Power Corridor",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxOWWIySmJXb1dkQ2t6OVJfbnRlSjBCZU9yTTY5VjNwblZ2UWRzMy1hZFJ3djc2U2c2Yks1Q0g0V041MFhtNWRPSWpPRVB3V0tpLVllUlBDeDhNeThfczFlU2tDOTl1V2lDZjUwZ19jWmZtYl81MFRsT1l4dFNob0RLeEEtM1VRTTVtRTJGdVVRRFQ4TjZPa1hMLVV4MVVRSHVRYkloa1prQ0I?oc=5",
+          "domain": "tradersunion.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-26T07:55:35+00:00",
+          "quality": 0.65,
+          "title": "Maybank, DBS and IFC develop financing framework for Johor-Singapore renewable energy corridor",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 6,
+        "polarity_mean": 0.0,
+        "sources": 6,
+        "uncertainty_mean": 0.0
+      },
+      "upcoming": []
+    },
+    {
+      "escalated": 1,
+      "events": [],
+      "instrument_id": "MYX:5347",
+      "label": "Tenaga",
+      "snapshot": [],
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxPTEtpOUlHbHRzZXNobjlKTV80SmVWOE83QXdrOUtZYzlSaU4tMUpjd2tzQVpTWDlGMEFueVFxY1VwNHVnM3Fzem8zQ3NYMkZ4V0RHYXI1N3BNY2xoSmZwZ1JXd2pfczhqZ2Z1Y2JfWkRSTmpHeUNCa0dkUGtZWTZmdUhmaE43Nnp0WV9kNHpTNVREaGt1Q0R5LWcwTmxJWlk1NkVlZ0J6RGNfSDVHZ3NoWHU4WXM4b0tHMU1v?oc=5",
+          "domain": "www.nst.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-26T08:27:12+00:00",
+          "quality": 0.8,
+          "title": "TNB, Petronas-backed regional power project secures Singapore's conditional approval",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://www.nst.com.my/news/nation/2026/10/1563998/malaysia-benefit-cross-border-electricity-project-vietnam-singapore",
+          "domain": "www.nst.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-26T09:07:56+00:00",
+          "quality": 1.0,
+          "title": "Malaysia to benefit from cross-border electricity project with Vietnam, Singapore",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://www.nst.com.my/news/regional/2026/10/1563702/tnb-expresses-condolences-family-three-killed-dungun-crash",
+          "domain": "www.nst.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-26T03:27:32+00:00",
+          "quality": 1.0,
+          "title": "TNB expresses condolences to family of three killed in Dungun crash",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://www.freemalaysiatoday.com/category/nation/2026/10/25/3-family-members-killed-in-dungun-crash",
+          "domain": "www.freemalaysiatoday.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-25T15:36:00+00:00",
+          "quality": 1.0,
+          "title": "3 family members killed in Dungun crash",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMitgFBVV95cUxQTzc3OXNLb21lc2VpcW5lS1k5c3FhTnRvbUxqRmU3S1BFc2dPdTBVXzU1NlhCOXUyekVzb25qWjhMWHFMUzVGY1RHaGl2c05qZWZoYU9SSVR5MjBndXVPR3ljZnRGdGJWbzRRMVFMLVVrMzBmaHlCbk1UTmx1OXVCbHh4d3pCWHlScThDWlRxNVFXQmN2UkE3QWtYZnZHMTgzdlpmU0MweTJERFhEaWJhYzRpWGdQZ9IBuwFBVV95cUxNa0QwTEtyU01ZcE5xRE1EdGhNSFl0bXZXN1JNNHdDQlBxQkx2TWVwTVBiaVlQVWVnZFpOazBYQWlHRkhCcXF6M0JLbFlyU0MxMDJIN0Jfekp5ekFzNDZSU3ZDR19mcGk1U1RncWptV0IwMTBrbDc3dVRlN2M3ZWtjbEdGWld6SkQzVXpSSVE4U05tNkFQOEdWZ2VHMHNmZjBpRzNsYU9sT1YtY0FVUGxrb1M1ZnZOcHdEOHdR?oc=5",
+          "domain": "www.nst.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-26T09:20:19+00:00",
+          "quality": 0.8,
+          "title": "SKA Capital unit secures RM89.28mil contracts for TNB projects",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMitwFBVV95cUxQOGZITk5KV0c1N2Z6NEpWUE5hMmtWT3JlVXh2V1Jibm0yMi1FQ2hzUjQ2aWdWSWcxSWxEaDZHOXRib2VwR1VfVDdmRmcxMVNxY0x2YjIxMXE2TUlnb2FaYWNScWJJQS0wX1pQVDg3RDNXS044YTd5QnZpQ2l0RVREeEJNQ3VDRWx5U251QkozS0VLR0ZDV3JUNW55TXRXbXUxTE9OdUduNHhIektEN0ZTMUhkR1R0UUk?oc=5",
+          "domain": "themalaysianreserve.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-26T07:53:49+00:00",
+          "quality": 0.8,
+          "title": "SKA Capital bags RM89m TNB-related contracts ahead of ACE Market listing",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE10bDdFX3Z3elhxSnJlSkxjUVhxWWN5c25fOTgtc1E1WDBhZDEzTXpLWUsxSzJpUHphaWgxNmxfRWVrbWNoaHIyQ2wwSGViMHFa?oc=5",
+          "domain": "theedgemalaysia.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-26T07:26:27+00:00",
+          "quality": 0.8,
+          "title": "ACE Market-bound SKA Capital bags 6 TNB-linked jobs worth RM89.3 mil",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxPc3ZVenhqakNfSV9YeENKM0FUWkZJTVR0cng0LWFTeFU0U2RSUzM3a0xYTmtHZjZXaVlJa2tEMnNHclFBdXo4cTJxQjluTVlTUTZDd0c3NlNyRV80aWFZUzZhOEw1enVyQWE2RVY5SFYyOWRtVzdkcE9QY2JYZFUwSUdhclRDVFM3SzFwaF9meTdaM3JVN0p6UnNhS0VFLWRBSG1ocUVZeEM0RF9nLWxDVTJqcWFmN3I4Tk8w?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-26T07:19:00+00:00",
+          "quality": 0.8,
+          "title": "SKA Capital unit accepts RM89.28mil award for TNB contracts",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 12,
+        "polarity_mean": 0.083,
+        "sources": 8,
+        "uncertainty_mean": 0.0
+      },
+      "upcoming": []
+    },
+    {
+      "escalated": 0,
+      "events": [],
+      "instrument_id": "MYX:5183",
+      "label": "Petronas Chemicals",
+      "snapshot": [],
+      "stories": [],
+      "tone": {},
+      "upcoming": []
+    },
+    {
+      "escalated": 0,
+      "events": [],
+      "instrument_id": "MYX:5225",
+      "label": "IHH",
+      "snapshot": [],
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMic0FVX3lxTE14Z1kyb0dja0hSMnhVckF1X29BYktZV1ZZc3YyUG92dDNBUWlRcHdRblhzTU5xQXczaldvXzlIN2FYRmd1QU02djVzeUNQczRkWWl5bFlrSVJqMGl1ZEhlMWNjRkFaWGxUM09GemtMcmVBaUk?oc=5",
+          "domain": "www.tradingview.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-25T19:10:10+00:00",
+          "quality": 0.65,
+          "title": "IHH Healthcare Bhd. Estimates \u2013 MYX:IHH",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
+      "upcoming": []
+    },
+    {
+      "escalated": 0,
+      "events": [],
+      "instrument_id": "MYX:8869",
+      "label": "Press Metal",
+      "snapshot": [],
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMirgFBVV95cUxOWXBJMDEtbWRHNE1sWUNHM0I3eFMyMmstYXJEcnJ6bFhFTlo0UlE5U0NNTDR1ZkFTLW1KWGJEOG8yZFgxNXFOMHhmNV84a3NKSjFveS1XV0tORkdFSERJelJxVWZER1p0WnpTV0FBbjNjb00wTDBnQURfeUNMM3Zpd282dGZLUFpETEhhckowYkJZbm04VTNkVnJsRFhzNWxMZUVZOXpUNTdMNlVPZXfSAbMBQVVfeXFMT1pxdVN5NkpIWHItXzFmYzdtNEtjQU5UdC1xWjA4VlFNc0dMdEJTbmxvbDVIWDNUUU9IYS1Bdks0NE1tQzlYY21YaUlJMFVoTWJNZ2lNeGRIV3lxVkdWVGt3VktBNUdyOWJaSVhPM3dkMENXNGdZZ2NPWkVLTXVmNWM2WkdKSEV0WHV3UlJzdXhvaGZORE1EZUMxZFBjU3BvRlNwMEY5M0h1dzRpSUV5emxWdVU?oc=5",
+          "domain": "www.nst.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-26T04:11:21+00:00",
+          "quality": 0.8,
+          "title": "Press Metal's Q3 core earnings seen hitting RM650mil",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE9iNXNjcHhJMXN6bUV3VkJGTEU2MTRDalZzUG5CbUF0S0ZDUTMwZ3UyaEl2enpnVTIwam5zMTBpa2E4b19MdDI1WXhMSnB0czRl?oc=5",
+          "domain": "theedgemalaysia.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-26T03:11:34+00:00",
+          "quality": 0.8,
+          "title": "Press Metal faces softer 2H smelting margins as aluminium supply crunch eases \u2014 HLIB Research",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMipgFBVV95cUxNR0lzbWRKaDJXTUdSYWZpY1VDckZnTnJjVnZyN0Z5bEtldlhRZXdFS0FHQnZtazh1UzdPTFVBZjBBcUZHdFVsTjdnUmtmOTNKY1EzVDVKYjJVVHNzSjc0WTd1Ull3TlBDNlZtaGZCWTFlaFpELVc5YkhrSTk0dFVpSkZsVmt2VGtZZ2U3MExhRlBUcWV0MDQxUjNoVENDSER6cTdDQVhR?oc=5",
+          "domain": "www.moomoo.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-26T03:02:30+00:00",
+          "quality": 0.65,
+          "title": "Press Metal Aluminium's 3Q Earnings Likely Lower on Quarter -- Market Talk",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 3,
+        "polarity_mean": 0.0,
+        "sources": 3,
+        "uncertainty_mean": 0.0
+      },
+      "upcoming": []
+    },
+    {
+      "escalated": 0,
+      "events": [],
+      "instrument_id": "MYX:3182",
+      "label": "Genting",
+      "snapshot": [],
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxQNWhFOUczUUpRLWxwTWVBcTU3T3JfRnFOLWpnQmk0aHFIY2w3Zm9CNzFrVXpid3k0eXBPQUotaS14M0JONlUzWHVOdVptQ0RaRW14UXRKVW1sOHRUU3BESWgza2xzSlQ4blEyNEhhYXM4Q0FyY18xRER2UTRpNmRRSmRwWG5XTnVob3hLUEtUdnkxcVFrREdGU2N6US1fU2NoMHg1Q19PRFQzX0hPdU1mU3UtVGxZU3lHRFRXRUQ2UjRXVDhwS3BiRDZNUTladXBDYkhhSw?oc=5",
+          "domain": "asgam.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-25T20:34:56+00:00",
+          "quality": 0.65,
+          "title": "Genting\u2019s Resorts World New York City launches VIP gaming room with 48 gaming tables and three private salons - IAG",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
+      "upcoming": []
+    },
+    {
+      "escalated": 3,
+      "events": [],
+      "instrument_id": "XNAS:NVDA",
+      "label": "NVIDIA",
+      "snapshot": [
+        {
+          "concept": "pe_ttm",
+          "known_at": "2026-10-25",
+          "label": "P/E (ttm)",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "26.36"
+        },
+        {
+          "concept": "pb",
+          "known_at": "2026-10-25",
+          "label": "P/B",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "28.81"
+        },
+        {
+          "concept": "eps_ttm",
+          "known_at": "2026-10-25",
+          "label": "EPS (ttm)",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "7.91"
+        },
+        {
+          "concept": "dividend_yield",
+          "known_at": "2026-10-25",
+          "label": "dividend yield",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "0.03"
+        },
+        {
+          "concept": "beta",
+          "known_at": "2026-10-25",
+          "label": "beta",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "2.27"
+        },
+        {
+          "concept": "high_52w",
+          "known_at": "2026-10-25",
+          "label": "52w high",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "243.37"
+        },
+        {
+          "concept": "low_52w",
+          "known_at": "2026-10-25",
+          "label": "52w low",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "164.27"
+        },
+        {
+          "concept": "price_target_consensus",
+          "known_at": "2026-10-25",
+          "label": "target (consensus)",
+          "period_end": null,
+          "source": "fmp",
+          "value": "339.17"
+        },
+        {
+          "concept": "analyst_buy",
+          "known_at": "2026-10-20",
+          "label": "analysts: buy",
+          "period_end": "2026-10-01",
+          "source": "finnhub",
+          "value": "41"
+        },
+        {
+          "concept": "analyst_hold",
+          "known_at": "2026-10-20",
+          "label": "analysts: hold",
+          "period_end": "2026-10-01",
+          "source": "finnhub",
+          "value": "2"
+        },
+        {
+          "concept": "analyst_sell",
+          "known_at": "2026-10-20",
+          "label": "analysts: sell",
+          "period_end": "2026-10-01",
+          "source": "finnhub",
+          "value": "1"
+        },
+        {
+          "concept": "av_news_sentiment",
+          "known_at": "2026-10-06",
+          "label": "vendor sentiment",
+          "period_end": "2026-10-05",
+          "source": "alphavantage_news",
+          "value": "0.25"
+        },
+        {
+          "concept": "revenue",
+          "known_at": "2026-08-26",
+          "label": "revenue (last quarter)",
+          "period_end": "2026-07-26",
+          "source": "sec_xbrl",
+          "value": "96.22bn"
+        },
+        {
+          "concept": "net_income",
+          "known_at": "2026-08-26",
+          "label": "net income (last quarter)",
+          "period_end": "2026-07-26",
+          "source": "sec_xbrl",
+          "value": "59.69bn"
+        },
+        {
+          "concept": "eps_surprise_pct",
+          "known_at": "2026-09-05",
+          "label": "last EPS surprise %",
+          "period_end": "2026-09-30",
+          "source": "finnhub",
+          "value": "3.82"
+        }
+      ],
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMijgFBVV95cUxQWHEweWR6Z3JqaWdQV2FfUmxjWG9Wck5rOXdvZFZMcWFhUGp2NGxZT042S2xxdm00OEY4WUtnQ3VrTUlhTHA5SGpkcmpRemNLbFNodjZ1R09fSGxTVDhJbDgzRzFFY1ZkNEZRVldZSnJxZG5ySmt6c09fbzFVU3hNMWtmbkNCOHdpTU5yc1pB?oc=5",
+          "domain": "www.chosun.com",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "polarity": 1.0,
+          "published_at": "2026-10-25T22:11:34+00:00",
+          "quality": 0.65,
+          "title": "S&P 500 Profits Surge 30% Led by NVIDIA, Micron",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxPQjdNV3FheVNZOVF3c0E5TVFBamI5OURuVHFDUkhxS0JERnc4QUVkTW1EMElHMHlGRjNmZDc4VE16T0RYdjI3M1hIaUVrSU5HYVRUU0I0SThPcGJlZHlqZzVwdTdfcmNhUEM5aENBWGRPSDVpeWRjYWl0RGlmQXpFMlU3T1FJSXdQ0gGcAUFVX3lxTFA2U0dnMlFvU2pKSHhCTVEtR21CeFA1VDM3anV5SnVxT2RxclM4T1BXT0hXUmFNUTZEWWlhN0dmWnRwSWMyeElPWVFVRV95TVlFSVpqM3ZVcWhYRm1UTDl5X1BYTzZPX2pOQU9RUGl2N3c2UGpJQ1lrNUVYYUkwTTk0cGRpeVJrQV9LQ25wWklEMkNwdG5xaVgxYVdENA?oc=5",
+          "domain": "biz.chosun.com",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "polarity": 1.0,
+          "published_at": "2026-10-25T16:47:00+00:00",
+          "quality": 0.65,
+          "title": "Nvidia, Micron drive 34% of S&P 500 profit surge as AI boosts earnings - CHOSUNBIZ",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "finnhub:143181399",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-25T15:10:04+00:00",
+          "quality": 0.65,
+          "title": "Amkor Rises 4.7% on New $1.3 Billion NVIDIA Deal Highlighting the \u201cCritical Role\u201d of Packaging",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxNVlFkOFVPOUpxTmpqYjkxaTh3ZHZNOUg2aFVPekk0TkVxVjBhRHVpVGdhaEJlbXZOODBVeHJ1TE80UjhFU2tFdFF0dnhtdElIa3FDSnVUOV9JdUZIRmQ5c1pxU256eFdqNlRaZ0NlUXBPSU1mckE3UVZHdFJzNFFlSER4NmNPTTlNZXQ4LVoyRXpHM3NLMTBRMnhaSUFUQk9kVzBWaG8xQjFDeGQxZVBPcDlUNEdkYTd4WGhJ?oc=5",
+          "domain": "seekingalpha.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-25T19:24:04+00:00",
+          "quality": 0.8,
+          "title": "Amkor Technology: Nvidia's $3 Billion Vote Of Confidence Lands On A De-Rated Stock (AMKR)",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMikwFBVV95cUxNZXBrdnEtYnZLWk95RmJjZlRTeFR2ZjZDaGM5dDR4VW9KNWdDZjRjTmJidlY0eWExNVJVYUZ2NGJlNlo3NXZYMzFTZkhYeUU4ZC1RSGUzMXhLYkdkRUZXMEt5bVJRY1E0LW52Z0QzaWFYRTE3bDh1SVBMWnRNZUs0dndHVXBXdmZkYjBoRWFsX0p6RG8?oc=5",
+          "domain": "finance.yahoo.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-25T19:06:26+00:00",
+          "quality": 0.8,
+          "title": "Nvidia (NVDA) Has Lost Its China AI Accelerator Market",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMimgFBVV95cUxQam9ueHNidEo0LVFIUml2R3NFbl8wNklCdzcxNWVsc1FqSF9yTUh6eVRoU3Y5eDFpN1dXa2EtQnAzOW96WDZaZXgwTzlGaGJZZHc2cGNsbWt1Y0hvWFV1MGJfTldLVU52WVpoT1lpZ2JiY1k1TUt4bzIyS0pmaUNKY1ZUYzRwOEduWnRETElFS2tBUTZ3Y2JsakpB?oc=5",
+          "domain": "finance.yahoo.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-25T13:35:00+00:00",
+          "quality": 0.8,
+          "title": "Here's What $10,000 Invested Equally in Nvidia, AMD, and Broadcom Could Be Worth by 2030",
+          "uncertainty": 0.9615384615384615
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMifEFVX3lxTE10Q3VRYnBwUUFrVzFGQU9UMlZHS1gwaWJkTGRXYzRDTVZGZ0RhaEZfMktBc1AtVHZuQVpxa2xabnRMZTBHMU1sUkhNSkJwcUJSaXktRnhQLWZqMy1UUHh3SFFHbTNrTHFJMnNWODBUa3J5b014UUJIazd0OXQ?oc=5",
+          "domain": "www.asiae.co.kr",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-25T20:48:31+00:00",
+          "quality": 0.65,
+          "title": "U.S. S&P 500 Q3 Net Income Seen Rising 30%... Nvidia and Micron to Drive 34% of Increase",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxNbU1oNklfTDRzcnFyRXBDZXF0ZWxIaktfcFE1QmFaVXJlNzBxRXRzdG90b3ZkZlRObFNqTGZ4Yk0tR1B0RE1YeGFBY3hjQ2l2Qlk3UTBZN2FweTNrWTBkN1lIbzFVODUtVXFIZ2tWRkdyYlVYZ2JHQlB3akZWcFV0WE1lV3p6RGhCMDZBeGV6TllUZ3BGVkZTUGRCaERqVFBseDJTUUdYdTBFUHllRlZ5TGhKQ2xlN1F6SFNzVGRfRWh2YVRqUVJnWmMyTmFBVUViRXE4?oc=5",
+          "domain": "www.marketbeat.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-25T20:14:39+00:00",
+          "quality": 0.65,
+          "title": "6,000 NVIDIA Corporation $NVDA Shares Purchased by Palogic Value Management L.P.",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.333,
+        "n": 19,
+        "polarity_mean": 0.158,
+        "sources": 16,
+        "uncertainty_mean": 0.156
+      },
+      "upcoming": [
+        {
+          "kind": "earnings_result",
+          "source": "finnhub",
+          "title": "Q3 2027 results after the close",
+          "url": "",
+          "when": "2026-11-17T00:00:00+00:00"
+        }
+      ]
+    },
+    {
+      "escalated": 1,
+      "events": [],
+      "instrument_id": "XNAS:AAPL",
+      "label": "Apple",
+      "snapshot": [
+        {
+          "concept": "pe_ttm",
+          "known_at": "2026-10-25",
+          "label": "P/E (ttm)",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "39.36"
+        },
+        {
+          "concept": "pb",
+          "known_at": "2026-10-25",
+          "label": "P/B",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "50.98"
+        },
+        {
+          "concept": "eps_ttm",
+          "known_at": "2026-10-25",
+          "label": "EPS (ttm)",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "8.72"
+        },
+        {
+          "concept": "dividend_yield",
+          "known_at": "2026-10-25",
+          "label": "dividend yield",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "0.51"
+        },
+        {
+          "concept": "beta",
+          "known_at": "2026-10-25",
+          "label": "beta",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "1.10"
+        },
+        {
+          "concept": "high_52w",
+          "known_at": "2026-10-25",
+          "label": "52w high",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "351.73"
+        },
+        {
+          "concept": "low_52w",
+          "known_at": "2026-10-25",
+          "label": "52w low",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "243.42"
+        },
+        {
+          "concept": "price_target_consensus",
+          "known_at": "2026-10-25",
+          "label": "target (consensus)",
+          "period_end": null,
+          "source": "fmp",
+          "value": "340.14"
+        },
+        {
+          "concept": "analyst_buy",
+          "known_at": "2026-10-20",
+          "label": "analysts: buy",
+          "period_end": "2026-10-01",
+          "source": "finnhub",
+          "value": "20"
+        },
+        {
+          "concept": "analyst_hold",
+          "known_at": "2026-10-20",
+          "label": "analysts: hold",
+          "period_end": "2026-10-01",
+          "source": "finnhub",
+          "value": "14"
+        },
+        {
+          "concept": "analyst_sell",
+          "known_at": "2026-10-20",
+          "label": "analysts: sell",
+          "period_end": "2026-10-01",
+          "source": "finnhub",
+          "value": "3"
+        },
+        {
+          "concept": "av_news_sentiment",
+          "known_at": "2026-10-06",
+          "label": "vendor sentiment",
+          "period_end": "2026-10-06",
+          "source": "alphavantage_news",
+          "value": "-0.23"
+        },
+        {
+          "concept": "revenue",
+          "known_at": "2026-07-31",
+          "label": "revenue (last quarter)",
+          "period_end": "2026-06-27",
+          "source": "sec_xbrl",
+          "value": "109.42bn"
+        },
+        {
+          "concept": "net_income",
+          "known_at": "2026-07-31",
+          "label": "net income (last quarter)",
+          "period_end": "2026-06-27",
+          "source": "sec_xbrl",
+          "value": "29.79bn"
+        },
+        {
+          "concept": "eps_surprise_pct",
+          "known_at": "2026-09-05",
+          "label": "last EPS surprise %",
+          "period_end": "2026-06-30",
+          "source": "finnhub",
+          "value": "-0.89"
+        }
+      ],
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMi1wFBVV95cUxPaDlkWmt5Vk9nVzFYYVBKNU5nWlVqYTFyM3BFSjdhbllYZHIzRjhjR1lvSm1GcFpZRGluVVRNRkxuZ0pwU0owUUpsWU1ZRzVlcG8zdGc3Y3dlQ1NGM2w0eFpSUExtaGtiUVJTUTQxUlZSa2xvbkp1eWhEX1ZPYkRnZXJuOFp4YkJaNFFHeXlpUzFvWEFQNkdIaFNRUnhiVF9lbDVDZzdGMlhfMjNCYXVHdHMwbVgwMDJUa3IwTkpqUXN4UXQ4RDRBM3JDLTdVdnNRc2NWZ0lxTdIB3wFBVV95cUxQazZnUFNFUV9Pbk11aFpGbHJreVkzU19tV01qWmVRRmdrUndYZnVKN1RSY3N1dHpYcGZsNGFDYy03UVo4alJNMF9wa1REY0dKR1Y2SVZ1X1RpZ3E5RzNTdGNDLUJFSXBFUDQzMUZLSndDY0dVUUFmdXJqQ0RTU0pjalVhLWR5anc1OG84empVdWxYUTd4a3paS2w1bUpTejIwMGVuWS1MTmZfWDdkWkE0U0NHVEgwSUdqYzJtT2dIVWQxVkZTWFBrYlJDUmNLQWdVbkpNelFmTmRIeUFCX3l3?oc=5",
+          "domain": "telecomlead.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-10-25T12:27:16+00:00",
+          "quality": 0.65,
+          "title": "China Smartphone Market Q3 2026: Huawei and Apple Gain Share as Xiaomi, vivo, OPPO and HONOR Decline",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMirwFBVV95cUxOTVpTQ29MbXAydi1iRlZZLVZHYXNnUEQ2V05xSlFSR0daQTczYU1QVmlPNXRic1l4eklNSURMU1RCQlJucUJ0dGxaeGFtXzAtcjNDa0dvTEhFeGk2MlljeGRCN1hndU1XeTRfeWhzdXJ6S0Z4cnN1bHh5aERfN1pLYjBzRHhna0cycVRBZXYxeXJ2WkI2djl2WExBQ29NSy1fWHNwWTV1NGE2MUFVQW1J0gG0AUFVX3lxTE1UNDhRekM4cFRMR1Jnd3Y4dzVUbmJQT2ZPejhQZnVDaEMta3dIdHZYcWRadDExdF9KMkJ6bnhXZjI3NEsxMU5reVZmVFROWlpiRkliVjIxX1RTdFJlSTlScGhObHlEQjRocUphaWI3Nnh1NllFajBCdndobVlya0ZfZl83OW93S0FPVWtONXpXd2x1MTZIelU4bFVHNUhUbHo3U0EtRTBxanFTS3l2Tk4zM2pscg?oc=5",
+          "domain": "simplywall.st",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-25T20:06:04+00:00",
+          "quality": 0.65,
+          "title": "Is Apple (AAPL) Pricing In Too Much Future Cash Flow?",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxQRzVnYmcyS3lBY183UFJ0QjBSSERweGZCeTgxSGhHWkhRUmVGX3E5WlBMcUpwSGdNdkt6bkcwUnROTmhsWDIzQzY5XzNDREtTUEZ4S3ZFXy1sazBKWHhxZG5oS2dMMUtPcUxOZld5V0dhR1lDbWlWZHM0WDZMcFN5ZHZPVVh6WWpDLTJ1b3JiQzZ1dDBEeUR4dGtOZnkzWDdVclAwSFRqXzBYRnFYWDJxRDZrckh1eFpf0gG-AUFVX3lxTE9GcEtUdkVILTZ4RllxQ2l4QmRmRzZINy1IeFJhclpoYnA0Mk5ISDRsQTFJMnM1UEt5U2tRa1YzRDFGV01MS1FWTEV4N0R3YkRDRjRlVmVGNlh0UmdVdU0tVnk1ZU1sLXdiLVRtbElYdWI1VVE3Sk1ZaGh2OVpGcmVXUjdST3hLQnFRbEhEemd5aTI5aEc3a3J6ejlhd29DT2I5eHV4VkNLMGRnZENyUFF3bmpvN0xzbkhPcTJvdnc?oc=5",
+          "domain": "www.theapplepost.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-25T19:33:47+00:00",
+          "quality": 0.65,
+          "title": "Apple Stores get new anti-theft iPhone checker that scans sealed boxes",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "gdelt:https://dailythepatriot.com/apples-first-foldable-iphone-faces-complaints-from-buyers/",
+          "domain": "dailythepatriot.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-25T18:00:00+00:00",
+          "quality": 0.65,
+          "title": "Apple first foldable iPhone faces complaints from buyers",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiW0FVX3lxTE55VWo0TEhJOWl1eUNkX0RySlVCcXIxMExjTWR2cjlPTTBEZEh5TmJEUE1TRGFUeUFweEd1QUpMRU84ZzlUbXZDbmN5SzB3WERoTUgzbjhvcWt5S0k?oc=5",
+          "domain": "finance.biggo.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-25T17:08:00+00:00",
+          "quality": 0.65,
+          "title": "A London Developer Turned $100 of Apple Ads Credit Into a $10,000-a-Month Habit App",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxPR3VMTl93bjB4N0FoeGF2c043eUVaMG8yaGc5cEdpVmFjbmIwMEpRTVhtVmUwekN5MS1TRW5rYTZmVzNqRlQtUWNlUmd5Q3RCNk04SG9MRTV5UmJiR2dTSndpcUV6VUlzSU41NDFFWV9RZ1RUUTFNeHNJNDRyczlmNUp2Zjl3OUtvbW9RTndOcF96Vl9tTGkzejVxOWxVc1pLZmE1OFRmenB5ZzlBejhxVzVkRXZ1ME1u0gG-AUFVX3lxTFBSUUdNZlhJTFZUczZwVXloWGx4Rm9NZWI0RWdsQTVQTVFwNmFOa29EVldjQm9NQUVWUUsxQXpKUWI3NUFjN2FLNzR3bG5Oek5IV0FPdkZpdGdOSTVyM3JfNExLNUU0Mi12ajJrU0lKU2c1T1I2NWdlXzNIY2xFNmR6NjBVdVJJRGFlckRZYnh4WFVGR3Bxd0Fsa01PNjNUaEJwZEhoci1UZEF4QlZhVGxlWUtnVzJSRGVwZjZJVUE?oc=5",
+          "domain": "www.theapplepost.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-25T14:01:35+00:00",
+          "quality": 0.65,
+          "title": "Apple shares iPhone Duo launch-day scenes from stores around the world",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMizwJBVV95cUxNNWZXS0ctWHRseUF1UlFGWXM4M2xJb2V6cVBHSWt0T0VWMXhRWWZDNkRTODExaDNxVUFIRFlhRFBlMFhXS1Y2WWlUVTM1STBHRGp1U3VqTTI4OXE3QlNoM1NGbG1oLWlCUmEtbTFuQUZxT05ELThUajRJamJJVnJrYWt6dFBtOVF4UGYwa2xrOWtNQWw1bEFjQkNtYlN5dkNMWjIzNFF4UUFTSV9fQzliaExjQV9selBpbEJiT1FTcUJmdnhNWFFUcFlBZjFtTl9LYzlnU0ladEJFQTdLSWVSVUZZeTZqNlRvdFZURFl6Q0J2d2hIVlp5MVFLX0F2SnllYzkzVEdNSUhnM2I1ODdieHBnNm5uSFkxZ1dhQXhkUlBNLTlHMW12bFI3NGVsSzlzRHVKUzloSnN3X0N5NnNoZlJfWUJlZVROT1Y1aTl0VQ?oc=5",
+          "domain": "247wallst.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-25T13:27:00+00:00",
+          "quality": 0.65,
+          "title": "In 1985, He Was Forced Out of the Company He Founded. Months Later He Bet $10 Million On A Graphics Unit He Bought From George Lucas. By 2006, That Bet Was Worth Far More Than His Apple Stock",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMi5AFBVV95cUxOdlRDeFlqMFoxcE81eno5LTdTempwQXB2SWI2UkNuaUJNSU81YzJYTUpVb2lFYUpGRk1fbEp4enF0YlpsUHFSMjBrR0FxZGUxMWFVY1RBaVJkbEVhcmRFTG1Mbkw4WlJOa0lNWTJZN1VuazBBVGo5OTZLcEFkSFpRZ0ZNZmpILTEtdFQ2dVQxVnoybVJvYmtyU2RGU0RnTkF4UU9DQXJBMk9Na0RiWkpQQmM5aWh4RGE4a1ljZnBVTkVlOEdkMklfY1lSTnNSNndZaDE5dUtsbEdvcWp6clV4U0lsRTE?oc=5",
+          "domain": "www.tradingview.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-25T13:00:18+00:00",
+          "quality": 0.65,
+          "title": "Apple\u2019s iPhone Duo, Musk\u2019s Merger Challenge, AI Spending Questions and More: This Week in Tech",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 9,
+        "polarity_mean": -0.111,
+        "sources": 8,
+        "uncertainty_mean": 0.0
+      },
+      "upcoming": [
+        {
+          "kind": "earnings_result",
+          "source": "finnhub",
+          "title": "Q4 2026 results after the close",
+          "url": "",
+          "when": "2026-11-02T00:00:00+00:00"
+        },
+        {
+          "kind": "earnings_result",
+          "source": "finnhub",
+          "title": "Q4 2026 results after the close",
+          "url": "",
+          "when": "2026-10-29T00:00:00+00:00"
+        },
+        {
+          "kind": "earnings_result",
+          "source": "finnhub",
+          "title": "Q4 2026 results after the close",
+          "url": "",
+          "when": "2026-10-28T00:00:00+00:00"
+        }
+      ]
+    },
+    {
+      "escalated": 7,
+      "events": [],
+      "instrument_id": "XNAS:MSFT",
+      "label": "Microsoft",
+      "snapshot": [
+        {
+          "concept": "pe_ttm",
+          "known_at": "2026-10-25",
+          "label": "P/E (ttm)",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "29.12"
+        },
+        {
+          "concept": "pb",
+          "known_at": "2026-10-25",
+          "label": "P/B",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "6.26"
+        },
+        {
+          "concept": "eps_ttm",
+          "known_at": "2026-10-25",
+          "label": "EPS (ttm)",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "17.95"
+        },
+        {
+          "concept": "dividend_yield",
+          "known_at": "2026-10-25",
+          "label": "dividend yield",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "0.79"
+        },
+        {
+          "concept": "beta",
+          "known_at": "2026-10-25",
+          "label": "beta",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "1.06"
+        },
+        {
+          "concept": "high_52w",
+          "known_at": "2026-10-25",
+          "label": "52w high",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "553.72"
+        },
+        {
+          "concept": "low_52w",
+          "known_at": "2026-10-25",
+          "label": "52w low",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "349.20"
+        },
+        {
+          "concept": "price_target_consensus",
+          "known_at": "2026-10-25",
+          "label": "target (consensus)",
+          "period_end": null,
+          "source": "fmp",
+          "value": "595.21"
+        },
+        {
+          "concept": "analyst_buy",
+          "known_at": "2026-10-20",
+          "label": "analysts: buy",
+          "period_end": "2026-10-01",
+          "source": "finnhub",
+          "value": "40"
+        },
+        {
+          "concept": "analyst_hold",
+          "known_at": "2026-10-20",
+          "label": "analysts: hold",
+          "period_end": "2026-10-01",
+          "source": "finnhub",
+          "value": "3"
+        },
+        {
+          "concept": "analyst_sell",
+          "known_at": "2026-10-20",
+          "label": "analysts: sell",
+          "period_end": "2026-10-01",
+          "source": "finnhub",
+          "value": "0"
+        },
+        {
+          "concept": "av_news_sentiment",
+          "known_at": "2026-10-06",
+          "label": "vendor sentiment",
+          "period_end": "2026-10-05",
+          "source": "alphavantage_news",
+          "value": "0.29"
+        },
+        {
+          "concept": "revenue",
+          "known_at": "2026-07-29",
+          "label": "revenue (last quarter)",
+          "period_end": "2026-06-30",
+          "source": "sec_xbrl",
+          "value": "90.01bn"
+        },
+        {
+          "concept": "net_income",
+          "known_at": "2026-07-29",
+          "label": "net income (last quarter)",
+          "period_end": "2026-06-30",
+          "source": "sec_xbrl",
+          "value": "35.77bn"
+        },
+        {
+          "concept": "eps_surprise_pct",
+          "known_at": "2026-09-05",
+          "label": "last EPS surprise %",
+          "period_end": "2026-06-30",
+          "source": "finnhub",
+          "value": "9.53"
+        }
+      ],
+      "stories": [
+        {
+          "doc_id": "https://www.thestreet.com/investing/vanguard-flags-a-hidden-ai-risk-in-your-value-fund?.tsrc=rss",
+          "domain": "www.thestreet.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-25T19:13:00+00:00",
+          "quality": 0.85,
+          "title": "Vanguard flags a hidden AI risk in your value fund",
+          "uncertainty": 1.0
+        },
+        {
+          "doc_id": "finnhub:143181790",
+          "domain": "SeekingAlpha",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-25T12:52:00+00:00",
+          "quality": 0.85,
+          "title": "Wall Street Brunch: Fed And Hyperscaler Earnings",
+          "uncertainty": 0.3787878787878788
+        },
+        {
+          "doc_id": "https://finance.yahoo.com/m/cdb9c13b-db57-3551-acd0-7507e9d69b5a/dow-jones-futures-rise-with.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-25T22:26:13+00:00",
+          "quality": 0.8,
+          "title": "Dow Jones Futures Rise With Microsoft, Google, Amazon Ahead; Will Doom Or Bloom Control Market?",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMijAFBVV95cUxOdVZSWW5KY09oVmNUdEpXRUVULTAtdW5aNjJTXy03eTVkSWh1bHp0TnItaF9uaVlDdWZNNmRRb2FNaG5UeDdlZGxfcFZvU182enhVcU1ETndydWFZdEdkbE9vSnlWN3ZDNU5EMHhCaF94Z1JkdGhzbl8zTENlZldzUENhSHp5emdleENIUw?oc=5",
+          "domain": "pluang.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-25T17:06:04+00:00",
+          "quality": 0.65,
+          "title": "Microsoft earnings under scrutiny as AI growth and spending raise investor debate ahead of Fed meeting.",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMickFVX3lxTE9DUnktZERBOXVSbTQ4cnVOM2g4aGVXcjcyZGJfeHpZVGgxZlNCUDdMQnZpdV92cVFoMDd0ZDhGY19nbG1aV2g5QWlVYWFzTzhmQmRCbnZyUWhiTk1DUEd3N2s3RDNyNkM4ZkNSWW04M0xvUQ?oc=5",
+          "domain": "suaragarut.id",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-25T14:32:21+00:00",
+          "quality": 0.65,
+          "title": "Microsoft Amazon and Alphabet Lead Upcoming Earnings Week",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMi4wFBVV95cUxOZnNvYzVzcjZTSnd0WGZldTNncVlfZmVDcnIwdm5ZZzNKSlhadF8xdGF0QVV5WW5SU0pVNXA3elFKQkJjX1QyWFN4RzhqeXpiTkxKZHh4YkRjWDB6X3ptdHVYUWVXd3VhX2VBSGw2WjBYQVN5dFBwMndpVU4tU2NrV0xrNGFGektNZFMtVWtRMUtEYjFLSldBdmkzeUVvUExPZWpBaDJWZGRFWnc4ajFZTFkzRUNEUjJZTDk4ZHRIVjhoc3ZDVGJYdm5oemRWQlNiNVo4bzMxZk5WVGFWdDJJU1B2VQ?oc=5",
+          "domain": "www.foreignpolicyjournal.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-25T13:24:00+00:00",
+          "quality": 0.65,
+          "title": "Microsoft (NASDAQ: MSFT) Stock Trades At A Premium As Earnings Growth Slows And Capital Spending Surges",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "gdelt:https://www.thenews.com.pk/latest/1421246-microsoft-mai-dxo-beats-doctors-at-diagnosis-study-finds",
+          "domain": "thenews.com.pk",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-25T12:30:00+00:00",
+          "quality": 0.65,
+          "title": "Microsoft MAI - DxO beats doctors at diagnosis, study finds",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/why-microsoft-msft-central-ai-220628516.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-25T22:06:28+00:00",
+          "quality": 1.0,
+          "title": "Why Is Microsoft (MSFT) Central To AI Cyberattacks And Digital Patient Twins?",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 21,
+        "polarity_mean": 0.143,
+        "sources": 20,
+        "uncertainty_mean": 0.113
+      },
+      "upcoming": [
+        {
+          "kind": "earnings_result",
+          "source": "finnhub",
+          "title": "Q1 2027 results",
+          "url": "",
+          "when": "2026-10-28T00:00:00+00:00"
+        },
+        {
+          "kind": "earnings_result",
+          "source": "finnhub",
+          "title": "Q1 2027 results",
+          "url": "",
+          "when": "2026-10-27T00:00:00+00:00"
+        }
+      ]
+    }
+  ],
+  "notice": "This is analysis, not advice, and this system cannot place orders.",
+  "slot": "all"
+}
