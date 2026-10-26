@@ -1,6 +1,42 @@
 {
   "collection": [
     {
+      "at": "2026-10-26T18:50:18.386377+00:00",
+      "detail": "facts 0; ",
+      "fetched": 450,
+      "kept": 0,
+      "source": "dbnomics",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-26T18:50:16.375036+00:00",
+      "detail": "facts 0; window not covered back to 2026-10-26 10:11Z; the oldest item read is 2026-10-26 18:00Z, so 7.8h of the window was never served",
+      "fetched": 21,
+      "kept": 21,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 19
+    },
+    {
+      "at": "2026-10-26T18:50:15.044993+00:00",
+      "detail": "facts 10; release calendar: 'FOMC Press Release' listed on 15 days of the fortnight - a daily table, not a scheduled print; not stored as a release",
+      "fetched": 470,
+      "kept": 0,
+      "source": "fred",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-26T18:50:00.708877+00:00",
+      "detail": "facts 12; fmp /earnings is outside the plan (HTTP 402); not collected for NVDA, AAPL, MSFT",
+      "fetched": 3968,
+      "kept": 0,
+      "source": "fmp",
+      "status": "ok",
+      "stored": 0
+    },
+    {
       "at": "2026-10-26T10:11:21.383856+00:00",
       "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
       "fetched": 0,
@@ -83,26 +119,26 @@
     }
   ],
   "counts": {
-    "articles": 25112,
+    "articles": 25131,
     "documents": 0,
     "escalated": 3337,
-    "events": 4254,
+    "events": 4255,
     "failed_sweeps": 94,
     "linked": 14020,
-    "observations": 6293,
+    "observations": 6305,
     "series": 31,
-    "sweeps": 1131
+    "sweeps": 1135
   },
   "day": "2026-10-26",
-  "generated_at": "2026-10-26 10:12 UTC",
+  "generated_at": "2026-10-26 18:50 UTC",
   "macro": [
     {
-      "change": "0.13",
-      "obs_date": "2026-10-22",
+      "change": "-0.02",
+      "obs_date": "2026-10-23",
       "series_id": "BAMLH0A0HYM2",
       "source": "fred",
       "title": "ICE BofA US high-yield option-adjusted spread, %",
-      "value": "3.40"
+      "value": "3.38"
     },
     {
       "change": "0",
@@ -138,27 +174,27 @@
     },
     {
       "change": "0",
-      "obs_date": "2026-10-21",
+      "obs_date": "2026-10-22",
       "series_id": "DFF",
       "source": "fred",
       "title": "Federal funds effective rate, %",
       "value": "3.88"
     },
     {
-      "change": "0.01",
-      "obs_date": "2026-10-21",
+      "change": "-0.17",
+      "obs_date": "2026-10-22",
       "series_id": "DGS10",
       "source": "fred",
       "title": "10-year Treasury yield, %",
-      "value": "5.13"
+      "value": "4.96"
     },
     {
-      "change": "0.02",
-      "obs_date": "2026-10-21",
+      "change": "-0.16",
+      "obs_date": "2026-10-22",
       "series_id": "DGS2",
       "source": "fred",
       "title": "2-year Treasury yield, %",
-      "value": "4.81"
+      "value": "4.65"
     },
     {
       "change": "0.1",
@@ -177,12 +213,12 @@
       "value": "121.40"
     },
     {
-      "change": "-694",
-      "obs_date": "2026-10-22",
+      "change": "-53.52",
+      "obs_date": "2026-10-23",
       "series_id": "NASDAQCOM",
       "source": "fred",
       "title": "NASDAQ Composite, index level",
-      "value": "26,008.86"
+      "value": "25,955.34"
     },
     {
       "change": "32.9329",
@@ -193,16 +229,16 @@
       "value": "3,283.05"
     },
     {
-      "change": "44.6",
-      "obs_date": "2026-10-21",
+      "change": "-39.75",
+      "obs_date": "2026-10-23",
       "series_id": "SP500",
       "source": "fred",
       "title": "S&P 500, index level",
-      "value": "7,757.17"
+      "value": "7,623.68"
     },
     {
-      "change": "-0.01",
-      "obs_date": "2026-10-22",
+      "change": "0",
+      "obs_date": "2026-10-23",
       "series_id": "T10Y2Y",
       "source": "fred",
       "title": "10y minus 2y Treasury spread, %",
@@ -217,12 +253,12 @@
       "value": "4.20"
     },
     {
-      "change": "2.35",
-      "obs_date": "2026-10-22",
+      "change": "0.42",
+      "obs_date": "2026-10-23",
       "series_id": "VIXCLS",
       "source": "fred",
       "title": "CBOE VIX, index",
-      "value": "19.03"
+      "value": "19.45"
     }
   ],
   "names": [
@@ -594,7 +630,7 @@
         },
         {
           "concept": "price_target_consensus",
-          "known_at": "2026-10-25",
+          "known_at": "2026-10-26",
           "label": "target (consensus)",
           "period_end": null,
           "source": "fmp",
@@ -828,7 +864,7 @@
         },
         {
           "concept": "price_target_consensus",
-          "known_at": "2026-10-25",
+          "known_at": "2026-10-26",
           "label": "target (consensus)",
           "period_end": null,
           "source": "fmp",
@@ -1076,11 +1112,11 @@
         },
         {
           "concept": "price_target_consensus",
-          "known_at": "2026-10-25",
+          "known_at": "2026-10-26",
           "label": "target (consensus)",
           "period_end": null,
           "source": "fmp",
-          "value": "595.21"
+          "value": "597.92"
         },
         {
           "concept": "analyst_buy",
