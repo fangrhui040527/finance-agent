@@ -1,18 +1,100 @@
 {
-  "collection": [],
+  "collection": [
+    {
+      "at": "2026-10-27T10:08:24.398746+00:00",
+      "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-27T10:08:24.396823+00:00",
+      "detail": "facts 0; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-27T10:08:20.483362+00:00",
+      "detail": "facts 0; window not covered back to 2026-10-26 22:41Z; the oldest item read is 2026-10-27 09:52Z, so 11.2h of the window was never served",
+      "fetched": 15,
+      "kept": 15,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 15
+    },
+    {
+      "at": "2026-10-27T10:08:19.448476+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-27T10:08:17.826740+00:00",
+      "detail": "window overflow: all 150 dated items are newer than the window's start (2026-10-26 10:11Z); the oldest is 2026-10-26 16:10Z, so 6.0h scrolled off unseen; read 3 pages, the most this feed may; page 2 starts 2.8h before page 1 ends (2026-10-27 04:37Z under 2026-10-27 07:27Z): the items between were served by neither",
+      "fetched": 150,
+      "kept": 143,
+      "source": "nst_business",
+      "status": "degraded",
+      "stored": 135
+    },
+    {
+      "at": "2026-10-27T10:08:14.241257+00:00",
+      "detail": "window overflow: all 50 dated items are newer than the window's start (2026-10-26 10:11Z); the oldest is 2026-10-26 12:50Z, so 2.6h scrolled off unseen",
+      "fetched": 50,
+      "kept": 50,
+      "source": "fmt_business",
+      "status": "degraded",
+      "stored": 50
+    },
+    {
+      "at": "2026-10-27T10:08:13.764840+00:00",
+      "detail": "read but empty: Genting, Maybank, IHH, Press Metal; named the company: 1 of 2 (lowest: Tenaga 0/1, Petronas Chemicals 1/1)",
+      "fetched": 2,
+      "kept": 2,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 1
+    },
+    {
+      "at": "2026-10-27T10:08:12.724815+00:00",
+      "detail": "named the company: 12 of 29 (lowest: Genting 0/3, IHH 0/2, Maybank 5/14)",
+      "fetched": 31,
+      "kept": 29,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 25
+    },
+    {
+      "at": "2026-10-27T10:08:10.749087+00:00",
+      "detail": "no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked); deferred: Tenaga, Petronas Chemicals, IHH",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "failed",
+      "stored": 0
+    }
+  ],
   "counts": {
-    "articles": 25608,
+    "articles": 25834,
     "documents": 0,
-    "escalated": 3415,
+    "escalated": 3418,
     "events": 4256,
-    "failed_sweeps": 95,
-    "linked": 14273,
+    "failed_sweeps": 96,
+    "linked": 14288,
     "observations": 6344,
     "series": 31,
-    "sweeps": 1143
+    "sweeps": 1152
   },
   "day": "2026-10-27",
-  "generated_at": "2026-10-27 00:26 UTC",
+  "generated_at": "2026-10-27 10:12 UTC",
   "macro": [
     {
       "change": "-0.02",
@@ -150,18 +232,142 @@
       "instrument_id": "MYX:1155",
       "label": "Maybank",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://www.nst.com.my/business/corporate/2026/10/1564715/maybank-islamic-cgc-launch-first-supply-chain-financing",
+          "domain": "www.nst.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-27T08:15:12+00:00",
+          "quality": 1.0,
+          "title": "Maybank Islamic, CGC launch first supply chain financing guarantee scheme",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://www.nst.com.my/sports/golf/2026/10/1564501/yamashita-relaxed-historic-maybank-championship-title-defence-looms",
+          "domain": "www.nst.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-27T03:49:29+00:00",
+          "quality": 1.0,
+          "title": "Yamashita relaxed as historic Maybank Championship title defence looms",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxQbF9lVG9IZGVsc2E1a29UM2xPZXc3ZEl0aGFiOWtHb1dFMWdMSy1Fa3JjcUk2U0IxSGY3c3hxX2N1dWhKZFNUa3BUd0pfZjI3VnVNWkFGaHVkcDlBSnFpY2VFeTBVRl9MT01uUDJlVWM0X18yNDQ0VXZLMDNqR3pzZVJicmtOeVRuWHV6WDdURXZiaGozbkNwVC1GdnZVVnY1ODVTRllDR2Y3RmNFZE1uSEF6Zjc0X1JfNDRv?oc=5",
+          "domain": "technode.global",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-27T09:26:07+00:00",
+          "quality": 0.65,
+          "title": "Maybank, DBS, IFC back $6 billion Johor-Singapore renewable energy financing framework",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMi4AFBVV95cUxNQ3JyN3V5eVBQdm1JajhCMFowcmMwNnBfSWdzc2xuWXBtS2NuenlId1h1dUVCRkYyanowYjJ4U3ZNN3ZDWk45cTFxcW1rUENHdHJrSDVlQnA3QWNpaFh3V0lScU5SVjNIbm5nQ21qNDg0RDVyNkZKblhubXU0al9kQzJzOE1KUFhZdWZRc19xdGo4RHpfWEdtSDlLdHU4OUtxRFg5akU2OEpvdTJPRXRLekc5dk1qNnJfc0dVanpJZHJRUVV3RDdfUkxyWFEyVTVSd21yZUVITUphSzl2aTFXZ9IB4AFBVV95cUxNQ3JyN3V5eVBQdm1JajhCMFowcmMwNnBfSWdzc2xuWXBtS2NuenlId1h1dUVCRkYyanowYjJ4U3ZNN3ZDWk45cTFxcW1rUENHdHJrSDVlQnA3QWNpaFh3V0lScU5SVjNIbm5nQ21qNDg0RDVyNkZKblhubXU0al9kQzJzOE1KUFhZdWZRc19xdGo4RHpfWEdtSDlLdHU4OUtxRFg5akU2OEpvdTJPRXRLekc5dk1qNnJfc0dVanpJZHJRUVV3RDdfUkxyWFEyVTVSd21yZUVITUphSzl2aTFXZw?oc=5",
+          "domain": "www.philstar.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-27T08:11:00+00:00",
+          "quality": 0.65,
+          "title": "Maybank Women Eco-Weavers launches 2nd weaving training center in the Philippines",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMirgFBVV95cUxQODBzOWJpRXZJRzFFcUpUNi1IU0RrODVFVU9pc2ZOZ1BxRl9UdHdOdUtEVUFORlZaRDdWeHBwMnpoeEkxRUdZLWljVDRPcGVmREV0RXg3N2hEUnozT2c2MWtwV05OWTREbzRPVWpub2JjZkF3QmFPN2FyRVJOMURNbUpSYjdZLTdqd2R3eXo1QkRuNmhVOWhNaE8wYUNiVTdTVnFhM2l4UjFRN3NWMHc?oc=5",
+          "domain": "w.media",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-27T04:00:00+00:00",
+          "quality": 0.65,
+          "title": "DBS, IFC and Maybank partner to finance US$ 6 billion Johor-Singapore renewable energy project",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMikAFBVV95cUxPZERrV2xhZTJTZXN5YUVFcld4ODUzRllpTmJiTHNXdHBkLVgwZlhYbjRuUU8xVERDREZ2VloxUmNFMW5pWnRycGZrMkZxSTlHa0FXTnNGVkdMOEZ0SUJiNWh4NFBTSU50VlRKakp0UElMcV9aSllVXzducU9ZdGNOa3hsVXB1YzVNWDhYYjlxNHI?oc=5",
+          "domain": "asian-power.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-27T01:37:13+00:00",
+          "quality": 0.65,
+          "title": "DBS, Maybank and IFC team up on $7.7b Johor solar project financing",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 6,
+        "polarity_mean": 0.0,
+        "sources": 5,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
-      "escalated": 0,
+      "escalated": 2,
       "events": [],
       "instrument_id": "MYX:5347",
       "label": "Tenaga",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMitAFBVV95cUxQcEVPa0tiaXM3eFRoTVIxWmN3QVJMd1Ita1RhcTRfR0Z0M0tkc0FUb2sxakhHSWgyOFZNS183RW9KMUg0Q2hsNV9Xa1gtRnhyVVhkdGF2ZURUSDhQZFlVcTdBWVJPMkQtUTBfeTNxTHl6TXZQMl9xTGFfbks0R0xpRTRFRFJwWUMwZmUzMkZSY3hvWGlUTU5lWldYYllwT2pIWlBaZ1hYOURVUDNNVlBHMXVXYTE?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-27T09:47:00+00:00",
+          "quality": 0.8,
+          "title": "Bintai Kinden unit accepts TNB contract for RM20.28mil",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxQbzl6dVctUWlKUDdFVEFVS1p4SVM2Vm9vVkpZQVNtWDFoUG5BZFpqRjc2V0ZxNFBzV3NzVVRjQVdnRmVJTklMRzRKanUwR2x4cHJxck94UEFXd1BRLVk4QW4tcG02ZkhIUXZTTkZGQ2ZDUmtmVy1KZHpEZGlnMEswSUZ1ZEROenR3V0tOTmNEU011bF9LWS1RZlg1SWhYTDBjVExETTl1UEEwUFNOb2FPMXpkaW91clI5dlNF?oc=5",
+          "domain": "www.minichart.com.sg",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-26T12:35:00+00:00",
+          "quality": 0.65,
+          "title": "SKA Capital Unit Wins RM89.28m TNB-Linked Contract Ahead of ACE Market Listing",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMingFBVV95cUxOVnBfcWZYb05XbTgtZi1SbFNER0J5Y1pKWVpIdnQtWEhLTEZmQTZIbXcxV25uanhCREtVaGJ2M095Y3BnM1pOR0xqdEstTDQ0VmJBWmdQNjBIdkpub1d6R00yT0g0X2lxRS1fMTVPYlc5VFpKVFFJelVXNlpSRWtJdFZ4b2FpcVBxNFB2QmRRb3o3UEZsQl80VVlMbVU0QQ?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-26T23:44:16+00:00",
+          "quality": 0.8,
+          "title": "TNB strengthens overseas green shift",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMikgFBVV95cUxNUWVxYm16M1M5NVBfaEtqZm53UlJxUlNaZjVLSXlzalJRTjQxZW1mempVYVMwVXozNHNtZzY1WFhidnpMQnMzOXc5MXVtS3dmZGhPSHVfZlVCbEx4cHNEcXQ4WTlpbmdsN3l5S3ZjUmFiSnJOaUlMV2hSZ29tUDJZQ3BkR21CRlVxV01lNUtOVzl4dw?oc=5",
+          "domain": "www.klsescreener.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-26T16:00:00+00:00",
+          "quality": 0.65,
+          "title": "SKA Capital bags RM89mil TNB contracts",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 4,
+        "polarity_mean": 0.5,
+        "sources": 3,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -170,8 +376,26 @@
       "instrument_id": "MYX:5183",
       "label": "Petronas Chemicals",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMijAFBVV95cUxOczgzc0otcXd4Y0JSMnZuOXVlQ3NZeEk0YTBTYW9BLXo4MHhsNFlvbld5aHBJSEFVcndTZG1vbE1hYkZVSG1RcGtqWnE2czk4Z0JlZ1VNSU5FY3FaWElvbG91VWdVdVQtY3cxbzBacUNxeDhLbDBCNHNwUzJpOWh5cGktM2JpbkFnNnZmNA?oc=5",
+          "domain": "sg.finance.yahoo.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-27T09:10:00+00:00",
+          "quality": 0.65,
+          "title": "What Early Petronas Chemicals Buyers Saw",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -190,8 +414,37 @@
       "instrument_id": "MYX:8869",
       "label": "Press Metal",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMingFBVV95cUxPaWllT3F5a25CajN5ejNPX1VIcjZqcUxuSTVJbHk0Ul80V1NTRlpnNWNBVmFTRTE3Qmo5ZWNsbVozLXhaVTliNTNvYjVkVUp2NVR3Qzh2Q1VuV1JleVRKTUVaRjhBY2RxRmdnRDUzNngzZTNyQUtwcXBqUVg0OUI0QzdBNEl6TERZU3hoWWFYQlY5R3FtRXBwYl9fMElRdw?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-26T23:40:07+00:00",
+          "quality": 0.8,
+          "title": "Margin squeeze looms for Press Metal",
+          "uncertainty": 0.0
+        },
+        {
+          "doc_id": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxNeGJ0aGtIZUozY0lydnlsRV9yVXFGeWE4b3VZdzBNZ3NKYWZZaUlHbXBZVnJWU2dyWG82X1BmQXM2dDRkcTNIZFF6S3c5aHREa19aRTNFUG5hVTBLclpOYURUVTRtZTNLUmJDeDV2RE84U3BQWHdRRVFDdnFLcC1hTUtPUU9KT3ZOd0NHVTR2THdwSGt3OV9FMThfNFF3Y0FLSDhFVjJ0cHJjQmR3TkdXSklhc2gxZV9TUGdib01Ha3NpcWs?oc=5",
+          "domain": "www.alcircle.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-26T14:30:00+00:00",
+          "quality": 0.65,
+          "title": "Press Metal feels the squeeze as aluminium supply tightness eases",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 2,
+        "polarity_mean": 0.0,
+        "sources": 2,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {

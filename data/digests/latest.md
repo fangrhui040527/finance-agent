@@ -1,23 +1,36 @@
 # Digest 2026-10-27
 
-Generated 2026-10-27 00:26 UTC · slot `all` · 25608 articles in the corpus, 6344 observations, 4256 events in the fact book.
+Generated 2026-10-27 10:12 UTC · slot `all` · 25834 articles in the corpus, 6344 observations, 4256 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- quiet: nothing collected for this name in the window
+- tone: 6 stories from 5 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-10-27 www.nst.com.my — Maybank Islamic, CGC launch first supply chain financing guarantee scheme [q 1.00, tone +0.0]
+- 2026-10-27 www.nst.com.my — Yamashita relaxed as historic Maybank Championship title defence looms [q 1.00, tone +0.0]
+- 2026-10-27 technode.global — Maybank, DBS, IFC back $6 billion Johor-Singapore renewable energy financing framework [q 0.65, tone +0.0]
+- 2026-10-27 www.philstar.com — Maybank Women Eco-Weavers launches 2nd weaving training center in the Philippines [q 0.65, tone +0.0]
+- 2026-10-27 w.media — DBS, IFC and Maybank partner to finance US$ 6 billion Johor-Singapore renewable energy project [q 0.65, tone +0.0]
+- 2026-10-27 asian-power.com — DBS, Maybank and IFC team up on $7.7b Johor solar project financing [q 0.65, tone +0.0]
 
 ### Tenaga (MYX:5347)
-- quiet: nothing collected for this name in the window
+- tone: 4 stories from 3 sources, polarity +0.50, peak intensity 0.00, uncertainty 0.00 · 2 escalated
+- 2026-10-27 www.thestar.com.my — Bintai Kinden unit accepts TNB contract for RM20.28mil [q 0.80, tone +1.0] ★
+- 2026-10-26 www.minichart.com.sg — SKA Capital Unit Wins RM89.28m TNB-Linked Contract Ahead of ACE Market Listing [q 0.65, tone +1.0] ★
+- 2026-10-26 www.thestar.com.my — TNB strengthens overseas green shift [q 0.80, tone +0.0]
+- 2026-10-26 www.klsescreener.com — SKA Capital bags RM89mil TNB contracts [q 0.65, tone +0.0]
 
 ### Petronas Chemicals (MYX:5183)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-10-27 sg.finance.yahoo.com — What Early Petronas Chemicals Buyers Saw [q 0.65, tone +0.0]
 
 ### IHH (MYX:5225)
 - quiet: nothing collected for this name in the window
 
 ### Press Metal (MYX:8869)
-- quiet: nothing collected for this name in the window
+- tone: 2 stories from 2 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-10-26 www.thestar.com.my — Margin squeeze looms for Press Metal [q 0.80, tone +0.0]
+- 2026-10-26 www.alcircle.com — Press Metal feels the squeeze as aluminium supply tightness eases [q 0.65, tone +0.0]
 
 ### Genting (MYX:3182)
 - quiet: nothing collected for this name in the window
@@ -84,6 +97,20 @@ Generated 2026-10-27 00:26 UTC · slot `all` · 25608 articles in the corpus, 63
 | 10y minus 2y Treasury spread, % | 0.31 | 2026-10-23 | +0 | fred |
 | US unemployment rate, % | 4.20 | 2026-09-01 | +0.1 | fred |
 | CBOE VIX, index | 19.45 | 2026-10-23 | +0.42 | fred |
+
+## Collection
+
+| at (UTC) | source | status | fetched | kept | stored | detail |
+|---|---|---|---|---|---|---|
+| 10:08 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
+| 10:08 | twse_openapi | ok | 8 | 0 | 0 | facts 0;  |
+| 10:08 | jin10_flash | degraded | 15 | 15 | 15 | facts 0; window not covered back to 2026-10-26 22:41Z; the oldest item read is 2 |
+| 10:08 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 10:08 | nst_business | degraded | 150 | 143 | 135 | window overflow: all 150 dated items are newer than the window's start (2026-10- |
+| 10:08 | fmt_business | degraded | 50 | 50 | 50 | window overflow: all 50 dated items are newer than the window's start (2026-10-2 |
+| 10:08 | yahoo_rss | ok | 2 | 2 | 1 | read but empty: Genting, Maybank, IHH, Press Metal; named the company: 1 of 2 (l |
+| 10:08 | google_news | ok | 31 | 29 | 25 | named the company: 12 of 29 (lowest: Genting 0/3, IHH 0/2, Maybank 5/14) |
+| 10:08 | gdelt | failed | 0 | 0 | 0 | no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP |
 
 ---
 
