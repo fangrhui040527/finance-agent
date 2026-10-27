@@ -1,6 +1,6 @@
 # Digest 2026-10-27
 
-Generated 2026-10-27 12:39 UTC · slot `all` · 25847 articles in the corpus, 6344 observations, 4256 events in the fact book.
+Generated 2026-10-27 16:33 UTC · slot `all` · 25940 articles in the corpus, 6344 observations, 4256 events in the fact book.
 
 ## The book
 
@@ -14,11 +14,15 @@ Generated 2026-10-27 12:39 UTC · slot `all` · 25847 articles in the corpus, 63
 - 2026-10-27 asian-power.com — DBS, Maybank and IFC team up on $7.7b Johor solar project financing [q 0.65, tone +0.0]
 
 ### Tenaga (MYX:5347)
-- tone: 4 stories from 3 sources, polarity +0.50, peak intensity 0.00, uncertainty 0.00 · 2 escalated
+- tone: 14 stories from 8 sources, polarity +0.57, peak intensity 0.00, uncertainty 0.00 · 8 escalated
+- 2026-10-27 themalaysianreserve.com — Bintai Kinden wins RM20m TNB substation contract in Pahang [q 0.80, tone +1.0] ★
+- 2026-10-27 theedgemalaysia.com — Electricity bill protection expansion will not affect Tenaga dividend payout, says Fadillah [q 0.80, tone +1.0] ★
 - 2026-10-27 www.thestar.com.my — Bintai Kinden unit accepts TNB contract for RM20.28mil [q 0.80, tone +1.0] ★
+- 2026-10-27 www.klsescreener.com — Bintai Kinden wins RM20.3mil TNB contract [q 0.65, tone +1.0] ★
+- 2026-10-27 thesun.my — TNB dividend commitment unaffected by extended electricity bill protection, says Fadillah [q 0.65, tone +1.0] ★
+- 2026-10-27 www.klsescreener.com — Bintai Kinden bags RM20 mil Tenaga contract in Pahang, second since PN17 exit [q 0.65, tone +1.0] ★
+- 2026-10-27 tradersunion.com — Tenaga Nasional maintains dividend commitment despite expansion of electricity bill protection [q 0.65, tone +1.0] ★
 - 2026-10-26 www.minichart.com.sg — SKA Capital Unit Wins RM89.28m TNB-Linked Contract Ahead of ACE Market Listing [q 0.65, tone +1.0] ★
-- 2026-10-26 www.thestar.com.my — TNB strengthens overseas green shift [q 0.80, tone +0.0]
-- 2026-10-26 www.klsescreener.com — SKA Capital bags RM89mil TNB contracts [q 0.65, tone +0.0]
 
 ### Petronas Chemicals (MYX:5183)
 - tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
@@ -102,6 +106,15 @@ Generated 2026-10-27 12:39 UTC · slot `all` · 25847 articles in the corpus, 63
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 16:32 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
+| 16:32 | twse_openapi | ok | 8 | 0 | 0 | facts 0;  |
+| 16:32 | jin10_flash | degraded | 17 | 17 | 17 | facts 0; window not covered back to 2026-10-27 12:39Z; the oldest item read is 2 |
+| 16:32 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 16:32 | nst_business | degraded | 50 | 50 | 47 | page 2 starts 3.1h before page 1 ends (2026-10-27 08:31Z under 2026-10-27 11:35Z |
+| 16:32 | fmt_business | ok | 17 | 17 | 17 |  |
+| 16:32 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Tenaga, Petronas Chemicals, IHH, Press Metal, Genting, Maybank |
+| 16:32 | google_news | ok | 11 | 11 | 11 | read but empty: Petronas Chemicals, IHH, Press Metal, Maybank; named the company |
+| 16:32 | gdelt | ok | 3 | 1 | 1 | grouped 3 names per request; 2 requests (HTTP 429 on request 2: the rest of the  |
 | 12:39 | dbnomics | ok | 450 | 0 | 0 | facts 0;  |
 | 12:39 | jin10_flash | degraded | 15 | 15 | 13 | facts 0; window not covered back to 2026-10-27 10:08Z; the oldest item read is 2 |
 | 12:39 | fred | ok | 0 | 0 | 0 | skipped: fred needs FRED_API_KEY, which is not set. Add it to .env or as a GitHu |
