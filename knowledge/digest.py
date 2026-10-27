@@ -137,10 +137,13 @@ class Digest:
                 # None: stored before the quality score existed, not "worthless".
                 q = "–" if s["quality"] is None else f"{s['quality']:.2f}"
                 when, cite = s["published_at"][:10], ""
+                if s.get("day"):
+                    when = f"{s['day']} (date only)"
                 if refs is not None:
-                    at = datetime.fromisoformat(s["published_at"])
-                    at = (at if at.tzinfo else at.replace(tzinfo=UTC)).astimezone(UTC)
-                    when = f"{at:%Y-%m-%d %H:%M}Z"
+                    if not s.get("day"):
+                        at = datetime.fromisoformat(s["published_at"])
+                        at = (at if at.tzinfo else at.replace(tzinfo=UTC)).astimezone(UTC)
+                        when = f"{at:%Y-%m-%d %H:%M}Z"
                     cite = f" · doc_id `{refs.get(s['doc_id'], s['doc_id'])}`"
                 out.append(
                     f"- {when} {s['domain']} — {s['title']} "
@@ -336,6 +339,7 @@ def _name_digest(
             -af[0].published_at.timestamp(),
         )
     )
+    from knowledge.evidence.web import stated_day
     from knowledge.news.clean import normalise_text
 
     nd = NameDigest(instrument_id=iid, label=_label(iid))
@@ -345,6 +349,9 @@ def _name_digest(
             {
                 "doc_id": a.doc_id,
                 "published_at": a.published_at.isoformat(),
+                # A web evidence page dated by its day alone: that day, so the
+                # line below never prints its end-of-day stamp as a time.
+                "day": stated_day(a.body) if a.doc_id.startswith("web_search:") else None,
                 "domain": a.source_domain,
                 # Rows stored before the cleaning layer keep their artefacts in
                 # the corpus (append-only); the page shows the normal form.

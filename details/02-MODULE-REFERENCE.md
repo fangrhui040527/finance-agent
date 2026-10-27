@@ -40,8 +40,9 @@ questions.
 
 | Module | Owns |
 |---|---|
-| `tiers.py` | `TaskClass` (22 classes) → `Tier` (`REASON`/`BALANCED`/`CHEAP`/`EMBED`/`LOCAL`). `route()` raises `TierRoutingError` for an unregistered class. `PRICING_USD` and `MODEL_IDS` per tier. `cost_usd()` bills cached input at ~10%. |
-| `client.py` | `InferenceClient.complete()` — the single seam every model call goes through. Records to the ledger before returning. |
+| `tiers.py` | `TaskClass` (22 classes) → `Tier` (`REASON`/`BALANCED`/`CHEAP`/`EMBED`/`LOCAL`). `route()` raises `TierRoutingError` for an unregistered class. `MODEL_IDS` per tier (the 5.5 family); `MODEL_RATES` per model, with `PRICING_USD` derived from it. `cost_usd()` prices cache reads and writes at the model's own rates, Haiku 5.5's long-prompt step and web searches; `worst_case_usd()` is a call's most before it is made. |
+| `client.py` | `InferenceClient.complete()` — the single seam every model call goes through. Refuses a call whose worst case would carry the month past `monthly_budget_usd`; records to the ledger before returning. |
+| `spend.py` | Month-to-date USD: the committed evidence spend in the corpus plus the local ledger. Read by the client's cap, `doctor` and the monitor's `spend_month`. |
 | `backends.py` | `EchoBackend` (deterministic stub, no key) and the Anthropic backend. `backend_from_env()` says which is answering and why. |
 
 **Callers never pick a tier.** They declare what the call is *for*; the tier is

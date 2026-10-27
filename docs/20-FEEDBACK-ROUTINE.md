@@ -104,6 +104,17 @@ became knowable, the collection rows from the sweeps table. The routine's job
 is the chain of *why*, the confirm/refute conditions, and the honesty about
 what the evidence does not reach.
 
+Since 2026-10-22 the pack also carries a **Web evidence** section: for each
+move the collector judged worth a search (beyond 1.96 sigma, company-specific;
+docs/14, "Web evidence"), what was searched, what it cost, and the pages kept
+as corpus rows (source `web_search`, cited by `doc_id` like any story). Those
+rows are evidence at the web tier - a search engine chose them, not a person -
+and each carries its own date, so before/after the close is still the page's
+to judge. A row printed "(date only)" is known only by its day: it cannot say
+whether it came before or after the close, and the page must not say it did.
+The model summary on an attempt is a pointer to the rows, never a cause to
+cite.
+
 ## The prompt
 
 This is the text the Routine carries. It is kept here so it is versioned with

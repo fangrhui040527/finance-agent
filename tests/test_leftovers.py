@@ -29,7 +29,7 @@ def test_a_context_overflow_400_is_its_own_error():
     )
     fake = FakeAnthropic([overflow])
     with pytest.raises(ContextOverflow, match="[Ss]hrink"):
-        AnthropicBackend(client=fake, sleep=lambda _s: None).complete("claude-haiku-4-5", "q", None)
+        AnthropicBackend(client=fake, sleep=lambda _s: None).complete("claude-haiku-5-5", "q", None)
     assert len(fake.calls) == 1  # never retried: the same prompt hits the same wall
 
     plain = anthropic.BadRequestError(
@@ -37,7 +37,7 @@ def test_a_context_overflow_400_is_its_own_error():
     )
     with pytest.raises(BackendError) as exc:
         AnthropicBackend(client=FakeAnthropic([plain]), sleep=lambda _s: None).complete(
-            "claude-haiku-4-5", "q", None
+            "claude-haiku-5-5", "q", None
         )
     assert not isinstance(exc.value, ContextOverflow)
 

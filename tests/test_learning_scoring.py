@@ -187,7 +187,7 @@ def ledger_with_claims():
         agent="a10",
         task_class=TaskClass.THESIS_SYNTHESIS,
         tier=Tier.REASON,
-        model_id="claude-opus-5",
+        model_id="claude-opus-5-5",
         prompt="p" * 400,
         usage=Usage(input_tokens=1000, output_tokens=200),
     )

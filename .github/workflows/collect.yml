@@ -78,8 +78,13 @@ jobs:
     runs-on: ubuntu-latest
     # SWEEP_DEADLINE_SECONDS stops new requests at 10 minutes so the run always
     # reaches the commit step; a job killed by this cap commits nothing at all.
-    # The price step has its own budget and cap for the same reason (below).
-    timeout-minutes: 25
+    # The price step has its own budget and cap for the same reason (below),
+    # and so does the web evidence step. This cap must be at least the sum of
+    # those bounds - setup ~1, sweep 10 plus requests in flight ~1, prices 8,
+    # web evidence 11, digest, monitor and commit ~2 - or it can cancel the
+    # job while the evidence step waits on a search it has already paid for,
+    # and the commit that records that spend never runs.
+    timeout-minutes: 35
     defaults:
       run:
         shell: bash
@@ -148,6 +153,13 @@ jobs:
             exit 0
           fi
           python3 .github/scripts/keys_from_blob.py ALL_SECRET | while IFS='=' read -r name value; do
+            # Exported here, a key reaches every later step's processes. The
+            # Anthropic key is read from the blob by the web evidence step
+            # itself, so it reaches that step alone.
+            if [ "$name" = "ANTHROPIC_API_KEY" ]; then
+              echo "$name: found; read by the web evidence step alone"
+              continue
+            fi
             if [ -n "${!name}" ]; then
               echo "$name: set under its own name; the blob's copy is ignored"
               continue
@@ -241,6 +253,51 @@ jobs:
           code=$?
           if [ "$code" -ne 0 ]; then
             echo "::warning title=predictions not graded::ask.py paper grade exited $code"
+          fi
+          exit 0
+
+      # Web evidence (knowledge/evidence/web.py): for a book name whose
+      # session moved beyond 1.96 sigma with the decomposition saying a
+      # company-specific cause is warranted, ask Claude with web search what
+      # explains it, and keep each page it cites as a corpus row. After the
+      # price cache and the marks, because the trigger is measured from the
+      # bars just cached; before the digest and the commit, so its rows are
+      # committed with the sweep. A session is searched once it has been shut
+      # for 6 hours, so a Bursa day is searched at that day's us_close and a
+      # US day at the next bursa_close. Every attempt and its cost is a row
+      # in the corpus, which is also the month's spend record, checked against
+      # config.toml [budget] before each search. The key goes to this step
+      # only - from its own secret, or read here from ALL_SECRET, which is
+      # then dropped before anything runs. The run starts no search leg that
+      # cannot finish inside DEADLINE_SECONDS (8 min, knowledge/evidence/
+      # web.py); the limit below is that plus startup, so a billed search is
+      # never killed before it is recorded. Non-fatal like its neighbours: no
+      # key, no move, a refused search or an API fault costs this step, never
+      # the commit.
+      - name: Search the web for unexplained moves
+        if: (steps.slot.outputs.slot == 'bursa_close' || steps.slot.outputs.slot == 'us_close' || steps.slot.outputs.slot == 'all') && (steps.sweep.outputs.code == '0' || steps.sweep.outputs.code == '3')
+        timeout-minutes: 11
+        continue-on-error: true
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ALL_SECRET: ${{ secrets.ALL_SECRET }}
+          ANTHROPIC_WORKSPACE_ID: ${{ secrets.ANTHROPIC_WORKSPACE_ID }}
+          FINPLANET_OFFLINE: "1"
+        run: |
+          set +e
+          if [ -z "$ANTHROPIC_API_KEY" ] && [ -n "$ALL_SECRET" ]; then
+            ANTHROPIC_API_KEY=$(python3 .github/scripts/keys_from_blob.py ALL_SECRET --only ANTHROPIC_API_KEY 2>/dev/null | sed -n 's/^ANTHROPIC_API_KEY=//p')
+            if [ -n "$ANTHROPIC_API_KEY" ]; then
+              echo "::add-mask::$ANTHROPIC_API_KEY"
+              echo "ANTHROPIC_API_KEY: taken from ALL_SECRET"
+            fi
+            export ANTHROPIC_API_KEY
+          fi
+          unset ALL_SECRET
+          uv run python ask.py evidence
+          code=$?
+          if [ "$code" -ne 0 ]; then
+            echo "::warning title=web evidence not searched::ask.py evidence exited $code; see the step log"
           fi
           exit 0
 

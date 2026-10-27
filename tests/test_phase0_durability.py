@@ -29,7 +29,7 @@ def _call(led, cost_at=None, **kw):
         agent=kw.get("agent", "a1_fundamentals"),
         task_class=TaskClass.FUNDAMENTALS_READ,
         tier=Tier.BALANCED,
-        model_id="claude-sonnet-5",
+        model_id="claude-sonnet-5-5",
         prompt="p" * 4000,
         usage=Usage(input_tokens=100_000, output_tokens=1000),
         at=cost_at,

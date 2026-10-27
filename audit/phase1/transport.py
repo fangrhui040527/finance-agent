@@ -74,7 +74,7 @@ class _Answer:
 
     content = [type("B", (), {"type": "text", "text": "ok"})()]
     usage = _Usage()
-    model = "claude-haiku-4-5"
+    model = "claude-haiku-5-5"
     stop_reason = "end_turn"
     _request_id = "req_scripted"
 
@@ -88,7 +88,7 @@ def _backend(errors, sleeps):
 
 def _call(backend):
     return backend._request(
-        {"model": "claude-haiku-4-5", "max_tokens": 8, "messages": []}, stream=False
+        {"model": "claude-haiku-5-5", "max_tokens": 8, "messages": []}, stream=False
     )
 
 

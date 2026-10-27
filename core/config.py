@@ -56,6 +56,18 @@ HARD_BOUNDS: tuple[tuple[str, float, float, str], ...] = (
     ("waterfall.debt_hurdle", 0.0, 1.0, "the debt hurdle is an annual rate"),
     ("budget.daily_myr", 0.0, 10_000.0, "a daily budget above RM 10,000 is a typo, not a decision"),
     (
+        "budget.monthly_usd",
+        0.0,
+        10_000.0,
+        "a monthly model budget above USD 10,000 is a typo, not a decision",
+    ),
+    (
+        "budget.evidence_monthly_usd",
+        0.0,
+        10_000.0,
+        "a monthly evidence budget above USD 10,000 is a typo, not a decision",
+    ),
+    (
         "budget.per_question_myr",
         0.0,
         1_000.0,
@@ -297,6 +309,12 @@ class Config:
     """
     provenance_db: str = "data/provenance.db"
     daemon_budget_myr: Decimal = Decimal("10.0")
+    #: The owner's hard monthly limit on the API key, USD per calendar month
+    #: (UTC). None means no monthly cap - which `doctor` warns about, because
+    #: the rolling 24h rail alone lets a month add up to thirty of them.
+    monthly_budget_usd: Decimal | None = None
+    #: The web evidence ingest's share of `monthly_budget_usd`; never above it.
+    evidence_budget_usd: Decimal | None = None
     #: Feeds a scheduled sweep reads. `[sources] enabled` described these for
     #: months and nothing loaded it, so enabling a source did exactly nothing -
     #: the same defect class as the unreachable waterfall in details/10, and it
@@ -337,7 +355,20 @@ class Config:
             f"   (interactive)\n"
             f"  daemon budget        RM {self.daemon_budget_myr:.2f}"
             f"   (unattended; separate so a runaway job cannot eat the above)\n"
-            f"  prediction log       {self.database}\n"
+            f"  monthly cap          "
+            + (
+                f"USD {self.monthly_budget_usd:.2f}   (hard; every call reserves its worst case)"
+                if self.monthly_budget_usd is not None
+                else "(none - no monthly limit on the API key)"
+            )
+            + "\n"
+            + (
+                f"  evidence sub-cap     USD {self.evidence_budget_usd:.2f}   "
+                "(web search, inside the monthly cap)\n"
+                if self.evidence_budget_usd is not None
+                else ""
+            )
+            + f"  prediction log       {self.database}\n"
             f"  provenance ledger    {self.provenance_db}\n"
             f"  investable capital   "
             + (
@@ -658,6 +689,43 @@ def _paper(data: dict) -> PaperSettings:
     )
 
 
+def _monthly_caps(data: dict) -> tuple[Decimal | None, Decimal | None]:
+    """[budget] monthly_usd and evidence_monthly_usd: absent is None (no cap).
+
+    HARD_BOUNDS has already refused a non-number and anything outside
+    [0, 10,000]. What is left is the part a range cannot say: a cap of zero is
+    not a cap but a switch that refuses every call, so it is refused here with
+    that said; and the evidence cap is a SHARE of the monthly one, so it cannot
+    exceed it or exist without it.
+    """
+    caps: list[Decimal | None] = []
+    for key in ("budget.monthly_usd", "budget.evidence_monthly_usd"):
+        raw = _get(data, key, None)
+        if raw is None:
+            caps.append(None)
+            continue
+        value = Decimal(str(raw))
+        if value <= 0:
+            raise ConfigError(
+                f"{key} = {raw} must be above zero: a cap of zero refuses every call. "
+                "Remove the key for no cap."
+            )
+        caps.append(value)
+    monthly, evidence = caps
+    if evidence is not None:
+        if monthly is None:
+            raise ConfigError(
+                "budget.evidence_monthly_usd is a share of budget.monthly_usd, and "
+                "monthly_usd is not set; set the monthly cap first"
+            )
+        if evidence > monthly:
+            raise ConfigError(
+                f"budget.evidence_monthly_usd = {evidence} is above budget.monthly_usd = "
+                f"{monthly}: the evidence ingest's share cannot exceed the whole"
+            )
+    return monthly, evidence
+
+
 def _check_bounds(data: dict) -> None:
     for key, lo, hi, why in HARD_BOUNDS:
         value = _get(data, key, None)
@@ -806,6 +874,8 @@ def load(path: str | Path | None = None) -> Config:
             raise ConfigError(f"{k} must be a number, got {type(v).__name__}")
         return float(v)
 
+    monthly_usd, evidence_usd = _monthly_caps(data)
+
     sources = _sources(data)
     read_only = _instruments(data, "sources.read_only")
     held = set(_instruments(data, "account.holdings")) | set(
@@ -841,6 +911,8 @@ def load(path: str | Path | None = None) -> Config:
         facts_db=_store_path(_get(data, "sources.facts_database", "data/facts.db")),
         languages=_strings(data, "sources.languages"),
         daemon_budget_myr=dec("budget.daemon_daily_myr", 10.0),
+        monthly_budget_usd=monthly_usd,
+        evidence_budget_usd=evidence_usd,
         emergency_months=_int("waterfall.emergency_months", 6),
         debt_hurdle=dec("waterfall.debt_hurdle", 0.08),
         daily_budget_myr=dec("budget.daily_myr", 25.0),

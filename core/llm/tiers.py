@@ -3,9 +3,9 @@
 docs/01 section 9: four tiers routed by task class, never by habit. No agent
 imports a vendor SDK directly - everything goes through complete() here.
 
-docs/08 section 4.6: routing everything to the reasoning tier costs 3.4x for no
-quality gain (RM 6,300/year). That is why the routing table lives here and is not
-left to each agent's discretion.
+docs/08 section 4.6: routing everything to the reasoning tier costs 5x for no
+quality gain (RM 5,700/year at the 5.5 rates). That is why the routing table
+lives here and is not left to each agent's discretion.
 """
 
 from __future__ import annotations
@@ -110,27 +110,80 @@ ROUTING: dict[TaskClass, Tier] = {
     TaskClass.EMBED_TEXT: Tier.EMBED,
 }
 
-# USD per million tokens, first-party API rates (docs/08 section 4).
-#
-# These are paired with MODEL_IDS below and must be changed together. BALANCED
-# was billed at $3/$15 - Sonnet 4.6's rate - while MODEL_IDS already pointed at
-# Sonnet 5, which is $2/$10. Nothing failed: every cost, every budget check and
-# every ledger row was simply 50% too high, and the daily budget refused
-# questions it could afford.
-PRICING_USD: dict[Tier, tuple[Decimal, Decimal]] = {
-    Tier.REASON: (Decimal("5.00"), Decimal("25.00")),  # claude-opus-5
-    Tier.BALANCED: (Decimal("2.00"), Decimal("10.00")),  # claude-sonnet-5
-    Tier.CHEAP: (Decimal("1.00"), Decimal("5.00")),  # claude-haiku-4-5
-    Tier.EMBED: (Decimal("0.05"), Decimal("0")),
-    Tier.LOCAL: (Decimal("0"), Decimal("0")),
+
+@dataclass(frozen=True)
+class Rates:
+    """One model's first-party price card, USD per million tokens.
+
+    Keyed by MODEL, not by tier: a tier is a role and the model behind it
+    changes, and a price that followed the role billed BALANCED at Sonnet 4.6's
+    $3/$15 for weeks after the role had moved to Sonnet 5 at $2/$10 - every
+    cost, budget check and ledger row 50% high, and the daily budget refusing
+    questions it could afford. Cache reads and writes are stated per model
+    because the ratio is not constant (Opus 5.5 reads at 0.05x, older models at
+    0.1x). `long_above` is Haiku 5.5's step: a request whose input, cached or
+    not, exceeds it is billed whole at the long rates.
+    """
+
+    input: Decimal
+    output: Decimal
+    cache_read: Decimal
+    cache_write: Decimal
+    long_above: int | None = None
+    long_input: Decimal | None = None
+    long_output: Decimal | None = None
+
+
+def _r(*values: str, long_above: int | None = None, long: tuple[str, str] | None = None) -> Rates:
+    i, o, cr, cw = (Decimal(v) for v in values)
+    if long is None:
+        return Rates(i, o, cr, cw)
+    return Rates(i, o, cr, cw, long_above, Decimal(long[0]), Decimal(long[1]))
+
+
+#: The models this system has called or may call. Earlier generations stay so a
+#: ledger row written against them can still be priced and reported.
+MODEL_RATES: dict[str, Rates] = {
+    "claude-opus-5-5": _r("4.00", "20.00", "0.20", "5.00"),
+    # The cache read is $0.20 in the bundled API notes and $0.10 on the live
+    # pricing page; the higher figure is kept, because a cap that counts low is
+    # the direction of error that spends money nobody approved.
+    "claude-sonnet-5-5": _r("2.00", "10.00", "0.20", "2.50"),
+    "claude-haiku-5-5": _r(
+        "0.10", "0.50", "0.01", "0.125", long_above=100_000, long=("0.50", "2.50")
+    ),
+    "claude-opus-5": _r("5.00", "25.00", "0.50", "6.25"),
+    "claude-sonnet-5": _r("2.00", "10.00", "0.20", "2.50"),
+    "claude-haiku-4-5": _r("1.00", "5.00", "0.10", "1.25"),
 }
 
+#: The server-side web search tool: $10 per 1,000 searches, on top of tokens.
+#: A search that errors is not billed (the API says so), and the count the
+#: response reports - `usage.server_tool_use.web_search_requests` - is of
+#: searches run, so it is what is charged here.
+WEB_SEARCH_USD = Decimal("0.01")
+
+#: The model each Messages tier calls: the current (5.5) generation. A change
+#: here moves the price with it (PRICING_USD below is derived), and the exact
+#: ids in MODEL_ALIASES must follow, because an exact id names the model called.
 MODEL_IDS: dict[Tier, str] = {
-    Tier.REASON: "claude-opus-5",
-    Tier.BALANCED: "claude-sonnet-5",
-    Tier.CHEAP: "claude-haiku-4-5",
+    Tier.REASON: "claude-opus-5-5",
+    Tier.BALANCED: "claude-sonnet-5-5",
+    Tier.CHEAP: "claude-haiku-5-5",
     Tier.EMBED: "text-embedding-3-small",
     Tier.LOCAL: "finbert-local",
+}
+
+# USD per million tokens, first-party API rates (docs/08 section 4), as an
+# (input, output) pair per tier - DERIVED from the model each tier resolves to,
+# so the two tables cannot drift apart again.
+PRICING_USD: dict[Tier, tuple[Decimal, Decimal]] = {
+    **{
+        t: (MODEL_RATES[MODEL_IDS[t]].input, MODEL_RATES[MODEL_IDS[t]].output)
+        for t in (Tier.REASON, Tier.BALANCED, Tier.CHEAP)
+    },
+    Tier.EMBED: (Decimal("0.05"), Decimal("0")),
+    Tier.LOCAL: (Decimal("0"), Decimal("0")),
 }
 
 
@@ -159,62 +212,51 @@ class Usage:
 
     input_tokens: int
     output_tokens: int
-    cached_input_tokens: int = 0  # cache_read_input_tokens, billed at 0.1x
-    cache_write_tokens: int = 0  # cache_creation_input_tokens, billed at 1.25x
+    cached_input_tokens: int = 0  # cache_read_input_tokens, the model's cache-read rate
+    cache_write_tokens: int = 0  # cache_creation_input_tokens, its cache-write rate
+    #: `usage.server_tool_use.web_search_requests`: searches the server tool
+    #: ran, each billed at WEB_SEARCH_USD on top of the tokens.
+    web_search_requests: int = 0
 
 
 @dataclass(frozen=True)
 class RequestProfile:
     """How a request is SHAPED for the model a tier resolves to.
 
-    Haiku 4.5 rejects `output_config.effort` and `thinking: {type: "adaptive"}`
-    with a 400; the Opus/Sonnet 5 family wants adaptive thinking and an effort
-    level, and long generations should stream so they cannot die on an HTTP idle
-    timeout. The table below is the single place that knowledge lives - the
-    backend never guesses.
-
-    `thinking_budget` is the Haiku-shaped dial: that model takes the older
-    `{type: "enabled", budget_tokens: N}` form instead of an effort level, so
-    the same five-level control reaches all three models without either one
-    being sent a parameter it rejects. The two thinking forms are mutually
-    exclusive by construction - sending both is a 400, and a profile that could
-    express it would be a bug waiting for a live call to find.
+    All three Messages models are the 5.5 generation now, and they share one
+    request surface: adaptive thinking plus `output_config.effort`. The older
+    `thinking: {type: "enabled", budget_tokens: N}` form is a 400 on every one
+    of them - Haiku 5.5 included, which is why the budget dial Haiku 4.5 needed
+    is gone rather than kept for a model nothing calls. Sampling parameters
+    (`temperature`, `top_p`, `top_k`) are a 400 on every model from API version
+    2026-10-21, so a profile has no field for them. Long generations stream so
+    they cannot die on an HTTP idle timeout. This dataclass and the table below
+    are the single place that knowledge lives - the backend never guesses.
     """
 
     max_tokens: int
     adaptive_thinking: bool = False
     effort: str | None = None
     stream: bool = False
-    thinking_budget: int | None = None
 
     def __post_init__(self) -> None:
-        if self.thinking_budget is not None:
-            if self.adaptive_thinking or self.effort:
-                raise ValueError(
-                    "thinking_budget is the pre-4.6 form and cannot be combined with "
-                    "adaptive thinking or an effort level; one model, one dial"
-                )
-            if self.thinking_budget < 1024:
-                raise ValueError(
-                    f"thinking budget must be at least 1024 tokens, got {self.thinking_budget}"
-                )
-            if self.thinking_budget >= self.max_tokens:
-                raise ValueError(
-                    f"thinking budget {self.thinking_budget} must be under max_tokens "
-                    f"{self.max_tokens}; the budget is spent INSIDE the output cap"
-                )
         if self.effort is not None and self.effort not in _EFFORT_VALUES:
             raise ValueError(
                 f"unknown effort {self.effort!r}; expected one of {', '.join(_EFFORT_VALUES)}"
             )
 
 
+#: Every effort is stated rather than left to the model's default, because the
+#: defaults differ by model and moved with 5.5 - Opus 5.5 and Haiku 5.5 default
+#: to `medium`, Sonnet 5.5 to `high` - and a profile that relied on one would
+#: change what it buys the day the model behind the tier changes.
 REQUEST_PROFILES: dict[Tier, RequestProfile] = {
     Tier.REASON: RequestProfile(
         max_tokens=16000, adaptive_thinking=True, effort="high", stream=True
     ),
     Tier.BALANCED: RequestProfile(max_tokens=8000, adaptive_thinking=True, effort="medium"),
-    Tier.CHEAP: RequestProfile(max_tokens=1024),
+    # Triage, tagging, routing: `low`, under Haiku 5.5's own `medium` default.
+    Tier.CHEAP: RequestProfile(max_tokens=4096, adaptive_thinking=True, effort="low"),
     Tier.EMBED: RequestProfile(max_tokens=1),
     Tier.LOCAL: RequestProfile(max_tokens=1),
 }
@@ -224,18 +266,23 @@ REQUEST_PROFILES: dict[Tier, RequestProfile] = {
 #: the exact model id resolve to the same tier, because the two get used
 #: interchangeably in practice and a system that accepts one spelling and
 #: silently ignores the other is the `MYX`/`XKLS` defect again.
+#:
+#: A VERSIONED name must name the model actually called. `claude-haiku-4-5`
+#: resolving to a tier that calls Haiku 5.5 would be a selection that reads as
+#: one model and bills as another, so the previous generation's ids and short
+#: names are refused (loudly, at startup) rather than quietly remapped.
 MODEL_ALIASES: dict[str, Tier] = {
     "haiku": Tier.CHEAP,
-    "haiku-4-5": Tier.CHEAP,
-    "claude-haiku-4-5": Tier.CHEAP,
+    "haiku-5-5": Tier.CHEAP,
+    "claude-haiku-5-5": Tier.CHEAP,
     "cheap": Tier.CHEAP,
     "sonnet": Tier.BALANCED,
-    "sonnet-5": Tier.BALANCED,
-    "claude-sonnet-5": Tier.BALANCED,
+    "sonnet-5-5": Tier.BALANCED,
+    "claude-sonnet-5-5": Tier.BALANCED,
     "balanced": Tier.BALANCED,
     "opus": Tier.REASON,
-    "opus-5": Tier.REASON,
-    "claude-opus-5": Tier.REASON,
+    "opus-5-5": Tier.REASON,
+    "claude-opus-5-5": Tier.REASON,
     "reason": Tier.REASON,
 }
 
@@ -243,20 +290,10 @@ MODEL_ALIASES: dict[str, Tier] = {
 #: pinned, capped or given an effort level.
 MESSAGES_TIERS: tuple[Tier, ...] = (Tier.REASON, Tier.BALANCED, Tier.CHEAP)
 
-#: Tiers whose model accepts `output_config.effort`. Haiku 4.5 does not - it
-#: returns a 400 - which is why CHEAP is absent here and gets a budget instead.
-EFFORT_TIERS: tuple[Tier, ...] = (Tier.REASON, Tier.BALANCED)
-
-#: Effort -> (thinking budget, output cap) for Haiku 4.5, the one model here
-#: with no effort parameter. The budget is spent INSIDE the cap, so the two
-#: move together; a table is the only honest way to hold that.
-CHEAP_EFFORT_BUDGET: dict[Effort, tuple[int, int]] = {
-    Effort.LOW: (1024, 3072),
-    Effort.MEDIUM: (2048, 4608),
-    Effort.HIGH: (4096, 8192),
-    Effort.XHIGH: (8192, 12288),
-    Effort.MAX: (16000, 20000),
-}
+#: Tiers whose model accepts `output_config.effort`: every Messages tier, now
+#: that CHEAP is Haiku 5.5. (Haiku 4.5 returned a 400 for an effort level and
+#: needed a thinking budget instead; nothing here calls it any more.)
+EFFORT_TIERS: tuple[Tier, ...] = (Tier.REASON, Tier.BALANCED, Tier.CHEAP)
 
 #: The output cap an effort level needs to land in on an effort-taking model.
 #: Raising effort without raising the cap buys thinking that is then truncated:
@@ -376,27 +413,19 @@ def profile_for(tier: Tier) -> RequestProfile:
     nothing is selected, and what the tests pin. This is the resolved view,
     and it is the only shape the client should send.
 
-    Three model-shaped facts live here and nowhere else:
+    Two model-shaped facts live here and nowhere else:
 
-      * Opus 5 and Sonnet 5 take `output_config.effort` at all five levels.
-      * Haiku 4.5 takes no effort parameter at all. Its dial is the older
-        `thinking.budget_tokens`, so the five levels reach it in the one form
-        it accepts rather than being quietly dropped on the floor.
+      * Opus 5.5, Sonnet 5.5 and Haiku 5.5 all take adaptive thinking and
+        `output_config.effort` at all five levels, so one path serves every
+        Messages tier. None takes `thinking.budget_tokens` (a 400), and none is
+        ever sent it.
       * A higher effort needs a bigger output cap to land in, and a big cap
         needs to stream.
     """
     base = REQUEST_PROFILES[tier]
     effort = selected_effort()
-    if effort is None or tier not in MESSAGES_TIERS:
+    if effort is None or tier not in EFFORT_TIERS:
         return base
-
-    if tier is Tier.CHEAP:
-        budget, cap = CHEAP_EFFORT_BUDGET[effort]
-        return RequestProfile(
-            max_tokens=cap,
-            thinking_budget=budget,
-            stream=cap >= STREAM_ABOVE_MAX_TOKENS,
-        )
 
     cap = max(base.max_tokens, EFFORT_MAX_TOKENS[effort])
     return RequestProfile(
@@ -421,12 +450,6 @@ def selection_note() -> str:
         parts.append(f"every Messages tier pinned to {MODEL_IDS[pin]} ({pin_source()})")
     if effort is not None:
         parts.append(f"effort {effort.value} (FINPLANET_EFFORT)")
-        if pin is None or pin is Tier.CHEAP:
-            budget = CHEAP_EFFORT_BUDGET[effort][0]
-            parts.append(
-                f"on Haiku 4.5 that is a {budget}-token thinking budget, "
-                "because it takes no effort parameter"
-            )
     # No colons. `ask.py` labels the narrative with `reason.split(":")[0]` to cut
     # the explanatory tail off the echo reason, so a colon in here truncates the
     # disclosure mid-sentence - the label stops exactly where it starts saying
@@ -457,20 +480,87 @@ CACHE_MIN_FLOOR = 512
 CACHE_MIN_CEILING = 4096
 
 
-def cost_usd(tier: Tier, usage: Usage, pricing: tuple[Decimal, Decimal] | None = None) -> Decimal:
-    """Fresh input at the base rate, reads at a tenth, writes at a quarter over.
+def cost_usd(
+    tier: Tier,
+    usage: Usage,
+    pricing: tuple[Decimal, Decimal] | None = None,
+    model_id: str | None = None,
+) -> Decimal:
+    """What one call cost, in USD.
 
     `pricing` is the (input, output) USD-per-million pair the BACKEND declares
     for this call, when it is not on the first-party table: a free provider
-    passes zero. None bills at the tier's own rate, as before.
+    passes zero, and reads and writes scale its input rate. Otherwise the call
+    is priced on the card of the model that answered (`model_id`, or the one
+    the tier resolves to) - cache reads, writes and Haiku 5.5's long-prompt
+    step included - plus WEB_SEARCH_USD per server-side search.
 
     Every term is clamped at zero, so the sum can never be negative whatever a
     malformed usage block says.
     """
-    in_rate, out_rate = pricing if pricing is not None else PRICING_USD[tier]
     million = Decimal(1_000_000)
-    fresh = Decimal(max(usage.input_tokens, 0)) / million * in_rate
-    cached = Decimal(max(usage.cached_input_tokens, 0)) / million * in_rate * CACHE_READ_MULTIPLIER
-    written = Decimal(max(usage.cache_write_tokens, 0)) / million * in_rate * CACHE_WRITE_MULTIPLIER
-    out = Decimal(max(usage.output_tokens, 0)) / million * out_rate
-    return fresh + cached + written + out
+    fresh_n = Decimal(max(usage.input_tokens, 0))
+    read_n = Decimal(max(usage.cached_input_tokens, 0))
+    write_n = Decimal(max(usage.cache_write_tokens, 0))
+    out_n = Decimal(max(usage.output_tokens, 0))
+    searches = Decimal(max(usage.web_search_requests, 0)) * WEB_SEARCH_USD
+    rates = None if pricing is not None else MODEL_RATES.get(model_id or MODEL_IDS[tier])
+    if rates is None:
+        in_rate, out_rate = pricing if pricing is not None else PRICING_USD[tier]
+        return (
+            fresh_n / million * in_rate
+            + read_n / million * in_rate * CACHE_READ_MULTIPLIER
+            + write_n / million * in_rate * CACHE_WRITE_MULTIPLIER
+            + out_n / million * out_rate
+            + searches
+        )
+    in_rate, out_rate, read_rate, write_rate = (
+        rates.input,
+        rates.output,
+        rates.cache_read,
+        rates.cache_write,
+    )
+    if rates.long_above is not None and fresh_n + read_n + write_n > rates.long_above:
+        scale = (rates.long_input or rates.input) / rates.input
+        in_rate, read_rate, write_rate = in_rate * scale, read_rate * scale, write_rate * scale
+        out_rate = rates.long_output or rates.output
+    return (
+        fresh_n / million * in_rate
+        + read_n / million * read_rate
+        + write_n / million * write_rate
+        + out_n / million * out_rate
+        + searches
+    )
+
+
+def worst_case_usd(
+    model_id: str,
+    input_tokens: int,
+    max_tokens: int,
+    *,
+    searches: int = 0,
+) -> Decimal:
+    """The most one call can cost, to reserve against a budget BEFORE it is made.
+
+    A check of what has already been spent lets the last call overshoot by its
+    whole cost; this is that cost, priced as if every input token were fresh
+    (cache writes aside, the dearest way to be billed) and every output token
+    used, at the long-prompt rate when the input could cross the step.
+
+    A model with no price card raises: a reservation that read zero would
+    leave a cap checking only what was already spent, and the call would
+    overshoot it by its whole cost. (`InferenceClient.reservation_usd` asks
+    only for ids on the card and reserves the rest at the tier's rate.)"""
+    rates = MODEL_RATES.get(model_id)
+    if rates is None:
+        raise ValueError(f"no price card for {model_id!r} in MODEL_RATES: cannot reserve for it")
+    in_rate, out_rate = rates.input, rates.output
+    if rates.long_above is not None and input_tokens > rates.long_above:
+        in_rate, out_rate = rates.long_input or in_rate, rates.long_output or out_rate
+    million = Decimal(1_000_000)
+    write_rate = rates.cache_write * (in_rate / rates.input)
+    return (
+        Decimal(max(input_tokens, 0)) / million * max(in_rate, write_rate)
+        + Decimal(max(max_tokens, 0)) / million * out_rate
+        + Decimal(max(searches, 0)) * WEB_SEARCH_USD
+    )

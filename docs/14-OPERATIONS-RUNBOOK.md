@@ -249,6 +249,13 @@ Tell them the three rules that are not negotiable:
   and names misconceptions. It does not replace reading.
 - **Costs are planning estimates** at RM 4.15/USD, not measured bills. The
   provenance ledger records actuals from day one — compare monthly.
+- **The monthly cap sees what is recorded, not everything.** `[budget]
+  monthly_usd` (USD 50) is enforced before every call against the committed
+  evidence spend in `data/corpus.db` plus the ledger of the process making the
+  call. A call made on another machine whose ledger is never committed is
+  invisible to it. Set the same figure as the workspace spend limit in the
+  Anthropic Console: that limit is enforced by the API itself and is the
+  backstop for what this one cannot see.
 
 ---
 
@@ -295,6 +302,7 @@ The rules, all thresholds in `config.toml [monitor]` and bounded in code:
 | rule | fires when |
 |---|---|
 | `spend_24h` | 24h spend crosses `spend_fraction` of the daily budget |
+| `spend_month` | month-to-date USD (committed evidence spend in the corpus plus the local ledger, from 00:00 UTC on the 1st) reaches 85% of `[budget] monthly_usd` (warn) or the cap itself (alert - calls are being refused by then); no cap, no rule |
 | `latency_p95` | p95 latency over 24h exceeds `p95_latency_ms` |
 | `dropped_claims` | claims dropped for want of a citation exceed `dropped_claim_rate` |
 | `silence` | no model calls in `silence_hours`, on a ledger that HAS run before (0 = off) |
@@ -709,6 +717,90 @@ Then read it from anywhere: `ask.py alerts` on the command line, the
 `open_alerts` MCP tool in a Claude session, or `GET /api/alerts` in the web
 app. An empty history means no rule has been EVALUATED - not that none would
 fire.
+
+## Web evidence: searching for what the feeds missed (2026-10-22)
+
+On 2026-10-16 Press Metal fell 9.34%, an idiosyncratic move of 5.43 sigma, and
+the nightly page could only say "no collected evidence reaches it". RHB's
+explanation (falling aluminium prices, carbon anode costs, US inflation) was
+on the open web and nowhere in the store. `ask.py evidence`
+(`knowledge/evidence/web.py`) goes and looks, for exactly those moves.
+
+**Which moves.** A book name's session, measured by the same decomposition the
+pack prints, when the verdict is `no_identified_catalyst` (a company-specific
+cause is warranted) and |SAR| > 1.96, and the row is clean (not mis-dated,
+stale, blank, provisional, or a "1d" return spanning a gap). Over
+2026-04-22..10-22 that fired 76 times in 1,125 name-sessions, about 13 a
+month. A session the fact book already holds a structured cause for is not
+searched: a rating change that day, or an earnings report mapped to the
+session it moves (after the close -> the next session; before the open or
+during it -> that day's; no time given -> both), using only the date the
+calendar announced last for that quarter. At most 3 names per market session
+(largest first) and 4 per run.
+
+**When.** Once the session's close is 6 hours old (the notes that explain a
+move arrive after it) and while it is among the last 3 sessions. A Bursa day
+is searched at that day's us_close slot, a US day at the next bursa_close;
+both before the 22:30Z routine writes the page.
+
+**How.** One Messages call to `claude-opus-5-5` with Anthropic's server-side
+`web_search_20260209` tool (`max_uses` 3, effort medium, the market's country
+as the search location), through `core/llm/websearch.py`. A paused turn is
+resumed once, never more. A refusal is recorded and never re-routed. Each leg
+has 180 s, the SDK never retries (a retried timeout is a second paid turn),
+and no leg starts unless it can finish inside the run's 8-minute deadline; the
+collector step allows 11 minutes and the job 35 (the sum of its steps' bounds),
+so a billed search is never killed before it is recorded. A request the API
+refuses before running it (429, 5xx, 529) is retried twice inside the
+deadline; one that may have run with no response seen (a read timeout, a
+dropped connection) is priced at its reserve and not sent again.
+
+**What is kept.** One corpus row per page the model cited: its title, the
+passages cited, its own date (`page_age`; an undated page is not stored, never
+dated by when it was found), `first_seen_at` = when it was retrieved, `query`
+= what was searched, `fetched_for` = the name, doc_id `web_search:<url>`. A
+page dated by day alone ("October 22, 2026", "3 days ago") is that day in the
+market's timezone, stamped at its END (capped at retrieval) so it is never
+dated earlier than it could have appeared; its body says "day only", the pack
+prints it as a date, and it takes no headline key, so a feed's precisely timed
+copy of the story is still stored. Each row goes through the same cleaning and
+linking as every source and is scanned for injection both as given and as
+stored (the corpus is append-only). Retrieval cites these rows at the
+WEB_SEARCH trust tier with a caveat. The model's own summary is not evidence;
+it is kept, scanned, on the attempt's record as a pointer. The pack prints a
+"Web evidence" section listing each name's attempts, with each stored row
+under the search that found it.
+
+**What it costs, and the cap.** Measured estimate: about USD 0.29 a move
+(3 searches at USD 0.01, ~44k input tokens at $4/M, ~4k output at $20/M), so
+~USD 4-7 a month at the measured trigger rate. Every attempt is a row in
+`evidence_searches` in data/corpus.db - committed by the collector, so it is
+the month's spend record across every run (a runner's own ledger is thrown
+away). Before each search the most it could cost (USD ~1.88: per leg, 150k
+input tokens at the cache-write rate, a full output and three searches; two
+legs) is reserved against two caps in config.toml [budget]:
+`evidence_monthly_usd` (10) and `monthly_usd` (50, all reasoning: the
+committed evidence spend plus this machine's own ledger). If either would be
+crossed the search is not made, and a `budget` row says so; a search that
+still costs more than its reserve ends the run. A move already searched is
+never searched again. A call refused before any work (nothing billed) is an
+`error` row at USD 0 and is retried by the next run; one that fails after a
+billed leg is recorded at that leg's cost (`incomplete`), and a leg that timed
+out at its reserve (`timeout`), since its usage is never seen - both count as
+searched.
+
+**What it needs.** `ANTHROPIC_API_KEY` as a repository secret (or in
+ALL_SECRET, labelled "anthropic"/"claude" or recognised by its `sk-ant-api`
+prefix; a Claude Code OAuth or Admin token is never taken for it). The key
+reaches the evidence step alone: `keys_from_blob.py` prints it only when asked
+(`--only ANTHROPIC_API_KEY`), so no workflow's ALL_SECRET reader exports it,
+and the evidence step reads the blob itself. Without it the step lists the
+qualifying moves and records nothing. An identity-linked key needs
+`ANTHROPIC_WORKSPACE_ID` (a repository secret too); it is sent as the
+`anthropic-workspace-id` header, and a workspace 400 stops the run after one
+attempt. As a backstop the cap in code cannot provide - a call from a machine
+whose corpus is never committed - set a monthly spend limit on the key's
+workspace in the Anthropic Console.
 
 ## Large stores: GitHub's file limits (2026-10-22)
 

@@ -32,6 +32,13 @@ token was one the old pattern could already match.
 
 Nothing is printed for a name it is not sure about, and no value is ever
 written to stderr: the summary there names the names.
+
+THE PAID KEY IS PRINTED ONLY WHEN ASKED FOR. Every workflow's reader loop
+writes what this prints to $GITHUB_ENV, which reaches every later step's
+processes. ANTHROPIC_API_KEY is recognised (so its token is never taken for
+another name) but printed only with `--only ANTHROPIC_API_KEY`, which the one
+step that spends it - collect.yml's web evidence step - passes. A run with the
+key in its environment bills it, on a runner whose ledger is thrown away.
 """
 
 from __future__ import annotations
@@ -51,6 +58,9 @@ LABELS: tuple[tuple[str, re.Pattern[str]], ...] = (
     # a pasted blob, not by the variable, because nobody writes
     # "EMBEDDING_API_KEY" beside the key they just copied.
     ("EMBEDDING_API_KEY", re.compile(r"open\s*router|\bembed(ding)?\b|nemotron", re.I)),
+    # The web evidence step (knowledge/evidence/web.py) calls Claude with web
+    # search; named by the vendor or the model, as a person writes it.
+    ("ANTHROPIC_API_KEY", re.compile(r"anthropic|\bclaude\b", re.I)),
 )
 
 SHAPES: tuple[tuple[str, re.Pattern[str]], ...] = (
@@ -67,7 +77,19 @@ SHAPES: tuple[tuple[str, re.Pattern[str]], ...] = (
     # OpenRouter prefixes every key `sk-or-v1-` and follows it with 64 hex
     # characters. Distinctive enough to recognise unlabelled.
     ("EMBEDDING_API_KEY", re.compile(r"^sk-or-v1-[0-9a-f]{64}$")),
+    # An Anthropic Messages key is `sk-ant-api03-...`: recognisable unlabelled,
+    # and never confused with OpenRouter's `sk-or-`. Not any `sk-ant-`: a
+    # Claude Code OAuth token (`sk-ant-oat01-`) or an Admin key
+    # (`sk-ant-admin01-`) would be sent as x-api-key and refused, every run.
+    ("ANTHROPIC_API_KEY", re.compile(r"^sk-ant-api\d\d-[A-Za-z0-9_\-]{20,}$")),
 )
+
+#: A labelled token must still be this, or the label is passed over and a
+#: later line may supply the key: "claude code oauth token: sk-ant-oat01-..."
+#: carries a label this name answers to and a token it cannot use.
+MUST: dict[str, re.Pattern[str]] = {
+    "ANTHROPIC_API_KEY": re.compile(r"^sk-ant-api\d\d-"),
+}
 
 #: What counts as a token worth examining. Two alternatives, because vendors
 #: do not agree on the shape of a key: the long unbroken run most of them use,
@@ -77,6 +99,9 @@ SHAPES: tuple[tuple[str, re.Pattern[str]], ...] = (
 #: cannot be mistaken for a key.
 TOKEN = re.compile(r"[A-Za-z0-9_\-]{16,}|[0-9a-fA-F]{10,}\.[0-9a-fA-F]{6,}")
 NAMES = tuple(name for name, _ in LABELS)
+
+#: Recognised, but printed only on request (`--only NAME`).
+OPT_IN = ("ANTHROPIC_API_KEY",)
 
 
 def recognise(blob: str) -> dict[str, str]:
@@ -96,6 +121,8 @@ def recognise(blob: str) -> dict[str, str]:
             if tok is None or tok.group(0).upper() in NAMES:
                 continue
             value = tok.group(0)
+            if name in MUST and not MUST[name].match(value):
+                continue
             found[name] = value
             claimed.add(value)
             break
@@ -112,19 +139,31 @@ def recognise(blob: str) -> dict[str, str]:
 
 
 def main(argv: list[str]) -> int:
-    var = argv[1] if len(argv) > 1 else "ALL_SECRET"
+    args = list(argv[1:])
+    only: str | None = None
+    if "--only" in args:
+        i = args.index("--only")
+        if i + 1 >= len(args) or args[i + 1] not in NAMES:
+            sys.stderr.write(f"--only needs one of: {', '.join(NAMES)}\n")
+            return 2
+        only = args[i + 1]
+        del args[i : i + 2]
+    var = args[0] if args else "ALL_SECRET"
     blob = os.environ.get(var, "")
     if not blob.strip():
         sys.stderr.write(f"{var} is empty or unset\n")
         return 0
     found = recognise(blob)
-    for name in NAMES:
+    printed = (only,) if only else tuple(n for n in NAMES if n not in OPT_IN)
+    for name in printed:
         if name in found:
             sys.stdout.write(f"{name}={found[name]}\n")
     missing = [n for n in NAMES if n not in found]
+    held = [n for n in OPT_IN if n in found and n not in printed]
     sys.stderr.write(
         f"{var}: recognised {', '.join(n for n in NAMES if n in found) or 'nothing'}"
         + (f"; not found: {', '.join(missing)}" if missing else "")
+        + (f"; not printed (ask with --only): {', '.join(held)}" if held else "")
         + "\n"
     )
     return 0
