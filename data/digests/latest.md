@@ -1,6 +1,6 @@
 # Digest 2026-10-27
 
-Generated 2026-10-27 16:33 UTC · slot `all` · 25940 articles in the corpus, 6344 observations, 4256 events in the fact book.
+Generated 2026-10-27 17:11 UTC · slot `all` · 25958 articles in the corpus, 6344 observations, 4256 events in the fact book.
 
 ## The book
 
@@ -106,6 +106,15 @@ Generated 2026-10-27 16:33 UTC · slot `all` · 25940 articles in the corpus, 63
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 17:11 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
+| 17:11 | twse_openapi | ok | 8 | 0 | 0 | facts 0;  |
+| 17:11 | jin10_flash | ok | 16 | 16 | 16 | facts 0;  |
+| 17:11 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 17:11 | nst_business | ok | 2 | 2 | 2 |  |
+| 17:11 | fmt_business | ok | 0 | 0 | 0 |  |
+| 17:11 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Genting, Maybank, Tenaga, Petronas Chemicals, IHH, Press Metal |
+| 17:11 | google_news | ok | 0 | 0 | 0 | read but empty: Genting, Maybank, Tenaga, Petronas Chemicals, IHH, Press Metal |
+| 17:11 | gdelt | failed | 0 | 0 | 0 | no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP |
 | 16:32 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
 | 16:32 | twse_openapi | ok | 8 | 0 | 0 | facts 0;  |
 | 16:32 | jin10_flash | degraded | 17 | 17 | 17 | facts 0; window not covered back to 2026-10-27 12:39Z; the oldest item read is 2 |
