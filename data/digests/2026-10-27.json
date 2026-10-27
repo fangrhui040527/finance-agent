@@ -1,6 +1,42 @@
 {
   "collection": [
     {
+      "at": "2026-10-27T12:39:41.540456+00:00",
+      "detail": "facts 0; ",
+      "fetched": 450,
+      "kept": 0,
+      "source": "dbnomics",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-27T12:39:39.822620+00:00",
+      "detail": "facts 0; window not covered back to 2026-10-27 10:08Z; the oldest item read is 2026-10-27 12:29Z, so 2.4h of the window was never served",
+      "fetched": 15,
+      "kept": 15,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 13
+    },
+    {
+      "at": "2026-10-27T12:39:38.623624+00:00",
+      "detail": "skipped: fred needs FRED_API_KEY, which is not set. Add it to .env or as a GitHub Actions secret of the same name; until then this source is skipped.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "fred",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-27T12:39:38.622291+00:00",
+      "detail": "skipped: fmp needs FMP_API_KEY, which is not set. Add it to .env or as a GitHub Actions secret of the same name; until then this source is skipped.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "fmp",
+      "status": "ok",
+      "stored": 0
+    },
+    {
       "at": "2026-10-27T10:08:24.398746+00:00",
       "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
       "fetched": 0,
@@ -83,7 +119,7 @@
     }
   ],
   "counts": {
-    "articles": 25834,
+    "articles": 25847,
     "documents": 0,
     "escalated": 3418,
     "events": 4256,
@@ -91,10 +127,10 @@
     "linked": 14288,
     "observations": 6344,
     "series": 31,
-    "sweeps": 1152
+    "sweeps": 1156
   },
   "day": "2026-10-27",
-  "generated_at": "2026-10-27 10:12 UTC",
+  "generated_at": "2026-10-27 12:39 UTC",
   "macro": [
     {
       "change": "-0.02",
@@ -234,6 +270,7 @@
       "snapshot": [],
       "stories": [
         {
+          "day": null,
           "doc_id": "https://www.nst.com.my/business/corporate/2026/10/1564715/maybank-islamic-cgc-launch-first-supply-chain-financing",
           "domain": "www.nst.com.my",
           "escalated": false,
@@ -245,6 +282,7 @@
           "uncertainty": 0.0
         },
         {
+          "day": null,
           "doc_id": "https://www.nst.com.my/sports/golf/2026/10/1564501/yamashita-relaxed-historic-maybank-championship-title-defence-looms",
           "domain": "www.nst.com.my",
           "escalated": false,
@@ -256,6 +294,7 @@
           "uncertainty": 0.0
         },
         {
+          "day": null,
           "doc_id": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxQbF9lVG9IZGVsc2E1a29UM2xPZXc3ZEl0aGFiOWtHb1dFMWdMSy1Fa3JjcUk2U0IxSGY3c3hxX2N1dWhKZFNUa3BUd0pfZjI3VnVNWkFGaHVkcDlBSnFpY2VFeTBVRl9MT01uUDJlVWM0X18yNDQ0VXZLMDNqR3pzZVJicmtOeVRuWHV6WDdURXZiaGozbkNwVC1GdnZVVnY1ODVTRllDR2Y3RmNFZE1uSEF6Zjc0X1JfNDRv?oc=5",
           "domain": "technode.global",
           "escalated": false,
@@ -267,6 +306,7 @@
           "uncertainty": 0.0
         },
         {
+          "day": null,
           "doc_id": "https://news.google.com/rss/articles/CBMi4AFBVV95cUxNQ3JyN3V5eVBQdm1JajhCMFowcmMwNnBfSWdzc2xuWXBtS2NuenlId1h1dUVCRkYyanowYjJ4U3ZNN3ZDWk45cTFxcW1rUENHdHJrSDVlQnA3QWNpaFh3V0lScU5SVjNIbm5nQ21qNDg0RDVyNkZKblhubXU0al9kQzJzOE1KUFhZdWZRc19xdGo4RHpfWEdtSDlLdHU4OUtxRFg5akU2OEpvdTJPRXRLekc5dk1qNnJfc0dVanpJZHJRUVV3RDdfUkxyWFEyVTVSd21yZUVITUphSzl2aTFXZ9IB4AFBVV95cUxNQ3JyN3V5eVBQdm1JajhCMFowcmMwNnBfSWdzc2xuWXBtS2NuenlId1h1dUVCRkYyanowYjJ4U3ZNN3ZDWk45cTFxcW1rUENHdHJrSDVlQnA3QWNpaFh3V0lScU5SVjNIbm5nQ21qNDg0RDVyNkZKblhubXU0al9kQzJzOE1KUFhZdWZRc19xdGo4RHpfWEdtSDlLdHU4OUtxRFg5akU2OEpvdTJPRXRLekc5dk1qNnJfc0dVanpJZHJRUVV3RDdfUkxyWFEyVTVSd21yZUVITUphSzl2aTFXZw?oc=5",
           "domain": "www.philstar.com",
           "escalated": false,
@@ -278,6 +318,7 @@
           "uncertainty": 0.0
         },
         {
+          "day": null,
           "doc_id": "https://news.google.com/rss/articles/CBMirgFBVV95cUxQODBzOWJpRXZJRzFFcUpUNi1IU0RrODVFVU9pc2ZOZ1BxRl9UdHdOdUtEVUFORlZaRDdWeHBwMnpoeEkxRUdZLWljVDRPcGVmREV0RXg3N2hEUnozT2c2MWtwV05OWTREbzRPVWpub2JjZkF3QmFPN2FyRVJOMURNbUpSYjdZLTdqd2R3eXo1QkRuNmhVOWhNaE8wYUNiVTdTVnFhM2l4UjFRN3NWMHc?oc=5",
           "domain": "w.media",
           "escalated": false,
@@ -289,6 +330,7 @@
           "uncertainty": 0.0
         },
         {
+          "day": null,
           "doc_id": "https://news.google.com/rss/articles/CBMikAFBVV95cUxPZERrV2xhZTJTZXN5YUVFcld4ODUzRllpTmJiTHNXdHBkLVgwZlhYbjRuUU8xVERDREZ2VloxUmNFMW5pWnRycGZrMkZxSTlHa0FXTnNGVkdMOEZ0SUJiNWh4NFBTSU50VlRKakp0UElMcV9aSllVXzducU9ZdGNOa3hsVXB1YzVNWDhYYjlxNHI?oc=5",
           "domain": "asian-power.com",
           "escalated": false,
@@ -317,6 +359,7 @@
       "snapshot": [],
       "stories": [
         {
+          "day": null,
           "doc_id": "https://news.google.com/rss/articles/CBMitAFBVV95cUxQcEVPa0tiaXM3eFRoTVIxWmN3QVJMd1Ita1RhcTRfR0Z0M0tkc0FUb2sxakhHSWgyOFZNS183RW9KMUg0Q2hsNV9Xa1gtRnhyVVhkdGF2ZURUSDhQZFlVcTdBWVJPMkQtUTBfeTNxTHl6TXZQMl9xTGFfbks0R0xpRTRFRFJwWUMwZmUzMkZSY3hvWGlUTU5lWldYYllwT2pIWlBaZ1hYOURVUDNNVlBHMXVXYTE?oc=5",
           "domain": "www.thestar.com.my",
           "escalated": true,
@@ -328,6 +371,7 @@
           "uncertainty": 0.0
         },
         {
+          "day": null,
           "doc_id": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxQbzl6dVctUWlKUDdFVEFVS1p4SVM2Vm9vVkpZQVNtWDFoUG5BZFpqRjc2V0ZxNFBzV3NzVVRjQVdnRmVJTklMRzRKanUwR2x4cHJxck94UEFXd1BRLVk4QW4tcG02ZkhIUXZTTkZGQ2ZDUmtmVy1KZHpEZGlnMEswSUZ1ZEROenR3V0tOTmNEU011bF9LWS1RZlg1SWhYTDBjVExETTl1UEEwUFNOb2FPMXpkaW91clI5dlNF?oc=5",
           "domain": "www.minichart.com.sg",
           "escalated": true,
@@ -339,6 +383,7 @@
           "uncertainty": 0.0
         },
         {
+          "day": null,
           "doc_id": "https://news.google.com/rss/articles/CBMingFBVV95cUxOVnBfcWZYb05XbTgtZi1SbFNER0J5Y1pKWVpIdnQtWEhLTEZmQTZIbXcxV25uanhCREtVaGJ2M095Y3BnM1pOR0xqdEstTDQ0VmJBWmdQNjBIdkpub1d6R00yT0g0X2lxRS1fMTVPYlc5VFpKVFFJelVXNlpSRWtJdFZ4b2FpcVBxNFB2QmRRb3o3UEZsQl80VVlMbVU0QQ?oc=5",
           "domain": "www.thestar.com.my",
           "escalated": false,
@@ -350,6 +395,7 @@
           "uncertainty": 0.0
         },
         {
+          "day": null,
           "doc_id": "https://news.google.com/rss/articles/CBMikgFBVV95cUxNUWVxYm16M1M5NVBfaEtqZm53UlJxUlNaZjVLSXlzalJRTjQxZW1mempVYVMwVXozNHNtZzY1WFhidnpMQnMzOXc5MXVtS3dmZGhPSHVfZlVCbEx4cHNEcXQ4WTlpbmdsN3l5S3ZjUmFiSnJOaUlMV2hSZ29tUDJZQ3BkR21CRlVxV01lNUtOVzl4dw?oc=5",
           "domain": "www.klsescreener.com",
           "escalated": false,
@@ -378,6 +424,7 @@
       "snapshot": [],
       "stories": [
         {
+          "day": null,
           "doc_id": "https://news.google.com/rss/articles/CBMijAFBVV95cUxOczgzc0otcXd4Y0JSMnZuOXVlQ3NZeEk0YTBTYW9BLXo4MHhsNFlvbld5aHBJSEFVcndTZG1vbE1hYkZVSG1RcGtqWnE2czk4Z0JlZ1VNSU5FY3FaWElvbG91VWdVdVQtY3cxbzBacUNxeDhLbDBCNHNwUzJpOWh5cGktM2JpbkFnNnZmNA?oc=5",
           "domain": "sg.finance.yahoo.com",
           "escalated": false,
@@ -416,6 +463,7 @@
       "snapshot": [],
       "stories": [
         {
+          "day": null,
           "doc_id": "https://news.google.com/rss/articles/CBMingFBVV95cUxPaWllT3F5a25CajN5ejNPX1VIcjZqcUxuSTVJbHk0Ul80V1NTRlpnNWNBVmFTRTE3Qmo5ZWNsbVozLXhaVTliNTNvYjVkVUp2NVR3Qzh2Q1VuV1JleVRKTUVaRjhBY2RxRmdnRDUzNngzZTNyQUtwcXBqUVg0OUI0QzdBNEl6TERZU3hoWWFYQlY5R3FtRXBwYl9fMElRdw?oc=5",
           "domain": "www.thestar.com.my",
           "escalated": false,
@@ -427,6 +475,7 @@
           "uncertainty": 0.0
         },
         {
+          "day": null,
           "doc_id": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxNeGJ0aGtIZUozY0lydnlsRV9yVXFGeWE4b3VZdzBNZ3NKYWZZaUlHbXBZVnJWU2dyWG82X1BmQXM2dDRkcTNIZFF6S3c5aHREa19aRTNFUG5hVTBLclpOYURUVTRtZTNLUmJDeDV2RE84U3BQWHdRRVFDdnFLcC1hTUtPUU9KT3ZOd0NHVTR2THdwSGt3OV9FMThfNFF3Y0FLSDhFVjJ0cHJjQmR3TkdXSklhc2gxZV9TUGdib01Ha3NpcWs?oc=5",
           "domain": "www.alcircle.com",
           "escalated": false,
@@ -586,6 +635,7 @@
       ],
       "stories": [
         {
+          "day": null,
           "doc_id": "https://finance.yahoo.com/technology/ai/articles/arista-networks-anet-winning-ai-210715608.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
           "escalated": true,
@@ -597,6 +647,7 @@
           "uncertainty": 0.15432098765432098
         },
         {
+          "day": null,
           "doc_id": "https://247wallst.com/videos/the-nasdaq-crashed-700-points-in-a-day-last-week-one-major-wall-street-firm-is-predicting-the-correction-will-end-after-midterms/?.tsrc=rss",
           "domain": "247wallst.com",
           "escalated": true,
@@ -608,6 +659,7 @@
           "uncertainty": 0.5263157894736842
         },
         {
+          "day": null,
           "doc_id": "https://www.tikr.com/blog/anthropics-ipo-will-suck-a-massive-amount-of-money-from-ai-stocks-cramer-warns?ref=yahoofinance&.tsrc=rss",
           "domain": "www.tikr.com",
           "escalated": true,
@@ -619,6 +671,7 @@
           "uncertainty": 0.0
         },
         {
+          "day": null,
           "doc_id": "finnhub:143200092",
           "domain": "Yahoo",
           "escalated": true,
@@ -630,6 +683,7 @@
           "uncertainty": 0.0
         },
         {
+          "day": null,
           "doc_id": "finnhub:143200099",
           "domain": "Yahoo",
           "escalated": true,
@@ -641,6 +695,7 @@
           "uncertainty": 0.0
         },
         {
+          "day": null,
           "doc_id": "finnhub:143197687",
           "domain": "Yahoo",
           "escalated": true,
@@ -652,6 +707,7 @@
           "uncertainty": 0.0
         },
         {
+          "day": null,
           "doc_id": "https://news.google.com/rss/articles/CBMioAFBVV95cUxQUVFxdTh4NlEtNFBwOVpCbm90NWwxcnFfRTRxZUtTWTJUaFR6QU94SGVpSWwzdmZwaW5KQTNBVmRYTGhlNlFmb2ZqVEJnUklncDV0bGpnOWhqS2tWVGJLWkRySXpMNkptZU44MkdtNThQN3puNjcyQ21Td2hkYWdVWkxzTVhkSWgwcGV0U29BWDdoX2N0bVBlTExuWTFWR1do?oc=5",
           "domain": "finance.yahoo.com",
           "escalated": true,
@@ -663,6 +719,7 @@
           "uncertainty": 0.0
         },
         {
+          "day": null,
           "doc_id": "https://news.google.com/rss/articles/CBMimAFBVV95cUxON3Z3eDViNUE2OFRBVWFNRVp3WlpiM2lTbEZCUm1CVFNYMC12S3BCSDA2N0xqeEJpLTZJdlNpX084M01MNHF4bFRQeTZwcnE4UEJMR2F0cUpHdFdLbXZrV3VqSW51ZWFqNFpWWEJETWllSVdhLWgtTEZfY2Y2Z0xWcUlGTWhjVkhnQ3VBSTUwbENTd0xEdXFXaw?oc=5",
           "domain": "finance.yahoo.com",
           "escalated": true,
@@ -820,6 +877,7 @@
       ],
       "stories": [
         {
+          "day": null,
           "doc_id": "finnhub:143196802",
           "domain": "Yahoo",
           "escalated": true,
@@ -831,6 +889,7 @@
           "uncertainty": 0.0
         },
         {
+          "day": null,
           "doc_id": "https://news.google.com/rss/articles/CBMinwFBVV95cUxPNkZWUzFDVnV6dnJSNWxJZzQwWm94bFpsa1lGaXpXR3RGQktsN0JzaVMxZUVkTk56Z0M0cG9KTHFFa2w4QVg0dVF3RjRVYjFNams2NTJreTJsTlNQd1hEMkQxMVBMZ2lxVUxzMV9FZHRnd2oyVlc1eFlUMWdtWFdyamk3Zy14ZzBneFRvSE01YmpiSXFjSXNGTTQybEFFeUE?oc=5",
           "domain": "finance.yahoo.com",
           "escalated": true,
@@ -842,6 +901,7 @@
           "uncertainty": 1.0
         },
         {
+          "day": null,
           "doc_id": "https://news.google.com/rss/articles/CBMirAFBVV95cUxQRnBlUU5qQU16c2ItU043bDBzb0ExYkxTOUlya2U3X0Y4OE91SDRSbGx3ZFVvOVBJUWhEcjRjdGs3elB4LW1zMUtWYWExd1RjZWJnakZFVTZ6a2NjUzJKUmhuUVZYUUdGUlBRVXo5NmFGY0wxZVBWajFPR3Z1emYwbFNZNVNNNUhJVjR3WkxzRnEwc0lyeFY0VWNnUG16SHItVHktVHJtOE9LUVh3?oc=5",
           "domain": "startupfortune.com",
           "escalated": true,
@@ -853,6 +913,7 @@
           "uncertainty": 0.0
         },
         {
+          "day": null,
           "doc_id": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxPWGZoQjVSd1cxeXNRRFB5WWQzZTdxNFdzZk1LTjJpWkY1bkNJT0JPOTR1WFB4V1NYZk5SeUNiX1l1bkZZbEJmdkNnX2ZUMzVtZXRBVGx3dWg1N01Db0V5MFExTGVETjR4V2xqUGtYa1Z1elFTMjMwNzJkZnBmeEFkN1drNjVJd1dxZEVBTFRkSnowLTJHRmU3c1paMFpiM202eXlka0FUWjI5ZExrd0dPYVBrVFpSOVpHYmVwdGxqSmU?oc=5",
           "domain": "www.businessday.co.za",
           "escalated": true,
@@ -864,6 +925,7 @@
           "uncertainty": 0.0
         },
         {
+          "day": null,
           "doc_id": "https://news.google.com/rss/articles/CBMingFBVV95cUxPbzZJR0F2LTlsMGYzODhDYXdUeXVQeExKQm1XNU44UldURWo3alJ2eG82YUQ1d0tLd2FUNnpwQnJYcGM3bXhUVkhyenVHTDZNVjdyYk84dWoxOFQ2bzF2OVROMFdqUGxrMElfMFlDb2FROHRZRS1zV2d0UkdCUWxndnhXOENXYzJSTVU2Q0Z2NHV4T1R5dDAtaVR3MkFydw?oc=5",
           "domain": "kalkinemedia.com",
           "escalated": true,
@@ -875,6 +937,7 @@
           "uncertainty": 1.0
         },
         {
+          "day": null,
           "doc_id": "https://news.google.com/rss/articles/CBMidkFVX3lxTFBLa0NzeVlFcmpBa2N5UHBUNkprVUROZlAxZ1l0VUFuOTBCYVN2endRaVUxS2lPd0o1THM2cTFCdTczY1dibkRwcmZ6RmthOFlNWjBxTkhpeUpEbHB4Y19IWUpXUTFuOEEwTi1GNHN5QS1PZDF6Unc?oc=5",
           "domain": "finance.biggo.com",
           "escalated": true,
@@ -886,6 +949,7 @@
           "uncertainty": 0.0
         },
         {
+          "day": null,
           "doc_id": "https://news.google.com/rss/articles/CBMiswFBVV95cUxPeGdOZzVZdGIxX3RQZE5BZ0VtVmtmYVpIM1FmZld2SlVpUkFSOG9vZ0NOMVN1N0RKeHBnektnMlpKdUR5SF8wYkNRS3N2MWtma21XWGlTRDVWRWFJNWVldHJPdWJIUzE2YVZBOXh3M1ZIR01xUVRPWnVQalJwRTJaNmVpbXVDcUNvbjhsQm9NYURUdDdjRDViUjVETFVuQjNOaHJPU2VURmlPTjJhRDd4SkFoSQ?oc=5",
           "domain": "247wallst.com",
           "escalated": true,
@@ -897,6 +961,7 @@
           "uncertainty": 1.0
         },
         {
+          "day": null,
           "doc_id": "finnhub:143203642",
           "domain": "SeekingAlpha",
           "escalated": false,
@@ -1076,6 +1141,7 @@
       ],
       "stories": [
         {
+          "day": null,
           "doc_id": "https://www.euronews.com/2026/10/26/microsoft-offers-around-60000-employees-voluntary-buyouts?.tsrc=rss",
           "domain": "www.euronews.com",
           "escalated": true,
@@ -1087,6 +1153,7 @@
           "uncertainty": 0.26595744680851063
         },
         {
+          "day": null,
           "doc_id": "https://www.tikr.com/blog/anthropics-ipo-will-suck-a-massive-amount-of-money-from-ai-stocks-cramer-warns?ref=yahoofinance&.tsrc=rss",
           "domain": "www.tikr.com",
           "escalated": true,
@@ -1098,6 +1165,7 @@
           "uncertainty": 0.0
         },
         {
+          "day": null,
           "doc_id": "https://www.thestreet.com/video/stocks-higher-by-year-end-george-seay-on-where-to-deploy-your-cash-now?.tsrc=rss",
           "domain": "www.thestreet.com",
           "escalated": true,
@@ -1109,6 +1177,7 @@
           "uncertainty": 0.0
         },
         {
+          "day": null,
           "doc_id": "finnhub:143202591",
           "domain": "Yahoo",
           "escalated": true,
@@ -1120,6 +1189,7 @@
           "uncertainty": 0.0
         },
         {
+          "day": null,
           "doc_id": "finnhub:143202594",
           "domain": "Yahoo",
           "escalated": true,
@@ -1131,6 +1201,7 @@
           "uncertainty": 0.0
         },
         {
+          "day": null,
           "doc_id": "finnhub:143202595",
           "domain": "Yahoo",
           "escalated": true,
@@ -1142,6 +1213,7 @@
           "uncertainty": 0.0
         },
         {
+          "day": null,
           "doc_id": "finnhub:143201573",
           "domain": "Yahoo",
           "escalated": true,
@@ -1153,6 +1225,7 @@
           "uncertainty": 0.3125
         },
         {
+          "day": null,
           "doc_id": "finnhub:143200124",
           "domain": "Yahoo",
           "escalated": true,

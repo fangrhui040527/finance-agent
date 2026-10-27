@@ -1,6 +1,6 @@
 # Digest 2026-10-27
 
-Generated 2026-10-27 10:12 UTC · slot `all` · 25834 articles in the corpus, 6344 observations, 4256 events in the fact book.
+Generated 2026-10-27 12:39 UTC · slot `all` · 25847 articles in the corpus, 6344 observations, 4256 events in the fact book.
 
 ## The book
 
@@ -102,6 +102,10 @@ Generated 2026-10-27 10:12 UTC · slot `all` · 25834 articles in the corpus, 63
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 12:39 | dbnomics | ok | 450 | 0 | 0 | facts 0;  |
+| 12:39 | jin10_flash | degraded | 15 | 15 | 13 | facts 0; window not covered back to 2026-10-27 10:08Z; the oldest item read is 2 |
+| 12:39 | fred | ok | 0 | 0 | 0 | skipped: fred needs FRED_API_KEY, which is not set. Add it to .env or as a GitHu |
+| 12:39 | fmp | ok | 0 | 0 | 0 | skipped: fmp needs FMP_API_KEY, which is not set. Add it to .env or as a GitHub  |
 | 10:08 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
 | 10:08 | twse_openapi | ok | 8 | 0 | 0 | facts 0;  |
 | 10:08 | jin10_flash | degraded | 15 | 15 | 15 | facts 0; window not covered back to 2026-10-26 22:41Z; the oldest item read is 2 |
