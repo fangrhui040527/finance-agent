@@ -222,19 +222,13 @@ def test_any_OTHER_unexpected_object_is_still_an_error():
             feed.fetch(NOW - timedelta(hours=1))
 
 
-def test_a_rate_limit_waits_long_enough_to_be_worth_waiting():
-    """429 is a quota, not a dropped packet. The `with_retry` default backs off
-    0.5s then 1s, which puts all three attempts inside the same throttle
-    window - and 5s then 10s, which this used to send, did too: measured over
-    the four days to 2026-09-17, every retry of a 429 was itself a 429, so one
-    refusal cost three requests against the very quota that was spent. Two
-    attempts a minute apart is the shape that can succeed; anything past it is
-    the sweep's decision, not the feed's."""
-    from knowledge.feeds.adapter import GdeltFeed as G
-
-    assert G.RETRY_ATTEMPTS == 2
-    assert G.RETRY_BASE_SECONDS >= 60.0, "a retry inside the throttle window is a wasted request"
-
+def test_a_429_is_asked_once_and_never_retried_blind():
+    """429 is a quota, not a dropped packet, and GDELT's block lasts about 25
+    minutes. Measured over the four days to 2026-09-17, every retry of a 429
+    5s and 10s later was itself a 429, and a retry a minute later is still well
+    inside the block: a refused request counted against the spent quota. With
+    no Retry-After there is no wait worth making: one request, then the sweep
+    decides."""
     waits: list[float] = []
     calls = {"n": 0}
 
@@ -243,11 +237,92 @@ def test_a_rate_limit_waits_long_enough_to_be_worth_waiting():
         raise urllib.error.HTTPError(req.full_url, 429, "Too Many Requests", {}, None)
 
     feed = GdeltFeed(opener=_rate_limited, sleep=waits.append)
-    with pytest.raises(FeedError, match="429"):
+    with pytest.raises(FeedThrottled, match="429") as caught:
         feed.fetch(NOW - timedelta(hours=1))
 
-    assert calls["n"] == 2, "one retry, not two"
-    assert len(waits) == 1 and waits[0] >= 60.0, f"waited {waits}, inside the throttle window"
+    assert calls["n"] == 1, "a blind retry of a 429 is a wasted request"
+    assert waits == [], waits
+    assert caught.value.cause == "HTTP 429"
+
+
+def test_a_429_naming_a_wait_past_the_cap_is_asked_once():
+    """A Retry-After longer than the retry cap is the block, named. Waiting the
+    capped minute and asking again lands inside it: a second refused request."""
+    waits: list[float] = []
+    calls = {"n": 0}
+
+    def _blocked(req, timeout=None):
+        calls["n"] += 1
+        raise http_error(429, headers={"Retry-After": "1500"})
+
+    feed = GdeltFeed(opener=_blocked, sleep=waits.append)
+    with pytest.raises(FeedThrottled, match="429"):
+        feed.fetch(NOW - timedelta(hours=1))
+    assert calls["n"] == 1 and waits == [], (calls, waits)
+
+
+def test_a_429_naming_a_short_wait_is_retried_after_that_wait():
+    """The server named a wait the retry can honour, so one more ask is fair."""
+    waits: list[float] = []
+    calls = {"n": 0}
+
+    def _brief(req, timeout=None):
+        calls["n"] += 1
+        raise http_error(429, headers={"Retry-After": "5"})
+
+    feed = GdeltFeed(opener=_brief, sleep=waits.append)
+    with pytest.raises(FeedThrottled, match="429"):
+        feed.fetch(NOW - timedelta(hours=1))
+    assert calls["n"] == 2 and len(waits) == 1 and 5.0 <= waits[0] < 6.0, (calls, waits)
+
+
+def test_what_a_minute_can_fix_is_still_retried_once_a_minute_later():
+    """The retry stays for a 5xx or a timeout: two attempts, a minute apart."""
+    from knowledge.feeds.adapter import GdeltFeed as G
+
+    assert G.RETRY_ATTEMPTS == 2
+    assert G.RETRY_BASE_SECONDS >= 60.0
+    waits: list[float] = []
+    calls = {"n": 0}
+
+    def _unavailable(req, timeout=None):
+        calls["n"] += 1
+        raise http_error(503)
+
+    feed = GdeltFeed(opener=_unavailable, sleep=waits.append)
+    with pytest.raises(FeedError, match="503"):
+        feed.fetch(NOW - timedelta(hours=1))
+    assert calls["n"] == 2 and len(waits) == 1 and waits[0] >= 60.0, (calls, waits)
+
+
+def test_an_empty_200_is_a_throttle_not_a_quiet_window():
+    """A quiet window is JSON - `{}` or an empty list. A 200 with no body at all
+    is the host refusing without saying so, and counting it as "0 articles"
+    is the broken-feed-looks-quiet error this module exists to prevent."""
+    for body in ("", "   \n"):
+        feed = GdeltFeed(opener=_opener(body))
+        with pytest.raises(FeedThrottled, match="empty body") as caught:
+            feed.fetch(NOW - timedelta(hours=1))
+        assert caught.value.cause == "empty 200"
+
+
+def test_a_plain_text_rate_notice_is_a_throttle():
+    """GDELT has answered for rate in plain text in place of JSON. That is the
+    quota speaking, not a bad query, and the sweep must stop asking."""
+    notice = "Please limit requests to one every 5 seconds or contact us for larger queries."
+    feed = GdeltFeed(opener=_opener(notice))
+    with pytest.raises(FeedThrottled, match="rate notice") as caught:
+        feed.fetch(NOW - timedelta(hours=1))
+    assert caught.value.cause == "rate notice"
+
+
+def test_a_query_error_in_plain_text_is_still_only_a_failure():
+    """The narrow side of the rule above: "your query was too short" is about
+    one query, and calling it a throttle would stop every other group."""
+    feed = GdeltFeed(opener=_opener("Your query was too short or too long."))
+    with pytest.raises(FeedError) as caught:
+        feed.fetch(NOW - timedelta(hours=1))
+    assert not isinstance(caught.value, FeedThrottled)
 
 
 def test_a_429_is_throttled_and_any_other_failure_is_merely_failed():

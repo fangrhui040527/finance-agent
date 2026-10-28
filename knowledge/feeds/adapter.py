@@ -277,7 +277,22 @@ class FeedThrottled(FeedError):
     asking anyway costs: nine per-name requests a slot, the quota gone after
     about five, every later request paid for in full and answered 429, and
     0 rows stored.
+
+    `cause` is the short form the sweep row quotes ("HTTP 429", "empty 200"):
+    a throttle that arrives as a 200 is still a throttle, and the row should
+    say which shape it took.
     """
+
+    def __init__(self, message: str, cause: str = "HTTP 429") -> None:
+        super().__init__(message)
+        self.cause = cause
+
+
+#: GDELT's own words when it refuses for rate. Matched lower-case. It has sent
+#: these as plain text in place of JSON ("Please limit requests to one every 5
+#: seconds"), and a proxy in front of it may say "Too Many Requests" in an HTML
+#: page - either way the quota answered, not the query.
+GDELT_RATE_NOTICES = ("limit requests", "rate limit", "too many requests")
 
 
 class GdeltFeed(FeedAdapter):
@@ -297,9 +312,14 @@ class GdeltFeed(FeedAdapter):
          an error, and a caller polling on a fast loop would otherwise turn its
          own impatience into an outage.
       3. A 429 is `FeedThrottled`, not a plain failure, and it is not retried
-         into the ground: two attempts a minute apart, then the caller decides.
-         The sweep defers the rest of the slot; GDELT's quota is per address,
-         and a request that is refused still counts against it.
+         at all unless the server names its own wait: a block lasts about 25
+         minutes, so a retry a minute later is refused too and counts against
+         the quota. The sweep defers the rest of the slot; GDELT's quota is per
+         address, and a request that is refused still counts against it.
+      4. A 200 that is EMPTY, or that carries GDELT's plain-text rate notice,
+         is `FeedThrottled` too - not a quiet window and not a broken query.
+         Other non-JSON text ("your query was too short") stays a plain
+         failure: it is about one query, and must not stop the others.
     """
 
     name = "gdelt"
@@ -334,10 +354,12 @@ class GdeltFeed(FeedAdapter):
     #: Retry-After, and over the four days to 2026-09-17 a retry 5 s and 10 s
     #: later landed inside the same throttle window every time, so one 429
     #: cost three requests against the very quota that was exhausted and still
-    #: failed. One retry after a minute is the shape that can succeed; past
-    #: that it is the sweep's decision (`FeedThrottled`), which defers the rest
-    #: of the slot rather than keep asking. `with_retry` caps a computed wait
-    #: at 8 s unless told otherwise, which is why the cap is passed as well.
+    #: failed. One retry after a minute is for what a minute can fix - a 5xx,
+    #: a timeout. A 429 without Retry-After is not retried at all (a block
+    #: lasts about 25 minutes); it is the sweep's decision
+    #: (`FeedThrottled`), which defers the rest of the slot rather than keep
+    #: asking. `with_retry` caps a computed wait at 8 s unless told otherwise,
+    #: which is why the cap is passed as well.
     RETRY_ATTEMPTS = 2
     RETRY_BASE_SECONDS = 60.0
     DEFAULT_USER_AGENT = "finplanet-analyst-mind/0.1 (personal research)"
@@ -437,7 +459,7 @@ class GdeltFeed(FeedAdapter):
         import urllib.request
 
         from core.net.breaker import CircuitOpen
-        from core.net.retry import with_retry
+        from core.net.retry import RETRY_AFTER_CAP_S, with_retry
 
         opener = self._opener or urllib.request.urlopen
         req = urllib.request.Request(url, headers={"User-Agent": self.user_agent})
@@ -445,6 +467,19 @@ class GdeltFeed(FeedAdapter):
         def _transport():
             with opener(req, timeout=self.TIMEOUT) as resp:
                 return resp.read()
+
+        def _worth_retrying(e: BaseException) -> bool:
+            # A 429 with no named wait is the ~25-minute block; asking again a
+            # minute later is one more refused request on the spent quota. A
+            # named wait past the cap is the same block: the retry would come
+            # early, so only a wait the retry can honour is worth one.
+            if isinstance(e, urllib.error.HTTPError) and e.code == 429:
+                raw = e.headers.get("Retry-After") if e.headers is not None else None
+                try:
+                    return raw is not None and 0 <= float(raw) <= RETRY_AFTER_CAP_S
+                except ValueError:
+                    return False  # an HTTP-date: no number to check against the cap
+            return True
 
         kwargs = {"sleep": self._sleep} if self._sleep is not None else {}
         # Two attempts a minute apart (see RETRY_ATTEMPTS). A Retry-After
@@ -456,6 +491,7 @@ class GdeltFeed(FeedAdapter):
                 attempts=self.RETRY_ATTEMPTS,
                 base=self.RETRY_BASE_SECONDS,
                 cap=self.RETRY_BASE_SECONDS,
+                retryable=_worth_retrying,
                 **kwargs,
             )
         except CircuitOpen as e:
@@ -478,9 +514,19 @@ class GdeltFeed(FeedAdapter):
 
         if isinstance(body, bytes):
             body = body.decode("utf-8", errors="replace")
+        # A 200 with nothing in it is not "0 articles": a quiet window is `{}`
+        # or an empty list, both JSON. Read as a decode failure, it let the
+        # sweep go on to ask the next group on a quota that was already spent.
+        if not body.strip():
+            raise FeedThrottled("GDELT answered 200 with an empty body", cause="empty 200")
         try:
             payload = json.loads(body)
         except json.JSONDecodeError as e:
+            if any(n in body.lower() for n in GDELT_RATE_NOTICES):
+                raise FeedThrottled(
+                    f"GDELT answered 200 with a rate notice: {body[:200]!r}",
+                    cause="rate notice",
+                ) from e
             raise FeedError(
                 f"GDELT returned non-JSON, which is how it reports errors: {body[:200]!r}"
             ) from e

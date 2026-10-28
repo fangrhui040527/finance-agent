@@ -1053,6 +1053,18 @@ the whole book and `ask.py sources --probe gdelt` from a runner will say so.
 run, so a higher cap collects less, not more. That was the state before it:
 nine names asked, a mean of 3.5 refused.
 
+**A `throttled` row (2026-10-28).** The first sign GDELT is refusing for rate
+ends GDELT for the rest of that run: an HTTP 429 with no Retry-After (not
+retried — a block lasts about 25 minutes), a 200 with an empty body, or a 200
+carrying its plain-text "limit requests" notice. The row's status is
+`throttled`, never `ok`, even when an earlier group was read; the detail says
+which shape it took and on which request (`empty 200 on request 2: the rest of
+the slot is deferred, not asked`) and names the deferred companies. The run
+exits 3. A throttled row does not move the watermark, so the next slot asks
+over the held-back names' window again; the corpus dedupes the rest. Nothing
+to do for one row. Every GDELT row throttled for a day means the runners'
+address is blocked: do not add retries or requests to push through it.
+
 ## `name_coverage`: one name going quiet inside a working collector (2026-09-08)
 
 The two collector rules watch the COLLECTOR. This one watches the BOOK.

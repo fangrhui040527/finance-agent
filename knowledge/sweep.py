@@ -31,7 +31,7 @@ import zlib
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 
-from knowledge.corpus import AUTH_FAILED, DEGRADED, FAILED, OK, SKIPPED_NO_KEY, Corpus
+from knowledge.corpus import AUTH_FAILED, DEGRADED, FAILED, OK, SKIPPED_NO_KEY, THROTTLED, Corpus
 from knowledge.facts import SKIPPED, FactBook
 from knowledge.feeds.adapter import FeedAdapter, FeedError, FeedThrottled, IngestStats, RawRecord
 from knowledge.news.features import Article
@@ -307,9 +307,10 @@ class SweepReport:
 
     @property
     def exit_code(self) -> int:
-        """0 every source read; 3 a source failed, was degraded or had its key
-        refused; 2 could not run. A missing key stays 0 here, as before: the
-        run's verdict on keys is `knowledge/ledger.py`'s, read after the commit.
+        """0 every source read; 3 a source failed, was degraded, was throttled
+        or had its key refused; 2 could not run. A missing key stays 0 here, as
+        before: the run's verdict on keys is `knowledge/ledger.py`'s, read
+        after the commit.
 
         A slot that already ran today exits 0, not 2. It is a no-op, not a
         fault: the day's collection happened, and a scheduler that treated the
@@ -320,7 +321,7 @@ class SweepReport:
             return 2
         if self.already_ran:
             return 0
-        if any(r.status in (FAILED, DEGRADED, AUTH_FAILED) for r in self.results):
+        if any(r.status in (FAILED, DEGRADED, THROTTLED, AUTH_FAILED) for r in self.results):
             return 3
         return 0
 
@@ -714,7 +715,7 @@ def _run_news(
                     detail=f"skipped: {result.detail}",
                 )
                 return result, []
-            records, articles, notes, degraded = _news_per_instrument(
+            records, articles, notes, status = _news_per_instrument(
                 spec,
                 cfg,
                 instruments,
@@ -732,8 +733,7 @@ def _run_news(
             )
             stats = _merge_stats(articles, records)
             result.detail = notes
-            if degraded:
-                result.status = DEGRADED
+            result.status = status
         else:
             feed = adapter_for(spec.name)
             # A paging feed (NST) asks this before each page after the first,
@@ -756,10 +756,14 @@ def _run_news(
                 result.status = DEGRADED
                 result.detail = overflow
     except FeedError as e:
+        # A source that refused for quota read nothing either, and holds the
+        # watermark like a failure; it is spelled apart so a run table can
+        # tell "GDELT is throttling this address" from "GDELT is broken".
+        status = THROTTLED if isinstance(e, FeedThrottled) else FAILED
         corpus.record_sweep(
-            run_id, spec.name, since, FAILED, at=tick(), slot=slot, detail=str(e)[:DETAIL_CHARS]
+            run_id, spec.name, since, status, at=tick(), slot=slot, detail=str(e)[:DETAIL_CHARS]
         )
-        result.status = FAILED
+        result.status = status
         result.detail = str(e)
         return result, []
 
@@ -783,7 +787,7 @@ def _run_news(
         run_id,
         spec.name,
         since,
-        result.status if result.status in (OK, DEGRADED) else OK,
+        result.status if result.status in (OK, DEGRADED, THROTTLED) else OK,
         at=tick(),
         slot=slot,
         fetched=result.fetched,
@@ -823,6 +827,11 @@ def _news_per_instrument(
     and a `FeedThrottled` answer ends the slot: the groups not yet asked for
     are DEFERRED, named as such, and never sent. Every request's records are
     normalised by the feed that fetched them, as before.
+
+    Returns `(records, articles, note, status)`. A throttled run is THROTTLED
+    whatever was read before the refusal - the names held back were not read,
+    and `ok` over them is the 0-rows-and-fine row this exists to prevent - and
+    one that read nothing at all raises `FeedThrottled` rather than FeedError.
     """
     from knowledge.feeds.company_feeds import EDITION_FOR_MIC, finance_query
     from knowledge.graph.ids import display_names
@@ -897,7 +906,7 @@ def _news_per_instrument(
         except FeedThrottled as e:
             failed.extend((label, str(e)) for label in labels)
             throttled = (
-                f"HTTP 429 on request {requests}: the rest of the slot is deferred, not asked"
+                f"{e.cause} on request {requests}: the rest of the slot is deferred, not asked"
             )
             continue
         except FeedError as e:
@@ -939,17 +948,24 @@ def _news_per_instrument(
         )
         if throttled:
             grouped += f" ({throttled})"
+    elif throttled:
+        grouped = throttled
     held_note = f"deferred: {', '.join(held)}" if held else ""
 
     if not articles and not counts and (failed or skipped):
         first = failed[0][1] if failed else "deadline reached"
         tail = "; ".join(x for x in (grouped, held_note) if x)
-        raise FeedError(
+        message = (
             f"no name could be read ({len(failed)} failed, {len(skipped)} not reached). "
             f"First: {first}" + (f"; {tail}" if tail else "")
         )
+        if throttled:
+            raise FeedThrottled(f"throttled: {message}")
+        raise FeedError(message)
     degraded = _mostly_failed(failed, skipped, counts)
-    if degraded:
+    if throttled:
+        emit(f"  {'':<20} THROTTLED: {throttled}")
+    elif degraded:
         n = len(failed) + len(skipped)
         emit(f"  {'':<20} DEGRADED: {n} of {n + len(counts)} names could not be read")
     note = _sweep_note(failed, skipped, counts)
@@ -957,7 +973,8 @@ def _news_per_instrument(
     # The shape the nightly page quotes: what was grouped and how many requests
     # it took, then who is waiting on the next slot, then the per-name reading.
     parts = (grouped, held_note, note, hit, deferred)
-    return records_total, articles, "; ".join(x for x in parts if x), degraded
+    status = THROTTLED if throttled else DEGRADED if degraded else OK
+    return records_total, articles, "; ".join(x for x in parts if x), status
 
 
 def _groups(names, size: int) -> list[tuple[str, ...]]:

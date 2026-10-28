@@ -1240,7 +1240,7 @@ def cmd_sweep(a) -> int:
     # Failures also go to stderr, where a scheduler's log and a person's eye
     # both look first; the full table above is the record.
     for r in report.results:
-        if r.status in ("failed", "degraded", "auth_failed", "skipped_no_key"):
+        if r.status in ("failed", "degraded", "throttled", "auth_failed", "skipped_no_key"):
             print(f"  {r.name:<16} {r.status.upper()}: {r.detail}", file=sys.stderr)
     if not (cfg.holdings or cfg.watchlist):
         print(
