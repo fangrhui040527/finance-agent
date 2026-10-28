@@ -203,8 +203,15 @@ def indexable(art: Article) -> bool:
     return bool(art.instruments) or not headline_only
 
 
-def news_chunks(art: Article, extractor: LexiconExtractor | None = None, names=None) -> list[Chunk]:
-    """One article -> its retrieval chunks, metadata attached."""
+def news_chunks(
+    art: Article, extractor: LexiconExtractor | None = None, names=None, incidental=None
+) -> list[Chunk]:
+    """One article -> its retrieval chunks, metadata attached.
+
+    `incidental` is `EntityLinker.incidental` of the text: the ids it names
+    without being news about them, and the kind, kept under both id forms so
+    the news agent can say "[mention] ... not a cause" for whichever it asks.
+    """
     from knowledge.graph.ids import instrument_id as canonical
 
     text = news_text(art)
@@ -215,6 +222,10 @@ def news_chunks(art: Article, extractor: LexiconExtractor | None = None, names=N
         for form in (iid, canonical(iid) or iid):
             if form and form not in ids:
                 ids.append(form)
+    kinds: dict[str, str] = {}
+    for iid, kind in (incidental or {}).items():
+        for form in (iid, canonical(iid) or iid):
+            kinds[form] = kind
     features = art.features
     if features is None and extractor is not None:
         features = extractor.extract(art.text, list(names or art.instruments))
@@ -223,6 +234,7 @@ def news_chunks(art: Article, extractor: LexiconExtractor | None = None, names=N
         "source_domain": art.source_domain,
         "language": art.language,
         "instruments": ids,
+        "incidental": kinds,
         "countries": list(art.countries),
         "themes": list(art.themes),
         "licence": NEWS_LICENCE,
@@ -236,16 +248,21 @@ def news_collection(
     articles: list[Article], index: dict[str, str] | None = None, embedder=None
 ) -> Collection:
     """`kb_news`, built from stored articles."""
-    from knowledge.news.linking import linker_for
+    from knowledge.news.linking import linker_for, relinked
 
     col = Collection("kb_news", embedder)
     extractor = LexiconExtractor()
     linker = linker_for(index) if index else None
     for art in articles:
+        # Stored links read by today's rules, as the digest reads them: an
+        # Apple Hospitality row stored as Apple's is not retrieved for Apple.
+        if linker is not None:
+            art = relinked(art, linker)
         if not indexable(art):
             continue
         names = linker.names_for(art.instruments) if linker is not None else None
-        col.add_all(news_chunks(art, extractor, names))
+        incidental = linker.incidental(art.text) if linker is not None else None
+        col.add_all(news_chunks(art, extractor, names, incidental))
     return col
 
 

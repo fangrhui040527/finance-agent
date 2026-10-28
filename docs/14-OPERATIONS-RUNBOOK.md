@@ -1023,6 +1023,27 @@ it index-book marks) and `facts.db` (4.7 MB, +20-35 KiB a day) are still whole
 files; at today's rates the first reaches 50 MiB in 2029. `price_cache.db` is
 bounded (it upserts). The 45 MiB warning will name either one long before.
 
+## A story linked to the wrong company, or to the right one for the wrong reason (2026-10-28)
+
+The linker (`knowledge/news/linking.py`) now refuses an alias written behind
+another market's exchange code (`UPCOM:TNB` is Nha Be Steel, not Tenaga;
+`MYX:`, `KLSE:` and `NASDAQ:` still link the book's names), and reads
+`not_the_company` in `knowledge/graph/data/entities.yaml`: `names` that contain
+an alias and are someone else ("Apple Hospitality", "Apple Bank"), and `near`
+words that make a short alias another listing's ticker. **To stop a new false
+link, add it there** - a person edits that file, as with the aliases.
+
+Two kinds of story stay linked but are never a cause: another company's
+contract win (`[mention]`: "Bintai Kinden wins RM20.3mil TNB contract") and an
+accident involving the company's vehicle, staff or premises
+(`[incident_bystander]`). The digest and the pack print the tag, never star
+them, and rank them below the company's own news; the ingest gate and the
+ragqa audit's gate re-run do not escalate for them, and `news_evidence` cites
+them with a `[mention] ...: not a cause` caveat. Stored links are not
+rewritten: the digest, the graph rebuild, `kb_news` and ragqa read every row
+through `EntityLinker.recheck`, so a new exclusion reaches old rows on the next
+digest, `derive` or index build.
+
 ## Reading a capped sweep row (2026-09-08)
 
 GDELT asks about three names a run, not the whole book. A sweep row for it now
