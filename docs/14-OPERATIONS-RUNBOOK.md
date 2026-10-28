@@ -744,11 +744,15 @@ is searched at that day's us_close slot, a US day at the next bursa_close;
 both before the 22:30Z routine writes the page.
 
 **How.** One Messages call to `claude-opus-5-5` with Anthropic's server-side
-`web_search_20260209` tool (`max_uses` 8, effort medium, the market's country
+`web_search_20260209` tool (`max_uses` 6, effort medium, the market's country
 as the search location), through `core/llm/websearch.py`. The prompt states
 the budget and asks for no repeated query: with `max_uses` 3 the first live run
 (2026-10-28) spent all three on its first idea, the same query twice, and every
-later search failed with `max_uses_exceeded`. A paused turn is
+later search failed with `max_uses_exceeded`. The search is called directly
+(`allowed_callers` ["direct"]): this tool version otherwise runs searches from
+code (dynamic filtering), whose output cannot be cited, and both searches that
+day cited nothing, so nothing was stored. The prompt asks for every statement
+to rest on a cited result. A paused turn is
 resumed once, never more. A refusal is recorded and never re-routed. Each leg
 has 180 s, the SDK never retries (a retried timeout is a second paid turn),
 and no leg starts unless it can finish inside the run's 8-minute deadline; the
@@ -779,8 +783,8 @@ under the search that found it.
 ~USD 4-7 a month at the measured trigger rate. Every attempt is a row in
 `evidence_searches` in data/corpus.db - committed by the collector, so it is
 the month's spend record across every run (a runner's own ledger is thrown
-away). Before each search the most it could cost (USD ~1.98: per leg, 150k
-input tokens at the cache-write rate, a full output and eight searches; two
+away). Before each search the most it could cost (USD ~2.44: per leg, 200k
+input tokens at the cache-write rate, a full output and six searches; two
 legs) is reserved against two caps in config.toml [budget]:
 `evidence_monthly_usd` (10) and `monthly_usd` (50, all reasoning: the
 committed evidence spend plus this machine's own ledger). If either would be

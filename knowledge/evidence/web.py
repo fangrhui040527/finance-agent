@@ -79,10 +79,13 @@ MODEL = "claude-opus-5-5"
 EFFORT = "medium"
 #: Searches one leg may run. It was 3, and the first live run spent all 3 on
 #: its first idea - the same query twice - so every later search failed with
-#: `max_uses_exceeded` and neither move was really searched. A search is USD
-#: 0.01; the tokens its results add are the cost, and the reserve below prices
-#: every one of them. The prompt states the budget (`_prompt`).
-MAX_USES = 8
+#: `max_uses_exceeded` and neither move was really searched. 8 ran cleanly
+#: through dynamic filtering (USD 0.60); called directly (websearch.
+#: ALLOWED_CALLERS), every result enters the context and is re-read by each
+#: later step of the turn, so 6. A search is USD 0.01; the tokens its results
+#: add are the cost, and the reserve below prices them. The prompt states the
+#: budget (`_prompt`).
+MAX_USES = 6
 MAX_TOKENS = 8000
 
 TRIGGER_SAR = PARAMETRIC_Z
@@ -102,9 +105,10 @@ DEADLINE_SECONDS = 480
 #: Reserved before each search, per leg: every input token at the cache-write
 #: rate (the dearest way input is billed), the full output cap and every search
 #: the leg may run - twice, for a paused turn's continuation. Far above a real
-#: call (~USD 0.29), on purpose; a search that still costs more than it ends
-#: the run (`run`), so the cap is overshot by one search at most.
-RESERVE_INPUT_TOKENS = 150_000
+#: call (USD 0.20-0.60 measured), on purpose; a search that still costs more
+#: than it ends the run (`run`), so the cap is overshot by one search at most.
+#: 200k, not 150k: direct results re-read across six searches.
+RESERVE_INPUT_TOKENS = 200_000
 
 #: A structured candidate the fact book already holds for the session.
 STRUCTURED_CAUSES = ("earnings_result", "rating_change")
@@ -716,7 +720,9 @@ def _prompt(t: Trigger, now: datetime) -> str:
         "time when the page shows one, and say whether it came before or after the close.\n\n"
         f"You have {MAX_USES} web searches in all. Never run the same query twice: vary them "
         "across the company's own announcements, news about it, broker notes, and the "
-        "market or sector report for that session."
+        "market or sector report for that session.\n\n"
+        "Base every statement on a search result and cite it. A source you mention without "
+        "citing it is not kept as evidence."
     )
 
 

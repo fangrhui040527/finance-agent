@@ -97,6 +97,7 @@ def test_the_request_is_one_search_tool_and_no_parameter_the_current_models_reje
             "type": TOOL_TYPE,
             "name": "web_search",
             "max_uses": 3,
+            "allowed_callers": ["direct"],
             "user_location": {
                 "type": "approximate",
                 "country": "MY",
@@ -424,3 +425,11 @@ def test_request_too_large_reported_by_the_code_is_a_failed_search():
     }
     a = WebSearch("m", client=Client(_response([script]))).search("s", "p")
     assert a.errors == ["request_too_large"]
+
+
+def test_the_search_is_called_directly_so_its_results_can_be_cited():
+    """Run from code (dynamic filtering), results reach the model as code
+    output, which cannot be cited: both live searches on 2026-10-28 cited 0
+    pages and stored nothing."""
+    tool = WebSearch("m", client=Client(_response([ANSWER]))).tools()[0]
+    assert tool["allowed_callers"] == ["direct"]
