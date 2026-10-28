@@ -245,6 +245,37 @@ def test_a_429_is_asked_once_and_never_retried_blind():
     assert caught.value.cause == "HTTP 429"
 
 
+def test_a_429_naming_a_wait_past_the_cap_is_asked_once():
+    """A Retry-After longer than the retry cap is the block, named. Waiting the
+    capped minute and asking again lands inside it: a second refused request."""
+    waits: list[float] = []
+    calls = {"n": 0}
+
+    def _blocked(req, timeout=None):
+        calls["n"] += 1
+        raise http_error(429, headers={"Retry-After": "1500"})
+
+    feed = GdeltFeed(opener=_blocked, sleep=waits.append)
+    with pytest.raises(FeedThrottled, match="429"):
+        feed.fetch(NOW - timedelta(hours=1))
+    assert calls["n"] == 1 and waits == [], (calls, waits)
+
+
+def test_a_429_naming_a_short_wait_is_retried_after_that_wait():
+    """The server named a wait the retry can honour, so one more ask is fair."""
+    waits: list[float] = []
+    calls = {"n": 0}
+
+    def _brief(req, timeout=None):
+        calls["n"] += 1
+        raise http_error(429, headers={"Retry-After": "5"})
+
+    feed = GdeltFeed(opener=_brief, sleep=waits.append)
+    with pytest.raises(FeedThrottled, match="429"):
+        feed.fetch(NOW - timedelta(hours=1))
+    assert calls["n"] == 2 and len(waits) == 1 and 5.0 <= waits[0] < 6.0, (calls, waits)
+
+
 def test_what_a_minute_can_fix_is_still_retried_once_a_minute_later():
     """The retry stays for a 5xx or a timeout: two attempts, a minute apart."""
     from knowledge.feeds.adapter import GdeltFeed as G

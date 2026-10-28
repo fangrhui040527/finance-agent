@@ -459,7 +459,7 @@ class GdeltFeed(FeedAdapter):
         import urllib.request
 
         from core.net.breaker import CircuitOpen
-        from core.net.retry import retry_after_seconds, with_retry
+        from core.net.retry import RETRY_AFTER_CAP_S, with_retry
 
         opener = self._opener or urllib.request.urlopen
         req = urllib.request.Request(url, headers={"User-Agent": self.user_agent})
@@ -470,9 +470,15 @@ class GdeltFeed(FeedAdapter):
 
         def _worth_retrying(e: BaseException) -> bool:
             # A 429 with no named wait is the ~25-minute block; asking again a
-            # minute later is one more refused request on the spent quota.
+            # minute later is one more refused request on the spent quota. A
+            # named wait past the cap is the same block: the retry would come
+            # early, so only a wait the retry can honour is worth one.
             if isinstance(e, urllib.error.HTTPError) and e.code == 429:
-                return retry_after_seconds(e) is not None
+                raw = e.headers.get("Retry-After") if e.headers is not None else None
+                try:
+                    return raw is not None and 0 <= float(raw) <= RETRY_AFTER_CAP_S
+                except ValueError:
+                    return False  # an HTTP-date: no number to check against the cap
             return True
 
         kwargs = {"sleep": self._sleep} if self._sleep is not None else {}

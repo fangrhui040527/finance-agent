@@ -132,7 +132,7 @@ jobs:
       # flattening them with `|| true`:
       #   0  every enabled source read (a source without a key is SKIPPED, not failed)
       #   2  the sweep could not run at all - bad config, unknown slot
-      #   3  at least one source failed or came back degraded; recorded in the stores
+      #   3  at least one source failed, came back degraded or was throttled; recorded in the stores
       #
       # 3 still commits. A failed sweep that leaves no trace is indistinguishable
       # from a quiet day. The job is still marked failed afterwards so a person
@@ -496,7 +496,7 @@ jobs:
       - name: Warn if a source was degraded
         if: steps.sweep.outputs.code == '3'
         run: |
-          echo "::warning title=sweep degraded::a source failed or was degraded; see the sweeps table in data/corpus.db and the pulls table in data/facts.db, or the summary above"
+          echo "::warning title=sweep degraded::a source failed, was degraded or was throttled; see the sweeps table in data/corpus.db and the pulls table in data/facts.db, or the summary above"
 
       - name: Fail if the sweep could not run
         if: (steps.sweep.outputs.code != '0' && steps.sweep.outputs.code != '3') || (steps.fx.outcome != 'skipped' && steps.fx.outputs.code != '0')
