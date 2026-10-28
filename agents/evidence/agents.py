@@ -60,6 +60,8 @@ def event_type_for(kind: str, title: str) -> EventType | None:
         return EVENT_KINDS[kind]
     if kind == "insider_filing":
         return None  # a Form 4 filing without its direction; Finnhub carries the typed one
+    if kind == "results_released":
+        return None  # the timed twin of an Item 2.02 8-K, which is typed from its own row
     for pattern, kind_ in _TITLE_TYPES:
         if pattern.search(title or ""):
             return kind_

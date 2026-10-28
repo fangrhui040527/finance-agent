@@ -718,6 +718,19 @@ Then read it from anywhere: `ask.py alerts` on the command line, the
 app. An empty history means no rule has been EVALUATED - not that none would
 fire.
 
+## Earnings dates: which one to believe (2026-10-28)
+
+The calendars disagree: on 2026-10-28 Finnhub and FMP dated Apple's results a
+day apart. Each source's date stays its own row; `ask.py facts`, the
+`fact_snapshot` tool, the pack and the digest add one resolved line
+(`knowledge/earnings_date.py`). Authority: an EDGAR 8-K with Item 2.02 (stored
+as `results_released`, known at its acceptance time, read as New York time) >
+the company's own date (no collector yet: `COMPANY_SOURCES` is the hook) >
+Finnhub > FMP > anything else. When the top two disagree the line reads
+`unconfirmed (2026-10-29 finnhub / 2026-10-28 fmp)`: do not date a move by
+either until the 8-K lands. A one-day gap counts as agreement only when the
+earlier date is listed after the close.
+
 ## Web evidence: searching for what the feeds missed (2026-10-22)
 
 On 2026-10-16 Press Metal fell 9.34%, an idiosyncratic move of 5.43 sigma, and
