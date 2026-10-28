@@ -1,6 +1,42 @@
 {
   "collection": [
     {
+      "at": "2026-10-28T16:06:21.017472+00:00",
+      "detail": "facts 0; ",
+      "fetched": 450,
+      "kept": 0,
+      "source": "dbnomics",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-28T16:06:18.969190+00:00",
+      "detail": "facts 0; ",
+      "fetched": 9,
+      "kept": 9,
+      "source": "jin10_flash",
+      "status": "ok",
+      "stored": 9
+    },
+    {
+      "at": "2026-10-28T16:06:18.076758+00:00",
+      "detail": "facts 1; release calendar: 'FOMC Press Release' listed on 15 days of the fortnight - a daily table, not a scheduled print; not stored as a release",
+      "fetched": 476,
+      "kept": 0,
+      "source": "fred",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-28T16:06:08.490522+00:00",
+      "detail": "facts 15; fmp /earnings is outside the plan (HTTP 402); not collected for NVDA, AAPL, MSFT",
+      "fetched": 3971,
+      "kept": 0,
+      "source": "fmp",
+      "status": "ok",
+      "stored": 0
+    },
+    {
       "at": "2026-10-28T16:00:05.408450+00:00",
       "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
       "fetched": 0,
@@ -443,26 +479,26 @@
     }
   ],
   "counts": {
-    "articles": 26541,
+    "articles": 26550,
     "documents": 0,
     "escalated": 3463,
-    "events": 4258,
+    "events": 4261,
     "failed_sweeps": 100,
     "linked": 14476,
-    "observations": 6349,
+    "observations": 6361,
     "series": 31,
-    "sweeps": 1231
+    "sweeps": 1235
   },
   "day": "2026-10-28",
-  "generated_at": "2026-10-28 16:04 UTC",
+  "generated_at": "2026-10-28 16:06 UTC",
   "macro": [
     {
-      "change": "-0.08",
-      "obs_date": "2026-10-26",
+      "change": "-0.12",
+      "obs_date": "2026-10-27",
       "series_id": "BAMLH0A0HYM2",
       "source": "fred",
       "title": "ICE BofA US high-yield option-adjusted spread, %",
-      "value": "3.30"
+      "value": "3.18"
     },
     {
       "change": "0",
@@ -858,7 +894,7 @@
         },
         {
           "concept": "price_target_consensus",
-          "known_at": "2026-10-26",
+          "known_at": "2026-10-28",
           "label": "target (consensus)",
           "period_end": null,
           "source": "fmp",
@@ -1108,11 +1144,11 @@
         },
         {
           "concept": "price_target_consensus",
-          "known_at": "2026-10-26",
+          "known_at": "2026-10-28",
           "label": "target (consensus)",
           "period_end": null,
           "source": "fmp",
-          "value": "340.14"
+          "value": "340.88"
         },
         {
           "concept": "analyst_buy",
@@ -1372,11 +1408,11 @@
         },
         {
           "concept": "price_target_consensus",
-          "known_at": "2026-10-26",
+          "known_at": "2026-10-28",
           "label": "target (consensus)",
           "period_end": null,
           "source": "fmp",
-          "value": "597.92"
+          "value": "599.20"
         },
         {
           "concept": "analyst_buy",

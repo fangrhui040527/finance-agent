@@ -1,6 +1,6 @@
 # Digest 2026-10-28
 
-Generated 2026-10-28 16:04 UTC · slot `all` · 26541 articles in the corpus, 6349 observations, 4258 events in the fact book.
+Generated 2026-10-28 16:06 UTC · slot `all` · 26550 articles in the corpus, 6361 observations, 4261 events in the fact book.
 
 ## The book
 
@@ -43,7 +43,7 @@ Generated 2026-10-28 16:04 UTC · slot `all` · 26541 articles in the corpus, 63
 - 2026-10-27 finance.yahoo.com — Accenture (ACN) Launches Physical AI Safety Suite For Factories And Warehouses [q 1.00, tone +0.0]
 - 2026-10-27 finance.yahoo.com — The AI economy, Apple's iPhone Duo issues, and Meta partners with Nvidia [q 1.00, tone +0.0]
 - upcoming 2026-11-17 earnings_result — Q3 2027 results after the close (finnhub)
-- snapshot: P/E (ttm) 26.36 (finnhub, 2026-10-26) · P/B 28.81 (finnhub, 2026-10-26) · EPS (ttm) 7.91 (finnhub, 2026-10-26) · dividend yield 0.03 (finnhub, 2026-10-26) · beta 2.27 (finnhub, 2026-10-26) · 52w high 243.37 (finnhub, 2026-10-26) · 52w low 164.27 (finnhub, 2026-10-26) · target (consensus) 339.17 (fmp, 2026-10-26) · analysts: buy 41 (finnhub, 2026-10-20) · analysts: hold 2 (finnhub, 2026-10-20) · analysts: sell 1 (finnhub, 2026-10-20) · vendor sentiment 0.25 (alphavantage_news, 2026-10-06) · revenue (last quarter) 96.22bn (sec_xbrl, 2026-08-26) · net income (last quarter) 59.69bn (sec_xbrl, 2026-08-26) · last EPS surprise % 3.82 (finnhub, 2026-09-05)
+- snapshot: P/E (ttm) 26.36 (finnhub, 2026-10-26) · P/B 28.81 (finnhub, 2026-10-26) · EPS (ttm) 7.91 (finnhub, 2026-10-26) · dividend yield 0.03 (finnhub, 2026-10-26) · beta 2.27 (finnhub, 2026-10-26) · 52w high 243.37 (finnhub, 2026-10-26) · 52w low 164.27 (finnhub, 2026-10-26) · target (consensus) 339.17 (fmp, 2026-10-28) · analysts: buy 41 (finnhub, 2026-10-20) · analysts: hold 2 (finnhub, 2026-10-20) · analysts: sell 1 (finnhub, 2026-10-20) · vendor sentiment 0.25 (alphavantage_news, 2026-10-06) · revenue (last quarter) 96.22bn (sec_xbrl, 2026-08-26) · net income (last quarter) 59.69bn (sec_xbrl, 2026-08-26) · last EPS surprise % 3.82 (finnhub, 2026-09-05)
 
 ### Apple (XNAS:AAPL)
 - tone: 29 stories from 16 sources, polarity +0.10, peak intensity 0.00, uncertainty 0.14 · 5 escalated
@@ -58,7 +58,7 @@ Generated 2026-10-28 16:04 UTC · slot `all` · 26541 articles in the corpus, 63
 - event 2026-10-28 earnings_result — Q4 2026 results after the close (finnhub)
 - upcoming 2026-11-02 earnings_result — Q4 2026 results after the close (finnhub)
 - upcoming 2026-10-29 earnings_result — Q4 2026 results after the close (finnhub)
-- snapshot: P/E (ttm) 39.36 (finnhub, 2026-10-26) · P/B 50.98 (finnhub, 2026-10-26) · EPS (ttm) 8.72 (finnhub, 2026-10-26) · dividend yield 0.51 (finnhub, 2026-10-26) · beta 1.10 (finnhub, 2026-10-26) · 52w high 351.73 (finnhub, 2026-10-26) · 52w low 243.42 (finnhub, 2026-10-26) · target (consensus) 340.14 (fmp, 2026-10-26) · analysts: buy 20 (finnhub, 2026-10-20) · analysts: hold 14 (finnhub, 2026-10-20) · analysts: sell 3 (finnhub, 2026-10-20) · vendor sentiment -0.23 (alphavantage_news, 2026-10-06) · revenue (last quarter) 109.42bn (sec_xbrl, 2026-07-31) · net income (last quarter) 29.79bn (sec_xbrl, 2026-07-31) · last EPS surprise % -0.89 (finnhub, 2026-09-05)
+- snapshot: P/E (ttm) 39.36 (finnhub, 2026-10-26) · P/B 50.98 (finnhub, 2026-10-26) · EPS (ttm) 8.72 (finnhub, 2026-10-26) · dividend yield 0.51 (finnhub, 2026-10-26) · beta 1.10 (finnhub, 2026-10-26) · 52w high 351.73 (finnhub, 2026-10-26) · 52w low 243.42 (finnhub, 2026-10-26) · target (consensus) 340.88 (fmp, 2026-10-28) · analysts: buy 20 (finnhub, 2026-10-20) · analysts: hold 14 (finnhub, 2026-10-20) · analysts: sell 3 (finnhub, 2026-10-20) · vendor sentiment -0.23 (alphavantage_news, 2026-10-06) · revenue (last quarter) 109.42bn (sec_xbrl, 2026-07-31) · net income (last quarter) 29.79bn (sec_xbrl, 2026-07-31) · last EPS surprise % -0.89 (finnhub, 2026-09-05)
 
 ### Microsoft (XNAS:MSFT)
 - tone: 39 stories from 24 sources, polarity +0.20, peak intensity 0.33, uncertainty 0.12 · 16 escalated
@@ -72,13 +72,13 @@ Generated 2026-10-28 16:04 UTC · slot `all` · 26541 articles in the corpus, 63
 - 2026-10-27 news.futunn.com — Microsoft Expected to Report Higher 1Q Revenue With AI Growth, CapEx in Focus -- Earnings Preview [q 0.65, tone +1.0] ★
 - event 2026-10-28 earnings_result — Q1 2027 results (finnhub)
 - event 2026-10-27 earnings_result — Q1 2027 results (finnhub)
-- snapshot: P/E (ttm) 29.12 (finnhub, 2026-10-26) · P/B 6.26 (finnhub, 2026-10-26) · EPS (ttm) 17.95 (finnhub, 2026-10-26) · dividend yield 0.79 (finnhub, 2026-10-26) · beta 1.06 (finnhub, 2026-10-26) · 52w high 553.72 (finnhub, 2026-10-26) · 52w low 349.20 (finnhub, 2026-10-26) · target (consensus) 597.92 (fmp, 2026-10-26) · analysts: buy 40 (finnhub, 2026-10-20) · analysts: hold 3 (finnhub, 2026-10-20) · analysts: sell 0 (finnhub, 2026-10-20) · vendor sentiment 0.29 (alphavantage_news, 2026-10-06) · revenue (last quarter) 90.01bn (sec_xbrl, 2026-07-29) · net income (last quarter) 35.77bn (sec_xbrl, 2026-07-29) · last EPS surprise % 9.53 (finnhub, 2026-09-05)
+- snapshot: P/E (ttm) 29.12 (finnhub, 2026-10-26) · P/B 6.26 (finnhub, 2026-10-26) · EPS (ttm) 17.95 (finnhub, 2026-10-26) · dividend yield 0.79 (finnhub, 2026-10-26) · beta 1.06 (finnhub, 2026-10-26) · 52w high 553.72 (finnhub, 2026-10-26) · 52w low 349.20 (finnhub, 2026-10-26) · target (consensus) 599.20 (fmp, 2026-10-28) · analysts: buy 40 (finnhub, 2026-10-20) · analysts: hold 3 (finnhub, 2026-10-20) · analysts: sell 0 (finnhub, 2026-10-20) · vendor sentiment 0.29 (alphavantage_news, 2026-10-06) · revenue (last quarter) 90.01bn (sec_xbrl, 2026-07-29) · net income (last quarter) 35.77bn (sec_xbrl, 2026-07-29) · last EPS surprise % 9.53 (finnhub, 2026-09-05)
 
 ## Macro
 
 | series | latest | as of | change | source |
 |---|---|---|---|---|
-| ICE BofA US high-yield option-adjusted spread, % | 3.30 | 2026-10-26 | -0.08 | fred |
+| ICE BofA US high-yield option-adjusted spread, % | 3.18 | 2026-10-27 | -0.12 | fred |
 | BNM Overnight Policy Rate, % | 2.75 | 2026-09-03 | +0 | bnm_opr |
 | US CPI, all items, index 1982-84=100 | 336.30 | 2026-09-01 | +2.167 | fred |
 | Brent crude, USD per barrel (EIA, daily) | 115.22 | 2026-10-20 | -3.6 | fred |
@@ -99,6 +99,10 @@ Generated 2026-10-28 16:04 UTC · slot `all` · 26541 articles in the corpus, 63
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 16:06 | dbnomics | ok | 450 | 0 | 0 | facts 0;  |
+| 16:06 | jin10_flash | ok | 9 | 9 | 9 | facts 0;  |
+| 16:06 | fred | ok | 476 | 0 | 0 | facts 1; release calendar: 'FOMC Press Release' listed on 15 days of the fortnig |
+| 16:06 | fmp | ok | 3971 | 0 | 0 | facts 15; fmp /earnings is outside the plan (HTTP 402); not collected for NVDA,  |
 | 16:00 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
 | 16:00 | twse_openapi | ok | 8 | 0 | 0 | facts 0;  |
 | 16:00 | jin10_flash | ok | 18 | 18 | 18 | facts 0;  |
