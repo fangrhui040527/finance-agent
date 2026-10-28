@@ -29,6 +29,7 @@ from pathlib import Path
 from core.guardrails.policy import PolicyEngine
 from core.guardrails.publish import PUBLICATION_NOTICE
 from knowledge.corpus import Corpus
+from knowledge.earnings_date import earnings_dates
 from knowledge.facts import FactBook
 from knowledge.news.features import Article, LexiconExtractor
 from knowledge.redact import scrub
@@ -75,6 +76,8 @@ class NameDigest:
     tone: dict = field(default_factory=dict)
     events: list[dict] = field(default_factory=list)
     upcoming: list[dict] = field(default_factory=list)
+    #: The resolved earnings date per upcoming release (knowledge/earnings_date).
+    earnings: list[str] = field(default_factory=list)
     snapshot: list[dict] = field(default_factory=list)
 
     @property
@@ -157,6 +160,8 @@ class Digest:
                 out.append(
                     f"- upcoming {e['when'][:10]} {e['kind']} — {e['title']} ({e['source']})"
                 )
+            for label in n.earnings:
+                out.append(f"- earnings date: {label}")
             if n.snapshot:
                 out.append(
                     "- snapshot: "
@@ -395,6 +400,11 @@ def _name_digest(
         nd.events.append(_event(e))
     for e in facts.events(iid, since=now, until=now + UPCOMING, limit=10):
         nd.upcoming.append(_event(e))
+    # One line per release the upcoming rows date: the date to believe, or
+    # "unconfirmed" with each source's when they disagree (knowledge/earnings_date).
+    nd.earnings = [
+        d.label() for d in earnings_dates(facts, iid, now, now + UPCOMING) if not d.released
+    ]
     for concept, label in SNAPSHOT:
         o = facts.latest(iid, concept)
         if o is None or o.value is None:
