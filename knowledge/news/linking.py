@@ -446,8 +446,8 @@ def _writes_the_note(text: str, start: int, end: int) -> bool:
 #
 # Linked, because the name is written, and listed on its page as what they are,
 # but never a CAUSE: the digest neither stars nor ranks them above a story about
-# the company (`EntityLinker.incidental`, read by knowledge/digest.py and the
-# ingest's escalation gate). Two kinds:
+# the company (`EntityLinker.incidental`, read by knowledge/digest.py, the
+# ingest's escalation gate, the news agent's citations and ragqa). Two kinds:
 #
 #   * MENTION - another company's contract win. "Bintai Kinden wins RM20.3mil
 #     TNB contract" was starred on Tenaga's page on 2026-10-27 and 10-28, and
@@ -455,15 +455,23 @@ def _writes_the_note(text: str, start: int, end: int) -> bool:
 #     event is the contractor's, and for the utility it is one more purchase
 #     order. Read as the winner, a win verb, up to six words, then the alias
 #     followed by a contract noun ("TNB-linked jobs", "Tenaga contract"), or a
-#     contract noun "from"/"by" the alias ("Deal from Tenaga Nasional"). "TNB
-#     awards RM568m contract" names TNB as the actor and stays its news.
+#     contract noun "from"/"by" the alias ("Deal from Tenaga Nasional"), all in
+#     ONE clause: a comma after the verb, or "as", "against", "amid" and the
+#     rest of _CLAUSE_BREAK, ends it. "Dell wins as Nvidia orders surge" and
+#     "Apple wins appeal against Microsoft deal" are two clauses, and Nvidia's
+#     orders are not what Dell won. "TNB awards RM568m contract" names TNB as
+#     the actor and stays its news.
 #   * INCIDENT_BYSTANDER - an accident, crash or fire that involves the
 #     company's vehicle, staff or premises and not its business. "3 family
 #     members killed in Dungun crash" ("MPV and TNB vehicle collide") was ranked
-#     first for Tenaga on 2026-10-25 at quality 1.00. Read per text: an incident
-#     word, the company's thing ("TNB lorry", "a company vehicle"), and no word
-#     of the business - a substation fire that "triggered JB power outage" is
-#     the utility's news and stays it, as does any substation fire.
+#     first for Tenaga on 2026-10-25 at quality 1.00. Read per thing (_THINGS):
+#     the company's thing ("TNB lorry", "a company vehicle"), an incident word
+#     that can happen to THAT thing within a few words of it - a crash to a
+#     vehicle, a fire to an office, a death or injury to staff, written after
+#     them - and no word of the business anywhere: a substation fire that
+#     "triggered JB power outage" is the utility's news and stays it.
+#     "Microsoft Office crash" is software, and "Apple Vision Pro is dead,
+#     Apple staff say" is a product: neither is an incident.
 #
 # Measured over the 26,518 stored rows to 2026-10-28: MENTION on 24 rows - 20
 # Tenaga contractor awards, and "NiSource Lands Major Microsoft Power Deal",
@@ -481,15 +489,27 @@ _WIN_VERB = (
     r"|nets?|netted|accepts?|accepted|obtains?|obtained|awarded)"
 )
 _CONTRACT_NOUN = r"(?i:(?:sub)?contracts?|jobs?|tenders?|deals?|projects?|works|orders?|packages?)"
+#: Words that start another clause, so a win on one side of them is not a
+#: contract from the name on the other.
+_CLAUSE_BREAK = (
+    r"(?i:as|while|after|before|against|amid|despite|but|though|although|when|whereas"
+    r"|because|since|over|until|unlike)\b"
+)
+#: One word of the win's clause.
+_CLAUSE_WORD = rf"(?!{_CLAUSE_BREAK})[^\s;?!]+"
+#: ...and one between the verb and the name, which a comma also ends.
+_OBJECT_WORD = rf"(?!{_CLAUSE_BREAK})[^\s;?!]*[^\s,;?!]"
 #: "Jati Tinggi, Kerjaya Prospek consortium wins RM568m ", "SKA Capital unit
 #: accepts RM89.28mil award for ": a capitalised winner, the verb, up to six
 #: words, in one clause.
 _WINNER_WINS = re.compile(
-    rf"[A-Z0-9][^\s;?!]*(?:\s+[^\s;?!]+){{0,6}}?\s+{_WIN_VERB}(?:\s+[^\s;?!]+){{0,6}}?\s+\Z"
+    rf"[A-Z0-9][^\s;?!]*(?:\s+{_CLAUSE_WORD}){{0,6}}?\s+{_WIN_VERB}"
+    rf"(?:\s+{_OBJECT_WORD}){{0,6}}?\s+\Z"
 )
 #: "TNB contract", "TNB-linked jobs", "Tenaga's substation contract".
 _CONTRACT_AFTER = re.compile(
-    rf"\A(?:[-‐](?i:linked|related|owned)|['’]s)?(?:\s+[^\s;?!]+){{0,3}}?\s+{_CONTRACT_NOUN}\b"
+    rf"\A(?:[-‐](?i:linked|related|owned)|['’]s)?(?:\s+{_OBJECT_WORD}){{0,3}}?"
+    rf"\s+{_CONTRACT_NOUN}\b"
 )
 #: "Bags MYR13 Million Deal from Tenaga Nasional".
 _CONTRACT_FROM = re.compile(rf"\b{_CONTRACT_NOUN}\s+(?i:from|by)\s+\Z")
@@ -504,23 +524,87 @@ def _wins_its_contract(text: str, start: int, end: int) -> bool:
     )
 
 
-_INCIDENT = re.compile(
-    r"\b(?i:crash(?:es|ed)?|collisions?|collided?|collides|accidents?|mishaps?|overturned"
-    r"|skidded|fire|blaze|killed|dies|died|dead|injured|hurt|electrocuted|electric\s+shock)\b"
+_HARM = r"killed|dies|died|dead|injured|electrocuted|electric\s+shock"
+_FIRE = r"fire|blaze"
+_CRASH = r"crash(?:es|ed)?|collisions?|collided?|collides|accidents?|mishaps?|overturned|skidded"
+#: How far, in words and within one sentence, an incident word may sit from the thing.
+INCIDENT_WORDS = 8
+
+
+@dataclass(frozen=True)
+class _Thing:
+    """A kind of thing a company owns, and what can happen to it."""
+
+    #: The alias and then its thing: "TNB lorry", "TNB's van", "(TNB) cable".
+    after_alias: re.Pattern[str]
+    #: "a collision involving a company vehicle".
+    of_a_company: re.Pattern[str]
+    incident: re.Pattern[str]
+    #: Words looked at before the alias, and after the thing.
+    before: int
+    after: int
+
+
+def _thing(nouns: str, incidents: str, before: int, after: int) -> _Thing:
+    return _Thing(
+        re.compile(rf"\A\)?(?:['’]s)?\s+(?i:{nouns})\b"),
+        re.compile(rf"\b(?i:company|company['’]s)\s+(?i:{nouns})\b"),
+        re.compile(rf"\b(?i:{incidents})\b"),
+        before,
+        after,
+    )
+
+
+_THINGS = (
+    _thing(
+        r"lorry|lorries|vans?|trucks?|vehicles?|pick-?ups?|bus|buses|motorcycles?",
+        f"{_CRASH}|{_FIRE}|{_HARM}",
+        INCIDENT_WORDS,
+        INCIDENT_WORDS,
+    ),
+    _thing(r"cables?", _HARM, INCIDENT_WORDS, INCIDENT_WORDS),
+    # An office or a building burns; "Microsoft Office crash" is software.
+    _thing(r"premises|office|depot|building", _FIRE, INCIDENT_WORDS, INCIDENT_WORDS),
+    # People are hurt AFTER they are named - "TNB workers injured", "TNB
+    # technician electrocuted" - and "is dead, Apple staff say" is a quote.
+    _thing(r"workers?|staff|employees?|technicians?|linem[ae]n", _HARM, 0, 3),
 )
-_ITS_THING = (
-    r"(?i:lorry|lorries|vans?|trucks?|vehicles?|pick-?ups?|bus|buses|motorcycles?|workers?"
-    r"|staff|employees?|technicians?|linem[ae]n|premises|office|depot|building|cables?)"
-)
-#: The alias and then its thing: "TNB lorry", "TNB's van", "(TNB) cable".
-_THING_AFTER = re.compile(rf"\A\)?(?:['’]s)?\s+{_ITS_THING}\b")
-#: "a collision involving a company vehicle".
-_COMPANY_THING = re.compile(rf"\b(?i:company|company['’]s)\s+{_ITS_THING}\b")
+_SENTENCE_WORD = r"[^\s.;!?|]"
 _BUSINESS = re.compile(
     r"\b(?i:outages?|blackouts?|power\s+(?:cuts?|supply|disruptions?)|supply\s+disruptions?"
     r"|substations?|tariffs?|shares|stocks?|earnings|profits?|revenue|dividends?|contracts?"
     r"|guidance)\b"
 )
+
+
+def _near_incident(text: str, start: int, end: int, thing: _Thing) -> bool:
+    """Is one of the thing's incident words within its window of text[start:end]?"""
+    before = re.search(
+        rf"(?:{_SENTENCE_WORD}+\s+){{0,{thing.before}}}{_SENTENCE_WORD}*\Z",
+        text[max(0, start - 160) : start],
+    )
+    after = re.match(
+        rf"{_SENTENCE_WORD}*(?:\s+{_SENTENCE_WORD}+){{0,{thing.after}}}",
+        text[end : end + 160],
+    )
+    return bool(
+        (thing.before and before and thing.incident.search(before.group()))
+        or (after and thing.incident.search(after.group()))
+    )
+
+
+def _its_thing_in_an_incident(text: str, alias_spans: Iterable[tuple[int, int]]) -> bool:
+    """Does the text put a company's vehicle, cable, premises or staff in an incident?"""
+    spans = list(alias_spans)
+    for thing in _THINGS:
+        found = [(m.start(), m.end()) for m in thing.of_a_company.finditer(text)]
+        for start, end in spans:
+            m = thing.after_alias.match(text[end : end + 40])
+            if m:
+                found.append((start, end + m.end()))
+        if any(_near_incident(text, s, e, thing) for s, e in found):
+            return True
+    return False
 
 
 def alias_pattern(surface: str, *, bare: bool = False) -> re.Pattern[str]:
@@ -700,13 +784,8 @@ class EntityLinker:
         matches = self._matches(text)
         if not matches:
             return {}
-        if (
-            _INCIDENT.search(text)
-            and not _BUSINESS.search(text)
-            and (
-                _COMPANY_THING.search(text)
-                or any(_THING_AFTER.match(text[end : end + 40]) for _s, end, _o, _i in matches)
-            )
+        if not _BUSINESS.search(text) and _its_thing_in_an_incident(
+            text, ((start, end) for start, end, _o, _i in matches)
         ):
             return {iid: INCIDENT_BYSTANDER for _s, _e, _o, iid in matches}
         only: dict[str, bool] = {}

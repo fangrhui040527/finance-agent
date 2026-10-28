@@ -21,8 +21,6 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 
-from agents.evidence.agents import event_type_for
-from engines.events.taxonomy import EventType
 from knowledge.feeds.adapter import FixtureFeed
 from knowledge.news.linking import (
     INCIDENT_BYSTANDER,
@@ -170,6 +168,20 @@ def test_the_company_awarding_or_acting_is_still_its_own_news():
         assert linker.incidental(text) == {}, text
 
 
+def test_a_win_in_another_clause_is_not_the_names_contract():
+    """A review's counter-examples: the win and the name's orders sit in two
+    clauses, so the name is the subject of its own news."""
+    linker = EntityLinker({**INDEX, "Nvidia": "XNAS:NVDA", "Dell": "XNYS:DELL"})
+    for text in (
+        "Dell wins as Nvidia orders surge",
+        "Nvidia wins big as Microsoft orders more chips",
+        "Apple wins appeal against Microsoft deal",
+        "Dell wins, Nvidia orders more servers",
+        "Bintai Kinden wins RM20m job amid TNB contract delays",
+    ):
+        assert linker.incidental(text) == {}, text
+
+
 # --- an accident involving the company's lorry is an INCIDENT_BYSTANDER -----------------
 
 
@@ -190,6 +202,32 @@ def test_a_crash_involving_the_companys_vehicle_is_an_incident_bystander():
         assert linker.link(text) == [TENAGA], text
 
 
+def test_each_thing_counts_only_the_incidents_that_happen_to_it():
+    linker = EntityLinker(INDEX)
+    for text in (
+        "Fire guts TNB office in Kuantan, no one hurt",
+        "TNB technician electrocuted while repairing line in Kapar",
+        "Two TNB workers killed when scaffold collapses",
+    ):
+        assert linker.incidental(text) == {TENAGA: INCIDENT_BYSTANDER}, text
+
+
+def test_a_product_or_software_story_is_not_an_incident():
+    """A review's counter-examples: a crash of software and a "dead" product
+    are the company's own news, and an incident word far from the thing, or
+    in another sentence, does not reach it."""
+    linker = EntityLinker(INDEX)
+    for text in (
+        "Microsoft Office crash wipes documents for millions",
+        "Apple Vision Pro is dead, Apple staff say",
+        "Apple staff say the Vision Pro is dead",
+        "Microsoft employees crash the stage at Build",
+        "Market crash. Apple vehicle project scrapped after a decade of work",
+        "Crash in chip demand hits Apple suppliers as the company's vehicle plan stalls",
+    ):
+        assert linker.incidental(text) == {}, text
+
+
 def test_an_incident_that_reaches_the_business_is_still_the_companys_news():
     linker = EntityLinker(INDEX)
     for text in (
@@ -204,13 +242,6 @@ def test_an_incident_that_reaches_the_business_is_still_the_companys_news():
 
 def test_both_kinds_are_never_a_cause():
     assert {MENTION, INCIDENT_BYSTANDER} == NOT_A_CAUSE
-
-
-def test_a_stored_event_of_either_kind_is_never_typed_as_a_catalyst():
-    title = "Bintai Kinden wins RM20.3mil TNB contract"
-    assert event_type_for("announcement", title) is EventType.CONTRACT_WIN
-    assert event_type_for(MENTION, title) is None
-    assert event_type_for(INCIDENT_BYSTANDER, "TNB lorry crash closes road") is None
 
 
 # --- the escalation gate and the digest -----------------------------------------------
@@ -298,3 +329,82 @@ def test_the_digest_lists_each_kind_unstarred_and_below_the_companys_own_news(tm
     assert "Bintai Kinden wins RM20.3mil TNB contract [q 0.95, tone +1.0] [mention]" in page
     assert "killed in Dungun crash [q 1.00, tone +0.0] [incident_bystander]" in page
     assert page.count("★") == 1
+
+
+# --- the news agent's citations and the ragqa audit --------------------------------------
+
+
+def _stored(tmp_path, rows):
+    """A corpus holding `rows` of (doc_id, title, body, stored links)."""
+    from knowledge.corpus import Corpus
+    from knowledge.news.features import Article
+
+    now = datetime(2026, 10, 28, 12, 0, tzinfo=UTC)
+    path = tmp_path / "corpus.db"
+    with Corpus(path) as c:
+        for doc_id, title, body, instruments in rows:
+            art = Article(
+                doc_id=doc_id,
+                title=title,
+                body=body,
+                source_domain="example.com",
+                published_at=now,
+                instruments=instruments,
+                quality=1.0,
+            )
+            c.add(art, source="fixture", seen_at=now)
+    return path, now
+
+
+NEWS_ROWS = [
+    ("a", "Bintai Kinden wins RM20.3mil TNB contract", "", [TENAGA]),
+    (
+        "b",
+        "TNB expresses condolences to family of three killed in Dungun crash",
+        "Three people were killed in a collision involving a company vehicle.",
+        [TENAGA],
+    ),
+    ("c", "TNB profit rose on higher tariffs", "", [TENAGA]),
+    # Stored as Apple's before entities.yaml said Apple Hospitality is not Apple.
+    ("d", "Apple Hospitality REIT to issue monthly dividend", "", ["XNAS:AAPL"]),
+]
+
+
+def test_the_news_agent_cites_each_kind_as_not_a_cause(registry, tmp_path):
+    from agents.base import AgentContext
+    from agents.evidence.agents import A4NewsNarrative
+    from core.guardrails.defaults import default_engine
+    from knowledge.corpus import Corpus
+    from knowledge.retrieval.index import build_router
+
+    path, now = _stored(tmp_path, NEWS_ROWS)
+    with Corpus(path) as c:
+        router = build_router(registry, c, now=now, index=INDEX)
+    ctx = AgentContext(router=router, engine=default_engine(registry.allowlist()), now=now)
+    findings = A4NewsNarrative(ctx).run(TENAGA, "TNB contract crash profit tariffs", limit=5)
+    caveats = {f.text.split(": ", 1)[1]: f.caveats for f in findings if f.kind == "news"}
+    assert caveats["Bintai Kinden wins RM20.3mil TNB contract"] == [
+        "[mention] another company's contract win: not a cause"
+    ]
+    assert caveats["TNB expresses condolences to family of three killed in Dungun crash"] == [
+        "[incident_bystander] an accident involving the company's vehicle, staff or premises: "
+        "not a cause"
+    ]
+    # The company's own news carries no kind (only the relevance caveat it always had).
+    assert not any(c.startswith("[") for c in caveats["TNB profit rose on higher tariffs"])
+    # The stale Apple Hospitality link is rechecked away before indexing.
+    apple = A4NewsNarrative(ctx).run("XNAS:AAPL", "Apple Hospitality dividend")
+    assert all("Apple Hospitality" not in f.text for f in apple)
+
+
+def test_ragqa_reruns_the_gate_the_digest_ships(tmp_path):
+    from ragqa.run import Report, cleaning
+
+    path, _now = _stored(tmp_path, NEWS_ROWS)
+    rep = Report()
+    cleaning(rep, str(path), (TENAGA, "XNAS:AAPL"))
+    (gate,) = [c for c in rep.checks if c.name == "the escalation gate rejects something"]
+    rows = {r["instrument"]: r for r in gate.evidence["detail_rows"]}
+    # Three Tenaga rows, only its own news escalated; Apple's stale link is dropped.
+    assert (rows[TENAGA]["linked"], rows[TENAGA]["escalated"]) == (3, 1)
+    assert rows["XNAS:AAPL"]["linked"] == 0

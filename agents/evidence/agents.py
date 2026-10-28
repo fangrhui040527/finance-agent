@@ -18,7 +18,7 @@ from core.llm.tiers import TaskClass
 from core.market.pointintime import FactStore, assert_no_lookahead
 from core.market.prices import PriceSeries
 from engines.events.taxonomy import BaseRateTable, Event, EventType
-from knowledge.news.linking import NOT_A_CAUSE
+from knowledge.news.linking import INCIDENT_BYSTANDER, MENTION
 
 #: Stored event kinds (knowledge/facts.py) -> the taxonomy's types. A kind not
 #: here is inferred from the title by `event_type_for`, or left out.
@@ -61,10 +61,6 @@ def event_type_for(kind: str, title: str) -> EventType | None:
         return EVENT_KINDS[kind]
     if kind == "insider_filing":
         return None  # a Form 4 filing without its direction; Finnhub carries the typed one
-    if kind in NOT_A_CAUSE:
-        # Names the company without being news about it: "Bintai Kinden wins
-        # RM20.3mil TNB contract" is not Tenaga's CONTRACT_WIN, whatever its title says.
-        return None
     for pattern, kind_ in _TITLE_TYPES:
         if pattern.search(title or ""):
             return kind_
@@ -642,6 +638,11 @@ class A4NewsNarrative(Agent):
     #: The five feature dimensions carried into a Finding's numbers, so the
     #: synthesis layer reads intensity and uncertainty rather than a headline.
     FEATURE_KEYS = ("relevance", "polarity", "intensity", "uncertainty", "forwardness")
+    #: knowledge.news.linking.NOT_A_CAUSE, as a story's caveat reads it.
+    INCIDENTAL_KINDS = {
+        MENTION: "another company's contract win",
+        INCIDENT_BYSTANDER: "an accident involving the company's vehicle, staff or premises",
+    }
 
     def run(self, instrument_id: str, query: str, max_age=None, limit: int = 5) -> list[Finding]:
         res = self.retrieve("kb_news", query, max_age=max_age, entity=instrument_id, limit=limit)
@@ -678,11 +679,17 @@ class A4NewsNarrative(Agent):
             # is cited at the web tier, not as curated news: nobody chose that
             # publisher as a source, a search engine did.
             web = c.chunk_id.startswith("web_search:")
-            caveats = (
-                ["a mention, not a cause: the story names the company"]
-                if numbers.get("relevance", 1.0) < 0.75
-                else []
-            )
+            # A story that names the company without being news about it
+            # (`EntityLinker.incidental`, read when kb_news is built) says
+            # which kind, whatever its relevance: three Tenaga rows scored
+            # 0.75-1.0 were a contractor's award and two accidents.
+            kind = (meta.get("incidental") or {}).get(instrument_id, "")
+            if kind:
+                caveats = [f"[{kind}] {self.INCIDENTAL_KINDS.get(kind, kind)}: not a cause"]
+            elif numbers.get("relevance", 1.0) < 0.75:
+                caveats = ["a mention, not a cause: the story names the company"]
+            else:
+                caveats = []
             if web:
                 caveats.append("found by a web search for a move, not collected from a feed")
             out.append(

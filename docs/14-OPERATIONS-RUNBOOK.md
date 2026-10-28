@@ -958,10 +958,12 @@ Two kinds of story stay linked but are never a cause: another company's
 contract win (`[mention]`: "Bintai Kinden wins RM20.3mil TNB contract") and an
 accident involving the company's vehicle, staff or premises
 (`[incident_bystander]`). The digest and the pack print the tag, never star
-them, and rank them below the company's own news; the ingest gate does not
-escalate for them. Stored links are not rewritten: the digest and the graph
-rebuild read every row through `EntityLinker.recheck`, so a new exclusion
-reaches old rows on the next digest or `derive`.
+them, and rank them below the company's own news; the ingest gate and the
+ragqa audit's gate re-run do not escalate for them, and `news_evidence` cites
+them with a `[mention] ...: not a cause` caveat. Stored links are not
+rewritten: the digest, the graph rebuild, `kb_news` and ragqa read every row
+through `EntityLinker.recheck`, so a new exclusion reaches old rows on the next
+digest, `derive` or index build.
 
 ## Reading a capped sweep row (2026-09-08)
 
