@@ -4,10 +4,10 @@ Every source's claim stays its own row in the fact book - the calendars'
 `earnings_result` events and EDGAR's `results_released` - and nothing here
 writes. This only reads them and says which one a page should print.
 
-Why it exists: on 2026-10-28 the vendors dated Apple's results 10-28 and 10-29
-while a report had Apple announcing 2026-11-02, and the pack printed each
-calendar row as though it were the date. A page that names one vendor's date
-as fact when the vendors do not agree is the same error as an estimated price.
+Why it exists: by 2026-10-28 Finnhub had listed Apple's results for 10-28,
+10-29 and then 11-02, and the pack printed each calendar row as though it were
+the date. A page that names one vendor's date as fact when the vendors do not
+agree is the same error as an estimated price.
 
 Authority, highest first:
 
@@ -24,9 +24,9 @@ Authority, highest first:
 When the top two claims disagree the date is "unconfirmed (a / b)" with every
 claim and its source, wherever it is printed. Two claims agree when they name
 the same day, or adjacent days where the earlier is listed after the close (a
-vendor dating the report by the session it moves). A one-day gap with nothing
-to explain it is a disagreement: it is the 10-28/10-29 case above, and it
-decides which session the report lands in.
+vendor dating the report by the session it moves); the line then gives each
+source's own date. A one-day gap with nothing to explain it is a disagreement:
+it decides which session the report lands in.
 """
 
 from __future__ import annotations
@@ -104,8 +104,17 @@ class EarningsDate:
             return f"{top.day} (edgar 8-K item 2.02" + (f", accepted {at:%H:%M} ET)" if at else ")")
         if not self.confirmed:
             return "unconfirmed (" + " / ".join(str(c) for c in self.claims) + ")"
-        agreeing = [c.source for c in self.claims[:2]] if len(self.claims) > 1 else [top.source]
-        return f"{top.day} ({', '.join(agreeing)})"
+        if len(self.claims) < 2:
+            return f"{top.day} ({top.source})"
+        second = self.claims[1]
+        if second.day == top.day:
+            return f"{top.day} ({top.source}, {second.source})"
+        # Agreed through the after-close rule: each source's own date, and why.
+        theirs = f"{second.day}" + (f" {second.hour}" if second.hour else "")
+        if second.day > top.day:
+            theirs += ", next session"
+        hour = f" {top.hour}" if top.hour else ""
+        return f"{top.day}{hour} ({top.source}; {second.source} {theirs})"
 
 
 def _agree(a: Claim, b: Claim) -> bool:
@@ -142,9 +151,16 @@ def earnings_dates(
         claims.append(_claim(e, seen))
     claims.sort(key=lambda c: c.day)
 
+    # A release absorbs the calendar dates on or before it (plus the one-day
+    # after-close slack), never the ones after: an Item 2.02 8-K weeks early is
+    # a pre-announcement or a warning, and the scheduled report still comes.
     clusters: list[list[Claim]] = []
     for c in claims:
-        if clusters and (c.day - clusters[-1][0].day) <= SPREAD:
+        if (
+            clusters
+            and (c.day - clusters[-1][0].day) <= SPREAD
+            and not any(r.released and (c.day - r.day).days > 1 for r in clusters[-1])
+        ):
             clusters[-1].append(c)
         else:
             clusters.append([c])

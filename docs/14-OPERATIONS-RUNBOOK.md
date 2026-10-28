@@ -720,16 +720,20 @@ fire.
 
 ## Earnings dates: which one to believe (2026-10-28)
 
-The calendars disagree: on 2026-10-28 Finnhub and FMP dated Apple's results a
-day apart. Each source's date stays its own row; `ask.py facts`, the
-`fact_snapshot` tool, the pack and the digest add one resolved line
+Calendars move and disagree: by 2026-10-28 Finnhub alone had listed Apple's
+results for 10-28, 10-29 and then 11-02 (the store has no FMP earnings rows:
+FMP's `/earnings` is outside the plan, HTTP 402). Each source's date stays its
+own row, and each source's newest listing is the one counted; `ask.py facts`,
+the `fact_snapshot` tool, the pack and the digest add one resolved line
 (`knowledge/earnings_date.py`). Authority: an EDGAR 8-K with Item 2.02 (stored
 as `results_released`, known at its acceptance time, read as New York time) >
 the company's own date (no collector yet: `COMPANY_SOURCES` is the hook) >
 Finnhub > FMP > anything else. When the top two disagree the line reads
 `unconfirmed (2026-10-29 finnhub / 2026-10-28 fmp)`: do not date a move by
 either until the 8-K lands. A one-day gap counts as agreement only when the
-earlier date is listed after the close.
+earlier date is listed after the close. An 8-K never absorbs a calendar date
+more than a day after it (a pre-announcement leaves the report expected), and a
+calendar-only date already past prints as `past ... - no 8-K on file`.
 
 ## Web evidence: searching for what the feeds missed (2026-10-22)
 

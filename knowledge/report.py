@@ -81,7 +81,15 @@ def fact_snapshot(
         lines.append("")
         lines.append("  earnings date (edgar 8-K > company > finnhub > fmp > news)")
         for d in dates:
-            lines.append(f"    {'released' if d.released else 'expected':<9} {d.label()}")
+            # A calendar-only date already behind us is not "expected": the 8-K
+            # is missing (no CIK, not collected yet, or older than the window).
+            last = d.day or max(c.day for c in d.claims)
+            if d.released:
+                lines.append(f"    {'released':<9} {d.label()}")
+            elif last < now.date():
+                lines.append(f"    {'past':<9} {d.label()}  - no 8-K on file")
+            else:
+                lines.append(f"    {'expected':<9} {d.label()}")
 
     docs = book.documents(instrument_id, limit=5)
     if docs:

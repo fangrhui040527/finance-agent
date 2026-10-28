@@ -158,7 +158,41 @@ def test_a_one_day_gap_explained_by_an_after_close_listing_agrees(tmp_path):
     with book_with(
         tmp_path, finnhub("XNAS:MSFT", day(2026, 10, 28)), fmp("XNAS:MSFT", day(2026, 10, 29))
     ) as book:
-        assert resolve(book, "XNAS:MSFT").label() == "2026-10-28 (finnhub, fmp)"
+        # Each source's own date: FMP never said 10-28.
+        assert (
+            resolve(book, "XNAS:MSFT").label()
+            == "2026-10-28 amc (finnhub; fmp 2026-10-29, next session)"
+        )
+
+
+def test_a_pre_announcement_8k_does_not_absorb_the_scheduled_report(tmp_path):
+    # An Item 2.02 8-K two weeks early (preliminary results, a warning): the
+    # scheduled report is still ahead, and still printed as expected.
+    with book_with(
+        tmp_path,
+        finnhub("XNAS:MSFT", day(2026, 10, 28)),
+        fmp("XNAS:MSFT", day(2026, 10, 29)),
+        edgar("XNAS:MSFT", datetime(2026, 10, 12, 20, 30, tzinfo=UTC)),
+    ) as book:
+        found = earnings_dates(book, "XNAS:MSFT", day(2026, 10, 10), day(2026, 11, 19))
+        assert [(d.released, d.label()) for d in found] == [
+            (True, "2026-10-12 (edgar 8-K item 2.02, accepted 16:30 ET)"),
+            (False, "2026-10-28 amc (finnhub; fmp 2026-10-29, next session)"),
+        ]
+        upcoming = earnings_dates(book, "XNAS:MSFT", day(2026, 10, 20), day(2026, 11, 19))
+        assert [d.label() for d in upcoming if not d.released] == [
+            "2026-10-28 amc (finnhub; fmp 2026-10-29, next session)"
+        ]
+
+
+def test_an_8k_still_absorbs_a_calendar_date_one_session_after_it(tmp_path):
+    with book_with(
+        tmp_path,
+        fmp("XNAS:MSFT", day(2026, 10, 29)),
+        edgar("XNAS:MSFT", datetime(2026, 10, 28, 20, 5, tzinfo=UTC)),
+    ) as book:
+        d = resolve(book, "XNAS:MSFT")
+        assert d.released and [c.source for c in d.claims] == ["edgar", "fmp"]
 
 
 def test_aapl_shaped_an_item_2_02_8k_resolves_to_its_date(tmp_path):
@@ -217,6 +251,19 @@ def test_the_fact_snapshot_prints_the_resolved_date_or_unconfirmed(tmp_path):
         text = fact_snapshot(book, "XNAS:AAPL", now=NOW, days=7)
     assert "earnings date (edgar 8-K > company > finnhub > fmp > news)" in text
     assert "expected  unconfirmed (2026-10-29 finnhub / 2026-10-28 fmp)" in text
+
+
+def test_a_calendar_only_date_already_past_is_not_expected(tmp_path):
+    with book_with(
+        tmp_path,
+        finnhub("XNAS:MSFT", day(2026, 10, 27), seen=SEEN - timedelta(days=5)),
+        finnhub("XNAS:MSFT", day(2026, 10, 28)),
+    ) as book:
+        text = fact_snapshot(book, "XNAS:MSFT", now=day(2026, 10, 30), days=30)
+        assert "past      2026-10-28 (finnhub)  - no 8-K on file" in text
+        assert "expected" not in text
+        # The same day, before it has passed, is still expected.
+        assert "expected  2026-10-28 (finnhub)" in fact_snapshot(book, "XNAS:MSFT", now=NOW)
 
 
 @dataclass
