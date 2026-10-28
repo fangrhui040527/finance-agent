@@ -12,9 +12,10 @@
 # extracts of the FTSE Russell / Bursa releases and the press reports quoting
 # them, cited on the line it touched. Those reviews account for the 30 KLCI
 # names exactly. The Mid 70 names no review since June 2024 touched are still
-# from memory and unchecked, and the replay leaves MID70 one name short: at
-# least one member that joined outside a review (Malaysia Airports' replacement
-# after its February 2025 delisting is the likeliest) is not identified.
+# from memory and unchecked, and the replay leaves MID70 two names short: two
+# members that joined outside a review are not identified - the replacements
+# for Malaysia Airports (delisted February 2025) and FGV Holdings (delisted
+# 2025-08-28, below).
 #
 # The collector still checks each code against the company name Yahoo reports
 # for it (`ask.py paper universe`) and the index book skips any name that does
@@ -75,10 +76,15 @@
 #   MYX:1651 Malaysian Resources Corporation - left the Mid 70 for FBM Small Cap
 #     when QL Resources dropped into it [MAR26]
 #   MYX:2291 Genting Plantations - Mid 70 exclusion [JUN26]
+#   MYX:5222 FGV Holdings - delisted 2025-08-28 after FELDA's takeover (trading
+#     suspended 2025-08-25); its Mid 70 replacement is not identified. Yahoo
+#     had already stopped quoting it (knowledge/paper/2026-09-30.md: HTTP 404).
+#     https://www.nst.com.my/amp/business/corporate/2025/08/1265182/fgv-exit-bursa-ending-13-year-run-mega-ipo
+#     https://bernama.com/lite/news.php?id=2461790
 as_of: 2026-10-28
-source: "June 2026 review and every review since June 2024 replayed over a list first written from memory (2026-09-25); Mid 70 names no review touched still unchecked; one Mid 70 name unidentified"
+source: "June 2026 review and every review since June 2024 replayed over a list first written from memory (2026-09-25); Mid 70 names no review touched still unchecked; two Mid 70 names unidentified"
 review: "June 2026"
-segments: {KLCI: 30, MID70: 69}
+segments: {KLCI: 30, MID70: 68}
 names:
   # FBM KLCI (30)
   - {id: "MYX:1155", name: "Malayan Banking", segment: KLCI}
@@ -111,7 +117,7 @@ names:
   - {id: "MYX:1015", name: "AMMB Holdings", segment: KLCI} # was MID70; KLCI inclusion [JUN25]
   - {id: "MYX:5555", name: "Sunway Healthcare Holdings", segment: KLCI} # new; fast entry, replaced QL Resources [MAR26]
   - {id: "MYX:5249", name: "IOI Properties Group", segment: KLCI} # was MID70; KLCI inclusion [JUN26]
-  # FBM Mid 70 (69 here; one member unidentified - see above)
+  # FBM Mid 70 (68 here; two members unidentified - see above)
   - {id: "MYX:3182", name: "Genting", segment: MID70} # was KLCI; KLCI exclusion, Mid 70 inclusion [DEC24]
   - {id: "MYX:4715", name: "Genting Malaysia", segment: MID70} # was KLCI; KLCI exclusion, Mid 70 inclusion [DEC24]
   - {id: "MYX:4197", name: "Sime Darby", segment: MID70} # was KLCI; KLCI exclusion, Mid 70 inclusion [JUN26]
@@ -121,7 +127,9 @@ names:
   - {id: "MYX:3336", name: "IJM Corporation", segment: MID70}
   - {id: "MYX:2488", name: "Alliance Bank Malaysia", segment: MID70}
   - {id: "MYX:5258", name: "Bank Islam Malaysia", segment: MID70}
-  - {id: "MYX:1171", name: "Malaysia Building Society", segment: MID70}
+  # Malaysia Building Society renamed itself MBSB Berhad, code unchanged; Yahoo
+  # lists 1171.KL as "MBSB Berhad" (price_cache.db listed_name, 2026-10-28).
+  - {id: "MYX:1171", name: "MBSB", segment: MID70}
   - {id: "MYX:5185", name: "Affin Bank", segment: MID70}
   - {id: "MYX:5139", name: "AEON Credit Service (M)", segment: MID70}
   - {id: "MYX:1163", name: "Allianz Malaysia", segment: MID70} # Mid 70 inclusion [JUN26]
@@ -132,7 +140,6 @@ names:
   - {id: "MYX:3069", name: "Mega First Corporation", segment: MID70}
   - {id: "MYX:5209", name: "Gas Malaysia", segment: MID70}
   - {id: "MYX:7277", name: "Dialog Group", segment: MID70}
-  - {id: "MYX:5222", name: "FGV Holdings", segment: MID70}
   - {id: "MYX:1899", name: "Batu Kawan", segment: MID70}
   - {id: "MYX:2089", name: "United Plantations", segment: MID70}
   - {id: "MYX:5126", name: "Sarawak Oil Palms", segment: MID70}
