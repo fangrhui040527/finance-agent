@@ -852,6 +852,7 @@ def test_the_prompt_states_the_search_budget_and_forbids_repeats(stores, moves, 
     _run(stores, searcher, monkeypatch)
     assert f"You have {web.MAX_USES} web searches in all" in searcher.prompts[0]
     assert "Never run the same query twice" in searcher.prompts[0]
+    assert "Base every statement on a search result and cite it" in searcher.prompts[0]
     assert web.MAX_USES >= 6, "three searches were spent on one idea in the first live run"
 
 

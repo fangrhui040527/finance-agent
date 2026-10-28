@@ -7,9 +7,10 @@ date, the words the model cited - and the model's prose only says which of
 those it relied on. `_parse` in backends.py keeps text blocks and drops
 everything else, which is right for a question and wrong here.
 
-The search runs on Anthropic's servers (`web_search_20260209`, the version
-with dynamic filtering), so the caller needs a route to api.anthropic.com and
-nothing else. Results arrive in the same response:
+The search runs on Anthropic's servers (`web_search_20260209`, called
+directly: `allowed_callers` ["direct"], see ALLOWED_CALLERS), so the caller
+needs a route to api.anthropic.com and nothing else. Results arrive in the
+same response:
 
     server_tool_use          the query the model ran
     web_search_tool_result   a LIST of results (url, title, page_age) - or one
@@ -50,6 +51,15 @@ from core.llm.tiers import Usage
 #: The tool version with dynamic filtering, documented for Opus 5.5 and Sonnet
 #: 5.5. Its code execution runs server-side and is not declared separately.
 TOOL_TYPE = "web_search_20260209"
+
+#: Who may call the search. This version defaults to the code-execution caller
+#: (dynamic filtering): the model runs its searches from code and reads the
+#: code's filtered output - and output from code cannot be cited. Both live
+#: searches on 2026-10-28 cited nothing (0 of 18, 0 of 55 pages), so nothing
+#: was stored as evidence. Called directly, the results enter the model's
+#: context as search results, which its answer cites (`web_search_result_location`).
+#: The cost is more input tokens per search; the caller's reserve prices them.
+ALLOWED_CALLERS = ("direct",)
 
 #: Continuations of a paused turn. Each gets its own `max_uses`, so this is what
 #: bounds the searches one call can run: max_uses x (1 + CONTINUATIONS).
@@ -190,7 +200,12 @@ class WebSearch:
         return self._client
 
     def tools(self) -> list[dict]:
-        tool: dict = {"type": TOOL_TYPE, "name": "web_search", "max_uses": self.max_uses}
+        tool: dict = {
+            "type": TOOL_TYPE,
+            "name": "web_search",
+            "max_uses": self.max_uses,
+            "allowed_callers": list(ALLOWED_CALLERS),
+        }
         if self.user_location:
             tool["user_location"] = {"type": "approximate", **self.user_location}
         return [tool]
