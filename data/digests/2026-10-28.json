@@ -1,6 +1,87 @@
 {
   "collection": [
     {
+      "at": "2026-10-28T14:26:56.696428+00:00",
+      "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-28T14:26:56.694569+00:00",
+      "detail": "facts 0; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-28T14:26:50.713082+00:00",
+      "detail": "facts 0; ",
+      "fetched": 14,
+      "kept": 14,
+      "source": "jin10_flash",
+      "status": "ok",
+      "stored": 13
+    },
+    {
+      "at": "2026-10-28T14:26:49.399723+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-28T14:26:47.271485+00:00",
+      "detail": "",
+      "fetched": 3,
+      "kept": 3,
+      "source": "nst_business",
+      "status": "ok",
+      "stored": 3
+    },
+    {
+      "at": "2026-10-28T14:26:47.098912+00:00",
+      "detail": "",
+      "fetched": 0,
+      "kept": 0,
+      "source": "fmt_business",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-28T14:26:46.980823+00:00",
+      "detail": "read but empty: Maybank, Tenaga, Petronas Chemicals, IHH, Press Metal, Genting",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-28T14:26:46.111794+00:00",
+      "detail": "read but empty: Maybank, Tenaga, Petronas Chemicals, IHH, Press Metal, Genting",
+      "fetched": 0,
+      "kept": 0,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-28T14:26:44.213452+00:00",
+      "detail": "no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked); deferred: IHH, Press Metal, Genting",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "failed",
+      "stored": 0
+    },
+    {
       "at": "2026-10-28T14:12:44.329667+00:00",
       "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
       "fetched": 0,
@@ -200,18 +281,18 @@
     }
   ],
   "counts": {
-    "articles": 26477,
+    "articles": 26493,
     "documents": 0,
     "escalated": 3463,
     "events": 4258,
-    "failed_sweeps": 99,
-    "linked": 14474,
+    "failed_sweeps": 100,
+    "linked": 14475,
     "observations": 6349,
     "series": 31,
-    "sweeps": 1204
+    "sweeps": 1213
   },
   "day": "2026-10-28",
-  "generated_at": "2026-10-28 14:13 UTC",
+  "generated_at": "2026-10-28 14:28 UTC",
   "macro": [
     {
       "change": "-0.08",
