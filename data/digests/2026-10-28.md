@@ -1,22 +1,28 @@
 # Digest 2026-10-28
 
-Generated 2026-10-28 00:32 UTC · slot `all` · 26193 articles in the corpus, 6344 observations, 4256 events in the fact book.
+Generated 2026-10-28 10:11 UTC · slot `all` · 26403 articles in the corpus, 6349 observations, 4256 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- quiet: nothing collected for this name in the window
+- tone: 3 stories from 2 sources, polarity +0.33, peak intensity 0.00, uncertainty 0.00 · 1 escalated
+- 2026-10-28 www.nst.com.my — Yamashita set for fierce title defence against major winner Hae Ran [WATCH] [q 1.00, tone +1.0] ★
+- 2026-10-28 www.nst.com.my — Thai-phoons blow into Maybank Championship for dream LPGA debut [q 1.00, tone +0.0]
+- 2026-10-28 www.moomoo.com — MAYBANK (1155) [q 0.55, tone +0.0]
 
 ### Tenaga (MYX:5347)
-- tone: 2 stories from 2 sources, polarity +0.50, peak intensity 0.00, uncertainty 0.00 · 1 escalated
+- tone: 4 stories from 4 sources, polarity +0.50, peak intensity 0.00, uncertainty 0.00 · 2 escalated
+- 2026-10-28 simplywall.st — Bintai Kindenko Builds Strong Comeback with RM20.28 Million TNB Contract, Order Book Climbs to RM183.8 Million [q 0.65, tone +1.0] ★
 - 2026-10-27 www.klsescreener.com — Bintai Kinden wins RM20.3mil TNB contract [q 0.65, tone +1.0] ★
+- 2026-10-27 www.thestar.com.my — TNB issues RM4.8bil sukuk [q 0.80, tone +0.0]
 - 2026-10-27 theedgemalaysia.com — Zetrix AI, AirAsia, CIMB, SD Guthrie, Nestle Malaysia, LPI Capital, Dufu Technology, Eco-Shop, Tenaga Nasional, Matrix Concepts, AME Elite, Ni Hsin, HB Global, Infomina, Bintai Kinden, Paragon Globe [q 0.80, tone +0.0]
 
 ### Petronas Chemicals (MYX:5183)
 - quiet: nothing collected for this name in the window
 
 ### IHH (MYX:5225)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-10-28 www.moomoo.com — IHH (5225) Stock Forum [q 0.65, tone +0.0]
 
 ### Press Metal (MYX:8869)
 - quiet: nothing collected for this name in the window
@@ -86,6 +92,20 @@ Generated 2026-10-28 00:32 UTC · slot `all` · 26193 articles in the corpus, 63
 | 10y minus 2y Treasury spread, % | 0.31 | 2026-10-23 | +0 | fred |
 | US unemployment rate, % | 4.20 | 2026-09-01 | +0.1 | fred |
 | CBOE VIX, index | 19.45 | 2026-10-23 | +0.42 | fred |
+
+## Collection
+
+| at (UTC) | source | status | fetched | kept | stored | detail |
+|---|---|---|---|---|---|---|
+| 10:10 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
+| 10:10 | twse_openapi | ok | 8 | 0 | 0 | facts 5;  |
+| 10:10 | jin10_flash | degraded | 16 | 15 | 15 | facts 0; window not covered back to 2026-10-27 22:43Z; the oldest item read is 2 |
+| 10:10 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 10:09 | nst_business | degraded | 150 | 145 | 137 | window overflow: all 150 dated items are newer than the window's start (2026-10- |
+| 10:09 | fmt_business | ok | 41 | 41 | 40 |  |
+| 10:09 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals, IHH |
+| 10:09 | google_news | ok | 19 | 19 | 18 | read but empty: Press Metal; named the company: 4 of 19 (lowest: Genting 0/7, Pe |
+| 10:09 | gdelt | failed | 0 | 0 | 0 | no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP |
 
 ---
 

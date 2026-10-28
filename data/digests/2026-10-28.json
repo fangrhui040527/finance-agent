@@ -1,18 +1,100 @@
 {
-  "collection": [],
+  "collection": [
+    {
+      "at": "2026-10-28T10:10:08.999005+00:00",
+      "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-28T10:10:08.997153+00:00",
+      "detail": "facts 5; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-28T10:10:03.336062+00:00",
+      "detail": "facts 0; window not covered back to 2026-10-27 22:43Z; the oldest item read is 2026-10-28 09:58Z, so 11.2h of the window was never served",
+      "fetched": 16,
+      "kept": 15,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 15
+    },
+    {
+      "at": "2026-10-28T10:10:01.875260+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-28T10:09:59.607603+00:00",
+      "detail": "window overflow: all 150 dated items are newer than the window's start (2026-10-27 17:11Z); the oldest is 2026-10-27 22:00Z, so 4.8h scrolled off unseen; read 3 pages, the most this feed may; page 2 starts 2.2h before page 1 ends (2026-10-28 05:01Z under 2026-10-28 07:15Z): the items between were served by neither",
+      "fetched": 150,
+      "kept": 145,
+      "source": "nst_business",
+      "status": "degraded",
+      "stored": 137
+    },
+    {
+      "at": "2026-10-28T10:09:55.209342+00:00",
+      "detail": "",
+      "fetched": 41,
+      "kept": 41,
+      "source": "fmt_business",
+      "status": "ok",
+      "stored": 40
+    },
+    {
+      "at": "2026-10-28T10:09:54.853519+00:00",
+      "detail": "read but empty: Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals, IHH",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-28T10:09:53.578641+00:00",
+      "detail": "read but empty: Press Metal; named the company: 4 of 19 (lowest: Genting 0/7, Petronas Chemicals 0/1, Maybank 1/7)",
+      "fetched": 19,
+      "kept": 19,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 18
+    },
+    {
+      "at": "2026-10-28T10:09:51.890775+00:00",
+      "detail": "no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked); deferred: IHH, Press Metal, Genting",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "failed",
+      "stored": 0
+    }
+  ],
   "counts": {
-    "articles": 26193,
+    "articles": 26403,
     "documents": 0,
-    "escalated": 3461,
+    "escalated": 3463,
     "events": 4256,
-    "failed_sweeps": 97,
-    "linked": 14465,
-    "observations": 6344,
+    "failed_sweeps": 98,
+    "linked": 14473,
+    "observations": 6349,
     "series": 31,
-    "sweeps": 1182
+    "sweeps": 1191
   },
   "day": "2026-10-28",
-  "generated_at": "2026-10-28 00:32 UTC",
+  "generated_at": "2026-10-28 10:11 UTC",
   "macro": [
     {
       "change": "-0.02",
@@ -145,22 +227,77 @@
   ],
   "names": [
     {
-      "escalated": 0,
+      "escalated": 1,
       "events": [],
       "instrument_id": "MYX:1155",
       "label": "Maybank",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://www.nst.com.my/sports/golf/2026/10/1565511/yamashita-set-fierce-title-defence-against-major-winner-hae-ran-watch",
+          "domain": "www.nst.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-28T08:00:19+00:00",
+          "quality": 1.0,
+          "title": "Yamashita set for fierce title defence against major winner Hae Ran [WATCH]",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://www.nst.com.my/sports/golf/2026/10/1565470/thai-phoons-blow-maybank-championship-dream-lpga-debut",
+          "domain": "www.nst.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-28T07:30:22+00:00",
+          "quality": 1.0,
+          "title": "Thai-phoons blow into Maybank Championship for dream LPGA debut",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMi7AJBVV95cUxNZGZHSkNWRTJBTWJzU0QyLWROLXBkN1ZfWTZvYjRVelgzdTV4ZWZvTHZ1UE5BWFhPSUNpWmdTRXk3MndoMUtXUmxNb0t3VUZPV0RSUWRTNWJDX2RIQ3hxTGtfd2ZCUWRzUjlCS0tEbmZUM2ZzMnRKYkZfR0pxUkwyeEZOeUk3RExRYk1hellmZUVzSnY2N2JLWnlyVHAtSzJoUHJfME9mTTlDQXROS1hQbzZYTU80VVdXQVRRaUk1UkNEVF91MHNQTkFTNlRGMGJxWnZlSzVJcmxWNEpudm9WaEgtSk8xQncwMXJIcXZtLUVJOXhVWlJsUmsxTVhWV2NJOW5KSk9FSnJGd21YUlkyVDY2dkRxdUdjZzM0cms0eUFDaWVIWGl0Sjl3VThMZ0pwRS1CNjYwR05vVDVvd3lMdE1ySm4wcHdFbFRhTC0tc3BYU0dVUXA0T2dWZWlyc2VfeFF6aGZMOHRCeW5a?oc=5",
+          "domain": "www.moomoo.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-28T03:45:57+00:00",
+          "quality": 0.55,
+          "title": "MAYBANK (1155)",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 3,
+        "polarity_mean": 0.333,
+        "sources": 2,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
-      "escalated": 1,
+      "escalated": 2,
       "events": [],
       "instrument_id": "MYX:5347",
       "label": "Tenaga",
       "snapshot": [],
       "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMizAJBVV95cUxPUDlDZ2Q4UlRnMzhINHpjd0JFSVlNZHhLUmFGVFBVUTlpZFNQdzZsUEkwN1l4TEpKNlg1SXZMUExLRGFmOWl0cXc2REExcTZHNFJHUVZHMzBNQ3pSbUhwMmdVZUd1VVNLeU1FYUhhbzhpc2E5bDctWjdzWDREalFyVHEzMkVpSUJOQk5Ra2VMZDNQMHRreFJGNmVoRHc5cElvc2lRV1AyejJEMXcyM2hFS1VpV2o1eWJmbzQ5d3RpZG02ZHNicjNIS1pvSjVzZ3NWRUNsRUVVWXQ1cG9lOUh5QzczSzhQdGpBZDFBWlliN0txMzBSX0VhUjlVOGZ6bjhMVWo4Yi1vbzRkX2ZJblQ0a1lrVlpXU2F2aVo4U1JxMjlWbkNEa2oxclFsbmlfWFFXcVR2RUV2d0JOUzU2c1pMUEFTd1RQQ1ZCRlRsTg?oc=5",
+          "domain": "simplywall.st",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-28T04:32:42+00:00",
+          "quality": 0.65,
+          "title": "Bintai Kindenko Builds Strong Comeback with RM20.28 Million TNB Contract, Order Book Climbs to RM183.8 Million",
+          "uncertainty": 0.0
+        },
         {
           "day": null,
           "doc_id": "https://news.google.com/rss/articles/CBMilgFBVV95cUxOclJ5LTJhd3A4d0ZLdnB0RG1obmJlYW9HQWwzVTVXdEFFSmZKU0k5eUVVNUt6cGFHN2lzejIzR0RLT3I0TTRaMzRKNmU0bWs4V1dYVDk4ajZqbFNlb1V3OWc0aFktY241XzVTaHlUV0FNR192Uzk5ZWNkcVd6UVZGX1JRT2lKSVhNLVBURjRqOHBYRUM1X2c?oc=5",
@@ -171,6 +308,18 @@
           "published_at": "2026-10-27T12:11:19+00:00",
           "quality": 0.65,
           "title": "Bintai Kinden wins RM20.3mil TNB contract",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMijgFBVV95cUxQZU5DY2pnakVTOWlkNjZNNTJoeWZGT1kwbXYtTGNmYVFHREI4amRJU3RuLW9ZeFN0bGhidmZOdFdsb0FURTUxLUZudlduVnJCMjc5LWdwblFZbjJQYnlTcEhhajRmRGQyUUpfVFJSREVISVNzMmhKQ1VLZGZJYmdRbW8yZHI4aEZlNElwUEln?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-27T21:01:20+00:00",
+          "quality": 0.8,
+          "title": "TNB issues RM4.8bil sukuk",
           "uncertainty": 0.0
         },
         {
@@ -188,9 +337,9 @@
       ],
       "tone": {
         "intensity_max": 0.0,
-        "n": 2,
+        "n": 4,
         "polarity_mean": 0.5,
-        "sources": 2,
+        "sources": 4,
         "uncertainty_mean": 0.0
       },
       "upcoming": []
@@ -211,8 +360,27 @@
       "instrument_id": "MYX:5225",
       "label": "IHH",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiiwNBVV95cUxQSTBFWUxzLThaTHgzNThvcFMzSTlCaHJyUlVNS0VwUkwzLVRqX1k1eTNYSnFFS3FILXcydE9SQnlvYzJoZ0xreWpUcDVpbHUwd3Y2X18tc3NETTBjWnpOMjVjSDFCTXZoN0d4OG55NlJGd0NUYkpVeGsyUlhINzN4Vjlza21MaUFWaUU1X0RyMVBSOUdRZ1BZd3A3UjNaTzNsZFdHZ080OGh4TjNsemxleXdLMXg1ZlN1UndrTlFtSVhHT1lhSGFrbURHR3Q2VlZiYUxnQVoyMDNuNW1lMmQ1MUtQVmNjYktwdVVrOTRuUEpnYWxqZkFuT3dqNzNLUzBuYk9KSFdZWThzRFlmS25LcThEVHo1SU05cFRUOUNtSGtOdXlsZkJ0N1BqSU9KMWRXYi1lSEotNUhBaFZzZEJIelZ5YWxRdGZKUzM5OVhFWTRYSWtRT04tNVlTWE1xazNxTzVHZUtpVldBTFgxcURwRDJGYS1KNUhOXzM5RDlvdW5sQ1l2NklndTh0cw?oc=5",
+          "domain": "www.moomoo.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-28T02:01:00+00:00",
+          "quality": 0.65,
+          "title": "IHH (5225) Stock Forum",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
