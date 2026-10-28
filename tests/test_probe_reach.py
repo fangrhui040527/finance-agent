@@ -275,7 +275,7 @@ def test_bursa_data_alone_gets_no_outlet_verdict_and_blocks_reach_the_summary(
         lambda name, url, ua, headers=None, timeout=15: reach.Reach(name, url, status=404),
     )
     assert bursa.main() == 0
-    text = summary.read_text()
+    text = summary.read_text(encoding="utf-8")
     assert "NO USABLE FEED" not in text and "Malaysian business feeds" not in text
     assert "bursa_data" in text and "Reachability from this runner" in text
     assert len(blocks) == 1, blocks
@@ -289,7 +289,7 @@ def test_each_outlet_block_is_written_as_it_finishes(monkeypatch, tmp_path):
     seen_at_fetch: list[str] = []
 
     def fake(name, url, ua, headers=None, timeout=15):
-        seen_at_fetch.append(summary.read_text() if summary.exists() else "")
+        seen_at_fetch.append(summary.read_text(encoding="utf-8") if summary.exists() else "")
         return reach.Reach(name, url, error="URLError: refused")
 
     monkeypatch.setattr(reach, "fetch", fake)
@@ -297,4 +297,4 @@ def test_each_outlet_block_is_written_as_it_finishes(monkeypatch, tmp_path):
     # By the time bernamabiz is asked, malaymail's block is already in the summary.
     assert "=== malaymail_money" in seen_at_fetch[-1]
     assert "=== bernamabiz" not in seen_at_fetch[-1]
-    assert "NO USABLE FEED FOUND" in summary.read_text()
+    assert "NO USABLE FEED FOUND" in summary.read_text(encoding="utf-8")
