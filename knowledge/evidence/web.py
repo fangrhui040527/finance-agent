@@ -71,13 +71,18 @@ from zoneinfo import ZoneInfo
 from engines.attribution.decompose import PARAMETRIC_Z, Verdict
 
 #: Anthropic's default model; Claude Sonnet 5.5 (`claude-sonnet-5-5`) costs
-#: about half. Measured estimate per search on this one: ~USD 0.29 (3 searches,
-#: ~44k input tokens re-read across the turn, ~4k output).
+#: about half. Measured on the first live run (2026-10-28): USD 0.27 and 0.20
+#: (3 searches, 37k-50k input tokens re-read across the turn, 1-2k output).
 MODEL = "claude-opus-5-5"
 #: Opus 5.5's own default. `low` makes a search-capable model more likely to
 #: answer without searching, which is the one thing this is for.
 EFFORT = "medium"
-MAX_USES = 3
+#: Searches one leg may run. It was 3, and the first live run spent all 3 on
+#: its first idea - the same query twice - so every later search failed with
+#: `max_uses_exceeded` and neither move was really searched. A search is USD
+#: 0.01; the tokens its results add are the cost, and the reserve below prices
+#: every one of them. The prompt states the budget (`_prompt`).
+MAX_USES = 8
 MAX_TOKENS = 8000
 
 TRIGGER_SAR = PARAMETRIC_Z
@@ -113,7 +118,8 @@ AGENT = "web_evidence"
 #: `budget` and `error` are not here: an `error` row carries no cost when the
 #: request failed before any work, and the next run may try; one that fails
 #: AFTER a billed leg carries that cost and counts as searched by it
-#: (`searched_keys`).
+#: (`searched_keys`). `search_error` is not here either: a paid turn whose
+#: searches failed (RETRYABLE) is searched again, up to MAX_ATTEMPTS paid tries.
 SEARCHED = (
     "stored",
     "nothing_found",
@@ -123,6 +129,15 @@ SEARCHED = (
     "incomplete",
     "timeout",
 )
+
+#: Paid outcomes that do not settle a move on their own: the turn ran, but its
+#: searches failed, so "nothing found" would be a claim about searches that
+#: never happened.
+RETRYABLE = ("search_error",)
+
+#: The most paid tries one move gets, automatic retries and an operator's
+#: `--retry` together. Each is a full turn (~USD 0.2-0.3).
+MAX_ATTEMPTS = 2
 
 EXCHANGES = {
     "XKLS": ("Bursa Malaysia", {"country": "MY", "timezone": "Asia/Kuala_Lumpur"}),
@@ -187,6 +202,12 @@ class Report:
             f"month to date USD {self.month_usd:.2f} (evidence USD {self.evidence_month_usd:.2f})"
         ]
         out += [a.line() for a in self.attempts]
+        tried = {a.key for a in self.attempts}
+        out += [
+            f"  {t.key}: qualifies ({t.label}, {t.r1:+.2%}, {t.sar:+.2f} sigma); not searched here"
+            for t in self.triggers
+            if t.key not in tried
+        ]
         out += [f"  - {n}" for n in self.notes]
         return "\n".join(out)
 
@@ -573,15 +594,55 @@ def _screen(engine, text: str) -> str | None:
 # -- the run ------------------------------------------------------------------
 
 
-def searched_keys(corpus) -> set[str]:
-    """Moves not to search again: any outcome in SEARCHED, or any row that
-    carries a cost or a search - an `error` after a billed leg was paid for."""
+def searched_keys(corpus, retry: tuple[str, ...] = ()) -> set[str]:
+    """Moves not to search again: any outcome in SEARCHED, any other row that
+    carries a cost or a search (an `error` after a billed leg was paid for)
+    unless it is RETRYABLE, and any move with MAX_ATTEMPTS paid tries.
+
+    `retry` is the operator's: moves to search once more although settled,
+    while they have fewer than MAX_ATTEMPTS paid tries."""
+    rows = _rows(corpus)
+    tries = paid_tries(rows)
+    settled = {
+        key
+        for key, outcome, searches, cost in rows
+        if outcome in SEARCHED
+        or (_paid(searches, cost) and outcome not in RETRYABLE)
+        or tries.get(key, 0) >= MAX_ATTEMPTS
+    }
+    return {k for k in settled if not (k in retry and tries.get(k, 0) < MAX_ATTEMPTS)}
+
+
+def _rows(corpus) -> list:
     if not corpus.has_table("evidence_searches"):
-        return set()
-    rows = corpus.conn.execute(
+        return []
+    return corpus.conn.execute(
         "SELECT key, outcome, searches, cost_usd FROM evidence_searches"
     ).fetchall()
-    return {r[0] for r in rows if r[1] in SEARCHED or int(r[2] or 0) > 0 or Decimal(r[3] or 0) > 0}
+
+
+def _paid(searches, cost) -> bool:
+    return int(searches or 0) > 0 or Decimal(cost or 0) > 0
+
+
+def paid_tries(rows) -> dict[str, int]:
+    """Paid attempts per move, from (key, outcome, searches, cost_usd) rows."""
+    out: dict[str, int] = {}
+    for key, _outcome, searches, cost in rows:
+        if _paid(searches, cost):
+            out[key] = out.get(key, 0) + 1
+    return out
+
+
+def _tally(items) -> str:
+    counts: dict[str, int] = {}
+    for item in items:
+        counts[item] = counts.get(item, 0) + 1
+    return _tally_counts(counts)
+
+
+def _tally_counts(counts: dict[str, int]) -> str:
+    return ", ".join(f"{k} x{n}" if n > 1 else k for k, n in counts.items())
 
 
 def evidence_month_usd(corpus, now: datetime) -> Decimal:
@@ -652,7 +713,10 @@ def _prompt(t: Trigger, now: datetime) -> str:
         f"which is significant. The session closed at {t.close_utc:%Y-%m-%d %H:%M} UTC.\n\n"
         f"Find what explains this move: news, filings, results, broker notes or market reports "
         f"about {t.label} published {window}the close. For each source, give its publication "
-        "time when the page shows one, and say whether it came before or after the close."
+        "time when the page shows one, and say whether it came before or after the close.\n\n"
+        f"You have {MAX_USES} web searches in all. Never run the same query twice: vary them "
+        "across the company's own announcements, news about it, broker notes, and the "
+        "market or sector report for that session."
     )
 
 
@@ -669,6 +733,7 @@ def run(
     log=None,
     clock=None,
     monotonic=None,
+    retry: tuple[str, ...] = (),
 ) -> Report:
     """Find the qualifying moves, search the ones not yet searched, store what
     is cited. Never raises for one search; a failed search is a recorded row.
@@ -707,11 +772,25 @@ def run(
     ):
         triggers, notes = candidates(cfg, now, feed, facts)
         report.notes += notes
-        done = searched_keys(corpus)
+        done = searched_keys(corpus, retry)
         report.triggers = [t for t in triggers if t.key not in done]
         for t in triggers:
             if t.key in done:
                 report.notes.append(f"{t.key} ({t.sar:+.2f} sigma) already searched")
+        if retry:
+            tries = paid_tries(_rows(corpus))
+            qualifying = {t.key for t in triggers}
+            for key in retry:
+                if key not in qualifying:
+                    report.notes.append(
+                        f"{key}: asked to retry, but it is not a qualifying move now"
+                    )
+                elif tries.get(key, 0) >= MAX_ATTEMPTS:
+                    report.notes.append(
+                        f"{key}: asked to retry, but it has had {MAX_ATTEMPTS} paid tries already"
+                    )
+                elif tries.get(key, 0):
+                    report.notes.append(f"{key}: searched again on request")
         if len(report.triggers) > PER_RUN:
             for t in report.triggers[PER_RUN:]:
                 report.notes.append(
@@ -880,6 +959,10 @@ def _keep(answer, t: Trigger, retrieved: datetime, corpus, engine, **norm):
         outcome = "truncated"
     elif answer.sources:
         outcome = "no_new_evidence"
+    elif answer.errors:
+        # The turn ran but its searches failed: what it "found" is not a
+        # finding. Searched again, up to MAX_ATTEMPTS paid tries.
+        outcome = "search_error"
     else:
         outcome = "nothing_found"
     parts = [
@@ -894,7 +977,8 @@ def _keep(answer, t: Trigger, retrieved: datetime, corpus, engine, **norm):
         if answer.stop_reason not in ("", "end_turn", "refusal")
         else "",
         f"{answer.lost_legs} leg(s) timed out, priced at the reserve" if answer.lost_legs else "",
-        f"search errors: {', '.join(answer.errors)}" if answer.errors else "",
+        f"search errors: {_tally(answer.errors)}" if answer.errors else "",
+        f"blocks: {_tally_counts(answer.blocks)}" if getattr(answer, "blocks", None) else "",
         f"refusal {answer.refusal}" if answer.refused else "",
     ]
     detail = "; ".join(p for p in parts if p)

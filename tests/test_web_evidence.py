@@ -540,7 +540,9 @@ def test_a_timed_out_search_is_priced_at_its_reserve_and_not_paid_for_again(
     moves[("MYX:3182", d)] = _move("MYX:3182", d, -3.19)
     seam = WebSearch("claude-opus-5-5", client=Client())
     report = _run(stores, seam, monkeypatch)
-    leg = worst_case_usd("claude-opus-5-5", web.RESERVE_INPUT_TOKENS, web.MAX_TOKENS, searches=3)
+    leg = worst_case_usd(
+        "claude-opus-5-5", web.RESERVE_INPUT_TOKENS, web.MAX_TOKENS, searches=web.MAX_USES
+    )
     assert report.attempts[0].outcome == "timeout" and report.attempts[0].cost_usd == leg
     _run(stores, seam, monkeypatch)
     assert Client.calls == 1, "a request that may have been billed is not sent again"
@@ -766,3 +768,97 @@ def test_the_digest_prints_a_day_only_web_row_as_its_day(stores, moves, monkeypa
     page = digest.to_markdown(refs=refs)
     line = next(ln for ln in page.splitlines() if "Genting falls on rights issue" in ln)
     assert line.startswith("- 2026-10-22 (date only) "), line
+
+
+# -- searches that failed -----------------------------------------------------
+
+
+def _failed(searches=3):
+    """A paid turn whose searches failed after the first: nothing cited."""
+    return SearchAnswer(
+        "claude-opus-5-5",
+        text="I could not find anything; my search tool hit its usage limit.",
+        sources=[],
+        queries=["Genting Berhad shares", "Genting Berhad shares", "Genting Bhd shares rise"],
+        uncited={"https://stockanalysis.com/quote/klse/GENTING/": ("Genting", "")},
+        errors=["max_uses_exceeded"] * 4,
+        usage=Usage(50_000, 2_000, web_search_requests=searches),
+        stop_reason="end_turn",
+        blocks={"server_tool_use": 3, "code_execution_tool_result": 2, "text": 1},
+    )
+
+
+def test_a_search_whose_searches_failed_is_not_nothing_found_and_is_tried_once_more(
+    stores, moves, monkeypatch
+):
+    d = date(2026, 10, 22)
+    moves[("MYX:3182", d)] = _move("MYX:3182", d, -3.19)
+    searcher = Searcher(_failed(), _failed(), _answer(DATED))
+    first = _run(stores, searcher, monkeypatch)
+    assert first.attempts[0].outcome == "search_error"
+    assert first.attempts[0].cost_usd > 0, "the turn ran, and is billed"
+    with Corpus(stores.corpus_db) as c:
+        detail = c.conn.execute("SELECT detail FROM evidence_searches").fetchone()[0]
+    assert "search errors: max_uses_exceeded x4" in detail
+    assert "blocks: server_tool_use x3, code_execution_tool_result x2, text" in detail
+    second = _run(stores, searcher, monkeypatch)
+    assert [a.outcome for a in second.attempts] == ["search_error"]
+    third = _run(stores, searcher, monkeypatch)
+    assert third.attempts == [], "two paid tries is the most one move gets"
+    assert any("already searched" in n for n in third.notes)
+    assert len(searcher.prompts) == 2
+
+
+def test_errors_beside_a_cited_page_still_store_the_page(stores, moves, monkeypatch):
+    d = date(2026, 10, 22)
+    moves[("MYX:3182", d)] = _move("MYX:3182", d, -3.19)
+    partial = _answer(DATED)
+    partial.errors = ["max_uses_exceeded"]
+    report = _run(stores, Searcher(partial), monkeypatch)
+    assert [a.outcome for a in report.attempts] == ["stored"]
+    assert "search errors: max_uses_exceeded" in report.attempts[0].detail
+
+
+def test_an_operator_retry_searches_a_settled_move_once_and_never_a_third_time(
+    stores, moves, monkeypatch
+):
+    d = date(2026, 10, 22)
+    key = "MYX:3182|2026-10-22"
+    moves[("MYX:3182", d)] = _move("MYX:3182", d, -3.19)
+    searcher = Searcher(_answer(), _answer(DATED), _answer())
+    assert [a.outcome for a in _run(stores, searcher, monkeypatch).attempts] == ["nothing_found"]
+    assert _run(stores, searcher, monkeypatch).attempts == [], "settled: not searched again"
+    retried = _run(stores, searcher, monkeypatch, retry=(key,))
+    assert [a.outcome for a in retried.attempts] == ["stored"]
+    assert any("searched again on request" in n for n in retried.notes)
+    again = _run(stores, searcher, monkeypatch, retry=(key,))
+    assert again.attempts == []
+    assert any("2 paid tries already" in n for n in again.notes)
+    assert len(searcher.prompts) == 2
+
+
+def test_a_retry_of_a_move_that_does_not_qualify_now_is_noted_and_not_searched(
+    stores, moves, monkeypatch
+):
+    report = _run(stores, Searcher(), monkeypatch, retry=("MYX:8869|2026-10-16",))
+    assert report.attempts == []
+    assert any("not a qualifying move now" in n for n in report.notes)
+
+
+def test_the_prompt_states_the_search_budget_and_forbids_repeats(stores, moves, monkeypatch):
+    d = date(2026, 10, 22)
+    moves[("MYX:3182", d)] = _move("MYX:3182", d, -3.19)
+    searcher = Searcher(_answer())
+    _run(stores, searcher, monkeypatch)
+    assert f"You have {web.MAX_USES} web searches in all" in searcher.prompts[0]
+    assert "Never run the same query twice" in searcher.prompts[0]
+    assert web.MAX_USES >= 6, "three searches were spent on one idea in the first live run"
+
+
+def test_a_dry_run_names_each_move_that_qualifies(stores, moves, monkeypatch):
+    d = date(2026, 10, 22)
+    moves[("MYX:3182", d)] = _move("MYX:3182", d, -3.19)
+    text = _run(stores, Searcher(), monkeypatch, dry_run=True).text()
+    assert (
+        "MYX:3182|2026-10-22: qualifies (Genting, -5.00%, -3.19 sigma); not searched here" in text
+    )
