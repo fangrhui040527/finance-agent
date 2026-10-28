@@ -20,6 +20,8 @@ from datetime import date
 from email.message import Message
 from pathlib import Path
 
+import pytest
+
 SCRIPTS = Path(__file__).resolve().parent.parent / ".github" / "scripts"
 
 
@@ -34,6 +36,13 @@ def _load(name: str):
 bursa = _load("bursa_feeds_probe")
 macro = _load("macro_alternatives_probe")
 reach = bursa.reach
+
+
+@pytest.fixture(autouse=True)
+def _fresh_budget(monkeypatch):
+    """The probe's run budget counts from import unless main() resets it; a slow
+    suite (Windows CI) can spend BUDGET before these tests call fetch() directly."""
+    monkeypatch.setattr(bursa, "STARTED", bursa.time.monotonic())
 
 
 def test_the_last_trading_day_is_the_weekday_before_the_run():
