@@ -120,20 +120,23 @@ def _firings(rows, slot: str, is_session: Callable[[str, date], bool]) -> list[i
 
     A run belongs to the firing before it (`core.monitor.slot_window_start`),
     and a firing answered twice - the cron and the catch-up, or a forced
-    re-run an hour later over a one-hour window - counts its FIRST run, the
-    one that read the firing's whole window.
+    re-run - counts its BEST run. A re-run an hour later over a one-hour
+    window reads less than the run that read the whole window, so it cannot
+    pull the firing down; and a `force` re-run after the source was repaired
+    reads more, so it clears the firing's shortfall at once instead of at the
+    next scheduled firing.
     """
     from core.monitor import slot_window_start
 
-    first: dict[datetime, int] = {}
-    for r in rows:  # newest first, so the last write per firing is its earliest run
+    best: dict[datetime, int] = {}
+    for r in rows:
         at = datetime.fromisoformat(r["at"])
         at = at if at.tzinfo else at.replace(tzinfo=UTC)
         fired = slot_window_start(slot, at)
         if not is_session(slot, fired.date()):
             continue
-        first[fired] = int(r["fetched"] or 0)
-    return [first[f] for f in sorted(first, reverse=True)]
+        best[fired] = max(best.get(fired, 0), int(r["fetched"] or 0))
+    return [best[f] for f in sorted(best, reverse=True)]
 
 
 def row_shortfalls(

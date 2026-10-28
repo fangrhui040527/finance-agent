@@ -686,6 +686,22 @@ class Corpus:
         )
         return list(rows.fetchall())
 
+    def key_verdict(self, source: str) -> sqlite3.Row | None:
+        """This source's newest row that says anything about its key: a key
+        problem (`KEY_PROBLEMS`), or a run that READ, which proves the key.
+
+        A skip by design and a plain failure say neither, so they are passed
+        over: eodhd's "no name in this slot is on the free plan" at bursa_close
+        is not the key coming back after us_close refused it, and a network
+        failure after a 401 is not a fixed key. The `source_keys` monitor rule
+        judges this row, not the newest one.
+        """
+        sql = (
+            "SELECT * FROM sweeps WHERE source = ? AND (status IN (?, ?)"
+            " OR (status IN (?, ?) AND detail NOT LIKE ?)) ORDER BY at DESC LIMIT 1"
+        )
+        return self.conn.execute(sql, [source, *KEY_PROBLEMS, *_READ_SOMETHING_ARGS]).fetchone()
+
     def sweeps(self, limit: int = 20, source: str | None = None) -> list[sqlite3.Row]:
         sql = "SELECT * FROM sweeps"
         args: list = []

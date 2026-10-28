@@ -437,9 +437,11 @@ def _source_rules(cfg) -> list[Alert]:
     with no key are `skipped_no_key` now and a refused key `auth_failed`
     (`knowledge.corpus`), and this reads them.
 
-      * `source_keys`: an enabled source whose NEWEST sweep row is one of
-        those. At once, not after an allowance: a key does not come back on
-        its own. Resolves when the source's next row reads.
+      * `source_keys`: an enabled source whose newest sweep row that says
+        anything about its key (`Corpus.key_verdict`) is one of those. At
+        once, not after an allowance: a key does not come back on its own.
+        Resolves only on a row that READ - a skip by design or a plain
+        failure after it neither proves nor disproves the key.
       * `expected_rows`: `knowledge.ledger.row_shortfalls` over each slot -
         a source whose last two trading-day firings each read under a fifth
         of its usual. collect.yml fails the run on the same two facts, after
@@ -457,9 +459,9 @@ def _source_rules(cfg) -> list[Alert]:
     short = []
     with Corpus(path) as corpus:
         for name in sources:
-            newest = corpus.sweeps(limit=1, source=name)
-            if newest and newest[0]["status"] in KEY_PROBLEMS:
-                keys.append((name, newest[0]["status"], str(newest[0]["detail"] or "")))
+            verdict = corpus.key_verdict(name)
+            if verdict is not None and verdict["status"] in KEY_PROBLEMS:
+                keys.append((name, verdict["status"], str(verdict["detail"] or "")))
         for slot in SLOT_TIMES:
             names = [n for n in sources if n in CATALOG and slot in CATALOG[n].slots]
             short.extend(row_shortfalls(corpus, slot, names))

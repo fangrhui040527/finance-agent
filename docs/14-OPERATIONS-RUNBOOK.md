@@ -748,7 +748,8 @@ Now:
 * **Expected rows.** A source's row count (`fetched`) on each firing of a
   slot is compared with its median over the 20 firings before. Two firings in
   a row under 20% of that median (zero always is) is a shortfall. One run per
-  firing counts (the first, which read the whole window); holidays and
+  firing counts (the one that read most, so a `force` re-run after a repair
+  clears the shortfall at once); holidays and
   weekends of the slot's market (`markets/holidays.py`; Bursa for
   `bursa_close`, US for `us_preopen`/`us_close`) are left out; a source with
   fewer than 5 firings of history or a median under 5 rows is not judged. The
@@ -763,10 +764,14 @@ no-op.
 
 1. Sign up at https://healthchecks.io (the free plan is enough) and add a check.
 2. Schedule: **Cron**, expression `20 9 * * *` (collect.yml's bursa_close
-   line, the slot that fires every day), time zone **UTC**, grace **1 hour**.
-   The other slots' pings land between those times and show in the check's
-   log; a `/fail` from any slot turns the check down at once. This cron has
-   fired hours late before - if a late firing pages you, widen the grace.
+   line, the slot that fires every day), time zone **UTC**, grace **12
+   hours**. GitHub fires this cron late: over 2026-10-01..28 the first
+   bursa_close run landed 47 minutes to 9 hours 11 minutes after 09:20, and
+   more than 2 hours late on 14 of 28 days (latest 10-05, 18:31). A 1-hour
+   grace would page on those days while the collector works; 12 hours still
+   catches a dead cron the same day. The other slots' pings land between
+   those times and show in the check's log; a `/fail` from any slot turns the
+   check down at once.
 3. Copy the check's ping URL (`https://hc-ping.com/<uuid>`) and add it as the
    repository secret **HEALTHCHECKS_PING_URL** (Settings, Secrets and
    variables, Actions). It is a secret: anyone holding it can ping.

@@ -167,6 +167,10 @@ class Collector(ABC):
     #: a second, and a collector that asks one name per request meets that
     #: limit on its second name.
     SECONDS_BETWEEN_REQUESTS = 0.0
+    #: Words in an HTTP 400 body that say the KEY was refused, for a vendor
+    #: that answers a bad key with 400 instead of 401 (FRED). Lower case.
+    #: Empty, a 400 is just a 400.
+    KEY_REFUSED_400: tuple[str, ...] = ()
 
     def __init__(
         self,
@@ -228,6 +232,8 @@ class Collector(ABC):
         except urllib.error.HTTPError as e:
             if e.code in (401,):
                 raise KeyRejected(f"{self.name}: {KEY_REFUSED} (HTTP 401)") from e
+            if e.code == 400 and self._names_the_key(e):
+                raise KeyRejected(f"{self.name}: {KEY_REFUSED} (HTTP 400)") from e
             if e.code in (402, 403):
                 raise PlanExcluded(
                     f"{self.name}: HTTP {e.code} for {_redact(url)} - the plan does not include it"
@@ -253,6 +259,17 @@ class Collector(ABC):
             return json.loads(text)
         except json.JSONDecodeError as e:
             raise SourceError(f"{self.name} returned malformed JSON: {stripped[:160]!r}") from e
+
+    def _names_the_key(self, error: urllib.error.HTTPError) -> bool:
+        """Whether a 400's body says the key is what was wrong (`KEY_REFUSED_400`)."""
+        if not self.KEY_REFUSED_400:
+            return False
+        try:
+            body = error.read(4096)
+        except (OSError, ValueError, http.client.HTTPException):
+            return False
+        text = body.decode("utf-8", errors="replace").lower() if body else ""
+        return any(m in text for m in self.KEY_REFUSED_400)
 
     def _pace(self) -> None:
         """Wait out `SECONDS_BETWEEN_REQUESTS` since the previous request started."""

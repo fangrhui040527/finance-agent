@@ -20,9 +20,18 @@ import pytest
 import yaml
 
 from knowledge import ledger
-from knowledge.corpus import AUTH_FAILED, OK, SKIPPED_NO_KEY, Corpus
+from knowledge.corpus import AUTH_FAILED, FAILED, OK, SKIPPED_NO_KEY, Corpus
 from knowledge.facts import FactBook
-from knowledge.sources.base import Collector, KeyMissing, PlanExcluded, Pull, SourceError
+from knowledge.sources.alphavantage import AlphaVantageNews
+from knowledge.sources.base import (
+    Collector,
+    KeyMissing,
+    KeyRejected,
+    PlanExcluded,
+    Pull,
+    SourceError,
+)
+from knowledge.sources.fred import FredCollector
 from knowledge.sweep import run_sweep
 
 NOW = datetime(2026, 10, 27, 22, 43, tzinfo=UTC)
@@ -113,6 +122,8 @@ def test_a_401_is_auth_failed_not_failed(tmp_path):
         assert c.counts()["failed_sweeps"] == 1
     with FactBook(str(tmp_path / "facts.db")) as f:
         assert f.pulls()[0]["status"] == AUTH_FAILED
+        # Counted as a failure in both stores, so the two never disagree.
+        assert f.counts()["failed_pulls"] == 1
 
 
 def test_a_refusal_a_collector_wrapped_is_still_auth_failed(tmp_path):
@@ -123,6 +134,87 @@ def test_a_refusal_a_collector_wrapped_is_still_auth_failed(tmp_path):
     )
     (r,) = _sweep(tmp_path, Canned(raise_=wrapped)).results
     assert r.status == AUTH_FAILED
+
+
+class _Reply:
+    def __init__(self, body: bytes):
+        self._body = body
+
+    def read(self):
+        return self._body
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        return False
+
+
+def _fred_400(message: str):
+    body = (
+        '{"error_code":400,"error_message":"Bad Request.  The value for variable api_key '
+        + message
+        + '"}'
+    ).encode()
+
+    def opener(req, timeout=None):
+        raise urllib.error.HTTPError(req.full_url, 400, "Bad Request", {}, io.BytesIO(body))  # type: ignore[arg-type]
+
+    return opener
+
+
+@pytest.mark.parametrize(
+    "message", ["is not registered.", "is not a 32 character alpha-numeric lower-case string."]
+)
+def test_fred_answers_a_bad_key_with_400_and_it_is_auth_failed(tmp_path, message):
+    """FRED refuses a revoked or wrong key with HTTP 400, not 401."""
+    fred = FredCollector(
+        series={"DFF": "x"}, key="k" * 32, opener=_fred_400(message), sleep=lambda s: None
+    )
+    with pytest.raises(KeyRejected, match="the key was refused"):
+        fred.get_json("https://api.stlouisfed.org/fred/series/observations")
+    (r,) = _sweep(tmp_path, fred).results
+    assert r.status == AUTH_FAILED and "k" * 32 not in r.detail
+
+
+def test_fred_a_400_that_is_not_about_the_key_is_still_failed(tmp_path):
+    def opener(req, timeout=None):
+        body = io.BytesIO(b'{"error_message":"Bad Request.  Series does not exist."}')
+        raise urllib.error.HTTPError(req.full_url, 400, "Bad Request", {}, body)  # type: ignore[arg-type]
+
+    fred = FredCollector(series={"DFF": "x"}, key="k", opener=opener, sleep=lambda s: None)
+    (r,) = _sweep(tmp_path, fred).results
+    assert r.status == FAILED
+
+
+def test_fred_a_key_error_in_a_200_payload_is_auth_failed(tmp_path):
+    body = b'{"error_code":400,"error_message":"The value for variable api_key is not registered."}'
+    fred = FredCollector(
+        series={"DFF": "x"}, key="k", opener=lambda req, timeout=None: _Reply(body)
+    )
+    (r,) = _sweep(tmp_path, fred).results
+    assert r.status == AUTH_FAILED and "not registered" in r.detail
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        b'{"Information": "The **demo** API key is for demo purposes only. '
+        b'Please claim your free API key."}',
+        b'{"Error Message": "the parameter apikey is invalid or missing."}',
+    ],
+)
+def test_alphavantage_refuses_a_key_with_a_200_and_it_is_auth_failed(tmp_path, payload):
+    av = AlphaVantageNews(key="k", opener=lambda req, timeout=None: _Reply(payload))
+    (r,) = _sweep(tmp_path, av, slot="us_close", source="alphavantage_news").results
+    assert r.status == AUTH_FAILED and "rejected the key" in r.detail
+
+
+def test_alphavantage_a_spent_quota_is_still_failed(tmp_path):
+    body = b'{"Information": "Our standard API rate limit is 25 requests per day."}'
+    av = AlphaVantageNews(key="k", opener=lambda req, timeout=None: _Reply(body))
+    (r,) = _sweep(tmp_path, av, slot="us_close", source="alphavantage_news").results
+    assert r.status == FAILED
 
 
 def test_an_ordinary_failure_and_a_plan_skip_are_unchanged(tmp_path):
@@ -205,6 +297,42 @@ def test_the_key_alert_resolves_when_the_source_reads_again(tmp_path):
     assert "source_keys" in _check(tmp_path, cfg, later).resolved
 
 
+def test_a_skip_by_design_or_a_failure_does_not_resolve_the_key_alert(tmp_path):
+    """eodhd: us_close's 401 opens the alert, then bursa_close raises PlanExcluded
+    before any request ('ok', 'skipped: ...'). That is not the key coming back,
+    and neither is a network failure; only a run that reads resolves it."""
+    cfg = _monitor_cfg(tmp_path, ("eodhd",))
+    with Corpus(cfg.corpus_db) as c:
+        c.record_sweep("r1", "eodhd", NOW, AUTH_FAILED, at=NOW, detail="eodhd: the key was refused")
+    assert [a for a in _check(tmp_path, cfg, NOW).opened if a.rule == "source_keys"]
+    later = NOW + timedelta(hours=11)
+    with Corpus(cfg.corpus_db) as c:
+        c.record_sweep(
+            "r2",
+            "eodhd",
+            later,
+            OK,
+            at=later,
+            slot="bursa_close",
+            detail="skipped: no name in this slot is on the free plan",
+        )
+    after_skip = _check(tmp_path, cfg, later)
+    assert "source_keys" not in after_skip.resolved
+    assert "source_keys" in [a.rule for a in after_skip.still_open]
+    later += timedelta(hours=12)
+    with Corpus(cfg.corpus_db) as c:
+        c.record_sweep(
+            "r3", "eodhd", later, FAILED, at=later, detail="eodhd fetch failed: timed out"
+        )
+        verdict = c.key_verdict("eodhd")
+        assert verdict is not None and verdict["status"] == AUTH_FAILED
+    assert "source_keys" not in _check(tmp_path, cfg, later).resolved
+    later += timedelta(hours=12)
+    with Corpus(cfg.corpus_db) as c:
+        c.record_sweep("r4", "eodhd", later, OK, at=later, fetched=2)
+    assert "source_keys" in _check(tmp_path, cfg, later).resolved
+
+
 # --- 3. expected rows ----------------------------------------------------------------
 
 
@@ -265,7 +393,7 @@ def test_a_sparse_or_new_source_is_not_judged(tmp_path):
 
 
 def test_a_forced_rerun_inside_a_firing_does_not_count(tmp_path):
-    """The firing counts its FIRST run, which read the whole window; a re-run an
+    """The firing counts its best run, the one that read the whole window; a re-run an
     hour later over an hour's window is not the source running dry."""
     path = str(tmp_path / "corpus.db")
     days = _bursa_days(date(2026, 10, 27), 22)
@@ -275,6 +403,19 @@ def test_a_forced_rerun_inside_a_firing_does_not_count(tmp_path):
             rerun = _firing(day) + timedelta(hours=5)
             c.record_sweep("x", "google_news", rerun, OK, at=rerun, slot="bursa_close", fetched=0)
         assert not ledger.row_shortfalls(c, "bursa_close", ["google_news"], _every_day)
+
+
+def test_a_forced_rerun_that_reads_after_a_repair_clears_the_shortfall(tmp_path):
+    """The firing counts its best run: a `force` dispatch after the adapter was
+    fixed clears the shortfall now, not at the next scheduled firing."""
+    path = str(tmp_path / "corpus.db")
+    days = _bursa_days(date(2026, 10, 27), 22)
+    _history(path, "fmt_business", [0, 0] + [50] * 20, days)
+    with Corpus(path) as c:
+        assert ledger.row_shortfalls(c, "bursa_close", ["fmt_business"], _every_day)
+        rerun = _firing(days[0]) + timedelta(hours=3)
+        c.record_sweep("y", "fmt_business", rerun, OK, at=rerun, slot="bursa_close", fetched=50)
+        assert not ledger.row_shortfalls(c, "bursa_close", ["fmt_business"], _every_day)
 
 
 def test_a_bursa_holiday_is_left_out_of_the_streak(tmp_path):
