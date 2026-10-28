@@ -37,6 +37,12 @@ The rule set here is small and deliberate, and every branch has a test:
   * **No alias matches inside a fund's name** - see _IN_A_FUNDS_NAME. "FAST
     Maybank ACI Opp ... (0P0001STK3)" is a fund's quote page, not the bank.
 
+  * **No alias matches behind another market's exchange code** - see
+    OTHER_EXCHANGES. "UPCOM:TNB" is Nha Be Steel on Vietnam's UPCoM.
+
+  * **No alias matches inside a name, or near a word, entities.yaml says is
+    not the company** - see NotTheCompany. "Apple Hospitality" is a REIT.
+
   * **Stored links are re-read by these rules** - see EntityLinker.recheck. A
     link is written when a row is stored, and a rule added later would
     otherwise never reach the rows before it.
@@ -58,6 +64,10 @@ refusing "pineapple" and "Amdocs".
     bank and is news about the airport operator; the digest reads the
     difference.
 
+  * **Another company's contract win, and a crash involving the company's
+    lorry, are linked**, and `EntityLinker.incidental` says which kind of not-
+    news they are - MENTION or INCIDENT_BYSTANDER, never a cause.
+
 Longest alias first, as before, so "Maybank Islamic" resolves to the subsidiary
 and the "Maybank" inside it is spent on that match, not linked to the parent.
 The parent is linked when the text names it separately.
@@ -66,7 +76,8 @@ The parent is linked when the text names it separately.
 from __future__ import annotations
 
 import re
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
+from dataclasses import dataclass
 from functools import lru_cache
 
 _ASCII_WORD = r"[A-Za-z0-9]"
@@ -189,6 +200,124 @@ OTHER_NAMES = (
     "Genting Highlands",
     "Resorts World Genting",
 )
+
+# --- an exchange-qualified ticker names the company listed THERE -----------------
+#
+# "Nha Be Steel JSC Estimates – UPCOM:TNB" (tradingview.com, 2026-10-25) is a
+# Vietnamese steelmaker's page, TNB its ticker on UPCoM, and two such rows were
+# linked to Tenaga (MYX:5347) on the token alone. An alias written directly
+# behind an exchange's code and a colon links only when that exchange is the
+# instrument's own market, both read through markets.registry: "MYX:TENAGA" and
+# "KLSE:TENAGA" are XKLS, "NASDAQ:AMD" and "NasdaqGS:AMD" are XNAS. A rejected
+# match is an excluded mention, as a building's name is: it claims its span,
+# links nothing, and `recheck` drops a stored link it made.
+#
+# Codes markets.registry has no adapter for, so no book name is listed on them.
+# A code in neither list is not read as an exchange. Measured over the 26,518
+# stored rows to 2026-10-28: an alias sits directly behind a known code in 16
+# rows (NASDAQ:AMD, MYX:TENAGA, ...), and the guard rejects the two UPCOM:TNB
+# rows and nothing else.
+OTHER_EXCHANGES = (
+    "UPCOM",
+    "HOSE",
+    "HNX",
+    "NYSE",
+    "NYSEARCA",
+    "NYSEAMERICAN",
+    "AMEX",
+    "BATS",
+    "OTC",
+    "OTCMKTS",
+    "BSE",
+    "SET",
+    "IDX",
+    "PSE",
+    "SSE",
+    "SZSE",
+    "TSX",
+    "TSXV",
+)
+#: Nasdaq's three tiers, as Yahoo and S&P write the prefix: "NasdaqGS:AMD".
+NASDAQ_TIERS = ("NASDAQGS", "NASDAQGM", "NASDAQCM")
+_EXCHANGE_CODE = re.compile(rf"(?<!{_ASCII_WORD})([A-Za-z]{{2,12}}):\Z")
+
+
+@lru_cache(maxsize=64)
+def _exchange_mic(code: str) -> str | None:
+    """The market an exchange code names, or None when it is not one we know."""
+    from markets.registry import known_prefixes, resolve_mic
+
+    up = code.upper()
+    if up in NASDAQ_TIERS:
+        return resolve_mic("NASDAQ")
+    if up in known_prefixes():
+        return resolve_mic(up)
+    return up if up in OTHER_EXCHANGES else None
+
+
+def _listed_elsewhere(text: str, start: int, iid: str) -> bool:
+    """Is the alias at text[start:] written behind ANOTHER market's code?"""
+    from markets.registry import mic_of
+
+    m = _EXCHANGE_CODE.search(text, max(0, start - 13), start)
+    there = _exchange_mic(m.group(1)) if m else None
+    if there is None:
+        return False
+    try:
+        return there != mic_of(iid)
+    except ValueError:
+        return False  # an id with no market prefix has nothing to compare
+
+
+# --- names and contexts that are not the company, per instrument -----------------
+#
+# OTHER_NAMES above is the linker's own list. Per-instrument exclusions live
+# beside the aliases, in entities.yaml's `not_the_company`, and reach every
+# linker built by `linker_for`:
+#
+#   * `names`: longer names that contain an alias and name something else.
+#     "Apple Hospitality REIT (NYSE:APLE)" and "Apple Bank" were linked to
+#     XNAS:AAPL; over the 26,518 stored rows to 2026-10-28 this drops 23 AAPL
+#     links, every one an Apple Hospitality row. Each is matched like an alias
+#     and spends its span, as an OTHER_NAMES entry does.
+#   * `near`: alias -> words that, within NEAR_WORDS words of it on either
+#     side, say the alias is another listing's ticker ("TNB" beside UPCOM,
+#     HOSE or Hanoi is Nha Be Steel, not Tenaga). Title Case or ALL CAPS, as
+#     written, never lowercase: "hose" is a word.
+NEAR_WORDS = 3
+_TOKEN = re.compile(rf"{_ASCII_WORD}+")
+
+
+@dataclass(frozen=True)
+class NotTheCompany:
+    """One instrument's entry in entities.yaml's `not_the_company`."""
+
+    names: tuple[str, ...] = ()
+    near: tuple[tuple[str, tuple[str, ...]], ...] = ()
+
+
+@lru_cache(maxsize=1)
+def configured_exclusions() -> dict[str, NotTheCompany]:
+    """entities.yaml's `not_the_company`, keyed by the id as the file writes it."""
+    import yaml
+
+    from knowledge.graph.ids import ENTITIES_FILE
+
+    if not ENTITIES_FILE.exists():
+        return {}
+    raw = yaml.safe_load(ENTITIES_FILE.read_text(encoding="utf-8")) or {}
+    out: dict[str, NotTheCompany] = {}
+    for iid, entry in (raw.get("not_the_company") or {}).items():
+        entry = entry or {}
+        out[str(iid)] = NotTheCompany(
+            names=tuple(str(n) for n in entry.get("names") or ()),
+            near=tuple(
+                (str(alias), tuple(str(w) for w in words or ()))
+                for alias, words in (entry.get("near") or {}).items()
+            ),
+        )
+    return out
+
 
 # --- a bank named as the AUTHOR of a broker's note -------------------------------
 #
@@ -313,6 +442,87 @@ def _writes_the_note(text: str, start: int, end: int) -> bool:
     )
 
 
+# --- stories that name a company without being news about it ---------------------
+#
+# Linked, because the name is written, and listed on its page as what they are,
+# but never a CAUSE: the digest neither stars nor ranks them above a story about
+# the company (`EntityLinker.incidental`, read by knowledge/digest.py and the
+# ingest's escalation gate). Two kinds:
+#
+#   * MENTION - another company's contract win. "Bintai Kinden wins RM20.3mil
+#     TNB contract" was starred on Tenaga's page on 2026-10-27 and 10-28, and
+#     the Jati Tinggi, Kerjaya Prospek and SKA Capital awards before it: the
+#     event is the contractor's, and for the utility it is one more purchase
+#     order. Read as the winner, a win verb, up to six words, then the alias
+#     followed by a contract noun ("TNB-linked jobs", "Tenaga contract"), or a
+#     contract noun "from"/"by" the alias ("Deal from Tenaga Nasional"). "TNB
+#     awards RM568m contract" names TNB as the actor and stays its news.
+#   * INCIDENT_BYSTANDER - an accident, crash or fire that involves the
+#     company's vehicle, staff or premises and not its business. "3 family
+#     members killed in Dungun crash" ("MPV and TNB vehicle collide") was ranked
+#     first for Tenaga on 2026-10-25 at quality 1.00. Read per text: an incident
+#     word, the company's thing ("TNB lorry", "a company vehicle"), and no word
+#     of the business - a substation fire that "triggered JB power outage" is
+#     the utility's news and stays it, as does any substation fire.
+#
+# Measured over the 26,518 stored rows to 2026-10-28: MENTION on 24 rows - 20
+# Tenaga contractor awards, and "NiSource Lands Major Microsoft Power Deal",
+# "Qualcomm Secures Apple Licensing Deal", Intel's foundry orders from Nvidia
+# and HPE's AMD rack deal - and INCIDENT_BYSTANDER on 3, the two Dungun crash
+# rows and the cable-theft electrocution. Not caught: "Bintai Kindenko Builds
+# Strong Comeback with RM20.28 Million TNB Contract" (no win verb).
+MENTION = "mention"
+INCIDENT_BYSTANDER = "incident_bystander"
+#: Kinds a cause is never drawn from.
+NOT_A_CAUSE = frozenset({MENTION, INCIDENT_BYSTANDER})
+
+_WIN_VERB = (
+    r"(?i:wins?|won|bags?|bagged|secures?|secured|clinch(?:es|ed)?|lands?|landed"
+    r"|nets?|netted|accepts?|accepted|obtains?|obtained|awarded)"
+)
+_CONTRACT_NOUN = r"(?i:(?:sub)?contracts?|jobs?|tenders?|deals?|projects?|works|orders?|packages?)"
+#: "Jati Tinggi, Kerjaya Prospek consortium wins RM568m ", "SKA Capital unit
+#: accepts RM89.28mil award for ": a capitalised winner, the verb, up to six
+#: words, in one clause.
+_WINNER_WINS = re.compile(
+    rf"[A-Z0-9][^\s;?!]*(?:\s+[^\s;?!]+){{0,6}}?\s+{_WIN_VERB}(?:\s+[^\s;?!]+){{0,6}}?\s+\Z"
+)
+#: "TNB contract", "TNB-linked jobs", "Tenaga's substation contract".
+_CONTRACT_AFTER = re.compile(
+    rf"\A(?:[-‐](?i:linked|related|owned)|['’]s)?(?:\s+[^\s;?!]+){{0,3}}?\s+{_CONTRACT_NOUN}\b"
+)
+#: "Bags MYR13 Million Deal from Tenaga Nasional".
+_CONTRACT_FROM = re.compile(rf"\b{_CONTRACT_NOUN}\s+(?i:from|by)\s+\Z")
+
+
+def _wins_its_contract(text: str, start: int, end: int) -> bool:
+    """Is the alias at text[start:end] the CLIENT in another company's contract win?"""
+    before, after = text[max(0, start - 160) : start], text[end : end + 60]
+    return bool(
+        _WINNER_WINS.search(before)
+        and (_CONTRACT_AFTER.match(after) or _CONTRACT_FROM.search(before))
+    )
+
+
+_INCIDENT = re.compile(
+    r"\b(?i:crash(?:es|ed)?|collisions?|collided?|collides|accidents?|mishaps?|overturned"
+    r"|skidded|fire|blaze|killed|dies|died|dead|injured|hurt|electrocuted|electric\s+shock)\b"
+)
+_ITS_THING = (
+    r"(?i:lorry|lorries|vans?|trucks?|vehicles?|pick-?ups?|bus|buses|motorcycles?|workers?"
+    r"|staff|employees?|technicians?|linem[ae]n|premises|office|depot|building|cables?)"
+)
+#: The alias and then its thing: "TNB lorry", "TNB's van", "(TNB) cable".
+_THING_AFTER = re.compile(rf"\A\)?(?:['’]s)?\s+{_ITS_THING}\b")
+#: "a collision involving a company vehicle".
+_COMPANY_THING = re.compile(rf"\b(?i:company|company['’]s)\s+{_ITS_THING}\b")
+_BUSINESS = re.compile(
+    r"\b(?i:outages?|blackouts?|power\s+(?:cuts?|supply|disruptions?)|supply\s+disruptions?"
+    r"|substations?|tariffs?|shares|stocks?|earnings|profits?|revenue|dividends?|contracts?"
+    r"|guidance)\b"
+)
+
+
 def alias_pattern(surface: str, *, bare: bool = False) -> re.Pattern[str]:
     """The compiled matcher for one alias, per the rules in the module doc.
 
@@ -349,11 +559,22 @@ def alias_pattern(surface: str, *, bare: bool = False) -> re.Pattern[str]:
 class EntityLinker:
     """A compiled index. Build once per process; `link` is then cheap."""
 
-    def __init__(self, index: dict[str, str]) -> None:
+    def __init__(
+        self, index: dict[str, str], exclusions: Mapping[str, NotTheCompany] | None = None
+    ) -> None:
         # Longest first so a subsidiary's longer name wins over its parent's.
-        # OTHER_NAMES ride along with no instrument (''), unless the index
-        # names them, in which case the index entry is the one kept.
-        named = {**{n: "" for n in OTHER_NAMES}, **index}
+        # OTHER_NAMES and each instrument's `not_the_company` names ride along
+        # with no instrument (''), unless the index names them, in which case
+        # the index entry is the one kept.
+        exclusions = exclusions or {}
+        not_names = [n for e in exclusions.values() for n in e.names]
+        named = {**{n: "" for n in (*OTHER_NAMES, *not_names)}, **index}
+        #: (alias, iid) -> the words that, near it, make it another listing's.
+        self._near: dict[tuple[str, str], frozenset[str]] = {
+            (alias, iid): frozenset(w for word in words for w in (word, word.upper()))
+            for iid, e in exclusions.items()
+            for alias, words in e.near
+        }
         self._entries: tuple[tuple[str, str, re.Pattern[str]], ...] = tuple(
             (surface, iid, alias_pattern(surface))
             for surface, iid in sorted(named.items(), key=lambda kv: (-len(kv[0]), kv[0]))
@@ -376,13 +597,14 @@ class EntityLinker:
         2026-10-10, linked "Genting Malaysia posts higher quarterly revenue"
         to Genting Malaysia AND Genting Berhad. Every occurrence is checked,
         not just the first, so "Genting Malaysia ... Genting Berhad" still
-        links both. A match of an OTHER_NAMES entry claims its span and links
-        nothing, and so does one that ends a Malay building's name or is a
-        word of a fund's name.
+        links both. A match of an OTHER_NAMES or `not_the_company` name
+        claims its span and links nothing, and so does one that ends a Malay
+        building's name, is a word of a fund's name, sits behind another
+        market's exchange code or near a `not_the_company` word.
         """
         claimed: list[tuple[int, int]] = []
         out: list[tuple[int, int, int, str]] = []
-        for order, (_surface, iid, pattern) in enumerate(self._entries):
+        for order, (surface, iid, pattern) in enumerate(self._entries):
             for m in pattern.finditer(text):
                 start, end = m.span()
                 if any(start < e and s < end for s, e in claimed):
@@ -395,9 +617,21 @@ class EntityLinker:
                     iid
                     and not _IN_A_BUILDING_NAME.search(text, max(0, start - 80), start)
                     and not _IN_A_FUNDS_NAME.match(text[end : end + 80])
+                    and not _listed_elsewhere(text, start, iid)
+                    and not self._near_another_listing(text, start, end, surface, iid)
                 ):
                     out.append((start, end, order, iid))
         return out
+
+    def _near_another_listing(
+        self, text: str, start: int, end: int, surface: str, iid: str
+    ) -> bool:
+        words = self._near.get((surface, iid))
+        if not words:
+            return False
+        before = _TOKEN.findall(text[max(0, start - 80) : start])[-NEAR_WORDS:]
+        after = _TOKEN.findall(text[end : end + 80])[:NEAR_WORDS]
+        return any(w in words for w in (*before, *after))
 
     def link(self, text: str) -> list[str]:
         """Instrument ids the text names, in order of first mention.
@@ -453,6 +687,33 @@ class EntityLinker:
             only[iid] = only.get(iid, True) and _writes_the_note(text, start, end)
         return {iid for iid, yes in only.items() if yes}
 
+    def incidental(self, text: str) -> dict[str, str]:
+        """Linked ids the story names without being news about them, and how.
+
+        INCIDENT_BYSTANDER for every linked id of a story about an accident,
+        crash or fire involving a company's vehicle, staff or premises and not
+        its business; MENTION for an id the text names ONLY as the client in
+        another company's contract win - one mention in any other role
+        ("...; TNB shares rose 1%") and the id is not returned. Both kinds are
+        in NOT_A_CAUSE. See the shapes above `_wins_its_contract`.
+        """
+        matches = self._matches(text)
+        if not matches:
+            return {}
+        if (
+            _INCIDENT.search(text)
+            and not _BUSINESS.search(text)
+            and (
+                _COMPANY_THING.search(text)
+                or any(_THING_AFTER.match(text[end : end + 40]) for _s, end, _o, _i in matches)
+            )
+        ):
+            return {iid: INCIDENT_BYSTANDER for _s, _e, _o, iid in matches}
+        only: dict[str, bool] = {}
+        for start, end, _order, iid in matches:
+            only[iid] = only.get(iid, True) and _wins_its_contract(text, start, end)
+        return {iid: MENTION for iid, yes in only.items() if yes}
+
     def surfaces(self, instrument_id: str) -> list[str]:
         """Every alias of one instrument, longest first."""
         return list(self._surfaces.get(instrument_id, []))
@@ -469,7 +730,7 @@ class EntityLinker:
 
 @lru_cache(maxsize=8)
 def _cached(items: tuple[tuple[str, str], ...]) -> EntityLinker:
-    return EntityLinker(dict(items))
+    return EntityLinker(dict(items), configured_exclusions())
 
 
 def relinked(article, linker: EntityLinker):
@@ -489,7 +750,8 @@ def relinked(article, linker: EntityLinker):
 
 
 def linker_for(index: dict[str, str]) -> EntityLinker:
-    """A linker for this index, compiled once per distinct index."""
+    """A linker for this index, compiled once per distinct index, with the
+    exclusions entities.yaml's `not_the_company` configures."""
     return _cached(tuple(sorted(index.items())))
 
 

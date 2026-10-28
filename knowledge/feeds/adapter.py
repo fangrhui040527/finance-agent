@@ -174,8 +174,15 @@ class FeedAdapter(ABC):
                 linked=bool(art.instruments),
                 language_ok=language_ok,
             )
+            # A name the story is not news about (another company's contract
+            # win, a crash involving its lorry: `EntityLinker.incidental`)
+            # does not open the gate for it.
+            incidental = linker.incidental(art.text) if linker is not None else {}
             art.escalated = should_escalate(
-                art.features, art.instruments, holdings or set(), watchlist or set()
+                art.features,
+                [i for i in art.instruments if i not in incidental],
+                holdings or set(),
+                watchlist or set(),
             )
             if art.escalated:
                 stats.escalated += 1

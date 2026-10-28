@@ -115,3 +115,19 @@ companies:
   "XNAS:AMZN":
     - Amazon
     - Amazon.com
+
+# Names and contexts that write a company's alias and are NOT the company. Read
+# by the news linker (knowledge/news/linking.py, `configured_exclusions`): a
+# match inside one of `names` links nothing, and an alias in `near` links
+# nothing when one of its words is within three words of it. Title Case or ALL
+# CAPS, as written. A stored link these exclude is dropped where rows are read
+# (`EntityLinker.recheck`); the corpus itself is not rewritten.
+not_the_company:
+  "XNAS:AAPL":
+    names:
+      - Apple Hospitality # NYSE:APLE, a hotel REIT
+      - Apple Bank # Apple Bank for Savings, New York
+  "MYX:5347":
+    near:
+      # TNB is also Nha Be Steel's ticker on Vietnam's UPCoM ("UPCOM:TNB")
+      TNB: [UPCOM, UPCoM, HOSE, HNX, Hanoi, Vietnam, Vietnamese]

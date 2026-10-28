@@ -134,6 +134,8 @@ class Digest:
                 )
             for s in n.stories:
                 star = " ★" if s["escalated"] else ""
+                if s.get("kind"):
+                    star = f" [{s['kind']}]"  # not a cause; see _name_digest
                 # None: stored before the quality score existed, not "worthless".
                 q = "–" if s["quality"] is None else f"{s['quality']:.2f}"
                 when, cite = s["published_at"][:10], ""
@@ -318,9 +320,16 @@ def _name_digest(
     reading list once the rule changes. On 2026-09-07 the gate stopped treating
     "the company is named" as materiality; a digest still reading the column
     would have gone on starring the charity cheque and the golf tournament.
+
+    A story that names the company without being news about it - another
+    company's contract win, a crash involving its lorry - is listed with its
+    kind (`EntityLinker.incidental`), never starred, and ranked below the rest:
+    it is not a cause.
     """
+    from knowledge.graph.ids import instrument_id as canonical
     from knowledge.news.features import should_escalate
 
+    forms = {iid, canonical(iid) or iid}
     seen: set[str] = set()
     scored = []
     for a in articles:
@@ -331,10 +340,15 @@ def _name_digest(
         feats = a.features or extractor.extract(
             a.text, linker.names_for(a.instruments) or a.instruments
         )
-        scored.append((a, feats, should_escalate(feats, a.instruments, book, set())))
+        incidental = linker.incidental(a.text)
+        kind = next((k for i, k in incidental.items() if (canonical(i) or i) in forms), "")
+        material = [i for i in a.instruments if i not in incidental]
+        escalated = not kind and should_escalate(feats, material, book, set())
+        scored.append((a, feats, escalated, kind))
     scored.sort(
         key=lambda af: (
             not af[2],
+            bool(af[3]),
             -(af[0].quality or 0.0),
             -af[0].published_at.timestamp(),
         )
@@ -343,8 +357,8 @@ def _name_digest(
     from knowledge.news.clean import normalise_text
 
     nd = NameDigest(instrument_id=iid, label=_label(iid))
-    nd.escalated = sum(1 for _a, _f, e in scored if e)
-    for a, f, escalated in scored[:top_n]:
+    nd.escalated = sum(1 for _a, _f, e, _k in scored if e)
+    for a, f, escalated, kind in scored[:top_n]:
         nd.stories.append(
             {
                 "doc_id": a.doc_id,
@@ -361,16 +375,21 @@ def _name_digest(
                 "intensity": f.intensity,
                 "uncertainty": f.uncertainty,
                 "escalated": escalated,
+                # knowledge.news.linking.NOT_A_CAUSE ("mention",
+                # "incident_bystander"), or "" for a story about the company.
+                "kind": kind,
             }
         )
     if scored:
-        pols = [f.polarity for _a, f, _e in scored]
+        pols = [f.polarity for _a, f, _e, _k in scored]
         nd.tone = {
             "n": len(scored),
-            "sources": len({a.source_domain for a, _f, _e in scored}),
+            "sources": len({a.source_domain for a, _f, _e, _k in scored}),
             "polarity_mean": round(sum(pols) / len(pols), 3),
-            "intensity_max": round(max(f.intensity for _a, f, _e in scored), 3),
-            "uncertainty_mean": round(sum(f.uncertainty for _a, f, _e in scored) / len(scored), 3),
+            "intensity_max": round(max(f.intensity for _a, f, _e, _k in scored), 3),
+            "uncertainty_mean": round(
+                sum(f.uncertainty for _a, f, _e, _k in scored) / len(scored), 3
+            ),
         }
     for e in facts.events(iid, since=now - timedelta(days=2), until=now, limit=20, opinions=2):
         nd.events.append(_event(e))

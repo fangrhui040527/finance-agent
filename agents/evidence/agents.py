@@ -18,6 +18,7 @@ from core.llm.tiers import TaskClass
 from core.market.pointintime import FactStore, assert_no_lookahead
 from core.market.prices import PriceSeries
 from engines.events.taxonomy import BaseRateTable, Event, EventType
+from knowledge.news.linking import NOT_A_CAUSE
 
 #: Stored event kinds (knowledge/facts.py) -> the taxonomy's types. A kind not
 #: here is inferred from the title by `event_type_for`, or left out.
@@ -60,6 +61,10 @@ def event_type_for(kind: str, title: str) -> EventType | None:
         return EVENT_KINDS[kind]
     if kind == "insider_filing":
         return None  # a Form 4 filing without its direction; Finnhub carries the typed one
+    if kind in NOT_A_CAUSE:
+        # Names the company without being news about it: "Bintai Kinden wins
+        # RM20.3mil TNB contract" is not Tenaga's CONTRACT_WIN, whatever its title says.
+        return None
     for pattern, kind_ in _TITLE_TYPES:
         if pattern.search(title or ""):
             return kind_
