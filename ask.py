@@ -1176,8 +1176,11 @@ def cmd_sweep(a) -> int:
     failed OR came back badly degraded, 2 the sweep itself could not run. A
     scheduler can act on those without parsing text - and it needs to, because
     the failure this command exists to make visible is the one that looks like
-    a quiet world. A source whose key is absent is SKIPPED, not failed: the row
-    names the variable, and the job stays green until someone adds it.
+    a quiet world. A source whose key is absent is `skipped_no_key`, not
+    failed: the row names the variable and the exit stays 0. A refused key is
+    `auth_failed` and exits 3. Neither is ever `ok`; `--ledger PATH` writes
+    the per-source ledger collect.yml fails the run on after its commit
+    (knowledge/ledger.py).
     """
     from core.config import load as load_cfg
     from knowledge.sweep import run_sweep
@@ -1219,6 +1222,9 @@ def cmd_sweep(a) -> int:
         log=lambda _msg: None,
         force=getattr(a, "force", False),
     )
+    ledger_path = getattr(a, "ledger", "")
+    if ledger_path:
+        _write_sweep_ledger(report, ledger_path, a.db or str(cfg.corpus_db))
     if report.could_not_run:
         print(f"sweep could not run: {report.could_not_run}", file=sys.stderr)
         return 2
@@ -1234,7 +1240,7 @@ def cmd_sweep(a) -> int:
     # Failures also go to stderr, where a scheduler's log and a person's eye
     # both look first; the full table above is the record.
     for r in report.results:
-        if r.status in ("failed", "degraded"):
+        if r.status in ("failed", "degraded", "auth_failed", "skipped_no_key"):
             print(f"  {r.name:<16} {r.status.upper()}: {r.detail}", file=sys.stderr)
     if not (cfg.holdings or cfg.watchlist):
         print(
@@ -1243,6 +1249,27 @@ def cmd_sweep(a) -> int:
             "will ever be flagged for review."
         )
     return report.exit_code
+
+
+def _write_sweep_ledger(report, path: str, corpus_db: str) -> None:
+    """The run's ledger (knowledge/ledger.py), with the expected-row check for
+    the slot it collected. `all` and a run that did not collect have no slot
+    history to compare with. Never fails the sweep: a ledger that cannot be
+    written is said on stderr, and collect.yml reads its absence as such."""
+    from pathlib import Path
+
+    from knowledge import ledger
+    from knowledge.corpus import DEGRADED, OK, Corpus
+
+    try:
+        shortfalls = []
+        read = [r.name for r in report.results if r.status in (OK, DEGRADED)]
+        if read and report.slot != "all" and Path(corpus_db).exists():
+            with Corpus(corpus_db) as corpus:
+                shortfalls = ledger.row_shortfalls(corpus, report.slot, read)
+        ledger.write(path, ledger.build(report, shortfalls))
+    except Exception as e:  # the collection is already stored; the ledger is its report
+        print(f"sweep ledger not written: {type(e).__name__}: {e}", file=sys.stderr)
 
 
 def _sources_coverage(cfg, days: int) -> int:
@@ -2801,6 +2828,12 @@ def main(argv=None) -> int:
         action="store_true",
         help="collect even if this slot's firing already ran (the cron and the catch-up "
         "can both fire for one slot; the second is skipped unless you say otherwise)",
+    )
+    sw.add_argument(
+        "--ledger",
+        default="",
+        help="also write the run's per-source ledger (JSON) here; "
+        "`python -m knowledge.ledger check PATH` judges it",
     )
     sw.set_defaults(fn=cmd_sweep)
 

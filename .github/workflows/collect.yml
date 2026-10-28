@@ -93,6 +93,20 @@ jobs:
       run:
         shell: bash
     steps:
+      # A dead-man switch outside GitHub (healthchecks.io), because a run that
+      # never starts - a disabled cron, a dropped schedule - emails nobody.
+      # Optional: with HEALTHCHECKS_PING_URL unset every ping is a no-op. The
+      # URL is a secret (anyone holding it can ping), so it is never echoed.
+      # The matching end ping is the job's last step. docs/14, Sweep ledger.
+      - name: Dead-man switch, start
+        env:
+          HEALTHCHECKS_PING_URL: ${{ secrets.HEALTHCHECKS_PING_URL }}
+        run: |
+          if [ -z "$HEALTHCHECKS_PING_URL" ]; then exit 0; fi
+          curl -fsS -m 10 --retry 3 -o /dev/null "${HEALTHCHECKS_PING_URL%/}/start" \
+            || echo "::warning title=dead-man ping not sent::the start ping did not reach healthchecks.io"
+          exit 0
+
       # The branch as it stands when this run starts, not the commit the event
       # carried. The concurrency group queues a run behind the one in flight,
       # and without `ref` a queued run checks out the SHA from when it was
@@ -130,13 +144,17 @@ jobs:
 
       # Exit codes are the sweep's interface, so read them instead of
       # flattening them with `|| true`:
-      #   0  every enabled source read (a source without a key is SKIPPED, not failed)
+      #   0  every enabled source read (a source without a key is skipped_no_key, not failed)
       #   2  the sweep could not run at all - bad config, unknown slot
       #   3  at least one source failed or came back degraded; recorded in the stores
       #
       # 3 still commits. A failed sweep that leaves no trace is indistinguishable
       # from a quiet day. The job is still marked failed afterwards so a person
       # looks.
+      #
+      # --ledger writes one line per source (knowledge/ledger.py), shown below
+      # as a table on the run's summary page and judged by the step after the
+      # commit, which fails the run on a missing or refused key.
       # An operator who keeps every key in one repository secret named
       # ALL_SECRET has done something reasonable that these workflows did not
       # expect. .github/scripts/keys_from_blob.py finds each key in it by label
@@ -191,8 +209,9 @@ jobs:
           GDELT_USER_AGENT: ${{ secrets.GDELT_USER_AGENT }}
         run: |
           set +e
-          uv run python ask.py sweep --slot "${{ steps.slot.outputs.slot }}" ${{ inputs.force && '--force' || '' }}
+          uv run python ask.py sweep --slot "${{ steps.slot.outputs.slot }}" ${{ inputs.force && '--force' || '' }} --ledger "$RUNNER_TEMP/sweep-ledger.json"
           echo "code=$?" >> "$GITHUB_OUTPUT"
+          uv run python -m knowledge.ledger summary "$RUNNER_TEMP/sweep-ledger.json" >> "$GITHUB_STEP_SUMMARY"
           exit 0
 
       # Its own step. A news source being throttled says nothing about whether
@@ -515,3 +534,33 @@ jobs:
           echo "split_failed=${{ steps.commit.outputs.split_failed }} too_big=${{ steps.commit.outputs.too_big }}"
           echo "see the commit step's annotations, and docs/14-OPERATIONS-RUNBOOK.md, Large stores"
           exit 1
+
+      # The sweep ledger's verdict, AFTER the commit so the data has landed
+      # whatever it says. A source skipped for want of a key, a key the vendor
+      # refused (HTTP 401), or an expected source nearly empty two firings of
+      # its slot running fails the run - red is what makes GitHub e-mail the
+      # owner. On 2026-10-27/28 three keys vanished and FMP's was refused, and
+      # every run concluded `success`. Names the sources and why, never a key.
+      # `!cancelled()`: it must run even when an earlier check failed the job.
+      - name: Fail if a key is missing or refused, or a source ran short
+        if: ${{ !cancelled() && (steps.sweep.outputs.code == '0' || steps.sweep.outputs.code == '3') }}
+        run: uv run python -m knowledge.ledger check "$RUNNER_TEMP/sweep-ledger.json"
+
+      # The end of the dead-man switch: success, or /fail when any step above
+      # failed the job, with the ledger as a short plain-text body. A missed
+      # end ping inside the check's grace is healthchecks.io's alert.
+      - name: Dead-man switch, end
+        if: always()
+        env:
+          HEALTHCHECKS_PING_URL: ${{ secrets.HEALTHCHECKS_PING_URL }}
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          set +e
+          if [ -z "$HEALTHCHECKS_PING_URL" ]; then exit 0; fi
+          suffix="/fail"
+          if [ "$JOB_STATUS" = "success" ]; then suffix=""; fi
+          body="$(uv run python -m knowledge.ledger text "$RUNNER_TEMP/sweep-ledger.json" 2>/dev/null | head -c 10000)"
+          if [ -z "$body" ]; then body="job $JOB_STATUS; no sweep ledger"; fi
+          curl -fsS -m 10 --retry 3 -o /dev/null --data-binary "$body" "${HEALTHCHECKS_PING_URL%/}${suffix}" \
+            || echo "::warning title=dead-man ping not sent::the end ping did not reach healthchecks.io"
+          exit 0

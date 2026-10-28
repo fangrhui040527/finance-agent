@@ -12,8 +12,9 @@ the catalogue in knowledge/sources/catalog.py:
     documents into the fact book - and any articles it carries go into the
     corpus by the same path as every other article;
   * every attempt is recorded, including the ones that could not run: a
-    missing key is `skipped` with the variable named, a plan boundary is a
-    note, a transport failure is `failed`, and a per-instrument source where
+    missing key is `skipped_no_key` with the variable named, a refused key
+    (HTTP 401) is `auth_failed`, a plan boundary is a note or a `skipped`,
+    a transport failure is `failed`, and a per-instrument source where
     more than half the names could not be read is `degraded` - which exits 3
     like a failure, because eight of nine names unreachable produces almost
     no news, which is the exact shape of a quiet week.
@@ -30,7 +31,7 @@ import zlib
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 
-from knowledge.corpus import DEGRADED, FAILED, OK, Corpus
+from knowledge.corpus import AUTH_FAILED, DEGRADED, FAILED, OK, SKIPPED_NO_KEY, Corpus
 from knowledge.facts import SKIPPED, FactBook
 from knowledge.feeds.adapter import FeedAdapter, FeedError, FeedThrottled, IngestStats, RawRecord
 from knowledge.news.features import Article
@@ -275,9 +276,9 @@ class SourceResult:
 
     def line(self) -> str:
         head = f"  {self.name:<20} {self.status:<9}"
-        if self.status == SKIPPED:
+        if self.status in (SKIPPED, SKIPPED_NO_KEY):
             return f"{head} {self.detail}"
-        if self.status == FAILED:
+        if self.status in (FAILED, AUTH_FAILED):
             return f"{head} {self.detail[:200]}"
         body = (
             f"fetched {self.fetched:<4} kept {self.kept:<4} stored {self.stored:<4} "
@@ -306,7 +307,9 @@ class SweepReport:
 
     @property
     def exit_code(self) -> int:
-        """0 every source read; 3 a source failed or degraded; 2 could not run.
+        """0 every source read; 3 a source failed, was degraded or had its key
+        refused; 2 could not run. A missing key stays 0 here, as before: the
+        run's verdict on keys is `knowledge/ledger.py`'s, read after the commit.
 
         A slot that already ran today exits 0, not 2. It is a no-op, not a
         fault: the day's collection happened, and a scheduler that treated the
@@ -317,7 +320,7 @@ class SweepReport:
             return 2
         if self.already_ran:
             return 0
-        if any(r.status in (FAILED, DEGRADED) for r in self.results):
+        if any(r.status in (FAILED, DEGRADED, AUTH_FAILED) for r in self.results):
             return 3
         return 0
 
@@ -1127,7 +1130,13 @@ def _run_structured(
     run_id,
     emit,
 ) -> tuple[SourceResult, list[Article]]:
-    from knowledge.sources.base import KeyMissing, PlanExcluded, SourceError
+    from knowledge.sources.base import (
+        KEY_REFUSED,
+        KeyMissing,
+        KeyRejected,
+        PlanExcluded,
+        SourceError,
+    )
 
     since = _structured_since(facts, corpus, spec, slot, tick(), hours)
     result = SourceResult(spec.name, spec.kind, OK)
@@ -1168,14 +1177,18 @@ def _run_structured(
         collector = collector_for(spec.name)
         pull = collector.collect(since, instruments, slot)
     except KeyMissing as e:
-        result.status = SKIPPED
+        # Its own status, never `ok`: a row with no key read nothing, and
+        # recorded as `ok` it moved `last_success` and resolved a silence alert
+        # on 2026-10-27 (see `knowledge.corpus.SKIPPED_NO_KEY`). The "skipped:"
+        # detail is kept, so the row still reads as the dispatch it was.
+        result.status = SKIPPED_NO_KEY
         result.detail = str(e)
-        facts.record_pull(run_id, spec.name, SKIPPED, at=tick(), detail=result.detail)
+        facts.record_pull(run_id, spec.name, SKIPPED_NO_KEY, at=tick(), detail=result.detail)
         corpus.record_sweep(
             run_id,
             spec.name,
             since,
-            OK,
+            SKIPPED_NO_KEY,
             at=tick(),
             slot=slot,
             detail=f"skipped: {result.detail[:DETAIL_CHARS]}",
@@ -1199,14 +1212,17 @@ def _run_structured(
         )
         return result, []
     except SourceError as e:
-        result.status = FAILED
+        # A refused key by its type, or by its words when a collector wrapped
+        # it ("every endpoint failed. First: ... the key was refused").
+        refused = isinstance(e, KeyRejected) or KEY_REFUSED in str(e)
+        result.status = AUTH_FAILED if refused else FAILED
         result.detail = str(e)
-        facts.record_pull(run_id, spec.name, FAILED, at=tick(), detail=result.detail)
+        facts.record_pull(run_id, spec.name, result.status, at=tick(), detail=result.detail)
         corpus.record_sweep(
             run_id,
             spec.name,
             since,
-            FAILED,
+            result.status,
             at=tick(),
             slot=slot,
             detail=result.detail[:DETAIL_CHARS],
