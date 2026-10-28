@@ -1261,12 +1261,15 @@ def _write_sweep_ledger(report, path: str, corpus_db: str) -> None:
     from knowledge import ledger
     from knowledge.corpus import DEGRADED, OK, Corpus
 
+    shortfalls = []
     try:
-        shortfalls = []
         read = [r.name for r in report.results if r.status in (OK, DEGRADED)]
         if read and report.slot != "all" and Path(corpus_db).exists():
             with Corpus(corpus_db) as corpus:
                 shortfalls = ledger.row_shortfalls(corpus, report.slot, read)
+    except Exception as e:  # the row check is secondary: never let it hide a key problem
+        print(f"expected-row check skipped: {type(e).__name__}: {e}", file=sys.stderr)
+    try:
         ledger.write(path, ledger.build(report, shortfalls))
     except Exception as e:  # the collection is already stored; the ledger is its report
         print(f"sweep ledger not written: {type(e).__name__}: {e}", file=sys.stderr)

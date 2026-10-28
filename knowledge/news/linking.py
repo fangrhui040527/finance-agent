@@ -283,8 +283,9 @@ def _listed_elsewhere(text: str, start: int, iid: str) -> bool:
 #     and spends its span, as an OTHER_NAMES entry does.
 #   * `near`: alias -> words that, within NEAR_WORDS words of it on either
 #     side, say the alias is another listing's ticker ("TNB" beside UPCOM,
-#     HOSE or Hanoi is Nha Be Steel, not Tenaga). Title Case or ALL CAPS, as
-#     written, never lowercase: "hose" is a word.
+#     HOSE or HNX is Nha Be Steel, not Tenaga). Exchange codes only, never a
+#     country: "TNB, Vietnam EVN sign power MoU" is Tenaga's own news. Title
+#     Case or ALL CAPS, as written, never lowercase: "hose" is a word.
 NEAR_WORDS = 3
 _TOKEN = re.compile(rf"{_ASCII_WORD}+")
 
@@ -306,7 +307,7 @@ NOT_THE_COMPANY: dict[str, NotTheCompany] = {
     ),
     "MYX:5347": NotTheCompany(
         # TNB is also Nha Be Steel's ticker on Vietnam's UPCoM ("UPCOM:TNB")
-        near=(("TNB", ("UPCOM", "UPCoM", "HOSE", "HNX", "Hanoi", "Vietnam", "Vietnamese")),),
+        near=(("TNB", ("UPCOM", "UPCoM", "HOSE", "HNX")),),
     ),
 }
 
@@ -472,8 +473,8 @@ def _writes_the_note(text: str, start: int, end: int) -> bool:
 #
 # Measured over the 26,518 stored rows to 2026-10-28: MENTION on 24 rows - 20
 # Tenaga contractor awards, and "NiSource Lands Major Microsoft Power Deal",
-# "Qualcomm Secures Apple Licensing Deal", Intel's foundry orders from Nvidia
-# and HPE's AMD rack deal - and INCIDENT_BYSTANDER on 3, the two Dungun crash
+# "Qualcomm Secures Apple Licensing Deal" and Intel's foundry orders from
+# Nvidia - and INCIDENT_BYSTANDER on 3, the two Dungun crash
 # rows and the cable-theft electrocution. Not caught: "Bintai Kindenko Builds
 # Strong Comeback with RM20.28 Million TNB Contract" (no win verb).
 MENTION = "mention"
@@ -503,9 +504,16 @@ _WINNER_WINS = re.compile(
     rf"[A-Z0-9][^\s;?!]*(?:\s+{_CLAUSE_WORD}){{0,6}}?\s+{_WIN_VERB}"
     rf"(?:\s+{_OBJECT_WORD}){{0,6}}?\s+\Z"
 )
+#: "AMD chip deal", "Nvidia chips deal", "Google TPU deal": a word between the
+#: name and the deal that names what the name SELLS makes it the supplier, and
+#: the deal its own revenue news, not a purchase order.
+_SUPPLY_WORD = (
+    r"(?i:chips?|gpus?|tpus?|cpus?|processors?|accelerators?|silicon|semiconductors?"
+    r"|racks?|servers?|ai|compute|cloud|hardware|software|supply|supplies)\b"
+)
 #: "TNB contract", "TNB-linked jobs", "Tenaga's substation contract".
 _CONTRACT_AFTER = re.compile(
-    rf"\A(?:[-‐](?i:linked|related|owned)|['’]s)?(?:\s+{_OBJECT_WORD}){{0,3}}?"
+    rf"\A(?:[-‐](?i:linked|related|owned)|['’]s)?(?:\s+(?!{_SUPPLY_WORD}){_OBJECT_WORD}){{0,3}}?"
     rf"\s+{_CONTRACT_NOUN}\b"
 )
 #: "Bags MYR13 Million Deal from Tenaga Nasional".

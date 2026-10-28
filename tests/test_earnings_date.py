@@ -228,6 +228,19 @@ def test_a_moved_calendar_date_counts_only_where_it_was_listed_last(tmp_path):
         assert resolve(book, "XNAS:AAPL").label() == "2026-10-29 (finnhub, fmp)"
 
 
+def test_a_date_the_calendar_moved_away_from_is_not_a_release_to_come(tmp_path):
+    # Finnhub listed 11-02, then moved it to 10-29; the 8-K lands on 10-29. The
+    # 11-02 row is still stored, and must not stand as a second, upcoming release.
+    with book_with(
+        tmp_path,
+        finnhub("XNAS:AAPL", day(2026, 11, 2), seen=SEEN - timedelta(days=11)),
+        finnhub("XNAS:AAPL", day(2026, 10, 29), seen=SEEN),
+        edgar("XNAS:AAPL", datetime(2026, 10, 29, 20, 30, tzinfo=UTC)),
+    ) as book:
+        found = earnings_dates(book, "XNAS:AAPL", day(2026, 10, 23), day(2026, 12, 29))
+        assert [(d.released, d.day) for d in found] == [(True, day(2026, 10, 29).date())]
+
+
 def test_releases_a_quarter_apart_are_separate(tmp_path):
     with book_with(
         tmp_path,

@@ -7,7 +7,7 @@ boundary built from one:
     JSC Estimates – UPCOM:TNB" is a Vietnamese steelmaker, and it was linked to
     Tenaga (MYX:5347) on the token alone.
   * NOT_THE_COMPANY: "Apple Hospitality REIT (NYSE:APLE)" and
-    "Apple Bank" are not Apple Inc; "TNB" beside UPCOM, HOSE or Vietnam is not
+    "Apple Bank" are not Apple Inc; "TNB" beside UPCOM, HOSE or HNX is not
     Tenaga.
   * Another company's contract win is a MENTION of its client ("Bintai Kinden
     wins RM20.3mil TNB contract", starred on Tenaga's page 2026-10-27/28).
@@ -95,7 +95,8 @@ def test_the_linker_lists_the_names_that_are_not_the_company():
     ex = configured_exclusions()
     assert {"Apple Hospitality", "Apple Bank"} <= set(ex["XNAS:AAPL"].names)
     near = dict(ex[TENAGA].near)
-    assert {"UPCOM", "HOSE", "Vietnam"} <= set(near["TNB"])
+    assert {"UPCOM", "HOSE", "HNX"} <= set(near["TNB"])
+    assert "Vietnam" not in near["TNB"]
 
 
 def test_apple_hospitality_and_apple_bank_are_not_apple():
@@ -111,10 +112,12 @@ def test_apple_hospitality_and_apple_bank_are_not_apple():
     assert linker.link("Apple's iPhone sales fell") == ["XNAS:AAPL"]
 
 
-def test_tnb_near_a_vietnamese_market_word_is_not_tenaga():
+def test_tnb_near_a_vietnamese_exchange_code_is_not_tenaga():
     linker = linker_for(INDEX)
-    assert linker.link("Vietnam's TNB steel unit reports loss") == []
+    assert linker.link("HOSE-listed TNB steel unit reports loss") == []
     assert linker.link("UPCOM: TNB estimates revised") == []
+    # A country is not an exchange: Tenaga's own Vietnam news stays Tenaga's.
+    assert linker.link("TNB, Vietnam EVN sign power interconnection MoU") == [TENAGA]
     # Only the alias the rule names: Tenaga written in full is still Tenaga.
     assert linker.link("Tenaga Nasional signs Vietnam power deal") == [TENAGA]
     # Title Case or ALL CAPS only: "hose" is a word.
@@ -165,6 +168,19 @@ def test_the_company_awarding_or_acting_is_still_its_own_news():
         # An insider's share award is the company's own filing, not a contract.
         "Amy Hood Receives 29,077 Microsoft Shares in Insider Award Transaction",
     ):
+        assert linker.incidental(text) == {}, text
+
+
+def test_a_deal_for_what_the_name_sells_is_its_own_news():
+    """The name is the SUPPLIER here: the chips, racks or TPUs are what it sold."""
+    linker = EntityLinker({**INDEX, "Nvidia": "XNAS:NVDA", "Google": "XNAS:GOOGL"})
+    for text in (
+        "OpenAI secures AMD chip deal, takes stake of up to 10%",
+        "Humain secures Nvidia chips deal worth $10 billion",
+        "Anthropic lands Google TPU deal worth tens of billions",
+        "HPE lands $1.2B AMD AI rack deal",
+    ):
+        assert linker.link(text), text
         assert linker.incidental(text) == {}, text
 
 

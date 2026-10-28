@@ -150,6 +150,24 @@ def earnings_dates(
         seen = max(e.announced_at, sightings.get((e.source, e.event_id), e.announced_at))
         claims.append(_claim(e, seen))
     claims.sort(key=lambda c: c.day)
+    # A calendar's listing that the same calendar has since moved is not a claim
+    # any more. Drop it before clustering: a release splits the neighbourhood,
+    # and a moved-from date past it would otherwise stand as a release to come.
+    claims = [
+        c
+        for c in claims
+        if c.released
+        or not any(
+            o is not c
+            and not o.released
+            and o.source == c.source
+            and abs(o.day - c.day) <= SPREAD
+            and o.known_at
+            and c.known_at
+            and o.known_at > c.known_at
+            for o in claims
+        )
+    ]
 
     # A release absorbs the calendar dates on or before it (plus the one-day
     # after-close slack), never the ones after: an Item 2.02 8-K weeks early is

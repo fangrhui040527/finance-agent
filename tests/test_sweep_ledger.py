@@ -10,6 +10,7 @@ workflow that reads the ledger after its commit. Offline throughout.
 
 from __future__ import annotations
 
+import dataclasses
 import io
 import urllib.error
 from dataclasses import replace
@@ -506,6 +507,26 @@ def test_ask_sweep_writes_the_ledger_with_the_slot_check(tmp_path):
     written = ledger.read(path)
     assert written is not None
     assert [s["source"] for s in written["row_shortfalls"]] == ["fred"]
+
+
+def test_a_row_check_that_raises_still_writes_the_key_verdict(tmp_path, monkeypatch, capsys):
+    import ask
+
+    def boom(*a, **k):
+        raise RuntimeError("calendar unavailable")
+
+    monkeypatch.setattr(ledger, "row_shortfalls", boom)
+    corpus_db = str(tmp_path / "corpus.db")
+    _history(corpus_db, "fred", [480] * 21, _bursa_days(date(2026, 10, 27), 21), "us_preopen")
+    report = _sweep(tmp_path, Canned(pull=Pull()), at=datetime(2026, 10, 28, 12, 35, tzinfo=UTC))
+    # fred read (so the row check runs and raises); fmp's key was refused.
+    report.results.append(
+        dataclasses.replace(report.results[0], name="fmp", status=AUTH_FAILED, detail="HTTP 401")
+    )
+    path = tmp_path / "ledger.json"
+    ask._write_sweep_ledger(report, str(path), corpus_db)
+    assert "expected-row check skipped: RuntimeError" in capsys.readouterr().err
+    assert ledger.main(["check", str(path)]) == 1
 
 
 # --- 5. collect.yml ------------------------------------------------------------------
