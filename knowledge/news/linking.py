@@ -41,7 +41,7 @@ The rule set here is small and deliberate, and every branch has a test:
     OTHER_EXCHANGES. "UPCOM:TNB" is Nha Be Steel on Vietnam's UPCoM.
 
   * **No alias matches inside a name, or near a word, entities.yaml says is
-    not the company** - see NotTheCompany. "Apple Hospitality" is a REIT.
+    not the company** - see NOT_THE_COMPANY. "Apple Hospitality" is a REIT.
 
   * **Stored links are re-read by these rules** - see EntityLinker.recheck. A
     link is written when a row is stored, and a rule added later would
@@ -271,9 +271,10 @@ def _listed_elsewhere(text: str, start: int, iid: str) -> bool:
 
 # --- names and contexts that are not the company, per instrument -----------------
 #
-# OTHER_NAMES above is the linker's own list. Per-instrument exclusions live
-# beside the aliases, in entities.yaml's `not_the_company`, and reach every
-# linker built by `linker_for`:
+# OTHER_NAMES above is the linker's own list. Per-instrument exclusions are
+# NOT_THE_COMPANY below, keyed by instrument id, and reach every linker built
+# by `linker_for`. They live here, not in entities.yaml: that file is
+# human-authored and no agent writes it.
 #
 #   * `names`: longer names that contain an alias and name something else.
 #     "Apple Hospitality REIT (NYSE:APLE)" and "Apple Bank" were linked to
@@ -290,33 +291,29 @@ _TOKEN = re.compile(rf"{_ASCII_WORD}+")
 
 @dataclass(frozen=True)
 class NotTheCompany:
-    """One instrument's entry in entities.yaml's `not_the_company`."""
+    """One instrument's entry in NOT_THE_COMPANY."""
 
     names: tuple[str, ...] = ()
     near: tuple[tuple[str, tuple[str, ...]], ...] = ()
 
 
-@lru_cache(maxsize=1)
+NOT_THE_COMPANY: dict[str, NotTheCompany] = {
+    "XNAS:AAPL": NotTheCompany(
+        names=(
+            "Apple Hospitality",  # NYSE:APLE, a hotel REIT
+            "Apple Bank",  # Apple Bank for Savings, New York
+        ),
+    ),
+    "MYX:5347": NotTheCompany(
+        # TNB is also Nha Be Steel's ticker on Vietnam's UPCoM ("UPCOM:TNB")
+        near=(("TNB", ("UPCOM", "UPCoM", "HOSE", "HNX", "Hanoi", "Vietnam", "Vietnamese")),),
+    ),
+}
+
+
 def configured_exclusions() -> dict[str, NotTheCompany]:
-    """entities.yaml's `not_the_company`, keyed by the id as the file writes it."""
-    import yaml
-
-    from knowledge.graph.ids import ENTITIES_FILE
-
-    if not ENTITIES_FILE.exists():
-        return {}
-    raw = yaml.safe_load(ENTITIES_FILE.read_text(encoding="utf-8")) or {}
-    out: dict[str, NotTheCompany] = {}
-    for iid, entry in (raw.get("not_the_company") or {}).items():
-        entry = entry or {}
-        out[str(iid)] = NotTheCompany(
-            names=tuple(str(n) for n in entry.get("names") or ()),
-            near=tuple(
-                (str(alias), tuple(str(w) for w in words or ()))
-                for alias, words in (entry.get("near") or {}).items()
-            ),
-        )
-    return out
+    """NOT_THE_COMPANY, keyed by instrument id."""
+    return NOT_THE_COMPANY
 
 
 # --- a bank named as the AUTHOR of a broker's note -------------------------------
@@ -647,7 +644,7 @@ class EntityLinker:
         self, index: dict[str, str], exclusions: Mapping[str, NotTheCompany] | None = None
     ) -> None:
         # Longest first so a subsidiary's longer name wins over its parent's.
-        # OTHER_NAMES and each instrument's `not_the_company` names ride along
+        # OTHER_NAMES and each instrument's NOT_THE_COMPANY names ride along
         # with no instrument (''), unless the index names them, in which case
         # the index entry is the one kept.
         exclusions = exclusions or {}
@@ -681,10 +678,10 @@ class EntityLinker:
         2026-10-10, linked "Genting Malaysia posts higher quarterly revenue"
         to Genting Malaysia AND Genting Berhad. Every occurrence is checked,
         not just the first, so "Genting Malaysia ... Genting Berhad" still
-        links both. A match of an OTHER_NAMES or `not_the_company` name
+        links both. A match of an OTHER_NAMES or NOT_THE_COMPANY name
         claims its span and links nothing, and so does one that ends a Malay
         building's name, is a word of a fund's name, sits behind another
-        market's exchange code or near a `not_the_company` word.
+        market's exchange code or near a NOT_THE_COMPANY word.
         """
         claimed: list[tuple[int, int]] = []
         out: list[tuple[int, int, int, str]] = []
@@ -830,7 +827,7 @@ def relinked(article, linker: EntityLinker):
 
 def linker_for(index: dict[str, str]) -> EntityLinker:
     """A linker for this index, compiled once per distinct index, with the
-    exclusions entities.yaml's `not_the_company` configures."""
+    exclusions in NOT_THE_COMPANY."""
     return _cached(tuple(sorted(index.items())))
 
 

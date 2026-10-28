@@ -1045,10 +1045,11 @@ bounded (it upserts). The 45 MiB warning will name either one long before.
 The linker (`knowledge/news/linking.py`) now refuses an alias written behind
 another market's exchange code (`UPCOM:TNB` is Nha Be Steel, not Tenaga;
 `MYX:`, `KLSE:` and `NASDAQ:` still link the book's names), and reads
-`not_the_company` in `knowledge/graph/data/entities.yaml`: `names` that contain
-an alias and are someone else ("Apple Hospitality", "Apple Bank"), and `near`
-words that make a short alias another listing's ticker. **To stop a new false
-link, add it there** - a person edits that file, as with the aliases.
+`NOT_THE_COMPANY` in the same module: `names` that contain an alias and are
+someone else ("Apple Hospitality", "Apple Bank"), and `near` words that make a
+short alias another listing's ticker. **To stop a new false link, add it
+there**, with a test in `tests/test_linker_guards.py`; entities.yaml stays
+human-authored and holds aliases only.
 
 Two kinds of story stay linked but are never a cause: another company's
 contract win (`[mention]`: "Bintai Kinden wins RM20.3mil TNB contract") and an

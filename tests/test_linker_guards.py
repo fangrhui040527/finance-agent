@@ -6,7 +6,7 @@ boundary built from one:
   * An exchange-qualified ticker names the company listed THERE: "Nha Be Steel
     JSC Estimates – UPCOM:TNB" is a Vietnamese steelmaker, and it was linked to
     Tenaga (MYX:5347) on the token alone.
-  * entities.yaml's `not_the_company`: "Apple Hospitality REIT (NYSE:APLE)" and
+  * NOT_THE_COMPANY: "Apple Hospitality REIT (NYSE:APLE)" and
     "Apple Bank" are not Apple Inc; "TNB" beside UPCOM, HOSE or Vietnam is not
     Tenaga.
   * Another company's contract win is a MENTION of its client ("Bintai Kinden
@@ -88,10 +88,10 @@ def test_a_rejected_exchange_link_is_an_excluded_mention_and_recheck_drops_it():
     assert linker.recheck(text, [TENAGA]) == [TENAGA]
 
 
-# --- not_the_company, from entities.yaml ----------------------------------------------
+# --- NOT_THE_COMPANY ----------------------------------------------------------------
 
 
-def test_entities_yaml_configures_the_names_that_are_not_the_company():
+def test_the_linker_lists_the_names_that_are_not_the_company():
     ex = configured_exclusions()
     assert {"Apple Hospitality", "Apple Bank"} <= set(ex["XNAS:AAPL"].names)
     near = dict(ex[TENAGA].near)
