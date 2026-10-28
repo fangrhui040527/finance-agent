@@ -718,6 +718,20 @@ Then read it from anywhere: `ask.py alerts` on the command line, the
 app. An empty history means no rule has been EVALUATED - not that none would
 fire.
 
+### What a runner can reach (2026-10-28)
+
+Dispatch `bursa-feeds-probe` (Bursa's daily PDFs, robots.txt, the trading
+participation page, the FBM100 list, the Malaysian outlets; `bursa_data` alone
+for just Bursa's files) and `macro-alternatives-probe` (BNM OpenAPI and yield
+page, Yahoo BZ=F and ALI=F, Single Buyer AFA, World Bank and its Pink Sheet,
+OpenDOSM parquet, GDELT). Each ends with a "Reachability from this runner"
+table in the job summary: status, content type, final URL, bytes and the first
+200 bytes per target. Read the first bytes before the status - `%PDF` or `PAR1`
+is the file; `<html>` under a 200 is a challenge or an error page. Bursa's
+daily files are asked for the last weekday before the run and for a date known
+to have existed, so a 404 on the first alone is a holiday or a late post, on
+both a wrong path. Read-only, keyless, honest User-Agent, 15s timeouts.
+
 ## Web evidence: searching for what the feeds missed (2026-10-22)
 
 On 2026-10-16 Press Metal fell 9.34%, an idiosyncratic move of 5.43 sigma, and

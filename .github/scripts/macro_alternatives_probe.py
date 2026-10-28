@@ -28,6 +28,14 @@ series sourced from IMF PCPS will be exactly as frozen as DBnomics was, and one
 sourced from the EIA or a central bank will not. Both kinds are probed on
 purpose, so the answer distinguishes them instead of assuming.
 
+REACHABILITY. After the verdicts, a fixed list of keyless sources a collector
+might be built on - BNM's OpenAPI and yield page, Yahoo's chart for Brent and
+aluminium futures, Single Buyer's fuel adjustment page, the World Bank's
+commodity page and the Pink Sheet it links, OpenDOSM parquet files, GDELT's
+last-update file - is asked once each and recorded by reach.py: status,
+content type, final URL, bytes and the first 200 of them. FRED is not in that
+table: its key travels in the URL, and the table prints URLs.
+
 Read-only. FRED needs FRED_API_KEY (already a repository secret); the World
 Bank and BNM candidates are keyless. Stores nothing. Manual: the answer changes
 when a publisher stops, not hourly.
@@ -42,6 +50,11 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from datetime import date, datetime
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+import reach  # noqa: E402
 
 TIMEOUT = 30
 UA = "finance-agent-probe/1.0 (+https://github.com/fangrhui040527/finance-agent)"
@@ -182,6 +195,55 @@ def newest_from_worldbank(_: str) -> tuple[date | None, str]:
     return None, "reachable, but XLSX only - would need a parser, not a collector"
 
 
+BNM_ACCEPT = {"Accept": "application/vnd.BNM.API.v1+json"}
+YAHOO_CHART = "https://query1.finance.yahoo.com/v8/finance/chart/"  # as core/market/feed.py
+WORLDBANK_CMO = "https://www.worldbank.org/en/research/commodity-markets"
+
+#: name -> (url, extra headers). Keyless only: every URL here is printed.
+#: The DOSM paths are unverified; finding out is what the row is for.
+REACH_TARGETS: dict[str, tuple[str, dict[str, str]]] = {
+    "bnm_msb_1.13": ("https://api.bnm.gov.my/public/msb/1.13", BNM_ACCEPT),
+    "bnm_interest_rate": ("https://api.bnm.gov.my/public/interest-rate", BNM_ACCEPT),
+    "bnm_kl_usd_ref_rate": ("https://api.bnm.gov.my/public/kl-usd-reference-rate", BNM_ACCEPT),
+    "bnm_govt_yield_page": ("https://www.bnm.gov.my/government-securities-yield", {}),
+    "yahoo_brent_BZ=F": (
+        f"{YAHOO_CHART}{urllib.parse.quote('BZ=F')}?range=5d&interval=1d",
+        {"Accept": "application/json"},
+    ),
+    "yahoo_aluminium_ALI=F": (
+        f"{YAHOO_CHART}{urllib.parse.quote('ALI=F')}?range=5d&interval=1d",
+        {"Accept": "application/json"},
+    ),
+    "singlebuyer_afa": (
+        "https://singlebuyer.com.my/Generation-Info-Tariff/automatic-fuel-adjustment-(afa)",
+        {},
+    ),
+    "worldbank_cmo_page": (WORLDBANK_CMO, {}),
+    "dosm_ipi_parquet": ("https://storage.dosm.gov.my/ipi/ipi.parquet", {}),
+    "dosm_trade_sitc_1d": ("https://storage.dosm.gov.my/trade/trade_sitc_1d.parquet", {}),
+    "gdelt_lastupdate": ("http://data.gdeltproject.org/gdeltv2/lastupdate.txt", {}),
+}
+
+#: The Pink Sheet's monthly workbook, as the commodity page links it.
+PINK_SHEET_HREF = r"CMO-Historical-Data-Monthly\.xlsx"
+
+
+def probe_reach() -> list[reach.Reach]:
+    """Every REACH_TARGETS row, then the Pink Sheet the World Bank page links.
+    reach.fetch never raises, so one dead host costs one row, not the rest."""
+    rows: list[reach.Reach] = []
+    for name, (url, headers) in REACH_TARGETS.items():
+        r = reach.fetch(name, url, UA, headers)
+        rows.append(r)
+        if url == WORLDBANK_CMO and r.status == 200:
+            links = reach.links_matching(r.body, r.final_url or url, PINK_SHEET_HREF)
+            if links:
+                rows.append(reach.fetch("worldbank_pink_sheet_xlsx", links[0], UA))
+            else:
+                rows.append(reach.Reach("worldbank_pink_sheet_xlsx", url, error="no xlsx href"))
+    return rows
+
+
 FETCHERS = {"fred": newest_from_fred, "bnm": newest_from_bnm, "worldbank": newest_from_worldbank}
 
 
@@ -234,6 +296,7 @@ def main() -> int:
     if summary := os.environ.get("GITHUB_STEP_SUMMARY"):
         with open(summary, "a", encoding="utf-8") as fh:
             fh.write("```\n" + text + "\n```\n")
+    reach.report("Reachability from this runner", probe_reach())
     return 0
 
 

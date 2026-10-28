@@ -30,6 +30,15 @@ WHAT THIS DOES. For each outlet, in order:
      sweep overflowed its window with all 50 items dated (16.8h unseen on
      2026-10-16; fmt_business 1.6h). Which URL fixes that - a second page, or
      a business-only feed whose 50 items reach further - is read off the span.
+  5. BURSA'S OWN FILES. The daily PDFs under /misc/missftp/ (short-selling
+     trade detail, net short positions, the daily scoreboard, key indicators)
+     for the last weekday before the run and for one date known to have
+     existed, the trading-participation page, robots.txt, and wherever the
+     FBM100 constituents list lives. Selected by the name `bursa_data`.
+
+Every URL asked is also recorded in one table - status, content type, final URL
+after redirects, bytes and the first 200 of them - by reach.py, because "HTTP
+200" alone cannot tell a PDF from a bot challenge served with status 200.
 
 Read-only, keyless, stores nothing. Manual: it is a diagnostic, and the answer
 changes when a publisher redesigns, not hourly.
@@ -40,14 +49,18 @@ from __future__ import annotations
 import os
 import re
 import sys
-import urllib.error
 import urllib.parse
-import urllib.request
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from email.utils import parsedate_to_datetime
+from pathlib import Path
 from xml.etree import ElementTree
 
-TIMEOUT = 30
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+import reach  # noqa: E402
+
+#: Short: nine outlets' pages and paths and the Bursa files share a 15-minute job.
+TIMEOUT = 15
 UA = "finance-agent-probe/1.0 (+https://github.com/fangrhui040527/finance-agent)"
 
 #: Outlet -> (pages to read autodiscovery tags from, conventional paths to try).
@@ -62,6 +75,8 @@ OUTLETS: dict[str, tuple[tuple[str, ...], tuple[str, ...]]] = {
             "https://www.thestar.com.my/rss/business",
             "https://www.thestar.com.my/rss/editors-pick",
             "https://www.thestar.com.my/rss",
+            # The page that lists The Star's feeds; paths are case-sensitive.
+            "https://www.thestar.com.my/RSS",
         ),
     ),
     "edge_malaysia": (
@@ -122,7 +137,46 @@ OUTLETS: dict[str, tuple[tuple[str, ...], tuple[str, ...]]] = {
             "https://www.freemalaysiatoday.com/category/business/local-business/feed/",
         ),
     ),
+    # Not registered at all; asked whether they serve dated business items.
+    "malaymail_money": (
+        ("https://www.malaymail.com/",),
+        ("https://www.malaymail.com/feed/rss/money",),
+    ),
+    "malaysian_reserve": (
+        ("https://themalaysianreserve.com/",),
+        ("https://themalaysianreserve.com/feed/",),
+    ),
+    "businesstoday": (
+        ("https://www.businesstoday.com.my/",),
+        ("https://www.businesstoday.com.my/feed/",),
+    ),
+    "bernamabiz": (("https://bernamabiz.com/",), ()),
 }
+
+BURSA = "https://www.bursamalaysia.com"
+MISSFTP = f"{BURSA}/misc/missftp"
+
+#: Daily PDF -> (path with {d} for YYYYMMDD, a day the file is known to have
+#: existed). The known day separates "this path is wrong" from "not posted yet".
+BURSA_DAILY: dict[str, tuple[str, str]] = {
+    "shortsell_trades": ("securities/securities_equities_rss_{d}.pdf", "20260710"),
+    "net_short_position": ("sblnt/NetShortPosition{d}.pdf", "20260717"),
+    "daily_scoreboard": ("securities/securities_equities_daily_scoreboard_{d}.pdf", "20260923"),
+    "key_indicators": ("securities/securities_equities_keyindicators_{d}.pdf", "20260707"),
+}
+
+#: Pages that might link the FBM100 constituents list, which Bursa posts as
+#: FBM100_Constituents_List_<Mon><YYYY>.pdf after the June and December reviews.
+#: Where it lives is unverified - the hrefs are read off these pages.
+FBM100_PAGES: tuple[str, ...] = (
+    f"{BURSA}/trade/our_products_services/indices/ftse_bursa_malaysia_indices",
+    f"{BURSA}/market_information/ftse_bursa_malaysia",
+    "https://www.lseg.com/en/ftse-russell/indices/ftse-bursa-malaysia",
+)
+FBM100_HREF = r"FBM100_Constituents|FBM100[^\"']*\.pdf|constituents?[^\"']*\.pdf"
+
+#: Every URL fetch() asked, in order: the reachability table.
+FETCHED: list[reach.Reach] = []
 
 #: `<link rel="alternate" type="application/rss+xml" href="...">`, attributes in
 #: any order and quoted either way - a publisher's own pointer to its feed.
@@ -130,16 +184,44 @@ LINK_TAG = re.compile(r"<link\b[^>]*>", re.IGNORECASE)
 ATTR = re.compile(r"""(\w[\w:-]*)\s*=\s*["']([^"']*)["']""")
 
 
-def fetch(url: str) -> tuple[int, bytes, str]:
-    """(status, body, error). A non-200 is data here, not an exception."""
-    req = urllib.request.Request(url, headers={"User-Agent": UA})
-    try:
-        with urllib.request.urlopen(req, timeout=TIMEOUT) as r:  # noqa: S310 - fixed hosts
-            return r.status, r.read(), ""
-    except urllib.error.HTTPError as e:
-        return e.code, b"", ""
-    except Exception as e:  # DNS, TLS, timeout: the reason is the finding
-        return 0, b"", f"{type(e).__name__}: {e}"
+def fetch(url: str, name: str = "") -> tuple[int, bytes, str]:
+    """(status, body, error). A non-200 is data here, not an exception.
+
+    Every call is kept in FETCHED, so the reachability table covers each URL
+    the probe asked, not only the ones that answered.
+    """
+    r = reach.fetch(name or urllib.parse.urlsplit(url).netloc, url, UA, timeout=TIMEOUT)
+    FETCHED.append(r)
+    if r.error:
+        return 0, b"", r.error
+    return r.status, (r.body if r.status == 200 else b""), ""
+
+
+def bursa_targets(today: date) -> list[tuple[str, str]]:
+    """(name, url) for Bursa's own files: each daily PDF for the last weekday
+    before today and for its known day, then the fixed pages."""
+    day = reach.last_trading_day(today).strftime("%Y%m%d")
+    out = [("bursa_robots", f"{BURSA}/robots.txt")]
+    for name, (path, known) in BURSA_DAILY.items():
+        for d in dict.fromkeys((day, known)):
+            out.append((f"{name}_{d}", f"{MISSFTP}/{path.format(d=d)}"))
+    out.append(("trading_participation", f"{BURSA}/market_information/market_statistic/securities"))
+    out += [(f"fbm100_page_{i}", page) for i, page in enumerate(FBM100_PAGES)]
+    return out
+
+
+def probe_bursa_data(today: date) -> list[str]:
+    """Ask every Bursa target, then any FBM100 list the index pages link."""
+    last = reach.last_trading_day(today)
+    out = [f"\n=== bursa_data (last weekday before the run: {last}) " + "=" * 8]
+    for name, url in bursa_targets(today):
+        status, body, err = fetch(url, name)
+        out.append(f"  {name:<34} {err or f'HTTP {status}'}")
+        if name.startswith("fbm100_page") and body:
+            for i, link in enumerate(reach.links_matching(body, url, FBM100_HREF)[:5]):
+                status, _, err = fetch(link, f"{name}_link_{i}")
+                out.append(f"    links {link}\n      {err or f'HTTP {status}'}")
+    return out
 
 
 def advertised(html: bytes, base: str) -> list[str]:
@@ -214,8 +296,8 @@ def dated_items(body: bytes) -> tuple[int, int, str]:
     )
 
 
-def probe_url(url: str) -> str:
-    status, body, err = fetch(url)
+def probe_url(url: str, name: str = "") -> str:
+    status, body, err = fetch(url, name)
     if err:
         return f"ERROR   {err}"
     if status != 200:
@@ -239,7 +321,7 @@ def main() -> int:
 
         found: list[str] = []
         for page in pages:
-            status, body, err = fetch(page)
+            status, body, err = fetch(page, name)
             if err or status != 200:
                 out.append(f"  page   {page}\n         {err or f'HTTP {status}'}")
                 continue
@@ -249,7 +331,7 @@ def main() -> int:
             found += links
 
         for url in dict.fromkeys(list(found) + list(candidates)):
-            verdict = probe_url(url)
+            verdict = probe_url(url, name)
             mark = "advertised" if url in found else "candidate "
             out.append(f"  {mark} {url}\n             {verdict}")
             if verdict.startswith("OK"):
@@ -262,14 +344,17 @@ def main() -> int:
     else:
         out += [
             "NO USABLE FEED FOUND. If fmt_business also failed, suspect the runner's",
-            "egress rather than five publishers; fmt_business is the control row.",
+            "egress rather than every publisher at once; fmt_business is the control row.",
         ]
+    if not only or "bursa_data" in only:
+        out += probe_bursa_data(datetime.now(UTC).date())
 
     text = "\n".join(out)
     sys.stdout.write(text + "\n")
     if summary := os.environ.get("GITHUB_STEP_SUMMARY"):
         with open(summary, "a", encoding="utf-8") as fh:
             fh.write("```\n" + text + "\n```\n")
+    reach.report("Reachability from this runner", FETCHED)
     return 0
 
 
