@@ -340,3 +340,87 @@ def test_a_refused_request_is_not_retried_past_the_deadline_or_forever():
     always.create = lambda **kw: (_ for _ in ()).throw(_Refused(503))  # type: ignore[method-assign]
     with pytest.raises(_Refused):
         WebSearch("m", client=always, sleep=lambda s: None).search("s", "p")
+
+
+def test_a_search_that_fails_inside_the_filtering_code_is_kept_as_an_error():
+    """Dynamic filtering runs the searches from code, so a failed search
+    reports its code inside a code-execution result. The first live run hit
+    `max_uses_exceeded` that way and both moves read "nothing found"."""
+
+    class Dumped:  # an SDK object: read through model_dump
+        def model_dump(self):
+            return {
+                "type": "bash_code_execution_tool_result_error",
+                "error_code": "too_many_requests",
+            }
+
+    script = {
+        "type": "code_execution_tool_result",
+        "tool_use_id": "c1",
+        "content": {
+            "type": "code_execution_result",
+            "stdout": 'query 2: {"error_code": "max_uses_exceeded"}\nquery 3: max_uses_exceeded\n'
+            "page text: the service was unavailable for an hour\n",
+            "stderr": "",
+            "return_code": 0,
+        },
+    }
+    failed = {"type": "bash_code_execution_tool_result", "tool_use_id": "c2", "content": Dumped()}
+    a = WebSearch(
+        "m",
+        client=Client(
+            _response([SEARCH, RESULTS, script, failed, {"type": "text", "text": "Nothing."}])
+        ),
+    ).search("s", "p")
+    assert a.errors == ["max_uses_exceeded", "max_uses_exceeded", "too_many_requests"]
+    assert "unavailable" not in a.errors, "a word in page text is not an error code"
+    assert a.blocks == {
+        "server_tool_use": 1,
+        "web_search_tool_result": 1,
+        "code_execution_tool_result": 1,
+        "bash_code_execution_tool_result": 1,
+        "text": 1,
+    }
+
+
+def test_an_error_code_field_is_read_once_not_again_as_text():
+    nested = {
+        "type": "code_execution_tool_result",
+        "content": {"type": "x", "error_code": "max_uses_exceeded"},
+    }
+    a = WebSearch("m", client=Client(_response([nested]))).search("s", "p")
+    assert a.errors == ["max_uses_exceeded"]
+
+
+def test_a_sandbox_error_is_on_the_record_but_is_not_a_failed_search():
+    sandbox = {
+        "type": "text_editor_code_execution_tool_result",
+        "content": {
+            "type": "text_editor_code_execution_tool_result_error",
+            "error_code": "file_not_found",
+        },
+    }
+    timed = {
+        "type": "code_execution_tool_result",
+        "content": {
+            "type": "code_execution_tool_result_error",
+            "error_code": "execution_time_exceeded",
+        },
+    }
+    a = WebSearch(
+        "m",
+        client=Client(
+            _response([SEARCH, RESULTS, sandbox, timed, {"type": "text", "text": "No."}])
+        ),
+    ).search("s", "p")
+    assert a.errors == []
+    assert a.tool_errors == ["file_not_found", "execution_time_exceeded"]
+
+
+def test_request_too_large_reported_by_the_code_is_a_failed_search():
+    script = {
+        "type": "code_execution_tool_result",
+        "content": {"type": "code_execution_result", "stdout": "search failed: request_too_large"},
+    }
+    a = WebSearch("m", client=Client(_response([script]))).search("s", "p")
+    assert a.errors == ["request_too_large"]

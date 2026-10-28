@@ -744,8 +744,11 @@ is searched at that day's us_close slot, a US day at the next bursa_close;
 both before the 22:30Z routine writes the page.
 
 **How.** One Messages call to `claude-opus-5-5` with Anthropic's server-side
-`web_search_20260209` tool (`max_uses` 3, effort medium, the market's country
-as the search location), through `core/llm/websearch.py`. A paused turn is
+`web_search_20260209` tool (`max_uses` 8, effort medium, the market's country
+as the search location), through `core/llm/websearch.py`. The prompt states
+the budget and asks for no repeated query: with `max_uses` 3 the first live run
+(2026-10-28) spent all three on its first idea, the same query twice, and every
+later search failed with `max_uses_exceeded`. A paused turn is
 resumed once, never more. A refusal is recorded and never re-routed. Each leg
 has 180 s, the SDK never retries (a retried timeout is a second paid turn),
 and no leg starts unless it can finish inside the run's 8-minute deadline; the
@@ -776,8 +779,8 @@ under the search that found it.
 ~USD 4-7 a month at the measured trigger rate. Every attempt is a row in
 `evidence_searches` in data/corpus.db - committed by the collector, so it is
 the month's spend record across every run (a runner's own ledger is thrown
-away). Before each search the most it could cost (USD ~1.88: per leg, 150k
-input tokens at the cache-write rate, a full output and three searches; two
+away). Before each search the most it could cost (USD ~1.98: per leg, 150k
+input tokens at the cache-write rate, a full output and eight searches; two
 legs) is reserved against two caps in config.toml [budget]:
 `evidence_monthly_usd` (10) and `monthly_usd` (50, all reasoning: the
 committed evidence spend plus this machine's own ledger). If either would be
@@ -788,6 +791,19 @@ never searched again. A call refused before any work (nothing billed) is an
 billed leg is recorded at that leg's cost (`incomplete`), and a leg that timed
 out at its reserve (`timeout`), since its usage is never seen - both count as
 searched.
+
+**A search whose searches failed is not a finding.** With dynamic filtering
+the model runs its searches from code, so a failed search reports its error
+code inside a code-execution result; `websearch.py` reads error codes from
+every tool-result block, and the record lists them (`search errors:`) with
+a tally of the response's block types (`blocks:`). A paid turn that hit search
+errors and cited nothing is `search_error`, not `nothing_found`, and is
+searched again by the next run - at most two paid tries per move in all. An
+operator can ask for one more try of a move already searched, within the same
+two-try bound and the same caps: `ask.py evidence --retry "MYX:3182|2026-10-26"`
+locally, or the `evidence_retry` input when dispatching collect.yml with a
+`bursa_close` or `us_close` slot. The move must still qualify (within its last
+3 sessions).
 
 **What it needs.** `ANTHROPIC_API_KEY` as a repository secret (or in
 ALL_SECRET, labelled "anthropic"/"claude" or recognised by its `sk-ant-api`

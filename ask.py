@@ -26,6 +26,7 @@ from __future__ import annotations
 import argparse
 import csv
 import random
+import re
 import sys
 from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
@@ -1964,6 +1965,7 @@ def cmd_evidence(a) -> int:
             load_config(),
             dry_run=a.dry_run,
             log=lambda msg: print(msg, file=sys.stderr),
+            retry=tuple(k for k in re.split(r"[,\s]+", a.retry or "") if k),
         )
     except Exception as e:  # noqa: BLE001 - the step reports, the job goes on
         from knowledge.redact import scrub
@@ -2976,6 +2978,13 @@ def main(argv=None) -> int:
         "--dry-run",
         action="store_true",
         help="list the moves that qualify and what is already searched; search nothing",
+    )
+    ev.add_argument(
+        "--retry",
+        default="",
+        metavar="KEYS",
+        help="search these moves once more although already searched, by key "
+        "(MYX:3182|2026-10-26), comma- or space-separated; never past two paid tries",
     )
     ev.set_defaults(fn=cmd_evidence)
 

@@ -63,6 +63,27 @@ TIMEOUT = 180.0
 #: Retries of a request the API refused before running it (REFUSED_STATUSES).
 RETRIES = 2
 
+#: The web search tool's error codes that are distinctive enough to find as
+#: words. With dynamic filtering the model runs its searches from code, and a
+#: search that fails there reports its code inside a code-execution result, not
+#: as a `web_search_tool_result` error object. The first live run (2026-10-28)
+#: hit `max_uses_exceeded` that way on both moves, and both were filed as
+#: "nothing found". `unavailable` is a code too, but as a word it is page text:
+#: it is read only from an `error_code` field.
+SEARCH_ERROR_WORDS = (
+    "max_uses_exceeded",
+    "too_many_requests",
+    "query_too_long",
+    "invalid_tool_input",
+    "request_too_large",
+)
+
+#: The web search tool's error codes. Another code in a code-execution result
+#: (`file_not_found`, `execution_time_exceeded`, ...) is the sandbox's, not a
+#: failed search: it goes on the record (`tool_errors`) and does not make the
+#: turn's searches read as failed.
+SEARCH_ERROR_CODES = (*SEARCH_ERROR_WORDS, "unavailable")
+
 
 @dataclass(frozen=True)
 class Source:
@@ -94,6 +115,11 @@ class SearchAnswer:
     incomplete: bool = False
     #: Legs that timed out: billed or not, their usage was never seen.
     lost_legs: int = 0
+    #: Content block types seen, with counts: on the record, so a turn whose
+    #: shape the reader did not expect can be diagnosed from the record alone.
+    blocks: dict[str, int] = field(default_factory=dict)
+    #: Error codes from code execution that are not the search tool's.
+    tool_errors: list[str] = field(default_factory=list)
 
 
 def _add(a: Usage, b: Usage) -> Usage:
@@ -256,6 +282,17 @@ class WebSearch:
         texts: list[str] = []
         for block in blocks or ():
             kind = _field(block, "type")
+            answer.blocks[str(kind)] = answer.blocks.get(str(kind), 0) + 1
+            if (
+                isinstance(kind, str)
+                and kind.endswith("_tool_result")
+                and kind != "web_search_tool_result"
+            ):
+                # A search run from the filtering code fails inside this block.
+                for code in _error_codes(_field(block, "content")):
+                    (answer.errors if code in SEARCH_ERROR_CODES else answer.tool_errors).append(
+                        code
+                    )
             if kind == "server_tool_use" and _field(block, "name") == "web_search":
                 query = _field(_field(block, "input") or {}, "query")
                 if query:
@@ -298,6 +335,31 @@ class WebSearch:
             else:
                 known[url] = Source(url, title or titles.get(url, ""), age, tuple(snippets))
         answer.sources = list(known.values())
+
+
+def _error_codes(obj, depth: int = 0) -> list[str]:
+    """Every search error code inside a tool result: an `error_code` field at
+    any depth, or one of SEARCH_ERROR_WORDS in its text (a script's stdout,
+    stderr or return value). SDK objects are read through `model_dump`."""
+    if depth > 12 or obj is None:
+        return []
+    dump = getattr(obj, "model_dump", None)
+    if callable(dump):
+        obj = dump()
+    if isinstance(obj, str):
+        return [w for w in SEARCH_ERROR_WORDS for _ in range(obj.count(w))]
+    found: list[str] = []
+    if isinstance(obj, dict):
+        code = obj.get("error_code")
+        if code:
+            found.append(str(code))
+        for key, value in obj.items():
+            if key != "error_code":
+                found.extend(_error_codes(value, depth + 1))
+    elif isinstance(obj, (list, tuple)):
+        for value in obj:
+            found.extend(_error_codes(value, depth + 1))
+    return found
 
 
 def _retry_after(e: Exception) -> float | None:

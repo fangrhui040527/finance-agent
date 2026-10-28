@@ -60,6 +60,10 @@ on:
         description: "collect even if this slot's firing already ran"
         type: boolean
         default: false
+      evidence_retry:
+        description: "web evidence: moves to search once more although already searched, by key (MYX:3182|2026-10-26), comma-separated; never past two paid tries"
+        type: string
+        default: ""
 
 # The sweep COMMITS what it collected. ci.yml is contents: read; this one
 # cannot be.
@@ -282,6 +286,9 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           ALL_SECRET: ${{ secrets.ALL_SECRET }}
           ANTHROPIC_WORKSPACE_ID: ${{ secrets.ANTHROPIC_WORKSPACE_ID }}
+          # An input reaches the script as data in the environment, never
+          # pasted into it: the shell does not parse what an operator typed.
+          EVIDENCE_RETRY: ${{ inputs.evidence_retry }}
           FINPLANET_OFFLINE: "1"
         run: |
           set +e
@@ -294,7 +301,7 @@ jobs:
             export ANTHROPIC_API_KEY
           fi
           unset ALL_SECRET
-          uv run python ask.py evidence
+          uv run python ask.py evidence --retry "${EVIDENCE_RETRY:-}"
           code=$?
           if [ "$code" -ne 0 ]; then
             echo "::warning title=web evidence not searched::ask.py evidence exited $code; see the step log"
