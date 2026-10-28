@@ -968,7 +968,8 @@ def test_the_first_429_ends_the_slot_and_names_the_groups_it_deferred(stores):
     report = _sweep_gdelt(stores, adapters, BOOK_MY + BOOK_US, "all")
     assert adapters.gdelt_requests == 2, "the third group was never asked"
     (r,) = report.results
-    assert r.status == "ok", r.detail  # three read, three refused: not more than half
+    # Three read, six not: never `ok`, whatever the half rule says about it.
+    assert r.status == "throttled" and report.exit_code == 3, r.detail
     assert r.detail.startswith(
         "grouped 3 names per request; 2 requests "
         "(HTTP 429 on request 2: the rest of the slot is deferred, not asked); deferred: "
@@ -979,25 +980,108 @@ def test_the_first_429_ends_the_slot_and_names_the_groups_it_deferred(stores):
     assert "HTTP Error 429" in rest, "the names that were refused still say why"
     with Corpus(corpus_db) as c:
         (sweep,) = c.sweeps()
-        assert sweep["status"] == "ok" and "deferred: " in sweep["detail"]
-        assert c.last_success("gdelt") is not None, "the group that WAS read moves the watermark"
+        assert sweep["status"] == "throttled" and "deferred: " in sweep["detail"]
+        # The six names held back were not read over this window; the next run
+        # asks over it again and the corpus dedupes what the first group stored.
+        assert c.last_success("gdelt") is None, "a throttled run holds the watermark"
 
 
-def test_a_429_on_the_first_request_is_a_failed_row_that_still_names_the_deferred(stores):
-    """Nothing read, so the watermark stays and the row is failed - and the six
-    names never asked are named in it, because a failed row listing three
-    companies reads as three companies with a problem."""
+def test_a_429_on_the_first_request_is_a_throttled_row_that_still_names_the_deferred(stores):
+    """Nothing read, so the watermark stays and the row is throttled - not
+    failed, since nothing is broken, and not ok - and the six names never asked
+    are named in it, because a row listing three companies reads as three
+    companies with a problem."""
     corpus_db, _ = stores
     adapters = RefusingAdapters(refuse_request=1)
     report = _sweep_gdelt(stores, adapters, BOOK_MY + BOOK_US, "all")
     assert adapters.gdelt_requests == 1
     (r,) = report.results
-    assert r.status == "failed" and report.exit_code == 3
+    assert r.status == "throttled" and report.exit_code == 3
+    assert r.detail.startswith("throttled: "), r.detail
     assert "no name could be read" in r.detail and "429" in r.detail, r.detail
     deferred = r.detail.split("deferred: ", 1)[1].split(";")[0]
     assert len(deferred.split(", ")) == 6, deferred
     with Corpus(corpus_db) as c:
         assert c.last_success("gdelt") is None
+
+
+class ScriptedGdelt:
+    """adapter_for double that builds the REAL GdeltFeed over a scripted opener.
+
+    The N-th gdelt request is answered with the N-th body, so what the sweep
+    sees is what the adapter makes of an HTTP 200 - not an exception a test
+    chose for it.
+    """
+
+    def __init__(self, *bodies: str):
+        self.bodies = list(bodies)
+        self.requests = 0
+
+    def __call__(self, name, **kw):
+        from knowledge.feeds.adapter import GdeltFeed
+        from tests.conftest import FakeResponse
+
+        def opener(req, timeout=None):
+            self.requests += 1
+            return FakeResponse(self.bodies[self.requests - 1])
+
+        return GdeltFeed(opener=opener, sleep=lambda s: None, **kw)
+
+
+def test_an_empty_200_after_a_quiet_group_is_throttled_and_never_ok_with_0_rows(stores):
+    """The row this exists to prevent: the first group quiet (`{}`), the second
+    an empty 200. Read as a decode failure that was three read, three failed -
+    not more than half - and so `ok` with nothing stored, and the third group
+    asked on a spent quota. It is a throttle: the slot stops, the row says so."""
+    corpus_db, _ = stores
+    adapters = ScriptedGdelt("{}", "", '{"articles": []}')
+    report = _sweep_gdelt(stores, adapters, BOOK_MY + BOOK_US, "all")
+    assert adapters.requests == 2, "the third group was never asked"
+    (r,) = report.results
+    assert r.status == "throttled" and report.exit_code == 3, r.detail
+    assert "(empty 200 on request 2: the rest of the slot is deferred, not asked)" in r.detail
+    with Corpus(corpus_db) as c:
+        (sweep,) = c.sweeps()
+        assert sweep["status"] == "throttled", sweep["detail"]
+        assert c.last_success("gdelt") is None
+
+
+def test_a_rate_notice_on_the_first_request_stops_gdelt_for_the_run(stores):
+    """GDELT's plain-text rate notice on request one: nothing more is asked,
+    and the row is throttled with the notice as its reason, not failed."""
+    corpus_db, _ = stores
+    notice = "Please limit requests to one every 5 seconds."
+    adapters = ScriptedGdelt(notice, "{}", "{}")
+    report = _sweep_gdelt(stores, adapters, BOOK_MY + BOOK_US, "all")
+    assert adapters.requests == 1
+    (r,) = report.results
+    assert r.status == "throttled" and "limit requests" in r.detail, r.detail
+    assert "rate notice on request 1" in r.detail, r.detail
+    with Corpus(corpus_db) as c:
+        (sweep,) = c.sweeps()
+        assert sweep["status"] == "throttled"
+        assert c.last_success("gdelt") is None
+
+
+def test_a_throttle_still_leads_the_row_when_names_are_asked_one_at_a_time(stores, monkeypatch):
+    """The "on request N" clause rode on the grouping note, so a GDELT asked
+    one name per request would have been throttled with the reason only in
+    the per-name list. It leads the row either way."""
+    from dataclasses import replace
+
+    from knowledge.sources import catalog
+
+    monkeypatch.setitem(
+        catalog.CATALOG, "gdelt", replace(catalog.CATALOG["gdelt"], names_per_request=1)
+    )
+    adapters = ScriptedGdelt("{}", "")
+    report = _sweep_gdelt(stores, adapters, BOOK_US, "all")
+    assert adapters.requests == 2
+    (r,) = report.results
+    assert r.status == "throttled", r.detail
+    assert r.detail.startswith(
+        "empty 200 on request 2: the rest of the slot is deferred, not asked; deferred: "
+    ), r.detail
 
 
 def test_a_plain_failure_on_one_group_does_not_defer_the_others(stores):

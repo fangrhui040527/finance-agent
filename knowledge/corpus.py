@@ -59,6 +59,13 @@ FAILED = "failed"
 #: back - a status the writer cannot spell is a status the reader never sees,
 #: which is exactly what happened. See `last_success` and defect log §20.
 DEGRADED = "degraded"
+#: A run the SOURCE stopped: it answered 429 (or a 200 with nothing in it) and
+#: the sweep asked it nothing more that run. Not `ok` even when an earlier
+#: request was read, because the names it held back were not; and not read for
+#: the watermark (`last_success`), so the next run asks over their window again
+#: instead of starting two hours short of where the throttle cut in. The corpus
+#: dedupes what the earlier request already stored.
+THROTTLED = "throttled"
 
 #: How much of a long doc_id a page prints (`Corpus.short_ids`). Every Google
 #: News key opens with the same ~50 characters - host, path and the token's
