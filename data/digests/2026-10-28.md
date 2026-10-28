@@ -1,6 +1,6 @@
 # Digest 2026-10-28
 
-Generated 2026-10-28 10:11 UTC · slot `all` · 26403 articles in the corpus, 6349 observations, 4256 events in the fact book.
+Generated 2026-10-28 14:09 UTC · slot `all` · 26419 articles in the corpus, 6349 observations, 4258 events in the fact book.
 
 ## The book
 
@@ -76,27 +76,31 @@ Generated 2026-10-28 10:11 UTC · slot `all` · 26403 articles in the corpus, 63
 
 | series | latest | as of | change | source |
 |---|---|---|---|---|
-| ICE BofA US high-yield option-adjusted spread, % | 3.38 | 2026-10-23 | -0.02 | fred |
+| ICE BofA US high-yield option-adjusted spread, % | 3.30 | 2026-10-26 | -0.08 | fred |
 | BNM Overnight Policy Rate, % | 2.75 | 2026-09-03 | +0 | bnm_opr |
 | US CPI, all items, index 1982-84=100 | 336.30 | 2026-09-01 | +2.167 | fred |
 | Brent crude, USD per barrel (EIA, daily) | 115.22 | 2026-10-20 | -3.6 | fred |
-| Malaysian ringgit per US dollar | 4.08 | 2026-10-16 | -0.0009 | fred |
-| Federal funds effective rate, % | 3.88 | 2026-10-22 | +0 | fred |
-| 10-year Treasury yield, % | 4.96 | 2026-10-22 | -0.17 | fred |
-| 2-year Treasury yield, % | 4.65 | 2026-10-22 | -0.16 | fred |
+| Malaysian ringgit per US dollar | 4.08 | 2026-10-23 | +0.0024 | fred |
+| Federal funds effective rate, % | 3.88 | 2026-10-26 | +0 | fred |
+| 10-year Treasury yield, % | 5 | 2026-10-26 | +0 | fred |
+| 2-year Treasury yield, % | 4.68 | 2026-10-26 | -0.01 | fred |
 | Malaysia CPI headline, index 2010=100 | 137.60 | 2026-09-01 | +0.1 | dosm_cpi |
-| Broad US dollar index | 121.40 | 2026-10-16 | -0.1645 | fred |
-| NASDAQ Composite, index level | 25,955.34 | 2026-10-23 | -53.52 | fred |
+| Broad US dollar index | 121.32 | 2026-10-23 | -0.0329 | fred |
+| NASDAQ Composite, index level | 26,477.81 | 2026-10-27 | +308.43 | fred |
 | Aluminium, USD per tonne (IMF PCPS via FRED) | 3,283.05 | 2026-09-01 | +32.9329 | fred |
-| S&P 500, index level | 7,623.68 | 2026-10-23 | -39.75 | fred |
-| 10y minus 2y Treasury spread, % | 0.31 | 2026-10-23 | +0 | fred |
+| S&P 500, index level | 7,722.60 | 2026-10-27 | +45.83 | fred |
+| 10y minus 2y Treasury spread, % | 0.29 | 2026-10-27 | -0.03 | fred |
 | US unemployment rate, % | 4.20 | 2026-09-01 | +0.1 | fred |
-| CBOE VIX, index | 19.45 | 2026-10-23 | +0.42 | fred |
+| CBOE VIX, index | 17.52 | 2026-10-27 | -0.87 | fred |
 
 ## Collection
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 14:09 | dbnomics | ok | 450 | 0 | 0 | facts 0;  |
+| 14:09 | jin10_flash | degraded | 17 | 17 | 16 | facts 0; window not covered back to 2026-10-28 10:10Z; the oldest item read is 2 |
+| 14:09 | fred | ok | 475 | 0 | 0 | facts 29; release calendar: 'FOMC Press Release' listed on 15 days of the fortni |
+| 14:09 | fmp | failed | 0 | 0 | 0 | every endpoint failed. First: XNAS:NVDA _grades: fmp: the key was refused (HTTP  |
 | 10:10 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
 | 10:10 | twse_openapi | ok | 8 | 0 | 0 | facts 5;  |
 | 10:10 | jin10_flash | degraded | 16 | 15 | 15 | facts 0; window not covered back to 2026-10-27 22:43Z; the oldest item read is 2 |
