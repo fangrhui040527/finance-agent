@@ -1,6 +1,6 @@
 # Digest 2026-10-28
 
-Generated 2026-10-28 14:09 UTC · slot `all` · 26419 articles in the corpus, 6349 observations, 4258 events in the fact book.
+Generated 2026-10-28 14:13 UTC · slot `all` · 26477 articles in the corpus, 6349 observations, 4258 events in the fact book.
 
 ## The book
 
@@ -28,7 +28,8 @@ Generated 2026-10-28 14:09 UTC · slot `all` · 26419 articles in the corpus, 63
 - quiet: nothing collected for this name in the window
 
 ### Genting (MYX:3182)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.38 · 0 escalated
+- 2026-10-28 www.freemalaysiatoday.com — Foreigner held for alleged assault, damage at Genting casino [q 1.00, tone +0.0]
 
 ### NVIDIA (XNAS:NVDA)
 - tone: 43 stories from 20 sources, polarity +0.02, peak intensity 0.00, uncertainty 0.14 · 6 escalated
@@ -97,6 +98,15 @@ Generated 2026-10-28 14:09 UTC · slot `all` · 26419 articles in the corpus, 63
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 14:12 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
+| 14:12 | twse_openapi | ok | 8 | 0 | 0 | facts 0;  |
+| 14:12 | jin10_flash | ok | 4 | 4 | 4 | facts 0;  |
+| 14:12 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 14:12 | nst_business | ok | 44 | 44 | 41 |  |
+| 14:12 | fmt_business | ok | 11 | 11 | 11 |  |
+| 14:12 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Maybank, Tenaga, Petronas Chemicals, IHH, Press Metal, Genting |
+| 14:12 | google_news | ok | 2 | 2 | 2 | read but empty: Maybank, Petronas Chemicals, IHH, Press Metal; named the company |
+| 14:12 | gdelt | ok | 0 | 0 | 0 | grouped 3 names per request; 2 requests (HTTP 429 on request 2: the rest of the  |
 | 14:09 | dbnomics | ok | 450 | 0 | 0 | facts 0;  |
 | 14:09 | jin10_flash | degraded | 17 | 17 | 16 | facts 0; window not covered back to 2026-10-28 10:10Z; the oldest item read is 2 |
 | 14:09 | fred | ok | 475 | 0 | 0 | facts 29; release calendar: 'FOMC Press Release' listed on 15 days of the fortni |
