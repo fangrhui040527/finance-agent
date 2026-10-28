@@ -211,3 +211,90 @@ def test_one_dead_target_does_not_stop_the_rest_and_the_pink_sheet_is_followed(m
     xlsx = "https://thedocs.worldbank.org/x/CMO-Historical-Data-Monthly.xlsx"
     assert asked[asked.index(macro.WORLDBANK_CMO) + 1] == xlsx
     assert any(r.error for r in rows) and rows[-1].name == "gdelt_lastupdate"
+
+
+def test_the_bursa_day_skips_its_holidays_and_falls_back_to_weekdays(monkeypatch):
+    # 2026-11-09 is Deepavali on the XKLS calendar: the day after asks for Friday.
+    assert bursa.last_bursa_day(date(2026, 11, 10)) == date(2026, 11, 6)
+    assert bursa.last_bursa_day(date(2026, 10, 26)) == date(2026, 10, 23)
+    monkeypatch.setitem(__import__("sys").modules, "markets.registry", None)  # import fails
+    assert bursa.last_bursa_day(date(2026, 11, 10)) == date(2026, 11, 9)
+
+
+def test_fbm100_links_resolve_after_redirects_and_fbm100_comes_first(monkeypatch):
+    page = "https://www.lseg.com/en/ftse-russell/indices/ftse-bursa-malaysia"
+    moved = "https://www.lseg.com/content/dam/ftse/index/"
+    others = "".join(f'<a href="KLCI_{i}_constituents.pdf">x</a>' for i in range(6))
+    html = (others + '<a href="FBM100_Constituents_List_Jun2026.pdf">x</a>').encode()
+    asked: list[str] = []
+
+    def fake(name, url, ua, headers=None, timeout=reach.TIMEOUT):
+        asked.append(url)
+        final = moved if url == page else url
+        return reach.Reach(name, url, status=200, final_url=final, body=html)
+
+    monkeypatch.setattr(bursa, "FETCHED", [])
+    monkeypatch.setattr(bursa, "FBM100_PAGES", (page,))
+    monkeypatch.setattr(reach, "fetch", fake)
+    bursa.probe_bursa_data(date(2026, 10, 28))
+    followed = asked[asked.index(page) + 1 :]
+    assert len(followed) == 5, followed
+    assert followed[0] == moved + "FBM100_Constituents_List_Jun2026.pdf"
+
+
+def test_past_the_budget_a_url_is_recorded_as_skipped_not_asked(monkeypatch):
+    def boom(*a, **k):
+        raise AssertionError("asked the network past the budget")
+
+    monkeypatch.setattr(bursa, "FETCHED", [])
+    monkeypatch.setattr(reach, "fetch", boom)
+    monkeypatch.setattr(bursa, "STARTED", bursa.time.monotonic() - bursa.BUDGET - 1)
+    status, body, err = bursa.fetch("https://www.bursamalaysia.com/robots.txt", "bursa_robots")
+    assert (status, body) == (0, b"") and err.startswith("skipped")
+    assert bursa.FETCHED[-1].error == err and bursa.FETCHED[-1].name == "bursa_robots"
+
+
+def test_bursa_data_alone_gets_no_outlet_verdict_and_blocks_reach_the_summary(
+    monkeypatch, tmp_path
+):
+    summary = tmp_path / "summary.md"
+    monkeypatch.setenv("GITHUB_STEP_SUMMARY", str(summary))
+    monkeypatch.setattr(bursa.sys, "argv", ["probe", "bursa_data"])
+    monkeypatch.setattr(bursa, "FETCHED", [])
+    blocks: list[str] = []
+    real_emit = bursa.emit
+
+    def spy(lines):
+        blocks.append("\n".join(lines))
+        real_emit(lines)
+
+    monkeypatch.setattr(bursa, "emit", spy)
+    monkeypatch.setattr(
+        reach,
+        "fetch",
+        lambda name, url, ua, headers=None, timeout=15: reach.Reach(name, url, status=404),
+    )
+    assert bursa.main() == 0
+    text = summary.read_text()
+    assert "NO USABLE FEED" not in text and "Malaysian business feeds" not in text
+    assert "bursa_data" in text and "Reachability from this runner" in text
+    assert len(blocks) == 1, blocks
+
+
+def test_each_outlet_block_is_written_as_it_finishes(monkeypatch, tmp_path):
+    summary = tmp_path / "summary.md"
+    monkeypatch.setenv("GITHUB_STEP_SUMMARY", str(summary))
+    monkeypatch.setattr(bursa.sys, "argv", ["probe", "bernamabiz", "malaymail_money"])
+    monkeypatch.setattr(bursa, "FETCHED", [])
+    seen_at_fetch: list[str] = []
+
+    def fake(name, url, ua, headers=None, timeout=15):
+        seen_at_fetch.append(summary.read_text() if summary.exists() else "")
+        return reach.Reach(name, url, error="URLError: refused")
+
+    monkeypatch.setattr(reach, "fetch", fake)
+    bursa.main()
+    # By the time bernamabiz is asked, malaymail's block is already in the summary.
+    assert "=== malaymail_money" in seen_at_fetch[-1]
+    assert "=== bernamabiz" not in seen_at_fetch[-1]
+    assert "NO USABLE FEED FOUND" in summary.read_text()

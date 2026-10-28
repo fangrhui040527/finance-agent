@@ -728,9 +728,11 @@ OpenDOSM parquet, GDELT). Each ends with a "Reachability from this runner"
 table in the job summary: status, content type, final URL, bytes and the first
 200 bytes per target. Read the first bytes before the status - `%PDF` or `PAR1`
 is the file; `<html>` under a 200 is a challenge or an error page. Bursa's
-daily files are asked for the last weekday before the run and for a date known
-to have existed, so a 404 on the first alone is a holiday or a late post, on
-both a wrong path. Read-only, keyless, honest User-Agent, 15s timeouts.
+daily files are asked for the last Bursa session before the run (MYT, XKLS
+holidays skipped) and for a date known to have existed, so a 404 on the first
+alone is a late post, on both a wrong path. Read-only, keyless, honest
+User-Agent, 15s timeouts; the Bursa probe stops asking after 12 minutes and
+records the rest as skipped, and writes each block to the summary as it ends.
 
 ## Web evidence: searching for what the feeds missed (2026-10-22)
 

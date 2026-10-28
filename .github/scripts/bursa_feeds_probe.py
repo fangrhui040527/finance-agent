@@ -32,8 +32,8 @@ WHAT THIS DOES. For each outlet, in order:
      a business-only feed whose 50 items reach further - is read off the span.
   5. BURSA'S OWN FILES. The daily PDFs under /misc/missftp/ (short-selling
      trade detail, net short positions, the daily scoreboard, key indicators)
-     for the last weekday before the run and for one date known to have
-     existed, the trading-participation page, robots.txt, and wherever the
+     for the last Bursa session before the run and for one date known to
+     have existed, the trading-participation page, robots.txt, and wherever the
      FBM100 constituents list lives. Selected by the name `bursa_data`.
 
 Every URL asked is also recorded in one table - status, content type, final URL
@@ -49,8 +49,9 @@ from __future__ import annotations
 import os
 import re
 import sys
+import time
 import urllib.parse
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta, timezone
 from email.utils import parsedate_to_datetime
 from pathlib import Path
 from xml.etree import ElementTree
@@ -61,6 +62,13 @@ import reach  # noqa: E402
 
 #: Short: nine outlets' pages and paths and the Bursa files share a 15-minute job.
 TIMEOUT = 15
+#: Seconds of asking before every remaining URL is recorded as skipped rather
+#: than fetched. About 80 URLs at 15s each would outlast the job, and a job
+#: cancelled at its limit loses the reachability table; this leaves the install
+#: and one last slow answer room inside the 15 minutes.
+BUDGET = 12 * 60
+#: When the asking started; main() resets it, fetch() measures BUDGET from it.
+STARTED = time.monotonic()
 UA = "finance-agent-probe/1.0 (+https://github.com/fangrhui040527/finance-agent)"
 
 #: Outlet -> (pages to read autodiscovery tags from, conventional paths to try).
@@ -154,6 +162,8 @@ OUTLETS: dict[str, tuple[tuple[str, ...], tuple[str, ...]]] = {
 }
 
 BURSA = "https://www.bursamalaysia.com"
+#: Bursa's day turns over at midnight MYT, eight hours before UTC's does.
+MYT = timezone(timedelta(hours=8))
 MISSFTP = f"{BURSA}/misc/missftp"
 
 #: Daily PDF -> (path with {d} for YYYYMMDD, a day the file is known to have
@@ -190,17 +200,42 @@ def fetch(url: str, name: str = "") -> tuple[int, bytes, str]:
     Every call is kept in FETCHED, so the reachability table covers each URL
     the probe asked, not only the ones that answered.
     """
-    r = reach.fetch(name or urllib.parse.urlsplit(url).netloc, url, UA, timeout=TIMEOUT)
+    name = name or urllib.parse.urlsplit(url).netloc
+    if time.monotonic() - STARTED > BUDGET:
+        r = reach.Reach(name, url, error=f"skipped: the probe's {BUDGET}s were spent")
+    else:
+        r = reach.fetch(name, url, UA, timeout=TIMEOUT)
     FETCHED.append(r)
     if r.error:
         return 0, b"", r.error
     return r.status, (r.body if r.status == 200 else b""), ""
 
 
+def last_bursa_day(today: date) -> date:
+    """The last Bursa session strictly before today.
+
+    Read off the XKLS calendar, which knows Bursa's holidays, so the day after
+    one asks for a file that can exist. Weekends only (reach's rule) when the
+    calendar cannot be loaded.
+    """
+    try:
+        from markets.registry import get
+
+        calendar = get("XKLS").calendar
+    except (ImportError, KeyError, ValueError):
+        return reach.last_trading_day(today)
+    d = today - timedelta(days=1)
+    for _ in range(14):
+        if calendar.session(d) is not None:
+            return d
+        d -= timedelta(days=1)
+    return reach.last_trading_day(today)
+
+
 def bursa_targets(today: date) -> list[tuple[str, str]]:
-    """(name, url) for Bursa's own files: each daily PDF for the last weekday
+    """(name, url) for Bursa's own files: each daily PDF for the last session
     before today and for its known day, then the fixed pages."""
-    day = reach.last_trading_day(today).strftime("%Y%m%d")
+    day = last_bursa_day(today).strftime("%Y%m%d")
     out = [("bursa_robots", f"{BURSA}/robots.txt")]
     for name, (path, known) in BURSA_DAILY.items():
         for d in dict.fromkeys((day, known)):
@@ -211,14 +246,20 @@ def bursa_targets(today: date) -> list[tuple[str, str]]:
 
 
 def probe_bursa_data(today: date) -> list[str]:
-    """Ask every Bursa target, then any FBM100 list the index pages link."""
-    last = reach.last_trading_day(today)
-    out = [f"\n=== bursa_data (last weekday before the run: {last}) " + "=" * 8]
+    """Ask every Bursa target, then any FBM100 list the index pages link.
+
+    Hrefs are resolved against where the page ended up after redirects, and
+    the ones naming FBM100 are followed before other indices' constituents.
+    """
+    last = last_bursa_day(today)
+    out = [f"\n=== bursa_data (last session before the run: {last}) " + "=" * 8]
     for name, url in bursa_targets(today):
         status, body, err = fetch(url, name)
         out.append(f"  {name:<34} {err or f'HTTP {status}'}")
         if name.startswith("fbm100_page") and body:
-            for i, link in enumerate(reach.links_matching(body, url, FBM100_HREF)[:5]):
+            links = reach.links_matching(body, FETCHED[-1].final_url or url, FBM100_HREF)
+            links.sort(key=lambda link: "fbm100" not in link.lower())
+            for i, link in enumerate(links[:5]):
                 status, _, err = fetch(link, f"{name}_link_{i}")
                 out.append(f"    links {link}\n      {err or f'HTTP {status}'}")
     return out
@@ -310,14 +351,34 @@ def probe_url(url: str, name: str = "") -> str:
     return f"NO FEED {note}"
 
 
+def emit(lines: list[str]) -> None:
+    """One finished block into the job log and the step summary, at once.
+
+    Not held to the end: a run cancelled at the job's limit still shows every
+    block that finished before it.
+    """
+    text = "\n".join(lines)
+    sys.stdout.write(text + "\n")
+    sys.stdout.flush()
+    if summary := os.environ.get("GITHUB_STEP_SUMMARY"):
+        with open(summary, "a", encoding="utf-8") as fh:
+            fh.write("```\n" + text + "\n```\n")
+
+
 def main() -> int:
+    global STARTED
+    STARTED = time.monotonic()
     only = set(sys.argv[1:])
     usable: list[tuple[str, str]] = []
-    out: list[str] = ["## Malaysian business feeds", ""]
+    # `bursa_data` alone asks no outlet, so it gets no outlet verdict either:
+    # "no usable feed" there would be about feeds nobody asked for.
+    outlets = not only or bool(only & OUTLETS.keys())
+    if outlets:
+        emit(["## Malaysian business feeds"])
     for name, (pages, candidates) in OUTLETS.items():
         if only and name not in only:
             continue
-        out.append(f"\n=== {name} " + "=" * (56 - len(name)))
+        out = [f"\n=== {name} " + "=" * (56 - len(name))]
 
         found: list[str] = []
         for page in pages:
@@ -336,24 +397,22 @@ def main() -> int:
             out.append(f"  {mark} {url}\n             {verdict}")
             if verdict.startswith("OK"):
                 usable.append((name, url))
+        emit(out)
 
-    out.append("\n" + "=" * 64)
-    if usable:
-        out.append("USABLE FEEDS (items with dates) - the ones worth enabling:")
-        out += [f"  {name:<20} {url}" for name, url in usable]
-    else:
-        out += [
-            "NO USABLE FEED FOUND. If fmt_business also failed, suspect the runner's",
-            "egress rather than every publisher at once; fmt_business is the control row.",
-        ]
+    if outlets:
+        out = ["\n" + "=" * 64]
+        if usable:
+            out.append("USABLE FEEDS (items with dates) - the ones worth enabling:")
+            out += [f"  {name:<20} {url}" for name, url in usable]
+        else:
+            out += [
+                "NO USABLE FEED FOUND. If fmt_business also failed, suspect the runner's",
+                "egress rather than every publisher at once; fmt_business is the control row.",
+            ]
+        emit(out)
     if not only or "bursa_data" in only:
-        out += probe_bursa_data(datetime.now(UTC).date())
+        emit(probe_bursa_data(datetime.now(MYT).date()))
 
-    text = "\n".join(out)
-    sys.stdout.write(text + "\n")
-    if summary := os.environ.get("GITHUB_STEP_SUMMARY"):
-        with open(summary, "a", encoding="utf-8") as fh:
-            fh.write("```\n" + text + "\n```\n")
     reach.report("Reachability from this runner", FETCHED)
     return 0
 
