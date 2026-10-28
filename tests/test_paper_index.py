@@ -9,11 +9,14 @@ whole lots, under the control's own phases, floor, fees and rebalance clock.
 from __future__ import annotations
 
 import json
+import re
+from collections import Counter
 from datetime import UTC, date, datetime
 from decimal import Decimal
 from pathlib import Path
 
 import pytest
+import yaml
 
 from core.market.cache import PriceCache
 from core.market.feed import ChainedFeed, YahooFeed
@@ -25,6 +28,7 @@ from engines.paper.settings import PaperSettings
 from engines.paper.store import CONTROL, DECIDED, INDEX, PaperStore
 from engines.paper.universe import (
     AGREES,
+    DEFAULT_UNIVERSE,
     DISAGREES,
     UNVERIFIED,
     check,
@@ -122,14 +126,44 @@ def _fund(iid, lot_usd, lot=100, error=""):
 # -- the shipped universe -------------------------------------------------------------
 
 
-def test_the_shipped_fbm100_file_is_a_hundred_distinct_bursa_codes():
+#: A Bursa stock code: four digits, and a letter or two for a class or a
+#: stapled security (KLCC Property's 5235SS).
+BURSA_ID = re.compile(r"MYX:\d{4}[A-Z]{0,2}")
+
+
+def test_the_shipped_fbm100_file_is_distinct_bursa_codes_in_its_declared_segments():
     u = load_universe()
-    assert len(u.members) == 100 == len(set(u.ids))
-    assert all(iid.startswith("MYX:") and iid[4:].isalnum() or "SS" in iid for iid in u.ids)
-    segments = [m.segment for m in u.members]
-    assert segments.count("KLCI") == 30 and segments.count("MID70") == 70
-    # Not yet checked against Bursa's list, and the file says so where a reader looks.
-    assert "memory" in u.source
+    raw = yaml.safe_load(DEFAULT_UNIVERSE.read_text(encoding="utf-8"))
+    assert len(u.members) == len(set(u.ids))
+    assert all(BURSA_ID.fullmatch(iid) for iid in u.ids), [
+        i for i in u.ids if not BURSA_ID.fullmatch(i)
+    ]
+    assert all(m.name and m.segment for m in u.members)
+    # The file says what each segment holds, and holds that: 30 + 69 after the
+    # June 2026 review (one Mid 70 name unidentified), 50 + 50 once the December
+    # 2026 KLCI enhancement is applied - so no count is written here.
+    declared = raw["segments"]
+    held = Counter(m.segment for m in u.members)
+    assert held == Counter(declared)
+    assert len(u.members) == sum(declared.values()) <= 100
+    assert declared["KLCI"] <= 50
+    # Still partly from memory, and the file says so where a reader looks.
+    assert u.as_of and u.review and "memory" in u.source
+
+
+def test_declared_segments_take_a_fifty_name_klci(tmp_path):
+    """The loader caps nothing at 30: a December 2026 file with 50 KLCI names loads."""
+    rows = [f'  - {{id: "MYX:{i:04d}", name: "Name {i}", segment: KLCI}}' for i in range(1, 51)]
+    rows += [f'  - {{id: "MYX:{i:04d}", name: "Name {i}", segment: MID70}}' for i in range(51, 101)]
+    p = tmp_path / "fbm100.yaml"
+    p.write_text(
+        "as_of: 2026-12-21\nsource: test\nreview: December 2026\n"
+        "segments: {KLCI: 50, MID70: 50}\nnames:\n" + "\n".join(rows) + "\n",
+        encoding="utf-8",
+    )
+    u = load_universe(p)
+    assert Counter(m.segment for m in u.members) == {"KLCI": 50, "MID70": 50}
+    assert u.review == "December 2026"
 
 
 @pytest.mark.parametrize(
@@ -460,13 +494,14 @@ def test_paper_init_index_opens_once_on_an_open_ledger(tmp_path, capsys, monkeyp
     capsys.readouterr()
     assert ask.main(["paper", "init", "--index", "--db", db, "--date", "2026-09-25"]) == 0
     out = capsys.readouterr().out
+    shipped = len(load_universe().members)
     assert "opened the index book" in out and "notional USD 1,000,000.00" in out
-    assert "100 names" in out and "engines/paper/data/fbm100.yaml" in out
+    assert f"{shipped} names" in out and "engines/paper/data/fbm100.yaml" in out
     with PaperStore(db) as store:
         assert store.book_opened_on(INDEX) == date(2026, 9, 25)
         terms = store.book_terms(INDEX)
         assert terms["universe"] == "engines/paper/data/fbm100.yaml"
-        assert terms["universe_names"] == 100 and terms["start_date"] == "2026-09-08"
+        assert terms["universe_names"] == shipped and terms["start_date"] == "2026-09-08"
         assert store.initial_cash(DECIDED) == Decimal(1000)
     assert ask.main(["paper", "init", "--index", "--db", db, "--date", "2026-09-26"]) == 2
     assert "no reset" in capsys.readouterr().err

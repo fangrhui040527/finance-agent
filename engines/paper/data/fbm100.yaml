@@ -1,23 +1,84 @@
 # The index book's universe: Bursa's FTSE Bursa Malaysia Top 100 (FBM100) -
-# the 30 FBM KLCI names plus the 70 FBM Mid 70 names - as best known on
-# 2026-09-25.
+# the 30 FBM KLCI names plus the 70 FBM Mid 70 names - after the June 2026
+# semi-annual review (effective 2026-06-22).
 #
-# NOT YET CHECKED against the official constituent list. Bursa publishes it as
+# STILL NOT the official constituent list. Bursa publishes that as
 # FBM100_Constituents_List_<Mon><YYYY>.pdf after each June and December review;
-# the session that wrote this file could not reach bursamalaysia.com, so the
-# names below come from memory and will be wrong in places: a name that left the
-# index, one that joined it, a code that moved. The collector checks each code
-# against the company name Yahoo reports for it (`ask.py paper universe`) and the
-# index book skips any name that does not match or has no price, so a wrong code
-# costs a slot, never a wrong company's prices. Replace this list with the
-# official one when it is to hand, and record the review it came from below.
+# no session has yet been able to open bursamalaysia.com or lseg.com. The list
+# was first written from memory on 2026-09-25, then corrected on 2026-10-28 by
+# replaying every published review change since June 2024 over it (the June
+# 2024 KLCI list, the December 2024, June 2025, December 2025 and June 2026
+# reviews, the March 2026 fast entry) - each change read from web-search
+# extracts of the FTSE Russell / Bursa releases and the press reports quoting
+# them, cited on the line it touched. Those reviews account for the 30 KLCI
+# names exactly. The Mid 70 names no review since June 2024 touched are still
+# from memory and unchecked, and the replay leaves MID70 one name short: at
+# least one member that joined outside a review (Malaysia Airports' replacement
+# after its February 2025 delisting is the likeliest) is not identified.
 #
-# `segment` is the sub-index each name is believed to sit in. Nothing reads it
-# for weighting - the index book is equal-weight across all of them - it is here
-# so a review can be applied one half at a time.
-as_of: 2026-09-25
-source: "memory; to be checked against Bursa's FBM100 constituent list"
-review: null
+# The collector still checks each code against the company name Yahoo reports
+# for it (`ask.py paper universe`) and the index book skips any name that does
+# not match or has no price, so a wrong code costs a slot, never a wrong
+# company's prices. Replace this list with the official one when it is to hand.
+#
+# `segment` is the sub-index each name sits in. Nothing reads it for weighting -
+# the index book is equal-weight across all of them - it is here so a review can
+# be applied one half at a time. `segments` says how many names each holds in
+# this file; tests/test_paper_index.py holds the file to it.
+#
+# NEXT: the December 2026 review is the first of the KLCI enhancement, confirmed
+# by FTSE Russell and Bursa Malaysia on 2026-08-20 (The Star, 2026-08-20 and
+# 08-21; NST 2026-08; LSEG "FTSE Bursa Malaysia Index Series Enhancement FAQ",
+# v1.1, August 2026 - read through search extracts, not opened):
+#   - FBM KLCI goes from 30 to 50 constituents (about 60% -> 70% of Main Market
+#     capitalisation); the 20 new names are selected on data as at 2026-11-23
+#     and the final list is announced 2026-12-03.
+#   - Phase 1, effective 2026-12-21: the 20 new constituents enter at half
+#     their final weight. Phase 2, effective 2027-06-21: full weight.
+#   - FBM Mid 70 goes from 70 to 50 and is renamed the FTSE Bursa Malaysia Mid
+#     Cap Index (FBMMCAP). The FBM100 stays at 100 names (50 + 50).
+# Weights do not matter here (equal weight), so only the membership of
+# 2026-12-21 does: on that day 20 names move KLCI <- MID70, `segments` becomes
+# {KLCI: 50, MID70: 50} (rename MID70 if wanted) and the FBM100 membership
+# itself changes only by the review's own inclusions and exclusions. Nothing in
+# the loader assumes 30. Do not apply any of it before the 2026-12-03 list.
+#   https://www.thestar.com.my/business/business-news/2026/08/20/fbm-klci-to-expand-to-50-stocks-in-first-major-revamp-since-2009
+#   https://www.thestar.com.my/business/business-news/2026/08/21/fbm-klci-to-broaden-to-50-constituent-stocks
+#   https://www.nst.com.my/amp/business/corporate/2026/08/1515699/bursa-malaysia-ftse-russell-enhance-fbm-klci-fbm-70
+#   https://www.lseg.com/content/dam/ftse-russell/en_us/documents/policy-documents/ftse-bursa-malaysia-index-series-enhancement-faq.pdf
+#
+# Sources for the changes below, by review:
+#   [JUN24]  https://www.bursamalaysia.com/sites/5d809dcf39fba22790cad230/assets/667a3b3acd34aa3200ac1f8c/FBMKLCI_Constituents_List_Jun24.pdf
+#            https://www.exchange-handbook.co.uk/media-and-resources/news/ftse-bursa-malaysia-index-series-semi-annual-review-june-2024-202466/
+#   [DEC24]  https://www.bursamalaysia.com/sites/5bb54be15f36ca0af339077a/content_entry5c11a9db758f8d31544574c6/675163f3cd34aadbe452a614/files/051224_MEDIA_RELEASE_FTSE_BURSA_MALAYSIA_INDEX_SERIES_SEMI-ANNUAL_REVIEW_DECEMBER_2024.pdf
+#            https://www.malaymail.com/news/money/2024/12/06/genting-out-of-ftse-bursa-malaysia-klci-while-99-speed-mart-and-gamuda-join-list/159043
+#   [JUN25]  https://www.lseg.com/en/media-centre/press-releases/ftse-russell/2025/ftse-bursa-malaysia-klci-june-2025-semi-annual-review
+#            https://www.businesstoday.com.my/2025/06/05/ammb-replaces-hong-leong-financial-in-the-elite-ftse-klci-index/
+#   [DEC25]  https://www.lseg.com/en/media-centre/press-releases/ftse-russell/2025/ftse-bursa-malaysia-klci-december-2025-semi-annual-review
+#            https://www.businesstoday.com.my/2025/12/04/ftse-russell-bursa-announce-index-review-results-no-change-to-fbm-klci/
+#   [MAR26]  https://www.thestar.com.my/business/business-news/2026/03/18/sunway-healthcare-to-replace-ql-resources-on-fbm-klci-on-march-25
+#            https://www.nst.com.my/business/corporate/2026/03/1398057/sunway-healthcare-set-join-fbm-klci-replacing-ql-resources
+#   [JUN26]  https://www.lseg.com/en/media-centre/press-releases/ftse-russell/2026/ftse-bursa-malaysia-klci-june-2026-semi-annual-review
+#            https://bursamalaysia.com/sites/5bb54be15f36ca0af339077a/content_entry5c11a9db758f8d31544574c6/6a216394e6414a42a4c72543/files/040626_Media_Release_FBM_Index_Semi-Annual_Review_June_2026.pdf
+#            https://www.businesstoday.com.my/2026/06/04/ioi-properties-replaces-sime-darby-in-fbm-klci-following-june-review/
+#            https://www.klsescreener.com/v2/news/view/1733015/ioi-properties-enters-fbm-klci-sime-darby-drops-to-mid-70
+#
+# Removed from the memory list, each out of the FBM100 and not re-added since:
+#   MYX:6599 AEON Co. (M), MYX:6399 Astro Malaysia Holdings, MYX:5199 Hibiscus
+#     Petroleum - Mid 70 exclusions [JUN24]
+#   MYX:4162 British American Tobacco (Malaysia), MYX:5284 Lotte Chemical Titan,
+#     MYX:1562 Sports Toto, MYX:5243 Velesto Energy - Mid 70 exclusions [DEC24]
+#   MYX:1082 Hong Leong Financial Group - KLCI exclusion, not among the Mid 70
+#     inclusions (failed the liquidity screen) [JUN25]
+#   MYX:5248 Bermaz Auto - Mid 70 exclusion [JUN25]
+#   MYX:5210 Bumi Armada, MYX:3689 Fraser & Neave Holdings - Mid 70 exclusions [DEC25]
+#   MYX:1651 Malaysian Resources Corporation - left the Mid 70 for FBM Small Cap
+#     when QL Resources dropped into it [MAR26]
+#   MYX:2291 Genting Plantations - Mid 70 exclusion [JUN26]
+as_of: 2026-10-28
+source: "June 2026 review and every review since June 2024 replayed over a list first written from memory (2026-09-25); Mid 70 names no review touched still unchecked; one Mid 70 name unidentified"
+review: "June 2026"
+segments: {KLCI: 30, MID70: 69}
 names:
   # FBM KLCI (30)
   - {id: "MYX:1155", name: "Malayan Banking", segment: KLCI}
@@ -34,10 +95,7 @@ names:
   - {id: "MYX:5285", name: "SD Guthrie", segment: KLCI}
   - {id: "MYX:1961", name: "IOI Corporation", segment: KLCI}
   - {id: "MYX:2445", name: "Kuala Lumpur Kepong", segment: KLCI}
-  - {id: "MYX:3182", name: "Genting", segment: KLCI}
-  - {id: "MYX:4715", name: "Genting Malaysia", segment: KLCI}
   - {id: "MYX:5819", name: "Hong Leong Bank", segment: KLCI}
-  - {id: "MYX:1082", name: "Hong Leong Financial Group", segment: KLCI}
   - {id: "MYX:1066", name: "RHB Bank", segment: KLCI}
   - {id: "MYX:6888", name: "Axiata Group", segment: KLCI}
   - {id: "MYX:4863", name: "Telekom Malaysia", segment: KLCI}
@@ -48,12 +106,16 @@ names:
   - {id: "MYX:5211", name: "Sunway", segment: KLCI}
   - {id: "MYX:5296", name: "MR D.I.Y. Group", segment: KLCI}
   - {id: "MYX:5326", name: "99 Speed Mart Retail Holdings", segment: KLCI}
-  - {id: "MYX:4197", name: "Sime Darby", segment: KLCI}
   - {id: "MYX:4707", name: "Nestle (Malaysia)", segment: KLCI}
-  # FBM Mid 70 (70)
-  - {id: "MYX:5398", name: "Gamuda", segment: MID70}
+  - {id: "MYX:5398", name: "Gamuda", segment: KLCI} # was MID70; KLCI inclusion [DEC24]
+  - {id: "MYX:1015", name: "AMMB Holdings", segment: KLCI} # was MID70; KLCI inclusion [JUN25]
+  - {id: "MYX:5555", name: "Sunway Healthcare Holdings", segment: KLCI} # new; fast entry, replaced QL Resources [MAR26]
+  - {id: "MYX:5249", name: "IOI Properties Group", segment: KLCI} # was MID70; KLCI inclusion [JUN26]
+  # FBM Mid 70 (69 here; one member unidentified - see above)
+  - {id: "MYX:3182", name: "Genting", segment: MID70} # was KLCI; KLCI exclusion, Mid 70 inclusion [DEC24]
+  - {id: "MYX:4715", name: "Genting Malaysia", segment: MID70} # was KLCI; KLCI exclusion, Mid 70 inclusion [DEC24]
+  - {id: "MYX:4197", name: "Sime Darby", segment: MID70} # was KLCI; KLCI exclusion, Mid 70 inclusion [JUN26]
   - {id: "MYX:7084", name: "QL Resources", segment: MID70}
-  - {id: "MYX:1015", name: "AMMB Holdings", segment: MID70}
   - {id: "MYX:5246", name: "Westports Holdings", segment: MID70}
   - {id: "MYX:0166", name: "Inari Amertron", segment: MID70}
   - {id: "MYX:3336", name: "IJM Corporation", segment: MID70}
@@ -62,7 +124,7 @@ names:
   - {id: "MYX:1171", name: "Malaysia Building Society", segment: MID70}
   - {id: "MYX:5185", name: "Affin Bank", segment: MID70}
   - {id: "MYX:5139", name: "AEON Credit Service (M)", segment: MID70}
-  - {id: "MYX:1163", name: "Allianz Malaysia", segment: MID70}
+  - {id: "MYX:1163", name: "Allianz Malaysia", segment: MID70} # Mid 70 inclusion [JUN26]
   - {id: "MYX:8621", name: "LPI Capital", segment: MID70}
   - {id: "MYX:6139", name: "Syarikat Takaful Malaysia Keluarga", segment: MID70}
   - {id: "MYX:1818", name: "Bursa Malaysia", segment: MID70}
@@ -70,33 +132,24 @@ names:
   - {id: "MYX:3069", name: "Mega First Corporation", segment: MID70}
   - {id: "MYX:5209", name: "Gas Malaysia", segment: MID70}
   - {id: "MYX:7277", name: "Dialog Group", segment: MID70}
-  - {id: "MYX:5199", name: "Hibiscus Petroleum", segment: MID70}
-  - {id: "MYX:5210", name: "Bumi Armada", segment: MID70}
-  - {id: "MYX:5243", name: "Velesto Energy", segment: MID70}
-  - {id: "MYX:2291", name: "Genting Plantations", segment: MID70}
   - {id: "MYX:5222", name: "FGV Holdings", segment: MID70}
   - {id: "MYX:1899", name: "Batu Kawan", segment: MID70}
   - {id: "MYX:2089", name: "United Plantations", segment: MID70}
   - {id: "MYX:5126", name: "Sarawak Oil Palms", segment: MID70}
   - {id: "MYX:5031", name: "TIME dotCom", segment: MID70}
-  - {id: "MYX:0138", name: "MY E.G. Services", segment: MID70}
-  - {id: "MYX:6399", name: "Astro Malaysia Holdings", segment: MID70}
-  - {id: "MYX:3689", name: "Fraser & Neave Holdings", segment: MID70}
+  # MY E.G. Services renamed Zetrix AI on 2025-07-03, code unchanged:
+  # https://www.businesstoday.com.my/2025/06/30/myeg-rebrands-to-zetrix-ai-effective-july-3/
+  - {id: "MYX:0138", name: "Zetrix AI", segment: MID70}
   - {id: "MYX:3255", name: "Heineken Malaysia", segment: MID70}
   - {id: "MYX:2836", name: "Carlsberg Brewery Malaysia", segment: MID70}
-  - {id: "MYX:4162", name: "British American Tobacco (Malaysia)", segment: MID70}
   - {id: "MYX:5306", name: "Farm Fresh", segment: MID70}
   - {id: "MYX:5102", name: "Guan Chong", segment: MID70}
-  - {id: "MYX:6599", name: "AEON Co. (M)", segment: MID70}
-  - {id: "MYX:1562", name: "Sports Toto", segment: MID70}
-  - {id: "MYX:5248", name: "Bermaz Auto", segment: MID70}
   - {id: "MYX:6633", name: "Leong Hup International", segment: MID70}
   - {id: "MYX:5318", name: "DXN Holdings", segment: MID70}
   - {id: "MYX:5878", name: "KPJ Healthcare", segment: MID70}
   - {id: "MYX:7153", name: "Kossan Rubber Industries", segment: MID70}
   - {id: "MYX:7113", name: "Top Glove Corporation", segment: MID70}
   - {id: "MYX:5168", name: "Hartalega Holdings", segment: MID70}
-  - {id: "MYX:5284", name: "Lotte Chemical Titan Holding", segment: MID70}
   - {id: "MYX:3794", name: "Malayan Cement", segment: MID70}
   - {id: "MYX:4731", name: "Scientex", segment: MID70}
   - {id: "MYX:5263", name: "Sunway Construction Group", segment: MID70}
@@ -112,8 +165,6 @@ names:
   - {id: "MYX:0208", name: "Greatech Technology", segment: MID70}
   - {id: "MYX:9822", name: "SAM Engineering & Equipment (M)", segment: MID70}
   - {id: "MYX:8664", name: "S P Setia", segment: MID70}
-  - {id: "MYX:5249", name: "IOI Properties Group", segment: MID70}
-  - {id: "MYX:1651", name: "Malaysian Resources Corporation", segment: MID70}
   - {id: "MYX:5148", name: "UEM Sunrise", segment: MID70}
   - {id: "MYX:8583", name: "Mah Sing Group", segment: MID70}
   - {id: "MYX:8206", name: "Eco World Development Group", segment: MID70}
@@ -121,3 +172,15 @@ names:
   - {id: "MYX:5176", name: "Sunway Real Estate Investment Trust", segment: MID70}
   - {id: "MYX:5212", name: "Pavilion Real Estate Investment Trust", segment: MID70}
   - {id: "MYX:5227", name: "IGB Real Estate Investment Trust", segment: MID70}
+  # Not in the memory list; each a Mid 70 inclusion not excluded since.
+  - {id: "MYX:4006", name: "Oriental Holdings", segment: MID70} # [DEC24]
+  - {id: "MYX:2429", name: "Tanco Holdings", segment: MID70} # [DEC24]
+  - {id: "MYX:5337", name: "Eco-Shop Marketing", segment: MID70} # [DEC25]
+  - {id: "MYX:3034", name: "Hap Seng Consolidated", segment: MID70} # [DEC25]
+  - {id: "MYX:3301", name: "Hong Leong Industries", segment: MID70} # [DEC25]
+  - {id: "MYX:0151", name: "Kelington Group", segment: MID70} # [DEC25]
+  - {id: "MYX:5038", name: "KSL Holdings", segment: MID70} # [DEC25]
+  - {id: "MYX:5286", name: "Mi Technovation", segment: MID70} # [DEC25]
+  - {id: "MYX:5238", name: "AirAsia X", segment: MID70} # [JUN26]
+  - {id: "MYX:5272", name: "Ranhill Utilities", segment: MID70} # [JUN26]
+  - {id: "MYX:0215", name: "Solarvest Holdings", segment: MID70} # [JUN26]

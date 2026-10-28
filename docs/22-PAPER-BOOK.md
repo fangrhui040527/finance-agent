@@ -136,7 +136,7 @@ other two, never a change to either.
 
 | | control | index |
 |---|---|---|
-| names | the fundable watchlist (9) | every fundable member of `engines/paper/data/fbm100.yaml` (100) |
+| names | the fundable watchlist (9) | every fundable member of `engines/paper/data/fbm100.yaml` (99 of the 100) |
 | sizing | greedy equal lots, cheapest first | equal value, nearest whole lot, 1% inside the ceiling for entry costs |
 | money | USD 1,000 | a notional, USD 1,000,000 by default - a scale for percentages, not money |
 | opened | with the ledger | on its own day: `ask.py paper init --index` |
@@ -153,9 +153,15 @@ own window - from its opening day - because it opened later than the others.
 The index pays the same fees, but the per-trade platform fee weighs less on a
 larger trade, so its cost drag is its own figure on the page, not the control's.
 
-**The universe file is not yet checked.** It was written from memory on
-2026-09-25 because the session that wrote it could not reach
-bursamalaysia.com, and it will be wrong in places. The collector is the check:
+**The universe file is not yet the official list.** It was written from memory
+on 2026-09-25 because the session that wrote it could not reach
+bursamalaysia.com. On 2026-10-28 every published review change since June 2024
+(through the June 2026 review) was replayed over it, each cited in the file:
+the 30 KLCI names now match those reviews, but the Mid 70 names no review
+touched are still from memory, and one Mid 70 member is unidentified, so the
+file holds 99. The December 2026 review widens the KLCI to 50 and the Mid 70
+to 50 (FBM100 still 100); the file records the dates and is not to change
+before the 2026-12-03 announcement. The collector is the check:
 each Yahoo fetch records the company name Yahoo lists the code under
 (`price_cache.db`, table `listed_name`), and `ask.py paper universe` prints
 every member's expected and listed names with a verdict. A code whose listed
