@@ -1,6 +1,6 @@
 # Digest 2026-10-28
 
-Generated 2026-10-28 14:28 UTC · slot `all` · 26493 articles in the corpus, 6349 observations, 4258 events in the fact book.
+Generated 2026-10-28 15:29 UTC · slot `all` · 26518 articles in the corpus, 6349 observations, 4258 events in the fact book.
 
 ## The book
 
@@ -28,8 +28,9 @@ Generated 2026-10-28 14:28 UTC · slot `all` · 26493 articles in the corpus, 63
 - quiet: nothing collected for this name in the window
 
 ### Genting (MYX:3182)
-- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.38 · 0 escalated
+- tone: 2 stories from 2 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.19 · 0 escalated
 - 2026-10-28 www.freemalaysiatoday.com — Foreigner held for alleged assault, damage at Genting casino [q 1.00, tone +0.0]
+- 2026-10-28 www.nst.com.my — Foreigner nabbed for breaking auxiliary cop's teeth, damaging Genting casino [q 0.80, tone +0.0]
 
 ### NVIDIA (XNAS:NVDA)
 - tone: 43 stories from 20 sources, polarity +0.02, peak intensity 0.00, uncertainty 0.14 · 6 escalated
@@ -98,6 +99,15 @@ Generated 2026-10-28 14:28 UTC · slot `all` · 26493 articles in the corpus, 63
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 15:28 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
+| 15:28 | twse_openapi | ok | 8 | 0 | 0 | facts 0;  |
+| 15:27 | jin10_flash | ok | 18 | 18 | 18 | facts 0;  |
+| 15:27 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 15:27 | nst_business | ok | 4 | 4 | 3 |  |
+| 15:27 | fmt_business | ok | 3 | 3 | 3 |  |
+| 15:27 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Petronas Chemicals, IHH, Press Metal, Genting, Maybank, Tenaga |
+| 15:27 | google_news | ok | 1 | 1 | 1 | read but empty: Petronas Chemicals, IHH, Press Metal, Maybank, Tenaga; named the |
+| 15:27 | gdelt | ok | 0 | 0 | 0 | grouped 3 names per request; 2 requests (HTTP 429 on request 2: the rest of the  |
 | 14:26 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
 | 14:26 | twse_openapi | ok | 8 | 0 | 0 | facts 0;  |
 | 14:26 | jin10_flash | ok | 14 | 14 | 13 | facts 0;  |

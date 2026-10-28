@@ -1,6 +1,87 @@
 {
   "collection": [
     {
+      "at": "2026-10-28T15:28:00.324142+00:00",
+      "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-28T15:28:00.322141+00:00",
+      "detail": "facts 0; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-28T15:27:55.166870+00:00",
+      "detail": "facts 0; ",
+      "fetched": 18,
+      "kept": 18,
+      "source": "jin10_flash",
+      "status": "ok",
+      "stored": 18
+    },
+    {
+      "at": "2026-10-28T15:27:53.974360+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-28T15:27:51.914768+00:00",
+      "detail": "",
+      "fetched": 4,
+      "kept": 4,
+      "source": "nst_business",
+      "status": "ok",
+      "stored": 3
+    },
+    {
+      "at": "2026-10-28T15:27:51.780107+00:00",
+      "detail": "",
+      "fetched": 3,
+      "kept": 3,
+      "source": "fmt_business",
+      "status": "ok",
+      "stored": 3
+    },
+    {
+      "at": "2026-10-28T15:27:51.645958+00:00",
+      "detail": "read but empty: Petronas Chemicals, IHH, Press Metal, Genting, Maybank, Tenaga",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-28T15:27:50.446318+00:00",
+      "detail": "read but empty: Petronas Chemicals, IHH, Press Metal, Maybank, Tenaga; named the company: 1 of 1 (lowest: Genting 1/1)",
+      "fetched": 1,
+      "kept": 1,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 1
+    },
+    {
+      "at": "2026-10-28T15:27:48.538604+00:00",
+      "detail": "grouped 3 names per request; 2 requests (HTTP 429 on request 2: the rest of the slot is deferred, not asked); read but empty: Petronas Chemicals, IHH, Press Metal; failed: GDELT fetch failed: HTTP Error 429: Too Many Requests (Genting, Maybank, Tenaga)",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "ok",
+      "stored": 0
+    },
+    {
       "at": "2026-10-28T14:26:56.696428+00:00",
       "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
       "fetched": 0,
@@ -281,18 +362,18 @@
     }
   ],
   "counts": {
-    "articles": 26493,
+    "articles": 26518,
     "documents": 0,
     "escalated": 3463,
     "events": 4258,
     "failed_sweeps": 100,
-    "linked": 14475,
+    "linked": 14476,
     "observations": 6349,
     "series": 31,
-    "sweeps": 1213
+    "sweeps": 1222
   },
   "day": "2026-10-28",
-  "generated_at": "2026-10-28 14:28 UTC",
+  "generated_at": "2026-10-28 15:29 UTC",
   "macro": [
     {
       "change": "-0.08",
@@ -609,14 +690,26 @@
           "quality": 1.0,
           "title": "Foreigner held for alleged assault, damage at Genting casino",
           "uncertainty": 0.3787878787878788
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMivgFBVV95cUxQU2FjZDQ2UmRtRHBiUGNzODZaa2h0eC16SXhUUlFDU2hVQlpVcEVVSHMwRDVrNnJScnRZZUY3OXNlMGhoMkotRmhvWmdYNlQxQmw4aGNIazRGcFd5VjRudkZjbjd5NXdoNFZvRTNBeGpyd1VPVzkxVjVycGh6YmhSZmZ5RHN5azI4WlhXbWJvZ1dic3oyTkJBQzFvVnlodVZFaWlPOWdMdVg3dkU4czFyOHdzS0drWWIydmg4YTBR0gHDAUFVX3lxTE52QzIyb2I3NTZPMnJ4SzNMQS1fME5sQUt6emxIajE5czF4aTFmWHdXY2RQN0NCeXA1TXBLNUgyTEIyLThoTEd2WDJpbXQ3RnJLQ0dlQWFyYjM1Vlo2dUdqWUZKNndvWmsyU2ZuMUN6bGg0MlloU0h5THZKd3FQY2FTamcyR2taTnFYQjlSZjhxVF9wVjE5eHV6Y0lxM3M3blI0ckg2cFZOMmxBYndfSjVETG55QkdGaTd4d1hPckF4aUh3OA?oc=5",
+          "domain": "www.nst.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-28T15:10:18+00:00",
+          "quality": 0.8,
+          "title": "Foreigner nabbed for breaking auxiliary cop's teeth, damaging Genting casino",
+          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.0,
-        "n": 1,
+        "n": 2,
         "polarity_mean": 0.0,
-        "sources": 1,
-        "uncertainty_mean": 0.379
+        "sources": 2,
+        "uncertainty_mean": 0.189
       },
       "upcoming": []
     },
