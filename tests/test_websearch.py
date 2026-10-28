@@ -390,3 +390,37 @@ def test_an_error_code_field_is_read_once_not_again_as_text():
     }
     a = WebSearch("m", client=Client(_response([nested]))).search("s", "p")
     assert a.errors == ["max_uses_exceeded"]
+
+
+def test_a_sandbox_error_is_on_the_record_but_is_not_a_failed_search():
+    sandbox = {
+        "type": "text_editor_code_execution_tool_result",
+        "content": {
+            "type": "text_editor_code_execution_tool_result_error",
+            "error_code": "file_not_found",
+        },
+    }
+    timed = {
+        "type": "code_execution_tool_result",
+        "content": {
+            "type": "code_execution_tool_result_error",
+            "error_code": "execution_time_exceeded",
+        },
+    }
+    a = WebSearch(
+        "m",
+        client=Client(
+            _response([SEARCH, RESULTS, sandbox, timed, {"type": "text", "text": "No."}])
+        ),
+    ).search("s", "p")
+    assert a.errors == []
+    assert a.tool_errors == ["file_not_found", "execution_time_exceeded"]
+
+
+def test_request_too_large_reported_by_the_code_is_a_failed_search():
+    script = {
+        "type": "code_execution_tool_result",
+        "content": {"type": "code_execution_result", "stdout": "search failed: request_too_large"},
+    }
+    a = WebSearch("m", client=Client(_response([script]))).search("s", "p")
+    assert a.errors == ["request_too_large"]

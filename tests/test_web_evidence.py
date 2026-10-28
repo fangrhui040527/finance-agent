@@ -862,3 +862,31 @@ def test_a_dry_run_names_each_move_that_qualifies(stores, moves, monkeypatch):
     assert (
         "MYX:3182|2026-10-22: qualifies (Genting, -5.00%, -3.19 sigma); not searched here" in text
     )
+
+
+def test_a_sandbox_error_beside_working_searches_is_still_nothing_found(stores, moves, monkeypatch):
+    d = date(2026, 10, 22)
+    moves[("MYX:3182", d)] = _move("MYX:3182", d, -3.19)
+    quiet = _answer()
+    quiet.tool_errors = ["file_not_found"]
+    report = _run(stores, Searcher(quiet), monkeypatch)
+    assert [a.outcome for a in report.attempts] == ["nothing_found"]
+    assert "other tool errors: file_not_found" in report.attempts[0].detail
+
+
+def test_a_retry_goes_first_and_is_reported_searched_only_when_it_was(stores, moves, monkeypatch):
+    old = date(2026, 10, 21)
+    key = "MYX:3182|2026-10-21"
+    moves[("MYX:3182", old)] = _move("MYX:3182", old, -2.0)
+    searcher = Searcher(*[_answer() for _ in range(6)])
+    _run(stores, searcher, monkeypatch)
+    d = date(2026, 10, 22)
+    for iid, sar in (("MYX:8869", 5.0), ("MYX:5347", 4.5), ("MYX:1155", 4.0)):
+        moves[(iid, d)] = _move(iid, d, sar)
+    moves[("MYX:8869", old)] = _move("MYX:8869", old, 4.2)
+    dry = _run(stores, searcher, monkeypatch, retry=(key, key), dry_run=True)
+    assert not any("searched again on request" in n for n in dry.notes)
+    assert any(f"{key}: asked to retry, but not searched in this run" in n for n in dry.notes)
+    report = _run(stores, searcher, monkeypatch, retry=(key, key))
+    assert key in [a.key for a in report.attempts], "a requested retry is not crowded out"
+    assert sum("searched again on request" in n for n in report.notes) == 1

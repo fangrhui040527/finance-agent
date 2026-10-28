@@ -75,7 +75,14 @@ SEARCH_ERROR_WORDS = (
     "too_many_requests",
     "query_too_long",
     "invalid_tool_input",
+    "request_too_large",
 )
+
+#: The web search tool's error codes. Another code in a code-execution result
+#: (`file_not_found`, `execution_time_exceeded`, ...) is the sandbox's, not a
+#: failed search: it goes on the record (`tool_errors`) and does not make the
+#: turn's searches read as failed.
+SEARCH_ERROR_CODES = (*SEARCH_ERROR_WORDS, "unavailable")
 
 
 @dataclass(frozen=True)
@@ -111,6 +118,8 @@ class SearchAnswer:
     #: Content block types seen, with counts: on the record, so a turn whose
     #: shape the reader did not expect can be diagnosed from the record alone.
     blocks: dict[str, int] = field(default_factory=dict)
+    #: Error codes from code execution that are not the search tool's.
+    tool_errors: list[str] = field(default_factory=list)
 
 
 def _add(a: Usage, b: Usage) -> Usage:
@@ -280,7 +289,10 @@ class WebSearch:
                 and kind != "web_search_tool_result"
             ):
                 # A search run from the filtering code fails inside this block.
-                answer.errors.extend(_error_codes(_field(block, "content")))
+                for code in _error_codes(_field(block, "content")):
+                    (answer.errors if code in SEARCH_ERROR_CODES else answer.tool_errors).append(
+                        code
+                    )
             if kind == "server_tool_use" and _field(block, "name") == "web_search":
                 query = _field(_field(block, "input") or {}, "query")
                 if query:

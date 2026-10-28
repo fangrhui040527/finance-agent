@@ -772,8 +772,29 @@ def run(
     ):
         triggers, notes = candidates(cfg, now, feed, facts)
         report.notes += notes
+        retry = tuple(dict.fromkeys(retry))
         done = searched_keys(corpus, retry)
-        report.triggers = [t for t in triggers if t.key not in done]
+        # An operator's retry goes first, so the per-run cap cannot crowd it out.
+        fresh = [t for t in triggers if t.key not in done]
+        report.triggers = [t for t in fresh if t.key in retry] + [
+            t for t in fresh if t.key not in retry
+        ]
+        # Moves searched again only because the operator asked.
+        plain = searched_keys(corpus)
+        retried = {t.key for t in fresh if t.key in retry and t.key in plain}
+
+        def finish() -> Report:
+            # Said after the fact: a retry is reported searched only when it was.
+            tried = {a.key for a in report.attempts}
+            for key in sorted(retried):
+                if key in tried:
+                    report.notes.append(f"{key}: searched again on request")
+                else:
+                    report.notes.append(
+                        f"{key}: asked to retry, but not searched in this run; ask again"
+                    )
+            return report
+
         for t in triggers:
             if t.key in done:
                 report.notes.append(f"{t.key} ({t.sar:+.2f} sigma) already searched")
@@ -789,8 +810,6 @@ def run(
                     report.notes.append(
                         f"{key}: asked to retry, but it has had {MAX_ATTEMPTS} paid tries already"
                     )
-                elif tries.get(key, 0):
-                    report.notes.append(f"{key}: searched again on request")
         if len(report.triggers) > PER_RUN:
             for t in report.triggers[PER_RUN:]:
                 report.notes.append(
@@ -800,7 +819,7 @@ def run(
         report.evidence_month_usd = evidence_month_usd(corpus, now)
         report.month_usd = month_usd(corpus, cfg, now)
         if dry_run or not report.triggers:
-            return report
+            return finish()
         import os
 
         if searcher is None and not os.environ.get("ANTHROPIC_API_KEY", "").strip():
@@ -808,7 +827,7 @@ def run(
                 f"no ANTHROPIC_API_KEY in this environment: {len(report.triggers)} move(s) "
                 "qualify and were not searched (nothing recorded, nothing billed)"
             )
-            return report
+            return finish()
 
         corpus.ensure_evidence_table()
         norm = dict(
@@ -906,7 +925,7 @@ def run(
                 break
         report.evidence_month_usd = evidence_month_usd(corpus, now)
         report.month_usd = month_usd(corpus, cfg, now)
-    return report
+    return finish()
 
 
 def _keep(answer, t: Trigger, retrieved: datetime, corpus, engine, **norm):
@@ -978,6 +997,9 @@ def _keep(answer, t: Trigger, retrieved: datetime, corpus, engine, **norm):
         else "",
         f"{answer.lost_legs} leg(s) timed out, priced at the reserve" if answer.lost_legs else "",
         f"search errors: {_tally(answer.errors)}" if answer.errors else "",
+        f"other tool errors: {_tally(answer.tool_errors)}"
+        if getattr(answer, "tool_errors", None)
+        else "",
         f"blocks: {_tally_counts(answer.blocks)}" if getattr(answer, "blocks", None) else "",
         f"refusal {answer.refusal}" if answer.refused else "",
     ]
