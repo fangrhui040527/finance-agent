@@ -78,6 +78,16 @@ class PlanExcluded(SourceError):
     """The key works, but the plan does not include this endpoint."""
 
 
+#: The words a refused key is reported in. A collector that asks one name at a
+#: time wraps the first error in its own ("every endpoint failed. First: ..."),
+#: which loses the exception's type and keeps its text, so the sweep reads both.
+KEY_REFUSED = "the key was refused"
+
+
+class KeyRejected(SourceError):
+    """The key was sent and refused (HTTP 401): set, but revoked or wrong."""
+
+
 @dataclass
 class Pull:
     """What one collector produced. Empty lists are 'nothing new', not failure."""
@@ -217,7 +227,7 @@ class Collector(ABC):
             raise SourceError(str(e)) from e
         except urllib.error.HTTPError as e:
             if e.code in (401,):
-                raise SourceError(f"{self.name}: the key was refused (HTTP 401)") from e
+                raise KeyRejected(f"{self.name}: {KEY_REFUSED} (HTTP 401)") from e
             if e.code in (402, 403):
                 raise PlanExcluded(
                     f"{self.name}: HTTP {e.code} for {_redact(url)} - the plan does not include it"

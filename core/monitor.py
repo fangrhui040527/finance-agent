@@ -257,6 +257,7 @@ def evaluate(
                 )
 
     out.extend(_sweep_rules(cfg, now))
+    out.extend(_source_rules(cfg))
     out.extend(_series_rules(cfg, now))
     out.extend(_slot_rules(cfg, now))
     out.extend(_name_coverage_rules(cfg, now))
@@ -424,6 +425,79 @@ def _sweep_rules(cfg, now: datetime) -> list[Alert]:
             },
         )
     ]
+
+
+def _source_rules(cfg) -> list[Alert]:
+    """A key that is missing or refused, and a source that came back nearly empty.
+
+    `sweep_silence` cannot see either in time. It waits out a source's whole
+    allowance, and until 2026-10-28 a run with no key was written `ok`, so it
+    was not just late - it was RESET: alphavantage_news's alert, open at 309h,
+    resolved on 2026-10-27 at the first us_close whose key had vanished. Rows
+    with no key are `skipped_no_key` now and a refused key `auth_failed`
+    (`knowledge.corpus`), and this reads them.
+
+      * `source_keys`: an enabled source whose NEWEST sweep row is one of
+        those. At once, not after an allowance: a key does not come back on
+        its own. Resolves when the source's next row reads.
+      * `expected_rows`: `knowledge.ledger.row_shortfalls` over each slot -
+        a source whose last two trading-day firings each read under a fifth
+        of its usual. collect.yml fails the run on the same two facts, after
+        its commit, so the owner is e-mailed; this is the record of when.
+    """
+    from knowledge.corpus import KEY_PROBLEMS, Corpus
+    from knowledge.ledger import EXPECTED_ROWS_FRACTION, row_shortfalls
+    from knowledge.sources.catalog import CATALOG
+
+    path = str(getattr(cfg, "corpus_db", "data/corpus.db"))
+    if not Path(path).exists():
+        return []
+    sources = tuple(getattr(cfg, "sources", ()))
+    keys: list[tuple[str, str, str]] = []
+    short = []
+    with Corpus(path) as corpus:
+        for name in sources:
+            newest = corpus.sweeps(limit=1, source=name)
+            if newest and newest[0]["status"] in KEY_PROBLEMS:
+                keys.append((name, newest[0]["status"], str(newest[0]["detail"] or "")))
+        for slot in SLOT_TIMES:
+            names = [n for n in sources if n in CATALOG and slot in CATALOG[n].slots]
+            short.extend(row_shortfalls(corpus, slot, names))
+
+    out: list[Alert] = []
+    if keys:
+        named = ", ".join(f"{n} ({status})" for n, status, _ in keys)
+        out.append(
+            Alert(
+                rule="source_keys",
+                severity=ALERT,
+                title=f"a source's key is missing or refused: {named}",
+                detail="; ".join(f"{n}: {d[:160]}" for n, _, d in keys),
+                next_step="set or replace the key as a repository secret of the name the "
+                "detail gives (or in ALL_SECRET); docs/14-OPERATIONS-RUNBOOK.md, Sweep ledger",
+                evidence={
+                    "sources": [n for n, _, _ in keys],
+                    "statuses": {n: s for n, s, _ in keys},
+                },
+            )
+        )
+    if short:
+        out.append(
+            Alert(
+                rule="expected_rows",
+                severity=ALERT,
+                title=f"{len(short)} source(s) came back nearly empty two firings running: "
+                + ", ".join(f"{s.source} in {s.slot}" for s in short),
+                detail="; ".join(s.line() for s in short),
+                next_step="run `ask.py sweep --source <name> --slot <slot>` by hand and read its "
+                "detail; a vendor that changed its reply shape answers 200 with nothing in it",
+                evidence={
+                    "fraction": EXPECTED_ROWS_FRACTION,
+                    "shortfalls": [f"{s.source}/{s.slot}" for s in short],
+                },
+            )
+        )
+    return out
 
 
 #: Which slots the cron in `.github/workflows/collect.yml` owes on a given
@@ -1429,6 +1503,8 @@ def _slots_short(ev: dict) -> list[str]:
 #: every hour. A rule absent here writes nothing while it stays open.
 _MEMBERS = {
     "sweep_silence": lambda ev: ev.get("sources") or [],
+    "source_keys": lambda ev: ev.get("sources") or [],
+    "expected_rows": lambda ev: ev.get("shortfalls") or [],
     "series_stale": lambda ev: [s["series_id"] for s in ev.get("stale") or []],
     "price_stale": lambda ev: [f"{s['market']}:{s['symbol']}" for s in ev.get("stale") or []],
     "name_coverage": lambda ev: [n for n in str(ev.get("empty") or "").split(",") if n],

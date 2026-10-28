@@ -214,7 +214,11 @@ def test_naming_a_source_runs_it_whatever_the_slot(stores):
 # --- outcomes are recorded, every kind ----------------------------------------------------
 
 
-def test_a_missing_key_is_skipped_and_the_job_stays_green(stores):
+def test_a_missing_key_is_skipped_no_key_and_never_ok(stores):
+    """The sweep still exits 0 for a missing key, but the row is
+    `skipped_no_key`, not `ok`: written `ok` it moved `last_success` and on
+    2026-10-27 resolved a silence alert on a run that read nothing. The run's
+    verdict on keys is knowledge/ledger.py's, after the commit."""
     corpus_db, facts_db = stores
     fred = CannedCollector(raise_=KeyMissing("fred needs FRED_API_KEY, which is not set."))
     report = run_sweep(
@@ -228,13 +232,14 @@ def test_a_missing_key_is_skipped_and_the_job_stays_green(stores):
         log=lambda m: None,
     )
     (r,) = report.results
-    assert r.status == "skipped" and "FRED_API_KEY" in r.detail and report.exit_code == 0
+    assert r.status == "skipped_no_key" and "FRED_API_KEY" in r.detail and report.exit_code == 0
     with FactBook(facts_db) as book:
         (pull,) = book.pulls()
-        assert pull["status"] == "skipped" and book.last_success("fred") is None
+        assert pull["status"] == "skipped_no_key" and book.last_success("fred") is None
     with Corpus(corpus_db) as c:
         (sweep,) = c.sweeps()
-        assert sweep["detail"].startswith("skipped:")
+        assert sweep["status"] == "skipped_no_key" and sweep["detail"].startswith("skipped:")
+        assert c.last_success("fred") is None
 
 
 def test_a_plan_boundary_at_the_top_is_skipped_too(stores):
