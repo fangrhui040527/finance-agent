@@ -1,18 +1,100 @@
 {
-  "collection": [],
+  "collection": [
+    {
+      "at": "2026-10-29T10:11:13.061014+00:00",
+      "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-29T10:11:13.059366+00:00",
+      "detail": "facts 5; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-29T10:11:07.499804+00:00",
+      "detail": "facts 0; window not covered back to 2026-10-28 22:43Z; the oldest item read is 2026-10-29 10:00Z, so 11.3h of the window was never served",
+      "fetched": 18,
+      "kept": 18,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 18
+    },
+    {
+      "at": "2026-10-29T10:11:06.207321+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-29T10:11:04.062918+00:00",
+      "detail": "page 2 starts 3.3h before page 1 ends (2026-10-29 03:29Z under 2026-10-29 06:50Z): the items between were served by neither",
+      "fetched": 130,
+      "kept": 126,
+      "source": "nst_business",
+      "status": "degraded",
+      "stored": 122
+    },
+    {
+      "at": "2026-10-29T10:11:00.710393+00:00",
+      "detail": "",
+      "fetched": 37,
+      "kept": 37,
+      "source": "fmt_business",
+      "status": "ok",
+      "stored": 37
+    },
+    {
+      "at": "2026-10-29T10:11:00.372379+00:00",
+      "detail": "read but empty: IHH, Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-29T10:10:59.195600+00:00",
+      "detail": "read but empty: Press Metal, Petronas Chemicals; named the company: 12 of 24 (lowest: IHH 0/1, Tenaga 0/3, Genting 5/10)",
+      "fetched": 24,
+      "kept": 24,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 24
+    },
+    {
+      "at": "2026-10-29T10:10:57.415294+00:00",
+      "detail": "grouped 3 names per request; 2 requests (HTTP 429 on request 2: the rest of the slot is deferred, not asked); read but empty: Maybank, Tenaga, Petronas Chemicals; failed: GDELT fetch failed: HTTP Error 429: Too Many Requests (IHH, Press Metal, Genting)",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "ok",
+      "stored": 0
+    }
+  ],
   "counts": {
-    "articles": 27145,
+    "articles": 27346,
     "documents": 0,
-    "escalated": 3566,
+    "escalated": 3568,
     "events": 4265,
     "failed_sweeps": 102,
-    "linked": 14792,
-    "observations": 6403,
+    "linked": 14809,
+    "observations": 6408,
     "series": 31,
-    "sweeps": 1243
+    "sweeps": 1252
   },
   "day": "2026-10-29",
-  "generated_at": "2026-10-29 00:56 UTC",
+  "generated_at": "2026-10-29 10:12 UTC",
   "macro": [
     {
       "change": "-0.12",
@@ -145,13 +227,116 @@
   ],
   "names": [
     {
-      "escalated": 0,
+      "escalated": 1,
       "events": [],
       "instrument_id": "MYX:1155",
       "label": "Maybank",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMivgFBVV95cUxPcXBRVDZJSUxhSzB5cHNaWk94MEVudF9yWlhpb0FLWkE3N183eEVWWFNicGpOMWVZMDA2N2ZrY0QydG9QVWI1M25feEt6ZHRZXzRHc1Y0OERQN3dtMlpLR3dHZklCY1pBTE1HQ0MybVQ3Yk5fYllfcUFxbWg2VGoyV00xN3g3UVFVVEZfZEd6dDNONHRia0lOYUlncnljTC1UcVFsRDBoNjNsSXlVWmtZZnFZX0VFZ290ckpGeExn?oc=5",
+          "domain": "www.businesstoday.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-29T04:39:26+00:00",
+          "quality": 0.8,
+          "title": "Stock Today: Maybank Edges Higher To RM10 Amid Cross-Border Banking Expansion",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://www.nst.com.my/sports/golf/2026/10/1566187/roussin-bouchard-seizes-maybank-lead-flawless-64-watch",
+          "domain": "www.nst.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-29T07:20:08+00:00",
+          "quality": 1.0,
+          "title": "Roussin-Bouchard seizes Maybank lead with flawless 64 [WATCH]",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://www.nst.com.my/sports/golf/2026/10/1566183/liyana-stays-calm-bogey-free-opening-round-klgcc",
+          "domain": "www.nst.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-29T07:19:00+00:00",
+          "quality": 1.0,
+          "title": "Liyana stays calm for bogey-free opening round at KLGCC",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxNNlEwbU5vNlV5d3oyN193LTVEZkwwbk95RGpLb2piMU01Mk0wY2JmLWJMRkxqWjFXR3NENHhlQVJRZ0Y4MnNubUotelRLdVlCcDA1alB6Y1VFLXlocmJtLXBQcHNSMWtkT09tdkllbjM0SkRLOU5rckUwTzR0VFFBaEFYXzFkNXNLeHU1RWN1TW4tZlZ0bTQtTE1EUFZZbWJ4czNrRVlrdFlzQQ?oc=5",
+          "domain": "www.lpga.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-29T09:59:06+00:00",
+          "quality": 0.65,
+          "title": "Miyu Yamashita Opens Maybank Championship Title Defense With First-Round 65",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMihgFBVV95cUxPRkh3ZVA2R2l5ZlNuTG1MYmdTSjVVTmtLcTFPY25OQ3ptdGN6aHU3MVk1SFVVUlJwT0dJTFJ3djlEei1ELWE2bUJmZnRIcXpiWUFnQkhpN3NFSHVRdFpWdFZtRUdNUXR3ZWl3Nzg5bXRCNF9Dc3FEREhSWFNZX29adld3RE5pZw?oc=5",
+          "domain": "malaysia.news.yahoo.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-29T09:52:57+00:00",
+          "quality": 0.65,
+          "title": "Menara Tun Perak, formerly Menara Maybank, on offer for full or partial sale",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMivgFBVV95cUxOSGlhUUFxWkVieUwwSTcwV094dFQyNzFYNkdxNlMwZk80UUJwTGl2WlZEQzNnWVNRRlU4bmlIMlNrNXY4c3Y5Z2RXOVgzRFdXSmlPRFl1SmNBY3BYMU9ZVGt2OU1Yc2p3WF9tR0N4S2h5alhkekx2WkczOVNma3ozYWhIVW41a3lLbU9tQWM0YWJJaVA5NTJmWjIwQ2RDcDZwNnVDU0Z5OEZaLVgyUUFlU0M3WndKTkRfWjJjOXZn?oc=5",
+          "domain": "infonews.ca",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-29T07:02:50+00:00",
+          "quality": 0.65,
+          "title": "Three closing birdies put Pauline Roussin-Bouchard atop the Maybank Classic leaderboard",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiiwJBVV95cUxORDh6TlR2Yy1qVzNWZTNjNkJDX2NfNDZ5UU1IWElaSkg1RS0yN1BDWUpyaUJha0hqUlMxQXlqUmYzLVFBaFdUSzVNOU9EU1VzVU8tanNiR1dkWGVQenlUMms1T0p3NUdEZGFlOVF3c1NFVEp3SnVuN19iTVY2Rkt5QTFfNnZ6bTVmbGFhNDJNeGJWV1NpdnJVSzlqVTVxWnppbWtIXzZtV0otSkxNUTRHdm8xSEg2ekJuSnhlTm5sbVFFR1FvUk5iTFRMakdhNnN3OWhNMVlKejFpcm1LZWJDbU9CSDhHWUhfblBqN0xOWEh5NHo1MlRvZ2xZYWZqRUFZRzhyeUFMQ3MtQlE?oc=5",
+          "domain": "www.mankatofreepress.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-29T03:58:41+00:00",
+          "quality": 0.65,
+          "title": "Haeran Ryu withdraws from the LPGA's Maybank Classic in Malaysia before her first round",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMixwFBVV95cUxQRHRaalExcElZdUtFcm1TYlZGcS1nSmR4OW5rWXZFYUlDQi12c0RnaUNyc0hXTm9rYVRrRFFjdEY4VG1WZGlFQ0V5Wk1IbEczbG9lT3V2WkVjQUx6TzVVY2VBQkdIQXh0cTB3SVBkaVZpMC1iVVNYc3lIVWg0UjdfemFsR05ZN3BKczlpQi1jMTZ3Y3R6VGJXc3ZYaldCcnFOUjE3bFFtcGVDUDJQUE16V2lseEU1NlVSekM1NjFBYm9kazhSczF3?oc=5",
+          "domain": "www.theedgesingapore.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-29T02:12:53+00:00",
+          "quality": 0.65,
+          "title": "Menara Tun Perak, Maybank\u2019s former Kuala Lumpur headquarters, up for sale: sources",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 8,
+        "polarity_mean": 0.125,
+        "sources": 7,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -195,12 +380,24 @@
       "upcoming": []
     },
     {
-      "escalated": 0,
+      "escalated": 1,
       "events": [],
       "instrument_id": "MYX:3182",
       "label": "Genting",
       "snapshot": [],
       "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMimgFBVV95cUxNdU8yTHFHcEp0M2phLXFoam9jdVhjRU50aUh2SE8tMzdQVHU2ZHprcERrYkloZHlQN3pYRUxYbHI1Ml94WHRBMjJfaTFMX1dyY3VJXy01VEF3ZTJleWE3TlN5VjRkSUpvWGVMei1qMGRSOV9tcTVEY0JGa2hTdzhPNF9zLUNkek95aVFYUl9GWDlsSHVZZC1TdGV3?oc=5",
+          "domain": "tradersunion.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-29T06:10:29+00:00",
+          "quality": 0.65,
+          "title": "Genting's global expansion weighs on operations with rising debt",
+          "uncertainty": 0.0
+        },
         {
           "day": null,
           "doc_id": "https://www.freemalaysiatoday.com/category/nation/2026/10/28/foreigner-held-for-alleged-assault-damage-at-genting-casino",
@@ -215,6 +412,30 @@
         },
         {
           "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE5YWVZUTHRPQ3BJdWhFNC1ZSHRZdUxIWjdnRkFVOXpVT1FIQnRrZkd6QXJXWHMxV3FBWXc4MDQxVEZsMVV4b2xRb1BuN0piNGRK?oc=5",
+          "domain": "theedgemalaysia.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-29T06:00:00+00:00",
+          "quality": 0.8,
+          "title": "Cover Story: No further fundraising planned for now, says Genting",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE9TNDEtbzNUbXJjSjJVSGgxRkRSenBVWnFWbWw4OE56OU01YnFLU2k5a2RtUjdRTzRBQnVjUHY3WjFPQ3paM1lnR2lvNzM5Qjkx?oc=5",
+          "domain": "theedgemalaysia.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-29T06:00:00+00:00",
+          "quality": 0.8,
+          "title": "Cover Story: Debt repayment looms for Genting",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
           "doc_id": "https://news.google.com/rss/articles/CBMivgFBVV95cUxQU2FjZDQ2UmRtRHBiUGNzODZaa2h0eC16SXhUUlFDU2hVQlpVcEVVSHMwRDVrNnJScnRZZUY3OXNlMGhoMkotRmhvWmdYNlQxQmw4aGNIazRGcFd5VjRudkZjbjd5NXdoNFZvRTNBeGpyd1VPVzkxVjVycGh6YmhSZmZ5RHN5azI4WlhXbWJvZ1dic3oyTkJBQzFvVnlodVZFaWlPOWdMdVg3dkU4czFyOHdzS0drWWIydmg4YTBR0gHDAUFVX3lxTE52QzIyb2I3NTZPMnJ4SzNMQS1fME5sQUt6emxIajE5czF4aTFmWHdXY2RQN0NCeXA1TXBLNUgyTEIyLThoTEd2WDJpbXQ3RnJLQ0dlQWFyYjM1Vlo2dUdqWUZKNndvWmsyU2ZuMUN6bGg0MlloU0h5THZKd3FQY2FTamcyR2taTnFYQjlSZjhxVF9wVjE5eHV6Y0lxM3M3blI0ckg2cFZOMmxBYndfSjVETG55QkdGaTd4d1hPckF4aUh3OA?oc=5",
           "domain": "www.nst.com.my",
           "escalated": false,
@@ -224,14 +445,38 @@
           "quality": 0.8,
           "title": "Foreigner nabbed for breaking auxiliary cop's teeth, damaging Genting casino",
           "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxOMnY1OXI2cWFtUzd0SXZBeEo5NUcydEZaNEFGUkRRakNHdGtkUTZ6cVBJX2dsTW05ckJ1cTB0ZXhMdW4wOUc5T25DZXpNQmRDaDhBUzNkSzhpV2NnNDQ0czVUWVQxdWdjSGhUbE0wWTl4YVFiNWM0RDZIM3M2d3AyMm1fbWxpMFJQRV8tSUd1SDZpMWFDbXlXREVHZndwMVNQWFphRjhsdkMwZVk?oc=5",
+          "domain": "app.dealroom.co",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-29T06:54:03+00:00",
+          "quality": 0.65,
+          "title": "Genting calls for $308 million rights issue as $618 million debt bill looms",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMilANBVV95cUxQempJeC1XQnllYjJFcUJjbXU4X3ducHVySWlEOTVTWlZST3VFb0hKY2p1bGh5OThuMEZMRnNUaEFpY1BxZDlrMUswZmpBNnJzSDJaQ1RDd3Yzamt2THJyT2ljTWZDYmVCQVdFa21ZSDlremZYd3JHazZhRFo0NjFmM0FMRTB3b09rWGY1RDZ0Y1RhYmdNVV9CNC1SbWd4VlZzYnJ6RFZsYzlSNnhWQkppMHZaNS1PR1Nza1dZcmxLRVlENmpSNUJLWWVESnhGVVctQkRndHBWd204dXRxWG44WDYwbGMzdGQ0YTZZTm1ZVWwxODNNYjk1U3FaOV8wck9uNnlxWmFQQ19WX21RWGNKZ3RiUVdubl9iNnlNMmJ6WmRfTzNPbGZGSjhGZ2hPVEw5SThPaTFVak9UVmFDSDR0Ul9KMGdTVE1GLWd2LUhROGdETUJydmFDeU5jcVZuYTkwSHBySVQxVWk3Y3hxZlVfSGRVNDZYV1VEQmZoVFFWLVBZS0V1YUJ4ekJoY3p3bUctQXg4ZA?oc=5",
+          "domain": "www.moomoo.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-29T01:28:16+00:00",
+          "quality": 0.55,
+          "title": "GENTING (3182)",
+          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.0,
-        "n": 2,
-        "polarity_mean": 0.0,
-        "sources": 2,
-        "uncertainty_mean": 0.189
+        "n": 7,
+        "polarity_mean": 0.143,
+        "sources": 6,
+        "uncertainty_mean": 0.054
       },
       "upcoming": []
     },

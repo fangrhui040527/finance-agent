@@ -1,11 +1,19 @@
 # Digest 2026-10-29
 
-Generated 2026-10-29 00:56 UTC · slot `all` · 27145 articles in the corpus, 6403 observations, 4265 events in the fact book.
+Generated 2026-10-29 10:12 UTC · slot `all` · 27346 articles in the corpus, 6408 observations, 4265 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- quiet: nothing collected for this name in the window
+- tone: 8 stories from 7 sources, polarity +0.12, peak intensity 0.00, uncertainty 0.00 · 1 escalated
+- 2026-10-29 www.businesstoday.com.my — Stock Today: Maybank Edges Higher To RM10 Amid Cross-Border Banking Expansion [q 0.80, tone +1.0] ★
+- 2026-10-29 www.nst.com.my — Roussin-Bouchard seizes Maybank lead with flawless 64 [WATCH] [q 1.00, tone +0.0]
+- 2026-10-29 www.nst.com.my — Liyana stays calm for bogey-free opening round at KLGCC [q 1.00, tone +0.0]
+- 2026-10-29 www.lpga.com — Miyu Yamashita Opens Maybank Championship Title Defense With First-Round 65 [q 0.65, tone +0.0]
+- 2026-10-29 malaysia.news.yahoo.com — Menara Tun Perak, formerly Menara Maybank, on offer for full or partial sale [q 0.65, tone +0.0]
+- 2026-10-29 infonews.ca — Three closing birdies put Pauline Roussin-Bouchard atop the Maybank Classic leaderboard [q 0.65, tone +0.0]
+- 2026-10-29 www.mankatofreepress.com — Haeran Ryu withdraws from the LPGA's Maybank Classic in Malaysia before her first round [q 0.65, tone +0.0]
+- 2026-10-29 www.theedgesingapore.com — Menara Tun Perak, Maybank’s former Kuala Lumpur headquarters, up for sale: sources [q 0.65, tone +0.0]
 
 ### Tenaga (MYX:5347)
 - quiet: nothing collected for this name in the window
@@ -20,9 +28,14 @@ Generated 2026-10-29 00:56 UTC · slot `all` · 27145 articles in the corpus, 64
 - quiet: nothing collected for this name in the window
 
 ### Genting (MYX:3182)
-- tone: 2 stories from 2 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.19 · 0 escalated
+- tone: 7 stories from 6 sources, polarity +0.14, peak intensity 0.00, uncertainty 0.05 · 1 escalated
+- 2026-10-29 tradersunion.com — Genting's global expansion weighs on operations with rising debt [q 0.65, tone +1.0] ★
 - 2026-10-28 www.freemalaysiatoday.com — Foreigner held for alleged assault, damage at Genting casino [q 1.00, tone +0.0]
+- 2026-10-29 theedgemalaysia.com — Cover Story: No further fundraising planned for now, says Genting [q 0.80, tone +0.0]
+- 2026-10-29 theedgemalaysia.com — Cover Story: Debt repayment looms for Genting [q 0.80, tone +0.0]
 - 2026-10-28 www.nst.com.my — Foreigner nabbed for breaking auxiliary cop's teeth, damaging Genting casino [q 0.80, tone +0.0]
+- 2026-10-29 app.dealroom.co — Genting calls for $308 million rights issue as $618 million debt bill looms [q 0.65, tone +0.0]
+- 2026-10-29 www.moomoo.com — GENTING (3182) [q 0.55, tone +0.0]
 
 ### NVIDIA (XNAS:NVDA)
 - tone: 43 stories from 22 sources, polarity +0.09, peak intensity 0.33, uncertainty 0.17 · 11 escalated
@@ -89,6 +102,20 @@ Generated 2026-10-29 00:56 UTC · slot `all` · 27145 articles in the corpus, 64
 | 10y minus 2y Treasury spread, % | 0.29 | 2026-10-27 | -0.03 | fred |
 | US unemployment rate, % | 4.20 | 2026-09-01 | +0.1 | fred |
 | CBOE VIX, index | 17.52 | 2026-10-27 | -0.87 | fred |
+
+## Collection
+
+| at (UTC) | source | status | fetched | kept | stored | detail |
+|---|---|---|---|---|---|---|
+| 10:11 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
+| 10:11 | twse_openapi | ok | 8 | 0 | 0 | facts 5;  |
+| 10:11 | jin10_flash | degraded | 18 | 18 | 18 | facts 0; window not covered back to 2026-10-28 22:43Z; the oldest item read is 2 |
+| 10:11 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 10:11 | nst_business | degraded | 130 | 126 | 122 | page 2 starts 3.3h before page 1 ends (2026-10-29 03:29Z under 2026-10-29 06:50Z |
+| 10:11 | fmt_business | ok | 37 | 37 | 37 |  |
+| 10:11 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: IHH, Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals |
+| 10:10 | google_news | ok | 24 | 24 | 24 | read but empty: Press Metal, Petronas Chemicals; named the company: 12 of 24 (lo |
+| 10:10 | gdelt | ok | 0 | 0 | 0 | grouped 3 names per request; 2 requests (HTTP 429 on request 2: the rest of the  |
 
 ---
 
