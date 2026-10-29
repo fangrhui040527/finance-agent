@@ -1,0 +1,91 @@
+# Temporary: test the Marketaux key and its Bursa coverage (2026-10-29).
+# Removed in the next commit. Runs only when this file is pushed; prints no
+# key, only its shape and Marketaux's answers with the key scrubbed. Spends 6
+# of the free plan's 100 daily calls.
+name: marketaux-key-diagnose
+
+on:
+  push:
+    branches: [claude/new-session-3rm9vv]
+    paths: [.github/workflows/marketaux-key-diagnose.yml]
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Diagnose
+        env:
+          NAMED: ${{ secrets.MARKETAUX_API_KEY }}
+          NAMED_ALT: ${{ secrets.MARKETAUX_API_TOKEN }}
+          ALL_SECRET: ${{ secrets.ALL_SECRET }}
+          SECRET_NAMES: ${{ toJSON(secrets) }}
+        run: |
+          python3 - <<'EOF'
+          import hashlib, json, os, re, time, urllib.parse, urllib.request
+          from datetime import datetime, timedelta, timezone
+
+          names = [n for n in json.loads(os.environ.get("SECRET_NAMES") or "{}") if "MARKET" in n.upper()]
+          print("secret names containing MARKET:", names or "none")
+
+          def shape(name, k):
+              if not k:
+                  print(f"{name}: not set"); return
+              s = k.strip()
+              print(f"{name}: length {len(k)}, stripped {len(s)}, whitespace at ends {k != s}, "
+                    f"alphanumeric {s.isalnum()}, sha256[:8] {hashlib.sha256(s.encode()).hexdigest()[:8]}")
+
+          # A line in ALL_SECRET labelled marketaux (any case), "label: value" or "LABEL=value".
+          blob = ""
+          for line in (os.environ.get("ALL_SECRET") or "").splitlines():
+              m = re.match(r"\s*([A-Za-z_ ]*marketaux[A-Za-z_ ]*)\s*[:=]\s*(\S+)", line, re.I)
+              if m:
+                  blob = m.group(2).strip().strip("'\"")
+                  break
+          named = os.environ.get("NAMED") or os.environ.get("NAMED_ALT") or ""
+          shape("MARKETAUX key (named secret)", named)
+          shape("MARKETAUX key (line inside ALL_SECRET)", blob)
+          key = (named or blob).strip()
+          if not key:
+              raise SystemExit("no Marketaux key found under MARKETAUX_API_KEY, MARKETAUX_API_TOKEN or in ALL_SECRET")
+
+          since = (datetime.now(timezone.utc) - timedelta(days=7)).strftime("%Y-%m-%dT%H:%M")
+          base = {"filter_entities": "true", "language": "en", "published_after": since}
+          calls = [
+              ("NVDA, last 7 days", {"symbols": "NVDA", **base}),
+              ("1155.KL Maybank, last 7 days", {"symbols": "1155.KL", **base}),
+              ("8869.KL Press Metal, last 7 days", {"symbols": "8869.KL", **base}),
+              ("3182.KL Genting, last 7 days", {"symbols": "3182.KL", **base}),
+              ("5347.KL Tenaga, last 7 days", {"symbols": "5347.KL", **base}),
+              ("all six Bursa names together, last 30 days, any language",
+               {"symbols": "1155.KL,5347.KL,5183.KL,5225.KL,8869.KL,3182.KL", "filter_entities": "true",
+                "published_after": (datetime.now(timezone.utc) - timedelta(days=30)).strftime("%Y-%m-%dT%H:%M")}),
+          ]
+          for label, params in calls:
+              time.sleep(1.5)
+              url = "https://api.marketaux.com/v1/news/all?" + urllib.parse.urlencode({**params, "api_token": key})
+              try:
+                  with urllib.request.urlopen(url, timeout=20) as r:
+                      status, body = r.status, r.read().decode("utf-8", "replace")
+              except urllib.error.HTTPError as e:
+                  status, body = e.code, e.read().decode("utf-8", "replace")
+              except Exception as e:
+                  print(f"\n== {label}: request failed: {type(e).__name__}: {str(e).replace(key, '***')}")
+                  continue
+              body = body.replace(key, "***")
+              try:
+                  data = json.loads(body)
+              except ValueError:
+                  print(f"\n== {label}: HTTP {status}, not JSON: {body[:200]!r}"); continue
+              if "error" in data:
+                  print(f"\n== {label}: HTTP {status}, ERROR {json.dumps(data['error'])[:300]}"); continue
+              meta, items = data.get("meta", {}), data.get("data", [])
+              print(f"\n== {label}: HTTP {status}, found {meta.get('found')}, returned {meta.get('returned')}, limit {meta.get('limit')}")
+              for a in items[:3]:
+                  ents = [(e.get("symbol"), e.get("match_score"), e.get("sentiment_score")) for e in a.get("entities", [])]
+                  print(f"   {a.get('published_at','')[:16]} {a.get('source','')[:22]:22} {a.get('title','')[:70]!r}")
+                  print(f"      entities (symbol, match_score, sentiment_score): {ents[:4]}")
+          EOF
