@@ -1,0 +1,333 @@
+{
+ "day": "2026-10-29",
+ "written_at": "2026-10-29T22:48:00Z",
+ "phase": "full",
+ "week": 8,
+ "equity_usd": 1000.0,
+ "cash_usd": 1000.0,
+ "control_equity_usd": 955.22,
+ "control_return_to_date": -0.0448,
+ "drawdown": 0.0,
+ "control_drawdown": 0.0448,
+ "halted": false,
+ "marks": 40,
+ "positions": [],
+ "changes": [],
+ "control_changes": [],
+ "control_mark": {
+  "marked_on": "2026-10-29",
+  "equity_usd": 955.22,
+  "cash_usd": 406.02,
+  "positions_usd": 549.2,
+  "day_return": -0.0009,
+  "note": "no change; holdings as left by the 10-21 week-7 rebalance"
+ },
+ "index_book": {
+  "mark": {
+   "marked_on": "2026-10-29",
+   "equity_usd": 996398.68,
+   "cash_usd": 198608.4,
+   "positions_usd": 797790.28,
+   "day_return": 0.0041,
+   "drawdown": 0.0036,
+   "held": 97,
+   "pending": 0
+  },
+  "cost_to_date_share_of_notional": 0.0097,
+  "since_2026_09_30": {
+   "index": -0.0036,
+   "decided": 0.0,
+   "control": -0.0253
+  },
+  "dividends": [],
+  "changes": {},
+  "note": "no change"
+ },
+ "caps": [
+  {
+   "cap": "largest name",
+   "value": "0.00%",
+   "limit": "25%",
+   "breached": false
+  },
+  {
+   "cap": "invested",
+   "value": "0.00%",
+   "limit": "80%",
+   "breached": false
+  },
+  {
+   "cap": "cash floor",
+   "value": "100.00%",
+   "limit": "20%",
+   "breached": false
+  },
+  {
+   "cap": "names held",
+   "value": "0",
+   "limit": "0",
+   "breached": false
+  },
+  {
+   "cap": "drawdown from peak",
+   "value": "0.00%",
+   "limit": "8% halts entries",
+   "breached": false
+  },
+  {
+   "cap": "turnover, 5 weekdays",
+   "value": "USD 0.00",
+   "limit": "USD 500.00",
+   "breached": false
+  }
+ ],
+ "prices": {
+  "bursa": "Thursday 2026-10-29 closes (catch-up bursa_close, 2adb5b0)",
+  "us": "Thursday 2026-10-29 closes (tonight's us_close, bc9a39c)",
+  "fx": "MYR 4.0605 per USD (bnm, 2026-10-29)"
+ },
+ "fundable": [
+  {
+   "instrument_id": "MYX:1155",
+   "lot_usd": 246.28,
+   "share": 0.246,
+   "round_trip": 0.0098,
+   "lots": 1
+  },
+  {
+   "instrument_id": "MYX:5183",
+   "lot_usd": 112.55,
+   "share": 0.113,
+   "round_trip": 0.0199,
+   "lots": 2
+  },
+  {
+   "instrument_id": "MYX:5225",
+   "lot_usd": 193.33,
+   "share": 0.193,
+   "round_trip": 0.0121,
+   "lots": 1
+  },
+  {
+   "instrument_id": "MYX:8869",
+   "lot_usd": 168.94,
+   "share": 0.169,
+   "round_trip": 0.0137,
+   "lots": 1
+  },
+  {
+   "instrument_id": "MYX:3182",
+   "lot_usd": 37.19,
+   "share": 0.037,
+   "round_trip": 0.0575,
+   "lots": 6
+  },
+  {
+   "instrument_id": "XNAS:NVDA",
+   "lot_usd": 213.66,
+   "share": 0.214,
+   "round_trip": 0.012,
+   "lots": 1
+  }
+ ],
+ "over_cap": {
+  "MYX:5347": 0.328,
+  "XNAS:AAPL": 0.349,
+  "XNAS:MSFT": 0.53
+ },
+ "ledger": {
+  "mark_days": 28,
+  "gap": "no routine ran 2026-10-02..10-06; no paper page and no decision for those days; no decision is backdated"
+ },
+ "attribution": null,
+ "decision": {
+  "recorded": true,
+  "weights": {},
+  "thesis": "All cash, the forty-fourth all-cash row. The 2026-10-28 feedback page decomposes Wednesday: no book name significant at 5%; Genting rose 4.14% to 1.51 at 1.87 sigma (idiosyncratic +4.28%, rank p 0.038), its third rise in a row, with no row about the company in the session and Genting Malaysia up 6.09% the same day, so a group leg is as likely as a Genting story and no cached proxy can tell them apart. Every other name moved within normal variation. Genting's 10-26 rise and Press Metal's 10-23 fall remain unexplained after the web searches. Microsoft reported after the 10-28 close; its first session after the results is 10-29, not yet decomposed. Alpha Vantage's news call is now a paid endpoint for this key, so the US names lost one sentiment source. No name carries a measured, sourced reason to expect it to beat cash over 21 sessions. Nineteen all-cash claims are graded, all correct, against a control at -4.48%. Claim: nothing in the fundable universe beats cash over 21 sessions.",
+  "horizon": 21,
+  "confidence": 0.55,
+  "prediction_id": "paper-2026-10-29-allcash-21d-2ead",
+  "grades_on": "2026-11-30",
+  "refusals": []
+ },
+ "stores": {
+  "decided_targets": 44,
+  "predictions": 44,
+  "outcomes": 19,
+  "index_targets": 291,
+  "control_targets": 11,
+  "index_pending": 0,
+  "made_at": "2026-10-29T22:48:07Z"
+ },
+ "evidence": {
+  "feedback_pages": "knowledge/feedback/2026-10-28.md (a2e7360)",
+  "wednesday": "no book name significant at 5%; Genting +4.14% at 1.87 sigma (idiosyncratic +4.28%, rank p 0.038), no company row, Genting Malaysia +6.09%; every other name within normal variation",
+  "microsoft": "results after the 10-28 close (8-K item 2.02); 10-29 is its first session after them",
+  "keys": "alphavantage_news: key valid on free calls, NEWS_SENTIMENT refused as premium in every shape (run 40922330724)",
+  "phase": "week 8, full caps"
+ },
+ "mistakes": [
+  "Checked, holds: the 2026-10-28 page (paper-2026-10-28-allcash-21d-bc1b) named Genting +4.14% for the next decomposition; decomposed it is 1.87 sigma, past 1.5 and short of 5% significance, with no cause in the store.",
+  "Standing: paper-2026-10-16-allcash-21d-2b02 filed Press Metal's -9.34% as not decomposed; decomposed it is 5.43 sigma, cause not in the store; 6.86 tonight against 7.17 before the fall.",
+  "Standing: paper-2026-10-01-allcash-21d-5a1e is behind on IHH +1.95% (7.70 -> 7.85) and Petronas Chemicals +10.65% (4.13 -> 4.57) since the 10-01 closes; grades 10-31.",
+  "Standing: paper-2026-10-08-allcash-21d-7bb6's test (Genting above 1.93 before 11-07) stands at 1.51."
+ ],
+ "mistakes_checked": [
+  "paper-2026-10-28-allcash-21d-bc1b: Genting's 10-28 move named for decomposition; 1.87 sigma (holds)",
+  "paper-2026-10-28-allcash-21d-bc1b grade date 2026-11-27"
+ ],
+ "grades_due": [
+  {
+   "prediction_id": "paper-2026-09-30-allcash-21d-ee21",
+   "on": "2026-10-30"
+  },
+  {
+   "prediction_id": "paper-2026-10-01-allcash-21d-5a1e",
+   "on": "2026-10-31"
+  }
+ ],
+ "lessons": [
+  "A move shared with a sister listing is not yet a company story: on 10-28 Genting rose 4.14% and Genting Malaysia 6.09% with no row about either; until a group or sector proxy is cached, such a move stays unexplained rather than becoming a Genting cause."
+ ],
+ "dividend_boundary": {
+  "decided": "2026-10-10T15:25:31Z",
+  "control": "2026-10-10T15:25:31Z",
+  "index": "2026-10-10T15:25:31Z",
+  "note": "marks before it are not restated; no credit to the decided or control book yet"
+ },
+ "graded": [
+  {
+   "prediction_id": "paper-2026-09-11-allcash-21d-8bf9",
+   "benchmark": -0.024,
+   "correct": true
+  },
+  {
+   "prediction_id": "paper-2026-09-12-allcash-21d-1661",
+   "benchmark": -0.024,
+   "correct": true
+  },
+  {
+   "prediction_id": "paper-2026-09-13-allcash-21d-5baf",
+   "benchmark": -0.0237,
+   "correct": true
+  },
+  {
+   "prediction_id": "paper-2026-09-14-allcash-21d-9d7e",
+   "benchmark": -0.0441,
+   "correct": true
+  },
+  {
+   "prediction_id": "paper-2026-09-15-allcash-21d-af55",
+   "benchmark": -0.0466,
+   "correct": true
+  },
+  {
+   "prediction_id": "paper-2026-09-16-allcash-21d-3865",
+   "benchmark": -0.0616,
+   "correct": true
+  },
+  {
+   "prediction_id": "paper-2026-09-17-allcash-21d-7667",
+   "benchmark": -0.0616,
+   "correct": true
+  },
+  {
+   "prediction_id": "paper-2026-09-18-allcash-21d-667a",
+   "benchmark": -0.0616,
+   "correct": true
+  },
+  {
+   "prediction_id": "paper-2026-09-19-allcash-21d-b7bd",
+   "benchmark": -0.0557,
+   "correct": true
+  },
+  {
+   "prediction_id": "paper-2026-09-20-allcash-21d-dbaf",
+   "benchmark": -0.0557,
+   "correct": true
+  },
+  {
+   "prediction_id": "paper-2026-09-21-allcash-21d-c04f",
+   "benchmark": -0.0533,
+   "correct": true
+  },
+  {
+   "prediction_id": "paper-2026-09-22-allcash-21d-33c5",
+   "benchmark": -0.0533,
+   "correct": true
+  },
+  {
+   "prediction_id": "paper-2026-09-23-allcash-21d-b999",
+   "benchmark": -0.0469,
+   "correct": true
+  },
+  {
+   "prediction_id": "paper-2026-09-24-allcash-21d-e5b2",
+   "benchmark": -0.0446,
+   "correct": true
+  },
+  {
+   "prediction_id": "paper-2026-09-25-allcash-21d-468d",
+   "benchmark": -0.0433,
+   "correct": true
+  },
+  {
+   "prediction_id": "paper-2026-09-26-allcash-21d-cf74",
+   "benchmark": -0.0435,
+   "correct": true
+  },
+  {
+   "prediction_id": "paper-2026-09-27-allcash-21d-9d18",
+   "benchmark": -0.0435,
+   "correct": true
+  },
+  {
+   "prediction_id": "paper-2026-09-28-allcash-21d-111e",
+   "benchmark": -0.0418,
+   "correct": true
+  },
+  {
+   "prediction_id": "paper-2026-09-29-allcash-21d-7831",
+   "benchmark": -0.0266,
+   "correct": true
+  }
+ ],
+ "closes": {
+  "MYX:1155": [
+   9.99,
+   10.0
+  ],
+  "MYX:5347": [
+   13.22,
+   13.3
+  ],
+  "MYX:5183": [
+   4.72,
+   4.57
+  ],
+  "MYX:5225": [
+   7.83,
+   7.85
+  ],
+  "MYX:8869": [
+   6.86,
+   6.86
+  ],
+  "MYX:3182": [
+   1.51,
+   1.51
+  ],
+  "XNAS:NVDA": [
+   215.38,
+   213.66
+  ],
+  "XNAS:AAPL": [
+   343.83,
+   348.91
+  ],
+  "XNAS:MSFT": [
+   531.01,
+   530.14
+  ]
+ }
+}
