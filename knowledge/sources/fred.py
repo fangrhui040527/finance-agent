@@ -22,7 +22,7 @@ from __future__ import annotations
 from datetime import UTC, date, datetime, timedelta
 
 from knowledge.facts import EventRecord, SeriesPoint, as_decimal
-from knowledge.sources.base import Collector, Pull, SourceError, parse_date
+from knowledge.sources.base import KEY_REFUSED, Collector, Pull, SourceError, parse_date
 
 URL = "https://api.stlouisfed.org/fred/series/observations"
 RELEASES_URL = "https://api.stlouisfed.org/fred/releases/dates"
@@ -95,9 +95,15 @@ SERIES: dict[str, str] = {
 LOOKBACK = timedelta(days=60)
 
 
+#: How FRED says the key is wrong: HTTP 400 with an `error_message`, not a
+#: 401, so without these a revoked key read as a plain failure.
+KEY_MARKERS = ("api_key is not registered", "api_key is not a 32 character")
+
+
 class FredCollector(Collector):
     name = "fred"
     key_env = "FRED_API_KEY"
+    KEY_REFUSED_400 = KEY_MARKERS
 
     def __init__(self, series: dict[str, str] | None = None, **kw) -> None:
         super().__init__(**kw)
@@ -127,7 +133,10 @@ class FredCollector(Collector):
                 failures.append(f"{sid}: {e}")
                 continue
             if isinstance(payload, dict) and payload.get("error_message"):
-                failures.append(f"{sid}: {payload['error_message']}")
+                message = str(payload["error_message"])
+                if any(m in message.lower() for m in KEY_MARKERS):
+                    message = f"{KEY_REFUSED}: {message}"
+                failures.append(f"{sid}: {message}")
                 continue
             rows = payload.get("observations") if isinstance(payload, dict) else None
             if not isinstance(rows, list):

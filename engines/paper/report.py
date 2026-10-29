@@ -16,10 +16,11 @@ from decimal import Decimal
 from pathlib import Path
 
 from engines.backtest.metrics import drawdown_profile
-from engines.paper.book import current_weights, settings_of, turnover_used
+from engines.paper.book import current_weights, index_universe_path, settings_of, turnover_used
 from engines.paper.fx import UsdMyr
 from engines.paper.rules import Fundable, Phase, fundables, min_names, names_rule, phase_for
 from engines.paper.store import CONTROL, DECIDED, INDEX, MarkRow, PaperStore, TargetRow
+from engines.paper.universe import load_universe
 
 
 @dataclass
@@ -120,11 +121,17 @@ def index_line(store: PaperStore, day: date) -> IndexLine | None:
     cost = store.cost_to_date(INDEX)
     name = str(terms.get("universe") or "index")
     label = Path(name).stem.upper() if name else "INDEX"
+    # The file the book rebalances against, as it stands now; the count frozen
+    # at opening only when the file cannot be read.
+    try:
+        members = len(load_universe(index_universe_path(store)).members)
+    except (OSError, ValueError):
+        members = int(terms.get("universe_names") or 0)
     return IndexLine(
         opened_on=opened,
         notional_usd=notional,
         universe=label,
-        members=int(terms.get("universe_names") or 0),
+        members=members,
         marked_on=m.day if m else None,
         equity_usd=m.equity_usd if m else notional,
         cash_usd=m.cash_usd if m else notional,

@@ -283,8 +283,9 @@ traces, and records every state CHANGE to `data/alerts.db` (append-only, like
 every other record here). A rule that stays tripped writes nothing new - an
 alert repeating hourly is noise a person learns to ignore, which is worse
 than silence - unless what it names changed: a rule that rolls many sources,
-series or names into one alert (`sweep_silence`, `series_stale`,
-`price_stale`, `name_coverage`, `slots_missed`, `run_errors`) writes an
+series or names into one alert (`sweep_silence`, `source_keys`,
+`expected_rows`, `series_stale`, `price_stale`, `name_coverage`,
+`slots_missed`, `run_errors`) writes an
 `updated` event when its members or severity move, and `watch` lists it under
 UPDATED rather than NEW. `ask.py alerts` shows the latest title and the time it
 first opened.
@@ -307,6 +308,8 @@ The rules, all thresholds in `config.toml [monitor]` and bounded in code:
 | `dropped_claims` | claims dropped for want of a citation exceed `dropped_claim_rate` |
 | `silence` | no model calls in `silence_hours`, on a ledger that HAS run before (0 = off) |
 | `sweep_silence` | no successful sweep in `sweep_silence_hours`, for a source that HAS succeeded before (0 = off) |
+| `source_keys` | an enabled source's newest sweep row is `skipped_no_key` (its key is not set) or `auth_failed` (its key was refused, HTTP 401) - at once, no allowance |
+| `expected_rows` | a source's last two trading-day firings of a slot each read under 20% of its median over the 20 firings before (see Sweep ledger, below) |
 | `slots_missed` | the collector fired fewer times than its own cron owes over `slot_window_days` whole days (0 = off) |
 | `series_stale` | a macro series' newest observation is past the cadence declared for it in `knowledge/sources/freshness.py` |
 | `series_resumed` | a series recorded as ENDED in that same file has printed past the period its upstream stopped at |
@@ -718,6 +721,99 @@ Then read it from anywhere: `ask.py alerts` on the command line, the
 app. An empty history means no rule has been EVALUATED - not that none would
 fire.
 
+### What a runner can reach (2026-10-28)
+
+Dispatch `bursa-feeds-probe` (Bursa's daily PDFs, robots.txt, the trading
+participation page, the FBM100 list, the Malaysian outlets; `bursa_data` alone
+for just Bursa's files) and `macro-alternatives-probe` (BNM OpenAPI and yield
+page, Yahoo BZ=F and ALI=F, Single Buyer AFA, World Bank and its Pink Sheet,
+OpenDOSM parquet, GDELT). Each ends with a "Reachability from this runner"
+table in the job summary: status, content type, final URL, bytes and the first
+200 bytes per target. Read the first bytes before the status - `%PDF` or `PAR1`
+is the file; `<html>` under a 200 is a challenge or an error page. Bursa's
+daily files are asked for the last Bursa session before the run (MYT, XKLS
+holidays skipped) and for a date known to have existed, so a 404 on the first
+alone is a late post, on both a wrong path. Read-only, keyless, honest
+User-Agent, 15s timeouts; the Bursa probe stops asking after 12 minutes and
+records the rest as skipped, and writes each block to the summary as it ends.
+
+## Sweep ledger: a missing key turns the run red (2026-10-28)
+
+On 2026-10-27/28 the ALL_SECRET blob was overwritten, the FINNHUB, FRED and
+ALPHAVANTAGE keys vanished and FMP's key was refused with HTTP 401 - and every
+collect run concluded `success`. A source with no key was written `ok`, which
+even resolved the open alphavantage_news `sweep_silence` alert.
+
+Now:
+
+* **Statuses.** No key is `skipped_no_key`; a refused key (HTTP 401) is
+  `auth_failed`. Neither is ever `ok`: neither moves a source's watermark,
+  counts as a run that read, or resolves `sweep_silence`. A skip by design
+  (eodhd's free-plan rotation, a slot with no name for a source, a plan
+  boundary) is still `skipped` / `ok` with a "skipped:" detail, as before.
+* **The ledger.** `ask.py sweep --ledger PATH` writes one line per source
+  (`knowledge/ledger.py`). collect.yml shows it as a table on the run's
+  summary page, and its step **Fail if a key is missing or refused, or a
+  source ran short** - after the data commit, which it can never block -
+  exits 1 when a source is `skipped_no_key` or `auth_failed`, or an expected
+  source ran short. The run goes red and GitHub e-mails the owner; the log
+  names each source and why, never a key. Fix: set or replace the key as the
+  repository secret the detail names (or inside ALL_SECRET), then dispatch
+  the slot with `force`. An optional key you do not intend to set (EODHD)
+  turns the run red too: take the source out of `[sources] enabled` instead.
+* **Expected rows.** A source's row count (`fetched`) on each firing of a
+  slot is compared with its median over the 20 firings before. Two firings in
+  a row under 20% of that median (zero always is) is a shortfall. One run per
+  firing counts (the one that read most, so a `force` re-run after a repair
+  clears the shortfall at once); holidays and
+  weekends of the slot's market (`markets/holidays.py`; Bursa for
+  `bursa_close`, US for `us_preopen`/`us_close`) are left out; a source with
+  fewer than 5 firings of history or a median under 5 rows is not judged. The
+  constants are `EXPECTED_ROWS_*` in `knowledge/ledger.py`. The monitor raises
+  the same facts as `source_keys` and `expected_rows`.
+
+### The dead-man switch (healthchecks.io)
+
+A run that never starts - a disabled workflow, a dropped cron - turns nothing
+red. An outside check catches it. Optional; with no secret every ping is a
+no-op.
+
+1. Sign up at https://healthchecks.io (the free plan is enough) and add a check.
+2. Schedule: **Cron**, expression `20 9 * * *` (collect.yml's bursa_close
+   line, the slot that fires every day), time zone **UTC**, grace **12
+   hours**. GitHub fires this cron late: over 2026-10-01..28 the first
+   bursa_close run landed 47 minutes to 9 hours 11 minutes after 09:20, and
+   more than 2 hours late on 14 of 28 days (latest 10-05, 18:31). A 1-hour
+   grace would page on those days while the collector works; 12 hours still
+   catches a dead cron the same day. The other slots' pings land between
+   those times and show in the check's log; a `/fail` from any slot turns the
+   check down at once.
+3. Copy the check's ping URL (`https://hc-ping.com/<uuid>`) and add it as the
+   repository secret **HEALTHCHECKS_PING_URL** (Settings, Secrets and
+   variables, Actions). It is a secret: anyone holding it can ping.
+
+The job pings `<url>/start` first, and last `<url>` on success or
+`<url>/fail` when any step failed it, with the ledger as a short plain-text
+body (`curl -fsS -m 10 --retry 3`). A ping that does not get through is a
+warning on the run, never a failure.
+
+## Earnings dates: which one to believe (2026-10-28)
+
+Calendars move and disagree: by 2026-10-28 Finnhub alone had listed Apple's
+results for 10-28, 10-29 and then 11-02 (the store has no FMP earnings rows:
+FMP's `/earnings` is outside the plan, HTTP 402). Each source's date stays its
+own row, and each source's newest listing is the one counted; `ask.py facts`,
+the `fact_snapshot` tool, the pack and the digest add one resolved line
+(`knowledge/earnings_date.py`). Authority: an EDGAR 8-K with Item 2.02 (stored
+as `results_released`, known at its acceptance time, read as New York time) >
+the company's own date (no collector yet: `COMPANY_SOURCES` is the hook) >
+Finnhub > FMP > anything else. When the top two disagree the line reads
+`unconfirmed (2026-10-29 finnhub / 2026-10-28 fmp)`: do not date a move by
+either until the 8-K lands. A one-day gap counts as agreement only when the
+earlier date is listed after the close. An 8-K never absorbs a calendar date
+more than a day after it (a pre-announcement leaves the report expected), and a
+calendar-only date already past prints as `past ... - no 8-K on file`.
+
 ## Web evidence: searching for what the feeds missed (2026-10-22)
 
 On 2026-10-16 Press Metal fell 9.34%, an idiosyncratic move of 5.43 sigma, and
@@ -944,6 +1040,28 @@ it index-book marks) and `facts.db` (4.7 MB, +20-35 KiB a day) are still whole
 files; at today's rates the first reaches 50 MiB in 2029. `price_cache.db` is
 bounded (it upserts). The 45 MiB warning will name either one long before.
 
+## A story linked to the wrong company, or to the right one for the wrong reason (2026-10-28)
+
+The linker (`knowledge/news/linking.py`) now refuses an alias written behind
+another market's exchange code (`UPCOM:TNB` is Nha Be Steel, not Tenaga;
+`MYX:`, `KLSE:` and `NASDAQ:` still link the book's names), and reads
+`NOT_THE_COMPANY` in the same module: `names` that contain an alias and are
+someone else ("Apple Hospitality", "Apple Bank"), and `near` words that make a
+short alias another listing's ticker. **To stop a new false link, add it
+there**, with a test in `tests/test_linker_guards.py`; entities.yaml stays
+human-authored and holds aliases only.
+
+Two kinds of story stay linked but are never a cause: another company's
+contract win (`[mention]`: "Bintai Kinden wins RM20.3mil TNB contract") and an
+accident involving the company's vehicle, staff or premises
+(`[incident_bystander]`). The digest and the pack print the tag, never star
+them, and rank them below the company's own news; the ingest gate and the
+ragqa audit's gate re-run do not escalate for them, and `news_evidence` cites
+them with a `[mention] ...: not a cause` caveat. Stored links are not
+rewritten: the digest, the graph rebuild, `kb_news` and ragqa read every row
+through `EntityLinker.recheck`, so a new exclusion reaches old rows on the next
+digest, `derive` or index build.
+
 ## Reading a capped sweep row (2026-09-08)
 
 GDELT asks about three names a run, not the whole book. A sweep row for it now
@@ -973,6 +1091,18 @@ the whole book and `ask.py sources --probe gdelt` from a runner will say so.
 **Do not raise the cap to "catch up".** The refusals scale with requests per
 run, so a higher cap collects less, not more. That was the state before it:
 nine names asked, a mean of 3.5 refused.
+
+**A `throttled` row (2026-10-28).** The first sign GDELT is refusing for rate
+ends GDELT for the rest of that run: an HTTP 429 with no Retry-After (not
+retried — a block lasts about 25 minutes), a 200 with an empty body, or a 200
+carrying its plain-text "limit requests" notice. The row's status is
+`throttled`, never `ok`, even when an earlier group was read; the detail says
+which shape it took and on which request (`empty 200 on request 2: the rest of
+the slot is deferred, not asked`) and names the deferred companies. The run
+exits 3. A throttled row does not move the watermark, so the next slot asks
+over the held-back names' window again; the corpus dedupes the rest. Nothing
+to do for one row. Every GDELT row throttled for a day means the runners'
+address is blocked: do not add retries or requests to push through it.
 
 ## `name_coverage`: one name going quiet inside a working collector (2026-09-08)
 
