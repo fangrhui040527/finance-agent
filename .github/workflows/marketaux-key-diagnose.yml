@@ -22,14 +22,11 @@ jobs:
           NAMED: ${{ secrets.MARKETAUX_API_KEY }}
           NAMED_ALT: ${{ secrets.MARKETAUX_API_TOKEN }}
           ALL_SECRET: ${{ secrets.ALL_SECRET }}
-          SECRET_NAMES: ${{ toJSON(secrets) }}
         run: |
           python3 - <<'EOF'
           import hashlib, json, os, re, time, urllib.parse, urllib.request
           from datetime import datetime, timedelta, timezone
 
-          names = [n for n in json.loads(os.environ.get("SECRET_NAMES") or "{}") if "MARKET" in n.upper()]
-          print("secret names containing MARKET:", names or "none")
 
           def shape(name, k):
               if not k:
