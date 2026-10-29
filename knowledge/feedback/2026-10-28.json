@@ -1,0 +1,235 @@
+{
+ "day": "2026-10-28",
+ "written_at": "2026-10-29T22:47:00Z",
+ "measured_session": "2026-10-28",
+ "pack_built": "2026-10-29T22:44:00Z",
+ "market": {
+  "regime": "neutral",
+  "notes": [
+   "MYX:^KLSE +0.13% (1,611.85 -> 1,613.87) on 156,019,000; 99 Bursa names: 46 up, 37 down, 16 flat, median 0.00%; Genting Malaysia +6.09%, Lotte Chemical Titan +7.81%",
+   "XNAS:SPY +0.34% (769.66 -> 772.31) on 30,133,800; the three US names fell against it, each within normal variation",
+   "SP500 7,743.98, NASDAQCOM 26,549.85, VIXCLS 16.91, BAMLH0A0HYM2 3.14 on 10-28; DCOILBRENTEU 123.10 on 10-27, the store's first Brent print after 10-20",
+   "no book name significant at 5%; Genting 1.87 sigma (rank p 0.038), no_identified_catalyst"
+  ]
+ },
+ "names": [
+  {
+   "instrument_id": "MYX:1155",
+   "move": {
+    "return_1d": 0.0,
+    "market_1d": 0.0013,
+    "unexplained_share": 0.5,
+    "session": "2026-10-28",
+    "note": "0.20 sigma, not_significant; 9.99 -> 9.99 on 7,140,800; rows are mentions"
+   },
+   "causes": [],
+   "open_questions": [],
+   "watch": []
+  },
+  {
+   "instrument_id": "MYX:5347",
+   "move": {
+    "return_1d": -0.006,
+    "market_1d": 0.0013,
+    "unexplained_share": 0.86,
+    "session": "2026-10-28",
+    "note": "0.89 sigma, not_significant; idiosyncratic -0.71%; 13.30 -> 13.22 on 1,804,300; RM4.8bil sukuk title before the session"
+   },
+   "causes": [],
+   "open_questions": [],
+   "watch": []
+  },
+  {
+   "instrument_id": "MYX:5183",
+   "move": {
+    "return_1d": 0.0194,
+    "market_1d": 0.0013,
+    "unexplained_share": 0.93,
+    "session": "2026-10-28",
+    "note": "0.49 sigma, not_significant, R2 0.00; idiosyncratic +1.87%; 4.63 -> 4.72; quiet; Lotte Chemical Titan +7.81%"
+   },
+   "causes": [],
+   "open_questions": [],
+   "watch": []
+  },
+  {
+   "instrument_id": "MYX:5225",
+   "move": {
+    "return_1d": -0.0013,
+    "market_1d": 0.0013,
+    "unexplained_share": 0.62,
+    "session": "2026-10-28",
+    "note": "0.18 sigma, not_significant; 7.84 -> 7.83; KPJ +1.24%"
+   },
+   "causes": [],
+   "open_questions": [],
+   "watch": []
+  },
+  {
+   "instrument_id": "MYX:8869",
+   "move": {
+    "return_1d": 0.0208,
+    "market_1d": 0.0013,
+    "unexplained_share": 0.87,
+    "session": "2026-10-28",
+    "note": "1.18 sigma, not_significant; idiosyncratic +1.82%; 6.72 -> 6.86 on 3,303,700 vs 6,828,800; quiet"
+   },
+   "causes": [],
+   "open_questions": [],
+   "watch": []
+  },
+  {
+   "instrument_id": "MYX:3182",
+   "move": {
+    "return_1d": 0.0414,
+    "market_1d": 0.0013,
+    "unexplained_share": 0.92,
+    "session": "2026-10-28",
+    "note": "1.87 sigma, no_identified_catalyst (rank p 0.038); idiosyncratic +4.28%; 1.45 -> 1.51 (open 1.46, low 1.44, high 1.52) on 9,272,300 vs 8,077,100; third rise in a row; Genting Malaysia +6.09%"
+   },
+   "causes": [
+    {
+     "claim": "unknown: no collected evidence reaches further; a group or casino-sector leg shared with Genting Malaysia (+6.09%) is a hypothesis no cached proxy can measure",
+     "evidence": [],
+     "chain": [
+      "no Genting row published between the 10-27 and 10-28 closes",
+      "the after-close casino assault rows are an incident, not a cause"
+     ],
+     "confidence": 0.0,
+     "confirm": "a filing, broker note or press row about Genting timed before 09:00Z on 10-28 (rights terms, Bursa approval of the listing)",
+     "refute": "a row that moved Genting Malaysia or the casino sector by a similar amount the same session"
+    }
+   ],
+   "open_questions": [
+    "New: what lifted Genting 1.87 sigma on 10-28 (idiosyncratic +4.28%, 1.45 → 1.51 on 9,272,300 shares against Tuesday's 8,077,100)? The parametric and rank tests disagree (rank p 0.038). Genting Malaysia rose 6.09% the same session. The store holds no row about the company published between the 10-27 and 10-28 closes. It is the third rise in a row (1.43 → 1.45 → 1.51). (since 2026-10-28)"
+   ],
+   "watch": []
+  },
+  {
+   "instrument_id": "XNAS:NVDA",
+   "move": {
+    "return_1d": -0.0117,
+    "market_1d": 0.0034,
+    "unexplained_share": 0.73,
+    "session": "2026-10-28",
+    "note": "0.95 sigma, not_significant; market +0.58% at beta 1.68, idiosyncratic -1.70%; 217.94 -> 215.38"
+   },
+   "causes": [],
+   "open_questions": [],
+   "watch": [
+    {
+     "when": "2026-11-17",
+     "what": "earnings_result (finnhub)"
+    },
+    {
+     "when": "2026-11-25",
+     "what": "earnings_result (finnhub)"
+    }
+   ]
+  },
+  {
+   "instrument_id": "XNAS:AAPL",
+   "move": {
+    "return_1d": -0.0094,
+    "market_1d": 0.0034,
+    "unexplained_share": 0.79,
+    "session": "2026-10-28",
+    "note": "0.89 sigma, not_significant; idiosyncratic -1.28%; 347.10 -> 343.83"
+   },
+   "causes": [],
+   "open_questions": [],
+   "watch": [
+    {
+     "when": "2026-11-02",
+     "what": "earnings_result (finnhub); 10-28 and 10-29 listings passed with no results row"
+    }
+   ]
+  },
+  {
+   "instrument_id": "XNAS:MSFT",
+   "move": {
+    "return_1d": -0.0006,
+    "market_1d": 0.0034,
+    "unexplained_share": 0.46,
+    "session": "2026-10-28",
+    "note": "0.16 sigma, not_significant; 531.33 -> 531.01 on 28,594,200; results after the close (8-K item 2.02, edgar:0001193125-26-436122)"
+   },
+   "causes": [],
+   "open_questions": [],
+   "watch": [
+    {
+     "when": "2026-10-29",
+     "what": "first session after the results"
+    }
+   ]
+  }
+ ],
+ "machine": {
+  "dispatched": [
+   "us_close (run 40967795104, landed bc9a39c at 22:44:01Z)"
+  ],
+  "alpha_vantage_diagnosis": "run 40922330724 (10-29 17:33Z): free calls GLOBAL_QUOTE and SYMBOL_SEARCH returned data; NEWS_SENTIMENT refused as a premium endpoint at 5, 50, by topic and in the collector's shape",
+  "marketaux_test": "runs 40926615256 and 40926895209 (10-29): 113 NVIDIA articles over 7 days with per-entity sentiment; 0 articles for each of the six Bursa names over 30 days",
+  "web_evidence": "no search recorded after 2026-10-28 15:29Z; month to date USD 1.07"
+ },
+ "data_quality": {
+  "failed": [
+   "gdelt (HTTP 429: 10-28 10:09Z, 14:26Z, 22:42Z)",
+   "fmp (10-28 14:09Z: key refused, HTTP 401; collected 16:06Z)",
+   "alphavantage_news (premium endpoint: 10-28 22:43Z, 10-29 22:43Z)"
+  ],
+  "degraded": [
+   "jin10_flash",
+   "nst_business (window overflow 10-28 10:09Z; page gap 10-29 10:10Z)"
+  ],
+  "skipped": [
+   "eodhd: every asked name refused or not on the free plan"
+  ]
+ },
+ "monitor": [
+  "past its own cadence: alphavantage_news (48h ago, allowed 30h) (open)",
+  "PALUMUSDM ended series printed again (open)",
+  "16 questions carried over 21 days; oldest 39d (open)",
+  "slots_missed not open"
+ ],
+ "closed": [
+  "Is alphavantage_news's endpoint outside the free plan, and has it been since 10-07? Yes: the 10-29 diagnostic run showed the key valid on free calls and NEWS_SENTIMENT refused in every shape; the refusals began 10-07 with no collector code change between 09-29 and 10-08."
+ ],
+ "open_questions_carried": [
+  "New: what lifted Genting 1.87 sigma on 10-28 (idiosyncratic +4.28%, 1.45 → 1.51 on 9,272,300 shares against Tuesday's 8,077,100)? The parametric and rank tests disagree (rank p 0.038). Genting Malaysia rose 6.09% the same session. The store holds no row about the company published between the 10-27 and 10-28 closes. It is the third rise in a row (1.43 → 1.45 → 1.51). (since 2026-10-28)",
+  "What lifted Genting 2.80 sigma on 10-26 (idiosyncratic +5.01%, 1.37 → 1.43 on 7,836,200 shares against Friday's 10,720,600; Genting Malaysia +3.57%)? (since 2026-10-26) The store holds no row about the company published on 10-26. The last company rows before the session were titles after Friday's close, among them the Bursa application to list the rights shares (minichart.com.sg, 10-23 15:20Z). The move took it back to its 10-21 close, before the 10-22 fall. The web evidence step searched it twice on 10-28. The 14:27Z search ran 3 searches before its tool hit a usage limit, and it cost USD 0.27. The 15:29Z search ran 8, cited 0 of 55 and cost USD 0.5955. Both were filed `nothing_found`, so the move is out of paid tries. On 10-27 it rose 1.40% to 1.45 (0.54 sigma) while Genting Malaysia fell 0.86%. On 10-28 it rose 4.14% to 1.51 (1.87 sigma), its third rise in a row; Genting Malaysia rose 6.09%.",
+  "What links `UPCOM:TNB` to Tenaga? (since 2026-10-24) *Issuance/retirement of stock (net) of Nha Be Steel JSC – UPCOM:TNB* (tradingview.com, 10-24 18:09Z) is a Vietnamese company's data page, and its only match to Tenaga is the token `TNB`. A second row, *Nha Be Steel JSC Estimates – UPCOM:TNB* (tradingview.com, 10-25 15:28Z), was linked to Tenaga too. PR #98, not merged, adds a rule that reads the exchange prefix and keeps both off Tenaga's page. Does a stored row still carry the link once it is merged and the digest re-reads the rows?",
+  "What took Press Metal down 3.03% at 2.19 sigma on 10-23 (idiosyncratic −3.38%, 6.94 → 6.73 on 13,253,600 shares against Thursday's 9,779,300)? The parametric and rank tests disagree (rank p 0.054). Nothing was collected about it in the session, and the store has no daily aluminium price. On 10-26 it rose 0.30% to 6.75 (0.41 sigma) on session rows that forecast weaker earnings (HLIB Research on softer 2H smelting margins, theedgemalaysia.com, 03:11Z; Q3 core earnings seen at RM650 million, nst.com.my, 04:11Z), titles only and in the first session after the fall. (since 2026-10-23) On 10-27 it fell 0.44% to 6.72 (0.69 sigma), after *Margin squeeze looms for Press Metal* (thestar.com.my, 10-26 23:40Z), title only. The web evidence step searched it once on 10-28 (14:28Z, USD 0.2034). Only the first of 3 searches returned results and the rest hit a usage limit; it was filed `nothing_found`. On 10-28 it rose 2.08% to 6.86 (1.18 sigma), with nothing collected for the name.",
+  "What took Genting down 5.59% at 3.19 sigma on 10-22 (idiosyncratic −5.66%, 1.43 → 1.35 on 33,594,800 shares against Wednesday's 4,507,400; Genting Malaysia −2.52%)? (since 2026-10-22) The session's only group rows concern Genting Singapore's planned US$1.56-1.6 billion borrowing for the Resorts World Sentosa expansion (focusgn.com, 10-21 10:30Z; igamingtoday.com, 10-22 04:33Z), titles only and not linked to Genting. A title after the 10-23 close reports the Bursa application to list the rights shares (minichart.com.sg, 15:20Z). That weighs against 10-22 having been the ex-date. Does a Bursa filing date the application and the entitlement? It has since risen to 1.43 on 10-26 and 1.45 on 10-27. On 10-28 it closed 1.51, above its 10-21 close of 1.43.",
+  "What lifted Tenaga 2.13 sigma on 10-22 (idiosyncratic +1.70%, 12.98 → 13.24 on 6,056,400 shares against Wednesday's 2,579,900)? (since 2026-10-22) The only rows are a pre-open trading-ideas list and, after the close, a RM568.2 million substation contract TNB awarded to a Kerjaya Prospek and Jati Tinggi consortium. It has moved within normal variation since and closed 13.30 on 10-27. No row timed in the 10-22 session has arrived. Did a filing, the Energy Commission or a broker publish anything in the 10-22 session? It fell 0.60% to 13.22 on 10-28 (0.89 sigma).",
+  "Genting's RM1.25 billion rights issue (reported 10-09 after the close; −22.87% on 10-12 at 12.90 sigma). (since 2026-10-09) In reply to a Bursa query (rows after the 10-14 close, titles only), the company *defends a 25%-30% rights issue discount* and earmarks RM280 million of the working-capital portion for interest costs. After the 10-16 close: *Genting chairman buys more shares as stock nears two-decade low* (theedgemalaysia.com, 12:01Z). On 10-19, titles only: *Genting Share Price Dives 24% In Last 10 Days As Rights Issue Raises Cash Flow Concerns* (businesstoday.com.my, 04:21Z) and *CIMB sees 17 percent dilution for Genting stock* (ad-hoc-news.de, 23:48Z). On 10-23, after the close: *Genting Files Bursa Application for RM1.25 Bil Rights Share Listing* (minichart.com.sg, 15:20Z), title only. It closed 1.43 on 10-21, 1.35 on 10-22, 1.37 on 10-23, 1.43 on 10-26 and 1.45 on 10-27. The exact issue price, the entitlement ratio, the entitlement date and the filing itself are still not in the store. The only Genting rows on 10-28 report an assault at its casino. It closed 1.51 on 10-28. Still no row in the store gives the issue price, the ratio or the entitlement date.",
+  "Apple's opening gap. The 10-09 open at 331.70 (−2.56%) followed a Nikkei Asia report of iPhone 18 Pro component order cuts. (since 2026-10-09) It closed 343.46 on 10-16, above the 340.42 refute line, on rows that iPhone Duo pre-orders sold out. Since then, press accounts: DigiTimes-sourced raised iPhone Duo shipment targets (10-22), a record 351.73 tied to a 44% higher iPhone Duo production target (10-23), Jefferies on shorter iPhone 18 Pro delivery times and order cuts (10-24), and on 10-27 Loop Capital's price-target cut on shipment concerns and HSBC's strong-demand view. No company or supplier statement on the order cuts is in the store. Does one arrive before the results?",
+  "What lifted Genting 1.71 sigma on 10-08 (idiosyncratic +3.08%), back to Tuesday's 1.84 after Wednesday's −2.17%? No row about the company was published on 10-08. It closed 1.88 on 10-09, with Genting Malaysia +2.05%. The rights issue reported after the 10-09 close is the first company row since 10-07. A pre-announcement leg is a hypothesis the store cannot test. (since 2026-10-08)",
+  "What lifted IHH 1.69 sigma on 10-06, while the hospital peer KPJ fell 0.77%? (since 2026-10-06) Title-only rows say EPF raised its stake to 13.4% via a 3-million-share purchase (10-13), that IHH is *said to join the race for TPG's Malaysian hospitals* (theedgemalaysia.com, 10-14 03:52Z) and that *IHH eyes TPG's Malaysian hospital assets for sale* (thestar.com.my, 10-14 23:04Z). After the 10-19 close, IHH was reported acquiring Afiniti Wellness for the Gleneagles Hospital Johor expansion (theedgemarkets.com, 10:45Z), a different deal. It has moved within normal variation every session since. Which days did EPF buy, and does a Bursa filing carry them or the bid?",
+  "What did the Petronas Chemicals CEO appointment (title only, 10-05 14:44Z) say, and does a Bursa filing carry it? A second title-only row on 10-14 (ad-hoc-news.de, 05:04Z) reports a 20-year methanol deal. The name is 4.13 → 4.63 since 10-01 on days that each read not_significant. Does a filing give the deal's counterparty and terms? (since 2026-10-06)",
+  "Tenaga fell 2.52 sigma on 09-29 with no collected row and gave back three-quarters of it on 09-30, when the utilities rallied. What, if anything, did the company, the Energy Commission or a Bursa filing publish on 09-29? `bursa_announcements` stored nothing for it. (since 2026-09-29)",
+  "Bank of America's note names Apple's transaction and referral revenue as the exposure. The fact book has no services or App Store line for Apple. Which filing field would size it? (since 2026-09-29)",
+  "Does an 8-K or 10-Q record NVIDIA's USD 150 billion authorization increase? (since 2026-09-28)",
+  "The fact book holds three Q4 result dates for Apple, 2026-10-28, 10-29 and 11-02, all from `finnhub`. Which one does the company's own calendar give? (since 2026-09-28) A 10-17 title, *Apple Hit a Record Close Ahead of Its November 2 Report* (finance.yahoo.com, 14:48Z), gives 11-02. A 10-21 title, *Prediction: Apple Will Soar After Oct. 28* (finance.yahoo.com, 11:30Z), assumes 10-28. A 10-25 title, *Key facts: Apple (AAPL) Q4 Nov 2; iPhone Duo 20M; strong launch demand* (tradingview.com, 07:00Z), gives 11-02. The store has held titles reporting that Apple set 11-02 since 10-07: *Apple Sets November 2 for Q4 2026 Earnings and Ternus' First CEO Call* (macobserver.com, 15:09Z), *Apple stock heads toward November 2 earnings with 9% guidance* (ad-hoc-news.de, 15:09Z) and *Apple to report Q426 earnings on Monday, November 2nd* (macdailynews.com, 18:30Z). Most later titles point to 11-02. Several 10-28 titles name the 'Pro and Tell' product event; two 10-21 titles give 10-28 alone, and a 10-12 title says *Ahead of Oct. 29 Earnings* (finance.yahoo.com, 11:15Z). What is open is why `finnhub` also lists 10-28 and 10-29, and whether a company source reaches the store. Both are press titles, not the company's calendar. The 10-28 listing passed with no results row by the 22:43Z collection; the 10-28 rows are previews, for example *Apple Is at a Record Going Into Earnings. Wall Street's Target Is Below It* (finance.yahoo.com, 15:33Z). An 8-K with Item 2.02 will settle it, as it did for Microsoft. The 10-29 listing passed with no results row either by the 22:43Z collection on 10-29; the rows that evening are previews, for example *Ahead of Apple Earnings, Here's What Barchart Data Says Comes Next for AAPL Stock* (barchart.com, 10-29 20:51Z).",
+  "Does a primary statement follow the report that China may let Alibaba and ByteDance buy the RTX Pro 5500? A 10-23 row, *The Hardware Ceiling: ByteDance, Alibaba, and Tencent Bet $35B on the RTX PRO 5500* (`finnhub:143129578`, 10:15Z), is another press account. (since 2026-09-27)",
+  "The fact book has no event kind for a court verdict, an appeal or a settlement. Where would a legal event be recorded, so that a later page can date it? On 10-26 a title reports *TNB, Sinohydro conclude arbitration matters via consent judgment* (thestar.com.my, 06:39Z), and the fact book holds no event for it. (since 2026-09-26)",
+  "Microsoft's cached bar opens at 499.04 (+0.22%) on 09-25, while two rows describe a 3% rise before or at the open. Should the collector hold a second price source for the open on a day a cause is being timed? (since 2026-09-25)",
+  "Does IHH carry the Daiichi Sankyo claim at any value in its accounts? (since 2026-09-24)",
+  "IHH's 09-22 session was significant alone (3.80 sigma). The one candidate, the Macquarie headline, has no body. Which source carries the note's figures? (since 2026-09-22)",
+  "The move to 260-session betas re-measured the same Monday. Which window's shares do pages compare across the change? (since 2026-09-22)",
+  "Petronas Chemicals, Press Metal and Genting: one factor or three stories? No Bursa sector proxy is cached. (since 2026-09-21) On 10-09 they read +0.47%, +1.54% and +2.17%. On 10-21, −2.00%, +1.63% and 0.00%. On 10-22, +2.05%, +1.17% and −5.59%. On 10-23, +3.56%, −3.03% and +1.48%. On 10-26, −1.72%, +0.30% and +4.38%. On 10-27, +1.31%, −0.44% and +1.40%. On 10-28, +1.94%, +2.08% and +4.14%: all three rose, alongside Lotte Chemical Titan +7.81% and Genting Malaysia +6.09%.",
+  "Tenaga: the rows hold both readings of the IBR framework, *minimal impact* and *undermines*, as titles only. Neither has appeared since. (since 2026-09-18)",
+  "`DFF` stepped +0.25 on 2026-09-17 and the collector holds no statement for it. Where does a statement come from? (since 2026-09-20)",
+  "A short-interest weekly named Petronas Chemicals for the week to 09-18. Would Bursa's daily short-selling report give the name a body? (since 2026-09-20)",
+  "Wiring a catalyst matcher to the corpus is still open. Genting's 10-09 rights issue, its 10-22 fall and 10-26 rise, and Press Metal's 10-23 fall are the cases for a matcher that compares a row's time with the session's close. (since 2026-09-18)",
+  "Petronas Chemicals' idiosyncratic days read *not significant* because its own sigma contains the +22.56% run. On 10-26 it fell 1.72% with an idiosyncratic −1.28% that read 0.34 sigma, on 10-27 it rose 1.31% with an idiosyncratic +0.94% that read 0.25 sigma, and on 10-28 it rose 1.94% with an idiosyncratic +1.87% that read 0.49 sigma. (since 2026-09-18)",
+  "Petronas Chemicals collecting a body: which of the eleven listed sources carries a Bursa-hours story about it at all? On 10-23 `gdelt` read it empty at `bursa_close`, and its two rows since are an after-close analysis title and an estimates page. On 10-25 `google_news` read it empty at `bursa_close`, and on 10-26 the digest marks it quiet. (since 2026-09-10; folded 09-17)",
+  "The Bursa banks fell together on 10-07 and 10-08 and steadied on 10-09 (Hong Leong Bank +1.80%, CIMB 0.00%). The titles name foreign selling, oil and US yields. Which source would carry Bursa's daily foreign net flow? On 10-27 a title, *A Look At KLCI Fund Flows By Investors* (businesstoday.com.my, 08:08Z), names the subject, title only. (since 2026-10-07)",
+  "A scheduled routine reached the session 12h38m late. The Bursa catch-up fired at 10:06Z on 10-15 and was delivered at 22:44Z, so no catch-up ran that day; the 14:10Z cron `bursa_close` collected the Bursa close instead. On 10-16 it fired at 10:06:04Z and was read 28 seconds later. Is a late delivery visible anywhere but this page? (since 2026-10-15)",
+  "What lifted Maybank 1.81 sigma on 10-15 (idiosyncratic +1.25%, 9.98 → 10.08 on 6,664,300 shares, half Wednesday's 13,701,400), while Public Bank −0.21%, CIMB −0.27%, RHB −0.68% and Hong Leong Bank −1.12% fell? Every Maybank row in the session window is Maybank Securities research on another company. It closed 9.99 on 10-16 (0.12 sigma, market-driven), giving the leg back. (since 2026-10-15)",
+  "What took Press Metal down 9.34% at 5.43 sigma on 10-16 (idiosyncratic −8.42%, 7.17 → 6.50 on 50,249,300 shares against Thursday's 12,000,600, low 6.32)? (since 2026-10-16) The one row in the session is an earnings-projection analysis. The two broker notes (AmInvestment Buy at MYR8.50, Affin Hwang cut to Hold at MYR7.70) were published after the close. The first rows since the fall arrived Monday 10-19, all after the fall and titles only: a cost side (*Press Metal faces earnings pressure from falling aluminium prices, rising costs*, nst.com.my, 10-19 03:18Z) and an RHB Research view that the sell-off is a buying opportunity (theborneopost.com, 08:02Z). The store holds aluminium through 2026-09 (`PALUMUSDM`, fred): 3,158.27 (07), 3,250.12 (08), 3,283.05 (09). \"Falling aluminium prices\" is not in the store's series before October. Does October's print, or a daily price, show the fall the title names? It closed 6.72 on 10-27, still under 7.17. Does a Bursa filing, a block-trade record or a note timed before 09:00Z reach the store?"
+ ],
+ "lessons": [
+  "Test a failing vendor endpoint on its own before replacing the key: on 10-29 one run of six calls showed the Alpha Vantage key valid on free calls and refused on the news call in every shape; the fault was the plan, not the key, and no new key would have fixed it."
+ ]
+}
