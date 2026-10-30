@@ -1,26 +1,40 @@
 # Digest 2026-10-30
 
-Generated 2026-10-30 00:59 UTC · slot `all` · 27816 articles in the corpus, 6462 observations, 4276 events in the fact book.
+Generated 2026-10-30 10:12 UTC · slot `all` · 28058 articles in the corpus, 6467 observations, 4276 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- quiet: nothing collected for this name in the window
+- tone: 8 stories from 5 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-10-30 www.nst.com.my — Matthews fires magical ace at Maybank Championship [q 1.00, tone +0.0]
+- 2026-10-30 www.nst.com.my — Kelly back in contention at Maybank Championship [q 1.00, tone +0.0]
+- 2026-10-30 www.nst.com.my — Defending champion Yamashita takes control at Maybank Championship [q 1.00, tone +0.0]
+- 2026-10-29 www.thestar.com.my — Liyana Durisic leads the Malaysian charge at the Maybank Championship 2026 [q 0.80, tone +0.0]
+- 2026-10-30 www.sinardaily.my — Maybank, CIMB, GXBank win top honours at Asean banking awards [q 0.65, tone +0.0]
+- 2026-10-30 www.marketscreener.com — Maybank Investment Banking Group Adjusts Mapletree Logistics Trust's Price Target to SG$1.35 [q 0.65, tone +0.0]
+- 2026-10-29 nextinsight.net — This Stock Has Fallen, But Its Earnings Are About To Take Off, Says Maybank [q 0.65, tone +0.0]
+- 2026-10-30 www.nst.com.my — Petronas, Genting, Maybank rank among Asean's top 10 brands [q 0.45, tone +0.0]
 
 ### Tenaga (MYX:5347)
-- quiet: nothing collected for this name in the window
+- tone: 2 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-10-30 thesun.my — TNB to cooperate with authorities over electric shock incident in Alor Setar [q 0.65, tone +0.0]
+- 2026-10-29 thesun.my — Government in talks with TNB on electricity bill relief beyond December [q 0.65, tone +0.0]
 
 ### Petronas Chemicals (MYX:5183)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-10-29 www.moomoo.com — PCHEM (5183) [q 0.55, tone +0.0]
 
 ### IHH (MYX:5225)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 1 escalated
+- 2026-10-30 www.ad-hoc-news.de — IHH Healthcare stock: Research fund targets clinical innovation - ad-hoc-news.de [q 0.65, tone +0.0] ★
 
 ### Press Metal (MYX:8869)
 - quiet: nothing collected for this name in the window
 
 ### Genting (MYX:3182)
-- quiet: nothing collected for this name in the window
+- tone: 2 stories from 2 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-10-30 ca.finance.yahoo.com — Genting Berhad (GEBHY) Seasonal Returns Chart [q 0.65, tone +0.0]
+- 2026-10-30 www.nst.com.my — Petronas, Genting, Maybank rank among Asean's top 10 brands [q 0.45, tone +0.0]
 
 ### NVIDIA (XNAS:NVDA)
 - tone: 34 stories from 18 sources, polarity -0.06, peak intensity 0.67, uncertainty 0.21 · 9 escalated
@@ -85,6 +99,20 @@ Generated 2026-10-30 00:59 UTC · slot `all` · 27816 articles in the corpus, 64
 | 10y minus 2y Treasury spread, % | 0.38 | 2026-10-28 | +0.09 | fred |
 | US unemployment rate, % | 4.20 | 2026-09-01 | +0.1 | fred |
 | CBOE VIX, index | 16.91 | 2026-10-28 | -0.61 | fred |
+
+## Collection
+
+| at (UTC) | source | status | fetched | kept | stored | detail |
+|---|---|---|---|---|---|---|
+| 10:11 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
+| 10:11 | twse_openapi | ok | 8 | 0 | 0 | facts 5;  |
+| 10:11 | jin10_flash | degraded | 15 | 15 | 15 | facts 0; window not covered back to 2026-10-29 22:43Z; the oldest item read is 2 |
+| 10:11 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 10:10 | nst_business | degraded | 150 | 146 | 142 | window overflow: all 150 dated items are newer than the window's start (2026-10- |
+| 10:10 | fmt_business | degraded | 50 | 50 | 50 | window overflow: all 50 dated items are newer than the window's start (2026-10-2 |
+| 10:10 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals, IHH |
+| 10:10 | google_news | ok | 42 | 41 | 35 | named the company: 13 of 41 (lowest: Press Metal 0/1, Tenaga 2/9, Genting 2/6) |
+| 10:10 | gdelt | failed | 0 | 0 | 0 | no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP |
 
 ---
 

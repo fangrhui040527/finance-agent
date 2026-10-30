@@ -1,18 +1,100 @@
 {
-  "collection": [],
+  "collection": [
+    {
+      "at": "2026-10-30T10:11:07.479951+00:00",
+      "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-30T10:11:07.478446+00:00",
+      "detail": "facts 5; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-30T10:11:02.349070+00:00",
+      "detail": "facts 0; window not covered back to 2026-10-29 22:43Z; the oldest item read is 2026-10-30 10:00Z, so 11.3h of the window was never served",
+      "fetched": 15,
+      "kept": 15,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 15
+    },
+    {
+      "at": "2026-10-30T10:11:01.048613+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-30T10:10:58.910768+00:00",
+      "detail": "window overflow: all 150 dated items are newer than the window's start (2026-10-29 10:11Z); the oldest is 2026-10-29 14:58Z, so 4.8h scrolled off unseen; read 3 pages, the most this feed may; page 2 starts 3.5h before page 1 ends (2026-10-30 03:54Z under 2026-10-30 07:25Z): the items between were served by neither",
+      "fetched": 150,
+      "kept": 146,
+      "source": "nst_business",
+      "status": "degraded",
+      "stored": 142
+    },
+    {
+      "at": "2026-10-30T10:10:55.226914+00:00",
+      "detail": "window overflow: all 50 dated items are newer than the window's start (2026-10-29 10:11Z); the oldest is 2026-10-29 12:49Z, so 2.6h scrolled off unseen",
+      "fetched": 50,
+      "kept": 50,
+      "source": "fmt_business",
+      "status": "degraded",
+      "stored": 50
+    },
+    {
+      "at": "2026-10-30T10:10:54.782968+00:00",
+      "detail": "read but empty: Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals, IHH",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-30T10:10:53.351494+00:00",
+      "detail": "named the company: 13 of 41 (lowest: Press Metal 0/1, Tenaga 2/9, Genting 2/6)",
+      "fetched": 42,
+      "kept": 41,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 35
+    },
+    {
+      "at": "2026-10-30T10:10:51.178438+00:00",
+      "detail": "no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked); deferred: Press Metal, Genting, Maybank",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "failed",
+      "stored": 0
+    }
+  ],
   "counts": {
-    "articles": 27816,
+    "articles": 28058,
     "documents": 0,
-    "escalated": 3655,
+    "escalated": 3656,
     "events": 4276,
-    "failed_sweeps": 103,
-    "linked": 15069,
-    "observations": 6462,
+    "failed_sweeps": 104,
+    "linked": 15085,
+    "observations": 6467,
     "series": 31,
-    "sweeps": 1264
+    "sweeps": 1273
   },
   "day": "2026-10-30",
-  "generated_at": "2026-10-30 00:59 UTC",
+  "generated_at": "2026-10-30 10:12 UTC",
   "macro": [
     {
       "change": "-0.04",
@@ -150,8 +232,111 @@
       "instrument_id": "MYX:1155",
       "label": "Maybank",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://www.nst.com.my/sports/golf/2026/10/1567070/matthews-fires-magical-ace-maybank-championship",
+          "domain": "www.nst.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-30T10:02:22+00:00",
+          "quality": 1.0,
+          "title": "Matthews fires magical ace at Maybank Championship",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://www.nst.com.my/sports/golf/2026/10/1566979/kelly-back-contention-maybank-championship",
+          "domain": "www.nst.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-30T08:02:57+00:00",
+          "quality": 1.0,
+          "title": "Kelly back in contention at Maybank Championship",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://www.nst.com.my/sports/golf/2026/10/1566974/defending-champion-yamashita-takes-control-maybank-championship",
+          "domain": "www.nst.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-30T07:59:19+00:00",
+          "quality": 1.0,
+          "title": "Defending champion Yamashita takes control at Maybank Championship",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxNd1FYQnZ2SGdjcC1nUUJwQXZzRWotRnItb1N1TGxrTTJ1UTFGb2dGOGF1aTVyR3oyckVRa2s0NHZveWI4RllVVkw2cnZ3R1BCUVRHbl9xNnpkZVM2a19PWEJnUGxrVXJoUDFVangyWVoxcVg3dS1haUdIaTV4Slk2Tll3TVRobnBGSVA0V0pRZ0tRdmlGcjJMemlUNGlfd0Y3TkhBblgtc1pXZVlnY2ZGV3MwSkRfSE5QUEcyWHU2SVluekdhMnVsMG4zRHRqczR1YlU4?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-29T12:45:00+00:00",
+          "quality": 0.8,
+          "title": "Liyana Durisic leads the Malaysian charge at the Maybank Championship 2026",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiVkFVX3lxTFBxaXFsQTZ1aS11SXFoMmVTeFNhdkVyNkRNZE1rRnI4MV9EVm1TU0lwTVhRdS14clNKNFBucGFnaUFQRFRmZWNaMS0tWUw3clo2Y0Z6aTlR?oc=5",
+          "domain": "www.sinardaily.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-30T07:02:00+00:00",
+          "quality": 0.65,
+          "title": "Maybank, CIMB, GXBank win top honours at Asean banking awards",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMi3gFBVV95cUxNLUoyeVpiWDNmdmRFLXRfdzBtdXpfWURXLUJ4bVhPbEdjSGNSQ1NBYjNOZ2RzQ2dkWTNwZE9iTzljY2tubjlsWElDSmdvcmcxVm5oNVdTbTR2aHczTUJxOU93anBfY3RZemtCQmdkbWlpY1ZVR20zR183emNJVFhsT3FGaXJBSy1xUkNQTkE0Zk83THpKZDNHcDFwRG9NLXd6OVVMWnZuMU1EcDFBVG5wMTRuaWtMVkhOQV9yLVJrWk1uZTZxY25VY3NRUjVmV0wwUTd1cGRTZ1JkZ1plbmc?oc=5",
+          "domain": "www.marketscreener.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-30T01:13:13+00:00",
+          "quality": 0.65,
+          "title": "Maybank Investment Banking Group Adjusts Mapletree Logistics Trust's Price Target to SG$1.35",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxNN3pmNk5qTFpLNmphcW9DQ0VrREtmNG1adTg0Z2dkbjdUWFVPeEJBamtjTXlsc252WXVXQXFibWZVWG02bXE1MEU3dzcxVDlya3ppR3hIWTdwbE9aMmxYYWhyUVB1OEZXSGFzcXNQVmNlcDJjNWN4QkxJMHpSQ1VkNnc3V244b3NFZWdDMml3RG91MjI5RUZZaWN2ZG1WWlZGNTZ3ZGpWcFBBV0JoZk05YWlqeXN4X0lDcWV6VjZPdnlCd1ZRUGVUTGVqd0hTcE9GRmRBNw?oc=5",
+          "domain": "nextinsight.net",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-29T21:32:16+00:00",
+          "quality": 0.65,
+          "title": "This Stock Has Fallen, But Its Earnings Are About To Take Off, Says Maybank",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMitAFBVV95cUxQVGtqQ1F2dXgzRFAxWVVXMU5ZRDZJZzloWnBZNTlaU2lQYXdiODVwYmhwVlJRZVpHUnVVWk9Qd1FHUFJnMzlSYnRIZF92aWJyRlZ2MHMweTRmYVF0YlFfMUZqc3RmU18tb2xUbU5xOTNJOVdSbDA0ZVlSbTZ2c00xMTVNdGVGaW9zd3dkaW5wNE9jWVN0MlBMTGdSNVJUb094QVJ3OUNpSDZKVmd0bzMtUE5Ockw?oc=5",
+          "domain": "www.nst.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-30T03:17:42+00:00",
+          "quality": 0.45,
+          "title": "Petronas, Genting, Maybank rank among Asean's top 10 brands",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 8,
+        "polarity_mean": 0.0,
+        "sources": 5,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -160,8 +345,39 @@
       "instrument_id": "MYX:5347",
       "label": "Tenaga",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMixwFBVV95cUxOTkxHeV9nOE1iaWNHQWlOa3FfNzBuSUxKRkJFR0wtc09VTlJtNE5XU2MtY2pRR0VqUDFsRW9xejB6YW9zUHRXNHZJcEZsU3dfbUh0MW5KX3RobF9wbXlrajZnaVZleWdrXzdxRXNHRDdaZ0tmdlBPd0pQcWp5a1ZYV3ZMUG40ZGVJamxLQlU0RkZPbnpLbHFJcVU5Q3lDREdRbnQ2U0FMZElyY0QtM1gwX1o0RVBfUG5GdkJXVmVXbUVVSHRGMGZr?oc=5",
+          "domain": "thesun.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-30T01:58:09+00:00",
+          "quality": 0.65,
+          "title": "TNB to cooperate with authorities over electric shock incident in Alor Setar",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMioAFBVV95cUxQeS1DUGN6cjdlb1dJUy1pWkxHcW9keFBUQmZYN2lzS0UyNnBlQUswMkh0RHFEMXpSU1RVMkZSRkhwcGg0YTJMM21RN1FEaEFqaGhMSWREY3RfRlkyWmh4dVJJZ3FtbHNUaEtpU25zU0xlaVN3OE5xekt0Tkh2b0hBaDZBei0tX0Fwdm9xNk42cnZiLXpyZE5pQVZPazF2d0kw?oc=5",
+          "domain": "thesun.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-29T19:40:52+00:00",
+          "quality": 0.65,
+          "title": "Government in talks with TNB on electricity bill relief beyond December",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 2,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -170,18 +386,56 @@
       "instrument_id": "MYX:5183",
       "label": "Petronas Chemicals",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMi7gJBVV95cUxNYWd2anV4QmsxYk1PWHVYN2VPdVZUM01YaGtudEFob2tKREo0UzRITWJQQnFGNEh4WGpUMjRYNzFMd1VkbjViQTFMaFpScU1ISlB3NW9YZUs3YkxUWXVMM19UcE5RRWFBcnlab3lqTkF0S3ZGSmZiR2tRdXNzOGwxNGFydW9FR2Z5X0pfWTY4TUtBRDIwVkkweGprWk13SXpLWlZzY0M5alVmN19UcFk0Vi1aNFhrMGZIOVV3d29KVm84czZJbzBTU1ppd0J4Q1N6ZWN5QXdVeG1BR2o3c1lRVjRoQUNlTDhZY2F3QVFlTzkweG9DMkY2Zkxyck51VDNrZnNUQkRDdE5oR2xfbVJiaFNVY19XUmlFUS1qNS1DbVdQaGtFLUFOV1NCZExXYW9tNk10TUhkaDRZTjBxTXdPeXFlUGdMVFRYd1ZabUpGbEZkSFB3cHlSN2J3NzFab0E2TnVQVDQ1SFEzLU9JekE?oc=5",
+          "domain": "www.moomoo.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-29T19:18:53+00:00",
+          "quality": 0.55,
+          "title": "PCHEM (5183)",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
-      "escalated": 0,
+      "escalated": 1,
       "events": [],
       "instrument_id": "MYX:5225",
       "label": "IHH",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMivgFBVV95cUxOa1N3Nko1UkhWWnNMUGV5VW1LWjdZU1kzS055amV2U2stXzFrT1JLMDFKS3YtV1ZlSUhkVko3RGdfa2xuZUZXeEg1Q1RrZWtNS3ZLNWJwdEJWTzZJV2Z4bzZaZWpLbVFMRUxFS0NmUmo1c25yT19VS0RkWTh3U0NQdFVVV2IxTWxZRzUzeS14ZnF1ak9GTGlwSzhIYlJvN0x0dDdrcS1KNjVKUURYenYzLVlSN0tlZ0puaEdIWTFR?oc=5",
+          "domain": "www.ad-hoc-news.de",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-30T00:44:42+00:00",
+          "quality": 0.65,
+          "title": "IHH Healthcare stock: Research fund targets clinical innovation - ad-hoc-news.de",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -200,8 +454,39 @@
       "instrument_id": "MYX:3182",
       "label": "Genting",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiY0FVX3lxTE1KWFZ0VlhIV3JQSlBBcmQzSjdsS2p3OWZ1RUpHTFNFY3JPcU9rNk42S19wV0NHZElCSFNWa0xpU0NPcGVvMzRoVDlZaEZZY0dtcWgwbFdMRzVkbjhDOUlXMVpYOA?oc=5",
+          "domain": "ca.finance.yahoo.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-30T05:32:27+00:00",
+          "quality": 0.65,
+          "title": "Genting Berhad (GEBHY) Seasonal Returns Chart",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMitAFBVV95cUxQVGtqQ1F2dXgzRFAxWVVXMU5ZRDZJZzloWnBZNTlaU2lQYXdiODVwYmhwVlJRZVpHUnVVWk9Qd1FHUFJnMzlSYnRIZF92aWJyRlZ2MHMweTRmYVF0YlFfMUZqc3RmU18tb2xUbU5xOTNJOVdSbDA0ZVlSbTZ2c00xMTVNdGVGaW9zd3dkaW5wNE9jWVN0MlBMTGdSNVJUb094QVJ3OUNpSDZKVmd0bzMtUE5Ockw?oc=5",
+          "domain": "www.nst.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-30T03:17:42+00:00",
+          "quality": 0.45,
+          "title": "Petronas, Genting, Maybank rank among Asean's top 10 brands",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 2,
+        "polarity_mean": 0.0,
+        "sources": 2,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
