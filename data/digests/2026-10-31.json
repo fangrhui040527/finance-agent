@@ -1,18 +1,100 @@
 {
-  "collection": [],
+  "collection": [
+    {
+      "at": "2026-10-31T15:22:22.916898+00:00",
+      "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-31T15:22:22.915274+00:00",
+      "detail": "facts 5; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-31T15:22:17.918990+00:00",
+      "detail": "facts 0; window not covered back to 2026-10-30 22:43Z; the oldest item read is 2026-10-31 13:20Z, so 14.6h of the window was never served",
+      "fetched": 16,
+      "kept": 16,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 15
+    },
+    {
+      "at": "2026-10-31T15:22:16.812464+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-31T15:22:14.950635+00:00",
+      "detail": "window overflow: all 150 dated items are newer than the window's start (2026-10-30 10:10Z); the oldest is 2026-10-30 12:27Z, so 2.3h scrolled off unseen; read 3 pages, the most this feed may; page 2 starts 4.9h before page 1 ends (2026-10-31 04:00Z under 2026-10-31 08:55Z): the items between were served by neither",
+      "fetched": 150,
+      "kept": 145,
+      "source": "nst_business",
+      "status": "degraded",
+      "stored": 141
+    },
+    {
+      "at": "2026-10-31T15:22:10.842580+00:00",
+      "detail": "window overflow: all 50 dated items are newer than the window's start (2026-10-30 10:10Z); the oldest is 2026-10-30 23:38Z, so 13.5h scrolled off unseen",
+      "fetched": 50,
+      "kept": 50,
+      "source": "fmt_business",
+      "status": "degraded",
+      "stored": 50
+    },
+    {
+      "at": "2026-10-31T15:22:10.445251+00:00",
+      "detail": "read but empty: Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals, IHH",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-31T15:22:08.319790+00:00",
+      "detail": "read but empty: Press Metal; named the company: 13 of 21 (lowest: Genting 0/1, Tenaga 0/2, Maybank 10/15)",
+      "fetched": 21,
+      "kept": 21,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 20
+    },
+    {
+      "at": "2026-10-31T15:22:06.288639+00:00",
+      "detail": "no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked); deferred: Tenaga, Petronas Chemicals, IHH",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "failed",
+      "stored": 0
+    }
+  ],
   "counts": {
-    "articles": 28480,
+    "articles": 28706,
     "documents": 0,
     "escalated": 3710,
     "events": 4286,
-    "failed_sweeps": 106,
-    "linked": 15322,
-    "observations": 6518,
+    "failed_sweeps": 107,
+    "linked": 15335,
+    "observations": 6523,
     "series": 31,
-    "sweeps": 1285
+    "sweeps": 1294
   },
   "day": "2026-10-31",
-  "generated_at": "2026-10-31 00:48 UTC",
+  "generated_at": "2026-10-31 15:22 UTC",
   "macro": [
     {
       "change": "0.12",
@@ -150,8 +232,99 @@
       "instrument_id": "MYX:1155",
       "label": "Maybank",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMisgFBVV95cUxOM2FFM3ZqclhScDVqV3I0LTFCY01NQVR5ZTBlVXIwUVV2Q2RvWndqUW9pb013eEoySGN0SHJaOTBpUllYVEdUZ21zdkY0TXBRTVdhUHJNQVpTTFBJWVNQMVZRMjhxb0F3eWJhSk1EWktUN1Zqd1JaQTI3em9zVHFIM0w5THRjdEFWZEVJdjZkSy1ZWlJxZ0pheE5IdW40LWtKWDFqUXJPWFdmWmxhU1k1aXBn0gG3AUFVX3lxTE0zWURsRHpYV09pS0ZqYnhfU0s3MGttZFVmNmdIV2EtNmt2eHNqRTBqQ014Mk56WVA4Q0hob0FfZkhnUVprNkZNMjI3N1k1WjVkZFlYOGZvT0RYY0lIc05BdEplZ2tfSU5HaFUyTDFYVE1DV2VVQkxiRkFMZ1RMdGxlRVRGdkZYazdDbXQzc08yWFNvMnRLMWRjc242c0ZySG16UGNMdGVmMU9zVUNBbHVPMkV0QldFNA?oc=5",
+          "domain": "www.nst.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-31T07:36:13+00:00",
+          "quality": 0.8,
+          "title": "Mirabel weathers heat and greens to lead local Maybank challenge",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMimwFBVV95cUxQSEhCNkdkZTE4aXBRUDhyWFFUcHp3aXdYMmhsZWRZT2NBVldObW1UNHEzRzY4ZTNZU1E3VGdlRVNzTEppY1dmd0ZRMHpFdkdwak05OEg2TzNvMFVoTVZ2aXc0NmdpRllIU3VOaHZ3dERjbk5VanB6RjhROUgwZ2RxWUwwLUJDbk1sZjBDYU8wWm1JQTcwdmZnOXVGVQ?oc=5",
+          "domain": "www.indiasnews.net",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-31T15:01:23+00:00",
+          "quality": 0.65,
+          "title": "Defending champ Miyu Yamashita maintains Maybank lead",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPVGxZMG9lUlF2cnNVWGZYTHdnQnQyY1djbnJyWUJ1TnY4S0N3blo1Q08xWkd1M29iNDhZc0ROUEg1MHhOb21tSUg2NjU2UkNGWlBxc2lhdGsyc2dBdGVkWEFIMHE5RXdCdnlMQkNGdl9yT3VsYVo5bmhDM3pSTDZCbzU4WUVWdDRIaHhjZmtzaUtzMWs2LUY2R2xvQlk?oc=5",
+          "domain": "mainlymiles.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-31T10:00:30+00:00",
+          "quality": 0.65,
+          "title": "Maybank Horizon Visa Signature offering 3.2 mpd on Asian FCY spend",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxNdmRkWlVvMDVKZENkc2VOMVVPR3pXMGo1ZFBEa2d4aEFjZEU2WHZSTmMtV3dpSDJpcEU5dkZndG5TVS03UkdfWXBUdDRvX09hLUVCbnRhaTY0bXpZaDVtN2p1T0V1U3ZsMHNzTWhUYjJaYU1sYjhWbWowekhqWXE4bkhIMmZONHVsUTRN?oc=5",
+          "domain": "mezha.net",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-31T09:44:32+00:00",
+          "quality": 0.65,
+          "title": "Yamashita takes two-shot lead into Maybank Championship final round",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMipwFBVV95cUxOWkR0QnJrZllZVUIyZzNxbGZaQkpHT0FOT2t4ZVRUTGlkMHlMYVJJaWloZ2Z3NHg3UUtUenJvWUJxdmt2eUtrRmNhWHBQZC12VEh6dTJybmV3aFBSajRvSDh4dUFob3BYV2c1NmdsLWViRV9zRzBTaGd1SnRDeVZzSk5ES2lrQWlQU3V4bDh2Z0JPVTVDSXBPZGE3UHZBSE5UVUJJY21LOA?oc=5",
+          "domain": "milelion.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-30T23:35:20+00:00",
+          "quality": 0.65,
+          "title": "Maybank Horizon Visa Signature offering 3.2 mpd on selected FCY spend",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMifkFVX3lxTE4waENFVU9VcXRoZUVTTW5UdEJ1UExlU2o4QkVsRk5nbmVidllOeDhKNlg4cld6V0xMSFJxT0pUNmQ5aU1haUVhdGJnMzIxb2VhQ3Y1MkNPa0xlUHlGR2Y5NXR4TXItZnRrY2oxb2xpQkh4aFh3SW41eXEwc0FCdw?oc=5",
+          "domain": "bilyonaryo.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-30T16:25:35+00:00",
+          "quality": 0.65,
+          "title": "Defending champ Miyu Yamashita takes Maybank lead",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxOWUVFUDd1U2FXUk9nNHpaRC14bE5pS3pmMTVMdXBaSVVYUEhsb19ZdkNHY1dKQk5icW1MdExYazN2dEd0TWpNcGNBTjdKSWN0OGJROE9wRWQ1dUpnc3FhaUZEV2x1aHU3TGhnVzJIZlF6OUxzYUcwMVdaTkNRa2dCcEZ5MmtrcUhpOUtWS2VZUjhSVU85NE1WaEp4TFpuUXVKMVc4MEVIWU12bkRKTXBZc0I0Q3dEdnJu?oc=5",
+          "domain": "ua.news",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-30T14:07:01+00:00",
+          "quality": 0.65,
+          "title": "Miyu Yamashita leads Maybank Championship after round two",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 7,
+        "polarity_mean": 0.0,
+        "sources": 7,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -170,8 +343,27 @@
       "instrument_id": "MYX:5183",
       "label": "Petronas Chemicals",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMi1wFBVV95cUxPVEItSFZyamQ1T1FSYm1CZlZkbEFkVGJ2LVJveUFBdG5XZ1oyRHMxbzU4ZGtNTjhTelk1dWM4R25ZY2lnVWxSWTdRSVhZYWRLZUFVUDgwUUlHM3BhS01Pa0VrTTNNMlFRTFlRaGk3X1Z1Rl95c2YwLU4zN21zN3VBMUo0ZkZBSWhzMnk3YW5qSEdWXy1pbHpuRTRFZzJ2UHlzUGZEX2Zwb1A3Y1VYNzJUa1ljQUxTTVRzNmYySjl0eDlRX1Z3cllTRjQ4VXJqaUJDMExKLUdySdIB3AFBVV95cUxONU5HOTZ0NWhZcmhmclVWclVfRTRFeWRfOGFrT1A0T0JlbHBRSG1qTU91YUREMjhpaWJWeThFaVJrNmRLR29FRkYyeEx6UTFEbkp0ck1HaGEzMzVPdVZmdEhGS2pPX3NKNU9LcHNiOUduNW4zejN2RUJMdXlFQ0RTSjRnb2NwNldfTFBiVzZ3Wk9mZUdSMHVwREZRb2FxMkhaODNMNkM1MXVDc3JZTXhwMm41NEh1bTdYNmZCbXFXcWpIQzdueDhBN1RsMVhaM0pCbTlmTUNHQmJia1po?oc=5",
+          "domain": "simplywall.st",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-31T02:04:45+00:00",
+          "quality": 0.65,
+          "title": "What PETRONAS Chemicals Holders Bought Into",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -180,8 +372,27 @@
       "instrument_id": "MYX:5225",
       "label": "IHH",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMitwJBVV95cUxQRE91T1JSZlNFWHFPQ2M5dEdKNjR5Ri1STWVxcmJNVng1bEtIaFBlWkc4TklQZERUeW91NVV3eVptS201a0xOM1FZdk1QXzJXeHEyZjg1Xzl5b01idmZBOFFtTlQ0Mk0zQU9YX1lzQjVHc2F4YzBaekxPbHBLSnFwWWY4U3dzMVFQR3l5VEZIck1JWjhtZVROZDJmcVBjUzhoOG1XTkNQcThvaHp3RWdZY1cxeHRkWkgtVU1YQ0M2SEJnZjdfVHhheGtTRHhSNmQxVW02YVUweXB5S0ZnSEk1b1ZhNHlqVlFPRW5YRTZtX2FsUHFHbWZsajJ0bmR2NjlVcDBzckp3Q0ppdlhXb1pIaUNOZUYyU1liWUtTdl9JNy1YT0ZrejlNeDFDaWRjV091WFJBcjEtdw?oc=5",
+          "domain": "www.moomoo.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-30T23:03:45+00:00",
+          "quality": 0.55,
+          "title": "IHH (5225)",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -431,10 +642,10 @@
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 40,
-        "polarity_mean": -0.075,
-        "sources": 24,
-        "uncertainty_mean": 0.108
+        "n": 41,
+        "polarity_mean": -0.073,
+        "sources": 25,
+        "uncertainty_mean": 0.106
       },
       "upcoming": [
         {

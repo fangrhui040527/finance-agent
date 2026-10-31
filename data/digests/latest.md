@@ -1,20 +1,29 @@
 # Digest 2026-10-31
 
-Generated 2026-10-31 00:48 UTC · slot `all` · 28480 articles in the corpus, 6518 observations, 4286 events in the fact book.
+Generated 2026-10-31 15:22 UTC · slot `all` · 28706 articles in the corpus, 6523 observations, 4286 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- quiet: nothing collected for this name in the window
+- tone: 7 stories from 7 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-10-31 www.nst.com.my — Mirabel weathers heat and greens to lead local Maybank challenge [q 0.80, tone +0.0]
+- 2026-10-31 www.indiasnews.net — Defending champ Miyu Yamashita maintains Maybank lead [q 0.65, tone +0.0]
+- 2026-10-31 mainlymiles.com — Maybank Horizon Visa Signature offering 3.2 mpd on Asian FCY spend [q 0.65, tone +0.0]
+- 2026-10-31 mezha.net — Yamashita takes two-shot lead into Maybank Championship final round [q 0.65, tone +0.0]
+- 2026-10-30 milelion.com — Maybank Horizon Visa Signature offering 3.2 mpd on selected FCY spend [q 0.65, tone +0.0]
+- 2026-10-30 bilyonaryo.com — Defending champ Miyu Yamashita takes Maybank lead [q 0.65, tone +0.0]
+- 2026-10-30 ua.news — Miyu Yamashita leads Maybank Championship after round two [q 0.65, tone +0.0]
 
 ### Tenaga (MYX:5347)
 - quiet: nothing collected for this name in the window
 
 ### Petronas Chemicals (MYX:5183)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-10-31 simplywall.st — What PETRONAS Chemicals Holders Bought Into [q 0.65, tone +0.0]
 
 ### IHH (MYX:5225)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-10-30 www.moomoo.com — IHH (5225) [q 0.55, tone +0.0]
 
 ### Press Metal (MYX:8869)
 - quiet: nothing collected for this name in the window
@@ -23,7 +32,7 @@ Generated 2026-10-31 00:48 UTC · slot `all` · 28480 articles in the corpus, 65
 - quiet: nothing collected for this name in the window
 
 ### NVIDIA (XNAS:NVDA)
-- tone: 40 stories from 24 sources, polarity -0.07, peak intensity 0.33, uncertainty 0.11 · 10 escalated
+- tone: 41 stories from 25 sources, polarity -0.07, peak intensity 0.33, uncertainty 0.11 · 10 escalated
 - 2026-10-30 Yahoo — Alphabet's October wipeout hits $766 billion, its worst month ever [q 0.85, tone -1.0] ★
 - 2026-10-30 Yahoo — Will AI Equity Raise Change Meta (META) Stock Narrative [q 0.85, tone +0.0] ★
 - 2026-10-30 finance.yahoo.com — Nvidia Stocks Decline 4.7% With Oracle Offering Separate CPU and GPU Scaling [q 0.80, tone -1.0] ★
@@ -81,6 +90,20 @@ Generated 2026-10-31 00:48 UTC · slot `all` · 28480 articles in the corpus, 65
 | 10y minus 2y Treasury spread, % | 0.37 | 2026-10-29 | -0.01 | fred |
 | US unemployment rate, % | 4.20 | 2026-09-01 | +0.1 | fred |
 | CBOE VIX, index | 17.20 | 2026-10-29 | +0.29 | fred |
+
+## Collection
+
+| at (UTC) | source | status | fetched | kept | stored | detail |
+|---|---|---|---|---|---|---|
+| 15:22 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
+| 15:22 | twse_openapi | ok | 8 | 0 | 0 | facts 5;  |
+| 15:22 | jin10_flash | degraded | 16 | 16 | 15 | facts 0; window not covered back to 2026-10-30 22:43Z; the oldest item read is 2 |
+| 15:22 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 15:22 | nst_business | degraded | 150 | 145 | 141 | window overflow: all 150 dated items are newer than the window's start (2026-10- |
+| 15:22 | fmt_business | degraded | 50 | 50 | 50 | window overflow: all 50 dated items are newer than the window's start (2026-10-3 |
+| 15:22 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals, IHH |
+| 15:22 | google_news | ok | 21 | 21 | 20 | read but empty: Press Metal; named the company: 13 of 21 (lowest: Genting 0/1, T |
+| 15:22 | gdelt | failed | 0 | 0 | 0 | no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP |
 
 ---
 
