@@ -1,6 +1,78 @@
 {
   "collection": [
     {
+      "at": "2026-10-31T22:42:50.388801+00:00",
+      "detail": "skipped: every asked name was refused: outside the plan or over today's credits (XNAS:NVDA, XNAS:AAPL)",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-31T22:42:49.901400+00:00",
+      "detail": "facts 0; window not covered back to 2026-10-31 15:22Z; the oldest item read is 2026-10-31 18:55Z, so 3.6h of the window was never served",
+      "fetched": 15,
+      "kept": 14,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 13
+    },
+    {
+      "at": "2026-10-31T22:42:48.612944+00:00",
+      "detail": "alphavantage refused a premium endpoint (the key's plan does not include it): Thank you for using Alpha Vantage! This is a premium endpoint. You may subscribe to any of the premium plans at https://www.alphavantage.co/premium/ to instantl",
+      "fetched": 0,
+      "kept": 0,
+      "source": "alphavantage_news",
+      "status": "failed",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-31T22:42:46.184415+00:00",
+      "detail": "facts 40; ",
+      "fetched": 142,
+      "kept": 126,
+      "source": "finnhub",
+      "status": "ok",
+      "stored": 80
+    },
+    {
+      "at": "2026-10-31T22:42:44.450963+00:00",
+      "detail": "facts 0; ",
+      "fetched": 0,
+      "kept": 0,
+      "source": "edgar",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-10-31T22:42:44.238455+00:00",
+      "detail": "named the company: 14 of 48 (lowest: NVIDIA 2/20, Microsoft 6/16, Apple 6/12)",
+      "fetched": 48,
+      "kept": 48,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 30
+    },
+    {
+      "at": "2026-10-31T22:42:43.557953+00:00",
+      "detail": "named the company: 86 of 93 (lowest: Microsoft 17/20, Apple 32/34, NVIDIA 37/39)",
+      "fetched": 98,
+      "kept": 93,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 75
+    },
+    {
+      "at": "2026-10-31T22:42:41.597483+00:00",
+      "detail": "no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked)",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "failed",
+      "stored": 0
+    },
+    {
       "at": "2026-10-31T15:22:22.916898+00:00",
       "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
       "fetched": 0,
@@ -83,18 +155,18 @@
     }
   ],
   "counts": {
-    "articles": 28706,
+    "articles": 28904,
     "documents": 0,
-    "escalated": 3710,
-    "events": 4286,
-    "failed_sweeps": 107,
-    "linked": 15335,
-    "observations": 6523,
+    "escalated": 3724,
+    "events": 4287,
+    "failed_sweeps": 109,
+    "linked": 15424,
+    "observations": 6562,
     "series": 31,
-    "sweeps": 1294
+    "sweeps": 1302
   },
   "day": "2026-10-31",
-  "generated_at": "2026-10-31 15:22 UTC",
+  "generated_at": "2026-10-31 22:46 UTC",
   "macro": [
     {
       "change": "0.12",
@@ -416,14 +488,14 @@
       "upcoming": []
     },
     {
-      "escalated": 10,
+      "escalated": 14,
       "events": [],
       "instrument_id": "XNAS:NVDA",
       "label": "NVIDIA",
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-10-30",
+          "known_at": "2026-10-31",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -431,7 +503,7 @@
         },
         {
           "concept": "pb",
-          "known_at": "2026-10-30",
+          "known_at": "2026-10-31",
           "label": "P/B",
           "period_end": null,
           "source": "finnhub",
@@ -439,7 +511,7 @@
         },
         {
           "concept": "eps_ttm",
-          "known_at": "2026-10-30",
+          "known_at": "2026-10-31",
           "label": "EPS (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -447,7 +519,7 @@
         },
         {
           "concept": "dividend_yield",
-          "known_at": "2026-10-30",
+          "known_at": "2026-10-31",
           "label": "dividend yield",
           "period_end": null,
           "source": "finnhub",
@@ -455,7 +527,7 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-10-30",
+          "known_at": "2026-10-31",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
@@ -463,7 +535,7 @@
         },
         {
           "concept": "high_52w",
-          "known_at": "2026-10-30",
+          "known_at": "2026-10-31",
           "label": "52w high",
           "period_end": null,
           "source": "finnhub",
@@ -471,7 +543,7 @@
         },
         {
           "concept": "low_52w",
-          "known_at": "2026-10-30",
+          "known_at": "2026-10-31",
           "label": "52w low",
           "period_end": null,
           "source": "finnhub",
@@ -545,6 +617,18 @@
       "stories": [
         {
           "day": null,
+          "doc_id": "https://finance.yahoo.com/technology/articles/volkswagen-xtra-vow3-puts-vehicle-100801350.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-31T10:08:01+00:00",
+          "quality": 1.0,
+          "title": "Volkswagen (XTRA:VOW3) Puts New Vehicle Software And AV Data Partnerships To Work",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
           "doc_id": "finnhub:143349342",
           "domain": "Yahoo",
           "escalated": true,
@@ -593,59 +677,47 @@
         },
         {
           "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxQSWtCZ3hRMG0tZW45YmNoZ2tMYTZHQy1nc1VOMl80dUZFUlVGQmZqaVJIOVZFUW5xalRvRVhlRkh4bDF5Tk0wUF9scEtRZVgxV0pQMVg4dktmaVg0NllBc19FV21lcUpKVVhfTmdzczNZekNuNlhHVkU4WkFkT2hhZDJpemYwX1daMUxGekhLYktyTnJjYnR4RklLOHVmZGdFSkQyMDg4eGlCdV9vV3IyM3FfTUV2SUdHM3F5QmM1NmpBdl9pVWlPbkNlSU84TU5ZXzdmbA?oc=5",
-          "domain": "www.tradingkey.com",
+          "doc_id": "https://news.google.com/rss/articles/CBMimgFBVV95cUxNR1BpSGZ3d1VPX3k3NEMtV3RySzFjdnlyZnhMaDBHZ282bEpoSEFPTEdISWJ3eTFUeWo2YVF2dVhIeDNNdUlSLTVwMWNwNnU2b1dtWEtpcG5YUDRraHFaUGpVLUhyVldFa29DMXlBQ3h1aFBlbUdpazQxclVvazVDOEh5R2IzbV9lZDFPMFNEenZHY3M2N0NWN2xR?oc=5",
+          "domain": "news.metal.com",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-10-30T22:08:56+00:00",
+          "published_at": "2026-10-31T15:02:00+00:00",
           "quality": 0.65,
-          "title": "Micron Stock Price Forecast: Nvidia's Planned Rubin Ultra HBM Layer Cut and Declining Per-Unit Memory Usage May Drag on Revenue Growth",
-          "uncertainty": 0.5681818181818182
-        },
-        {
-          "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMimgFBVV95cUxPZ0VieTFqdkdSazB4aGt3MDNLWm1waGJZV2xYdFJBNWdRNFpSeXMybURZOXgzRDJmNktJSFA4VEdka2JpeFhYb1duaVdvM2lsNkxKOTVNc19NTjhaQUpCcVVVd1BTTks5Z0dLRGtJbnhqMGNCTkZibHRCaTdmdzNiYXk3M0FUc2hqQzlycEk5T2t5NG1pbjZpcGhn?oc=5",
-          "domain": "www.nacionale.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": -1.0,
-          "published_at": "2026-10-30T20:24:52+00:00",
-          "quality": 0.65,
-          "title": "Why Nvidia stock fell on Friday, and why October is its worst month in a year",
+          "title": "[Nvidia showcases next-gen CPO prototype named OOI]",
           "uncertainty": 0.0
         },
         {
           "day": null,
-          "doc_id": "finnhub:143349348",
-          "domain": "Yahoo",
+          "doc_id": "https://news.google.com/rss/articles/CBMi0gFBVV95cUxNN2o0UlJsUDVwTUdBNE4tZnloT2JaLUxuTEpiZGxTUHpCbW9DVWtERnFtcVdER1NkSDlDZEd2Q1plcmNER2ttczdEZzRUUElhUUxWN3JuQi0tQmp3RTFCRGdCRGYtTkppUkxpaEZlZXFuREtoUHFJS3Zoby1VdTRoTkIxNTktVTU2LTBEcmt5MndBeXJEaXVDQ2llUVdQdnpVb1BGbDNIYjVFQ2NoQ1NJNFhjeHo1UzJ3V1MxLUxpaG43cEp6b2hiUXJsMXhNMTQ1Ymc?oc=5",
+          "domain": "www.marketbeat.com",
           "escalated": true,
-          "intensity": 0.3333333333333333,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-10-31T08:27:22+00:00",
+          "quality": 0.65,
+          "title": "NVIDIA Corporation $NVDA Holdings Cut by Zevenbergen Capital Investments LLC",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiowFBVV95cUxOVmhYYm1CYUpIX2UwOXRyTkxfMzlUUjdlaWtFVG43TGowNWtzV0VfaGozdjVsN1h2RjB6M0U2Y3lHb3lwbHotNFBKVEJjUklRYVVmcEt5cnJoV0FPYTk0dWFLVkxEWkRWeDlzcHdVQzRZNWNHa1BhV296TXlJZHpzRFJSVEJHN0Zwclk0N2lLZm1kekx2WUYwLWVacU9XWlZ6WnAw?oc=5",
+          "domain": "news.futunn.com",
+          "escalated": true,
+          "intensity": 0.0,
           "polarity": 1.0,
-          "published_at": "2026-10-30T18:14:45+00:00",
+          "published_at": "2026-10-30T23:35:12+00:00",
           "quality": 0.65,
-          "title": "Nvidia\u2019s GPU Rents Surge as Anthropic\u2019s Revenue Has \u201cGone Vertical,\u201d Says Gavin Baker",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMitAFBVV95cUxPRnpuVWNBZFNNOE1EaEF2NkpQMFVNTmlGaTlBYjgtV3pCa3pZc0FZbU96R1g1Z3BXbWk2bGdMaXhhSHlkXy1GbFBzbUF0WF9Xb1BydGdEdVRWaGMzQ3FFMXhvTWFLeldoNmtoS3YzTV8wQ2tJSVg0amdsNXItcGt4N1gzN2ZmOXBtbGNlMEY3SWJCN3ozbm5TdGRSYmg3TnlHQS1pcGQ0VjRfa0NZT2FndU9BNlDSAboBQVVfeXFMTm5FVE5SMm94WVV0NnZ4VmFHTngtVVpDS0VaLWswVU9adkM4NFJUMi1PRC1ib2twNWJRQWx5dDVaU3BIVC04cURLMFZyODl6UURzUkJFeV9sRWZUXzhwWm9XY2hnVUtMUlNGb0VtX1ZyRTlKalZabzNBaU5HVjJPeEItRXVId3JTLWg0NGFBY29nTUFQa2tqLU9IUHNlZjBYczB5UUtsVjVKUF9jaVJKc1JwZTItX0V5aHBR?oc=5",
-          "domain": "coinpedia.org",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": -1.0,
-          "published_at": "2026-10-30T16:24:27+00:00",
-          "quality": 0.65,
-          "title": "Why Is Nvidia Stock Down Today? AI Spending Fears And China Probe Headlines",
+          "title": "Apple (AAPL.US) overtakes NVIDIA (NVDA.US) to regain top spot in global market capitalization, as its relatively restrained capital expenditure wins market favor.",
           "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 41,
-        "polarity_mean": -0.073,
-        "sources": 25,
-        "uncertainty_mean": 0.106
+        "n": 81,
+        "polarity_mean": -0.037,
+        "sources": 38,
+        "uncertainty_mean": 0.079
       },
       "upcoming": [
         {
@@ -665,14 +737,14 @@
       ]
     },
     {
-      "escalated": 12,
+      "escalated": 16,
       "events": [],
       "instrument_id": "XNAS:AAPL",
       "label": "Apple",
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-10-30",
+          "known_at": "2026-10-31",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -680,7 +752,7 @@
         },
         {
           "concept": "pb",
-          "known_at": "2026-10-30",
+          "known_at": "2026-10-31",
           "label": "P/B",
           "period_end": null,
           "source": "finnhub",
@@ -688,7 +760,7 @@
         },
         {
           "concept": "eps_ttm",
-          "known_at": "2026-10-30",
+          "known_at": "2026-10-31",
           "label": "EPS (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -696,7 +768,7 @@
         },
         {
           "concept": "dividend_yield",
-          "known_at": "2026-10-30",
+          "known_at": "2026-10-31",
           "label": "dividend yield",
           "period_end": null,
           "source": "finnhub",
@@ -704,7 +776,7 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-10-30",
+          "known_at": "2026-10-31",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
@@ -712,7 +784,7 @@
         },
         {
           "concept": "high_52w",
-          "known_at": "2026-10-30",
+          "known_at": "2026-10-31",
           "label": "52w high",
           "period_end": null,
           "source": "finnhub",
@@ -720,7 +792,7 @@
         },
         {
           "concept": "low_52w",
-          "known_at": "2026-10-30",
+          "known_at": "2026-10-31",
           "label": "52w low",
           "period_end": null,
           "source": "finnhub",
@@ -806,6 +878,18 @@
         },
         {
           "day": null,
+          "doc_id": "finnhub:143364757",
+          "domain": "SeekingAlpha",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-31T11:00:00+00:00",
+          "quality": 0.85,
+          "title": "Apple Leads Packed Earnings Calendar As Investors Eye Tech, Pharma Results",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
           "doc_id": "finnhub:143348237",
           "domain": "Yahoo",
           "escalated": true,
@@ -854,47 +938,35 @@
         },
         {
           "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMijwFBVV95cUxNMERFZzEweEpLb0VZV0l5VjZfUDhfd28xM3J6eXoyR0w2ZHo0aDF3UFBPbDhuS2tWMzlxTDFJaDRQcjVIM010eGROc1ZjN2RpSXNqU0hkeGU2MFlnSlRSVHpkREZlQm9zc05NaVdXZ204Uk1tQzJIQkpHSWJfT2hPNFRxbXVteWNWeTg3dDlUNA?oc=5",
-          "domain": "www.investors.com",
+          "doc_id": "https://news.google.com/rss/articles/CBMi_gFBVV95cUxQbGxOVU5XV1ZTVVBNc2g2UVlGSWtZcW5tWEpPY21rTXFIR1ZQM3NNb05vMnduMU9XellzZ3d6UXV0bVdYRTZFV0RuUnZVOEpvcDV1bWYyZUZpdTNhUGtFTHNRSExENUhqMUg1TnJaUGJPMDhkcHQ1Rm1FNmprR3JkNE1NRF90cGgwYUt2YlJKR1REZFFaXy10TTQwTlNmandzVlIzOHFUWWdzc2lFd3M2dE9yejdjd3dvSTMzam9VTnFSWWg0M1NrZ1Z2dkJXSS1yUEVBMFRnaUppcUJTdW5GaE1tZkp0VlZQN0NTMTZnbWZlSFRHYnhXNGwxN1NmQQ?oc=5",
+          "domain": "www.tradingkey.com",
           "escalated": true,
           "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-10-30T21:06:00+00:00",
+          "published_at": "2026-10-31T12:04:25+00:00",
           "quality": 0.65,
-          "title": "Apple Sentiment Cautious On December-Ending Quarter Outlook",
+          "title": "Apple Stock Forecast: AAPL Tests $352.04 Before Monday's Earnings as Memory Costs Meet iPhone Duo Demand",
           "uncertainty": 0.0
         },
         {
           "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxOekV6dEN3eTZPczREaXhFNGFzQllLX3pPVGxJbC1PZTkxTkpWcXpiRFZ2OEpYVjFXVGd2cWxORTJHaU5ZaEY0cUpUNlc2Nklza0FyTXZXRTNxbFhkRFdqdnhzUUprYkFwc1c1YVVjRElIOGYxZFpZbGxuZDd5LVdvWmhPaUhnSnFKeTBTSFJrdlVCWFRHX25zRjZ2dEgwOG12eWV3TERxdDJJei1mU2UxUzJFV256UnkyU1FF?oc=5",
-          "domain": "www.fool.com",
+          "doc_id": "https://news.google.com/rss/articles/CBMilgFBVV95cUxNcmpwaExvbVhIV0xxbHVDc0xLVlNxaTBIdXRzckVwdGJlTEhWRlN4STl1X3NwUGlLSThlTlFUNEtySmNDbENhYzJuREtWRk42OXhaWmtUcXIxUXB3SnNyRWRRWWMxMlBIU1NoTWxqLVpHUmJJb3Y3Z0lscGRfM2xldGlvOW42QVYxWUItTmN2S1R4N0FxZnc?oc=5",
+          "domain": "shattered.io",
           "escalated": true,
-          "intensity": 0.3333333333333333,
+          "intensity": 0.0,
           "polarity": 1.0,
-          "published_at": "2026-10-30T19:32:00+00:00",
+          "published_at": "2026-10-31T11:26:12+00:00",
           "quality": 0.65,
-          "title": "Apple Is Near a Record. Netflix Is Down More Than Half. I'd Buy Only 1 of Them.",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMinwFBVV95cUxONXlkVXdhcEJRSnlTQmQ3dU0xQ2V0NGlka2xlSTJLUVppR3ZjZ1pmZ2I0RHhpc1RqRjBxVWwxTF9KTFRvUUFHVVdCV2NBSXJLUDNKdklJLU9Ha2hnOVludXZMbzU0d0gzQUtLYUFqbjRicjhsMFV3aWVZck83WHBHdThQZmpqcG5ZU1RUQjM4WDhpbEpycW82Q0p3aElPbGM?oc=5",
-          "domain": "investinglive.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-30T18:53:01+00:00",
-          "quality": 0.65,
-          "title": "Earnings next week: Can Apple, Palantir and AMD restore confidence?",
+          "title": "Apple Stock Gains 1.66% as MacBook Pro Wins Support [2026]",
           "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 44,
+        "n": 73,
         "polarity_mean": 0.068,
-        "sources": 27,
-        "uncertainty_mean": 0.06
+        "sources": 47,
+        "uncertainty_mean": 0.047
       },
       "upcoming": [
         {
@@ -907,14 +979,14 @@
       ]
     },
     {
-      "escalated": 12,
+      "escalated": 20,
       "events": [],
       "instrument_id": "XNAS:MSFT",
       "label": "Microsoft",
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-10-30",
+          "known_at": "2026-10-31",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -922,7 +994,7 @@
         },
         {
           "concept": "pb",
-          "known_at": "2026-10-30",
+          "known_at": "2026-10-31",
           "label": "P/B",
           "period_end": null,
           "source": "finnhub",
@@ -930,7 +1002,7 @@
         },
         {
           "concept": "eps_ttm",
-          "known_at": "2026-10-30",
+          "known_at": "2026-10-31",
           "label": "EPS (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -938,7 +1010,7 @@
         },
         {
           "concept": "dividend_yield",
-          "known_at": "2026-10-30",
+          "known_at": "2026-10-31",
           "label": "dividend yield",
           "period_end": null,
           "source": "finnhub",
@@ -946,7 +1018,7 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-10-30",
+          "known_at": "2026-10-31",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
@@ -954,7 +1026,7 @@
         },
         {
           "concept": "high_52w",
-          "known_at": "2026-10-30",
+          "known_at": "2026-10-31",
           "label": "52w high",
           "period_end": null,
           "source": "finnhub",
@@ -962,7 +1034,7 @@
         },
         {
           "concept": "low_52w",
-          "known_at": "2026-10-30",
+          "known_at": "2026-10-31",
           "label": "52w low",
           "period_end": null,
           "source": "finnhub",
@@ -1036,6 +1108,30 @@
       "stories": [
         {
           "day": null,
+          "doc_id": "https://finance.yahoo.com/m/9f64f875-35a4-3cac-86e3-a7d06eb54605/openai-cuts-funding-target.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": -1.0,
+          "published_at": "2026-10-31T12:57:04+00:00",
+          "quality": 1.0,
+          "title": "OpenAI Cuts Funding Target Amid Meta, Microsoft Offerings, Anthropic IPO",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://finance.yahoo.com/technology/articles/volkswagen-xtra-vow3-puts-vehicle-100801350.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-31T10:08:01+00:00",
+          "quality": 1.0,
+          "title": "Volkswagen (XTRA:VOW3) Puts New Vehicle Software And AV Data Partnerships To Work",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
           "doc_id": "https://finance.yahoo.com/technology/ai/articles/leaders-wolters-kluwer-microsoft-salesforce-201500186.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
           "escalated": true,
@@ -1044,6 +1140,18 @@
           "published_at": "2026-10-30T20:15:00+00:00",
           "quality": 1.0,
           "title": "Leaders from Wolters Kluwer, Microsoft, Salesforce, and McKinsey challenge accounting firms to make one AI move in the next 90 days",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "finnhub:143362739",
+          "domain": "SeekingAlpha",
+          "escalated": true,
+          "intensity": 0.0,
+          "polarity": 1.0,
+          "published_at": "2026-10-31T09:30:00+00:00",
+          "quality": 0.85,
+          "title": "Microsoft's AI Boom Has A Cost",
           "uncertainty": 0.0
         },
         {
@@ -1093,50 +1201,14 @@
           "quality": 0.85,
           "title": "Global Clinical Knowledge Graphs for Genomics Market Report 2026 | Capitalize on 20.7% CAGR as Microsoft, IBM, Illumina and Genomenon Scale AI, Cloud and Precision Medicine",
           "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "finnhub:143343667",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-10-30T13:22:00+00:00",
-          "quality": 0.85,
-          "title": "The Est\u00e9e Lauder Companies and Microsoft Announce a New Strategic Partnership to Power Enterprise Efficiency and Consumer-Centric Growth",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "finnhub:143343669",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 1.0,
-          "published_at": "2026-10-30T12:59:48+00:00",
-          "quality": 0.85,
-          "title": "Microsoft Sold $25 Billion in Bonds a Day After Its Azure Beat. Here\u2019s Where the Stock Could Go by 2031",
-          "uncertainty": 0.3787878787878788
-        },
-        {
-          "day": null,
-          "doc_id": "finnhub:143343670",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-30T12:30:07+00:00",
-          "quality": 0.85,
-          "title": "Microsoft Wants to Charge More as AI Agents Do More Work, While Google Sees a New Advertising Gold Mine \u2014 Here\u2019s How Satya Nadella and Sundar Pichai Plan to Make Money From AI Boom",
-          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 22,
-        "polarity_mean": 0.318,
-        "sources": 12,
-        "uncertainty_mean": 0.072
+        "n": 45,
+        "polarity_mean": 0.156,
+        "sources": 25,
+        "uncertainty_mean": 0.057
       },
       "upcoming": []
     }
