@@ -1,15 +1,24 @@
 # Digest 2026-11-01
 
-Generated 2026-11-01 05:59 UTC · slot `all` · 28904 articles in the corpus, 6622 observations, 4287 events in the fact book.
+Generated 2026-11-01 16:05 UTC · slot `all` · 29130 articles in the corpus, 6622 observations, 4287 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
-- 2026-10-31 www.indiasnews.net — Defending champ Miyu Yamashita maintains Maybank lead [q 0.65, tone +0.0]
+- tone: 15 stories from 10 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-11-01 www.freemalaysiatoday.com — Yamashita keeps her cool to retain Maybank Championships title [q 1.00, tone +0.0]
+- 2026-11-01 www.thestar.com.my — The Asean contingent led by the Thais shines at the Maybank Championship at KLGCC [q 0.80, tone +0.0]
+- 2026-11-01 www.thestar.com.my — Japan's Miyu Yamashita is rightly 'the queen' after creating history defending her Maybank Championship title [q 0.80, tone +0.0]
+- 2026-11-01 www.thestar.com.my — LPGA bound young star Mirabel Ting ends Maybank Championship 2026 as best Malaysian for the third year running [q 0.80, tone +0.0]
+- 2026-11-01 www.thestar.com.my — Golf: Back-to-back Maybank Championship glory in KL for Japan's Yamashita [q 0.80, tone +0.0]
+- 2026-10-31 www.thestar.com.my — Golf: Maybank Championship spotlight falls on elite LPGA stars [q 0.80, tone +0.0]
+- 2026-11-01 www.indiasnews.net — Miyu Yamashita defends championship at Maybank [q 0.65, tone +0.0]
+- 2026-11-01 sports.yahoo.com — Miyu Yamashita defends Maybank title for third victory this year and fifth in last 15 months [q 0.65, tone +0.0]
 
 ### Tenaga (MYX:5347)
-- quiet: nothing collected for this name in the window
+- tone: 2 stories from 2 sources, polarity +0.50, peak intensity 0.33, uncertainty 0.00 · 1 escalated
+- 2026-11-01 www.moomoo.com — Master Tec Carries Record Revenue and an Expanded TNB Mandate Into the Second Half [q 0.65, tone +1.0] ★
+- 2026-11-01 www.ad-hoc-news.de — Tenaga Nasional stock in focus after MARC affirms AAA rating - ad-hoc-news.de [q 0.65, tone +0.0]
 
 ### Petronas Chemicals (MYX:5183)
 - quiet: nothing collected for this name in the window
@@ -24,15 +33,15 @@ Generated 2026-11-01 05:59 UTC · slot `all` · 28904 articles in the corpus, 66
 - quiet: nothing collected for this name in the window
 
 ### NVIDIA (XNAS:NVDA)
-- tone: 10 stories from 9 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.06 · 1 escalated
+- tone: 11 stories from 10 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.06 · 1 escalated
 - 2026-10-31 news.metal.com — [Nvidia showcases next-gen CPO prototype named OOI] [q 0.65, tone +0.0] ★
+- 2026-11-01 www.nst.com.my — Trump says US looking 'closely' at report Nvidia CEO target of China spy plot [q 1.00, tone +0.0]
 - 2026-10-31 finance.yahoo.com — Nvidia (NVDA) CEO Jensen Huang Reportedly Targeted In Chinese Espionage Plot [q 0.80, tone +0.0]
 - 2026-10-31 finance.yahoo.com — Jensen Huang Just Announced Fantastic News for Nvidia Stock Investors [q 0.80, tone +0.0]
 - 2026-10-31 www.marketwatch.com — Nvidia’s Megaspeed ties show potential blind spots in the U.S. effort to block China from accessing advanced chips [q 0.80, tone +0.0]
 - 2026-10-31 www.thestreet.com — Microsoft just gave Nvidia shareholders a reason to pay attention [q 0.65, tone +0.0]
 - 2026-10-31 finance.biggo.com — AI Spending Doubts Mount as Apple's $5.03 Trillion Market Cap Overtakes NVIDIA to Reclaim the Crown [q 0.65, tone +0.0]
 - 2026-10-31 www.techpowerup.com — Apple Takes Back the Top Spot From NVIDIA After Rough Day for AI Stocks [q 0.65, tone +0.0]
-- 2026-10-31 www.moomoo.com — NVIDIA (NVDA) Stock Analysis – Entry & Exit Strategy [q 0.65, tone +0.0]
 - upcoming 2026-11-25 earnings_result — Q3 2027 results after the close (finnhub)
 - upcoming 2026-11-17 earnings_result — Q3 2027 results after the close (finnhub)
 - snapshot: P/E (ttm) 25.82 (finnhub, 2026-10-31) · P/B 28.81 (finnhub, 2026-10-31) · EPS (ttm) 7.91 (finnhub, 2026-10-31) · dividend yield 0.03 (finnhub, 2026-10-31) · beta 2.26 (finnhub, 2026-10-31) · 52w high 243.37 (finnhub, 2026-10-31) · 52w low 164.27 (finnhub, 2026-10-31) · target (consensus) 339.17 (fmp, 2026-11-01) · analysts: buy 41 (finnhub, 2026-10-20) · analysts: hold 2 (finnhub, 2026-10-20) · analysts: sell 1 (finnhub, 2026-10-20) · vendor sentiment 0.25 (alphavantage_news, 2026-10-06) · revenue (last quarter) 96.22bn (sec_xbrl, 2026-08-26) · net income (last quarter) 59.69bn (sec_xbrl, 2026-08-26) · last EPS surprise % 3.82 (finnhub, 2026-09-05)
@@ -87,6 +96,15 @@ Generated 2026-11-01 05:59 UTC · slot `all` · 28904 articles in the corpus, 66
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 16:05 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
+| 16:05 | twse_openapi | ok | 8 | 0 | 0 | facts 0;  |
+| 16:05 | jin10_flash | degraded | 19 | 19 | 18 | facts 0; window not covered back to 2026-10-31 22:42Z; the oldest item read is 2 |
+| 16:05 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 16:05 | nst_business | degraded | 150 | 145 | 141 | window overflow: all 150 dated items are newer than the window's start (2026-10- |
+| 16:05 | fmt_business | degraded | 50 | 50 | 49 | window overflow: all 50 dated items are newer than the window's start (2026-10-3 |
+| 16:05 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: IHH, Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals |
+| 16:04 | google_news | ok | 19 | 18 | 18 | read but empty: Press Metal, Petronas Chemicals; named the company: 15 of 18 (lo |
+| 16:04 | gdelt | failed | 0 | 0 | 0 | no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP |
 | 05:59 | sec_xbrl | ok | 4414 | 0 | 0 | facts 27;  |
 | 05:59 | finmind | ok | 70 | 0 | 0 | facts 4;  |
 | 05:59 | twse_openapi | ok | 8 | 0 | 0 | facts 0;  |

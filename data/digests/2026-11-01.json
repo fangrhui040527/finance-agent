@@ -1,6 +1,87 @@
 {
   "collection": [
     {
+      "at": "2026-11-01T16:05:13.498544+00:00",
+      "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-01T16:05:13.496484+00:00",
+      "detail": "facts 0; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-01T16:05:08.633010+00:00",
+      "detail": "facts 0; window not covered back to 2026-10-31 22:42Z; the oldest item read is 2026-11-01 14:10Z, so 15.5h of the window was never served",
+      "fetched": 19,
+      "kept": 19,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 18
+    },
+    {
+      "at": "2026-11-01T16:05:07.411929+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-01T16:05:05.523774+00:00",
+      "detail": "window overflow: all 150 dated items are newer than the window's start (2026-10-31 15:22Z); the oldest is 2026-10-31 23:48Z, so 8.4h scrolled off unseen; read 3 pages, the most this feed may; page 2 starts 2.6h before page 1 ends (2026-11-01 07:07Z under 2026-11-01 09:41Z): the items between were served by neither",
+      "fetched": 150,
+      "kept": 145,
+      "source": "nst_business",
+      "status": "degraded",
+      "stored": 141
+    },
+    {
+      "at": "2026-11-01T16:05:02.124678+00:00",
+      "detail": "window overflow: all 50 dated items are newer than the window's start (2026-10-31 15:22Z); the oldest is 2026-10-31 23:00Z, so 7.6h scrolled off unseen",
+      "fetched": 50,
+      "kept": 50,
+      "source": "fmt_business",
+      "status": "degraded",
+      "stored": 49
+    },
+    {
+      "at": "2026-11-01T16:05:01.661029+00:00",
+      "detail": "read but empty: IHH, Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-01T16:04:59.517315+00:00",
+      "detail": "read but empty: Press Metal, Petronas Chemicals; named the company: 15 of 18 (lowest: Genting 0/2, IHH 0/1, Maybank 13/13)",
+      "fetched": 19,
+      "kept": 18,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 18
+    },
+    {
+      "at": "2026-11-01T16:04:57.599137+00:00",
+      "detail": "no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked); deferred: Tenaga, Petronas Chemicals, IHH",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "failed",
+      "stored": 0
+    },
+    {
       "at": "2026-11-01T05:59:34.976644+00:00",
       "detail": "facts 27; ",
       "fetched": 4414,
@@ -56,18 +137,18 @@
     }
   ],
   "counts": {
-    "articles": 28904,
+    "articles": 29130,
     "documents": 0,
-    "escalated": 3724,
+    "escalated": 3725,
     "events": 4287,
-    "failed_sweeps": 109,
-    "linked": 15424,
+    "failed_sweeps": 110,
+    "linked": 15441,
     "observations": 6622,
     "series": 31,
-    "sweeps": 1308
+    "sweeps": 1317
   },
   "day": "2026-11-01",
-  "generated_at": "2026-11-01 05:59 UTC",
+  "generated_at": "2026-11-01 16:05 UTC",
   "macro": [
     {
       "change": "0.12",
@@ -208,34 +289,149 @@
       "stories": [
         {
           "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMimwFBVV95cUxQSEhCNkdkZTE4aXBRUDhyWFFUcHp3aXdYMmhsZWRZT2NBVldObW1UNHEzRzY4ZTNZU1E3VGdlRVNzTEppY1dmd0ZRMHpFdkdwak05OEg2TzNvMFVoTVZ2aXc0NmdpRllIU3VOaHZ3dERjbk5VanB6RjhROUgwZ2RxWUwwLUJDbk1sZjBDYU8wWm1JQTcwdmZnOXVGVQ?oc=5",
+          "doc_id": "https://www.freemalaysiatoday.com/category/nation/2026/11/01/yamashita-keeps-her-cool-to-retain-maybank-championships-title",
+          "domain": "www.freemalaysiatoday.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-11-01T07:34:00+00:00",
+          "quality": 1.0,
+          "title": "Yamashita keeps her cool to retain Maybank Championships title",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMi3AFBVV95cUxQUGoyenkxUFRzd2x2RU1FbkwyRHo5MTZXYm51VGRyMWtvRU9rVThlZ2xud1k0MUllbC1jN3V5OGlVZGp3N0FDM1EyV3N3RXNnWHZBWFB5azZhUE5nR3haSmlvYVdIT3RRa3pvcXZBWENYNDRKckh3aEx1R1FKZjhteW5iUmVodUVJbGpqejdtbFZwMnBOOFhUSDlBLUVLa1BPUXk3eUlVODJWX1J1NC1odkNsRlVvT2MwLWVoRl9KTVFnNEZwY21kUzlDZklKOGpoR2Nxdm5KOTJEWU9o?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-11-01T14:32:00+00:00",
+          "quality": 0.8,
+          "title": "The Asean contingent led by the Thais shines at the Maybank Championship at KLGCC",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiigJBVV95cUxQMWxMR3U0X2JwNDZLT1ZBdmRYVkFKR2dCSkdfYkNUcXBBS1FjQTV0cGFIQ29xenRlYm9pUkV6V2o3Qll1YjUtQ2pzd3lqZDVwNDJBLTZXOFpSbG1RM0dEX0ZTWXlzU0VfU01TTHp4WG9VQWdTZ2pFbmxkX3RYUTkxNmp2TVdlbWZMT19qNGpwd2UtRXZqM0l0OGR3MEFhVk5iSFZFLUJGdE10Mnc5ajl1d2lQX1dSTkFSRFk5aW5ZcGFlZGpra2FxMk5TV3JBcVpMcXl4UkNfLXpEeXRvbHRHTmJuV3FjR1FkZUVCU3lCSHlZMkdySzNzcjF1OGFXNnpIbGRONF85VnpXUQ?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-11-01T12:13:00+00:00",
+          "quality": 0.8,
+          "title": "Japan's Miyu Yamashita is rightly 'the queen' after creating history defending her Maybank Championship title",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMigwJBVV95cUxNX242TThES2ZJS3FsWEY3enBkWENwZTd3MnpHbi1JazN5U2FrS0FXTVR4ekNLWHJidzhZMXpVN1pocHhjVG9aMGtxelN1T0tmMlc3NklvWWtRc0hudWc0VjY1S09JOUU2MWdJakxRbW5md2l4dks1NkdnVmlHQmxDaE9xMG5ZN3hLNlJwTXJkTFJ1WkNmQ2lPX3BEam51QUhKNEs3bndJbjk4SzhxYU1hYjRuRkpXaE1nOXJmZ2NaVmFDei1kdV9zVS1JTEdrUkFyNUlMSU50Y1FsaWNKS1lHV19MUWNaRU5OVXQzYmx1X1ZINmFndWYtYzIzNk15bW8tcXA4?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-11-01T10:06:00+00:00",
+          "quality": 0.8,
+          "title": "LPGA bound young star Mirabel Ting ends Maybank Championship 2026 as best Malaysian for the third year running",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiugFBVV95cUxPMjBrN3hwazdLUkFPYzJyeU96THY4Nzl5RDFWS21BVTBxTzZmWkFrZHpxdXlMeUF2aFJBbnN2aGhwcWNKbVYxaC1xVG9UUThiQVU0YktUVXdUTENIZW5Uc1dnSkoxVlREeGlsUjYtVVhIQi1qZE1VbVB0N3BYSUdoU1hHbU5sTG5IVnhPTTZyQTl1bE1xRVdXb25qUXFtcXl2TDM5ZXpVRGJfSjM0NE1OYUhFbFdoNlpXd1E?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-11-01T08:31:00+00:00",
+          "quality": 0.8,
+          "title": "Golf: Back-to-back Maybank Championship glory in KL for Japan's Yamashita",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxNYy1abkNGU3BGZG9rOVY1ZERaN0dib2tITlBZbW8wNTdDSnhrLTJmdEZkM0wyRS1md2MySDNfS0FJbExSM0JBU1BOcHlKTjc0T0NiY2h2RmVEWXpvOFRNQTNCUk9NX2J1NThPekhTUnlQNFZJZC1VY0lzT0lSdTBibHNINVkxUkt1b3BKeUxjd3ZXaVVOaXFJT3pHZnRqX0liMnRVbEhrenQ?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-10-31T23:40:15+00:00",
+          "quality": 0.8,
+          "title": "Golf: Maybank Championship spotlight falls on elite LPGA stars",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMikgFBVV95cUxQWERTWkN3RFJGUXQ4TFk0S2FIQW9oQl9nTzhScmZpclVTSTdyUVVzTFpuRHYyNlJVTzBFVTExNk9iUTF0QTJwVDFlRkpvRzR5TW1xLWZHSk14dVZTQ1hTQnEwWEx1YXF0SnVnZzNWLUpJRGxXN19JYXNNeVJsbVFMVWJzWUQtUUFLekpOZngxVFhydw?oc=5",
           "domain": "www.indiasnews.net",
           "escalated": false,
           "intensity": 0.0,
           "polarity": 0.0,
-          "published_at": "2026-10-31T15:01:23+00:00",
+          "published_at": "2026-11-01T15:59:23+00:00",
           "quality": 0.65,
-          "title": "Defending champ Miyu Yamashita maintains Maybank lead",
+          "title": "Miyu Yamashita defends championship at Maybank",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMijgFBVV95cUxONFA1VTFEX2dsM29mMWFnWnZBTHgwQWIwRDFyNlR2N0dQVkVOQnB0V25qQURpMy1zVmhCRlR6TDM2UFp4cGw4dzNFX3NEU3pzTzg5NExFRHdJM2hDTzhISXNKVnJ4UE4wR01xOGJzWWNKY0VJRng3YmhWQUMzb3pMZU11d0xDWGlTOGd5NGdn?oc=5",
+          "domain": "sports.yahoo.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-11-01T13:12:53+00:00",
+          "quality": 0.65,
+          "title": "Miyu Yamashita defends Maybank title for third victory this year and fifth in last 15 months",
           "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.0,
-        "n": 1,
+        "n": 15,
         "polarity_mean": 0.0,
-        "sources": 1,
+        "sources": 10,
         "uncertainty_mean": 0.0
       },
       "upcoming": []
     },
     {
-      "escalated": 0,
+      "escalated": 1,
       "events": [],
       "instrument_id": "MYX:5347",
       "label": "Tenaga",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMitgFBVV95cUxPS1RsQll3SzA4VHJ3ZlBWT2N6TzR0dnhtQklfLUIyRlRSSUdjT1ZyRDVsa2V1X215V1RaaVZlOGVEalp0NXdNX0c2Q3hBOG5MaTFiZ2pZRWpmRjBseVI4N2FYQUR3YnVsRGZtY3VRXzVaR3pVM2QwQ3kzUndUUHR4dUV5SkMxT1ZrcnBCSlJDT2FtX1dwUjEzMU4wZ1Z6UzBjeG9nUW8xT2tFUFVlV3otQmhLa2V6UQ?oc=5",
+          "domain": "www.moomoo.com",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "polarity": 1.0,
+          "published_at": "2026-11-01T08:16:34+00:00",
+          "quality": 0.65,
+          "title": "Master Tec Carries Record Revenue and an Expanded TNB Mandate Into the Second Half",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxQcmFlaURzanBhWUlqWVNiMjA3U3pCQ3M3OGFvSmRYa19mX0YyRzlPcUZqQmMzd3ZvOU5aN1F6T1JOUERlMlRXeUp4Qk9NSjRGS1Y4ZWlVeXhsVHZPb0ZISkM4c1hxRWxpMWJlZDczX2RTNi1tYTlBbjhET0xkRmRuMTdjTXZnZXRsOFFwQ2tzeTYzMXRJLVhuY1pJeXhoWjF3WDFiWklLdE9qeG9ZeFp6c2lFQ2stTDNaOTRv?oc=5",
+          "domain": "www.ad-hoc-news.de",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-11-01T00:29:51+00:00",
+          "quality": 0.65,
+          "title": "Tenaga Nasional stock in focus after MARC affirms AAA rating - ad-hoc-news.de",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.333,
+        "n": 2,
+        "polarity_mean": 0.5,
+        "sources": 2,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -420,6 +616,18 @@
         },
         {
           "day": null,
+          "doc_id": "https://www.nst.com.my/business/corporate/2026/11/1568118/trump-says-us-looking-closely-report-nvidia-ceo-target-china-spy",
+          "domain": "www.nst.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "polarity": 0.0,
+          "published_at": "2026-11-01T03:48:35+00:00",
+          "quality": 1.0,
+          "title": "Trump says US looking 'closely' at report Nvidia CEO target of China spy plot",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
           "doc_id": "https://news.google.com/rss/articles/CBMilwFBVV95cUxNR0Jrc3lXSnh5QnN1WEpKX2M4QWNSeVhvekRSbUQ3QXdFVmRPeXo4dHI0TkQ0eVRzeGtrcVhTUlJhT2hONWtqV2ZxNzZmdG03dkJpdk9SZjVqX2FOdF8zMEZZcHRlNVFyeWc2V0pPZkpBeXdPTXJtekZ6ODBlNkg5cVc2QUVVVFFkbUNFNnZ6VzVESmhSM3lv?oc=5",
           "domain": "finance.yahoo.com",
           "escalated": false,
@@ -489,26 +697,14 @@
           "quality": 0.65,
           "title": "Apple Takes Back the Top Spot From NVIDIA After Rough Day for AI Stocks",
           "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMifkFVX3lxTFB6OHRQdGVsOWNWWUdEX1BydDlHU3p3eER5VGJaV1NJQk1Ebld5UUxGdWZxUERIZC1RMVlNMDlXbHpIYWlaQW9yMUVta0ZsZDRGT2FIVzBDUWFvZDRBUkY5LWxUT1Q2cjZjcGE3NlVsWU1HODRUdlFyVDZLZ3pKZw?oc=5",
-          "domain": "www.moomoo.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-10-31T16:32:19+00:00",
-          "quality": 0.65,
-          "title": "NVIDIA (NVDA) Stock Analysis \u2013 Entry & Exit Strategy",
-          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.0,
-        "n": 10,
+        "n": 11,
         "polarity_mean": 0.0,
-        "sources": 9,
-        "uncertainty_mean": 0.062
+        "sources": 10,
+        "uncertainty_mean": 0.057
       },
       "upcoming": [
         {
