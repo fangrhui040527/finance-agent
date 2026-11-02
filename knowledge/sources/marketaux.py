@@ -47,6 +47,7 @@ from knowledge.redact import scrub
 from knowledge.sources.base import (
     Collector,
     KeyRejected,
+    PlanExcluded,
     Pull,
     SourceError,
     local_code,
@@ -85,7 +86,8 @@ class MarketauxNews(Collector):
         cut: set[tuple[str, str]] = set()
         errors: list[SourceError] = []
         pull.asked = [by_symbol[s] for s in sorted(by_symbol)]
-        for symbol in sorted(by_symbol):
+        symbols = sorted(by_symbol)
+        for n, symbol in enumerate(symbols):
             iid = by_symbol[symbol]
             oldest: date | None = None
             try:
@@ -117,6 +119,15 @@ class MarketauxNews(Collector):
                         cut.add((iid, oldest.isoformat()))
             except KeyRejected:
                 raise  # a bad token is the same for every name; say so once
+            except PlanExcluded as e:
+                # HTTP 402: the day's allowance is spent, for every name after
+                # this one too. Refused, not failed - the sweep reads a pull
+                # whose every name was refused as a skip with its reason - and
+                # not asked again today.
+                for rest in symbols[n:]:
+                    pull.refused.append((by_symbol[rest], str(e)))
+                pull.notes.append(f"{iid} and after: {e}")
+                break
             except SourceError as e:
                 errors.append(e)
                 pull.notes.append(f"{iid}: {e}")

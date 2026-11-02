@@ -132,6 +132,23 @@ def test_marketaux_one_failing_name_keeps_the_others_and_all_failing_raises():
         c.collect(SINCE, ("XNAS:NVDA",))
 
 
+def test_marketaux_a_spent_allowance_refuses_the_rest_and_stops_asking():
+    spent = http_error(402, '{"error":{"code":"usage_limit_reached"}}')
+    opener = pages(
+        {
+            ("AAPL", 1): [item("a", "2026-11-02T14:00:00Z", "AAPL")],
+            ("MSFT", 1): spent,
+            ("NVDA", 1): [item("n", "2026-11-02T14:00:00Z")],
+        }
+    )
+    c = MarketauxNews(key="k", clock=CLOCK, opener=opener, sleep=lambda s: None)
+    pull = c.collect(SINCE, ("XNAS:AAPL", "XNAS:MSFT", "XNAS:NVDA"))
+    assert len(pull.articles) == 1, "the name read before the allowance ran out is kept"
+    assert [n for n, _ in pull.refused] == ["XNAS:MSFT", "XNAS:NVDA"]
+    assert pull.failed == [], "a spent allowance is a refusal with its reason, not a failure"
+    assert c.requests == 2, "NVDA is not asked once the day's allowance is gone"
+
+
 def test_marketaux_a_refused_token_is_a_key_problem_not_a_quiet_day():
     body = {"error": {"code": "invalid_api_token", "message": "An invalid API token was supplied."}}
     c = MarketauxNews(
@@ -218,15 +235,49 @@ def test_finbert_tone_scores_each_names_english_titles_per_day(tmp_path):
     assert len(calls) == 1, "one batch for the run, not one per name"
 
 
-def test_finbert_tone_scores_nothing_and_never_loads_the_model_when_no_title_is_linked(tmp_path):
+def test_finbert_tone_scores_nothing_and_never_loads_the_model_when_no_title_is_linked(
+    tmp_path, monkeypatch
+):
     path = _corpus(tmp_path, [("up unrelated", NOW - timedelta(hours=1), ["XNAS:AAPL"], "en")])
 
-    def must_not_run(texts):
-        raise AssertionError("the model was asked to score nothing")
+    class MustNotLoad:
+        def __init__(self, *a, **k):
+            raise AssertionError("the model was loaded for a run with nothing to score")
 
-    c = FinbertTone(corpus_path=path, scorer=must_not_run, clock=CLOCK)
+    # No injected scorer: the collector's own path to the model is what is tested.
+    monkeypatch.setattr(finbert, "FinBert", MustNotLoad)
+    c = FinbertTone(corpus_path=path, clock=CLOCK)
     pull = c.collect(SINCE, ("MYX:3182",))
     assert pull.observations == [] and "nothing scored" in pull.notes[0]
+
+
+def test_finbert_tone_scores_a_title_stored_twice_once_per_name_and_day(tmp_path):
+    """The corpus refuses a repeated headline on the same day, but two sources'
+    rows can still carry one title (written before that key, or a day apart in
+    UTC on either side of a window). Written straight into the table here, so
+    the collector's own guard is what is tested."""
+    import sqlite3
+
+    day = datetime(2026, 11, 2, 3, tzinfo=UTC)
+    path = _corpus(tmp_path, [("up Genting rebounds", day, ["MYX:3182"], "en")])
+    conn = sqlite3.connect(path)
+    row = conn.execute("SELECT * FROM articles WHERE doc_id = 't:0'").fetchone()
+    cols = [d[0] for d in conn.execute("SELECT * FROM articles LIMIT 0").description]
+    copy = dict(zip(cols, row, strict=True))
+    copy.update(doc_id="t:copy", source="yahoo_rss", dup_hash="other")
+    conn.execute(
+        f"INSERT INTO articles ({','.join(copy)}) VALUES ({','.join('?' * len(copy))})",
+        tuple(copy.values()),
+    )
+    conn.commit()
+    assert conn.execute("SELECT COUNT(*) FROM articles").fetchone()[0] == 2
+    conn.close()
+    calls: list = []
+    c = FinbertTone(corpus_path=path, scorer=fake_scorer(calls), clock=CLOCK)
+    pull = c.collect(SINCE, ("MYX:3182",))
+    assert calls == [["up Genting rebounds"]]
+    count = next(o for o in pull.observations if o.concept == "finbert_count")
+    assert count.value == 1
 
 
 def test_finbert_tone_without_its_dependencies_is_a_failure_that_names_the_fix(
@@ -280,6 +331,16 @@ def test_fetch_model_falls_back_to_the_next_export_and_records_the_commit(tmp_pa
     n = len(asked)
     finbert.fetch_model(tmp_path, opener)
     assert len(asked) == n, "a cached model is not downloaded again"
+
+
+def test_a_download_cut_off_part_way_leaves_no_partial_file(tmp_path):
+    class Broken(Stream):
+        def read(self, n=-1):
+            raise OSError("connection reset")
+
+    with pytest.raises(finbert.FinbertUnavailable):
+        finbert.fetch_model(tmp_path, lambda req, timeout=None: Broken(b""))
+    assert not [p for p in tmp_path.rglob("*") if p.is_file() and p.name != "meta.json"]
 
 
 def test_fetch_model_with_no_network_is_unavailable_not_a_crash(tmp_path):

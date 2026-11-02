@@ -37,6 +37,7 @@ from __future__ import annotations
 import json
 import math
 import os
+import tempfile
 import urllib.error
 import urllib.request
 from collections.abc import Sequence
@@ -66,19 +67,26 @@ def _download(url: str, dest: Path, opener=None) -> str:
     """Fetch `url` into `dest` atomically. Returns the repo commit, if given."""
     req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
     open_ = opener or urllib.request.urlopen
-    tmp = dest.with_suffix(dest.suffix + ".part")
     dest.parent.mkdir(parents=True, exist_ok=True)
-    with open_(req, timeout=120) as resp, open(tmp, "wb") as out:
-        commit = ""
-        headers = getattr(resp, "headers", None)
-        if headers is not None:
-            commit = headers.get("X-Repo-Commit", "") or ""
-        while True:
-            chunk = resp.read(1 << 20)
-            if not chunk:
-                break
-            out.write(chunk)
-    tmp.replace(dest)
+    # A temporary file of its own, so two processes filling one cache never
+    # write into each other's half-downloaded file; the rename is atomic.
+    fd, name = tempfile.mkstemp(prefix=f"{dest.name}.", suffix=".part", dir=dest.parent)
+    tmp = Path(name)
+    commit = ""
+    try:
+        with open_(req, timeout=120) as resp, os.fdopen(fd, "wb") as out:
+            headers = getattr(resp, "headers", None)
+            if headers is not None:
+                commit = headers.get("X-Repo-Commit", "") or ""
+            while True:
+                chunk = resp.read(1 << 20)
+                if not chunk:
+                    break
+                out.write(chunk)
+        tmp.replace(dest)
+    except BaseException:
+        tmp.unlink(missing_ok=True)
+        raise
     return commit
 
 
