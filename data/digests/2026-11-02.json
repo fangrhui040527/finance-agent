@@ -1,18 +1,100 @@
 {
-  "collection": [],
+  "collection": [
+    {
+      "at": "2026-11-02T10:08:23.139729+00:00",
+      "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-02T10:08:23.137698+00:00",
+      "detail": "facts 0; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-02T10:08:18.768550+00:00",
+      "detail": "facts 0; window not covered back to 2026-11-01 22:42Z; the oldest item read is 2026-11-02 09:51Z, so 11.1h of the window was never served",
+      "fetched": 18,
+      "kept": 18,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 17
+    },
+    {
+      "at": "2026-11-02T10:08:17.456156+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-02T10:08:15.798395+00:00",
+      "detail": "page 2 starts 2.8h before page 1 ends (2026-11-02 04:43Z under 2026-11-02 07:32Z): the items between were served by neither",
+      "fetched": 149,
+      "kept": 144,
+      "source": "nst_business",
+      "status": "degraded",
+      "stored": 140
+    },
+    {
+      "at": "2026-11-02T10:08:12.263583+00:00",
+      "detail": "",
+      "fetched": 45,
+      "kept": 45,
+      "source": "fmt_business",
+      "status": "ok",
+      "stored": 45
+    },
+    {
+      "at": "2026-11-02T10:08:11.866151+00:00",
+      "detail": "read but empty: Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals, IHH",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-02T10:08:10.823148+00:00",
+      "detail": "read but empty: Genting; named the company: 11 of 23 (lowest: IHH 0/1, Petronas Chemicals 0/1, Press Metal 0/1)",
+      "fetched": 23,
+      "kept": 23,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 17
+    },
+    {
+      "at": "2026-11-02T10:08:08.794264+00:00",
+      "detail": "grouped 3 names per request; 2 requests (HTTP 429 on request 2: the rest of the slot is deferred, not asked); read but empty: Tenaga, Petronas Chemicals, IHH; failed: GDELT fetch failed: HTTP Error 429: Too Many Requests (Press Metal, Genting, Maybank)",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "throttled",
+      "stored": 0
+    }
+  ],
   "counts": {
-    "articles": 29361,
+    "articles": 29580,
     "documents": 0,
-    "escalated": 3751,
+    "escalated": 3753,
     "events": 4287,
     "failed_sweeps": 112,
-    "linked": 15554,
+    "linked": 15564,
     "observations": 6661,
     "series": 31,
-    "sweeps": 1325
+    "sweeps": 1334
   },
   "day": "2026-11-02",
-  "generated_at": "2026-11-02 00:45 UTC",
+  "generated_at": "2026-11-02 10:09 UTC",
   "macro": [
     {
       "change": "0.12",
@@ -145,6 +227,7 @@
   ],
   "names": [
     {
+      "earnings": [],
       "escalated": 0,
       "events": [],
       "instrument_id": "MYX:1155",
@@ -153,10 +236,37 @@
       "stories": [
         {
           "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiU0FVX3lxTE1oZ2ZZZkZMMFVScTNTUEZfX1M4R2hjakJrbmczVXVId3lqZTFDZmZFT0lhbjlkVFhQTng0Ylh0bTVFTEhzQW5HcFJldTkwY1JELUx3?oc=5",
+          "domain": "www.theedgemarkets.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-02T07:00:00+00:00",
+          "quality": 0.8,
+          "title": "Menara Tun Perak, Maybank\u2019s former KL headquarters, up for sale, sources say",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMi1gFBVV95cUxNdE55S0pBbVRPd0NkdjZObEhjSGZuNURpc0JTeVhHZDZJalRaOUdLSmFHeUtoSGVYNkZWdU1QV3RySDNiaTVfSWF4OFFRYUpvZl90YTFMVElJWXJ1b0haQXJJNXRYNW90TTJaZzhvQTlTblJMZVpWTHlXWEpXVksyS2Q0Ykg5OElVSU5TSENZQWJlcm9tbFpFMDlsNldoTDhjY0pwNkQtbTlkX2JNZEEzN1QzbDRHSHk2bVdyeEhsdkxKdFp1cHJwN2NOQWFSdTVZRW1LNS1B?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-02T00:39:26+00:00",
+          "quality": 0.8,
+          "title": "Golf: Yamashita the first to retain Maybank crown, fastest Japanese to reach five LPGA Tour titles",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
           "doc_id": "https://news.google.com/rss/articles/CBMi3AFBVV95cUxQUGoyenkxUFRzd2x2RU1FbkwyRHo5MTZXYm51VGRyMWtvRU9rVThlZ2xud1k0MUllbC1jN3V5OGlVZGp3N0FDM1EyV3N3RXNnWHZBWFB5azZhUE5nR3haSmlvYVdIT3RRa3pvcXZBWENYNDRKckh3aEx1R1FKZjhteW5iUmVodUVJbGpqejdtbFZwMnBOOFhUSDlBLUVLa1BPUXk3eUlVODJWX1J1NC1odkNsRlVvT2MwLWVoRl9KTVFnNEZwY21kUzlDZklKOGpoR2Nxdm5KOTJEWU9o?oc=5",
           "domain": "www.thestar.com.my",
           "escalated": false,
           "intensity": 0.0,
+          "kind": "",
           "polarity": 0.0,
           "published_at": "2026-11-01T14:32:00+00:00",
           "quality": 0.8,
@@ -169,6 +279,7 @@
           "domain": "www.thestar.com.my",
           "escalated": false,
           "intensity": 0.0,
+          "kind": "",
           "polarity": 0.0,
           "published_at": "2026-11-01T12:13:00+00:00",
           "quality": 0.8,
@@ -177,73 +288,112 @@
         },
         {
           "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMipAFBVV95cUxPbTRyaTRpNkRKREdOMVFqV19FY00yYUVkR1lwXzcwdkJvd2RmOUQ0Vy1saXBmQ3lIbHEwbU1PekhBWDNWZTdPR2FteXdlQk5JNWRhNlBheG9vVXVDNUlOc2dPM3h4WGxiWXVSZEhnd19vVUw2YWN5WHJBMTQ3VVNQc3pSTlNrbk5vaDJLXzR2Mi0xNmtnZkNibDFuckVINjAtem01Sg?oc=5",
+          "domain": "www.edgeprop.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-02T08:35:26+00:00",
+          "quality": 0.65,
+          "title": "Former Maybank HQ marketed for investment, alternative uses floated",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMivgFBVV95cUxQdzhCaDRvLTR1THRJMXF3VWxueUFuVURDVWo4bHJsN2VEVGZWVGRWUU9RSUxrQU1RVE5vcUhtLU5PbHZZU0duRjVLUy0yYk52QnFJQUFUMVM2WDZkTG1tWEk0LUJ1Rko4MktRZl9GblQ3UmdEd3FuN3hmWVlQUFR0dEtjNElNUFo5bmN4Y3l6X3lab3NPTkJhdVdfYUdZSTZrSzNEWFZVNzJuc3BSRUlsZXdnakRGdFJyX1hadW9n?oc=5",
+          "domain": "www.ad-hoc-news.de",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-02T00:25:14+00:00",
+          "quality": 0.65,
+          "title": "Malayan Banking stock: Maybank expands regional resilience push - ad-hoc-news.de",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMijwFBVV95cUxOZjIyRWxnMTJPX2JzTEt3Y0Q1OEdSbHVUOHA5bDE3a2ZJRy1feE9GSlhNRER6NGVhSXVHZ3paYW9YVW8xY2VOMGVqZGw5VUxUT0xQTW9IazFCWVpfYlBBYnNDNWRXMVBfVzJFMDFsbGFnaGpkY0hPTGQ3X3FGQjNRb1FIaDhsMkMxQkkxckdoWQ?oc=5",
+          "domain": "athlonsports.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-01T18:42:02+00:00",
+          "quality": 0.65,
+          "title": "Miyu Yamashita Holds Off Yan Liu to Defend Maybank Title",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
           "doc_id": "https://news.google.com/rss/articles/CBMikgFBVV95cUxQWERTWkN3RFJGUXQ4TFk0S2FIQW9oQl9nTzhScmZpclVTSTdyUVVzTFpuRHYyNlJVTzBFVTExNk9iUTF0QTJwVDFlRkpvRzR5TW1xLWZHSk14dVZTQ1hTQnEwWEx1YXF0SnVnZzNWLUpJRGxXN19JYXNNeVJsbVFMVWJzWUQtUUFLekpOZngxVFhydw?oc=5",
           "domain": "www.indiasnews.net",
           "escalated": false,
           "intensity": 0.0,
+          "kind": "",
           "polarity": 0.0,
           "published_at": "2026-11-01T15:59:23+00:00",
           "quality": 0.65,
           "title": "Miyu Yamashita defends championship at Maybank",
           "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMijgFBVV95cUxONFA1VTFEX2dsM29mMWFnWnZBTHgwQWIwRDFyNlR2N0dQVkVOQnB0V25qQURpMy1zVmhCRlR6TDM2UFp4cGw4dzNFX3NEU3pzTzg5NExFRHdJM2hDTzhISXNKVnJ4UE4wR01xOGJzWWNKY0VJRng3YmhWQUMzb3pMZU11d0xDWGlTOGd5NGdn?oc=5",
-          "domain": "sports.yahoo.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-11-01T13:12:53+00:00",
-          "quality": 0.65,
-          "title": "Miyu Yamashita defends Maybank title for third victory this year and fifth in last 15 months",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMijgFBVV95cUxOTlNubjZPQ0tWbTFUNnlsdl9fZ3hZSzQxQVNQZVpoYVBGUzZ3aW50WjhoVUhYVmZRWnBjRzZaZFFLcWFkOVJHRjc0NjZDcWFBa1dBUFdHVkhPSWV1ajRRcXRXZ1ZTME5MczVWUUxRWlRyb2VSRlcwc3QtdFl5Y1ZWR1h4VTJGNzMyNjVxM19R?oc=5",
-          "domain": "uk.sports.yahoo.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-11-01T12:44:54+00:00",
-          "quality": 0.65,
-          "title": "2026 Maybank Championship prize money payouts for each LPGA player in Malaysia",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMirAFBVV95cUxPOVRkbkhZYjZlMnFNNFVfQUZIeHM0WE9vSUFXNW4yNkUtZ256LXUxTHlaRnhWeTdVa3ViRUJXYWhEWVExck54Tk5UN3ZocE9qeWJxX2c3UktRSWJzUHpidUpOTEllVTNLb0QyR0pLeVRDMFVqREl0WmhmSGlsdW5tOTc2cVF5ZGpnQUt0bzF4VG1mZzlYZFhfWk5XMjBiV2kyMnpwTWxPOXBVZTR0?oc=5",
-          "domain": "www.lpga.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-11-01T12:34:10+00:00",
-          "quality": 0.65,
-          "title": "Epson Tour Graduate Mirabel Ting Caps Landmark Season at Maybank Championship",
-          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.0,
-        "n": 6,
+        "n": 11,
         "polarity_mean": 0.0,
-        "sources": 5,
+        "sources": 9,
         "uncertainty_mean": 0.0
       },
       "upcoming": []
     },
     {
+      "earnings": [],
       "escalated": 0,
       "events": [],
       "instrument_id": "MYX:5347",
       "label": "Tenaga",
       "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMitgFBVV95cUxOOS13SzJjUkZ3UU9wQ0ZhWHNROS1jNjhJMl9OQjhrTVVaazlZMFdzeUhfcENSR2tpbHc0RWg5VDNDRFZQb3RrakMxaWY5d2t0bkxpYlM1bWQ0WmV5bGxacXBHYU15V1FrZlNUZWM4RWdpWWtBc01iN1hmYVJHdDQtRVBLeDdxdjJ4M1R1SmVYY2I1dXNUYjk4ZGZrcnNiUG5mQ253MHpPdnVhVVY2MlFnRFo1TDZTdw?oc=5",
+          "domain": "www.businesstoday.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-02T04:04:26+00:00",
+          "quality": 0.8,
+          "title": "MARC Affirms TNB\u2019s AAA Ratings As Data Centre Drives Electricity Demand",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxPc1NuOHFOODBMNHJvdGxYZFBtdU9sRklNWHZybkZtMEt5VkcwM0I5TGNxN05qYVkxLUplOXVYUjBpUkxPVUdNMEpUZWt4cGRNUEVKZFBiN2tUUVp4czMtVDJYRmFvanBhU3lZXy1Kb0p3UlBWVG1HYUh0NURWUHg3aER3T1hBczJCWGQ4?oc=5",
+          "domain": "paultan.org",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-02T01:05:58+00:00",
+          "quality": 0.65,
+          "title": "TNB bill AFA rate November 2026 set at +3.60 sen/kWh",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 2,
+        "polarity_mean": 0.0,
+        "sources": 2,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
+      "earnings": [],
       "escalated": 0,
       "events": [],
       "instrument_id": "MYX:5183",
@@ -254,6 +404,7 @@
       "upcoming": []
     },
     {
+      "earnings": [],
       "escalated": 0,
       "events": [],
       "instrument_id": "MYX:5225",
@@ -264,6 +415,7 @@
       "upcoming": []
     },
     {
+      "earnings": [],
       "escalated": 0,
       "events": [],
       "instrument_id": "MYX:8869",
@@ -274,6 +426,7 @@
       "upcoming": []
     },
     {
+      "earnings": [],
       "escalated": 0,
       "events": [],
       "instrument_id": "MYX:3182",
@@ -284,6 +437,9 @@
       "upcoming": []
     },
     {
+      "earnings": [
+        "2026-11-17 (finnhub)"
+      ],
       "escalated": 3,
       "events": [],
       "instrument_id": "XNAS:NVDA",
@@ -417,6 +573,7 @@
           "domain": "www.fool.com",
           "escalated": true,
           "intensity": 0.3333333333333333,
+          "kind": "",
           "polarity": 0.0,
           "published_at": "2026-11-01T20:29:00+00:00",
           "quality": 0.65,
@@ -429,6 +586,7 @@
           "domain": "fourweekmba.com",
           "escalated": true,
           "intensity": 0.0,
+          "kind": "",
           "polarity": 1.0,
           "published_at": "2026-11-01T18:19:14+00:00",
           "quality": 0.65,
@@ -441,6 +599,7 @@
           "domain": "www.gurufocus.com",
           "escalated": true,
           "intensity": 0.3333333333333333,
+          "kind": "",
           "polarity": 0.0,
           "published_at": "2026-11-01T16:28:49+00:00",
           "quality": 0.65,
@@ -453,6 +612,7 @@
           "domain": "Yahoo",
           "escalated": false,
           "intensity": 0.0,
+          "kind": "",
           "polarity": 0.0,
           "published_at": "2026-11-01T16:07:06+00:00",
           "quality": 0.85,
@@ -465,6 +625,7 @@
           "domain": "finance.yahoo.com",
           "escalated": false,
           "intensity": 0.0,
+          "kind": "",
           "polarity": 0.0,
           "published_at": "2026-11-01T16:57:37+00:00",
           "quality": 0.8,
@@ -477,6 +638,7 @@
           "domain": "finance.yahoo.com",
           "escalated": false,
           "intensity": 0.0,
+          "kind": "",
           "polarity": 0.0,
           "published_at": "2026-11-01T12:52:03+00:00",
           "quality": 0.8,
@@ -489,6 +651,7 @@
           "domain": "cryptonews.net",
           "escalated": false,
           "intensity": 0.0,
+          "kind": "",
           "polarity": 0.0,
           "published_at": "2026-11-01T22:01:51+00:00",
           "quality": 0.65,
@@ -501,6 +664,7 @@
           "domain": "www.barchart.com",
           "escalated": false,
           "intensity": 0.0,
+          "kind": "",
           "polarity": 0.0,
           "published_at": "2026-11-01T21:20:38+00:00",
           "quality": 0.65,
@@ -533,7 +697,10 @@
       ]
     },
     {
-      "escalated": 6,
+      "earnings": [
+        "2026-11-02 (finnhub)"
+      ],
+      "escalated": 7,
       "events": [
         {
           "kind": "earnings_result",
@@ -670,10 +837,24 @@
       "stories": [
         {
           "day": null,
+          "doc_id": "https://www.nst.com.my/world/world/2026/11/1568901/apple-warns-german-politicians-potential-phone-compromise-reports",
+          "domain": "www.nst.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-02T04:35:13+00:00",
+          "quality": 1.0,
+          "title": "Apple warns German politicians of potential phone compromise: Reports",
+          "uncertainty": 0.6944444444444444
+        },
+        {
+          "day": null,
           "doc_id": "https://finance.yahoo.com/m/70ce984f-00d7-351b-ac85-1541ff0679b6/jobs%2C-midterm-elections%2C.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
           "escalated": true,
           "intensity": 0.0,
+          "kind": "",
           "polarity": 0.0,
           "published_at": "2026-11-01T19:00:00+00:00",
           "quality": 1.0,
@@ -686,6 +867,7 @@
           "domain": "stocksdownunder.com",
           "escalated": true,
           "intensity": 0.0,
+          "kind": "",
           "polarity": 0.0,
           "published_at": "2026-11-01T21:38:42+00:00",
           "quality": 0.65,
@@ -698,6 +880,7 @@
           "domain": "www.benzinga.com",
           "escalated": true,
           "intensity": 0.0,
+          "kind": "",
           "polarity": 1.0,
           "published_at": "2026-11-01T20:30:59+00:00",
           "quality": 0.65,
@@ -710,6 +893,7 @@
           "domain": "www.fool.com",
           "escalated": true,
           "intensity": 0.0,
+          "kind": "",
           "polarity": 1.0,
           "published_at": "2026-11-01T17:09:00+00:00",
           "quality": 0.65,
@@ -722,6 +906,7 @@
           "domain": "www.ad-hoc-news.de",
           "escalated": true,
           "intensity": 0.0,
+          "kind": "",
           "polarity": 0.0,
           "published_at": "2026-11-01T16:32:39+00:00",
           "quality": 0.65,
@@ -734,6 +919,7 @@
           "domain": "www.tipranks.com",
           "escalated": true,
           "intensity": 0.0,
+          "kind": "",
           "polarity": 1.0,
           "published_at": "2026-11-01T12:15:42+00:00",
           "quality": 0.65,
@@ -742,39 +928,29 @@
         },
         {
           "day": null,
-          "doc_id": "https://finance.yahoo.com/m/d0bc23d0-115b-314d-8989-07ca797bebfa/dow-jones-futures-loom-after.html?.tsrc=rss",
-          "domain": "finance.yahoo.com",
+          "doc_id": "https://www.nst.com.my/business/economy/2026/11/1568742/asia-shares-bend-under-ai-stress-apple-earnings-loom",
+          "domain": "www.nst.com.my",
           "escalated": false,
           "intensity": 0.0,
+          "kind": "",
           "polarity": 0.0,
-          "published_at": "2026-11-01T21:01:28+00:00",
-          "quality": 0.8,
-          "title": "Dow Jones Futures Loom After Market Sell-Off; How Midterm Elections May Swing Stocks",
-          "uncertainty": 0.3676470588235294
-        },
-        {
-          "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMizAFBVV95cUxPM0xOOWdDN2pXdGpnZnlHTzliX1ZST05ITXdYZXZ5WVN2WFI1eGYxYlcwVnZvWGFkMWNhcklYaXJYQkN1dlR2OHA4RzZSNDRQNjd2ejd2N0k5UW1QeGk1dVdQbHpjVmZaMWhoamc0Ml83bkZWRTBPc1B6aUVLRUUwVTJpM0JxYWpLYnhkc3Q1SXpwdnZpSkFuWEJrWVlyNzZjOXNOZG5CdHgwaEhReWM3SE9Dd09tT2h4SzFzQk0zTFcxR1BNT2oyRF9NMjU?oc=5",
-          "domain": "finance.yahoo.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "polarity": 0.0,
-          "published_at": "2026-11-01T19:01:38+00:00",
-          "quality": 0.8,
-          "title": "Apple to report Q4 earnings Monday, with iPhone 18 sales in the spotlight",
+          "published_at": "2026-11-02T01:00:11+00:00",
+          "quality": 1.0,
+          "title": "Asia shares bend under AI stress; Apple earnings loom",
           "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.0,
-        "n": 24,
-        "polarity_mean": 0.125,
-        "sources": 18,
-        "uncertainty_mean": 0.094
+        "n": 26,
+        "polarity_mean": 0.077,
+        "sources": 19,
+        "uncertainty_mean": 0.114
       },
       "upcoming": []
     },
     {
+      "earnings": [],
       "escalated": 3,
       "events": [],
       "instrument_id": "XNAS:MSFT",
@@ -908,6 +1084,7 @@
           "domain": "pluang.com",
           "escalated": true,
           "intensity": 0.0,
+          "kind": "",
           "polarity": 1.0,
           "published_at": "2026-11-01T19:09:08+00:00",
           "quality": 0.65,
@@ -920,6 +1097,7 @@
           "domain": "www.barchart.com",
           "escalated": true,
           "intensity": 0.0,
+          "kind": "",
           "polarity": 1.0,
           "published_at": "2026-11-01T15:30:03+00:00",
           "quality": 0.65,
@@ -932,6 +1110,7 @@
           "domain": "www.benzinga.com",
           "escalated": true,
           "intensity": 0.0,
+          "kind": "",
           "polarity": -1.0,
           "published_at": "2026-11-01T14:00:08+00:00",
           "quality": 0.65,
@@ -944,6 +1123,7 @@
           "domain": "99bitcoins.com",
           "escalated": false,
           "intensity": 0.0,
+          "kind": "",
           "polarity": 0.0,
           "published_at": "2026-11-01T15:00:19+00:00",
           "quality": 0.85,
@@ -956,6 +1136,7 @@
           "domain": "finance.yahoo.com",
           "escalated": false,
           "intensity": 0.0,
+          "kind": "",
           "polarity": 0.0,
           "published_at": "2026-11-01T18:03:00+00:00",
           "quality": 0.8,
@@ -968,6 +1149,7 @@
           "domain": "www.eteknix.com",
           "escalated": false,
           "intensity": 0.0,
+          "kind": "",
           "polarity": 0.0,
           "published_at": "2026-11-01T20:51:08+00:00",
           "quality": 0.65,
@@ -980,6 +1162,7 @@
           "domain": "economictimes.indiatimes.com",
           "escalated": false,
           "intensity": 0.0,
+          "kind": "",
           "polarity": 0.0,
           "published_at": "2026-11-01T19:06:10+00:00",
           "quality": 0.65,
@@ -992,6 +1175,7 @@
           "domain": "www.trefis.com",
           "escalated": false,
           "intensity": 0.0,
+          "kind": "",
           "polarity": 0.0,
           "published_at": "2026-11-01T14:41:42+00:00",
           "quality": 0.65,

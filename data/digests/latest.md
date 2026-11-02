@@ -1,20 +1,24 @@
 # Digest 2026-11-02
 
-Generated 2026-11-02 00:45 UTC · slot `all` · 29361 articles in the corpus, 6661 observations, 4287 events in the fact book.
+Generated 2026-11-02 10:09 UTC · slot `all` · 29580 articles in the corpus, 6661 observations, 4287 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- tone: 6 stories from 5 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- tone: 11 stories from 9 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-11-02 www.theedgemarkets.com — Menara Tun Perak, Maybank’s former KL headquarters, up for sale, sources say [q 0.80, tone +0.0]
+- 2026-11-02 www.thestar.com.my — Golf: Yamashita the first to retain Maybank crown, fastest Japanese to reach five LPGA Tour titles [q 0.80, tone +0.0]
 - 2026-11-01 www.thestar.com.my — The Asean contingent led by the Thais shines at the Maybank Championship at KLGCC [q 0.80, tone +0.0]
 - 2026-11-01 www.thestar.com.my — Japan's Miyu Yamashita is rightly 'the queen' after creating history defending her Maybank Championship title [q 0.80, tone +0.0]
+- 2026-11-02 www.edgeprop.my — Former Maybank HQ marketed for investment, alternative uses floated [q 0.65, tone +0.0]
+- 2026-11-02 www.ad-hoc-news.de — Malayan Banking stock: Maybank expands regional resilience push - ad-hoc-news.de [q 0.65, tone +0.0]
+- 2026-11-01 athlonsports.com — Miyu Yamashita Holds Off Yan Liu to Defend Maybank Title [q 0.65, tone +0.0]
 - 2026-11-01 www.indiasnews.net — Miyu Yamashita defends championship at Maybank [q 0.65, tone +0.0]
-- 2026-11-01 sports.yahoo.com — Miyu Yamashita defends Maybank title for third victory this year and fifth in last 15 months [q 0.65, tone +0.0]
-- 2026-11-01 uk.sports.yahoo.com — 2026 Maybank Championship prize money payouts for each LPGA player in Malaysia [q 0.65, tone +0.0]
-- 2026-11-01 www.lpga.com — Epson Tour Graduate Mirabel Ting Caps Landmark Season at Maybank Championship [q 0.65, tone +0.0]
 
 ### Tenaga (MYX:5347)
-- quiet: nothing collected for this name in the window
+- tone: 2 stories from 2 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-11-02 www.businesstoday.com.my — MARC Affirms TNB’s AAA Ratings As Data Centre Drives Electricity Demand [q 0.80, tone +0.0]
+- 2026-11-02 paultan.org — TNB bill AFA rate November 2026 set at +3.60 sen/kWh [q 0.65, tone +0.0]
 
 ### Petronas Chemicals (MYX:5183)
 - quiet: nothing collected for this name in the window
@@ -40,19 +44,21 @@ Generated 2026-11-02 00:45 UTC · slot `all` · 29361 articles in the corpus, 66
 - 2026-11-01 www.barchart.com — Indian Trading Apps Are Offering Access to U.S. Stocks. Why That’s Huge News for Nvidia Stock. [q 0.65, tone +0.0]
 - upcoming 2026-11-25 earnings_result — Q3 2027 results after the close (finnhub)
 - upcoming 2026-11-17 earnings_result — Q3 2027 results after the close (finnhub)
+- earnings date: 2026-11-17 (finnhub)
 - snapshot: P/E (ttm) 25.57 (finnhub, 2026-11-01) · P/B 28.81 (finnhub, 2026-11-01) · EPS (ttm) 7.91 (finnhub, 2026-11-01) · dividend yield 0.03 (finnhub, 2026-11-01) · beta 2.27 (finnhub, 2026-11-01) · 52w high 243.37 (finnhub, 2026-11-01) · 52w low 164.27 (finnhub, 2026-11-01) · target (consensus) 339.17 (fmp, 2026-11-01) · analysts: buy 41 (finnhub, 2026-10-20) · analysts: hold 2 (finnhub, 2026-10-20) · analysts: sell 1 (finnhub, 2026-10-20) · vendor sentiment 0.25 (alphavantage_news, 2026-10-06) · revenue (last quarter) 96.22bn (sec_xbrl, 2026-08-26) · net income (last quarter) 59.69bn (sec_xbrl, 2026-08-26) · last EPS surprise % 3.82 (finnhub, 2026-09-05)
 
 ### Apple (XNAS:AAPL)
-- tone: 24 stories from 18 sources, polarity +0.12, peak intensity 0.00, uncertainty 0.09 · 6 escalated
+- tone: 26 stories from 19 sources, polarity +0.08, peak intensity 0.00, uncertainty 0.11 · 7 escalated
+- 2026-11-02 www.nst.com.my — Apple warns German politicians of potential phone compromise: Reports [q 1.00, tone -1.0] ★
 - 2026-11-01 finance.yahoo.com — Jobs, Midterm Elections, Apple, Palantir, McDonald’s, Moderna, and More to Watch This Week [q 1.00, tone +0.0] ★
 - 2026-11-01 stocksdownunder.com — Apple (NASDAQ:AAPL) Earnings Preview: US$113 Billion Revenue Expected as AI Stock Selloff Deepens [q 0.65, tone +0.0] ★
 - 2026-11-01 www.benzinga.com — Apple, Palantir On Deck Monday As AI Demand, iPhone Growth Face Test [q 0.65, tone +1.0] ★
 - 2026-11-01 www.fool.com — Could Apple's Latest iPhone Be Its Biggest Growth Catalyst in Years? [q 0.65, tone +1.0] ★
 - 2026-11-01 www.ad-hoc-news.de — Apple stock faces Monday earnings test as margin outlook sharpens - ad-hoc-news.de [q 0.65, tone +0.0] ★
 - 2026-11-01 www.tipranks.com — Apple (AAPL) Q4 Earnings Preview: Strong iPhone Demand Meets Rising Costs [q 0.65, tone +1.0] ★
-- 2026-11-01 finance.yahoo.com — Dow Jones Futures Loom After Market Sell-Off; How Midterm Elections May Swing Stocks [q 0.80, tone +0.0]
-- 2026-11-01 finance.yahoo.com — Apple to report Q4 earnings Monday, with iPhone 18 sales in the spotlight [q 0.80, tone +0.0]
+- 2026-11-02 www.nst.com.my — Asia shares bend under AI stress; Apple earnings loom [q 1.00, tone +0.0]
 - event 2026-11-02 earnings_result — Q4 2026 results after the close (finnhub)
+- earnings date: 2026-11-02 (finnhub)
 - snapshot: P/E (ttm) 39.01 (finnhub, 2026-11-01) · P/B 50.98 (finnhub, 2026-11-01) · EPS (ttm) 8.72 (finnhub, 2026-11-01) · dividend yield 0.51 (finnhub, 2026-11-01) · beta 1.10 (finnhub, 2026-11-01) · 52w high 351.73 (finnhub, 2026-11-01) · 52w low 243.42 (finnhub, 2026-11-01) · target (consensus) 340.88 (fmp, 2026-11-01) · analysts: buy 20 (finnhub, 2026-10-20) · analysts: hold 14 (finnhub, 2026-10-20) · analysts: sell 3 (finnhub, 2026-10-20) · vendor sentiment -0.23 (alphavantage_news, 2026-10-06) · revenue (last quarter) 109.42bn (sec_xbrl, 2026-07-31) · net income (last quarter) 29.79bn (sec_xbrl, 2026-07-31) · last EPS surprise % -0.89 (finnhub, 2026-09-05)
 
 ### Microsoft (XNAS:MSFT)
@@ -87,6 +93,20 @@ Generated 2026-11-02 00:45 UTC · slot `all` · 29361 articles in the corpus, 66
 | 10y minus 2y Treasury spread, % | 0.37 | 2026-10-29 | -0.01 | fred |
 | US unemployment rate, % | 4.20 | 2026-09-01 | +0.1 | fred |
 | CBOE VIX, index | 17.20 | 2026-10-29 | +0.29 | fred |
+
+## Collection
+
+| at (UTC) | source | status | fetched | kept | stored | detail |
+|---|---|---|---|---|---|---|
+| 10:08 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
+| 10:08 | twse_openapi | ok | 8 | 0 | 0 | facts 0;  |
+| 10:08 | jin10_flash | degraded | 18 | 18 | 17 | facts 0; window not covered back to 2026-11-01 22:42Z; the oldest item read is 2 |
+| 10:08 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 10:08 | nst_business | degraded | 149 | 144 | 140 | page 2 starts 2.8h before page 1 ends (2026-11-02 04:43Z under 2026-11-02 07:32Z |
+| 10:08 | fmt_business | ok | 45 | 45 | 45 |  |
+| 10:08 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals, IHH |
+| 10:08 | google_news | ok | 23 | 23 | 17 | read but empty: Genting; named the company: 11 of 23 (lowest: IHH 0/1, Petronas  |
+| 10:08 | gdelt | throttled | 0 | 0 | 0 | grouped 3 names per request; 2 requests (HTTP 429 on request 2: the rest of the  |
 
 ---
 
