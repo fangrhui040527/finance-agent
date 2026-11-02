@@ -1,7 +1,6 @@
-# TEMPORARY (2026-11-02): one look at londonstrategicedge.com from a runner,
-# because this project's sandbox cannot resolve it. Keyless; prints status,
-# content type, final URL, size, the page's text and its links. Removed after
-# its run.
+# TEMPORARY (2026-11-02): a second look at londonstrategicedge.com from a
+# runner - its pages are a JavaScript app, so read the bundle for the API base,
+# endpoint paths, Malaysian coverage and the terms. Keyless. Removed after.
 name: tmp-probe-lse
 on:
   push:
@@ -12,35 +11,42 @@ permissions:
 jobs:
   probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 8
     steps:
-      - name: Fetch
+      - name: Read the bundle
         shell: python
         run: |
-          import html, re, urllib.request, urllib.error
+          import re, urllib.request, urllib.error, json
           UA = "finplanet-analyst-mind/0.1 (personal research; source evaluation)"
-          urls = ["https://londonstrategicedge.com/data", "https://londonstrategicedge.com/",
-                  "https://londonstrategicedge.com/robots.txt", "https://londonstrategicedge.com/api",
-                  "https://londonstrategicedge.com/docs", "https://londonstrategicedge.com/pricing",
-                  "https://londonstrategicedge.com/terms"]
-          for u in urls:
-              print("=" * 100); print(u)
+          def get(u, n=30_000_000):
               try:
-                  r = urllib.request.urlopen(urllib.request.Request(u, headers={"User-Agent": UA}), timeout=20)
-                  body = r.read(2_000_000); status = r.status; ctype = r.headers.get("Content-Type"); final = r.geturl()
+                  r = urllib.request.urlopen(urllib.request.Request(u, headers={"User-Agent": UA}), timeout=30)
+                  return r.status, r.headers.get("Content-Type"), r.read(n).decode("utf-8", "replace")
               except urllib.error.HTTPError as e:
-                  body = e.read(200_000); status = e.code; ctype = e.headers.get("Content-Type"); final = u
+                  return e.code, e.headers.get("Content-Type"), e.read(20000).decode("utf-8", "replace")
               except Exception as e:
-                  print("ERROR", type(e).__name__, e); continue
-              text = body.decode("utf-8", "replace")
-              print(f"status {status} | type {ctype} | final {final} | bytes {len(body)}")
-              links = sorted(set(re.findall(r'href=["\']([^"\'#]+)', text)))
-              scripts = re.findall(r'<script[^>]*src=["\']([^"\']+)', text)
-              plain = re.sub(r"<(script|style)[^>]*>.*?</\1>", " ", text, flags=re.S | re.I)
-              plain = html.unescape(re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", plain))).strip()
-              print("TEXT:", plain[:6000] if u.endswith("/data") else plain[:1500])
-              print("LINKS:", links[:120])
-              print("SCRIPTS:", scripts[:20])
-              if u.endswith("/data"):
-                  for m in re.findall(r'(https?://[^"\'\s<>]*(?:api|\.json|\.csv|data)[^"\'\s<>]*)', text)[:60]:
-                      print("URLISH:", m)
+                  return None, None, f"{type(e).__name__}: {e}"
+          s, t, page = get("https://londonstrategicedge.com/api-documentation")
+          entries = re.findall(r'src="(/assets/[^"]+\.js)"', page)
+          print("api-documentation", s, t, "entries", entries)
+          seen, queue, bundle = set(), list(entries), ""
+          while queue and len(seen) < 60:
+              p = queue.pop(0)
+              if p in seen: continue
+              seen.add(p)
+              s, t, js = get("https://londonstrategicedge.com" + p)
+              print("chunk", p, s, len(js))
+              bundle += "\n" + js
+              for c in re.findall(r'["\'](\.?/?assets/[A-Za-z0-9_\-.]+\.js)["\']', js):
+                  c = "/" + c.lstrip("./") if not c.startswith("/") else c
+                  if c not in seen: queue.append(c)
+          print("chunks read", len(seen), "bytes", len(bundle))
+          hosts = sorted(set(re.findall(r'https?://[a-zA-Z0-9.\-]+(?:/[a-zA-Z0-9_\-/{}.]*)?', bundle)))
+          print("URLS:", [h for h in hosts if "googleapis" not in h and "w3.org" not in h][:150])
+          paths = sorted(set(re.findall(r'["\'`](/(?:api|v1|v2|data|databank|ws)[a-zA-Z0-9_\-/{}.:?=&$]*)["\'`]', bundle)))
+          print("PATHS:", paths[:200])
+          for word in ["Malaysia", "Bursa", "KLSE", "MYX", ".KL", "MYR", "Kuala", "sentiment", "news", "rate limit", "per hour", "redistribut", "commercial", "licen", "attribution", "X-API-Key", "api_key", "apikey", "Authorization"]:
+              hits = [m.start() for m in re.finditer(re.escape(word), bundle)]
+              print(f"--- {word!r}: {len(hits)} hits")
+              for h in hits[:4]:
+                  print("   ", re.sub(r"\s+", " ", bundle[max(0, h - 160): h + 220]))
