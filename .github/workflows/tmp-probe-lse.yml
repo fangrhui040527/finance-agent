@@ -1,0 +1,46 @@
+# TEMPORARY (2026-11-02): one look at londonstrategicedge.com from a runner,
+# because this project's sandbox cannot resolve it. Keyless; prints status,
+# content type, final URL, size, the page's text and its links. Removed after
+# its run.
+name: tmp-probe-lse
+on:
+  push:
+    branches: [claude/new-session-3rm9vv]
+    paths: [.github/workflows/tmp-probe-lse.yml]
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Fetch
+        shell: python
+        run: |
+          import html, re, urllib.request, urllib.error
+          UA = "finplanet-analyst-mind/0.1 (personal research; source evaluation)"
+          urls = ["https://londonstrategicedge.com/data", "https://londonstrategicedge.com/",
+                  "https://londonstrategicedge.com/robots.txt", "https://londonstrategicedge.com/api",
+                  "https://londonstrategicedge.com/docs", "https://londonstrategicedge.com/pricing",
+                  "https://londonstrategicedge.com/terms"]
+          for u in urls:
+              print("=" * 100); print(u)
+              try:
+                  r = urllib.request.urlopen(urllib.request.Request(u, headers={"User-Agent": UA}), timeout=20)
+                  body = r.read(2_000_000); status = r.status; ctype = r.headers.get("Content-Type"); final = r.geturl()
+              except urllib.error.HTTPError as e:
+                  body = e.read(200_000); status = e.code; ctype = e.headers.get("Content-Type"); final = u
+              except Exception as e:
+                  print("ERROR", type(e).__name__, e); continue
+              text = body.decode("utf-8", "replace")
+              print(f"status {status} | type {ctype} | final {final} | bytes {len(body)}")
+              links = sorted(set(re.findall(r'href=["\']([^"\'#]+)', text)))
+              scripts = re.findall(r'<script[^>]*src=["\']([^"\']+)', text)
+              plain = re.sub(r"<(script|style)[^>]*>.*?</\1>", " ", text, flags=re.S | re.I)
+              plain = html.unescape(re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", plain))).strip()
+              print("TEXT:", plain[:6000] if u.endswith("/data") else plain[:1500])
+              print("LINKS:", links[:120])
+              print("SCRIPTS:", scripts[:20])
+              if u.endswith("/data"):
+                  for m in re.findall(r'(https?://[^"\'\s<>]*(?:api|\.json|\.csv|data)[^"\'\s<>]*)', text)[:60]:
+                      print("URLISH:", m)
