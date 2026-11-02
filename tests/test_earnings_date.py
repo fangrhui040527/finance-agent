@@ -95,6 +95,16 @@ def test_an_acceptance_time_z_is_utc():
     assert acceptance_time("not a time") is None and acceptance_time("Z") is None
 
 
+def test_a_bare_acceptance_time_takes_the_later_clock_never_an_early_release():
+    """No zone at all, which EDGAR has not been seen to send, could be UTC or
+    New York's wall clock. New York's is the later instant, so a release read
+    that way can be late but never public before it was."""
+    bare = acceptance_time("2026-11-02T16:30:23")
+    as_utc = datetime(2026, 11, 2, 16, 30, 23, tzinfo=UTC)
+    assert bare == datetime(2026, 11, 2, 21, 30, 23, tzinfo=UTC)
+    assert bare is not None and bare >= as_utc
+
+
 # --- the collector stores the release ------------------------------------------------
 
 SUBMISSIONS = {

@@ -88,8 +88,10 @@ def acceptance_time(raw) -> datetime | None:
     """An EDGAR acceptanceDateTime as a UTC instant, or None.
 
     "Z" and an explicit offset are taken as written. A bare timestamp with
-    neither, which EDGAR has not been seen to send, is read as UTC too: the
-    same clock as the "Z" form, and never earlier than any other reading.
+    neither, which EDGAR has not been seen to send, is read as New York wall
+    time: of the two clocks it could be on, that is the LATER instant, so a
+    release is never dated before it was public. Read as UTC it would be four
+    or five hours early if it were New York's - a look-ahead.
     """
     s = str(raw or "").strip()
     if not s or s in ("Z", "z"):
@@ -101,7 +103,7 @@ def acceptance_time(raw) -> datetime | None:
     except ValueError:
         return None
     if parsed.tzinfo is None:
-        parsed = parsed.replace(tzinfo=UTC)
+        parsed = parsed.replace(tzinfo=SEC_TZ)
     return parsed.astimezone(UTC)
 
 
