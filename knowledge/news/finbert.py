@@ -74,7 +74,10 @@ def _download(url: str, dest: Path, opener=None) -> str:
     tmp = Path(name)
     commit = ""
     try:
-        with open_(req, timeout=120) as resp, os.fdopen(fd, "wb") as out:
+        # The temporary file is opened FIRST, so it is closed even when the
+        # request itself fails (a 404, a refused connection); Windows will not
+        # remove a file whose handle is still open.
+        with os.fdopen(fd, "wb") as out, open_(req, timeout=120) as resp:
             headers = getattr(resp, "headers", None)
             if headers is not None:
                 commit = headers.get("X-Repo-Commit", "") or ""

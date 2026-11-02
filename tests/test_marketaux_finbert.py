@@ -326,6 +326,8 @@ def test_fetch_model_falls_back_to_the_next_export_and_records_the_commit(tmp_pa
 
     root, meta = finbert.fetch_model(tmp_path, opener)
     assert meta["model_file"] == "onnx/model_int8.onnx" and meta["commit"].startswith("abc123")
+    # The 404'd file's temporary copy is gone - closed before it was removed,
+    # which Windows requires (WinError 32 on 2026-11-02 when it was not).
     assert (root / "onnx/model_int8.onnx").read_bytes() == b"x" * 10
     assert not list(root.rglob("*.part"))
     n = len(asked)
