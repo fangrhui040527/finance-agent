@@ -52,6 +52,8 @@ PROVIDER_KEYS: tuple[str, ...] = (
     "FINNHUB_API_KEY",
     "FMP_API_KEY",
     "ALPHAVANTAGE_API_KEY",
+    # Marketaux news and per-entity sentiment for the US names (marketaux.py).
+    "MARKETAUX_API_KEY",
     "FRED_API_KEY",
     "SEC_USER_AGENT",
     # Optional: FinMind answers 300 requests an hour without it and 600 with.

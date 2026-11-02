@@ -125,8 +125,18 @@ jobs:
           python-version: "3.12"
           enable-cache: true
 
+      # The sentiment group is ONNX Runtime and the tokenizer for finbert_tone
+      # (knowledge/news/finbert.py), about 20 MB; the model itself, about 110
+      # MB, is downloaded once and kept in the Actions cache from then on.
       - name: Install
-        run: uv sync --frozen
+        run: uv sync --frozen --group sentiment
+
+      - name: Restore the FinBERT model
+        id: finbert-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ runner.temp }}/finbert
+          key: finbert-xenova-main-v1
 
       # The schedule string is the only thing that says which cron fired.
       - name: Which slot
@@ -166,6 +176,7 @@ jobs:
           FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
           FMP_API_KEY: ${{ secrets.FMP_API_KEY }}
           ALPHAVANTAGE_API_KEY: ${{ secrets.ALPHAVANTAGE_API_KEY }}
+          MARKETAUX_API_KEY: ${{ secrets.MARKETAUX_API_KEY }}
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
           EODHD_API_KEY: ${{ secrets.EODHD_API_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
@@ -197,8 +208,12 @@ jobs:
           FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY || env.FINNHUB_API_KEY }}
           FMP_API_KEY: ${{ secrets.FMP_API_KEY || env.FMP_API_KEY }}
           ALPHAVANTAGE_API_KEY: ${{ secrets.ALPHAVANTAGE_API_KEY || env.ALPHAVANTAGE_API_KEY }}
+          MARKETAUX_API_KEY: ${{ secrets.MARKETAUX_API_KEY || env.MARKETAUX_API_KEY }}
           FRED_API_KEY: ${{ secrets.FRED_API_KEY || env.FRED_API_KEY }}
           EODHD_API_KEY: ${{ secrets.EODHD_API_KEY || env.EODHD_API_KEY }}
+          # Where finbert_tone keeps the model it downloads once (the cache
+          # step below restores it). See knowledge/news/finbert.py.
+          FINBERT_CACHE: ${{ runner.temp }}/finbert
           # Which EODHD plan the key is on (free | fundamentals | all-in-one).
           # Not a secret, but kept beside the key it describes; absent means
           # the free plan and its two-names-a-day rotation. See .env.example.
@@ -217,6 +232,20 @@ jobs:
       # Its own step. A news source being throttled says nothing about whether
       # the central bank published a rate. Bursa-close and manual runs only:
       # BNM publishes once a day, after the Kuala Lumpur session.
+      # Saved here, straight after the sweep, and not by actions/cache's own
+      # post step: that one saves only when the whole job succeeds, and this
+      # job is failed on purpose when a source is degraded or a key refused,
+      # so the model would be downloaded afresh on most runs.
+      - name: Keep the FinBERT model
+        # A run that never loaded the model (no title to score, or the source
+        # failed) has nothing to save; that is a warning, never the job's fault.
+        if: always() && steps.finbert-cache.outputs.cache-hit != 'true'
+        continue-on-error: true
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ runner.temp }}/finbert
+          key: finbert-xenova-main-v1
+
       - name: Record the official FX rate
         id: fx
         if: steps.slot.outputs.slot == 'bursa_close' || steps.slot.outputs.slot == 'all'
