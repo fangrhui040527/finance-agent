@@ -270,7 +270,8 @@ min_graded_for_calibration = 30
 # The register of every name here, what it needs and when it runs, is
 # knowledge/sources/catalog.py (`python ask.py sources` prints it). Keyed
 # sources skip themselves, with the variable named, until the key exists:
-# FINNHUB_API_KEY, FMP_API_KEY, ALPHAVANTAGE_API_KEY, FRED_API_KEY.
+# FINNHUB_API_KEY, FMP_API_KEY, MARKETAUX_API_KEY, FRED_API_KEY (ALPHAVANTAGE_API_KEY
+# for alphavantage_news, registered and off).
 #
 # Malaysian business RSS candidates (thestar_business, edge_malaysia,
 # bernama_business, fmt_business, nst_business) and bursa_announcements are
@@ -326,7 +327,12 @@ enabled = [
   # dates nothing - all three settled, see knowledge/feeds/registry.py.
   "fmt_business", "nst_business",
   "edgar", "bnm_opr", "dosm_cpi",
-  "finnhub", "fmp", "alphavantage_news", "fred",
+  # alphavantage_news came off on 2026-11-02: its NEWS_SENTIMENT call has been
+  # premium-only for this key since 2026-10-07 and every pull since was a
+  # refusal. marketaux_news replaces it for the US names; finbert_tone scores
+  # the stored titles of all nine names, the Bursa six included, which no
+  # reachable vendor scores. The collector stays registered for a paid key.
+  "finnhub", "fmp", "marketaux_news", "fred",
   # 2026-09-05, the four sites asked for by their free routes (details/09):
   # Jin10's public flash and calendar endpoints, DBnomics for the series behind
   # MacroMicro's charts, TWSE OpenAPI + FinMind for the Taiwan names Goodinfo
@@ -340,6 +346,7 @@ enabled = [
   # facts for the US names, keyless; EODHD behind an optional key, two names a
   # day on its free plan and US only until the Fundamentals plan.
   "sec_xbrl", "eodhd",
+  "finbert_tone",
 ]
 
 # Names the collectors read but the book never holds. TSMC is here as the

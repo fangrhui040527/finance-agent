@@ -61,6 +61,8 @@ SNAPSHOT = (
     ("analyst_hold", "analysts: hold"),
     ("analyst_sell", "analysts: sell"),
     ("av_news_sentiment", "vendor sentiment"),
+    ("mx_news_sentiment", "Marketaux sentiment"),
+    ("finbert_sentiment", "FinBERT headline tone"),
     ("revenue", "revenue (last quarter)"),
     ("net_income", "net income (last quarter)"),
     ("eps_surprise_pct", "last EPS surprise %"),

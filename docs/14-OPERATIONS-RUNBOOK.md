@@ -797,6 +797,56 @@ The job pings `<url>/start` first, and last `<url>` on success or
 body (`curl -fsS -m 10 --retry 3`). A ping that does not get through is a
 warning on the run, never a failure.
 
+## News sentiment: Marketaux for the US names, FinBERT for all nine (2026-11-02)
+
+`alphavantage_news` is off. Its NEWS_SENTIMENT call has been premium-only for
+this key since 2026-10-07, and every pull after that was a refusal. It stays
+registered, so a paid key can turn it back on.
+
+Two sources replace it:
+
+- **`marketaux_news`** (`knowledge/sources/marketaux.py`, key `MARKETAUX_API_KEY`):
+  - Runs at `us_close` for the US names. The free plan answers 100 requests a
+    day with 3 articles each, so a name is read 3 at a time, newest first, up to
+    8 pages: 24 requests a run.
+  - Stores the articles, and per name per day `mx_news_sentiment` (the mean of
+    the vendor's per-entity score, -1..1) and `mx_news_count`.
+  - If all 8 pages come back full, the run stopped before the start of the
+    window, so the oldest day is partial and is not aggregated. The sweep row
+    says so.
+  - It answered no Bursa `.KL` symbol on the free plan (checked 2026-10-29),
+    which is why it is not asked for them.
+- **`finbert_tone`** (`knowledge/sources/finbert_tone.py`, no key):
+  - Runs last in `bursa_close` and `us_close` and reads the corpus, not the
+    network.
+  - Scores the English titles the linker attached to each name with FinBERT
+    (`knowledge/news/finbert.py`). It stores per name per day
+    `finbert_sentiment` (the mean of P(positive) - P(negative)) and
+    `finbert_count`, with the positive/negative/neutral split and the model
+    version in the payload.
+  - A day with no linked English title stores nothing. An absent row means
+    "not scored", never a neutral 0.
+
+What the runner needs for FinBERT:
+
+- `uv sync --group sentiment` (ONNX Runtime and the tokenizer, about 20 MB, no
+  PyTorch).
+- The model, `Xenova/finbert` on Hugging Face (the ProsusAI weights exported to
+  ONNX, the int8 file at about 110 MB). It is downloaded once into
+  `FINBERT_CACHE`, and collect.yml keeps that folder in the Actions cache
+  (`finbert-xenova-main-v1`).
+- `FINBERT_REVISION` pins a commit instead of `main`. Change the cache key with
+  it.
+
+When it fails:
+
+- `finbert_tone ... uv sync --group sentiment`: the dependency group is not
+  installed.
+- `could not download Xenova/finbert@main`: Hugging Face was unreachable and
+  nothing was cached. The next run tries again.
+
+Either way it is a `failed` sweep row, not a quiet day.
+
 ## Earnings dates: which one to believe (2026-10-28)
 
 Calendars move and disagree: by 2026-10-28 Finnhub alone had listed Apple's

@@ -265,6 +265,20 @@ CATALOG: dict[str, SourceSpec] = {
         key_env="ALPHAVANTAGE_API_KEY",
         docs="https://www.alphavantage.co/documentation/#news-sentiment",
     ),
+    # 2026-11-02, in place of alphavantage_news (premium-only since 2026-10-07):
+    # US only - its free tier answered 0 articles for every `.KL` symbol when
+    # checked from a runner on 2026-10-29. 100 requests a day, 3 articles each.
+    "marketaux_news": SourceSpec(
+        "marketaux_news",
+        MIXED,
+        "Marketaux news with per-entity sentiment, US names only; up to 8 pages of 3 "
+        "articles per name a night (100 requests/day plan)",
+        "general_news",
+        ("us_close",),
+        markets=("XNAS", "XNYS"),
+        key_env="MARKETAUX_API_KEY",
+        docs="https://www.marketaux.com/documentation",
+    ),
     "fred": SourceSpec(
         "fred",
         STRUCTURED,
@@ -348,6 +362,20 @@ CATALOG: dict[str, SourceSpec] = {
         per_instrument=True,
         markets=("XKLS", "XNAS", "XNYS", "XTAI"),
         docs="https://eodhd.com/financial-apis/stock-etfs-fundamental-data-feeds",
+    ),
+    # LAST on purpose: it scores the titles the news sources above stored in the
+    # same run, and the sweep runs sources in catalogue order. No key, no
+    # network once the model is cached (knowledge/news/finbert.py).
+    "finbert_tone": SourceSpec(
+        "finbert_tone",
+        STRUCTURED,
+        "FinBERT headline tone, scored locally over the English titles linked to each "
+        "name that day (needs `uv sync --group sentiment`)",
+        "vendor",
+        ("bursa_close", "us_close"),
+        per_instrument=True,
+        markets=("XKLS", "XNAS", "XNYS"),
+        docs="https://huggingface.co/ProsusAI/finbert",
     ),
 }
 

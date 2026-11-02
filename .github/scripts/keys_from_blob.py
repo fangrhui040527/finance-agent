@@ -51,6 +51,9 @@ LABELS: tuple[tuple[str, re.Pattern[str]], ...] = (
     ("FINNHUB_API_KEY", re.compile(r"fin+hub", re.I)),
     ("FMP_API_KEY", re.compile(r"\bfmp\b|financial\s*modeling", re.I)),
     ("ALPHAVANTAGE_API_KEY", re.compile(r"alpha\s*_?vantage|\balpha\b|\bav\b", re.I)),
+    # Marketaux, by label only: its token is 40 alphanumerics and an unlabelled
+    # one cannot be told from a Finnhub key by shape.
+    ("MARKETAUX_API_KEY", re.compile(r"market\s*aux", re.I)),
     ("FRED_API_KEY", re.compile(r"\bfred\b", re.I)),
     ("GROQ_API_KEY", re.compile(r"\bgroq\b", re.I)),
     ("EODHD_API_KEY", re.compile(r"\beod\s*hd\b|\beodhd\b|eod\s*historical", re.I)),

@@ -41,6 +41,14 @@ dev = [
 ]
 
 [dependency-groups]
+# FinBERT headline tone (knowledge/news/finbert.py, the finbert_tone source).
+# ONNX Runtime and the Rust tokenizer, about 20 MB, instead of PyTorch. Not a
+# default group: only collect.yml installs it, with `uv sync --group sentiment`.
+sentiment = [
+  "onnxruntime>=1.18",
+  "tokenizers>=0.19",
+  "numpy>=1.26",
+]
 dev = [
   "pytest>=8.0",
   "pytest-cov>=5.0",

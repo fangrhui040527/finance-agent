@@ -15,11 +15,13 @@ from knowledge.sources.dbnomics import DbnomicsCollector
 from knowledge.sources.dosm import DosmCpiCollector
 from knowledge.sources.edgar import EdgarFilings
 from knowledge.sources.eodhd import EodhdFundamentals
+from knowledge.sources.finbert_tone import FinbertTone
 from knowledge.sources.finmind import FinMindCollector
 from knowledge.sources.finnhub import FinnhubCollector
 from knowledge.sources.fmp import FmpCollector
 from knowledge.sources.fred import FredCollector
 from knowledge.sources.jin10 import Jin10CalendarCollector, Jin10FlashCollector
+from knowledge.sources.marketaux import MarketauxNews
 from knowledge.sources.sec_xbrl import SecCompanyFacts
 from knowledge.sources.twse import TwseOpenApiCollector
 
@@ -32,6 +34,7 @@ COLLECTORS: dict[str, type[Collector]] = {
     "finnhub": FinnhubCollector,
     "fmp": FmpCollector,
     "alphavantage_news": AlphaVantageNews,
+    "marketaux_news": MarketauxNews,
     "fred": FredCollector,
     "bnm_opr": BnmOprCollector,
     "dosm_cpi": DosmCpiCollector,
@@ -44,6 +47,7 @@ COLLECTORS: dict[str, type[Collector]] = {
     "finmind": FinMindCollector,
     "sec_xbrl": SecCompanyFacts,
     "eodhd": EodhdFundamentals,
+    "finbert_tone": FinbertTone,
 }
 
 
