@@ -83,14 +83,14 @@ def test_trace_run_live_flag_records_the_feed(prices_online, run_cli, tmp_path):
 
 @pytest.mark.network
 def test_gdelt_answers_with_a_list_and_never_with_silence_on_failure(gdelt):
-    from knowledge.feeds.adapter import FeedError, GdeltFeed
+    from knowledge.feeds.adapter import FeedError, FeedThrottled, GdeltFeed
 
     feed = GdeltFeed(query="Malaysia bank")
     since = datetime.now(timezone.utc) - timedelta(minutes=60)
     try:
         records = feed.fetch(since, limit=5)
     except FeedError as e:
-        if "429" in str(e):
+        if isinstance(e, FeedThrottled) or "429" in str(e):
             # GDELT asks for one request every five seconds per client, and a
             # runner that has just finished the sources suite is over it. The
             # product raised, named the status and opened its breaker: that is

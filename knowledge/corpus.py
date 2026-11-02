@@ -59,6 +59,26 @@ FAILED = "failed"
 #: back - a status the writer cannot spell is a status the reader never sees,
 #: which is exactly what happened. See `last_success` and defect log §20.
 DEGRADED = "degraded"
+#: A source that did not run because its key is not set. NOT `ok`: until
+#: 2026-10-28 this was written `ok` with a "skipped:" detail, like a plan
+#: boundary, so `last_success` read a run with no key as a read. On 2026-10-27
+#: the keys vanished from the secrets, and the 22:43 us_close row that said
+#: "ALPHAVANTAGE_API_KEY, which is not set" resolved alphavantage_news's
+#: `sweep_silence` alert, open at 309h, on a run that read nothing.
+SKIPPED_NO_KEY = "skipped_no_key"
+#: A source whose key was sent and refused (HTTP 401). A failure, not a skip,
+#: and spelled apart from FAILED so a rotated or revoked key is named as one.
+AUTH_FAILED = "auth_failed"
+#: The two statuses that say a KEY is the problem; `knowledge/ledger.py` and
+#: the `source_keys` monitor rule turn either into an alert.
+KEY_PROBLEMS = (SKIPPED_NO_KEY, AUTH_FAILED)
+#: A run the SOURCE stopped: it answered 429 (or a 200 with nothing in it) and
+#: the sweep asked it nothing more that run. Not `ok` even when an earlier
+#: request was read, because the names it held back were not; and not read for
+#: the watermark (`last_success`), so the next run asks over their window again
+#: instead of starting two hours short of where the throttle cut in. The corpus
+#: dedupes what the earlier request already stored.
+THROTTLED = "throttled"
 
 #: How much of a long doc_id a page prints (`Corpus.short_ids`). Every Google
 #: News key opens with the same ~50 characters - host, path and the token's
@@ -649,7 +669,7 @@ class Corpus:
         ).fetchone()[0]
         sweeps = self.conn.execute("SELECT COUNT(*) FROM sweeps").fetchone()[0]
         failed = self.conn.execute(
-            "SELECT COUNT(*) FROM sweeps WHERE status = ?", (FAILED,)
+            "SELECT COUNT(*) FROM sweeps WHERE status IN (?, ?)", (FAILED, AUTH_FAILED)
         ).fetchone()[0]
         return {
             "articles": articles,
@@ -658,6 +678,36 @@ class Corpus:
             "sweeps": sweeps,
             "failed_sweeps": failed,
         }
+
+    def slot_history(self, source: str, slot: str, limit: int = 200) -> list[sqlite3.Row]:
+        """This source's runs in `slot` that READ something, newest first.
+
+        The history `knowledge/ledger.py` takes a source's usual row count
+        from: ok or degraded, never a skip, a failure or a missing key, so
+        a run that could not read does not pull the median down.
+        """
+        sql = "SELECT * FROM sweeps WHERE source = ? AND slot = ?" + _READ_SOMETHING
+        rows = self.conn.execute(
+            sql + " ORDER BY at DESC LIMIT ?",
+            [source, slot, *_READ_SOMETHING_ARGS, max(1, limit)],
+        )
+        return list(rows.fetchall())
+
+    def key_verdict(self, source: str) -> sqlite3.Row | None:
+        """This source's newest row that says anything about its key: a key
+        problem (`KEY_PROBLEMS`), or a run that READ, which proves the key.
+
+        A skip by design and a plain failure say neither, so they are passed
+        over: eodhd's "no name in this slot is on the free plan" at bursa_close
+        is not the key coming back after us_close refused it, and a network
+        failure after a 401 is not a fixed key. The `source_keys` monitor rule
+        judges this row, not the newest one.
+        """
+        sql = (
+            "SELECT * FROM sweeps WHERE source = ? AND (status IN (?, ?)"
+            " OR (status IN (?, ?) AND detail NOT LIKE ?)) ORDER BY at DESC LIMIT 1"
+        )
+        return self.conn.execute(sql, [source, *KEY_PROBLEMS, *_READ_SOMETHING_ARGS]).fetchone()
 
     def sweeps(self, limit: int = 20, source: str | None = None) -> list[sqlite3.Row]:
         sql = "SELECT * FROM sweeps"

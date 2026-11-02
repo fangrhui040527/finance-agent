@@ -20,7 +20,7 @@ on:
   workflow_dispatch:
     inputs:
       outlets:
-        description: "space-separated outlet names; empty probes every one"
+        description: "space-separated outlet names, or bursa_data for Bursa's own files; empty probes every one"
         type: string
         default: ""
 

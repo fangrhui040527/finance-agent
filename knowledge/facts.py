@@ -53,6 +53,9 @@ SKIPPED = "skipped"  # no key, or the plan does not include the endpoint
 #: reply did not reach back to the window's start. The same word and meaning
 #: as the corpus's sweep status (`knowledge.corpus.DEGRADED`).
 DEGRADED = "degraded"
+#: A key that was sent and refused. The same word as the corpus's sweep status
+#: (`knowledge.corpus.AUTH_FAILED`); a failure, counted with FAILED.
+AUTH_FAILED = "auth_failed"
 
 #: How much of a pull's detail the pulls table keeps. 2000, up from 400, for
 #: the reason knowledge/sweep.DETAIL_CHARS gives: the nightly page quotes this
@@ -734,7 +737,9 @@ class FactBook:
             "series": one("SELECT COUNT(DISTINCT series_id) FROM series"),
             "documents": one("SELECT COUNT(*) FROM documents"),
             "pulls": one("SELECT COUNT(*) FROM pulls"),
-            "failed_pulls": one("SELECT COUNT(*) FROM pulls WHERE status = ?", FAILED),
+            "failed_pulls": one(
+                "SELECT COUNT(*) FROM pulls WHERE status IN (?, ?)", FAILED, AUTH_FAILED
+            ),
         }
 
     # -- the bridge to A1 ------------------------------------------------------

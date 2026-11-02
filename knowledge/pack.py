@@ -632,7 +632,10 @@ def build_pack(
         "Each story line below carries its publication time in UTC and its corpus key: "
         f"cite it as the `doc_id`. A key ending in … is the first {SHORT_ID_CHARS} "
         f"characters of the only key in the corpus that begins with them "
-        f"(`substr(doc_id, 1, {SHORT_ID_CHARS})`).",
+        f"(`substr(doc_id, 1, {SHORT_ID_CHARS})`). A line tagged `[mention]` (another "
+        "company's contract win) or `[incident_bystander]` (an accident, crash or fire "
+        "involving the company's vehicle, staff or premises) names the company without "
+        "being news about it: it is not a cause.",
         "",
     ]
     out.append(digest.to_markdown(refs=refs))

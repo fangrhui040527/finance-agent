@@ -158,8 +158,10 @@ Vantage, FRED, EDGAR, BNM's OPR, DOSM's CPI) produces observations, events,
 series and documents into `data/facts.db` — append-only and vintaged, so a
 restated figure is a new row and a backtest sees what was knowable. The register
 of every source, its slot and the key it needs is `knowledge/sources/catalog.py`;
-`ask.py sources` prints it. A keyed source whose key is absent is **skipped**,
-with the variable named, and the job stays green.
+`ask.py sources` prints it. A keyed source whose key is absent is
+**skipped_no_key**, with the variable named, and a refused key is
+**auth_failed**; neither is ever `ok`, and collect.yml turns the run red on
+either after its commit (docs/14, Sweep ledger).
 
 ### `sources` — the catalogue, and one live probe of each
 

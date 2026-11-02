@@ -40,14 +40,14 @@ def _enabled() -> frozenset[str]:
 
 @pytest.mark.network
 def test_gdelt_answers_a_bursa_name_with_dated_json(gdelt):
-    from knowledge.feeds.adapter import FeedError
+    from knowledge.feeds.adapter import FeedError, FeedThrottled
     from knowledge.feeds.registry import adapter_for
 
     feed = adapter_for("gdelt", query='"Maybank"')
     try:
         records = feed.fetch(SINCE, limit=5)
     except FeedError as e:
-        if "429" in str(e):
+        if isinstance(e, FeedThrottled) or "429" in str(e):
             pytest.xfail(f"GDELT throttled this runner (one request per 5s per client): {e}")
         raise
     arts, stats = feed.normalize(records)

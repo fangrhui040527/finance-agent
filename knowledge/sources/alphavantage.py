@@ -39,7 +39,14 @@ from decimal import Decimal
 from knowledge.facts import Observation, as_decimal
 from knowledge.news.features import Article
 from knowledge.redact import scrub
-from knowledge.sources.base import Collector, Pull, SourceError, local_code, parse_datetime
+from knowledge.sources.base import (
+    Collector,
+    KeyRejected,
+    Pull,
+    SourceError,
+    local_code,
+    parse_datetime,
+)
 
 URL = "https://www.alphavantage.co/query"
 
@@ -61,6 +68,10 @@ _BURST_MARKERS = ("per second", "spreading out", "sparingly")
 _PREMIUM_MARKERS = ("premium endpoint",)
 _QUOTA_MARKERS = ("rate limit", "requests per day", "call frequency")
 _KEY_MARKERS = ("api key", "apikey")
+#: The label `classify_notice` gives a rejected key. It is raised as
+#: `KeyRejected`, so the sweep records `auth_failed`, not `failed`: the vendor
+#: answers a bad key with a 200, never the 401 the transport recognises.
+KEY_REJECTED = "rejected the key (check ALPHAVANTAGE_API_KEY)"
 
 
 def classify_notice(text: str) -> str:
@@ -74,7 +85,7 @@ def classify_notice(text: str) -> str:
     if any(m in low for m in _QUOTA_MARKERS):
         return "quota exhausted for today"
     if any(m in low for m in _KEY_MARKERS):
-        return "rejected the key (check ALPHAVANTAGE_API_KEY)"
+        return KEY_REJECTED
     return "refused"
 
 
@@ -231,9 +242,14 @@ class AlphaVantageNews(Collector):
         for field in ("Information", "Note"):
             if payload.get(field):
                 notice = scrub(str(payload[field]))
-                raise SourceError(f"alphavantage {classify_notice(notice)}: {notice[:160]}")
+                label = classify_notice(notice)
+                error = KeyRejected if label == KEY_REJECTED else SourceError
+                raise error(f"alphavantage {label}: {notice[:160]}")
         if payload.get("Error Message"):
-            raise SourceError(f"alphavantage: {str(payload['Error Message'])[:160]}")
+            message = str(payload["Error Message"])
+            if "apikey" in message.lower():  # "the parameter apikey is invalid or missing"
+                raise KeyRejected(f"alphavantage {KEY_REJECTED}: {scrub(message)[:160]}")
+            raise SourceError(f"alphavantage: {message[:160]}")
         feed = payload.get("feed")
         if not isinstance(feed, list):
             raise SourceError(f"alphavantage: no feed list in {str(payload)[:120]!r}")

@@ -78,6 +78,16 @@ class PlanExcluded(SourceError):
     """The key works, but the plan does not include this endpoint."""
 
 
+#: The words a refused key is reported in. A collector that asks one name at a
+#: time wraps the first error in its own ("every endpoint failed. First: ..."),
+#: which loses the exception's type and keeps its text, so the sweep reads both.
+KEY_REFUSED = "the key was refused"
+
+
+class KeyRejected(SourceError):
+    """The key was sent and refused (HTTP 401): set, but revoked or wrong."""
+
+
 @dataclass
 class Pull:
     """What one collector produced. Empty lists are 'nothing new', not failure."""
@@ -157,6 +167,10 @@ class Collector(ABC):
     #: a second, and a collector that asks one name per request meets that
     #: limit on its second name.
     SECONDS_BETWEEN_REQUESTS = 0.0
+    #: Words in an HTTP 400 body that say the KEY was refused, for a vendor
+    #: that answers a bad key with 400 instead of 401 (FRED). Lower case.
+    #: Empty, a 400 is just a 400.
+    KEY_REFUSED_400: tuple[str, ...] = ()
 
     def __init__(
         self,
@@ -217,7 +231,9 @@ class Collector(ABC):
             raise SourceError(str(e)) from e
         except urllib.error.HTTPError as e:
             if e.code in (401,):
-                raise SourceError(f"{self.name}: the key was refused (HTTP 401)") from e
+                raise KeyRejected(f"{self.name}: {KEY_REFUSED} (HTTP 401)") from e
+            if e.code == 400 and self._names_the_key(e):
+                raise KeyRejected(f"{self.name}: {KEY_REFUSED} (HTTP 400)") from e
             if e.code in (402, 403):
                 raise PlanExcluded(
                     f"{self.name}: HTTP {e.code} for {_redact(url)} - the plan does not include it"
@@ -243,6 +259,17 @@ class Collector(ABC):
             return json.loads(text)
         except json.JSONDecodeError as e:
             raise SourceError(f"{self.name} returned malformed JSON: {stripped[:160]!r}") from e
+
+    def _names_the_key(self, error: urllib.error.HTTPError) -> bool:
+        """Whether a 400's body says the key is what was wrong (`KEY_REFUSED_400`)."""
+        if not self.KEY_REFUSED_400:
+            return False
+        try:
+            body = error.read(4096)
+        except (OSError, ValueError, http.client.HTTPException):
+            return False
+        text = body.decode("utf-8", errors="replace").lower() if body else ""
+        return any(m in text for m in self.KEY_REFUSED_400)
 
     def _pace(self) -> None:
         """Wait out `SECONDS_BETWEEN_REQUESTS` since the previous request started."""

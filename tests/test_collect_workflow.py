@@ -117,9 +117,15 @@ def test_a_store_not_published_fails_the_job_after_the_commit():
     names = [s.get("name", "") for s in steps]
     fail = names.index("Fail if a store was not published")
     assert names.index("Commit what was collected") < fail
-    # Last: a failing step skips every step after it, and the degraded warning
-    # and the fx check must still run.
-    assert fail == len(steps) - 1
+    # Last of the plain checks: a failing step skips every step after it, and
+    # the degraded warning and the fx check must still run. What follows it -
+    # the sweep ledger's verdict and the dead-man end ping - must run even
+    # when it failed, so each is guarded by !cancelled() or always().
+    assert names.index("Warn if a source was degraded") < fail
+    assert names.index("Fail if the sweep could not run") < fail
+    for later in steps[fail + 1 :]:
+        cond = str(later.get("if", ""))
+        assert "!cancelled()" in cond or "always()" in cond, later.get("name")
     cond = steps[fail]["if"]
     assert "steps.commit.outputs.split_failed" in cond and "steps.commit.outputs.too_big" in cond
     assert _commit_step()["id"] == "commit"

@@ -9,11 +9,14 @@ whole lots, under the control's own phases, floor, fees and rebalance clock.
 from __future__ import annotations
 
 import json
+import re
+from collections import Counter
 from datetime import UTC, date, datetime
 from decimal import Decimal
 from pathlib import Path
 
 import pytest
+import yaml
 
 from core.market.cache import PriceCache
 from core.market.feed import ChainedFeed, YahooFeed
@@ -25,6 +28,7 @@ from engines.paper.settings import PaperSettings
 from engines.paper.store import CONTROL, DECIDED, INDEX, PaperStore
 from engines.paper.universe import (
     AGREES,
+    DEFAULT_UNIVERSE,
     DISAGREES,
     UNVERIFIED,
     check,
@@ -122,14 +126,73 @@ def _fund(iid, lot_usd, lot=100, error=""):
 # -- the shipped universe -------------------------------------------------------------
 
 
-def test_the_shipped_fbm100_file_is_a_hundred_distinct_bursa_codes():
-    u = load_universe()
-    assert len(u.members) == 100 == len(set(u.ids))
-    assert all(iid.startswith("MYX:") and iid[4:].isalnum() or "SS" in iid for iid in u.ids)
-    segments = [m.segment for m in u.members]
-    assert segments.count("KLCI") == 30 and segments.count("MID70") == 70
-    # Not yet checked against Bursa's list, and the file says so where a reader looks.
-    assert "memory" in u.source
+#: A Bursa stock code: four digits, and a letter or two for a class or a
+#: stapled security (KLCC Property's 5235SS).
+BURSA_ID = re.compile(r"MYX:\d{4}[A-Z]{0,2}")
+
+
+def _held_as_declared(path: Path):
+    """Load a universe file and hold it to its own `segments` block.
+
+    The file says what each segment holds, and must hold that: 30 + 68 after the
+    June 2026 review, 50 + 50 once the December 2026 KLCI enhancement is applied
+    - so no count is written here. Never more than 100 names, never more than
+    50 in the KLCI.
+    """
+    u = load_universe(path)
+    declared = yaml.safe_load(Path(path).read_text(encoding="utf-8"))["segments"]
+    held = Counter(m.segment for m in u.members)
+    assert held == Counter(declared), f"holds {dict(held)}, declares {declared}"
+    assert len(u.members) == sum(declared.values()) <= 100
+    assert declared["KLCI"] <= 50
+    return u
+
+
+def _segment_file(tmp: Path, klci: int, mid: int, declared: str) -> Path:
+    rows = [
+        f'  - {{id: "MYX:{i:04d}", name: "Name {i}", segment: KLCI}}' for i in range(1, klci + 1)
+    ]
+    rows += [
+        f'  - {{id: "MYX:{i:04d}", name: "Name {i}", segment: MID70}}'
+        for i in range(klci + 1, klci + mid + 1)
+    ]
+    p = tmp / "fbm100.yaml"
+    p.write_text(
+        "as_of: 2026-12-21\nsource: test\nreview: December 2026\n"
+        f"segments: {declared}\nnames:\n" + "\n".join(rows) + "\n",
+        encoding="utf-8",
+    )
+    return p
+
+
+def test_the_shipped_fbm100_file_is_distinct_bursa_codes_in_its_declared_segments():
+    u = _held_as_declared(DEFAULT_UNIVERSE)
+    assert len(u.members) == len(set(u.ids))
+    assert all(BURSA_ID.fullmatch(iid) for iid in u.ids), [
+        i for i in u.ids if not BURSA_ID.fullmatch(i)
+    ]
+    assert all(m.name and m.segment for m in u.members)
+    # Still partly from memory, and the file says so where a reader looks.
+    assert u.as_of and u.review and "memory" in u.source
+
+
+def test_declared_segments_take_a_fifty_name_klci(tmp_path):
+    """Nothing caps the KLCI at 30: a December 2026 file with 50 + 50 names passes."""
+    u = _held_as_declared(_segment_file(tmp_path, 50, 50, "{KLCI: 50, MID70: 50}"))
+    assert len(u.members) == 100 and u.review == "December 2026"
+
+
+@pytest.mark.parametrize(
+    "klci, mid, declared",
+    [
+        (49, 51, "{KLCI: 50, MID70: 50}"),  # a name filed in the wrong segment
+        (30, 68, "{KLCI: 30, MID70: 69}"),  # a removed name the count still claims
+        (51, 49, "{KLCI: 51, MID70: 49}"),  # more KLCI names than the index has
+    ],
+)
+def test_a_file_that_holds_other_than_it_declares_fails_the_check(tmp_path, klci, mid, declared):
+    with pytest.raises(AssertionError):
+        _held_as_declared(_segment_file(tmp_path, klci, mid, declared))
 
 
 @pytest.mark.parametrize(
@@ -368,6 +431,21 @@ def test_status_shows_the_index_over_its_own_window(index_env):
     assert j["names_held"] == 12 and j["since"] == "2026-03-16"
 
 
+def test_status_counts_the_universe_file_as_it_stands(index_env):
+    """A review that edits the file changes the count; the opening count is only a fallback."""
+    env = index_env
+    _open(env)
+    _mark(env, RAMP_DAY)
+    smaller = dict(list(MEMBERS.items())[:10])
+    _universe_file(env.tmp, smaller)  # rewrites the file the book was opened with
+    line = status(env.store, env.cfg, env.feed, env.fx, day=RAMP_DAY).index
+    assert line is not None and line.members == 10
+    assert "of 10 names held" in "\n".join(line.render())
+    env.universe.write_text("names: [\n", encoding="utf-8")
+    line = status(env.store, env.cfg, env.feed, env.fx, day=RAMP_DAY).index
+    assert line is not None and line.members == len(MEMBERS), "unreadable: the count at opening"
+
+
 def test_the_pack_counts_the_index_day_instead_of_listing_it(index_env):
     from knowledge.paper.pack import build_paper_pack
 
@@ -460,13 +538,14 @@ def test_paper_init_index_opens_once_on_an_open_ledger(tmp_path, capsys, monkeyp
     capsys.readouterr()
     assert ask.main(["paper", "init", "--index", "--db", db, "--date", "2026-09-25"]) == 0
     out = capsys.readouterr().out
+    shipped = len(load_universe().members)
     assert "opened the index book" in out and "notional USD 1,000,000.00" in out
-    assert "100 names" in out and "engines/paper/data/fbm100.yaml" in out
+    assert f"{shipped} names" in out and "engines/paper/data/fbm100.yaml" in out
     with PaperStore(db) as store:
         assert store.book_opened_on(INDEX) == date(2026, 9, 25)
         terms = store.book_terms(INDEX)
         assert terms["universe"] == "engines/paper/data/fbm100.yaml"
-        assert terms["universe_names"] == 100 and terms["start_date"] == "2026-09-08"
+        assert terms["universe_names"] == shipped and terms["start_date"] == "2026-09-08"
         assert store.initial_cash(DECIDED) == Decimal(1000)
     assert ask.main(["paper", "init", "--index", "--db", db, "--date", "2026-09-26"]) == 2
     assert "no reset" in capsys.readouterr().err

@@ -10,6 +10,7 @@ from __future__ import annotations
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
+from knowledge.earnings_date import earnings_dates
 from knowledge.facts import FactBook, Observation
 
 
@@ -70,6 +71,25 @@ def fact_snapshot(
         for e in upcoming:
             when = (e.effective_at or e.announced_at).date()
             lines.append(f"    {when}  {e.kind:<18} {e.title[:90]}  ({e.source})")
+
+    # The rows above are each source's claim; this is the one to believe, or
+    # "unconfirmed" with every claim when the sources disagree.
+    dates = earnings_dates(
+        book, instrument_id, now - timedelta(days=days), now + timedelta(days=60)
+    )
+    if dates:
+        lines.append("")
+        lines.append("  earnings date (edgar 8-K > company > finnhub > fmp > news)")
+        for d in dates:
+            # A calendar-only date already behind us is not "expected": the 8-K
+            # is missing (no CIK, not collected yet, or older than the window).
+            last = d.day or max(c.day for c in d.claims)
+            if d.released:
+                lines.append(f"    {'released':<9} {d.label()}")
+            elif last < now.date():
+                lines.append(f"    {'past':<9} {d.label()}  - no 8-K on file")
+            else:
+                lines.append(f"    {'expected':<9} {d.label()}")
 
     docs = book.documents(instrument_id, limit=5)
     if docs:

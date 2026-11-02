@@ -267,27 +267,42 @@ def cleaning(rep: Report, corpus_db: str, book: tuple[str, ...]) -> None:
     # append-only by trigger - "what the system saw is not editable after the
     # fact" - so that column records the rule in force the day each article
     # arrived, and reading it back would grade a gate that has since been
-    # replaced. Recomputing measures the gate that is actually shipping.
+    # replaced. Recomputing measures the gate that is actually shipping, read
+    # as knowledge/digest.py's _name_digest reads it: stored links rechecked by
+    # today's linker, and a name the story is not news about
+    # (`EntityLinker.incidental`) never escalated for.
     from knowledge.graph.extractors.gdelt import entity_index
+    from knowledge.graph.ids import instrument_id as canonical
     from knowledge.news.features import LexiconExtractor, should_escalate
     from knowledge.news.linking import linker_for
 
     linker = linker_for(entity_index() or {"": ""})
+
+    def _both_forms(ids) -> set[str]:
+        return {f for i in ids for f in (i, canonical(i) or i)}
+
     extractor = LexiconExtractor()
     held = set(book)
     rows = []
     for iid in book:
+        forms = {iid, canonical(iid) or iid}
         got = db.execute(
             "SELECT title, body, instruments_json FROM articles WHERE instruments_json LIKE ?",
             (f"%{iid}%",),
         ).fetchall()
-        esc = 0
+        n = esc = 0
         for title, body, ij in got:
             text = title if (not body or body == title) else f"{title}. {body}"
-            iids = json.loads(ij or "[]")
+            iids = linker.recheck(text, json.loads(ij or "[]"))
+            if not forms & _both_forms(iids):
+                continue  # a stale link today's rules drop
+            n += 1
+            incidental = linker.incidental(text)
+            if forms & _both_forms(incidental):
+                continue  # named, not news about it: the digest does not star it
             features = extractor.extract(text, linker.names_for(iids))
-            esc += should_escalate(features, iids, held, set())
-        rows.append((iid, len(got), esc))
+            esc += should_escalate(features, [i for i in iids if i not in incidental], held, set())
+        rows.append((iid, n, esc))
 
     silent = [i for i, n, _ in rows if n == 0]
     rep.add(
