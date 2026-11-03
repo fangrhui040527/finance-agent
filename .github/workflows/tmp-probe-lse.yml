@@ -1,0 +1,62 @@
+# TEMPORARY (2026-11-03): first look at londonstrategicedge.com's API with the
+# owner's own key (LSE_API_KEY). Prints what the API lists, never the key.
+# Removed after its run.
+name: tmp-probe-lse
+on:
+  push:
+    branches: [claude/new-session-3rm9vv]
+    paths: [.github/workflows/tmp-probe-lse.yml]
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Catalogue with the owner's key
+        env:
+          LSE_API_KEY: ${{ secrets.LSE_API_KEY }}
+        shell: python
+        run: |
+          import json, os, re, urllib.request, urllib.error
+          KEY = os.environ.get("LSE_API_KEY", "").strip()
+          print("key set:", bool(KEY), "length:", len(KEY))
+          UA = "finplanet-analyst-mind/0.1 (personal research)"
+          def get(url, accept="application/json", extra=None, n=2_000_000):
+              h = {"User-Agent": UA, "Accept": accept, "x-api-key": KEY}
+              h.update(extra or {})
+              try:
+                  r = urllib.request.urlopen(urllib.request.Request(url, headers=h), timeout=30)
+                  return r.status, dict(r.headers), r.read(n).decode("utf-8", "replace")
+              except urllib.error.HTTPError as e:
+                  return e.code, dict(e.headers or {}), e.read(3000).decode("utf-8", "replace")
+              except Exception as e:
+                  return None, {}, f"{type(e).__name__}: {e}"
+          def show(label, url, **kw):
+              s, h, b = get(url, **kw)
+              keep = {k: v for k, v in h.items() if k.lower() in ("content-type", "content-range", "x-ratelimit-limit", "x-ratelimit-remaining", "ratelimit-limit", "ratelimit-remaining", "retry-after")}
+              print("=" * 90); print(label, url, "->", s, keep, len(b))
+              return s, b
+          # 1. The API roots. A PostgREST root answers its OpenAPI description: every table and column.
+          for base in ("https://data-api.londonstrategicedge.com", "https://api.londonstrategicedge.com"):
+              s, b = show("root", base + "/", accept="application/openapi+json")
+              try:
+                  spec = json.loads(b)
+              except ValueError:
+                  print(b[:800]); continue
+              paths = sorted(spec.get("paths", {}))
+              print("PATHS", len(paths), paths[:400])
+              defs = spec.get("definitions") or spec.get("components", {}).get("schemas", {})
+              for name in sorted(defs)[:400]:
+                  cols = list((defs[name].get("properties") or {}).keys())
+                  print(f"  {name}: {cols[:30]}")
+              print("INFO", json.dumps(spec.get("info", {}))[:500])
+          # 2. The public documentation page's own text, as the app ships it: curl examples and endpoint strings.
+          s, h, page = get("https://londonstrategicedge.com/api-documentation", accept="text/html")
+          entry = (re.findall(r'src="(/assets/[^"]+\.js)"', page) or [""])[0]
+          s, h, js = get("https://londonstrategicedge.com" + entry, accept="*/*", n=30_000_000)
+          for word in ("curl ", "/v1/", "/v2/", "per hour", "requests per", "Terms of Service", "redistribut", "commercial use", "Malaysia", "KLSE", "Bursa"):
+              hits = [m.start() for m in re.finditer(re.escape(word), js)]
+              print(f"--- {word!r}: {len(hits)} hits")
+              for i in hits[:5]:
+                  print("   ", re.sub(r"\s+", " ", js[max(0, i - 200): i + 300]))
