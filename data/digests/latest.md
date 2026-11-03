@@ -1,14 +1,23 @@
 # Digest 2026-11-03
 
-Generated 2026-11-03 02:56 UTC · slot `all` · 30112 articles in the corpus, 6749 observations, 4290 events in the fact book.
+Generated 2026-11-03 10:08 UTC · slot `all` · 30343 articles in the corpus, 6762 observations, 4290 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- quiet: nothing collected for this name in the window
+- tone: 2 stories from 2 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-11-02 www.lpga.com — ICYMI: 2026 Maybank Championship [q 0.65, tone +0.0]
+- 2026-11-02 www.moomoo.com — Maybank BUY recommendation [q 0.65, tone +0.0]
+- snapshot: FinBERT headline tone 0.32 (finbert_tone, 2026-11-03)
 
 ### Tenaga (MYX:5347)
-- quiet: nothing collected for this name in the window
+- tone: 5 stories from 4 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-11-03 theedgemalaysia.com — Tenaga, IOI Corp, SME consortium to develop 500MW solar project in Negeri Sembilan [q 0.80, tone +0.0]
+- 2026-11-03 www.businesstoday.com.my — TNB, IOI Corp And 12 SMEs Form RM606 Million JV For 500 MV Solar Project In Negeri Sembilan [q 0.80, tone +0.0]
+- 2026-11-02 www.thestar.com.my — TNB unit in RM2bil sukuk issuance to fund Bess job [q 0.80, tone +0.0]
+- 2026-11-02 www.thestar.com.my — TNB subsidiary lodges RM2bil Asean sustainability SRI Sukuk Wakalah Facility with SC [q 0.80, tone +0.0]
+- 2026-11-03 tradersunion.com — Tenaga, IOI and SME consortium develop 500MW solar project in Negeri Sembilan [q 0.65, tone +0.0]
+- snapshot: FinBERT headline tone 0.22 (finbert_tone, 2026-11-03)
 
 ### Petronas Chemicals (MYX:5183)
 - quiet: nothing collected for this name in the window
@@ -20,7 +29,9 @@ Generated 2026-11-03 02:56 UTC · slot `all` · 30112 articles in the corpus, 67
 - quiet: nothing collected for this name in the window
 
 ### Genting (MYX:3182)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-11-03 www.petromindo.com — Wison reaches 15 million LTI-free manhours on Genting FLNG project [q 0.65, tone +0.0]
+- snapshot: FinBERT headline tone 0.57 (finbert_tone, 2026-11-03)
 
 ### NVIDIA (XNAS:NVDA)
 - tone: 49 stories from 25 sources, polarity +0.00, peak intensity 0.33, uncertainty 0.12 · 16 escalated
@@ -38,15 +49,15 @@ Generated 2026-11-03 02:56 UTC · slot `all` · 30112 articles in the corpus, 67
 - snapshot: P/E (ttm) 25.57 (finnhub, 2026-11-02) · P/B 28.81 (finnhub, 2026-11-02) · EPS (ttm) 7.91 (finnhub, 2026-11-02) · dividend yield 0.03 (finnhub, 2026-11-02) · beta 2.28 (finnhub, 2026-11-02) · 52w high 243.37 (finnhub, 2026-11-02) · 52w low 164.27 (finnhub, 2026-11-02) · target (consensus) 339.17 (fmp, 2026-11-02) · analysts: buy 41 (finnhub, 2026-11-02) · analysts: hold 2 (finnhub, 2026-11-02) · analysts: sell 1 (finnhub, 2026-11-02) · vendor sentiment 0.25 (alphavantage_news, 2026-10-06) · Marketaux sentiment 0.32 (marketaux_news, 2026-11-02) · FinBERT headline tone 0.13 (finbert_tone, 2026-11-02) · revenue (last quarter) 96.22bn (sec_xbrl, 2026-08-26) · net income (last quarter) 59.69bn (sec_xbrl, 2026-08-26) · last EPS surprise % 3.82 (finnhub, 2026-09-05)
 
 ### Apple (XNAS:AAPL)
-- tone: 118 stories from 47 sources, polarity +0.28, peak intensity 0.33, uncertainty 0.05 · 55 escalated
+- tone: 120 stories from 48 sources, polarity +0.29, peak intensity 0.33, uncertainty 0.05 · 57 escalated
+- 2026-11-03 www.nst.com.my — Apple beats sales and profit expectations but AI costs weigh on holiday sales [q 1.00, tone +1.0] ★
 - 2026-11-02 finance.yahoo.com — Apple Posts Fiscal Q4 Beat On Strong iPhone, Services Sales [q 1.00, tone +0.5] ★
+- 2026-11-02 www.nst.com.my — Apple beats sales and profit expectations amid iPhone growth [q 1.00, tone +1.0] ★
 - 2026-11-02 thestockmarketwatch.com — Apple Beats Q4 Estimates Amid Tech Selloff; Oil Slumps on Iran Diplomacy [q 0.85, tone +1.0] ★
 - 2026-11-02 www.axios.com — Apple earnings: iPhone sales lead revenue upward [q 0.85, tone +0.0] ★
 - 2026-11-02 www.proactiveinvestors.com — Apple beats fourth-quarter earnings expectations as revenue rises 12% to $114.5 billion [q 0.85, tone +0.3] ★
 - 2026-11-02 Yahoo — Apple could owe iPhone owners up to $95. Here's how to claim it. [q 0.85, tone -1.0] ★
 - 2026-11-02 Yahoo — Alibaba Soars 6% as Apple Sets December Launch for Qwen-Powered iPhone AI in China [q 0.85, tone +1.0] ★
-- 2026-11-02 Yahoo — Why Trump-Tied Companies Could Face Democratic Probes Post-Midterms [q 0.85, tone -1.0] ★
-- 2026-11-02 Yahoo — Apple's Valuation Premium Confronts AI Jitters [q 0.85, tone +0.0] ★
 - event 2026-11-03 results_released — results released: 8-K accepted 2026-11-02 21:30 ET (edgar)
 - event 2026-11-02 earnings_result — Q4 2026 results after the close (finnhub)
 - event 2026-11-02 filing — 8-K: 8-K (items 2.02,9.01) (edgar)
@@ -84,6 +95,21 @@ Generated 2026-11-03 02:56 UTC · slot `all` · 30112 articles in the corpus, 67
 | 10y minus 2y Treasury spread, % | 0.38 | 2026-10-30 | +0.01 | fred |
 | US unemployment rate, % | 4.20 | 2026-09-01 | +0.1 | fred |
 | CBOE VIX, index | 19.42 | 2026-10-30 | +2.22 | fred |
+
+## Collection
+
+| at (UTC) | source | status | fetched | kept | stored | detail |
+|---|---|---|---|---|---|---|
+| 10:07 | finbert_tone | ok | 8 | 0 | 0 | facts 8; scored 17 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized. |
+| 10:07 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
+| 10:07 | twse_openapi | ok | 8 | 0 | 0 | facts 5;  |
+| 10:07 | jin10_flash | degraded | 19 | 19 | 19 | facts 0; window not covered back to 2026-11-02 22:42Z; the oldest item read is 2 |
+| 10:07 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 10:07 | nst_business | degraded | 150 | 144 | 140 | window overflow: all 150 dated items are newer than the window's start (2026-11- |
+| 10:07 | fmt_business | degraded | 50 | 50 | 50 | window overflow: all 50 dated items are newer than the window's start (2026-11-0 |
+| 10:07 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals, IHH |
+| 10:07 | google_news | ok | 28 | 27 | 22 | read but empty: Petronas Chemicals; named the company: 10 of 27 (lowest: IHH 0/1 |
+| 10:07 | gdelt | throttled | 0 | 0 | 0 | throttled: no name could be read (3 failed, 0 not reached). First: GDELT fetch f |
 
 ---
 

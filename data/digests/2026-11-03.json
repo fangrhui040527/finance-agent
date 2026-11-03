@@ -1,18 +1,109 @@
 {
-  "collection": [],
+  "collection": [
+    {
+      "at": "2026-11-03T10:07:26.677556+00:00",
+      "detail": "facts 8; scored 17 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized.onnx",
+      "fetched": 8,
+      "kept": 0,
+      "source": "finbert_tone",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-03T10:07:25.816007+00:00",
+      "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-03T10:07:25.814275+00:00",
+      "detail": "facts 5; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-03T10:07:20.552655+00:00",
+      "detail": "facts 0; window not covered back to 2026-11-02 22:42Z; the oldest item read is 2026-11-03 09:51Z, so 11.2h of the window was never served",
+      "fetched": 19,
+      "kept": 19,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 19
+    },
+    {
+      "at": "2026-11-03T10:07:19.209810+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-03T10:07:17.102189+00:00",
+      "detail": "window overflow: all 150 dated items are newer than the window's start (2026-11-02 10:08Z); the oldest is 2026-11-02 16:40Z, so 6.5h scrolled off unseen; read 3 pages, the most this feed may; page 2 starts 2.9h before page 1 ends (2026-11-03 04:34Z under 2026-11-03 07:27Z): the items between were served by neither",
+      "fetched": 150,
+      "kept": 144,
+      "source": "nst_business",
+      "status": "degraded",
+      "stored": 140
+    },
+    {
+      "at": "2026-11-03T10:07:13.633341+00:00",
+      "detail": "window overflow: all 50 dated items are newer than the window's start (2026-11-02 10:08Z); the oldest is 2026-11-02 15:09Z, so 5.0h scrolled off unseen",
+      "fetched": 50,
+      "kept": 50,
+      "source": "fmt_business",
+      "status": "degraded",
+      "stored": 50
+    },
+    {
+      "at": "2026-11-03T10:07:13.150834+00:00",
+      "detail": "read but empty: Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals, IHH",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-03T10:07:11.523114+00:00",
+      "detail": "read but empty: Petronas Chemicals; named the company: 10 of 27 (lowest: IHH 0/1, Press Metal 0/1, Maybank 2/7)",
+      "fetched": 28,
+      "kept": 27,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 22
+    },
+    {
+      "at": "2026-11-03T10:07:09.577922+00:00",
+      "detail": "throttled: no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked); deferred: Genting, Maybank, Tenaga",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "throttled",
+      "stored": 0
+    }
+  ],
   "counts": {
-    "articles": 30112,
+    "articles": 30343,
     "documents": 0,
-    "escalated": 3861,
+    "escalated": 3863,
     "events": 4290,
     "failed_sweeps": 112,
-    "linked": 15871,
-    "observations": 6749,
+    "linked": 15885,
+    "observations": 6762,
     "series": 31,
-    "sweeps": 1347
+    "sweeps": 1357
   },
   "day": "2026-11-03",
-  "generated_at": "2026-11-03 02:56 UTC",
+  "generated_at": "2026-11-03 10:08 UTC",
   "macro": [
     {
       "change": "0.18",
@@ -150,9 +241,51 @@
       "events": [],
       "instrument_id": "MYX:1155",
       "label": "Maybank",
-      "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "snapshot": [
+        {
+          "concept": "finbert_sentiment",
+          "known_at": "2026-11-03",
+          "label": "FinBERT headline tone",
+          "period_end": "2026-11-02",
+          "source": "finbert_tone",
+          "value": "0.32"
+        }
+      ],
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMib0FVX3lxTFBQSUxkRXR1aG9VS2NzTGVuM01JYlZhWUFyakc3b1BMdER3VHZfb0VCWU9RTVNiTHNTWDVjT29sMkFtOUNLR1NVcjV1WGdXdk90ZkZzeGE4VFozMEFTd1BuN0RUM3NEQzFDWTI0TEJ3bw?oc=5",
+          "domain": "www.lpga.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-02T22:06:07+00:00",
+          "quality": 0.65,
+          "title": "ICYMI: 2026 Maybank Championship",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMihwFBVV95cUxNMWdWWDZpZ3FGMlFneFdTN0dZQUJLemZieGMyOVBXTEtQT3hFUDNfUXg4ajNsalJKRW8tTWNkbE9adVVUM05jZk1MbWtsYlQ4SVYxeE12X1BlUmxjOXgya1R5Ylg5QWplYTN4UWJsSEczOHZsTmNCSXl5WWQtWnpNaDQtVEFYOWc?oc=5",
+          "domain": "www.moomoo.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-02T13:22:06+00:00",
+          "quality": 0.65,
+          "title": "Maybank BUY recommendation",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 2,
+        "polarity_mean": 0.0,
+        "sources": 2,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -161,9 +294,90 @@
       "events": [],
       "instrument_id": "MYX:5347",
       "label": "Tenaga",
-      "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "snapshot": [
+        {
+          "concept": "finbert_sentiment",
+          "known_at": "2026-11-03",
+          "label": "FinBERT headline tone",
+          "period_end": "2026-11-03",
+          "source": "finbert_tone",
+          "value": "0.22"
+        }
+      ],
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE1iQTI5OUZzQ1o4QXIxdUhmZzZxSjhLcFI5VmZGTkdtZW1oNC1iRjMxVWcxRFYzTEFSNVBYX09zUUZBdHY1ai1pZmpLRzVRczdD?oc=5",
+          "domain": "theedgemalaysia.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-03T09:32:47+00:00",
+          "quality": 0.8,
+          "title": "Tenaga, IOI Corp, SME consortium to develop 500MW solar project in Negeri Sembilan",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMi0AFBVV95cUxPOUVFb2xEZEREQWhOU3FjQ182ZHhwdGprdFFtUk1ON28yYjh6WTZrVGlkdUdVNm1JTXdWdFI2NFhsNDJheHhZLURsbjM4M1V5REZ0S0dzZ1p4ampQTW44ODJ5UEVJMjgzcUhqbndFYTRIUmtkMnp2TWdGVEUwbDhHaXJSNkNjYlF0SVlFQzhvZzJoTmprTmlPaWhpT0pzSmk5NER0VTVSOVlvdmoteF9DcURmYUdBemVaZzlBNG9kOFRCMk1VNUhmbzd6OVdaUzZ1?oc=5",
+          "domain": "www.businesstoday.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-03T09:26:54+00:00",
+          "quality": 0.8,
+          "title": "TNB, IOI Corp And 12 SMEs Form RM606 Million JV For 500 MV Solar Project In Negeri Sembilan",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMisAFBVV95cUxPXzYxN0VEWmFUSDh1ejZsMGR4d1ZIbDJfdlNnMy1vX0RRd0Z0TW13T1Zkc2JiR29FY1A4bHF1RXVVSUxHcUpqcExJdms5TXdTVVZBUXlid1dhUjFmZzVvYmZrb2JVMkJHRVFVVFFEbDR3dUhIRGxraHRCVnAtdFR3Y0RqTVREQTZwVUlsQmVuZy1hUGlSanJpamo3ZG9HQmdrTFc2OXVUXzRTX2FLVG9SRg?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-02T23:58:28+00:00",
+          "quality": 0.8,
+          "title": "TNB unit in RM2bil sukuk issuance to fund Bess job",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMi3AFBVV95cUxNdnI0X1htX0NxeHFrTWduN3hMTGtmN0xfMEMxbnRocTNTMFIzQkZCRC1MVEo0R1lDRXZ3bUt1SHZKZ2hZcWZhTzM1cTlJelJaVWFMRm93dmFHeUx2azl5a3hteWpNQk9iWmtGU1NEc3lpYzhOYV83cWxwajlNQkkyTkI0cDlaVUk5LW9HQm5tbkY0UzhWdnZmT1JSRTVGNjBOTF81RjBhb1FYSnBBelR6eEFtczRyVGpNMU9NR05XelFad2pTVTZwV2FJMGVmWDEwT0VxUExBQ0c1OGNj?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-02T12:28:00+00:00",
+          "quality": 0.8,
+          "title": "TNB subsidiary lodges RM2bil Asean sustainability SRI Sukuk Wakalah Facility with SC",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMimgFBVV95cUxQX2lsN2pQZGlIVHBDWUc3ZGsxeTFCYXpmWGVjaDB0dmwwYlR2aC1lSXFTd2lwcm9CejhLS19LTlh2cFoweGxOZXRNSEt5S1UydmtLVExzN1lCaHliMkx0MDBjZEdPam1ndkw5MDVFTkJmSERFREg5RmdtNEJMTHZCemg5OC1KanZscDFpZWdjMkZHTkFncmVzWk53?oc=5",
+          "domain": "tradersunion.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-03T09:41:44+00:00",
+          "quality": 0.65,
+          "title": "Tenaga, IOI and SME consortium develop 500MW solar project in Negeri Sembilan",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 5,
+        "polarity_mean": 0.0,
+        "sources": 4,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -205,9 +419,38 @@
       "events": [],
       "instrument_id": "MYX:3182",
       "label": "Genting",
-      "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "snapshot": [
+        {
+          "concept": "finbert_sentiment",
+          "known_at": "2026-11-03",
+          "label": "FinBERT headline tone",
+          "period_end": "2026-11-03",
+          "source": "finbert_tone",
+          "value": "0.57"
+        }
+      ],
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxOUjNaMmFGblA4cTBJeC1qLUI5SnREVUxkbnpqeGtPYXI1YndjUUtVM0pnWUlmR3pMbUM2SWVhZVNEU1BmY2NsQUlfaG02dG5NQlJfUWVRN3JjdGxoYzQ1dUVEWTBBNU5pTzBQaWN1XzZkVHRKeVdSRFJkbFBNdFdiRDVWRHlBVE55T0ljR1lJQXQxUVotQ2tORGFpd0tWY1AxQVpDUENzU2VuUQ?oc=5",
+          "domain": "www.petromindo.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-03T06:42:39+00:00",
+          "quality": 0.65,
+          "title": "Wison reaches 15 million LTI-free manhours on Genting FLNG project",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -488,7 +731,7 @@
     },
     {
       "earnings": [],
-      "escalated": 55,
+      "escalated": 57,
       "events": [
         {
           "kind": "results_released",
@@ -647,6 +890,19 @@
       "stories": [
         {
           "day": null,
+          "doc_id": "https://www.nst.com.my/business/corporate/2026/11/1569497/apple-beats-sales-and-profit-expectations-ai-costs-weigh-holiday",
+          "domain": "www.nst.com.my",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-03T00:50:16+00:00",
+          "quality": 1.0,
+          "title": "Apple beats sales and profit expectations but AI costs weigh on holiday sales",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
           "doc_id": "https://finance.yahoo.com/m/b9cc1524-d563-386e-bcb1-0ef26820d429/apple-posts-fiscal-q4-beat-on.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
           "escalated": true,
@@ -656,6 +912,19 @@
           "published_at": "2026-11-02T22:39:40+00:00",
           "quality": 1.0,
           "title": "Apple Posts Fiscal Q4 Beat On Strong iPhone, Services Sales",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://www.nst.com.my/business/corporate/2026/11/1569440/apple-beats-sales-and-profit-expectations-amid-iphone-growth",
+          "domain": "www.nst.com.my",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-02T22:31:04+00:00",
+          "quality": 1.0,
+          "title": "Apple beats sales and profit expectations amid iPhone growth",
           "uncertainty": 0.0
         },
         {
@@ -722,40 +991,14 @@
           "quality": 0.85,
           "title": "Alibaba Soars 6% as Apple Sets December Launch for Qwen-Powered iPhone AI in China",
           "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "finnhub:143400902",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": -1.0,
-          "published_at": "2026-11-02T18:14:56+00:00",
-          "quality": 0.85,
-          "title": "Why Trump-Tied Companies Could Face Democratic Probes Post-Midterms",
-          "uncertainty": 0.4310344827586207
-        },
-        {
-          "day": null,
-          "doc_id": "finnhub:143400901",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 0.0,
-          "published_at": "2026-11-02T17:40:35+00:00",
-          "quality": 0.85,
-          "title": "Apple's Valuation Premium Confronts AI Jitters",
-          "uncertainty": 0.2604166666666667
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 118,
-        "polarity_mean": 0.278,
-        "sources": 47,
-        "uncertainty_mean": 0.053
+        "n": 120,
+        "polarity_mean": 0.29,
+        "sources": 48,
+        "uncertainty_mean": 0.052
       },
       "upcoming": []
     },
