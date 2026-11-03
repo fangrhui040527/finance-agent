@@ -1,6 +1,42 @@
 {
   "collection": [
     {
+      "at": "2026-11-03T19:44:35.385142+00:00",
+      "detail": "facts 0; ",
+      "fetched": 450,
+      "kept": 0,
+      "source": "dbnomics",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-03T19:44:32.627590+00:00",
+      "detail": "facts 0; window not covered back to 2026-11-03 10:07Z; the oldest item read is 2026-11-03 18:45Z, so 8.6h of the window was never served",
+      "fetched": 19,
+      "kept": 19,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 18
+    },
+    {
+      "at": "2026-11-03T19:44:31.724600+00:00",
+      "detail": "facts 8; release calendar: 'FOMC Press Release' listed on 15 days of the fortnight - a daily table, not a scheduled print; not stored as a release",
+      "fetched": 474,
+      "kept": 0,
+      "source": "fred",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-03T19:44:21.014818+00:00",
+      "detail": "facts 22; fmp /earnings is outside the plan (HTTP 402); not collected for NVDA, AAPL, MSFT",
+      "fetched": 3998,
+      "kept": 0,
+      "source": "fmp",
+      "status": "ok",
+      "stored": 0
+    },
+    {
       "at": "2026-11-03T10:07:26.677556+00:00",
       "detail": "facts 8; scored 17 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized.onnx",
       "fetched": 8,
@@ -92,26 +128,26 @@
     }
   ],
   "counts": {
-    "articles": 30343,
+    "articles": 30361,
     "documents": 0,
     "escalated": 3863,
-    "events": 4290,
+    "events": 4303,
     "failed_sweeps": 112,
     "linked": 15885,
-    "observations": 6762,
+    "observations": 6774,
     "series": 31,
-    "sweeps": 1357
+    "sweeps": 1361
   },
   "day": "2026-11-03",
-  "generated_at": "2026-11-03 10:08 UTC",
+  "generated_at": "2026-11-03 19:44 UTC",
   "macro": [
     {
-      "change": "0.18",
-      "obs_date": "2026-10-30",
+      "change": "-0.01",
+      "obs_date": "2026-11-02",
       "series_id": "BAMLH0A0HYM2",
       "source": "fred",
       "title": "ICE BofA US high-yield option-adjusted spread, %",
-      "value": "3.44"
+      "value": "3.43"
     },
     {
       "change": "0",
@@ -186,12 +222,12 @@
       "value": "121.67"
     },
     {
-      "change": "-365.13",
-      "obs_date": "2026-10-29",
+      "change": "-272.64",
+      "obs_date": "2026-11-02",
       "series_id": "NASDAQCOM",
       "source": "fred",
       "title": "NASDAQ Composite, index level",
-      "value": "26,184.72"
+      "value": "25,164.36"
     },
     {
       "change": "32.9329",
@@ -210,12 +246,12 @@
       "value": "7,580.07"
     },
     {
-      "change": "0.01",
-      "obs_date": "2026-10-30",
+      "change": "-0.06",
+      "obs_date": "2026-11-02",
       "series_id": "T10Y2Y",
       "source": "fred",
       "title": "10y minus 2y Treasury spread, %",
-      "value": "0.38"
+      "value": "0.32"
     },
     {
       "change": "0.1",
@@ -226,12 +262,12 @@
       "value": "4.20"
     },
     {
-      "change": "2.22",
-      "obs_date": "2026-10-30",
+      "change": "1.73",
+      "obs_date": "2026-11-02",
       "series_id": "VIXCLS",
       "source": "fred",
       "title": "CBOE VIX, index",
-      "value": "19.42"
+      "value": "21.15"
     }
   ],
   "names": [
@@ -458,7 +494,15 @@
         "2026-11-17 (finnhub)"
       ],
       "escalated": 16,
-      "events": [],
+      "events": [
+        {
+          "kind": "rating_reiteration",
+          "source": "fmp",
+          "title": "Melius Research maintain Buy",
+          "url": "",
+          "when": "2026-11-02T00:00:00+00:00"
+        }
+      ],
       "instrument_id": "XNAS:NVDA",
       "label": "NVIDIA",
       "snapshot": [
@@ -520,7 +564,7 @@
         },
         {
           "concept": "price_target_consensus",
-          "known_at": "2026-11-02",
+          "known_at": "2026-11-03",
           "label": "target (consensus)",
           "period_end": null,
           "source": "fmp",
@@ -741,6 +785,20 @@
           "when": "2026-11-03T02:30:23+00:00"
         },
         {
+          "kind": "rating_reiteration",
+          "source": "fmp",
+          "title": "UBS maintain Neutral",
+          "url": "",
+          "when": "2026-11-03T00:00:00+00:00"
+        },
+        {
+          "kind": "rating_reiteration",
+          "source": "fmp",
+          "title": "Baird maintain Outperform",
+          "url": "",
+          "when": "2026-11-03T00:00:00+00:00"
+        },
+        {
           "kind": "earnings_result",
           "source": "finnhub",
           "title": "Q4 2026 results after the close",
@@ -816,11 +874,11 @@
         },
         {
           "concept": "price_target_consensus",
-          "known_at": "2026-11-02",
+          "known_at": "2026-11-03",
           "label": "target (consensus)",
           "period_end": null,
           "source": "fmp",
-          "value": "340.88"
+          "value": "341.85"
         },
         {
           "concept": "analyst_buy",
@@ -1067,7 +1125,7 @@
         },
         {
           "concept": "price_target_consensus",
-          "known_at": "2026-11-02",
+          "known_at": "2026-11-03",
           "label": "target (consensus)",
           "period_end": null,
           "source": "fmp",
