@@ -65,24 +65,39 @@ FORMS = {
 RESULTS_ITEM = "2.02"
 RELEASED = "results_released"
 
-#: EDGAR's acceptance clock runs on Eastern time. The submissions JSON writes
-#: `acceptanceDateTime` as "2026-07-30T16:30:41.000Z", and the "Z" is taken to
-#: be a formatting suffix, not UTC: Apple's results 8-Ks, released at 4:30pm New
-#: York time, read T16:30 there. Read as UTC they would be dated four or five
-#: hours early - before the release they record, a look-ahead. Assumed, not
-#: re-checked live when this was written (data.sec.gov was not reachable from
-#: the machine): a trailing "Z" is dropped and the time read as New York's; an
-#: explicit numeric offset, should one ever appear, is kept as given.
+#: EDGAR writes `acceptanceDateTime` as "2026-11-02T21:30:23.000Z", and the
+#: "Z" means UTC. Settled on 2026-11-02 by the first results 8-K read live:
+#: Apple's Q4 8-K carried T21:30:23.000Z and was read by a collection that ran
+#: at 22:41:49Z the same evening, an hour later. Read as New York time it would
+#: have been 02:30Z the next morning, a release four hours in the future of
+#: the run that stored it. 21:30Z is 16:30 New York (EST), the half hour after
+#: the close at which Apple releases.
+#:
+#: Until that evening this read the "Z" as New York wall-clock time, an
+#: assumption written without a live check (data.sec.gov was not reachable
+#: from the machine that wrote it). It dated every release four or five hours
+#: LATE, never early, so it cost timeliness, not look-ahead; the one event
+#: stored under it (0000320193-26-000024:2.02, 2026-11-03T02:30:23Z) stays in
+#: the append-only store and still resolves to its New York date, 2026-11-02.
+#:
+#: SEC_TZ stays: the label, and the release's DAY, are New York's.
 SEC_TZ = ZoneInfo("America/New_York")
 
 
 def acceptance_time(raw) -> datetime | None:
-    """An EDGAR acceptanceDateTime as a UTC instant, or None."""
+    """An EDGAR acceptanceDateTime as a UTC instant, or None.
+
+    "Z" and an explicit offset are taken as written. A bare timestamp with
+    neither, which EDGAR has not been seen to send, is read as New York wall
+    time: of the two clocks it could be on, that is the LATER instant, so a
+    release is never dated before it was public. Read as UTC it would be four
+    or five hours early if it were New York's - a look-ahead.
+    """
     s = str(raw or "").strip()
-    if s[-1:] in ("Z", "z"):
-        s = s[:-1]
-    if not s:
+    if not s or s in ("Z", "z"):
         return None
+    if s[-1:] in ("Z", "z"):
+        s = s[:-1] + "+00:00"
     try:
         parsed = datetime.fromisoformat(s)
     except ValueError:

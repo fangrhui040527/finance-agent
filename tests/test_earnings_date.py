@@ -72,19 +72,37 @@ def resolve(book, iid):
 # --- the timezone of an acceptance ---------------------------------------------------
 
 
-def test_an_acceptance_time_is_new_york_wall_clock_whatever_its_z_says():
-    # Summer: EDT, UTC-4. A 4:05pm New York release is 20:05Z, not 16:05Z.
-    assert acceptance_time("2026-07-30T16:05:12.000Z") == datetime(
+def test_an_acceptance_time_z_is_utc():
+    """EDGAR's "Z" is UTC. Apple's Q4 8-K read T21:30:23.000Z and was stored by
+    a collection at 22:41:49Z the same evening (2026-11-02); read as New York
+    time it would have been accepted at 02:30Z the next morning, after the run
+    that read it."""
+    assert acceptance_time("2026-11-02T21:30:23.000Z") == datetime(
+        2026, 11, 2, 21, 30, 23, tzinfo=UTC
+    )
+    read_at = datetime(2026, 11, 2, 22, 41, 49, tzinfo=UTC)
+    accepted = acceptance_time("2026-11-02T21:30:23.000Z")
+    assert accepted is not None and accepted < read_at, "a release is before the read of it"
+    # Summer (EDT): 20:05Z is 4:05pm New York.
+    assert acceptance_time("2026-07-30T20:05:12.000Z") == datetime(
         2026, 7, 30, 20, 5, 12, tzinfo=UTC
     )
-    # Winter: EST, UTC-5.
-    assert acceptance_time("2026-01-29T16:30:00.000Z") == datetime(2026, 1, 29, 21, 30, tzinfo=UTC)
     # An explicit offset is taken as given.
     assert acceptance_time("2026-07-30T16:05:12-04:00") == datetime(
         2026, 7, 30, 20, 5, 12, tzinfo=UTC
     )
     assert acceptance_time("") is None and acceptance_time(None) is None
     assert acceptance_time("not a time") is None and acceptance_time("Z") is None
+
+
+def test_a_bare_acceptance_time_takes_the_later_clock_never_an_early_release():
+    """No zone at all, which EDGAR has not been seen to send, could be UTC or
+    New York's wall clock. New York's is the later instant, so a release read
+    that way can be late but never public before it was."""
+    bare = acceptance_time("2026-11-02T16:30:23")
+    as_utc = datetime(2026, 11, 2, 16, 30, 23, tzinfo=UTC)
+    assert bare == datetime(2026, 11, 2, 21, 30, 23, tzinfo=UTC)
+    assert bare is not None and bare >= as_utc
 
 
 # --- the collector stores the release ------------------------------------------------
@@ -97,7 +115,7 @@ SUBMISSIONS = {
             "reportDate": ["2026-10-29", "2026-10-29", "2026-10-29", "2026-10-27"],
             "acceptanceDateTime": [
                 "2026-10-30T09:00:00.000Z",
-                "2026-10-29T16:30:41.000Z",
+                "2026-10-29T20:30:41.000Z",
                 "2026-10-29T17:00:00.000Z",
                 "2026-10-28T08:00:00.000Z",
             ],
@@ -196,7 +214,7 @@ def test_an_8k_still_absorbs_a_calendar_date_one_session_after_it(tmp_path):
 
 
 def test_aapl_shaped_an_item_2_02_8k_resolves_to_its_date(tmp_path):
-    accepted = acceptance_time("2026-11-02T16:30:41.000Z")
+    accepted = acceptance_time("2026-11-02T21:30:41.000Z")
     assert accepted is not None
     with book_with(
         tmp_path,
@@ -211,8 +229,8 @@ def test_aapl_shaped_an_item_2_02_8k_resolves_to_its_date(tmp_path):
 
 
 def test_a_late_evening_acceptance_keeps_its_new_york_date(tmp_path):
-    # 20:15 New York is 00:15Z the next day; the release is still the 29th's.
-    accepted = acceptance_time("2026-10-29T20:15:00.000Z")
+    # 00:15Z on the 30th is 20:15 New York on the 29th; the release is the 29th's.
+    accepted = acceptance_time("2026-10-30T00:15:00.000Z")
     assert accepted is not None and accepted.date() == day(2026, 10, 30).date()
     with book_with(tmp_path, edgar("XNAS:AAPL", accepted)) as book:
         assert resolve(book, "XNAS:AAPL").day == day(2026, 10, 29).date()
