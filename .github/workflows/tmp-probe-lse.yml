@@ -1,7 +1,9 @@
-# TEMPORARY (2026-11-03): second look at londonstrategicedge.com's API - the
-# documentation, guide and terms pages load as separate script files; read
-# them for the documented endpoints, limits and terms. The owner's own key
-# (LSE_API_KEY) is sent, never printed. Removed after its run.
+# TEMPORARY (2026-11-03): what londonstrategicedge.com's catalogue holds for
+# this book - Malaysia's macro and yield series, the economic calendar's
+# countries, and the three US names. Catalogue facts only (names, counts,
+# date ranges); no data value is printed, because this repository's Actions
+# logs are public and LSE's terms forbid redistributing its data. The
+# owner's key (LSE_API_KEY) is sent, never printed. Removed after its run.
 name: tmp-probe-lse
 on:
   push:
@@ -14,45 +16,51 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:
-      - name: Documentation, guides and terms
+      - name: Catalogue for the book
         env:
           LSE_API_KEY: ${{ secrets.LSE_API_KEY }}
         shell: python
         run: |
-          import html, json, os, re, urllib.request, urllib.error
-          KEY = os.environ.get("LSE_API_KEY", "").strip()
-          UA = "finplanet-analyst-mind/0.1 (personal research)"
-          def get(url, accept="*/*", key=False, n=8_000_000):
-              h = {"User-Agent": UA, "Accept": accept}
-              if key: h["x-api-key"] = KEY
+          import json, os, urllib.parse, urllib.request, urllib.error
+          KEY = os.environ["LSE_API_KEY"].strip()
+          BASE = "https://download.londonstrategicedge.com"
+          def get(path, **q):
+              url = BASE + path + ("?" + urllib.parse.urlencode(q) if q else "")
+              req = urllib.request.Request(url, headers={"X-API-Key": KEY, "User-Agent": "finplanet-analyst-mind/0.1", "Accept": "application/json"})
               try:
-                  r = urllib.request.urlopen(urllib.request.Request(url, headers=h), timeout=30)
-                  return r.status, r.read(n).decode("utf-8", "replace")
+                  with urllib.request.urlopen(req, timeout=40) as r:
+                      return r.status, json.loads(r.read().decode())
               except urllib.error.HTTPError as e:
-                  return e.code, e.read(4000).decode("utf-8", "replace")
+                  try: return e.code, json.loads(e.read().decode())
+                  except Exception: return e.code, {}
               except Exception as e:
-                  return None, f"{type(e).__name__}: {e}"
-          s, b = get("https://data-api.londonstrategicedge.com/", accept="application/json", key=True)
-          print("data-api root:", s, b[:500])
-          s, page = get("https://londonstrategicedge.com/data/documentation", accept="text/html")
-          entry = re.findall(r'src="(/assets/[^"]+\.js)"', page)[0]
-          s, js = get("https://londonstrategicedge.com" + entry)
-          chunks = sorted(set(re.findall(r'["\'`](?:\./|/assets/|assets/)([A-Za-z0-9_\-]+\.js)["\'`]', js)))
-          print("chunks named in the entry:", len(chunks))
-          want = [c for c in chunks if re.search(r'(?i)doc|guide|term|legal|api|databank|data|python|stream|pricing|plan|limit', c)]
-          print("reading:", want[:40])
-          for c in want[:40]:
-              s, t = get("https://londonstrategicedge.com/assets/" + c)
-              hits = []
-              for word in ("curl", "data-api.londonstrategicedge.com", "api.londonstrategicedge.com", "x-api-key", "X-API-Key", "requests per", "per hour", "per minute", "rate limit", "Rate limit", "redistribut", "commercial", "licen", "attribution", "Malaysia", "Bursa", "KLSE", "economic_calendar", "macro", "options", "/v1/"):
-                  for m in list(re.finditer(re.escape(word), t))[:3]:
-                      hits.append((word, m.start()))
-              if not hits: continue
-              print("=" * 90); print(c, s, len(t))
-              shown = []
-              for word, i in sorted(hits, key=lambda x: x[1]):
-                  if any(abs(i - j) < 400 for j in shown): continue
-                  shown.append(i)
-                  frag = re.sub(r"\s+", " ", html.unescape(t[max(0, i - 250): i + 450]))
-                  print(f"  [{word}] {frag}")
-                  if len(shown) >= 14: break
+                  return None, {"error": f"{type(e).__name__}: {e}"}
+          s, u = get("/v3/usage")
+          print("usage:", s, {k: u.get(k) for k in ("plan", "markets", "calls_per_minute", "connections", "withheld")}, "weekly allowance GiB:", round((u.get("weekly") or {}).get("allowance_bytes", 0) / 2**30, 1))
+          s, m = get("/v3/macro")
+          print("macro kinds:", s, m.get("kinds"))
+          my = [c for c in m.get("countries", []) if c.get("country") == "MY"]
+          print("macro MY:", my, "| countries:", len(m.get("countries", [])))
+          for kind in ("observation", "yield", "release"):
+              s, p = get("/v3/macro", kind=kind, country="MY", limit=200)
+              rows = p.get("series", [])
+              print(f"== MY {kind}: {s} total {p.get('total')}")
+              for r in rows[:200]:
+                  print("   ", r.get("code"), "|", r.get("name"), "|", r.get("frequency"), "|", r.get("first"), "->", r.get("last"), "| records", r.get("stored_records"), "| source", r.get("latest_source"))
+          s, ref = get("/v3/reference")
+          print("reference datasets:", s)
+          for d in ref.get("datasets", []):
+              print("   ", d.get("dataset"), "|", d.get("name"), "| rows", d.get("rows"), "|", d.get("first"), "->", d.get("last"), "| as_of", d.get("as_of"), "| cols", (d.get("columns") or [])[:14])
+          s, cal = get("/v3/reference", dataset="economic_calendar", country="MY", limit=50)
+          print("economic_calendar MY:", s, "total", cal.get("total"), [ (x.get("symbol"), x.get("name"), x.get("rows"), x.get("last")) for x in cal.get("series", [])[:50]])
+          print("economic_calendar countries:", [c if isinstance(c, str) else c.get("country") for c in cal.get("countries", [])][:80])
+          for sym in ("NVDA", "AAPL", "MSFT"):
+              s, p = get("/v3/pairs", market="us_stocks", q=sym, limit=3)
+              hit = [(x.get("symbol"), x.get("name"), x.get("tick_first"), x.get("tick_last")) for x in (p.get("pairs") or p.get("rows") or [])[:3]]
+              s2, ch = get("/v3/options/chain", underlying=sym, max_dte=30, limit=1)
+              print(f"{sym}: pairs {s} {hit} | chain {s2} contracts {ch.get('contracts')} greeks_as_of {ch.get('greeks_as_of')}")
+          for sym in ("^KLSE", "KLSE", "FBMKLCI"):
+              s, p = get("/v3/pairs", market="indices", q=sym, limit=5)
+              print("indices", sym, s, [(x.get("symbol"), x.get("name")) for x in (p.get("pairs") or p.get("rows") or [])[:5]])
+          s, u = get("/v3/usage")
+          print("calls used this run: about 16; weekly used bytes:", (u.get("weekly") or {}).get("used_bytes"))
