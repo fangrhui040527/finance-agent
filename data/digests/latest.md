@@ -1,24 +1,14 @@
-# Digest 2026-11-02
+# Digest 2026-11-03
 
-Generated 2026-11-02 22:42 UTC · slot `all` · 30112 articles in the corpus, 6749 observations, 4290 events in the fact book.
+Generated 2026-11-03 02:56 UTC · slot `all` · 30112 articles in the corpus, 6749 observations, 4290 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- tone: 11 stories from 9 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
-- 2026-11-02 www.theedgemarkets.com — Menara Tun Perak, Maybank’s former KL headquarters, up for sale, sources say [q 0.80, tone +0.0]
-- 2026-11-02 www.thestar.com.my — Golf: Yamashita the first to retain Maybank crown, fastest Japanese to reach five LPGA Tour titles [q 0.80, tone +0.0]
-- 2026-11-01 www.thestar.com.my — The Asean contingent led by the Thais shines at the Maybank Championship at KLGCC [q 0.80, tone +0.0]
-- 2026-11-01 www.thestar.com.my — Japan's Miyu Yamashita is rightly 'the queen' after creating history defending her Maybank Championship title [q 0.80, tone +0.0]
-- 2026-11-02 www.edgeprop.my — Former Maybank HQ marketed for investment, alternative uses floated [q 0.65, tone +0.0]
-- 2026-11-02 www.ad-hoc-news.de — Malayan Banking stock: Maybank expands regional resilience push - ad-hoc-news.de [q 0.65, tone +0.0]
-- 2026-11-01 athlonsports.com — Miyu Yamashita Holds Off Yan Liu to Defend Maybank Title [q 0.65, tone +0.0]
-- 2026-11-01 www.indiasnews.net — Miyu Yamashita defends championship at Maybank [q 0.65, tone +0.0]
+- quiet: nothing collected for this name in the window
 
 ### Tenaga (MYX:5347)
-- tone: 2 stories from 2 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
-- 2026-11-02 www.businesstoday.com.my — MARC Affirms TNB’s AAA Ratings As Data Centre Drives Electricity Demand [q 0.80, tone +0.0]
-- 2026-11-02 paultan.org — TNB bill AFA rate November 2026 set at +3.60 sen/kWh [q 0.65, tone +0.0]
+- quiet: nothing collected for this name in the window
 
 ### Petronas Chemicals (MYX:5183)
 - quiet: nothing collected for this name in the window
@@ -33,7 +23,7 @@ Generated 2026-11-02 22:42 UTC · slot `all` · 30112 articles in the corpus, 67
 - quiet: nothing collected for this name in the window
 
 ### NVIDIA (XNAS:NVDA)
-- tone: 99 stories from 41 sources, polarity +0.03, peak intensity 0.33, uncertainty 0.09 · 26 escalated
+- tone: 49 stories from 25 sources, polarity +0.00, peak intensity 0.33, uncertainty 0.12 · 16 escalated
 - 2026-11-02 finance.yahoo.com — IREN (NasdaqGS:IREN) Objects To Tokenized Share Trading On New Blockchain Venue [q 1.00, tone +1.0] ★
 - 2026-11-02 Yahoo — Qualcomm (QCOM) Joins $700 Million Hark Funding Round In AI Assistant Bet [q 0.85, tone +0.0] ★
 - 2026-11-02 financefeeds.com — NVDA Stock at $208.63: What AMD and 17 November Decide [q 0.85, tone -1.0] ★
@@ -41,37 +31,37 @@ Generated 2026-11-02 22:42 UTC · slot `all` · 30112 articles in the corpus, 67
 - 2026-11-02 manilatimes.net — Stratum Holdings CEO Issues Shareholder Letter Highlighting Progress in AI Infrastructure Transformation [q 0.85, tone +1.0] ★
 - 2026-11-02 manilatimes.net — XMax Announces AI Infrastructure Services Agreement, Expects Over US$100 Million in Revenue Over the Next Five Years [q 0.85, tone +0.0] ★
 - 2026-11-02 economictimes.indiatimes.com — Why are US stock futures rising today? Dow Jones, S&P 500 and Nasdaq rebound, but will midterm elections hit Wall Street? Apple, Nvidia, Intel and AMD to watch [q 0.85, tone -1.0] ★
-- 2026-11-02 Yahoo — iShares Russell 1000 Growth (IWF) Adds NVIDIA and Apple on Oct. 29 [q 0.85, tone +1.0] ★
+- 2026-11-02 finance.yahoo.com — Polymarket Traders Missed Nvidia’s October Drop. Here’s What They Predict for November. [q 0.80, tone -1.0] ★
 - upcoming 2026-11-25 earnings_result — Q3 2027 results after the close (finnhub)
 - upcoming 2026-11-17 earnings_result — Q3 2027 results after the close (finnhub)
 - earnings date: 2026-11-17 (finnhub)
 - snapshot: P/E (ttm) 25.57 (finnhub, 2026-11-02) · P/B 28.81 (finnhub, 2026-11-02) · EPS (ttm) 7.91 (finnhub, 2026-11-02) · dividend yield 0.03 (finnhub, 2026-11-02) · beta 2.28 (finnhub, 2026-11-02) · 52w high 243.37 (finnhub, 2026-11-02) · 52w low 164.27 (finnhub, 2026-11-02) · target (consensus) 339.17 (fmp, 2026-11-02) · analysts: buy 41 (finnhub, 2026-11-02) · analysts: hold 2 (finnhub, 2026-11-02) · analysts: sell 1 (finnhub, 2026-11-02) · vendor sentiment 0.25 (alphavantage_news, 2026-10-06) · Marketaux sentiment 0.32 (marketaux_news, 2026-11-02) · FinBERT headline tone 0.13 (finbert_tone, 2026-11-02) · revenue (last quarter) 96.22bn (sec_xbrl, 2026-08-26) · net income (last quarter) 59.69bn (sec_xbrl, 2026-08-26) · last EPS surprise % 3.82 (finnhub, 2026-09-05)
 
 ### Apple (XNAS:AAPL)
-- tone: 174 stories from 63 sources, polarity +0.23, peak intensity 0.33, uncertainty 0.06 · 76 escalated
+- tone: 118 stories from 47 sources, polarity +0.28, peak intensity 0.33, uncertainty 0.05 · 55 escalated
 - 2026-11-02 finance.yahoo.com — Apple Posts Fiscal Q4 Beat On Strong iPhone, Services Sales [q 1.00, tone +0.5] ★
-- 2026-11-02 www.nst.com.my — Apple warns German politicians of potential phone compromise: Reports [q 1.00, tone -1.0] ★
-- 2026-11-01 finance.yahoo.com — Jobs, Midterm Elections, Apple, Palantir, McDonald’s, Moderna, and More to Watch This Week [q 1.00, tone +0.0] ★
 - 2026-11-02 thestockmarketwatch.com — Apple Beats Q4 Estimates Amid Tech Selloff; Oil Slumps on Iran Diplomacy [q 0.85, tone +1.0] ★
 - 2026-11-02 www.axios.com — Apple earnings: iPhone sales lead revenue upward [q 0.85, tone +0.0] ★
 - 2026-11-02 www.proactiveinvestors.com — Apple beats fourth-quarter earnings expectations as revenue rises 12% to $114.5 billion [q 0.85, tone +0.3] ★
 - 2026-11-02 Yahoo — Apple could owe iPhone owners up to $95. Here's how to claim it. [q 0.85, tone -1.0] ★
 - 2026-11-02 Yahoo — Alibaba Soars 6% as Apple Sets December Launch for Qwen-Powered iPhone AI in China [q 0.85, tone +1.0] ★
+- 2026-11-02 Yahoo — Why Trump-Tied Companies Could Face Democratic Probes Post-Midterms [q 0.85, tone -1.0] ★
+- 2026-11-02 Yahoo — Apple's Valuation Premium Confronts AI Jitters [q 0.85, tone +0.0] ★
+- event 2026-11-03 results_released — results released: 8-K accepted 2026-11-02 21:30 ET (edgar)
 - event 2026-11-02 earnings_result — Q4 2026 results after the close (finnhub)
 - event 2026-11-02 filing — 8-K: 8-K (items 2.02,9.01) (edgar)
-- upcoming 2026-11-03 results_released — results released: 8-K accepted 2026-11-02 21:30 ET (edgar)
 - snapshot: P/E (ttm) 39.01 (finnhub, 2026-11-02) · P/B 50.98 (finnhub, 2026-11-02) · EPS (ttm) 8.72 (finnhub, 2026-11-02) · dividend yield 0.51 (finnhub, 2026-11-02) · beta 1.10 (finnhub, 2026-11-02) · 52w high 351.73 (finnhub, 2026-11-02) · 52w low 243.42 (finnhub, 2026-11-02) · target (consensus) 340.88 (fmp, 2026-11-02) · analysts: buy 19 (finnhub, 2026-11-02) · analysts: hold 15 (finnhub, 2026-11-02) · analysts: sell 3 (finnhub, 2026-11-02) · vendor sentiment -0.23 (alphavantage_news, 2026-10-06) · FinBERT headline tone 0.11 (finbert_tone, 2026-11-02) · revenue (last quarter) 109.42bn (sec_xbrl, 2026-07-31) · net income (last quarter) 29.79bn (sec_xbrl, 2026-07-31) · last EPS surprise % -0.89 (finnhub, 2026-09-05)
 
 ### Microsoft (XNAS:MSFT)
-- tone: 69 stories from 35 sources, polarity +0.13, peak intensity 0.33, uncertainty 0.07 · 23 escalated
+- tone: 40 stories from 18 sources, polarity +0.07, peak intensity 0.33, uncertainty 0.07 · 15 escalated
 - 2026-11-02 finance.yahoo.com — Estée Lauder Companies (EL) Partners With Microsoft On AI And Data Tools [q 1.00, tone +1.0] ★
 - 2026-11-02 99bitcoins.com — Microsoft Copilot AI Predicts a Pudgy Penguins (PENGU) Explosion [q 0.85, tone -1.0] ★
 - 2026-11-02 Yahoo — Small and Medium-Sized Businesses (SMBs) IT Spending Market Report 2026 | Capture $1.10T by 2030 as Microsoft, Amazon, Google, Dell, and Cisco Scale Cloud and Cybersecurity [q 0.85, tone -1.0] ★
 - 2026-11-02 Yahoo — Clarivate to Bring Trusted Trademark Data into Microsoft Copilot Through IPOne [q 0.85, tone +0.0] ★
 - 2026-11-02 Yahoo — Cloud Numbers Are In; This Week the Spotlight Moves to Phones, Laptops and Chips [q 0.85, tone +0.0] ★
-- 2026-11-02 Yahoo — Zefiro Provides Support for Upcoming Launch of New North American Orphaned Well Plugging Carbon Credit Methodology [q 0.85, tone +1.0] ★
-- 2026-11-02 SeekingAlpha — Microsoft: I'm Betting On Azure [q 0.85, tone +1.0] ★
 - 2026-11-02 finance.yahoo.com — Microsoft Corporation (MSFT) Delivers Strong Azure Growth as AI Demand Exceeds Supply [q 0.80, tone +1.0] ★
+- 2026-11-02 finance.yahoo.com — Microsoft Stocks Move Higher With Cloud Growth Supporting Baird's Higher Target [q 0.80, tone +1.0] ★
+- 2026-11-02 finance.yahoo.com — Apple Vs.Microsoft: Margin Expansion Is Apple’s Massive Advantage [q 0.80, tone +1.0] ★
 - snapshot: P/E (ttm) 27.17 (finnhub, 2026-11-02) · P/B 6.26 (finnhub, 2026-11-02) · EPS (ttm) 19.15 (finnhub, 2026-11-02) · dividend yield 0.79 (finnhub, 2026-11-02) · beta 1.06 (finnhub, 2026-11-02) · 52w high 551.15 (finnhub, 2026-11-02) · 52w low 349.20 (finnhub, 2026-11-02) · target (consensus) 611.74 (fmp, 2026-11-02) · analysts: buy 40 (finnhub, 2026-11-02) · analysts: hold 3 (finnhub, 2026-11-02) · analysts: sell 0 (finnhub, 2026-11-02) · vendor sentiment 0.29 (alphavantage_news, 2026-10-06) · Marketaux sentiment 0.31 (marketaux_news, 2026-11-02) · FinBERT headline tone 0.19 (finbert_tone, 2026-11-02) · revenue (last quarter) 92.28bn (sec_xbrl, 2026-10-28) · net income (last quarter) 36.63bn (sec_xbrl, 2026-10-28) · last EPS surprise % 1.53 (finnhub, 2026-10-28)
 
 ## Macro
@@ -94,33 +84,6 @@ Generated 2026-11-02 22:42 UTC · slot `all` · 30112 articles in the corpus, 67
 | 10y minus 2y Treasury spread, % | 0.38 | 2026-10-30 | +0.01 | fred |
 | US unemployment rate, % | 4.20 | 2026-09-01 | +0.1 | fred |
 | CBOE VIX, index | 19.42 | 2026-10-30 | +2.22 | fred |
-
-## Collection
-
-| at (UTC) | source | status | fetched | kept | stored | detail |
-|---|---|---|---|---|---|---|
-| 22:42 | finbert_tone | ok | 12 | 0 | 0 | facts 12; scored 402 titles with Xenova/finbert@8f269abebfdd onnx/model_quantize |
-| 22:42 | eodhd | ok | 0 | 0 | 0 | skipped: every asked name was refused: outside the plan or over today's credits  |
-| 22:42 | jin10_flash | ok | 20 | 20 | 17 | facts 0;  |
-| 22:42 | marketaux_news | ok | 43 | 43 | 34 | facts 8; XNAS:AAPL: 2026-11-02 not aggregated - 8 full pages ended part-way thro |
-| 22:41 | finnhub | ok | 404 | 318 | 231 | facts 56;  |
-| 22:41 | edgar | ok | 2 | 0 | 0 | facts 2;  |
-| 22:41 | yahoo_rss | ok | 51 | 51 | 31 | named the company: 21 of 51 (lowest: NVIDIA 2/20, Microsoft 6/17, Apple 13/14) |
-| 22:41 | google_news | ok | 234 | 217 | 201 | named the company: 185 of 217 (lowest: Microsoft 43/60, NVIDIA 67/78, Apple 75/7 |
-| 22:41 | gdelt | throttled | 0 | 0 | 0 | throttled: no name could be read (3 failed, 0 not reached). First: GDELT fetch f |
-| 21:53 | dbnomics | ok | 450 | 0 | 0 | facts 0;  |
-| 21:52 | jin10_flash | degraded | 18 | 18 | 18 | facts 0; window not covered back to 2026-11-02 10:08Z; the oldest item read is 2 |
-| 21:52 | fred | ok | 478 | 0 | 0 | facts 22; release calendar: 'FOMC Press Release' listed on 15 days of the fortni |
-| 21:52 | fmp | ok | 3988 | 0 | 0 | facts 12; fmp /earnings is outside the plan (HTTP 402); not collected for NVDA,  |
-| 10:08 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
-| 10:08 | twse_openapi | ok | 8 | 0 | 0 | facts 0;  |
-| 10:08 | jin10_flash | degraded | 18 | 18 | 17 | facts 0; window not covered back to 2026-11-01 22:42Z; the oldest item read is 2 |
-| 10:08 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
-| 10:08 | nst_business | degraded | 149 | 144 | 140 | page 2 starts 2.8h before page 1 ends (2026-11-02 04:43Z under 2026-11-02 07:32Z |
-| 10:08 | fmt_business | ok | 45 | 45 | 45 |  |
-| 10:08 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals, IHH |
-| 10:08 | google_news | ok | 23 | 23 | 17 | read but empty: Genting; named the company: 11 of 23 (lowest: IHH 0/1, Petronas  |
-| 10:08 | gdelt | throttled | 0 | 0 | 0 | grouped 3 names per request; 2 requests (HTTP 429 on request 2: the rest of the  |
 
 ---
 
