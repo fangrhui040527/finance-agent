@@ -1,18 +1,109 @@
 {
-  "collection": [],
+  "collection": [
+    {
+      "at": "2026-11-04T10:07:10.900528+00:00",
+      "detail": "facts 9; scored 13 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized.onnx",
+      "fetched": 10,
+      "kept": 0,
+      "source": "finbert_tone",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-04T10:07:10.260215+00:00",
+      "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-04T10:07:10.061544+00:00",
+      "detail": "facts 5; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-04T10:07:04.746771+00:00",
+      "detail": "facts 0; window not covered back to 2026-11-03 22:42Z; the oldest item read is 2026-11-04 09:59Z, so 11.3h of the window was never served",
+      "fetched": 15,
+      "kept": 15,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 15
+    },
+    {
+      "at": "2026-11-04T10:07:03.558244+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-04T10:07:01.780293+00:00",
+      "detail": "window overflow: all 150 dated items are newer than the window's start (2026-11-03 10:07Z); the oldest is 2026-11-03 16:03Z, so 5.9h scrolled off unseen; read 3 pages, the most this feed may; page 2 starts 2.9h before page 1 ends (2026-11-04 04:19Z under 2026-11-04 07:14Z): the items between were served by neither",
+      "fetched": 150,
+      "kept": 143,
+      "source": "nst_business",
+      "status": "degraded",
+      "stored": 135
+    },
+    {
+      "at": "2026-11-04T10:06:58.115751+00:00",
+      "detail": "window overflow: all 50 dated items are newer than the window's start (2026-11-03 10:07Z); the oldest is 2026-11-03 12:00Z, so 1.9h scrolled off unseen",
+      "fetched": 50,
+      "kept": 50,
+      "source": "fmt_business",
+      "status": "degraded",
+      "stored": 50
+    },
+    {
+      "at": "2026-11-04T10:06:57.688626+00:00",
+      "detail": "read but empty: Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals, IHH",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-04T10:06:56.624422+00:00",
+      "detail": "read but empty: Petronas Chemicals; named the company: 11 of 32 (lowest: Press Metal 0/1, Maybank 2/10, Genting 1/3)",
+      "fetched": 35,
+      "kept": 32,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 25
+    },
+    {
+      "at": "2026-11-04T10:06:54.535089+00:00",
+      "detail": "throttled: no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked); deferred: Tenaga, Petronas Chemicals, IHH",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "throttled",
+      "stored": 0
+    }
+  ],
   "counts": {
-    "articles": 30878,
+    "articles": 31103,
     "documents": 0,
     "escalated": 3971,
     "events": 4304,
     "failed_sweeps": 112,
-    "linked": 16191,
-    "observations": 6832,
+    "linked": 16203,
+    "observations": 6846,
     "series": 31,
-    "sweeps": 1370
+    "sweeps": 1380
   },
   "day": "2026-11-04",
-  "generated_at": "2026-11-04 01:20 UTC",
+  "generated_at": "2026-11-04 10:08 UTC",
   "macro": [
     {
       "change": "-0.01",
@@ -153,15 +244,35 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-03",
+          "known_at": "2026-11-04",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-02",
+          "period_end": "2026-11-04",
           "source": "finbert_tone",
-          "value": "0.32"
+          "value": "0.60"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE80aUxKS3R0VnBuMm44WDhxV0hfYVJfNnpGbFk4QTcxcmtRbTM4R2JZTndOOHpmaWlEOE5OWDk5MUNMc3ZNdG85ZG9iaWNZMkM1?oc=5",
+          "domain": "theedgemalaysia.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-04T02:33:38+00:00",
+          "quality": 0.8,
+          "title": "Sime Darby Property mulls REIT listing by 2028, to bank on heavy industrial parks, says Maybank IB",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -173,15 +284,74 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-03",
+          "known_at": "2026-11-04",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-03",
+          "period_end": "2026-11-04",
           "source": "finbert_tone",
-          "value": "0.22"
+          "value": "0.08"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMimwJBVV95cUxPUkdxUzYtU3ZQVHhEVzhnWFZzbUNnQUY5UFhLYklGYWpweHh0VHJXbjN6cHpqazR6TjF1eVhoZVh6ekUzT21nd2VsUDZSeHhBTlR1TkFCT0xZc0tOM2ZKVk93Wk1CRllPTkR3OWtlTnZ2alZkLW5IcU5YQ1J2QnZuRTdlSDRvelVHYk5VSWpta2Z0NURtbXFKLVRsRGJBbThwQnhCUUpGeTREYS1zdjBXRDFodjUxMFdPdlRIbXIwbGRQd29RWEpkVmhVRV9jaE5GQjIxVm8xNms3b194UG8xVjMxN1N5aF8wLW9mU1V4eW96NGVqNHRpRWZ2YmpBcWlzSnlxeXJManNPSXNtQWZReGFTeUd2UE9hbTMw?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-04T00:05:00+00:00",
+          "quality": 0.8,
+          "title": "Trading ideas: GDB, MMCS, Theta, ES Sunlogy, Salutica, IOIPG, TNB, SP Setia, Pertama Digital, Malakoff, Orkim, RHB, Asdion, TWL, Pekat, IOIPG REIT",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMinwFBVV95cUxPbnp4c2dEb3ZQWUdlekM5Wl9WUVZTU2NFRV9zSTlGdHJuTEhUem5oSTQ4bTg5bzR1N1l4V0xEQjU0SjRjeDdTMUtQVXE4a3I0a1ljWkJ2dlJQT0tYUjExWEdoLVdNdFU1N0ZXMlNkZHI3enM3NlduSjlPa2VLOG96SjdDTy1rUWM2cWdyZXRyNXkwUTFfNnhiZFBhTDFTejg?oc=5",
+          "domain": "finance.yahoo.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-03T20:00:00+00:00",
+          "quality": 0.8,
+          "title": "Dynace Global, Farm Fresh, Getha, Munchy\u2019s, Tenaga Nasional Berhad, Spritzer, Watsons, and Zus Coffee are among the \"Brand of the Year\" Winners at the 2026\u20132027 World Branding Awards",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiUEFVX3lxTFBhWTJnZEFKOHhLVG1tOGZidnhkSkRJaFl4Rk5ocFZmZnR4cDZsUGhlRkRrMmxUY0NRWlJjenpfTkFZVW1CbFJSQ3NzRG1wOWFW?oc=5",
+          "domain": "theedgemalaysia.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-03T15:00:01+00:00",
+          "quality": 0.8,
+          "title": "IOI Properties, IOIPG REIT, Tenaga Nasional, GDB, TWL, HB Global, Malakoff, Orkim, Pertama Digital, MMCS, Asdion, Pekat, Theta Edge, ES Sunlogy",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMilwFBVV95cUxNQ1ZUY2E3RU5URmJQaVNPNHRmemozQVJVR2RvZU1Zd3RPTkZ6MXo4dVJOVFhGek0xVUtVSHMwYWp3XzNheWdjNnAxMWxMU2tUTF9aVFduUmZRVXcwbFRyQUVKN2trR2pSdW5IdTNFT1A2STYzbEVuUkZyU3ZoV3p0N05hczk5eXpQUjYzMTVjcWVmZ091OVNz?oc=5",
+          "domain": "www.klsescreener.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-03T23:36:22+00:00",
+          "quality": 0.65,
+          "title": "TNB and IOI team up for mega-solar project",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 4,
+        "polarity_mean": 0.0,
+        "sources": 4,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -201,7 +371,16 @@
       "events": [],
       "instrument_id": "MYX:5225",
       "label": "IHH",
-      "snapshot": [],
+      "snapshot": [
+        {
+          "concept": "finbert_sentiment",
+          "known_at": "2026-11-04",
+          "label": "FinBERT headline tone",
+          "period_end": "2026-11-03",
+          "source": "finbert_tone",
+          "value": "0.05"
+        }
+      ],
       "stories": [],
       "tone": {},
       "upcoming": []
@@ -226,11 +405,11 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-03",
+          "known_at": "2026-11-04",
           "label": "FinBERT headline tone",
           "period_end": "2026-11-03",
           "source": "finbert_tone",
-          "value": "0.57"
+          "value": "0.41"
         }
       ],
       "stories": [],

@@ -1,14 +1,21 @@
 # Digest 2026-11-04
 
-Generated 2026-11-04 01:20 UTC · slot `all` · 30878 articles in the corpus, 6832 observations, 4304 events in the fact book.
+Generated 2026-11-04 10:08 UTC · slot `all` · 31103 articles in the corpus, 6846 observations, 4304 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-11-04 theedgemalaysia.com — Sime Darby Property mulls REIT listing by 2028, to bank on heavy industrial parks, says Maybank IB [q 0.80, tone +0.0]
+- snapshot: FinBERT headline tone 0.60 (finbert_tone, 2026-11-04)
 
 ### Tenaga (MYX:5347)
-- quiet: nothing collected for this name in the window
+- tone: 4 stories from 4 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-11-04 www.thestar.com.my — Trading ideas: GDB, MMCS, Theta, ES Sunlogy, Salutica, IOIPG, TNB, SP Setia, Pertama Digital, Malakoff, Orkim, RHB, Asdion, TWL, Pekat, IOIPG REIT [q 0.80, tone +0.0]
+- 2026-11-03 finance.yahoo.com — Dynace Global, Farm Fresh, Getha, Munchy’s, Tenaga Nasional Berhad, Spritzer, Watsons, and Zus Coffee are among the "Brand of the Year" Winners at the 2026–2027 World Branding Awards [q 0.80, tone +0.0]
+- 2026-11-03 theedgemalaysia.com — IOI Properties, IOIPG REIT, Tenaga Nasional, GDB, TWL, HB Global, Malakoff, Orkim, Pertama Digital, MMCS, Asdion, Pekat, Theta Edge, ES Sunlogy [q 0.80, tone +0.0]
+- 2026-11-03 www.klsescreener.com — TNB and IOI team up for mega-solar project [q 0.65, tone +0.0]
+- snapshot: FinBERT headline tone 0.08 (finbert_tone, 2026-11-04)
 
 ### Petronas Chemicals (MYX:5183)
 - quiet: nothing collected for this name in the window
@@ -85,6 +92,21 @@ Generated 2026-11-04 01:20 UTC · slot `all` · 30878 articles in the corpus, 68
 | 10y minus 2y Treasury spread, % | 0.32 | 2026-11-02 | -0.06 | fred |
 | US unemployment rate, % | 4.20 | 2026-09-01 | +0.1 | fred |
 | CBOE VIX, index | 21.15 | 2026-11-02 | +1.73 | fred |
+
+## Collection
+
+| at (UTC) | source | status | fetched | kept | stored | detail |
+|---|---|---|---|---|---|---|
+| 10:07 | finbert_tone | ok | 10 | 0 | 0 | facts 9; scored 13 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized. |
+| 10:07 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
+| 10:07 | twse_openapi | ok | 8 | 0 | 0 | facts 5;  |
+| 10:07 | jin10_flash | degraded | 15 | 15 | 15 | facts 0; window not covered back to 2026-11-03 22:42Z; the oldest item read is 2 |
+| 10:07 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 10:07 | nst_business | degraded | 150 | 143 | 135 | window overflow: all 150 dated items are newer than the window's start (2026-11- |
+| 10:06 | fmt_business | degraded | 50 | 50 | 50 | window overflow: all 50 dated items are newer than the window's start (2026-11-0 |
+| 10:06 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals, IHH |
+| 10:06 | google_news | ok | 35 | 32 | 25 | read but empty: Petronas Chemicals; named the company: 11 of 32 (lowest: Press M |
+| 10:06 | gdelt | throttled | 0 | 0 | 0 | throttled: no name could be read (3 failed, 0 not reached). First: GDELT fetch f |
 
 ---
 
