@@ -1,6 +1,87 @@
 {
   "collection": [
     {
+      "at": "2026-11-05T22:41:29.895284+00:00",
+      "detail": "facts 11; scored 507 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized.onnx",
+      "fetched": 12,
+      "kept": 0,
+      "source": "finbert_tone",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-05T22:41:22.598086+00:00",
+      "detail": "skipped: every asked name was refused: outside the plan or over today's credits (XNAS:AAPL, XNAS:MSFT)",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-05T22:41:22.067090+00:00",
+      "detail": "facts 0; window not covered back to 2026-11-05 20:13Z; the oldest item read is 2026-11-05 21:35Z, so 1.4h of the window was never served",
+      "fetched": 20,
+      "kept": 19,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 18
+    },
+    {
+      "at": "2026-11-05T22:41:20.422010+00:00",
+      "detail": "facts 4; XNAS:AAPL: 2026-11-04 not aggregated - 8 full pages ended part-way through that day; XNAS:MSFT: 2026-11-04 not aggregated - 8 full pages ended part-way through that day; XNAS:NVDA: 2026-11-05 not aggregated - 8 full pages ended part-way through that day",
+      "fetched": 38,
+      "kept": 38,
+      "source": "marketaux_news",
+      "status": "ok",
+      "stored": 36
+    },
+    {
+      "at": "2026-11-05T22:41:16.179802+00:00",
+      "detail": "facts 39; ",
+      "fetched": 387,
+      "kept": 320,
+      "source": "finnhub",
+      "status": "ok",
+      "stored": 235
+    },
+    {
+      "at": "2026-11-05T22:41:12.588622+00:00",
+      "detail": "facts 1; ",
+      "fetched": 2,
+      "kept": 0,
+      "source": "edgar",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-05T22:41:12.424211+00:00",
+      "detail": "named the company: 17 of 53 (lowest: NVIDIA 2/19, Microsoft 6/16, Apple 9/18)",
+      "fetched": 53,
+      "kept": 53,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 36
+    },
+    {
+      "at": "2026-11-05T22:41:11.665083+00:00",
+      "detail": "named the company: 172 of 189 (lowest: Microsoft 47/52, NVIDIA 66/73, Apple 59/64)",
+      "fetched": 204,
+      "kept": 189,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 178
+    },
+    {
+      "at": "2026-11-05T22:41:08.663721+00:00",
+      "detail": "throttled: no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked)",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "throttled",
+      "stored": 0
+    },
+    {
       "at": "2026-11-05T20:13:26.059592+00:00",
       "detail": "facts 0; ",
       "fetched": 450,
@@ -128,18 +209,18 @@
     }
   ],
   "counts": {
-    "articles": 31865,
+    "articles": 32368,
     "documents": 0,
-    "escalated": 4069,
-    "events": 4310,
+    "escalated": 4149,
+    "events": 4311,
     "failed_sweeps": 112,
-    "linked": 16482,
-    "observations": 6941,
+    "linked": 16738,
+    "observations": 6995,
     "series": 31,
-    "sweeps": 1407
+    "sweeps": 1416
   },
   "day": "2026-11-05",
-  "generated_at": "2026-11-05 20:13 UTC",
+  "generated_at": "2026-11-05 22:41 UTC",
   "macro": [
     {
       "change": "-0.08",
@@ -600,22 +681,22 @@
       "earnings": [
         "2026-11-17 (finnhub)"
       ],
-      "escalated": 21,
+      "escalated": 42,
       "events": [],
       "instrument_id": "XNAS:NVDA",
       "label": "NVIDIA",
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-11-04",
+          "known_at": "2026-11-05",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "25.83"
+          "value": "25.01"
         },
         {
           "concept": "pb",
-          "known_at": "2026-11-04",
+          "known_at": "2026-11-05",
           "label": "P/B",
           "period_end": null,
           "source": "finnhub",
@@ -623,7 +704,7 @@
         },
         {
           "concept": "eps_ttm",
-          "known_at": "2026-11-04",
+          "known_at": "2026-11-05",
           "label": "EPS (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -631,7 +712,7 @@
         },
         {
           "concept": "dividend_yield",
-          "known_at": "2026-11-04",
+          "known_at": "2026-11-05",
           "label": "dividend yield",
           "period_end": null,
           "source": "finnhub",
@@ -639,15 +720,15 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-11-04",
+          "known_at": "2026-11-05",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
-          "value": "2.34"
+          "value": "2.33"
         },
         {
           "concept": "high_52w",
-          "known_at": "2026-11-04",
+          "known_at": "2026-11-05",
           "label": "52w high",
           "period_end": null,
           "source": "finnhub",
@@ -655,7 +736,7 @@
         },
         {
           "concept": "low_52w",
-          "known_at": "2026-11-04",
+          "known_at": "2026-11-05",
           "label": "52w low",
           "period_end": null,
           "source": "finnhub",
@@ -711,11 +792,11 @@
         },
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-04",
+          "known_at": "2026-11-05",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-04",
+          "period_end": "2026-11-05",
           "source": "finbert_tone",
-          "value": "0.09"
+          "value": "-0.10"
         },
         {
           "concept": "revenue",
@@ -770,90 +851,90 @@
           "uncertainty": 0.0
         },
         {
-          "day": "2026-11-05",
-          "doc_id": "web_search:https://coinpedia.org/crypto-live-news/nvidia-stock-news-nvda-rises-as-70-billion-china-chip-order-stuck-in-queue/",
-          "domain": "coinpedia.org",
+          "day": null,
+          "doc_id": "https://stocktwits.com/news-articles/markets/equity/microsoft-reportedly-steps-back-from-renewing-data-center-contract-with-nvidia-backed-nscale/cNG1qdXR94S?.tsrc=rss",
+          "domain": "stocktwits.com",
           "escalated": true,
           "intensity": 0.0,
           "kind": "",
-          "polarity": 1.0,
-          "published_at": "2026-11-05T10:09:59.655372+00:00",
+          "polarity": 0.3333333333333333,
+          "published_at": "2026-11-05T18:04:58+00:00",
           "quality": 0.85,
-          "title": "Nvidia Stock News: NVDA Rises As $70 Billion China Chip Order Stuck In Queue",
-          "uncertainty": 0.0
-        },
-        {
-          "day": "2026-11-05",
-          "doc_id": "web_search:https://invezz.com/news/2026/11/04/why-is-nvidia-stock-falling-while-broader-markets-rally-on-democratic-midterm-win/",
-          "domain": "invezz.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": -1.0,
-          "published_at": "2026-11-05T10:09:59.655372+00:00",
-          "quality": 0.85,
-          "title": "Why is Nvidia stock falling while broader markets rally on Democratic midterm win?",
-          "uncertainty": 0.0
-        },
-        {
-          "day": "2026-11-05",
-          "doc_id": "web_search:https://www.heygotrade.com/en/news/nvidia-nvda-stock-news-november-5-2026/",
-          "domain": "www.heygotrade.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": -1.0,
-          "published_at": "2026-11-05T10:09:59.655372+00:00",
-          "quality": 0.85,
-          "title": "Nvidia Stock (NVDA) Falls 3.2% as Chip Stocks Slide (Nov 4)",
-          "uncertainty": 0.0
-        },
-        {
-          "day": "2026-11-05",
-          "doc_id": "web_search:https://www.stocktitan.net/articles/stock-market-today-live-november-4-2026",
-          "domain": "www.stocktitan.net",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
-          "kind": "",
-          "polarity": 0.0,
-          "published_at": "2026-11-05T10:09:59.655372+00:00",
-          "quality": 0.85,
-          "title": "The Dow Soared in the Stock Market Today, November 4, 2026, After Democrats Won Congress and Oil Fell",
-          "uncertainty": 0.0
-        },
-        {
-          "day": "2026-11-05",
-          "doc_id": "web_search:https://www.tradingkey.com/analysis/stocks/us-stocks/262279444-nvda-forecast-7-day-decline-3-month-low-165-target-tradingkey",
-          "domain": "www.tradingkey.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 0.0,
-          "published_at": "2026-11-05T10:09:59.655372+00:00",
-          "quality": 0.85,
-          "title": "Nvidia Stock Price Forecast: Shares Hit Nearly Three-Month Low Amid Seven-Day Losing Streak, Risking Drop Toward $165",
+          "title": "Microsoft Reportedly Steps Back From Renewing Data Center Contract With Nvidia-Backed Nscale",
           "uncertainty": 0.0
         },
         {
           "day": null,
-          "doc_id": "finnhub:143494546",
+          "doc_id": "marketaux:https://economictimes.indiatimes.com/news/international/us/qqq-stock-today-falls-over-5-why-nvidia-nvda-qualcomm-qcom-intel-intc-and-marvell-mrvl-are-dragging-down-invesco-qqq-trust/articleshow/135582240.cms",
+          "domain": "economictimes.indiatimes.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-05T17:50:08+00:00",
+          "quality": 0.85,
+          "title": "QQQ stock today falls over 5%: Why Nvidia (NVDA), Qualcomm (QCOM), Intel (INTC) and Marvell (MRVL) are dragging down Invesco QQQ Trust",
+          "uncertainty": 0.14367816091954022
+        },
+        {
+          "day": null,
+          "doc_id": "marketaux:https://economictimes.indiatimes.com/news/international/us/mu-stock-crashes-11-today-as-nasdaq-plunges-nearly-4-why-is-micron-stock-falling-with-nvidia-intel-and-tesla-as-wall-streets-tech-selloff-deepens/articleshow/135580261.cms",
+          "domain": "economictimes.indiatimes.com",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-05T16:44:04+00:00",
+          "quality": 0.85,
+          "title": "MU stock crashes 11% today as Nasdaq plunges nearly 4%: Why is Micron stock falling with Nvidia, Intel and Tesla as Wall Street\u2019s tech selloff deepens?",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "marketaux:https://economictimes.indiatimes.com/news/international/us/nvda-stock-price-falls-below-200-why-is-nvidia-stock-going-down-today-heres-what-analysts-predict-next/articleshow/135578339.cms",
+          "domain": "economictimes.indiatimes.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-05T15:55:45+00:00",
+          "quality": 0.85,
+          "title": "NVDA stock price falls below $200: Why is Nvidia stock going down today? Here's what analysts predict next",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "finnhub:143537653",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-05T15:38:00+00:00",
+          "quality": 0.85,
+          "title": "Port Announces PortCon - the First AI Software Factory Summit",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "finnhub:143537656",
           "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "kind": "",
           "polarity": 1.0,
-          "published_at": "2026-11-04T21:17:43+00:00",
+          "published_at": "2026-11-05T15:22:00+00:00",
           "quality": 0.85,
-          "title": "How Investors May Respond To Schneider Electric (ENXTPA:SU) AI Data Center Expansion",
-          "uncertainty": 0.14705882352941177
+          "title": "Nvidia vs. Taiwan Semiconductor: The AI Revolution Is Big Enough for Both. Here's the Better Buy.",
+          "uncertainty": 0.2976190476190476
         }
       ],
       "tone": {
-        "intensity_max": 0.333,
-        "n": 53,
-        "polarity_mean": -0.085,
-        "sources": 31,
-        "uncertainty_mean": 0.025
+        "intensity_max": 0.667,
+        "n": 135,
+        "polarity_mean": -0.009,
+        "sources": 50,
+        "uncertainty_mean": 0.077
       },
       "upcoming": [
         {
@@ -874,7 +955,7 @@
     },
     {
       "earnings": [],
-      "escalated": 21,
+      "escalated": 56,
       "events": [
         {
           "kind": "rating_reiteration",
@@ -889,7 +970,7 @@
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-11-04",
+          "known_at": "2026-11-05",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -897,7 +978,7 @@
         },
         {
           "concept": "pb",
-          "known_at": "2026-11-04",
+          "known_at": "2026-11-05",
           "label": "P/B",
           "period_end": null,
           "source": "finnhub",
@@ -905,7 +986,7 @@
         },
         {
           "concept": "eps_ttm",
-          "known_at": "2026-11-04",
+          "known_at": "2026-11-05",
           "label": "EPS (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -913,7 +994,7 @@
         },
         {
           "concept": "dividend_yield",
-          "known_at": "2026-11-04",
+          "known_at": "2026-11-05",
           "label": "dividend yield",
           "period_end": null,
           "source": "finnhub",
@@ -921,23 +1002,23 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-11-04",
+          "known_at": "2026-11-05",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
-          "value": "1.10"
+          "value": "1.09"
         },
         {
           "concept": "high_52w",
-          "known_at": "2026-11-04",
+          "known_at": "2026-11-05",
           "label": "52w high",
           "period_end": null,
           "source": "finnhub",
-          "value": "351.73"
+          "value": "354.50"
         },
         {
           "concept": "low_52w",
-          "known_at": "2026-11-04",
+          "known_at": "2026-11-05",
           "label": "52w low",
           "period_end": null,
           "source": "finnhub",
@@ -985,19 +1066,19 @@
         },
         {
           "concept": "mx_news_sentiment",
-          "known_at": "2026-11-04",
+          "known_at": "2026-11-05",
           "label": "Marketaux sentiment",
-          "period_end": "2026-11-04",
+          "period_end": "2026-11-05",
           "source": "marketaux_news",
-          "value": "0.41"
+          "value": "0.23"
         },
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-04",
+          "known_at": "2026-11-05",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-04",
+          "period_end": "2026-11-05",
           "source": "finbert_tone",
-          "value": "0.16"
+          "value": "0.12"
         },
         {
           "concept": "revenue",
@@ -1026,6 +1107,32 @@
       ],
       "stories": [
         {
+          "day": null,
+          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/apple-aapl-stock-could-30-221028392.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-05T22:10:28+00:00",
+          "quality": 1.0,
+          "title": "Apple (AAPL) Stock Could Be 30% Overvalued Despite Record iPhone Sales",
+          "uncertainty": 0.13440860215053763
+        },
+        {
+          "day": null,
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/why-apple-aapl-capping-internal-211247074.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-05T21:12:47+00:00",
+          "quality": 1.0,
+          "title": "Why Is Apple (AAPL) Capping Internal AI Spending Under John Ternus?",
+          "uncertainty": 0.0
+        },
+        {
           "day": "2026-11-05",
           "doc_id": "web_search:https://www.cnbc.com/2026/11/04/apple-and-other-big-tech-stocks-surge-after-2026-midterm-elections.html",
           "domain": "www.cnbc.com",
@@ -1052,97 +1159,78 @@
           "uncertainty": 0.1893939393939394
         },
         {
-          "day": "2026-11-05",
-          "doc_id": "web_search:https://daily.dev/posts/us-election-results-fuel-big-tech-rally-ajugnpyjj",
-          "domain": "daily.dev",
+          "day": null,
+          "doc_id": "https://www.tikr.com/blog/baird-cut-its-qualcomm-target-to-320-it-still-sees-104-upside?ref=yahoofinance&tlnk=yf-261105-m8g363m2&.tsrc=rss",
+          "domain": "www.tikr.com",
           "escalated": true,
-          "intensity": 0.3333333333333333,
+          "intensity": 0.0,
           "kind": "",
-          "polarity": 1.0,
-          "published_at": "2026-11-05T10:11:06.380629+00:00",
+          "polarity": -1.0,
+          "published_at": "2026-11-05T22:16:15+00:00",
           "quality": 0.85,
-          "title": "US election results fuel Big Tech rally",
+          "title": "Baird Cut Its Qualcomm Target to $320. It Still Sees 104% Upside",
           "uncertainty": 0.0
         },
         {
-          "day": "2026-11-05",
-          "doc_id": "web_search:https://appleinsider.com/articles/26/11/04/aapl-hits-another-record-high-closing-price-following-election-q4-financials",
-          "domain": "appleinsider.com",
+          "day": null,
+          "doc_id": "https://247wallst.com/investing/2026/11/05/qualcomm-says-december-wont-be-its-biggest-quarter-anymore-as-apple-walks-away/?.tsrc=rss",
+          "domain": "247wallst.com",
           "escalated": true,
-          "intensity": 0.3333333333333333,
+          "intensity": 0.0,
           "kind": "",
           "polarity": 1.0,
-          "published_at": "2026-11-05T10:10:32.311273+00:00",
+          "published_at": "2026-11-05T17:14:44+00:00",
           "quality": 0.85,
-          "title": "AAPL hits another record high closing price following election & Q4 financials",
+          "title": "Qualcomm Says December Won\u2019t Be Its Biggest Quarter Anymore as Apple Walks Away",
           "uncertainty": 0.0
         },
         {
-          "day": "2026-11-05",
-          "doc_id": "web_search:https://finwire.io/news/stock-markets-news/apple-stock-hit-a-new-all-time-high-on-wednesday-whats-fuelling-the-rally",
-          "domain": "finwire.io",
+          "day": null,
+          "doc_id": "finnhub:143539288",
+          "domain": "Yahoo",
           "escalated": true,
-          "intensity": 0.3333333333333333,
+          "intensity": 0.0,
           "kind": "",
-          "polarity": 1.0,
-          "published_at": "2026-11-05T10:10:32.311273+00:00",
+          "polarity": -1.0,
+          "published_at": "2026-11-05T17:10:00+00:00",
           "quality": 0.85,
-          "title": "Apple stock hit a new all-time high on Wednesday: what's fuelling the rally?",
-          "uncertainty": 0.22727272727272727
-        },
-        {
-          "day": "2026-11-05",
-          "doc_id": "web_search:https://macdailynews.com/2026/11/04/apple-shares-hit-new-all-time-intraday-and-closing-highs-94/",
-          "domain": "macdailynews.com",
-          "escalated": true,
-          "intensity": 0.6666666666666666,
-          "kind": "",
-          "polarity": 1.0,
-          "published_at": "2026-11-05T10:10:32.311273+00:00",
-          "quality": 0.85,
-          "title": "Apple shares hit new all-time intraday and closing highs - MacDailyNews",
-          "uncertainty": 0.2232142857142857
-        },
-        {
-          "day": "2026-11-05",
-          "doc_id": "web_search:https://www.fxleaders.com/news/2026/11/04/aapl-stock-claims-record-highs-as-dems-win-helps-apples-china-and-global-business/",
-          "domain": "www.fxleaders.com",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
-          "kind": "",
-          "polarity": 1.0,
-          "published_at": "2026-11-05T10:10:32.311273+00:00",
-          "quality": 0.85,
-          "title": "AAPL Stock Claims Record Highs As Dems Win Helps Apple\u2019s China and Global Business - Forex News by FX Leaders",
+          "title": "Apple cuts employee AI budgets as new CEO looks to rein in costs",
           "uncertainty": 0.0
         },
         {
-          "day": "2026-11-05",
-          "doc_id": "web_search:https://www.fxleaders.com/news/2026/11/04/aapl-stock-reclaims-record-highs-as-democrat-win-helps-apples-china-and-global-business/",
-          "domain": "www.fxleaders.com",
+          "day": null,
+          "doc_id": "finnhub:143537670",
+          "domain": "Yahoo",
           "escalated": true,
-          "intensity": 0.3333333333333333,
+          "intensity": 0.0,
           "kind": "",
-          "polarity": 1.0,
-          "published_at": "2026-11-05T10:10:32.311273+00:00",
+          "polarity": 0.0,
+          "published_at": "2026-11-05T15:17:28+00:00",
           "quality": 0.85,
-          "title": "AAPL Stock Reclaims Record Highs As Democrat Win Helps Apple\u2019s China and Global Business - Forex News by FX Leaders",
-          "uncertainty": 0.29069767441860467
+          "title": "Learn Why The Bull Case For Resideo Technologies (REZI) Could Change Following Apple HomeView Update",
+          "uncertainty": 0.1488095238095238
         }
       ],
       "tone": {
         "intensity_max": 0.667,
-        "n": 69,
-        "polarity_mean": 0.222,
-        "sources": 39,
-        "uncertainty_mean": 0.101
+        "n": 158,
+        "polarity_mean": 0.175,
+        "sources": 71,
+        "uncertainty_mean": 0.086
       },
       "upcoming": []
     },
     {
       "earnings": [],
-      "escalated": 31,
+      "escalated": 62,
       "events": [
+        {
+          "kind": "filing",
+          "source": "edgar",
+          "title": "8-K: 8-K (items 5.02)",
+          "url": "https://www.sec.gov/Archives/edgar/data/789019/000119312526448357/d177209d8k.htm",
+          "when": "2026-11-05T00:00:00+00:00"
+        },
         {
           "kind": "filing",
           "source": "edgar",
@@ -1156,15 +1244,15 @@
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-11-04",
+          "known_at": "2026-11-05",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "27.13"
+          "value": "28.94"
         },
         {
           "concept": "pb",
-          "known_at": "2026-11-04",
+          "known_at": "2026-11-05",
           "label": "P/B",
           "period_end": null,
           "source": "finnhub",
@@ -1172,7 +1260,7 @@
         },
         {
           "concept": "eps_ttm",
-          "known_at": "2026-11-04",
+          "known_at": "2026-11-05",
           "label": "EPS (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -1180,7 +1268,7 @@
         },
         {
           "concept": "dividend_yield",
-          "known_at": "2026-11-04",
+          "known_at": "2026-11-05",
           "label": "dividend yield",
           "period_end": null,
           "source": "finnhub",
@@ -1188,23 +1276,23 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-11-04",
+          "known_at": "2026-11-05",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
-          "value": "1.06"
+          "value": "1.07"
         },
         {
           "concept": "high_52w",
-          "known_at": "2026-11-04",
+          "known_at": "2026-11-05",
           "label": "52w high",
           "period_end": null,
           "source": "finnhub",
-          "value": "551.15"
+          "value": "559.15"
         },
         {
           "concept": "low_52w",
-          "known_at": "2026-11-04",
+          "known_at": "2026-11-05",
           "label": "52w low",
           "period_end": null,
           "source": "finnhub",
@@ -1252,19 +1340,19 @@
         },
         {
           "concept": "mx_news_sentiment",
-          "known_at": "2026-11-04",
+          "known_at": "2026-11-05",
           "label": "Marketaux sentiment",
-          "period_end": "2026-11-04",
+          "period_end": "2026-11-05",
           "source": "marketaux_news",
-          "value": "0.40"
+          "value": "0.24"
         },
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-04",
+          "known_at": "2026-11-05",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-04",
+          "period_end": "2026-11-05",
           "source": "finbert_tone",
-          "value": "0.17"
+          "value": "0.03"
         },
         {
           "concept": "revenue",
@@ -1332,77 +1420,77 @@
           "uncertainty": 0.40322580645161293
         },
         {
-          "day": "2026-11-05",
-          "doc_id": "web_search:https://daily.dev/posts/us-election-results-fuel-big-tech-rally-ajugnpyjj",
-          "domain": "daily.dev",
+          "day": null,
+          "doc_id": "https://stocktwits.com/news-articles/markets/equity/microsoft-reportedly-steps-back-from-renewing-data-center-contract-with-nvidia-backed-nscale/cNG1qdXR94S?.tsrc=rss",
+          "domain": "stocktwits.com",
           "escalated": true,
-          "intensity": 0.3333333333333333,
+          "intensity": 0.0,
           "kind": "",
-          "polarity": 1.0,
-          "published_at": "2026-11-05T10:11:06.380629+00:00",
+          "polarity": 0.3333333333333333,
+          "published_at": "2026-11-05T18:04:58+00:00",
           "quality": 0.85,
-          "title": "US election results fuel Big Tech rally",
+          "title": "Microsoft Reportedly Steps Back From Renewing Data Center Contract With Nvidia-Backed Nscale",
           "uncertainty": 0.0
         },
         {
-          "day": "2026-11-05",
-          "doc_id": "web_search:https://uk.investing.com/news/stock-market-news/why-is-microsoft-stock-surging-today-93CH-4957179",
-          "domain": "uk.investing.com",
+          "day": null,
+          "doc_id": "finnhub:143539306",
+          "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.3333333333333333,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-05T15:58:48+00:00",
+          "quality": 0.85,
+          "title": "Are Big Tech stock buybacks officially dead?",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "finnhub:143537689",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
           "kind": "",
           "polarity": 0.0,
-          "published_at": "2026-11-05T10:11:06.380629+00:00",
+          "published_at": "2026-11-05T14:05:39+00:00",
           "quality": 0.85,
-          "title": "Why is Microsoft stock surging today? By Investing.com",
-          "uncertainty": 0.3676470588235294
-        },
-        {
-          "day": "2026-11-05",
-          "doc_id": "web_search:https://www.benzinga.com/markets/tech/26/11/62881873/microsoft-stock-record-high-blue-wave-midterms-hyperscalers",
-          "domain": "www.benzinga.com",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
-          "kind": "",
-          "polarity": 1.0,
-          "published_at": "2026-11-05T10:11:06.380629+00:00",
-          "quality": 0.85,
-          "title": "Microsoft Stock Hits Record High After Blue Wave - Microsoft (NASDAQ:MSFT) - Benzinga",
+          "title": "Not One Analyst Rates Microsoft a Sell. Is the Consensus View Right?",
           "uncertainty": 0.0
         },
         {
-          "day": "2026-11-05",
-          "doc_id": "web_search:https://www.gurufocus.com/news/9171512/microsoft-msft-shares-surge-to-new-52week-high-amid-strong-earnings-and-political-tailwinds",
-          "domain": "www.gurufocus.com",
+          "day": null,
+          "doc_id": "finnhub:143537691",
+          "domain": "Yahoo",
           "escalated": true,
-          "intensity": 0.3333333333333333,
+          "intensity": 0.0,
           "kind": "",
-          "polarity": 1.0,
-          "published_at": "2026-11-05T10:11:06.380629+00:00",
+          "polarity": 0.0,
+          "published_at": "2026-11-05T14:00:00+00:00",
           "quality": 0.85,
-          "title": "Microsoft (MSFT) Shares Surge to New 52-Week High Amid Strong Earnings and Political Tailwinds",
+          "title": "Blitzy Announces Collaboration with Microsoft to Accelerate Legacy Modernization and Software Development at Scale",
           "uncertainty": 0.0
         },
         {
-          "day": "2026-11-05",
-          "doc_id": "web_search:https://www.heygotrade.com/en/news/microsoft-msft-stock-news-november-5-2026/",
-          "domain": "www.heygotrade.com",
+          "day": null,
+          "doc_id": "finnhub:143533586",
+          "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "kind": "",
           "polarity": 1.0,
-          "published_at": "2026-11-05T10:11:06.380629+00:00",
+          "published_at": "2026-11-05T12:15:22+00:00",
           "quality": 0.85,
-          "title": "Microsoft Stock (MSFT) Rises 6.7% as Big Tech Stocks Rally (Nov 4)",
-          "uncertainty": 0.0
+          "title": "IREN is Only Fit for a Specific Investor Currently",
+          "uncertainty": 0.24509803921568626
         }
       ],
       "tone": {
-        "intensity_max": 0.333,
-        "n": 63,
-        "polarity_mean": 0.315,
-        "sources": 38,
-        "uncertainty_mean": 0.117
+        "intensity_max": 0.667,
+        "n": 138,
+        "polarity_mean": 0.248,
+        "sources": 50,
+        "uncertainty_mean": 0.079
       },
       "upcoming": []
     }
