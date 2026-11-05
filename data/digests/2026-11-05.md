@@ -1,65 +1,78 @@
 # Digest 2026-11-05
 
-Generated 2026-11-05 01:28 UTC · slot `all` · 31569 articles in the corpus, 6913 observations, 4308 events in the fact book.
+Generated 2026-11-05 10:11 UTC · slot `all` · 31832 articles in the corpus, 6929 observations, 4308 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- quiet: nothing collected for this name in the window
+- tone: 2 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 1 escalated
+- 2026-11-05 www.kaohooninternational.com — Maybank Favors AWC and AOT as Thailand Tourism Earnings Outlook Strengthens in 2H26 [q 0.65, tone +0.0] ★
+- 2026-11-05 www.kaohooninternational.com — Maybank Highlights Thai Stocks to Benefit From Democratic Midterm Win [q 0.65, tone +0.0]
+- snapshot: FinBERT headline tone 0.89 (finbert_tone, 2026-11-05)
 
 ### Tenaga (MYX:5347)
-- quiet: nothing collected for this name in the window
+- tone: 4 stories from 3 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-11-04 www.thestar.com.my — TNB recognised as Brand of the Year at the World Branding Awards 2026-2027 [q 0.80, tone +0.0]
+- 2026-11-05 www.edgeprop.my — Bintai Kinden to start RM20.28m TNB substation works on Nov 30 [q 0.65, tone +0.0]
+- 2026-11-04 www.indexbox.io — Malaysia's IOI, TNB Plan 500 MWac Solar and 250 MW/1,000 MWh Battery Storage in Bahau - News and Statistics [q 0.65, tone +0.0]
+- 2026-11-04 www.thestar.com.my — Jati Tinggi lands RM2.9mil TNB project [q 0.80, tone +0.0] [mention]
+- snapshot: FinBERT headline tone 0.14 (finbert_tone, 2026-11-05)
 
 ### Petronas Chemicals (MYX:5183)
 - quiet: nothing collected for this name in the window
 
 ### IHH (MYX:5225)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-11-04 www.tipranks.com — EPF Disposes 1.79 Million IHH Healthcare Shares [q 0.65, tone +0.0]
+- snapshot: FinBERT headline tone 0.03 (finbert_tone, 2026-11-05)
 
 ### Press Metal (MYX:8869)
 - quiet: nothing collected for this name in the window
 
 ### Genting (MYX:3182)
-- quiet: nothing collected for this name in the window
+- tone: 3 stories from 3 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 2 escalated
+- 2026-11-04 www.businesstoday.com.my — RAM Affirms Genting AA1 Ratings But Maintains Negative Outlook On Rising Debt [q 0.80, tone +0.0] ★
+- 2026-11-04 www.ram.com.my — RAM Ratings affirms Genting Group’s AA1 ratings with negative outlook; timely execution remains key [q 0.65, tone +0.0] ★
+- 2026-11-04 www.lngindustry.com — Wison New Energies reaches safety milestone for Genting FLNG [q 0.65, tone +0.0]
+- snapshot: FinBERT headline tone 0.30 (finbert_tone, 2026-11-05)
 
 ### NVIDIA (XNAS:NVDA)
-- tone: 45 stories from 25 sources, polarity -0.06, peak intensity 0.33, uncertainty 0.03 · 15 escalated
+- tone: 53 stories from 31 sources, polarity -0.09, peak intensity 0.33, uncertainty 0.03 · 21 escalated
+- 2026-11-05 (date only) finance.yahoo.com — 5-star analyst resets Nvidia stock target after Intel crash [q 1.00, tone -1.0] ★
+- 2026-11-05 (date only) finance.yahoo.com — Nvidia Stocks Decline 1.35% as $108 Billion Guide Sets the Next Revenue Hurdle [q 1.00, tone -1.0] ★
+- 2026-11-05 (date only) coinpedia.org — Nvidia Stock News: NVDA Rises As $70 Billion China Chip Order Stuck In Queue [q 0.85, tone +1.0] ★
+- 2026-11-05 (date only) invezz.com — Why is Nvidia stock falling while broader markets rally on Democratic midterm win? [q 0.85, tone -1.0] ★
+- 2026-11-05 (date only) www.heygotrade.com — Nvidia Stock (NVDA) Falls 3.2% as Chip Stocks Slide (Nov 4) [q 0.85, tone -1.0] ★
+- 2026-11-05 (date only) www.stocktitan.net — The Dow Soared in the Stock Market Today, November 4, 2026, After Democrats Won Congress and Oil Fell [q 0.85, tone +0.0] ★
+- 2026-11-05 (date only) www.tradingkey.com — Nvidia Stock Price Forecast: Shares Hit Nearly Three-Month Low Amid Seven-Day Losing Streak, Risking Drop Toward $165 [q 0.85, tone +0.0] ★
 - 2026-11-04 Yahoo — How Investors May Respond To Schneider Electric (ENXTPA:SU) AI Data Center Expansion [q 0.85, tone +1.0] ★
-- 2026-11-04 Yahoo — Hive lines up $129 million to buy Nvidia AI chips [q 0.85, tone +1.0] ★
-- 2026-11-04 economictimes.indiatimes.com — AI stocks retreat as Democratic sweep puts data centre boom in focus [q 0.85, tone -1.0] ★
-- 2026-11-04 Yahoo — Nvidia's China Customers Face a Stunning 99% Chip Shortfall [q 0.85, tone -1.0] ★
-- 2026-11-04 economictimes.indiatimes.com — US stock market stages big rally today: Why is Dow Jones surging? Dow jumps 1,100 points as S&P 500 and Nasdaq turn green, with healthcare stocks at the centre [q 0.85, tone +1.0] ★
-- 2026-11-04 economictimes.indiatimes.com — Big Tech barely moved after the midterms, but Tesla and SpaceX fell up to 5%, and even Tesla missed the solar rally: Did Elon Musk’s big bet on Republicans just backfire? [q 0.85, tone -0.5] ★
-- 2026-11-04 finance.yahoo.com — Alibaba and Tencent Face Stunning Nvidia Chip Shortfall Despite Millions of Orders [q 0.80, tone -1.0] ★
-- 2026-11-04 Yahoo — Nvidia Stocks Decline 1.35% as $108 Billion Guide Sets the Next Revenue Hurdle [q 0.65, tone -1.0] ★
 - upcoming 2026-11-25 earnings_result — Q3 2027 results after the close (finnhub)
 - upcoming 2026-11-17 earnings_result — Q3 2027 results after the close (finnhub)
 - earnings date: 2026-11-17 (finnhub)
 - snapshot: P/E (ttm) 25.83 (finnhub, 2026-11-04) · P/B 28.81 (finnhub, 2026-11-04) · EPS (ttm) 7.91 (finnhub, 2026-11-04) · dividend yield 0.03 (finnhub, 2026-11-04) · beta 2.34 (finnhub, 2026-11-04) · 52w high 243.37 (finnhub, 2026-11-04) · 52w low 164.27 (finnhub, 2026-11-04) · target (consensus) 339.17 (fmp, 2026-11-04) · analysts: buy 41 (finnhub, 2026-11-02) · analysts: hold 2 (finnhub, 2026-11-02) · analysts: sell 1 (finnhub, 2026-11-02) · vendor sentiment 0.25 (alphavantage_news, 2026-10-06) · Marketaux sentiment 0.22 (marketaux_news, 2026-11-04) · FinBERT headline tone 0.09 (finbert_tone, 2026-11-04) · revenue (last quarter) 96.22bn (sec_xbrl, 2026-08-26) · net income (last quarter) 59.69bn (sec_xbrl, 2026-08-26) · last EPS surprise % 3.82 (finnhub, 2026-09-05)
 
 ### Apple (XNAS:AAPL)
-- tone: 58 stories from 32 sources, polarity +0.17, peak intensity 0.67, uncertainty 0.10 · 13 escalated
+- tone: 69 stories from 39 sources, polarity +0.22, peak intensity 0.67, uncertainty 0.10 · 21 escalated
+- 2026-11-05 (date only) www.cnbc.com — Hyperscalers and Apple surge after election results remove investor uncertainty [q 1.00, tone +0.3] ★
 - 2026-11-04 finance.yahoo.com — Apple’s Siri AI Could Become a Paid Upgrade — CEO John Ternus Reveals Plans to Charge for More Server-Side Apple Intelligence Usage [q 1.00, tone +1.0] ★
-- 2026-11-04 Yahoo — Microsoft Soars 7% to Record, Apple and Amazon Up 7% After Democratic Midterm Sweep [q 0.85, tone +1.0] ★
-- 2026-11-04 Yahoo — Constellation Research CEO R ‘Ray’ Wang Talks Data Center Growth After AMD Reports Earnings [q 0.85, tone +1.0] ★
-- 2026-11-04 Yahoo — Post-election gridlock might be a bullish sign for Apple, [q 0.85, tone +0.0] ★
-- 2026-11-04 finance.yahoo.com — Dow Jones Futures: Elections, Plunging Oil Fuel Big Rally; Apple, Microsoft, Amazon Flash Buy Signals. CoreWeave, SpaceX Skid. [q 0.80, tone +1.0] ★
-- 2026-11-04 www.cnbc.com — Hyperscalers and Apple surge after election results remove investor uncertainty [q 0.80, tone +1.0] ★
-- 2026-11-04 finance.yahoo.com — Apple’s Pain Could Be Micron’s Gain as Memory Prices Surge [q 0.80, tone +1.0] ★
-- 2026-11-04 www.marketbeat.com — Apple (NASDAQ:AAPL) Stock Jumps 5.3% Following Analyst Upgrade [q 0.65, tone +1.0] ★
-- event 2026-11-03 results_released — results released: 8-K accepted 2026-11-02 21:30 ET (edgar)
+- 2026-11-05 (date only) daily.dev — US election results fuel Big Tech rally [q 0.85, tone +1.0] ★
+- 2026-11-05 (date only) appleinsider.com — AAPL hits another record high closing price following election & Q4 financials [q 0.85, tone +1.0] ★
+- 2026-11-05 (date only) finwire.io — Apple stock hit a new all-time high on Wednesday: what's fuelling the rally? [q 0.85, tone +1.0] ★
+- 2026-11-05 (date only) macdailynews.com — Apple shares hit new all-time intraday and closing highs - MacDailyNews [q 0.85, tone +1.0] ★
+- 2026-11-05 (date only) www.fxleaders.com — AAPL Stock Claims Record Highs As Dems Win Helps Apple’s China and Global Business - Forex News by FX Leaders [q 0.85, tone +1.0] ★
+- 2026-11-05 (date only) www.fxleaders.com — AAPL Stock Reclaims Record Highs As Democrat Win Helps Apple’s China and Global Business - Forex News by FX Leaders [q 0.85, tone +1.0] ★
 - snapshot: P/E (ttm) 38.99 (finnhub, 2026-11-04) · P/B 44.06 (finnhub, 2026-11-04) · EPS (ttm) 8.97 (finnhub, 2026-11-04) · dividend yield 0.51 (finnhub, 2026-11-04) · beta 1.10 (finnhub, 2026-11-04) · 52w high 351.73 (finnhub, 2026-11-04) · 52w low 243.42 (finnhub, 2026-11-04) · target (consensus) 344.46 (fmp, 2026-11-04) · analysts: buy 19 (finnhub, 2026-11-02) · analysts: hold 15 (finnhub, 2026-11-02) · analysts: sell 3 (finnhub, 2026-11-02) · vendor sentiment -0.23 (alphavantage_news, 2026-10-06) · Marketaux sentiment 0.41 (marketaux_news, 2026-11-04) · FinBERT headline tone 0.16 (finbert_tone, 2026-11-04) · revenue (last quarter) 109.42bn (sec_xbrl, 2026-07-31) · net income (last quarter) 29.79bn (sec_xbrl, 2026-07-31) · last EPS surprise % 1.15 (finnhub, 2026-11-03)
 
 ### Microsoft (XNAS:MSFT)
-- tone: 51 stories from 31 sources, polarity +0.27, peak intensity 0.33, uncertainty 0.12 · 22 escalated
+- tone: 63 stories from 38 sources, polarity +0.32, peak intensity 0.33, uncertainty 0.12 · 31 escalated
+- 2026-11-05 (date only) finance.yahoo.com — AI data-center stocks slide, renewables rally after Democratic US midterm sweep [q 1.00, tone +1.0] ★
+- 2026-11-05 (date only) www.cnbc.com — Hyperscalers and Apple surge after election results remove investor uncertainty [q 1.00, tone +0.3] ★
 - 2026-11-04 finance.yahoo.com — Top Research Reports for Microsoft, SpaceX & Marvell [q 1.00, tone +1.0] ★
-- 2026-11-04 www.tikr.com — Ironically, the Blue Wave Could Make Hyperscalers “Good Businesses Again” by Forcing Capex Discipline [q 0.85, tone +1.0] ★
-- 2026-11-04 Yahoo — Microsoft Soars 7% to Record, Apple and Amazon Up 7% After Democratic Midterm Sweep [q 0.85, tone +1.0] ★
-- 2026-11-04 Yahoo — Forget the 12-Month Squeeze: Microsoft Is Primed for an Explosive AI Payoff [q 0.85, tone +0.0] ★
-- 2026-11-04 Yahoo — Amazon Soars 7% as Tech Shrugs Off Data Center Bans: “Can Buy Its Way Into New Towns” [q 0.85, tone +1.0] ★
-- 2026-11-04 Yahoo — If You Invest $1,000 in Microsoft Today, Here’s What It Could Be Worth by 2029 [q 0.85, tone +1.0] ★
-- 2026-11-04 Yahoo — MSFT Q1 Earnings Call Highlights Azure Growth and AI Spending [q 0.85, tone +1.0] ★
-- 2026-11-04 economictimes.indiatimes.com — Big Tech barely moved after the midterms, but Tesla and SpaceX fell up to 5%, and even Tesla missed the solar rally: Did Elon Musk’s big bet on Republicans just backfire? [q 0.85, tone -0.5] ★
+- 2026-11-05 (date only) daily.dev — US election results fuel Big Tech rally [q 0.85, tone +1.0] ★
+- 2026-11-05 (date only) uk.investing.com — Why is Microsoft stock surging today? By Investing.com [q 0.85, tone +0.0] ★
+- 2026-11-05 (date only) www.benzinga.com — Microsoft Stock Hits Record High After Blue Wave - Microsoft (NASDAQ:MSFT) - Benzinga [q 0.85, tone +1.0] ★
+- 2026-11-05 (date only) www.gurufocus.com — Microsoft (MSFT) Shares Surge to New 52-Week High Amid Strong Earnings and Political Tailwinds [q 0.85, tone +1.0] ★
+- 2026-11-05 (date only) www.heygotrade.com — Microsoft Stock (MSFT) Rises 6.7% as Big Tech Stocks Rally (Nov 4) [q 0.85, tone +1.0] ★
 - event 2026-11-04 filing — 8-K: 8-K (items 8.01,9.01) (edgar)
 - snapshot: P/E (ttm) 27.13 (finnhub, 2026-11-04) · P/B 6.26 (finnhub, 2026-11-04) · EPS (ttm) 19.15 (finnhub, 2026-11-04) · dividend yield 0.79 (finnhub, 2026-11-04) · beta 1.06 (finnhub, 2026-11-04) · 52w high 551.15 (finnhub, 2026-11-04) · 52w low 349.20 (finnhub, 2026-11-04) · target (consensus) 611.74 (fmp, 2026-11-04) · analysts: buy 40 (finnhub, 2026-11-02) · analysts: hold 3 (finnhub, 2026-11-02) · analysts: sell 0 (finnhub, 2026-11-02) · vendor sentiment 0.29 (alphavantage_news, 2026-10-06) · Marketaux sentiment 0.40 (marketaux_news, 2026-11-04) · FinBERT headline tone 0.17 (finbert_tone, 2026-11-04) · revenue (last quarter) 92.28bn (sec_xbrl, 2026-10-28) · net income (last quarter) 36.63bn (sec_xbrl, 2026-10-28) · last EPS surprise % 1.53 (finnhub, 2026-10-28)
 
@@ -83,6 +96,21 @@ Generated 2026-11-05 01:28 UTC · slot `all` · 31569 articles in the corpus, 69
 | 10y minus 2y Treasury spread, % | 0.34 | 2026-11-03 | +0.02 | fred |
 | US unemployment rate, % | 4.20 | 2026-09-01 | +0.1 | fred |
 | CBOE VIX, index | 20.83 | 2026-11-03 | -0.32 | fred |
+
+## Collection
+
+| at (UTC) | source | status | fetched | kept | stored | detail |
+|---|---|---|---|---|---|---|
+| 10:08 | finbert_tone | ok | 12 | 0 | 0 | facts 11; scored 15 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized |
+| 10:08 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
+| 10:08 | twse_openapi | ok | 8 | 0 | 0 | facts 5;  |
+| 10:08 | jin10_flash | degraded | 16 | 16 | 16 | facts 0; window not covered back to 2026-11-04 22:41Z; the oldest item read is 2 |
+| 10:08 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 10:08 | nst_business | degraded | 150 | 146 | 136 | window overflow: all 150 dated items are newer than the window's start (2026-11- |
+| 10:08 | fmt_business | ok | 50 | 50 | 48 |  |
+| 10:08 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Maybank, Tenaga, Petronas Chemicals, IHH, Press Metal, Genting |
+| 10:08 | google_news | ok | 26 | 24 | 22 | read but empty: Press Metal; named the company: 12 of 24 (lowest: Petronas Chemi |
+| 10:08 | gdelt | throttled | 0 | 0 | 0 | grouped 3 names per request; 2 requests (HTTP 429 on request 2: the rest of the  |
 
 ---
 

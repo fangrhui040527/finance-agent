@@ -1,5 +1,5 @@
 {
- "bytes": 24748032,
+ "bytes": 24989696,
  "file": "corpus.db",
  "format": 1,
  "page_size": 4096,
@@ -8,82 +8,82 @@
   {
    "bytes": 16777216,
    "name": "part-000",
-   "sha256": "82abde1a171323396be8fe6dd0bd3992f6447e9fd4d979c70e3966709d401e05"
+   "sha256": "49b92b3d1f485883a5055dd8bf60ef68b13b96a02cc16947bf00f2cd4c236c44"
   },
   {
-   "bytes": 7970816,
+   "bytes": 8212480,
    "name": "part-001",
-   "sha256": "9372ae93bc0d7a3781a5196343ff2ae2d3dbd75337719c99a05938b327631f20"
+   "sha256": "6fc9126866a2c5ca3bae8d9f780efe5b726ccf5930f7bbe926cd8ffc071668f9"
   }
  ],
  "rows": {
-  "articles": 31569,
-  "evidence_searches": 3,
-  "sweeps": 1393
+  "articles": 31832,
+  "evidence_searches": 6,
+  "sweeps": 1403
  },
- "sha256": "12fd3b4990897add7e53408a160c3b2b84098f88d6eb847146ded02ce3132c70",
+ "sha256": "567a6bd2c72fa206a9fe1ad75a569aa577f7da34a18b74ad598963c48389225e",
  "tips": {
   "articles": {
    "columns": {
-    "body": "61f7a5b20e5bca95",
-    "countries_json": "727e34856737c342",
-    "doc_id": "2dfebcea6fb87402",
-    "dup_hash": "3d902c20a9b297a0",
+    "body": "4987772e07f0311b",
+    "countries_json": "b3283bf184bb082f",
+    "doc_id": "c802cbce9bf71511",
+    "dup_hash": "5657842dde4c4ce4",
     "escalated": "5feceb66ffc86f38",
-    "fetched_for": "12ae32cb1ec02d01",
-    "first_seen_at": "18d1a26bd3708415",
+    "fetched_for": "b7792941477dcb05",
+    "first_seen_at": "feed0f705ab6a527",
     "instruments_json": "b3283bf184bb082f",
-    "language": "26ab4b495289822b",
-    "published_at": "fe7b9f75038c0ead",
-    "quality": "d2cbad71ff333de6",
-    "query": "12ae32cb1ec02d01",
+    "language": "50eac10e7966a04e",
+    "published_at": "49d7bcbea894ab3e",
+    "quality": "1e181f0934d44144",
+    "query": "32f90fe4ffaf5d56",
     "relevance": "8aed642bf5118b9d",
-    "source": "6c2d515a3e6b4f90",
-    "source_domain": "76cde1362ba439a1",
+    "source": "6acf037c8a691e01",
+    "source_domain": "ccb7e40dbb39988e",
     "themes_json": "b3283bf184bb082f",
-    "title": "61f7a5b20e5bca95",
-    "title_key": "c55fd73bc514dc73"
+    "title": "a5bb15def665a8b2",
+    "title_key": "12ae32cb1ec02d01"
    },
-   "rowid": 31569
+   "rowid": 31832
   },
   "evidence_searches": {
    "columns": {
-    "at": "687ab6ae26690370",
-    "cost_usd": "a70c6a8f5ec9885d",
-    "detail": "c2f1e7c85d8fe6e4",
-    "idio": "e1ff1c0757fd52f8",
-    "input_tokens": "2fc4a087ad1e561a",
-    "instrument": "df183609271e0aa4",
-    "key": "9140b456f75e14e0",
+    "at": "feed0f705ab6a527",
+    "cost_usd": "fa9611c2c5c91870",
+    "detail": "3f4d2bc00f0f2e9e",
+    "idio": "180dc49463a5eb1b",
+    "input_tokens": "64b5ee848272df69",
+    "instrument": "b7792941477dcb05",
+    "key": "7c903d8e8465a34b",
     "model": "15cd98bbce41024d",
-    "outcome": "13cfd727274fc581",
-    "output_tokens": "ebdac3c98535aaf9",
-    "queries": "f2d876dd4cda419b",
-    "r1": "3e9e6f888b5e24a2",
-    "sar": "05e2f312e26f9aec",
-    "searches": "2c624232cdd22177",
-    "session": "dca4a87c4d365552",
-    "stored": "5feceb66ffc86f38"
+    "outcome": "7c20246386d108ef",
+    "output_tokens": "bc805497f86694ce",
+    "queries": "dd0f983e9650f34e",
+    "r1": "ed8b8cb95846d3a5",
+    "sar": "b98f8f71ca75bb9c",
+    "searches": "ef2d127de37b942b",
+    "session": "ba9fc93c7ed70a8b",
+    "stored": "8527a891e2241369"
    },
-   "rowid": 3
+   "rowid": 6
   },
   "sweeps": {
    "columns": {
-    "at": "58746c0581989866",
-    "detail": "c77eaae8edc92eee",
+    "at": "7f9d80089277cd21",
+    "detail": "09e0483417c20ca8",
     "duplicates": "5feceb66ffc86f38",
     "escalated": "5feceb66ffc86f38",
     "fetched": "6b51d431df5d7f14",
     "kept": "5feceb66ffc86f38",
-    "run_id": "410be9b8167c3f24",
-    "since": "e29b604abc1a7171",
-    "slot": "d723b4470d3dd091",
+    "run_id": "8476e07235442be2",
+    "since": "d57df10b7c6fc245",
+    "slot": "c28fbdb78b433202",
     "source": "3a2eb8bf50077831",
     "status": "c48b5b1a9776c846",
     "stored": "5feceb66ffc86f38",
     "unlinked": "5feceb66ffc86f38"
    },
-   "rowid": 1393
+   "rowid": 1403
   }
  },
  "triggers": [
