@@ -92,18 +92,18 @@
     }
   ],
   "counts": {
-    "articles": 31832,
+    "articles": 31849,
     "documents": 0,
-    "escalated": 4064,
+    "escalated": 4069,
     "events": 4308,
     "failed_sweeps": 112,
-    "linked": 16473,
+    "linked": 16482,
     "observations": 6929,
     "series": 31,
     "sweeps": 1403
   },
   "day": "2026-11-05",
-  "generated_at": "2026-11-05 10:11 UTC",
+  "generated_at": "2026-11-05 17:27 UTC",
   "macro": [
     {
       "change": "-0.03",
@@ -237,7 +237,7 @@
   "names": [
     {
       "earnings": [],
-      "escalated": 1,
+      "escalated": 4,
       "events": [],
       "instrument_id": "MYX:1155",
       "label": "Maybank",
@@ -253,6 +253,45 @@
       ],
       "stories": [
         {
+          "day": "2026-11-06",
+          "doc_id": "web_search:https://www.thestar.com.my/business/business-news/2026/11/05/banks-expected-to-benefit-from-potential-hike-in-the-opr",
+          "domain": "www.thestar.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-05T17:27:03.073503+00:00",
+          "quality": 1.0,
+          "title": "Banks expected to benefit from potential hike in the OPR",
+          "uncertainty": 0.7352941176470588
+        },
+        {
+          "day": "2026-11-06",
+          "doc_id": "web_search:https://www.thestar.com.my/business/business-news/2026/11/05/bursa-malaysia-closes-higher-on-bank-negara039s-opr-decision-wall-st-gains",
+          "domain": "www.thestar.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-05T17:27:03.073503+00:00",
+          "quality": 1.0,
+          "title": "Bursa Malaysia closes higher on Bank Negara's OPR decision, Wall St gains",
+          "uncertainty": 0.0
+        },
+        {
+          "day": "2026-11-06",
+          "doc_id": "web_search:https://www.thestar.com.my/business/business-news/2026/11/05/bursa-malaysia-rallies-as-oil-prices-fall-after-us-midterms",
+          "domain": "www.thestar.com.my",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-05T17:27:03.073503+00:00",
+          "quality": 1.0,
+          "title": "Bursa Malaysia rallies as oil prices fall after US midterms",
+          "uncertainty": 0.1582278481012658
+        },
+        {
           "day": null,
           "doc_id": "https://news.google.com/rss/articles/CBMiYEFVX3lxTFBHTnBYSFNnWXBOQkRBZ2VhOHNiSWJZWVlqVkdFV2syMEE5Y3g3SzZoZ2NRcHNSLXRlNW9RSFpvNENXcFFGWmxaLTBZZ3Y5TWZ4SU5tclVfVjZHNDZ4OUQzMA?oc=5",
           "domain": "www.kaohooninternational.com",
@@ -263,6 +302,19 @@
           "published_at": "2026-11-05T03:26:21+00:00",
           "quality": 0.65,
           "title": "Maybank Favors AWC and AOT as Thailand Tourism Earnings Outlook Strengthens in 2H26",
+          "uncertainty": 0.0
+        },
+        {
+          "day": "2026-11-05",
+          "doc_id": "web_search:https://www.malaymail.com/news/money/2026/11/04/bursa-malaysia-closes-lower-on-profit-taking-in-banks-telcos/241987",
+          "domain": "www.malaymail.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-05T15:59:59+00:00",
+          "quality": 1.0,
+          "title": "Bursa Malaysia closes lower on profit-taking in banks, telcos",
           "uncertainty": 0.0
         },
         {
@@ -280,11 +332,11 @@
         }
       ],
       "tone": {
-        "intensity_max": 0.0,
-        "n": 2,
+        "intensity_max": 0.333,
+        "n": 6,
         "polarity_mean": 0.0,
-        "sources": 1,
-        "uncertainty_mean": 0.0
+        "sources": 3,
+        "uncertainty_mean": 0.149
       },
       "upcoming": []
     },
@@ -305,6 +357,19 @@
         }
       ],
       "stories": [
+        {
+          "day": "2026-11-05",
+          "doc_id": "web_search:https://www.malaymail.com/news/money/2026/11/04/bursa-malaysia-closes-lower-on-profit-taking-in-banks-telcos/241987",
+          "domain": "www.malaymail.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-05T15:59:59+00:00",
+          "quality": 1.0,
+          "title": "Bursa Malaysia closes lower on profit-taking in banks, telcos",
+          "uncertainty": 0.0
+        },
         {
           "day": null,
           "doc_id": "https://news.google.com/rss/articles/CBMivwFBVV95cUxNOWU4bFo3RUlJTGRuY2lnMENCdzlLSC10bzFWSmx1aE5jTmVreTRpVFp1OGdRbnA0S0RXXzJMN1ZIdFJsb2stalZnMzZfZnFkSDg4bTZtWEZETWNxdl9RbEhoeVczaUswYlg5Vm01ZGRiLXlkNzlOa1RSU1QzR1d6QzM1dXRxcGNJYWh0WVdxcGU0T1hxM0RvZGpNTGJJSVd1b0IwVVhsdmFaeFN4enU1R0QyQnhiS0JLUHhnQnhscw?oc=5",
@@ -360,9 +425,9 @@
       ],
       "tone": {
         "intensity_max": 0.0,
-        "n": 4,
+        "n": 5,
         "polarity_mean": 0.0,
-        "sources": 3,
+        "sources": 4,
         "uncertainty_mean": 0.0
       },
       "upcoming": []

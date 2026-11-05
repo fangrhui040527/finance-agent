@@ -1,17 +1,22 @@
 # Digest 2026-11-05
 
-Generated 2026-11-05 10:11 UTC · slot `all` · 31832 articles in the corpus, 6929 observations, 4308 events in the fact book.
+Generated 2026-11-05 17:27 UTC · slot `all` · 31849 articles in the corpus, 6929 observations, 4308 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- tone: 2 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 1 escalated
+- tone: 6 stories from 3 sources, polarity +0.00, peak intensity 0.33, uncertainty 0.15 · 4 escalated
+- 2026-11-06 (date only) www.thestar.com.my — Banks expected to benefit from potential hike in the OPR [q 1.00, tone +0.0] ★
+- 2026-11-06 (date only) www.thestar.com.my — Bursa Malaysia closes higher on Bank Negara's OPR decision, Wall St gains [q 1.00, tone +1.0] ★
+- 2026-11-06 (date only) www.thestar.com.my — Bursa Malaysia rallies as oil prices fall after US midterms [q 1.00, tone -1.0] ★
 - 2026-11-05 www.kaohooninternational.com — Maybank Favors AWC and AOT as Thailand Tourism Earnings Outlook Strengthens in 2H26 [q 0.65, tone +0.0] ★
+- 2026-11-05 (date only) www.malaymail.com — Bursa Malaysia closes lower on profit-taking in banks, telcos [q 1.00, tone +0.0]
 - 2026-11-05 www.kaohooninternational.com — Maybank Highlights Thai Stocks to Benefit From Democratic Midterm Win [q 0.65, tone +0.0]
 - snapshot: FinBERT headline tone 0.89 (finbert_tone, 2026-11-05)
 
 ### Tenaga (MYX:5347)
-- tone: 4 stories from 3 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- tone: 5 stories from 4 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-11-05 (date only) www.malaymail.com — Bursa Malaysia closes lower on profit-taking in banks, telcos [q 1.00, tone +0.0]
 - 2026-11-04 www.thestar.com.my — TNB recognised as Brand of the Year at the World Branding Awards 2026-2027 [q 0.80, tone +0.0]
 - 2026-11-05 www.edgeprop.my — Bintai Kinden to start RM20.28m TNB substation works on Nov 30 [q 0.65, tone +0.0]
 - 2026-11-04 www.indexbox.io — Malaysia's IOI, TNB Plan 500 MWac Solar and 250 MW/1,000 MWh Battery Storage in Bahau - News and Statistics [q 0.65, tone +0.0]
