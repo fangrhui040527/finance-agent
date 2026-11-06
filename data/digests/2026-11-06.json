@@ -1,0 +1,1133 @@
+{
+  "collection": [],
+  "counts": {
+    "articles": 32368,
+    "documents": 0,
+    "escalated": 4149,
+    "events": 4311,
+    "failed_sweeps": 112,
+    "linked": 16738,
+    "observations": 6995,
+    "series": 31,
+    "sweeps": 1416
+  },
+  "day": "2026-11-06",
+  "generated_at": "2026-11-06 01:33 UTC",
+  "macro": [
+    {
+      "change": "-0.08",
+      "obs_date": "2026-11-04",
+      "series_id": "BAMLH0A0HYM2",
+      "source": "fred",
+      "title": "ICE BofA US high-yield option-adjusted spread, %",
+      "value": "3.32"
+    },
+    {
+      "change": "0",
+      "obs_date": "2026-09-03",
+      "series_id": "BNM:OPR",
+      "source": "bnm_opr",
+      "title": "BNM Overnight Policy Rate, %",
+      "value": "2.75"
+    },
+    {
+      "change": "2.167",
+      "obs_date": "2026-09-01",
+      "series_id": "CPIAUCSL",
+      "source": "fred",
+      "title": "US CPI, all items, index 1982-84=100",
+      "value": "336.30"
+    },
+    {
+      "change": "-0.36",
+      "obs_date": "2026-11-03",
+      "series_id": "DCOILBRENTEU",
+      "source": "fred",
+      "title": "Brent crude, USD per barrel (EIA, daily)",
+      "value": "107.03"
+    },
+    {
+      "change": "-0.0014",
+      "obs_date": "2026-10-30",
+      "series_id": "DEXMAUS",
+      "source": "fred",
+      "title": "Malaysian ringgit per US dollar",
+      "value": "4.06"
+    },
+    {
+      "change": "0",
+      "obs_date": "2026-11-03",
+      "series_id": "DFF",
+      "source": "fred",
+      "title": "Federal funds effective rate, %",
+      "value": "3.88"
+    },
+    {
+      "change": "0.04",
+      "obs_date": "2026-11-03",
+      "series_id": "DGS10",
+      "source": "fred",
+      "title": "10-year Treasury yield, %",
+      "value": "4.95"
+    },
+    {
+      "change": "0.02",
+      "obs_date": "2026-11-03",
+      "series_id": "DGS2",
+      "source": "fred",
+      "title": "2-year Treasury yield, %",
+      "value": "4.61"
+    },
+    {
+      "change": "0.1",
+      "obs_date": "2026-09-01",
+      "series_id": "DOSM:CPI_HEADLINE",
+      "source": "dosm_cpi",
+      "title": "Malaysia CPI headline, index 2010=100",
+      "value": "137.60"
+    },
+    {
+      "change": "-0.0705",
+      "obs_date": "2026-10-30",
+      "series_id": "DTWEXBGS",
+      "source": "fred",
+      "title": "Broad US dollar index",
+      "value": "121.67"
+    },
+    {
+      "change": "364.5",
+      "obs_date": "2026-11-04",
+      "series_id": "NASDAQCOM",
+      "source": "fred",
+      "title": "NASDAQ Composite, index level",
+      "value": "25,736.51"
+    },
+    {
+      "change": "32.9329",
+      "obs_date": "2026-09-01",
+      "series_id": "PALUMUSDM",
+      "source": "fred",
+      "title": "Aluminium, USD per tonne (IMF PCPS via FRED)",
+      "value": "3,283.05"
+    },
+    {
+      "change": "119.7",
+      "obs_date": "2026-11-04",
+      "series_id": "SP500",
+      "source": "fred",
+      "title": "S&P 500, index level",
+      "value": "7,688.62"
+    },
+    {
+      "change": "-0.02",
+      "obs_date": "2026-11-04",
+      "series_id": "T10Y2Y",
+      "source": "fred",
+      "title": "10y minus 2y Treasury spread, %",
+      "value": "0.32"
+    },
+    {
+      "change": "0.1",
+      "obs_date": "2026-09-01",
+      "series_id": "UNRATE",
+      "source": "fred",
+      "title": "US unemployment rate, %",
+      "value": "4.20"
+    },
+    {
+      "change": "-4.22",
+      "obs_date": "2026-11-04",
+      "series_id": "VIXCLS",
+      "source": "fred",
+      "title": "CBOE VIX, index",
+      "value": "16.61"
+    }
+  ],
+  "names": [
+    {
+      "earnings": [],
+      "escalated": 3,
+      "events": [],
+      "instrument_id": "MYX:1155",
+      "label": "Maybank",
+      "snapshot": [
+        {
+          "concept": "finbert_sentiment",
+          "known_at": "2026-11-05",
+          "label": "FinBERT headline tone",
+          "period_end": "2026-11-05",
+          "source": "finbert_tone",
+          "value": "0.89"
+        }
+      ],
+      "stories": [
+        {
+          "day": "2026-11-06",
+          "doc_id": "web_search:https://www.thestar.com.my/business/business-news/2026/11/05/banks-expected-to-benefit-from-potential-hike-in-the-opr",
+          "domain": "www.thestar.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-05T17:27:03.073503+00:00",
+          "quality": 1.0,
+          "title": "Banks expected to benefit from potential hike in the OPR",
+          "uncertainty": 0.7352941176470588
+        },
+        {
+          "day": "2026-11-06",
+          "doc_id": "web_search:https://www.thestar.com.my/business/business-news/2026/11/05/bursa-malaysia-closes-higher-on-bank-negara039s-opr-decision-wall-st-gains",
+          "domain": "www.thestar.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-05T17:27:03.073503+00:00",
+          "quality": 1.0,
+          "title": "Bursa Malaysia closes higher on Bank Negara's OPR decision, Wall St gains",
+          "uncertainty": 0.0
+        },
+        {
+          "day": "2026-11-06",
+          "doc_id": "web_search:https://www.thestar.com.my/business/business-news/2026/11/05/bursa-malaysia-rallies-as-oil-prices-fall-after-us-midterms",
+          "domain": "www.thestar.com.my",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-05T17:27:03.073503+00:00",
+          "quality": 1.0,
+          "title": "Bursa Malaysia rallies as oil prices fall after US midterms",
+          "uncertainty": 0.1582278481012658
+        },
+        {
+          "day": "2026-11-05",
+          "doc_id": "web_search:https://www.malaymail.com/news/money/2026/11/04/bursa-malaysia-closes-lower-on-profit-taking-in-banks-telcos/241987",
+          "domain": "www.malaymail.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-05T15:59:59+00:00",
+          "quality": 1.0,
+          "title": "Bursa Malaysia closes lower on profit-taking in banks, telcos",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.333,
+        "n": 4,
+        "polarity_mean": 0.0,
+        "sources": 2,
+        "uncertainty_mean": 0.223
+      },
+      "upcoming": []
+    },
+    {
+      "earnings": [],
+      "escalated": 0,
+      "events": [],
+      "instrument_id": "MYX:5347",
+      "label": "Tenaga",
+      "snapshot": [
+        {
+          "concept": "finbert_sentiment",
+          "known_at": "2026-11-05",
+          "label": "FinBERT headline tone",
+          "period_end": "2026-11-05",
+          "source": "finbert_tone",
+          "value": "0.14"
+        }
+      ],
+      "stories": [
+        {
+          "day": "2026-11-05",
+          "doc_id": "web_search:https://www.malaymail.com/news/money/2026/11/04/bursa-malaysia-closes-lower-on-profit-taking-in-banks-telcos/241987",
+          "domain": "www.malaymail.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-05T15:59:59+00:00",
+          "quality": 1.0,
+          "title": "Bursa Malaysia closes lower on profit-taking in banks, telcos",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
+      "upcoming": []
+    },
+    {
+      "earnings": [],
+      "escalated": 0,
+      "events": [],
+      "instrument_id": "MYX:5183",
+      "label": "Petronas Chemicals",
+      "snapshot": [],
+      "stories": [],
+      "tone": {},
+      "upcoming": []
+    },
+    {
+      "earnings": [],
+      "escalated": 0,
+      "events": [],
+      "instrument_id": "MYX:5225",
+      "label": "IHH",
+      "snapshot": [
+        {
+          "concept": "finbert_sentiment",
+          "known_at": "2026-11-05",
+          "label": "FinBERT headline tone",
+          "period_end": "2026-11-04",
+          "source": "finbert_tone",
+          "value": "0.03"
+        }
+      ],
+      "stories": [],
+      "tone": {},
+      "upcoming": []
+    },
+    {
+      "earnings": [],
+      "escalated": 0,
+      "events": [],
+      "instrument_id": "MYX:8869",
+      "label": "Press Metal",
+      "snapshot": [],
+      "stories": [],
+      "tone": {},
+      "upcoming": []
+    },
+    {
+      "earnings": [],
+      "escalated": 0,
+      "events": [],
+      "instrument_id": "MYX:3182",
+      "label": "Genting",
+      "snapshot": [
+        {
+          "concept": "finbert_sentiment",
+          "known_at": "2026-11-05",
+          "label": "FinBERT headline tone",
+          "period_end": "2026-11-04",
+          "source": "finbert_tone",
+          "value": "0.30"
+        }
+      ],
+      "stories": [],
+      "tone": {},
+      "upcoming": []
+    },
+    {
+      "earnings": [
+        "2026-11-17 (finnhub)"
+      ],
+      "escalated": 19,
+      "events": [],
+      "instrument_id": "XNAS:NVDA",
+      "label": "NVIDIA",
+      "snapshot": [
+        {
+          "concept": "pe_ttm",
+          "known_at": "2026-11-05",
+          "label": "P/E (ttm)",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "25.01"
+        },
+        {
+          "concept": "pb",
+          "known_at": "2026-11-05",
+          "label": "P/B",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "28.81"
+        },
+        {
+          "concept": "eps_ttm",
+          "known_at": "2026-11-05",
+          "label": "EPS (ttm)",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "7.91"
+        },
+        {
+          "concept": "dividend_yield",
+          "known_at": "2026-11-05",
+          "label": "dividend yield",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "0.03"
+        },
+        {
+          "concept": "beta",
+          "known_at": "2026-11-05",
+          "label": "beta",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "2.33"
+        },
+        {
+          "concept": "high_52w",
+          "known_at": "2026-11-05",
+          "label": "52w high",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "243.37"
+        },
+        {
+          "concept": "low_52w",
+          "known_at": "2026-11-05",
+          "label": "52w low",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "164.27"
+        },
+        {
+          "concept": "price_target_consensus",
+          "known_at": "2026-11-05",
+          "label": "target (consensus)",
+          "period_end": null,
+          "source": "fmp",
+          "value": "339.17"
+        },
+        {
+          "concept": "analyst_buy",
+          "known_at": "2026-11-02",
+          "label": "analysts: buy",
+          "period_end": "2026-11-01",
+          "source": "finnhub",
+          "value": "41"
+        },
+        {
+          "concept": "analyst_hold",
+          "known_at": "2026-11-02",
+          "label": "analysts: hold",
+          "period_end": "2026-11-01",
+          "source": "finnhub",
+          "value": "2"
+        },
+        {
+          "concept": "analyst_sell",
+          "known_at": "2026-11-02",
+          "label": "analysts: sell",
+          "period_end": "2026-11-01",
+          "source": "finnhub",
+          "value": "1"
+        },
+        {
+          "concept": "av_news_sentiment",
+          "known_at": "2026-10-06",
+          "label": "vendor sentiment",
+          "period_end": "2026-10-05",
+          "source": "alphavantage_news",
+          "value": "0.25"
+        },
+        {
+          "concept": "mx_news_sentiment",
+          "known_at": "2026-11-04",
+          "label": "Marketaux sentiment",
+          "period_end": "2026-11-04",
+          "source": "marketaux_news",
+          "value": "0.22"
+        },
+        {
+          "concept": "finbert_sentiment",
+          "known_at": "2026-11-05",
+          "label": "FinBERT headline tone",
+          "period_end": "2026-11-05",
+          "source": "finbert_tone",
+          "value": "-0.10"
+        },
+        {
+          "concept": "revenue",
+          "known_at": "2026-08-26",
+          "label": "revenue (last quarter)",
+          "period_end": "2026-07-26",
+          "source": "sec_xbrl",
+          "value": "96.22bn"
+        },
+        {
+          "concept": "net_income",
+          "known_at": "2026-08-26",
+          "label": "net income (last quarter)",
+          "period_end": "2026-07-26",
+          "source": "sec_xbrl",
+          "value": "59.69bn"
+        },
+        {
+          "concept": "eps_surprise_pct",
+          "known_at": "2026-09-05",
+          "label": "last EPS surprise %",
+          "period_end": "2026-09-30",
+          "source": "finnhub",
+          "value": "3.82"
+        }
+      ],
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://stocktwits.com/news-articles/markets/equity/microsoft-reportedly-steps-back-from-renewing-data-center-contract-with-nvidia-backed-nscale/cNG1qdXR94S?.tsrc=rss",
+          "domain": "stocktwits.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.3333333333333333,
+          "published_at": "2026-11-05T18:04:58+00:00",
+          "quality": 0.85,
+          "title": "Microsoft Reportedly Steps Back From Renewing Data Center Contract With Nvidia-Backed Nscale",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "marketaux:https://economictimes.indiatimes.com/news/international/us/qqq-stock-today-falls-over-5-why-nvidia-nvda-qualcomm-qcom-intel-intc-and-marvell-mrvl-are-dragging-down-invesco-qqq-trust/articleshow/135582240.cms",
+          "domain": "economictimes.indiatimes.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-05T17:50:08+00:00",
+          "quality": 0.85,
+          "title": "QQQ stock today falls over 5%: Why Nvidia (NVDA), Qualcomm (QCOM), Intel (INTC) and Marvell (MRVL) are dragging down Invesco QQQ Trust",
+          "uncertainty": 0.14367816091954022
+        },
+        {
+          "day": null,
+          "doc_id": "marketaux:https://economictimes.indiatimes.com/news/international/us/mu-stock-crashes-11-today-as-nasdaq-plunges-nearly-4-why-is-micron-stock-falling-with-nvidia-intel-and-tesla-as-wall-streets-tech-selloff-deepens/articleshow/135580261.cms",
+          "domain": "economictimes.indiatimes.com",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-05T16:44:04+00:00",
+          "quality": 0.85,
+          "title": "MU stock crashes 11% today as Nasdaq plunges nearly 4%: Why is Micron stock falling with Nvidia, Intel and Tesla as Wall Street\u2019s tech selloff deepens?",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "marketaux:https://economictimes.indiatimes.com/news/international/us/nvda-stock-price-falls-below-200-why-is-nvidia-stock-going-down-today-heres-what-analysts-predict-next/articleshow/135578339.cms",
+          "domain": "economictimes.indiatimes.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-05T15:55:45+00:00",
+          "quality": 0.85,
+          "title": "NVDA stock price falls below $200: Why is Nvidia stock going down today? Here's what analysts predict next",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "finnhub:143537653",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-05T15:38:00+00:00",
+          "quality": 0.85,
+          "title": "Port Announces PortCon - the First AI Software Factory Summit",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "finnhub:143537656",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-05T15:22:00+00:00",
+          "quality": 0.85,
+          "title": "Nvidia vs. Taiwan Semiconductor: The AI Revolution Is Big Enough for Both. Here's the Better Buy.",
+          "uncertainty": 0.2976190476190476
+        },
+        {
+          "day": null,
+          "doc_id": "finnhub:143537657",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-05T15:15:08+00:00",
+          "quality": 0.85,
+          "title": "Amazon and Google Could Outperform Nvidia as AI Trade Enters New Phase, Says Joseph Carlson",
+          "uncertainty": 0.42372881355932207
+        },
+        {
+          "day": null,
+          "doc_id": "finnhub:143533556",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-05T13:49:06+00:00",
+          "quality": 0.85,
+          "title": "Nvidia Just Dipped Below $200 for the First Time Since August",
+          "uncertainty": 0.26595744680851063
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.667,
+        "n": 67,
+        "polarity_mean": 0.02,
+        "sources": 28,
+        "uncertainty_mean": 0.099
+      },
+      "upcoming": [
+        {
+          "kind": "earnings_result",
+          "source": "finnhub",
+          "title": "Q3 2027 results after the close",
+          "url": "",
+          "when": "2026-11-25T00:00:00+00:00"
+        },
+        {
+          "kind": "earnings_result",
+          "source": "finnhub",
+          "title": "Q3 2027 results after the close",
+          "url": "",
+          "when": "2026-11-17T00:00:00+00:00"
+        }
+      ]
+    },
+    {
+      "earnings": [],
+      "escalated": 18,
+      "events": [],
+      "instrument_id": "XNAS:AAPL",
+      "label": "Apple",
+      "snapshot": [
+        {
+          "concept": "pe_ttm",
+          "known_at": "2026-11-05",
+          "label": "P/E (ttm)",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "38.99"
+        },
+        {
+          "concept": "pb",
+          "known_at": "2026-11-05",
+          "label": "P/B",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "44.06"
+        },
+        {
+          "concept": "eps_ttm",
+          "known_at": "2026-11-05",
+          "label": "EPS (ttm)",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "8.97"
+        },
+        {
+          "concept": "dividend_yield",
+          "known_at": "2026-11-05",
+          "label": "dividend yield",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "0.51"
+        },
+        {
+          "concept": "beta",
+          "known_at": "2026-11-05",
+          "label": "beta",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "1.09"
+        },
+        {
+          "concept": "high_52w",
+          "known_at": "2026-11-05",
+          "label": "52w high",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "354.50"
+        },
+        {
+          "concept": "low_52w",
+          "known_at": "2026-11-05",
+          "label": "52w low",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "243.42"
+        },
+        {
+          "concept": "price_target_consensus",
+          "known_at": "2026-11-05",
+          "label": "target (consensus)",
+          "period_end": null,
+          "source": "fmp",
+          "value": "344.46"
+        },
+        {
+          "concept": "analyst_buy",
+          "known_at": "2026-11-02",
+          "label": "analysts: buy",
+          "period_end": "2026-11-01",
+          "source": "finnhub",
+          "value": "19"
+        },
+        {
+          "concept": "analyst_hold",
+          "known_at": "2026-11-02",
+          "label": "analysts: hold",
+          "period_end": "2026-11-01",
+          "source": "finnhub",
+          "value": "15"
+        },
+        {
+          "concept": "analyst_sell",
+          "known_at": "2026-11-02",
+          "label": "analysts: sell",
+          "period_end": "2026-11-01",
+          "source": "finnhub",
+          "value": "3"
+        },
+        {
+          "concept": "av_news_sentiment",
+          "known_at": "2026-10-06",
+          "label": "vendor sentiment",
+          "period_end": "2026-10-06",
+          "source": "alphavantage_news",
+          "value": "-0.23"
+        },
+        {
+          "concept": "mx_news_sentiment",
+          "known_at": "2026-11-05",
+          "label": "Marketaux sentiment",
+          "period_end": "2026-11-05",
+          "source": "marketaux_news",
+          "value": "0.23"
+        },
+        {
+          "concept": "finbert_sentiment",
+          "known_at": "2026-11-05",
+          "label": "FinBERT headline tone",
+          "period_end": "2026-11-05",
+          "source": "finbert_tone",
+          "value": "0.12"
+        },
+        {
+          "concept": "revenue",
+          "known_at": "2026-07-31",
+          "label": "revenue (last quarter)",
+          "period_end": "2026-06-27",
+          "source": "sec_xbrl",
+          "value": "109.42bn"
+        },
+        {
+          "concept": "net_income",
+          "known_at": "2026-07-31",
+          "label": "net income (last quarter)",
+          "period_end": "2026-06-27",
+          "source": "sec_xbrl",
+          "value": "29.79bn"
+        },
+        {
+          "concept": "eps_surprise_pct",
+          "known_at": "2026-11-03",
+          "label": "last EPS surprise %",
+          "period_end": "2026-09-30",
+          "source": "finnhub",
+          "value": "1.15"
+        }
+      ],
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/apple-aapl-stock-could-30-221028392.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-05T22:10:28+00:00",
+          "quality": 1.0,
+          "title": "Apple (AAPL) Stock Could Be 30% Overvalued Despite Record iPhone Sales",
+          "uncertainty": 0.13440860215053763
+        },
+        {
+          "day": null,
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/why-apple-aapl-capping-internal-211247074.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-05T21:12:47+00:00",
+          "quality": 1.0,
+          "title": "Why Is Apple (AAPL) Capping Internal AI Spending Under John Ternus?",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://www.tikr.com/blog/baird-cut-its-qualcomm-target-to-320-it-still-sees-104-upside?ref=yahoofinance&tlnk=yf-261105-m8g363m2&.tsrc=rss",
+          "domain": "www.tikr.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-05T22:16:15+00:00",
+          "quality": 0.85,
+          "title": "Baird Cut Its Qualcomm Target to $320. It Still Sees 104% Upside",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://247wallst.com/investing/2026/11/05/qualcomm-says-december-wont-be-its-biggest-quarter-anymore-as-apple-walks-away/?.tsrc=rss",
+          "domain": "247wallst.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-05T17:14:44+00:00",
+          "quality": 0.85,
+          "title": "Qualcomm Says December Won\u2019t Be Its Biggest Quarter Anymore as Apple Walks Away",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "finnhub:143539288",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-05T17:10:00+00:00",
+          "quality": 0.85,
+          "title": "Apple cuts employee AI budgets as new CEO looks to rein in costs",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "finnhub:143537670",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-05T15:17:28+00:00",
+          "quality": 0.85,
+          "title": "Learn Why The Bull Case For Resideo Technologies (REZI) Could Change Following Apple HomeView Update",
+          "uncertainty": 0.1488095238095238
+        },
+        {
+          "day": null,
+          "doc_id": "marketaux:https://www.mortgagenewsdaily.com/markets/mbs-morning-11052026",
+          "domain": "mortgagenewsdaily.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-05T14:06:38+00:00",
+          "quality": 0.85,
+          "title": "Modestly Weaker For a Few Potential Reasons",
+          "uncertainty": 0.78125
+        },
+        {
+          "day": null,
+          "doc_id": "finnhub:143533556",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-05T13:49:06+00:00",
+          "quality": 0.85,
+          "title": "Nvidia Just Dipped Below $200 for the First Time Since August",
+          "uncertainty": 0.26595744680851063
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.333,
+        "n": 57,
+        "polarity_mean": 0.053,
+        "sources": 34,
+        "uncertainty_mean": 0.1
+      },
+      "upcoming": []
+    },
+    {
+      "earnings": [],
+      "escalated": 15,
+      "events": [
+        {
+          "kind": "filing",
+          "source": "edgar",
+          "title": "8-K: 8-K (items 5.02)",
+          "url": "https://www.sec.gov/Archives/edgar/data/789019/000119312526448357/d177209d8k.htm",
+          "when": "2026-11-05T00:00:00+00:00"
+        }
+      ],
+      "instrument_id": "XNAS:MSFT",
+      "label": "Microsoft",
+      "snapshot": [
+        {
+          "concept": "pe_ttm",
+          "known_at": "2026-11-05",
+          "label": "P/E (ttm)",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "28.94"
+        },
+        {
+          "concept": "pb",
+          "known_at": "2026-11-05",
+          "label": "P/B",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "6.26"
+        },
+        {
+          "concept": "eps_ttm",
+          "known_at": "2026-11-05",
+          "label": "EPS (ttm)",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "19.15"
+        },
+        {
+          "concept": "dividend_yield",
+          "known_at": "2026-11-05",
+          "label": "dividend yield",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "0.79"
+        },
+        {
+          "concept": "beta",
+          "known_at": "2026-11-05",
+          "label": "beta",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "1.07"
+        },
+        {
+          "concept": "high_52w",
+          "known_at": "2026-11-05",
+          "label": "52w high",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "559.15"
+        },
+        {
+          "concept": "low_52w",
+          "known_at": "2026-11-05",
+          "label": "52w low",
+          "period_end": null,
+          "source": "finnhub",
+          "value": "349.20"
+        },
+        {
+          "concept": "price_target_consensus",
+          "known_at": "2026-11-05",
+          "label": "target (consensus)",
+          "period_end": null,
+          "source": "fmp",
+          "value": "611.74"
+        },
+        {
+          "concept": "analyst_buy",
+          "known_at": "2026-11-02",
+          "label": "analysts: buy",
+          "period_end": "2026-11-01",
+          "source": "finnhub",
+          "value": "40"
+        },
+        {
+          "concept": "analyst_hold",
+          "known_at": "2026-11-02",
+          "label": "analysts: hold",
+          "period_end": "2026-11-01",
+          "source": "finnhub",
+          "value": "3"
+        },
+        {
+          "concept": "analyst_sell",
+          "known_at": "2026-11-02",
+          "label": "analysts: sell",
+          "period_end": "2026-11-01",
+          "source": "finnhub",
+          "value": "0"
+        },
+        {
+          "concept": "av_news_sentiment",
+          "known_at": "2026-10-06",
+          "label": "vendor sentiment",
+          "period_end": "2026-10-05",
+          "source": "alphavantage_news",
+          "value": "0.29"
+        },
+        {
+          "concept": "mx_news_sentiment",
+          "known_at": "2026-11-05",
+          "label": "Marketaux sentiment",
+          "period_end": "2026-11-05",
+          "source": "marketaux_news",
+          "value": "0.24"
+        },
+        {
+          "concept": "finbert_sentiment",
+          "known_at": "2026-11-05",
+          "label": "FinBERT headline tone",
+          "period_end": "2026-11-05",
+          "source": "finbert_tone",
+          "value": "0.03"
+        },
+        {
+          "concept": "revenue",
+          "known_at": "2026-10-28",
+          "label": "revenue (last quarter)",
+          "period_end": "2026-09-30",
+          "source": "sec_xbrl",
+          "value": "92.28bn"
+        },
+        {
+          "concept": "net_income",
+          "known_at": "2026-10-28",
+          "label": "net income (last quarter)",
+          "period_end": "2026-09-30",
+          "source": "sec_xbrl",
+          "value": "36.63bn"
+        },
+        {
+          "concept": "eps_surprise_pct",
+          "known_at": "2026-10-28",
+          "label": "last EPS surprise %",
+          "period_end": "2027-03-31",
+          "source": "finnhub",
+          "value": "1.53"
+        }
+      ],
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://stocktwits.com/news-articles/markets/equity/microsoft-reportedly-steps-back-from-renewing-data-center-contract-with-nvidia-backed-nscale/cNG1qdXR94S?.tsrc=rss",
+          "domain": "stocktwits.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.3333333333333333,
+          "published_at": "2026-11-05T18:04:58+00:00",
+          "quality": 0.85,
+          "title": "Microsoft Reportedly Steps Back From Renewing Data Center Contract With Nvidia-Backed Nscale",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "finnhub:143539306",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-05T15:58:48+00:00",
+          "quality": 0.85,
+          "title": "Are Big Tech stock buybacks officially dead?",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "finnhub:143537689",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-05T14:05:39+00:00",
+          "quality": 0.85,
+          "title": "Not One Analyst Rates Microsoft a Sell. Is the Consensus View Right?",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "finnhub:143537691",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-05T14:00:00+00:00",
+          "quality": 0.85,
+          "title": "Blitzy Announces Collaboration with Microsoft to Accelerate Legacy Modernization and Software Development at Scale",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "finnhub:143533586",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-05T12:15:22+00:00",
+          "quality": 0.85,
+          "title": "IREN is Only Fit for a Specific Investor Currently",
+          "uncertainty": 0.24509803921568626
+        },
+        {
+          "day": null,
+          "doc_id": "https://finance.yahoo.com/technology/articles/market-chatter-microsoft-declines-texas-182142412.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-05T18:21:42+00:00",
+          "quality": 0.8,
+          "title": "Update: Market Chatter: Microsoft Declines Texas Data Center Contract Extension With Nscale, Tightening Data Center Oversight",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMimwFBVV95cUxQanVwSFFZTVNGTU8zRXhTNmdJeFowUjFfaVk3Xy1vdHZDSEd4T3VWNDlxalRCdHcyNzUxUEZtVVl2cHRKTm9zV1ZIa1FiUThRdm04LWdYcW92N2tyV3NvOVhCcjhNOHZ4N2FaRURUVVdfQkRaR2RZSVdHdmxuelc1Q3lmSS1tTTkzaUNKbjdua0d2azF4RFo2aEhCZw?oc=5",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-05T16:43:02+00:00",
+          "quality": 0.8,
+          "title": "Microsoft Stock Has Gained More Than 50% in About 4 Months. Here's What It Has Usually Done Next.",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiogFBVV95cUxNUXZ4TFF4TXk4dlFDYzhxaDFyd1hqYVJqdXVvZ3VMc0J5YTVDbUxic1c0dEYtZ20zd2lib1BCTTBDU3ZPbHBqQ0ZLTGlXZDBTUHU2czRaMGVSNXdXUzdRYUF3UzhwWnhtVU5xT1NEekFpLVZYX2x3V29kc1RVMTFWcU9rTXJNT3VjcDRhamhkdFF6Zk1SazFqZ2UwNDFIaVlxUmc?oc=5",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-05T16:13:55+00:00",
+          "quality": 0.8,
+          "title": "Market Chatter: Microsoft Declines Texas Data Center Contract Extension With Nscale, Tightening Data Center Oversight",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.333,
+        "n": 44,
+        "polarity_mean": 0.076,
+        "sources": 22,
+        "uncertainty_mean": 0.042
+      },
+      "upcoming": []
+    }
+  ],
+  "notice": "This is analysis, not advice, and this system cannot place orders.",
+  "slot": "all"
+}
