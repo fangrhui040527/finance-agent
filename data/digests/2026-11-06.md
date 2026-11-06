@@ -1,6 +1,6 @@
 # Digest 2026-11-06
 
-Generated 2026-11-06 01:33 UTC · slot `all` · 32368 articles in the corpus, 6995 observations, 4311 events in the fact book.
+Generated 2026-11-06 10:09 UTC · slot `all` · 32582 articles in the corpus, 7010 observations, 4311 events in the fact book.
 
 ## The book
 
@@ -10,18 +10,26 @@ Generated 2026-11-06 01:33 UTC · slot `all` · 32368 articles in the corpus, 69
 - 2026-11-06 (date only) www.thestar.com.my — Bursa Malaysia closes higher on Bank Negara's OPR decision, Wall St gains [q 1.00, tone +1.0] ★
 - 2026-11-06 (date only) www.thestar.com.my — Bursa Malaysia rallies as oil prices fall after US midterms [q 1.00, tone -1.0] ★
 - 2026-11-05 (date only) www.malaymail.com — Bursa Malaysia closes lower on profit-taking in banks, telcos [q 1.00, tone +0.0]
-- snapshot: FinBERT headline tone 0.89 (finbert_tone, 2026-11-05)
+- snapshot: FinBERT headline tone 0.40 (finbert_tone, 2026-11-06)
 
 ### Tenaga (MYX:5347)
-- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- tone: 2 stories from 2 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 1 escalated
+- 2026-11-05 www.marketscreener.com — Azimut sees next step in TNB transaction after nod from Bank of Italy [q 0.65, tone +0.0] ★
 - 2026-11-05 (date only) www.malaymail.com — Bursa Malaysia closes lower on profit-taking in banks, telcos [q 1.00, tone +0.0]
-- snapshot: FinBERT headline tone 0.14 (finbert_tone, 2026-11-05)
+- snapshot: FinBERT headline tone 0.03 (finbert_tone, 2026-11-06)
 
 ### Petronas Chemicals (MYX:5183)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-11-06 www.ad-hoc-news.de — Petronas Chemicals stock weighs utilization gains against margin pressure - ad-hoc-news.de [q 0.65, tone +0.0]
+- snapshot: FinBERT headline tone 0.56 (finbert_tone, 2026-11-06)
 
 ### IHH (MYX:5225)
-- quiet: nothing collected for this name in the window
+- tone: 4 stories from 2 sources, polarity -0.75, peak intensity 0.00, uncertainty 0.00 · 3 escalated
+- 2026-11-05 www.businesstimes.com.sg — IHH Healthcare to cut close to 400 jobs across S’pore, Hong Kong and Malaysia [q 0.80, tone -1.0] ★
+- 2026-11-05 www.businesstimes.com.sg — IHH Healthcare to cut close to 400 jobs across Singapore, Hong Kong and Malaysia [q 0.80, tone -1.0] ★
+- 2026-11-06 sbr.com.sg — IHH Healthcare to cut about 380 jobs across three markets [q 0.65, tone -1.0] ★
+- 2026-11-06 www.businesstimes.com.sg — Stocks to watch: OCBC, IHH Healthcare, FLCT, SingPost, Koh Brothers Eco Engineering [q 0.80, tone +0.0]
+- snapshot: FinBERT headline tone -0.42 (finbert_tone, 2026-11-06)
 
 ### Press Metal (MYX:8869)
 - quiet: nothing collected for this name in the window
@@ -89,6 +97,21 @@ Generated 2026-11-06 01:33 UTC · slot `all` · 32368 articles in the corpus, 69
 | 10y minus 2y Treasury spread, % | 0.32 | 2026-11-04 | -0.02 | fred |
 | US unemployment rate, % | 4.20 | 2026-09-01 | +0.1 | fred |
 | CBOE VIX, index | 16.61 | 2026-11-04 | -4.22 | fred |
+
+## Collection
+
+| at (UTC) | source | status | fetched | kept | stored | detail |
+|---|---|---|---|---|---|---|
+| 10:08 | finbert_tone | ok | 10 | 0 | 0 | facts 10; scored 17 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized |
+| 10:08 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
+| 10:08 | twse_openapi | ok | 8 | 0 | 0 | facts 5;  |
+| 10:08 | jin10_flash | degraded | 18 | 18 | 16 | facts 0; window not covered back to 2026-11-05 22:41Z; the oldest item read is 2 |
+| 10:07 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 10:07 | nst_business | degraded | 150 | 140 | 135 | window overflow: all 150 dated items are newer than the window's start (2026-11- |
+| 10:07 | fmt_business | ok | 50 | 50 | 49 |  |
+| 10:07 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Tenaga, Petronas Chemicals, IHH, Press Metal, Genting, Maybank |
+| 10:07 | google_news | ok | 15 | 15 | 14 | read but empty: Press Metal; named the company: 9 of 15 (lowest: Genting 0/4, Ma |
+| 10:07 | gdelt | throttled | 0 | 0 | 0 | throttled: no name could be read (3 failed, 0 not reached). First: GDELT fetch f |
 
 ---
 

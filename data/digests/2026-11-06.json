@@ -1,18 +1,109 @@
 {
-  "collection": [],
+  "collection": [
+    {
+      "at": "2026-11-06T10:08:07.032396+00:00",
+      "detail": "facts 10; scored 17 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized.onnx",
+      "fetched": 10,
+      "kept": 0,
+      "source": "finbert_tone",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-06T10:08:06.236676+00:00",
+      "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-06T10:08:06.234602+00:00",
+      "detail": "facts 5; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-06T10:08:01.146716+00:00",
+      "detail": "facts 0; window not covered back to 2026-11-05 22:41Z; the oldest item read is 2026-11-06 09:51Z, so 11.2h of the window was never served",
+      "fetched": 18,
+      "kept": 18,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 16
+    },
+    {
+      "at": "2026-11-06T10:07:59.738454+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-06T10:07:57.650422+00:00",
+      "detail": "window overflow: all 150 dated items are newer than the window's start (2026-11-05 10:08Z); the oldest is 2026-11-05 13:05Z, so 3.0h scrolled off unseen; read 3 pages, the most this feed may; page 2 starts 3.4h before page 1 ends (2026-11-06 03:47Z under 2026-11-06 07:10Z): the items between were served by neither",
+      "fetched": 150,
+      "kept": 140,
+      "source": "nst_business",
+      "status": "degraded",
+      "stored": 135
+    },
+    {
+      "at": "2026-11-06T10:07:53.826533+00:00",
+      "detail": "",
+      "fetched": 50,
+      "kept": 50,
+      "source": "fmt_business",
+      "status": "ok",
+      "stored": 49
+    },
+    {
+      "at": "2026-11-06T10:07:53.368640+00:00",
+      "detail": "read but empty: Tenaga, Petronas Chemicals, IHH, Press Metal, Genting, Maybank",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-06T10:07:51.854117+00:00",
+      "detail": "read but empty: Press Metal; named the company: 9 of 15 (lowest: Genting 0/4, Maybank 1/3, IHH 5/5)",
+      "fetched": 15,
+      "kept": 15,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 14
+    },
+    {
+      "at": "2026-11-06T10:07:50.116632+00:00",
+      "detail": "throttled: no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked); deferred: Press Metal, Genting, Maybank",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "throttled",
+      "stored": 0
+    }
+  ],
   "counts": {
-    "articles": 32368,
+    "articles": 32582,
     "documents": 0,
-    "escalated": 4149,
+    "escalated": 4153,
     "events": 4311,
     "failed_sweeps": 112,
-    "linked": 16738,
-    "observations": 6995,
+    "linked": 16751,
+    "observations": 7010,
     "series": 31,
-    "sweeps": 1416
+    "sweeps": 1426
   },
   "day": "2026-11-06",
-  "generated_at": "2026-11-06 01:33 UTC",
+  "generated_at": "2026-11-06 10:09 UTC",
   "macro": [
     {
       "change": "-0.08",
@@ -153,11 +244,11 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-05",
+          "known_at": "2026-11-06",
           "label": "FinBERT headline tone",
           "period_end": "2026-11-05",
           "source": "finbert_tone",
-          "value": "0.89"
+          "value": "0.40"
         }
       ],
       "stories": [
@@ -225,21 +316,34 @@
     },
     {
       "earnings": [],
-      "escalated": 0,
+      "escalated": 1,
       "events": [],
       "instrument_id": "MYX:5347",
       "label": "Tenaga",
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-05",
+          "known_at": "2026-11-06",
           "label": "FinBERT headline tone",
           "period_end": "2026-11-05",
           "source": "finbert_tone",
-          "value": "0.14"
+          "value": "0.03"
         }
       ],
       "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMivwFBVV95cUxNRHBjcFhoOEJBdzk2WG5CZWlDOWtPVGlWaUYxdWdCYWljeGM2UmtFQlhTVmNPa0UxVUVxdE5DSTJvT3hodHNIWDVZcFlPamdrTWtCLU0wWjZJZVRoU1ZZYWlOY2dNMWIzeVhNeVJ5a0xFR193Y1Vjd2xpLWtZZjRhOEVOREJ3WnMwY25oTHBVY0JIMWFNVlZGZ0duQXFycGt3dFo2ZFN2Z29aeWt6NEpxeGk1UXBzSkxreENidF9mNA?oc=5",
+          "domain": "www.marketscreener.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-05T18:58:34+00:00",
+          "quality": 0.65,
+          "title": "Azimut sees next step in TNB transaction after nod from Bank of Italy",
+          "uncertainty": 0.0
+        },
         {
           "day": "2026-11-05",
           "doc_id": "web_search:https://www.malaymail.com/news/money/2026/11/04/bursa-malaysia-closes-lower-on-profit-taking-in-banks-telcos/241987",
@@ -256,9 +360,9 @@
       ],
       "tone": {
         "intensity_max": 0.0,
-        "n": 1,
+        "n": 2,
         "polarity_mean": 0.0,
-        "sources": 1,
+        "sources": 2,
         "uncertainty_mean": 0.0
       },
       "upcoming": []
@@ -269,29 +373,117 @@
       "events": [],
       "instrument_id": "MYX:5183",
       "label": "Petronas Chemicals",
-      "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "snapshot": [
+        {
+          "concept": "finbert_sentiment",
+          "known_at": "2026-11-06",
+          "label": "FinBERT headline tone",
+          "period_end": "2026-11-06",
+          "source": "finbert_tone",
+          "value": "0.56"
+        }
+      ],
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMizAFBVV95cUxPTE9pdGFWYk82bXJUbkZxN1Qwem5nREp2OS1kUUhKR28yX0pXbTZfOWpyV202UG5lX3I2ZTdUcHV5RlhySWNobmFDZWdWb2xPMER2WDZPYnQ4aVVQNmdEdUZ0b2xoOUlTZndzck05VThRdm1iY3VmZXFvNmRrOUhWampwQV9zQVVTMGN5TmRlbURuSUxydmI3dE0ybk9MTVRpTFFFYmU3dE5Ha3dKZFpCZVFMMVNmeFUwMWQ3S0dndnMxLU02NDhwY1lWd2w?oc=5",
+          "domain": "www.ad-hoc-news.de",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-06T01:13:51+00:00",
+          "quality": 0.65,
+          "title": "Petronas Chemicals stock weighs utilization gains against margin pressure - ad-hoc-news.de",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
       "earnings": [],
-      "escalated": 0,
+      "escalated": 3,
       "events": [],
       "instrument_id": "MYX:5225",
       "label": "IHH",
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-05",
+          "known_at": "2026-11-06",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-04",
+          "period_end": "2026-11-06",
           "source": "finbert_tone",
-          "value": "0.03"
+          "value": "-0.42"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMi4gFBVV95cUxOSHpzWGtlaGVyV20zNXhXc0c4c2EyM3U1OURIdVF1ajZHb25xaEZKRWF6UWxqUlVDNm1JN29uc3BhY2xvWXpDb1dpdWh5eHJPaUVEelZzN0RNdjZoUGZKTFR2QmhrSktHa18yOTlXd0tkNVN0Tmktb280TTUyUk1zNV8taHlGajA4ZkN5Tks5cTJSYjVuWUg4QXBXR1NSMXhVOUhDcW9BUWREY1p1UnZjWXc0Wi1ZbU1yNEt5Wi1sUG5qaG1UUmpKNnlGcXhoWXNnQklhUVZ3Nmh2VVJkbmc2Y21B?oc=5",
+          "domain": "www.businesstimes.com.sg",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-05T12:42:00+00:00",
+          "quality": 0.8,
+          "title": "IHH Healthcare to cut close to 400 jobs across S\u2019pore, Hong Kong and Malaysia",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxNY1RqbTBZQUlYXzhYNVZhT2JCRkVRajdpVWM5WGVrRHN3TG94XzEyMFZfSjJiNmdseHB4SmkxZ3B5X1VDMVdsdTJqWnBfMzhheHpNQWdsUzN0N0VoeGdmLTY4emc5Wk56QWxnQ2RjZ0t5LWROMlFuYWI2T1lvY3Y4OFZvUHZ0VndPNXcwSDY2eGdHeXRSMG9nZW9DdDl3akZfWDYtZ3dLT1RPQ1NzLVI4QTRzUUJJanBRTjFsY3hyUFBuUQ?oc=5",
+          "domain": "www.businesstimes.com.sg",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-05T12:42:00+00:00",
+          "quality": 0.8,
+          "title": "IHH Healthcare to cut close to 400 jobs across Singapore, Hong Kong and Malaysia",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMikwFBVV95cUxOUEd1d2VnTWhHZGFEd1djV1Npc01KWWkzYjIxTUd4dURVOGJuRXJ0MkE5djZ3U2tkRGFBMGdGXzFESGJ2Q0lBZlRJaDcyNWhDSnhqUkRkOElvT0MxSzZ2bFVDVDZ4QkNlM1hlaDRrOExLN3RIZjNfOVpwdTBVRVN6amNtc0VDYmUzWjBsbHRSMUtmclk?oc=5",
+          "domain": "sbr.com.sg",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-06T01:44:38+00:00",
+          "quality": 0.65,
+          "title": "IHH Healthcare to cut about 380 jobs across three markets",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMixAFBVV95cUxQLVpCMGYzUjJGdWtaSU1kSzUyYlZGcE1lUjdwZ3RJSV9jYmxlY2dGdklQQVNSSzEzdTlGUUFYUC16TmNhOGZLd3A1bUxVOU5ramVfREZZR0tnMmE2bFlTZVFEbFdwX2RzVUp6MGtYb3pXdFFlWGVxenNldURETlQ1OE9LckdUR1o0NE1lNU9IRWZWRlZ0eE1YR2pKdkdJcmtKODI5djdmeC01bUJSZEdqc05lSUc0VXU5dGRQeXVZU0txSXE0?oc=5",
+          "domain": "www.businesstimes.com.sg",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-06T00:37:00+00:00",
+          "quality": 0.8,
+          "title": "Stocks to watch: OCBC, IHH Healthcare, FLCT, SingPost, Koh Brothers Eco Engineering",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 4,
+        "polarity_mean": -0.75,
+        "sources": 2,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
