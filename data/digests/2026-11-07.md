@@ -1,6 +1,6 @@
 # Digest 2026-11-07
 
-Generated 2026-11-07 00:57 UTC · slot `all` · 33054 articles in the corpus, 7076 observations, 4314 events in the fact book.
+Generated 2026-11-07 15:41 UTC · slot `all` · 33263 articles in the corpus, 7089 observations, 4314 events in the fact book.
 
 ## The book
 
@@ -8,7 +8,9 @@ Generated 2026-11-07 00:57 UTC · slot `all` · 33054 articles in the corpus, 70
 - quiet: nothing collected for this name in the window
 
 ### Tenaga (MYX:5347)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-11-06 investor.id — Harga Emas Terpukul Data Tenaga Kerja AS [q 0.65, tone +0.0]
+- snapshot: FinBERT headline tone 0.03 (finbert_tone, 2026-11-07)
 
 ### Petronas Chemicals (MYX:5183)
 - quiet: nothing collected for this name in the window
@@ -20,7 +22,10 @@ Generated 2026-11-07 00:57 UTC · slot `all` · 33054 articles in the corpus, 70
 - quiet: nothing collected for this name in the window
 
 ### Genting (MYX:3182)
-- quiet: nothing collected for this name in the window
+- tone: 2 stories from 2 sources, polarity +0.50, peak intensity 0.00, uncertainty 0.42 · 1 escalated
+- 2026-11-06 focusgn.com — Genting Berhad debt set to rise 53% as expansion accelerates [q 0.65, tone +1.0] ★
+- 2026-11-06 tribuna.com — Play'n GO prepares for sale as Aristocrat, Light & Wonder and Genting emerge as potential buyers [q 0.65, tone +0.0]
+- snapshot: FinBERT headline tone 0.79 (finbert_tone, 2026-11-07)
 
 ### NVIDIA (XNAS:NVDA)
 - tone: 67 stories from 23 sources, polarity +0.13, peak intensity 0.33, uncertainty 0.09 · 23 escalated
@@ -82,6 +87,21 @@ Generated 2026-11-07 00:57 UTC · slot `all` · 33054 articles in the corpus, 70
 | 10y minus 2y Treasury spread, % | 0.38 | 2026-11-05 | +0.06 | fred |
 | US unemployment rate, % | 4.10 | 2026-10-01 | -0.1 | fred |
 | CBOE VIX, index | 28.18 | 2026-11-05 | +11.57 | fred |
+
+## Collection
+
+| at (UTC) | source | status | fetched | kept | stored | detail |
+|---|---|---|---|---|---|---|
+| 15:40 | finbert_tone | ok | 10 | 0 | 0 | facts 8; scored 8 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized.o |
+| 15:40 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
+| 15:40 | twse_openapi | ok | 8 | 0 | 0 | facts 5;  |
+| 15:40 | jin10_flash | degraded | 16 | 16 | 15 | facts 0; window not covered back to 2026-11-06 22:41Z; the oldest item read is 2 |
+| 15:40 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 15:40 | nst_business | degraded | 150 | 138 | 131 | window overflow: all 150 dated items are newer than the window's start (2026-11- |
+| 15:40 | fmt_business | degraded | 50 | 49 | 49 | window overflow: all 50 dated items are newer than the window's start (2026-11-0 |
+| 15:40 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Tenaga, Petronas Chemicals, IHH, Press Metal, Genting, Maybank |
+| 15:40 | google_news | ok | 18 | 16 | 14 | read but empty: Petronas Chemicals; named the company: 7 of 16 (lowest: IHH 0/1, |
+| 15:40 | gdelt | throttled | 0 | 0 | 0 | throttled: no name could be read (3 failed, 0 not reached). First: GDELT fetch f |
 
 ---
 
