@@ -55,6 +55,8 @@ LABELS: tuple[tuple[str, re.Pattern[str]], ...] = (
     # one cannot be told from a Finnhub key by shape.
     ("MARKETAUX_API_KEY", re.compile(r"market\s*aux", re.I)),
     ("FRED_API_KEY", re.compile(r"\bfred\b", re.I)),
+    # London Strategic Edge; its keys start lse_live_, matched by shape below too.
+    ("LSE_API_KEY", re.compile(r"london\s*strategic|\blse\b", re.I)),
     ("GROQ_API_KEY", re.compile(r"\bgroq\b", re.I)),
     ("EODHD_API_KEY", re.compile(r"\beod\s*hd\b|\beodhd\b|eod\s*historical", re.I)),
     # The retrieval embedder. Labelled by the provider people actually name in
@@ -80,6 +82,8 @@ SHAPES: tuple[tuple[str, re.Pattern[str]], ...] = (
     # OpenRouter prefixes every key `sk-or-v1-` and follows it with 64 hex
     # characters. Distinctive enough to recognise unlabelled.
     ("EMBEDDING_API_KEY", re.compile(r"^sk-or-v1-[0-9a-f]{64}$")),
+    # London Strategic Edge prints its keys as `lse_live_...` (the lse-data README).
+    ("LSE_API_KEY", re.compile(r"^lse_live_[A-Za-z0-9]{8,}$")),
     # An Anthropic Messages key is `sk-ant-api03-...`: recognisable unlabelled,
     # and never confused with OpenRouter's `sk-or-`. Not any `sk-ant-`: a
     # Claude Code OAuth token (`sk-ant-oat01-`) or an Admin key
