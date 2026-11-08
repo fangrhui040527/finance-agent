@@ -1,20 +1,26 @@
 # Digest 2026-11-08
 
-Generated 2026-11-08 05:49 UTC · slot `all` · 33501 articles in the corpus, 7217 observations, 4315 events in the fact book.
+Generated 2026-11-08 15:59 UTC · slot `all` · 33697 articles in the corpus, 7223 observations, 4315 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-11-07 uk.finance.yahoo.com — Malayan Banking Berhad (1155.KL) Seasonal returns chart [q 0.65, tone +0.0]
+- snapshot: FinBERT headline tone 0.07 (finbert_tone, 2026-11-08)
 
 ### Tenaga (MYX:5347)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-11-08 www.beritasatu.com — Data Tenaga Kerja AS Menguat, Peluang The Fed Naikkan Bunga Membesar [q 0.65, tone +0.0]
+- snapshot: FinBERT headline tone 0.09 (finbert_tone, 2026-11-08)
 
 ### Petronas Chemicals (MYX:5183)
 - quiet: nothing collected for this name in the window
 
 ### IHH (MYX:5225)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-11-08 ca.finance.yahoo.com — IHH Healthcare Berhad (Q0F.SI) Seasonal Returns Chart [q 0.65, tone +0.0]
+- snapshot: FinBERT headline tone 0.10 (finbert_tone, 2026-11-08)
 
 ### Press Metal (MYX:8869)
 - quiet: nothing collected for this name in the window
@@ -86,6 +92,16 @@ Generated 2026-11-08 05:49 UTC · slot `all` · 33501 articles in the corpus, 72
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 15:59 | finbert_tone | ok | 6 | 0 | 0 | facts 6; scored 3 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized.o |
+| 15:59 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
+| 15:59 | twse_openapi | ok | 8 | 0 | 0 | facts 0;  |
+| 15:59 | jin10_flash | degraded | 17 | 11 | 11 | facts 0; window not covered back to 2026-11-07 22:43Z; the oldest item read is 2 |
+| 15:59 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 15:59 | nst_business | degraded | 136 | 135 | 133 | page 2 starts 3.5h before page 1 ends (2026-11-08 06:27Z under 2026-11-08 09:57Z |
+| 15:59 | fmt_business | ok | 43 | 43 | 43 |  |
+| 15:59 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Maybank, Tenaga, Petronas Chemicals, IHH, Press Metal, Genting |
+| 15:59 | google_news | ok | 11 | 11 | 9 | read but empty: Petronas Chemicals, Press Metal; named the company: 3 of 11 (low |
+| 15:59 | gdelt | throttled | 0 | 0 | 0 | throttled: no name could be read (3 failed, 0 not reached). First: GDELT fetch f |
 | 05:49 | sec_xbrl | ok | 4455 | 0 | 0 | facts 41;  |
 | 05:49 | finmind | ok | 69 | 0 | 0 | facts 5;  |
 | 05:49 | twse_openapi | ok | 8 | 0 | 0 | facts 0;  |

@@ -1,6 +1,96 @@
 {
   "collection": [
     {
+      "at": "2026-11-08T15:59:33.406186+00:00",
+      "detail": "facts 6; scored 3 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized.onnx",
+      "fetched": 6,
+      "kept": 0,
+      "source": "finbert_tone",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-08T15:59:32.951431+00:00",
+      "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-08T15:59:32.949965+00:00",
+      "detail": "facts 0; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-08T15:59:28.804542+00:00",
+      "detail": "facts 0; window not covered back to 2026-11-07 22:43Z; the oldest item read is 2026-11-08 15:16Z, so 16.6h of the window was never served",
+      "fetched": 17,
+      "kept": 11,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 11
+    },
+    {
+      "at": "2026-11-08T15:59:27.762287+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-08T15:59:26.060409+00:00",
+      "detail": "page 2 starts 3.5h before page 1 ends (2026-11-08 06:27Z under 2026-11-08 09:57Z): the items between were served by neither",
+      "fetched": 136,
+      "kept": 135,
+      "source": "nst_business",
+      "status": "degraded",
+      "stored": 133
+    },
+    {
+      "at": "2026-11-08T15:59:22.368312+00:00",
+      "detail": "",
+      "fetched": 43,
+      "kept": 43,
+      "source": "fmt_business",
+      "status": "ok",
+      "stored": 43
+    },
+    {
+      "at": "2026-11-08T15:59:21.936722+00:00",
+      "detail": "read but empty: Maybank, Tenaga, Petronas Chemicals, IHH, Press Metal, Genting",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-08T15:59:20.871091+00:00",
+      "detail": "read but empty: Petronas Chemicals, Press Metal; named the company: 3 of 11 (lowest: Genting 0/3, Maybank 1/4, IHH 1/2)",
+      "fetched": 11,
+      "kept": 11,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 9
+    },
+    {
+      "at": "2026-11-08T15:59:19.159425+00:00",
+      "detail": "throttled: no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked); deferred: IHH, Press Metal, Genting",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "throttled",
+      "stored": 0
+    },
+    {
       "at": "2026-11-08T05:49:55.484245+00:00",
       "detail": "facts 41; ",
       "fetched": 4455,
@@ -56,18 +146,18 @@
     }
   ],
   "counts": {
-    "articles": 33501,
+    "articles": 33697,
     "documents": 0,
     "escalated": 4240,
     "events": 4315,
     "failed_sweeps": 112,
-    "linked": 17060,
-    "observations": 7217,
+    "linked": 17064,
+    "observations": 7223,
     "series": 31,
-    "sweeps": 1464
+    "sweeps": 1474
   },
   "day": "2026-11-08",
-  "generated_at": "2026-11-08 05:49 UTC",
+  "generated_at": "2026-11-08 15:59 UTC",
   "macro": [
     {
       "change": "0.16",
@@ -208,15 +298,35 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-07",
+          "known_at": "2026-11-08",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-06",
+          "period_end": "2026-11-07",
           "source": "finbert_tone",
-          "value": "0.30"
+          "value": "0.07"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiZkFVX3lxTE5ISkZEOWotWm9zX0NKM2s5aEpTaXB6Zjc5OGFsbjVtc3NfTFBITDdaNTlvZFZ5V1puZV9jU1pycHZWV2Q4UzF6RUIyVHBCV2FxYXlBMHluOGVfZWpIUGpCQXJRVzRLUQ?oc=5",
+          "domain": "uk.finance.yahoo.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-07T23:36:10+00:00",
+          "quality": 0.65,
+          "title": "Malayan Banking Berhad (1155.KL) Seasonal returns chart",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -228,15 +338,35 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-07",
+          "known_at": "2026-11-08",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-06",
+          "period_end": "2026-11-08",
           "source": "finbert_tone",
-          "value": "0.03"
+          "value": "0.09"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMirwFBVV95cUxPZTAxQW9aVG0wVGN6MEt3TnhaQ1U4cGNvOHdLd1B4XzQ0Q1pLWkNSdnhZWHpYZkU3SlVZMy1tVFMyNUFqSTZLVzFCamFwTWdzcmFKcUpTX0RHNE4xZnBVYnh5MjV3UW8xc2xWT2xRa0tkZzZPVkVPUE9FNEEwVTgzVzlLTGFxYm9LZjFTdDQwY1B1S1g2ak9xMjc0YTMwME16ZjI3ZjRMaE9CbXpFTUQ0?oc=5",
+          "domain": "www.beritasatu.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-08T00:05:00+00:00",
+          "quality": 0.65,
+          "title": "Data Tenaga Kerja AS Menguat, Peluang The Fed Naikkan Bunga Membesar",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -268,15 +398,35 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-07",
+          "known_at": "2026-11-08",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-06",
+          "period_end": "2026-11-08",
           "source": "finbert_tone",
-          "value": "-0.42"
+          "value": "0.10"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiZEFVX3lxTE5xa0FLUmtKRGJGc094RjI5XzI2cDd5SnpNQnlMTU9rd2hodXFhRHc5eXZoUWlEcnNWYk1kZ0ctY3hRUHBHWlhnT21WSl9kOHpBWld0YUx0bTI2MkNWby01aDlLWEg?oc=5",
+          "domain": "ca.finance.yahoo.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-08T00:16:20+00:00",
+          "quality": 0.65,
+          "title": "IHH Healthcare Berhad (Q0F.SI) Seasonal Returns Chart",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
