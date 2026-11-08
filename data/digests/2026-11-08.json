@@ -1,5 +1,60 @@
 {
-  "collection": [],
+  "collection": [
+    {
+      "at": "2026-11-08T05:49:55.484245+00:00",
+      "detail": "facts 41; ",
+      "fetched": 4455,
+      "kept": 0,
+      "source": "sec_xbrl",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-08T05:49:54.757212+00:00",
+      "detail": "facts 5; ",
+      "fetched": 69,
+      "kept": 0,
+      "source": "finmind",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-08T05:49:53.601116+00:00",
+      "detail": "facts 0; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-08T05:49:49.665547+00:00",
+      "detail": "facts 0; ",
+      "fetched": 450,
+      "kept": 0,
+      "source": "dbnomics",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-08T05:49:28.645157+00:00",
+      "detail": "facts 25; fmp /earnings is outside the plan (HTTP 402); not collected for NVDA, AAPL, MSFT; fmp /income-statement is outside the plan (HTTP 402); not collected for NVDA, AAPL, MSFT; fmp /cash-flow-statement is outside the plan (HTTP 402); not collected for NVDA, AAPL, MSFT; fmp /balance-sheet-statement is outside the plan (HTTP 402); not collected for NVDA, AAPL, MSFT",
+      "fetched": 4024,
+      "kept": 0,
+      "source": "fmp",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-08T05:49:24.074040+00:00",
+      "detail": "facts 0; ",
+      "fetched": 36,
+      "kept": 0,
+      "source": "dosm_cpi",
+      "status": "ok",
+      "stored": 0
+    }
+  ],
   "counts": {
     "articles": 33501,
     "documents": 0,
@@ -7,12 +62,12 @@
     "events": 4315,
     "failed_sweeps": 112,
     "linked": 17060,
-    "observations": 7146,
+    "observations": 7217,
     "series": 31,
-    "sweeps": 1458
+    "sweeps": 1464
   },
   "day": "2026-11-08",
-  "generated_at": "2026-11-08 00:35 UTC",
+  "generated_at": "2026-11-08 05:49 UTC",
   "macro": [
     {
       "change": "0.16",
@@ -322,7 +377,7 @@
         },
         {
           "concept": "price_target_consensus",
-          "known_at": "2026-11-06",
+          "known_at": "2026-11-08",
           "label": "target (consensus)",
           "period_end": null,
           "source": "fmp",
@@ -596,7 +651,7 @@
         },
         {
           "concept": "price_target_consensus",
-          "known_at": "2026-11-06",
+          "known_at": "2026-11-08",
           "label": "target (consensus)",
           "period_end": null,
           "source": "fmp",
@@ -652,19 +707,19 @@
         },
         {
           "concept": "revenue",
-          "known_at": "2026-07-31",
+          "known_at": "2026-11-03",
           "label": "revenue (last quarter)",
-          "period_end": "2026-06-27",
+          "period_end": "2026-09-26",
           "source": "sec_xbrl",
-          "value": "109.42bn"
+          "value": "114.48bn"
         },
         {
           "concept": "net_income",
-          "known_at": "2026-07-31",
+          "known_at": "2026-11-03",
           "label": "net income (last quarter)",
-          "period_end": "2026-06-27",
+          "period_end": "2026-09-26",
           "source": "sec_xbrl",
-          "value": "29.79bn"
+          "value": "30.71bn"
         },
         {
           "concept": "eps_surprise_pct",
@@ -855,7 +910,7 @@
         },
         {
           "concept": "price_target_consensus",
-          "known_at": "2026-11-06",
+          "known_at": "2026-11-08",
           "label": "target (consensus)",
           "period_end": null,
           "source": "fmp",

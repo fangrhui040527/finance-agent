@@ -1,5 +1,5 @@
 {
- "bytes": 26296320,
+ "bytes": 26300416,
  "file": "corpus.db",
  "format": 1,
  "page_size": 4096,
@@ -8,20 +8,20 @@
   {
    "bytes": 16777216,
    "name": "part-000",
-   "sha256": "470790c29c5ea9a352b47b2e81a2f49b7d6346ca5671fda18214c96c6fb5736f"
+   "sha256": "e67fc85f3eefba9905cd0f685d2172007015fd81c87ccc09053e22eb1d502a6d"
   },
   {
-   "bytes": 9519104,
+   "bytes": 9523200,
    "name": "part-001",
-   "sha256": "e8231431df87a920f3b19b330f546c0d6aca836937b48f92aebb4c3eaadf2061"
+   "sha256": "74bb213c416400ca9621a456dfd1a1bd1f6a56ca0dd8c16b31b6c98eb2920b00"
   }
  ],
  "rows": {
   "articles": 33501,
   "evidence_searches": 8,
-  "sweeps": 1458
+  "sweeps": 1464
  },
- "sha256": "da02f120979cda43dca306cdf281b4841bb70750551470cb28ea5dbcd233d2ee",
+ "sha256": "800d5ddcfd72a5a0a7c5dd78658096979444f7e7ebdcaa7215742999a19ec6e6",
  "tips": {
   "articles": {
    "columns": {
@@ -69,21 +69,21 @@
   },
   "sweeps": {
    "columns": {
-    "at": "8482493a36f4b113",
-    "detail": "88116c42e080cc07",
+    "at": "bb8a5e6a2be3b630",
+    "detail": "0ed07b5f5d48d411",
     "duplicates": "5feceb66ffc86f38",
     "escalated": "5feceb66ffc86f38",
-    "fetched": "6b51d431df5d7f14",
+    "fetched": "dec1ab2f6d6e994c",
     "kept": "5feceb66ffc86f38",
-    "run_id": "bd9cc379a7906898",
-    "since": "39857422fec74400",
-    "slot": "d723b4470d3dd091",
-    "source": "3a2eb8bf50077831",
+    "run_id": "acb6472f46870a0d",
+    "since": "f8cef79663da87ac",
+    "slot": "abc95b719e8599d6",
+    "source": "3f05b03abfa4f4bd",
     "status": "c48b5b1a9776c846",
     "stored": "5feceb66ffc86f38",
     "unlinked": "5feceb66ffc86f38"
    },
-   "rowid": 1458
+   "rowid": 1464
   }
  },
  "triggers": [
