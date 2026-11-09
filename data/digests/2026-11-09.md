@@ -1,17 +1,25 @@
 # Digest 2026-11-09
 
-Generated 2026-11-09 00:55 UTC · slot `all` · 33941 articles in the corpus, 7285 observations, 4316 events in the fact book.
+Generated 2026-11-09 10:07 UTC · slot `all` · 34090 articles in the corpus, 7293 observations, 4316 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- quiet: nothing collected for this name in the window
+- tone: 2 stories from 2 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-11-09 www.kaohooninternational.com — Maybank Positive on KCE’s 4Q26 Sales Target, Flags Caution on Long-Term Margin Sustainability [q 0.65, tone +0.0]
+- 2026-11-09 www.tradingview.com — Rukun Raharja (RAJA) Kantongi Fasilitas Pembiayaan Syariah Rp 250 Miliar dari Maybank [q 0.65, tone +0.0]
+- snapshot: FinBERT headline tone 0.43 (finbert_tone, 2026-11-09)
 
 ### Tenaga (MYX:5347)
-- quiet: nothing collected for this name in the window
+- tone: 2 stories from 2 sources, polarity +0.50, peak intensity 0.00, uncertainty 0.00 · 1 escalated
+- 2026-11-09 www.tradingview.com — Weekly Recap: Profit rises, target reaffirmed and FSI seeks TNB approval [q 0.65, tone +1.0] ★
+- 2026-11-09 theedgemalaysia.com — TNB’s role in Malaysia’s energy future [q 0.80, tone +0.0]
+- snapshot: FinBERT headline tone 0.52 (finbert_tone, 2026-11-09)
 
 ### Petronas Chemicals (MYX:5183)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-11-09 simplywall.st — What PETRONAS Chemicals Shareholders Got Right [q 0.65, tone +0.0]
+- snapshot: FinBERT headline tone 0.09 (finbert_tone, 2026-11-09)
 
 ### IHH (MYX:5225)
 - quiet: nothing collected for this name in the window
@@ -23,15 +31,15 @@ Generated 2026-11-09 00:55 UTC · slot `all` · 33941 articles in the corpus, 72
 - quiet: nothing collected for this name in the window
 
 ### NVIDIA (XNAS:NVDA)
-- tone: 56 stories from 37 sources, polarity -0.41, peak intensity 0.00, uncertainty 0.11 · 30 escalated
+- tone: 61 stories from 38 sources, polarity -0.41, peak intensity 0.00, uncertainty 0.10 · 32 escalated
+- 2026-11-09 www.nst.com.my — Nvidia's out-of-hour shares fall as firm probes CEO Jensen Huang [q 1.00, tone -1.0] ★
+- 2026-11-08 www.nst.com.my — Nvidia probes CEO Huang amid reports of Chinese spy links to Singapore-based firm [WATCH] [q 1.00, tone -1.0] ★
 - 2026-11-08 finance.yahoo.com — SpaceX (SPCX) Lands $45 Billion AI Deal As New Contracts Recast Its Growth Story [q 1.00, tone +1.0] ★
 - 2026-11-08 finance.yahoo.com — Nvidia's board launches investigation into CEO Jensen Huang's affair with alleged Chinese spy [q 1.00, tone -1.0] ★
 - 2026-11-08 www.bloomberg.com — Asian Markets at Risk of Pressure on Nvidia Probe: Markets Wrap [q 0.80, tone -1.0] ★
 - 2026-11-08 finance.yahoo.com — Nvidia Board Starts Independent Investigation of Huang’s Links to Alleged Spy [q 0.80, tone -1.0] ★
 - 2026-11-08 www.marketwatch.com — Nvidia’s board will probe CEO Jensen Huang’s relationship with an alleged spy. Here’s what to know. [q 0.80, tone -1.0] ★
 - 2026-11-08 www.reuters.com — Nvidia opens probe after report of CEO Huang's relationship with alleged Chinese spy [q 0.80, tone -1.0] ★
-- 2026-11-08 finance.yahoo.com — Nvidia will investigate CEO Jensen Huang’s relationship with possible Chinese spy [q 0.80, tone +0.0] ★
-- 2026-11-08 www.investing.com — Nvidia CEO Huang admits to affair, apologizes to employees as probe launched [q 0.80, tone -1.0] ★
 - upcoming 2026-11-25 earnings_result — Q3 2027 results after the close (finnhub)
 - upcoming 2026-11-17 earnings_result — Q3 2027 results after the close (finnhub)
 - earnings date: 2026-11-17 (finnhub)
@@ -81,6 +89,21 @@ Generated 2026-11-09 00:55 UTC · slot `all` · 33941 articles in the corpus, 72
 | 10y minus 2y Treasury spread, % | 0.38 | 2026-11-05 | +0.06 | fred |
 | US unemployment rate, % | 4.10 | 2026-10-01 | -0.1 | fred |
 | CBOE VIX, index | 28.18 | 2026-11-05 | +11.57 | fred |
+
+## Collection
+
+| at (UTC) | source | status | fetched | kept | stored | detail |
+|---|---|---|---|---|---|---|
+| 10:07 | finbert_tone | ok | 10 | 0 | 0 | facts 8; scored 7 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized.o |
+| 10:07 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
+| 10:07 | twse_openapi | ok | 8 | 0 | 0 | facts 0;  |
+| 10:07 | jin10_flash | degraded | 17 | 16 | 16 | facts 0; window not covered back to 2026-11-08 22:41Z; the oldest item read is 2 |
+| 10:07 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 10:07 | nst_business | degraded | 106 | 102 | 94 | page 2 starts 3.3h before page 1 ends (2026-11-09 02:37Z under 2026-11-09 05:57Z |
+| 10:07 | fmt_business | ok | 27 | 27 | 27 |  |
+| 10:07 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Petronas Chemicals, IHH, Press Metal, Genting, Maybank, Tenaga |
+| 10:07 | google_news | ok | 12 | 12 | 12 | read but empty: Press Metal; named the company: 5 of 12 (lowest: Genting 0/1, IH |
+| 10:07 | gdelt | throttled | 0 | 0 | 0 | throttled: no name could be read (3 failed, 0 not reached). First: GDELT fetch f |
 
 ---
 

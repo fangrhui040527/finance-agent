@@ -1,18 +1,109 @@
 {
-  "collection": [],
+  "collection": [
+    {
+      "at": "2026-11-09T10:07:29.512429+00:00",
+      "detail": "facts 8; scored 7 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized.onnx",
+      "fetched": 10,
+      "kept": 0,
+      "source": "finbert_tone",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-09T10:07:28.846196+00:00",
+      "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-09T10:07:28.844576+00:00",
+      "detail": "facts 0; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-09T10:07:24.081743+00:00",
+      "detail": "facts 0; window not covered back to 2026-11-08 22:41Z; the oldest item read is 2026-11-09 09:57Z, so 11.3h of the window was never served",
+      "fetched": 17,
+      "kept": 16,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 16
+    },
+    {
+      "at": "2026-11-09T10:07:22.729061+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-09T10:07:20.786928+00:00",
+      "detail": "page 2 starts 3.3h before page 1 ends (2026-11-09 02:37Z under 2026-11-09 05:57Z): the items between were served by neither",
+      "fetched": 106,
+      "kept": 102,
+      "source": "nst_business",
+      "status": "degraded",
+      "stored": 94
+    },
+    {
+      "at": "2026-11-09T10:07:16.442417+00:00",
+      "detail": "",
+      "fetched": 27,
+      "kept": 27,
+      "source": "fmt_business",
+      "status": "ok",
+      "stored": 27
+    },
+    {
+      "at": "2026-11-09T10:07:16.146120+00:00",
+      "detail": "read but empty: Petronas Chemicals, IHH, Press Metal, Genting, Maybank, Tenaga",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-09T10:07:14.890662+00:00",
+      "detail": "read but empty: Press Metal; named the company: 5 of 12 (lowest: Genting 0/1, IHH 0/1, Tenaga 2/6)",
+      "fetched": 12,
+      "kept": 12,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 12
+    },
+    {
+      "at": "2026-11-09T10:07:13.361713+00:00",
+      "detail": "throttled: no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked); deferred: Genting, Maybank, Tenaga",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "throttled",
+      "stored": 0
+    }
+  ],
   "counts": {
-    "articles": 33941,
+    "articles": 34090,
     "documents": 0,
-    "escalated": 4281,
+    "escalated": 4284,
     "events": 4316,
     "failed_sweeps": 112,
-    "linked": 17191,
-    "observations": 7285,
+    "linked": 17202,
+    "observations": 7293,
     "series": 31,
-    "sweeps": 1483
+    "sweeps": 1493
   },
   "day": "2026-11-09",
-  "generated_at": "2026-11-09 00:55 UTC",
+  "generated_at": "2026-11-09 10:07 UTC",
   "macro": [
     {
       "change": "0.16",
@@ -153,35 +244,101 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-08",
+          "known_at": "2026-11-09",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-07",
+          "period_end": "2026-11-09",
           "source": "finbert_tone",
-          "value": "0.07"
+          "value": "0.43"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE1pcGp1bUxFRW5hbDZHRE9FTmRfc3pLX3dHSUdCZnUwb1puMi1Lekdhd05Sd1pma1NUMU0xS3ZFcVNvWlh6ZGhMOW1OZEJpNXd3RmZ4VTd1VUZheWdpYndGWA?oc=5",
+          "domain": "www.kaohooninternational.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-09T08:42:49+00:00",
+          "quality": 0.65,
+          "title": "Maybank Positive on KCE\u2019s 4Q26 Sales Target, Flags Caution on Long-Term Margin Sustainability",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiZ0FVX3lxTE00cXNSZmYtVTRjc0pISV9LTldxbl9GN0M0VFdkV3BRVm1JNENOZFZ3MjNzRUkzejBodnNYOUN4T1NQcXNwY1NrS1BnQzlQcEdVUnVPcENwQVc3RTBnMGFHZnV6MFhtckk?oc=5",
+          "domain": "www.tradingview.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-09T01:52:00+00:00",
+          "quality": 0.65,
+          "title": "Rukun Raharja (RAJA) Kantongi Fasilitas Pembiayaan Syariah Rp 250 Miliar dari Maybank",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 2,
+        "polarity_mean": 0.0,
+        "sources": 2,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
       "earnings": [],
-      "escalated": 0,
+      "escalated": 1,
       "events": [],
       "instrument_id": "MYX:5347",
       "label": "Tenaga",
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-08",
+          "known_at": "2026-11-09",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-08",
+          "period_end": "2026-11-09",
           "source": "finbert_tone",
-          "value": "0.09"
+          "value": "0.52"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMizAFBVV95cUxOcGZJS1pyeXlPdjUwaGE5TEJBYnBuMTdkMEFXR2lEak9RZ2l0aXNuRU4xajJUUnV0aHpFcF9na0MtcTFQakUyMXFnUGtBbTN4STdyQTJJSmFUbHpjVmhVUjk3X0FGTFFCSFM0R3pMT3g3a24xeUpvOUtSTktyTE8wYWhGdGEtRjNHX0pVc0k0VThGTkVyUXctd1ZFSFQtSjAwSEwzYmdJTWJ2ZnNWMXduYmdra2xJVmJMaW4wc3kxQnVUZkRXOG5TSURGYTA?oc=5",
+          "domain": "www.tradingview.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-09T05:00:00+00:00",
+          "quality": 0.65,
+          "title": "Weekly Recap: Profit rises, target reaffirmed and FSI seeks TNB approval",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiaEFVX3lxTFBtTWpLWWc1cFo1bWRHcl9NaTM4WXFXR1h4ODE4NXJpRFVsWElTRGU1WnZPSEhQVXhHclRaR21LcElqamY0QU4tNlgwRGs3amNidXFsU1lkNm5Wa0w4cERIUTFQcmkwT2Np?oc=5",
+          "domain": "theedgemalaysia.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-09T07:29:28+00:00",
+          "quality": 0.8,
+          "title": "TNB\u2019s role in Malaysia\u2019s energy future",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 2,
+        "polarity_mean": 0.5,
+        "sources": 2,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -193,15 +350,35 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-07",
+          "known_at": "2026-11-09",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-06",
+          "period_end": "2026-11-09",
           "source": "finbert_tone",
-          "value": "0.30"
+          "value": "0.09"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMi4AFBVV95cUxQbUxHU0puQ0NjYXpsbEdZaC1Rd2FPcjdFemlDd3dLSks2OGJtaFJvZ1htRmxfZEVCX052UU5QUVpqNjBRUmd0ZWJzTVh6NENkOVlRSzFFeFZHVkpyajBSMThQWWxma010WjE5SkwxcldFaW5sYjlOYlB0RHNjazQ5d3VVTGY4MldROGNiaDlsLUh0ZndRM3VJLVprQlUwMENGd1JZVW5CQXFISVkxMy1FSjdwRlF4YWQ0MTVYbjViNkx3WTVWV1JjanZaVV9nTDJCanBwXzhseUJhNmt5UFBEVNIB4AFBVV95cUxQbUxHU0puQ0NjYXpsbEdZaC1Rd2FPcjdFemlDd3dLSks2OGJtaFJvZ1htRmxfZEVCX052UU5QUVpqNjBRUmd0ZWJzTVh6NENkOVlRSzFFeFZHVkpyajBSMThQWWxma010WjE5SkwxcldFaW5sYjlOYlB0RHNjazQ5d3VVTGY4MldROGNiaDlsLUh0ZndRM3VJLVprQlUwMENGd1JZVW5CQXFISVkxMy1FSjdwRlF4YWQ0MTVYbjViNkx3WTVWV1JjanZaVV9nTDJCanBwXzhseUJhNmt5UFBEVA?oc=5",
+          "domain": "simplywall.st",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-09T03:29:20+00:00",
+          "quality": 0.65,
+          "title": "What PETRONAS Chemicals Shareholders Got Right",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -213,11 +390,11 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-08",
+          "known_at": "2026-11-09",
           "label": "FinBERT headline tone",
           "period_end": "2026-11-08",
           "source": "finbert_tone",
-          "value": "0.10"
+          "value": "0.12"
         }
       ],
       "stories": [],
@@ -259,7 +436,7 @@
       "earnings": [
         "2026-11-17 (finnhub)"
       ],
-      "escalated": 30,
+      "escalated": 32,
       "events": [],
       "instrument_id": "XNAS:NVDA",
       "label": "NVIDIA",
@@ -404,6 +581,32 @@
       "stories": [
         {
           "day": null,
+          "doc_id": "https://www.nst.com.my/business/corporate/2026/11/1573902/nvidias-out-hour-shares-fall-firm-probes-ceo-jensen-huang",
+          "domain": "www.nst.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-09T05:57:48+00:00",
+          "quality": 1.0,
+          "title": "Nvidia's out-of-hour shares fall as firm probes CEO Jensen Huang",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://www.nst.com.my/business/corporate/2026/11/1573680/nvidia-probes-ceo-huang-amid-reports-chinese-spy-links-singapore",
+          "domain": "www.nst.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-08T23:45:02+00:00",
+          "quality": 1.0,
+          "title": "Nvidia probes CEO Huang amid reports of Chinese spy links to Singapore-based firm [WATCH]",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
           "doc_id": "https://finance.yahoo.com/technology/ai/articles/spacex-spcx-lands-45-billion-220638884.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
           "escalated": true,
@@ -479,40 +682,14 @@
           "quality": 0.8,
           "title": "Nvidia opens probe after report of CEO Huang's relationship with alleged Chinese spy",
           "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMioAFBVV95cUxOWkhVdEx4bnBnRUEtWjVCaEVodEppXzRzM1lxWlk3YVlfNVQzcHBPNVU4ajBsUzRKemQ5amRhd0liSF9Benl5UDhRV1NsOU93bGh3N3pDd2pldFREX200V285NV9PSWdZNVJJOElFbXVOU3ZlRmgxRVhaQm1sazBiOTJ3YlJnTUdQLWdvekc3Z3FPdVA2eTQ2TDNuZGpmekRv?oc=5",
-          "domain": "finance.yahoo.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 0.0,
-          "published_at": "2026-11-08T21:00:11+00:00",
-          "quality": 0.8,
-          "title": "Nvidia will investigate CEO Jensen Huang\u2019s relationship with possible Chinese spy",
-          "uncertainty": 1.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMizwFBVV95cUxQOVRsMnNFSmh0Uldhb2VaLTlCUllNVG8wckxnSTlHRGFqb0NkR1VtNlRjaEEtWW9aOTJvQmV0aWNRVjlOSVNOUVZEOFp4c2JITkVxUlRGVzNFZjFTRmRmcEpOcG1MU0lnT3hqWmlhRi1lSDRxTHpfWEQ1b1ZDb284Ri1LaTNmWHgtbTEzYXlkMXd0M1FnOHNBczV3UW1HZnl1ODN4RHA4TExCT2pKOW5NOWlzU0RfNDdqa3BGQjNTZEE1cFFHeUhXT2ttb3A1THM?oc=5",
-          "domain": "www.investing.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": -1.0,
-          "published_at": "2026-11-08T20:56:05+00:00",
-          "quality": 0.8,
-          "title": "Nvidia CEO Huang admits to affair, apologizes to employees as probe launched",
-          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.0,
-        "n": 56,
-        "polarity_mean": -0.411,
-        "sources": 37,
-        "uncertainty_mean": 0.109
+        "n": 61,
+        "polarity_mean": -0.41,
+        "sources": 38,
+        "uncertainty_mean": 0.1
       },
       "upcoming": [
         {
