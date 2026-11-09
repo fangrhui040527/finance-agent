@@ -1,0 +1,333 @@
+{
+  "day": "2026-11-09",
+  "written_at": "2026-11-09T22:46:00Z",
+  "phase": "full",
+  "week": 9,
+  "equity_usd": 1000.0,
+  "cash_usd": 1000.0,
+  "control_equity_usd": 910.24,
+  "control_return_to_date": -0.0898,
+  "drawdown": 0.0,
+  "control_drawdown": 0.0898,
+  "halted": false,
+  "marks": 47,
+  "positions": [],
+  "changes": [],
+  "control_changes": [],
+  "control_mark": {
+    "marked_on": "2026-11-09",
+    "equity_usd": 910.24,
+    "cash_usd": 196.68,
+    "positions_usd": 713.56,
+    "day_return": -0.0087,
+    "halted": true,
+    "note": "US legs marked at 11-09 closes; Bursa shut (Deepavali observed); mark reads halted at 8.98% drawdown though docs/22 gives the control no halt"
+  },
+  "index_book": {
+    "mark": {
+      "marked_on": "2026-11-09",
+      "equity_usd": 986718.01,
+      "cash_usd": 198944.62,
+      "positions_usd": 787773.39,
+      "day_return": 0.0,
+      "drawdown": 0.014,
+      "held": 100,
+      "pending": 12
+    },
+    "cost_to_date_share_of_notional": 0.0112,
+    "since_2026_09_30": {
+      "index": -0.0133,
+      "decided": 0.0,
+      "control": -0.0712
+    },
+    "dividends": [],
+    "changes": {},
+    "note": "no change in holdings; Bursa holiday"
+  },
+  "caps": [
+    {
+      "cap": "largest name",
+      "value": "0.00%",
+      "limit": "25%",
+      "breached": false
+    },
+    {
+      "cap": "invested",
+      "value": "0.00%",
+      "limit": "80%",
+      "breached": false
+    },
+    {
+      "cap": "cash floor",
+      "value": "100.00%",
+      "limit": "20%",
+      "breached": false
+    },
+    {
+      "cap": "names held",
+      "value": "0",
+      "limit": "0",
+      "breached": false
+    },
+    {
+      "cap": "drawdown from peak",
+      "value": "0.00%",
+      "limit": "8% halts entries",
+      "breached": false
+    },
+    {
+      "cap": "turnover, 5 weekdays",
+      "value": "USD 0.00",
+      "limit": "USD 500.00",
+      "breached": false
+    }
+  ],
+  "prices": {
+    "bursa": "no session (Deepavali observed); Friday 2026-11-06 closes",
+    "us": "Monday 2026-11-09 closes",
+    "fx": "MYR 4.0588 per USD (bnm, 2026-11-06)"
+  },
+  "fundable": [
+    {
+      "instrument_id": "MYX:1155",
+      "lot_usd": 249.33,
+      "share": 0.249,
+      "round_trip": 0.0117,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:5183",
+      "lot_usd": 103.48,
+      "share": 0.103,
+      "round_trip": 0.0215,
+      "lots": 2
+    },
+    {
+      "instrument_id": "MYX:5225",
+      "lot_usd": 189.71,
+      "share": 0.19,
+      "round_trip": 0.0123,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:8869",
+      "lot_usd": 168.77,
+      "share": 0.169,
+      "round_trip": 0.0137,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:3182",
+      "lot_usd": 36.46,
+      "share": 0.036,
+      "round_trip": 0.0586,
+      "lots": 6
+    },
+    {
+      "instrument_id": "XNAS:NVDA",
+      "lot_usd": 178.67,
+      "share": 0.179,
+      "round_trip": 0.0139,
+      "lots": 1
+    }
+  ],
+  "over_cap": {
+    "MYX:5347": 0.321,
+    "XNAS:AAPL": 0.351,
+    "XNAS:MSFT": 0.545
+  },
+  "ledger": {
+    "mark_days": 30,
+    "gap": "no routine ran 2026-10-02..10-06; no paper page and no decision for those days; no decision is backdated"
+  },
+  "attribution": null,
+  "decision": {
+    "recorded": true,
+    "weights": {},
+    "thesis": "All cash, the fifty-fifth all-cash row. Bursa was shut on Monday 11-09 for Deepavali observed, so the Bursa marks are still Friday 11-06's; Nasdaq traded and its closes are cached but not yet decomposed. The 2026-11-08 feedback page records one company event: on Sunday 11-08 NVIDIA's board opened an investigation into its chief executive over reported links to an alleged Chinese intelligence effort, with press rows only and no company statement or 8-K in the store. NVIDIA closed 178.67 on 11-09 against 186.64 on 11-06; whether that is the probe or the market is tomorrow's decomposition. Petronas Chemicals' 11-05 fall and Genting's rights terms are still not in the store. No name carries a measured, sourced reason to expect it to beat cash over 21 sessions. Twenty-four all-cash claims are graded, all correct, against a control at -8.98%. Claim: nothing in the fundable universe beats cash over 21 sessions.",
+    "prediction_id": "paper-2026-11-09-allcash-21d-a37c",
+    "grades_on": "2026-12-09",
+    "confidence": 0.55,
+    "horizon": 21
+  },
+  "stores": {
+    "decided_targets": 55,
+    "predictions": 55,
+    "outcomes": 24,
+    "index_targets": 402,
+    "control_targets": 16,
+    "index_pending": 12,
+    "made_at": "2026-11-09T22:46:05Z"
+  },
+  "evidence": {
+    "feedback_pages": "knowledge/feedback/2026-11-08.md (d70514e)",
+    "weekend": "NVIDIA board probe of its CEO reported 11-08 from 20:01Z, press only; no session measured yet",
+    "phase": "week 9, full caps"
+  },
+  "mistakes": [
+    "Refuted: paper-2026-11-08-allcash-21d-35cb reason 1 ('the weekend added no company event'): NVIDIA's board probe was reported from 20:01Z on 11-08, 2h42m before that decision.",
+    "Standing: paper-2026-10-16-allcash-21d-2b02 Press Metal -9.34% not decomposed; 5.43 sigma, cause not in store; 6.85 against 7.17."
+  ],
+  "mistakes_checked": [
+    "paper-2026-11-08-allcash-21d-35cb: reason 1 no weekend company event (refuted)"
+  ],
+  "grades_due": [
+    {
+      "prediction_id": "paper-2026-10-10-allcash-21d-f51e",
+      "on": "2026-11-10"
+    },
+    {
+      "prediction_id": "paper-2026-10-11-allcash-21d-071b",
+      "on": "2026-11-10"
+    },
+    {
+      "prediction_id": "paper-2026-10-12-allcash-21d-a3c9",
+      "on": "2026-11-11"
+    },
+    {
+      "prediction_id": "paper-2026-10-13-allcash-21d-8010",
+      "on": "2026-11-12"
+    },
+    {
+      "prediction_id": "paper-2026-10-14-allcash-21d-a9b4",
+      "on": "2026-11-13"
+    },
+    {
+      "prediction_id": "paper-2026-10-15-allcash-21d-8274",
+      "on": "2026-11-16"
+    }
+  ],
+  "lessons": [
+    "A decision reads yesterday's feedback page, which stops at yesterday: the 11-08 decision missed NVIDIA's board probe published on the decision day."
+  ],
+  "dividend_boundary": {
+    "decided": "2026-10-10T15:25:31Z",
+    "control": "2026-10-10T15:25:31Z",
+    "index": "2026-10-10T15:25:31Z",
+    "note": "marks before it are not restated; no credit to the decided or control book yet"
+  },
+  "graded": [
+    {
+      "prediction_id": "paper-2026-09-11-allcash-21d-8bf9",
+      "benchmark": -0.024,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-12-allcash-21d-1661",
+      "benchmark": -0.024,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-13-allcash-21d-5baf",
+      "benchmark": -0.0237,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-14-allcash-21d-9d7e",
+      "benchmark": -0.0441,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-15-allcash-21d-af55",
+      "benchmark": -0.0466,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-16-allcash-21d-3865",
+      "benchmark": -0.0616,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-17-allcash-21d-7667",
+      "benchmark": -0.0616,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-18-allcash-21d-667a",
+      "benchmark": -0.0616,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-19-allcash-21d-b7bd",
+      "benchmark": -0.0557,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-20-allcash-21d-dbaf",
+      "benchmark": -0.0557,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-21-allcash-21d-c04f",
+      "benchmark": -0.0533,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-22-allcash-21d-33c5",
+      "benchmark": -0.0533,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-23-allcash-21d-b999",
+      "benchmark": -0.0469,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-24-allcash-21d-e5b2",
+      "benchmark": -0.0446,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-25-allcash-21d-468d",
+      "benchmark": -0.0433,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-26-allcash-21d-cf74",
+      "benchmark": -0.0435,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-27-allcash-21d-9d18",
+      "benchmark": -0.0435,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-28-allcash-21d-111e",
+      "benchmark": -0.0418,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-29-allcash-21d-7831",
+      "benchmark": -0.0266,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-30-allcash-21d-ee21",
+      "benchmark": -0.0253,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-10-01-allcash-21d-5a1e",
+      "benchmark": -0.009,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-10-07-allcash-21d-2b2c",
+      "benchmark": -0.0466,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-10-08-allcash-21d-7bb6",
+      "benchmark": -0.0539,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-10-09-allcash-21d-81d7",
+      "benchmark": -0.0592,
+      "correct": true
+    }
+  ],
+  "closes": {},
+  "closes_note": "no session on Sunday 2026-11-08"
+}
