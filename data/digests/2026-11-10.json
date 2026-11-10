@@ -1,18 +1,109 @@
 {
-  "collection": [],
+  "collection": [
+    {
+      "at": "2026-11-10T10:07:51.467709+00:00",
+      "detail": "facts 13; scored 13 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized.onnx",
+      "fetched": 14,
+      "kept": 0,
+      "source": "finbert_tone",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-10T10:07:50.668076+00:00",
+      "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-10T10:07:50.666308+00:00",
+      "detail": "facts 5; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-10T10:07:44.790233+00:00",
+      "detail": "facts 0; window not covered back to 2026-11-09 22:41Z; the oldest item read is 2026-11-10 09:55Z, so 11.2h of the window was never served",
+      "fetched": 19,
+      "kept": 16,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 16
+    },
+    {
+      "at": "2026-11-10T10:07:43.466518+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-10T10:07:41.363544+00:00",
+      "detail": "nst_business fetch failed: HTTP Error 404: Not Found - and https://www.nst.com.my/ advertises no feed of its own",
+      "fetched": 0,
+      "kept": 0,
+      "source": "nst_business",
+      "status": "failed",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-10T10:07:41.239106+00:00",
+      "detail": "",
+      "fetched": 47,
+      "kept": 47,
+      "source": "fmt_business",
+      "status": "ok",
+      "stored": 46
+    },
+    {
+      "at": "2026-11-10T10:07:40.796119+00:00",
+      "detail": "read but empty: Maybank, Tenaga, Petronas Chemicals, IHH, Press Metal, Genting",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-10T10:07:39.603499+00:00",
+      "detail": "named the company: 9 of 26 (lowest: Petronas Chemicals 0/1, Press Metal 0/1, Maybank 3/11)",
+      "fetched": 26,
+      "kept": 26,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 22
+    },
+    {
+      "at": "2026-11-10T10:07:37.639427+00:00",
+      "detail": "grouped 3 names per request; 2 requests (HTTP 429 on request 2: the rest of the slot is deferred, not asked); read but empty: Maybank, Tenaga, Petronas Chemicals; failed: GDELT fetch failed: HTTP Error 429: Too Many Requests (IHH, Press Metal, Genting); named the company: 0 of 7 (lowest: Maybank + Tenaga + Petronas Chemicals 0/7)",
+      "fetched": 8,
+      "kept": 7,
+      "source": "gdelt",
+      "status": "throttled",
+      "stored": 7
+    }
+  ],
   "counts": {
-    "articles": 34561,
+    "articles": 34652,
     "documents": 0,
-    "escalated": 4412,
+    "escalated": 4413,
     "events": 4320,
-    "failed_sweeps": 113,
-    "linked": 17515,
-    "observations": 7356,
+    "failed_sweeps": 114,
+    "linked": 17524,
+    "observations": 7374,
     "series": 31,
-    "sweeps": 1506
+    "sweeps": 1516
   },
   "day": "2026-11-10",
-  "generated_at": "2026-11-10 03:35 UTC",
+  "generated_at": "2026-11-10 10:08 UTC",
   "macro": [
     {
       "change": "-0.06",
@@ -153,15 +244,35 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-09",
+          "known_at": "2026-11-10",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-09",
+          "period_end": "2026-11-10",
           "source": "finbert_tone",
-          "value": "0.43"
+          "value": "0.53"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMijwFBVV95cUxNZ0gweWF3ZWRXLWFEOVVUcmJEWnRobnE1N2lBY3NFQk5qbktfLUNNY1JEcmlrWDVvMjhsWTJITUpzdmlvMDAwOHRjaEEzS2VzX1pTeVpoLXNjaXotWjlqZ3FsUk1CbDJleTNfejY2QUoxcEp4M3lPU1h3ZjdtbkVXT2VIdE8tLUpZbHdrVXdOdw?oc=5",
+          "domain": "www.ggrasia.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-10T03:18:46+00:00",
+          "quality": 0.65,
+          "title": "Genting Bhd sees higher ESG score under Maybank\u2019s rating system",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -173,15 +284,61 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-09",
+          "known_at": "2026-11-10",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-09",
+          "period_end": "2026-11-10",
           "source": "finbert_tone",
-          "value": "0.52"
+          "value": "0.18"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxPcGRsckU4aHFrbkt6b3pKaUVhdnhmX2pEWm1aTThBQkJrZjJWalhxYWZ5S1FmZXJ1ODhWeDB0MktQYWd3dWhPanB4bTZBck5jOVVlQ05Sa19QSWVhMDN5TXVIek5QMUk3MHZ3MWJDdl9OMUZaTWVIbFJISFFVUnk0TllPRWRCZHI1ZTVVdUs1Qk9BbkpwVy1odWJLaE1VTHJJNy13bEJVSXMtVUM5Vy0yd3RsZzk1aFA1MGFN?oc=5",
+          "domain": "solarquarter.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-10T05:21:52+00:00",
+          "quality": 0.65,
+          "title": "TNB, IOI Partner For 500 MW Solar Project With 1,000 MWh Battery Storage In Malaysia",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMilAFBVV95cUxNZ3VuZ1ptdzk0YTN2WHNxOTRvbVc4OUhseFZ5bHBkT2ZNeDk4TUFIQVB2aF94RHR1cTI4WlZLWms2NVlITGlEUldSTkxUbFZpTHc2YzFiTDdRUWZQYy0wRkdRNnBILTk1U1kxa1AzRXlKUjZVb2tnMndpNHRLNjlTeE5aNlp4WWdqY0pxV2MzYXVibnl1?oc=5",
+          "domain": "energynews.pro",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-09T23:32:27+00:00",
+          "quality": 0.65,
+          "title": "Tenaga and IOI Corp team up with 12 SMEs on 500 MW solar project",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMitgFBVV95cUxQb2ZGYzQzS0p6UTdrRDZIQUo3YW5JSWFsVWRycEFvS01hVGNab3BSYUtxYmIzTnNCOWRNUGQxblExZV9hZ0JTeHpwYUJFMW0zdU5pS1AtalRUVGlYenpISGFHUjZzblRmUFhUYlRnUk9YYVdBeE1mOWVkVkY4eE8xOXJrRkVPZkc1cnpha0F3bllZd0h3ejF0Rko2WHppTmZxUGFxbW1mbjhkR1FsYkgzZ1NmNXZnUQ?oc=5",
+          "domain": "solarbytes.info",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-09T15:15:55+00:00",
+          "quality": 0.65,
+          "title": "TNB & IOI partner for 500 MWac solar, 1 GWh BESS in Malaysia",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 3,
+        "polarity_mean": 0.0,
+        "sources": 3,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -193,11 +350,11 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-09",
+          "known_at": "2026-11-10",
           "label": "FinBERT headline tone",
           "period_end": "2026-11-09",
           "source": "finbert_tone",
-          "value": "0.09"
+          "value": "0.10"
         }
       ],
       "stories": [],
@@ -213,15 +370,35 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-09",
+          "known_at": "2026-11-10",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-08",
+          "period_end": "2026-11-10",
           "source": "finbert_tone",
-          "value": "0.12"
+          "value": "-0.08"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMinwFBVV95cUxNSUg2UXZWNGZJRFhLeFU5UmpXeVlISWt4SGF5dzFja0xHUExBQUt0ZnFDUUFCalhVQmhYSjVhTVBHNnhRWmEzQ21KNGxjQWV6M2FMeTVpdURuYU9lS1JqdnZoWFpqRWFsbkowbjd3MXZmWVdrNUx3MUR2Q3ZnOVhGUFVrT2dDRnVCVndYeWVvVGFnYkh0eENOWmFPTUp1czg?oc=5",
+          "domain": "www.tipranks.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-10T09:37:41+00:00",
+          "quality": 0.65,
+          "title": "EPF Reports Two IHH Healthcare Share Disposals",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -244,22 +421,42 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-07",
+          "known_at": "2026-11-10",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-06",
+          "period_end": "2026-11-10",
           "source": "finbert_tone",
-          "value": "0.79"
+          "value": "0.92"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMijwFBVV95cUxNZ0gweWF3ZWRXLWFEOVVUcmJEWnRobnE1N2lBY3NFQk5qbktfLUNNY1JEcmlrWDVvMjhsWTJITUpzdmlvMDAwOHRjaEEzS2VzX1pTeVpoLXNjaXotWjlqZ3FsUk1CbDJleTNfejY2QUoxcEp4M3lPU1h3ZjdtbkVXT2VIdE8tLUpZbHdrVXdOdw?oc=5",
+          "domain": "www.ggrasia.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-10T03:18:46+00:00",
+          "quality": 0.65,
+          "title": "Genting Bhd sees higher ESG score under Maybank\u2019s rating system",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
       "earnings": [
         "2026-11-17 (finnhub)"
       ],
-      "escalated": 66,
+      "escalated": 67,
       "events": [
         {
           "kind": "rating_reiteration",
@@ -418,6 +615,19 @@
       ],
       "stories": [
         {
+          "day": null,
+          "doc_id": "https://www.freemalaysiatoday.com/category/nation/2026/11/10/no-probe-yet-into-m-sian-firm-linked-to-nvidia-scandal",
+          "domain": "www.freemalaysiatoday.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-10T06:04:00+00:00",
+          "quality": 1.0,
+          "title": "No probe yet into M\u2019sian firm linked to Nvidia scandal",
+          "uncertainty": 0.0
+        },
+        {
           "day": "2026-11-09",
           "doc_id": "web_search:https://finance.yahoo.com/markets/live/stock-market-today-monday-november-9-dow-sp-500-nasdaq-nvidia-090535419.html",
           "domain": "finance.yahoo.com",
@@ -507,27 +717,14 @@
           "quality": 1.0,
           "title": "Nvidia's Huang scandal rattles AI industry built around him",
           "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://finance.yahoo.com/m/7bcea03a-9f2e-3518-97dc-b837344745d8/amd-stock-could-jump-34%25.-no%2C.html?.tsrc=rss",
-          "domain": "finance.yahoo.com",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
-          "kind": "",
-          "polarity": 1.0,
-          "published_at": "2026-11-09T18:02:00+00:00",
-          "quality": 1.0,
-          "title": "AMD Stock Could Jump 34%. No, It\u2019s Got Nothing to Do With the Nvidia Turmoil.",
-          "uncertainty": 0.7352941176470588
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 134,
-        "polarity_mean": -0.308,
-        "sources": 42,
-        "uncertainty_mean": 0.112
+        "n": 135,
+        "polarity_mean": -0.314,
+        "sources": 43,
+        "uncertainty_mean": 0.111
       },
       "upcoming": [
         {

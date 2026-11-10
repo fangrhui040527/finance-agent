@@ -1,29 +1,40 @@
 # Digest 2026-11-10
 
-Generated 2026-11-10 03:35 UTC · slot `all` · 34561 articles in the corpus, 7356 observations, 4320 events in the fact book.
+Generated 2026-11-10 10:08 UTC · slot `all` · 34652 articles in the corpus, 7374 observations, 4320 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-11-10 www.ggrasia.com — Genting Bhd sees higher ESG score under Maybank’s rating system [q 0.65, tone +0.0]
+- snapshot: FinBERT headline tone 0.53 (finbert_tone, 2026-11-10)
 
 ### Tenaga (MYX:5347)
-- quiet: nothing collected for this name in the window
+- tone: 3 stories from 3 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-11-10 solarquarter.com — TNB, IOI Partner For 500 MW Solar Project With 1,000 MWh Battery Storage In Malaysia [q 0.65, tone +0.0]
+- 2026-11-09 energynews.pro — Tenaga and IOI Corp team up with 12 SMEs on 500 MW solar project [q 0.65, tone +0.0]
+- 2026-11-09 solarbytes.info — TNB & IOI partner for 500 MWac solar, 1 GWh BESS in Malaysia [q 0.65, tone +0.0]
+- snapshot: FinBERT headline tone 0.18 (finbert_tone, 2026-11-10)
 
 ### Petronas Chemicals (MYX:5183)
 - quiet: nothing collected for this name in the window
 
 ### IHH (MYX:5225)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-11-10 www.tipranks.com — EPF Reports Two IHH Healthcare Share Disposals [q 0.65, tone +0.0]
+- snapshot: FinBERT headline tone -0.08 (finbert_tone, 2026-11-10)
 
 ### Press Metal (MYX:8869)
 - quiet: nothing collected for this name in the window
 
 ### Genting (MYX:3182)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-11-10 www.ggrasia.com — Genting Bhd sees higher ESG score under Maybank’s rating system [q 0.65, tone +0.0]
+- snapshot: FinBERT headline tone 0.92 (finbert_tone, 2026-11-10)
 
 ### NVIDIA (XNAS:NVDA)
-- tone: 134 stories from 42 sources, polarity -0.31, peak intensity 0.33, uncertainty 0.11 · 66 escalated
+- tone: 135 stories from 43 sources, polarity -0.31, peak intensity 0.33, uncertainty 0.11 · 67 escalated
+- 2026-11-10 www.freemalaysiatoday.com — No probe yet into M’sian firm linked to Nvidia scandal [q 1.00, tone -1.0] ★
 - 2026-11-09 (date only) finance.yahoo.com — Stock market today: Nasdaq surges despite Nvidia stock slide, Dow and S&P 500 rally as AI tech trade rises [q 1.00, tone -1.0] ★
 - 2026-11-09 (date only) finance.yahoo.com — Stocks find firmer ground but Nvidia woes pose fresh test, oil falls [q 1.00, tone +1.0] ★
 - 2026-11-09 (date only) www.bloomberg.com — Nvidia Board to Probe Spying Case After CEO Jensen Huang Admits Infidelity - Bloomberg [q 1.00, tone -1.0] ★
@@ -31,7 +42,6 @@ Generated 2026-11-10 03:35 UTC · slot `all` · 34561 articles in the corpus, 73
 - 2026-11-09 (date only) www.investing.com — Mizuho cuts Nvidia stock price target on Chinese spy allegations By Investing.com [q 1.00, tone -1.0] ★
 - 2026-11-09 finance.yahoo.com — Shopify Is Just One Of 3 Top Founder Led Stocks [q 1.00, tone -1.0] ★
 - 2026-11-09 finance.yahoo.com — Nvidia's Huang scandal rattles AI industry built around him [q 1.00, tone -1.0] ★
-- 2026-11-09 finance.yahoo.com — AMD Stock Could Jump 34%. No, It’s Got Nothing to Do With the Nvidia Turmoil. [q 1.00, tone +1.0] ★
 - event 2026-11-09 rating_reiteration — Goldman Sachs maintain Buy (fmp)
 - event 2026-11-09 rating_reiteration — RBC Capital maintain Outperform (fmp)
 - upcoming 2026-11-25 earnings_result — Q3 2027 results after the close (finnhub)
@@ -84,6 +94,21 @@ Generated 2026-11-10 03:35 UTC · slot `all` · 34561 articles in the corpus, 73
 | 10y minus 2y Treasury spread, % | 0.32 | 2026-11-09 | -0.03 | fred |
 | US unemployment rate, % | 4.10 | 2026-10-01 | -0.1 | fred |
 | CBOE VIX, index | 25.64 | 2026-11-06 | -2.54 | fred |
+
+## Collection
+
+| at (UTC) | source | status | fetched | kept | stored | detail |
+|---|---|---|---|---|---|---|
+| 10:07 | finbert_tone | ok | 14 | 0 | 0 | facts 13; scored 13 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized |
+| 10:07 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
+| 10:07 | twse_openapi | ok | 8 | 0 | 0 | facts 5;  |
+| 10:07 | jin10_flash | degraded | 19 | 16 | 16 | facts 0; window not covered back to 2026-11-09 22:41Z; the oldest item read is 2 |
+| 10:07 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 10:07 | nst_business | failed | 0 | 0 | 0 | nst_business fetch failed: HTTP Error 404: Not Found - and https://www.nst.com.m |
+| 10:07 | fmt_business | ok | 47 | 47 | 46 |  |
+| 10:07 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Maybank, Tenaga, Petronas Chemicals, IHH, Press Metal, Genting |
+| 10:07 | google_news | ok | 26 | 26 | 22 | named the company: 9 of 26 (lowest: Petronas Chemicals 0/1, Press Metal 0/1, May |
+| 10:07 | gdelt | throttled | 8 | 7 | 7 | grouped 3 names per request; 2 requests (HTTP 429 on request 2: the rest of the  |
 
 ---
 
