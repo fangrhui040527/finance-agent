@@ -1,6 +1,42 @@
 {
   "collection": [
     {
+      "at": "2026-11-10T19:56:29.501261+00:00",
+      "detail": "facts 0; ",
+      "fetched": 450,
+      "kept": 0,
+      "source": "dbnomics",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-10T19:56:27.899674+00:00",
+      "detail": "facts 0; window not covered back to 2026-11-10 10:07Z; the oldest item read is 2026-11-10 19:01Z, so 8.9h of the window was never served",
+      "fetched": 20,
+      "kept": 19,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 17
+    },
+    {
+      "at": "2026-11-10T19:56:26.285014+00:00",
+      "detail": "facts 6; release calendar: 'FOMC Press Release' listed on 15 days of the fortnight - a daily table, not a scheduled print; not stored as a release",
+      "fetched": 481,
+      "kept": 0,
+      "source": "fred",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-10T19:56:21.995499+00:00",
+      "detail": "facts 13; fmp /earnings is outside the plan (HTTP 402); not collected for NVDA, AAPL, MSFT",
+      "fetched": 4003,
+      "kept": 0,
+      "source": "fmp",
+      "status": "ok",
+      "stored": 0
+    },
+    {
       "at": "2026-11-10T10:07:51.467709+00:00",
       "detail": "facts 13; scored 13 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized.onnx",
       "fetched": 14,
@@ -92,26 +128,26 @@
     }
   ],
   "counts": {
-    "articles": 34661,
+    "articles": 34678,
     "documents": 0,
     "escalated": 4418,
-    "events": 4320,
+    "events": 4321,
     "failed_sweeps": 114,
-    "linked": 17531,
-    "observations": 7374,
+    "linked": 17533,
+    "observations": 7386,
     "series": 31,
-    "sweeps": 1516
+    "sweeps": 1520
   },
   "day": "2026-11-10",
-  "generated_at": "2026-11-10 17:04 UTC",
+  "generated_at": "2026-11-10 19:56 UTC",
   "macro": [
     {
-      "change": "-0.06",
-      "obs_date": "2026-11-06",
+      "change": "-0.08",
+      "obs_date": "2026-11-09",
       "series_id": "BAMLH0A0HYM2",
       "source": "fred",
       "title": "ICE BofA US high-yield option-adjusted spread, %",
-      "value": "3.42"
+      "value": "3.34"
     },
     {
       "change": "0",
@@ -122,12 +158,12 @@
       "value": "2.75"
     },
     {
-      "change": "2.167",
-      "obs_date": "2026-09-01",
+      "change": "1.178",
+      "obs_date": "2026-10-01",
       "series_id": "CPIAUCSL",
       "source": "fred",
       "title": "US CPI, all items, index 1982-84=100",
-      "value": "336.30"
+      "value": "337.48"
     },
     {
       "change": "-0.36",
@@ -186,12 +222,12 @@
       "value": "121.88"
     },
     {
-      "change": "264.42",
-      "obs_date": "2026-11-06",
+      "change": "673.72",
+      "obs_date": "2026-11-09",
       "series_id": "NASDAQCOM",
       "source": "fred",
       "title": "NASDAQ Composite, index level",
-      "value": "24,579.42"
+      "value": "25,253.14"
     },
     {
       "change": "32.9329",
@@ -202,12 +238,12 @@
       "value": "3,283.05"
     },
     {
-      "change": "-334.89",
-      "obs_date": "2026-11-05",
+      "change": "173.08",
+      "obs_date": "2026-11-09",
       "series_id": "SP500",
       "source": "fred",
       "title": "S&P 500, index level",
-      "value": "7,353.73"
+      "value": "7,549.94"
     },
     {
       "change": "-0.03",
@@ -226,12 +262,12 @@
       "value": "4.10"
     },
     {
-      "change": "-2.54",
-      "obs_date": "2026-11-06",
+      "change": "-5.72",
+      "obs_date": "2026-11-09",
       "series_id": "VIXCLS",
       "source": "fred",
       "title": "CBOE VIX, index",
-      "value": "25.64"
+      "value": "19.92"
     }
   ],
   "names": [
@@ -513,14 +549,14 @@
         {
           "kind": "rating_reiteration",
           "source": "fmp",
-          "title": "Goldman Sachs maintain Buy",
+          "title": "Wells Fargo maintain Overweight",
           "url": "",
-          "when": "2026-11-09T00:00:00+00:00"
+          "when": "2026-11-10T00:00:00+00:00"
         },
         {
           "kind": "rating_reiteration",
           "source": "fmp",
-          "title": "RBC Capital maintain Outperform",
+          "title": "Goldman Sachs maintain Buy",
           "url": "",
           "when": "2026-11-09T00:00:00+00:00"
         }
@@ -586,11 +622,11 @@
         },
         {
           "concept": "price_target_consensus",
-          "known_at": "2026-11-09",
+          "known_at": "2026-11-10",
           "label": "target (consensus)",
           "period_end": null,
           "source": "fmp",
-          "value": "336.93"
+          "value": "340.03"
         },
         {
           "concept": "analyst_buy",
@@ -868,7 +904,7 @@
         },
         {
           "concept": "price_target_consensus",
-          "known_at": "2026-11-09",
+          "known_at": "2026-11-10",
           "label": "target (consensus)",
           "period_end": null,
           "source": "fmp",
@@ -1127,7 +1163,7 @@
         },
         {
           "concept": "price_target_consensus",
-          "known_at": "2026-11-09",
+          "known_at": "2026-11-10",
           "label": "target (consensus)",
           "period_end": null,
           "source": "fmp",
