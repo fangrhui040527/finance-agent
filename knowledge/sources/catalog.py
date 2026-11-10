@@ -363,6 +363,56 @@ CATALOG: dict[str, SourceSpec] = {
         markets=("XKLS", "XNAS", "XNYS", "XTAI"),
         docs="https://eodhd.com/financial-apis/stock-etfs-fundamental-data-feeds",
     ),
+    # -- London Strategic Edge, one free key, four collectors (2026-11-03) ---------------
+    # Read ONLY from a private repository: LSE's terms forbid making its data
+    # available to third parties, and this repository commits what it collects.
+    # Each collector skips, without a request, unless LSE_REPO_PRIVATE is
+    # "true" (collect.yml sets it from the repository's visibility). 60 calls a
+    # minute on the free plan. See knowledge/sources/lse.py.
+    "lse_macro_my": SourceSpec(
+        "lse_macro_my",
+        STRUCTURED,
+        "LSE Data: 15 Malaysian macro series (CPI, OPR, IPI, PMI, trade, M3...) and the "
+        "MGS 3Y/5Y/10Y yields; private repository only",
+        "vendor",
+        ("bursa_close",),
+        key_env="LSE_API_KEY",
+        docs="https://github.com/londonstrategicedge/lse-data/blob/main/docs/api.md",
+    ),
+    "lse_calendar": SourceSpec(
+        "lse_calendar",
+        STRUCTURED,
+        "LSE Data economic calendar for MY and US: scheduled releases and prints "
+        "(actual vs consensus) as MACRO:<country> events; private repository only",
+        "vendor",
+        ("bursa_close", "us_close"),
+        key_env="LSE_API_KEY",
+        docs="https://github.com/londonstrategicedge/lse-data/blob/main/docs/api.md",
+    ),
+    "lse_options": SourceSpec(
+        "lse_options",
+        STRUCTURED,
+        "LSE Data US options chain: 30-day at-the-money implied volatility and put/call "
+        "volume per US name; private repository only",
+        "vendor",
+        ("us_close",),
+        per_instrument=True,
+        markets=("XNAS", "XNYS"),
+        key_env="LSE_API_KEY",
+        docs="https://github.com/londonstrategicedge/lse-data/blob/main/docs/api.md",
+    ),
+    "lse_prices": SourceSpec(
+        "lse_prices",
+        STRUCTURED,
+        "LSE Data US daily candles (adjusted), a second close beside Yahoo's; private "
+        "repository only",
+        "vendor",
+        ("us_close",),
+        per_instrument=True,
+        markets=("XNAS", "XNYS"),
+        key_env="LSE_API_KEY",
+        docs="https://github.com/londonstrategicedge/lse-data/blob/main/docs/api.md",
+    ),
     # LAST on purpose: it scores the titles the news sources above stored in the
     # same run, and the sweep runs sources in catalogue order. No key, no
     # network once the model is cached (knowledge/news/finbert.py).

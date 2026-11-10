@@ -63,6 +63,8 @@ SNAPSHOT = (
     ("av_news_sentiment", "vendor sentiment"),
     ("mx_news_sentiment", "Marketaux sentiment"),
     ("finbert_sentiment", "FinBERT headline tone"),
+    ("lse_atm_iv_30d", "30-day ATM implied vol (LSE)"),
+    ("lse_put_call_volume_ratio", "put/call volume (LSE)"),
     ("revenue", "revenue (last quarter)"),
     ("net_income", "net income (last quarter)"),
     ("eps_surprise_pct", "last EPS surprise %"),

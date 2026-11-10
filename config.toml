@@ -346,6 +346,11 @@ enabled = [
   # facts for the US names, keyless; EODHD behind an optional key, two names a
   # day on its free plan and US only until the Fundamentals plan.
   "sec_xbrl", "eodhd",
+  # London Strategic Edge (2026-11-03): Malaysian macro and yields, the MY/US
+  # release calendar, US options and a second US close. Each skips without a
+  # request while the repository is public - LSE's terms forbid passing its
+  # data on, and this repository commits what it collects.
+  "lse_macro_my", "lse_calendar", "lse_options", "lse_prices",
   "finbert_tone",
 ]
 
