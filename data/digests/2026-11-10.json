@@ -1,6 +1,87 @@
 {
   "collection": [
     {
+      "at": "2026-11-10T22:41:45.178297+00:00",
+      "detail": "facts 12; scored 653 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized.onnx",
+      "fetched": 12,
+      "kept": 0,
+      "source": "finbert_tone",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-10T22:41:38.721470+00:00",
+      "detail": "skipped: every asked name was refused: outside the plan or over today's credits (XNAS:MSFT, XNAS:NVDA)",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-10T22:41:38.357322+00:00",
+      "detail": "facts 0; window not covered back to 2026-11-10 19:56Z; the oldest item read is 2026-11-10 21:48Z, so 1.9h of the window was never served",
+      "fetched": 19,
+      "kept": 19,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 17
+    },
+    {
+      "at": "2026-11-10T22:41:37.196843+00:00",
+      "detail": "facts 2; XNAS:AAPL: 2026-11-09 not aggregated - 8 full pages ended part-way through that day; XNAS:MSFT: 2026-11-10 not aggregated - 8 full pages ended part-way through that day; XNAS:NVDA: 2026-11-10 not aggregated - 8 full pages ended part-way through that day",
+      "fetched": 59,
+      "kept": 58,
+      "source": "marketaux_news",
+      "status": "ok",
+      "stored": 46
+    },
+    {
+      "at": "2026-11-10T22:41:29.240817+00:00",
+      "detail": "facts 39; ",
+      "fetched": 369,
+      "kept": 322,
+      "source": "finnhub",
+      "status": "ok",
+      "stored": 245
+    },
+    {
+      "at": "2026-11-10T22:41:19.058558+00:00",
+      "detail": "facts 1; ",
+      "fetched": 2,
+      "kept": 0,
+      "source": "edgar",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-10T22:41:18.649183+00:00",
+      "detail": "named the company: 21 of 51 (lowest: NVIDIA 6/17, Apple 8/19, Microsoft 7/15)",
+      "fetched": 51,
+      "kept": 51,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 38
+    },
+    {
+      "at": "2026-11-10T22:41:17.877972+00:00",
+      "detail": "named the company: 180 of 196 (lowest: NVIDIA 68/77, Apple 40/45, Microsoft 72/74)",
+      "fetched": 213,
+      "kept": 196,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 182
+    },
+    {
+      "at": "2026-11-10T22:41:13.547738+00:00",
+      "detail": "throttled: no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked)",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "throttled",
+      "stored": 0
+    },
+    {
       "at": "2026-11-10T19:56:29.501261+00:00",
       "detail": "facts 0; ",
       "fetched": 450,
@@ -128,18 +209,18 @@
     }
   ],
   "counts": {
-    "articles": 34678,
+    "articles": 35206,
     "documents": 0,
-    "escalated": 4418,
-    "events": 4321,
+    "escalated": 4526,
+    "events": 4322,
     "failed_sweeps": 114,
-    "linked": 17533,
-    "observations": 7386,
+    "linked": 17856,
+    "observations": 7439,
     "series": 31,
-    "sweeps": 1520
+    "sweeps": 1529
   },
   "day": "2026-11-10",
-  "generated_at": "2026-11-10 19:56 UTC",
+  "generated_at": "2026-11-10 22:42 UTC",
   "macro": [
     {
       "change": "-0.08",
@@ -544,7 +625,7 @@
       "earnings": [
         "2026-11-17 (finnhub)"
       ],
-      "escalated": 67,
+      "escalated": 139,
       "events": [
         {
           "kind": "rating_reiteration",
@@ -566,15 +647,15 @@
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-11-09",
+          "known_at": "2026-11-10",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "23.32"
+          "value": "22.32"
         },
         {
           "concept": "pb",
-          "known_at": "2026-11-09",
+          "known_at": "2026-11-10",
           "label": "P/B",
           "period_end": null,
           "source": "finnhub",
@@ -582,7 +663,7 @@
         },
         {
           "concept": "eps_ttm",
-          "known_at": "2026-11-09",
+          "known_at": "2026-11-10",
           "label": "EPS (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -590,7 +671,7 @@
         },
         {
           "concept": "dividend_yield",
-          "known_at": "2026-11-09",
+          "known_at": "2026-11-10",
           "label": "dividend yield",
           "period_end": null,
           "source": "finnhub",
@@ -598,7 +679,7 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-11-09",
+          "known_at": "2026-11-10",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
@@ -606,7 +687,7 @@
         },
         {
           "concept": "high_52w",
-          "known_at": "2026-11-09",
+          "known_at": "2026-11-10",
           "label": "52w high",
           "period_end": null,
           "source": "finnhub",
@@ -614,7 +695,7 @@
         },
         {
           "concept": "low_52w",
-          "known_at": "2026-11-09",
+          "known_at": "2026-11-10",
           "label": "52w low",
           "period_end": null,
           "source": "finnhub",
@@ -670,11 +751,11 @@
         },
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-09",
+          "known_at": "2026-11-10",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-09",
+          "period_end": "2026-11-10",
           "source": "finbert_tone",
-          "value": "-0.08"
+          "value": "-0.06"
         },
         {
           "concept": "revenue",
@@ -702,6 +783,45 @@
         }
       ],
       "stories": [
+        {
+          "day": null,
+          "doc_id": "https://finance.yahoo.com/m/656fca57-9896-3dfb-96e8-e0af2bc227df/dow-jones-futures%3A-stock.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-10T22:38:12+00:00",
+          "quality": 1.0,
+          "title": "Dow Jones Futures: Stock Market Falls On Surging Treasury Yields, Nvidia Sell-Off; CoreWeave Rises Late",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://finance.yahoo.com/video/nvidia-in-the-hot-seat-anthropic-to-test-the-ipo-market-hotter-than-expected-us-inflation-184626512.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-10T18:46:26+00:00",
+          "quality": 1.0,
+          "title": "Nvidia in the hot seat, Anthropic to test the IPO market, hotter-than-expected US inflation",
+          "uncertainty": 0.12254901960784313
+        },
+        {
+          "day": null,
+          "doc_id": "https://finance.yahoo.com/video/no-chair-and-30-year-tenures-will-nvidias-board-go-soft-on-jensen-150036535.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-10T15:00:36+00:00",
+          "quality": 1.0,
+          "title": "No chair and 30-year tenures: Will Nvidia's board go soft on Jensen?",
+          "uncertainty": 0.25510204081632654
+        },
         {
           "day": null,
           "doc_id": "https://www.freemalaysiatoday.com/category/nation/2026/11/10/no-probe-yet-into-m-sian-firm-linked-to-nvidia-scandal",
@@ -766,53 +886,14 @@
           "quality": 1.0,
           "title": "Nvidia stock falls 4% as scrutiny turns to Jensen Huang\u2019s affair with alleged Chinese spy",
           "uncertainty": 0.12135922330097088
-        },
-        {
-          "day": "2026-11-09",
-          "doc_id": "web_search:https://www.investing.com/news/analyst-ratings/mizuho-cuts-nvidia-stock-price-target-on-chinese-spy-allegations-93CH-5012936",
-          "domain": "www.investing.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": -1.0,
-          "published_at": "2026-11-10T03:35:32.603171+00:00",
-          "quality": 1.0,
-          "title": "Mizuho cuts Nvidia stock price target on Chinese spy allegations By Investing.com",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/shopify-just-one-3-top-221047863.html?.tsrc=rss",
-          "domain": "finance.yahoo.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": -1.0,
-          "published_at": "2026-11-09T22:10:47+00:00",
-          "quality": 1.0,
-          "title": "Shopify Is Just One Of 3 Top Founder Led Stocks",
-          "uncertainty": 0.14204545454545456
-        },
-        {
-          "day": null,
-          "doc_id": "https://finance.yahoo.com/technology/ai/articles/nvidias-huang-scandal-rattles-ai-180531112.html?.tsrc=rss",
-          "domain": "finance.yahoo.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": -1.0,
-          "published_at": "2026-11-09T18:05:31+00:00",
-          "quality": 1.0,
-          "title": "Nvidia's Huang scandal rattles AI industry built around him",
-          "uncertainty": 0.0
         }
       ],
       "tone": {
-        "intensity_max": 0.333,
-        "n": 135,
-        "polarity_mean": -0.314,
-        "sources": 43,
-        "uncertainty_mean": 0.111
+        "intensity_max": 0.667,
+        "n": 326,
+        "polarity_mean": -0.232,
+        "sources": 85,
+        "uncertainty_mean": 0.101
       },
       "upcoming": [
         {
@@ -833,7 +914,7 @@
     },
     {
       "earnings": [],
-      "escalated": 7,
+      "escalated": 19,
       "events": [
         {
           "kind": "filing",
@@ -848,15 +929,15 @@
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-11-09",
+          "known_at": "2026-11-10",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "37.64"
+          "value": "38.37"
         },
         {
           "concept": "pb",
-          "known_at": "2026-11-09",
+          "known_at": "2026-11-10",
           "label": "P/B",
           "period_end": null,
           "source": "finnhub",
@@ -864,7 +945,7 @@
         },
         {
           "concept": "eps_ttm",
-          "known_at": "2026-11-09",
+          "known_at": "2026-11-10",
           "label": "EPS (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -872,7 +953,7 @@
         },
         {
           "concept": "dividend_yield",
-          "known_at": "2026-11-09",
+          "known_at": "2026-11-10",
           "label": "dividend yield",
           "period_end": null,
           "source": "finnhub",
@@ -880,7 +961,7 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-11-09",
+          "known_at": "2026-11-10",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
@@ -888,7 +969,7 @@
         },
         {
           "concept": "high_52w",
-          "known_at": "2026-11-09",
+          "known_at": "2026-11-10",
           "label": "52w high",
           "period_end": null,
           "source": "finnhub",
@@ -896,7 +977,7 @@
         },
         {
           "concept": "low_52w",
-          "known_at": "2026-11-09",
+          "known_at": "2026-11-10",
           "label": "52w low",
           "period_end": null,
           "source": "finnhub",
@@ -944,19 +1025,19 @@
         },
         {
           "concept": "mx_news_sentiment",
-          "known_at": "2026-11-08",
+          "known_at": "2026-11-10",
           "label": "Marketaux sentiment",
-          "period_end": "2026-11-08",
+          "period_end": "2026-11-10",
           "source": "marketaux_news",
-          "value": "0.34"
+          "value": "0.39"
         },
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-09",
+          "known_at": "2026-11-10",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-09",
+          "period_end": "2026-11-10",
           "source": "finbert_tone",
-          "value": "0.17"
+          "value": "0.11"
         },
         {
           "concept": "revenue",
@@ -986,6 +1067,32 @@
       "stories": [
         {
           "day": null,
+          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/apple-dividend-tiny-business-advantage-192939467.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-10T19:29:39+00:00",
+          "quality": 1.0,
+          "title": "Apple\u2019s Dividend Is Tiny, but its Business Advantage is Massive",
+          "uncertainty": 0.17857142857142855
+        },
+        {
+          "day": null,
+          "doc_id": "https://finance.yahoo.com/technology/articles/apple-faces-major-supplier-investigation-141906790.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-10T14:19:06+00:00",
+          "quality": 1.0,
+          "title": "Apple faces major supplier investigation after 3 worker deaths",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
           "doc_id": "https://finance.yahoo.com/markets/stocks/articles/qualcomm-qcom-stock-fair-value-162051691.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
           "escalated": true,
@@ -996,6 +1103,32 @@
           "quality": 1.0,
           "title": "Qualcomm (QCOM) Stock Fair Value Edges Lower As Analysts Trim Targets",
           "uncertainty": 0.2747252747252747
+        },
+        {
+          "day": null,
+          "doc_id": "https://www.fool.com/investing/2026/11/10/these-3-dividend-stocks-pay-growing-payouts-heres/?.tsrc=rss",
+          "domain": "www.fool.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-10T15:35:00+00:00",
+          "quality": 0.85,
+          "title": "These 3 Dividend Stocks Pay Growing Payouts. Here's Why Buybacks Could Be the Real Prize.",
+          "uncertainty": 0.3571428571428571
+        },
+        {
+          "day": null,
+          "doc_id": "finnhub:143691211",
+          "domain": "CNBC",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-09T22:47:42+00:00",
+          "quality": 0.85,
+          "title": "Apple is the \"tortoise in the race\", but their strategy is working: CIO",
+          "uncertainty": 0.22727272727272727
         },
         {
           "day": null,
@@ -1012,6 +1145,19 @@
         },
         {
           "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMilAFBVV95cUxQOTluMHhsdUl2LXpHekdlOUZIWmFHQ0t5M3c1LTJaNm9uUU9ENHJlQ25BNzN6SFJaaXd5NVE0SlJtMEl2UHBhNnllV0JXVS1GRGhJWUdEMjBxT1RhRDBwTmo1R2hnNTZpOVpPb3Z4YVl0My0tQTc0NTZMZzZKTnpGOHlNYXUtd252c3NSOE9vMFhybUc4?oc=5",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-10T15:56:10+00:00",
+          "quality": 0.8,
+          "title": "Apple Inc. (AAPL) Rallied 15% as Investors Reassessed Its Growth: What\u2019s Next for the Stock?",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
           "doc_id": "https://news.google.com/rss/articles/CBMilAFBVV95cUxObEJWcVExS0JUOTB4RW8zdzRSNDh5dThnbDM2X2JfTlpBTENiRmJQdjhfczUwUEVVbWp4elAtQkJzTmo4Rnd3UmNxT0FmZjF3QUkwRkNfZldWY3h2cm5fMjBqMVpua3JJbkhNem0yU21DNnd4cGRmSzE0SnVZRURqZEM2VDgxN1otcEh6am5DVnk2djRy?oc=5",
           "domain": "finance.yahoo.com",
           "escalated": true,
@@ -1022,100 +1168,43 @@
           "quality": 0.8,
           "title": "Where Will Apple Stock Be in 5 Years?",
           "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMilwFBVV95cUxNdmh3YmNIUHlOT3dJYjFzbjFhc0NGTWJqTmZwRk1xLUZXRHdsSlJyRjNhWTFkNExyakxzdGJGcmIyMUotVGVIMEMtUDlneGcxaVJJR3hTUHdnTFJqNzZxd2VNbEJYbTlES1ZQSEY3bENVUVpGNVQtclUxclpZZDRySzNrLW5vUHp1N2pScmVmTEJjdEpKcTFn?oc=5",
-          "domain": "seekingalpha.com",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
-          "kind": "",
-          "polarity": 1.0,
-          "published_at": "2026-11-09T13:25:00+00:00",
-          "quality": 0.8,
-          "title": "Apple: Record Earnings Mask A Growing Margin Problem (NASDAQ:AAPL)",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMiogFBVV95cUxPYTJicFA2UmI2NFk2S29QbmlmLVJiRGRIVG1GeXJWYjRoeXpPXzdPRktLbXR3dzBCUFhGZDNWZllkUmFqekRQWWVKVThsd2VZY2J1bDVaREUzRjRsSEdyaFhHYmhRZWpSbF9USUtTZ3FRTDh3cE1oQ09jTm9PWU5Va1M4YkZyMmo3eU54bWVHY0dvX1ZqUkJYWW11MjhQMzNSNXc?oc=5",
-          "domain": "seekingalpha.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": -1.0,
-          "published_at": "2026-11-09T12:20:00+00:00",
-          "quality": 0.8,
-          "title": "Apple cut tax bill by $2.7B by moving some earnings to Singapore (AAPL:NASDAQ)",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMivgFBVV95cUxPa3dkQ19YdUhpMXZlMVB4STU2Sno3OVRzUHF2b0dINHNzX19USWdIOFlMMHV4SjZrZzQ1LTR2M3k4MTdnejB4TUVXU3R4MUVES0tFbGJuUXdSQVpzRTQ2VjRTOTdadjZyaXZFLUNYaElYaXhPNGEzNzRScEExZGxYT2ZpQmg2bTBZM2l4TTNQYUE2MlVXcE5JQ295VVRwQlVtb3ZHVWEwazh2Rmh3cTB4SzMxMHFRTzNnQmVrdG9B?oc=5",
-          "domain": "www.ad-hoc-news.de",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
-          "kind": "",
-          "polarity": 1.0,
-          "published_at": "2026-11-09T12:37:54+00:00",
-          "quality": 0.65,
-          "title": "Apple stock enters holiday season after record fiscal 2026 - ad-hoc-news.de",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMijAFBVV95cUxQOWhieVF1VFdkWlF3OVUxQjQ3czFFSW9TenJKODczYkZ5U3NZMVFpWlRyLWlsM2UwSnEwZ01LRXo5SEtab0NaYmR5UVF4ZWRjd2p4VEtadXdVVWhxSTlRYW10NF9hS1hmdm5TTlBKdEVYV09IRUdna1pMV0E5VU41UVBZVkZreVl6S3l1eQ?oc=5",
-          "domain": "pluang.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 1.0,
-          "published_at": "2026-11-09T12:35:53+00:00",
-          "quality": 0.65,
-          "title": "Apple's strong device sales and services growth drive cash returns despite rising memory costs.",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://finance.yahoo.com/economy/policy/articles/apple-reveals-2-7-billion-163829635.html?.tsrc=rss",
-          "domain": "finance.yahoo.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 0.0,
-          "published_at": "2026-11-09T16:38:29+00:00",
-          "quality": 1.0,
-          "title": "Apple reveals $2.7 billion tax benefit outside the US",
-          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 33,
-        "polarity_mean": 0.121,
-        "sources": 19,
-        "uncertainty_mean": 0.008
+        "n": 80,
+        "polarity_mean": 0.113,
+        "sources": 39,
+        "uncertainty_mean": 0.034
       },
       "upcoming": []
     },
     {
       "earnings": [],
-      "escalated": 14,
-      "events": [],
+      "escalated": 42,
+      "events": [
+        {
+          "kind": "insider_filing",
+          "source": "edgar",
+          "title": "4: STATEMENT OF CHANGES IN BENEFICIAL OWNERSHIP OF SECURITIES",
+          "url": "https://www.sec.gov/Archives/edgar/data/789019/000078901926000230/xslF345X06/form4.xml",
+          "when": "2026-11-09T00:00:00+00:00"
+        }
+      ],
       "instrument_id": "XNAS:MSFT",
       "label": "Microsoft",
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-11-09",
+          "known_at": "2026-11-10",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "27.63"
+          "value": "28.39"
         },
         {
           "concept": "pb",
-          "known_at": "2026-11-09",
+          "known_at": "2026-11-10",
           "label": "P/B",
           "period_end": null,
           "source": "finnhub",
@@ -1123,7 +1212,7 @@
         },
         {
           "concept": "eps_ttm",
-          "known_at": "2026-11-09",
+          "known_at": "2026-11-10",
           "label": "EPS (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -1131,7 +1220,7 @@
         },
         {
           "concept": "dividend_yield",
-          "known_at": "2026-11-09",
+          "known_at": "2026-11-10",
           "label": "dividend yield",
           "period_end": null,
           "source": "finnhub",
@@ -1139,15 +1228,15 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-11-09",
+          "known_at": "2026-11-10",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
-          "value": "1.05"
+          "value": "1.06"
         },
         {
           "concept": "high_52w",
-          "known_at": "2026-11-09",
+          "known_at": "2026-11-10",
           "label": "52w high",
           "period_end": null,
           "source": "finnhub",
@@ -1155,7 +1244,7 @@
         },
         {
           "concept": "low_52w",
-          "known_at": "2026-11-09",
+          "known_at": "2026-11-10",
           "label": "52w low",
           "period_end": null,
           "source": "finnhub",
@@ -1211,11 +1300,11 @@
         },
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-09",
+          "known_at": "2026-11-10",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-09",
+          "period_end": "2026-11-10",
           "source": "finbert_tone",
-          "value": "0.08"
+          "value": "0.07"
         },
         {
           "concept": "revenue",
@@ -1245,6 +1334,45 @@
       "stories": [
         {
           "day": null,
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/microsoft-jeff-teper-sandy-teper-214300600.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-10T21:43:00+00:00",
+          "quality": 1.0,
+          "title": "Microsoft\u2019s Jeff Teper and Sandy Teper Inspire NYU Stern Students to Unlock Innovation with AI",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://finance.yahoo.com/m/f591b7f8-013b-367b-b8b5-72d9ef7903d2/microsoft-stock-falls-on.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-10T21:27:43+00:00",
+          "quality": 1.0,
+          "title": "Microsoft Stock Falls On Anthropic Challenge To Office Software",
+          "uncertainty": 0.4464285714285714
+        },
+        {
+          "day": null,
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/microsoft-corporation-msft-pouring-billions-212222905.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-10T21:22:22+00:00",
+          "quality": 1.0,
+          "title": "Microsoft Corporation (MSFT) Is Pouring Billions Into AI: Could Massive Spending Weigh on Future Returns?",
+          "uncertainty": 0.551470588235294
+        },
+        {
+          "day": null,
           "doc_id": "https://finance.yahoo.com/technology/articles/soprano-support-organisations-navigating-microsoft-210000722.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
           "escalated": true,
@@ -1258,102 +1386,63 @@
         },
         {
           "day": null,
-          "doc_id": "https://99bitcoins.com/news/altcoins/bill-gates-microsoft-copilot-ai-predicts-sol-crypto-explosion/?.tsrc=rss",
-          "domain": "99bitcoins.com",
+          "doc_id": "finnhub:143691532",
+          "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "kind": "",
-          "polarity": 1.0,
-          "published_at": "2026-11-09T20:37:52+00:00",
+          "polarity": -0.3333333333333333,
+          "published_at": "2026-11-10T16:37:12+00:00",
           "quality": 0.85,
-          "title": "Bill Gates Microsoft Copilot AI Predicts a SOL Crypto Explosion",
-          "uncertainty": 0.2232142857142857
-        },
-        {
-          "day": null,
-          "doc_id": "finnhub:143660707",
-          "domain": "SeekingAlpha",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 1.0,
-          "published_at": "2026-11-09T16:07:53+00:00",
-          "quality": 0.85,
-          "title": "Microsoft: The AI Numbers Are Telling Two Stories",
+          "title": "JPMorgan Cut Its IREN Target to $55. It Still Sees 148% Upside",
           "uncertainty": 0.0
         },
         {
           "day": null,
-          "doc_id": "finnhub:143657361",
+          "doc_id": "finnhub:143690230",
           "domain": "Yahoo",
           "escalated": true,
-          "intensity": 0.0,
+          "intensity": 0.3333333333333333,
           "kind": "",
           "polarity": -1.0,
-          "published_at": "2026-11-09T15:01:36+00:00",
+          "published_at": "2026-11-10T15:16:19+00:00",
           "quality": 0.85,
-          "title": "Cantor cuts IREN price target to $47 from $99 as Microsoft deployment slips",
-          "uncertainty": 0.0
+          "title": "Microsoft warns proposed Chinese transceiver ban threatens U.S. AI edge - Reuters",
+          "uncertainty": 0.3333333333333333
         },
         {
           "day": null,
-          "doc_id": "finnhub:143657362",
+          "doc_id": "finnhub:143690237",
           "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "kind": "",
           "polarity": 1.0,
-          "published_at": "2026-11-09T14:32:00+00:00",
+          "published_at": "2026-11-10T14:36:00+00:00",
           "quality": 0.85,
-          "title": "Global Clinical Genomics Software Market Report 2026 | Capitalize on 14.8% CAGR Through 2030 as Google, Microsoft, NVIDIA and Illumina Scale AI, Cloud and Precision Medicine",
+          "title": "Global High-Performance Computing (HPC) Application-Specific Integrated Circuit (ASIC) Market Report 2026-2030",
           "uncertainty": 0.0
         },
         {
           "day": null,
-          "doc_id": "finnhub:143657363",
-          "domain": "Yahoo",
+          "doc_id": "marketaux:https://www.manilatimes.net/2026/11/10/tmt-newswire/globenewswire/avepoint-deepens-strategic-partnership-with-microsoft-to-advance-trusted-ai-adoption/2466544",
+          "domain": "manilatimes.net",
           "escalated": true,
-          "intensity": 0.0,
+          "intensity": 0.3333333333333333,
           "kind": "",
           "polarity": 1.0,
-          "published_at": "2026-11-09T14:09:34+00:00",
+          "published_at": "2026-11-10T14:23:45+00:00",
           "quality": 0.85,
-          "title": "Is Oracle (ORCL) Losing Ground In AI Infrastructure Demand?",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "finnhub:143654633",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 1.0,
-          "published_at": "2026-11-09T13:33:40+00:00",
-          "quality": 0.85,
-          "title": "Microsoft reportedly winds down Oracle AI infrastructure contract",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "finnhub:143654634",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 0.0,
-          "published_at": "2026-11-09T13:00:00+00:00",
-          "quality": 0.85,
-          "title": "Microsoft UWP Map Control Retires Nov. 30, 2026; A Replacement Is Ready Today",
+          "title": "AvePoint Deepens Strategic Partnership with Microsoft to Advance Trusted AI Adoption",
           "uncertainty": 0.0
         }
       ],
       "tone": {
-        "intensity_max": 0.0,
-        "n": 33,
-        "polarity_mean": 0.0,
-        "sources": 17,
-        "uncertainty_mean": 0.037
+        "intensity_max": 0.333,
+        "n": 135,
+        "polarity_mean": -0.021,
+        "sources": 56,
+        "uncertainty_mean": 0.064
       },
       "upcoming": []
     }
