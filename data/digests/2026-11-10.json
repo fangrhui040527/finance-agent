@@ -92,18 +92,18 @@
     }
   ],
   "counts": {
-    "articles": 34652,
+    "articles": 34661,
     "documents": 0,
-    "escalated": 4413,
+    "escalated": 4418,
     "events": 4320,
     "failed_sweeps": 114,
-    "linked": 17524,
+    "linked": 17531,
     "observations": 7374,
     "series": 31,
     "sweeps": 1516
   },
   "day": "2026-11-10",
-  "generated_at": "2026-11-10 10:08 UTC",
+  "generated_at": "2026-11-10 17:04 UTC",
   "macro": [
     {
       "change": "-0.06",
@@ -237,7 +237,7 @@
   "names": [
     {
       "earnings": [],
-      "escalated": 0,
+      "escalated": 2,
       "events": [],
       "instrument_id": "MYX:1155",
       "label": "Maybank",
@@ -252,6 +252,32 @@
         }
       ],
       "stories": [
+        {
+          "day": "2026-11-11",
+          "doc_id": "web_search:https://www.thestar.com.my/business/business-news/2026/11/10/bursa-malaysia-ends-lower-as-banking-data-centre-heavyweights-weigh-on-sentiment",
+          "domain": "www.thestar.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-10T17:04:40.320706+00:00",
+          "quality": 1.0,
+          "title": "Bursa Malaysia ends lower as banking, data centre heavyweights weigh on sentiment",
+          "uncertainty": 0.0
+        },
+        {
+          "day": "2026-11-11",
+          "doc_id": "web_search:https://www.thestar.com.my/business/business-news/2026/11/10/bursa-malaysia-extends-losses-at-midday-in-contrast-with-regional-peers",
+          "domain": "www.thestar.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-10T17:04:40.320706+00:00",
+          "quality": 1.0,
+          "title": "Bursa Malaysia extends losses at midday in contrast with regional peers",
+          "uncertainty": 0.0
+        },
         {
           "day": null,
           "doc_id": "https://news.google.com/rss/articles/CBMijwFBVV95cUxNZ0gweWF3ZWRXLWFEOVVUcmJEWnRobnE1N2lBY3NFQk5qbktfLUNNY1JEcmlrWDVvMjhsWTJITUpzdmlvMDAwOHRjaEEzS2VzX1pTeVpoLXNjaXotWjlqZ3FsUk1CbDJleTNfejY2QUoxcEp4M3lPU1h3ZjdtbkVXT2VIdE8tLUpZbHdrVXdOdw?oc=5",
@@ -268,16 +294,16 @@
       ],
       "tone": {
         "intensity_max": 0.0,
-        "n": 1,
+        "n": 3,
         "polarity_mean": 0.0,
-        "sources": 1,
+        "sources": 2,
         "uncertainty_mean": 0.0
       },
       "upcoming": []
     },
     {
       "earnings": [],
-      "escalated": 0,
+      "escalated": 1,
       "events": [],
       "instrument_id": "MYX:5347",
       "label": "Tenaga",
@@ -292,6 +318,19 @@
         }
       ],
       "stories": [
+        {
+          "day": "2026-11-11",
+          "doc_id": "web_search:https://www.thestar.com.my/business/business-news/2026/11/10/bursa-malaysia-ends-lower-as-banking-data-centre-heavyweights-weigh-on-sentiment",
+          "domain": "www.thestar.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-10T17:04:40.320706+00:00",
+          "quality": 1.0,
+          "title": "Bursa Malaysia ends lower as banking, data centre heavyweights weigh on sentiment",
+          "uncertainty": 0.0
+        },
         {
           "day": null,
           "doc_id": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxPcGRsckU4aHFrbkt6b3pKaUVhdnhmX2pEWm1aTThBQkJrZjJWalhxYWZ5S1FmZXJ1ODhWeDB0MktQYWd3dWhPanB4bTZBck5jOVVlQ05Sa19QSWVhMDN5TXVIek5QMUk3MHZ3MWJDdl9OMUZaTWVIbFJISFFVUnk0TllPRWRCZHI1ZTVVdUs1Qk9BbkpwVy1odWJLaE1VTHJJNy13bEJVSXMtVUM5Vy0yd3RsZzk1aFA1MGFN?oc=5",
@@ -334,9 +373,9 @@
       ],
       "tone": {
         "intensity_max": 0.0,
-        "n": 3,
-        "polarity_mean": 0.0,
-        "sources": 3,
+        "n": 4,
+        "polarity_mean": 0.25,
+        "sources": 4,
         "uncertainty_mean": 0.0
       },
       "upcoming": []
@@ -363,7 +402,7 @@
     },
     {
       "earnings": [],
-      "escalated": 0,
+      "escalated": 1,
       "events": [],
       "instrument_id": "MYX:5225",
       "label": "IHH",
@@ -378,6 +417,19 @@
         }
       ],
       "stories": [
+        {
+          "day": "2026-11-11",
+          "doc_id": "web_search:https://www.thestar.com.my/business/business-news/2026/11/10/bursa-malaysia-extends-losses-at-midday-in-contrast-with-regional-peers",
+          "domain": "www.thestar.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-10T17:04:40.320706+00:00",
+          "quality": 1.0,
+          "title": "Bursa Malaysia extends losses at midday in contrast with regional peers",
+          "uncertainty": 0.0
+        },
         {
           "day": null,
           "doc_id": "https://news.google.com/rss/articles/CBMinwFBVV95cUxNSUg2UXZWNGZJRFhLeFU5UmpXeVlISWt4SGF5dzFja0xHUExBQUt0ZnFDUUFCalhVQmhYSjVhTVBHNnhRWmEzQ21KNGxjQWV6M2FMeTVpdURuYU9lS1JqdnZoWFpqRWFsbkowbjd3MXZmWVdrNUx3MUR2Q3ZnOVhGUFVrT2dDRnVCVndYeWVvVGFnYkh0eENOWmFPTUp1czg?oc=5",
@@ -394,9 +446,9 @@
       ],
       "tone": {
         "intensity_max": 0.0,
-        "n": 1,
-        "polarity_mean": 0.0,
-        "sources": 1,
+        "n": 2,
+        "polarity_mean": -0.5,
+        "sources": 2,
         "uncertainty_mean": 0.0
       },
       "upcoming": []

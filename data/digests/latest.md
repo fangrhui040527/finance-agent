@@ -1,16 +1,19 @@
 # Digest 2026-11-10
 
-Generated 2026-11-10 10:08 UTC · slot `all` · 34652 articles in the corpus, 7374 observations, 4320 events in the fact book.
+Generated 2026-11-10 17:04 UTC · slot `all` · 34661 articles in the corpus, 7374 observations, 4320 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- tone: 3 stories from 2 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 2 escalated
+- 2026-11-11 (date only) www.thestar.com.my — Bursa Malaysia ends lower as banking, data centre heavyweights weigh on sentiment [q 1.00, tone +1.0] ★
+- 2026-11-11 (date only) www.thestar.com.my — Bursa Malaysia extends losses at midday in contrast with regional peers [q 1.00, tone -1.0] ★
 - 2026-11-10 www.ggrasia.com — Genting Bhd sees higher ESG score under Maybank’s rating system [q 0.65, tone +0.0]
 - snapshot: FinBERT headline tone 0.53 (finbert_tone, 2026-11-10)
 
 ### Tenaga (MYX:5347)
-- tone: 3 stories from 3 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- tone: 4 stories from 4 sources, polarity +0.25, peak intensity 0.00, uncertainty 0.00 · 1 escalated
+- 2026-11-11 (date only) www.thestar.com.my — Bursa Malaysia ends lower as banking, data centre heavyweights weigh on sentiment [q 1.00, tone +1.0] ★
 - 2026-11-10 solarquarter.com — TNB, IOI Partner For 500 MW Solar Project With 1,000 MWh Battery Storage In Malaysia [q 0.65, tone +0.0]
 - 2026-11-09 energynews.pro — Tenaga and IOI Corp team up with 12 SMEs on 500 MW solar project [q 0.65, tone +0.0]
 - 2026-11-09 solarbytes.info — TNB & IOI partner for 500 MWac solar, 1 GWh BESS in Malaysia [q 0.65, tone +0.0]
@@ -20,7 +23,8 @@ Generated 2026-11-10 10:08 UTC · slot `all` · 34652 articles in the corpus, 73
 - quiet: nothing collected for this name in the window
 
 ### IHH (MYX:5225)
-- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- tone: 2 stories from 2 sources, polarity -0.50, peak intensity 0.00, uncertainty 0.00 · 1 escalated
+- 2026-11-11 (date only) www.thestar.com.my — Bursa Malaysia extends losses at midday in contrast with regional peers [q 1.00, tone -1.0] ★
 - 2026-11-10 www.tipranks.com — EPF Reports Two IHH Healthcare Share Disposals [q 0.65, tone +0.0]
 - snapshot: FinBERT headline tone -0.08 (finbert_tone, 2026-11-10)
 
