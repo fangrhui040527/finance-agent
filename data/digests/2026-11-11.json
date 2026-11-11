@@ -1,6 +1,87 @@
 {
   "collection": [
     {
+      "at": "2026-11-11T22:47:49.063031+00:00",
+      "detail": "facts 12; scored 696 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized.onnx",
+      "fetched": 12,
+      "kept": 0,
+      "source": "finbert_tone",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-11T22:47:41.677467+00:00",
+      "detail": "skipped: every asked name was refused: outside the plan or over today's credits (XNAS:AAPL, XNAS:MSFT)",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-11T22:47:41.398867+00:00",
+      "detail": "facts 0; window not covered back to 2026-11-11 19:49Z; the oldest item read is 2026-11-11 21:22Z, so 1.5h of the window was never served",
+      "fetched": 17,
+      "kept": 16,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 15
+    },
+    {
+      "at": "2026-11-11T22:47:40.012588+00:00",
+      "detail": "facts 4; XNAS:MSFT: 2026-11-10 not aggregated - 8 full pages ended part-way through that day; XNAS:NVDA: 2026-11-11 not aggregated - 8 full pages ended part-way through that day",
+      "fetched": 34,
+      "kept": 34,
+      "source": "marketaux_news",
+      "status": "ok",
+      "stored": 30
+    },
+    {
+      "at": "2026-11-11T22:47:34.204717+00:00",
+      "detail": "facts 40; ",
+      "fetched": 334,
+      "kept": 284,
+      "source": "finnhub",
+      "status": "ok",
+      "stored": 207
+    },
+    {
+      "at": "2026-11-11T22:47:28.671118+00:00",
+      "detail": "facts 1; ",
+      "fetched": 1,
+      "kept": 0,
+      "source": "edgar",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-11T22:47:28.562139+00:00",
+      "detail": "named the company: 24 of 45 (lowest: NVIDIA 6/12, Microsoft 8/15, Apple 10/18)",
+      "fetched": 53,
+      "kept": 45,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 30
+    },
+    {
+      "at": "2026-11-11T22:47:27.292704+00:00",
+      "detail": "named the company: 179 of 190 (lowest: Microsoft 45/49, NVIDIA 76/80, Apple 58/61)",
+      "fetched": 198,
+      "kept": 190,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 173
+    },
+    {
+      "at": "2026-11-11T22:47:24.804299+00:00",
+      "detail": "grouped 3 names per request; 1 request; named the company: 43 of 147 (lowest: Apple + Microsoft + NVIDIA 43/147)",
+      "fetched": 250,
+      "kept": 147,
+      "source": "gdelt",
+      "status": "ok",
+      "stored": 141
+    },
+    {
       "at": "2026-11-11T19:49:03.449510+00:00",
       "detail": "facts 0; ",
       "fetched": 450,
@@ -128,18 +209,18 @@
     }
   ],
   "counts": {
-    "articles": 35458,
+    "articles": 36054,
     "documents": 0,
-    "escalated": 4541,
-    "events": 4329,
+    "escalated": 4644,
+    "events": 4331,
     "failed_sweeps": 114,
-    "linked": 17889,
-    "observations": 7467,
+    "linked": 18225,
+    "observations": 7522,
     "series": 31,
-    "sweeps": 1543
+    "sweeps": 1552
   },
   "day": "2026-11-11",
-  "generated_at": "2026-11-11 19:49 UTC",
+  "generated_at": "2026-11-11 22:48 UTC",
   "macro": [
     {
       "change": "-0.08",
@@ -563,7 +644,7 @@
       "earnings": [
         "2026-11-17 (finnhub)"
       ],
-      "escalated": 55,
+      "escalated": 123,
       "events": [
         {
           "kind": "rating_change",
@@ -585,15 +666,15 @@
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-11-10",
+          "known_at": "2026-11-11",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "22.32"
+          "value": "21.10"
         },
         {
           "concept": "pb",
-          "known_at": "2026-11-10",
+          "known_at": "2026-11-11",
           "label": "P/B",
           "period_end": null,
           "source": "finnhub",
@@ -601,7 +682,7 @@
         },
         {
           "concept": "eps_ttm",
-          "known_at": "2026-11-10",
+          "known_at": "2026-11-11",
           "label": "EPS (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -609,7 +690,7 @@
         },
         {
           "concept": "dividend_yield",
-          "known_at": "2026-11-10",
+          "known_at": "2026-11-11",
           "label": "dividend yield",
           "period_end": null,
           "source": "finnhub",
@@ -617,15 +698,15 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-11-10",
+          "known_at": "2026-11-11",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
-          "value": "2.35"
+          "value": "2.36"
         },
         {
           "concept": "high_52w",
-          "known_at": "2026-11-10",
+          "known_at": "2026-11-11",
           "label": "52w high",
           "period_end": null,
           "source": "finnhub",
@@ -633,7 +714,7 @@
         },
         {
           "concept": "low_52w",
-          "known_at": "2026-11-10",
+          "known_at": "2026-11-11",
           "label": "52w low",
           "period_end": null,
           "source": "finnhub",
@@ -689,11 +770,11 @@
         },
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-10",
+          "known_at": "2026-11-11",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-10",
+          "period_end": "2026-11-11",
           "source": "finbert_tone",
-          "value": "-0.06"
+          "value": "-0.01"
         },
         {
           "concept": "revenue",
@@ -813,25 +894,25 @@
           "uncertainty": 0.25510204081632654
         },
         {
-          "day": "2026-11-11",
-          "doc_id": "web_search:https://247wallst.com/investing/2026/11/10/nvidia-falls-4-as-board-probe-of-jensen-huang-weighs-on-shares-amd-and-broadcom-gain-3/",
+          "day": null,
+          "doc_id": "https://247wallst.com/investing/2026/11/11/nvidia-just-fell-8-3-after-hours-on-a-report-of-a-second-jensen-huang-affair-heres-what-2000-shares-have-lost-this-week/?.tsrc=rss",
           "domain": "247wallst.com",
           "escalated": true,
           "intensity": 0.0,
           "kind": "",
           "polarity": -1.0,
-          "published_at": "2026-11-11T10:09:16.399877+00:00",
+          "published_at": "2026-11-11T22:37:55+00:00",
           "quality": 0.85,
-          "title": "NVIDIA Falls 4% as Board Probe of Jensen Huang Weighs on Shares; AMD and Broadcom Gain 3% - 24/7 Wall St.",
+          "title": "Nvidia Just Fell 8.3% After Hours on a Report of a Second Jensen Huang Affair. Here\u2019s What 2,000 Shares Have Lost This Week",
           "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 142,
-        "polarity_mean": -0.204,
-        "sources": 65,
-        "uncertainty_mean": 0.086
+        "n": 340,
+        "polarity_mean": -0.142,
+        "sources": 112,
+        "uncertainty_mean": 0.125
       },
       "upcoming": [
         {
@@ -852,22 +933,22 @@
     },
     {
       "earnings": [],
-      "escalated": 10,
+      "escalated": 30,
       "events": [],
       "instrument_id": "XNAS:AAPL",
       "label": "Apple",
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-11-10",
+          "known_at": "2026-11-11",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "38.37"
+          "value": "38.90"
         },
         {
           "concept": "pb",
-          "known_at": "2026-11-10",
+          "known_at": "2026-11-11",
           "label": "P/B",
           "period_end": null,
           "source": "finnhub",
@@ -875,7 +956,7 @@
         },
         {
           "concept": "eps_ttm",
-          "known_at": "2026-11-10",
+          "known_at": "2026-11-11",
           "label": "EPS (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -883,7 +964,7 @@
         },
         {
           "concept": "dividend_yield",
-          "known_at": "2026-11-10",
+          "known_at": "2026-11-11",
           "label": "dividend yield",
           "period_end": null,
           "source": "finnhub",
@@ -891,7 +972,7 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-11-10",
+          "known_at": "2026-11-11",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
@@ -899,7 +980,7 @@
         },
         {
           "concept": "high_52w",
-          "known_at": "2026-11-10",
+          "known_at": "2026-11-11",
           "label": "52w high",
           "period_end": null,
           "source": "finnhub",
@@ -907,7 +988,7 @@
         },
         {
           "concept": "low_52w",
-          "known_at": "2026-11-10",
+          "known_at": "2026-11-11",
           "label": "52w low",
           "period_end": null,
           "source": "finnhub",
@@ -955,19 +1036,19 @@
         },
         {
           "concept": "mx_news_sentiment",
-          "known_at": "2026-11-10",
+          "known_at": "2026-11-11",
           "label": "Marketaux sentiment",
-          "period_end": "2026-11-10",
+          "period_end": "2026-11-11",
           "source": "marketaux_news",
-          "value": "0.39"
+          "value": "0.30"
         },
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-10",
+          "known_at": "2026-11-11",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-10",
+          "period_end": "2026-11-11",
           "source": "finbert_tone",
-          "value": "0.11"
+          "value": "0.14"
         },
         {
           "concept": "revenue",
@@ -997,6 +1078,32 @@
       "stories": [
         {
           "day": null,
+          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/mp-materials-mp-q3-beat-191334168.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.6666666666666666,
+          "published_at": "2026-11-11T19:13:34+00:00",
+          "quality": 1.0,
+          "title": "MP Materials (MP) Q3 Beat Raises The Question Of Whether Its Story Is Already Priced In",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "marketaux:https://seekingalpha.com/article/4966247-apple-stock-capex-light-ai-amid-regulatory-uncertainty-rating-upgrade",
+          "domain": "seekingalpha.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-11T03:02:25+00:00",
+          "quality": 1.0,
+          "title": "Apple Stock: Capex-Light AI Amid Regulatory Uncertainty (Rating Upgrade) (NASDAQ:AAPL)",
+          "uncertainty": 0.3125
+        },
+        {
+          "day": null,
           "doc_id": "https://finance.yahoo.com/markets/stocks/articles/apple-dividend-tiny-business-advantage-192939467.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
           "escalated": true,
@@ -1023,6 +1130,45 @@
         },
         {
           "day": null,
+          "doc_id": "https://www.marketbeat.com/instant-alerts/event-mp-materials-clears-gm-magnet-milestone-targets-apple-as-next-customer-2026-11-11/?utm_source=yahoofinance&utm_medium=yahoofinance&.tsrc=rss",
+          "domain": "www.marketbeat.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-11T17:15:48+00:00",
+          "quality": 0.85,
+          "title": "MP Materials Clears GM Magnet Milestone, Targets Apple as Next Customer",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "finnhub:143734450",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -0.3333333333333333,
+          "published_at": "2026-11-11T12:57:12+00:00",
+          "quality": 0.85,
+          "title": "Buy, Sell, or Hold? Wednesday\u2019s Top Upgrades and Downgrades: Akamai Technologies, Apple, BILL Holdings, Corning, Form Factor, Guidewire Software, NVIDIA, Riot Platforms, Toast, and More",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "marketaux:https://www.realclearmarkets.com/2026/11/11/wall_street_is_fast_becoming_worlds_stock_market_1216174.html",
+          "domain": "realclearmarkets.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-11T09:00:23+00:00",
+          "quality": 0.85,
+          "title": "Wall Street Is Fast Becoming World's Stock Market",
+          "uncertainty": 0.2604166666666667
+        },
+        {
+          "day": null,
           "doc_id": "https://www.fool.com/investing/2026/11/10/these-3-dividend-stocks-pay-growing-payouts-heres/?.tsrc=rss",
           "domain": "www.fool.com",
           "escalated": true,
@@ -1033,100 +1179,43 @@
           "quality": 0.85,
           "title": "These 3 Dividend Stocks Pay Growing Payouts. Here's Why Buybacks Could Be the Real Prize.",
           "uncertainty": 0.3571428571428571
-        },
-        {
-          "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMilAFBVV95cUxQOTluMHhsdUl2LXpHekdlOUZIWmFHQ0t5M3c1LTJaNm9uUU9ENHJlQ25BNzN6SFJaaXd5NVE0SlJtMEl2UHBhNnllV0JXVS1GRGhJWUdEMjBxT1RhRDBwTmo1R2hnNTZpOVpPb3Z4YVl0My0tQTc0NTZMZzZKTnpGOHlNYXUtd252c3NSOE9vMFhybUc4?oc=5",
-          "domain": "finance.yahoo.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 1.0,
-          "published_at": "2026-11-10T15:56:10+00:00",
-          "quality": 0.8,
-          "title": "Apple Inc. (AAPL) Rallied 15% as Investors Reassessed Its Growth: What\u2019s Next for the Stock?",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://www.thestreet.com/crypto/technology/apple-users-get-urgent-security-warning-over-iphone-flaw?.tsrc=rss",
-          "domain": "www.thestreet.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": -1.0,
-          "published_at": "2026-11-10T20:31:51+00:00",
-          "quality": 0.65,
-          "title": "Apple users get urgent security warning over iPhone flaw",
-          "uncertainty": 0.6944444444444444
-        },
-        {
-          "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMirwFBVV95cUxNZjN2LVc0SGpkN0E4WU12Sl9vMFhqOC1KQVBkN2xsZ2VyR0VrMXEzTzctYmJ5VWY1SktYbXpGdVU1X2ZuRi1Mb0cyVUtvaFVPSFpxbG82VnJUQXJQemczMFk2SGIzc0tZcUdEWjAtbndVa1lKODlDOXJzVldqcWdiNE5lcGZoLXBON1FoUUFTZzgtQ1FXLXhJelRnOHV3UnFMQUJINUcya09Hb1ZlVTd3?oc=5",
-          "domain": "9to5mac.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 0.0,
-          "published_at": "2026-11-10T19:57:00+00:00",
-          "quality": 0.65,
-          "title": "Apple TV shares trailers for upcoming Snoopy and Fraggle Rock holiday specials",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMi3wFBVV95cUxPRThsUkJDZGdtcy1jUERMUEVNajhrMVhnalVlejl3aDloekVrWXNnMjF5SW1qVGpxVF94SXpwQ2FUSnotUTZHemlJQ0xlRGpDWFNrRW51c1FKVlFhQWFKNnk3QWVqT1BwOThFMUExMDUzenB3SXhkbENUZ1I2dHpZTHlibDYtcGZ6UkVWdy1ZODR1blprSHEzX1JSbE9fN1IyZXJ6dE9fd24zTlA5djNDQTlnZ2xPNE1iTVRfbHJZRVA3ZDJhX1ZTbFMtYUZwVU5Ecmgxb2VNamJ3d1ZGZGFR?oc=5",
-          "domain": "www.foreignpolicyjournal.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 1.0,
-          "published_at": "2026-11-10T19:04:00+00:00",
-          "quality": 0.65,
-          "title": "$3 Trillion Wipeout Exposes Cracks In The AI Profit Story For (NASDAQ: AAPL) Apple, (NASDAQ: AMZN) Amazon",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMilAFBVV95cUxOcWxCYVVUX21vcmoxV1N5QV9pcmZFTVY3Y1NMWnFHQzB1dUtTRkxzbXJNLW9IVXptUzM1ZzN0WWZHWi1qR3cwa0NPNTJMSEVjZE9jei1HZG4ybHNTdzlzU0Y4TEJmejU3Sk1sX3g1RjJQUUdoNVNXbnZ1X2o1S1N5S2pXZ1BXYjI0bG9YM0hsUDBhM2po?oc=5",
-          "domain": "www.fool.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 1.0,
-          "published_at": "2026-11-10T16:34:00+00:00",
-          "quality": 0.65,
-          "title": "Apple Is Holding Strong While Big Tech Sells Off. Is It Next?",
-          "uncertainty": 0.0
         }
       ],
       "tone": {
-        "intensity_max": 0.333,
-        "n": 19,
-        "polarity_mean": 0.158,
-        "sources": 15,
-        "uncertainty_mean": 0.117
+        "intensity_max": 0.667,
+        "n": 83,
+        "polarity_mean": 0.173,
+        "sources": 42,
+        "uncertainty_mean": 0.088
       },
       "upcoming": []
     },
     {
       "earnings": [],
-      "escalated": 22,
-      "events": [],
+      "escalated": 39,
+      "events": [
+        {
+          "kind": "insider_filing",
+          "source": "edgar",
+          "title": "4: STATEMENT OF CHANGES IN BENEFICIAL OWNERSHIP OF SECURITIES",
+          "url": "https://www.sec.gov/Archives/edgar/data/789019/000078901926000232/xslF345X06/form4.xml",
+          "when": "2026-11-10T00:00:00+00:00"
+        }
+      ],
       "instrument_id": "XNAS:MSFT",
       "label": "Microsoft",
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-11-10",
+          "known_at": "2026-11-11",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "28.39"
+          "value": "27.76"
         },
         {
           "concept": "pb",
-          "known_at": "2026-11-10",
+          "known_at": "2026-11-11",
           "label": "P/B",
           "period_end": null,
           "source": "finnhub",
@@ -1134,7 +1223,7 @@
         },
         {
           "concept": "eps_ttm",
-          "known_at": "2026-11-10",
+          "known_at": "2026-11-11",
           "label": "EPS (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -1142,7 +1231,7 @@
         },
         {
           "concept": "dividend_yield",
-          "known_at": "2026-11-10",
+          "known_at": "2026-11-11",
           "label": "dividend yield",
           "period_end": null,
           "source": "finnhub",
@@ -1150,7 +1239,7 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-11-10",
+          "known_at": "2026-11-11",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
@@ -1158,7 +1247,7 @@
         },
         {
           "concept": "high_52w",
-          "known_at": "2026-11-10",
+          "known_at": "2026-11-11",
           "label": "52w high",
           "period_end": null,
           "source": "finnhub",
@@ -1166,7 +1255,7 @@
         },
         {
           "concept": "low_52w",
-          "known_at": "2026-11-10",
+          "known_at": "2026-11-11",
           "label": "52w low",
           "period_end": null,
           "source": "finnhub",
@@ -1214,19 +1303,19 @@
         },
         {
           "concept": "mx_news_sentiment",
-          "known_at": "2026-11-08",
+          "known_at": "2026-11-11",
           "label": "Marketaux sentiment",
-          "period_end": "2026-11-08",
+          "period_end": "2026-11-11",
           "source": "marketaux_news",
-          "value": "0.10"
+          "value": "0.35"
         },
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-10",
+          "known_at": "2026-11-11",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-10",
+          "period_end": "2026-11-11",
           "source": "finbert_tone",
-          "value": "0.07"
+          "value": "0.04"
         },
         {
           "concept": "revenue",
@@ -1254,6 +1343,45 @@
         }
       ],
       "stories": [
+        {
+          "day": null,
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/cloudforce-named-2026-microsoft-education-200000551.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-11T20:00:00+00:00",
+          "quality": 1.0,
+          "title": "Cloudforce Named 2026 Microsoft Education Partner of the Year, the First Company Ever to Win the Award Twice",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/insight-wins-three-2026-microsoft-200000149.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-11T20:00:00+00:00",
+          "quality": 1.0,
+          "title": "Insight Wins Three 2026 Microsoft Partner of the Year Awards Following GitHub Partner of the Year Win",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://finance.yahoo.com/technology/articles/td-synnex-recognized-winner-2026-200000186.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-11T20:00:00+00:00",
+          "quality": 1.0,
+          "title": "TD SYNNEX Recognized as the Winner of 2026 Microsoft Global Commercial Device Channel Partner of the Year Award",
+          "uncertainty": 0.0
+        },
         {
           "day": null,
           "doc_id": "https://www.nst.com.my/business/corporate/2026/11/1575134/microsoft-presses-trump-scuttle-ban-chinese-data-centre-tech",
@@ -1308,63 +1436,24 @@
         },
         {
           "day": null,
-          "doc_id": "finnhub:143691532",
+          "doc_id": "finnhub:143736790",
           "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "kind": "",
-          "polarity": -0.3333333333333333,
-          "published_at": "2026-11-10T16:37:12+00:00",
+          "polarity": 0.0,
+          "published_at": "2026-11-11T15:38:39+00:00",
           "quality": 0.85,
-          "title": "JPMorgan Cut Its IREN Target to $55. It Still Sees 148% Upside",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "finnhub:143690230",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
-          "kind": "",
-          "polarity": -1.0,
-          "published_at": "2026-11-10T15:16:19+00:00",
-          "quality": 0.85,
-          "title": "Microsoft warns proposed Chinese transceiver ban threatens U.S. AI edge - Reuters",
-          "uncertainty": 0.3333333333333333
-        },
-        {
-          "day": null,
-          "doc_id": "finnhub:143690237",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 1.0,
-          "published_at": "2026-11-10T14:36:00+00:00",
-          "quality": 0.85,
-          "title": "Global High-Performance Computing (HPC) Application-Specific Integrated Circuit (ASIC) Market Report 2026-2030",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "marketaux:https://www.manilatimes.net/2026/11/10/tmt-newswire/globenewswire/avepoint-deepens-strategic-partnership-with-microsoft-to-advance-trusted-ai-adoption/2466544",
-          "domain": "manilatimes.net",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
-          "kind": "",
-          "polarity": 1.0,
-          "published_at": "2026-11-10T14:23:45+00:00",
-          "quality": 0.85,
-          "title": "AvePoint Deepens Strategic Partnership with Microsoft to Advance Trusted AI Adoption",
+          "title": "Microsoft Is \u201cNo Longer the Bundler\u201d as Anthropic Gives Away Office Rivals, Says Jason Calacanis",
           "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 87,
-        "polarity_mean": -0.021,
-        "sources": 47,
-        "uncertainty_mean": 0.067
+        "n": 150,
+        "polarity_mean": -0.003,
+        "sources": 70,
+        "uncertainty_mean": 0.054
       },
       "upcoming": []
     }
