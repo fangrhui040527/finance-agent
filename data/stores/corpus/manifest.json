@@ -1,5 +1,5 @@
 {
- "bytes": 27754496,
+ "bytes": 27967488,
  "file": "corpus.db",
  "format": 1,
  "page_size": 4096,
@@ -8,82 +8,82 @@
   {
    "bytes": 16777216,
    "name": "part-000",
-   "sha256": "2741e218f24884544edccfd359315fc1f985a68bdf278daa8559bbda36fa29c2"
+   "sha256": "cc995b9990f5c6ddc3bc7e698f3a5b68bc9f6aef41b188bc96ecac63452aee4d"
   },
   {
-   "bytes": 10977280,
+   "bytes": 11190272,
    "name": "part-001",
-   "sha256": "146d397a106c301f5d3f192b030bf2cab7981436aff09f33904ee7cbf7610b9e"
+   "sha256": "e8a2949d0333d1c4038de20d4fd0d60b7c720d6ab69d4117a1b321f9ab62f971"
   }
  ],
  "rows": {
-  "articles": 35206,
-  "evidence_searches": 10,
-  "sweeps": 1529
+  "articles": 35441,
+  "evidence_searches": 11,
+  "sweeps": 1539
  },
- "sha256": "7d8f598eea0e5cf9b8605ccce6e81e5573ef2c6eba225376a4ef5a2af2376840",
+ "sha256": "091f649c78ec6e7a5a6b0b2e4b50a80d86c716e09c97b792aeceebeb96a3c7e9",
  "tips": {
   "articles": {
    "columns": {
-    "body": "53a1e127f503e2d1",
-    "countries_json": "727e34856737c342",
-    "doc_id": "3b38cc9f4f3616f1",
-    "dup_hash": "3652381bc9f41c70",
+    "body": "27821b579042a2fb",
+    "countries_json": "b3283bf184bb082f",
+    "doc_id": "9c4c32ca9480aa66",
+    "dup_hash": "e76cd24174020582",
     "escalated": "5feceb66ffc86f38",
-    "fetched_for": "12ae32cb1ec02d01",
-    "first_seen_at": "fa4a0d6e8fe85b1d",
-    "instruments_json": "b3283bf184bb082f",
-    "language": "26ab4b495289822b",
-    "published_at": "fa45c5952fd418a8",
-    "quality": "d2cbad71ff333de6",
-    "query": "12ae32cb1ec02d01",
-    "relevance": "8aed642bf5118b9d",
-    "source": "6c2d515a3e6b4f90",
-    "source_domain": "76cde1362ba439a1",
+    "fetched_for": "87e74aa1fe0ea76b",
+    "first_seen_at": "00246efe639f3aa6",
+    "instruments_json": "e7f72d511bb14439",
+    "language": "50eac10e7966a04e",
+    "published_at": "00246efe639f3aa6",
+    "quality": "d0ff5974b6aa52cf",
+    "query": "70cf8ccefce3f702",
+    "relevance": "d0ff5974b6aa52cf",
+    "source": "6acf037c8a691e01",
+    "source_domain": "d0f946abbd4658d0",
     "themes_json": "b3283bf184bb082f",
-    "title": "53a1e127f503e2d1",
-    "title_key": "90a086e3cd43908d"
+    "title": "b9aece20ee38f9af",
+    "title_key": "12ae32cb1ec02d01"
    },
-   "rowid": 35206
+   "rowid": 35441
   },
   "evidence_searches": {
    "columns": {
-    "at": "c54d4678fc22fe2d",
-    "cost_usd": "84964215b9e9c2df",
-    "detail": "898ca6223a9de493",
-    "idio": "18c187b0104e0b20",
-    "input_tokens": "ba173929764dd35e",
-    "instrument": "693b7228d27586c6",
-    "key": "1892e3595d45dc48",
+    "at": "00246efe639f3aa6",
+    "cost_usd": "8828668f518d6f59",
+    "detail": "3f4ce1a78958af12",
+    "idio": "29e1b0a623412b66",
+    "input_tokens": "65f96d09a43d6bf2",
+    "instrument": "87e74aa1fe0ea76b",
+    "key": "73d1c70c98b7085b",
     "model": "15cd98bbce41024d",
     "outcome": "7c20246386d108ef",
-    "output_tokens": "d8912eba4a0d0a84",
-    "queries": "c5cfad5f91169957",
-    "r1": "436191a71a637773",
-    "sar": "bb5f5b63eb62996f",
-    "searches": "e7f6c011776e8db7",
+    "output_tokens": "2cde073b39dd6bb1",
+    "queries": "3a9bc439a9d38b6d",
+    "r1": "6f1b7ab980a3617f",
+    "sar": "179a1bd0116d5dcb",
+    "searches": "ef2d127de37b942b",
     "session": "f67c5ec50bf3ce9b",
-    "stored": "19581e27de7ced00"
+    "stored": "8527a891e2241369"
    },
-   "rowid": 10
+   "rowid": 11
   },
   "sweeps": {
    "columns": {
-    "at": "b390e2ab73d71d4f",
-    "detail": "2380d13ac6018e54",
+    "at": "0a4ad6a7cc18a5f4",
+    "detail": "5303cea057baf5fa",
     "duplicates": "5feceb66ffc86f38",
     "escalated": "5feceb66ffc86f38",
     "fetched": "6b51d431df5d7f14",
     "kept": "5feceb66ffc86f38",
-    "run_id": "68d6c48c859bf038",
-    "since": "b5c011e3f762941f",
-    "slot": "d723b4470d3dd091",
+    "run_id": "2f421caf22a78055",
+    "since": "712c8c9f56d659cd",
+    "slot": "c28fbdb78b433202",
     "source": "3a2eb8bf50077831",
     "status": "c48b5b1a9776c846",
     "stored": "5feceb66ffc86f38",
     "unlinked": "5feceb66ffc86f38"
    },
-   "rowid": 1529
+   "rowid": 1539
   }
  },
  "triggers": [

@@ -1,18 +1,109 @@
 {
-  "collection": [],
+  "collection": [
+    {
+      "at": "2026-11-11T10:07:38.515226+00:00",
+      "detail": "facts 11; scored 20 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized.onnx",
+      "fetched": 12,
+      "kept": 0,
+      "source": "finbert_tone",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-11T10:07:37.712731+00:00",
+      "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-11T10:07:37.710998+00:00",
+      "detail": "facts 5; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-11T10:07:32.498717+00:00",
+      "detail": "facts 0; window not covered back to 2026-11-10 22:41Z; the oldest item read is 2026-11-11 09:55Z, so 11.2h of the window was never served",
+      "fetched": 19,
+      "kept": 18,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 17
+    },
+    {
+      "at": "2026-11-11T10:07:31.169337+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-11T10:07:29.046753+00:00",
+      "detail": "window overflow: all 150 dated items are newer than the window's start (2026-11-09 10:07Z); the oldest is 2026-11-10 13:59Z, so 27.9h scrolled off unseen; read 3 pages, the most this feed may; page 2 starts 3.0h before page 1 ends (2026-11-11 04:36Z under 2026-11-11 07:33Z): the items between were served by neither",
+      "fetched": 150,
+      "kept": 142,
+      "source": "nst_business",
+      "status": "degraded",
+      "stored": 136
+    },
+    {
+      "at": "2026-11-11T10:07:25.237231+00:00",
+      "detail": "window overflow: all 50 dated items are newer than the window's start (2026-11-10 10:07Z); the oldest is 2026-11-10 13:04Z, so 2.9h scrolled off unseen",
+      "fetched": 50,
+      "kept": 50,
+      "source": "fmt_business",
+      "status": "degraded",
+      "stored": 50
+    },
+    {
+      "at": "2026-11-11T10:07:24.745133+00:00",
+      "detail": "read but empty: Tenaga, Petronas Chemicals, IHH, Press Metal, Genting, Maybank",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-11T10:07:23.518084+00:00",
+      "detail": "read but empty: Petronas Chemicals, Genting; named the company: 10 of 22 (lowest: IHH 0/2, Press Metal 0/1, Tenaga 5/10)",
+      "fetched": 22,
+      "kept": 22,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 18
+    },
+    {
+      "at": "2026-11-11T10:07:21.506073+00:00",
+      "detail": "throttled: no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked); deferred: Press Metal, Genting, Maybank",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "throttled",
+      "stored": 0
+    }
+  ],
   "counts": {
-    "articles": 35206,
+    "articles": 35441,
     "documents": 0,
-    "escalated": 4526,
+    "escalated": 4541,
     "events": 4322,
     "failed_sweeps": 114,
-    "linked": 17856,
-    "observations": 7439,
+    "linked": 17888,
+    "observations": 7455,
     "series": 31,
-    "sweeps": 1529
+    "sweeps": 1539
   },
   "day": "2026-11-11",
-  "generated_at": "2026-11-11 01:15 UTC",
+  "generated_at": "2026-11-11 10:09 UTC",
   "macro": [
     {
       "change": "-0.08",
@@ -146,18 +237,18 @@
   "names": [
     {
       "earnings": [],
-      "escalated": 2,
+      "escalated": 4,
       "events": [],
       "instrument_id": "MYX:1155",
       "label": "Maybank",
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-10",
+          "known_at": "2026-11-11",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-10",
+          "period_end": "2026-11-11",
           "source": "finbert_tone",
-          "value": "0.53"
+          "value": "0.58"
         }
       ],
       "stories": [
@@ -186,31 +277,70 @@
           "quality": 1.0,
           "title": "Bursa Malaysia extends losses at midday in contrast with regional peers",
           "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE1WNERKbGRSbTlfT2FHdE5xWldfRVR1VHZYd1lDWWhMZi1IMU5IRUtFMnVYbl9rdzJBOXFlV3ROTXZPeWs2Wm9kTGl4ejRFdmJrSnBZTm10bU12SmJtLVhRVQ?oc=5",
+          "domain": "www.kaohooninternational.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-11T05:31:06+00:00",
+          "quality": 0.65,
+          "title": "Maybank Bullish on ADVANC as Core Business Expansion Sets to Drive 2027 Outlook",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMi1wFBVV95cUxNbm1qTmVoNUswNHZzcUtrbGdZcWlHRVpiT3FkU183NTlXOXZDNHp1UVZQa25BbC1VU1dyaE5Va3I2ZldiWURxS1dqam1wZ0l5WEpNV2k2ek5Db0FscEY2bDFubEo2T295bTN4NXl4cFVfWVQ2aUNaU2lhMXBxdXoxZ1poTGhkNUw3dFl6VFdsOS04eS1fX3pUVjFNYlFSWHR0eE1IWFNXdEtGVjljdGk3QXd0dHlVU3Y3c09CUWY5U2tpN1MzcHRlVkhrTUFFSVNfVXlKSE5hNA?oc=5",
+          "domain": "www.tradingview.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-10T13:30:23+00:00",
+          "quality": 0.65,
+          "title": "Maybank Securities Thailand Posts Quarterly Net Profit 118.87 MLN Baht",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiswFBVV95cUxNZ3k0elQ0S2hDWDFkNE9ValNqQ3VUV3FmY2xtNzNzN1RvaEt2eWE4SWpMX05NZWlaamFYN3JjQzVIU0xvdmtfMzRRVGJiSFk2UTlGYWRFSWZRRTkzVklvOEVsdnB3bWJjaTV5XzI3dGFlYl93cmdUajVodnhEbnNnTU93Snpkc1pScXRtenFLNmVFa0h3V0hWa0poY0tqTEQ0bGd5dkJORVpoRDU0VmRoVEtZdw?oc=5",
+          "domain": "www.moomoo.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-10T16:29:03+00:00",
+          "quality": 0.65,
+          "title": "Observing MAYBANK's Five-Year Trend | Bank Stocks Also Pull Back After Rallies",
+          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.0,
-        "n": 2,
-        "polarity_mean": 0.0,
-        "sources": 1,
+        "n": 5,
+        "polarity_mean": 0.4,
+        "sources": 4,
         "uncertainty_mean": 0.0
       },
       "upcoming": []
     },
     {
       "earnings": [],
-      "escalated": 1,
+      "escalated": 2,
       "events": [],
       "instrument_id": "MYX:5347",
       "label": "Tenaga",
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-10",
+          "known_at": "2026-11-11",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-10",
+          "period_end": "2026-11-11",
           "source": "finbert_tone",
-          "value": "0.18"
+          "value": "0.50"
         }
       ],
       "stories": [
@@ -226,13 +356,78 @@
           "quality": 1.0,
           "title": "Bursa Malaysia ends lower as banking, data centre heavyweights weigh on sentiment",
           "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMipwFBVV95cUxQZXR5Z1Fjako3MWpKa2VTM2tpc0FmRDc3ZnBZMnNhS0hzdGVtWF9oX2lrd2hDSWtzSXYxRHM1X0RyNlB5UU90aDNVUEQ0WkZjanBzTjIyWkQ5MUN1R2NRS002eEo4Z2VFZS05VTc5Rm90X0dScHRIVkpYSGFxejRsa2R5T3c4UXM0dTRvV2lsNlZPMWYtNU9XV1pJcUExZkhkVGwwVl9yMA?oc=5",
+          "domain": "themalaysianreserve.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-11T03:05:54+00:00",
+          "quality": 0.8,
+          "title": "PMW lifts TNB spun concrete pole contract value to RM148.05m",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://www.nst.com.my/business/corporate/2026/11/1575438/national-grid-readiness-crucial-ensuring-malaysias-economic",
+          "domain": "www.nst.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-11T08:10:53+00:00",
+          "quality": 1.0,
+          "title": "National grid readiness crucial to ensuring Malaysia's economic certainty: TNB chief",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMivAFBVV95cUxOLVo5djFYRk1tMlprS2hEUXNCem9OdTdWME1oRVNBWmhCMUowZkZjMHpObF9zUWkwU2FxOTU5OThmSUp5SFRqSEtZNTVXTTZzT0VUczNxMmFWTl9EWmN2SkxjM3RfbHJOdEpLdmg5NW45VEg5ZlktQ0cxd19KWFQ4YnI2OHZRNEJ4SGI3YjA4Y0c2VzFIODVxRG9IemRzVjAzdm5TVUR2NGppTlZGVG1GTy1kMnJMVUpuRDc0ZQ?oc=5",
+          "domain": "www.businesstoday.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-10T14:57:10+00:00",
+          "quality": 0.8,
+          "title": "PMW Secures Supplemental Agreement Of RM64 Million From TNB For Pole Supply",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMirgFBVV95cUxQUGRpM1FuWllJNkhnam9GLTI4UHg0QXFodk51OWFIazd6ZmhBVEplNFB2MHMxclNwXzlSajhPUXo1bVlMSWtjMnE5Z3JzQzlLVGVuS2hvY3Q0eGV6NnBQeGFnbzNZWVF4QzZRRF9yLWxZbTVsSU5OZHdUYmE5eXZPQk5vQURUOWxhNzZZUThtYW1pYWtYUUJCSlE5VHV1U25OQkNydk9DRThHQm1PSXfSAaABQVVfeXFMTWxtUGVRZUhyUGNwaEViWkFpR25hTFpxRl9GNFdhRGxzRXJodElXS1JYUmVEMENsWlplTWtsMm5kdDctOHNhV0N4RGFJMG1kSzNLOVRJbkZxb2tMZE9UWFlIdGxOSXRKNldoMWR2amk4SDBkS0lVUU5CLVUtWlVhU3hfUFgzUTZlYlVNaTQyR3ZmV0V6V203NFF6d2FVNTRSQw?oc=5",
+          "domain": "www.nst.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-10T12:52:02+00:00",
+          "quality": 0.8,
+          "title": "PMW unit extends pole supply deal with TNB",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE0wTGhkb21kMUtGMDFkNkVSbmtsUC1wbUViTTE4VWlIQlo3emFFbU12LXdWZmxHRElsVlBFTFk3STRLUUhlX2ZEdmhiUHJvSEw5?oc=5",
+          "domain": "theedgemalaysia.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-10T12:31:14+00:00",
+          "quality": 0.8,
+          "title": "PMW gets RM64m extension for Tenaga concrete pole supply job",
+          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.0,
-        "n": 1,
-        "polarity_mean": 1.0,
-        "sources": 1,
+        "n": 6,
+        "polarity_mean": 0.333,
+        "sources": 5,
         "uncertainty_mean": 0.0
       },
       "upcoming": []
@@ -266,11 +461,11 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-10",
+          "known_at": "2026-11-11",
           "label": "FinBERT headline tone",
           "period_end": "2026-11-10",
           "source": "finbert_tone",
-          "value": "-0.08"
+          "value": "-0.16"
         }
       ],
       "stories": [
@@ -317,11 +512,11 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-10",
+          "known_at": "2026-11-11",
           "label": "FinBERT headline tone",
           "period_end": "2026-11-10",
           "source": "finbert_tone",
-          "value": "0.92"
+          "value": "0.90"
         }
       ],
       "stories": [],
@@ -332,7 +527,7 @@
       "earnings": [
         "2026-11-17 (finnhub)"
       ],
-      "escalated": 49,
+      "escalated": 55,
       "events": [
         {
           "kind": "rating_reiteration",
@@ -484,6 +679,45 @@
       ],
       "stories": [
         {
+          "day": "2026-11-11",
+          "doc_id": "web_search:https://finance.yahoo.com/markets/live/stock-market-today-tuesday-november-10-dow-sp-500-nasdaq-inflation-data-cpi-090627830.html",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-11T10:09:16.399877+00:00",
+          "quality": 1.0,
+          "title": "Stock market today: Dow, S&P 500, Nasdaq slip as hot CPI fuels rate hike odds, Nvidia stock sinks",
+          "uncertainty": 0.0
+        },
+        {
+          "day": "2026-11-11",
+          "doc_id": "web_search:https://finance.yahoo.com/markets/stocks/articles/nvidia-stock-falls-citi-trims-173024804.html",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -0.3333333333333333,
+          "published_at": "2026-11-11T10:09:16.399877+00:00",
+          "quality": 1.0,
+          "title": "Nvidia Stock Falls as Citi Trims Price Target Ahead of Earnings",
+          "uncertainty": 0.16025641025641024
+        },
+        {
+          "day": null,
+          "doc_id": "https://www.nst.com.my/business/economy/2026/11/1575096/tighter-scrutiny-expected-malaysia-nvidia-scandal-spills-over",
+          "domain": "www.nst.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-11T00:00:17+00:00",
+          "quality": 1.0,
+          "title": "Tighter scrutiny expected on Malaysia as Nvidia scandal spills over",
+          "uncertainty": 0.5
+        },
+        {
           "day": null,
           "doc_id": "https://finance.yahoo.com/m/656fca57-9896-3dfb-96e8-e0af2bc227df/dow-jones-futures%3A-stock.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
@@ -494,6 +728,19 @@
           "published_at": "2026-11-10T22:38:12+00:00",
           "quality": 1.0,
           "title": "Dow Jones Futures: Stock Market Falls On Surging Treasury Yields, Nvidia Sell-Off; CoreWeave Rises Late",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://www.nst.com.my/world/world/2026/11/1575068/nvidia-heads-us470-billion-two-day-wipeout-ceo-affair-fallout-deepens",
+          "domain": "www.nst.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-10T22:22:22+00:00",
+          "quality": 1.0,
+          "title": "Nvidia heads for US$470 billion two-day wipeout as CEO affair fallout deepens",
           "uncertainty": 0.0
         },
         {
@@ -523,77 +770,25 @@
           "uncertainty": 0.25510204081632654
         },
         {
-          "day": null,
-          "doc_id": "marketaux:https://www.upsidetrader.com/2026/11/10/5-on-the-10-year-and-nvidias-bad-week-gets-worse/",
-          "domain": "upsidetrader.com",
+          "day": "2026-11-11",
+          "doc_id": "web_search:https://247wallst.com/investing/2026/11/10/nvidia-falls-4-as-board-probe-of-jensen-huang-weighs-on-shares-amd-and-broadcom-gain-3/",
+          "domain": "247wallst.com",
           "escalated": true,
           "intensity": 0.0,
           "kind": "",
           "polarity": -1.0,
-          "published_at": "2026-11-10T22:08:05+00:00",
+          "published_at": "2026-11-11T10:09:16.399877+00:00",
           "quality": 0.85,
-          "title": "5% On The 10-Year And Nvidia\u2019s Bad Week Gets Worse",
-          "uncertainty": 0.21551724137931036
-        },
-        {
-          "day": null,
-          "doc_id": "marketaux:https://economictimes.indiatimes.com/markets/us-stocks/wall-street-guide/us-stocks-us-market-ends-lower-as-hot-inflation-data-fed-comments-heighten-rate-worries/articleshow/135719918.cms",
-          "domain": "economictimes.indiatimes.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 0.0,
-          "published_at": "2026-11-10T21:15:32+00:00",
-          "quality": 0.85,
-          "title": "US stocks: US market falls as hot inflation, hawkish Fed fuel rate-hike fears",
-          "uncertainty": 0.1893939393939394
-        },
-        {
-          "day": null,
-          "doc_id": "finnhub:143692572",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
-          "kind": "",
-          "polarity": -0.3333333333333333,
-          "published_at": "2026-11-10T19:30:08+00:00",
-          "quality": 0.85,
-          "title": "AMD Gains 25% Against NVDA in 2 Days: Chip Analyst Says Lisa Su Is \u2018at Her Best\u2019",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "finnhub:143692575",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": -1.0,
-          "published_at": "2026-11-10T19:09:35+00:00",
-          "quality": 0.85,
-          "title": "NVIDIA Sinks 6% on Report Huang Affair Helped Move $7.5 Billion of Chips Into China",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "finnhub:143692587",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
-          "kind": "",
-          "polarity": 0.0,
-          "published_at": "2026-11-10T18:54:48+00:00",
-          "quality": 0.85,
-          "title": "Alphabet makes $10 billion bet on Anthropic's massive IPO",
+          "title": "NVIDIA Falls 4% as Board Probe of Jensen Huang Weighs on Shares; AMD and Broadcom Gain 3% - 24/7 Wall St.",
           "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 130,
-        "polarity_mean": -0.19,
-        "sources": 58,
-        "uncertainty_mean": 0.087
+        "n": 142,
+        "polarity_mean": -0.204,
+        "sources": 65,
+        "uncertainty_mean": 0.086
       },
       "upcoming": [
         {
@@ -873,7 +1068,7 @@
     },
     {
       "earnings": [],
-      "escalated": 21,
+      "escalated": 22,
       "events": [],
       "instrument_id": "XNAS:MSFT",
       "label": "Microsoft",
@@ -1018,6 +1213,19 @@
       "stories": [
         {
           "day": null,
+          "doc_id": "https://www.nst.com.my/business/corporate/2026/11/1575134/microsoft-presses-trump-scuttle-ban-chinese-data-centre-tech",
+          "domain": "www.nst.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-11T01:21:05+00:00",
+          "quality": 1.0,
+          "title": "Microsoft presses Trump to scuttle ban on Chinese data centre tech",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
           "doc_id": "https://finance.yahoo.com/technology/ai/articles/microsoft-jeff-teper-sandy-teper-214300600.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
           "escalated": true,
@@ -1106,27 +1314,14 @@
           "quality": 0.85,
           "title": "AvePoint Deepens Strategic Partnership with Microsoft to Advance Trusted AI Adoption",
           "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "finnhub:143690236",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 0.5,
-          "published_at": "2026-11-10T14:00:00+00:00",
-          "quality": 0.85,
-          "title": "Rubrik Introduces DevOps Protection with Cyber Recovery for Microsoft Azure DevOps and GitHub",
-          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 86,
+        "n": 87,
         "polarity_mean": -0.021,
-        "sources": 46,
-        "uncertainty_mean": 0.068
+        "sources": 47,
+        "uncertainty_mean": 0.067
       },
       "upcoming": []
     }
