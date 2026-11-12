@@ -1,6 +1,6 @@
 # Digest 2026-11-12
 
-Generated 2026-11-12 10:08 UTC · slot `all` · 36270 articles in the corpus, 7539 observations, 4331 events in the fact book.
+Generated 2026-11-12 20:19 UTC · slot `all` · 36287 articles in the corpus, 7551 observations, 4334 events in the fact book.
 
 ## The book
 
@@ -39,11 +39,12 @@ Generated 2026-11-12 10:08 UTC · slot `all` · 36270 articles in the corpus, 75
 - 2026-11-11 Yahoo — Nvidia short-seller warned of Jensen Huang's ties to suspected spy [q 0.85, tone -1.0] ★
 - 2026-11-11 thestockmarketwatch.com — Tech Surge Propels Markets as Nvidia and Semiconductors Lead Midday Rally [q 0.85, tone +1.0] ★
 - 2026-11-11 247wallst.com — Eric Schmidt, Former Google CEO, Should Run Nvidia [q 0.85, tone -1.0] ★
+- event 2026-11-12 rating_change — Oppenheimer downgrade Perform (from Outperform) (fmp)
 - event 2026-11-11 rating_change — Baird downgrade Neutral (from Outperform) (fmp)
 - upcoming 2026-11-25 earnings_result — Q3 2027 results after the close (finnhub)
 - upcoming 2026-11-17 earnings_result — Q3 2027 results after the close (finnhub)
 - earnings date: 2026-11-17 (finnhub)
-- snapshot: P/E (ttm) 21.10 (finnhub, 2026-11-11) · P/B 28.81 (finnhub, 2026-11-11) · EPS (ttm) 7.91 (finnhub, 2026-11-11) · dividend yield 0.03 (finnhub, 2026-11-11) · beta 2.36 (finnhub, 2026-11-11) · 52w high 243.37 (finnhub, 2026-11-11) · 52w low 164.27 (finnhub, 2026-11-11) · target (consensus) 340.03 (fmp, 2026-11-11) · analysts: buy 41 (finnhub, 2026-11-02) · analysts: hold 2 (finnhub, 2026-11-02) · analysts: sell 1 (finnhub, 2026-11-02) · vendor sentiment 0.25 (alphavantage_news, 2026-10-06) · Marketaux sentiment -0.03 (marketaux_news, 2026-11-08) · FinBERT headline tone -0.01 (finbert_tone, 2026-11-11) · revenue (last quarter) 96.22bn (sec_xbrl, 2026-08-26) · net income (last quarter) 59.69bn (sec_xbrl, 2026-08-26) · last EPS surprise % 3.82 (finnhub, 2026-09-05)
+- snapshot: P/E (ttm) 21.10 (finnhub, 2026-11-11) · P/B 28.81 (finnhub, 2026-11-11) · EPS (ttm) 7.91 (finnhub, 2026-11-11) · dividend yield 0.03 (finnhub, 2026-11-11) · beta 2.36 (finnhub, 2026-11-11) · 52w high 243.37 (finnhub, 2026-11-11) · 52w low 164.27 (finnhub, 2026-11-11) · target (consensus) 328.07 (fmp, 2026-11-12) · analysts: buy 41 (finnhub, 2026-11-02) · analysts: hold 2 (finnhub, 2026-11-02) · analysts: sell 1 (finnhub, 2026-11-02) · vendor sentiment 0.25 (alphavantage_news, 2026-10-06) · Marketaux sentiment -0.03 (marketaux_news, 2026-11-08) · FinBERT headline tone -0.01 (finbert_tone, 2026-11-11) · revenue (last quarter) 96.22bn (sec_xbrl, 2026-08-26) · net income (last quarter) 59.69bn (sec_xbrl, 2026-08-26) · last EPS surprise % 3.82 (finnhub, 2026-09-05)
 
 ### Apple (XNAS:AAPL)
 - tone: 31 stories from 21 sources, polarity +0.24, peak intensity 0.67, uncertainty 0.11 · 14 escalated
@@ -55,7 +56,8 @@ Generated 2026-11-12 10:08 UTC · slot `all` · 36270 articles in the corpus, 75
 - 2026-11-11 www.marketbeat.com — Apple (NASDAQ:AAPL) Reaches New 52-Week High on Analyst Upgrade [q 0.65, tone +1.0] ★
 - 2026-11-11 www.fool.com — Why Apple Stock Fell Despite a Record Quarter [q 0.65, tone +0.0] ★
 - 2026-11-11 tradersunion.com — Apple options activity rises as stock extends record-setting 2026 rally [q 0.65, tone +1.0] ★
-- snapshot: P/E (ttm) 38.90 (finnhub, 2026-11-11) · P/B 44.06 (finnhub, 2026-11-11) · EPS (ttm) 8.97 (finnhub, 2026-11-11) · dividend yield 0.51 (finnhub, 2026-11-11) · beta 1.09 (finnhub, 2026-11-11) · 52w high 355.38 (finnhub, 2026-11-11) · 52w low 243.42 (finnhub, 2026-11-11) · target (consensus) 341.94 (fmp, 2026-11-11) · analysts: buy 19 (finnhub, 2026-11-02) · analysts: hold 15 (finnhub, 2026-11-02) · analysts: sell 3 (finnhub, 2026-11-02) · vendor sentiment -0.23 (alphavantage_news, 2026-10-06) · Marketaux sentiment 0.30 (marketaux_news, 2026-11-11) · FinBERT headline tone 0.14 (finbert_tone, 2026-11-11) · revenue (last quarter) 114.48bn (sec_xbrl, 2026-11-03) · net income (last quarter) 30.71bn (sec_xbrl, 2026-11-03) · last EPS surprise % 3.64 (finnhub, 2026-11-08)
+- event 2026-11-11 rating_change — China Renaissance upgrade Buy (from Hold) (fmp)
+- snapshot: P/E (ttm) 38.90 (finnhub, 2026-11-11) · P/B 44.06 (finnhub, 2026-11-11) · EPS (ttm) 8.97 (finnhub, 2026-11-11) · dividend yield 0.51 (finnhub, 2026-11-11) · beta 1.09 (finnhub, 2026-11-11) · 52w high 355.38 (finnhub, 2026-11-11) · 52w low 243.42 (finnhub, 2026-11-11) · target (consensus) 341.94 (fmp, 2026-11-12) · analysts: buy 19 (finnhub, 2026-11-02) · analysts: hold 15 (finnhub, 2026-11-02) · analysts: sell 3 (finnhub, 2026-11-02) · vendor sentiment -0.23 (alphavantage_news, 2026-10-06) · Marketaux sentiment 0.30 (marketaux_news, 2026-11-11) · FinBERT headline tone 0.14 (finbert_tone, 2026-11-11) · revenue (last quarter) 114.48bn (sec_xbrl, 2026-11-03) · net income (last quarter) 30.71bn (sec_xbrl, 2026-11-03) · last EPS surprise % 3.64 (finnhub, 2026-11-08)
 
 ### Microsoft (XNAS:MSFT)
 - tone: 30 stories from 18 sources, polarity +0.07, peak intensity 0.00, uncertainty 0.03 · 10 escalated
@@ -67,13 +69,13 @@ Generated 2026-11-12 10:08 UTC · slot `all` · 36270 articles in the corpus, 75
 - 2026-11-11 finance.yahoo.com — Microsoft Stocks Decline 2.5% as $1 Billion Anthropic Stake Tests Partner-Rival Balance [q 0.80, tone -1.0] ★
 - 2026-11-11 www.barrons.com — Microsoft Bet Big on OpenAI. Anthropic’s Profit Lead Raises Questions. [q 0.80, tone +1.0] ★
 - 2026-11-11 www.reseller.co.nz — Avanade sees major growth opportunity as AI reshapes Microsoft services market [q 0.65, tone +1.0] ★
-- snapshot: P/E (ttm) 27.76 (finnhub, 2026-11-11) · P/B 6.26 (finnhub, 2026-11-11) · EPS (ttm) 19.15 (finnhub, 2026-11-11) · dividend yield 0.79 (finnhub, 2026-11-11) · beta 1.06 (finnhub, 2026-11-11) · 52w high 559.15 (finnhub, 2026-11-11) · 52w low 349.20 (finnhub, 2026-11-11) · target (consensus) 611.74 (fmp, 2026-11-11) · analysts: buy 40 (finnhub, 2026-11-02) · analysts: hold 3 (finnhub, 2026-11-02) · analysts: sell 0 (finnhub, 2026-11-02) · vendor sentiment 0.29 (alphavantage_news, 2026-10-06) · Marketaux sentiment 0.35 (marketaux_news, 2026-11-11) · FinBERT headline tone 0.04 (finbert_tone, 2026-11-11) · revenue (last quarter) 92.28bn (sec_xbrl, 2026-10-28) · net income (last quarter) 36.63bn (sec_xbrl, 2026-10-28) · last EPS surprise % 1.53 (finnhub, 2026-10-28)
+- snapshot: P/E (ttm) 27.76 (finnhub, 2026-11-11) · P/B 6.26 (finnhub, 2026-11-11) · EPS (ttm) 19.15 (finnhub, 2026-11-11) · dividend yield 0.79 (finnhub, 2026-11-11) · beta 1.06 (finnhub, 2026-11-11) · 52w high 559.15 (finnhub, 2026-11-11) · 52w low 349.20 (finnhub, 2026-11-11) · target (consensus) 611.74 (fmp, 2026-11-12) · analysts: buy 40 (finnhub, 2026-11-02) · analysts: hold 3 (finnhub, 2026-11-02) · analysts: sell 0 (finnhub, 2026-11-02) · vendor sentiment 0.29 (alphavantage_news, 2026-10-06) · Marketaux sentiment 0.35 (marketaux_news, 2026-11-11) · FinBERT headline tone 0.04 (finbert_tone, 2026-11-11) · revenue (last quarter) 92.28bn (sec_xbrl, 2026-10-28) · net income (last quarter) 36.63bn (sec_xbrl, 2026-10-28) · last EPS surprise % 1.53 (finnhub, 2026-10-28)
 
 ## Macro
 
 | series | latest | as of | change | source |
 |---|---|---|---|---|
-| ICE BofA US high-yield option-adjusted spread, % | 3.34 | 2026-11-09 | -0.08 | fred |
+| ICE BofA US high-yield option-adjusted spread, % | 3.30 | 2026-11-11 | -0.04 | fred |
 | BNM Overnight Policy Rate, % | 2.75 | 2026-09-03 | +0 | bnm_opr |
 | US CPI, all items, index 1982-84=100 | 337.48 | 2026-10-01 | +1.178 | fred |
 | Brent crude, USD per barrel (EIA, daily) | 107.03 | 2026-11-03 | -0.36 | fred |
@@ -83,17 +85,21 @@ Generated 2026-11-12 10:08 UTC · slot `all` · 36270 articles in the corpus, 75
 | 2-year Treasury yield, % | 4.56 | 2026-11-09 | +0.05 | fred |
 | Malaysia CPI headline, index 2010=100 | 137.60 | 2026-09-01 | +0.1 | dosm_cpi |
 | Broad US dollar index | 121.88 | 2026-11-06 | +0.3742 | fred |
-| NASDAQ Composite, index level | 25,065.87 | 2026-11-10 | -187.27 | fred |
+| NASDAQ Composite, index level | 25,466.19 | 2026-11-11 | +400.32 | fred |
 | Aluminium, USD per tonne (IMF PCPS via FRED) | 3,283.05 | 2026-09-01 | +32.9329 | fred |
-| S&P 500, index level | 7,520.93 | 2026-11-10 | -29.01 | fred |
+| S&P 500, index level | 7,619.38 | 2026-11-11 | +98.45 | fred |
 | 10y minus 2y Treasury spread, % | 0.25 | 2026-11-10 | -0.07 | fred |
 | US unemployment rate, % | 4.10 | 2026-10-01 | -0.1 | fred |
-| CBOE VIX, index | 19.46 | 2026-11-10 | -0.46 | fred |
+| CBOE VIX, index | 17.49 | 2026-11-11 | -1.97 | fred |
 
 ## Collection
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 20:19 | dbnomics | ok | 450 | 0 | 0 | facts 0;  |
+| 20:19 | jin10_flash | degraded | 18 | 18 | 17 | facts 0; window not covered back to 2026-11-12 10:07Z; the oldest item read is 2 |
+| 20:19 | fred | ok | 484 | 0 | 0 | facts 4; release calendar: 'FOMC Press Release' listed on 15 days of the fortnig |
+| 20:19 | fmp | ok | 4008 | 0 | 0 | facts 15; fmp /earnings is outside the plan (HTTP 402); not collected for NVDA,  |
 | 10:07 | finbert_tone | ok | 10 | 0 | 0 | facts 9; scored 12 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized. |
 | 10:07 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
 | 10:07 | twse_openapi | ok | 8 | 0 | 0 | facts 8;  |

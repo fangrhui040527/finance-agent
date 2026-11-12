@@ -1,6 +1,42 @@
 {
   "collection": [
     {
+      "at": "2026-11-12T20:19:39.748610+00:00",
+      "detail": "facts 0; ",
+      "fetched": 450,
+      "kept": 0,
+      "source": "dbnomics",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-12T20:19:37.617052+00:00",
+      "detail": "facts 0; window not covered back to 2026-11-12 10:07Z; the oldest item read is 2026-11-12 19:16Z, so 9.1h of the window was never served",
+      "fetched": 18,
+      "kept": 18,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 17
+    },
+    {
+      "at": "2026-11-12T20:19:36.487303+00:00",
+      "detail": "facts 4; release calendar: 'FOMC Press Release' listed on 15 days of the fortnight - a daily table, not a scheduled print; not stored as a release",
+      "fetched": 484,
+      "kept": 0,
+      "source": "fred",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-12T20:19:26.567826+00:00",
+      "detail": "facts 15; fmp /earnings is outside the plan (HTTP 402); not collected for NVDA, AAPL, MSFT",
+      "fetched": 4008,
+      "kept": 0,
+      "source": "fmp",
+      "status": "ok",
+      "stored": 0
+    },
+    {
       "at": "2026-11-12T10:07:54.541626+00:00",
       "detail": "facts 9; scored 12 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized.onnx",
       "fetched": 10,
@@ -92,26 +128,26 @@
     }
   ],
   "counts": {
-    "articles": 36270,
+    "articles": 36287,
     "documents": 0,
     "escalated": 4648,
-    "events": 4331,
+    "events": 4334,
     "failed_sweeps": 114,
     "linked": 18242,
-    "observations": 7539,
+    "observations": 7551,
     "series": 31,
-    "sweeps": 1562
+    "sweeps": 1566
   },
   "day": "2026-11-12",
-  "generated_at": "2026-11-12 10:08 UTC",
+  "generated_at": "2026-11-12 20:19 UTC",
   "macro": [
     {
-      "change": "-0.08",
-      "obs_date": "2026-11-09",
+      "change": "-0.04",
+      "obs_date": "2026-11-11",
       "series_id": "BAMLH0A0HYM2",
       "source": "fred",
       "title": "ICE BofA US high-yield option-adjusted spread, %",
-      "value": "3.34"
+      "value": "3.30"
     },
     {
       "change": "0",
@@ -186,12 +222,12 @@
       "value": "121.88"
     },
     {
-      "change": "-187.27",
-      "obs_date": "2026-11-10",
+      "change": "400.32",
+      "obs_date": "2026-11-11",
       "series_id": "NASDAQCOM",
       "source": "fred",
       "title": "NASDAQ Composite, index level",
-      "value": "25,065.87"
+      "value": "25,466.19"
     },
     {
       "change": "32.9329",
@@ -202,12 +238,12 @@
       "value": "3,283.05"
     },
     {
-      "change": "-29.01",
-      "obs_date": "2026-11-10",
+      "change": "98.45",
+      "obs_date": "2026-11-11",
       "series_id": "SP500",
       "source": "fred",
       "title": "S&P 500, index level",
-      "value": "7,520.93"
+      "value": "7,619.38"
     },
     {
       "change": "-0.07",
@@ -226,12 +262,12 @@
       "value": "4.10"
     },
     {
-      "change": "-0.46",
-      "obs_date": "2026-11-10",
+      "change": "-1.97",
+      "obs_date": "2026-11-11",
       "series_id": "VIXCLS",
       "source": "fred",
       "title": "CBOE VIX, index",
-      "value": "19.46"
+      "value": "17.49"
     }
   ],
   "names": [
@@ -428,6 +464,13 @@
         {
           "kind": "rating_change",
           "source": "fmp",
+          "title": "Oppenheimer downgrade Perform (from Outperform)",
+          "url": "",
+          "when": "2026-11-12T00:00:00+00:00"
+        },
+        {
+          "kind": "rating_change",
+          "source": "fmp",
           "title": "Baird downgrade Neutral (from Outperform)",
           "url": "",
           "when": "2026-11-11T00:00:00+00:00"
@@ -494,11 +537,11 @@
         },
         {
           "concept": "price_target_consensus",
-          "known_at": "2026-11-11",
+          "known_at": "2026-11-12",
           "label": "target (consensus)",
           "period_end": null,
           "source": "fmp",
-          "value": "340.03"
+          "value": "328.07"
         },
         {
           "concept": "analyst_buy",
@@ -706,7 +749,15 @@
     {
       "earnings": [],
       "escalated": 14,
-      "events": [],
+      "events": [
+        {
+          "kind": "rating_change",
+          "source": "fmp",
+          "title": "China Renaissance upgrade Buy (from Hold)",
+          "url": "",
+          "when": "2026-11-11T00:00:00+00:00"
+        }
+      ],
       "instrument_id": "XNAS:AAPL",
       "label": "Apple",
       "snapshot": [
@@ -768,7 +819,7 @@
         },
         {
           "concept": "price_target_consensus",
-          "known_at": "2026-11-11",
+          "known_at": "2026-11-12",
           "label": "target (consensus)",
           "period_end": null,
           "source": "fmp",
@@ -1027,7 +1078,7 @@
         },
         {
           "concept": "price_target_consensus",
-          "known_at": "2026-11-11",
+          "known_at": "2026-11-12",
           "label": "target (consensus)",
           "period_end": null,
           "source": "fmp",
