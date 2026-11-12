@@ -1,14 +1,19 @@
 # Digest 2026-11-12
 
-Generated 2026-11-12 02:16 UTC · slot `all` · 36054 articles in the corpus, 7522 observations, 4331 events in the fact book.
+Generated 2026-11-12 10:08 UTC · slot `all` · 36270 articles in the corpus, 7539 observations, 4331 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 1 escalated
+- 2026-11-12 www.klsescreener.com — Maybank targets 3mil lives under new social impact strategy [q 0.65, tone +0.0] ★
+- snapshot: FinBERT headline tone 0.22 (finbert_tone, 2026-11-12)
 
 ### Tenaga (MYX:5347)
-- quiet: nothing collected for this name in the window
+- tone: 2 stories from 2 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-11-12 freemalaysiatoday.com — TNB to bear bulk of RM248mil electricity bill relief cost [q 0.80, tone +0.0]
+- 2026-11-11 www.klsescreener.com — Minister: Expanded electricity bill protection to cost RM248 mil, Tenaga to bear automatic fuel adjustment costs [q 0.65, tone +0.0]
+- snapshot: FinBERT headline tone 0.19 (finbert_tone, 2026-11-12)
 
 ### Petronas Chemicals (MYX:5183)
 - quiet: nothing collected for this name in the window
@@ -20,10 +25,13 @@ Generated 2026-11-12 02:16 UTC · slot `all` · 36054 articles in the corpus, 75
 - quiet: nothing collected for this name in the window
 
 ### Genting (MYX:3182)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-11-12 www.minichart.com.sg — Genting Berhad Ceases to Be Substantial Shareholder of PUC Berhad After Private Placement Dilution [q 0.65, tone +0.0]
+- snapshot: FinBERT headline tone -0.09 (finbert_tone, 2026-11-12)
 
 ### NVIDIA (XNAS:NVDA)
-- tone: 109 stories from 36 sources, polarity -0.04, peak intensity 0.33, uncertainty 0.17 · 35 escalated
+- tone: 113 stories from 38 sources, polarity -0.04, peak intensity 0.67, uncertainty 0.17 · 36 escalated
+- 2026-11-12 www.nst.com.my — Nvidia shares plunge following reports CEO Huang could be ousted [q 1.00, tone +0.0] ★
 - 2026-11-11 247wallst.com — Nvidia Just Fell 8.3% After Hours on a Report of a Second Jensen Huang Affair. Here’s What 2,000 Shares Have Lost This Week [q 0.85, tone -1.0] ★
 - 2026-11-11 decrypt.co — Nvidia-Backed CoreWeave Is Surging: Here’s What It Means for the AI Boom [q 0.85, tone +1.0] ★
 - 2026-11-11 Yahoo — Why Nvidia Stock Was Downgraded to Hold by a Top Analyst and Price Target Halved to $200 [q 0.85, tone -0.3] ★
@@ -31,7 +39,6 @@ Generated 2026-11-12 02:16 UTC · slot `all` · 36054 articles in the corpus, 75
 - 2026-11-11 Yahoo — Nvidia short-seller warned of Jensen Huang's ties to suspected spy [q 0.85, tone -1.0] ★
 - 2026-11-11 thestockmarketwatch.com — Tech Surge Propels Markets as Nvidia and Semiconductors Lead Midday Rally [q 0.85, tone +1.0] ★
 - 2026-11-11 247wallst.com — Eric Schmidt, Former Google CEO, Should Run Nvidia [q 0.85, tone -1.0] ★
-- 2026-11-11 Yahoo — Nvidia is Now Down More Than 25% In 30 Days: This Wall Street Desk Predicts 205% Returns [q 0.85, tone +1.0] ★
 - event 2026-11-11 rating_change — Baird downgrade Neutral (from Outperform) (fmp)
 - upcoming 2026-11-25 earnings_result — Q3 2027 results after the close (finnhub)
 - upcoming 2026-11-17 earnings_result — Q3 2027 results after the close (finnhub)
@@ -39,7 +46,7 @@ Generated 2026-11-12 02:16 UTC · slot `all` · 36054 articles in the corpus, 75
 - snapshot: P/E (ttm) 21.10 (finnhub, 2026-11-11) · P/B 28.81 (finnhub, 2026-11-11) · EPS (ttm) 7.91 (finnhub, 2026-11-11) · dividend yield 0.03 (finnhub, 2026-11-11) · beta 2.36 (finnhub, 2026-11-11) · 52w high 243.37 (finnhub, 2026-11-11) · 52w low 164.27 (finnhub, 2026-11-11) · target (consensus) 340.03 (fmp, 2026-11-11) · analysts: buy 41 (finnhub, 2026-11-02) · analysts: hold 2 (finnhub, 2026-11-02) · analysts: sell 1 (finnhub, 2026-11-02) · vendor sentiment 0.25 (alphavantage_news, 2026-10-06) · Marketaux sentiment -0.03 (marketaux_news, 2026-11-08) · FinBERT headline tone -0.01 (finbert_tone, 2026-11-11) · revenue (last quarter) 96.22bn (sec_xbrl, 2026-08-26) · net income (last quarter) 59.69bn (sec_xbrl, 2026-08-26) · last EPS surprise % 3.82 (finnhub, 2026-09-05)
 
 ### Apple (XNAS:AAPL)
-- tone: 30 stories from 20 sources, polarity +0.24, peak intensity 0.67, uncertainty 0.12 · 14 escalated
+- tone: 31 stories from 21 sources, polarity +0.24, peak intensity 0.67, uncertainty 0.11 · 14 escalated
 - 2026-11-11 finance.yahoo.com — MP Materials (MP) Q3 Beat Raises The Question Of Whether Its Story Is Already Priced In [q 1.00, tone +0.7] ★
 - 2026-11-11 www.marketbeat.com — MP Materials Clears GM Magnet Milestone, Targets Apple as Next Customer [q 0.85, tone +1.0] ★
 - 2026-11-11 Yahoo — Buy, Sell, or Hold? Wednesday’s Top Upgrades and Downgrades: Akamai Technologies, Apple, BILL Holdings, Corning, Form Factor, Guidewire Software, NVIDIA, Riot Platforms, Toast, and More [q 0.85, tone -0.3] ★
@@ -82,6 +89,21 @@ Generated 2026-11-12 02:16 UTC · slot `all` · 36054 articles in the corpus, 75
 | 10y minus 2y Treasury spread, % | 0.25 | 2026-11-10 | -0.07 | fred |
 | US unemployment rate, % | 4.10 | 2026-10-01 | -0.1 | fred |
 | CBOE VIX, index | 19.46 | 2026-11-10 | -0.46 | fred |
+
+## Collection
+
+| at (UTC) | source | status | fetched | kept | stored | detail |
+|---|---|---|---|---|---|---|
+| 10:07 | finbert_tone | ok | 10 | 0 | 0 | facts 9; scored 12 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized. |
+| 10:07 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
+| 10:07 | twse_openapi | ok | 8 | 0 | 0 | facts 8;  |
+| 10:07 | jin10_flash | degraded | 18 | 17 | 16 | facts 0; window not covered back to 2026-11-11 22:47Z; the oldest item read is 2 |
+| 10:07 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 10:07 | nst_business | degraded | 150 | 138 | 132 | window overflow: all 150 dated items are newer than the window's start (2026-11- |
+| 10:07 | fmt_business | degraded | 50 | 50 | 48 | window overflow: all 50 dated items are newer than the window's start (2026-11-1 |
+| 10:07 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals, IHH |
+| 10:07 | google_news | ok | 14 | 13 | 11 | read but empty: Press Metal, Petronas Chemicals; named the company: 6 of 13 (low |
+| 10:07 | gdelt | ok | 20 | 19 | 9 | grouped 3 names per request; 2 requests; read but empty: Press Metal, Genting, M |
 
 ---
 

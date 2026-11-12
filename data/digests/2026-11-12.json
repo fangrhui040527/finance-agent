@@ -1,18 +1,109 @@
 {
-  "collection": [],
+  "collection": [
+    {
+      "at": "2026-11-12T10:07:54.541626+00:00",
+      "detail": "facts 9; scored 12 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized.onnx",
+      "fetched": 10,
+      "kept": 0,
+      "source": "finbert_tone",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-12T10:07:53.909819+00:00",
+      "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-12T10:07:53.907292+00:00",
+      "detail": "facts 8; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-12T10:07:48.299283+00:00",
+      "detail": "facts 0; window not covered back to 2026-11-11 22:47Z; the oldest item read is 2026-11-12 09:50Z, so 11.1h of the window was never served",
+      "fetched": 18,
+      "kept": 17,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 16
+    },
+    {
+      "at": "2026-11-12T10:07:46.803746+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-12T10:07:44.631276+00:00",
+      "detail": "window overflow: all 150 dated items are newer than the window's start (2026-11-11 10:07Z); the oldest is 2026-11-11 15:02Z, so 4.9h scrolled off unseen; read 3 pages, the most this feed may; page 2 starts 3.4h before page 1 ends (2026-11-12 03:44Z under 2026-11-12 07:10Z): the items between were served by neither",
+      "fetched": 150,
+      "kept": 138,
+      "source": "nst_business",
+      "status": "degraded",
+      "stored": 132
+    },
+    {
+      "at": "2026-11-12T10:07:40.953576+00:00",
+      "detail": "window overflow: all 50 dated items are newer than the window's start (2026-11-11 10:07Z); the oldest is 2026-11-11 15:26Z, so 5.3h scrolled off unseen",
+      "fetched": 50,
+      "kept": 50,
+      "source": "fmt_business",
+      "status": "degraded",
+      "stored": 48
+    },
+    {
+      "at": "2026-11-12T10:07:40.422459+00:00",
+      "detail": "read but empty: Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals, IHH",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-12T10:07:39.014818+00:00",
+      "detail": "read but empty: Press Metal, Petronas Chemicals; named the company: 6 of 13 (lowest: IHH 0/1, Genting 1/4, Maybank 2/4)",
+      "fetched": 14,
+      "kept": 13,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 11
+    },
+    {
+      "at": "2026-11-12T10:07:37.180539+00:00",
+      "detail": "grouped 3 names per request; 2 requests; read but empty: Press Metal, Genting, Maybank, Petronas Chemicals; named the company: 5 of 19 (lowest: Press Metal + Genting + Maybank 0/10, Tenaga + Petronas Chemicals + IHH 5/9)",
+      "fetched": 20,
+      "kept": 19,
+      "source": "gdelt",
+      "status": "ok",
+      "stored": 9
+    }
+  ],
   "counts": {
-    "articles": 36054,
+    "articles": 36270,
     "documents": 0,
-    "escalated": 4644,
+    "escalated": 4648,
     "events": 4331,
     "failed_sweeps": 114,
-    "linked": 18225,
-    "observations": 7522,
+    "linked": 18242,
+    "observations": 7539,
     "series": 31,
-    "sweeps": 1552
+    "sweeps": 1562
   },
   "day": "2026-11-12",
-  "generated_at": "2026-11-12 02:16 UTC",
+  "generated_at": "2026-11-12 10:08 UTC",
   "macro": [
     {
       "change": "-0.08",
@@ -146,22 +237,42 @@
   "names": [
     {
       "earnings": [],
-      "escalated": 0,
+      "escalated": 1,
       "events": [],
       "instrument_id": "MYX:1155",
       "label": "Maybank",
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-11",
+          "known_at": "2026-11-12",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-11",
+          "period_end": "2026-11-12",
           "source": "finbert_tone",
-          "value": "0.58"
+          "value": "0.22"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMirgFBVV95cUxQVXpsX21IN2hDYnFmM2g5N0lNNzZtaHBFVFc2ajA5VVpzRzhyaVl2T2wyMFJCaFgzWHlwMkdDZ2ZOMG11dnZnaUFUN1RFejl1NXp2MmlIZmxOOERJLUhGMWtBRXpiZ0pfcW5KNDdmdGIxWDBlODVKWnVjOHVtREUxUVRyVEpkdVE1Zm4wa3BfRUxLeU9pWTVPbkFDVlZPWlZ2R1B6RFdRbXNILXQ5Umc?oc=5",
+          "domain": "www.klsescreener.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-12T08:10:32+00:00",
+          "quality": 0.65,
+          "title": "Maybank targets 3mil lives under new social impact strategy",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -173,15 +284,48 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-11",
+          "known_at": "2026-11-12",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-11",
+          "period_end": "2026-11-12",
           "source": "finbert_tone",
-          "value": "0.50"
+          "value": "0.19"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "gdelt:https://www.freemalaysiatoday.com/category/nation/2026/11/12/tnb-to-bear-bulk-of-rm248mil-electricity-bill-relief-cost",
+          "domain": "freemalaysiatoday.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-12T03:45:00+00:00",
+          "quality": 0.8,
+          "title": "TNB to bear bulk of RM248mil electricity bill relief cost",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiXkFVX3lxTFAyMy1mX2Q0ZnFQSFVDXzdEcjF0QlNoSFJSRkNSamR3eTQ1VG9Ma0ZMYWRUWk5PdTA1d21SaXlXWnBKa1VLYjNtMWNkTUJKUkZuOThOeDh0dVUyS2dYb1E?oc=5",
+          "domain": "www.klsescreener.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-11T15:04:23+00:00",
+          "quality": 0.65,
+          "title": "Minister: Expanded electricity bill protection to cost RM248 mil, Tenaga to bear automatic fuel adjustment costs",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 2,
+        "polarity_mean": 0.0,
+        "sources": 2,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -244,22 +388,42 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-11",
+          "known_at": "2026-11-12",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-10",
+          "period_end": "2026-11-12",
           "source": "finbert_tone",
-          "value": "0.90"
+          "value": "-0.09"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMi1gFBVV95cUxQdzJQTDhSVklhaFp5X1hROENPWUpHdk0yZkhwUUE3WDJ6NHpRYkZ5Uk4yLUlMWHNmSnRrVGw4TkNfellGdWhFbC1BTEtISzB6bGV5R1dhQlZkb09ZcHZuMkZzV0d4WXBOM0E2VjNLemFYMURRT2pQN1hnSjBWVkRyb2FncWhZbG9VLVBtOUJBdUpjTFdjemJUdUtXS045N1d2WHVvazdodzhXOVFUa2JfbDJZYnFCOVZucDhwUnI1LThWYWpFTGdoSTZRbnAzVmV5MW1lY21R?oc=5",
+          "domain": "www.minichart.com.sg",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-12T03:17:00+00:00",
+          "quality": 0.65,
+          "title": "Genting Berhad Ceases to Be Substantial Shareholder of PUC Berhad After Private Placement Dilution",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
       "earnings": [
         "2026-11-17 (finnhub)"
       ],
-      "escalated": 35,
+      "escalated": 36,
       "events": [
         {
           "kind": "rating_change",
@@ -412,6 +576,19 @@
       "stories": [
         {
           "day": null,
+          "doc_id": "https://www.nst.com.my/business/corporate/2026/11/1575989/nvidia-shares-plunge-following-reports-ceo-huang-could-be-ousted",
+          "domain": "www.nst.com.my",
+          "escalated": true,
+          "intensity": 0.6666666666666666,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-12T03:32:30+00:00",
+          "quality": 1.0,
+          "title": "Nvidia shares plunge following reports CEO Huang could be ousted",
+          "uncertainty": 0.32894736842105265
+        },
+        {
+          "day": null,
           "doc_id": "https://247wallst.com/investing/2026/11/11/nvidia-just-fell-8-3-after-hours-on-a-report-of-a-second-jensen-huang-affair-heres-what-2000-shares-have-lost-this-week/?.tsrc=rss",
           "domain": "247wallst.com",
           "escalated": true,
@@ -500,27 +677,14 @@
           "quality": 0.85,
           "title": "Eric Schmidt, Former Google CEO, Should Run Nvidia",
           "uncertainty": 0.5681818181818182
-        },
-        {
-          "day": null,
-          "doc_id": "finnhub:143736778",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
-          "kind": "",
-          "polarity": 1.0,
-          "published_at": "2026-11-11T15:45:31+00:00",
-          "quality": 0.85,
-          "title": "Nvidia is Now Down More Than 25% In 30 Days: This Wall Street Desk Predicts 205% Returns",
-          "uncertainty": 0.25510204081632654
         }
       ],
       "tone": {
-        "intensity_max": 0.333,
-        "n": 109,
-        "polarity_mean": -0.043,
-        "sources": 36,
-        "uncertainty_mean": 0.167
+        "intensity_max": 0.667,
+        "n": 113,
+        "polarity_mean": -0.041,
+        "sources": 38,
+        "uncertainty_mean": 0.173
       },
       "upcoming": [
         {
@@ -791,10 +955,10 @@
       ],
       "tone": {
         "intensity_max": 0.667,
-        "n": 30,
-        "polarity_mean": 0.244,
-        "sources": 20,
-        "uncertainty_mean": 0.117
+        "n": 31,
+        "polarity_mean": 0.237,
+        "sources": 21,
+        "uncertainty_mean": 0.113
       },
       "upcoming": []
     },
