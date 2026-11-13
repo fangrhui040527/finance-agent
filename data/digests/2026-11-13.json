@@ -1,18 +1,109 @@
 {
-  "collection": [],
+  "collection": [
+    {
+      "at": "2026-11-13T10:09:14.118226+00:00",
+      "detail": "facts 19; scored 17 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized.onnx",
+      "fetched": 20,
+      "kept": 0,
+      "source": "finbert_tone",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-13T10:09:13.710929+00:00",
+      "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-13T10:09:13.709572+00:00",
+      "detail": "facts 5; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-13T10:09:09.907802+00:00",
+      "detail": "facts 0; window not covered back to 2026-11-12 22:41Z; the oldest item read is 2026-11-13 10:00Z, so 11.3h of the window was never served",
+      "fetched": 17,
+      "kept": 17,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 16
+    },
+    {
+      "at": "2026-11-13T10:09:08.905467+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-13T10:09:07.150055+00:00",
+      "detail": "window overflow: all 150 dated items are newer than the window's start (2026-11-12 10:07Z); the oldest is 2026-11-12 13:12Z, so 3.1h scrolled off unseen; read 3 pages, the most this feed may; page 2 starts 3.6h before page 1 ends (2026-11-13 03:05Z under 2026-11-13 06:38Z): the items between were served by neither",
+      "fetched": 150,
+      "kept": 136,
+      "source": "nst_business",
+      "status": "degraded",
+      "stored": 126
+    },
+    {
+      "at": "2026-11-13T10:09:03.418992+00:00",
+      "detail": "window overflow: all 50 dated items are newer than the window's start (2026-11-12 10:07Z); the oldest is 2026-11-12 13:54Z, so 3.8h scrolled off unseen",
+      "fetched": 50,
+      "kept": 50,
+      "source": "fmt_business",
+      "status": "degraded",
+      "stored": 48
+    },
+    {
+      "at": "2026-11-13T10:09:02.967396+00:00",
+      "detail": "read but empty: IHH, Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-13T10:09:01.797980+00:00",
+      "detail": "named the company: 13 of 35 (lowest: Genting 2/13, Tenaga 2/9, IHH 1/3)",
+      "fetched": 36,
+      "kept": 35,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 31
+    },
+    {
+      "at": "2026-11-13T10:08:59.861535+00:00",
+      "detail": "throttled: no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked); deferred: Press Metal, Genting, Maybank",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "throttled",
+      "stored": 0
+    }
+  ],
   "counts": {
-    "articles": 36963,
+    "articles": 37184,
     "documents": 0,
-    "escalated": 4818,
+    "escalated": 4830,
     "events": 4337,
     "failed_sweeps": 114,
-    "linked": 18709,
-    "observations": 7605,
+    "linked": 18739,
+    "observations": 7629,
     "series": 31,
-    "sweeps": 1575
+    "sweeps": 1585
   },
   "day": "2026-11-13",
-  "generated_at": "2026-11-13 01:50 UTC",
+  "generated_at": "2026-11-13 10:10 UTC",
   "macro": [
     {
       "change": "-0.04",
@@ -146,22 +237,81 @@
   "names": [
     {
       "earnings": [],
-      "escalated": 0,
+      "escalated": 2,
       "events": [],
       "instrument_id": "MYX:1155",
       "label": "Maybank",
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-12",
+          "known_at": "2026-11-13",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-12",
+          "period_end": "2026-11-13",
           "source": "finbert_tone",
-          "value": "0.22"
+          "value": "-0.33"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMi0AFBVV95cUxPS0FYV0wteTc4U3pvaGgwNzlxb25YQzlwVlp6RXhueXhvU2lxRVRqcTMzR2ZNN1lObWdxRkF0d3lRRWJvcnJ3ZWRweGNtd1B3Z05QbF9FRm5PQy1HeTNKcHdidFVnSHU5WG42NkZhTkdyTWFSMXJvd0lPWHlzZzJZc0R6OUViLW5QTkI4U3pDWnFtY2ZMWGR0Rlo1QWdPdlJPWXFIQ1RUc2RoWWllbUpiR2JHTXBDblJ2UUlTQkt6c2w0c09vOU5hUGhTOGhrNGc1?oc=5",
+          "domain": "www.ggrasia.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-13T04:41:28+00:00",
+          "quality": 0.65,
+          "title": "Maybank cuts GEN Singapore earnings estimate by up to 18pct as RWS hotel works curb room supply for top players",
+          "uncertainty": 0.625
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMipgFBVV95cUxQbG5JOHRGRXRVa0kzdGFpbXNiV1BzNlhIWTlJU2ItRE9pTFdVc3VXVkltTExTODE5dTNnOW5wanVsanpGeVI3cWkyWE5KNHdzTWhYalFfRC1Hck05ck1mdUQ5eVc0MzNwWW5jQU5XbWNRUHllUFFhR0tFc0Z3aGFHei1rT2FlbXVmdjNlOS1hMVFCZXpwU0tzb1hnZW1PclYyZkxTOVFn?oc=5",
+          "domain": "technode.global",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-13T00:02:49+00:00",
+          "quality": 0.65,
+          "title": "Sea\u2019s profit growth faces pressure from higher Shopee, AI investments - Maybank",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMirwFBVV95cUxOa244SjNlbVg2Vk84YWZlODBxWXhjZ2RKMGpoYTBXUElBSkx5S01GLTVXUkRZVHotSThIcU15eFRPRHNieFN1b2FJUDVleEk1d0J2RGh6YTFEcmV3NkFfN3haTUxsT2h0X2xaSUMxSFBXYzkwUF9WTEgwWmU5SHVicUk1NkZ1Q1BLTHd5c3pVdjROeE9zcENBU1pnd1dqZjJmeHZrTzFDODFJaDlUc3A4?oc=5",
+          "domain": "www.businesstoday.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-13T09:42:23+00:00",
+          "quality": 0.8,
+          "title": "Former MAG CEO Datuk Izham Appointed Maybank Independent Director",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMimAFBVV95cUxOTmZpTWNQcEtsT3dxWWJBd0Z6Y3NSVVdkRFJZNTFFbjhIejl4RnNnalhhM2hhZnJmQ2FLdl93YXB5ZzJhanVSNjRfczF2ZjVWalFQRnhLbFE1eXdEbTcxOGlrNXpMN3BmYWw2bXczMUNTR2pCWWx2RTJUUml0UFRoQ1VtU1o5b3hhMmRnOExoV25NUXJib05zTA?oc=5",
+          "domain": "www.bangkokpost.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-13T02:58:55+00:00",
+          "quality": 0.65,
+          "title": "Maybank shifts focus to advisory services",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 4,
+        "polarity_mean": 0.0,
+        "sources": 4,
+        "uncertainty_mean": 0.156
+      },
       "upcoming": []
     },
     {
@@ -173,15 +323,35 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-12",
+          "known_at": "2026-11-13",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-12",
+          "period_end": "2026-11-13",
           "source": "finbert_tone",
-          "value": "0.19"
+          "value": "0.03"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiYkFVX3lxTE9Rc2c3ZXgxNV9FMnBnRXpWcTh3LThWdUZOX2xEajlBWFphS3EwZVdNT2xjSlY5WHJGRTg5WHdId2ZPR29yU25VVGhBNldpV3hYNnBqWHotNThhdmVJeEJFcm1n?oc=5",
+          "domain": "ca.finance.yahoo.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-13T04:09:03+00:00",
+          "quality": 0.65,
+          "title": "Tenaga Nasional Berhad (6TN0.F) Stock Forum & Discussion - Yahoo Finance",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -193,15 +363,48 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-10",
+          "known_at": "2026-11-13",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-09",
+          "period_end": "2026-11-13",
           "source": "finbert_tone",
-          "value": "0.10"
+          "value": "0.17"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMivwFBVV95cUxPcGNfNUNZOHJYTGNMVTFnRDVod2wyWHYyX2c2QXpYSUl1X1F5MjFKeldfTUYydzc4R3MxLXNabGx6UzlGMHJsNGt2bTNndXpRVHRCaG8wQ0xyV0EtaG1fZXlLMDI3bUp1blV5ejFWdExBOVR6alZoY2RGbjZvX0k4S3lMbkNyYUg3VzRVQWI0cHRqeWN4aXVHUlRsS3N5N29JMVBjaTRGWEV1eGpDMGMteDczalpTbTJudy1vM182QQ?oc=5",
+          "domain": "www.ad-hoc-news.de",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-13T01:56:23+00:00",
+          "quality": 0.65,
+          "title": "Petronas Chemicals stock in focus as PETRONAS capex may recover - ad-hoc-news.de",
+          "uncertainty": 0.8928571428571428
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiU0FVX3lxTE1FTzRxOW5UelpsSDcyZUdlbFNQaDhGMjlqYXp5NEFmNXdMb2k3ZlJuM2hqUm80Qjg3dHI3UjNQaExIX0ZYMmMxYXdOazlBTVJkM08w?oc=5",
+          "domain": "ca.finance.yahoo.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-12T18:44:11+00:00",
+          "quality": 0.65,
+          "title": "PETRONAS Chemicals Group Berhad (PECGF) Stock Price, News, Quote & History",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 2,
+        "polarity_mean": 0.0,
+        "sources": 2,
+        "uncertainty_mean": 0.446
+      },
       "upcoming": []
     },
     {
@@ -213,26 +416,75 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-11",
+          "known_at": "2026-11-13",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-10",
+          "period_end": "2026-11-12",
           "source": "finbert_tone",
-          "value": "-0.16"
+          "value": "0.02"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMimAFBVV95cUxQV2dmU0UtTS02b29uM1RSbFhGTGVGTmx0ZXBNT0xlLUpadmxTbUt4dUJNSFpLdkNKUTlnWVZUZmhRT1Vmb19JYkdCaVhzUzJHaXl1U0xWZkVWSUxZekdOX2E0SkNaMGplRFVkM2ZsYzk5MTAzWm1ic0hhQUUxakJfZ3lwLXdJVl9Ia0ZaNGZRdVhraWtzN3EwZw?oc=5",
+          "domain": "www.tipranks.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-12T12:56:00+00:00",
+          "quality": 0.65,
+          "title": "EPF Disposes 581,400 IHH Healthcare Shares",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
       "earnings": [],
-      "escalated": 0,
+      "escalated": 1,
       "events": [],
       "instrument_id": "MYX:8869",
       "label": "Press Metal",
-      "snapshot": [],
-      "stories": [],
-      "tone": {},
+      "snapshot": [
+        {
+          "concept": "finbert_sentiment",
+          "known_at": "2026-11-13",
+          "label": "FinBERT headline tone",
+          "period_end": "2026-11-13",
+          "source": "finbert_tone",
+          "value": "-0.65"
+        }
+      ],
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMisAFBVV95cUxNR3BJX2NGNkVSbkl3Z2pnQkVvb2RjQkhQUGRCcW9zMUxNSXZHYzdITzVUS0dIVTlJR3dZeFg5SFBnSTJ2MGRJc3VzaTNhYVl1ZnJyN0tHYjlXNzJmWTFOXzI4V2FXY3BOU1czTG90cExZTXBaWXNaNS1vMTZ5cm1nMHRaVzBKa0V3TUNpTjZYZnBHZmZZa05zVzNYRzRGVjlSYU9aNGVPaEFaYWVDTHNJNA?oc=5",
+          "domain": "www.businesstoday.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-13T07:58:35+00:00",
+          "quality": 0.8,
+          "title": "Press Metal Expected To Deliver 11% To 18% Lower Profits For Q3 2026",
+          "uncertainty": 1.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 1.0
+      },
       "upcoming": []
     },
     {
@@ -244,22 +496,55 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-12",
+          "known_at": "2026-11-13",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-12",
+          "period_end": "2026-11-13",
           "source": "finbert_tone",
-          "value": "-0.09"
+          "value": "0.02"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMi1wFBVV95cUxORkhHeWFsNm9qUzF3Wmw3M1VuRTRyNU9GTko0V1AxeWc4TmlENkMtenE0RnQySHg2NDRZMHhDSGFBcXB1cmlzTDQwejU5RjR6UWUxY0d2XzVhcXYxeVVHd3BTWkRiamVPTnVBWTBhNlNCelZWZHFzdFNyUjRxNXJOQmZocUgzZ3c3MTN2eV82NjdBdWhLN3BiRTZqWFVYc2hnX01sMkRYc3BWV0d3dHBnT0NtN3ppU0ZWTVZvUFFacUZZMERub2htU2pjRnE1NmN5b1VKYVNBOA?oc=5",
+          "domain": "www.businesstimes.com.sg",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-13T00:40:00+00:00",
+          "quality": 0.8,
+          "title": "Stocks to watch: Singtel, ST Engg, Genting, First Resources, Golden Agri, CDG, Bumitama, Food Empire",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMifkFVX3lxTE5uSUV6c0pMX3FqVURYalFPYm5GV0UzbFU2YzZBYkZRZ1hIaUZ3anRDSVVqT0d1bFBnMU1PRGFMa1JsSUJNQkZtMDFZVEVFT1RBaGd0aUx6NV9ua1lpVnlMbjBYNHJfVkROSnhmR0s5RElXSVZFWktLOTlrY3JSQQ?oc=5",
+          "domain": "thesun.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-13T08:48:44+00:00",
+          "quality": 0.65,
+          "title": "Court keeps administrators of RM1.6b Genting heiress estate",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 2,
+        "polarity_mean": 0.0,
+        "sources": 2,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
       "earnings": [
         "2026-11-17 (finnhub)"
       ],
-      "escalated": 69,
+      "escalated": 76,
       "events": [
         {
           "kind": "filing",
@@ -419,6 +704,45 @@
       "stories": [
         {
           "day": null,
+          "doc_id": "https://www.nst.com.my/business/corporate/2026/11/1576678/market-pulse-am-nov-13-2026-watch",
+          "domain": "www.nst.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-13T03:00:17+00:00",
+          "quality": 1.0,
+          "title": "MARKET PULSE AM NOV 13, 2026 [WATCH]",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://www.nst.com.my/business/corporate/2026/11/1576568/wall-street-ends-lower-nvidia-ceo-resigns-us-yields",
+          "domain": "www.nst.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-13T00:40:31+00:00",
+          "quality": 1.0,
+          "title": "Wall Street ends lower as Nvidia CEO resigns; US yields up",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://www.nst.com.my/business/corporate/2026/11/1576484/nvidia-ceo-huang-quits-after-affair-suspected-china-spy",
+          "domain": "www.nst.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-12T22:38:49+00:00",
+          "quality": 1.0,
+          "title": "Nvidia CEO Huang quits after affair with suspected China spy",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
           "doc_id": "https://finance.yahoo.com/m/31cfc872-5831-3dfb-96c5-371c46d34068/nvidia%E2%80%99s-bonds-hold-steady.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
           "escalated": true,
@@ -481,53 +805,14 @@
           "quality": 1.0,
           "title": "It\u2019s the End of the AI Trade as We Know It. Who\u2019s Feeling Fine?",
           "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://www.benzinga.com/markets/prediction-markets/26/11/63227294/jensen-huang-spacex?utm_source=yahooFinance&utm_campaign=partner_feed&utm_medium=referral&.tsrc=rss",
-          "domain": "www.benzinga.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": -1.0,
-          "published_at": "2026-11-12T22:32:07+00:00",
-          "quality": 0.85,
-          "title": "From AI Chips to Rocket Ships: Will Jensen Huang Join Elon Musk?",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "marketaux:https://www.upsidetrader.com/2026/11/12/jensen-resigns-at-nvda-still-swimming-with-sharks-out-there/",
-          "domain": "upsidetrader.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": -1.0,
-          "published_at": "2026-11-12T22:28:26+00:00",
-          "quality": 0.85,
-          "title": "Jensen Resigns at NVDA, Still Swimming With Sharks Out There",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://www.cbsnews.com/news/nvidia-ceo-jensen-huang-resigns/?.tsrc=rss",
-          "domain": "www.cbsnews.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": -1.0,
-          "published_at": "2026-11-12T22:28:15+00:00",
-          "quality": 0.85,
-          "title": "Nvidia CEO Jensen Huang resigns in wake of affair, spy scandal",
-          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.667,
-        "n": 191,
-        "polarity_mean": -0.123,
-        "sources": 53,
-        "uncertainty_mean": 0.106
+        "n": 206,
+        "polarity_mean": -0.143,
+        "sources": 55,
+        "uncertainty_mean": 0.101
       },
       "upcoming": [
         {
@@ -798,16 +1083,16 @@
       ],
       "tone": {
         "intensity_max": 0.667,
-        "n": 35,
-        "polarity_mean": 0.143,
-        "sources": 21,
-        "uncertainty_mean": 0.017
+        "n": 37,
+        "polarity_mean": 0.135,
+        "sources": 23,
+        "uncertainty_mean": 0.024
       },
       "upcoming": []
     },
     {
       "earnings": [],
-      "escalated": 20,
+      "escalated": 22,
       "events": [],
       "instrument_id": "XNAS:MSFT",
       "label": "Microsoft",
@@ -952,6 +1237,19 @@
       "stories": [
         {
           "day": null,
+          "doc_id": "https://www.nst.com.my/world/world/2026/11/1576494/major-outage-hits-microsoft-outlook-watch",
+          "domain": "www.nst.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-12T23:12:17+00:00",
+          "quality": 1.0,
+          "title": "Major outage hits Microsoft Outlook [WATCH]",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
           "doc_id": "https://finance.yahoo.com/technology/articles/nebius-tests-neocloud-playbook-40-212710015.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
           "escalated": true,
@@ -961,6 +1259,19 @@
           "published_at": "2026-11-12T21:27:10+00:00",
           "quality": 1.0,
           "title": "Nebius tests the neocloud playbook with $40 billion in planned spending",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://www.freemalaysiatoday.com/category/highlight/2026/11/13/microsoft-365-outlook-down-for-thousands-of-us-users",
+          "domain": "www.freemalaysiatoday.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-12T21:19:29+00:00",
+          "quality": 1.0,
+          "title": "Microsoft 365, Outlook down for thousands of US users",
           "uncertainty": 0.0
         },
         {
@@ -1027,40 +1338,14 @@
           "quality": 0.85,
           "title": "If This Tech Giant Doubles, Here\u2019s What $10,000 Could Become",
           "uncertainty": 0.8152173913043478
-        },
-        {
-          "day": null,
-          "doc_id": "finnhub:143769309",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": -1.0,
-          "published_at": "2026-11-12T14:41:14+00:00",
-          "quality": 0.85,
-          "title": "5 Shocking Facts About Colette Kress, Nvidia\u2019s New Interim CEO",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "finnhub:143769304",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 1.0,
-          "published_at": "2026-11-12T14:20:00+00:00",
-          "quality": 0.85,
-          "title": "Artificial Intelligence (AI) Clinical Trial Optimization Global Market Report 2026 | Capitalize on 15.7% CAGR with IQVIA, NVIDIA, Microsoft and Oracle",
-          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 50,
-        "polarity_mean": 0.08,
-        "sources": 27,
-        "uncertainty_mean": 0.102
+        "n": 52,
+        "polarity_mean": 0.077,
+        "sources": 29,
+        "uncertainty_mean": 0.098
       },
       "upcoming": []
     }
