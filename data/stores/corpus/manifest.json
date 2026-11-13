@@ -1,5 +1,5 @@
 {
- "bytes": 29384704,
+ "bytes": 29396992,
  "file": "corpus.db",
  "format": 1,
  "page_size": 4096,
@@ -8,43 +8,43 @@
   {
    "bytes": 16777216,
    "name": "part-000",
-   "sha256": "60852a541efb375f9d43d48efa4f50e9a0b632f07a44e1a227dd984746e39eaf"
+   "sha256": "ac92709728e3569590957b50054412f87ef83a260665aedcab349385505a81f0"
   },
   {
-   "bytes": 12607488,
+   "bytes": 12619776,
    "name": "part-001",
-   "sha256": "1fae8df905d9967472f83ad74413f4f8dd4e0192a7c3c567117f6d3d453bd782"
+   "sha256": "593ef2f634bbf1a238ce3c193a5ae3fd08ea9141503b8e25b27a64a613a1ddd3"
   }
  ],
  "rows": {
-  "articles": 37184,
+  "articles": 37196,
   "evidence_searches": 11,
-  "sweeps": 1585
+  "sweeps": 1589
  },
- "sha256": "cdecc575029825429e2a65135351366c3691d86c913c919345a28ee3435dfa39",
+ "sha256": "b683c88a829cfff055049c5710407f0441aa59be7f034e16455d7fb576d2bfb8",
  "tips": {
   "articles": {
    "columns": {
-    "body": "037292f2123c577f",
+    "body": "209fd7658473c67f",
     "countries_json": "727e34856737c342",
-    "doc_id": "70112aa3ff6a8280",
-    "dup_hash": "5b1cd475dd7c9baf",
+    "doc_id": "2d010f80189730b0",
+    "dup_hash": "29c0857ce61bbac9",
     "escalated": "5feceb66ffc86f38",
     "fetched_for": "12ae32cb1ec02d01",
-    "first_seen_at": "500c9f94915de925",
+    "first_seen_at": "7756b029b7a180fb",
     "instruments_json": "b3283bf184bb082f",
     "language": "26ab4b495289822b",
-    "published_at": "5d52651080633a42",
+    "published_at": "73c53258cb4ba5a5",
     "quality": "d2cbad71ff333de6",
     "query": "12ae32cb1ec02d01",
     "relevance": "8aed642bf5118b9d",
     "source": "6c2d515a3e6b4f90",
     "source_domain": "76cde1362ba439a1",
-    "themes_json": "a057dad95751d5cf",
-    "title": "037292f2123c577f",
-    "title_key": "751b216487f68f5a"
+    "themes_json": "b3283bf184bb082f",
+    "title": "209fd7658473c67f",
+    "title_key": "a8dccafa7dc71ae7"
    },
-   "rowid": 37184
+   "rowid": 37196
   },
   "evidence_searches": {
    "columns": {
@@ -69,21 +69,21 @@
   },
   "sweeps": {
    "columns": {
-    "at": "67a6feb83e2069a6",
-    "detail": "9f3cc975da739060",
+    "at": "6eb6cdc75d857754",
+    "detail": "a8b00e80ae474bfa",
     "duplicates": "5feceb66ffc86f38",
     "escalated": "5feceb66ffc86f38",
-    "fetched": "f5ca38f748a1d6ea",
+    "fetched": "83151157c10d85af",
     "kept": "5feceb66ffc86f38",
-    "run_id": "1265d6a63327d538",
-    "since": "d2c37402b68e9737",
-    "slot": "c28fbdb78b433202",
-    "source": "3a2eb8bf50077831",
+    "run_id": "760dcf6af4c500ca",
+    "since": "2add4896e6a4519a",
+    "slot": "af6d817330933ec6",
+    "source": "5cb11d0efa2e5b3d",
     "status": "c48b5b1a9776c846",
     "stored": "5feceb66ffc86f38",
     "unlinked": "5feceb66ffc86f38"
    },
-   "rowid": 1585
+   "rowid": 1589
   }
  },
  "triggers": [
