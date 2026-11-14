@@ -1,6 +1,87 @@
 {
   "collection": [
     {
+      "at": "2026-11-14T22:41:22.016614+00:00",
+      "detail": "facts 12; scored 571 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized.onnx",
+      "fetched": 12,
+      "kept": 0,
+      "source": "finbert_tone",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-14T22:41:15.642823+00:00",
+      "detail": "skipped: every asked name was refused: outside the plan or over today's credits (XNAS:AAPL, XNAS:MSFT)",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-14T22:41:15.238201+00:00",
+      "detail": "facts 0; window not covered back to 2026-11-14 15:50Z; the oldest item read is 2026-11-14 18:48Z, so 3.0h of the window was never served",
+      "fetched": 17,
+      "kept": 16,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 16
+    },
+    {
+      "at": "2026-11-14T22:41:13.955782+00:00",
+      "detail": "facts 10; XNAS:NVDA: 2026-11-13 not aggregated - 8 full pages ended part-way through that day",
+      "fetched": 19,
+      "kept": 19,
+      "source": "marketaux_news",
+      "status": "ok",
+      "stored": 18
+    },
+    {
+      "at": "2026-11-14T22:41:10.963010+00:00",
+      "detail": "facts 41; ",
+      "fetched": 154,
+      "kept": 142,
+      "source": "finnhub",
+      "status": "ok",
+      "stored": 84
+    },
+    {
+      "at": "2026-11-14T22:41:08.700034+00:00",
+      "detail": "facts 0; ",
+      "fetched": 0,
+      "kept": 0,
+      "source": "edgar",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-14T22:41:08.172243+00:00",
+      "detail": "named the company: 18 of 39 (lowest: Microsoft 5/13, NVIDIA 8/18, Apple 5/8)",
+      "fetched": 39,
+      "kept": 39,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 27
+    },
+    {
+      "at": "2026-11-14T22:41:07.352447+00:00",
+      "detail": "named the company: 97 of 105 (lowest: Microsoft 13/15, Apple 27/29, NVIDIA 57/61)",
+      "fetched": 119,
+      "kept": 105,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 91
+    },
+    {
+      "at": "2026-11-14T22:41:05.231903+00:00",
+      "detail": "throttled: no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked)",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "throttled",
+      "stored": 0
+    },
+    {
       "at": "2026-11-14T15:50:18.031377+00:00",
       "detail": "facts 12; scored 21 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized.onnx",
       "fetched": 14,
@@ -92,18 +173,18 @@
     }
   ],
   "counts": {
-    "articles": 37957,
+    "articles": 38193,
     "documents": 0,
-    "escalated": 4997,
-    "events": 4357,
+    "escalated": 5040,
+    "events": 4359,
     "failed_sweeps": 114,
-    "linked": 19165,
-    "observations": 7713,
+    "linked": 19314,
+    "observations": 7774,
     "series": 31,
-    "sweeps": 1608
+    "sweeps": 1617
   },
   "day": "2026-11-14",
-  "generated_at": "2026-11-14 15:50 UTC",
+  "generated_at": "2026-11-14 22:41 UTC",
   "macro": [
     {
       "change": "-0.1",
@@ -471,14 +552,14 @@
       "earnings": [
         "2026-11-17 (finnhub)"
       ],
-      "escalated": 46,
+      "escalated": 81,
       "events": [],
       "instrument_id": "XNAS:NVDA",
       "label": "NVIDIA",
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-11-13",
+          "known_at": "2026-11-14",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -486,7 +567,7 @@
         },
         {
           "concept": "pb",
-          "known_at": "2026-11-13",
+          "known_at": "2026-11-14",
           "label": "P/B",
           "period_end": null,
           "source": "finnhub",
@@ -494,7 +575,7 @@
         },
         {
           "concept": "eps_ttm",
-          "known_at": "2026-11-13",
+          "known_at": "2026-11-14",
           "label": "EPS (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -502,7 +583,7 @@
         },
         {
           "concept": "dividend_yield",
-          "known_at": "2026-11-13",
+          "known_at": "2026-11-14",
           "label": "dividend yield",
           "period_end": null,
           "source": "finnhub",
@@ -510,7 +591,7 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-11-13",
+          "known_at": "2026-11-14",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
@@ -518,7 +599,7 @@
         },
         {
           "concept": "high_52w",
-          "known_at": "2026-11-13",
+          "known_at": "2026-11-14",
           "label": "52w high",
           "period_end": null,
           "source": "finnhub",
@@ -526,7 +607,7 @@
         },
         {
           "concept": "low_52w",
-          "known_at": "2026-11-13",
+          "known_at": "2026-11-14",
           "label": "52w low",
           "period_end": null,
           "source": "finnhub",
@@ -574,19 +655,19 @@
         },
         {
           "concept": "mx_news_sentiment",
-          "known_at": "2026-11-08",
+          "known_at": "2026-11-14",
           "label": "Marketaux sentiment",
-          "period_end": "2026-11-08",
+          "period_end": "2026-11-14",
           "source": "marketaux_news",
-          "value": "-0.03"
+          "value": "0.04"
         },
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-13",
+          "known_at": "2026-11-14",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-13",
+          "period_end": "2026-11-14",
           "source": "finbert_tone",
-          "value": "-0.04"
+          "value": "0.03"
         },
         {
           "concept": "revenue",
@@ -616,6 +697,19 @@
       "stories": [
         {
           "day": null,
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/nvidia-shock-investors-rethinking-ai-190934918.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-14T19:09:34+00:00",
+          "quality": 1.0,
+          "title": "Nvidia Shock Has Investors Rethinking AI Infrastructure Stocks",
+          "uncertainty": 0.2631578947368421
+        },
+        {
+          "day": null,
           "doc_id": "https://www.freemalaysiatoday.com/category/nation/2026/11/14/police-probing-alleged-nvidia-chip-diversion-since-april-2025-says-saifuddin",
           "domain": "www.freemalaysiatoday.com",
           "escalated": true,
@@ -639,6 +733,19 @@
           "quality": 1.0,
           "title": "Trump not expected to raise Alice Huang case with China's Xi",
           "uncertainty": 0.5208333333333334
+        },
+        {
+          "day": null,
+          "doc_id": "marketaux:https://seekingalpha.com/article/4968075-broadcom-nvidia-has-a-problem-and-that-creates-an-opportunity",
+          "domain": "seekingalpha.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-14T00:33:16+00:00",
+          "quality": 1.0,
+          "title": "Broadcom: Nvidia Has A Problem, And That Creates An Opportunity",
+          "uncertainty": 0.3571428571428571
         },
         {
           "day": null,
@@ -691,40 +798,14 @@
           "quality": 1.0,
           "title": "Jensen Huang fallout at Nvidia, Anthropic ready for IPO, United bans AI agents",
           "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "marketaux:https://seekingalpha.com/article/4967912-nvidia-jensen-huang-could-return-as-ceo",
-          "domain": "seekingalpha.com",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
-          "kind": "",
-          "polarity": 0.0,
-          "published_at": "2026-11-13T18:00:36+00:00",
-          "quality": 1.0,
-          "title": "Nvidia: Jensen Huang Could Return As CEO",
-          "uncertainty": 0.4464285714285714
-        },
-        {
-          "day": null,
-          "doc_id": "https://finance.yahoo.com/video/what-investors-should-consider-before-hitting-buy-on-nvidia-172018567.html?.tsrc=rss",
-          "domain": "finance.yahoo.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 0.0,
-          "published_at": "2026-11-13T15:59:00+00:00",
-          "quality": 1.0,
-          "title": "What investors should consider before hitting buy on Nvidia",
-          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 149,
-        "polarity_mean": -0.029,
-        "sources": 40,
-        "uncertainty_mean": 0.14
+        "n": 259,
+        "polarity_mean": -0.024,
+        "sources": 64,
+        "uncertainty_mean": 0.142
       },
       "upcoming": [
         {
@@ -745,22 +826,22 @@
     },
     {
       "earnings": [],
-      "escalated": 7,
+      "escalated": 11,
       "events": [],
       "instrument_id": "XNAS:AAPL",
       "label": "Apple",
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-11-13",
+          "known_at": "2026-11-14",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "39.05"
+          "value": "39.37"
         },
         {
           "concept": "pb",
-          "known_at": "2026-11-13",
+          "known_at": "2026-11-14",
           "label": "P/B",
           "period_end": null,
           "source": "finnhub",
@@ -768,7 +849,7 @@
         },
         {
           "concept": "eps_ttm",
-          "known_at": "2026-11-13",
+          "known_at": "2026-11-14",
           "label": "EPS (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -776,7 +857,7 @@
         },
         {
           "concept": "dividend_yield",
-          "known_at": "2026-11-13",
+          "known_at": "2026-11-14",
           "label": "dividend yield",
           "period_end": null,
           "source": "finnhub",
@@ -784,7 +865,7 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-11-13",
+          "known_at": "2026-11-14",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
@@ -792,7 +873,7 @@
         },
         {
           "concept": "high_52w",
-          "known_at": "2026-11-13",
+          "known_at": "2026-11-14",
           "label": "52w high",
           "period_end": null,
           "source": "finnhub",
@@ -800,7 +881,7 @@
         },
         {
           "concept": "low_52w",
-          "known_at": "2026-11-13",
+          "known_at": "2026-11-14",
           "label": "52w low",
           "period_end": null,
           "source": "finnhub",
@@ -848,19 +929,19 @@
         },
         {
           "concept": "mx_news_sentiment",
-          "known_at": "2026-11-13",
+          "known_at": "2026-11-14",
           "label": "Marketaux sentiment",
-          "period_end": "2026-11-13",
+          "period_end": "2026-11-14",
           "source": "marketaux_news",
-          "value": "0.14"
+          "value": "0.03"
         },
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-13",
+          "known_at": "2026-11-14",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-13",
+          "period_end": "2026-11-14",
           "source": "finbert_tone",
-          "value": "0.10"
+          "value": "0.14"
         },
         {
           "concept": "revenue",
@@ -929,6 +1010,58 @@
         },
         {
           "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMixAFBVV95cUxOcXFtZkVQekdNREIwSHJwQnBKaVpVd292ZnVRaHM4T25RMjEycVRieWdMS21OT3Ric2lKX1hyRFlpUWRWXzRyVW5zcnhmamsxeVJQY3BGdmtPT0hvQTJqNlhYb05Id1FZUnM3ZW1fUmg0Q1Q5MzY4ZGlpdER5TEFqNlo3cXJmLTlSYzN4VG0wZjROZWJxbzZWUWhwV2ljZER1RTBBVm9vYW5vOUNneExJUGpjR3FzMlJnNEZyUG9vNG9TYU9D?oc=5",
+          "domain": "za.investing.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-14T04:30:27+00:00",
+          "quality": 0.65,
+          "title": "Soros Fund Management boosts Intel stake to $340 million, cuts Apple holdings By Investing.com",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "finnhub:143806260",
+          "domain": "Benzinga",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-14T04:00:57+00:00",
+          "quality": 0.65,
+          "title": "'Nvidia Will Die Without Jensen' Doesn't Add Up, Says Anthony Scaramucci, Pointing to Apple's Post-Steve Jobs Success: 'Great Entrepreneurs...'",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxPS3AzN1BLSVVHVVROZXVZeVBzVG1kVTRZUkNRNkd4djVIMUduUkZTX082MVlIa3lUNVFNbVVxdFJvc0JyZm1ucWl2SDBqczBKZU91STJETUYzZDcwRXo3ZDVRM2x6WmVFNndPUnRHYy1ZNlV4SXV3c3RZdkxjSmtFbW1oaEpTVnQwVFNhZVFjbDFJVU9PX05oX2RoeTJBVmkzMmhtZ1dveUU?oc=5",
+          "domain": "www.gurufocus.com",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-14T02:05:06+00:00",
+          "quality": 0.65,
+          "title": "Apple Inc (AAPL) Shares Surge 0.4% -- What GF Score of 94 Tells Investors",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMi3AFBVV95cUxNa28yNEM1YmtrZHJFZFJESjZ4Q0UwenhmVEtFbDRWNzlRblN6NEs0cmRxZ2NMS3hzakt3Uld0cmVFWnJnN2FxSnBXOVJZVUd6T01pcUU4LWxNQ3hiY2hhMUFmZnhuUUxUUkJ5dTAxTGxtNGR5alA1Nzg5dmhVaEVKdVFjV0dRNW5ibjVncFNFUmVRT1Y4cTN6TkpLR0ZKWTZJLUw3NnMzYkxGZFpOUG5vWlB1Uk5adjRGc1o2REVKdk9rNmdLamF3U3pjTUJrNWxtNGFGaHVldVpJT2dJ?oc=5",
+          "domain": "www.foreignpolicyjournal.com",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-14T00:03:00+00:00",
+          "quality": 0.65,
+          "title": "China Renaissance Upgrades Apple (NASDAQ: AAPL) To Buy On $1,999 Foldable Sellout And Record Revenue",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
           "doc_id": "https://news.google.com/rss/articles/CBMihgFBVV95cUxQZFkzWFVjMGtkS0lGeFhwYVJWampNbkkzckhoeWowWWlvbDN3dVJOWFowYkVJSlRLbGJLUFdJcmNEczVLTUFsWF92dWtCOEp6d19KbVo0azE4UWNTamktbmt3b1kwbXBpVWxzNUZpbm5tZERoMUxMSG9tcGEtUm1YVG01eVY2dw?oc=5",
           "domain": "observer.com",
           "escalated": true,
@@ -939,79 +1072,27 @@
           "quality": 0.65,
           "title": "John Ternus\u2019 First Major Stress Test as Apple CEO Is the Memory Cost Crisis",
           "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMi_gFBVV95cUxNWVJhZDJfcFlqSnN2N25TRHpLazhkbE9GRFBWODJkaGVYd3FNZzRjR0prczZNcGdVV2djMVo5bHM0ZFd2djIzYlFkVFBQUk9KYjBuSFpVTExPQjRPT2pSd2Y4TFJlaE5wUHhBdDZUbnZUQXpGNG9lY2hkdWxDVnZ4aDl2bmxtVnI0WWZDaHUybEV3RU9GaGdhSWhGMG9JWnk5NkZCazk4d01uTlRBLVNnRGptVEotdXRFS05oY0tuV3U0d2gtaHFLaVJ0cU5mdWdvVFlBaE05Mng3WXZJdDJTTDZfRng2a3lNTTczbGtYY18wSzJwbGtTelpocm1JZw?oc=5",
-          "domain": "www.fool.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 0.0,
-          "published_at": "2026-11-13T15:22:00+00:00",
-          "quality": 0.65,
-          "title": "Apple Is the World\u2019s Largest Company, and Nvidia Is Second. Here\u2019s What $10,000 Invested in Each Today Could Be Worth by the End of Next Year.",
-          "uncertainty": 0.4629629629629629
-        },
-        {
-          "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMipAFBVV95cUxQQUlmQ1dudzVnVm90MXFveEs3eTZVM1BxSjBJR0VlT3FUM0w0RURpVFYyVGc5bVh3cHk5T01OWVV4WFBnZmVwNW9saXdmcnBtT3dxUnc0eUx5di1iZ3pWU19HNTY2YUVkLVBBeWtZUmtJMWxRWTRqaUVMc0ZKMzlFYlFrdkR0b204Rm9aaWtzUnFxQmktQ0QyY2R4UkI0N2F4SlBVeA?oc=5",
-          "domain": "www.moomoo.com",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
-          "kind": "",
-          "polarity": 1.0,
-          "published_at": "2026-11-13T15:13:41+00:00",
-          "quality": 0.65,
-          "title": "US Market Move | Apple (AAPL.US) Rises Nearly 2%, Hitting Another Record High, Becomes Wall Street's Top Choice for Hedging AI Risks",
-          "uncertainty": 0.5952380952380952
-        },
-        {
-          "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMieEFVX3lxTE9NWEhidTI4ZURhbWtXUkJ2WW1EVVlWeE5fNElycVM0aVMweUN5LU1qNTVEbXRLNG92UW1QRnZHaGhKRkwwLUhDNmdicVNDZXh5eWp1OEdEVzJvZEo2VXdrbkpaYVl1MHdyZzNublJHZnlZc3VvU1J4Mg?oc=5",
-          "domain": "cryptobriefing.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 1.0,
-          "published_at": "2026-11-13T13:13:31+00:00",
-          "quality": 0.65,
-          "title": "Binance pays Apple dividend to AAPLB holders in more AAPLB",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPUVhYalN0S3o2VVRpNWZPTU9oWEZJZnlRNi1VU1pTY3VzUXFueTh3Um9IUWIzdjY4OW9EU3kwVG5QblI5MzcxUVg2Y3J3QW5KM3RuZGh3UmRJYTRBWVR0Ql9iZVAzb2JucTM5Qi1IQkl1bHNLQXpDeFltVzhqQm9mTXFneG5GSi1vQ25oSGY0VnBrSEI5a1hWb1d3VDU?oc=5",
-          "domain": "finance.yahoo.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 0.0,
-          "published_at": "2026-11-13T21:13:10+00:00",
-          "quality": 0.8,
-          "title": "A $1,999 Sellout. What China Renaissance Sees in Apple (AAPL)",
-          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 23,
-        "polarity_mean": 0.174,
-        "sources": 14,
-        "uncertainty_mean": 0.089
+        "n": 48,
+        "polarity_mean": 0.104,
+        "sources": 27,
+        "uncertainty_mean": 0.072
       },
       "upcoming": []
     },
     {
       "earnings": [],
-      "escalated": 36,
+      "escalated": 39,
       "events": [],
       "instrument_id": "XNAS:MSFT",
       "label": "Microsoft",
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-11-13",
+          "known_at": "2026-11-14",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -1019,7 +1100,7 @@
         },
         {
           "concept": "pb",
-          "known_at": "2026-11-13",
+          "known_at": "2026-11-14",
           "label": "P/B",
           "period_end": null,
           "source": "finnhub",
@@ -1027,7 +1108,7 @@
         },
         {
           "concept": "eps_ttm",
-          "known_at": "2026-11-13",
+          "known_at": "2026-11-14",
           "label": "EPS (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -1035,7 +1116,7 @@
         },
         {
           "concept": "dividend_yield",
-          "known_at": "2026-11-13",
+          "known_at": "2026-11-14",
           "label": "dividend yield",
           "period_end": null,
           "source": "finnhub",
@@ -1043,7 +1124,7 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-11-13",
+          "known_at": "2026-11-14",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
@@ -1051,7 +1132,7 @@
         },
         {
           "concept": "high_52w",
-          "known_at": "2026-11-13",
+          "known_at": "2026-11-14",
           "label": "52w high",
           "period_end": null,
           "source": "finnhub",
@@ -1059,7 +1140,7 @@
         },
         {
           "concept": "low_52w",
-          "known_at": "2026-11-13",
+          "known_at": "2026-11-14",
           "label": "52w low",
           "period_end": null,
           "source": "finnhub",
@@ -1107,19 +1188,19 @@
         },
         {
           "concept": "mx_news_sentiment",
-          "known_at": "2026-11-13",
+          "known_at": "2026-11-14",
           "label": "Marketaux sentiment",
-          "period_end": "2026-11-13",
+          "period_end": "2026-11-14",
           "source": "marketaux_news",
-          "value": "0.13"
+          "value": "0.14"
         },
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-13",
+          "known_at": "2026-11-14",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-13",
+          "period_end": "2026-11-14",
           "source": "finbert_tone",
-          "value": "-0.10"
+          "value": "0.11"
         },
         {
           "concept": "revenue",
@@ -1254,10 +1335,10 @@
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 74,
-        "polarity_mean": 0.122,
-        "sources": 46,
-        "uncertainty_mean": 0.089
+        "n": 90,
+        "polarity_mean": 0.111,
+        "sources": 57,
+        "uncertainty_mean": 0.088
       },
       "upcoming": []
     }
