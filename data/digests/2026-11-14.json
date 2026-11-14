@@ -1,18 +1,109 @@
 {
-  "collection": [],
+  "collection": [
+    {
+      "at": "2026-11-14T15:50:18.031377+00:00",
+      "detail": "facts 12; scored 21 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized.onnx",
+      "fetched": 14,
+      "kept": 0,
+      "source": "finbert_tone",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-14T15:50:17.409370+00:00",
+      "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-14T15:50:17.407793+00:00",
+      "detail": "facts 5; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-14T15:50:12.235494+00:00",
+      "detail": "facts 0; window not covered back to 2026-11-13 22:41Z; the oldest item read is 2026-11-14 13:35Z, so 14.9h of the window was never served",
+      "fetched": 18,
+      "kept": 18,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 18
+    },
+    {
+      "at": "2026-11-14T15:50:10.653775+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-14T15:50:08.658523+00:00",
+      "detail": "window overflow: all 150 dated items are newer than the window's start (2026-11-13 10:09Z); the oldest is 2026-11-13 22:47Z, so 12.6h scrolled off unseen; read 3 pages, the most this feed may; page 2 starts 4.1h before page 1 ends (2026-11-14 07:12Z under 2026-11-14 11:18Z): the items between were served by neither",
+      "fetched": 150,
+      "kept": 145,
+      "source": "nst_business",
+      "status": "degraded",
+      "stored": 140
+    },
+    {
+      "at": "2026-11-14T15:50:03.786599+00:00",
+      "detail": "window overflow: all 50 dated items are newer than the window's start (2026-11-13 10:09Z); the oldest is 2026-11-14 02:38Z, so 16.5h scrolled off unseen",
+      "fetched": 50,
+      "kept": 48,
+      "source": "fmt_business",
+      "status": "degraded",
+      "stored": 48
+    },
+    {
+      "at": "2026-11-14T15:50:02.424069+00:00",
+      "detail": "read but empty: Petronas Chemicals, IHH, Press Metal, Genting, Maybank, Tenaga",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-14T15:50:00.791045+00:00",
+      "detail": "read but empty: Petronas Chemicals; named the company: 11 of 26 (lowest: Tenaga 0/5, Genting 1/6, IHH 1/3)",
+      "fetched": 30,
+      "kept": 26,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 23
+    },
+    {
+      "at": "2026-11-14T15:49:58.435902+00:00",
+      "detail": "throttled: no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked); deferred: Maybank, Tenaga, Petronas Chemicals",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "throttled",
+      "stored": 0
+    }
+  ],
   "counts": {
-    "articles": 37728,
+    "articles": 37957,
     "documents": 0,
-    "escalated": 4992,
+    "escalated": 4997,
     "events": 4357,
     "failed_sweeps": 114,
-    "linked": 19144,
-    "observations": 7696,
+    "linked": 19165,
+    "observations": 7713,
     "series": 31,
-    "sweeps": 1598
+    "sweeps": 1608
   },
   "day": "2026-11-14",
-  "generated_at": "2026-11-14 01:27 UTC",
+  "generated_at": "2026-11-14 15:50 UTC",
   "macro": [
     {
       "change": "-0.1",
@@ -153,35 +244,114 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-13",
+          "known_at": "2026-11-14",
           "label": "FinBERT headline tone",
           "period_end": "2026-11-13",
           "source": "finbert_tone",
-          "value": "-0.33"
+          "value": "-0.02"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMizAFBVV95cUxOWk5xZFRjdTZVRFhkLWVHOTJZSnhHcE1DMlJseU12emFMRFN0STNFWGotNmNnUUR6LTQ2ejVxRnQ5cWg4b1dsYjJ6Z0hSZ0xCazUyOTFHWGs2NFVoY2RKV2ROTVM2NHFJemxKdzRSVERsN2oybGphaTZoNkZmandRWW1XSDAzT3NPSU55cVQwQ3gzTmM5WTdMQ3FkUFdYVDJGS1ZydXl0NDhBQUQ2bzdtbVhWd05xSTE2X0NzczFhMUwwTV9zMnUzdmt4VFM?oc=5",
+          "domain": "themalaysianreserve.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-13T12:35:02+00:00",
+          "quality": 0.8,
+          "title": "Maybank appoints former Malaysia Aviation chief Izham Ismail as independent director",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMi1gFBVV95cUxPYlJpS29Fd05XanRrakFqc3BoenYtRXVaRW8zaTQtelJfZ1VXUGE2YUNObFR2RlVLLUxmNS1MUFFCcUJyQ29iSFNrbHlaX1Fkdm9wMVZ5VzYwZ3FvZTNMRnVEWmZyVko4TWZvMnMwM002ODFPTGlMOG1lYWRYanhobjk4UlBqUnBUR0hkcU52OURjQkV0bnExOEFrZzFUOFo0UFlrOWxpUzNVdzgtTllnSWJMNlFselotNXhNVE1GaE9aSDNTTFlaSzBQcXdLc2VMLTB6a2RR?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-13T12:19:00+00:00",
+          "quality": 0.8,
+          "title": "Sum Technology secures RM30mil Islamic banking facilities from Maybank Islamic",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMisAFBVV95cUxPR210VDAtZVFSM1JNdTlQZ0c3TmI5VnREMGJueWxyaFd2YjVwSkpXb3dWS210TERzdlZZU1Z2VExlLUxfa3dWV0ZyQjJ0RnQ5UTdDLWZuZzdyZjdlNmlfaUVtZHFSNnNiM2tMXy1EX1ZxcjFXYjNwRUdiLWRjRXV4QTcyeW1ZUTVfbGFQSXcxVTBmYWk1RFRWR1M3SllwYmVsaWttZ0RVeE9CRm5mUFpkNNIBtgFBVV95cUxNcHJ2WnRuYmcxalRtNTRpWjQ4ZFYzYzFJRUNBT0N3NFhYRkRhWlVuNDRwelV0WWZNbnR4UnpMM1JpNS0zNUFad2NxNnZMaXowYW9hQTJsWFRrWWlyTVdkSVBvQnVZZGs4MkhUYTJma0kzdUt1cGl4TlN0akhZaDczNHFHS05CR2Z1ZXFrWWQzNU90WEI2YW5RU1pib0pVank2bGthaWZlRnBzYjV6RE5hUE00OTAxQQ?oc=5",
+          "domain": "www.nst.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-13T12:09:44+00:00",
+          "quality": 0.8,
+          "title": "Former MAG chief Izham Ismail appointed to Maybank board",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMi3AFBVV95cUxQdVBXVkVFNUpTUlYybVlubUpNNmR2TmJScmJhQ2dFcWtDajlrMUtSU3NLTEI4T3cwVUhuSlhfeEw2NWVDTzNKNFVSbG0zSDRXdkxJallqMnJ4b3FqNG1CZG55YWdXOHROel9ab2VPNXNrNUNHSWZST2VMUjZzaEhJTC1rVWExTU9RVGdScVV2RzRPQ3BhVHkwbVpaZFhlaU01TWlhTm5QWU1DbDJkX2lxUjVHTGpTRUZyTmxNYmJ3YjN0YXVRS0NjUU5Ic1FFZUoxbkdIR1ZpSzhYUThF?oc=5",
+          "domain": "www.minichart.com.sg",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-13T17:19:00+00:00",
+          "quality": 0.65,
+          "title": "Sum Technology unit accepts RM30m Maybank Islamic facilities; gearing could rise to 0.74x if fully drawn",
+          "uncertainty": 1.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 4,
+        "polarity_mean": 0.0,
+        "sources": 4,
+        "uncertainty_mean": 0.25
+      },
       "upcoming": []
     },
     {
       "earnings": [],
-      "escalated": 0,
+      "escalated": 1,
       "events": [],
       "instrument_id": "MYX:5347",
       "label": "Tenaga",
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-13",
+          "known_at": "2026-11-14",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-13",
+          "period_end": "2026-11-14",
           "source": "finbert_tone",
-          "value": "0.03"
+          "value": "0.20"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://www.nst.com.my/sports/hockey/2026/11/1577853/thunderstar-power-mhl-league-title",
+          "domain": "www.nst.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-14T13:55:49+00:00",
+          "quality": 1.0,
+          "title": "Thunderstar power to MHL league title",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 1.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -193,11 +363,11 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-13",
+          "known_at": "2026-11-14",
           "label": "FinBERT headline tone",
           "period_end": "2026-11-13",
           "source": "finbert_tone",
-          "value": "0.17"
+          "value": "0.18"
         }
       ],
       "stories": [],
@@ -213,11 +383,11 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-13",
+          "known_at": "2026-11-14",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-12",
+          "period_end": "2026-11-13",
           "source": "finbert_tone",
-          "value": "0.02"
+          "value": "-0.01"
         }
       ],
       "stories": [],
@@ -226,22 +396,55 @@
     },
     {
       "earnings": [],
-      "escalated": 0,
+      "escalated": 1,
       "events": [],
       "instrument_id": "MYX:8869",
       "label": "Press Metal",
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-13",
+          "known_at": "2026-11-14",
           "label": "FinBERT headline tone",
           "period_end": "2026-11-13",
           "source": "finbert_tone",
-          "value": "-0.65"
+          "value": "-0.40"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMinwFBVV95cUxPOU5ZQjl2MExYRkpiZ21JeFo5TFFiQnNCQXE5VnRSb2JBSU1Cd2Q0QnhBVDJzYmo3eTlRNnRUWXM0ZlZtdGF4Yzh2ZzlSRHRSWVd5MWI0LWZ2REMwZkVKWGFYb1RSQVBKellKaGhWaHd4YnVHdHI0bmVEZjJZMFd0el9JeGFHak1pclRqbnJwOWhZS0ZTWHh6RVJTclNKNWs?oc=5",
+          "domain": "www.moomoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-13T12:27:41+00:00",
+          "quality": 0.65,
+          "title": "Press Metal Aluminium Target Price Cut to MYR9.05 From MYR9.30 by RHB IB>8869.KU",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiswFBVV95cUxOd1hHQk9Xc0dpaHc2eHNsS3cxbjRQSDRGbnJWUEpETWpRRndENW5wWXF2cUpacDlXT1NyRmZ0MTM5Zi1SR0ItSUhuWXpwVk10dzRrMnZSb2FYMm5WS0htaEJrVExLSW9JNk16UjNhYm9rd0FrSWI3cHFkczhMbDZzamRYT1B6WFBkY0ZUX0JRRURZOUNjdWd1NThqVzdqNXhudzE3eXdUbmxrX1UyZGY2N2p5NA?oc=5",
+          "domain": "www.moomoo.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-13T12:27:41+00:00",
+          "quality": 0.65,
+          "title": "Press Metal Aluminium 3Q Earnings Could Fall Sequentially -- Market Talk",
+          "uncertainty": 1.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 2,
+        "polarity_mean": -0.5,
+        "sources": 1,
+        "uncertainty_mean": 0.5
+      },
       "upcoming": []
     },
     {
@@ -253,11 +456,11 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-13",
+          "known_at": "2026-11-14",
           "label": "FinBERT headline tone",
           "period_end": "2026-11-13",
           "source": "finbert_tone",
-          "value": "0.02"
+          "value": "-0.12"
         }
       ],
       "stories": [],
@@ -268,7 +471,7 @@
       "earnings": [
         "2026-11-17 (finnhub)"
       ],
-      "escalated": 44,
+      "escalated": 46,
       "events": [],
       "instrument_id": "XNAS:NVDA",
       "label": "NVIDIA",
@@ -413,6 +616,32 @@
       "stories": [
         {
           "day": null,
+          "doc_id": "https://www.freemalaysiatoday.com/category/nation/2026/11/14/police-probing-alleged-nvidia-chip-diversion-since-april-2025-says-saifuddin",
+          "domain": "www.freemalaysiatoday.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-14T09:05:00+00:00",
+          "quality": 1.0,
+          "title": "Police probing alleged Nvidia chip diversion since April 2025, says Saifuddin",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://www.nst.com.my/world/world/2026/11/1577296/trump-not-expected-raise-alice-huang-case-chinas-xi",
+          "domain": "www.nst.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-14T03:01:16+00:00",
+          "quality": 1.0,
+          "title": "Trump not expected to raise Alice Huang case with China's Xi",
+          "uncertainty": 0.5208333333333334
+        },
+        {
+          "day": null,
           "doc_id": "https://finance.yahoo.com/markets/stocks/articles/asml-holding-enxtam-asml-faces-222140528.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
           "escalated": true,
@@ -488,40 +717,14 @@
           "quality": 1.0,
           "title": "What investors should consider before hitting buy on Nvidia",
           "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "marketaux:https://seekingalpha.com/article/4967834-nvidia-jensen-left-the-backlog-didnt-rating-downgrade",
-          "domain": "seekingalpha.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": -1.0,
-          "published_at": "2026-11-13T15:45:44+00:00",
-          "quality": 1.0,
-          "title": "Nvidia: Jensen Left, The Backlog Didn't (Rating Downgrade)",
-          "uncertainty": 0.4166666666666667
-        },
-        {
-          "day": null,
-          "doc_id": "https://247wallst.com/investing/2026/11/13/thierry-borgeat-says-chip-stocks-peak-every-two-years-his-chart-points-to-another-top/?.tsrc=rss",
-          "domain": "247wallst.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 0.0,
-          "published_at": "2026-11-13T22:07:13+00:00",
-          "quality": 0.85,
-          "title": "Thierry Borgeat Says Chip Stocks Peak Every Two Years. His Chart Points to Another Top",
-          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 143,
-        "polarity_mean": -0.023,
-        "sources": 38,
-        "uncertainty_mean": 0.137
+        "n": 149,
+        "polarity_mean": -0.029,
+        "sources": 40,
+        "uncertainty_mean": 0.14
       },
       "upcoming": [
         {
@@ -801,7 +1004,7 @@
     },
     {
       "earnings": [],
-      "escalated": 35,
+      "escalated": 36,
       "events": [],
       "instrument_id": "XNAS:MSFT",
       "label": "Microsoft",
@@ -946,6 +1149,19 @@
       "stories": [
         {
           "day": null,
+          "doc_id": "https://www.nst.com.my/world/world/2026/11/1577440/microsoft-says-all-services-restored-after-global-outage",
+          "domain": "www.nst.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-14T06:56:55+00:00",
+          "quality": 1.0,
+          "title": "Microsoft says all services restored after global outage",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
           "doc_id": "https://finance.yahoo.com/markets/article/microsofts-latest-outage-hit-outlook-and-copilot--what-it-means-for-your-email-190121806.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
           "escalated": true,
@@ -1034,27 +1250,14 @@
           "quality": 0.85,
           "title": "Microsoft Just Overtook NVIDIA. Our Model Sees $650+",
           "uncertainty": 0.5555555555555556
-        },
-        {
-          "day": null,
-          "doc_id": "finnhub:143803818",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 1.0,
-          "published_at": "2026-11-13T14:41:00+00:00",
-          "quality": 0.85,
-          "title": "Global Cyber Warfare Market Set to Reach $80.09 Billion by 2030 as Geopolitical Tensions Accelerate Investment | Microsoft, Lockheed Martin, RTX, and CrowdStrike Vie for Share",
-          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 72,
-        "polarity_mean": 0.125,
-        "sources": 45,
-        "uncertainty_mean": 0.092
+        "n": 74,
+        "polarity_mean": 0.122,
+        "sources": 46,
+        "uncertainty_mean": 0.089
       },
       "upcoming": []
     }
