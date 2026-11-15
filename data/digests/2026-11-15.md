@@ -1,16 +1,21 @@
 # Digest 2026-11-15
 
-Generated 2026-11-15 05:49 UTC · slot `all` · 38193 articles in the corpus, 7812 observations, 4359 events in the fact book.
+Generated 2026-11-15 16:23 UTC · slot `all` · 38407 articles in the corpus, 7817 observations, 4359 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- quiet: nothing collected for this name in the window
+- tone: 4 stories from 4 sources, polarity +0.25, peak intensity 0.00, uncertainty 0.25 · 1 escalated
+- 2026-11-15 nextinsight.net — CENTURION: More Beds, Strong Revenue Growth -- Maybank Remains Bullish [q 0.65, tone +1.0] ★
+- 2026-11-15 www.moomoo.com — November Live Trading Challenge | MAYBANK Position Review & Earnings Risk 📊 [q 0.65, tone +0.0]
+- 2026-11-15 www.tradingview.com — Maybank Indonesia Catat Transaksi Afiliasi Rp 1,27 Miliar dengan Maybank Group [q 0.65, tone +0.0]
+- 2026-11-15 milelion.com — Review: Maybank Visa Infinite Card [q 0.65, tone +0.0]
+- snapshot: FinBERT headline tone 0.20 (finbert_tone, 2026-11-15)
 
 ### Tenaga (MYX:5347)
 - tone: 1 stories from 1 sources, polarity +1.00, peak intensity 0.00, uncertainty 0.00 · 1 escalated
 - 2026-11-14 www.nst.com.my — Thunderstar power to MHL league title [q 1.00, tone +1.0] ★
-- snapshot: FinBERT headline tone 0.20 (finbert_tone, 2026-11-14)
+- snapshot: FinBERT headline tone 0.38 (finbert_tone, 2026-11-15)
 
 ### Petronas Chemicals (MYX:5183)
 - quiet: nothing collected for this name in the window
@@ -19,13 +24,15 @@ Generated 2026-11-15 05:49 UTC · slot `all` · 38193 articles in the corpus, 78
 - quiet: nothing collected for this name in the window
 
 ### Press Metal (MYX:8869)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity -1.00, peak intensity 0.00, uncertainty 0.00 · 1 escalated
+- 2026-11-15 www.nst.com.my — Press Metal Q3 earnings seen falling up to 18pct on weaker aluminium prices [q 0.80, tone -1.0] ★
+- snapshot: FinBERT headline tone -0.94 (finbert_tone, 2026-11-15)
 
 ### Genting (MYX:3182)
 - quiet: nothing collected for this name in the window
 
 ### NVIDIA (XNAS:NVDA)
-- tone: 65 stories from 30 sources, polarity -0.01, peak intensity 0.33, uncertainty 0.17 · 19 escalated
+- tone: 67 stories from 31 sources, polarity -0.01, peak intensity 0.33, uncertainty 0.17 · 19 escalated
 - 2026-11-14 finance.yahoo.com — Nvidia Shock Has Investors Rethinking AI Infrastructure Stocks [q 1.00, tone +0.0] ★
 - 2026-11-14 Yahoo — Jim Cramer has a strong take on Nvidia's next chapter [q 0.85, tone +1.0] ★
 - 2026-11-14 Yahoo — Dell Technologies (DELL) Will Build An Alabama Research Computing Center [q 0.85, tone +0.0] ★
@@ -86,6 +93,16 @@ Generated 2026-11-15 05:49 UTC · slot `all` · 38193 articles in the corpus, 78
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 16:23 | finbert_tone | ok | 6 | 0 | 0 | facts 5; scored 6 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized.o |
+| 16:23 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
+| 16:23 | twse_openapi | ok | 8 | 0 | 0 | facts 0;  |
+| 16:23 | jin10_flash | degraded | 19 | 19 | 19 | facts 0; window not covered back to 2026-11-14 22:41Z; the oldest item read is 2 |
+| 16:23 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 16:23 | nst_business | degraded | 135 | 133 | 130 | page 2 starts 3.9h before page 1 ends (2026-11-15 04:51Z under 2026-11-15 08:42Z |
+| 16:23 | fmt_business | degraded | 50 | 50 | 50 | window overflow: all 50 dated items are newer than the window's start (2026-11-1 |
+| 16:23 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals, IHH |
+| 16:23 | google_news | ok | 16 | 16 | 15 | read but empty: Petronas Chemicals; named the company: 6 of 16 (lowest: Genting  |
+| 16:23 | gdelt | ok | 1 | 0 | 0 | grouped 3 names per request; 2 requests; read but empty: Press Metal, Genting, M |
 | 05:49 | sec_xbrl | ok | 4454 | 0 | 0 | facts 0;  |
 | 05:49 | finmind | ok | 75 | 0 | 0 | facts 10;  |
 | 05:49 | twse_openapi | ok | 8 | 0 | 0 | facts 0;  |

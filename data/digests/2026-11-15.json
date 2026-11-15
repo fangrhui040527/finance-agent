@@ -1,6 +1,96 @@
 {
   "collection": [
     {
+      "at": "2026-11-15T16:23:37.000733+00:00",
+      "detail": "facts 5; scored 6 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized.onnx",
+      "fetched": 6,
+      "kept": 0,
+      "source": "finbert_tone",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-15T16:23:36.539475+00:00",
+      "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-15T16:23:36.537933+00:00",
+      "detail": "facts 0; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-15T16:23:32.430015+00:00",
+      "detail": "facts 0; window not covered back to 2026-11-14 22:41Z; the oldest item read is 2026-11-15 15:08Z, so 16.5h of the window was never served",
+      "fetched": 19,
+      "kept": 19,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 19
+    },
+    {
+      "at": "2026-11-15T16:23:31.408794+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-15T16:23:29.737984+00:00",
+      "detail": "page 2 starts 3.9h before page 1 ends (2026-11-15 04:51Z under 2026-11-15 08:42Z): the items between were served by neither",
+      "fetched": 135,
+      "kept": 133,
+      "source": "nst_business",
+      "status": "degraded",
+      "stored": 130
+    },
+    {
+      "at": "2026-11-15T16:23:25.824073+00:00",
+      "detail": "window overflow: all 50 dated items are newer than the window's start (2026-11-14 15:50Z); the oldest is 2026-11-14 21:08Z, so 5.3h scrolled off unseen",
+      "fetched": 50,
+      "kept": 50,
+      "source": "fmt_business",
+      "status": "degraded",
+      "stored": 50
+    },
+    {
+      "at": "2026-11-15T16:23:25.132011+00:00",
+      "detail": "read but empty: Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals, IHH",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-15T16:23:23.792381+00:00",
+      "detail": "read but empty: Petronas Chemicals; named the company: 6 of 16 (lowest: Genting 0/7, IHH 0/1, Tenaga 1/2)",
+      "fetched": 16,
+      "kept": 16,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 15
+    },
+    {
+      "at": "2026-11-15T16:23:20.774220+00:00",
+      "detail": "grouped 3 names per request; 2 requests; read but empty: Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals, IHH",
+      "fetched": 1,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "ok",
+      "stored": 0
+    },
+    {
       "at": "2026-11-15T05:49:52.997390+00:00",
       "detail": "facts 0; ",
       "fetched": 4454,
@@ -56,18 +146,18 @@
     }
   ],
   "counts": {
-    "articles": 38193,
+    "articles": 38407,
     "documents": 0,
-    "escalated": 5040,
+    "escalated": 5042,
     "events": 4359,
     "failed_sweeps": 114,
-    "linked": 19314,
-    "observations": 7812,
+    "linked": 19321,
+    "observations": 7817,
     "series": 31,
-    "sweeps": 1623
+    "sweeps": 1633
   },
   "day": "2026-11-15",
-  "generated_at": "2026-11-15 05:49 UTC",
+  "generated_at": "2026-11-15 16:23 UTC",
   "macro": [
     {
       "change": "-0.1",
@@ -201,22 +291,81 @@
   "names": [
     {
       "earnings": [],
-      "escalated": 0,
+      "escalated": 1,
       "events": [],
       "instrument_id": "MYX:1155",
       "label": "Maybank",
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-14",
+          "known_at": "2026-11-15",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-13",
+          "period_end": "2026-11-15",
           "source": "finbert_tone",
-          "value": "-0.02"
+          "value": "0.20"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiygFBVV95cUxNZk90MzFJeHlOZzZpLUlSa29rQ2lFa1JvbWlHQXdOc1NFemFSMUpFU0h3OUNuelViTjVxaXFYU2NCY0lxeXpBWmlreHdCU3otTERJblhHQ3NldFlYUFRsd3Q0UjRwU2VaMG1VU2ZLSks1alhxdVZkTWd1VUJTbXE0Ulc5VW9JbEVuSW9FQkRwNXJYOG1jWTdQVDhpUWhJYzYwdU04OWpWWG5KOVJpbjlqYUswd3NBV29GbDdGYTI3b0Q2ZlJaUFoxa2VB?oc=5",
+          "domain": "nextinsight.net",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-15T05:01:16+00:00",
+          "quality": 0.65,
+          "title": "CENTURION: More Beds, Strong Revenue Growth -- Maybank Remains Bullish",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxOUG5GalVIYVhSa0xsbld2cVl1LTRjMWE4ekpQT0hiS21mZHNBWG1zUHJuaEJpRnVoMFVtSUI2X3cyX1NXUDJYN1BodGtqdFZ1M3FGYjlSOFZEUnliQVMxbVZMSXF4NWxTdGY2Tk1oRTJNM3M4Y0dUODVQOEFLUDc3cUZtd1QyQkJYUVBvOFVuRVZNWlZDdklWYzB0SlpzTVFmM29sdlY1bVNvbXhoXzloT1BtNkFBWVU3SzdkcnppUEc?oc=5",
+          "domain": "www.moomoo.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-15T07:49:49+00:00",
+          "quality": 0.65,
+          "title": "November Live Trading Challenge | MAYBANK Position Review & Earnings Risk \ud83d\udcca",
+          "uncertainty": 1.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiZ0FVX3lxTFBWdFlLN0l2ZHN4bG9fOU4ySXh4bnpOVE1lbEpVT2RIUGdXenNkeVQ0ZlpLT01XVXNaM3ZjU1l6WjJBcGxIRnhRNFJmbXN5RFdZa2xubVYwQi1NczQxTnJGdG9UWVh1LWM?oc=5",
+          "domain": "www.tradingview.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-15T01:33:00+00:00",
+          "quality": 0.65,
+          "title": "Maybank Indonesia Catat Transaksi Afiliasi Rp 1,27 Miliar dengan Maybank Group",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMidEFVX3lxTFBJamdSckNTRUZnaURyaUlNaERiQmJpUzdvMzh1QmFNT29YTEhRa2VrM2F4NmlHLVFlT0V6UEhnYkpwLWJSOHBHRTFMSDA0ZXZkejF5dEhtMC1HVW9TRV9jenpTYnZrQ0dDWUx1bDhDZEUydVcy?oc=5",
+          "domain": "milelion.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-15T01:16:16+00:00",
+          "quality": 0.65,
+          "title": "Review: Maybank Visa Infinite Card",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 4,
+        "polarity_mean": 0.25,
+        "sources": 4,
+        "uncertainty_mean": 0.25
+      },
       "upcoming": []
     },
     {
@@ -228,11 +377,11 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-14",
+          "known_at": "2026-11-15",
           "label": "FinBERT headline tone",
           "period_end": "2026-11-14",
           "source": "finbert_tone",
-          "value": "0.20"
+          "value": "0.38"
         }
       ],
       "stories": [
@@ -301,22 +450,42 @@
     },
     {
       "earnings": [],
-      "escalated": 0,
+      "escalated": 1,
       "events": [],
       "instrument_id": "MYX:8869",
       "label": "Press Metal",
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-14",
+          "known_at": "2026-11-15",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-13",
+          "period_end": "2026-11-15",
           "source": "finbert_tone",
-          "value": "-0.40"
+          "value": "-0.94"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxPQ21FVk5PYjFubGRtWmNDNURtVmxZTG52N3FUUlNqZmNqQnBxSE5hOTFoTHl4SHp1MWhnLVJUUmVkT3V4OHU4dTFWZ0lpVXlzREdnOFNrbFpsaUhDRVl3cHVJSG5wMVhSZjhTam0tb0cyR3dTWkpxTTVUZzZzUW9tRmVaT3RQY0V2eGlmb1F0SFFvRm9sUDJlRHJWdngtOUlvQVRxSXBFU0RkLXJNRGZVUzRTNlVJSEEy0gG-AUFVX3lxTFBwU210RHFNdFFsWXlIcklSTkRiZWgtdGFLcmlhTHNTUTd2aTR5dTk0OUowa2xPMkJBSzhuVDdLakhGajB3ZzJHQUNXcWJaWmxZQWhBUW5xWm9YQlg2S1YtOTgtUnpFNGxFMy1pT3FTZUtWYjEyMmVkczJicExicjlyY3VEbmJSallyOGc1TUJkMXhtNE5DekFaSHkzTzZpOENzSVhPVExTc2x6Q3ZfUHhXSGNuVWhZczhxQ1Z0MlE?oc=5",
+          "domain": "www.nst.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-15T06:16:06+00:00",
+          "quality": 0.8,
+          "title": "Press Metal Q3 earnings seen falling up to 18pct on weaker aluminium prices",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": -1.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -593,10 +762,10 @@
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 65,
+        "n": 67,
         "polarity_mean": -0.015,
-        "sources": 30,
-        "uncertainty_mean": 0.17
+        "sources": 31,
+        "uncertainty_mean": 0.165
       },
       "upcoming": [
         {
