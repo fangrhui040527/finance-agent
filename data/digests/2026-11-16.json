@@ -1,18 +1,109 @@
 {
-  "collection": [],
+  "collection": [
+    {
+      "at": "2026-11-16T10:08:13.882701+00:00",
+      "detail": "facts 6; scored 10 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized.onnx",
+      "fetched": 8,
+      "kept": 0,
+      "source": "finbert_tone",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-16T10:08:13.471583+00:00",
+      "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-16T10:08:13.470110+00:00",
+      "detail": "facts 0; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-16T10:08:09.027112+00:00",
+      "detail": "facts 0; window not covered back to 2026-11-15 22:41Z; the oldest item read is 2026-11-16 09:53Z, so 11.2h of the window was never served",
+      "fetched": 17,
+      "kept": 17,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 17
+    },
+    {
+      "at": "2026-11-16T10:08:08.035295+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-16T10:08:06.164656+00:00",
+      "detail": "page 2 starts 3.4h before page 1 ends (2026-11-16 03:15Z under 2026-11-16 06:40Z): the items between were served by neither",
+      "fetched": 128,
+      "kept": 123,
+      "source": "nst_business",
+      "status": "degraded",
+      "stored": 114
+    },
+    {
+      "at": "2026-11-16T10:08:01.298162+00:00",
+      "detail": "",
+      "fetched": 41,
+      "kept": 41,
+      "source": "fmt_business",
+      "status": "ok",
+      "stored": 40
+    },
+    {
+      "at": "2026-11-16T10:08:00.851504+00:00",
+      "detail": "read but empty: Genting, Maybank, Tenaga, Petronas Chemicals, IHH, Press Metal",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-16T10:07:59.121299+00:00",
+      "detail": "read but empty: Petronas Chemicals, Press Metal; named the company: 5 of 31 (lowest: IHH 0/2, Tenaga 0/5, Genting 1/16)",
+      "fetched": 33,
+      "kept": 31,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 29
+    },
+    {
+      "at": "2026-11-16T10:07:57.024081+00:00",
+      "detail": "throttled: no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked); deferred: Petronas Chemicals, IHH, Press Metal",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "throttled",
+      "stored": 0
+    }
+  ],
   "counts": {
-    "articles": 38642,
+    "articles": 38842,
     "documents": 0,
-    "escalated": 5078,
+    "escalated": 5080,
     "events": 4359,
     "failed_sweeps": 114,
-    "linked": 19465,
-    "observations": 7872,
+    "linked": 19480,
+    "observations": 7878,
     "series": 31,
-    "sweeps": 1642
+    "sweeps": 1652
   },
   "day": "2026-11-16",
-  "generated_at": "2026-11-16 01:02 UTC",
+  "generated_at": "2026-11-16 10:09 UTC",
   "macro": [
     {
       "change": "-0.1",
@@ -153,15 +244,74 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-15",
+          "known_at": "2026-11-16",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-15",
+          "period_end": "2026-11-16",
           "source": "finbert_tone",
-          "value": "0.20"
+          "value": "0.14"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMi1wFBVV95cUxPbE9KMVR2akRyamNyVW5vNHlKZ25EM18xaUJYNzFhTEJBb2RxZ25LR3gzZm1jdks3T1JZM3MzZHRBRTJXZnB3MTRzYmJsNFpVMF9Gem1Rd3VFT2hxTkh5eXNKU1lweENyRHo1VzczMVhZSFQzRXVUUWMtNjFCUFJiQmlhazVkVGtVNEhLb0YyY0NMWkRSZWpDczdTQ2dlOTgzdGFUUUNVaHVldlpzZ0FsQ3pmVVJSczByc0YwWU1haFZMQlhGUU9FRk9iLXNiR3lkeVdhMVhubw?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-16T09:53:00+00:00",
+          "quality": 0.8,
+          "title": "KK Mart signs retail underwriting deal with Maybank IB ahead of Main Market IPO",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxOS1VkR0ZmZkxqTk9jTnN3RldWWFpBTHBVNF85Mjh1NmxuaWlJUWVVMy1aRzhNWXdjRWhMUEdQUlBoWGV0M0ppT0Y4cVg5OGhfck5md3lWTjM1Uzd5alhYTXRGQVRPSFMzdElRS3ZLcVJ5SHd3SFBQeHR4bU1VOXlLVUtFSkQwS0E5NUpHRnRqZW1vdDA0NndYWTV5MXc1SW0wVloyS0Y3dlFuSjgzNXhjOU5yQWNJWDZp0gG4AUFVX3lxTE5LVWRHRmZmTGpOT2NOc3dGV1ZYWkFMcFU0XzkyOHU2bG5paUlRZVUzLVpHOE1Zd2NFaExQR1BSUGhYZXQzSmlPRjhxWDk4aF9yTmZ3eVZOMzVTN3lqWFhNdEZBVE9IUzN0SVFLdktxUnlId3dIUFB4dHhtTVU5eUtVS0VKRDBLQTk1SkdGdGplbW90MDQ2d1hZNXkxdzVJbTBWWjJLRjd2UW5KODM1eGM5TnJBY0lYNmk?oc=5",
+          "domain": "www.nst.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-16T03:42:56+00:00",
+          "quality": 0.8,
+          "title": "Former Maybank HQ could fetch about RM500mil, or much higher [WATCH]",
+          "uncertainty": 1.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMi3wFBVV95cUxQZk9uWTdqSWVDU2hSRi1nMVdHSndwNFNzaXNEcnl2OW10ZDM0VHByLW5iQk5oMWtHOXU0V1RXdVFJY2c0SVdoYTJTRlNoUkU3RmpJaDAzal9lMThGTDgtR2xUNVVPMjV1Z0ZybGNWM2ZhZHJsN1RYWW5UYjJuVHlnVlJxdl9RZm1rQk5DX0hrcXg2U0lDWHFIcmUyZzNvemlJcWZuLXN5Z09CY2ppam5DTUJ2ZnRkdVkzVWs0QS1HYnlENmYyajRzSTU1U3p5TDZsamhUTHVpSGVBRG5qYlFr?oc=5",
+          "domain": "www.marketscreener.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-16T04:04:28+00:00",
+          "quality": 0.65,
+          "title": "Maybank Investment Banking Group Adjusts Singapore Telecommunications' Price Target to SG$5.22",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMi9wFBVV95cUxPS1JsRTdpRnpGMkM1eDZxT2MtQXQ2RkVrVGtOQVRIVXNyMG5xY0MwaGZOemVtMHFSQWpPS1BFdnNUZTE3NmhUZGlOVTFGZlpQZ0w5OHdBVUdmNUtvSWNfRjFlTkZXUkM2bHJRVW5iTWVzZHpORDZUMFZQdlVPUUc4cHFyeXowV19LX2pWSE43THc1cHN4dlVMUXpnX1A2UDVlMWYxTEZNRm1fRVRrekNmWFdJQlZ5UkVITmVxbFVXN2JtTVJnaGV2NHoyQkNfbHJQWGJPQ2pfWWR6cEdtN2tMdXNyY0pRRmNBQmd3WHV1a0IyODdJbWtv?oc=5",
+          "domain": "www.klsescreener.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-16T00:39:57+00:00",
+          "quality": 0.65,
+          "title": "Trading ideas: DXN, Zetrix, Magma, Sum, Destini, Heitech Padu, Alam Maritim, BCB, MyMBN, Zen Tech, Maybank, WCT, Southern Acids",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 4,
+        "polarity_mean": 0.0,
+        "sources": 4,
+        "uncertainty_mean": 0.25
+      },
       "upcoming": []
     },
     {
@@ -233,7 +383,7 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-15",
+          "known_at": "2026-11-16",
           "label": "FinBERT headline tone",
           "period_end": "2026-11-15",
           "source": "finbert_tone",
@@ -246,29 +396,49 @@
     },
     {
       "earnings": [],
-      "escalated": 0,
+      "escalated": 1,
       "events": [],
       "instrument_id": "MYX:3182",
       "label": "Genting",
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-14",
+          "known_at": "2026-11-16",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-13",
+          "period_end": "2026-11-15",
           "source": "finbert_tone",
-          "value": "-0.12"
+          "value": "-0.35"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMijAJBVV95cUxQYkVBWjdyQ0lkblh0NkNVWk1UX0h5LVhIZ0FWb3dvUm5LNnlSdmxzSmN0UUxKMGlkY2toQWNIVmYtSlAwcndBZWlnbWFnYXl3Zy1LYWtpV2JNa2ptRWVCaWVEYWFxT1hKUGRtcjFsY3pVQkk1VDRDZzczMzczaUdoSlRTd0gtejc2X3dFVElhU0tiNjBCdWhKZTFkcjl2Rnd3UFQ1dzVHVkc5T3JQR2lHbGF0M2xGM2pTTGlPNmdRS0dWWUc1eGtVY3RVcThUZ19Cc2dVWmVzTTFKd0k3VHZHam5mT21rWXROTmVEdGxFai0zcTF5dThxQ3VmR1pPeUNqaVR5MjNqTzRlZ1BJ?oc=5",
+          "domain": "e.vnexpress.net",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-15T23:10:18+00:00",
+          "quality": 0.65,
+          "title": "Late Malaysian billionaire Lim Goh Tong's grandson loses bid to remove administrators in Genting family will dispute",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
       "earnings": [
         "2026-11-17 (finnhub)"
       ],
-      "escalated": 16,
+      "escalated": 17,
       "events": [],
       "instrument_id": "XNAS:NVDA",
       "label": "NVIDIA",
@@ -413,6 +583,19 @@
       "stories": [
         {
           "day": null,
+          "doc_id": "https://www.nst.com.my/business/corporate/2026/11/1578728/nvidia-uncertainty-unlikely-derail-malaysias-data-centre",
+          "domain": "www.nst.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-16T03:02:54+00:00",
+          "quality": 1.0,
+          "title": "Nvidia uncertainty unlikely to derail Malaysia's data centre projects, says RHB",
+          "uncertainty": 0.7653061224489796
+        },
+        {
+          "day": null,
           "doc_id": "finnhub:143840355",
           "domain": "Yahoo",
           "escalated": true,
@@ -501,27 +684,14 @@
           "quality": 0.8,
           "title": "Elon Musk Warns Nvidia Will Lose \u2018Critical Deals\u2019 Without Jensen Huang",
           "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMijwFBVV95cUxPVFYyR3dpbVo5S3VYRE9DamI3UDRHWGpJaE9zSm9qUzR6aUJUVzNWRDIza2hXeXJkTVlkdmw3MWgxTkU0WTZlX2dRa2MxMHFub1FFUEtRN2NlWDBTYUFxUGtRTjlsdDQ0LWRkcDFvVVZDbVBBblhfd2UySkV2MTlZV094ckVrMDlWMDY0bXhtWQ?oc=5",
-          "domain": "finance.yahoo.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": -1.0,
-          "published_at": "2026-11-15T16:09:07+00:00",
-          "quality": 0.8,
-          "title": "3 AI Chip Stocks With Lower China Exposure After Nvidia Stock Fell 28%",
-          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 77,
-        "polarity_mean": -0.065,
-        "sources": 34,
-        "uncertainty_mean": 0.066
+        "n": 83,
+        "polarity_mean": -0.06,
+        "sources": 36,
+        "uncertainty_mean": 0.07
       },
       "upcoming": [
         {

@@ -1,11 +1,16 @@
 # Digest 2026-11-16
 
-Generated 2026-11-16 01:02 UTC · slot `all` · 38642 articles in the corpus, 7872 observations, 4359 events in the fact book.
+Generated 2026-11-16 10:09 UTC · slot `all` · 38842 articles in the corpus, 7878 observations, 4359 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- quiet: nothing collected for this name in the window
+- tone: 4 stories from 4 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.25 · 0 escalated
+- 2026-11-16 www.thestar.com.my — KK Mart signs retail underwriting deal with Maybank IB ahead of Main Market IPO [q 0.80, tone +0.0]
+- 2026-11-16 www.nst.com.my — Former Maybank HQ could fetch about RM500mil, or much higher [WATCH] [q 0.80, tone +0.0]
+- 2026-11-16 www.marketscreener.com — Maybank Investment Banking Group Adjusts Singapore Telecommunications' Price Target to SG$5.22 [q 0.65, tone +0.0]
+- 2026-11-16 www.klsescreener.com — Trading ideas: DXN, Zetrix, Magma, Sum, Destini, Heitech Padu, Alam Maritim, BCB, MyMBN, Zen Tech, Maybank, WCT, Southern Acids [q 0.65, tone +0.0]
+- snapshot: FinBERT headline tone 0.14 (finbert_tone, 2026-11-16)
 
 ### Tenaga (MYX:5347)
 - quiet: nothing collected for this name in the window
@@ -20,10 +25,13 @@ Generated 2026-11-16 01:02 UTC · slot `all` · 38642 articles in the corpus, 78
 - quiet: nothing collected for this name in the window
 
 ### Genting (MYX:3182)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 1 escalated
+- 2026-11-15 e.vnexpress.net — Late Malaysian billionaire Lim Goh Tong's grandson loses bid to remove administrators in Genting family will dispute [q 0.65, tone +0.0] ★
+- snapshot: FinBERT headline tone -0.35 (finbert_tone, 2026-11-16)
 
 ### NVIDIA (XNAS:NVDA)
-- tone: 77 stories from 34 sources, polarity -0.07, peak intensity 0.33, uncertainty 0.07 · 16 escalated
+- tone: 83 stories from 36 sources, polarity -0.06, peak intensity 0.33, uncertainty 0.07 · 17 escalated
+- 2026-11-16 www.nst.com.my — Nvidia uncertainty unlikely to derail Malaysia's data centre projects, says RHB [q 1.00, tone +0.0] ★
 - 2026-11-15 Yahoo — AMD vs. Broadcom: With NVDA’s Jensen Huang Gone, Which AI Stock Wins the Most? [q 0.85, tone +1.0] ★
 - 2026-11-15 Yahoo — Megaspeed Launches Internal Probe as Nvidia Scrutiny Grows: Claims “Not Supported by Verifiable Evidence” [q 0.85, tone -1.0] ★
 - 2026-11-15 finance.yahoo.com — Dow Jones Futures Due; How Will Nvidia React As Jensen Huang Mulls Return? [q 0.80, tone +0.0] ★
@@ -31,7 +39,6 @@ Generated 2026-11-16 01:02 UTC · slot `all` · 38642 articles in the corpus, 78
 - 2026-11-15 finance.yahoo.com — Jensen Huang Discusses Comeback as Nvidia CEO With Allies Amid Board Probe and Washington Pushback [q 0.80, tone -1.0] ★
 - 2026-11-15 finance.yahoo.com — Jensen Huang Reportedly Wants Back In As Nvidia CEO. How Will Stock React? [q 0.80, tone +0.0] ★
 - 2026-11-15 finance.yahoo.com — Elon Musk Warns Nvidia Will Lose ‘Critical Deals’ Without Jensen Huang [q 0.80, tone +0.0] ★
-- 2026-11-15 finance.yahoo.com — 3 AI Chip Stocks With Lower China Exposure After Nvidia Stock Fell 28% [q 0.80, tone -1.0] ★
 - upcoming 2026-11-25 earnings_result — Q3 2027 results after the close (finnhub)
 - upcoming 2026-11-17 earnings_result — Q3 2027 results after the close (finnhub)
 - earnings date: 2026-11-17 (finnhub)
@@ -78,6 +85,21 @@ Generated 2026-11-16 01:02 UTC · slot `all` · 38642 articles in the corpus, 78
 | 10y minus 2y Treasury spread, % | 0.24 | 2026-11-12 | -0.01 | fred |
 | US unemployment rate, % | 4.10 | 2026-10-01 | -0.1 | fred |
 | CBOE VIX, index | 18.70 | 2026-11-12 | +1.21 | fred |
+
+## Collection
+
+| at (UTC) | source | status | fetched | kept | stored | detail |
+|---|---|---|---|---|---|---|
+| 10:08 | finbert_tone | ok | 8 | 0 | 0 | facts 6; scored 10 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized. |
+| 10:08 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
+| 10:08 | twse_openapi | ok | 8 | 0 | 0 | facts 0;  |
+| 10:08 | jin10_flash | degraded | 17 | 17 | 17 | facts 0; window not covered back to 2026-11-15 22:41Z; the oldest item read is 2 |
+| 10:08 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 10:08 | nst_business | degraded | 128 | 123 | 114 | page 2 starts 3.4h before page 1 ends (2026-11-16 03:15Z under 2026-11-16 06:40Z |
+| 10:08 | fmt_business | ok | 41 | 41 | 40 |  |
+| 10:08 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Genting, Maybank, Tenaga, Petronas Chemicals, IHH, Press Metal |
+| 10:07 | google_news | ok | 33 | 31 | 29 | read but empty: Petronas Chemicals, Press Metal; named the company: 5 of 31 (low |
+| 10:07 | gdelt | throttled | 0 | 0 | 0 | throttled: no name could be read (3 failed, 0 not reached). First: GDELT fetch f |
 
 ---
 
