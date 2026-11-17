@@ -1,6 +1,42 @@
 {
   "collection": [
     {
+      "at": "2026-11-17T21:15:25.633523+00:00",
+      "detail": "facts 0; ",
+      "fetched": 450,
+      "kept": 0,
+      "source": "dbnomics",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-17T21:15:24.183109+00:00",
+      "detail": "facts 0; window not covered back to 2026-11-17 18:36Z; the oldest item read is 2026-11-17 20:29Z, so 1.9h of the window was never served",
+      "fetched": 21,
+      "kept": 20,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 19
+    },
+    {
+      "at": "2026-11-17T21:15:22.992713+00:00",
+      "detail": "facts 6; release calendar: 'FOMC Press Release' listed on 15 days of the fortnight - a daily table, not a scheduled print; not stored as a release",
+      "fetched": 479,
+      "kept": 0,
+      "source": "fred",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-17T21:15:17.294041+00:00",
+      "detail": "facts 12; fmp /earnings is outside the plan (HTTP 402); not collected for NVDA, AAPL, MSFT",
+      "fetched": 4025,
+      "kept": 0,
+      "source": "fmp",
+      "status": "ok",
+      "stored": 0
+    },
+    {
       "at": "2026-11-17T18:36:12.693981+00:00",
       "detail": "facts 13; scored 19 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized.onnx",
       "fetched": 14,
@@ -92,26 +128,26 @@
     }
   ],
   "counts": {
-    "articles": 39549,
+    "articles": 39568,
     "documents": 0,
     "escalated": 5204,
-    "events": 4360,
+    "events": 4362,
     "failed_sweeps": 114,
     "linked": 19833,
-    "observations": 7965,
+    "observations": 7977,
     "series": 31,
-    "sweeps": 1675
+    "sweeps": 1679
   },
   "day": "2026-11-17",
-  "generated_at": "2026-11-17 18:36 UTC",
+  "generated_at": "2026-11-17 21:15 UTC",
   "macro": [
     {
-      "change": "0.03",
-      "obs_date": "2026-11-13",
+      "change": "0.11",
+      "obs_date": "2026-11-16",
       "series_id": "BAMLH0A0HYM2",
       "source": "fred",
       "title": "ICE BofA US high-yield option-adjusted spread, %",
-      "value": "3.23"
+      "value": "3.34"
     },
     {
       "change": "0",
@@ -186,12 +222,12 @@
       "value": "122.65"
     },
     {
-      "change": "-229.82",
-      "obs_date": "2026-11-13",
+      "change": "-626.51",
+      "obs_date": "2026-11-16",
       "series_id": "NASDAQCOM",
       "source": "fred",
       "title": "NASDAQ Composite, index level",
-      "value": "25,136.27"
+      "value": "24,509.76"
     },
     {
       "change": "32.9329",
@@ -202,12 +238,12 @@
       "value": "3,283.05"
     },
     {
-      "change": "-30.73",
-      "obs_date": "2026-11-13",
+      "change": "-145.08",
+      "obs_date": "2026-11-16",
       "series_id": "SP500",
       "source": "fred",
       "title": "S&P 500, index level",
-      "value": "7,561.67"
+      "value": "7,416.59"
     },
     {
       "change": "0.02",
@@ -226,12 +262,12 @@
       "value": "4.10"
     },
     {
-      "change": "0.6",
-      "obs_date": "2026-11-13",
+      "change": "3.61",
+      "obs_date": "2026-11-16",
       "series_id": "VIXCLS",
       "source": "fred",
       "title": "CBOE VIX, index",
-      "value": "19.30"
+      "value": "22.91"
     }
   ],
   "names": [
@@ -640,11 +676,11 @@
         },
         {
           "concept": "price_target_consensus",
-          "known_at": "2026-11-16",
+          "known_at": "2026-11-17",
           "label": "target (consensus)",
           "period_end": null,
           "source": "fmp",
-          "value": "311.16"
+          "value": "303.88"
         },
         {
           "concept": "analyst_buy",
@@ -907,7 +943,7 @@
         },
         {
           "concept": "price_target_consensus",
-          "known_at": "2026-11-16",
+          "known_at": "2026-11-17",
           "label": "target (consensus)",
           "period_end": null,
           "source": "fmp",
@@ -1166,7 +1202,7 @@
         },
         {
           "concept": "price_target_consensus",
-          "known_at": "2026-11-16",
+          "known_at": "2026-11-17",
           "label": "target (consensus)",
           "period_end": null,
           "source": "fmp",
