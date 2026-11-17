@@ -1,18 +1,109 @@
 {
-  "collection": [],
+  "collection": [
+    {
+      "at": "2026-11-17T18:36:12.693981+00:00",
+      "detail": "facts 13; scored 19 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized.onnx",
+      "fetched": 14,
+      "kept": 0,
+      "source": "finbert_tone",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-17T18:36:11.932409+00:00",
+      "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-17T18:36:11.930287+00:00",
+      "detail": "facts 5; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-17T18:36:05.933996+00:00",
+      "detail": "facts 0; window not covered back to 2026-11-16 22:41Z; the oldest item read is 2026-11-17 18:11Z, so 19.5h of the window was never served",
+      "fetched": 18,
+      "kept": 18,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 17
+    },
+    {
+      "at": "2026-11-17T18:36:04.635404+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-17T18:36:02.432749+00:00",
+      "detail": "window overflow: all 150 dated items are newer than the window's start (2026-11-16 10:08Z); the oldest is 2026-11-17 04:22Z, so 18.2h scrolled off unseen; read 3 pages, the most this feed may; page 2 starts 2.9h before page 1 ends (2026-11-17 09:35Z under 2026-11-17 12:27Z): the items between were served by neither",
+      "fetched": 150,
+      "kept": 144,
+      "source": "nst_business",
+      "status": "degraded",
+      "stored": 139
+    },
+    {
+      "at": "2026-11-17T18:35:58.521079+00:00",
+      "detail": "window overflow: all 50 dated items are newer than the window's start (2026-11-16 10:08Z); the oldest is 2026-11-17 03:00Z, so 16.9h scrolled off unseen",
+      "fetched": 50,
+      "kept": 50,
+      "source": "fmt_business",
+      "status": "degraded",
+      "stored": 50
+    },
+    {
+      "at": "2026-11-17T18:35:57.959577+00:00",
+      "detail": "read but empty: Genting, Maybank, Tenaga, Petronas Chemicals, IHH, Press Metal",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-17T18:35:56.626899+00:00",
+      "detail": "named the company: 16 of 43 (lowest: Genting 0/11, Petronas Chemicals 0/1, Maybank 4/11)",
+      "fetched": 46,
+      "kept": 43,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 37
+    },
+    {
+      "at": "2026-11-17T18:35:54.056833+00:00",
+      "detail": "throttled: no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked); deferred: Petronas Chemicals, IHH, Press Metal",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "throttled",
+      "stored": 0
+    }
+  ],
   "counts": {
-    "articles": 39306,
+    "articles": 39549,
     "documents": 0,
-    "escalated": 5199,
+    "escalated": 5204,
     "events": 4360,
     "failed_sweeps": 114,
-    "linked": 19812,
-    "observations": 7947,
+    "linked": 19833,
+    "observations": 7965,
     "series": 31,
-    "sweeps": 1665
+    "sweeps": 1675
   },
   "day": "2026-11-17",
-  "generated_at": "2026-11-17 03:53 UTC",
+  "generated_at": "2026-11-17 18:36 UTC",
   "macro": [
     {
       "change": "0.03",
@@ -146,22 +237,81 @@
   "names": [
     {
       "earnings": [],
-      "escalated": 0,
+      "escalated": 1,
       "events": [],
       "instrument_id": "MYX:1155",
       "label": "Maybank",
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-16",
+          "known_at": "2026-11-17",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-16",
+          "period_end": "2026-11-17",
           "source": "finbert_tone",
-          "value": "0.14"
+          "value": "0.38"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPb3FLLVRMX2ZIWjZnTFg2YU1yVEE2LTJxaGk3aHB6RjRXeFJDOWdWcWJKYXJiNTZqaG9yOWFPd0tiWnNVUXJ4enVPRUxsUGd0SzJGQXl1ZjVHMFZwV3FwUlJiNmZQdVAxNmtiS29aTmhXNEZiLUdCbEVKMkFfSF8ySExQMnJ0UGlXcThORFRaODZnQjhxa1BfTlJHbFU?oc=5",
+          "domain": "tradersunion.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-17T10:21:28+00:00",
+          "quality": 0.65,
+          "title": "Maybank Indonesia Finance ratings affirmed at top national scale with stable outlook",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxORU9zcHhrc2lMXzJIRGVETkh1TmliN2UtcGxEd2F0MDNNWHZIdmJCVnF5RG1GTFdBNnFHMm1Tekl4X1Nudkl6a0dGUUpYOFFma2h6SS12Vkh3N2VYd3Y4WWh5NnZHb29telluQWZKdm5yT0pUSVdmYVBWdUUtTHNJd29BRXJQZFRPYkMwSm5pU2twaEV2czh4cGJHeE14eDRWamVRQmlFRGhXZUE?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-17T00:33:49+00:00",
+          "quality": 0.8,
+          "title": "KK Mart inks underwriting deal with Maybank IB",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxQR3oyd1NGeFNTeXBndmRkbThJaTgzeHFqdlhNNjNBNXhZZmxGQUhRbnV3cGJ0Q3QyN0E1QTdWVlMxU3NGN0ZPQkZNaVdUVGxYVVlrdXh1RWRXdUJKeDRFSzlGSHJIZGZuZ1c2ZlRYUllCMGxuMnVwX09HVWhjMWdsWktFNW1nTXVSdnNrVllHY2Zrd1h5aVljMkR6M19kZUNkLWlQWUJYWWo0cHl1S1d3SjJSdUxObTVNd0NfLU5QeThCM2s?oc=5",
+          "domain": "www.ad-hoc-news.de",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-17T08:35:34+00:00",
+          "quality": 0.65,
+          "title": "Singtel stock: Maybank lifts target as brokers retain buy calls - ad-hoc-news.de",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxNRlN5YUZXZFRCOEI4NWE5eVVPUTQweERvMGp3MHBYM19HNG5YQWVBR2duc2Q3djQ3LVNCdlE1OE5qSEJIUTVxeVliX3lXYzBTVWVkUWdUZ29DZ3Z0ODV6RkNaT1kxZFVDdXZCUk82b0FmeC1hSF9ySmNtU0s1dEJwbDRfT3FxMDhBSmtHUlhpSHNyRUExOEFWc29USUswNVFiQW8yNUlrSU1tV3AwTXVUZUxwUmtfamFxbndYbzFZSVRoTDNFcW9UQQ?oc=5",
+          "domain": "www.theedgesingapore.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-17T07:55:11+00:00",
+          "quality": 0.65,
+          "title": "Maybank's Seet maintains 34 cents target price on Addvalue Technologies, citing 'explosive growth' intact",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 4,
+        "polarity_mean": 0.0,
+        "sources": 4,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -173,15 +323,100 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-15",
+          "known_at": "2026-11-17",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-14",
+          "period_end": "2026-11-17",
           "source": "finbert_tone",
-          "value": "0.38"
+          "value": "0.42"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMizAFBVV95cUxNbmVPWGlVUWs2Mm1tNV9jb1c4RjUwc2dfSU40bHhhWHpyQXk2V2QwZ3B6RmVJV29XSklmaTJvWmRPb2JYME5BUTA4ejVxcWdqMFVVdkNLRXR1QzVyR3VNemhpR3ZRWl9lakJueG1ZNDZzajlUMEMyeEx4NXQ5VFc2YWdHM3lPUlpVSzNvSlE5R1VPVkUyT0pMQ2tNQVpTQVo0OE5EQUJrdTd2TENCT2pjS0hfY19NSUNvSnd1Z2g2ZWZuSGZKLTRxdy1LSHU?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-17T06:17:00+00:00",
+          "quality": 0.8,
+          "title": "TNB sees grid readiness, commercial viability key to unlocking wind energy investments",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiygFBVV95cUxPVHVRVmQxYnp4b0J1akpka1RQY2RCalppazZuc3BJWm9Nd2xyNnpSOUN1RWxoZHhhZnIzMl9PREdOSTFGeWlwZ2hMN0pWaWJ0OGV2U196ZmpSYWdDLS1uYVJWNXpGcEcxUUVOaDhYSkVxWTdYdTlCS3NRQXlXd3NtOU9QTXk0b2ZPX3JfZFpTNzVnN0tVcXFEUW1qdV9HdXdXbWtENzltWTZ4amlQbUE4WXlCa3A0UUhjZG03WWtMZ2gwdTlYTmV1T0ZB?oc=5",
+          "domain": "www.minichart.com.sg",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-17T12:23:00+00:00",
+          "quality": 0.65,
+          "title": "Citaglobal, TNB GENCO Sign MOU on Off-Grid Power for 1,300 MW AI Data Centre Park at Gebeng",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiugFBVV95cUxQTmlRdWlxdm1tT3RIVGxNdjFISlBub3ZfUnV3Rmg2RXJaYms3ZGN5Y20zVkNJV1QzeThJLVhLV1BuSTY5dGV1MU45Q2xlTVpaMXVyaGp6ZGRsNV9JUHVyV3RKZHVMWEUxVEhtMEJDbHZya21Iem5qMmxUbm83N0RGRl8wSEhRT0Nxd1A3SzZSc0lMeXBDWmJZeE5fUVlEMzl3MDdXNnphSFNoVEpkLUd5Z2VYdXhnS1JDMFE?oc=5",
+          "domain": "vocal.media",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-17T01:15:58+00:00",
+          "quality": 0.65,
+          "title": "Powering the Green Transition: Tenaga Nasional Raises RM4.8 Billion via Sustainability Sukuk",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMilAFBVV95cUxNbTFTMlRrdmM0TThndTQxWFZ5WjBvVU11YnRMM0JFWGZ0VGV3QUdyR0hTeFJBMlJadmltSkZERmJ0NVhGOHJJVkF6ZXltZHVtTDZ4SjdXOVRHOVBaUEpSbzd3ejZIN2FoZUxSamNLQmVVZF9zcXN5QVJQa1J3LWdVcDFadWNDSXdlOEV0Nk03QzVEeUZr?oc=5",
+          "domain": "www.klsescreener.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-16T16:00:00+00:00",
+          "quality": 0.65,
+          "title": "Citaglobal, TNB eye 1,300MW power project",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMirgFBVV95cUxNeE1TMmFTcE5iS1Q5OG5SNUpleF9iLXBUNkxmSFB0VDZmUVVucnRiN3BBY0prUTJITXM0VXV4RUxzZ0NEUGdCaU1FOE9Eb1RpRndWcXJMSW1CUTFIdVd0RTFBU2dkVnc0YUxhZi0taWp4dGI5cllqVDNEdjdmOHlUaFpOLXl2RVRadkViczhpYWJoR25vUzVGRGNZcEU0blF1aUYwb2pVWFAwZFdwQ0E?oc=5",
+          "domain": "www.moomoo.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-16T14:08:46+00:00",
+          "quality": 0.65,
+          "title": "Citaglobal, TNB Genco and TIZA AI explore off-grid power for Gebeng data centre park",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxNYXRiNmZJUVJkaUJLZURsSHB1WGdUdFNNVWpEREJLM0Jqd016aTM3eHJMYXRaSzBybXN0ejBoNThxOEl0V1Y0aXZ2b2wyM0o0MnpVLXBOSU1HWW5lTGU0cjhBeVdab0ZtUmNuaDNZTlFGbmJzMFh5d0poR2piRmczQWd0TDNQWjBZWUc0OFhReHlOZ0F0alZIUU1ZX2xkMFp3NWdQMk55MTJCc051R2JXM2kwWVdBNGk4czFF?oc=5",
+          "domain": "www.marketscreener.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-16T12:03:27+00:00",
+          "quality": 0.65,
+          "title": "Citaglobal, TNB GENCO, TIZA AI Sign MoU for Data Center Power Supply",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 6,
+        "polarity_mean": 0.0,
+        "sources": 6,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -206,42 +441,108 @@
     },
     {
       "earnings": [],
-      "escalated": 0,
+      "escalated": 1,
       "events": [],
       "instrument_id": "MYX:5225",
       "label": "IHH",
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-14",
+          "known_at": "2026-11-17",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-13",
+          "period_end": "2026-11-17",
           "source": "finbert_tone",
-          "value": "-0.01"
+          "value": "-0.19"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMihAFBVV95cUxNQUNfaktHZVM5T2N5WGFqTXZaZU9UamRGdWZ6UGJYVVhrS09hOHZNTm5ta0JEcFZzNVRGeTQ2Vk1DWEYtdHFDakhqbGViX2VmRjlUS0JnVjJQejdFMUdPODY0ZlZfdFlxMXJPTzhvTk1KQURUUmd4bHpaZ2Y2Sm5leUhDYVY?oc=5",
+          "domain": "healthcaretoday.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-17T06:05:27+00:00",
+          "quality": 0.65,
+          "title": "Asia: IHH Healthcare to cut almost 400 jobs",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMipgFBVV95cUxQRmljMnc3Sm11c0dYMzRhRWdYREhMRUpHdFVnNDdBazIwZXhscFZnbk5kZ1NMVFRMNmdXaFN6YlpUWXdtcE5pNW9Hd29keHFxenhBLUdlQ1VDZ09ZenNFRmx5YlA4QTNNVDQzbnV6Sm0tdWV5TDRSNVpEQm13bDZDS3hlSTdEclAwV0hmSnhUbVE1TERuTy1XeWk4ZkxrU0xyYkZWLUNB?oc=5",
+          "domain": "www.tipranks.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-17T10:43:57+00:00",
+          "quality": 0.65,
+          "title": "EPF Board Acquires Additional IHH Healthcare Shares",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 2,
+        "polarity_mean": -0.5,
+        "sources": 2,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
       "earnings": [],
-      "escalated": 0,
+      "escalated": 2,
       "events": [],
       "instrument_id": "MYX:8869",
       "label": "Press Metal",
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-16",
+          "known_at": "2026-11-17",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-15",
+          "period_end": "2026-11-17",
           "source": "finbert_tone",
-          "value": "-0.94"
+          "value": "0.72"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMipwFBVV95cUxQdndpWVRrMG1GejY0bUt0aVhyYlcxaE5ZNFh4ejhETDVUN1FScHhTUEVRZTlvYlM1dG1pVVFoQl9fT29mN3czSXdPbGg1bHplLW5KUmo5SUcwM2xDdVcyZmdfV1RzRjYyYXhyZTVYRHg3UGV6dnlLM0tTdW5lb1diLUcxcG9PRFlTelBFbFVqd1QyM3k3YnV6eXVzczNtZjR5blJPOXlPdw?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-16T23:53:55+00:00",
+          "quality": 0.8,
+          "title": "Press Metal\u2019s growth prospects remain intact",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMitAFBVV95cUxOWEl0OVY0STMwN0hHWWxXUXJCQzRFVHg2RmFuaWM1M2lWYmlsZnNLTWNqM1BIU0Q2dEhqbTFuVzUySzluaUJNdlhlZnh3QkNhbjlUd3lLQTA2MFZxNmZsUXVudG92M3I5VmxOMERhTTlNN2tpRU4tNmE3VnVsc3pRTFVJMWM4czllaG8yeUhicXVnUXM5XzBjSDR6eHBIbFAteHdIWlB3RGhTQ3loR3lKaUNvTXY?oc=5",
+          "domain": "www.alcircle.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-17T10:11:53+00:00",
+          "quality": 0.65,
+          "title": "Press Metal targets 2027 alumina self-sufficiency as RHB sees 31% share upside",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 2,
+        "polarity_mean": 0.5,
+        "sources": 2,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -268,7 +569,7 @@
       "earnings": [
         "2026-11-17 (finnhub)"
       ],
-      "escalated": 51,
+      "escalated": 52,
       "events": [
         {
           "kind": "earnings_result",
@@ -421,6 +722,19 @@
       "stories": [
         {
           "day": null,
+          "doc_id": "https://www.nst.com.my/world/world/2026/11/1580089/nvidias-jensen-huang-open-returning-ceo-board-sets-security-panel",
+          "domain": "www.nst.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-17T16:30:55+00:00",
+          "quality": 1.0,
+          "title": "Nvidia's Jensen Huang open to returning as CEO as board sets up security panel",
+          "uncertainty": 0.20161290322580647
+        },
+        {
+          "day": null,
           "doc_id": "https://finance.yahoo.com/technology/articles/questions-nvidia-answer-tuesday-probably-220302340.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
           "escalated": true,
@@ -509,27 +823,14 @@
           "quality": 1.0,
           "title": "Wall Street Breakfast Podcast: Amazon Satellite Payload Lost",
           "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://www.fool.com/coverage/stock-market-today/2026/11/16/stock-market-today-nov-16-nvidia-sinks-as-u-s-tightens-ai-chip-restrictions-and-analysts-slash-price-targets/?.tsrc=rss",
-          "domain": "www.fool.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 1.0,
-          "published_at": "2026-11-16T22:30:02+00:00",
-          "quality": 0.85,
-          "title": "Stock Market Today, Nov. 16: Nvidia Sinks as U.S. Tightens AI Chip Restrictions and Analysts Slash Price Targets",
-          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.667,
-        "n": 142,
-        "polarity_mean": -0.025,
-        "sources": 37,
-        "uncertainty_mean": 0.13
+        "n": 147,
+        "polarity_mean": -0.031,
+        "sources": 39,
+        "uncertainty_mean": 0.127
       },
       "upcoming": [
         {

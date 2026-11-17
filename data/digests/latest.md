@@ -1,29 +1,48 @@
 # Digest 2026-11-17
 
-Generated 2026-11-17 03:53 UTC · slot `all` · 39306 articles in the corpus, 7947 observations, 4360 events in the fact book.
+Generated 2026-11-17 18:36 UTC · slot `all` · 39549 articles in the corpus, 7965 observations, 4360 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- quiet: nothing collected for this name in the window
+- tone: 4 stories from 4 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 1 escalated
+- 2026-11-17 tradersunion.com — Maybank Indonesia Finance ratings affirmed at top national scale with stable outlook [q 0.65, tone +0.0] ★
+- 2026-11-17 www.thestar.com.my — KK Mart inks underwriting deal with Maybank IB [q 0.80, tone +0.0]
+- 2026-11-17 www.ad-hoc-news.de — Singtel stock: Maybank lifts target as brokers retain buy calls - ad-hoc-news.de [q 0.65, tone +0.0]
+- 2026-11-17 www.theedgesingapore.com — Maybank's Seet maintains 34 cents target price on Addvalue Technologies, citing 'explosive growth' intact [q 0.65, tone +0.0]
+- snapshot: FinBERT headline tone 0.38 (finbert_tone, 2026-11-17)
 
 ### Tenaga (MYX:5347)
-- quiet: nothing collected for this name in the window
+- tone: 6 stories from 6 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-11-17 www.thestar.com.my — TNB sees grid readiness, commercial viability key to unlocking wind energy investments [q 0.80, tone +0.0]
+- 2026-11-17 www.minichart.com.sg — Citaglobal, TNB GENCO Sign MOU on Off-Grid Power for 1,300 MW AI Data Centre Park at Gebeng [q 0.65, tone +0.0]
+- 2026-11-17 vocal.media — Powering the Green Transition: Tenaga Nasional Raises RM4.8 Billion via Sustainability Sukuk [q 0.65, tone +0.0]
+- 2026-11-16 www.klsescreener.com — Citaglobal, TNB eye 1,300MW power project [q 0.65, tone +0.0]
+- 2026-11-16 www.moomoo.com — Citaglobal, TNB Genco and TIZA AI explore off-grid power for Gebeng data centre park [q 0.65, tone +0.0]
+- 2026-11-16 www.marketscreener.com — Citaglobal, TNB GENCO, TIZA AI Sign MoU for Data Center Power Supply [q 0.65, tone +0.0]
+- snapshot: FinBERT headline tone 0.42 (finbert_tone, 2026-11-17)
 
 ### Petronas Chemicals (MYX:5183)
 - quiet: nothing collected for this name in the window
 
 ### IHH (MYX:5225)
-- quiet: nothing collected for this name in the window
+- tone: 2 stories from 2 sources, polarity -0.50, peak intensity 0.00, uncertainty 0.00 · 1 escalated
+- 2026-11-17 healthcaretoday.com — Asia: IHH Healthcare to cut almost 400 jobs [q 0.65, tone -1.0] ★
+- 2026-11-17 www.tipranks.com — EPF Board Acquires Additional IHH Healthcare Shares [q 0.65, tone +0.0]
+- snapshot: FinBERT headline tone -0.19 (finbert_tone, 2026-11-17)
 
 ### Press Metal (MYX:8869)
-- quiet: nothing collected for this name in the window
+- tone: 2 stories from 2 sources, polarity +0.50, peak intensity 0.00, uncertainty 0.00 · 2 escalated
+- 2026-11-16 www.thestar.com.my — Press Metal’s growth prospects remain intact [q 0.80, tone +1.0] ★
+- 2026-11-17 www.alcircle.com — Press Metal targets 2027 alumina self-sufficiency as RHB sees 31% share upside [q 0.65, tone +0.0] ★
+- snapshot: FinBERT headline tone 0.72 (finbert_tone, 2026-11-17)
 
 ### Genting (MYX:3182)
 - quiet: nothing collected for this name in the window
 
 ### NVIDIA (XNAS:NVDA)
-- tone: 142 stories from 37 sources, polarity -0.03, peak intensity 0.67, uncertainty 0.13 · 51 escalated
+- tone: 147 stories from 39 sources, polarity -0.03, peak intensity 0.67, uncertainty 0.13 · 52 escalated
+- 2026-11-17 www.nst.com.my — Nvidia's Jensen Huang open to returning as CEO as board sets up security panel [q 1.00, tone -1.0] ★
 - 2026-11-16 finance.yahoo.com — All the questions Nvidia should answer on Tuesday — but probably won’t [q 1.00, tone +1.0] ★
 - 2026-11-16 finance.yahoo.com — Elon Musk Warns Against Pushing Founders Out — Steve Jobs and Travis Kalanick Lessons Resurface as Jensen Huang Exits Nvidia [q 1.00, tone -1.0] ★
 - 2026-11-16 seekingalpha.com — Nvidia: Buying Before The Dust Settles And Selling After (Rating Upgrade) [q 1.00, tone +1.0] ★
@@ -31,7 +50,6 @@ Generated 2026-11-17 03:53 UTC · slot `all` · 39306 articles in the corpus, 79
 - 2026-11-16 seekingalpha.com — Nvidia: You Could See An 11.6x Forward P/E Post Q3, A 50% Discount To Nasdaq [q 1.00, tone +1.0] ★
 - 2026-11-16 seekingalpha.com — Nvidia's CEO Search Offers Several Paths: Each Supports A Strong Buy (Upgrade) [q 1.00, tone +0.5] ★
 - 2026-11-16 seekingalpha.com — Wall Street Breakfast Podcast: Amazon Satellite Payload Lost [q 1.00, tone +0.0] ★
-- 2026-11-16 www.fool.com — Stock Market Today, Nov. 16: Nvidia Sinks as U.S. Tightens AI Chip Restrictions and Analysts Slash Price Targets [q 0.85, tone +1.0] ★
 - event 2026-11-17 earnings_result — Q3 2027 results after the close (finnhub)
 - upcoming 2026-11-25 earnings_result — Q3 2027 results after the close (finnhub)
 - earnings date: 2026-11-17 (finnhub)
@@ -81,6 +99,21 @@ Generated 2026-11-17 03:53 UTC · slot `all` · 39306 articles in the corpus, 79
 | 10y minus 2y Treasury spread, % | 0.29 | 2026-11-16 | +0.02 | fred |
 | US unemployment rate, % | 4.10 | 2026-10-01 | -0.1 | fred |
 | CBOE VIX, index | 19.30 | 2026-11-13 | +0.6 | fred |
+
+## Collection
+
+| at (UTC) | source | status | fetched | kept | stored | detail |
+|---|---|---|---|---|---|---|
+| 18:36 | finbert_tone | ok | 14 | 0 | 0 | facts 13; scored 19 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized |
+| 18:36 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
+| 18:36 | twse_openapi | ok | 8 | 0 | 0 | facts 5;  |
+| 18:36 | jin10_flash | degraded | 18 | 18 | 17 | facts 0; window not covered back to 2026-11-16 22:41Z; the oldest item read is 2 |
+| 18:36 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 18:36 | nst_business | degraded | 150 | 144 | 139 | window overflow: all 150 dated items are newer than the window's start (2026-11- |
+| 18:35 | fmt_business | degraded | 50 | 50 | 50 | window overflow: all 50 dated items are newer than the window's start (2026-11-1 |
+| 18:35 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Genting, Maybank, Tenaga, Petronas Chemicals, IHH, Press Metal |
+| 18:35 | google_news | ok | 46 | 43 | 37 | named the company: 16 of 43 (lowest: Genting 0/11, Petronas Chemicals 0/1, Mayba |
+| 18:35 | gdelt | throttled | 0 | 0 | 0 | throttled: no name could be read (3 failed, 0 not reached). First: GDELT fetch f |
 
 ---
 
