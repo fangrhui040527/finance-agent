@@ -1,18 +1,109 @@
 {
-  "collection": [],
+  "collection": [
+    {
+      "at": "2026-11-18T10:07:27.714709+00:00",
+      "detail": "facts 8; scored 13 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized.onnx",
+      "fetched": 12,
+      "kept": 0,
+      "source": "finbert_tone",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-18T10:07:26.940378+00:00",
+      "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-18T10:07:26.938589+00:00",
+      "detail": "facts 5; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-18T10:07:23.624287+00:00",
+      "detail": "facts 0; window not covered back to 2026-11-17 22:41Z; the oldest item read is 2026-11-18 09:57Z, so 11.3h of the window was never served",
+      "fetched": 15,
+      "kept": 15,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 14
+    },
+    {
+      "at": "2026-11-18T10:07:22.568398+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-18T10:07:20.899170+00:00",
+      "detail": "page 2 starts 3.0h before page 1 ends (2026-11-18 05:05Z under 2026-11-18 08:06Z): the items between were served by neither",
+      "fetched": 143,
+      "kept": 137,
+      "source": "nst_business",
+      "status": "degraded",
+      "stored": 131
+    },
+    {
+      "at": "2026-11-18T10:07:13.176515+00:00",
+      "detail": "window overflow: all 50 dated items are newer than the window's start (2026-11-17 18:35Z); the oldest is 2026-11-17 22:51Z, so 4.3h scrolled off unseen",
+      "fetched": 50,
+      "kept": 50,
+      "source": "fmt_business",
+      "status": "degraded",
+      "stored": 49
+    },
+    {
+      "at": "2026-11-18T10:07:12.675854+00:00",
+      "detail": "read but empty: Maybank, Tenaga, Petronas Chemicals, IHH, Press Metal, Genting",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-18T10:07:11.879695+00:00",
+      "detail": "read but empty: Petronas Chemicals; named the company: 3 of 16 (lowest: Genting 0/3, IHH 0/1, Press Metal 0/1)",
+      "fetched": 16,
+      "kept": 16,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 11
+    },
+    {
+      "at": "2026-11-18T10:07:10.004150+00:00",
+      "detail": "throttled: no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked); deferred: IHH, Press Metal, Genting",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "throttled",
+      "stored": 0
+    }
+  ],
   "counts": {
-    "articles": 40087,
+    "articles": 40292,
     "documents": 0,
-    "escalated": 5342,
+    "escalated": 5344,
     "events": 4365,
     "failed_sweeps": 114,
-    "linked": 20204,
-    "observations": 8032,
+    "linked": 20216,
+    "observations": 8045,
     "series": 31,
-    "sweeps": 1688
+    "sweeps": 1698
   },
   "day": "2026-11-18",
-  "generated_at": "2026-11-18 02:59 UTC",
+  "generated_at": "2026-11-18 10:08 UTC",
   "macro": [
     {
       "change": "0.11",
@@ -153,15 +244,35 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-17",
+          "known_at": "2026-11-18",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-17",
+          "period_end": "2026-11-18",
           "source": "finbert_tone",
-          "value": "0.38"
+          "value": "-0.07"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMirgFBVV95cUxNNzVVWF83ZGdYdk10Qm9jWWU0cHV0cXZiWUtLNlVLODlxRVZBaHJ0aWx1dlVzWVhoVElRRTF5VENqWEpqU1dMNXNDcU5hUHlaanFOX24xdk96cE91SjR2VkUwdlFrTEJLMXp3ZE1FOWlNR3ZBSGtoR1NydzZsTC1zQ1FORXk4b2VzTVNIbWJJUmZxcFd2WUFGckZGd1U1aTJtRjFVNEdIY0R3LUZGcmc?oc=5",
+          "domain": "technode.global",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-18T09:27:56+00:00",
+          "quality": 0.65,
+          "title": "US AI chip curbs could slow Indonesia\u2019s data center ambitions, says Maybank",
+          "uncertainty": 0.9615384615384615
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.962
+      },
       "upcoming": []
     },
     {
@@ -173,14 +284,27 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-17",
+          "known_at": "2026-11-18",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-17",
+          "period_end": "2026-11-18",
           "source": "finbert_tone",
-          "value": "0.42"
+          "value": "0.08"
         }
       ],
       "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxNUXRObFFzVHJELXJRNmJlN0V0NXM5Mjd0X3dCbXdBVW9qSTUyQWR3T0RNTzFRR1FkeVFyZUdmU0FtWWp0YVdiRjV5eElvSnV1T3ZXZXJ4eGNqano4MTRrNHhvUWRxUkttRlJGQTE0dUllaWlTS1JwMlpXWnZoeEd2MlVuVmlsT3FncVZ1aGVhendlUk40R0lTSjhBZGN5SkhkeE5YMUtsSWRXZ3RLN3RMdWVJb1gzamlVRUdkeHcyMHptNFE?oc=5",
+          "domain": "www.ad-hoc-news.de",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-18T01:02:04+00:00",
+          "quality": 0.65,
+          "title": "Tenaga Nasional stock weighs RM248 million power bill support cost - ad-hoc-news.de",
+          "uncertainty": 0.0
+        },
         {
           "day": null,
           "doc_id": "https://news.google.com/rss/articles/CBMiygFBVV95cUxPVHVRVmQxYnp4b0J1akpka1RQY2RCalppazZuc3BJWm9Nd2xyNnpSOUN1RWxoZHhhZnIzMl9PREdOSTFGeWlwZ2hMN0pWaWJ0OGV2U196ZmpSYWdDLS1uYVJWNXpGcEcxUUVOaDhYSkVxWTdYdTlCS3NRQXlXd3NtOU9QTXk0b2ZPX3JfZFpTNzVnN0tVcXFEUW1qdV9HdXdXbWtENzltWTZ4amlQbUE4WXlCa3A0UUhjZG03WWtMZ2gwdTlYTmV1T0ZB?oc=5",
@@ -197,9 +321,9 @@
       ],
       "tone": {
         "intensity_max": 0.0,
-        "n": 1,
+        "n": 2,
         "polarity_mean": 0.0,
-        "sources": 1,
+        "sources": 2,
         "uncertainty_mean": 0.0
       },
       "upcoming": []
@@ -233,11 +357,11 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-17",
+          "known_at": "2026-11-18",
           "label": "FinBERT headline tone",
           "period_end": "2026-11-17",
           "source": "finbert_tone",
-          "value": "-0.19"
+          "value": "-0.23"
         }
       ],
       "stories": [],
@@ -253,11 +377,11 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-17",
+          "known_at": "2026-11-18",
           "label": "FinBERT headline tone",
           "period_end": "2026-11-17",
           "source": "finbert_tone",
-          "value": "0.72"
+          "value": "0.66"
         }
       ],
       "stories": [],
@@ -286,7 +410,7 @@
     },
     {
       "earnings": [],
-      "escalated": 56,
+      "escalated": 58,
       "events": [
         {
           "kind": "results_released",
@@ -453,6 +577,19 @@
       "stories": [
         {
           "day": null,
+          "doc_id": "https://www.nst.com.my/business/corporate/2026/11/1580209/nvidia-board-rules-out-reinstating-jensen-huang-ceo",
+          "domain": "www.nst.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-18T01:29:38+00:00",
+          "quality": 1.0,
+          "title": "Nvidia board rules out reinstating Jensen Huang as CEO",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
           "doc_id": "https://finance.yahoo.com/video/nvidia-interim-ceo-colette-kress-speaks-on-quarterly-revenue-doubling-223846656.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
           "escalated": true,
@@ -518,6 +655,19 @@
         },
         {
           "day": null,
+          "doc_id": "https://www.nst.com.my/business/corporate/2026/11/1580107/nvidia-board-will-not-reinstate-jensen-huang-chief",
+          "domain": "www.nst.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-17T22:27:25+00:00",
+          "quality": 1.0,
+          "title": "Nvidia board will not reinstate Jensen Huang as chief",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
           "doc_id": "https://finance.yahoo.com/technology/ai/articles/nvidia-expands-commitments-supply-chain-221800994.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
           "escalated": true,
@@ -528,40 +678,14 @@
           "quality": 1.0,
           "title": "NVIDIA Expands Commitments With Supply Chain Partners to Support AI Infrastructure Buildout",
           "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://www.nst.com.my/world/world/2026/11/1580089/nvidias-jensen-huang-open-returning-ceo-board-sets-security-panel",
-          "domain": "www.nst.com.my",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": -1.0,
-          "published_at": "2026-11-17T16:30:55+00:00",
-          "quality": 1.0,
-          "title": "Nvidia's Jensen Huang open to returning as CEO as board sets up security panel",
-          "uncertainty": 0.20161290322580647
-        },
-        {
-          "day": null,
-          "doc_id": "https://www.fool.com/coverage/stock-market-today/2026/11/17/stock-market-today-nov-17-nvidia-slides-ahead-of-earnings-but-soars-in-after-hours-trading/?.tsrc=rss",
-          "domain": "www.fool.com",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
-          "kind": "",
-          "polarity": 1.0,
-          "published_at": "2026-11-17T22:23:10+00:00",
-          "quality": 0.85,
-          "title": "Stock Market Today, Nov. 17: Nvidia Slides Ahead of Earnings but Soars in After Hours Trading",
-          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 139,
-        "polarity_mean": 0.072,
-        "sources": 39,
-        "uncertainty_mean": 0.102
+        "n": 143,
+        "polarity_mean": 0.07,
+        "sources": 40,
+        "uncertainty_mean": 0.106
       },
       "upcoming": [
         {
@@ -811,24 +935,24 @@
         },
         {
           "day": null,
-          "doc_id": "https://www.independent.co.uk/tech/apple-down-not-working-pay-icloud-music-app-store-iphone-status-b3086668.html?.tsrc=rss",
-          "domain": "www.independent.co.uk",
+          "doc_id": "https://www.nst.com.my/world/world/2026/11/1580144/websites-including-bbc-ikea-and-air-france-hit-attack",
+          "domain": "www.nst.com.my",
           "escalated": false,
           "intensity": 0.0,
           "kind": "",
           "polarity": 0.0,
-          "published_at": "2026-11-17T20:59:30+00:00",
-          "quality": 0.85,
-          "title": "Apple down live: iPhones stop working properly as iCloud taken down by \u2018internal update\u2019",
+          "published_at": "2026-11-17T23:40:43+00:00",
+          "quality": 1.0,
+          "title": "Websites including BBC, IKEA and Air France hit by attack",
           "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.0,
-        "n": 28,
-        "polarity_mean": 0.036,
-        "sources": 19,
-        "uncertainty_mean": 0.043
+        "n": 29,
+        "polarity_mean": 0.034,
+        "sources": 20,
+        "uncertainty_mean": 0.041
       },
       "upcoming": []
     },
