@@ -1,6 +1,87 @@
 {
   "collection": [
     {
+      "at": "2026-11-18T22:41:55.815213+00:00",
+      "detail": "facts 12; scored 739 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized.onnx",
+      "fetched": 12,
+      "kept": 0,
+      "source": "finbert_tone",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-18T22:41:52.047810+00:00",
+      "detail": "skipped: every asked name was refused: outside the plan or over today's credits (XNAS:NVDA, XNAS:AAPL)",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-18T22:41:51.618913+00:00",
+      "detail": "facts 0; window not covered back to 2026-11-18 20:50Z; the oldest item read is 2026-11-18 22:02Z, so 1.2h of the window was never served",
+      "fetched": 19,
+      "kept": 19,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 18
+    },
+    {
+      "at": "2026-11-18T22:41:50.728119+00:00",
+      "detail": "facts 8; XNAS:NVDA: 2026-11-18 not aggregated - 8 full pages ended part-way through that day",
+      "fetched": 35,
+      "kept": 35,
+      "source": "marketaux_news",
+      "status": "ok",
+      "stored": 25
+    },
+    {
+      "at": "2026-11-18T22:41:45.772023+00:00",
+      "detail": "facts 43; ",
+      "fetched": 426,
+      "kept": 361,
+      "source": "finnhub",
+      "status": "ok",
+      "stored": 302
+    },
+    {
+      "at": "2026-11-18T22:41:40.379577+00:00",
+      "detail": "facts 0; ",
+      "fetched": 2,
+      "kept": 0,
+      "source": "edgar",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-18T22:41:39.799472+00:00",
+      "detail": "named the company: 19 of 56 (lowest: Microsoft 5/19, Apple 7/19, NVIDIA 7/18)",
+      "fetched": 56,
+      "kept": 56,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 43
+    },
+    {
+      "at": "2026-11-18T22:41:38.849413+00:00",
+      "detail": "named the company: 152 of 159 (lowest: Apple 27/30, Microsoft 49/51, NVIDIA 76/78)",
+      "fetched": 169,
+      "kept": 159,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 143
+    },
+    {
+      "at": "2026-11-18T22:41:36.298227+00:00",
+      "detail": "throttled: no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked)",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "throttled",
+      "stored": 0
+    },
+    {
       "at": "2026-11-18T20:50:45.429571+00:00",
       "detail": "facts 0; ",
       "fetched": 450,
@@ -128,18 +209,18 @@
     }
   ],
   "counts": {
-    "articles": 40309,
+    "articles": 40840,
     "documents": 0,
-    "escalated": 5344,
-    "events": 4366,
+    "escalated": 5483,
+    "events": 4367,
     "failed_sweeps": 114,
-    "linked": 20216,
-    "observations": 8057,
+    "linked": 20596,
+    "observations": 8119,
     "series": 31,
-    "sweeps": 1702
+    "sweeps": 1711
   },
   "day": "2026-11-18",
-  "generated_at": "2026-11-18 20:50 UTC",
+  "generated_at": "2026-11-18 22:42 UTC",
   "macro": [
     {
       "change": "0.09",
@@ -446,7 +527,7 @@
     },
     {
       "earnings": [],
-      "escalated": 58,
+      "escalated": 165,
       "events": [
         {
           "kind": "results_released",
@@ -475,15 +556,15 @@
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-11-17",
+          "known_at": "2026-11-18",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "19.51"
+          "value": "16.56"
         },
         {
           "concept": "pb",
-          "known_at": "2026-11-17",
+          "known_at": "2026-11-18",
           "label": "P/B",
           "period_end": null,
           "source": "finnhub",
@@ -491,15 +572,15 @@
         },
         {
           "concept": "eps_ttm",
-          "known_at": "2026-11-17",
+          "known_at": "2026-11-18",
           "label": "EPS (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "7.91"
+          "value": "9.31"
         },
         {
           "concept": "dividend_yield",
-          "known_at": "2026-11-17",
+          "known_at": "2026-11-18",
           "label": "dividend yield",
           "period_end": null,
           "source": "finnhub",
@@ -507,15 +588,15 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-11-17",
+          "known_at": "2026-11-18",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
-          "value": "2.36"
+          "value": "2.40"
         },
         {
           "concept": "high_52w",
-          "known_at": "2026-11-17",
+          "known_at": "2026-11-18",
           "label": "52w high",
           "period_end": null,
           "source": "finnhub",
@@ -523,7 +604,7 @@
         },
         {
           "concept": "low_52w",
-          "known_at": "2026-11-17",
+          "known_at": "2026-11-18",
           "label": "52w low",
           "period_end": null,
           "source": "finnhub",
@@ -579,11 +660,11 @@
         },
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-17",
+          "known_at": "2026-11-18",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-17",
+          "period_end": "2026-11-18",
           "source": "finbert_tone",
-          "value": "0.06"
+          "value": "0.10"
         },
         {
           "concept": "revenue",
@@ -603,14 +684,27 @@
         },
         {
           "concept": "eps_surprise_pct",
-          "known_at": "2026-09-05",
+          "known_at": "2026-11-18",
           "label": "last EPS surprise %",
-          "period_end": "2026-09-30",
+          "period_end": "2026-12-31",
           "source": "finnhub",
-          "value": "3.82"
+          "value": "6.14"
         }
       ],
       "stories": [
+        {
+          "day": null,
+          "doc_id": "https://finance.yahoo.com/m/c539aeb8-6fe1-37d6-ab41-d28e4742890e/trump-and-xi-to-discuss-trade.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-18T19:25:00+00:00",
+          "quality": 1.0,
+          "title": "Trump and Xi to Discuss Trade at APEC Summit. What Isn\u2019t Said May Matter More.",
+          "uncertainty": 1.0
+        },
         {
           "day": null,
           "doc_id": "https://www.nst.com.my/business/corporate/2026/11/1580209/nvidia-board-rules-out-reinstating-jensen-huang-ceo",
@@ -701,27 +795,14 @@
           "quality": 1.0,
           "title": "Nvidia board will not reinstate Jensen Huang as chief",
           "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://finance.yahoo.com/technology/ai/articles/nvidia-expands-commitments-supply-chain-221800994.html?.tsrc=rss",
-          "domain": "finance.yahoo.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 1.0,
-          "published_at": "2026-11-17T22:18:00+00:00",
-          "quality": 1.0,
-          "title": "NVIDIA Expands Commitments With Supply Chain Partners to Support AI Infrastructure Buildout",
-          "uncertainty": 0.0
         }
       ],
       "tone": {
-        "intensity_max": 0.333,
-        "n": 143,
-        "polarity_mean": 0.07,
-        "sources": 40,
-        "uncertainty_mean": 0.106
+        "intensity_max": 0.667,
+        "n": 384,
+        "polarity_mean": 0.122,
+        "sources": 61,
+        "uncertainty_mean": 0.107
       },
       "upcoming": [
         {
@@ -735,22 +816,22 @@
     },
     {
       "earnings": [],
-      "escalated": 7,
+      "escalated": 15,
       "events": [],
       "instrument_id": "XNAS:AAPL",
       "label": "Apple",
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-11-17",
+          "known_at": "2026-11-18",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "38.82"
+          "value": "38.69"
         },
         {
           "concept": "pb",
-          "known_at": "2026-11-17",
+          "known_at": "2026-11-18",
           "label": "P/B",
           "period_end": null,
           "source": "finnhub",
@@ -758,7 +839,7 @@
         },
         {
           "concept": "eps_ttm",
-          "known_at": "2026-11-17",
+          "known_at": "2026-11-18",
           "label": "EPS (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -766,7 +847,7 @@
         },
         {
           "concept": "dividend_yield",
-          "known_at": "2026-11-17",
+          "known_at": "2026-11-18",
           "label": "dividend yield",
           "period_end": null,
           "source": "finnhub",
@@ -774,7 +855,7 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-11-17",
+          "known_at": "2026-11-18",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
@@ -782,7 +863,7 @@
         },
         {
           "concept": "high_52w",
-          "known_at": "2026-11-17",
+          "known_at": "2026-11-18",
           "label": "52w high",
           "period_end": null,
           "source": "finnhub",
@@ -790,7 +871,7 @@
         },
         {
           "concept": "low_52w",
-          "known_at": "2026-11-17",
+          "known_at": "2026-11-18",
           "label": "52w low",
           "period_end": null,
           "source": "finnhub",
@@ -838,19 +919,19 @@
         },
         {
           "concept": "mx_news_sentiment",
-          "known_at": "2026-11-17",
+          "known_at": "2026-11-18",
           "label": "Marketaux sentiment",
-          "period_end": "2026-11-17",
+          "period_end": "2026-11-18",
           "source": "marketaux_news",
-          "value": "0.16"
+          "value": "0.01"
         },
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-17",
+          "known_at": "2026-11-18",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-17",
+          "period_end": "2026-11-18",
           "source": "finbert_tone",
-          "value": "0.02"
+          "value": "0.09"
         },
         {
           "concept": "revenue",
@@ -893,6 +974,45 @@
         },
         {
           "day": null,
+          "doc_id": "https://www.tikr.com/blog/could-qualcomm-actually-climb-85-or-is-baird-totally-wrong?ref=yahoofinance&tlnk=yf-261118-fj25pvqf&.tsrc=rss",
+          "domain": "www.tikr.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-18T19:50:25+00:00",
+          "quality": 0.85,
+          "title": "Could Qualcomm Actually Climb 85%? Or Is Baird Totally Wrong?",
+          "uncertainty": 0.2976190476190476
+        },
+        {
+          "day": null,
+          "doc_id": "finnhub:143917145",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-18T14:00:00+00:00",
+          "quality": 0.85,
+          "title": "Sezzle Anywhere Launches in Canada, Bringing BNPL Everywhere Visa Is Accepted",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "finnhub:143895154",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-18T03:04:29+00:00",
+          "quality": 0.85,
+          "title": "A Retiree With $400,000 in His 401(k) Tries to Move Money Before Stocks Fall Further. Apple\u2019s Widespread Outage Raises the Stakes of a Missed Trade",
+          "uncertainty": 0.1953125
+        },
+        {
+          "day": null,
           "doc_id": "finnhub:143880610",
           "domain": "Yahoo",
           "escalated": true,
@@ -932,84 +1052,45 @@
         },
         {
           "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxPSUd5bmJLNXcyZzhfNFVPamhfUUJPSzR6SmJXcm5QSE9BSENwWUVrY3cyOHMwNzhEUzVTa3psRTE0N1lpc0pIcDVrNldzRUtGZ1MwNjV6WDRfY3d3aTMzUy1QNkZjYnFTZE4tMDBEcS1vclpyS3JEM3BPSXRTeUhULUlSYjN3X2ZVT2I0MlRKVzVDbmEwenA0c1FPV1REeXUxZVBKQWZPajTSAaQBQVVfeXFMT1lqSlJMUmFnUkd4WjY5OUxJWHhTOEF5b1JEYUhyaFBHcU5xQkpLcHFTUGExU3dmOWJWYnoxTGZYRlhWdHk0eGhLZnZqM0V1MnE1TmYxeHZsTlBFVGc0b09jcXFMOHRlUVlsLVBHWWFNTDZ6ckpoNE15VlhUZTZIcEowS2lFaTNpdzFodzRIdXJfV0FjSVBCSWRLb3ZQWm51YTh2S1Q?oc=5",
-          "domain": "www.gsmarena.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 1.0,
-          "published_at": "2026-11-17T22:02:02+00:00",
-          "quality": 0.65,
-          "title": "Samsung could beat Apple to market with a bezel-less phone display - GSMArena.com news",
-          "uncertainty": 0.8333333333333334
-        },
-        {
-          "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMimAFBVV95cUxPVWhVZVJKOElMempsZExBT1prSFNwUlZ5R181UUw1OWUtSGxEX2o4Ukx1VWwxSHRicjd6YmQtaV9TUnlQVS1mQkVka0hhalh4bF9ta2V3a3ZEdURkM3ZNckhmRXlzZkdQNGtoUl9odzFFSWoybm1RODh5VEhGRHNYNkJVRlpfaVlPWVJPZGczWHhXMzBGaTE0Qw?oc=5",
-          "domain": "kalkinemedia.com",
+          "doc_id": "https://stocktwits.com/news-articles/markets/equity/mp-to-become-major-domestic-permanent-magnet-supplier-over-next-3-years-says-needham/cNbgJ9JR9Ly?.tsrc=rss",
+          "domain": "stocktwits.com",
           "escalated": true,
           "intensity": 0.0,
           "kind": "",
           "polarity": 0.0,
-          "published_at": "2026-11-17T20:15:00+00:00",
+          "published_at": "2026-11-18T17:37:29+00:00",
           "quality": 0.65,
-          "title": "Will Apple (NASDAQ:AAPL) Benefit From Rising Margins?",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMikAFBVV95cUxNaUV5YWpra3YyQmljUk9yaVlOZ2lweGlFTmJueHByUEpVanVoQzRlN2RXMUJCalQyR2lWSk41NWRpd05NVXE3V2FnSjc3WWhvUGttUGRXeG4wN0V2b05ieDhMUkgtbUZ3ZVBUWExoalZ1Yzg1YTNLTFl3dTN6NTdSTGJTaHRXMDlZOU94ekk3b2E?oc=5",
-          "domain": "www.macrumors.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 0.0,
-          "published_at": "2026-11-17T16:29:51+00:00",
-          "quality": 0.65,
-          "title": "Former Apple Chairman Plans to Sell $32 Million in Apple Stock",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://www.nst.com.my/world/world/2026/11/1580144/websites-including-bbc-ikea-and-air-france-hit-attack",
-          "domain": "www.nst.com.my",
-          "escalated": false,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 0.0,
-          "published_at": "2026-11-17T23:40:43+00:00",
-          "quality": 1.0,
-          "title": "Websites including BBC, IKEA and Air France hit by attack",
+          "title": "MP To Become Major Domestic Permanent Magnet Supplier Over Next 3 Years, Says Needham",
           "uncertainty": 0.0
         }
       ],
       "tone": {
-        "intensity_max": 0.0,
-        "n": 29,
-        "polarity_mean": 0.034,
-        "sources": 20,
-        "uncertainty_mean": 0.041
+        "intensity_max": 0.333,
+        "n": 75,
+        "polarity_mean": 0.027,
+        "sources": 40,
+        "uncertainty_mean": 0.053
       },
       "upcoming": []
     },
     {
       "earnings": [],
-      "escalated": 14,
+      "escalated": 39,
       "events": [],
       "instrument_id": "XNAS:MSFT",
       "label": "Microsoft",
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-11-17",
+          "known_at": "2026-11-18",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
-          "value": "26.97"
+          "value": "26.36"
         },
         {
           "concept": "pb",
-          "known_at": "2026-11-17",
+          "known_at": "2026-11-18",
           "label": "P/B",
           "period_end": null,
           "source": "finnhub",
@@ -1017,7 +1098,7 @@
         },
         {
           "concept": "eps_ttm",
-          "known_at": "2026-11-17",
+          "known_at": "2026-11-18",
           "label": "EPS (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -1025,7 +1106,7 @@
         },
         {
           "concept": "dividend_yield",
-          "known_at": "2026-11-17",
+          "known_at": "2026-11-18",
           "label": "dividend yield",
           "period_end": null,
           "source": "finnhub",
@@ -1033,7 +1114,7 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-11-17",
+          "known_at": "2026-11-18",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
@@ -1041,7 +1122,7 @@
         },
         {
           "concept": "high_52w",
-          "known_at": "2026-11-17",
+          "known_at": "2026-11-18",
           "label": "52w high",
           "period_end": null,
           "source": "finnhub",
@@ -1049,7 +1130,7 @@
         },
         {
           "concept": "low_52w",
-          "known_at": "2026-11-17",
+          "known_at": "2026-11-18",
           "label": "52w low",
           "period_end": null,
           "source": "finnhub",
@@ -1097,19 +1178,19 @@
         },
         {
           "concept": "mx_news_sentiment",
-          "known_at": "2026-11-17",
+          "known_at": "2026-11-18",
           "label": "Marketaux sentiment",
-          "period_end": "2026-11-17",
+          "period_end": "2026-11-18",
           "source": "marketaux_news",
-          "value": "0.30"
+          "value": "0.21"
         },
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-17",
+          "known_at": "2026-11-18",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-17",
+          "period_end": "2026-11-18",
           "source": "finbert_tone",
-          "value": "0.06"
+          "value": "0.07"
         },
         {
           "concept": "revenue",
@@ -1139,6 +1220,19 @@
       "stories": [
         {
           "day": null,
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/microsoft-copilot-cost-advantage-claim-201123346.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-18T20:11:23+00:00",
+          "quality": 1.0,
+          "title": "Microsoft Copilot\u2019s cost advantage claim: plausible but unproven",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
           "doc_id": "https://finance.yahoo.com/video/nvidia-with-a-positive-q3-despite-sec-probing-nvidia-amid-huang-scandal-223224298.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
           "escalated": true,
@@ -1152,102 +1246,89 @@
         },
         {
           "day": null,
-          "doc_id": "https://www.thestreet.com/investing/bill-ackman-sells-microsoft-buys-netflix-13f?.tsrc=rss",
-          "domain": "www.thestreet.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": -1.0,
-          "published_at": "2026-11-17T22:33:00+00:00",
-          "quality": 0.85,
-          "title": "Bill Ackman\u2019s $14 billion bet beyond the Magnificent 7",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "finnhub:143884193",
+          "doc_id": "finnhub:143919966",
           "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "kind": "",
           "polarity": 0.0,
-          "published_at": "2026-11-17T18:15:00+00:00",
+          "published_at": "2026-11-18T19:00:00+00:00",
           "quality": 0.85,
-          "title": "Microsoft and organizations across industries launch AI Transparency Initiative to strengthen enterprise trust in AI models and agents",
+          "title": "Temporal Cloud Enters Public Preview on Microsoft Azure",
           "uncertainty": 0.0
         },
         {
           "day": null,
-          "doc_id": "finnhub:143882786",
+          "doc_id": "finnhub:143919969",
           "domain": "Yahoo",
           "escalated": true,
-          "intensity": 0.3333333333333333,
+          "intensity": 0.0,
           "kind": "",
           "polarity": 0.0,
-          "published_at": "2026-11-17T17:45:33+00:00",
+          "published_at": "2026-11-18T18:21:05+00:00",
           "quality": 0.85,
-          "title": "Oracle\u2019s 40% 6 Month Slide Continues: This Analyst Maintains His Buy Rating, Predicting 230% Returns",
-          "uncertainty": 0.24509803921568626
-        },
-        {
-          "day": null,
-          "doc_id": "finnhub:143885888",
-          "domain": "SeekingAlpha",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": -1.0,
-          "published_at": "2026-11-17T17:27:27+00:00",
-          "quality": 0.85,
-          "title": "Microsoft: Anthropic Is Moving Into Its Most Profitable Territory",
-          "uncertainty": 0.4166666666666667
-        },
-        {
-          "day": null,
-          "doc_id": "finnhub:143882778",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": -1.0,
-          "published_at": "2026-11-17T17:00:00+00:00",
-          "quality": 0.85,
-          "title": "Lucidity Launches the AI Action Engine to Turn Cloud Savings Into Delivered Results",
+          "title": "Microsoft, Intel Deepen Azure Partnership Amid Increasing AI, Cloud Demand",
           "uncertainty": 0.0
         },
         {
           "day": null,
-          "doc_id": "finnhub:143882781",
+          "doc_id": "finnhub:143918600",
           "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "kind": "",
           "polarity": 1.0,
-          "published_at": "2026-11-17T16:23:02+00:00",
+          "published_at": "2026-11-18T17:00:00+00:00",
           "quality": 0.85,
-          "title": "How Not Owning Microsoft Impacted the Fund\u2019s Relative Returns?",
+          "title": "Splashtop Joins Microsoft Virus Initiative, Strengthening Protection for Microsoft Environments",
           "uncertainty": 0.0
         },
         {
           "day": null,
-          "doc_id": "finnhub:143880639",
+          "doc_id": "finnhub:143918611",
           "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "kind": "",
           "polarity": 0.0,
-          "published_at": "2026-11-17T15:15:00+00:00",
+          "published_at": "2026-11-18T16:30:00+00:00",
           "quality": 0.85,
-          "title": "Action1 Extends Microsoft Intune Capabilities Without Expanding the Attack Surface",
+          "title": "Ivanti Unlocks Governed AI Access to Organizations by Providing Trusted Context and Control for Customers' AI Clients of Choice through GitHub Copilot Adoption",
           "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "finnhub:143918605",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-18T16:04:00+00:00",
+          "quality": 0.85,
+          "title": "Microsoft Corporation (MSFT) Surged on Strong Azure Growth and AI-related Demand",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "finnhub:143918003",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-18T16:00:00+00:00",
+          "quality": 0.85,
+          "title": "Commvault Expands Microsoft Security Integration to Turn Threat Intelligence into Recovery Action",
+          "uncertainty": 0.7352941176470588
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 50,
-        "polarity_mean": -0.04,
-        "sources": 20,
-        "uncertainty_mean": 0.043
+        "n": 144,
+        "polarity_mean": 0.076,
+        "sources": 40,
+        "uncertainty_mean": 0.058
       },
       "upcoming": []
     }
