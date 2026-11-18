@@ -21,6 +21,7 @@ from knowledge.sources.finnhub import FinnhubCollector
 from knowledge.sources.fmp import FmpCollector
 from knowledge.sources.fred import FredCollector
 from knowledge.sources.jin10 import Jin10CalendarCollector, Jin10FlashCollector
+from knowledge.sources.lse import LseCalendar, LseMalaysiaMacro, LseOptions, LsePrices
 from knowledge.sources.marketaux import MarketauxNews
 from knowledge.sources.sec_xbrl import SecCompanyFacts
 from knowledge.sources.twse import TwseOpenApiCollector
@@ -47,6 +48,10 @@ COLLECTORS: dict[str, type[Collector]] = {
     "finmind": FinMindCollector,
     "sec_xbrl": SecCompanyFacts,
     "eodhd": EodhdFundamentals,
+    "lse_macro_my": LseMalaysiaMacro,
+    "lse_calendar": LseCalendar,
+    "lse_options": LseOptions,
+    "lse_prices": LsePrices,
     "finbert_tone": FinbertTone,
 }
 

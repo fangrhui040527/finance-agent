@@ -1187,3 +1187,40 @@ does not search. Work it in this order:
 
 **Do not silence it by shortening the window.** The window is what makes a
 genuine quiet spell distinguishable from a broken query.
+
+## London Strategic Edge: four collectors on one key, private repository only (2026-11-03)
+
+`knowledge/sources/lse.py`, key `LSE_API_KEY` (LSE Data 3.0,
+`https://download.londonstrategicedge.com/v3`, the key sent in `X-API-Key`).
+The free plan allows 60 calls a minute and 12.5 GiB of downloads a week.
+
+| Source | Slots | What it stores |
+|---|---|---|
+| `lse_macro_my` | `bursa_close` | 15 Malaysian macro series and the MGS 3Y/5Y/10Y yields, as series `LSE:<code>` (400 days read back each run) |
+| `lse_calendar` | `bursa_close`, `us_close` | MY and US releases from 3 days back to 45 ahead, as `MACRO:<country>` events: `macro_release` when scheduled, `macro_print` with actual vs consensus |
+| `lse_options` | `us_close`, US names | `lse_atm_iv_30d` (the at-the-money IV at the expiry nearest 30 days, mean of call and put) and `lse_put_call_volume_ratio` |
+| `lse_prices` | `us_close`, US names | `lse_close`, the adjusted daily close with OHLCV in the payload, a second source beside Yahoo's |
+
+LSE does not carry Bursa stocks or the FBM KLCI. It adds context for the Bursa
+names, not prices for them.
+
+**The licence.** From the `lse-data` client's README and
+londonstrategicedge.com/terms: data fetched with an LSE key may be used for
+your own research, trading and model training, and "may not be redistributed,
+resold, or otherwise made available to third parties". This repository commits
+its stores and writes pages that quote them. So:
+
+- Every `lse_*` collector checks `LSE_REPO_PRIVATE` before it sends a request.
+  Anything but `true` is a SKIPPED row, *not collected: LSE's terms forbid...*,
+  never a failure and never a fetch.
+- collect.yml sets `LSE_REPO_PRIVATE` from the repository's own visibility
+  (`gh api repos/<owner>/<repo> --jq .private`) on every run. If that call
+  fails, the value is `false`.
+- **Making the repository public again would publish all LSE data its history
+  holds.** That is in `data/facts.db` and in every page that quotes it.
+  Removing it from the history means rewriting history, which is the owner's
+  decision. Turn the four collectors off in `config.toml` first.
+
+Expired or refused keys: `KeyRejected` on a 401/403, like every other vendor.
+A selection with no stored rows answers `404 data-unavailable`. For prices and
+the calendar that is a note on the row, not a failure.
