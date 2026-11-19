@@ -1,29 +1,38 @@
 # Digest 2026-11-19
 
-Generated 2026-11-19 02:34 UTC · slot `all` · 40840 articles in the corpus, 8119 observations, 4367 events in the fact book.
+Generated 2026-11-19 10:08 UTC · slot `all` · 41062 articles in the corpus, 8136 observations, 4367 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- quiet: nothing collected for this name in the window
+- tone: 2 stories from 2 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-11-19 kalkine.com.au — Maybank Securities Pte. Ltd. Reduces Substantial Holding in Sky Metals to 5.84% After DVP Sales [q 0.65, tone +0.0]
+- 2026-11-19 newswav.com — Former Maybank Headquarters Listed for Sale at Up to RM780 Million [q 0.65, tone +0.0]
+- snapshot: FinBERT headline tone -0.01 (finbert_tone, 2026-11-19)
 
 ### Tenaga (MYX:5347)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-11-19 www.nst.com.my — US company NTEC signs US$100mil coal supply deal with TNB unit [q 1.00, tone +0.0]
+- snapshot: FinBERT headline tone 0.74 (finbert_tone, 2026-11-19)
 
 ### Petronas Chemicals (MYX:5183)
 - quiet: nothing collected for this name in the window
 
 ### IHH (MYX:5225)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-11-19 www.tipranks.com — EPF Reports Acquisition of 2.033 Million IHH Shares [q 0.65, tone +0.0]
+- snapshot: FinBERT headline tone 0.04 (finbert_tone, 2026-11-19)
 
 ### Press Metal (MYX:8869)
 - quiet: nothing collected for this name in the window
 
 ### Genting (MYX:3182)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-11-19 www.theedgemarkets.com — Genting group succeeds in halting Sycal's Genting Sky City project [q 0.80, tone +0.0]
+- snapshot: FinBERT headline tone 0.12 (finbert_tone, 2026-11-19)
 
 ### NVIDIA (XNAS:NVDA)
-- tone: 141 stories from 37 sources, polarity +0.10, peak intensity 0.33, uncertainty 0.11 · 53 escalated
+- tone: 141 stories from 38 sources, polarity +0.10, peak intensity 0.33, uncertainty 0.11 · 53 escalated
 - 2026-11-18 finance.yahoo.com — Trump and Xi to Discuss Trade at APEC Summit. What Isn’t Said May Matter More. [q 1.00, tone +0.0] ★
 - 2026-11-18 www.ibtimes.com — Nvidia's AI Boom Faces Three Major Tests. Investor Flags Risks Beyond Record Sales. [q 0.85, tone +1.0] ★
 - 2026-11-18 www.fool.com — Stock Market Today, Nov. 18: CoreWeave Slides as Nvidia's Blowout Earnings Fail to Ease Debt Concerns [q 0.85, tone +1.0] ★
@@ -80,6 +89,21 @@ Generated 2026-11-19 02:34 UTC · slot `all` · 40840 articles in the corpus, 81
 | 10y minus 2y Treasury spread, % | 0.30 | 2026-11-17 | +0.01 | fred |
 | US unemployment rate, % | 4.10 | 2026-10-01 | -0.1 | fred |
 | CBOE VIX, index | 25.46 | 2026-11-17 | +2.55 | fred |
+
+## Collection
+
+| at (UTC) | source | status | fetched | kept | stored | detail |
+|---|---|---|---|---|---|---|
+| 10:07 | finbert_tone | ok | 14 | 0 | 0 | facts 12; scored 9 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized. |
+| 10:07 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
+| 10:07 | twse_openapi | ok | 8 | 0 | 0 | facts 5;  |
+| 10:07 | jin10_flash | degraded | 15 | 13 | 13 | facts 0; window not covered back to 2026-11-18 22:41Z; the oldest item read is 2 |
+| 10:07 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 10:07 | nst_business | degraded | 150 | 149 | 136 | window overflow: all 150 dated items are newer than the window's start (2026-11- |
+| 10:07 | fmt_business | degraded | 50 | 50 | 49 | window overflow: all 50 dated items are newer than the window's start (2026-11-1 |
+| 10:07 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: IHH, Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals |
+| 10:07 | google_news | ok | 33 | 33 | 24 | named the company: 5 of 33 (lowest: Petronas Chemicals 0/3, Press Metal 0/5, Ten |
+| 10:07 | gdelt | throttled | 0 | 0 | 0 | throttled: no name could be read (3 failed, 0 not reached). First: GDELT fetch f |
 
 ---
 

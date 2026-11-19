@@ -1,18 +1,109 @@
 {
-  "collection": [],
+  "collection": [
+    {
+      "at": "2026-11-19T10:07:35.223991+00:00",
+      "detail": "facts 12; scored 9 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized.onnx",
+      "fetched": 14,
+      "kept": 0,
+      "source": "finbert_tone",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-19T10:07:34.740348+00:00",
+      "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-19T10:07:34.738771+00:00",
+      "detail": "facts 5; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-19T10:07:29.735328+00:00",
+      "detail": "facts 0; window not covered back to 2026-11-18 22:41Z; the oldest item read is 2026-11-19 10:01Z, so 11.3h of the window was never served",
+      "fetched": 15,
+      "kept": 13,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 13
+    },
+    {
+      "at": "2026-11-19T10:07:28.361473+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-19T10:07:26.514340+00:00",
+      "detail": "window overflow: all 150 dated items are newer than the window's start (2026-11-18 10:07Z); the oldest is 2026-11-18 22:22Z, so 12.3h scrolled off unseen; read 3 pages, the most this feed may; page 2 starts 2.3h before page 1 ends (2026-11-19 05:13Z under 2026-11-19 07:30Z): the items between were served by neither",
+      "fetched": 150,
+      "kept": 149,
+      "source": "nst_business",
+      "status": "degraded",
+      "stored": 136
+    },
+    {
+      "at": "2026-11-19T10:07:22.462590+00:00",
+      "detail": "window overflow: all 50 dated items are newer than the window's start (2026-11-18 10:07Z); the oldest is 2026-11-18 21:38Z, so 11.5h scrolled off unseen",
+      "fetched": 50,
+      "kept": 50,
+      "source": "fmt_business",
+      "status": "degraded",
+      "stored": 49
+    },
+    {
+      "at": "2026-11-19T10:07:21.896828+00:00",
+      "detail": "read but empty: IHH, Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-19T10:07:20.793814+00:00",
+      "detail": "named the company: 5 of 33 (lowest: Petronas Chemicals 0/3, Press Metal 0/5, Tenaga 0/3)",
+      "fetched": 33,
+      "kept": 33,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 24
+    },
+    {
+      "at": "2026-11-19T10:07:18.060062+00:00",
+      "detail": "throttled: no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked); deferred: Maybank, Tenaga, Petronas Chemicals",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "throttled",
+      "stored": 0
+    }
+  ],
   "counts": {
-    "articles": 40840,
+    "articles": 41062,
     "documents": 0,
     "escalated": 5483,
     "events": 4367,
     "failed_sweeps": 114,
-    "linked": 20596,
-    "observations": 8119,
+    "linked": 20605,
+    "observations": 8136,
     "series": 31,
-    "sweeps": 1711
+    "sweeps": 1721
   },
   "day": "2026-11-19",
-  "generated_at": "2026-11-19 02:34 UTC",
+  "generated_at": "2026-11-19 10:08 UTC",
   "macro": [
     {
       "change": "0.09",
@@ -153,15 +244,48 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-18",
+          "known_at": "2026-11-19",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-18",
+          "period_end": "2026-11-19",
           "source": "finbert_tone",
-          "value": "-0.07"
+          "value": "-0.01"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMizgFBVV95cUxQQ0I2Ri00ZnU3V1BORzh1TmJmbTFPdEtzdHVaY0ZKRlByRjFyWG9oaWNvWkg5S1NaZ3pjV05vUlJyYkdUcFFZOFVzY0g1MnFHQXM5d0ZKcG0yOXpVNnh4cGdSaDJRMFhoQ2Z3Vy1qRnowbzdGak5XS0w5X09lR0lOTE5uYzVHb3ZwMDZsZlMtbm5qOXR1YU0zUXp6X2NrbmFIZEFkQVVxN1FQUnVUN2tPNHVUZTFudGYxMndscFRWRzI1TkM1TmhWZ3dOYjVjZw?oc=5",
+          "domain": "kalkine.com.au",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-19T09:03:31+00:00",
+          "quality": 0.65,
+          "title": "Maybank Securities Pte. Ltd. Reduces Substantial Holding in Sky Metals to 5.84% After DVP Sales",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxQTkNiUS1fTThIMkxrWkpEbzlSaFB1SjRPUnd0Mi1XZnplSmFvQXVlMXdPQkZoQ21BR1VYLWlDcXJSX1VPSERLeXRwSHhxUU1tUDRrLTVUWjYtbjhZM3dPaFl5UmRCQk9iWktSSGJBOG5HNzVQS3BCTW1ZSnlNMTJLdllCaWZ1cmlERmU3SlVHT3pONHhmU2hqMHMyOV84NDM3Q3pzbWlzUndsRHc?oc=5",
+          "domain": "newswav.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-19T07:00:14+00:00",
+          "quality": 0.65,
+          "title": "Former Maybank Headquarters Listed for Sale at Up to RM780 Million",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 2,
+        "polarity_mean": 0.0,
+        "sources": 2,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -173,15 +297,35 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-18",
+          "known_at": "2026-11-19",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-18",
+          "period_end": "2026-11-19",
           "source": "finbert_tone",
-          "value": "0.08"
+          "value": "0.74"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://www.nst.com.my/business/corporate/2026/11/1581091/us-company-ntec-signs-us100mil-coal-supply-deal-tnb-unit",
+          "domain": "www.nst.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-19T03:43:36+00:00",
+          "quality": 1.0,
+          "title": "US company NTEC signs US$100mil coal supply deal with TNB unit",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -213,15 +357,35 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-18",
+          "known_at": "2026-11-19",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-17",
+          "period_end": "2026-11-19",
           "source": "finbert_tone",
-          "value": "-0.23"
+          "value": "0.04"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMipgFBVV95cUxPNTRSR1JmMk9uVnB3RWQ1dHFPUWdTT3ZYV0s2eW9ubHJjRWNYZDNvSEo0YjNfX3B0WlgweG9nZndIdVBDQThaMmE1NVREaHBXMlI2WGpGejJmRkg2Smxpd3VNOHJxQXJxaW91aTlmSGh5VVFFT0pGeEFMY21ZLW9IRFRyYXdVTkhuZnprcTBMUXBXTjItaEdQWk82XzZhZF9seXhrTDNR?oc=5",
+          "domain": "www.tipranks.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-19T09:37:23+00:00",
+          "quality": 0.65,
+          "title": "EPF Reports Acquisition of 2.033 Million IHH Shares",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -253,15 +417,35 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-16",
+          "known_at": "2026-11-19",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-15",
+          "period_end": "2026-11-19",
           "source": "finbert_tone",
-          "value": "-0.35"
+          "value": "0.12"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiU0FVX3lxTE1NVEh2Ty1WUnJvMVJRcjV6YkFEbTNfdzNPNzVlTWNNY1BaQmdhQVpnZGR0QTJwc2J4WE5NMldfT285MFl2eVp5c2pQVVA2ekdtS013?oc=5",
+          "domain": "www.theedgemarkets.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-19T01:21:30+00:00",
+          "quality": 0.8,
+          "title": "Genting group succeeds in halting Sycal's Genting Sky City project",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -526,7 +710,7 @@
         "intensity_max": 0.333,
         "n": 141,
         "polarity_mean": 0.098,
-        "sources": 37,
+        "sources": 38,
         "uncertainty_mean": 0.109
       },
       "upcoming": [
