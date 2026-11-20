@@ -1,6 +1,6 @@
 # Digest 2026-11-20
 
-Generated 2026-11-20 20:40 UTC · slot `all` · 41897 articles in the corpus, 8230 observations, 4371 events in the fact book.
+Generated 2026-11-20 22:42 UTC · slot `all` · 42421 articles in the corpus, 8285 observations, 4375 events in the fact book.
 
 ## The book
 
@@ -39,41 +39,42 @@ Generated 2026-11-20 20:40 UTC · slot `all` · 41897 articles in the corpus, 82
 - snapshot: FinBERT headline tone 0.10 (finbert_tone, 2026-11-20)
 
 ### NVIDIA (XNAS:NVDA)
-- tone: 88 stories from 34 sources, polarity +0.13, peak intensity 0.67, uncertainty 0.10 · 29 escalated
+- tone: 239 stories from 47 sources, polarity +0.03, peak intensity 0.67, uncertainty 0.10 · 90 escalated
 - 2026-11-20 www.nst.com.my — Tech takes a beating as Anthropic surge fails to ease AI worries [q 1.00, tone +0.3] ★
 - 2026-11-20 www.nst.com.my — US approved nearly 900,000 AI chip shipments to China in six months [q 1.00, tone +1.0] ★
 - 2026-11-19 finance.yahoo.com — Anthropic soars in record Wall Street debut [q 1.00, tone +1.0] ★
 - 2026-11-19 www.nst.com.my — Anthropic raises record US$81.3bil in blockbuster IPO [q 1.00, tone +1.0] ★
-- 2026-11-19 Yahoo — Jensen Huang's Nvidia comeback: Why the math doesn't add up [q 0.85, tone +0.0] ★
-- 2026-11-19 Yahoo — Nvidia will not be the leader 5 years from now: Tiernan Ray [q 0.85, tone +0.0] ★
-- 2026-11-19 saastr.com — 20VC x SaaStr: Jensen Out at Nvidia, Anthropic’s $1.4 Trillion IPO, and HubSpot Brings Back Brian Halligan [q 0.85, tone +0.0] ★
-- 2026-11-19 Yahoo — $310 And Falling: Why Nvidia’s Turmoil and AI Server Margin Pressure Are Dragging Dell Lower Before Earnings [q 0.85, tone +0.0] ★
+- 2026-11-20 www.tikr.com — Trump’s Treasury Secretary Keeps Nvidia’s H200 China Policy as House Data Show Nearly 880,000 AI Chips Approved [q 0.85, tone +1.0] ★
+- 2026-11-20 www.tikr.com — Navitas Sinks 15%, Western Down 12%, Everpure Down 13% as AI Chip Rout Deepens [q 0.85, tone -1.0] ★
+- 2026-11-20 Yahoo — Trump Bought At Least $5 Million Of This Dividend ETF Before AI Sell-Off [q 0.85, tone +1.0] ★
+- 2026-11-20 Yahoo — SemiAnalysis Just Slashed Its AI Compute Forecast by $608 Billion [q 0.85, tone +0.0] ★
 - upcoming 2026-11-25 earnings_result — Q3 2027 results after the close (finnhub)
-- snapshot: P/E (ttm) 16.08 (finnhub, 2026-11-19) · P/B 28.81 (finnhub, 2026-11-19) · EPS (ttm) 9.31 (finnhub, 2026-11-19) · dividend yield 0.03 (finnhub, 2026-11-19) · beta 2.41 (finnhub, 2026-11-19) · 52w high 243.37 (finnhub, 2026-11-19) · 52w low 148.80 (finnhub, 2026-11-19) · target (consensus) 275.86 (fmp, 2026-11-20) · analysts: buy 41 (finnhub, 2026-11-02) · analysts: hold 2 (finnhub, 2026-11-02) · analysts: sell 1 (finnhub, 2026-11-02) · vendor sentiment 0.25 (alphavantage_news, 2026-10-06) · Marketaux sentiment 0.18 (marketaux_news, 2026-11-15) · FinBERT headline tone 0.01 (finbert_tone, 2026-11-19) · revenue (last quarter) 96.22bn (sec_xbrl, 2026-08-26) · net income (last quarter) 59.69bn (sec_xbrl, 2026-08-26) · last EPS surprise % 6.14 (finnhub, 2026-11-18)
+- snapshot: P/E (ttm) 16.08 (finnhub, 2026-11-20) · P/B 28.81 (finnhub, 2026-11-20) · EPS (ttm) 9.31 (finnhub, 2026-11-20) · dividend yield 0.03 (finnhub, 2026-11-20) · beta 2.41 (finnhub, 2026-11-20) · 52w high 243.37 (finnhub, 2026-11-20) · 52w low 148.80 (finnhub, 2026-11-20) · target (consensus) 275.86 (fmp, 2026-11-20) · analysts: buy 41 (finnhub, 2026-11-02) · analysts: hold 2 (finnhub, 2026-11-02) · analysts: sell 1 (finnhub, 2026-11-02) · vendor sentiment 0.25 (alphavantage_news, 2026-10-06) · Marketaux sentiment 0.18 (marketaux_news, 2026-11-15) · FinBERT headline tone -0.09 (finbert_tone, 2026-11-20) · revenue (last quarter) 96.22bn (sec_xbrl, 2026-08-26) · net income (last quarter) 59.69bn (sec_xbrl, 2026-08-26) · last EPS surprise % 6.14 (finnhub, 2026-11-18)
 
 ### Apple (XNAS:AAPL)
-- tone: 39 stories from 18 sources, polarity +0.20, peak intensity 0.33, uncertainty 0.15 · 13 escalated
+- tone: 123 stories from 43 sources, polarity +0.11, peak intensity 0.33, uncertainty 0.11 · 35 escalated
+- 2026-11-20 finance.yahoo.com — Apple Working on Own AI Agent to Rival OpenAI and Anthropic [q 1.00, tone +0.0] ★
+- 2026-11-20 finance.yahoo.com — Underweighting Apple (AAPL) Detracts from the Fund’s Relative Quarterly Returns [q 1.00, tone +1.0] ★
 - 2026-11-19 finance.yahoo.com — Apple’s head of iPhone camera software retires after eight years - Bloomberg [q 1.00, tone +1.0] ★
+- 2026-11-20 www.tikr.com — Shots Fired: Meta Will Reportedly Sell a $300 Muse Charm With Free Verizon 5G as Apple Builds Its Agent [q 0.85, tone +0.0] ★
+- 2026-11-20 financefeeds.com — Anthropic Stock Falls 12% to $85.52, Nears $83 IPO Price [q 0.85, tone -1.0] ★
+- 2026-11-20 Yahoo — 3 Tech Dividend Stocks Retirees Shouldn’t Overlook [q 0.85, tone +1.0] ★
+- 2026-11-20 CNBC — Apple job posting shows plans to build its own AI agent: Report [q 0.85, tone +0.0] ★
 - 2026-11-19 Yahoo — Samsung Electronics (KOSE:A005930) Stock Still Looks Undervalued on Earnings [q 0.85, tone +1.0] ★
-- 2026-11-19 Yahoo — The outages keep coming. Some Americans are preparing for a collapse. [q 0.85, tone +0.0] ★
-- 2026-11-19 Yahoo — Connected Health Devices - Global Strategic Business Report 2026: Capitalize on 21.3% CAGR and $11.6B Revenue Opportunity by 2032 with Apple, Medtronic, Microsoft, Roche and Epic Systems [q 0.85, tone +1.0] ★
-- 2026-11-19 finance.yahoo.com — Apple Marks a Big Moment for Its Free Radio Bet [q 0.80, tone +0.0] ★
-- 2026-11-19 finance.yahoo.com — Services Franchise and Installed Base Anchor Apple’s (AAPL) Durable Earnings Growth [q 0.80, tone +1.0] ★
-- 2026-11-19 www.foreignpolicyjournal.com — Nvidia's (NASDAQ: NVDA) $390 Billion Memory Stockpile Deepens Apple's (NASDAQ: AAPL) Margin Crisis Through 2027 [q 0.65, tone +0.0] ★
-- 2026-11-19 www.thestreet.com — Roundtable 100 analysts lift Apple on record R&D spend [q 0.65, tone +1.0] ★
-- snapshot: P/E (ttm) 38.81 (finnhub, 2026-11-19) · P/B 44.06 (finnhub, 2026-11-19) · EPS (ttm) 8.97 (finnhub, 2026-11-19) · dividend yield 0.51 (finnhub, 2026-11-19) · beta 1.07 (finnhub, 2026-11-19) · 52w high 360.83 (finnhub, 2026-11-19) · 52w low 243.42 (finnhub, 2026-11-19) · target (consensus) 341.03 (fmp, 2026-11-20) · analysts: buy 19 (finnhub, 2026-11-02) · analysts: hold 15 (finnhub, 2026-11-02) · analysts: sell 3 (finnhub, 2026-11-02) · vendor sentiment -0.23 (alphavantage_news, 2026-10-06) · Marketaux sentiment 0.30 (marketaux_news, 2026-11-19) · FinBERT headline tone 0.15 (finbert_tone, 2026-11-19) · revenue (last quarter) 114.48bn (sec_xbrl, 2026-11-03) · net income (last quarter) 30.71bn (sec_xbrl, 2026-11-03) · last EPS surprise % 3.64 (finnhub, 2026-11-08)
+- event 2026-11-19 insider_filing — 4: FORM 4 (edgar)
+- snapshot: P/E (ttm) 38.46 (finnhub, 2026-11-20) · P/B 44.06 (finnhub, 2026-11-20) · EPS (ttm) 8.97 (finnhub, 2026-11-20) · dividend yield 0.51 (finnhub, 2026-11-20) · beta 1.07 (finnhub, 2026-11-20) · 52w high 360.83 (finnhub, 2026-11-20) · 52w low 243.42 (finnhub, 2026-11-20) · target (consensus) 341.03 (fmp, 2026-11-20) · analysts: buy 19 (finnhub, 2026-11-02) · analysts: hold 15 (finnhub, 2026-11-02) · analysts: sell 3 (finnhub, 2026-11-02) · vendor sentiment -0.23 (alphavantage_news, 2026-10-06) · Marketaux sentiment 0.23 (marketaux_news, 2026-11-20) · FinBERT headline tone 0.05 (finbert_tone, 2026-11-20) · revenue (last quarter) 114.48bn (sec_xbrl, 2026-11-03) · net income (last quarter) 30.71bn (sec_xbrl, 2026-11-03) · last EPS surprise % 3.64 (finnhub, 2026-11-08)
 
 ### Microsoft (XNAS:MSFT)
-- tone: 46 stories from 20 sources, polarity +0.15, peak intensity 0.33, uncertainty 0.07 · 18 escalated
-- 2026-11-19 saastr.com — 20VC x SaaStr: Jensen Out at Nvidia, Anthropic’s $1.4 Trillion IPO, and HubSpot Brings Back Brian Halligan [q 0.85, tone +0.0] ★
-- 2026-11-19 Yahoo — Accelerating Azure Growth and Copilot Adoption Fuel Microsoft Corp.’s (MSFT) AI Momentum [q 0.85, tone +1.0] ★
-- 2026-11-19 insidermonkey.com — What Makes Microsoft Corporation (MSFT) a Strong Long-Term Bet? [q 0.85, tone +1.0] ★
-- 2026-11-19 Yahoo — Microsoft (MSFT) Secures New AI Chip Supply Deal For Azure Growth [q 0.85, tone +1.0] ★
-- 2026-11-19 Yahoo — The outages keep coming. Some Americans are preparing for a collapse. [q 0.85, tone +0.0] ★
-- 2026-11-19 Yahoo — Connected Health Devices - Global Strategic Business Report 2026: Capitalize on 21.3% CAGR and $11.6B Revenue Opportunity by 2032 with Apple, Medtronic, Microsoft, Roche and Epic Systems [q 0.85, tone +1.0] ★
-- 2026-11-19 Yahoo — InstaLILY Launches Lily for Sales on Microsoft Dynamics 365, Where Sellers and AI Agents Work Together in Shared Rooms [q 0.85, tone +1.0] ★
-- 2026-11-19 Yahoo — Profound brings your AI Marketer into Microsoft Teams and Microsoft 365 [q 0.85, tone +0.0] ★
-- snapshot: P/E (ttm) 26.41 (finnhub, 2026-11-19) · P/B 6.26 (finnhub, 2026-11-19) · EPS (ttm) 19.15 (finnhub, 2026-11-19) · dividend yield 0.79 (finnhub, 2026-11-19) · beta 1.06 (finnhub, 2026-11-19) · 52w high 559.15 (finnhub, 2026-11-19) · 52w low 349.20 (finnhub, 2026-11-19) · target (consensus) 617.36 (fmp, 2026-11-20) · analysts: buy 40 (finnhub, 2026-11-02) · analysts: hold 3 (finnhub, 2026-11-02) · analysts: sell 0 (finnhub, 2026-11-02) · vendor sentiment 0.29 (alphavantage_news, 2026-10-06) · Marketaux sentiment 0.36 (marketaux_news, 2026-11-19) · FinBERT headline tone 0.18 (finbert_tone, 2026-11-19) · revenue (last quarter) 92.28bn (sec_xbrl, 2026-10-28) · net income (last quarter) 36.63bn (sec_xbrl, 2026-10-28) · last EPS surprise % 1.53 (finnhub, 2026-10-28)
+- tone: 106 stories from 35 sources, polarity +0.17, peak intensity 0.33, uncertainty 0.08 · 36 escalated
+- 2026-11-20 Yahoo — Microsoft's Copilot strategy offers path to enterprise AI growth, says Bank of America [q 0.85, tone +1.0] ★
+- 2026-11-20 Yahoo — Intel Wins Microsoft AI Chip Business as Foundry Turnaround Faces New Test [q 0.85, tone +1.0] ★
+- 2026-11-20 Yahoo — Network Infrastructure and Software Market Report 2026: Global Size, Trends and Forecast to 2030 | Capitalize on Edge and Multi-Cloud Growth with AWS, Microsoft, Cisco, and Huawei [q 0.85, tone +1.0] ★
+- 2026-11-20 Yahoo — Global Data Protection and Replication Solutions Market Report 2026 | Capitalize on $18.5B by 2030 as Microsoft, Dell, IBM, Veeam, and Rubrik Drive Ransomware-Resilient Backups [q 0.85, tone +1.0] ★
+- 2026-11-20 Yahoo — Global Bias Monitors for Targeting Market Report 2026 | Capitalize on 22.3% CAGR as Google, Microsoft, IBM, Credo AI, and Fiddler Labs Accelerate Real-Time AI Governance [q 0.85, tone +1.0] ★
+- 2026-11-20 Yahoo — 3 Tech Dividend Stocks Retirees Shouldn’t Overlook [q 0.85, tone +1.0] ★
+- 2026-11-20 Yahoo — Did Microsoft Azure Deal Just Shift Intel's (INTC) Investment Narrative? [q 0.85, tone +1.0] ★
+- 2026-11-20 Yahoo — This Week In Cloud AI - AI Action Engine Revolutionizes Cloud Cost Management [q 0.85, tone +1.0] ★
+- snapshot: P/E (ttm) 26.41 (finnhub, 2026-11-20) · P/B 6.26 (finnhub, 2026-11-20) · EPS (ttm) 19.15 (finnhub, 2026-11-20) · dividend yield 0.79 (finnhub, 2026-11-20) · beta 1.06 (finnhub, 2026-11-20) · 52w high 559.15 (finnhub, 2026-11-20) · 52w low 349.20 (finnhub, 2026-11-20) · target (consensus) 617.36 (fmp, 2026-11-20) · analysts: buy 40 (finnhub, 2026-11-02) · analysts: hold 3 (finnhub, 2026-11-02) · analysts: sell 0 (finnhub, 2026-11-02) · vendor sentiment 0.29 (alphavantage_news, 2026-10-06) · Marketaux sentiment 0.07 (marketaux_news, 2026-11-20) · FinBERT headline tone 0.04 (finbert_tone, 2026-11-20) · revenue (last quarter) 92.28bn (sec_xbrl, 2026-10-28) · net income (last quarter) 36.63bn (sec_xbrl, 2026-10-28) · last EPS surprise % 1.53 (finnhub, 2026-10-28)
 
 ## Macro
 
@@ -100,6 +101,15 @@ Generated 2026-11-20 20:40 UTC · slot `all` · 41897 articles in the corpus, 82
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 22:42 | finbert_tone | ok | 12 | 0 | 0 | facts 12; scored 585 titles with Xenova/finbert@8f269abebfdd onnx/model_quantize |
+| 22:41 | eodhd | ok | 0 | 0 | 0 | skipped: every asked name was refused: outside the plan or over today's credits  |
+| 22:41 | jin10_flash | ok | 20 | 19 | 18 | facts 0;  |
+| 22:41 | marketaux_news | ok | 49 | 49 | 47 | facts 4; XNAS:AAPL: 2026-11-19 not aggregated - 8 full pages ended part-way thro |
+| 22:41 | finnhub | ok | 378 | 333 | 262 | facts 42;  |
+| 22:41 | edgar | ok | 1 | 0 | 0 | facts 1;  |
+| 22:41 | yahoo_rss | ok | 51 | 51 | 35 | named the company: 23 of 51 (lowest: Microsoft 6/18, NVIDIA 7/17, Apple 10/16) |
+| 22:41 | google_news | ok | 184 | 177 | 162 | named the company: 162 of 177 (lowest: Apple 62/69, Microsoft 27/30, NVIDIA 73/7 |
+| 22:41 | gdelt | throttled | 0 | 0 | 0 | throttled: no name could be read (3 failed, 0 not reached). First: GDELT fetch f |
 | 20:40 | dbnomics | ok | 450 | 0 | 0 | facts 0;  |
 | 20:40 | jin10_flash | degraded | 21 | 18 | 18 | facts 0; window not covered back to 2026-11-20 10:07Z; the oldest item read is 2 |
 | 20:40 | fred | ok | 495 | 0 | 0 | facts 10; release calendar: 'FOMC Press Release' listed on 15 days of the fortni |
