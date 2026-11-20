@@ -92,18 +92,18 @@
     }
   ],
   "counts": {
-    "articles": 41871,
+    "articles": 41879,
     "documents": 0,
-    "escalated": 5579,
+    "escalated": 5580,
     "events": 4369,
     "failed_sweeps": 114,
-    "linked": 20936,
+    "linked": 20939,
     "observations": 8218,
     "series": 31,
     "sweeps": 1744
   },
   "day": "2026-11-20",
-  "generated_at": "2026-11-20 10:08 UTC",
+  "generated_at": "2026-11-20 17:50 UTC",
   "macro": [
     {
       "change": "0.04",
@@ -384,6 +384,19 @@
       ],
       "stories": [
         {
+          "day": "2026-11-21",
+          "doc_id": "web_search:https://www.thestar.com.my/business/business-news/2026/11/20/bursa-malaysia-falls-as-wall-st-sell-off-spills-over",
+          "domain": "www.thestar.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-20T17:50:42.559201+00:00",
+          "quality": 1.0,
+          "title": "Bursa Malaysia falls as Wall St sell-off spills over",
+          "uncertainty": 0.0
+        },
+        {
           "day": null,
           "doc_id": "https://news.google.com/rss/articles/CBMi3gFBVV95cUxQRVlFY055TlVFTjJRY1VpckJvVkJvblhBYm9wQnNnQkNsWUg0VDY3bmFlaFZRbWtEUFBGN3pjNGVxVTE3aHl5RE5DMFlwTmJIUVBBUFNycjU4SmZtdkx4VWFTODFUckFoZnYtRzVlcVo5bnVSTVBZNDR5X1VIN3hHSDhtdm9ONWg3aV9RSzVzVjRDRkRWOU9oZmQwMlZLSDZIQmRWR0l5ODl4TWt3UlkxSWVhQVpqT3RlbDd2dG5acnE1ay1lZHA2WjlBZVN1LWpYb2sxUUNTS3BoZ1NHcFE?oc=5",
           "domain": "www.thestar.com.my",
@@ -399,7 +412,7 @@
       ],
       "tone": {
         "intensity_max": 0.0,
-        "n": 1,
+        "n": 2,
         "polarity_mean": 0.0,
         "sources": 1,
         "uncertainty_mean": 0.0
@@ -462,8 +475,28 @@
           "value": "0.66"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": "2026-11-21",
+          "doc_id": "web_search:https://www.thestar.com.my/business/business-news/2026/11/20/bursa-malaysia-falls-as-wall-st-sell-off-spills-over",
+          "domain": "www.thestar.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-20T17:50:42.559201+00:00",
+          "quality": 1.0,
+          "title": "Bursa Malaysia falls as Wall St sell-off spills over",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {

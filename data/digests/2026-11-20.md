@@ -1,6 +1,6 @@
 # Digest 2026-11-20
 
-Generated 2026-11-20 10:08 UTC · slot `all` · 41871 articles in the corpus, 8218 observations, 4369 events in the fact book.
+Generated 2026-11-20 17:50 UTC · slot `all` · 41879 articles in the corpus, 8218 observations, 4369 events in the fact book.
 
 ## The book
 
@@ -17,7 +17,8 @@ Generated 2026-11-20 10:08 UTC · slot `all` · 41871 articles in the corpus, 82
 - snapshot: FinBERT headline tone 0.34 (finbert_tone, 2026-11-20)
 
 ### Tenaga (MYX:5347)
-- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- tone: 2 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-11-21 (date only) www.thestar.com.my — Bursa Malaysia falls as Wall St sell-off spills over [q 1.00, tone +0.0]
 - 2026-11-20 www.thestar.com.my — Artificial intelligence can support smarter electricity grid operations - TNB SCSRSO [q 0.80, tone +0.0]
 - snapshot: FinBERT headline tone 0.18 (finbert_tone, 2026-11-20)
 
@@ -28,7 +29,9 @@ Generated 2026-11-20 10:08 UTC · slot `all` · 41871 articles in the corpus, 82
 - quiet: nothing collected for this name in the window
 
 ### Press Metal (MYX:8869)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-11-21 (date only) www.thestar.com.my — Bursa Malaysia falls as Wall St sell-off spills over [q 1.00, tone +0.0]
+- snapshot: FinBERT headline tone 0.66 (finbert_tone, 2026-11-18)
 
 ### Genting (MYX:3182)
 - tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
