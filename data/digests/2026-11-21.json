@@ -1,18 +1,109 @@
 {
-  "collection": [],
+  "collection": [
+    {
+      "at": "2026-11-21T16:48:49.525137+00:00",
+      "detail": "facts 12; scored 18 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized.onnx",
+      "fetched": 12,
+      "kept": 0,
+      "source": "finbert_tone",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-21T16:48:48.450792+00:00",
+      "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-21T16:48:48.448907+00:00",
+      "detail": "facts 5; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-21T16:48:43.366522+00:00",
+      "detail": "facts 0; window not covered back to 2026-11-20 22:41Z; the oldest item read is 2026-11-21 14:46Z, so 16.1h of the window was never served",
+      "fetched": 18,
+      "kept": 18,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 18
+    },
+    {
+      "at": "2026-11-21T16:48:42.319214+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-21T16:48:40.358210+00:00",
+      "detail": "window overflow: all 150 dated items are newer than the window's start (2026-11-20 10:07Z); the oldest is 2026-11-20 14:01Z, so 3.9h scrolled off unseen; read 3 pages, the most this feed may; page 2 starts 3.6h before page 1 ends (2026-11-21 06:48Z under 2026-11-21 10:26Z): the items between were served by neither",
+      "fetched": 150,
+      "kept": 148,
+      "source": "nst_business",
+      "status": "degraded",
+      "stored": 145
+    },
+    {
+      "at": "2026-11-21T16:48:35.536534+00:00",
+      "detail": "window overflow: all 50 dated items are newer than the window's start (2026-11-20 10:07Z); the oldest is 2026-11-20 14:15Z, so 4.1h scrolled off unseen",
+      "fetched": 50,
+      "kept": 50,
+      "source": "fmt_business",
+      "status": "degraded",
+      "stored": 50
+    },
+    {
+      "at": "2026-11-21T16:48:34.870781+00:00",
+      "detail": "read but empty: Genting, Maybank, Tenaga, Petronas Chemicals, IHH, Press Metal",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-21T16:48:33.654177+00:00",
+      "detail": "named the company: 7 of 18 (lowest: Petronas Chemicals 0/1, Press Metal 0/2, Tenaga 0/1)",
+      "fetched": 19,
+      "kept": 18,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 11
+    },
+    {
+      "at": "2026-11-21T16:48:31.577796+00:00",
+      "detail": "throttled: no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked); deferred: Petronas Chemicals, IHH, Press Metal",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "throttled",
+      "stored": 0
+    }
+  ],
   "counts": {
-    "articles": 42421,
+    "articles": 42656,
     "documents": 0,
-    "escalated": 5679,
+    "escalated": 5691,
     "events": 4375,
     "failed_sweeps": 114,
-    "linked": 21244,
-    "observations": 8285,
+    "linked": 21263,
+    "observations": 8302,
     "series": 31,
-    "sweeps": 1757
+    "sweeps": 1767
   },
   "day": "2026-11-21",
-  "generated_at": "2026-11-21 02:14 UTC",
+  "generated_at": "2026-11-21 16:49 UTC",
   "macro": [
     {
       "change": "0.05",
@@ -146,22 +237,68 @@
   "names": [
     {
       "earnings": [],
-      "escalated": 0,
+      "escalated": 1,
       "events": [],
       "instrument_id": "MYX:1155",
       "label": "Maybank",
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-20",
+          "known_at": "2026-11-21",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-20",
+          "period_end": "2026-11-21",
           "source": "finbert_tone",
-          "value": "0.34"
+          "value": "0.48"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMivAFBVV95cUxQMEhxY1BKRWVsczNfQXoxUDdFZzNpOEVKMDBrd2NCaDE2UXdWRXlyZEYxWHlzMkFCdEF2Zl9KWF9KZ2lWTjdtSmNGX0pCV0VsQl9rM3Zjc0RuMXNIY1VZd1JiSk9aOXh6bElmemFJQkgtWUxqOWVaUUYxRUxNSTdmajFXdGxfNUFhVE5WQ0t5VURrSDVKdzJOTGxrSnZTYTNxbGNyRFFZWUVuZkYxRUdnbHJHUGhYclNJQ0pXbA?oc=5",
+          "domain": "www.businesstoday.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-21T05:06:05+00:00",
+          "quality": 0.8,
+          "title": "RAM Affirms Maybank\u2019s AAA Ratings On Strong Capitalisation And Asset Quality",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiZ0FVX3lxTFA5dUhtWnBsNjhWTnNYSGZCODByUFlQazdaMU9NVHQ3ZEEtWmRfSV9oRnU0SnZ0ZDVwbkczZURhMktES2lrWl9xMWRWeUdfVXFPSDFYZWFicE5yQndKMlZxLTRKMFlsZFU?oc=5",
+          "domain": "www.tradingview.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-21T01:15:00+00:00",
+          "quality": 0.65,
+          "title": "Laba Bank Mandiri Tumbuh 19,6%, Maybank Sekuritas Rekomendasikan Buy Saham BMRI",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMipgFBVV95cUxPMFp4cjIxcnRTUVRPT3o3Q0EwdHBTVkF1eDlWQ1JadkppaUpNOFRkajc4bWNnMWpSY01OX0JXZzdPblBfMmVsdUtqSHN6bVpkZnowN2dWeDZ3bmtVa0dXWWxVMnBIc0J4TmJyNVJSWlVQaFJkcmxVbmtPOVgyN3IzbUhLZndqY0F5QzUxeVg1YzZVWnVjdlpaZ2FvN0FGUXRFQXk0MW1R?oc=5",
+          "domain": "thepaypers.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-20T16:11:10+00:00",
+          "quality": 0.65,
+          "title": "Maybank completes tokenised bond pilot with SettleMint",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 3,
+        "polarity_mean": 0.333,
+        "sources": 3,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -173,11 +310,11 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-20",
+          "known_at": "2026-11-21",
           "label": "FinBERT headline tone",
           "period_end": "2026-11-20",
           "source": "finbert_tone",
-          "value": "0.18"
+          "value": "-0.22"
         }
       ],
       "stories": [
@@ -233,11 +370,11 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-20",
+          "known_at": "2026-11-21",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-19",
+          "period_end": "2026-11-20",
           "source": "finbert_tone",
-          "value": "0.04"
+          "value": "0.01"
         }
       ],
       "stories": [],
@@ -253,11 +390,11 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-18",
+          "known_at": "2026-11-21",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-17",
+          "period_end": "2026-11-20",
           "source": "finbert_tone",
-          "value": "0.66"
+          "value": "-0.67"
         }
       ],
       "stories": [
@@ -293,20 +430,40 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-20",
+          "known_at": "2026-11-21",
           "label": "FinBERT headline tone",
           "period_end": "2026-11-20",
           "source": "finbert_tone",
-          "value": "0.10"
+          "value": "0.33"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMikgFBVV95cUxOb2RnZjlhWFFrS2prenZqYWtMVjhrT0VKWEZCQjl0eHBLQ0tvUTc5UFVDdFh2bVdMR3M4WnpSNnlhdVBtQnprV2xtSEJOYmRkdHV0RWJVb0VsNEtubUxvV0pEeFhoVHRfZ3Ntd0pVQ29GRERoOTFXeEZuUV9vc0JCM1JkcVVhWlc4MDNNUmg2OUh5QQ?oc=5",
+          "domain": "www.cruisemapper.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-20T19:29:00+00:00",
+          "quality": 0.65,
+          "title": "Dream Cruises partners with LOTI to introduce Chinese fashion experiences aboard Genting Dream",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
       "earnings": [],
-      "escalated": 36,
+      "escalated": 45,
       "events": [],
       "instrument_id": "XNAS:NVDA",
       "label": "NVIDIA",
@@ -450,116 +607,116 @@
       ],
       "stories": [
         {
-          "day": null,
-          "doc_id": "https://www.tikr.com/blog/trumps-treasury-secretary-keeps-nvidias-h200-china-policy-as-house-data-show-nearly-880000-ai-chips-approved?ref=yahoofinance&tlnk=yf-261120-rx666q2r&.tsrc=rss",
-          "domain": "www.tikr.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 1.0,
-          "published_at": "2026-11-20T21:58:37+00:00",
-          "quality": 0.85,
-          "title": "Trump\u2019s Treasury Secretary Keeps Nvidia\u2019s H200 China Policy as House Data Show Nearly 880,000 AI Chips Approved",
-          "uncertainty": 0.24509803921568626
-        },
-        {
-          "day": null,
-          "doc_id": "https://www.tikr.com/blog/navitas-sinks-15-western-down-12-everpure-down-13-as-ai-chip-rout-deepens?ref=yahoofinance&tlnk=yf-261120-9x747276&.tsrc=rss",
-          "domain": "www.tikr.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": -1.0,
-          "published_at": "2026-11-20T21:50:51+00:00",
-          "quality": 0.85,
-          "title": "Navitas Sinks 15%, Western Down 12%, Everpure Down 13% as AI Chip Rout Deepens",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "finnhub:143990888",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 1.0,
-          "published_at": "2026-11-20T19:33:55+00:00",
-          "quality": 0.85,
-          "title": "Trump Bought At Least $5 Million Of This Dividend ETF Before AI Sell-Off",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "finnhub:143990890",
-          "domain": "Yahoo",
+          "day": "2026-11-21",
+          "doc_id": "web_search:https://www.cnbc.com/2026/11/20/nvidias-7-week-losing-streak-is-longest-since-2008-financial-crisis.html",
+          "domain": "www.cnbc.com",
           "escalated": true,
           "intensity": 0.3333333333333333,
           "kind": "",
           "polarity": 0.0,
-          "published_at": "2026-11-20T18:49:46+00:00",
-          "quality": 0.85,
-          "title": "SemiAnalysis Just Slashed Its AI Compute Forecast by $608 Billion",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "finnhub:143989659",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": -1.0,
-          "published_at": "2026-11-20T17:37:21+00:00",
-          "quality": 0.85,
-          "title": "Nvidia Sinks 7% on New Probes as California AG Says Scandal \u201cRaises Bright Red Flags\u201d",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "finnhub:143992371",
-          "domain": "SeekingAlpha",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": -0.3333333333333333,
-          "published_at": "2026-11-20T17:03:34+00:00",
-          "quality": 0.85,
-          "title": "Nebius: I Was Wrong, Growth Financing In Danger (Rating Downgrade)",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "finnhub:143988229",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": -1.0,
-          "published_at": "2026-11-20T15:45:35+00:00",
-          "quality": 0.85,
-          "title": "Between IREN and CoreWeave Here\u2019s Who Has the Cleaner Path to a Sustained 30% Rebound",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "finnhub:143988237",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": -1.0,
-          "published_at": "2026-11-20T15:41:28+00:00",
-          "quality": 0.85,
-          "title": "Why the markets are being hit with a 'perfect storm' for AI",
+          "published_at": "2026-11-21T16:49:44.886144+00:00",
+          "quality": 1.0,
+          "title": "Nvidia stock plunges 14%, wraps up longest weekly losing streak since 2008 financial crisis",
           "uncertainty": 0.32894736842105265
+        },
+        {
+          "day": "2026-11-21",
+          "doc_id": "web_search:https://www.investing.com/news/economy-news/exclusiveus-secs-nvidia-probe-is-examining-potential-accounting-issues-sources-say-5042460",
+          "domain": "www.investing.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-21T16:49:44.886144+00:00",
+          "quality": 1.0,
+          "title": "Nvidia\u2019s accounting is a focus of US SEC investigation, sources say By Reuters",
+          "uncertainty": 0.2976190476190476
+        },
+        {
+          "day": null,
+          "doc_id": "https://www.nst.com.my/world/world/2026/11/1582361/give-him-second-chance-trump-backs-huangs-return-nvidia",
+          "domain": "www.nst.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-20T23:30:29+00:00",
+          "quality": 1.0,
+          "title": "'Give him a second chance': Trump backs Huang's return to Nvidia",
+          "uncertainty": 0.0
+        },
+        {
+          "day": "2026-11-21",
+          "doc_id": "web_search:https://finance.biggo.com/news/d18e569f-526d-447e-980b-10bb46a6fe95",
+          "domain": "finance.biggo.com",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-21T16:49:44.886144+00:00",
+          "quality": 0.85,
+          "title": "Nvidia Plunges 14%, Nasdaq Sinks 5.3% as SEC Accounting Probe Adds to Woes \u2014 BigGo Finance",
+          "uncertainty": 0.0
+        },
+        {
+          "day": "2026-11-21",
+          "doc_id": "web_search:https://finimize.com/content/sec-is-looking-into-nvidias-accounting-practices",
+          "domain": "finimize.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-21T16:49:44.886144+00:00",
+          "quality": 0.85,
+          "title": "SEC Is Looking Into Nvidia\u2019s Accounting Practices - Finimize",
+          "uncertainty": 0.0
+        },
+        {
+          "day": "2026-11-21",
+          "doc_id": "web_search:https://live.euronext.com/en/financial-news/nvidias-accounting-focus-us-sec-investigation-sources-say",
+          "domain": "live.euronext.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-21T16:49:44.886144+00:00",
+          "quality": 0.85,
+          "title": "Nvidia's accounting is a focus of US SEC investigation, sources say",
+          "uncertainty": 0.0
+        },
+        {
+          "day": "2026-11-21",
+          "doc_id": "web_search:https://superpowerdaily.com/posts/nvidia-shares-plunge-12-heading-for-longest-weekly-losing-streak-since-2008",
+          "domain": "superpowerdaily.com",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-21T16:49:44.886144+00:00",
+          "quality": 0.85,
+          "title": "Nvidia shares plunge 12%, heading for longest weekly losing streak since 2008",
+          "uncertainty": 0.0
+        },
+        {
+          "day": "2026-11-21",
+          "doc_id": "web_search:https://www.fool.com/investing/2026/11/20/nvidia-stock-plunge-wipes-out-nearly-usd500-billion-in-one-day-as-sec-reportedly-probes-its-accounting/",
+          "domain": "www.fool.com",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-21T16:49:44.886144+00:00",
+          "quality": 0.85,
+          "title": "Nvidia Stock Plunge Wipes Out Nearly $500 Billion in One Day as SEC Reportedly Probes Its Accounting",
+          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.667,
-        "n": 99,
-        "polarity_mean": -0.094,
-        "sources": 25,
-        "uncertainty_mean": 0.08
+        "n": 111,
+        "polarity_mean": -0.156,
+        "sources": 33,
+        "uncertainty_mean": 0.079
       },
       "upcoming": [
         {

@@ -1,16 +1,20 @@
 # Digest 2026-11-21
 
-Generated 2026-11-21 02:14 UTC · slot `all` · 42421 articles in the corpus, 8285 observations, 4375 events in the fact book.
+Generated 2026-11-21 16:49 UTC · slot `all` · 42656 articles in the corpus, 8302 observations, 4375 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- quiet: nothing collected for this name in the window
+- tone: 3 stories from 3 sources, polarity +0.33, peak intensity 0.00, uncertainty 0.00 · 1 escalated
+- 2026-11-21 www.businesstoday.com.my — RAM Affirms Maybank’s AAA Ratings On Strong Capitalisation And Asset Quality [q 0.80, tone +1.0] ★
+- 2026-11-21 www.tradingview.com — Laba Bank Mandiri Tumbuh 19,6%, Maybank Sekuritas Rekomendasikan Buy Saham BMRI [q 0.65, tone +0.0]
+- 2026-11-20 thepaypers.com — Maybank completes tokenised bond pilot with SettleMint [q 0.65, tone +0.0]
+- snapshot: FinBERT headline tone 0.48 (finbert_tone, 2026-11-21)
 
 ### Tenaga (MYX:5347)
 - tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
 - 2026-11-21 (date only) www.thestar.com.my — Bursa Malaysia falls as Wall St sell-off spills over [q 1.00, tone +0.0]
-- snapshot: FinBERT headline tone 0.18 (finbert_tone, 2026-11-20)
+- snapshot: FinBERT headline tone -0.22 (finbert_tone, 2026-11-21)
 
 ### Petronas Chemicals (MYX:5183)
 - quiet: nothing collected for this name in the window
@@ -21,21 +25,23 @@ Generated 2026-11-21 02:14 UTC · slot `all` · 42421 articles in the corpus, 82
 ### Press Metal (MYX:8869)
 - tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
 - 2026-11-21 (date only) www.thestar.com.my — Bursa Malaysia falls as Wall St sell-off spills over [q 1.00, tone +0.0]
-- snapshot: FinBERT headline tone 0.66 (finbert_tone, 2026-11-18)
+- snapshot: FinBERT headline tone -0.67 (finbert_tone, 2026-11-21)
 
 ### Genting (MYX:3182)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-11-20 www.cruisemapper.com — Dream Cruises partners with LOTI to introduce Chinese fashion experiences aboard Genting Dream [q 0.65, tone +0.0]
+- snapshot: FinBERT headline tone 0.33 (finbert_tone, 2026-11-21)
 
 ### NVIDIA (XNAS:NVDA)
-- tone: 99 stories from 25 sources, polarity -0.09, peak intensity 0.67, uncertainty 0.08 · 36 escalated
-- 2026-11-20 www.tikr.com — Trump’s Treasury Secretary Keeps Nvidia’s H200 China Policy as House Data Show Nearly 880,000 AI Chips Approved [q 0.85, tone +1.0] ★
-- 2026-11-20 www.tikr.com — Navitas Sinks 15%, Western Down 12%, Everpure Down 13% as AI Chip Rout Deepens [q 0.85, tone -1.0] ★
-- 2026-11-20 Yahoo — Trump Bought At Least $5 Million Of This Dividend ETF Before AI Sell-Off [q 0.85, tone +1.0] ★
-- 2026-11-20 Yahoo — SemiAnalysis Just Slashed Its AI Compute Forecast by $608 Billion [q 0.85, tone +0.0] ★
-- 2026-11-20 Yahoo — Nvidia Sinks 7% on New Probes as California AG Says Scandal “Raises Bright Red Flags” [q 0.85, tone -1.0] ★
-- 2026-11-20 SeekingAlpha — Nebius: I Was Wrong, Growth Financing In Danger (Rating Downgrade) [q 0.85, tone -0.3] ★
-- 2026-11-20 Yahoo — Between IREN and CoreWeave Here’s Who Has the Cleaner Path to a Sustained 30% Rebound [q 0.85, tone -1.0] ★
-- 2026-11-20 Yahoo — Why the markets are being hit with a 'perfect storm' for AI [q 0.85, tone -1.0] ★
+- tone: 111 stories from 33 sources, polarity -0.16, peak intensity 0.67, uncertainty 0.08 · 45 escalated
+- 2026-11-21 (date only) www.cnbc.com — Nvidia stock plunges 14%, wraps up longest weekly losing streak since 2008 financial crisis [q 1.00, tone +0.0] ★
+- 2026-11-21 (date only) www.investing.com — Nvidia’s accounting is a focus of US SEC investigation, sources say By Reuters [q 1.00, tone -1.0] ★
+- 2026-11-20 www.nst.com.my — 'Give him a second chance': Trump backs Huang's return to Nvidia [q 1.00, tone -1.0] ★
+- 2026-11-21 (date only) finance.biggo.com — Nvidia Plunges 14%, Nasdaq Sinks 5.3% as SEC Accounting Probe Adds to Woes — BigGo Finance [q 0.85, tone -1.0] ★
+- 2026-11-21 (date only) finimize.com — SEC Is Looking Into Nvidia’s Accounting Practices - Finimize [q 0.85, tone -1.0] ★
+- 2026-11-21 (date only) live.euronext.com — Nvidia's accounting is a focus of US SEC investigation, sources say [q 0.85, tone -1.0] ★
+- 2026-11-21 (date only) superpowerdaily.com — Nvidia shares plunge 12%, heading for longest weekly losing streak since 2008 [q 0.85, tone +0.0] ★
+- 2026-11-21 (date only) www.fool.com — Nvidia Stock Plunge Wipes Out Nearly $500 Billion in One Day as SEC Reportedly Probes Its Accounting [q 0.85, tone -1.0] ★
 - upcoming 2026-11-25 earnings_result — Q3 2027 results after the close (finnhub)
 - snapshot: P/E (ttm) 16.08 (finnhub, 2026-11-20) · P/B 28.81 (finnhub, 2026-11-20) · EPS (ttm) 9.31 (finnhub, 2026-11-20) · dividend yield 0.03 (finnhub, 2026-11-20) · beta 2.41 (finnhub, 2026-11-20) · 52w high 243.37 (finnhub, 2026-11-20) · 52w low 148.80 (finnhub, 2026-11-20) · target (consensus) 275.86 (fmp, 2026-11-20) · analysts: buy 41 (finnhub, 2026-11-02) · analysts: hold 2 (finnhub, 2026-11-02) · analysts: sell 1 (finnhub, 2026-11-02) · vendor sentiment 0.25 (alphavantage_news, 2026-10-06) · Marketaux sentiment 0.18 (marketaux_news, 2026-11-15) · FinBERT headline tone -0.09 (finbert_tone, 2026-11-20) · revenue (last quarter) 96.22bn (sec_xbrl, 2026-08-26) · net income (last quarter) 59.69bn (sec_xbrl, 2026-08-26) · last EPS surprise % 6.14 (finnhub, 2026-11-18)
 
@@ -83,6 +89,21 @@ Generated 2026-11-21 02:14 UTC · slot `all` · 42421 articles in the corpus, 82
 | 10y minus 2y Treasury spread, % | 0.28 | 2026-11-19 | +0.01 | fred |
 | US unemployment rate, % | 4.10 | 2026-10-01 | -0.1 | fred |
 | CBOE VIX, index | 28.44 | 2026-11-19 | +3.88 | fred |
+
+## Collection
+
+| at (UTC) | source | status | fetched | kept | stored | detail |
+|---|---|---|---|---|---|---|
+| 16:48 | finbert_tone | ok | 12 | 0 | 0 | facts 12; scored 18 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized |
+| 16:48 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
+| 16:48 | twse_openapi | ok | 8 | 0 | 0 | facts 5;  |
+| 16:48 | jin10_flash | degraded | 18 | 18 | 18 | facts 0; window not covered back to 2026-11-20 22:41Z; the oldest item read is 2 |
+| 16:48 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 16:48 | nst_business | degraded | 150 | 148 | 145 | window overflow: all 150 dated items are newer than the window's start (2026-11- |
+| 16:48 | fmt_business | degraded | 50 | 50 | 50 | window overflow: all 50 dated items are newer than the window's start (2026-11-2 |
+| 16:48 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Genting, Maybank, Tenaga, Petronas Chemicals, IHH, Press Metal |
+| 16:48 | google_news | ok | 19 | 18 | 11 | named the company: 7 of 18 (lowest: Petronas Chemicals 0/1, Press Metal 0/2, Ten |
+| 16:48 | gdelt | throttled | 0 | 0 | 0 | throttled: no name could be read (3 failed, 0 not reached). First: GDELT fetch f |
 
 ---
 
