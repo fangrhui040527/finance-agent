@@ -1,6 +1,6 @@
 # Digest 2026-11-22
 
-Generated 2026-11-22 17:14 UTC · slot `all` · 42985 articles in the corpus, 8402 observations, 4376 events in the fact book.
+Generated 2026-11-22 22:42 UTC · slot `all` · 43249 articles in the corpus, 8461 observations, 4376 events in the fact book.
 
 ## The book
 
@@ -29,40 +29,41 @@ Generated 2026-11-22 17:14 UTC · slot `all` · 42985 articles in the corpus, 84
 - snapshot: FinBERT headline tone 0.18 (finbert_tone, 2026-11-22)
 
 ### NVIDIA (XNAS:NVDA)
-- tone: 43 stories from 20 sources, polarity -0.26, peak intensity 0.33, uncertainty 0.07 · 19 escalated
+- tone: 112 stories from 45 sources, polarity -0.15, peak intensity 0.33, uncertainty 0.10 · 42 escalated
 - 2026-11-21 (date only) www.cnbc.com — Nvidia stock plunges 14%, wraps up longest weekly losing streak since 2008 financial crisis [q 1.00, tone +0.0] ★
 - 2026-11-21 (date only) www.investing.com — Nvidia’s accounting is a focus of US SEC investigation, sources say By Reuters [q 1.00, tone -1.0] ★
-- 2026-11-21 Yahoo — Debt-heavy CoreWeave just got $350M from Jensen Huang’s charity [q 0.85, tone +0.0] ★
-- 2026-11-21 (date only) finance.biggo.com — Nvidia Plunges 14%, Nasdaq Sinks 5.3% as SEC Accounting Probe Adds to Woes — BigGo Finance [q 0.85, tone -1.0] ★
-- 2026-11-21 (date only) finimize.com — SEC Is Looking Into Nvidia’s Accounting Practices - Finimize [q 0.85, tone -1.0] ★
-- 2026-11-21 (date only) live.euronext.com — Nvidia's accounting is a focus of US SEC investigation, sources say [q 0.85, tone -1.0] ★
-- 2026-11-21 (date only) superpowerdaily.com — Nvidia shares plunge 12%, heading for longest weekly losing streak since 2008 [q 0.85, tone +0.0] ★
-- 2026-11-21 (date only) www.fool.com — Nvidia Stock Plunge Wipes Out Nearly $500 Billion in One Day as SEC Reportedly Probes Its Accounting [q 0.85, tone -1.0] ★
+- 2026-11-22 Yahoo — SpaceX Expects to Pass “One Gigawatt a Month” of AI Compute by the End of 2027. That’s Great News for Nvidia [q 0.85, tone +0.0] ★
+- 2026-11-22 Yahoo — China Switched to Making Its Own Chips “At All Costs.” That Shrinks Nvidia’s China Upside [q 0.85, tone +1.0] ★
+- 2026-11-22 Yahoo — Arm Sinks 20% in a Week as Chips Slide and Nvidia’s Headhunters Approach CEO Rene Haas. Time to Buy? [q 0.85, tone -1.0] ★
+- 2026-11-22 Yahoo — Arista Networks Lost 15% in a Week. Rosenblatt Sees 67% Upside From Here [q 0.85, tone -1.0] ★
+- 2026-11-22 Yahoo — OpenAI’s Greg Brockman: AI Delivered “Roughly an Additional Year of Progress” on AMD’s Chip in Under 5 Months [q 0.85, tone +0.0] ★
+- 2026-11-22 Yahoo — Plot Twist: As CFO, Nvidia’s Interim CEO Said “Over 99%” of Singapore Billings Were for U.S. Customers [q 0.85, tone -1.0] ★
 - upcoming 2026-11-25 earnings_result — Q3 2027 results after the close (finnhub)
-- snapshot: P/E (ttm) 15.55 (finnhub, 2026-11-21) · P/B 28.81 (finnhub, 2026-11-21) · EPS (ttm) 9.31 (finnhub, 2026-11-21) · dividend yield 0.03 (finnhub, 2026-11-21) · beta 2.42 (finnhub, 2026-11-21) · 52w high 243.37 (finnhub, 2026-11-21) · 52w low 148.80 (finnhub, 2026-11-21) · target (consensus) 269.06 (fmp, 2026-11-22) · analysts: buy 41 (finnhub, 2026-11-02) · analysts: hold 2 (finnhub, 2026-11-02) · analysts: sell 1 (finnhub, 2026-11-02) · vendor sentiment 0.25 (alphavantage_news, 2026-10-06) · Marketaux sentiment 0.08 (marketaux_news, 2026-11-21) · FinBERT headline tone -0.05 (finbert_tone, 2026-11-21) · revenue (last quarter) 96.22bn (sec_xbrl, 2026-08-26) · net income (last quarter) 59.69bn (sec_xbrl, 2026-08-26) · last EPS surprise % 6.13 (finnhub, 2026-11-21)
+- snapshot: P/E (ttm) 13.37 (finnhub, 2026-11-22) · P/B 28.81 (finnhub, 2026-11-22) · EPS (ttm) 9.31 (finnhub, 2026-11-22) · dividend yield 0.03 (finnhub, 2026-11-22) · beta 2.50 (finnhub, 2026-11-22) · 52w high 243.37 (finnhub, 2026-11-22) · 52w low 124.50 (finnhub, 2026-11-22) · target (consensus) 269.06 (fmp, 2026-11-22) · analysts: buy 41 (finnhub, 2026-11-02) · analysts: hold 2 (finnhub, 2026-11-02) · analysts: sell 1 (finnhub, 2026-11-02) · vendor sentiment 0.25 (alphavantage_news, 2026-10-06) · Marketaux sentiment -0.04 (marketaux_news, 2026-11-22) · FinBERT headline tone -0.01 (finbert_tone, 2026-11-22) · revenue (last quarter) 96.22bn (sec_xbrl, 2026-08-26) · net income (last quarter) 59.69bn (sec_xbrl, 2026-08-26) · last EPS surprise % 6.13 (finnhub, 2026-11-21)
 
 ### Apple (XNAS:AAPL)
-- tone: 8 stories from 7 sources, polarity -0.12, peak intensity 0.00, uncertainty 0.12 · 4 escalated
+- tone: 45 stories from 28 sources, polarity +0.00, peak intensity 0.33, uncertainty 0.04 · 8 escalated
 - 2026-11-21 seekingalpha.com — Apple: The Hidden Risk Behind My Downgrade (NASDAQ:AAPL) [q 0.80, tone -1.0] ★
+- 2026-11-22 www.foreignpolicyjournal.com — Apple (NASDAQ: AAPL) Beats Big Tech's AI Spending Race With $109.4B Revenue And A $5 Trillion Valuation [q 0.65, tone +1.0] ★
+- 2026-11-22 www.tikr.com — Apple’s CEO Calls Memory Pricing “Unprecedented.” Its Purchase Obligations Jumped $33 Billion in a Quarter [q 0.65, tone +0.0] ★
+- 2026-11-22 www.tikr.com — The App Paradigm Will “Slowly, if Not Quickly, Dissipate,” Says Mark Gurman. That’s a Problem for Apple [q 0.65, tone +0.0] ★
+- 2026-11-22 kalkinemedia.com — Will Apple Inc. (NASDAQ:AAPL) Keep Moving Forward From Here? [q 0.65, tone +0.0] ★
 - 2026-11-21 www.kriptofoni.com — First USDC Dividend Paid on Tokenized Apple Shares Through Solana [q 0.65, tone +1.0] ★
 - 2026-11-21 www.barchart.com — Apple Is Now Worth Over $5 Trillion Without Betting Big on AI Data Centers. AAPL Stock Now Trades Near Wall Street’s Targets. [q 0.65, tone +0.0] ★
 - 2026-11-21 simplywall.st — Qualcomm Stock Faces Apple Loss As AI Data Center Push Takes Center Stage [q 0.65, tone -1.0] ★
-- 2026-11-21 247wallst.com — Google Is Paying Elon Musk’s SpaceX $30 Billion. Jim Cramer Just Revealed Why [q 0.85, tone +0.0]
-- 2026-11-21 finance.yahoo.com — Mark Gurman Says Apple Is “Not Set Up to Move at the Pace of These AI Companies” [q 0.80, tone +0.0]
-- 2026-11-21 wisevoter.com — Apple Reaches 57% of US Smartphone Market [q 0.65, tone +0.0]
-- 2026-11-21 simplywall.st — This Insider Has Just Sold Shares In Apple [q 0.65, tone +0.0]
-- snapshot: P/E (ttm) 38.00 (finnhub, 2026-11-21) · P/B 44.06 (finnhub, 2026-11-21) · EPS (ttm) 8.97 (finnhub, 2026-11-21) · dividend yield 0.51 (finnhub, 2026-11-21) · beta 1.06 (finnhub, 2026-11-21) · 52w high 360.83 (finnhub, 2026-11-21) · 52w low 243.42 (finnhub, 2026-11-21) · target (consensus) 341.03 (fmp, 2026-11-22) · analysts: buy 19 (finnhub, 2026-11-02) · analysts: hold 15 (finnhub, 2026-11-02) · analysts: sell 3 (finnhub, 2026-11-02) · vendor sentiment -0.23 (alphavantage_news, 2026-10-06) · Marketaux sentiment 0.24 (marketaux_news, 2026-11-21) · FinBERT headline tone 0.06 (finbert_tone, 2026-11-21) · revenue (last quarter) 114.48bn (sec_xbrl, 2026-11-03) · net income (last quarter) 30.71bn (sec_xbrl, 2026-11-03) · last EPS surprise % 3.64 (finnhub, 2026-11-08)
+- snapshot: P/E (ttm) 37.66 (finnhub, 2026-11-22) · P/B 44.06 (finnhub, 2026-11-22) · EPS (ttm) 8.97 (finnhub, 2026-11-22) · dividend yield 0.51 (finnhub, 2026-11-22) · beta 1.03 (finnhub, 2026-11-22) · 52w high 360.83 (finnhub, 2026-11-22) · 52w low 243.42 (finnhub, 2026-11-22) · target (consensus) 341.03 (fmp, 2026-11-22) · analysts: buy 19 (finnhub, 2026-11-02) · analysts: hold 15 (finnhub, 2026-11-02) · analysts: sell 3 (finnhub, 2026-11-02) · vendor sentiment -0.23 (alphavantage_news, 2026-10-06) · Marketaux sentiment 0.04 (marketaux_news, 2026-11-22) · FinBERT headline tone 0.12 (finbert_tone, 2026-11-22) · revenue (last quarter) 114.48bn (sec_xbrl, 2026-11-03) · net income (last quarter) 30.71bn (sec_xbrl, 2026-11-03) · last EPS surprise % 3.64 (finnhub, 2026-11-08)
 
 ### Microsoft (XNAS:MSFT)
-- tone: 7 stories from 6 sources, polarity +0.14, peak intensity 0.00, uncertainty 0.04 · 1 escalated
-- 2026-11-21 www.ad-hoc-news.de — Microsoft's Azure Paradox: Blistering Cloud Growth, Shrinking Free Cash Flow - ad-hoc-news.de [q 0.65, tone +1.0] ★
-- 2026-11-21 247wallst.com — Michael Burry Says ‘I Told You So’ as Wall Street Caught Off Guard by AI Selloff [q 0.85, tone +0.0]
-- 2026-11-21 www.tikr.com — Buy Microsoft and Amazon at More Than 70x 2028 Free Cash Flow? Here’s What Their Capex Must Return [q 0.65, tone +0.0]
-- 2026-11-21 simplywall.st — Intel Stock Gets A Foundry Win With Microsoft Backing [q 0.65, tone +0.0]
-- 2026-11-21 www.trefis.com — Microsoft Was The Only Big AI Buyer Paying Down Debt. How Much More Can It Spend? [q 0.65, tone +0.0]
-- 2026-11-21 www.tikr.com — Hank Paulson Has “Never Seen So Much Money Chasing One Opportunity.” That’s a Problem for Microsoft, Amazon and Alphabet [q 0.65, tone +0.0]
-- 2026-11-21 kalkinemedia.com — Why Is Microsoft (NASDAQ:MSFT) Drawing Attention Amid Rising AI Expenditure? [q 0.65, tone +0.0]
-- snapshot: P/E (ttm) 25.94 (finnhub, 2026-11-21) · P/B 6.26 (finnhub, 2026-11-21) · EPS (ttm) 19.15 (finnhub, 2026-11-21) · dividend yield 0.79 (finnhub, 2026-11-21) · beta 1.06 (finnhub, 2026-11-21) · 52w high 559.15 (finnhub, 2026-11-21) · 52w low 349.20 (finnhub, 2026-11-21) · target (consensus) 617.36 (fmp, 2026-11-22) · analysts: buy 40 (finnhub, 2026-11-02) · analysts: hold 3 (finnhub, 2026-11-02) · analysts: sell 0 (finnhub, 2026-11-02) · vendor sentiment 0.29 (alphavantage_news, 2026-10-06) · Marketaux sentiment 0.14 (marketaux_news, 2026-11-21) · FinBERT headline tone 0.07 (finbert_tone, 2026-11-21) · revenue (last quarter) 92.28bn (sec_xbrl, 2026-10-28) · net income (last quarter) 36.63bn (sec_xbrl, 2026-10-28) · last EPS surprise % 1.53 (finnhub, 2026-10-28)
+- tone: 30 stories from 17 sources, polarity +0.03, peak intensity 0.33, uncertainty 0.04 · 12 escalated
+- 2026-11-22 finance.yahoo.com — Is Microsoft (MSFT) Building A Bigger AI Role In Scientific Labs? [q 1.00, tone +0.0] ★
+- 2026-11-22 finance.yahoo.com — 15% of parents already cut college savings after Microsoft AI CEO told a mom 'probably not' to bother saving [q 0.80, tone -1.0] ★
+- 2026-11-22 finance.yahoo.com — Microsoft Stock Gave Back 8% Within 2 Weeks of Its Record. Here's How Past Quick Pullbacks Like This Played Out. [q 0.80, tone +1.0] ★
+- 2026-11-22 fortune.com — Microsoft’s CFO admits she joined the tech giant without even knowing her salary—and then missed her first day of work [q 0.65, tone -1.0] ★
+- 2026-11-22 www.barchart.com — Microsoft Remains Attractively Valued as Azure and Cloud Drive Growth [q 0.65, tone +1.0] ★
+- 2026-11-22 www.thestreet.com — Bank of America sends strong signal to Microsoft stock investors [q 0.65, tone +1.0] ★
+- 2026-11-22 journalarta.com — Microsoft Stock Gave Back 9% After Record Close [q 0.65, tone +1.0] ★
+- 2026-11-22 CNBC — Director of National Intelligence Jay Clayton warns Americans of 'bumps in the road' after tech outages [q 0.65, tone -1.0] ★
+- snapshot: P/E (ttm) 25.23 (finnhub, 2026-11-22) · P/B 6.26 (finnhub, 2026-11-22) · EPS (ttm) 19.15 (finnhub, 2026-11-22) · dividend yield 0.79 (finnhub, 2026-11-22) · beta 1.05 (finnhub, 2026-11-22) · 52w high 559.15 (finnhub, 2026-11-22) · 52w low 349.20 (finnhub, 2026-11-22) · target (consensus) 617.36 (fmp, 2026-11-22) · analysts: buy 40 (finnhub, 2026-11-02) · analysts: hold 3 (finnhub, 2026-11-02) · analysts: sell 0 (finnhub, 2026-11-02) · vendor sentiment 0.29 (alphavantage_news, 2026-10-06) · Marketaux sentiment -0.19 (marketaux_news, 2026-11-22) · FinBERT headline tone -0.05 (finbert_tone, 2026-11-22) · revenue (last quarter) 92.28bn (sec_xbrl, 2026-10-28) · net income (last quarter) 36.63bn (sec_xbrl, 2026-10-28) · last EPS surprise % 1.53 (finnhub, 2026-10-28)
 
 ## Macro
 
@@ -89,6 +90,15 @@ Generated 2026-11-22 17:14 UTC · slot `all` · 42985 articles in the corpus, 84
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 22:42 | finbert_tone | ok | 12 | 0 | 0 | facts 10; scored 246 titles with Xenova/finbert@8f269abebfdd onnx/model_quantize |
+| 22:42 | eodhd | ok | 0 | 0 | 0 | skipped: every asked name was refused: outside the plan or over today's credits  |
+| 22:42 | jin10_flash | degraded | 16 | 16 | 15 | facts 0; window not covered back to 2026-11-22 17:10Z; the oldest item read is 2 |
+| 22:42 | marketaux_news | ok | 21 | 21 | 18 | facts 10; XNAS:NVDA: 2026-11-21 not aggregated - 8 full pages ended part-way thr |
+| 22:42 | finnhub | ok | 169 | 158 | 91 | facts 39;  |
+| 22:42 | edgar | ok | 0 | 0 | 0 | facts 0;  |
+| 22:42 | yahoo_rss | ok | 48 | 48 | 27 | named the company: 21 of 48 (lowest: NVIDIA 2/19, Microsoft 11/17, Apple 8/12) |
+| 22:42 | google_news | ok | 139 | 128 | 113 | named the company: 114 of 128 (lowest: Microsoft 21/25, Apple 40/45, NVIDIA 53/5 |
+| 22:41 | gdelt | throttled | 0 | 0 | 0 | throttled: no name could be read (3 failed, 0 not reached). First: GDELT fetch f |
 | 17:10 | finbert_tone | ok | 8 | 0 | 0 | facts 7; scored 5 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized.o |
 | 17:10 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
 | 17:10 | twse_openapi | ok | 8 | 0 | 0 | facts 0;  |
