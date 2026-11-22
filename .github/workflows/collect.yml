@@ -178,6 +178,7 @@ jobs:
           ALPHAVANTAGE_API_KEY: ${{ secrets.ALPHAVANTAGE_API_KEY }}
           MARKETAUX_API_KEY: ${{ secrets.MARKETAUX_API_KEY }}
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          LSE_API_KEY: ${{ secrets.LSE_API_KEY }}
           EODHD_API_KEY: ${{ secrets.EODHD_API_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
         run: |
@@ -202,6 +203,22 @@ jobs:
             echo "$name: taken from ALL_SECRET"
           done
 
+      # London Strategic Edge's terms forbid making its data available to
+      # third parties, and this job commits what it collects. The lse_*
+      # collectors read nothing unless LSE_REPO_PRIVATE is "true", and this is
+      # the only place it is set: from the repository's own visibility, asked
+      # of the API on every run. Any failure to ask leaves it "false" - the
+      # collectors skip, they do not guess. See knowledge/sources/lse.py.
+      - name: Repository visibility, for the LSE licence
+        id: visibility
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          private=$(gh api "repos/${{ github.repository }}" --jq .private 2>/dev/null || echo false)
+          [ "$private" = "true" ] || private=false
+          echo "private=$private" >> "$GITHUB_OUTPUT"
+          echo "repository private: $private (lse_* collectors $([ "$private" = true ] && echo run || echo skip))"
+
       - name: Sweep
         id: sweep
         env:
@@ -211,6 +228,8 @@ jobs:
           MARKETAUX_API_KEY: ${{ secrets.MARKETAUX_API_KEY || env.MARKETAUX_API_KEY }}
           FRED_API_KEY: ${{ secrets.FRED_API_KEY || env.FRED_API_KEY }}
           EODHD_API_KEY: ${{ secrets.EODHD_API_KEY || env.EODHD_API_KEY }}
+          LSE_API_KEY: ${{ secrets.LSE_API_KEY || env.LSE_API_KEY }}
+          LSE_REPO_PRIVATE: ${{ steps.visibility.outputs.private }}
           # Where finbert_tone keeps the model it downloads once (the cache
           # step below restores it). See knowledge/news/finbert.py.
           FINBERT_CACHE: ${{ runner.temp }}/finbert

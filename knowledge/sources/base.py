@@ -60,6 +60,9 @@ PROVIDER_KEYS: tuple[str, ...] = (
     "FINMIND_TOKEN",
     # Optional: EODHD statements, 2 names a day on the free plan; the collector skips without it.
     "EODHD_API_KEY",
+    # London Strategic Edge (knowledge/sources/lse.py): Malaysian macro, the
+    # release calendar, US options and closes. Read only from a private repo.
+    "LSE_API_KEY",
 )
 
 
@@ -212,6 +215,23 @@ class Collector(ABC):
 
     def get_json(self, url: str, params: dict | None = None, headers: dict | None = None) -> Any:
         """GET, retry what waiting fixes, decode JSON. Raises on anything else."""
+        body = self.get_bytes(url, params, headers)
+        text = body.decode("utf-8", errors="replace") if isinstance(body, bytes) else body
+        stripped = text.lstrip()
+        if stripped[:1] not in ("{", "["):
+            raise SourceError(f"{self.name} returned non-JSON: {stripped[:160]!r}")
+        try:
+            return json.loads(text)
+        except json.JSONDecodeError as e:
+            raise SourceError(f"{self.name} returned malformed JSON: {stripped[:160]!r}") from e
+
+    def get_text(self, url: str, params: dict | None = None, headers: dict | None = None) -> str:
+        """GET, retry what waiting fixes, decode UTF-8 (a CSV file, say)."""
+        body = self.get_bytes(url, params, headers)
+        return body.decode("utf-8", errors="replace") if isinstance(body, bytes) else body
+
+    def get_bytes(self, url: str, params: dict | None = None, headers: dict | None = None):
+        """The transport under get_json and get_text: the body, or a raise."""
         if params:
             url = f"{url}{'&' if '?' in url else '?'}{urlencode(params)}"
         opener = self._opener or urllib.request.urlopen
@@ -252,15 +272,7 @@ class Collector(ABC):
             self._breaker.record_failure(e)
             raise SourceError(f"{self.name} fetch failed: {type(e).__name__}: {e}") from e
         self._breaker.record_success()
-
-        text = body.decode("utf-8", errors="replace") if isinstance(body, bytes) else body
-        stripped = text.lstrip()
-        if stripped[:1] not in ("{", "["):
-            raise SourceError(f"{self.name} returned non-JSON: {stripped[:160]!r}")
-        try:
-            return json.loads(text)
-        except json.JSONDecodeError as e:
-            raise SourceError(f"{self.name} returned malformed JSON: {stripped[:160]!r}") from e
+        return body
 
     def _names_the_key(self, error: urllib.error.HTTPError) -> bool:
         """Whether a 400's body says the key is what was wrong (`KEY_REFUSED_400`)."""
