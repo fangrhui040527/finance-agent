@@ -1,11 +1,13 @@
 # Digest 2026-11-22
 
-Generated 2026-11-22 05:50 UTC · slot `all` · 42916 articles in the corpus, 8395 observations, 4376 events in the fact book.
+Generated 2026-11-22 17:14 UTC · slot `all` · 42985 articles in the corpus, 8402 observations, 4376 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-11-22 www.tradingview.com — Maybank Completes Pilot Settlement of Tokenized Malaysian Government Bond [q 0.65, tone +0.0]
+- snapshot: FinBERT headline tone 0.63 (finbert_tone, 2026-11-22)
 
 ### Tenaga (MYX:5347)
 - quiet: nothing collected for this name in the window
@@ -14,13 +16,17 @@ Generated 2026-11-22 05:50 UTC · slot `all` · 42916 articles in the corpus, 83
 - quiet: nothing collected for this name in the window
 
 ### IHH (MYX:5225)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-11-21 en.yenisafak.com — Turkey's IHH teams greet first convoy from Aleppo [q 0.65, tone +0.0]
+- snapshot: FinBERT headline tone 0.16 (finbert_tone, 2026-11-22)
 
 ### Press Metal (MYX:8869)
 - quiet: nothing collected for this name in the window
 
 ### Genting (MYX:3182)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-11-22 www.traveldailynews.asia — Dream Cruises and LOTI partner to bring Chinese fashion and designer showcases to Genting Dream - Travel Daily News Asia-Pacific [q 0.65, tone +0.0]
+- snapshot: FinBERT headline tone 0.18 (finbert_tone, 2026-11-22)
 
 ### NVIDIA (XNAS:NVDA)
 - tone: 43 stories from 20 sources, polarity -0.26, peak intensity 0.33, uncertainty 0.07 · 19 escalated
@@ -83,6 +89,16 @@ Generated 2026-11-22 05:50 UTC · slot `all` · 42916 articles in the corpus, 83
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 17:10 | finbert_tone | ok | 8 | 0 | 0 | facts 7; scored 5 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized.o |
+| 17:10 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
+| 17:10 | twse_openapi | ok | 8 | 0 | 0 | facts 0;  |
+| 17:10 | jin10_flash | degraded | 17 | 17 | 16 | facts 0; window not covered back to 2026-11-21 22:42Z; the oldest item read is 2 |
+| 17:10 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 17:10 | nst_business | failed | 0 | 0 | 0 | nst_business fetch failed: HTTP Error 403: Forbidden |
+| 17:10 | fmt_business | ok | 44 | 44 | 44 |  |
+| 17:10 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Maybank, Tenaga, Petronas Chemicals, IHH, Press Metal, Genting |
+| 17:10 | google_news | ok | 9 | 9 | 9 | read but empty: Petronas Chemicals; named the company: 3 of 9 (lowest: Press Met |
+| 17:10 | gdelt | throttled | 0 | 0 | 0 | throttled: no name could be read (3 failed, 0 not reached). First: GDELT fetch f |
 | 05:50 | sec_xbrl | ok | 4454 | 0 | 0 | facts 0;  |
 | 05:50 | finmind | ok | 75 | 0 | 0 | facts 5;  |
 | 05:50 | twse_openapi | ok | 8 | 0 | 0 | facts 0;  |

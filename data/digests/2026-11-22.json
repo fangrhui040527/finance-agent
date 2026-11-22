@@ -1,6 +1,96 @@
 {
   "collection": [
     {
+      "at": "2026-11-22T17:10:44.795908+00:00",
+      "detail": "facts 7; scored 5 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized.onnx",
+      "fetched": 8,
+      "kept": 0,
+      "source": "finbert_tone",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-22T17:10:44.326619+00:00",
+      "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-22T17:10:44.325103+00:00",
+      "detail": "facts 0; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-22T17:10:42.956065+00:00",
+      "detail": "facts 0; window not covered back to 2026-11-21 22:42Z; the oldest item read is 2026-11-22 16:10Z, so 17.5h of the window was never served",
+      "fetched": 17,
+      "kept": 17,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 16
+    },
+    {
+      "at": "2026-11-22T17:10:41.855563+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-22T17:10:40.172567+00:00",
+      "detail": "nst_business fetch failed: HTTP Error 403: Forbidden",
+      "fetched": 0,
+      "kept": 0,
+      "source": "nst_business",
+      "status": "failed",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-22T17:10:40.085254+00:00",
+      "detail": "",
+      "fetched": 44,
+      "kept": 44,
+      "source": "fmt_business",
+      "status": "ok",
+      "stored": 44
+    },
+    {
+      "at": "2026-11-22T17:10:39.682473+00:00",
+      "detail": "read but empty: Maybank, Tenaga, Petronas Chemicals, IHH, Press Metal, Genting",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-22T17:10:39.100691+00:00",
+      "detail": "read but empty: Petronas Chemicals; named the company: 3 of 9 (lowest: Press Metal 0/2, Tenaga 0/3, IHH 1/2)",
+      "fetched": 9,
+      "kept": 9,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 9
+    },
+    {
+      "at": "2026-11-22T17:10:37.507007+00:00",
+      "detail": "throttled: no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked); deferred: IHH, Press Metal, Genting",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "throttled",
+      "stored": 0
+    },
+    {
       "at": "2026-11-22T05:50:15.443608+00:00",
       "detail": "facts 0; ",
       "fetched": 4454,
@@ -56,18 +146,18 @@
     }
   ],
   "counts": {
-    "articles": 42916,
+    "articles": 42985,
     "documents": 0,
     "escalated": 5722,
     "events": 4376,
-    "failed_sweeps": 114,
-    "linked": 21381,
-    "observations": 8395,
+    "failed_sweeps": 115,
+    "linked": 21385,
+    "observations": 8402,
     "series": 31,
-    "sweeps": 1782
+    "sweeps": 1792
   },
   "day": "2026-11-22",
-  "generated_at": "2026-11-22 05:50 UTC",
+  "generated_at": "2026-11-22 17:14 UTC",
   "macro": [
     {
       "change": "0.05",
@@ -208,15 +298,35 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-21",
+          "known_at": "2026-11-22",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-21",
+          "period_end": "2026-11-22",
           "source": "finbert_tone",
-          "value": "0.48"
+          "value": "0.63"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMi0gFBVV95cUxOSzVxdDBBbjhOX3p6U2ZuS1FYa1BkZ19PYU5PX2FmNnhOSFhSb01ZcVdaQ3lMOF9qMVBROEdycVFPQU9OMXB5Zmhrb3p0TG5BTmd3emktWDN5aDZWTEpCQ284OWoyUXhDVG42Z2VJQ1lnR09vM1NsX2t0Ulk5TDB0ZUd5NzZnX2pyb3BxOUJqVFlkTVhEWk1nRTRJTzhDVWd4ZVNZenB1cXRRSGpCY0k3RGZpcGtsNjdFeUZOUlZycWJ0RHNxY1VDdWpvTk9RMk9UTEE?oc=5",
+          "domain": "www.tradingview.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-22T07:25:00+00:00",
+          "quality": 0.65,
+          "title": "Maybank Completes Pilot Settlement of Tokenized Malaysian Government Bond",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -268,15 +378,35 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-21",
+          "known_at": "2026-11-22",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-20",
+          "period_end": "2026-11-21",
           "source": "finbert_tone",
-          "value": "0.01"
+          "value": "0.16"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMikAFBVV95cUxOQXlLVlhHUks3MDVGOG9xbE9GUXZ0NEVOS054X0RYelo3ZzF6VXZ1dzJYODh5ZGpXRmV4YUpHUmFfVDVyOGlqa0paaExCMG5LbGl1dVFOSGpjbnFPaVFnbzdDREVuUlFoWFNwQlRDdHJtTTlob3cxcEtkTU1iN0dJT3NscWRnNGw0aXNYNlRqNmU?oc=5",
+          "domain": "en.yenisafak.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-21T19:21:29+00:00",
+          "quality": 0.65,
+          "title": "Turkey's IHH teams greet first convoy from Aleppo",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -308,15 +438,35 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-21",
+          "known_at": "2026-11-22",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-20",
+          "period_end": "2026-11-22",
           "source": "finbert_tone",
-          "value": "0.33"
+          "value": "0.18"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMijgFBVV95cUxNVEd3N1U5bTQ1Z1dpMGpLeUI5OU0wQ3lyMV9MWVdjcGRob3ZsQmVvUzdSMEFTU2FRUnk3WTZ2VGxfYlE4enNSeGIwbVJFcUhMampKa1RYMjllQjctZGFNMzlxRXJvYUFGSUZJeTdGd25pR1o5NG4zdWl0LUliZlpEYnZWVjhwZ3JwSkl3dW9n?oc=5",
+          "domain": "www.traveldailynews.asia",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-22T17:08:10+00:00",
+          "quality": 0.65,
+          "title": "Dream Cruises and LOTI partner to bring Chinese fashion and designer showcases to Genting Dream - Travel Daily News Asia-Pacific",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
