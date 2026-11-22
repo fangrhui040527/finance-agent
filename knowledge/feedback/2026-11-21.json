@@ -167,7 +167,7 @@
   "data_quality": {
     "failed": [],
     "failed_next_day": [
-      "nst_business: HTTP Error 403 Forbidden at 11-22 17:10Z (first failure on these pages)"
+      "nst_business: HTTP Error 403 Forbidden at 11-22 17:10Z (third failure in the store, after HTTP 404s on 09-14 and 11-10; first 403)"
     ],
     "throttled": [
       "gdelt (every sweep since 11-15 22:41Z)"
