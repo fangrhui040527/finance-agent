@@ -1,5 +1,60 @@
 {
-  "collection": [],
+  "collection": [
+    {
+      "at": "2026-11-22T05:50:15.443608+00:00",
+      "detail": "facts 0; ",
+      "fetched": 4454,
+      "kept": 0,
+      "source": "sec_xbrl",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-22T05:50:14.079244+00:00",
+      "detail": "facts 5; ",
+      "fetched": 75,
+      "kept": 0,
+      "source": "finmind",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-22T05:50:12.524025+00:00",
+      "detail": "facts 0; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-22T05:50:06.902037+00:00",
+      "detail": "facts 0; ",
+      "fetched": 450,
+      "kept": 0,
+      "source": "dbnomics",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-22T05:50:03.837751+00:00",
+      "detail": "facts 29; fmp /earnings is outside the plan (HTTP 402); not collected for NVDA, AAPL, MSFT; fmp /income-statement is outside the plan (HTTP 402); not collected for NVDA, AAPL, MSFT; fmp /cash-flow-statement is outside the plan (HTTP 402); not collected for NVDA, AAPL, MSFT; fmp /balance-sheet-statement is outside the plan (HTTP 402); not collected for NVDA, AAPL, MSFT",
+      "fetched": 4049,
+      "kept": 0,
+      "source": "fmp",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-22T05:50:01.414213+00:00",
+      "detail": "facts 1; ",
+      "fetched": 36,
+      "kept": 0,
+      "source": "dosm_cpi",
+      "status": "ok",
+      "stored": 0
+    }
+  ],
   "counts": {
     "articles": 42916,
     "documents": 0,
@@ -7,12 +62,12 @@
     "events": 4376,
     "failed_sweeps": 114,
     "linked": 21381,
-    "observations": 8361,
+    "observations": 8395,
     "series": 31,
-    "sweeps": 1776
+    "sweeps": 1782
   },
   "day": "2026-11-22",
-  "generated_at": "2026-11-22 01:19 UTC",
+  "generated_at": "2026-11-22 05:50 UTC",
   "macro": [
     {
       "change": "0.05",
@@ -80,11 +135,11 @@
     },
     {
       "change": "0.1",
-      "obs_date": "2026-09-01",
+      "obs_date": "2026-10-01",
       "series_id": "DOSM:CPI_HEADLINE",
       "source": "dosm_cpi",
       "title": "Malaysia CPI headline, index 2010=100",
-      "value": "137.60"
+      "value": "137.70"
     },
     {
       "change": "0.107",
@@ -329,11 +384,11 @@
         },
         {
           "concept": "price_target_consensus",
-          "known_at": "2026-11-20",
+          "known_at": "2026-11-22",
           "label": "target (consensus)",
           "period_end": null,
           "source": "fmp",
-          "value": "275.86"
+          "value": "269.06"
         },
         {
           "concept": "analyst_buy",
@@ -596,7 +651,7 @@
         },
         {
           "concept": "price_target_consensus",
-          "known_at": "2026-11-20",
+          "known_at": "2026-11-22",
           "label": "target (consensus)",
           "period_end": null,
           "source": "fmp",
@@ -855,7 +910,7 @@
         },
         {
           "concept": "price_target_consensus",
-          "known_at": "2026-11-20",
+          "known_at": "2026-11-22",
           "label": "target (consensus)",
           "period_end": null,
           "source": "fmp",
