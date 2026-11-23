@@ -1,11 +1,20 @@
 # Digest 2026-11-23
 
-Generated 2026-11-23 01:46 UTC · slot `all` · 43249 articles in the corpus, 8461 observations, 4376 events in the fact book.
+Generated 2026-11-23 10:08 UTC · slot `all` · 43471 articles in the corpus, 8467 observations, 4376 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- quiet: nothing collected for this name in the window
+- tone: 16 stories from 11 sources, polarity +0.27, peak intensity 0.00, uncertainty 0.00 · 9 escalated
+- 2026-11-23 www.malaymail.com — Maybank 3Q net profit rises to RM2.74b despite lower revenue [q 0.80, tone +1.0] ★
+- 2026-11-23 themalaysianreserve.com — Maybank 3Q net profit rises 4.7% to RM2.74b on stronger fee income, lower impairment provisions [q 0.80, tone +0.3] ★
+- 2026-11-23 www.thestar.com.my — Maybank registers higher net profit of RM2.74bil in 3Q [q 0.80, tone +1.0] ★
+- 2026-11-23 theedgemalaysia.com — Maybank's 3Q earnings rise 4.7% as lower writedown soothes pain from rising bond yields [q 0.80, tone -1.0] ★
+- 2026-11-23 www.nst.com.my — Maybank's Q3 net profit rises 4.7pct to RM2.74bil, nine-month figure at RM7.92bil [q 0.80, tone +1.0] ★
+- 2026-11-23 www.tradingview.com — Malayan Banking Posts Q3 2026 Profit Attributable Of 2.74 Billion RGT [q 0.65, tone +1.0] ★
+- 2026-11-23 www.marketscreener.com — Maybank Profit Climbs on Stronger Fee Income, Beating Estimates -- Update [q 0.65, tone +1.0] ★
+- 2026-11-23 www.tradingview.com — MAYBANK: Core income advanced, but volatile mark-to-market losses pressured operating income [q 0.65, tone -1.0] ★
+- snapshot: FinBERT headline tone 0.54 (finbert_tone, 2026-11-23)
 
 ### Tenaga (MYX:5347)
 - quiet: nothing collected for this name in the window
@@ -20,12 +29,13 @@ Generated 2026-11-23 01:46 UTC · slot `all` · 43249 articles in the corpus, 84
 - quiet: nothing collected for this name in the window
 
 ### Genting (MYX:3182)
-- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- tone: 2 stories from 2 sources, polarity +0.50, peak intensity 0.00, uncertainty 0.00 · 1 escalated
+- 2026-11-22 asgam.com — Genting wins Malaysia court injunction halting proposed hotel development near Resorts World Genting’s First World Hotel - IAG [q 0.65, tone +1.0] ★
 - 2026-11-22 www.traveldailynews.asia — Dream Cruises and LOTI partner to bring Chinese fashion and designer showcases to Genting Dream - Travel Daily News Asia-Pacific [q 0.65, tone +0.0]
-- snapshot: FinBERT headline tone 0.18 (finbert_tone, 2026-11-22)
+- snapshot: FinBERT headline tone 0.01 (finbert_tone, 2026-11-23)
 
 ### NVIDIA (XNAS:NVDA)
-- tone: 41 stories from 27 sources, polarity -0.05, peak intensity 0.33, uncertainty 0.11 · 15 escalated
+- tone: 42 stories from 28 sources, polarity -0.05, peak intensity 0.33, uncertainty 0.10 · 15 escalated
 - 2026-11-22 Yahoo — SpaceX Expects to Pass “One Gigawatt a Month” of AI Compute by the End of 2027. That’s Great News for Nvidia [q 0.85, tone +0.0] ★
 - 2026-11-22 Yahoo — China Switched to Making Its Own Chips “At All Costs.” That Shrinks Nvidia’s China Upside [q 0.85, tone +1.0] ★
 - 2026-11-22 Yahoo — Arm Sinks 20% in a Week as Chips Slide and Nvidia’s Headhunters Approach CEO Rene Haas. Time to Buy? [q 0.85, tone -1.0] ★
@@ -81,6 +91,21 @@ Generated 2026-11-23 01:46 UTC · slot `all` · 43249 articles in the corpus, 84
 | 10y minus 2y Treasury spread, % | 0.28 | 2026-11-19 | +0.01 | fred |
 | US unemployment rate, % | 4.10 | 2026-10-01 | -0.1 | fred |
 | CBOE VIX, index | 28.44 | 2026-11-19 | +3.88 | fred |
+
+## Collection
+
+| at (UTC) | source | status | fetched | kept | stored | detail |
+|---|---|---|---|---|---|---|
+| 10:07 | finbert_tone | ok | 6 | 0 | 0 | facts 6; scored 19 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized. |
+| 10:07 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
+| 10:07 | twse_openapi | ok | 8 | 0 | 0 | facts 0;  |
+| 10:07 | jin10_flash | degraded | 15 | 15 | 14 | facts 0; window not covered back to 2026-11-22 22:42Z; the oldest item read is 2 |
+| 10:07 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 10:07 | nst_business | degraded | 150 | 145 | 137 | window overflow: all 150 dated items are newer than the window's start (2026-11- |
+| 10:07 | fmt_business | ok | 41 | 41 | 41 |  |
+| 10:07 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals, IHH |
+| 10:07 | google_news | ok | 32 | 31 | 30 | named the company: 17 of 31 (lowest: IHH 0/2, Petronas Chemicals 0/3, Press Meta |
+| 10:07 | gdelt | throttled | 0 | 0 | 0 | throttled: no name could be read (3 failed, 0 not reached). First: GDELT fetch f |
 
 ---
 

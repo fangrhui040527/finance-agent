@@ -1,18 +1,109 @@
 {
-  "collection": [],
+  "collection": [
+    {
+      "at": "2026-11-23T10:07:45.348069+00:00",
+      "detail": "facts 6; scored 19 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized.onnx",
+      "fetched": 6,
+      "kept": 0,
+      "source": "finbert_tone",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-23T10:07:44.740379+00:00",
+      "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-23T10:07:44.679023+00:00",
+      "detail": "facts 0; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-23T10:07:39.346513+00:00",
+      "detail": "facts 0; window not covered back to 2026-11-22 22:42Z; the oldest item read is 2026-11-23 09:49Z, so 11.1h of the window was never served",
+      "fetched": 15,
+      "kept": 15,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 14
+    },
+    {
+      "at": "2026-11-23T10:07:37.755653+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-23T10:07:35.879840+00:00",
+      "detail": "window overflow: all 150 dated items are newer than the window's start (2026-11-21 16:48Z); the oldest is 2026-11-22 16:27Z, so 23.7h scrolled off unseen; read 3 pages, the most this feed may; page 2 starts 2.4h before page 1 ends (2026-11-23 04:28Z under 2026-11-23 06:54Z): the items between were served by neither",
+      "fetched": 150,
+      "kept": 145,
+      "source": "nst_business",
+      "status": "degraded",
+      "stored": 137
+    },
+    {
+      "at": "2026-11-23T10:07:31.984208+00:00",
+      "detail": "",
+      "fetched": 41,
+      "kept": 41,
+      "source": "fmt_business",
+      "status": "ok",
+      "stored": 41
+    },
+    {
+      "at": "2026-11-23T10:07:31.600752+00:00",
+      "detail": "read but empty: Press Metal, Genting, Maybank, Tenaga, Petronas Chemicals, IHH",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-23T10:07:30.513345+00:00",
+      "detail": "named the company: 17 of 31 (lowest: IHH 0/2, Petronas Chemicals 0/3, Press Metal 0/1)",
+      "fetched": 32,
+      "kept": 31,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 30
+    },
+    {
+      "at": "2026-11-23T10:07:28.561647+00:00",
+      "detail": "throttled: no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked); deferred: Tenaga, Petronas Chemicals, IHH",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "throttled",
+      "stored": 0
+    }
+  ],
   "counts": {
-    "articles": 43249,
+    "articles": 43471,
     "documents": 0,
-    "escalated": 5761,
+    "escalated": 5771,
     "events": 4376,
     "failed_sweeps": 115,
-    "linked": 21526,
-    "observations": 8461,
+    "linked": 21544,
+    "observations": 8467,
     "series": 31,
-    "sweeps": 1801
+    "sweeps": 1811
   },
   "day": "2026-11-23",
-  "generated_at": "2026-11-23 01:46 UTC",
+  "generated_at": "2026-11-23 10:08 UTC",
   "macro": [
     {
       "change": "0.05",
@@ -146,22 +237,133 @@
   "names": [
     {
       "earnings": [],
-      "escalated": 0,
+      "escalated": 9,
       "events": [],
       "instrument_id": "MYX:1155",
       "label": "Maybank",
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-22",
+          "known_at": "2026-11-23",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-22",
+          "period_end": "2026-11-23",
           "source": "finbert_tone",
-          "value": "0.63"
+          "value": "0.54"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMitAFBVV95cUxOMFNNVVdoRlh3b0JQZm1oXzNQN1JUanBIOEVCcHEwNGt3T1VvWGdvZXlscWwxZjZWdnVucE52WGJBdWpSQmUwbVNOdUJncnZRTDBwU0d2aW16Z3N1Uzh6b1BIdmdVbWt2cUN6ZzlWbTMyNUxNOG5vRTNwVnIzVXhLV3R4MlpIVHl2VEZhTzI0LTQ4Nmw2V2M4OURLTkdrNzRNMDkyekNnQzJxYVhUcVgtcmtMV0_SAboBQVVfeXFMTTExTmtXZ2VVWkJoeDBUaWVZTF9mY0VWT1pobUpnaEpKeS1ZOVdsVUFKZmZCTlVMeVNKOWdCYTRuTWRXcnpacFhxVXVrZDFZa3JiQjhFcTE3M0ZUN1pZU1NnQm43M083ZjJSQnZ6eENMNmtWY2ZwR0NYYVJqX2R0LTJKcUZWbjUycjhLb3BJQ3k4UEViRFRNcWZpN210Qk1vTnM5VDJmeTAweFpraV9yU2NTLWEzOG85UWRB?oc=5",
+          "domain": "www.malaymail.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-23T08:37:42+00:00",
+          "quality": 0.8,
+          "title": "Maybank 3Q net profit rises to RM2.74b despite lower revenue",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxOSjFtWkttb0E2S2dSRnA1cE9va2VzaVppWXZLV1J5NGdBWElZRHhWZDNBbnZ1azJ5NE40cEctdW5lTUxhZjFVMGtRMTNRNlZoOEVjQ1VzZHV4MndDUjNzNXFjaTVJckYzalZnUXNVNmFLQjRkQU96d2NBVGtiWDE5dFJfXzhkX3N6VlBIRjdLbWNWVTNUeTZCM2hwU1I4YjU2Sl9ZLXFoSGxqcU5fZVc2MDBnSDVaN2dybjB2RDlkMDhYeEdLczZ3UlpRYmtOTmhCVFY4?oc=5",
+          "domain": "themalaysianreserve.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.3333333333333333,
+          "published_at": "2026-11-23T05:27:35+00:00",
+          "quality": 0.8,
+          "title": "Maybank 3Q net profit rises 4.7% to RM2.74b on stronger fee income, lower impairment provisions",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMitAFBVV95cUxPRzJMWGJqdzNNSGxvZnNWOUk5TGlkRUFoZ0Z0dE1BTElFY1pqWnBNSFg5UXJzTVZ1cXpuODZSUFhNRGlpMXh3X0hLYkFqZTA4U1F5UE5La19PVEZvSEVpZTlxdVZTSkR6ZlBiM1lEX2JWUXFLdi1qcTVMNUpsSEhmeWd1R0NnRFBhM3ZMajlTNHFZblJ5OFM0WTl5SC00Z05NbEt1UVhtcE4waDRDelpWclNiUHU?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-23T05:18:00+00:00",
+          "quality": 0.8,
+          "title": "Maybank registers higher net profit of RM2.74bil in 3Q",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiUEFVX3lxTFBteEhZWG5YbDI5ZThzVmgxTzI3eHlBLWtlOHRPOHlhdjhQWU9Pd3MzWUM1a2pFUnBMWnRRanU5SER5dWw1UE85dG9kZGdZRHhJ?oc=5",
+          "domain": "theedgemalaysia.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-23T05:04:44+00:00",
+          "quality": 0.8,
+          "title": "Maybank's 3Q earnings rise 4.7% as lower writedown soothes pain from rising bond yields",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxQQTlVVmYzanZuU0MtQmJ2LW5IUU9TTWUwTVhSd0JHOEg5SXk1UXpwSWktMURSUHpzM0J3Z0dxejgwVU9uS2FLRlZhaXA2d2RzTHZXTUc2bURCWlNJdWJsMXBPVFE5cnNBb19FREhnMVRPc2d2bFgwdlBhbW8yWVVObnpiTlMwUmx5d1lEdjJtRnFrRWxqN1IzdlNtMTBvNVhhWVFtU3lHMHl5cjlnbHNFOFk1RFhtSlNaMUo40gHAAUFVX3lxTE5KX3lzMEZ4MjU4U3ZRaEtGdVhySHZQNTY1eFNfekVjS1JBYTdCNU5jRVc5UGx0bUE4OXZSQ0ktM0tkaTJNRHlUaENIN2RqcENNcHJnamx6eTE5OU9UVlgzbGIwLUgtOHhmUG1HZ1A1SnVodjRyeXJBTlVhcFdfc1hLc0NjQWJmOWZxRnVvMnJxdEpBWDFvS0R3M0dGQjItb0o4bktqZW9pQWNwek5uZFlWZE1yTHF5Nk5hellycl9WeA?oc=5",
+          "domain": "www.nst.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-23T05:00:21+00:00",
+          "quality": 0.8,
+          "title": "Maybank's Q3 net profit rises 4.7pct to RM2.74bil, nine-month figure at RM7.92bil",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMi1gFBVV95cUxNMUhRemJyMzFLM0lxci0tRXpZSHNjQzVQUUhjaVhOMEVTcTJaeXJHMVI4akg3amNEWlFWNHgtWlgxLVh5SVNHNkkxTmJmU3hHcVoyRGlGOEFWQU9VTTBhdTJLQnU5VmF5aHEwWEstVllnZkVzcjFzZXQ1eEhQZlFEdk5ITmJuOHUxZU9IVUN6eWozNkFja0VOczAzMEdaSlRISVlSOHRYNmZubFlLaDhFYUkxZ2wzX0lQd0duZFVFSzVDUWVTN2kyV0d2Qk53TUJDcjBnMW9R?oc=5",
+          "domain": "www.tradingview.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-23T06:27:00+00:00",
+          "quality": 0.65,
+          "title": "Malayan Banking Posts Q3 2026 Profit Attributable Of 2.74 Billion RGT",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMivwFBVV95cUxQSnFTRmx5UVBJNjdGY294Q242am1ZZy1DNVpESWdUWXFCR2VPbmZXVmJNTW9KSDcxVENiZFQzWlhheDlYMDBhZkstMGtyVktzQTdKbWhtSWotT0EtYWxza3FsUGNuVlYySnB1Rlhpb1hnUnp4VkxmOEpsdVdjRlN4Q2FNTjN5VXNOc1dpQU1FRTJLSDVXSXNQTDdsOEtlWjhUbzRNdTdLWVZEdkhMa1UwMlo5RVlsZC1LSXdfMG90WQ?oc=5",
+          "domain": "www.marketscreener.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-23T06:12:23+00:00",
+          "quality": 0.65,
+          "title": "Maybank Profit Climbs on Stronger Fee Income, Beating Estimates -- Update",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMigwJBVV95cUxPbk0wS0JvSkpMNU9oSkdrLVoyNEFGeVVEVG5rV2I2aDV6cHl5cUZaay1KWXdRR2hYYnFCc0tGZ18yRTFfWXZaelhrS2M0b2lxZ0V3YlhzaGY3bkhqem9OTHR5S181dkx0YzRESmRTNVhDbm9OTEhoWHoweEkwbXRjTnpRS1ozY2stUkc2UGMzbDliaGhWT09Bbmc3X2NNYjhOX2p6cjQ4bEExVHdPSEh1a01Ec2xLdWU4T1lIS25YdXR4UllZNlBINm9aZTdWemRhcVFJNGNlc21yQVg2Z3pQeUVlSXR4dkZKTFl6dl9HV2dVX0xNZEgwckw2QjRBaDlXdEJF?oc=5",
+          "domain": "www.tradingview.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-23T06:01:00+00:00",
+          "quality": 0.65,
+          "title": "MAYBANK: Core income advanced, but volatile mark-to-market losses pressured operating income",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 16,
+        "polarity_mean": 0.271,
+        "sources": 11,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -246,21 +448,34 @@
     },
     {
       "earnings": [],
-      "escalated": 0,
+      "escalated": 1,
       "events": [],
       "instrument_id": "MYX:3182",
       "label": "Genting",
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-22",
+          "known_at": "2026-11-23",
           "label": "FinBERT headline tone",
           "period_end": "2026-11-22",
           "source": "finbert_tone",
-          "value": "0.18"
+          "value": "0.01"
         }
       ],
       "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMi4wFBVV95cUxPN2RJbHhnWG9nemRjdWNnMjdWcWZrdHZNM28xaGNjcWo0TlV4TTJWR3dmYkhqeGdVeHFURW51bmpTMm5CZWNSU0NHRWd4UG1KRTh5Y2Z0LTlfX1FwZFdMYUYwdFdETVp1VU94QllZR1pmWFgzMlh2eXNhdDhSV2pJNzhTd2xjdWthM0dPRFJKSXlXU1FKSVpjTWh4NjNSR1ZsWVZVdFlLY1BzWlh1MVIwTXI1NUxFbm5kZ1BnSDZyNEdTWm9Uck1ZNjlRMjhoaHlaZnBXaVcyR1otdHU5UEVFUHI4Yw?oc=5",
+          "domain": "asgam.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-22T21:05:11+00:00",
+          "quality": 0.65,
+          "title": "Genting wins Malaysia court injunction halting proposed hotel development near Resorts World Genting\u2019s First World Hotel - IAG",
+          "uncertainty": 0.0
+        },
         {
           "day": null,
           "doc_id": "https://news.google.com/rss/articles/CBMijgFBVV95cUxNVEd3N1U5bTQ1Z1dpMGpLeUI5OU0wQ3lyMV9MWVdjcGRob3ZsQmVvUzdSMEFTU2FRUnk3WTZ2VGxfYlE4enNSeGIwbVJFcUhMampKa1RYMjllQjctZGFNMzlxRXJvYUFGSUZJeTdGd25pR1o5NG4zdWl0LUliZlpEYnZWVjhwZ3JwSkl3dW9n?oc=5",
@@ -277,9 +492,9 @@
       ],
       "tone": {
         "intensity_max": 0.0,
-        "n": 1,
-        "polarity_mean": 0.0,
-        "sources": 1,
+        "n": 2,
+        "polarity_mean": 0.5,
+        "sources": 2,
         "uncertainty_mean": 0.0
       },
       "upcoming": []
@@ -536,10 +751,10 @@
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 41,
-        "polarity_mean": -0.049,
-        "sources": 27,
-        "uncertainty_mean": 0.108
+        "n": 42,
+        "polarity_mean": -0.048,
+        "sources": 28,
+        "uncertainty_mean": 0.105
       },
       "upcoming": [
         {
