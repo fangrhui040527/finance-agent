@@ -1,6 +1,87 @@
 {
   "collection": [
     {
+      "at": "2026-11-23T22:42:54.846034+00:00",
+      "detail": "facts 12; scored 498 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized.onnx",
+      "fetched": 12,
+      "kept": 0,
+      "source": "finbert_tone",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-23T22:42:42.078847+00:00",
+      "detail": "skipped: every asked name was refused: outside the plan or over today's credits (XNAS:AAPL, XNAS:MSFT)",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-23T22:42:41.590784+00:00",
+      "detail": "facts 0; ",
+      "fetched": 0,
+      "kept": 0,
+      "source": "jin10_flash",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-23T22:42:40.411058+00:00",
+      "detail": "facts 6; XNAS:NVDA: 2026-11-23 not aggregated - 8 full pages ended part-way through that day",
+      "fetched": 37,
+      "kept": 37,
+      "source": "marketaux_news",
+      "status": "ok",
+      "stored": 27
+    },
+    {
+      "at": "2026-11-23T22:42:37.596646+00:00",
+      "detail": "facts 39; ",
+      "fetched": 373,
+      "kept": 324,
+      "source": "finnhub",
+      "status": "ok",
+      "stored": 264
+    },
+    {
+      "at": "2026-11-23T22:42:32.442936+00:00",
+      "detail": "facts 2; ",
+      "fetched": 2,
+      "kept": 0,
+      "source": "edgar",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-23T22:42:32.116627+00:00",
+      "detail": "named the company: 21 of 50 (lowest: Apple 7/19, Microsoft 7/19, NVIDIA 7/12)",
+      "fetched": 50,
+      "kept": 50,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 37
+    },
+    {
+      "at": "2026-11-23T22:42:31.187628+00:00",
+      "detail": "named the company: 173 of 193 (lowest: Microsoft 36/42, Apple 62/71, NVIDIA 75/80)",
+      "fetched": 203,
+      "kept": 193,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 182
+    },
+    {
+      "at": "2026-11-23T22:42:27.791378+00:00",
+      "detail": "throttled: no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked)",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "throttled",
+      "stored": 0
+    },
+    {
       "at": "2026-11-23T22:41:41.528341+00:00",
       "detail": "facts 0; ",
       "fetched": 450,
@@ -128,18 +209,18 @@
     }
   ],
   "counts": {
-    "articles": 43486,
+    "articles": 43996,
     "documents": 0,
-    "escalated": 5771,
-    "events": 4409,
+    "escalated": 5895,
+    "events": 4411,
     "failed_sweeps": 115,
-    "linked": 21544,
-    "observations": 8479,
+    "linked": 21906,
+    "observations": 8536,
     "series": 31,
-    "sweeps": 1815
+    "sweeps": 1824
   },
   "day": "2026-11-23",
-  "generated_at": "2026-11-23 22:41 UTC",
+  "generated_at": "2026-11-23 22:43 UTC",
   "macro": [
     {
       "change": "0.24",
@@ -537,8 +618,22 @@
     },
     {
       "earnings": [],
-      "escalated": 15,
+      "escalated": 115,
       "events": [
+        {
+          "kind": "filing",
+          "source": "edgar",
+          "title": "8-K: 8-K (items 5.02,9.01)",
+          "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000090/nvda-20261122.htm",
+          "when": "2026-11-23T00:00:00+00:00"
+        },
+        {
+          "kind": "insider_filing",
+          "source": "edgar",
+          "title": "4: FORM 4",
+          "url": "https://www.sec.gov/Archives/edgar/data/1045810/000169684126000016/xslF345X06/wk-form4_1795470863.xml",
+          "when": "2026-11-23T00:00:00+00:00"
+        },
         {
           "kind": "rating_change",
           "source": "fmp",
@@ -559,7 +654,7 @@
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-11-22",
+          "known_at": "2026-11-23",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -567,7 +662,7 @@
         },
         {
           "concept": "pb",
-          "known_at": "2026-11-22",
+          "known_at": "2026-11-23",
           "label": "P/B",
           "period_end": null,
           "source": "finnhub",
@@ -575,7 +670,7 @@
         },
         {
           "concept": "eps_ttm",
-          "known_at": "2026-11-22",
+          "known_at": "2026-11-23",
           "label": "EPS (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -583,7 +678,7 @@
         },
         {
           "concept": "dividend_yield",
-          "known_at": "2026-11-22",
+          "known_at": "2026-11-23",
           "label": "dividend yield",
           "period_end": null,
           "source": "finnhub",
@@ -591,7 +686,7 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-11-22",
+          "known_at": "2026-11-23",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
@@ -599,7 +694,7 @@
         },
         {
           "concept": "high_52w",
-          "known_at": "2026-11-22",
+          "known_at": "2026-11-23",
           "label": "52w high",
           "period_end": null,
           "source": "finnhub",
@@ -607,7 +702,7 @@
         },
         {
           "concept": "low_52w",
-          "known_at": "2026-11-22",
+          "known_at": "2026-11-23",
           "label": "52w low",
           "period_end": null,
           "source": "finnhub",
@@ -663,11 +758,11 @@
         },
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-22",
+          "known_at": "2026-11-23",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-22",
+          "period_end": "2026-11-23",
           "source": "finbert_tone",
-          "value": "-0.01"
+          "value": "0.12"
         },
         {
           "concept": "revenue",
@@ -697,115 +792,115 @@
       "stories": [
         {
           "day": null,
-          "doc_id": "finnhub:144025835",
-          "domain": "Yahoo",
+          "doc_id": "https://finance.yahoo.com/m/640f8e0d-9484-3e30-a0fe-5206490b94be/don%27t-chase-after-the.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
           "escalated": true,
-          "intensity": 0.0,
+          "intensity": 0.3333333333333333,
           "kind": "",
           "polarity": 0.0,
-          "published_at": "2026-11-22T18:40:08+00:00",
-          "quality": 0.85,
-          "title": "SpaceX Expects to Pass \u201cOne Gigawatt a Month\u201d of AI Compute by the End of 2027. That\u2019s Great News for Nvidia",
-          "uncertainty": 0.5067567567567568
+          "published_at": "2026-11-23T21:02:36+00:00",
+          "quality": 1.0,
+          "title": "Don't Chase After the Market's Big AI Gains",
+          "uncertainty": 0.0
         },
         {
           "day": null,
-          "doc_id": "finnhub:144024409",
-          "domain": "Yahoo",
+          "doc_id": "https://finance.yahoo.com/video/jensen-huang-back-as-nvidia-ceo-after-12-days-shares-surge-30-161302539.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
           "escalated": true,
-          "intensity": 0.0,
+          "intensity": 0.3333333333333333,
           "kind": "",
           "polarity": 1.0,
-          "published_at": "2026-11-22T14:21:26+00:00",
-          "quality": 0.85,
-          "title": "China Switched to Making Its Own Chips \u201cAt All Costs.\u201d That Shrinks Nvidia\u2019s China Upside",
-          "uncertainty": 0.0
+          "published_at": "2026-11-23T16:13:02+00:00",
+          "quality": 1.0,
+          "title": "Jensen Huang back as Nvidia CEO after 12 days: Shares surge 30%",
+          "uncertainty": 0.06830601092896174
         },
         {
           "day": null,
-          "doc_id": "finnhub:144023813",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": -1.0,
-          "published_at": "2026-11-22T13:35:27+00:00",
-          "quality": 0.85,
-          "title": "Arm Sinks 20% in a Week as Chips Slide and Nvidia\u2019s Headhunters Approach CEO Rene Haas. Time to Buy?",
-          "uncertainty": 0.21929824561403508
-        },
-        {
-          "day": null,
-          "doc_id": "finnhub:144023940",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": -1.0,
-          "published_at": "2026-11-22T13:35:21+00:00",
-          "quality": 0.85,
-          "title": "Arista Networks Lost 15% in a Week. Rosenblatt Sees 67% Upside From Here",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "finnhub:144023421",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 0.0,
-          "published_at": "2026-11-22T12:35:32+00:00",
-          "quality": 0.85,
-          "title": "OpenAI\u2019s Greg Brockman: AI Delivered \u201cRoughly an Additional Year of Progress\u201d on AMD\u2019s Chip in Under 5 Months",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMioAFBVV95cUxPOUZUTmFNWGdrZXVXZkhPTzJhR3g1YXFmN3ZIbGxsWTd6WVZlZTdvOUx1ZVB2OFJiTXRmdFpwN1NET29tMWhCOWxxY29WeGJoSlNXXzVUaXRPOFFiOFlUcnpHTUxPd2VwTGYwU1hQMGZ1YkZvbko2V0RFU1hEVHpDbnVIMmg3Y1FSX2U3enNUNlB6ZHM1bmJxUTg4X1RIeGZK?oc=5",
+          "doc_id": "https://finance.yahoo.com/video/eyes-in-the-back-of-his-head-why-jensen-could-be-sharper-after-ouster-151351120.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
           "escalated": true,
           "intensity": 0.0,
           "kind": "",
           "polarity": 0.0,
-          "published_at": "2026-11-22T16:04:02+00:00",
-          "quality": 0.8,
-          "title": "Prediction: These Will Be AMD\u2019s and Nvidia\u2019s Stock Prices by 2028",
-          "uncertainty": 0.0
+          "published_at": "2026-11-23T15:13:51+00:00",
+          "quality": 1.0,
+          "title": "'Eyes in the back of his head': Why Jensen could be sharper after ouster",
+          "uncertainty": 0.25
         },
         {
           "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMikgJBVV95cUxOR3RGUXpRU3hQZS13ckJJLThxS0l5b0hsSDVUSEl1QW5HZDh4RnhQOGhhbGwwaEQ4RG5Sb1JmcE5IeUtzb1EyNlJXV19nclpyalh6dHJkRTVzaDlQUWdGa0RPdUNQT1JKbUpiZl9lcWNlNTg0LWtzN2h2Mk5kNnpiTjR6Tld2VDcwTDBQcEtRNmJ6Y053b1VTV3FVTGN0bkUtbzBSZDZWWk9nRk1Xc3RscG1rSXR5bldEZUM3VzhDZ01oZ2NxdHAyYlVaRXR0cmFyTDI1UDhjZEZmeGRuLWpYa0M4Nm1iT1FDdmliRGY2V3h1OFhxRnBicVlKZ2wwdEpFZm5Cb3MyZ2pLbEdnRHowckJR?oc=5",
-          "domain": "www.barchart.com",
+          "doc_id": "https://www.trefis.com/stock/snap/articles/627539/how-risky-is-snap-stock-now/2026-11-23?.tsrc=rss",
+          "domain": "www.trefis.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-23T21:54:36+00:00",
+          "quality": 0.85,
+          "title": "How Risky Is Snap Stock Now?",
+          "uncertainty": 0.7352941176470588
+        },
+        {
+          "day": null,
+          "doc_id": "finnhub:144053562",
+          "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.3333333333333333,
           "kind": "",
           "polarity": 1.0,
-          "published_at": "2026-11-22T18:30:03+00:00",
-          "quality": 0.65,
-          "title": "Leadership Risk vs. Record Numbers: Nvidia Posted $115 Billion in Revenue in Its First Report Without Jensen Huang. What It Means for NVDA Stock.",
-          "uncertainty": 0.5434782608695652
+          "published_at": "2026-11-23T21:43:48+00:00",
+          "quality": 0.85,
+          "title": "Wall Street Roars Back From Brutal Selloff. Nvidia's 31% Surge Sends Nasdaq Soaring 6.5%.",
+          "uncertainty": 0.0
         },
         {
           "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMitgFBVV95cUxPUzZpRHJyekZ3QjdOa0pGd0VJb1U5RlZ1U3lMZEVQaWdFSm96TzhnRXVwN3Jpb3dPajY5YUdESW5Vdmh5cEJWNHhWWUlQOGRmX2pCNXl2ZWpxekxVR2VoQkNpUjVyX0VNS1hKc04ya1FGR2lmTmpXdkNYNHpreEx2T093WnZ5dXZzT2JfaUkzSzdVNElzSmFlUFdEenJwcGZSRDdtam12WmQ3YkVjam9jaG5McWNvZw?oc=5",
-          "domain": "www.stonex.com",
+          "doc_id": "finnhub:144053563",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-23T21:40:38+00:00",
+          "quality": 0.85,
+          "title": "Nvidia closes up more than 30% after Jensen Huang returns as CEO",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "finnhub:144053564",
+          "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "kind": "",
-          "polarity": 0.0,
-          "published_at": "2026-11-22T18:28:07+00:00",
-          "quality": 0.65,
-          "title": "Nasdaq 100 Forecast: NDX rises after Nvidia earnings calm AI worries",
+          "polarity": -1.0,
+          "published_at": "2026-11-23T21:38:43+00:00",
+          "quality": 0.85,
+          "title": "Nvidia Stock Adds $950 Billion in a Day as Jensen Huang Returns. Here's What Analysts Now Project",
           "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "finnhub:144053566",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-23T21:34:17+00:00",
+          "quality": 0.85,
+          "title": "Coherent Is the Real Winner of Huang\u2019s Return. Nvidia Paid $2 Billion for Its Stock",
+          "uncertainty": 0.1923076923076923
         }
       ],
       "tone": {
-        "intensity_max": 0.333,
-        "n": 42,
-        "polarity_mean": -0.048,
-        "sources": 28,
-        "uncertainty_mean": 0.105
+        "intensity_max": 0.667,
+        "n": 282,
+        "polarity_mean": 0.017,
+        "sources": 78,
+        "uncertainty_mean": 0.13
       },
       "upcoming": [
         {
@@ -819,14 +914,14 @@
     },
     {
       "earnings": [],
-      "escalated": 3,
+      "escalated": 13,
       "events": [],
       "instrument_id": "XNAS:AAPL",
       "label": "Apple",
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-11-22",
+          "known_at": "2026-11-23",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -834,7 +929,7 @@
         },
         {
           "concept": "pb",
-          "known_at": "2026-11-22",
+          "known_at": "2026-11-23",
           "label": "P/B",
           "period_end": null,
           "source": "finnhub",
@@ -842,7 +937,7 @@
         },
         {
           "concept": "eps_ttm",
-          "known_at": "2026-11-22",
+          "known_at": "2026-11-23",
           "label": "EPS (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -850,7 +945,7 @@
         },
         {
           "concept": "dividend_yield",
-          "known_at": "2026-11-22",
+          "known_at": "2026-11-23",
           "label": "dividend yield",
           "period_end": null,
           "source": "finnhub",
@@ -858,7 +953,7 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-11-22",
+          "known_at": "2026-11-23",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
@@ -866,7 +961,7 @@
         },
         {
           "concept": "high_52w",
-          "known_at": "2026-11-22",
+          "known_at": "2026-11-23",
           "label": "52w high",
           "period_end": null,
           "source": "finnhub",
@@ -874,7 +969,7 @@
         },
         {
           "concept": "low_52w",
-          "known_at": "2026-11-22",
+          "known_at": "2026-11-23",
           "label": "52w low",
           "period_end": null,
           "source": "finnhub",
@@ -922,19 +1017,19 @@
         },
         {
           "concept": "mx_news_sentiment",
-          "known_at": "2026-11-22",
+          "known_at": "2026-11-23",
           "label": "Marketaux sentiment",
-          "period_end": "2026-11-22",
+          "period_end": "2026-11-23",
           "source": "marketaux_news",
-          "value": "0.04"
+          "value": "0.06"
         },
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-22",
+          "known_at": "2026-11-23",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-22",
+          "period_end": "2026-11-23",
           "source": "finbert_tone",
-          "value": "0.12"
+          "value": "0.10"
         },
         {
           "concept": "revenue",
@@ -964,128 +1059,128 @@
       "stories": [
         {
           "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMi3wFBVV95cUxOZFctSnd3bHlQUjVhTW5VZV9hYkxocDhzUXF3RnQ5Um1wcTVFdDhYU0dYRkhsYXljcFVUTzh2ZXk3V1N0aFNZZWx0WFBZTHA3MEp5R3ctZHpPWkQwQnREelJBVDN4YzhMNUtUc3dOV0tBYVdialRxUVhCQ1FxelNJT3hDRDE5WlVTLWZRSHdxclRoQXU0TEg3SVhiS1FLMnFfaFR4SFFWclYyZmQzMzM4M3U4U0h5YWgzMEtQVWZSamJvdHlfWDRhNEplVnhIRUJIQlNrRmNnOGM5WWJRc25r?oc=5",
-          "domain": "www.foreignpolicyjournal.com",
+          "doc_id": "https://247wallst.com/videos/crowdstrike-shares-fall-10-after-a-44-billion-zscaler-deal-despite-an-earnings-beat-and-raised-guidance/?.tsrc=rss",
+          "domain": "247wallst.com",
           "escalated": true,
           "intensity": 0.0,
           "kind": "",
-          "polarity": 1.0,
-          "published_at": "2026-11-22T18:14:00+00:00",
-          "quality": 0.65,
-          "title": "Apple (NASDAQ: AAPL) Beats Big Tech's AI Spending Race With $109.4B Revenue And A $5 Trillion Valuation",
-          "uncertainty": 0.0
+          "polarity": 0.6,
+          "published_at": "2026-11-23T19:55:23+00:00",
+          "quality": 0.85,
+          "title": "CrowdStrike Shares Fall 10% After a $44 Billion Zscaler Deal Despite an Earnings Beat and Raised Guidance",
+          "uncertainty": 0.13440860215053763
         },
         {
           "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMi_AFBVV95cUxQZ0V4c3FURkpoV3R1ODEtSFlVa0k5RTlQeXZacG14aDAybnhzMHdhWEpSSkhGRVJRUVJtMzRPMHNWREFkRGU5UlhUclE0VTN5SmRhTXBNS2JvT2NHQmxHZ2tYaGtJTEQ3VHBBSlpjQkpqdXNNSV9DT1BBaEVXcmRKaEZpQzgxcEkwb0wyNjI5RHYyWktSNWpweTlhSTM5OTVBamdRSVJrRHFwNlZyTlNFcDRibzhjZ2xkUjU4eFVKRjVkT1ZWZjVudXM0cVpmX1RiMGxuTWV2NXl2U21LYUFwbUFlaWYwX2ZCLUVNdy1ESHItaGJ0WnFPSC0wRlc?oc=5",
-          "domain": "www.tikr.com",
+          "doc_id": "finnhub:144048415",
+          "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.3333333333333333,
           "kind": "",
           "polarity": 0.0,
-          "published_at": "2026-11-22T15:01:06+00:00",
-          "quality": 0.65,
-          "title": "Apple\u2019s CEO Calls Memory Pricing \u201cUnprecedented.\u201d Its Purchase Obligations Jumped $33 Billion in a Quarter",
+          "published_at": "2026-11-23T12:30:05+00:00",
+          "quality": 0.85,
+          "title": "Aswath Damodaran Sets $140 Nvidia \u2018Limit Buy\u2019 After Jensen Huang Exit, Calls Tim Cook \u2018Not A Good Fit\u2019 Except As Temporary CEO During Crisis",
           "uncertainty": 0.0
         },
         {
           "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMi9gFBVV95cUxQV0t2aFVRRVhGOURDSWdBT2s2R0szc0tDM1o0V3R6cXU5TnJqWWRSZndJdUpTTDBCbDI1WFFGdDZ4R182QkpCemYxekNpMkU2TFB0cEpSb1J4SnJ1R0hXTG1uV2F5ZEoweGM1UUY2WEVNRndPNnFOTkRieXR2cWRrSFFQbEk1dzNxYWFiWl84SFdTdlctYzF3Y0Rsc2JuZUdnbDFKOEFvcTdsbHVpaFVQYXV4VDQycW10M09rRi1keTVDVF9mV2RvVzVNNkhSOVNJRXhYV0EtRzJNNGdnZnZjdGhZWHo0QVpXak43WS11cTlpWkQxZUE?oc=5",
-          "domain": "www.tikr.com",
+          "doc_id": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxPbjJnTFdnMXM4dGFUUXlhRW1XUXNmM01kSW9OOVJQcW5SMXo2ZG9sX2c0eGkyX2ZUTERidV9JNWpiTFJrdVRvS0JuUGtPNmpRaG1PNENnVHEyNGs0aXNTdnlPWEV4ZVdHV29yanBabFVqN1dMTG1MM0RqMnQ3M3RHTnhPc01DdVMyR0pHNDgycmxicXg0bTV0Z3pIZ3JjNGN1cVBFSlBVWkdqVjk1X29KT1dWbUJ0RzdB?oc=5",
+          "domain": "www.investing.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-23T21:09:48+00:00",
+          "quality": 0.8,
+          "title": "Apple shares bought by Ed Case through dividend reinvestment By Investing.com",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMingFBVV95cUxPcW1jOGhpTU9zdUNNMEpkN0RqUmZaeFNMbU1JS2FwTHB4cE5kMlVKcjRxZk5wTG01VzZmbFJYWmpSRFN2M0hicWMwMno3bHZ2dnNER2YzbEtQUUdiTENpUjhETFhvUzhxM1N6SkdYUE5ORGJNU1RaYkFmenJtVDNKN1ZOVGlCVzBUR29McU9MZTZ0MGl3OWxMdWtHYVhKQQ?oc=5",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-23T07:48:00+00:00",
+          "quality": 0.8,
+          "title": "Michael Burry Names Apple, Costco And Walmart Early Crash Havens \u2014 The \u2018Generals\u2019 Fell Months After 2000 And 2007 Peaks",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMixgFBVV95cUxQZ2R0ZXBaUTJ2bXNtRGxabG5VWkNJRzJ5TVZDT0dKa29yNmo4NHNVTzlFYmhMYnlrY1UtNmJXZ1cxSExIZnQ4bUpmN3B3aXlLT0ZyV2QxOG4tZlVGVElUQ3BUSjVmbnV4d29iWmZRZ1RPSnFwdTBMc3pyUVJXaEoxQW1la3VHQmg2N3c4ZnhqV0d0QXJweVEwOGxXYU9rZnJ6Y2hmMGxza1ZWXzYxZklTdDhtdmZIcjZWYWgwRlU1NlVQN3Y0bmfSAcsBQVVfeXFMTUtNd0xDNzFWT1BWOXJ4bV9vWm4yajZCY3l2Zkpxa2FMTmxieU9IRGpOWWlaU0dnM2szZEhjUWo2V0JuVWsyLVlsdk9peHFPd055d1R5RUZwOFR1SkpoMHlRTFhBNVZEcWNvUE5FMndTVTdpR3hQamxSTW1xd2JOYnFVNzNFUWpKbkhSNXRhMGRkZVdQQjM5Z09ZZ3BXc0Z0amxJcWxlcGdQa242RTlSQUcyZUVHSmtyWThkaF9jdHlRQXJ0emltNVpxcW8?oc=5",
+          "domain": "macdailynews.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-23T18:30:36+00:00",
+          "quality": 0.65,
+          "title": "Retail expansion and financing options continue to support Apple\u2019s meteoric growth in India",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMic0FVX3lxTFBtdkhYckFEMGFpZ3hpVHRYbnZYUmlHMWxxbnJjMFlYWWVueDJpRmM3VFRJLU1VMWFtRm13emtKQTlvLXdQZzMzTzROeUxPbWFRdmFfNVJuQnhKSjhlY2Y5bFo0Sk5pb0hfM1A0MTI2WTJXZkE?oc=5",
+          "domain": "cryptobriefing.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-23T16:18:08+00:00",
+          "quality": 0.65,
+          "title": "Apple hits all-time high as AI stocks decline amid market volatility",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxOS1diTmVPblFxSjBkUmlGMEo3ZFhMakd6a1NKUXdhdGhPXzVBeHFTcHRYcmMwOWd2MWNMajdRQXVsZktsa3BMLVRzYVZQNTk5VGVBX2E3MHZyb1Nrb2ZPYXNROE9uMm5JcFBlczZ2dEdYOEdVM2I3RlFzcFhtWWJsWG9xVll3V1Qta3B3?oc=5",
+          "domain": "tradersunion.com",
           "escalated": true,
           "intensity": 0.0,
           "kind": "",
           "polarity": 0.0,
-          "published_at": "2026-11-22T13:10:37+00:00",
+          "published_at": "2026-11-23T14:02:29+00:00",
           "quality": 0.65,
-          "title": "The App Paradigm Will \u201cSlowly, if Not Quickly, Dissipate,\u201d Says Mark Gurman. That\u2019s a Problem for Apple",
-          "uncertainty": 0.6944444444444444
-        },
-        {
-          "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMingFBVV95cUxPZkZLdmwyWGlObEo1YVNleUhDTEtRYlFmSUd5TUkwUUNOcm4wUi1ubVJGS2UwTjFtVWZoNHI0OUhELUNlTURHNmlCdVhrbVVUQmppRXk3OVJqX051VkpSOGZYeWlnVlc3aHRSeUZjYU02Y21uR0s3LWd4d3AzNjBEQ0MxZ2E1WE5qOWdya1VoZFd3b0VwTlNSQ0NzdE9BUQ?oc=5",
-          "domain": "finance.yahoo.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 0.0,
-          "published_at": "2026-11-22T20:06:14+00:00",
-          "quality": 0.8,
-          "title": "What Is Apple (AAPL) Planning With Its New Autonomous AI Agent?",
+          "title": "Apple stock forecast: Bearish momentum persists as sellers remain in control",
           "uncertainty": 0.0
         },
         {
           "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMi3wFBVV95cUxOa0FNZkJwV3ZJbVFSRFZZUXh2dzAzZktiSkNOY3NYc1E5M1prdTVaUTVZZlFZUmY5dFlaTTJNWFVHQnNrODB5VFlIUmR6eXh3WFc5bUhGbEVtSjR1SHY0Y1dZX0VMN2ZsRHBEMlYxU0ljOWVhek5DU2ZKOG1uZmlMTndWUld6eXlhTEx0SnBKV1Z1bDcyRjdQTHdiSmh2T2FMcWJfNDNyYW9BN0hFRG11XzVLdGNTcTZIQk9HOWpSS3g1UlFlWTFiaDg1LWd2QXFxcVRabER5QmtqQXpyb1B3?oc=5",
-          "domain": "www.fool.com",
-          "escalated": false,
+          "doc_id": "https://news.google.com/rss/articles/CBMiakFVX3lxTE9fbkQtVnRpVHBIbTg1aVhlVVhHaWxiakNlc2txY2RNQ1N1X1RtRjROUHBkd3dHWkE3R19xOXhNdVcwbXFIcWtLd1N1MVVZTXAxTmhDeGE3aXF1b2ZvM3N2YkZmekhkVllwTFE?oc=5",
+          "domain": "www.tradingview.com",
+          "escalated": true,
           "intensity": 0.0,
           "kind": "",
-          "polarity": 0.0,
-          "published_at": "2026-11-22T22:35:02+00:00",
+          "polarity": -1.0,
+          "published_at": "2026-11-23T11:45:58+00:00",
           "quality": 0.65,
-          "title": "Apple Is Now 25% of Berkshire Hathaway's Stock Portfolio. Here's What Holding Every Share Tells Investors.",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMi2gFBVV95cUxONDRvRjJKMXB1RTJBdXJXZmdQcjJhWjNfR2tUUkV5OUsxYkg3TkJCb3luZjdPcWh5ZWd5TzJhVEthaFc3eHhvbFljbzkxcE9uZzBDZ1NCY3VfZnNJaFZCNjhpcThyaS0xMC1DTTU3d0p3QzhsSVY3MFpGWDRJNjUtMUljaF95UHlFYTVBZEEzQ3c1NERGeXpEQ0U0anJ2QWJoZllIbG5ULXR1THpEVy12czAyYXBtd1pmOU9vQ3l6RjBwa0o0VFJJdERXZDVpb0Qtbnd2d3pIdFNoQQ?oc=5",
-          "domain": "www.foreignpolicyjournal.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 0.0,
-          "published_at": "2026-11-22T21:53:00+00:00",
-          "quality": 0.65,
-          "title": "Rival AI Habit Formation Poses Longer-Term Threat To Apple (NASDAQ: AAPL), Says Bloomberg's Gurman",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxPVElSWnc0aXIxNXNuRFNNaE9oSEJKanppUkN1VXdSWGl6YjVxN1FKcktGZzNYbF9VWmRMNWNNMWxmSW13S2RJRUNTNzlFWkpOR3M1dkxidVllMGdKUmtMZ0xZaHRCMzBHdzhiZWtKTU5EWHg3bmpkZUhfSkZsMFdCeE9sc0x5NDV6?oc=5",
-          "domain": "fourweekmba.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 0.0,
-          "published_at": "2026-11-22T20:38:12+00:00",
-          "quality": 0.65,
-          "title": "Apple Now 64% of Globalstar Revenue, Up From 24% in 2022",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMi9AFBVV95cUxNYklYTDJUU01hMDRUTThYZUp1dVg4RDdCWWZtdXplS0VDSWdaTnlBaktZRFgwZlBKeGgtTVkwNUdtM1pQZG11cXF5RjJxSGFNbThGcGlfTEJLUlhMN3JIRTZjZkRoYVhOWGFfUmNMTFMtdzNWMGo2RlNCVGszRTdURGx6YUtpUzg5bXNzN0RqWHN3MUI0SkxtcXJBdXFLdC10VGpLRzdZT21rY1NSTVl5RmlJTnlnQjYzT2VGekxjLWNxRVVLN3Ewc1hWWjBaeFVlbGpOVmFmS1FrSklRcTlzVy1aRFFLV04zbUZwS3BwQ2xUYkVM?oc=5",
-          "domain": "www.ad-hoc-news.de",
-          "escalated": false,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 0.0,
-          "published_at": "2026-11-22T18:01:24+00:00",
-          "quality": 0.65,
-          "title": "Apple's Week of Reckoning: UK Snooping Order, Service Outage and an AI Selloff Hit the Stock - ad-hoc-news.de",
-          "uncertainty": 0.0
+          "title": "Michael Burry Says Apple, Costco and Walmart Could Face a Delayed Selloff",
+          "uncertainty": 1.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 17,
-        "polarity_mean": 0.059,
-        "sources": 13,
-        "uncertainty_mean": 0.041
+        "n": 88,
+        "polarity_mean": 0.007,
+        "sources": 39,
+        "uncertainty_mean": 0.072
       },
       "upcoming": []
     },
     {
       "earnings": [],
-      "escalated": 5,
+      "escalated": 22,
       "events": [],
       "instrument_id": "XNAS:MSFT",
       "label": "Microsoft",
       "snapshot": [
         {
           "concept": "pe_ttm",
-          "known_at": "2026-11-22",
+          "known_at": "2026-11-23",
           "label": "P/E (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -1093,7 +1188,7 @@
         },
         {
           "concept": "pb",
-          "known_at": "2026-11-22",
+          "known_at": "2026-11-23",
           "label": "P/B",
           "period_end": null,
           "source": "finnhub",
@@ -1101,7 +1196,7 @@
         },
         {
           "concept": "eps_ttm",
-          "known_at": "2026-11-22",
+          "known_at": "2026-11-23",
           "label": "EPS (ttm)",
           "period_end": null,
           "source": "finnhub",
@@ -1109,7 +1204,7 @@
         },
         {
           "concept": "dividend_yield",
-          "known_at": "2026-11-22",
+          "known_at": "2026-11-23",
           "label": "dividend yield",
           "period_end": null,
           "source": "finnhub",
@@ -1117,7 +1212,7 @@
         },
         {
           "concept": "beta",
-          "known_at": "2026-11-22",
+          "known_at": "2026-11-23",
           "label": "beta",
           "period_end": null,
           "source": "finnhub",
@@ -1125,7 +1220,7 @@
         },
         {
           "concept": "high_52w",
-          "known_at": "2026-11-22",
+          "known_at": "2026-11-23",
           "label": "52w high",
           "period_end": null,
           "source": "finnhub",
@@ -1133,7 +1228,7 @@
         },
         {
           "concept": "low_52w",
-          "known_at": "2026-11-22",
+          "known_at": "2026-11-23",
           "label": "52w low",
           "period_end": null,
           "source": "finnhub",
@@ -1181,19 +1276,19 @@
         },
         {
           "concept": "mx_news_sentiment",
-          "known_at": "2026-11-22",
+          "known_at": "2026-11-23",
           "label": "Marketaux sentiment",
-          "period_end": "2026-11-22",
+          "period_end": "2026-11-23",
           "source": "marketaux_news",
-          "value": "-0.19"
+          "value": "0.18"
         },
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-22",
+          "known_at": "2026-11-23",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-22",
+          "period_end": "2026-11-23",
           "source": "finbert_tone",
-          "value": "-0.05"
+          "value": "0.20"
         },
         {
           "concept": "revenue",
@@ -1223,6 +1318,32 @@
       "stories": [
         {
           "day": null,
+          "doc_id": "https://finance.yahoo.com/small-business/articles/leading-chros-business-executives-convene-212500658.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-23T21:25:00+00:00",
+          "quality": 1.0,
+          "title": "Leading CHROs and Business Executives to Convene at i4cp's 2027 Next Practices Now Conference",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/drove-microsoft-corporation-msft-q3-180542777.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-23T18:05:42+00:00",
+          "quality": 1.0,
+          "title": "Here\u2019s What Drove Microsoft Corporation\u2019s (MSFT) Q3 Outperformance",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
           "doc_id": "https://finance.yahoo.com/technology/ai/articles/microsoft-msft-building-bigger-ai-160715680.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
           "escalated": true,
@@ -1236,102 +1357,76 @@
         },
         {
           "day": null,
-          "doc_id": "https://finance.yahoo.com/technology/ai/articles/15-parents-already-cut-college-211500548.html?.tsrc=rss",
-          "domain": "finance.yahoo.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": -1.0,
-          "published_at": "2026-11-22T21:15:00+00:00",
-          "quality": 0.8,
-          "title": "15% of parents already cut college savings after Microsoft AI CEO told a mom 'probably not' to bother saving",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMirAFBVV95cUxPaUZyeEEwS2VjTlFuaURmS1MxeHc1TnExMlA5a2RhZGpyeUw4M3VTazBodm1UMXdFUGE4YmxpZWxXZjgwem1xWjNkRzlMUkhrMWlDWnVzNHVpQlJpV3BPYTA2NlQzaVRhVUNWN3hSV3BObUhmQzRGQVRvRjB6VDlHTWlHSHVNOHJmQnRSUXA5YnF0N09mOHdicndZY3FMbEpkdHVYU2ZhcVkzN0pv?oc=5",
-          "domain": "fortune.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": -1.0,
-          "published_at": "2026-11-22T21:52:51+00:00",
-          "quality": 0.65,
-          "title": "Microsoft\u2019s CFO admits she joined the tech giant without even knowing her salary\u2014and then missed her first day of work",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMiswFBVV95cUxPeHpBLXlsb1ZkOEdmXzQ0cVFQc05jVGVFWEVsQ3FwekxjQ3hnSUxmLVh3cmozZWVXSTU5aXc2c2NsS051QS1jem5tb0NRTFJhc3VvVmFYMW1XdXNZQ2p6U1VnU3RQeC1PaHJqRzgxa2FsWTR6YnJxREZsTjdwQnVxdmpOb2JKVjJ3YUtHSXNpNGs5ZzRhZkh6bE00WGtEN2xzYXFNWGplR0ZVZ3BmclBYNDRvYw?oc=5",
-          "domain": "www.barchart.com",
+          "doc_id": "https://247wallst.com/videos/palantir-rips-10-to-lead-software-stocks-cloudflare-and-servicenow-also-join-jensen-rally/?.tsrc=rss",
+          "domain": "247wallst.com",
           "escalated": true,
           "intensity": 0.0,
           "kind": "",
           "polarity": 1.0,
-          "published_at": "2026-11-22T20:30:03+00:00",
-          "quality": 0.65,
-          "title": "Microsoft Remains Attractively Valued as Azure and Cloud Drive Growth",
-          "uncertainty": 0.0
+          "published_at": "2026-11-23T20:08:09+00:00",
+          "quality": 0.85,
+          "title": "Palantir Rips 10% to Lead Software Stocks. Cloudflare and ServiceNow Also Join \u2018Jensen Rally\u2019",
+          "uncertainty": 0.06443298969072166
         },
         {
           "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxPeXNyeV9qVldGOFFTVDUtdkdpQVV2SGpldEtGa1J2WTNmZTBYYWxEdFl1Ri00bWRzUG5VQnk1WUFLV0xEYVFTYUM3M2lGcVlHNkQzZHFQMnRjRFBJbHpKSTdVWExDcFdnRk42MWZacS1WS0ZlWGFXTm52RDFPMWZzaHRXemtnOGtlMHJ4QUJMSC1SckoxajU0Z2ZMQ1ZiNVUtczNuTm9vYmdjTXM?oc=5",
-          "domain": "www.thestreet.com",
+          "doc_id": "https://stocktwits.com/news-articles/markets/equity/gta-vi-hype-more-than-doubled-sony-s-us-ps-5-and-microsoft-s-xbox-weekly-sales-circana-says/cNbpaZJR9jN?.tsrc=rss",
+          "domain": "stocktwits.com",
           "escalated": true,
           "intensity": 0.0,
           "kind": "",
           "polarity": 1.0,
-          "published_at": "2026-11-22T16:03:00+00:00",
-          "quality": 0.65,
-          "title": "Bank of America sends strong signal to Microsoft stock investors",
+          "published_at": "2026-11-23T19:13:27+00:00",
+          "quality": 0.85,
+          "title": "GTA VI Hype More Than Doubled Sony\u2019s US PS5 And Microsoft\u2019s Xbox Weekly Sales, Circana Says",
           "uncertainty": 0.0
         },
         {
           "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMi1wFBVV95cUxOMFVjd1F2ekhnQTlPWFdqN3FPNEQ3cFBhNHJzTWtydmdnRFNiV1hIaWU5eUMzNGlKTFV0d3lWU0pXTTN2VjFQeHRheW9HV0dqdldsNWROVTJlajJQVGlvVHVDQVF2ZEJZb29GVmh1X0p5bFNQRG9qYnVieF9zTE5TWGk5dnB4Q1ZOSDFHb3BqYmxGeVllRExIUXFoQWZHMV9kZG43UkFTTFUwaC1SZWdkcjM2eFJSdG94akE2dHhDZUU4OEFJSEw2NnctMWlNdkhMeTF4bjVIQQ?oc=5",
-          "domain": "www.ad-hoc-news.de",
-          "escalated": false,
+          "doc_id": "finnhub:144051275",
+          "domain": "Yahoo",
+          "escalated": true,
           "intensity": 0.0,
           "kind": "",
           "polarity": 0.0,
-          "published_at": "2026-11-22T13:51:09+00:00",
-          "quality": 0.65,
-          "title": "SAP Ties Joule Work Closer to Microsoft as Shares Slide in Tech Rout - ad-hoc-news.de",
+          "published_at": "2026-11-23T17:33:00+00:00",
+          "quality": 0.85,
+          "title": "Intel landed Microsoft, but now it needs something it can't make",
           "uncertainty": 0.0
         },
         {
           "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMieEFVX3lxTFBraXpUTkdqY0w4c3lSVkc2ZHRyQlQ5TVVwa3hFSnRnRW5DTGFINVphZnBDdlpVTktJSURoWTZjVGNGRlVJRE5UOTB0TFVuRG5wbzRiREtHM0VoNDVUUzN3TU9fSlJUZjkxZWRBSjlOVWJWcTFBaDhTcA?oc=5",
-          "domain": "www.nett.com.au",
-          "escalated": false,
-          "intensity": 0.0,
+          "doc_id": "finnhub:144051283",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
           "kind": "",
-          "polarity": 0.0,
-          "published_at": "2026-11-22T13:15:51+00:00",
-          "quality": 0.65,
-          "title": "Microsoft's Turnaround: The Boring Fixes Behind Nadella's Run",
-          "uncertainty": 0.0
+          "polarity": 1.0,
+          "published_at": "2026-11-23T17:30:00+00:00",
+          "quality": 0.85,
+          "title": "NiobiumX Mining Inc. (OTCQB: NIOXF): Niobium Is Behind US Missiles and Next-Generation AI Chips. The US Imports All of It.",
+          "uncertainty": 0.13297872340425532
         },
         {
           "day": null,
-          "doc_id": "https://www.tikr.com/blog/a-164-billion-fund-bought-these-3-stocks-last-quarter?ref=yahoofinance&tlnk=yf-261122-9gjc63fr&.tsrc=rss",
-          "domain": "www.tikr.com",
-          "escalated": false,
+          "doc_id": "finnhub:144051280",
+          "domain": "Yahoo",
+          "escalated": true,
           "intensity": 0.0,
           "kind": "",
           "polarity": 0.0,
-          "published_at": "2026-11-22T12:20:37+00:00",
-          "quality": 0.5,
-          "title": "A $164 Billion Fund Bought These 3 Stocks Last Quarter",
+          "published_at": "2026-11-23T16:24:00+00:00",
+          "quality": 0.85,
+          "title": "Augmented Reality in Healthcare - Global Market Outlook Report (2026-2034) by Product, Technology, End User, Country, and Company",
           "uncertainty": 0.0
         }
       ],
       "tone": {
-        "intensity_max": 0.0,
-        "n": 8,
-        "polarity_mean": 0.0,
-        "sources": 7,
-        "uncertainty_mean": 0.0
+        "intensity_max": 0.667,
+        "n": 59,
+        "polarity_mean": 0.119,
+        "sources": 34,
+        "uncertainty_mean": 0.05
       },
       "upcoming": []
     }
