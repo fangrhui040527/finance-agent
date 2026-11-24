@@ -1,37 +1,63 @@
 # Digest 2026-11-24
 
-Generated 2026-11-24 00:15 UTC · slot `all` · 43996 articles in the corpus, 8536 observations, 4411 events in the fact book.
+Generated 2026-11-24 10:08 UTC · slot `all` · 44242 articles in the corpus, 8557 observations, 4411 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- quiet: nothing collected for this name in the window
+- tone: 10 stories from 10 sources, polarity +0.50, peak intensity 0.00, uncertainty 0.00 · 9 escalated
+- 2026-11-24 www.nst.com.my — Maybank shares rise on strong 3Q performance [q 0.80, tone +1.0] ★
+- 2026-11-24 www.businesstoday.com.my — RHB Research Cuts Maybank’s Target Price On Capital Concerns [q 0.80, tone -1.0] ★
+- 2026-11-24 www.thestar.com.my — Maybank records growth in loans and NIMs [q 0.80, tone +1.0] ★
+- 2026-11-24 asianbankingandfinance.net — Maybank Q3 profit rises 4.7% to $665.6m on wealth and investment fees [q 0.65, tone +1.0] ★
+- 2026-11-24 www.moomoo.com — Stock Today: Maybank Climbs 1.72% Despite Concerns Over Weaker Capital Buffer [q 0.65, tone -1.0] ★
+- 2026-11-23 thesun.my — Maybank Q3 net profit rises 4.7% to RM2.74 billion [q 0.65, tone +1.0] ★
+- 2026-11-23 www.bernamabiz.com — Maybank Posts Higher 3Q Net Profit Of RM2.74 Bln [q 0.65, tone +1.0] ★
+- 2026-11-23 www.minichart.com.sg — Maybank 9M2026 Profit Up 1.0% to RM7.92B, Revenue Down 9.9%, CET1 Falls to 13.09% [q 0.65, tone +1.0] ★
+- snapshot: FinBERT headline tone 0.48 (finbert_tone, 2026-11-24)
 
 ### Tenaga (MYX:5347)
-- quiet: nothing collected for this name in the window
+- tone: 5 stories from 1 sources, polarity +0.20, peak intensity 0.00, uncertainty 0.00 · 3 escalated
+- 2026-11-23 www.multibagg.ai — Shree TNB plans three-layer drums for 30% reprocessed rule [q 0.65, tone +0.0] ★
+- 2026-11-23 www.multibagg.ai — Shree TNB targets FY28 commercial output from new plants [q 0.65, tone +0.0] ★
+- 2026-11-23 www.multibagg.ai — Shree TNB targets Rs 135-150 crore expansion revenue by FY29 [q 0.65, tone +1.0] ★
+- 2026-11-23 www.multibagg.ai — Shree TNB says H2 accounts for 60% of its annual business [q 0.65, tone +0.0]
+- 2026-11-23 www.multibagg.ai — Shree TNB Starts Amul Dairy Gas-Pipe Order as Registration Continues [q 0.65, tone +0.0]
+- snapshot: FinBERT headline tone 0.13 (finbert_tone, 2026-11-24)
 
 ### Petronas Chemicals (MYX:5183)
-- quiet: nothing collected for this name in the window
+- tone: 5 stories from 5 sources, polarity +0.40, peak intensity 0.00, uncertainty 0.00 · 3 escalated
+- 2026-11-24 www.thestar.com.my — PETRONAS Chemicals records RM179mil net profit in 3Q [q 0.80, tone +1.0] ★
+- 2026-11-24 mcigroup.my — Petronas Chemicals Returns to the Black in 3Q With RM179 Mln Net Profit - Malaysia-China Insight [q 0.65, tone +1.0] ★
+- 2026-11-24 www.tradingview.com — PCHEM: Q3 returned to profit, but oversupply and weak specialty demand cloud the outlook [q 0.65, tone +0.0] ★
+- 2026-11-24 theedgemalaysia.com — PETRONAS Chemicals stays in the black on higher selling prices, lower costs [q 0.80, tone +0.0]
+- 2026-11-24 www.marketscreener.com — PETRONAS Chemicals Group Berhad Reports Earnings Results for the Third Quarter and Nine Months Ended September 30, 2026 [q 0.65, tone +0.0]
+- snapshot: FinBERT headline tone 0.11 (finbert_tone, 2026-11-24)
 
 ### IHH (MYX:5225)
-- quiet: nothing collected for this name in the window
+- tone: 2 stories from 2 sources, polarity +0.00, peak intensity 0.33, uncertainty 0.00 · 1 escalated
+- 2026-11-24 www.thestar.com.my — IHH Healthcare launches free emergency ambulance service in Klang Valley [q 0.80, tone +0.0] ★
+- 2026-11-24 www.tipranks.com — EPF Board Reports Disposal of 4,904,000 IHH Shares [q 0.65, tone +0.0]
+- snapshot: FinBERT headline tone 0.11 (finbert_tone, 2026-11-24)
 
 ### Press Metal (MYX:8869)
 - quiet: nothing collected for this name in the window
 
 ### Genting (MYX:3182)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +1.00, peak intensity 0.00, uncertainty 0.00 · 1 escalated
+- 2026-11-24 www.igamingtoday.com — Genting Wins Court Injunction Over Hotel Development Near First World Hotel [q 0.65, tone +1.0] ★
+- snapshot: FinBERT headline tone -0.09 (finbert_tone, 2026-11-24)
 
 ### NVIDIA (XNAS:NVDA)
-- tone: 189 stories from 59 sources, polarity +0.05, peak intensity 0.67, uncertainty 0.11 · 79 escalated
+- tone: 202 stories from 63 sources, polarity +0.07, peak intensity 0.67, uncertainty 0.10 · 85 escalated
+- 2026-11-24 www.nst.com.my — Tech firms soar as Huang's return reinvigorates AI trade [q 1.00, tone +1.0] ★
+- 2026-11-24 www.nst.com.my — Dollar climbs as renewed AI euphoria fuels Fed rate hike bets [q 1.00, tone +1.0] ★
+- 2026-11-24 www.nst.com.my — Japanese, South Korean stocks surge after Jensen Huang returns to Nvidia [q 1.00, tone +1.0] ★
+- 2026-11-23 www.nst.com.my — US stocks surge, cheering return of Nvidia CEO and shrugging off scandal [q 1.00, tone +1.0] ★
+- 2026-11-23 www.nst.com.my — US lawmakers criticise Nvidia decision to reinstate Huang as CEO [q 1.00, tone +0.0] ★
 - 2026-11-23 finance.yahoo.com — Don't Chase After the Market's Big AI Gains [q 1.00, tone +0.0] ★
 - 2026-11-23 finance.yahoo.com — Jensen Huang back as Nvidia CEO after 12 days: Shares surge 30% [q 1.00, tone +1.0] ★
 - 2026-11-23 finance.yahoo.com — 'Eyes in the back of his head': Why Jensen could be sharper after ouster [q 1.00, tone +0.0] ★
-- 2026-11-23 www.trefis.com — How Risky Is Snap Stock Now? [q 0.85, tone -1.0] ★
-- 2026-11-23 Yahoo — Wall Street Roars Back From Brutal Selloff. Nvidia's 31% Surge Sends Nasdaq Soaring 6.5%. [q 0.85, tone +1.0] ★
-- 2026-11-23 Yahoo — Nvidia closes up more than 30% after Jensen Huang returns as CEO [q 0.85, tone +0.0] ★
-- 2026-11-23 Yahoo — Nvidia Stock Adds $950 Billion in a Day as Jensen Huang Returns. Here's What Analysts Now Project [q 0.85, tone -1.0] ★
-- 2026-11-23 Yahoo — Coherent Is the Real Winner of Huang’s Return. Nvidia Paid $2 Billion for Its Stock [q 0.85, tone -1.0] ★
 - event 2026-11-23 filing — 8-K: 8-K (items 5.02,9.01) (edgar)
 - event 2026-11-23 insider_filing — 4: FORM 4 (edgar)
 - event 2026-11-23 rating_change — Bernstein upgrade Outperform (from Market Perform) (fmp)
@@ -83,6 +109,21 @@ Generated 2026-11-24 00:15 UTC · slot `all` · 43996 articles in the corpus, 85
 | 10y minus 2y Treasury spread, % | 0.29 | 2026-11-23 | +0 | fred |
 | US unemployment rate, % | 4.10 | 2026-10-01 | -0.1 | fred |
 | CBOE VIX, index | 35.89 | 2026-11-20 | +7.45 | fred |
+
+## Collection
+
+| at (UTC) | source | status | fetched | kept | stored | detail |
+|---|---|---|---|---|---|---|
+| 10:07 | finbert_tone | ok | 16 | 0 | 0 | facts 16; scored 42 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized |
+| 10:07 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
+| 10:07 | twse_openapi | ok | 8 | 0 | 0 | facts 5;  |
+| 10:07 | jin10_flash | degraded | 18 | 17 | 17 | facts 0; window not covered back to 2026-11-23 22:42Z; the oldest item read is 2 |
+| 10:07 | bnm_opr | ok | 10 | 0 | 0 | facts 0;  |
+| 10:07 | nst_business | degraded | 150 | 141 | 135 | window overflow: all 150 dated items are newer than the window's start (2026-11- |
+| 10:07 | fmt_business | degraded | 50 | 50 | 49 | window overflow: all 50 dated items are newer than the window's start (2026-11-2 |
+| 10:07 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Petronas Chemicals, IHH, Press Metal, Genting, Maybank, Tenaga |
+| 10:07 | google_news | ok | 54 | 51 | 45 | named the company: 29 of 51 (lowest: Press Metal 0/3, Genting 3/13, Tenaga 5/9) |
+| 10:07 | gdelt | throttled | 0 | 0 | 0 | throttled: no name could be read (3 failed, 0 not reached). First: GDELT fetch f |
 
 ---
 

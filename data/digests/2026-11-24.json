@@ -1,18 +1,109 @@
 {
-  "collection": [],
+  "collection": [
+    {
+      "at": "2026-11-24T10:07:29.596705+00:00",
+      "detail": "facts 16; scored 42 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized.onnx",
+      "fetched": 16,
+      "kept": 0,
+      "source": "finbert_tone",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-24T10:07:28.656713+00:00",
+      "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-24T10:07:28.640606+00:00",
+      "detail": "facts 5; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-24T10:07:23.182059+00:00",
+      "detail": "facts 0; window not covered back to 2026-11-23 22:42Z; the oldest item read is 2026-11-24 09:43Z, so 11.0h of the window was never served",
+      "fetched": 18,
+      "kept": 17,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 17
+    },
+    {
+      "at": "2026-11-24T10:07:22.115626+00:00",
+      "detail": "facts 0; ",
+      "fetched": 10,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-24T10:07:20.365356+00:00",
+      "detail": "window overflow: all 150 dated items are newer than the window's start (2026-11-23 10:07Z); the oldest is 2026-11-23 14:52Z, so 4.8h scrolled off unseen; read 3 pages, the most this feed may; page 2 starts 2.9h before page 1 ends (2026-11-24 04:42Z under 2026-11-24 07:36Z): the items between were served by neither",
+      "fetched": 150,
+      "kept": 141,
+      "source": "nst_business",
+      "status": "degraded",
+      "stored": 135
+    },
+    {
+      "at": "2026-11-24T10:07:16.492135+00:00",
+      "detail": "window overflow: all 50 dated items are newer than the window's start (2026-11-23 10:07Z); the oldest is 2026-11-23 12:17Z, so 2.2h scrolled off unseen",
+      "fetched": 50,
+      "kept": 50,
+      "source": "fmt_business",
+      "status": "degraded",
+      "stored": 49
+    },
+    {
+      "at": "2026-11-24T10:07:15.930034+00:00",
+      "detail": "read but empty: Petronas Chemicals, IHH, Press Metal, Genting, Maybank, Tenaga",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-24T10:07:14.834037+00:00",
+      "detail": "named the company: 29 of 51 (lowest: Press Metal 0/3, Genting 3/13, Tenaga 5/9)",
+      "fetched": 54,
+      "kept": 51,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 45
+    },
+    {
+      "at": "2026-11-24T10:07:12.271198+00:00",
+      "detail": "throttled: no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked); deferred: Genting, Maybank, Tenaga",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "throttled",
+      "stored": 0
+    }
+  ],
   "counts": {
-    "articles": 43996,
+    "articles": 44242,
     "documents": 0,
-    "escalated": 5895,
+    "escalated": 5919,
     "events": 4411,
     "failed_sweeps": 115,
-    "linked": 21906,
-    "observations": 8536,
+    "linked": 21947,
+    "observations": 8557,
     "series": 31,
-    "sweeps": 1824
+    "sweeps": 1834
   },
   "day": "2026-11-24",
-  "generated_at": "2026-11-24 00:15 UTC",
+  "generated_at": "2026-11-24 10:08 UTC",
   "macro": [
     {
       "change": "0.24",
@@ -146,82 +237,370 @@
   "names": [
     {
       "earnings": [],
-      "escalated": 0,
+      "escalated": 9,
       "events": [],
       "instrument_id": "MYX:1155",
       "label": "Maybank",
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-23",
+          "known_at": "2026-11-24",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-23",
+          "period_end": "2026-11-24",
           "source": "finbert_tone",
-          "value": "0.54"
+          "value": "0.48"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMipgFBVV95cUxQSjR4VTJhTEpKdVRfRXZReG9XWGt0SDR0anNTNHFWM0wxRUxCeXJ0VXItS3hRZmJDTDRHczBTcEY1bEVCVkRtNU12UmlBQnhWeXlqcGpfSXJta0k3SjJhUVRGQ3FNdGxNWkUxZUFRVGFiV0xLRzVQSFF0TVJrcUNuby1ZVWR1U3hyU2h2eHRFU0xjZjVsSVNraTY4U2V5QXhZU2pGWTBR0gGmAUFVX3lxTFBKNHhVMmFMSkp1VF9FdlF4b1dYa3RINHRqc1M0cVYzTDFFTEJ5cnRVci1LeFFmYkNMNEdzMFNwRjVsRUJWRG01TXZSaUFCeFZ5eWpwal9Jcm1rSTdKMmFRVEZDcU10bE1aRTFlQVFUYWJXTEtHNVBIUXRNUmtxQ25vLVlVZHVTeHJTaHZ4dEVTTGNmNWxJU2tpNjhTZXlBeFlTakZZMFE?oc=5",
+          "domain": "www.nst.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-24T06:46:13+00:00",
+          "quality": 0.8,
+          "title": "Maybank shares rise on strong 3Q performance",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMipwFBVV95cUxNdEpOVVdFeDR2Mk1lTXpHVUQwVTQ5R29RZ09vOVpPbmF4WmJZTVBKSEhLZ2VFQXJUUE1PUTdnNkNIRFZuSmx5T0hDUENBb2J5NDhNdmpoai1lemtBQ2RyTnRzZ2IzVEROS09rclFRYms4c3pMZS1DbGZfOE11Zll6S3RIbHgxZjk5Y1JJYWVtclYzT0tmS1ZCMmhhbWltWkZVbVd4WG9GNA?oc=5",
+          "domain": "www.businesstoday.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-24T02:08:02+00:00",
+          "quality": 0.8,
+          "title": "RHB Research Cuts Maybank\u2019s Target Price On Capital Concerns",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiowFBVV95cUxQNG5DUDFDM25najFLbDZEWHB1Z2Mwak5uZHQxRUVsN1dJeENLSGUtaTRkblloTXp1NzdNekZsbVp6bnJkazJTYmF2LUk4cGV3aFBUYTJPeWlVU0Q2X0QxalhwZ2dWZTVMd09ZdTBldEdTNjVKSTFkM18yVW0zR0RKME56TkhjOEsyakpMUTl3STZsVE9zcWl0RTk3UExBSUItRVFF?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-24T00:19:14+00:00",
+          "quality": 0.8,
+          "title": "Maybank records growth in loans and NIMs",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMitAFBVV95cUxNcU5DeS1HME5tbG9rZndaT19ZaVp0Q3JTWG5Uck9INFRCYV9aUmVVLXY0RjZocjlIZlVEeWN6NGUzOG5qWE1VUEFvN1VFajFQakpHX3N4NVR4WHNJVnhQbk8zdmtpQlRYTmtQaU5PWkdNcEVuVURPdVFpOEFDamdPcTVfS2x0OGhkc3V0cW0yWE5lTUJCMWdtWElVNnp0OFlXNHVfYnBVTVF4ck5VSnZYOWY2NmY?oc=5",
+          "domain": "asianbankingandfinance.net",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-24T04:55:34+00:00",
+          "quality": 0.65,
+          "title": "Maybank Q3 profit rises 4.7% to $665.6m on wealth and investment fees",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMipwFBVV95cUxPM0ZEWXR5OFB6bHRBWjN2Rjg4d3F2STBmbzZlUnRLVXNsTHBHX2ozZktoOHpseUtsVWJ0SjI4SWdBZTZSTjEyLWsyZWpQZzRKT18yTkN3Y1R4S1FqVzB5Uk5oaGhrNTk2ZWlSeVVaaWJpQ1RURzhYZVUxMnZVUjNMWTlUQzRKZ0RabnVYcGM0R2hWVmtrcDV0ek9xb1dWZXBrUFZSRlltdw?oc=5",
+          "domain": "www.moomoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-24T04:20:00+00:00",
+          "quality": 0.65,
+          "title": "Stock Today: Maybank Climbs 1.72% Despite Concerns Over Weaker Capital Buffer",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMilwFBVV95cUxQbEJFYmZWUldHbk8weDV5MDVjeDZUZ0k3U0hTaUtNMWFtYmwtNWNmbVZfNHYyRWEwTnN4amZMY21ncVVMVHVLUUx1eEVGenNyUERxeU52TWJBYm1XYU9oaWlYcks3eHIzMzhaaWN0RzJKRTdldFJTb3VsQ2N4R1BmbENtRW1DV1hpeUNZdFdHNjdsNlY2a05V?oc=5",
+          "domain": "thesun.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-23T13:10:24+00:00",
+          "quality": 0.65,
+          "title": "Maybank Q3 net profit rises 4.7% to RM2.74 billion",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiWkFVX3lxTE0tZEIwendyN3NmZGNHTUZjdTZTVUwycm5rQkE4WDAydmxzaEpnblVfbUlBZ052WU9hQTgwRTNXYUZiWEdWWE5hTk9NaWY5Wm5Lb0RHSjByZkJ2Zw?oc=5",
+          "domain": "www.bernamabiz.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-23T12:56:20+00:00",
+          "quality": 0.65,
+          "title": "Maybank Posts Higher 3Q Net Profit Of RM2.74 Bln",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxPemgzWjY1blRmV1JmZFc1aFBpSU9xdEwzMWJPcWd3a0k3ekdPaXpLWEV6SUZ5dkhnTnBGREE4UFMzM1NETzlvdHdXal9MNTVMZ0VEVE80YTZKaTltT1FmZVF4V1B1QmtzZTUxYXVUUHIwcm1Zd0MzUmFIbGpwTTNvNnJpd3dqcTQ1dFg3M1Q2UFo4YjVIcGctMF9ubGZMZk40Vjg2eGtud05ZRDlCSXlCRHJYVWxCeWtv?oc=5",
+          "domain": "www.minichart.com.sg",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-23T12:42:00+00:00",
+          "quality": 0.65,
+          "title": "Maybank 9M2026 Profit Up 1.0% to RM7.92B, Revenue Down 9.9%, CET1 Falls to 13.09%",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 10,
+        "polarity_mean": 0.5,
+        "sources": 10,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
       "earnings": [],
-      "escalated": 0,
+      "escalated": 3,
       "events": [],
       "instrument_id": "MYX:5347",
       "label": "Tenaga",
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-21",
+          "known_at": "2026-11-24",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-20",
+          "period_end": "2026-11-23",
           "source": "finbert_tone",
-          "value": "-0.22"
+          "value": "0.13"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMirAFBVV95cUxOT2hHRzYtWElodDZnSllqNU9qcEVLdnpRcldpYVVrelVaRUpMUjY1VzdJN1AwbmQtTk1SdkpUWEJxaWN4Sl9BbjBGc0FjcjFSWnUzMC1iSHBiaTRmdTdpZTNvTUpKR2JVMkF4NmxsYjRRWFV1SnZrM0tPR19iR3c4am5vVTYyaEdzVTU4TjU1X3VTQlIxV2hnZDctbENWTjg4bFBUYWp2MDM4NUJJ?oc=5",
+          "domain": "www.multibagg.ai",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-23T14:48:45+00:00",
+          "quality": 0.65,
+          "title": "Shree TNB plans three-layer drums for 30% reprocessed rule",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMirwFBVV95cUxNVzJESldXTGRWTUV1TFU5VnlsSmRHOW5vMUQ5cTQ2STE1MkJqd0JoVGZ4N1F1Mm9fYzJPNk5kQmtsMWd5ZlZTb3dkcENQT1NJWS01TVNNN0RPWGVLLXJKN3RNcFpGQjRTLUJIbUtRZDJmSnRKdGl0TmFjLWxhSXh5QjNMbVdMWWQ3YUEyTGtmZXU5ZGFkS0E2WEQwM1ppelItdDRLckd4NVhXSTJDN1Fn?oc=5",
+          "domain": "www.multibagg.ai",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-23T14:48:37+00:00",
+          "quality": 0.65,
+          "title": "Shree TNB targets FY28 commercial output from new plants",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMitwFBVV95cUxPRHNzcWc2dEd2SkZueC1lTE5vN19IVDlMdEtKM3BNQjJyQVoteElJSFFJZXZ2WFlmdktVZmZZbFdwSVVjNDNtVVp0NmZ2ZVVwSHZ0UFVQSW5sRHFVNnRjNlZVcGRPYTdIMmE2RzBqanUyQXE4UWF2YzJSc1p4T2hjamF5Qlkwd3ktOHBhNzlETHlWUFp3VkNmbGhkRWd0MVRFRFduajdaVGRhTnk4Y3VuVmlZb3RQSFU?oc=5",
+          "domain": "www.multibagg.ai",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-23T14:48:32+00:00",
+          "quality": 0.65,
+          "title": "Shree TNB targets Rs 135-150 crore expansion revenue by FY29",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMitAFBVV95cUxQcWFuLXpkNXNMSEFWX0NLMlphOGxYN1ktMzJJUkFua19senNTUUtFWDkzdXo5clJjd2ZZMl9XUEZ5dmc3ZkFtTHhvZHI2YlFza3BuMHZLSGszVG1ORjJJaWVDeWVnY3Q5Smp3Z29ZQ1JRcE1DMldmbFZsLXNpaFR4YVM1V2J5QzJaaXRzdDNNZEpIcGdHaXpGUTN4SUU1RlJyQ2ZfSGFYYXdZcDUzYlZTdGpmdGo?oc=5",
+          "domain": "www.multibagg.ai",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-23T14:48:38+00:00",
+          "quality": 0.65,
+          "title": "Shree TNB says H2 accounts for 60% of its annual business",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxQSU5FRXFDUDJBWFY1Umg0aVJrdjl6cjEwOTFrRElNa0xBNmlZbzVONmpjVlpzLTk0V29SZ0xfQTRleEJZTHBwQmpvdnMtNlplWnpBYUtMbWtxU0FEaXMzUFpWWF9zOXdoY1BsYkkwR0JUcXlZR3FQN3VNU1VQcGRPYmdXdm91MEt1N1NpbFg3aFVyUXYzR2lMYkFCS01XU2pkNlRQVlVTNk0?oc=5",
+          "domain": "www.multibagg.ai",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-23T14:48:31+00:00",
+          "quality": 0.65,
+          "title": "Shree TNB Starts Amul Dairy Gas-Pipe Order as Registration Continues",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 5,
+        "polarity_mean": 0.2,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
       "earnings": [],
-      "escalated": 0,
+      "escalated": 3,
       "events": [],
       "instrument_id": "MYX:5183",
       "label": "Petronas Chemicals",
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-14",
+          "known_at": "2026-11-24",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-13",
+          "period_end": "2026-11-24",
           "source": "finbert_tone",
-          "value": "0.18"
+          "value": "0.11"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiswFBVV95cUxNcmpTQnJRVnVyNUxORGpnTnZuNGptMmRzMzUwTEVfWUg0SnhNYm1xVTJ3THYtQVdIRnR2aEZWM2VQVlZqbGpSQjZsSkVkRDhsWTVDODJfQlZWMTNLWTdJUkdKRE5rNGl3RTNxalBnVkVyMXlXN2QydUowMWc4VGNvSU12NkN2M3ozb1RaQ3JLalJPY1FJck1QVHJaRXFzaHZqU1ZwOHNYR29Jek5qbVR3MGVQMA?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-24T05:05:00+00:00",
+          "quality": 0.8,
+          "title": "PETRONAS Chemicals records RM179mil net profit in 3Q",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMingFBVV95cUxQTDJQWFVoSkxGVVdYSnV6ZkNfQUR6dmxKZkVKWGdFa09tVHl0N2ViMHYxVE05NHNIbWhCanRPd2pBYmNCYTRMZmNlZWJuZk5sZ3BZeUFUeDJJOGVjWmN4b2k1NHBxSTR2VGVXT1BWcGZNNmppQk0yazVLaGo3TzcwU1BJSmhYZ09OZl9mSjlLcU10Nl8tM2hVOXVpVGlDQQ?oc=5",
+          "domain": "mcigroup.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-24T06:31:59+00:00",
+          "quality": 0.65,
+          "title": "Petronas Chemicals Returns to the Black in 3Q With RM179 Mln Net Profit - Malaysia-China Insight",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMi_gFBVV95cUxPUjNXVGJCREZWdEQ3VlltSzdoRVVzaE9HcWpKdnlBbV9JZzZMLXkxODN0ZDhuVm5HTTQxZFp6aUdPOUp6NDRMMmg5bDROOFhDVVFCc3ZRQkduaDgzaEhIRU5HZ25IZFJuYzItdnFPSmJhUXZBZnkzSWlRd190YnVnczhQZTRYSnJPSTl0RUdDd1FybkVKWUxOZHVFREtJb29ZaDh5NFVybXJQckpVSUhOajZvT2s2M3ZfY1FWSXhFOWxrZ1lsM1N4QXZkb2pwU1hXcHF6YjlhZV8tQVJ2eUlOLUFfRTc3a2FTS2tEUTJlZzJOaVRKN0U2clBmZzg3Zw?oc=5",
+          "domain": "www.tradingview.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-24T05:58:00+00:00",
+          "quality": 0.65,
+          "title": "PCHEM: Q3 returned to profit, but oversupply and weak specialty demand cloud the outlook",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiUEFVX3lxTFBOY2xNdi13SnlXZjNxRGFHV0ptR01VeFkwMWs1V3BJOVdCZDhjZmF5ZGwzQS1HaGZFQVJlNFNwcWNaVWZfQWJJaVRoWVBETDZU?oc=5",
+          "domain": "theedgemalaysia.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-24T05:31:12+00:00",
+          "quality": 0.8,
+          "title": "PETRONAS Chemicals stays in the black on higher selling prices, lower costs",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMi6AFBVV95cUxOSnVtQVpCbXJtQkR6NzRDX0lOT2VKRTVYOHlEOS1BanZBMGQ1RjRacWR1UTVkRWYxX3FQZDJ0UFprT0ZubVJIQkdodXBsVDlFcWJjT3pVaDlGZks2VEEyQ3RKMEg4LXlpd25DVktpSWIycnFHVTRsLWdxaEFsd0dkdUFxcHJRWHhnWjdTYklHamk2aUU3SlFJZFBSMmI2cUVnQm9qYnpDOUtHemJqM0d2T0lnTy1LMjdJV0pfRWhJNUtYRDZoUG5GQnlzdFhTQXg3Zi03WExhQmYxT3pDclFaTTlxQXlONi1h?oc=5",
+          "domain": "www.marketscreener.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-24T08:20:35+00:00",
+          "quality": 0.65,
+          "title": "PETRONAS Chemicals Group Berhad Reports Earnings Results for the Third Quarter and Nine Months Ended September 30, 2026",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 5,
+        "polarity_mean": 0.4,
+        "sources": 5,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
       "earnings": [],
-      "escalated": 0,
+      "escalated": 1,
       "events": [],
       "instrument_id": "MYX:5225",
       "label": "IHH",
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-22",
+          "known_at": "2026-11-24",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-21",
+          "period_end": "2026-11-24",
           "source": "finbert_tone",
-          "value": "0.16"
+          "value": "0.11"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMizgFBVV95cUxQVDMxU0JwT2l3R1VPLUxZcHN0Y2Q1SnRtNzdJbFpBdDJfWjlHTEc4YThBUVBsei1DMy1BQW1yUnpHNWU4UVNSNUJfWjVyX2R4RVZPdnh3d1JISDJXRl82SUZ4NFQ4dERmRlU5b3JCUmlhS2Ezdm9yY1pOVTJXVnl0Z2pJY2FkZWxfR0pXakFIY2N5MllUMV9ibUhUZHZsdThWbWVKVGlTNmE0VURhT1g3Z1hqMWQ2NEtFWEZidVNudURrekk4UXQxMExiQ1JwQQ?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-24T07:44:00+00:00",
+          "quality": 0.8,
+          "title": "IHH Healthcare launches free emergency ambulance service in Klang Valley",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiogFBVV95cUxOMFdNMUR5TnROblAyN255WkVNSEtkeWo4LU1wOHhSVVVpUWRGZXVTY2lyY0NWTmFqdEZxS3hYLWNEdGd4dG11ZDdlSDFuUjhzbkltQ1ZDSlAtc0gwb1RoV3laUC1nRVNiUHV3UDVDVVRtcjVUTVI1cHZibElna29GZVB3SF9HVmJESlRIdGxVcldqdWJJbWVmbU5pQ0h1cklyREE?oc=5",
+          "domain": "www.tipranks.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-24T09:57:34+00:00",
+          "quality": 0.65,
+          "title": "EPF Board Reports Disposal of 4,904,000 IHH Shares",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.333,
+        "n": 2,
+        "polarity_mean": 0.0,
+        "sources": 2,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -246,27 +625,47 @@
     },
     {
       "earnings": [],
-      "escalated": 0,
+      "escalated": 1,
       "events": [],
       "instrument_id": "MYX:3182",
       "label": "Genting",
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-23",
+          "known_at": "2026-11-24",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-22",
+          "period_end": "2026-11-24",
           "source": "finbert_tone",
-          "value": "0.01"
+          "value": "-0.09"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxQcG0ycHdaVlFiYXVPQ0ZKUVhVZEgtZV92NmZIMmphX21fRzlqX292RkwyNHlnaWdCZlV0cU9jckhBaElmMW5mSVRlTk5hQ0dITllxejVWaS1NLW10S25LeHZtellWSTVmdjJlV2Z4S0lIbVJRWE5SUDJrMXhPd2drU2JqOWdHNExDb2VnOUtUSjVuUUxXOTUwbHV3MEVaRHVhUU9KTnY4VDg?oc=5",
+          "domain": "www.igamingtoday.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-24T02:45:57+00:00",
+          "quality": 0.65,
+          "title": "Genting Wins Court Injunction Over Hotel Development Near First World Hotel",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 1.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
       "earnings": [],
-      "escalated": 79,
+      "escalated": 85,
       "events": [
         {
           "kind": "filing",
@@ -440,6 +839,71 @@
       "stories": [
         {
           "day": null,
+          "doc_id": "https://www.nst.com.my/business/corporate/2026/11/1584448/tech-firms-soar-huangs-return-reinvigorates-ai-trade",
+          "domain": "www.nst.com.my",
+          "escalated": true,
+          "intensity": 0.6666666666666666,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-24T02:46:57+00:00",
+          "quality": 1.0,
+          "title": "Tech firms soar as Huang's return reinvigorates AI trade",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://www.nst.com.my/business/corporate/2026/11/1584413/dollar-climbs-renewed-ai-euphoria-fuels-fed-rate-hike-bets",
+          "domain": "www.nst.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-24T01:59:20+00:00",
+          "quality": 1.0,
+          "title": "Dollar climbs as renewed AI euphoria fuels Fed rate hike bets",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://www.nst.com.my/business/corporate/2026/11/1584381/japanese-south-korean-stocks-surge-after-jensen-huang-returns",
+          "domain": "www.nst.com.my",
+          "escalated": true,
+          "intensity": 0.6666666666666666,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-24T00:51:08+00:00",
+          "quality": 1.0,
+          "title": "Japanese, South Korean stocks surge after Jensen Huang returns to Nvidia",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://www.nst.com.my/business/corporate/2026/11/1584357/us-stocks-surge-cheering-return-nvidia-ceo-and-shrugging-scandal",
+          "domain": "www.nst.com.my",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-23T23:58:31+00:00",
+          "quality": 1.0,
+          "title": "US stocks surge, cheering return of Nvidia CEO and shrugging off scandal",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://www.nst.com.my/world/world/2026/11/1584355/us-lawmakers-criticise-nvidia-decision-reinstate-huang-ceo",
+          "domain": "www.nst.com.my",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-23T23:56:57+00:00",
+          "quality": 1.0,
+          "title": "US lawmakers criticise Nvidia decision to reinstate Huang as CEO",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
           "doc_id": "https://finance.yahoo.com/m/640f8e0d-9484-3e30-a0fe-5206490b94be/don%27t-chase-after-the.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
           "escalated": true,
@@ -476,79 +940,14 @@
           "quality": 1.0,
           "title": "'Eyes in the back of his head': Why Jensen could be sharper after ouster",
           "uncertainty": 0.25
-        },
-        {
-          "day": null,
-          "doc_id": "https://www.trefis.com/stock/snap/articles/627539/how-risky-is-snap-stock-now/2026-11-23?.tsrc=rss",
-          "domain": "www.trefis.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": -1.0,
-          "published_at": "2026-11-23T21:54:36+00:00",
-          "quality": 0.85,
-          "title": "How Risky Is Snap Stock Now?",
-          "uncertainty": 0.7352941176470588
-        },
-        {
-          "day": null,
-          "doc_id": "finnhub:144053562",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
-          "kind": "",
-          "polarity": 1.0,
-          "published_at": "2026-11-23T21:43:48+00:00",
-          "quality": 0.85,
-          "title": "Wall Street Roars Back From Brutal Selloff. Nvidia's 31% Surge Sends Nasdaq Soaring 6.5%.",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "finnhub:144053563",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
-          "kind": "",
-          "polarity": 0.0,
-          "published_at": "2026-11-23T21:40:38+00:00",
-          "quality": 0.85,
-          "title": "Nvidia closes up more than 30% after Jensen Huang returns as CEO",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "finnhub:144053564",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": -1.0,
-          "published_at": "2026-11-23T21:38:43+00:00",
-          "quality": 0.85,
-          "title": "Nvidia Stock Adds $950 Billion in a Day as Jensen Huang Returns. Here's What Analysts Now Project",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "finnhub:144053566",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": -1.0,
-          "published_at": "2026-11-23T21:34:17+00:00",
-          "quality": 0.85,
-          "title": "Coherent Is the Real Winner of Huang\u2019s Return. Nvidia Paid $2 Billion for Its Stock",
-          "uncertainty": 0.1923076923076923
         }
       ],
       "tone": {
         "intensity_max": 0.667,
-        "n": 189,
-        "polarity_mean": 0.049,
-        "sources": 59,
-        "uncertainty_mean": 0.109
+        "n": 202,
+        "polarity_mean": 0.071,
+        "sources": 63,
+        "uncertainty_mean": 0.104
       },
       "upcoming": [
         {
