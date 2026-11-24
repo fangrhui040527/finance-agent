@@ -1,19 +1,19 @@
 # Digest 2026-11-24
 
-Generated 2026-11-24 10:08 UTC · slot `all` · 44242 articles in the corpus, 8557 observations, 4411 events in the fact book.
+Generated 2026-11-24 20:11 UTC · slot `all` · 44249 articles in the corpus, 8557 observations, 4411 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- tone: 10 stories from 10 sources, polarity +0.50, peak intensity 0.00, uncertainty 0.00 · 9 escalated
-- 2026-11-24 www.nst.com.my — Maybank shares rise on strong 3Q performance [q 0.80, tone +1.0] ★
+- tone: 14 stories from 13 sources, polarity +0.60, peak intensity 0.00, uncertainty 0.00 · 13 escalated
+- 2026-11-25 (date only) www.bernama.com — BERNAMA - Bursa Malaysia Rebounds To Snap Five-day Losing Streak [q 1.00, tone +1.0] ★
+- 2026-11-25 (date only) www.businesstoday.com.my — Stock Today: Maybank Climbs 1.72% Despite Concerns Over Weaker Capital Buffer [q 1.00, tone -0.3] ★
+- 2026-11-25 (date only) www.freemalaysiatoday.com — Bursa opens higher as Nvidia developments lift tech sentiment [q 1.00, tone +1.0] ★
+- 2026-11-25 (date only) www.nst.com.my — Maybank shares rise on strong 3Q performance [q 1.00, tone +1.0] ★
+- 2026-11-24 (date only) www.malaymail.com — Tech stocks rebound, but utilities drag Bursa Malaysia into negative territory [q 1.00, tone +1.0] ★
+- 2026-11-24 (date only) www.klsescreener.com — Maybank's 3Q earnings rise 4.7% as lower writedown soothes pain from rising bond yields [q 0.85, tone -0.2] ★
 - 2026-11-24 www.businesstoday.com.my — RHB Research Cuts Maybank’s Target Price On Capital Concerns [q 0.80, tone -1.0] ★
 - 2026-11-24 www.thestar.com.my — Maybank records growth in loans and NIMs [q 0.80, tone +1.0] ★
-- 2026-11-24 asianbankingandfinance.net — Maybank Q3 profit rises 4.7% to $665.6m on wealth and investment fees [q 0.65, tone +1.0] ★
-- 2026-11-24 www.moomoo.com — Stock Today: Maybank Climbs 1.72% Despite Concerns Over Weaker Capital Buffer [q 0.65, tone -1.0] ★
-- 2026-11-23 thesun.my — Maybank Q3 net profit rises 4.7% to RM2.74 billion [q 0.65, tone +1.0] ★
-- 2026-11-23 www.bernamabiz.com — Maybank Posts Higher 3Q Net Profit Of RM2.74 Bln [q 0.65, tone +1.0] ★
-- 2026-11-23 www.minichart.com.sg — Maybank 9M2026 Profit Up 1.0% to RM7.92B, Revenue Down 9.9%, CET1 Falls to 13.09% [q 0.65, tone +1.0] ★
 - snapshot: FinBERT headline tone 0.48 (finbert_tone, 2026-11-24)
 
 ### Tenaga (MYX:5347)
@@ -49,7 +49,8 @@ Generated 2026-11-24 10:08 UTC · slot `all` · 44242 articles in the corpus, 85
 - snapshot: FinBERT headline tone -0.09 (finbert_tone, 2026-11-24)
 
 ### NVIDIA (XNAS:NVDA)
-- tone: 202 stories from 63 sources, polarity +0.07, peak intensity 0.67, uncertainty 0.10 · 85 escalated
+- tone: 203 stories from 63 sources, polarity +0.08, peak intensity 0.67, uncertainty 0.10 · 86 escalated
+- 2026-11-25 (date only) www.freemalaysiatoday.com — Bursa opens higher as Nvidia developments lift tech sentiment [q 1.00, tone +1.0] ★
 - 2026-11-24 www.nst.com.my — Tech firms soar as Huang's return reinvigorates AI trade [q 1.00, tone +1.0] ★
 - 2026-11-24 www.nst.com.my — Dollar climbs as renewed AI euphoria fuels Fed rate hike bets [q 1.00, tone +1.0] ★
 - 2026-11-24 www.nst.com.my — Japanese, South Korean stocks surge after Jensen Huang returns to Nvidia [q 1.00, tone +1.0] ★
@@ -57,7 +58,6 @@ Generated 2026-11-24 10:08 UTC · slot `all` · 44242 articles in the corpus, 85
 - 2026-11-23 www.nst.com.my — US lawmakers criticise Nvidia decision to reinstate Huang as CEO [q 1.00, tone +0.0] ★
 - 2026-11-23 finance.yahoo.com — Don't Chase After the Market's Big AI Gains [q 1.00, tone +0.0] ★
 - 2026-11-23 finance.yahoo.com — Jensen Huang back as Nvidia CEO after 12 days: Shares surge 30% [q 1.00, tone +1.0] ★
-- 2026-11-23 finance.yahoo.com — 'Eyes in the back of his head': Why Jensen could be sharper after ouster [q 1.00, tone +0.0] ★
 - event 2026-11-23 filing — 8-K: 8-K (items 5.02,9.01) (edgar)
 - event 2026-11-23 insider_filing — 4: FORM 4 (edgar)
 - event 2026-11-23 rating_change — Bernstein upgrade Outperform (from Market Perform) (fmp)

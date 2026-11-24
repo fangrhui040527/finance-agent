@@ -92,18 +92,18 @@
     }
   ],
   "counts": {
-    "articles": 44242,
+    "articles": 44249,
     "documents": 0,
-    "escalated": 5919,
+    "escalated": 5925,
     "events": 4411,
     "failed_sweeps": 115,
-    "linked": 21947,
+    "linked": 21953,
     "observations": 8557,
     "series": 31,
     "sweeps": 1834
   },
   "day": "2026-11-24",
-  "generated_at": "2026-11-24 10:08 UTC",
+  "generated_at": "2026-11-24 20:11 UTC",
   "macro": [
     {
       "change": "0.24",
@@ -237,7 +237,7 @@
   "names": [
     {
       "earnings": [],
-      "escalated": 9,
+      "escalated": 13,
       "events": [],
       "instrument_id": "MYX:1155",
       "label": "Maybank",
@@ -253,16 +253,81 @@
       ],
       "stories": [
         {
-          "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMipgFBVV95cUxQSjR4VTJhTEpKdVRfRXZReG9XWGt0SDR0anNTNHFWM0wxRUxCeXJ0VXItS3hRZmJDTDRHczBTcEY1bEVCVkRtNU12UmlBQnhWeXlqcGpfSXJta0k3SjJhUVRGQ3FNdGxNWkUxZUFRVGFiV0xLRzVQSFF0TVJrcUNuby1ZVWR1U3hyU2h2eHRFU0xjZjVsSVNraTY4U2V5QXhZU2pGWTBR0gGmAUFVX3lxTFBKNHhVMmFMSkp1VF9FdlF4b1dYa3RINHRqc1M0cVYzTDFFTEJ5cnRVci1LeFFmYkNMNEdzMFNwRjVsRUJWRG01TXZSaUFCeFZ5eWpwal9Jcm1rSTdKMmFRVEZDcU10bE1aRTFlQVFUYWJXTEtHNVBIUXRNUmtxQ25vLVlVZHVTeHJTaHZ4dEVTTGNmNWxJU2tpNjhTZXlBeFlTakZZMFE?oc=5",
+          "day": "2026-11-25",
+          "doc_id": "web_search:https://www.bernama.com/en/market/news.php?id=2638819",
+          "domain": "www.bernama.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-24T20:11:33.549266+00:00",
+          "quality": 1.0,
+          "title": "BERNAMA - Bursa Malaysia Rebounds To Snap Five-day Losing Streak",
+          "uncertainty": 0.0
+        },
+        {
+          "day": "2026-11-25",
+          "doc_id": "web_search:https://www.businesstoday.com.my/2026/11/24/stock-today-maybank-climbs-1-72-despite-concerns-over-weaker-capital-buffer/",
+          "domain": "www.businesstoday.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -0.3333333333333333,
+          "published_at": "2026-11-24T20:11:33.549266+00:00",
+          "quality": 1.0,
+          "title": "Stock Today: Maybank Climbs 1.72% Despite Concerns Over Weaker Capital Buffer",
+          "uncertainty": 0.0
+        },
+        {
+          "day": "2026-11-25",
+          "doc_id": "web_search:https://www.freemalaysiatoday.com/category/business/2026/11/24/bursa-opens-higher-as-nvidia-developments-lift-tech-sentiment",
+          "domain": "www.freemalaysiatoday.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-24T20:11:33.549266+00:00",
+          "quality": 1.0,
+          "title": "Bursa opens higher as Nvidia developments lift tech sentiment",
+          "uncertainty": 0.0
+        },
+        {
+          "day": "2026-11-25",
+          "doc_id": "web_search:https://www.nst.com.my/business/corporate/2026/11/1584622/maybank-shares-rise-strong-3q-performance",
           "domain": "www.nst.com.my",
           "escalated": true,
           "intensity": 0.0,
           "kind": "",
           "polarity": 1.0,
-          "published_at": "2026-11-24T06:46:13+00:00",
-          "quality": 0.8,
+          "published_at": "2026-11-24T20:11:33.549266+00:00",
+          "quality": 1.0,
           "title": "Maybank shares rise on strong 3Q performance",
+          "uncertainty": 0.0
+        },
+        {
+          "day": "2026-11-24",
+          "doc_id": "web_search:https://www.malaymail.com/news/money/2026/11/23/tech-stocks-rebound-but-utilities-drag-bursa-malaysia-into-negative-territory/244460",
+          "domain": "www.malaymail.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-24T15:59:59+00:00",
+          "quality": 1.0,
+          "title": "Tech stocks rebound, but utilities drag Bursa Malaysia into negative territory",
+          "uncertainty": 0.0
+        },
+        {
+          "day": "2026-11-24",
+          "doc_id": "web_search:https://www.klsescreener.com/v2/news/view/1832811/maybank-s-3q-earnings-rise-4-7-as-lower-writedown-soothes-pain-from-rising-bond-yields",
+          "domain": "www.klsescreener.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -0.2,
+          "published_at": "2026-11-24T15:59:59+00:00",
+          "quality": 0.85,
+          "title": "Maybank's 3Q earnings rise 4.7% as lower writedown soothes pain from rising bond yields",
           "uncertainty": 0.0
         },
         {
@@ -290,78 +355,13 @@
           "quality": 0.8,
           "title": "Maybank records growth in loans and NIMs",
           "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMitAFBVV95cUxNcU5DeS1HME5tbG9rZndaT19ZaVp0Q3JTWG5Uck9INFRCYV9aUmVVLXY0RjZocjlIZlVEeWN6NGUzOG5qWE1VUEFvN1VFajFQakpHX3N4NVR4WHNJVnhQbk8zdmtpQlRYTmtQaU5PWkdNcEVuVURPdVFpOEFDamdPcTVfS2x0OGhkc3V0cW0yWE5lTUJCMWdtWElVNnp0OFlXNHVfYnBVTVF4ck5VSnZYOWY2NmY?oc=5",
-          "domain": "asianbankingandfinance.net",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 1.0,
-          "published_at": "2026-11-24T04:55:34+00:00",
-          "quality": 0.65,
-          "title": "Maybank Q3 profit rises 4.7% to $665.6m on wealth and investment fees",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMipwFBVV95cUxPM0ZEWXR5OFB6bHRBWjN2Rjg4d3F2STBmbzZlUnRLVXNsTHBHX2ozZktoOHpseUtsVWJ0SjI4SWdBZTZSTjEyLWsyZWpQZzRKT18yTkN3Y1R4S1FqVzB5Uk5oaGhrNTk2ZWlSeVVaaWJpQ1RURzhYZVUxMnZVUjNMWTlUQzRKZ0RabnVYcGM0R2hWVmtrcDV0ek9xb1dWZXBrUFZSRlltdw?oc=5",
-          "domain": "www.moomoo.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": -1.0,
-          "published_at": "2026-11-24T04:20:00+00:00",
-          "quality": 0.65,
-          "title": "Stock Today: Maybank Climbs 1.72% Despite Concerns Over Weaker Capital Buffer",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMilwFBVV95cUxQbEJFYmZWUldHbk8weDV5MDVjeDZUZ0k3U0hTaUtNMWFtYmwtNWNmbVZfNHYyRWEwTnN4amZMY21ncVVMVHVLUUx1eEVGenNyUERxeU52TWJBYm1XYU9oaWlYcks3eHIzMzhaaWN0RzJKRTdldFJTb3VsQ2N4R1BmbENtRW1DV1hpeUNZdFdHNjdsNlY2a05V?oc=5",
-          "domain": "thesun.my",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 1.0,
-          "published_at": "2026-11-23T13:10:24+00:00",
-          "quality": 0.65,
-          "title": "Maybank Q3 net profit rises 4.7% to RM2.74 billion",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMiWkFVX3lxTE0tZEIwendyN3NmZGNHTUZjdTZTVUwycm5rQkE4WDAydmxzaEpnblVfbUlBZ052WU9hQTgwRTNXYUZiWEdWWE5hTk9NaWY5Wm5Lb0RHSjByZkJ2Zw?oc=5",
-          "domain": "www.bernamabiz.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 1.0,
-          "published_at": "2026-11-23T12:56:20+00:00",
-          "quality": 0.65,
-          "title": "Maybank Posts Higher 3Q Net Profit Of RM2.74 Bln",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxPemgzWjY1blRmV1JmZFc1aFBpSU9xdEwzMWJPcWd3a0k3ekdPaXpLWEV6SUZ5dkhnTnBGREE4UFMzM1NETzlvdHdXal9MNTVMZ0VEVE80YTZKaTltT1FmZVF4V1B1QmtzZTUxYXVUUHIwcm1Zd0MzUmFIbGpwTTNvNnJpd3dqcTQ1dFg3M1Q2UFo4YjVIcGctMF9ubGZMZk40Vjg2eGtud05ZRDlCSXlCRHJYVWxCeWtv?oc=5",
-          "domain": "www.minichart.com.sg",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 1.0,
-          "published_at": "2026-11-23T12:42:00+00:00",
-          "quality": 0.65,
-          "title": "Maybank 9M2026 Profit Up 1.0% to RM7.92B, Revenue Down 9.9%, CET1 Falls to 13.09%",
-          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.0,
-        "n": 10,
-        "polarity_mean": 0.5,
-        "sources": 10,
+        "n": 14,
+        "polarity_mean": 0.605,
+        "sources": 13,
         "uncertainty_mean": 0.0
       },
       "upcoming": []
@@ -665,7 +665,7 @@
     },
     {
       "earnings": [],
-      "escalated": 85,
+      "escalated": 86,
       "events": [
         {
           "kind": "filing",
@@ -838,6 +838,19 @@
       ],
       "stories": [
         {
+          "day": "2026-11-25",
+          "doc_id": "web_search:https://www.freemalaysiatoday.com/category/business/2026/11/24/bursa-opens-higher-as-nvidia-developments-lift-tech-sentiment",
+          "domain": "www.freemalaysiatoday.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-24T20:11:33.549266+00:00",
+          "quality": 1.0,
+          "title": "Bursa opens higher as Nvidia developments lift tech sentiment",
+          "uncertainty": 0.0
+        },
+        {
           "day": null,
           "doc_id": "https://www.nst.com.my/business/corporate/2026/11/1584448/tech-firms-soar-huangs-return-reinvigorates-ai-trade",
           "domain": "www.nst.com.my",
@@ -927,27 +940,14 @@
           "quality": 1.0,
           "title": "Jensen Huang back as Nvidia CEO after 12 days: Shares surge 30%",
           "uncertainty": 0.06830601092896174
-        },
-        {
-          "day": null,
-          "doc_id": "https://finance.yahoo.com/video/eyes-in-the-back-of-his-head-why-jensen-could-be-sharper-after-ouster-151351120.html?.tsrc=rss",
-          "domain": "finance.yahoo.com",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 0.0,
-          "published_at": "2026-11-23T15:13:51+00:00",
-          "quality": 1.0,
-          "title": "'Eyes in the back of his head': Why Jensen could be sharper after ouster",
-          "uncertainty": 0.25
         }
       ],
       "tone": {
         "intensity_max": 0.667,
-        "n": 202,
-        "polarity_mean": 0.071,
+        "n": 203,
+        "polarity_mean": 0.076,
         "sources": 63,
-        "uncertainty_mean": 0.104
+        "uncertainty_mean": 0.103
       },
       "upcoming": [
         {
