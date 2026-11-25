@@ -149,7 +149,13 @@ def test_efficiency_on_an_empty_window_says_so(tmp_path):
 # --- quality ----------------------------------------------------------------------
 
 
-def test_quality_refuses_to_score_calibration_below_the_minimum(tmp_path):
+def test_quality_refuses_to_score_calibration_below_the_minimum(tmp_path, monkeypatch):
+    # quality_report reads the learning store at its default path. Point that at
+    # an empty store: the live data/learning.db crossed the 30-graded minimum on
+    # 2026-11-16, and a test that reads it stops testing the "below" branch.
+    import agents.learning.store as learning_store
+
+    monkeypatch.setattr(learning_store, "DEFAULT_PATH", str(tmp_path / "learning.db"))
     db = _ledger(tmp_path / "l.db", [{}])
     out = O.quality_report(days=30, db=str(db), root=str(tmp_path / "none"))
     assert "CANNOT SCORE" in out
