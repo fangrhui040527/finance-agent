@@ -1,24 +1,34 @@
 # Digest 2026-11-25
 
-Generated 2026-11-25 04:12 UTC · slot `all` · 44747 articles in the corpus, 8627 observations, 4413 events in the fact book.
+Generated 2026-11-25 19:19 UTC · slot `all` · 44999 articles in the corpus, 8644 observations, 4413 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- tone: 6 stories from 6 sources, polarity +0.58, peak intensity 0.00, uncertainty 0.00 · 6 escalated
+- tone: 20 stories from 16 sources, polarity +0.17, peak intensity 0.00, uncertainty 0.05 · 6 escalated
 - 2026-11-25 (date only) www.bernama.com — BERNAMA - Bursa Malaysia Rebounds To Snap Five-day Losing Streak [q 1.00, tone +1.0] ★
 - 2026-11-25 (date only) www.businesstoday.com.my — Stock Today: Maybank Climbs 1.72% Despite Concerns Over Weaker Capital Buffer [q 1.00, tone -0.3] ★
 - 2026-11-25 (date only) www.freemalaysiatoday.com — Bursa opens higher as Nvidia developments lift tech sentiment [q 1.00, tone +1.0] ★
 - 2026-11-25 (date only) www.nst.com.my — Maybank shares rise on strong 3Q performance [q 1.00, tone +1.0] ★
 - 2026-11-24 (date only) www.malaymail.com — Tech stocks rebound, but utilities drag Bursa Malaysia into negative territory [q 1.00, tone +1.0] ★
 - 2026-11-24 (date only) www.klsescreener.com — Maybank's 3Q earnings rise 4.7% as lower writedown soothes pain from rising bond yields [q 0.85, tone -0.2] ★
-- snapshot: FinBERT headline tone 0.48 (finbert_tone, 2026-11-24)
+- 2026-11-25 www.freemalaysiatoday.com — Finance minister ll Amir Hamzah mulling Maybank role, say sources [q 1.00, tone +0.0]
+- 2026-11-25 theedgemalaysia.com — CIMB, TM, Sunway, KLK, PPB, Alliance Bank, Batu Kawan, Hengyuan, Carlsberg, Capital A, Vantris Energy, Maybank, Industronics [q 0.80, tone +0.0]
+- snapshot: FinBERT headline tone 0.19 (finbert_tone, 2026-11-25)
 
 ### Tenaga (MYX:5347)
-- quiet: nothing collected for this name in the window
+- tone: 1 stories from 1 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
+- 2026-11-25 simplywall.st — PSP Energy Catat Pertumbuhan Untung Bersih 95.3%, Pengembangan Perniagaan Tenaga Pacu Prospek Pertumbuhan [q 0.65, tone +0.0]
+- snapshot: FinBERT headline tone 0.09 (finbert_tone, 2026-11-25)
 
 ### Petronas Chemicals (MYX:5183)
-- quiet: nothing collected for this name in the window
+- tone: 5 stories from 4 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.39 · 4 escalated
+- 2026-11-25 theedgemalaysia.com — CIMB Securities expects PETRONAS Chemicals’ earnings to improve in 4Q after softer-than-expected results [q 0.80, tone +0.0] ★
+- 2026-11-25 www.businesstoday.com.my — Stock Today: Petronas Chemicals Slips 0.79% Despite Return To Profit [q 0.80, tone +1.0] ★
+- 2026-11-25 www.nst.com.my — HLIB downgrades Petronas Chemicals on weaker outlook [q 0.80, tone -1.0] ★
+- 2026-11-25 tradersunion.com — PETRONAS Chemicals expected to post fourth-quarter earnings recovery, CIMB cuts target price [q 0.65, tone +0.0] ★
+- 2026-11-24 theedgemalaysia.com — PETRONAS Chemicals, Gas Malaysia, Greatech, Kelington, Mega First, Cahya Mata Sarawak, Wasco, MHB, SD Guthrie, NexG Bina, Zetrix, Maybank & Reservoir Link [q 0.80, tone +0.0]
+- snapshot: FinBERT headline tone 0.09 (finbert_tone, 2026-11-25)
 
 ### IHH (MYX:5225)
 - quiet: nothing collected for this name in the window
@@ -30,7 +40,7 @@ Generated 2026-11-25 04:12 UTC · slot `all` · 44747 articles in the corpus, 86
 - quiet: nothing collected for this name in the window
 
 ### NVIDIA (XNAS:NVDA)
-- tone: 122 stories from 46 sources, polarity +0.02, peak intensity 0.67, uncertainty 0.06 · 45 escalated
+- tone: 123 stories from 47 sources, polarity +0.02, peak intensity 0.67, uncertainty 0.06 · 45 escalated
 - 2026-11-24 (date only) finance.yahoo.com — Nvidia, AMD, Broadcom lead chip stocks lower as AI trade comes under pressure [q 1.00, tone -1.0] ★
 - 2026-11-24 (date only) www.investing.com — Nvidia stock falls 5% premarket; Goldman says Huang’s return not a clearing event By Investing.com [q 1.00, tone +1.0] ★
 - 2026-11-24 finance.yahoo.com — Anthropic falls below IPO price as Nvidia gives back gains [q 1.00, tone +1.0] ★
@@ -71,7 +81,7 @@ Generated 2026-11-25 04:12 UTC · slot `all` · 44747 articles in the corpus, 86
 | series | latest | as of | change | source |
 |---|---|---|---|---|
 | ICE BofA US high-yield option-adjusted spread, % | 3.63 | 2026-11-23 | -0.13 | fred |
-| BNM Overnight Policy Rate, % | 2.75 | 2026-09-03 | +0 | bnm_opr |
+| BNM Overnight Policy Rate, % | 2.75 | 2026-11-05 | +0 | bnm_opr |
 | US CPI, all items, index 1982-84=100 | 337.48 | 2026-10-01 | +1.178 | fred |
 | Brent crude, USD per barrel (EIA, daily) | 92.94 | 2026-11-17 | +0.04 | fred |
 | Malaysian ringgit per US dollar | 4.11 | 2026-11-20 | +0.0001 | fred |
@@ -86,6 +96,21 @@ Generated 2026-11-25 04:12 UTC · slot `all` · 44747 articles in the corpus, 86
 | 10y minus 2y Treasury spread, % | 0.28 | 2026-11-24 | -0.01 | fred |
 | US unemployment rate, % | 4.10 | 2026-10-01 | -0.1 | fred |
 | CBOE VIX, index | 26.62 | 2026-11-23 | -9.27 | fred |
+
+## Collection
+
+| at (UTC) | source | status | fetched | kept | stored | detail |
+|---|---|---|---|---|---|---|
+| 19:19 | finbert_tone | ok | 14 | 0 | 0 | facts 12; scored 40 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized |
+| 19:19 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
+| 19:19 | twse_openapi | ok | 8 | 0 | 0 | facts 5;  |
+| 19:19 | jin10_flash | degraded | 20 | 19 | 18 | facts 0; window not covered back to 2026-11-24 22:51Z; the oldest item read is 2 |
+| 19:18 | bnm_opr | ok | 12 | 0 | 0 | facts 2;  |
+| 19:18 | nst_business | degraded | 150 | 134 | 128 | window overflow: all 150 dated items are newer than the window's start (2026-11- |
+| 19:18 | fmt_business | degraded | 50 | 50 | 50 | window overflow: all 50 dated items are newer than the window's start (2026-11-2 |
+| 19:18 | yahoo_rss | ok | 1 | 1 | 0 | read but empty: Genting, Tenaga, Petronas Chemicals, IHH, Press Metal; named the |
+| 19:18 | google_news | ok | 46 | 44 | 41 | named the company: 22 of 44 (lowest: IHH 0/3, Press Metal 0/2, Genting 1/15) |
+| 19:18 | gdelt | ok | 24 | 22 | 15 | grouped 3 names per request; 2 requests; read but empty: Genting, Tenaga, Petron |
 
 ---
 

@@ -1,18 +1,109 @@
 {
-  "collection": [],
+  "collection": [
+    {
+      "at": "2026-11-25T19:19:08.180038+00:00",
+      "detail": "facts 12; scored 40 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized.onnx",
+      "fetched": 14,
+      "kept": 0,
+      "source": "finbert_tone",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-25T19:19:06.497398+00:00",
+      "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-25T19:19:06.495141+00:00",
+      "detail": "facts 5; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-25T19:19:00.711899+00:00",
+      "detail": "facts 0; window not covered back to 2026-11-24 22:51Z; the oldest item read is 2026-11-25 18:38Z, so 19.8h of the window was never served",
+      "fetched": 20,
+      "kept": 19,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 18
+    },
+    {
+      "at": "2026-11-25T19:18:59.327647+00:00",
+      "detail": "facts 2; ",
+      "fetched": 12,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-25T19:18:57.731600+00:00",
+      "detail": "window overflow: all 150 dated items are newer than the window's start (2026-11-24 10:07Z); the oldest is 2026-11-25 01:15Z, so 15.1h scrolled off unseen; read 3 pages, the most this feed may; page 2 starts 4.3h before page 1 ends (2026-11-25 08:00Z under 2026-11-25 12:16Z): the items between were served by neither",
+      "fetched": 150,
+      "kept": 134,
+      "source": "nst_business",
+      "status": "degraded",
+      "stored": 128
+    },
+    {
+      "at": "2026-11-25T19:18:53.925235+00:00",
+      "detail": "window overflow: all 50 dated items are newer than the window's start (2026-11-24 10:07Z); the oldest is 2026-11-25 01:30Z, so 15.4h scrolled off unseen",
+      "fetched": 50,
+      "kept": 50,
+      "source": "fmt_business",
+      "status": "degraded",
+      "stored": 50
+    },
+    {
+      "at": "2026-11-25T19:18:52.836811+00:00",
+      "detail": "read but empty: Genting, Tenaga, Petronas Chemicals, IHH, Press Metal; named the company: 1 of 1 (lowest: Maybank 1/1)",
+      "fetched": 1,
+      "kept": 1,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-25T19:18:51.917548+00:00",
+      "detail": "named the company: 22 of 44 (lowest: IHH 0/3, Press Metal 0/2, Genting 1/15)",
+      "fetched": 46,
+      "kept": 44,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 41
+    },
+    {
+      "at": "2026-11-25T19:18:49.439391+00:00",
+      "detail": "grouped 3 names per request; 2 requests; read but empty: Genting, Tenaga, Petronas Chemicals, IHH, Press Metal; named the company: 3 of 22 (lowest: Petronas Chemicals + IHH + Press Metal 0/5, Genting + Maybank + Tenaga 3/17)",
+      "fetched": 24,
+      "kept": 22,
+      "source": "gdelt",
+      "status": "ok",
+      "stored": 15
+    }
+  ],
   "counts": {
-    "articles": 44747,
+    "articles": 44999,
     "documents": 0,
-    "escalated": 6043,
+    "escalated": 6049,
     "events": 4413,
     "failed_sweeps": 115,
-    "linked": 22286,
-    "observations": 8627,
+    "linked": 22316,
+    "observations": 8644,
     "series": 31,
-    "sweeps": 1847
+    "sweeps": 1857
   },
   "day": "2026-11-25",
-  "generated_at": "2026-11-25 04:12 UTC",
+  "generated_at": "2026-11-25 19:19 UTC",
   "macro": [
     {
       "change": "-0.13",
@@ -24,7 +115,7 @@
     },
     {
       "change": "0",
-      "obs_date": "2026-09-03",
+      "obs_date": "2026-11-05",
       "series_id": "BNM:OPR",
       "source": "bnm_opr",
       "title": "BNM Overnight Policy Rate, %",
@@ -153,11 +244,11 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-24",
+          "known_at": "2026-11-25",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-24",
+          "period_end": "2026-11-25",
           "source": "finbert_tone",
-          "value": "0.48"
+          "value": "0.19"
         }
       ],
       "stories": [
@@ -238,14 +329,40 @@
           "quality": 0.85,
           "title": "Maybank's 3Q earnings rise 4.7% as lower writedown soothes pain from rising bond yields",
           "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://www.freemalaysiatoday.com/category/highlight/2026/11/25/second-finance-minister-amir-hamzah-mulls-maybank-role",
+          "domain": "www.freemalaysiatoday.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-25T10:00:00+00:00",
+          "quality": 1.0,
+          "title": "Finance minister ll Amir Hamzah mulling Maybank role, say sources",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE05c0g4VHRDM2RBRm95Ul9MWXBYNXR5WU1ZYlAtTUZLbHM5YldRQTZnMDlNeHNXZ2dhcV8xWktvclBsZkRCeElQelhtYVBaUDdX?oc=5",
+          "domain": "theedgemalaysia.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-25T15:40:26+00:00",
+          "quality": 0.8,
+          "title": "CIMB, TM, Sunway, KLK, PPB, Alliance Bank, Batu Kawan, Hengyuan, Carlsberg, Capital A, Vantris Energy, Maybank, Industronics",
+          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.0,
-        "n": 6,
-        "polarity_mean": 0.578,
-        "sources": 6,
-        "uncertainty_mean": 0.0
+        "n": 20,
+        "polarity_mean": 0.173,
+        "sources": 16,
+        "uncertainty_mean": 0.05
       },
       "upcoming": []
     },
@@ -258,35 +375,127 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-24",
+          "known_at": "2026-11-25",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-23",
+          "period_end": "2026-11-25",
           "source": "finbert_tone",
-          "value": "0.13"
+          "value": "0.09"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMirgJBVV95cUxNQ0sxTGRCbDZiOU45Q3dTYm9nV3RUY3BWSE90VVlxOUlmdVdFMEUxbkRnSW1zSjR4X3YxZjNzRldBZnhRN2hiYTJMX2xHT2VXVlpPS3lBbFpTYlhkRlAwUkpMZk45MjFvRENIcndvYmRBYmxSWG85YnVRZXhUNDlRVHFoM3VneTM0WlVvSEZPdUxQcFZ1ZXBfd3ZBenJZN1lGZ201SjBtTDRQb3pGTUttaUdabDNKdHdKemE3cUl6dlFQVXpVV3VkZVBrM0wtTklrVXFQR1V0R0tZcTZVNEhwajRCZ29qazJUZzA1bWMxemJ1Z0pXUnpDRS1xMWZ3THlxZ0JSZkRpYmtnT3doMFpRbWNidWZONGNteVk1d2NTMDBNd0thZkljZ1d5VlhRUQ?oc=5",
+          "domain": "simplywall.st",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-25T12:38:48+00:00",
+          "quality": 0.65,
+          "title": "PSP Energy Catat Pertumbuhan Untung Bersih 95.3%, Pengembangan Perniagaan Tenaga Pacu Prospek Pertumbuhan",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 1,
+        "polarity_mean": 0.0,
+        "sources": 1,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
       "earnings": [],
-      "escalated": 0,
+      "escalated": 4,
       "events": [],
       "instrument_id": "MYX:5183",
       "label": "Petronas Chemicals",
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-24",
+          "known_at": "2026-11-25",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-24",
+          "period_end": "2026-11-25",
           "source": "finbert_tone",
-          "value": "0.11"
+          "value": "0.09"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE52SVpFclQ5VERQX2tqNHdLSUJwV3dET0hQb3V0MGRlc1RGQVVkNW1CQ2sxTU9hTFVBeEZ2Vjl5dlc1LVZ0Y1lSQ3dhNnh6eGhj?oc=5",
+          "domain": "theedgemalaysia.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-25T04:13:57+00:00",
+          "quality": 0.8,
+          "title": "CIMB Securities expects PETRONAS Chemicals\u2019 earnings to improve in 4Q after softer-than-expected results",
+          "uncertainty": 1.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMisAFBVV95cUxOb1RycHRmT3hBM3RXZEx2XzQtVkR6bUFxZFhPcnRBSDZremVPZFdmZVN1Z3owY3BtRlM0VzFlNXZKLW1yUV9GWnVFTE5PLUxGSE5LT2txOEFkbTVzUllGdXlwZmh0ZzJqS1VORE5sLUUzN2hEa1BxNUxrdGV3aXRFakt5Rm1LVl9mR0VSeHQ2WjR5b1pqQ05TYlNnaS0yZjk5eS0zWEhRTVRLdmRIWEV3bA?oc=5",
+          "domain": "www.businesstoday.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-25T04:00:40+00:00",
+          "quality": 0.8,
+          "title": "Stock Today: Petronas Chemicals Slips 0.79% Despite Return To Profit",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxNaktPMU9CSnFpVENzMHB0eWxZOWJ6QWJsazZ4NnJJUHc2S1dWNUVlSmlYNVo4ZXNqQmJvOERQYWRUaExUSHdEajdiZ3l6WURuVEJyWEl2NGNJenAyVWJYWENtV2dHOVM1U21Jb0ozZ0dickZXUnA0eEFhSXZJazVpcVVfd2RFUWxvRnZ5eWxVTUZSV2RnM3ptOXRzX1lBaWdKa1A5UTkyT0JEU3PSAbABQVVfeXFMTTBILWRsZTA5ZS1weXZHM3pGa0V0a09WblRoQWU2LWxZRWNaVGlJXy0ybkROMUZTYkJvT0pBZkw4ZzVZRHhYUmtmOUlaU1RaYWlvMWJFelZoODN6UUk1MXpNaTFLcWJ5QWxCUlpsc3pQc0RIYURhUWR1S3JTM0xKWEZOVHNDMVhxS1l3emNXbC1xalVjTTNhWXE0YkFQSGc3eDdtNFg5NFg5VDdBRHpNX3g?oc=5",
+          "domain": "www.nst.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-25T02:15:40+00:00",
+          "quality": 0.8,
+          "title": "HLIB downgrades Petronas Chemicals on weaker outlook",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMijwFBVV95cUxQVGJmc205NEw4bVBmdVk1TUdMamlQdmtoV1ExVWtwZXNGZF9MLTFzWll2RDJIOGNqSFNWUWZlSk1SeWR5aWtqTzZVZFQwVGVfNXR1eElqRUp0QVhmdGRoNFV2UnB0TmNLSWY2djh6ZWhGbGpNY0xFbGdCLTRnUXNuRkpXWlBuSVF5akNmSS1hNA?oc=5",
+          "domain": "tradersunion.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-25T04:26:34+00:00",
+          "quality": 0.65,
+          "title": "PETRONAS Chemicals expected to post fourth-quarter earnings recovery, CIMB cuts target price",
+          "uncertainty": 0.9615384615384615
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE9mTzFDZnBTV0Uxb01Hem5TQzdOZ1B4YVo1M0puOUJtd0lVazVsNWFVdzRWeGpfaWtra0J1ZGd5MmJoWjZnQTl6MHBfWG5YRFFq?oc=5",
+          "domain": "theedgemalaysia.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-24T17:08:19+00:00",
+          "quality": 0.8,
+          "title": "PETRONAS Chemicals, Gas Malaysia, Greatech, Kelington, Mega First, Cahya Mata Sarawak, Wasco, MHB, SD Guthrie, NexG Bina, Zetrix, Maybank & Reservoir Link",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 5,
+        "polarity_mean": 0.0,
+        "sources": 4,
+        "uncertainty_mean": 0.392
+      },
       "upcoming": []
     },
     {
@@ -298,11 +507,11 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-24",
+          "known_at": "2026-11-25",
           "label": "FinBERT headline tone",
           "period_end": "2026-11-24",
           "source": "finbert_tone",
-          "value": "0.11"
+          "value": "0.09"
         }
       ],
       "stories": [],
@@ -338,11 +547,11 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-24",
+          "known_at": "2026-11-25",
           "label": "FinBERT headline tone",
           "period_end": "2026-11-24",
           "source": "finbert_tone",
-          "value": "-0.09"
+          "value": "-0.19"
         }
       ],
       "stories": [],
@@ -609,10 +818,10 @@
       ],
       "tone": {
         "intensity_max": 0.667,
-        "n": 122,
+        "n": 123,
         "polarity_mean": 0.019,
-        "sources": 46,
-        "uncertainty_mean": 0.062
+        "sources": 47,
+        "uncertainty_mean": 0.061
       },
       "upcoming": []
     },
