@@ -1,19 +1,14 @@
-# Digest 2026-11-25
+# Digest 2026-11-26
 
-Generated 2026-11-25 21:56 UTC · slot `all` · 45017 articles in the corpus, 8656 observations, 4413 events in the fact book.
+Generated 2026-11-26 03:35 UTC · slot `all` · 45518 articles in the corpus, 8720 observations, 4426 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- tone: 20 stories from 16 sources, polarity +0.17, peak intensity 0.00, uncertainty 0.05 · 6 escalated
-- 2026-11-25 (date only) www.bernama.com — BERNAMA - Bursa Malaysia Rebounds To Snap Five-day Losing Streak [q 1.00, tone +1.0] ★
-- 2026-11-25 (date only) www.businesstoday.com.my — Stock Today: Maybank Climbs 1.72% Despite Concerns Over Weaker Capital Buffer [q 1.00, tone -0.3] ★
-- 2026-11-25 (date only) www.freemalaysiatoday.com — Bursa opens higher as Nvidia developments lift tech sentiment [q 1.00, tone +1.0] ★
-- 2026-11-25 (date only) www.nst.com.my — Maybank shares rise on strong 3Q performance [q 1.00, tone +1.0] ★
-- 2026-11-24 (date only) www.malaymail.com — Tech stocks rebound, but utilities drag Bursa Malaysia into negative territory [q 1.00, tone +1.0] ★
-- 2026-11-24 (date only) www.klsescreener.com — Maybank's 3Q earnings rise 4.7% as lower writedown soothes pain from rising bond yields [q 0.85, tone -0.2] ★
-- 2026-11-25 www.freemalaysiatoday.com — Finance minister ll Amir Hamzah mulling Maybank role, say sources [q 1.00, tone +0.0]
+- tone: 3 stories from 2 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.00 · 0 escalated
 - 2026-11-25 theedgemalaysia.com — CIMB, TM, Sunway, KLK, PPB, Alliance Bank, Batu Kawan, Hengyuan, Carlsberg, Capital A, Vantris Energy, Maybank, Industronics [q 0.80, tone +0.0]
+- 2026-11-25 theedgemalaysia.com — E5: Amir Hamzah said to mull Maybank role [q 0.80, tone +0.0]
+- 2026-11-25 themalaysianreserve.com — Amir Hamzah weighs Maybank role as Senate term nears end, Bloomberg reports [q 0.80, tone +0.0]
 - snapshot: FinBERT headline tone 0.19 (finbert_tone, 2026-11-25)
 
 ### Tenaga (MYX:5347)
@@ -22,13 +17,7 @@ Generated 2026-11-25 21:56 UTC · slot `all` · 45017 articles in the corpus, 86
 - snapshot: FinBERT headline tone 0.09 (finbert_tone, 2026-11-25)
 
 ### Petronas Chemicals (MYX:5183)
-- tone: 5 stories from 4 sources, polarity +0.00, peak intensity 0.00, uncertainty 0.39 · 4 escalated
-- 2026-11-25 theedgemalaysia.com — CIMB Securities expects PETRONAS Chemicals’ earnings to improve in 4Q after softer-than-expected results [q 0.80, tone +0.0] ★
-- 2026-11-25 www.businesstoday.com.my — Stock Today: Petronas Chemicals Slips 0.79% Despite Return To Profit [q 0.80, tone +1.0] ★
-- 2026-11-25 www.nst.com.my — HLIB downgrades Petronas Chemicals on weaker outlook [q 0.80, tone -1.0] ★
-- 2026-11-25 tradersunion.com — PETRONAS Chemicals expected to post fourth-quarter earnings recovery, CIMB cuts target price [q 0.65, tone +0.0] ★
-- 2026-11-24 theedgemalaysia.com — PETRONAS Chemicals, Gas Malaysia, Greatech, Kelington, Mega First, Cahya Mata Sarawak, Wasco, MHB, SD Guthrie, NexG Bina, Zetrix, Maybank & Reservoir Link [q 0.80, tone +0.0]
-- snapshot: FinBERT headline tone 0.09 (finbert_tone, 2026-11-25)
+- quiet: nothing collected for this name in the window
 
 ### IHH (MYX:5225)
 - quiet: nothing collected for this name in the window
@@ -40,41 +29,42 @@ Generated 2026-11-25 21:56 UTC · slot `all` · 45017 articles in the corpus, 86
 - quiet: nothing collected for this name in the window
 
 ### NVIDIA (XNAS:NVDA)
-- tone: 123 stories from 47 sources, polarity +0.02, peak intensity 0.67, uncertainty 0.06 · 45 escalated
-- 2026-11-24 (date only) finance.yahoo.com — Nvidia, AMD, Broadcom lead chip stocks lower as AI trade comes under pressure [q 1.00, tone -1.0] ★
-- 2026-11-24 (date only) www.investing.com — Nvidia stock falls 5% premarket; Goldman says Huang’s return not a clearing event By Investing.com [q 1.00, tone +1.0] ★
-- 2026-11-24 finance.yahoo.com — Anthropic falls below IPO price as Nvidia gives back gains [q 1.00, tone +1.0] ★
-- 2026-11-24 finance.yahoo.com — Best Buy also among companies benefiting from AI boom [q 1.00, tone +1.0] ★
-- 2026-11-25 (date only) www.freemalaysiatoday.com — Bursa opens higher as Nvidia developments lift tech sentiment [q 1.00, tone +1.0] ★
-- 2026-11-24 finance.yahoo.com — Stocks give back gains as Anthropic dips below IPO price [q 1.00, tone +1.0] ★
-- 2026-11-24 finance.yahoo.com — Nvidia stock in focus: Why CEO comebacks are usually good for shares [q 1.00, tone +0.0] ★
-- 2026-11-24 (date only) cryptobriefing.com — US stocks open lower as Nvidia falls 4% and Anthropic drops 5% [q 0.85, tone -1.0] ★
+- tone: 114 stories from 39 sources, polarity -0.10, peak intensity 0.33, uncertainty 0.11 · 44 escalated
+- 2026-11-26 finance.yahoo.com — Dow Jones Futures Rise; Market Goes On Wild Ride As Nasdaq Slashes Losses [q 1.00, tone -1.0] ★
+- 2026-11-26 finance.yahoo.com — Nvidia chips reach Chinese-owned U.S. firms despite export curbs, CBS reports [q 1.00, tone -1.0] ★
+- 2026-11-26 finance.yahoo.com — Nvidia Put on Negative Credit Watch by S&P Over ‘Key Man’ Risk: Moody’s Says Jensen Huang’s Return as CEO ‘Reduces Near-Term Uncertainty’ [q 1.00, tone -1.0] ★
+- 2026-11-26 finance.yahoo.com — Pete Hegseth, Trump Officials Reportedly Floated Wartime Law to Force Jensen Huang’s Return as Nvidia CEO, But Pentagon Says It ‘Never Happened’ [q 1.00, tone +0.0] ★
+- 2026-11-26 finance.yahoo.com — 'Alarming, if unsurprising': Trump administration cut corners with hasty Nvidia investigation, former CIA officer warns [q 1.00, tone -1.0] ★
+- 2026-11-25 finance.yahoo.com — Will Funding Gap Change IREN Stock Narrative [q 1.00, tone +0.0] ★
+- 2026-11-26 livemint.com — Nvidia’s China link revealed? Investigation claims two US-based firms with Chinese owners are buying most advanced chips [q 0.85, tone -1.0] ★
+- 2026-11-26 beincrypto.com — Tech Stocks Stall Into Thanksgiving: Will the AI Rebound Return? [q 0.85, tone +0.0] ★
 - event 2026-11-25 earnings_result — Q3 2027 results after the close (finnhub)
-- snapshot: P/E (ttm) 17.58 (finnhub, 2026-11-24) · P/B 28.81 (finnhub, 2026-11-24) · EPS (ttm) 9.31 (finnhub, 2026-11-24) · dividend yield 0.03 (finnhub, 2026-11-24) · beta 2.47 (finnhub, 2026-11-24) · 52w high 243.37 (finnhub, 2026-11-24) · 52w low 124.50 (finnhub, 2026-11-24) · target (consensus) 261.09 (fmp, 2026-11-25) · analysts: buy 41 (finnhub, 2026-11-02) · analysts: hold 2 (finnhub, 2026-11-02) · analysts: sell 1 (finnhub, 2026-11-02) · vendor sentiment 0.25 (alphavantage_news, 2026-10-06) · Marketaux sentiment -0.04 (marketaux_news, 2026-11-22) · FinBERT headline tone 0.01 (finbert_tone, 2026-11-24) · revenue (last quarter) 96.22bn (sec_xbrl, 2026-08-26) · net income (last quarter) 59.69bn (sec_xbrl, 2026-08-26) · last EPS surprise % 6.13 (finnhub, 2026-11-21)
+- snapshot: P/E (ttm) 16.55 (finnhub, 2026-11-26) · P/B 28.81 (finnhub, 2026-11-26) · EPS (ttm) 9.31 (finnhub, 2026-11-26) · dividend yield 0.03 (finnhub, 2026-11-26) · beta 2.41 (finnhub, 2026-11-26) · 52w high 243.37 (finnhub, 2026-11-26) · 52w low 124.50 (finnhub, 2026-11-26) · target (consensus) 261.09 (fmp, 2026-11-25) · analysts: buy 41 (finnhub, 2026-11-02) · analysts: hold 2 (finnhub, 2026-11-02) · analysts: sell 1 (finnhub, 2026-11-02) · vendor sentiment 0.25 (alphavantage_news, 2026-10-06) · Marketaux sentiment 0.21 (marketaux_news, 2026-11-26) · FinBERT headline tone 0.08 (finbert_tone, 2026-11-26) · revenue (last quarter) 96.22bn (sec_xbrl, 2026-08-26) · net income (last quarter) 59.69bn (sec_xbrl, 2026-08-26) · last EPS surprise % 6.13 (finnhub, 2026-11-21)
 
 ### Apple (XNAS:AAPL)
-- tone: 15 stories from 9 sources, polarity +0.20, peak intensity 0.00, uncertainty 0.05 · 3 escalated
-- 2026-11-24 Yahoo — Embedded Microprocessor Unit (MPU) Global Market Report 2026 | Capitalize on Edge AI and IoT Growth to $59.18 Billion by 2030 with NVIDIA, Intel, Qualcomm, NXP, and Renesas [q 0.85, tone +1.0] ★
-- 2026-11-24 finance.yahoo.com — Apple Inc. (AAPL) Delivered Strong Results: Why Investors Are Watching Its Next Move Closely [q 0.80, tone +1.0] ★
-- 2026-11-24 www.fxleaders.com — Apple Outperforms Big Tech as AAPL Stock Nears $360 - Strong Earnings Offset Competition and Foldable iPhone Concerns [q 0.65, tone +1.0] ★
-- 2026-11-24 finance.yahoo.com — Is Apple (AAPL) Above Fair Value As ETF Buying Returns? [q 1.00, tone +0.0]
-- 2026-11-24 financefeeds.com — OKXICE Tokenized Stocks: Cuomo Blames Rivals for 67 Opt-Outs [q 0.85, tone +0.0]
-- 2026-11-24 finance.yahoo.com — Top Analyst Reports for Apple, Philip Morris & Intel [q 0.80, tone +0.0]
-- 2026-11-24 finance.yahoo.com — Apple Set to Revive Popular Product Line After Years [q 0.80, tone +0.0]
-- 2026-11-24 finance.yahoo.com — What Changed In Apple Stock's Story? [q 0.80, tone +0.0]
-- snapshot: P/E (ttm) 38.31 (finnhub, 2026-11-24) · P/B 44.06 (finnhub, 2026-11-24) · EPS (ttm) 8.97 (finnhub, 2026-11-24) · dividend yield 0.51 (finnhub, 2026-11-24) · beta 1.07 (finnhub, 2026-11-24) · 52w high 360.83 (finnhub, 2026-11-24) · 52w low 243.42 (finnhub, 2026-11-24) · target (consensus) 341.03 (fmp, 2026-11-25) · analysts: buy 19 (finnhub, 2026-11-02) · analysts: hold 15 (finnhub, 2026-11-02) · analysts: sell 3 (finnhub, 2026-11-02) · vendor sentiment -0.23 (alphavantage_news, 2026-10-06) · Marketaux sentiment -0.01 (marketaux_news, 2026-11-24) · FinBERT headline tone 0.15 (finbert_tone, 2026-11-24) · revenue (last quarter) 114.48bn (sec_xbrl, 2026-11-03) · net income (last quarter) 30.71bn (sec_xbrl, 2026-11-03) · last EPS surprise % 3.64 (finnhub, 2026-11-08)
+- tone: 28 stories from 22 sources, polarity +0.11, peak intensity 0.33, uncertainty 0.06 · 5 escalated
+- 2026-11-25 Yahoo — Alphabet Is Most Beat Down AI Company [q 0.85, tone +1.0] ★
+- 2026-11-25 Yahoo — The Zacks Analyst Blog Highlights Apple, Philip Morris, Intel and Crimson Wine [q 0.85, tone +1.0] ★
+- 2026-11-25 www.foreignpolicyjournal.com — Apple (NASDAQ: AAPL) Faces Unprecedented Memory Cost Pressure As Gross Margin Guidance Drops To 45%-46% [q 0.65, tone +0.0] ★
+- 2026-11-25 www.phonearena.com — Apple will likely edge out Samsung for the top spot in the slumping 2026 and 2027 smartphone market [q 0.65, tone +0.0] ★
+- 2026-11-25 gizmodo.com — AirTag 2 Is Now Nearly 40% Off, and Apple Doesn't Seem to Care About Profit Margins This Black Friday [q 0.65, tone +1.0] ★
+- 2026-11-25 business-standard.com — StayTouch vs NameDrop: An Indian entrepreneur's patent battle with Apple [q 0.85, tone +0.0]
+- 2026-11-25 SeekingAlpha — Apple: Great Company, Terrible Price [q 0.85, tone +0.0]
+- 2026-11-26 finance.yahoo.com — Apple Stock Defies AI Selloff: Is It the Market's Safe Haven? [q 0.80, tone +0.0]
+- event 2026-11-25 insider_filing — 4: FORM 4 (edgar)
+- snapshot: P/E (ttm) 38.09 (finnhub, 2026-11-26) · P/B 44.06 (finnhub, 2026-11-26) · EPS (ttm) 8.97 (finnhub, 2026-11-26) · dividend yield 0.51 (finnhub, 2026-11-26) · beta 1.06 (finnhub, 2026-11-26) · 52w high 360.83 (finnhub, 2026-11-26) · 52w low 243.42 (finnhub, 2026-11-26) · target (consensus) 341.03 (fmp, 2026-11-25) · analysts: buy 19 (finnhub, 2026-11-02) · analysts: hold 15 (finnhub, 2026-11-02) · analysts: sell 3 (finnhub, 2026-11-02) · vendor sentiment -0.23 (alphavantage_news, 2026-10-06) · Marketaux sentiment 0.01 (marketaux_news, 2026-11-26) · FinBERT headline tone 0.04 (finbert_tone, 2026-11-26) · revenue (last quarter) 114.48bn (sec_xbrl, 2026-11-03) · net income (last quarter) 30.71bn (sec_xbrl, 2026-11-03) · last EPS surprise % 3.64 (finnhub, 2026-11-08)
 
 ### Microsoft (XNAS:MSFT)
-- tone: 38 stories from 21 sources, polarity +0.18, peak intensity 0.33, uncertainty 0.05 · 13 escalated
-- 2026-11-24 finance.yahoo.com — Best Buy also among companies benefiting from AI boom [q 1.00, tone +1.0] ★
-- 2026-11-24 www.fool.com — 3 Unstoppable Stocks That Can Be Great Buys for Decades [q 0.85, tone +0.0] ★
-- 2026-11-24 insidermonkey.com — Microsoft Corporation (MSFT) Is Facing AI Spending Fears: Could Its Cloud Growth Change the Narrative? [q 0.85, tone +1.0] ★
-- 2026-11-24 Yahoo — Asia-Pacific Digital Transformation Market: Size, Trends, and Forecast (2026-2034) Featuring Intelligence on Accenture, Google (Alphabet), IBM, Microsoft, Oracle, HPE, SAP, EMC (Dell EMC), Cognex, Adobe and Siemens [q 0.85, tone +0.0] ★
-- 2026-11-24 Yahoo — Global Subject Access Request Software Market Report 2026 | Capitalize on 13.5% CAGR to $2.96 Billion by 2030 as Microsoft, IBM, OneTrust and BigID Accelerate AI-Cloud Compliance [q 0.85, tone +1.0] ★
-- 2026-11-24 Yahoo — Global Integration App Market Report 2026: $6.04 Billion Forecast to 2030 | Capitalize on 11.2% CAGR as Microsoft, IBM, Oracle, and Workato Accelerate AI and Multi-Cloud Adoption [q 0.85, tone +0.0] ★
-- 2026-11-24 Yahoo — Cloud AI Update - Audi Integrates Cutting-Edge AI for In-Car Microsoft Access [q 0.85, tone +0.0] ★
-- 2026-11-24 www.tipranks.com — Microsoft Stock (MSFT) Rises on Reports That Xbox’s Project Helix Will Be a Normal Gaming Console [q 0.65, tone +0.0] ★
-- snapshot: P/E (ttm) 25.64 (finnhub, 2026-11-24) · P/B 6.26 (finnhub, 2026-11-24) · EPS (ttm) 19.15 (finnhub, 2026-11-24) · dividend yield 0.79 (finnhub, 2026-11-24) · beta 1.07 (finnhub, 2026-11-24) · 52w high 559.15 (finnhub, 2026-11-24) · 52w low 349.20 (finnhub, 2026-11-24) · target (consensus) 617.36 (fmp, 2026-11-25) · analysts: buy 40 (finnhub, 2026-11-02) · analysts: hold 3 (finnhub, 2026-11-02) · analysts: sell 0 (finnhub, 2026-11-02) · vendor sentiment 0.29 (alphavantage_news, 2026-10-06) · Marketaux sentiment 0.25 (marketaux_news, 2026-11-24) · FinBERT headline tone 0.13 (finbert_tone, 2026-11-24) · revenue (last quarter) 92.28bn (sec_xbrl, 2026-10-28) · net income (last quarter) 36.63bn (sec_xbrl, 2026-10-28) · last EPS surprise % 1.53 (finnhub, 2026-10-28)
+- tone: 31 stories from 16 sources, polarity +0.16, peak intensity 0.33, uncertainty 0.14 · 10 escalated
+- 2026-11-25 finance.yahoo.com — Will Funding Gap Change IREN Stock Narrative [q 1.00, tone +0.0] ★
+- 2026-11-25 finance.yahoo.com — Microsoft (MSFT) Deepens Europe Sovereign AI Push With Expanded Public Sector Cloud Pact [q 1.00, tone +0.0] ★
+- 2026-11-25 www.ibtimes.com — Microsoft's Green Card Filings Reveal A Striking Pattern After Mass Layoffs. Trump's New Rule Could Freeze Sponsorships For Two Years. [q 0.85, tone +0.0] ★
+- 2026-11-25 Yahoo — How Jensen Huang and Sam Altman ‘Un-Fired’ Themselves [q 0.85, tone +0.0] ★
+- 2026-11-25 Yahoo — Global Risk Analysis Management Market Report 2026: Size, Share, Trends, and Forecast to 2030 | Capitalize on AI and Real-Time Risk with Microsoft, IBM, Oracle, SAP, and ServiceNow [q 0.85, tone +1.0] ★
+- 2026-11-25 Yahoo — Artificial Intelligence (AI) in Hospital Operations Market Report 2026 | Capitalize on 28.9% CAGR as Microsoft, Oracle, Epic, LeanTaaS and Qventus Accelerate Workflow Automation [q 0.85, tone +1.0] ★
+- 2026-11-25 Yahoo — Data Center Americas 2027 Announces Industry Leaders from AWS, Google, Microsoft, Oracle, CoreWeave and Applied Digital as Featured Speakers [q 0.85, tone +0.0] ★
+- 2026-11-25 Yahoo — Microsoft Declares Code Red After 24-Hour Global Outage [q 0.85, tone +1.0] ★
+- snapshot: P/E (ttm) 25.83 (finnhub, 2026-11-26) · P/B 6.26 (finnhub, 2026-11-26) · EPS (ttm) 19.15 (finnhub, 2026-11-26) · dividend yield 0.79 (finnhub, 2026-11-26) · beta 1.06 (finnhub, 2026-11-26) · 52w high 559.15 (finnhub, 2026-11-26) · 52w low 349.20 (finnhub, 2026-11-26) · target (consensus) 617.36 (fmp, 2026-11-25) · analysts: buy 40 (finnhub, 2026-11-02) · analysts: hold 3 (finnhub, 2026-11-02) · analysts: sell 0 (finnhub, 2026-11-02) · vendor sentiment 0.29 (alphavantage_news, 2026-10-06) · Marketaux sentiment 0.23 (marketaux_news, 2026-11-26) · FinBERT headline tone -0.14 (finbert_tone, 2026-11-26) · revenue (last quarter) 92.28bn (sec_xbrl, 2026-10-28) · net income (last quarter) 36.63bn (sec_xbrl, 2026-10-28) · last EPS surprise % 1.53 (finnhub, 2026-10-28)
 
 ## Macro
 
@@ -101,20 +91,15 @@ Generated 2026-11-25 21:56 UTC · slot `all` · 45017 articles in the corpus, 86
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
-| 21:56 | dbnomics | ok | 450 | 0 | 0 | facts 0;  |
-| 21:56 | jin10_flash | degraded | 20 | 20 | 18 | facts 0; window not covered back to 2026-11-25 19:19Z; the oldest item read is 2 |
-| 21:56 | fred | ok | 485 | 0 | 0 | facts 14; release calendar: 'FOMC Press Release' listed on 15 days of the fortni |
-| 21:56 | fmp | ok | 4056 | 0 | 0 | facts 12; fmp /earnings is outside the plan (HTTP 402); not collected for NVDA,  |
-| 19:19 | finbert_tone | ok | 14 | 0 | 0 | facts 12; scored 40 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized |
-| 19:19 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
-| 19:19 | twse_openapi | ok | 8 | 0 | 0 | facts 5;  |
-| 19:19 | jin10_flash | degraded | 20 | 19 | 18 | facts 0; window not covered back to 2026-11-24 22:51Z; the oldest item read is 2 |
-| 19:18 | bnm_opr | ok | 12 | 0 | 0 | facts 2;  |
-| 19:18 | nst_business | degraded | 150 | 134 | 128 | window overflow: all 150 dated items are newer than the window's start (2026-11- |
-| 19:18 | fmt_business | degraded | 50 | 50 | 50 | window overflow: all 50 dated items are newer than the window's start (2026-11-2 |
-| 19:18 | yahoo_rss | ok | 1 | 1 | 0 | read but empty: Genting, Tenaga, Petronas Chemicals, IHH, Press Metal; named the |
-| 19:18 | google_news | ok | 46 | 44 | 41 | named the company: 22 of 44 (lowest: IHH 0/3, Press Metal 0/2, Genting 1/15) |
-| 19:18 | gdelt | ok | 24 | 22 | 15 | grouped 3 names per request; 2 requests; read but empty: Genting, Tenaga, Petron |
+| 03:34 | finbert_tone | ok | 18 | 0 | 0 | facts 18; scored 641 titles with Xenova/finbert@8f269abebfdd onnx/model_quantize |
+| 03:34 | eodhd | ok | 0 | 0 | 0 | skipped: every asked name was refused: outside the plan or over today's credits  |
+| 03:34 | jin10_flash | degraded | 18 | 17 | 16 | facts 0; window not covered back to 2026-11-25 21:56Z; the oldest item read is 2 |
+| 03:34 | marketaux_news | ok | 40 | 39 | 35 | facts 7; XNAS:MSFT: 2026-11-24 not aggregated - 8 full pages ended part-way thro |
+| 03:34 | finnhub | ok | 373 | 330 | 261 | facts 51;  |
+| 03:34 | edgar | ok | 1 | 0 | 0 | facts 1;  |
+| 03:34 | yahoo_rss | ok | 51 | 50 | 37 | named the company: 23 of 50 (lowest: Apple 4/17, Microsoft 7/17, NVIDIA 12/16) |
+| 03:34 | google_news | ok | 175 | 167 | 152 | named the company: 151 of 167 (lowest: Microsoft 27/31, NVIDIA 71/79, Apple 53/5 |
+| 03:34 | gdelt | throttled | 0 | 0 | 0 | throttled: no name could be read (3 failed, 0 not reached). First: GDELT fetch f |
 
 ---
 
