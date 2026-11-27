@@ -1,49 +1,73 @@
 # Digest 2026-11-27
 
-Generated 2026-11-27 03:39 UTC · slot `all` · 46108 articles in the corpus, 8806 observations, 4432 events in the fact book.
+Generated 2026-11-27 19:01 UTC · slot `all` · 46352 articles in the corpus, 8830 observations, 4432 events in the fact book.
 
 ## The book
 
 ### Maybank (MYX:1155)
-- quiet: nothing collected for this name in the window
+- tone: 4 stories from 4 sources, polarity +0.25, peak intensity 0.00, uncertainty 0.00 · 1 escalated
+- 2026-11-27 www.ad-hoc-news.de — Malayan Banking stock: Q3 net profit rises 4.7% to MYR 2.74 billion - ad-hoc-news.de [q 0.65, tone +1.0] ★
+- 2026-11-27 www.businesstoday.com.my — Amanah Saham Bumiputera Disposes 18 Million Maybank Shares [q 0.80, tone +0.0]
+- 2026-11-27 simplywall.st — Maybank (KLSE:MAYBANK) Stock Looks Fully Priced As Excess Returns Hold Up [q 0.65, tone +0.0]
+- 2026-11-27 www.ggrasia.com — GEN Malaysia earnings to ‘improve markedly’ in 1H 2027, but home market pressured: Maybank [q 0.65, tone +0.0]
+- snapshot: FinBERT headline tone 0.46 (finbert_tone, 2026-11-27)
 
 ### Tenaga (MYX:5347)
-- tone: 5 stories from 5 sources, polarity +0.20, peak intensity 0.00, uncertainty 0.00 · 1 escalated
+- tone: 7 stories from 6 sources, polarity +0.14, peak intensity 0.00, uncertainty 0.00 · 1 escalated
 - 2026-11-26 www.tradingview.com — TENAGA: Revenue and EBITDA rose in 9MFY’26, but higher costs weighed on PAT [q 0.65, tone +1.0] ★
+- 2026-11-27 seekingalpha.com — Tenaga Nasional Berhad 2026 Q3 - Results - Earnings Call Presentation (OTCMKTS:TNABY) 2026-11-26 [q 0.80, tone +0.0]
 - 2026-11-26 theedgemalaysia.com — Tenaga, Press Metal, Hong Leong Bank, HLFG, AmBank, Sime Darby, Genting, IJM, IOI Properties, QL Resources, DRB-Hicom, AWC, AirAsia [q 0.80, tone +0.0]
 - 2026-11-26 www.nst.com.my — TNB delivers sustained financial & operational resilience, absorbs fuel costs to shield consumers [q 0.80, tone +0.0]
+- 2026-11-27 www.tradingview.com — Tenaga Nasional Q3 2026 Earnings Call Is Live [q 0.65, tone +0.0]
 - 2026-11-26 www.marketscreener.com — Tenaga Nasional Berhad Reports Earnings Results for the Third Quarter and Nine Months Ended September 30, 2026 [q 0.65, tone +0.0]
 - 2026-11-26 www.moomoo.com — Tenaga Nasional Malaysia 3rd-Quarter 2026 Earnings Summary Table [q 0.65, tone +0.0]
-- snapshot: FinBERT headline tone 0.09 (finbert_tone, 2026-11-26)
+- snapshot: FinBERT headline tone 0.05 (finbert_tone, 2026-11-27)
 
 ### Petronas Chemicals (MYX:5183)
-- tone: 1 stories from 1 sources, polarity +1.00, peak intensity 0.00, uncertainty 0.00 · 1 escalated
+- tone: 2 stories from 2 sources, polarity +1.00, peak intensity 0.00, uncertainty 0.00 · 2 escalated
 - 2026-11-26 www.thestar.com.my — PETRONAS Chemicals hit by four downgrades as core profit plunges [q 0.80, tone +1.0] ★
-- snapshot: FinBERT headline tone -0.77 (finbert_tone, 2026-11-26)
+- 2026-11-27 www.ad-hoc-news.de — Petronas Chemicals stock swings to RM179 million Q3 profit - ad-hoc-news.de [q 0.65, tone +1.0] ★
+- snapshot: FinBERT headline tone -0.21 (finbert_tone, 2026-11-27)
 
 ### IHH (MYX:5225)
-- quiet: nothing collected for this name in the window
+- tone: 12 stories from 10 sources, polarity +0.75, peak intensity 0.00, uncertainty 0.00 · 9 escalated
+- 2026-11-27 www.businesstimes.com.sg — IHH Healthcare’s Q3 net profit rises 10.2% to US$164.8 million [q 0.80, tone +1.0] ★
+- 2026-11-27 themalaysianreserve.com — IHH Healthcare’s 3Q net profit rises 10% to RM679m as patient volumes grow [q 0.80, tone +1.0] ★
+- 2026-11-27 www.thestar.com.my — IHH Healthcare’s 3Q net profit rises 10% to RM679mil [q 0.80, tone +1.0] ★
+- 2026-11-27 theedgemalaysia.com — IHH Healthcare 3Q net profit rises 10% on higher patient volumes [q 0.80, tone +1.0] ★
+- 2026-11-27 www.businesstoday.com.my — IHH Revenue Hits RM7.1 Billion, Profit Up 10% In Third Quarter [q 0.80, tone +1.0] ★
+- 2026-11-27 www.zaobao.com.sg — IHH third-quarter net profit rises 10% [q 0.65, tone +1.0] ★
+- 2026-11-27 tradersunion.com — IHH Healthcare posts higher third-quarter net profit on stronger patient volumes [q 0.65, tone +1.0] ★
+- 2026-11-27 www.tradingview.com — IHH: Core growth stayed strong as diversified operations supported margins and 2026 guidance [q 0.65, tone +1.0] ★
+- snapshot: FinBERT headline tone 0.67 (finbert_tone, 2026-11-27)
 
 ### Press Metal (MYX:8869)
-- tone: 4 stories from 4 sources, polarity +0.50, peak intensity 0.00, uncertainty 0.00 · 2 escalated
+- tone: 9 stories from 6 sources, polarity +0.67, peak intensity 0.33, uncertainty 0.00 · 6 escalated
+- 2026-11-27 www.businesstoday.com.my — Press Metal Set For Record FY2026 Earnings, Valuation Still Attractive [q 0.80, tone +1.0] ★
 - 2026-11-26 www.businesstoday.com.my — Press Metal’s 3QFY26 PATAMI Jumps 52% To RM855 Million, Declares 2.5 Sen Dividend [q 0.80, tone +1.0] ★
 - 2026-11-26 www.thestar.com.my — Press Metal 3Q net profit jumps to RM855mil [q 0.80, tone +1.0] ★
+- 2026-11-27 www.alcircle.com — Press Metal reports 25.7% revenue growth and 51.8% rise in shareholder profit in Q3 2026 [q 0.65, tone +1.0] ★
+- 2026-11-27 www.minichart.com.sg — Press Metal 3Q FY2026 core profit hits record RM714.37m, declares 2.5 sen dividend [q 0.65, tone +1.0] ★
+- 2026-11-26 www.marketscreener.com — Press Metal Aluminium Posts Higher Q3 Net Profit, Revenue Up [q 0.65, tone +1.0] ★
+- 2026-11-27 www.thestar.com.my — Trading ideas: AWC, Pekat, Capitaland, Takaful, CWG, KK Markt, IOIPG, DRB-Hicom, SimeProp, HLBank, AMMB, Optimax, Press Metal, Genting, QL Resources [q 0.80, tone +0.0]
 - 2026-11-26 theedgemalaysia.com — Tenaga, Press Metal, Hong Leong Bank, HLFG, AmBank, Sime Darby, Genting, IJM, IOI Properties, QL Resources, DRB-Hicom, AWC, AirAsia [q 0.80, tone +0.0]
-- 2026-11-26 www.marketscreener.com — Press Metal Aluminium Holdings Berhad Reports Earnings Results for the Third Quarter and Nine Months Ended September 30, 2026 [q 0.65, tone +0.0]
-- snapshot: FinBERT headline tone 0.48 (finbert_tone, 2026-11-26)
+- snapshot: FinBERT headline tone 0.45 (finbert_tone, 2026-11-27)
 
 ### Genting (MYX:3182)
-- tone: 6 stories from 5 sources, polarity -0.83, peak intensity 0.00, uncertainty 0.00 · 5 escalated
+- tone: 12 stories from 9 sources, polarity -0.67, peak intensity 0.00, uncertainty 0.08 · 8 escalated
+- 2026-11-27 www.freemalaysiatoday.com — Genting falls to 20-year low after RM161mil Q3 loss [q 0.80, tone -1.0] ★
+- 2026-11-27 theedgemalaysia.com — Genting falls to 2007 lows after weaker-than-expected quarter [q 0.80, tone -1.0] ★
+- 2026-11-27 www.nst.com.my — CIMB Securities slashes Genting earnings forecasts by up to 71pct, cuts target price [q 0.80, tone -1.0] ★
 - 2026-11-26 www.businesstoday.com.my — Genting Berhad Slumps Into RM161 Million Net Loss For Third Quarter [q 0.80, tone -1.0] ★
 - 2026-11-26 theedgemalaysia.com — Genting falls into 3Q loss as Singapore, Malaysia businesses drag [q 0.80, tone -1.0] ★
 - 2026-11-26 www.nst.com.my — Genting falls into the red in Q3 with RM161.4mil net loss [q 0.80, tone -1.0] ★
 - 2026-11-26 themalaysianreserve.com — Genting posts RM161.4m 3Q net loss as casino earnings weaken [q 0.80, tone -1.0] ★
 - 2026-11-26 tradersunion.com — Genting posts third-quarter loss as Malaysia, Singapore operations weigh on earnings [q 0.65, tone -1.0] ★
-- 2026-11-26 theedgemalaysia.com — Tenaga, Press Metal, Hong Leong Bank, HLFG, AmBank, Sime Darby, Genting, IJM, IOI Properties, QL Resources, DRB-Hicom, AWC, AirAsia [q 0.80, tone +0.0]
-- snapshot: FinBERT headline tone -0.25 (finbert_tone, 2026-11-26)
+- snapshot: FinBERT headline tone -0.40 (finbert_tone, 2026-11-27)
 
 ### NVIDIA (XNAS:NVDA)
-- tone: 59 stories from 25 sources, polarity -0.07, peak intensity 0.67, uncertainty 0.11 · 18 escalated
+- tone: 62 stories from 27 sources, polarity -0.07, peak intensity 0.67, uncertainty 0.11 · 19 escalated
+- 2026-11-27 www.nst.com.my — NationGate unaffected by Nvidia's reported server shipment curbs: Analyst [q 1.00, tone +0.0] ★
 - 2026-11-26 Yahoo — ‘Room to Spare,’ Says Investor About Oracle Stock [q 0.85, tone +1.0] ★
 - 2026-11-26 Yahoo — Super Micro Computer (SMCI) Faces Southeast Asia AI Server Disruption After Export Halt [q 0.85, tone -1.0] ★
 - 2026-11-26 Yahoo — BlackBerry (TSX:BB) Rebounds Before Earnings, Is The Stock Fully Priced? [q 0.85, tone +1.0] ★
@@ -51,7 +75,6 @@ Generated 2026-11-27 03:39 UTC · slot `all` · 46108 articles in the corpus, 88
 - 2026-11-26 Yahoo — Jensen Huang is back as the chief at Nvidia [q 0.85, tone -1.0] ★
 - 2026-11-26 Yahoo — Heading Into FY27: How to Trade Broadcom’s ~$115B AI Target Against Nvidia’s Multiple Reset [q 0.85, tone +1.0] ★
 - 2026-11-26 Yahoo — Why Did Nvidia (NVDA) Reinstate Jensen Huang As CEO So Quickly? [q 0.85, tone +0.0] ★
-- 2026-11-26 Yahoo — Jensen Huang 'absolutely could be fired again,' legal expert says [q 0.85, tone -1.0] ★
 - snapshot: P/E (ttm) 15.90 (finnhub, 2026-11-27) · P/B 28.81 (finnhub, 2026-11-27) · EPS (ttm) 9.31 (finnhub, 2026-11-27) · dividend yield 0.03 (finnhub, 2026-11-27) · beta 2.43 (finnhub, 2026-11-27) · 52w high 243.37 (finnhub, 2026-11-27) · 52w low 124.50 (finnhub, 2026-11-27) · target (consensus) 261.09 (fmp, 2026-11-26) · analysts: buy 41 (finnhub, 2026-11-02) · analysts: hold 2 (finnhub, 2026-11-02) · analysts: sell 1 (finnhub, 2026-11-02) · vendor sentiment 0.25 (alphavantage_news, 2026-10-06) · Marketaux sentiment 0.21 (marketaux_news, 2026-11-26) · FinBERT headline tone 0.05 (finbert_tone, 2026-11-27) · revenue (last quarter) 96.22bn (sec_xbrl, 2026-08-26) · net income (last quarter) 59.69bn (sec_xbrl, 2026-08-26) · last EPS surprise % 6.13 (finnhub, 2026-11-21)
 
 ### Apple (XNAS:AAPL)
@@ -103,6 +126,16 @@ Generated 2026-11-27 03:39 UTC · slot `all` · 46108 articles in the corpus, 88
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 19:00 | finbert_tone | ok | 24 | 0 | 0 | facts 19; scored 64 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized |
+| 19:00 | eodhd | ok | 0 | 0 | 0 | skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, U |
+| 19:00 | twse_openapi | ok | 8 | 0 | 0 | facts 5;  |
+| 19:00 | jin10_flash | degraded | 19 | 19 | 18 | facts 0; window not covered back to 2026-11-27 03:38Z; the oldest item read is 2 |
+| 19:00 | bnm_opr | ok | 12 | 0 | 0 | facts 0;  |
+| 19:00 | nst_business | degraded | 150 | 143 | 137 | window overflow: all 150 dated items are newer than the window's start (2026-11- |
+| 19:00 | fmt_business | degraded | 50 | 50 | 49 | window overflow: all 50 dated items are newer than the window's start (2026-11-2 |
+| 19:00 | yahoo_rss | ok | 0 | 0 | 0 | read but empty: Maybank, Tenaga, Petronas Chemicals, IHH, Press Metal, Genting |
+| 19:00 | google_news | ok | 47 | 44 | 40 | named the company: 33 of 44 (lowest: Genting 7/16, Petronas Chemicals 2/3, Tenag |
+| 19:00 | gdelt | throttled | 0 | 0 | 0 | throttled: no name could be read (3 failed, 0 not reached). First: GDELT fetch f |
 | 03:38 | finbert_tone | ok | 10 | 0 | 0 | facts 10; scored 218 titles with Xenova/finbert@8f269abebfdd onnx/model_quantize |
 | 03:38 | eodhd | ok | 0 | 0 | 0 | skipped: every asked name was refused: outside the plan or over today's credits  |
 | 03:38 | jin10_flash | degraded | 19 | 19 | 18 | facts 0; window not covered back to 2026-11-26 21:50Z; the oldest item read is 2 |

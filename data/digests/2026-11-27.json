@@ -1,6 +1,96 @@
 {
   "collection": [
     {
+      "at": "2026-11-27T19:00:37.428291+00:00",
+      "detail": "facts 19; scored 64 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized.onnx",
+      "fetched": 24,
+      "kept": 0,
+      "source": "finbert_tone",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-27T19:00:34.670692+00:00",
+      "detail": "skipped: eodhd: no name in this slot is on the free plan (free (2 names a day, US only, rotated)); nothing was asked. The EODHD Fundamentals plan covers KLSE and TW.",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-27T19:00:34.668643+00:00",
+      "detail": "facts 5; ",
+      "fetched": 8,
+      "kept": 0,
+      "source": "twse_openapi",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-27T19:00:28.822215+00:00",
+      "detail": "facts 0; window not covered back to 2026-11-27 03:38Z; the oldest item read is 2026-11-27 17:47Z, so 14.1h of the window was never served",
+      "fetched": 19,
+      "kept": 19,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 18
+    },
+    {
+      "at": "2026-11-27T19:00:27.475057+00:00",
+      "detail": "facts 0; ",
+      "fetched": 12,
+      "kept": 0,
+      "source": "bnm_opr",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-27T19:00:25.426432+00:00",
+      "detail": "window overflow: all 150 dated items are newer than the window's start (2026-11-26 19:02Z); the oldest is 2026-11-27 00:11Z, so 5.2h scrolled off unseen; read 3 pages, the most this feed may; page 2 starts 3.8h before page 1 ends (2026-11-27 07:13Z under 2026-11-27 11:03Z): the items between were served by neither",
+      "fetched": 150,
+      "kept": 143,
+      "source": "nst_business",
+      "status": "degraded",
+      "stored": 137
+    },
+    {
+      "at": "2026-11-27T19:00:21.141114+00:00",
+      "detail": "window overflow: all 50 dated items are newer than the window's start (2026-11-26 19:02Z); the oldest is 2026-11-27 00:59Z, so 5.9h scrolled off unseen",
+      "fetched": 50,
+      "kept": 50,
+      "source": "fmt_business",
+      "status": "degraded",
+      "stored": 49
+    },
+    {
+      "at": "2026-11-27T19:00:20.307571+00:00",
+      "detail": "read but empty: Maybank, Tenaga, Petronas Chemicals, IHH, Press Metal, Genting",
+      "fetched": 0,
+      "kept": 0,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-27T19:00:19.416662+00:00",
+      "detail": "named the company: 33 of 44 (lowest: Genting 7/16, Petronas Chemicals 2/3, Tenaga 2/3)",
+      "fetched": 47,
+      "kept": 44,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 40
+    },
+    {
+      "at": "2026-11-27T19:00:16.982511+00:00",
+      "detail": "throttled: no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked); deferred: IHH, Press Metal, Genting",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "throttled",
+      "stored": 0
+    },
+    {
       "at": "2026-11-27T03:38:28.521931+00:00",
       "detail": "facts 10; scored 218 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized.onnx",
       "fetched": 10,
@@ -83,18 +173,18 @@
     }
   ],
   "counts": {
-    "articles": 46108,
+    "articles": 46352,
     "documents": 0,
-    "escalated": 6218,
+    "escalated": 6237,
     "events": 4432,
     "failed_sweeps": 115,
-    "linked": 22848,
-    "observations": 8806,
+    "linked": 22890,
+    "observations": 8830,
     "series": 31,
-    "sweeps": 1893
+    "sweeps": 1903
   },
   "day": "2026-11-27",
-  "generated_at": "2026-11-27 03:39 UTC",
+  "generated_at": "2026-11-27 19:01 UTC",
   "macro": [
     {
       "change": "0.09",
@@ -228,22 +318,81 @@
   "names": [
     {
       "earnings": [],
-      "escalated": 0,
+      "escalated": 1,
       "events": [],
       "instrument_id": "MYX:1155",
       "label": "Maybank",
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-26",
+          "known_at": "2026-11-27",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-26",
+          "period_end": "2026-11-27",
           "source": "finbert_tone",
-          "value": "0.07"
+          "value": "0.46"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxOOGduQVhGYjNWendLQ3VURnhGR2Fvdm5nc19CdGRUWDFHNFhNMkJFSVdsRTBja0NYXy1IT2NWVWJNWW43Qi05cTFGSGxLRXFIbjJsM0JNeE1WT1pMSmRMemRxcGpZSlQtWDFYWUozb1czdXdITEFoaXhrN2hKU1laMVN0MkM5MlIxSS1TZ1ZuOHE1WU9RN1BxaG9XREVIVjRsNGJpYUdiVkJmYVFPTkpyTmNMVlR4ajVTWExfNHJ3di1yUQ?oc=5",
+          "domain": "www.ad-hoc-news.de",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-27T01:42:53+00:00",
+          "quality": 0.65,
+          "title": "Malayan Banking stock: Q3 net profit rises 4.7% to MYR 2.74 billion - ad-hoc-news.de",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMipgFBVV95cUxPSFA4T1JKNThBNUZ5UExIN2ZCbkpIVF9DMmdLcFdYU2t6OG03U2otWFZrR0szN0tWMzd0dVdIUnhOWGtRUUQzTkpGaU1vcnpWUzJoSnlhNlJCR0FiV0NKNUtlRDFPdGpUS0ZfY3FhRFBKQlVsa2dTeVdnMk8zQlllTWFUdVlEekxabjVQWllIRVZaWXBOTkJnVlhpUk93Y2R1VVZNWnRn?oc=5",
+          "domain": "www.businesstoday.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-27T10:14:42+00:00",
+          "quality": 0.8,
+          "title": "Amanah Saham Bumiputera Disposes 18 Million Maybank Shares",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMi3wFBVV95cUxOc0ZlcEZwcTlVYjlhYVpfS09rMS1jdVpJa2FvdWRwUVJWaTVtM3E0azVMTm51M2NRR0JHVDQ0MS1Cak1YZG43SkJ4THZ0LVBJUmM4QlhCWGVPMW1EeGRXTXF0dkJsM0lLaDFTLTgyNzZzYk9kdDZ6d2FKWTZXWFQ4R1VLS0trYUhfZmt5ajZvZkprQm13cFprU1pwUFZhZkJsc0Q5N3lHUjhHa0pIVXRBaGpVQU4xc0ZfVVNzNWNNR3lHeU9xT1dFYjB2Qms1M1VBNWZSUVdUZnlnSllYS3B30gHkAUFVX3lxTE1jR00xTkg1U2k4OUtvX3VLeGc1azlaRzUxTW81alVYTk9yZHk2UDNXaGI3a0h0cnBIb0xySFZfNGUyTFNVeEttOHpiWHN1TXpLOHllX05VLVNFcU1wUEIxWHo3TjBGVTdtV1N0ZnZDblBsNDlON25NVWxHOHR0UXJ4ZWkyMFl0MDF3MV9ZNzE3THZpbkZVUVg1RGdxOXBLNGdCUG1sWlZZMW5OeUpuS0VjRDA5VUJSNEZJSVJvRHhST2psZFI1bHFKMTRub0NMNTJHWGZRSHFydUhJUnVfeWJRajc1OA?oc=5",
+          "domain": "simplywall.st",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-27T18:08:45+00:00",
+          "quality": 0.65,
+          "title": "Maybank (KLSE:MAYBANK) Stock Looks Fully Priced As Excess Returns Hold Up",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMirwFBVV95cUxQZEt1YXUwYlZ5alBFWjVtcjJiZ1hjdGtOVkNUQXloa2hEdU5Kb2RkY21hSHJpX3FNazV5aTFqbkNjeHRlenJtUU94Yjc5cW1ZX0gwZ2plY2NCT1dENFpyMXFtSXJJX3VBMDlacE5mSGJOOG1Wemd3OHNBMHJ0OFlYamFNa2xfb09xa0lmd2JFYnNRdlZfbUVxdmZna3U2NjNSWHZBcEtOYkptZXRlY2xN?oc=5",
+          "domain": "www.ggrasia.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-27T02:10:00+00:00",
+          "quality": 0.65,
+          "title": "GEN Malaysia earnings to \u2018improve markedly\u2019 in 1H 2027, but home market pressured: Maybank",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 4,
+        "polarity_mean": 0.25,
+        "sources": 4,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
@@ -255,11 +404,11 @@
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-26",
+          "known_at": "2026-11-27",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-26",
+          "period_end": "2026-11-27",
           "source": "finbert_tone",
-          "value": "0.09"
+          "value": "0.05"
         }
       ],
       "stories": [
@@ -274,6 +423,19 @@
           "published_at": "2026-11-26T16:10:00+00:00",
           "quality": 0.65,
           "title": "TENAGA: Revenue and EBITDA rose in 9MFY\u201926, but higher costs weighed on PAT",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxQTHBBN3lpR1BxaV9PN0dMVkp2LWZxZ1dBZmxqa2ltRDUzQmx4VWNDZmVWQ2w0a3dCQXJ0enVZdGIteTNCLUlhR0VfZm1uZTFpTVJrNUg3T3dNMG52U0szYkJxRDgwOE9kWnBXclZxTTNPY093ZDFsYXlDZUhWUHlJOG4wSE5qQXJzQVdDdzVmMUttc3dQUVE2ZGZvNlcyV0dublNpMWREOUpEUQ?oc=5",
+          "domain": "seekingalpha.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-27T02:30:55+00:00",
+          "quality": 0.8,
+          "title": "Tenaga Nasional Berhad 2026 Q3 - Results - Earnings Call Presentation (OTCMKTS:TNABY) 2026-11-26",
           "uncertainty": 0.0
         },
         {
@@ -300,6 +462,19 @@
           "published_at": "2026-11-26T13:24:04+00:00",
           "quality": 0.8,
           "title": "TNB delivers sustained financial & operational resilience, absorbs fuel costs to shield consumers",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMitAFBVV95cUxPZnZzSmJ1dGxxaUl5UGFiVEFaZG9WRDhWbm5KNHpiRWszZzhMaFQwVGFndTVpR1dIT1V2MGdnWV9PVHZpVGZ0RXl4RlI1czBUaUVjLXJPSDQ5dDN1dFFud1dTdTVqOHZ0QkhsQkpDZUhmZzNOek1keFppNTVQb3BEbGxva1gtREdseVBJSUNQVzBZNU5nMm9ZSk1vbzQ1OWl0Q0RQN1hCQXpZVjNQazBJZTk0RWs?oc=5",
+          "domain": "www.tradingview.com",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-27T02:04:00+00:00",
+          "quality": 0.65,
+          "title": "Tenaga Nasional Q3 2026 Earnings Call Is Live",
           "uncertainty": 0.0
         },
         {
@@ -331,27 +506,27 @@
       ],
       "tone": {
         "intensity_max": 0.0,
-        "n": 5,
-        "polarity_mean": 0.2,
-        "sources": 5,
+        "n": 7,
+        "polarity_mean": 0.143,
+        "sources": 6,
         "uncertainty_mean": 0.0
       },
       "upcoming": []
     },
     {
       "earnings": [],
-      "escalated": 1,
+      "escalated": 2,
       "events": [],
       "instrument_id": "MYX:5183",
       "label": "Petronas Chemicals",
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-26",
+          "known_at": "2026-11-27",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-26",
+          "period_end": "2026-11-27",
           "source": "finbert_tone",
-          "value": "-0.77"
+          "value": "-0.21"
         }
       ],
       "stories": [
@@ -367,54 +542,191 @@
           "quality": 0.8,
           "title": "PETRONAS Chemicals hit by four downgrades as core profit plunges",
           "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxNWm01U3F2VVQ3M2J5US0xZTJQM3BkeWg0WkFUUVM1SzNHT2x1MFJMRjF2d3E1TEF0NTctRVc0RTdJZzBIaklWbXNmT0VYeFhqc1NPbWlVcTg2TEppVjE0MTBpNEgxY3dOc2Y4UjVkY2dwTXE0dU5OSk1udTdidm0tRnlKQ1dRZFluZ1B2RTJha3JPdWdvamlHTGlCaTR2U1BOU2o3eFBKM25mVUVYUEtXLVh2cHZXd2p0?oc=5",
+          "domain": "www.ad-hoc-news.de",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-27T02:30:06+00:00",
+          "quality": 0.65,
+          "title": "Petronas Chemicals stock swings to RM179 million Q3 profit - ad-hoc-news.de",
+          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.0,
-        "n": 1,
+        "n": 2,
         "polarity_mean": 1.0,
-        "sources": 1,
+        "sources": 2,
         "uncertainty_mean": 0.0
       },
       "upcoming": []
     },
     {
       "earnings": [],
-      "escalated": 0,
+      "escalated": 9,
       "events": [],
       "instrument_id": "MYX:5225",
       "label": "IHH",
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-26",
+          "known_at": "2026-11-27",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-26",
+          "period_end": "2026-11-27",
           "source": "finbert_tone",
-          "value": "0.01"
+          "value": "0.67"
         }
       ],
-      "stories": [],
-      "tone": {},
+      "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxPb0xXaXRnaGdna05PTUNGbHRSU1pCdFlYQkwzdGJnZEdJTHRjMldYMmxsRE1JU0xMdEkwcUtMaHctVmhRdHFRVWFzdlBoYmQ2OEpsOThzbnVJNTZXdjFkMWpIaS1tSmxLRFFmdWUwREpNVWl0MEdxWXM5SV9sdW1PeDNEWVNFMlYxNHQ4ZDE1a012TzI2V3dIMHdKMUZ6RmpiMHotNkVXMHZ1V28?oc=5",
+          "domain": "www.businesstimes.com.sg",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-27T10:27:00+00:00",
+          "quality": 0.8,
+          "title": "IHH Healthcare\u2019s Q3 net profit rises 10.2% to US$164.8 million",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMitwFBVV95cUxQSzJNZ1BqZnZYSXg3alJYOW5UYWtYZXBvWWNMT1ozMDdUaS1ZbTBMSzgyd2EydXA0TlRXbWFHYkhBcWV1eEhqeVNKMXRoUjB4TG90VkpWUTRFd044SFN1NU5URjlIRXVqQ2huU3hBVXRLWEZJVWV4SG1zYVhKWjNKc3VPdnkzV0kwbTg4akRnTWJyRVpEQmU3Y3VHRTJSSkdiWGtwYVQ5YXZZeW9ISjZJcVlheTB5cGc?oc=5",
+          "domain": "themalaysianreserve.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-27T10:18:45+00:00",
+          "quality": 0.8,
+          "title": "IHH Healthcare\u2019s 3Q net profit rises 10% to RM679m as patient volumes grow",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMisAFBVV95cUxOQXlGcWs1UjVTb1pMalNGTW5Tb1lBS3RUU0ZWWnVEVlNtdUpTbERUUkZwTDFRczRXSEYyTS00UW1Wck1Tdmo5NkU2aGtBa0ZRa3VyX2pZMHBmanNaVU54bVVkOHk4eEt6alNTWnBra3hDbVlPZFBhUnpVTW5wZ21uLVVMUGtxOHJ5RWJpd2czQzdUSXdSLW13dktQUzhOaElfQXZKX1kyemFPbC16bXo5Tg?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-27T10:18:00+00:00",
+          "quality": 0.8,
+          "title": "IHH Healthcare\u2019s 3Q net profit rises 10% to RM679mil",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE9NM2V6UE80bk5tODd0SWFZeHQwS1U2WnZlcGNNVDQ4Um53Q0Y5UjlvOXJkdmlfUlIxUFNPdTJxR1EybmpjSVBnWkpUbFFwUk9I?oc=5",
+          "domain": "theedgemalaysia.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-27T09:54:42+00:00",
+          "quality": 0.8,
+          "title": "IHH Healthcare 3Q net profit rises 10% on higher patient volumes",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxPc2xacFh6clJRUnJmal9EU2xxQTdOVEZWSE9rZlZqb1VsNjgxdjhKTWpoU3VyTlQzWWszampBaHV6QUU5UW4yakhJTDlfMXJhYk1CWDBobkhnbFFBRnE3UlBiWUwyNFNic3g3eTV2M0VzaGhnREJlMy16V3M5MWQ5aFFRRzNFbkRqMTlRZDYwcDkyVVRlMGNBc3p3OXVja0dwNV9KSHRuWmQ?oc=5",
+          "domain": "www.businesstoday.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-27T09:54:28+00:00",
+          "quality": 0.8,
+          "title": "IHH Revenue Hits RM7.1 Billion, Profit Up 10% In Third Quarter",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMijAFBVV95cUxQQkVqbF9ZUkstTlhNbjBFSWl3ZmROeFFON3pMSUkxeThIellLcE1tVEwyZFhzNldNTnp5SVA0QjF1OXBHS01URUNoNzh2SHRKdF9iSE8xY3BDQ1FEd1JxTmQtMzZkT0s3Nks4SlBxQkh4di13VzJEMzNFNFh1REJWZWl1Z2dkWnFjbXFSTw?oc=5",
+          "domain": "www.zaobao.com.sg",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-27T13:48:13+00:00",
+          "quality": 0.65,
+          "title": "IHH third-quarter net profit rises 10%",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMilwFBVV95cUxOd202cndqRjFXTHB5VU5ZdTN5aGZHazlldnMxUjRSVUhoWmxvSVdJeE5SZUhBZXZ1bVREWGI5MlpvaVUxc3ZsOHE2YUZpWnZnSjgwV25KOWhFWDJWM25xUk9KVlVNZGFsZzBONlh5eHRta0lVUkVCemk0M2k0YVZuZzd2dGk3R1hQVUh4ZzI1ODJNcjdLSHEw?oc=5",
+          "domain": "tradersunion.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-27T10:10:53+00:00",
+          "quality": 0.65,
+          "title": "IHH Healthcare posts higher third-quarter net profit on stronger patient volumes",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMihAJBVV95cUxQZ0lvZk9ELUdvcnZOMy1tQURaamx2ajZLUFc5aHVIRGpsNGJsV2Zsbnh2Nncta2k0djBpbVpYQ1NfeEpiQl91NDVCbHo0T0w4WDBMMEhkcDUtVldpMkRFZG5wVl9Kcy1ma1lGM01oZXpISlg5XzNyY1YyRVNDeURuZVZaNWNkcGRDcnBKTk5EbFhHSjQ0eGlhWWozQkxYOVNCQUZqS1dvbU5zUXlLVTE3cXNobkw5MkNMRS1nbFp5TU15REh1MWc1SFo3eGtzWUs3NndiX2hjRXlEZ0xkeURYRDg1bHBYQVdzM1V4LTk1N1V2MVFYN2cxRnh3a0p0dHY3U3QydQ?oc=5",
+          "domain": "www.tradingview.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-27T09:24:38+00:00",
+          "quality": 0.65,
+          "title": "IHH: Core growth stayed strong as diversified operations supported margins and 2026 guidance",
+          "uncertainty": 0.0
+        }
+      ],
+      "tone": {
+        "intensity_max": 0.0,
+        "n": 12,
+        "polarity_mean": 0.75,
+        "sources": 10,
+        "uncertainty_mean": 0.0
+      },
       "upcoming": []
     },
     {
       "earnings": [],
-      "escalated": 2,
+      "escalated": 6,
       "events": [],
       "instrument_id": "MYX:8869",
       "label": "Press Metal",
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-26",
+          "known_at": "2026-11-27",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-26",
+          "period_end": "2026-11-27",
           "source": "finbert_tone",
-          "value": "0.48"
+          "value": "0.45"
         }
       ],
       "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMitAFBVV95cUxPQl9aU2JvdHBkMU55YmF3bVliQUViOG8wZGx2eE16R0J0QVBrVGllSjZFVzVIV3Y1SXdSby14THVnTXpTSUFvNThNVGtYcEs1WHppRmc4NDBmUkNLbVNubXpubXBvSU44T25pMGc5UnUyYnBuS0tLVWxwczBqbzc0ZHRkWXpDYnlHYkNhaGx3NmgyQjg5M3FESVJJM3FSRXhNRC02OTByQmk4Z3E2OE5zTWk4UzQ?oc=5",
+          "domain": "www.businesstoday.com.my",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-27T03:59:08+00:00",
+          "quality": 0.8,
+          "title": "Press Metal Set For Record FY2026 Earnings, Valuation Still Attractive",
+          "uncertainty": 0.0
+        },
         {
           "day": null,
           "doc_id": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxNR0w4QXItYUN6enZSZXVOU1ZUSnZ2V29XWmwxeU5kM01zVXFRT200NU1Tek9FOWJzTjhKSnV2MTZ3Sy1DUEotSjlUaDBXT2hzRTl2WklUZlVRUHN3WDVmcXlVYzM3SVY4TVZwRkJ6eEM1a3haNDFtb3FzeC1CTjJNM05FWEJVSkNkZVdCZWVzMGVMb21CNXBqM1pTNzQ3UEI1UWhhNDNTMS1STG1RaUVwUjBLd3JYWUswYlJlNElRRXc?oc=5",
@@ -443,6 +755,58 @@
         },
         {
           "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxNZDlUSHRtdEhhamFLRU5mal9HVUwzOWlXbWFmU1JYSFgzS00yYlRDTXZTdWw0Zml4VDdudXJlc1J6NXk3REdJYXNjNHJtNXNMLVhwdHF2VmpUNm0waXRFaUFwX0dRcVRaUVZJcnEwRXlFcDQ5Y2FCXzR5cDlOM0dVN3J6cnRtTFphY3ZGRVkyRnFYWk40aFU1RmpMYXZNSDNzZUhCbUFPTDZZcDhEcmpSbkdSQ3llRFNBZ0dKY0YyQW8?oc=5",
+          "domain": "www.alcircle.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-27T09:39:00+00:00",
+          "quality": 0.65,
+          "title": "Press Metal reports 25.7% revenue growth and 51.8% rise in shareholder profit in Q3 2026",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMi9gFBVV95cUxPTkZRZUVQY0V0U1d0c1NNbXVCcldaTWg1a3dWbkxoZjVqZnplaEJxMXVfeTBySmpvODV5SjVIVlNwcVotM1pxcWphcDRmTFh1aDBkdms4TlR3ejF3b0lJWTBpZy05alcyTWlCRDFVUzNTdlFGZURMY19KbzVCaEQ2Z3dBY19NUjRicnhPYllZQThuMzl3eGJxaHN2eE01NmJhNGt5Ym9oVS15ZG1wWU5IVm9JSXRkcUxJZ3lmRnhjdHc1NVhQLWRjNVJiZ21nbGJwRTcwUU5ubm5Va1ZsOGdNdE5CWFVSd255eDFGdk1zYWw2WVRmSnc?oc=5",
+          "domain": "www.minichart.com.sg",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-27T04:11:00+00:00",
+          "quality": 0.65,
+          "title": "Press Metal 3Q FY2026 core profit hits record RM714.37m, declares 2.5 sen dividend",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMisgFBVV95cUxQNjBGNFY1MzZTOXhRQkJyWnlTT2ZZbFVzSmJ5Y2NJUDNfTmFjSHhCeW0zQ2s4U3dRRnQyQzE0akItTTA3M1BZVVRNZklCbFpXQkZVazhQV0lwMGFfWC14QW5qdkpPeWoxT2hqNlJFNmlXaVNjTmJpZFJVLThCU3FhOC1iMlFsNlFjcGJJeXpRemJSREJBM1kxNFFnb0RXSklTY3h0SDRJeHZHeE5YRFdKemRB?oc=5",
+          "domain": "www.marketscreener.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-26T23:52:13+00:00",
+          "quality": 0.65,
+          "title": "Press Metal Aluminium Posts Higher Q3 Net Profit, Revenue Up",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMinwJBVV95cUxPX1E2RlVKYzl1RlpOUzJyOXlIaUQ1Vkhvam1BVTNqUl9naV8tdE9ndkU1ZW1SZG1fNEZHRXE0S0M3NWtGaHRBQnRuSFhQRzJSSk9hNFNRdWdEQ1FsOGdVeU1JSVdYQ29sdkIwTmNxbW15bURaQVcxS0N1eDNvQ1UwWEIxSHJHTnNjcDM0Umg2RUNwRTJYanZWU2NZS2xKMkRrR0dJWElHZDVVeFNWbnVMaVFtQVk3emUzc3JBMUhmSHFwN3VBVHdiOGZ0eVFINllYQng5Mmc4MWlaNkVnendULVBIY2FNNWlEMnRKWU96ZGExVkFzSTJNajRsSWlmbUFhQlVQRklmc0pTc2t5QVQxYVhCMmQ5cWpDUU1qTGdLZw?oc=5",
+          "domain": "www.thestar.com.my",
+          "escalated": false,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-27T00:28:00+00:00",
+          "quality": 0.8,
+          "title": "Trading ideas: AWC, Pekat, Capitaland, Takaful, CWG, KK Markt, IOIPG, DRB-Hicom, SimeProp, HLBank, AMMB, Optimax, Press Metal, Genting, QL Resources",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
           "doc_id": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE8zbGlHckRtb2dNQ251Q0c5d0xGWXFzMlN3ZlRNb1AxcmxmdUgtOTNMa2JjNjQ2TkxoRndaLXFlbERxRGpmR3pQYmtTSFZyLVhL?oc=5",
           "domain": "theedgemalaysia.com",
           "escalated": false,
@@ -453,47 +817,73 @@
           "quality": 0.8,
           "title": "Tenaga, Press Metal, Hong Leong Bank, HLFG, AmBank, Sime Darby, Genting, IJM, IOI Properties, QL Resources, DRB-Hicom, AWC, AirAsia",
           "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMi6AFBVV95cUxPakktSTRaczVfYjk2Y2JqRzU2SXZHZXRpU1MzeEl2cnBiVEJLSGRwbDdmekNJZExlUzRCOWxCbGdZYlMwY2tVaUNRSUxQN29maGVTYkFyUFJZOVlzemhWblN2WGJsbjRNRE1PTkg2dHVvaWZWaFlNb1NBcVZnYnhFbFJ6cVNDU3p2cTZDanFmRlpvNHhxOG9XRWVmRlRsMUFncUFVcUVYTmtXTDFwUWVHeTUzQ1lzQld4TTNyNzlKdFhDS3dDUWFSNWhwZFozaW05S0g4NFA4YmN3OWh2WFh3RlZWTHpzRVc1?oc=5",
-          "domain": "www.marketscreener.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 0.0,
-          "published_at": "2026-11-26T14:21:11+00:00",
-          "quality": 0.65,
-          "title": "Press Metal Aluminium Holdings Berhad Reports Earnings Results for the Third Quarter and Nine Months Ended September 30, 2026",
-          "uncertainty": 0.0
         }
       ],
       "tone": {
-        "intensity_max": 0.0,
-        "n": 4,
-        "polarity_mean": 0.5,
-        "sources": 4,
+        "intensity_max": 0.333,
+        "n": 9,
+        "polarity_mean": 0.667,
+        "sources": 6,
         "uncertainty_mean": 0.0
       },
       "upcoming": []
     },
     {
       "earnings": [],
-      "escalated": 5,
+      "escalated": 8,
       "events": [],
       "instrument_id": "MYX:3182",
       "label": "Genting",
       "snapshot": [
         {
           "concept": "finbert_sentiment",
-          "known_at": "2026-11-26",
+          "known_at": "2026-11-27",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-26",
+          "period_end": "2026-11-27",
           "source": "finbert_tone",
-          "value": "-0.25"
+          "value": "-0.40"
         }
       ],
       "stories": [
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMitgFBVV95cUxQNEZ5QU1GR3F5ZXBlYnhiblRpcXlXM1NqcUh4LUhtdEdlUGNFeXFEd1JPdEZQVjZMVzJTTjhqem1MeGVkNF9PSzNCdnVNZTJxbFRQRHlQT2NrdjJIY09LUXZrZ2Q5THh6OXV6QUt3QnM2RmVMZTlsNHdFcFFmQWVvbFJkOVdXNnJUUGlDR0FKdG5QYVJ1b1ZaZmJPTFc5QU90X25MTlRNLWxFUHQydGVoczdHa2FOdw?oc=5",
+          "domain": "www.freemalaysiatoday.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-27T08:37:34+00:00",
+          "quality": 0.8,
+          "title": "Genting falls to 20-year low after RM161mil Q3 loss",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE44cnNuY2xRcW41Y2w4ZU9SWFg1NERnMENETld3dlNWY2haM0lmN2VLWEFRbXdsMkxZVTRWbnF2UXlJTGdoSXRTejlST0s2aHRB?oc=5",
+          "domain": "theedgemalaysia.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-27T02:09:33+00:00",
+          "quality": 0.8,
+          "title": "Genting falls to 2007 lows after weaker-than-expected quarter",
+          "uncertainty": 1.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMizgFBVV95cUxNZl9FSE81NEd1bGw5bmk2VVRtdkZQSk8xd3h0akk1aFZ1eTh5cjlZdDNxVzZsNEd4MkktdzJGRUUzbFBJUlZjUS1wVWJiY09tTW10cWNyQ2l3S01welRiOHFxRk5uTWgxS3NyR2M2ZlRlM203a194eklFQXF3bmQzeTVHemluYnoxYkRVZ2VBWU1yUW9PT0Rzcy1ORDkxRS1Va1NZaGNFTXZUaTg5YmJaVzNxelZBMHg3dDhzU1c2RVNDSUZKUVZNOUlNQmttZ9IBwAFBVV95cUxQQUV5bWx5X3pxTXNWZGZVRmtWNG1qa2l4Q0VaNko4ZFpsOWt4R0FNdWRianNuLWlLblQ3Y2J0TS0yVEJqQVZSd2g1T2dPMUZ6SHJERk16RzBVVEVYSjNuY2wzYVQyLTd2UlFqaE15M3E1Z0trUXhQMUF1Q1E0SlNSaHgyNzNtc0hwOVFZT2JPQW5ibWNyeWliekJmSDkxRndnNDlyZXJSV1FWQVdXS1hpMXpTSFR1TFRVWTJRQVl5Nk4?oc=5",
+          "domain": "www.nst.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-27T01:42:30+00:00",
+          "quality": 0.8,
+          "title": "CIMB Securities slashes Genting earnings forecasts by up to 71pct, cuts target price",
+          "uncertainty": 0.0
+        },
         {
           "day": null,
           "doc_id": "https://news.google.com/rss/articles/CBMisgFBVV95cUxQMjhsZVcxOGxTM242T0F6bU5xYUJaRnV4MHN2SUZ6SEhIX04tQVJRUXRuSnlpUlk4NkVIUy1rSk1pN3Z6c2NoQm1rc0RVaHFXQjN5V3k4a29ia1U3QUloelpIeDR4b1Nmb1RRR1RXVWNGSDhCYlY2aEM3MlpsQW44TEd2TzYwa1hvR05pcVlIV3pMVmJOUTZsdXZDMlZJd2o3MVM4WW8xRzJNTnRLVmJ5YWlR?oc=5",
@@ -558,33 +948,20 @@
           "quality": 0.65,
           "title": "Genting posts third-quarter loss as Malaysia, Singapore operations weigh on earnings",
           "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE8zbGlHckRtb2dNQ251Q0c5d0xGWXFzMlN3ZlRNb1AxcmxmdUgtOTNMa2JjNjQ2TkxoRndaLXFlbERxRGpmR3pQYmtTSFZyLVhL?oc=5",
-          "domain": "theedgemalaysia.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 0.0,
-          "published_at": "2026-11-26T15:10:08+00:00",
-          "quality": 0.8,
-          "title": "Tenaga, Press Metal, Hong Leong Bank, HLFG, AmBank, Sime Darby, Genting, IJM, IOI Properties, QL Resources, DRB-Hicom, AWC, AirAsia",
-          "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.0,
-        "n": 6,
-        "polarity_mean": -0.833,
-        "sources": 5,
-        "uncertainty_mean": 0.0
+        "n": 12,
+        "polarity_mean": -0.667,
+        "sources": 9,
+        "uncertainty_mean": 0.083
       },
       "upcoming": []
     },
     {
       "earnings": [],
-      "escalated": 18,
+      "escalated": 19,
       "events": [],
       "instrument_id": "XNAS:NVDA",
       "label": "NVIDIA",
@@ -729,6 +1106,19 @@
       "stories": [
         {
           "day": null,
+          "doc_id": "https://www.nst.com.my/business/corporate/2026/11/1586780/nationgate-unaffected-nvidias-reported-server-shipment-curbs",
+          "domain": "www.nst.com.my",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-27T01:49:48+00:00",
+          "quality": 1.0,
+          "title": "NationGate unaffected by Nvidia's reported server shipment curbs: Analyst",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
           "doc_id": "finnhub:144159190",
           "domain": "Yahoo",
           "escalated": true,
@@ -817,26 +1207,13 @@
           "quality": 0.85,
           "title": "Why Did Nvidia (NVDA) Reinstate Jensen Huang As CEO So Quickly?",
           "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "finnhub:144154236",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": -1.0,
-          "published_at": "2026-11-26T13:00:00+00:00",
-          "quality": 0.85,
-          "title": "Jensen Huang 'absolutely could be fired again,' legal expert says",
-          "uncertainty": 0.78125
         }
       ],
       "tone": {
         "intensity_max": 0.667,
-        "n": 59,
-        "polarity_mean": -0.068,
-        "sources": 25,
+        "n": 62,
+        "polarity_mean": -0.065,
+        "sources": 27,
         "uncertainty_mean": 0.114
       },
       "upcoming": []
