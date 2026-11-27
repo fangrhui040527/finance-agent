@@ -1,6 +1,42 @@
 {
   "collection": [
     {
+      "at": "2026-11-27T21:34:26.367503+00:00",
+      "detail": "facts 0; ",
+      "fetched": 450,
+      "kept": 0,
+      "source": "dbnomics",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-27T21:34:24.908919+00:00",
+      "detail": "facts 0; window not covered back to 2026-11-27 19:00Z; the oldest item read is 2026-11-27 20:20Z, so 1.3h of the window was never served",
+      "fetched": 18,
+      "kept": 18,
+      "source": "jin10_flash",
+      "status": "degraded",
+      "stored": 18
+    },
+    {
+      "at": "2026-11-27T21:34:23.525487+00:00",
+      "detail": "facts 10; release calendar: 'FOMC Press Release' listed on 15 days of the fortnight - a daily table, not a scheduled print; not stored as a release",
+      "fetched": 494,
+      "kept": 0,
+      "source": "fred",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-27T21:34:11.237816+00:00",
+      "detail": "facts 12; fmp /earnings is outside the plan (HTTP 402); not collected for NVDA, AAPL, MSFT",
+      "fetched": 4058,
+      "kept": 0,
+      "source": "fmp",
+      "status": "ok",
+      "stored": 0
+    },
+    {
       "at": "2026-11-27T19:00:37.428291+00:00",
       "detail": "facts 19; scored 64 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized.onnx",
       "fetched": 24,
@@ -173,26 +209,26 @@
     }
   ],
   "counts": {
-    "articles": 46352,
+    "articles": 46370,
     "documents": 0,
     "escalated": 6237,
-    "events": 4432,
+    "events": 4433,
     "failed_sweeps": 115,
     "linked": 22890,
-    "observations": 8830,
+    "observations": 8842,
     "series": 31,
-    "sweeps": 1903
+    "sweeps": 1907
   },
   "day": "2026-11-27",
-  "generated_at": "2026-11-27 19:01 UTC",
+  "generated_at": "2026-11-27 21:34 UTC",
   "macro": [
     {
-      "change": "0.09",
-      "obs_date": "2026-11-24",
+      "change": "0",
+      "obs_date": "2026-11-26",
       "series_id": "BAMLH0A0HYM2",
       "source": "fred",
       "title": "ICE BofA US high-yield option-adjusted spread, %",
-      "value": "3.72"
+      "value": "3.77"
     },
     {
       "change": "0",
@@ -228,27 +264,27 @@
     },
     {
       "change": "0",
-      "obs_date": "2026-11-24",
+      "obs_date": "2026-11-26",
       "series_id": "DFF",
       "source": "fred",
       "title": "Federal funds effective rate, %",
       "value": "3.88"
     },
     {
-      "change": "-0.01",
-      "obs_date": "2026-11-24",
+      "change": "-0.06",
+      "obs_date": "2026-11-25",
       "series_id": "DGS10",
       "source": "fred",
       "title": "10-year Treasury yield, %",
-      "value": "4.91"
+      "value": "4.85"
     },
     {
-      "change": "0",
-      "obs_date": "2026-11-24",
+      "change": "-0.02",
+      "obs_date": "2026-11-25",
       "series_id": "DGS2",
       "source": "fred",
       "title": "2-year Treasury yield, %",
-      "value": "4.63"
+      "value": "4.61"
     },
     {
       "change": "0.1",
@@ -283,12 +319,12 @@
       "value": "3,283.05"
     },
     {
-      "change": "-36.08",
-      "obs_date": "2026-11-24",
+      "change": "-18.31",
+      "obs_date": "2026-11-25",
       "series_id": "SP500",
       "source": "fred",
       "title": "S&P 500, index level",
-      "value": "7,201.09"
+      "value": "7,182.78"
     },
     {
       "change": "-0.04",
@@ -307,12 +343,12 @@
       "value": "4.10"
     },
     {
-      "change": "-0.26",
-      "obs_date": "2026-11-24",
+      "change": "-1.49",
+      "obs_date": "2026-11-26",
       "series_id": "VIXCLS",
       "source": "fred",
       "title": "CBOE VIX, index",
-      "value": "26.36"
+      "value": "26.80"
     }
   ],
   "names": [
@@ -1024,11 +1060,11 @@
         },
         {
           "concept": "price_target_consensus",
-          "known_at": "2026-11-26",
+          "known_at": "2026-11-27",
           "label": "target (consensus)",
           "period_end": null,
           "source": "fmp",
-          "value": "261.09"
+          "value": "255.81"
         },
         {
           "concept": "analyst_buy",
@@ -1283,7 +1319,7 @@
         },
         {
           "concept": "price_target_consensus",
-          "known_at": "2026-11-26",
+          "known_at": "2026-11-27",
           "label": "target (consensus)",
           "period_end": null,
           "source": "fmp",
@@ -1542,7 +1578,7 @@
         },
         {
           "concept": "price_target_consensus",
-          "known_at": "2026-11-26",
+          "known_at": "2026-11-27",
           "label": "target (consensus)",
           "period_end": null,
           "source": "fmp",
