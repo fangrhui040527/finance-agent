@@ -1,6 +1,87 @@
 {
   "collection": [
     {
+      "at": "2026-11-27T22:41:30.126988+00:00",
+      "detail": "facts 6; scored 227 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized.onnx",
+      "fetched": 6,
+      "kept": 0,
+      "source": "finbert_tone",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-27T22:41:23.935836+00:00",
+      "detail": "skipped: every asked name was refused: outside the plan or over today's credits (XNAS:NVDA, XNAS:AAPL)",
+      "fetched": 0,
+      "kept": 0,
+      "source": "eodhd",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-27T22:41:23.439041+00:00",
+      "detail": "facts 0; ",
+      "fetched": 3,
+      "kept": 3,
+      "source": "jin10_flash",
+      "status": "ok",
+      "stored": 3
+    },
+    {
+      "at": "2026-11-27T22:41:22.225130+00:00",
+      "detail": "facts 4; XNAS:NVDA: 2026-11-27 not aggregated - 8 full pages ended part-way through that day",
+      "fetched": 26,
+      "kept": 26,
+      "source": "marketaux_news",
+      "status": "ok",
+      "stored": 22
+    },
+    {
+      "at": "2026-11-27T22:41:20.516356+00:00",
+      "detail": "facts 0; ",
+      "fetched": 258,
+      "kept": 217,
+      "source": "finnhub",
+      "status": "ok",
+      "stored": 137
+    },
+    {
+      "at": "2026-11-27T22:41:17.160880+00:00",
+      "detail": "facts 0; ",
+      "fetched": 0,
+      "kept": 0,
+      "source": "edgar",
+      "status": "ok",
+      "stored": 0
+    },
+    {
+      "at": "2026-11-27T22:41:17.027331+00:00",
+      "detail": "named the company: 21 of 56 (lowest: NVIDIA 5/19, Microsoft 6/18, Apple 10/19)",
+      "fetched": 57,
+      "kept": 56,
+      "source": "yahoo_rss",
+      "status": "ok",
+      "stored": 38
+    },
+    {
+      "at": "2026-11-27T22:41:16.077825+00:00",
+      "detail": "named the company: 140 of 159 (lowest: NVIDIA 66/76, Microsoft 20/23, Apple 54/60)",
+      "fetched": 167,
+      "kept": 159,
+      "source": "google_news",
+      "status": "ok",
+      "stored": 148
+    },
+    {
+      "at": "2026-11-27T22:41:13.027373+00:00",
+      "detail": "throttled: no name could be read (3 failed, 0 not reached). First: GDELT fetch failed: HTTP Error 429: Too Many Requests; grouped 3 names per request; 1 request (HTTP 429 on request 1: the rest of the slot is deferred, not asked)",
+      "fetched": 0,
+      "kept": 0,
+      "source": "gdelt",
+      "status": "throttled",
+      "stored": 0
+    },
+    {
       "at": "2026-11-27T21:34:26.367503+00:00",
       "detail": "facts 0; ",
       "fetched": 450,
@@ -209,18 +290,18 @@
     }
   ],
   "counts": {
-    "articles": 46370,
+    "articles": 46718,
     "documents": 0,
-    "escalated": 6237,
+    "escalated": 6293,
     "events": 4433,
     "failed_sweeps": 115,
-    "linked": 22890,
-    "observations": 8842,
+    "linked": 23106,
+    "observations": 8852,
     "series": 31,
-    "sweeps": 1907
+    "sweeps": 1916
   },
   "day": "2026-11-27",
-  "generated_at": "2026-11-27 21:34 UTC",
+  "generated_at": "2026-11-27 22:42 UTC",
   "macro": [
     {
       "change": "0",
@@ -997,7 +1078,7 @@
     },
     {
       "earnings": [],
-      "escalated": 19,
+      "escalated": 54,
       "events": [],
       "instrument_id": "XNAS:NVDA",
       "label": "NVIDIA",
@@ -1112,7 +1193,7 @@
           "label": "FinBERT headline tone",
           "period_end": "2026-11-27",
           "source": "finbert_tone",
-          "value": "0.05"
+          "value": "0.09"
         },
         {
           "concept": "revenue",
@@ -1142,6 +1223,45 @@
       "stories": [
         {
           "day": null,
+          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/jensen-huang-back-nvidia-nvda-210600721.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-27T21:06:00+00:00",
+          "quality": 1.0,
+          "title": "Jensen Huang Is Back. Nvidia\u2019s (NVDA) Bull Case Remains",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/nvidia-stocks-slip-1-66-194936975.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-27T19:49:36+00:00",
+          "quality": 1.0,
+          "title": "Nvidia Stocks Slip 1.66% as S&P Weighs Downgrade Over Key-Man Risk",
+          "uncertainty": 0.7352941176470588
+        },
+        {
+          "day": null,
+          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/iren-nasdaqgs-iren-stock-sees-190922720.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-27T19:09:22+00:00",
+          "quality": 1.0,
+          "title": "IREN (NasdaqGS:IREN) Stock Sees Modest Fair Value Cut After AI Cloud Sentiment Swings",
+          "uncertainty": 0.125
+        },
+        {
+          "day": null,
           "doc_id": "https://www.nst.com.my/business/corporate/2026/11/1586780/nationgate-unaffected-nvidias-reported-server-shipment-curbs",
           "domain": "www.nst.com.my",
           "escalated": true,
@@ -1155,108 +1275,69 @@
         },
         {
           "day": null,
-          "doc_id": "finnhub:144159190",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.3333333333333333,
-          "kind": "",
-          "polarity": 1.0,
-          "published_at": "2026-11-26T21:52:43+00:00",
-          "quality": 0.85,
-          "title": "\u2018Room to Spare,\u2019 Says Investor About Oracle Stock",
-          "uncertainty": 0.12626262626262627
-        },
-        {
-          "day": null,
-          "doc_id": "finnhub:144157693",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": -1.0,
-          "published_at": "2026-11-26T18:15:32+00:00",
-          "quality": 0.85,
-          "title": "Super Micro Computer (SMCI) Faces Southeast Asia AI Server Disruption After Export Halt",
-          "uncertainty": 0.1388888888888889
-        },
-        {
-          "day": null,
-          "doc_id": "finnhub:144156794",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 1.0,
-          "published_at": "2026-11-26T16:10:12+00:00",
-          "quality": 0.85,
-          "title": "BlackBerry (TSX:BB) Rebounds Before Earnings, Is The Stock Fully Priced?",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "finnhub:144156790",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 0.0,
-          "published_at": "2026-11-26T16:06:22+00:00",
-          "quality": 0.85,
-          "title": "NVIDIA Just Dropped 31% in a Month. Will NVDA Stock Hit $125 or $200 First?",
-          "uncertainty": 0.24509803921568626
-        },
-        {
-          "day": null,
-          "doc_id": "finnhub:144155851",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": -1.0,
-          "published_at": "2026-11-26T14:16:59+00:00",
-          "quality": 0.85,
-          "title": "Jensen Huang is back as the chief at Nvidia",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "finnhub:144154237",
-          "domain": "Yahoo",
-          "escalated": true,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 1.0,
-          "published_at": "2026-11-26T13:45:33+00:00",
-          "quality": 0.85,
-          "title": "Heading Into FY27: How to Trade Broadcom\u2019s ~$115B AI Target Against Nvidia\u2019s Multiple Reset",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "finnhub:144154253",
+          "doc_id": "finnhub:144175762",
           "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.3333333333333333,
           "kind": "",
           "polarity": 0.0,
-          "published_at": "2026-11-26T13:08:54+00:00",
+          "published_at": "2026-11-27T15:10:01+00:00",
           "quality": 0.85,
-          "title": "Why Did Nvidia (NVDA) Reinstate Jensen Huang As CEO So Quickly?",
+          "title": "Nvidia halts sales to SE Asia, SpaceX surges on Musk's share promise",
           "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "finnhub:144174330",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-27T12:33:40+00:00",
+          "quality": 0.85,
+          "title": "Constellation Energy Sinks 10% in a Week, NuScale 17%, as \u201cthe Jensen Huang Stock Put Is Fading\u201d",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "finnhub:144173513",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-27T11:04:15+00:00",
+          "quality": 0.85,
+          "title": "What JPMorgan Active Growth ETF (JGRO) Bought: Amazon Leads on Nov. 25",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "finnhub:144175706",
+          "domain": "SeekingAlpha",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-27T10:40:43+00:00",
+          "quality": 0.85,
+          "title": "Nvidia: Valuing The Jensen-Sized Void",
+          "uncertainty": 0.4166666666666667
         }
       ],
       "tone": {
         "intensity_max": 0.667,
-        "n": 62,
-        "polarity_mean": -0.065,
-        "sources": 27,
-        "uncertainty_mean": 0.114
+        "n": 170,
+        "polarity_mean": -0.029,
+        "sources": 52,
+        "uncertainty_mean": 0.124
       },
       "upcoming": []
     },
     {
       "earnings": [],
-      "escalated": 5,
+      "escalated": 16,
       "events": [],
       "instrument_id": "XNAS:AAPL",
       "label": "Apple",
@@ -1361,9 +1442,9 @@
           "concept": "mx_news_sentiment",
           "known_at": "2026-11-27",
           "label": "Marketaux sentiment",
-          "period_end": "2026-11-26",
+          "period_end": "2026-11-27",
           "source": "marketaux_news",
-          "value": "0.00"
+          "value": "0.32"
         },
         {
           "concept": "finbert_sentiment",
@@ -1371,7 +1452,7 @@
           "label": "FinBERT headline tone",
           "period_end": "2026-11-27",
           "source": "finbert_tone",
-          "value": "-0.03"
+          "value": "0.10"
         },
         {
           "concept": "revenue",
@@ -1401,6 +1482,19 @@
       "stories": [
         {
           "day": null,
+          "doc_id": "https://finance.yahoo.com/technology/ai/articles/railtown-ai-introduces-model-evaluation-120000938.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-27T12:00:00+00:00",
+          "quality": 1.0,
+          "title": "Railtown AI Introduces Model Evaluation Technology to Help Reduce Inference Costs and Expand Model Choice",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
           "doc_id": "https://finance.yahoo.com/markets/stocks/articles/apple-stocks-rise-ai-selloff-190038273.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
           "escalated": true,
@@ -1427,6 +1521,19 @@
         },
         {
           "day": null,
+          "doc_id": "finnhub:144175583",
+          "domain": "SeekingAlpha",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-27T10:17:30+00:00",
+          "quality": 0.85,
+          "title": "Apple: The Mispricing Of The Market's AI Hedge",
+          "uncertainty": 0.7575757575757576
+        },
+        {
+          "day": null,
           "doc_id": "https://news.google.com/rss/articles/CBMinAFBVV95cUxOVnFVdWNJVWI3Tk1wUHNTS1A0Z2wwTHNpX3RFbkp2Ylk4V1ZMSHhzVGtSX2FUa01UanJEZm1jbnJuanN3UU5ZZ3Yxa1NmMEtQYUNPaW5hR1NPTlcycll5ZkdjemNsWVl6YWxtZmM2SjJ2NGVjdHh5akNEUHh6SVItbzJOWEQ0ZFI0UmdzU1FaYXRydFkyOGdwcTdQVEs?oc=5",
           "domain": "finance.yahoo.com",
           "escalated": true,
@@ -1440,82 +1547,56 @@
         },
         {
           "day": null,
-          "doc_id": "https://www.thestreet.com/retail/target-cut-its-apple-black-friday-discount-in-half?.tsrc=rss",
-          "domain": "www.thestreet.com",
+          "doc_id": "https://news.google.com/rss/articles/CBMijAFBVV95cUxONmJXZ0VsaDNFSmhXQzcxZkpLaTRwb29aTTR3RTVrSTFMNnJ0aS12WlNpZFZ1TTFOenFCeE9rSWFBWk0wbTJRWHVSZVJuWXFUV3QxOGMza0Q0ZmxzRTBEdnZmX0ZOdWRKQjlNV1VTa003R0FEMTZYLW0yT1pMQnp2WUI4M1VVejZMTUFXdA?oc=5",
+          "domain": "moneywise.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 0.0,
+          "published_at": "2026-11-27T22:24:29+00:00",
+          "quality": 0.65,
+          "title": "OpenAI says a spy handed Apple secret plans for AI devices that could 'outcompete' the iPhone maker on its 'own turf'",
+          "uncertainty": 0.5952380952380952
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxQRmxhTEVmZTNMSkdYZlpNVFJVUW5xRDJ1b09ialJGaGVxVVFFYzRwZWVaWmloUGd6NDFkWWoyc3BhbGdWcEFYTlBEbVQzRGlaX3V5aGtvTWg2X2Qzem5XYW5vZ2lndDhYeFNkSlhhTGZqMlhGNnQzbFN5dFVWUDNYOGsxSzR5WFVla0hweE5wbXc2UEtIN2VoUThnTE9kMjhwcEwtdVdkUnBnbW5JcmsyX0hCdUdJMEJnYVdOSjJLTWVlMUVQbWhXbQ?oc=5",
+          "domain": "en.oninvest.com",
           "escalated": true,
           "intensity": 0.0,
           "kind": "",
           "polarity": -1.0,
-          "published_at": "2026-11-27T03:17:00+00:00",
+          "published_at": "2026-11-27T20:54:01+00:00",
           "quality": 0.65,
-          "title": "Target cut its Apple Black Friday discount in half",
+          "title": "Apple was the only company to avoid a decline in smartphone shipments in the declining U.S. market",
           "uncertainty": 0.0
         },
         {
           "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMizwFBVV95cUxQSGxzTGVFdEV2SFdfOGdlNTVadjA0dFAyTlp3aEJjNzVzb3BRR05GdkZEeGNFUGtVVHpmQzZWejVUcUtUcExUQXFPNENTZ1JFaUhXTThkQjEtR254VU9LVWFTLS13MU5KemhSbEJMQ2FUYm8wQjVtWUNQVGJrV0VsM1NFdjdlTlZrdnNxZGlyLW0yOE1NNHJ3RDh6ck9USVJqNlVCajlYYWxOVHZUVFdPR1BRbXVBSE95TlJqWl9yTzd1TXo2eU9RbkRDSHRINVnSAdcBQVVfeXFMUHU2eE1SN2ZLU1VUV3ZVUGp4Q0t4UzFWM1BicjRwcERuYkJZa0V3d1NYblBxWThQR1BUUDh4QUVudXozMkhjYVBpbnk5QWZjc3BMaDVxVFZGcDlzWGQ4SVM5bGRDazJvTmdtSTJjS2tZMUx2Y3FKYmRXT2JzZVRxTmNyOWs3cWJZbGdITGw2NjlCcDM0Tl9aNFowa3dPUm1FajNxM3FXclhvQi1yOHNnVUFtQy1tVklWXzBmRDdkYnk0SDV4NjMwa3FvSEJhcW9ieTVzamtDbEE?oc=5",
-          "domain": "www.ndtv.com",
+          "doc_id": "https://news.google.com/rss/articles/CBMijwFBVV95cUxOMzN5QV9wOGttd1BWV1N1WUVHbzVDZWwtdWFsMjZkc2RCUTVSQmxmVDRHZmRmNjM2TzFPRGtlMDlfeDdVYWtpODRXY3B5U0kwVk5zLXNwMmJJaVBocG9lNEFTMWhudWh4TTJyUkJWcUdqakdManItWl82c3JGeHZYRmFvMlg3RFZ1MTMybTRCNA?oc=5",
+          "domain": "www.stocktitan.net",
           "escalated": true,
           "intensity": 0.0,
           "kind": "",
-          "polarity": 1.0,
-          "published_at": "2026-11-27T01:55:07+00:00",
+          "polarity": 0.0,
+          "published_at": "2026-11-27T18:07:10+00:00",
           "quality": 0.65,
-          "title": "This AI-Linked US Stock Beat Nvidia, Apple Among Indian Investors In 2026",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://247wallst.com/investing/2026/11/26/if-you-invest-1000-in-apple-today-heres-what-it-could-be-worth-by-2029/?.tsrc=rss",
-          "domain": "247wallst.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 0.0,
-          "published_at": "2026-11-26T15:03:38+00:00",
-          "quality": 0.85,
-          "title": "If You Invest $1,000 in Apple Today, Here\u2019s What It Could Be Worth by 2029",
-          "uncertainty": 0.49019607843137253
-        },
-        {
-          "day": null,
-          "doc_id": "marketaux:https://www.foxbusiness.com/technology/apple-pulls-chinese-developed-ai-chatbot-from-app-store-over-reports-sexual-messages-kids",
-          "domain": "foxbusiness.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 0.0,
-          "published_at": "2026-11-26T14:35:42+00:00",
-          "quality": 0.85,
-          "title": "Apple pulls Chinese-developed AI chatbot from App Store over reports of sexual messages to kids",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMimwFBVV95cUxOSWhUc0xMVndoX0IxZEo1QWk3MzRxQzhpYkx4Q3ZaVDF6SEpWNkFZNEVnZ2ZUN1ItR3hXa3pUVjFWeDhjSVVMSWxuOHBYdkJ2Y2hjaC0tbktheDh5WTdzQmlTcmh0YndKN19JdW1xcWhLNnVTY1dmNVpReTMyV3dobXo0cTVqSDZTNUpIUExTanQwNFVQV1B4YXJxVQ?oc=5",
-          "domain": "finance.yahoo.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 0.0,
-          "published_at": "2026-11-27T03:19:00+00:00",
-          "quality": 0.8,
-          "title": "Apple (AAPL) Has Found a New AI Opportunity That Has Little to Do With the iPhone",
+          "title": "An Apple (AAPL) officer\u2019s trust plans another share sale after grossing $19.2M on Nov. 25.",
           "uncertainty": 0.0
         }
       ],
       "tone": {
         "intensity_max": 0.333,
-        "n": 34,
-        "polarity_mean": 0.029,
-        "sources": 25,
-        "uncertainty_mean": 0.041
+        "n": 98,
+        "polarity_mean": 0.02,
+        "sources": 55,
+        "uncertainty_mean": 0.035
       },
       "upcoming": []
     },
     {
       "earnings": [],
-      "escalated": 3,
+      "escalated": 15,
       "events": [],
       "instrument_id": "XNAS:MSFT",
       "label": "Microsoft",
@@ -1620,17 +1701,17 @@
           "concept": "mx_news_sentiment",
           "known_at": "2026-11-27",
           "label": "Marketaux sentiment",
-          "period_end": "2026-11-26",
+          "period_end": "2026-11-27",
           "source": "marketaux_news",
-          "value": "-0.11"
+          "value": "0.25"
         },
         {
           "concept": "finbert_sentiment",
           "known_at": "2026-11-27",
           "label": "FinBERT headline tone",
-          "period_end": "2026-11-26",
+          "period_end": "2026-11-27",
           "source": "finbert_tone",
-          "value": "0"
+          "value": "0.08"
         },
         {
           "concept": "revenue",
@@ -1660,6 +1741,45 @@
       "stories": [
         {
           "day": null,
+          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/iren-nasdaqgs-iren-stock-sees-190922720.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-27T19:09:22+00:00",
+          "quality": 1.0,
+          "title": "IREN (NasdaqGS:IREN) Stock Sees Modest Fair Value Cut After AI Cloud Sentiment Swings",
+          "uncertainty": 0.125
+        },
+        {
+          "day": null,
+          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/microsoft-stocks-rise-0-26-182320294.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-27T18:23:20+00:00",
+          "quality": 1.0,
+          "title": "Microsoft Stocks Rise 0.26% as Code Red Targets One-Hour Outage Recovery",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/does-alphabet-googl-prove-air-181025421.html?.tsrc=rss",
+          "domain": "finance.yahoo.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": -1.0,
+          "published_at": "2026-11-27T18:10:25+00:00",
+          "quality": 1.0,
+          "title": "What Does Alphabet (GOOGL) Need To Prove After The Air Force Cloud Breach?",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
           "doc_id": "https://finance.yahoo.com/media-advertising/articles/does-pinterest-pins-pay-overhaul-171447901.html?.tsrc=rss",
           "domain": "finance.yahoo.com",
           "escalated": true,
@@ -1686,89 +1806,50 @@
         },
         {
           "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMilwFBVV95cUxOZHBWM2duQ3RNb3JWRnVybDlhQ2Z5MXIwc004eTlTVk5Xbm9UcE1tRmNrejZZb3QtVkhYdUVkckY4RzBCZ29VQjBNSXUyUGFyelNvdk1xMjM2a1hsV2Z5QnRvY2xaVjk1NGtJb2JmZzQ0THRVaGtKRUlsU1hxd3FKLU5ETGlZU2w1VFpCMjB6MTdqTUF4WEZJ?oc=5",
-          "domain": "tradersunion.com",
+          "doc_id": "finnhub:144175749",
+          "domain": "Yahoo",
           "escalated": true,
           "intensity": 0.0,
           "kind": "",
-          "polarity": -1.0,
-          "published_at": "2026-11-26T14:12:36+00:00",
+          "polarity": 1.0,
+          "published_at": "2026-11-27T14:36:00+00:00",
+          "quality": 0.85,
+          "title": "Privacy-Enhancing Computation Market to Reach $16.49 Billion by 2030 as Data Protection Demand Accelerates - Microsoft, IBM, Cisco, and Oracle Accelerate AI, FHE, and Cloud Security",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "finnhub:144174345",
+          "domain": "Yahoo",
+          "escalated": true,
+          "intensity": 0.3333333333333333,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-27T13:08:59+00:00",
+          "quality": 0.85,
+          "title": "Advanced Micro Devices (AMD) After AI Data Center Wins Looks Cheap Or Already Priced In",
+          "uncertainty": 0.0
+        },
+        {
+          "day": null,
+          "doc_id": "https://news.google.com/rss/articles/CBMimAFBVV95cUxPS3B2OTFDdGZkWDhjT25HZFZGZDEzZ1pZTG5OeDFnb0hDWFFod183YmEyZjVyTU81cFlqNTQ0V2pnWUd4MFIyQWhLa0RsM2tVUzhDc2tfYld4NndSWVFsaXJTM2tvRzdoUDczM1lWeXFoN012a3o0eXEzR3VhMXdVZWUtLTE0bzZTR3I1S3hQQUNtUUF6X1R4Qg?oc=5",
+          "domain": "pluang.com",
+          "escalated": true,
+          "intensity": 0.0,
+          "kind": "",
+          "polarity": 1.0,
+          "published_at": "2026-11-27T17:44:24+00:00",
           "quality": 0.65,
-          "title": "Microsoft shares technical analysis: Seller pressure dominates as weak momentum persists",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://finance.yahoo.com/markets/stocks/articles/microsoft-stocks-slip-1-25-184200035.html?.tsrc=rss",
-          "domain": "finance.yahoo.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 0.0,
-          "published_at": "2026-11-26T18:42:00+00:00",
-          "quality": 1.0,
-          "title": "Microsoft Stocks Slip 1.25% While Nadella Backs Cheaper In-House AI Models",
-          "uncertainty": 0.390625
-        },
-        {
-          "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMikwFBVV95cUxPRDRtekFKaGVnZ1lZanh5U1F2ZEVodndVeEhaanMyT1pleE42aE9Qa000TUpRbzljVGZWN1Nua3pqd2J0bXcyczZWU1hzMEs2aXIzZk1KdWxfLVBZMFEyWTZ3WWxvWWg5YzlpWG5NTXl2b3YwblVHRWplOXZHS1RMYVM0YlRUSlRFNmRPZ2hQU013MW8?oc=5",
-          "domain": "finance.yahoo.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 0.0,
-          "published_at": "2026-11-26T22:20:02+00:00",
-          "quality": 0.8,
-          "title": "Tech Stock Sell-Off: Down 13%, Is Microsoft a Buy Now?",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMikgFBVV95cUxPbEFtTmdOcFRUR3VYQjg3Tlh1d3JSQ3plZ1ZobTdReE9zWUhncmVYc2IzWG9rNEQ4N3hwc2ZqRl9JbVN2V1Z2M1ExN3dEOWs0Zkg4Ym1aUHNndDRmQXlZWUVJODlGQXRqLTlPN3lJbEo1dWlCQm12cUJSd1Q1STJTMDAtMkZDRzRKa1RyekZzbUZsZw?oc=5",
-          "domain": "seekingalpha.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 0.0,
-          "published_at": "2026-11-26T13:00:00+00:00",
-          "quality": 0.8,
-          "title": "Microsoft: Invite Copilot To Thanksgiving Dinner (NASDAQ:MSFT)",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMitwFBVV95cUxQbEZTRzh4ZENPMGVUNmFrdHF2Qlp0REpRQWZxZnd5RzVyZjN6YTVVNzJnckJxb0lxbkpZWTdEX1ZCbUVZSWVsaFItSGZEVjNOdmx5WGxnZS1IVW5nN1U2RUhkbUhqQVFRbzBneHQ1OHNvVGtGVVhsRWdOWkxRb2FmTmowZ0Z4QTB5YmdSVkx4eFpDNWxBd0l0QjRkZFdia1p0VUc1ZWJOckw2dDBTYXQtaFNNT0hmZDQ?oc=5",
-          "domain": "www.rswebsols.com",
-          "escalated": false,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 0.0,
-          "published_at": "2026-11-26T23:00:00+00:00",
-          "quality": 0.65,
-          "title": "Microsoft Shares and Top AI Software Leaders for Productivity Investors",
-          "uncertainty": 0.0
-        },
-        {
-          "day": null,
-          "doc_id": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxNaGQzZ2ZwN0EwWWdlc1BxczY0Vjd0NkxmZ0FwQW93UGJseWtrVVk0Ymc3czdWS1VUSHhSSHFqbC10dWEtTW5VVGM4SkZrV2hlLU1zXy0zZGxmdmNJX2ppdUljSElILWpocnFWa2JsTGxpZEQ2OE9OMFZrWXRDcml1eUpsUHJIR0Vq0gGOAUFVX3lxTE9zVTRfdXpFaGI3V2JLblhfM2hUVVk0YkxCcnFnWjd0eDdmS0tFVHFiSk5HNHMwVlc2bUZpa19WcmlCbnJLYnZOTzRDSlM4akdxcnlzWGp2RTVZQ3BxMXREcHpHRllocGlOTnFJVXlLRWxLU2ZDd0luR21nS09RdnlBV2RLR3A2UnByY3JOeEE?oc=5",
-          "domain": "www.express.co.uk",
-          "escalated": false,
-          "intensity": 0.0,
-          "kind": "",
-          "polarity": 0.0,
-          "published_at": "2026-11-26T20:47:00+00:00",
-          "quality": 0.65,
-          "title": "Iran shares video threatening horror attacks on Microsoft, Amazon and Starlink",
+          "title": "Microsoft's strong quarter and steady outlook m...",
           "uncertainty": 0.0
         }
       ],
       "tone": {
-        "intensity_max": 0.0,
-        "n": 13,
-        "polarity_mean": 0.077,
-        "sources": 10,
-        "uncertainty_mean": 0.11
+        "intensity_max": 0.333,
+        "n": 50,
+        "polarity_mean": 0.08,
+        "sources": 24,
+        "uncertainty_mean": 0.126
       },
       "upcoming": []
     }

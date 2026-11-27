@@ -1,6 +1,6 @@
 # Digest 2026-11-27
 
-Generated 2026-11-27 21:34 UTC · slot `all` · 46370 articles in the corpus, 8842 observations, 4433 events in the fact book.
+Generated 2026-11-27 22:42 UTC · slot `all` · 46718 articles in the corpus, 8852 observations, 4433 events in the fact book.
 
 ## The book
 
@@ -66,40 +66,40 @@ Generated 2026-11-27 21:34 UTC · slot `all` · 46370 articles in the corpus, 88
 - snapshot: FinBERT headline tone -0.40 (finbert_tone, 2026-11-27)
 
 ### NVIDIA (XNAS:NVDA)
-- tone: 62 stories from 27 sources, polarity -0.07, peak intensity 0.67, uncertainty 0.11 · 19 escalated
+- tone: 170 stories from 52 sources, polarity -0.03, peak intensity 0.67, uncertainty 0.12 · 54 escalated
+- 2026-11-27 finance.yahoo.com — Jensen Huang Is Back. Nvidia’s (NVDA) Bull Case Remains [q 1.00, tone +1.0] ★
+- 2026-11-27 finance.yahoo.com — Nvidia Stocks Slip 1.66% as S&P Weighs Downgrade Over Key-Man Risk [q 1.00, tone -1.0] ★
+- 2026-11-27 finance.yahoo.com — IREN (NasdaqGS:IREN) Stock Sees Modest Fair Value Cut After AI Cloud Sentiment Swings [q 1.00, tone -1.0] ★
 - 2026-11-27 www.nst.com.my — NationGate unaffected by Nvidia's reported server shipment curbs: Analyst [q 1.00, tone +0.0] ★
-- 2026-11-26 Yahoo — ‘Room to Spare,’ Says Investor About Oracle Stock [q 0.85, tone +1.0] ★
-- 2026-11-26 Yahoo — Super Micro Computer (SMCI) Faces Southeast Asia AI Server Disruption After Export Halt [q 0.85, tone -1.0] ★
-- 2026-11-26 Yahoo — BlackBerry (TSX:BB) Rebounds Before Earnings, Is The Stock Fully Priced? [q 0.85, tone +1.0] ★
-- 2026-11-26 Yahoo — NVIDIA Just Dropped 31% in a Month. Will NVDA Stock Hit $125 or $200 First? [q 0.85, tone +0.0] ★
-- 2026-11-26 Yahoo — Jensen Huang is back as the chief at Nvidia [q 0.85, tone -1.0] ★
-- 2026-11-26 Yahoo — Heading Into FY27: How to Trade Broadcom’s ~$115B AI Target Against Nvidia’s Multiple Reset [q 0.85, tone +1.0] ★
-- 2026-11-26 Yahoo — Why Did Nvidia (NVDA) Reinstate Jensen Huang As CEO So Quickly? [q 0.85, tone +0.0] ★
-- snapshot: P/E (ttm) 15.90 (finnhub, 2026-11-27) · P/B 28.81 (finnhub, 2026-11-27) · EPS (ttm) 9.31 (finnhub, 2026-11-27) · dividend yield 0.03 (finnhub, 2026-11-27) · beta 2.43 (finnhub, 2026-11-27) · 52w high 243.37 (finnhub, 2026-11-27) · 52w low 124.50 (finnhub, 2026-11-27) · target (consensus) 255.81 (fmp, 2026-11-27) · analysts: buy 41 (finnhub, 2026-11-02) · analysts: hold 2 (finnhub, 2026-11-02) · analysts: sell 1 (finnhub, 2026-11-02) · vendor sentiment 0.25 (alphavantage_news, 2026-10-06) · Marketaux sentiment 0.21 (marketaux_news, 2026-11-26) · FinBERT headline tone 0.05 (finbert_tone, 2026-11-27) · revenue (last quarter) 96.22bn (sec_xbrl, 2026-08-26) · net income (last quarter) 59.69bn (sec_xbrl, 2026-08-26) · last EPS surprise % 6.13 (finnhub, 2026-11-21)
+- 2026-11-27 Yahoo — Nvidia halts sales to SE Asia, SpaceX surges on Musk's share promise [q 0.85, tone +0.0] ★
+- 2026-11-27 Yahoo — Constellation Energy Sinks 10% in a Week, NuScale 17%, as “the Jensen Huang Stock Put Is Fading” [q 0.85, tone -1.0] ★
+- 2026-11-27 Yahoo — What JPMorgan Active Growth ETF (JGRO) Bought: Amazon Leads on Nov. 25 [q 0.85, tone +1.0] ★
+- 2026-11-27 SeekingAlpha — Nvidia: Valuing The Jensen-Sized Void [q 0.85, tone -1.0] ★
+- snapshot: P/E (ttm) 15.90 (finnhub, 2026-11-27) · P/B 28.81 (finnhub, 2026-11-27) · EPS (ttm) 9.31 (finnhub, 2026-11-27) · dividend yield 0.03 (finnhub, 2026-11-27) · beta 2.43 (finnhub, 2026-11-27) · 52w high 243.37 (finnhub, 2026-11-27) · 52w low 124.50 (finnhub, 2026-11-27) · target (consensus) 255.81 (fmp, 2026-11-27) · analysts: buy 41 (finnhub, 2026-11-02) · analysts: hold 2 (finnhub, 2026-11-02) · analysts: sell 1 (finnhub, 2026-11-02) · vendor sentiment 0.25 (alphavantage_news, 2026-10-06) · Marketaux sentiment 0.21 (marketaux_news, 2026-11-26) · FinBERT headline tone 0.09 (finbert_tone, 2026-11-27) · revenue (last quarter) 96.22bn (sec_xbrl, 2026-08-26) · net income (last quarter) 59.69bn (sec_xbrl, 2026-08-26) · last EPS surprise % 6.13 (finnhub, 2026-11-21)
 
 ### Apple (XNAS:AAPL)
-- tone: 34 stories from 25 sources, polarity +0.03, peak intensity 0.33, uncertainty 0.04 · 5 escalated
+- tone: 98 stories from 55 sources, polarity +0.02, peak intensity 0.33, uncertainty 0.04 · 16 escalated
+- 2026-11-27 finance.yahoo.com — Railtown AI Introduces Model Evaluation Technology to Help Reduce Inference Costs and Expand Model Choice [q 1.00, tone +0.0] ★
 - 2026-11-26 finance.yahoo.com — Apple Stocks Rise as AI Selloff Spares the iPhone Maker [q 1.00, tone -1.0] ★
 - 2026-11-26 finance.yahoo.com — Can VZ's New Apple Deals and Loyalty Benefits Drive Subscriber Growth? [q 1.00, tone +1.0] ★
+- 2026-11-27 SeekingAlpha — Apple: The Mispricing Of The Market's AI Hedge [q 0.85, tone +1.0] ★
 - 2026-11-26 finance.yahoo.com — An Apple Executive Just Filed to Sell $19 Million of Apple Stock With Shares a Hair Below Their Record [q 0.80, tone +1.0] ★
-- 2026-11-27 www.thestreet.com — Target cut its Apple Black Friday discount in half [q 0.65, tone -1.0] ★
-- 2026-11-27 www.ndtv.com — This AI-Linked US Stock Beat Nvidia, Apple Among Indian Investors In 2026 [q 0.65, tone +1.0] ★
-- 2026-11-26 247wallst.com — If You Invest $1,000 in Apple Today, Here’s What It Could Be Worth by 2029 [q 0.85, tone +0.0]
-- 2026-11-26 foxbusiness.com — Apple pulls Chinese-developed AI chatbot from App Store over reports of sexual messages to kids [q 0.85, tone +0.0]
-- 2026-11-27 finance.yahoo.com — Apple (AAPL) Has Found a New AI Opportunity That Has Little to Do With the iPhone [q 0.80, tone +0.0]
-- snapshot: P/E (ttm) 39.09 (finnhub, 2026-11-27) · P/B 44.06 (finnhub, 2026-11-27) · EPS (ttm) 8.97 (finnhub, 2026-11-27) · dividend yield 0.51 (finnhub, 2026-11-27) · beta 1.05 (finnhub, 2026-11-27) · 52w high 360.83 (finnhub, 2026-11-27) · 52w low 243.42 (finnhub, 2026-11-27) · target (consensus) 341.03 (fmp, 2026-11-27) · analysts: buy 19 (finnhub, 2026-11-02) · analysts: hold 15 (finnhub, 2026-11-02) · analysts: sell 3 (finnhub, 2026-11-02) · vendor sentiment -0.23 (alphavantage_news, 2026-10-06) · Marketaux sentiment 0.00 (marketaux_news, 2026-11-27) · FinBERT headline tone -0.03 (finbert_tone, 2026-11-27) · revenue (last quarter) 114.48bn (sec_xbrl, 2026-11-03) · net income (last quarter) 30.71bn (sec_xbrl, 2026-11-03) · last EPS surprise % 3.64 (finnhub, 2026-11-08)
+- 2026-11-27 moneywise.com — OpenAI says a spy handed Apple secret plans for AI devices that could 'outcompete' the iPhone maker on its 'own turf' [q 0.65, tone +0.0] ★
+- 2026-11-27 en.oninvest.com — Apple was the only company to avoid a decline in smartphone shipments in the declining U.S. market [q 0.65, tone -1.0] ★
+- 2026-11-27 www.stocktitan.net — An Apple (AAPL) officer’s trust plans another share sale after grossing $19.2M on Nov. 25. [q 0.65, tone +0.0] ★
+- snapshot: P/E (ttm) 39.09 (finnhub, 2026-11-27) · P/B 44.06 (finnhub, 2026-11-27) · EPS (ttm) 8.97 (finnhub, 2026-11-27) · dividend yield 0.51 (finnhub, 2026-11-27) · beta 1.05 (finnhub, 2026-11-27) · 52w high 360.83 (finnhub, 2026-11-27) · 52w low 243.42 (finnhub, 2026-11-27) · target (consensus) 341.03 (fmp, 2026-11-27) · analysts: buy 19 (finnhub, 2026-11-02) · analysts: hold 15 (finnhub, 2026-11-02) · analysts: sell 3 (finnhub, 2026-11-02) · vendor sentiment -0.23 (alphavantage_news, 2026-10-06) · Marketaux sentiment 0.32 (marketaux_news, 2026-11-27) · FinBERT headline tone 0.10 (finbert_tone, 2026-11-27) · revenue (last quarter) 114.48bn (sec_xbrl, 2026-11-03) · net income (last quarter) 30.71bn (sec_xbrl, 2026-11-03) · last EPS surprise % 3.64 (finnhub, 2026-11-08)
 
 ### Microsoft (XNAS:MSFT)
-- tone: 13 stories from 10 sources, polarity +0.08, peak intensity 0.00, uncertainty 0.11 · 3 escalated
+- tone: 50 stories from 24 sources, polarity +0.08, peak intensity 0.33, uncertainty 0.13 · 15 escalated
+- 2026-11-27 finance.yahoo.com — IREN (NasdaqGS:IREN) Stock Sees Modest Fair Value Cut After AI Cloud Sentiment Swings [q 1.00, tone -1.0] ★
+- 2026-11-27 finance.yahoo.com — Microsoft Stocks Rise 0.26% as Code Red Targets One-Hour Outage Recovery [q 1.00, tone +1.0] ★
+- 2026-11-27 finance.yahoo.com — What Does Alphabet (GOOGL) Need To Prove After The Air Force Cloud Breach? [q 1.00, tone -1.0] ★
 - 2026-11-26 finance.yahoo.com — What Does Pinterest (PINS) Pay Overhaul Mean For Its Takeover Talk And Ad Push? [q 1.00, tone +1.0] ★
 - 2026-11-26 finance.yahoo.com — Data Engineering Workflow Orchestration Market Global Report 2026 | Capture $14.43B AI and Multi-Cloud Demand with Databricks, Microsoft, Snowflake and Astronomer [q 1.00, tone +1.0] ★
-- 2026-11-26 tradersunion.com — Microsoft shares technical analysis: Seller pressure dominates as weak momentum persists [q 0.65, tone -1.0] ★
-- 2026-11-26 finance.yahoo.com — Microsoft Stocks Slip 1.25% While Nadella Backs Cheaper In-House AI Models [q 1.00, tone +0.0]
-- 2026-11-26 finance.yahoo.com — Tech Stock Sell-Off: Down 13%, Is Microsoft a Buy Now? [q 0.80, tone +0.0]
-- 2026-11-26 seekingalpha.com — Microsoft: Invite Copilot To Thanksgiving Dinner (NASDAQ:MSFT) [q 0.80, tone +0.0]
-- 2026-11-26 www.rswebsols.com — Microsoft Shares and Top AI Software Leaders for Productivity Investors [q 0.65, tone +0.0]
-- 2026-11-26 www.express.co.uk — Iran shares video threatening horror attacks on Microsoft, Amazon and Starlink [q 0.65, tone +0.0]
-- snapshot: P/E (ttm) 25.51 (finnhub, 2026-11-27) · P/B 6.26 (finnhub, 2026-11-27) · EPS (ttm) 19.15 (finnhub, 2026-11-27) · dividend yield 0.79 (finnhub, 2026-11-27) · beta 1.07 (finnhub, 2026-11-27) · 52w high 559.15 (finnhub, 2026-11-27) · 52w low 349.20 (finnhub, 2026-11-27) · target (consensus) 617.36 (fmp, 2026-11-27) · analysts: buy 40 (finnhub, 2026-11-02) · analysts: hold 3 (finnhub, 2026-11-02) · analysts: sell 0 (finnhub, 2026-11-02) · vendor sentiment 0.29 (alphavantage_news, 2026-10-06) · Marketaux sentiment -0.11 (marketaux_news, 2026-11-27) · FinBERT headline tone 0 (finbert_tone, 2026-11-27) · revenue (last quarter) 92.28bn (sec_xbrl, 2026-10-28) · net income (last quarter) 36.63bn (sec_xbrl, 2026-10-28) · last EPS surprise % 1.53 (finnhub, 2026-10-28)
+- 2026-11-27 Yahoo — Privacy-Enhancing Computation Market to Reach $16.49 Billion by 2030 as Data Protection Demand Accelerates - Microsoft, IBM, Cisco, and Oracle Accelerate AI, FHE, and Cloud Security [q 0.85, tone +1.0] ★
+- 2026-11-27 Yahoo — Advanced Micro Devices (AMD) After AI Data Center Wins Looks Cheap Or Already Priced In [q 0.85, tone +1.0] ★
+- 2026-11-27 pluang.com — Microsoft's strong quarter and steady outlook m... [q 0.65, tone +1.0] ★
+- snapshot: P/E (ttm) 25.51 (finnhub, 2026-11-27) · P/B 6.26 (finnhub, 2026-11-27) · EPS (ttm) 19.15 (finnhub, 2026-11-27) · dividend yield 0.79 (finnhub, 2026-11-27) · beta 1.07 (finnhub, 2026-11-27) · 52w high 559.15 (finnhub, 2026-11-27) · 52w low 349.20 (finnhub, 2026-11-27) · target (consensus) 617.36 (fmp, 2026-11-27) · analysts: buy 40 (finnhub, 2026-11-02) · analysts: hold 3 (finnhub, 2026-11-02) · analysts: sell 0 (finnhub, 2026-11-02) · vendor sentiment 0.29 (alphavantage_news, 2026-10-06) · Marketaux sentiment 0.25 (marketaux_news, 2026-11-27) · FinBERT headline tone 0.08 (finbert_tone, 2026-11-27) · revenue (last quarter) 92.28bn (sec_xbrl, 2026-10-28) · net income (last quarter) 36.63bn (sec_xbrl, 2026-10-28) · last EPS surprise % 1.53 (finnhub, 2026-10-28)
 
 ## Macro
 
@@ -126,6 +126,15 @@ Generated 2026-11-27 21:34 UTC · slot `all` · 46370 articles in the corpus, 88
 
 | at (UTC) | source | status | fetched | kept | stored | detail |
 |---|---|---|---|---|---|---|
+| 22:41 | finbert_tone | ok | 6 | 0 | 0 | facts 6; scored 227 titles with Xenova/finbert@8f269abebfdd onnx/model_quantized |
+| 22:41 | eodhd | ok | 0 | 0 | 0 | skipped: every asked name was refused: outside the plan or over today's credits  |
+| 22:41 | jin10_flash | ok | 3 | 3 | 3 | facts 0;  |
+| 22:41 | marketaux_news | ok | 26 | 26 | 22 | facts 4; XNAS:NVDA: 2026-11-27 not aggregated - 8 full pages ended part-way thro |
+| 22:41 | finnhub | ok | 258 | 217 | 137 | facts 0;  |
+| 22:41 | edgar | ok | 0 | 0 | 0 | facts 0;  |
+| 22:41 | yahoo_rss | ok | 57 | 56 | 38 | named the company: 21 of 56 (lowest: NVIDIA 5/19, Microsoft 6/18, Apple 10/19) |
+| 22:41 | google_news | ok | 167 | 159 | 148 | named the company: 140 of 159 (lowest: NVIDIA 66/76, Microsoft 20/23, Apple 54/6 |
+| 22:41 | gdelt | throttled | 0 | 0 | 0 | throttled: no name could be read (3 failed, 0 not reached). First: GDELT fetch f |
 | 21:34 | dbnomics | ok | 450 | 0 | 0 | facts 0;  |
 | 21:34 | jin10_flash | degraded | 18 | 18 | 18 | facts 0; window not covered back to 2026-11-27 19:00Z; the oldest item read is 2 |
 | 21:34 | fred | ok | 494 | 0 | 0 | facts 10; release calendar: 'FOMC Press Release' listed on 15 days of the fortni |
