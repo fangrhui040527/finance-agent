@@ -1,0 +1,445 @@
+{
+  "day": "2026-11-27",
+  "written_at": "2026-11-27T22:46:00Z",
+  "phase": "full",
+  "week": 12,
+  "equity_usd": 1000.0,
+  "cash_usd": 1000.0,
+  "control_equity_usd": 862.39,
+  "control_return_to_date": -0.1376,
+  "drawdown": 0.0,
+  "control_drawdown": 0.1376,
+  "halted": false,
+  "marks": 61,
+  "positions": [],
+  "changes": [],
+  "control_changes": [],
+  "control_mark": {
+    "marked_on": "2026-11-27",
+    "equity_usd": 862.39,
+    "cash_usd": 196.68,
+    "positions_usd": 665.71,
+    "day_return": 0.009,
+    "halted": true,
+    "note": "halted reads yes though docs/22 gives the control no halt"
+  },
+  "index_book": {
+    "mark": {
+      "marked_on": "2026-11-27",
+      "equity_usd": 946293.21,
+      "cash_usd": 199642.18,
+      "positions_usd": 746651.03,
+      "day_return": -0.0025,
+      "drawdown": 0.0544,
+      "held": 100,
+      "pending": 0
+    },
+    "cost_to_date_share_of_notional": 0.0112,
+    "since_2026_09_30": {
+      "index": -0.0537,
+      "decided": 0.0,
+      "control": -0.12
+    },
+    "dividends": [
+      {
+        "instrument_id": "MYX:6012",
+        "local": "409.50 MYR",
+        "usd": 99.33
+      }
+    ],
+    "changes": {
+      "dividend": 1,
+      "cash_usd": 99.33
+    },
+    "note": "no change in holdings; the status line reads '100 of 98 names held'"
+  },
+  "caps": [
+    {
+      "cap": "largest name",
+      "value": "0.00%",
+      "limit": "25%",
+      "breached": false
+    },
+    {
+      "cap": "invested",
+      "value": "0.00%",
+      "limit": "80%",
+      "breached": false
+    },
+    {
+      "cap": "cash floor",
+      "value": "100.00%",
+      "limit": "20%",
+      "breached": false
+    },
+    {
+      "cap": "names held",
+      "value": "0",
+      "limit": "0",
+      "breached": false
+    },
+    {
+      "cap": "drawdown from peak",
+      "value": "0.00%",
+      "limit": "8% halts entries",
+      "breached": false
+    },
+    {
+      "cap": "turnover, 5 weekdays",
+      "value": "USD 0.00",
+      "limit": "USD 500.00",
+      "breached": false
+    }
+  ],
+  "prices": {
+    "bursa": "Friday 2026-11-27 closes",
+    "us": "Friday 2026-11-27 closes",
+    "fx": "MYR 4.1225 per USD (bnm, 2026-11-27)"
+  },
+  "fundable": [
+    {
+      "instrument_id": "MYX:5183",
+      "lot_usd": 94.6,
+      "share": 0.095,
+      "round_trip": 0.023,
+      "lots": 2
+    },
+    {
+      "instrument_id": "MYX:5225",
+      "lot_usd": 191.63,
+      "share": 0.192,
+      "round_trip": 0.012,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:8869",
+      "lot_usd": 164.95,
+      "share": 0.165,
+      "round_trip": 0.0138,
+      "lots": 1
+    },
+    {
+      "instrument_id": "MYX:3182",
+      "lot_usd": 32.02,
+      "share": 0.032,
+      "round_trip": 0.0655,
+      "lots": 7
+    },
+    {
+      "instrument_id": "XNAS:NVDA",
+      "lot_usd": 150.49,
+      "share": 0.15,
+      "round_trip": 0.016,
+      "lots": 1
+    }
+  ],
+  "over_cap": {
+    "MYX:1155": 0.251,
+    "MYX:5347": 0.303,
+    "XNAS:AAPL": 0.359,
+    "XNAS:MSFT": 0.493
+  },
+  "ledger": {
+    "mark_days": 39,
+    "gap": "no routine ran 2026-10-02..10-06; no paper page and no decision for those days; no decision is backdated"
+  },
+  "attribution": null,
+  "decision": {
+    "recorded": true,
+    "weights": {},
+    "thesis": "All cash, the seventy-first all-cash row. No decision was recorded for 11-25 or 11-26: those nights' routines reached this session only on 11-27, and no decision is backdated. Friday 11-27 marks: the control is USD 862.39 (-13.76% to date). The 2026-11-26 feedback page finds no Bursa name beyond normal variation; four book names reported Q3 results after the 11-26 close (Press Metal a record, Tenaga lower, Genting a loss, Petronas Chemicals four downgrades), which the 11-27 session prices and tomorrow's page measures. NVIDIA fell 1.75 sigma on 11-25 with the chip names and an S&P CreditWatch, and its inquiries remain open. No name carries a measured, sourced reason to expect it to beat cash over 21 sessions. Forty-three all-cash claims are graded, all correct. Claim: nothing in the fundable universe beats cash over 21 sessions.",
+    "prediction_id": "paper-2026-11-27-allcash-21d-913f",
+    "grades_on": "2026-12-29",
+    "confidence": 0.55,
+    "horizon": 21
+  },
+  "stores": {
+    "decided_targets": 71,
+    "predictions": 71,
+    "outcomes": 43,
+    "index_targets": 402,
+    "control_targets": 16,
+    "index_pending": 0,
+    "made_at": "2026-11-27T22:45:38Z"
+  },
+  "evidence": {
+    "feedback_pages": "knowledge/feedback/2026-11-26.md (8fb12da)",
+    "session_2026_11_26": "no Bursa name beyond normal variation; four sets of Q3 results after the close",
+    "nvidia_2026_11_25": "-3.91% at 1.75 sigma with the chip names at the open; S&P CreditWatch during the session",
+    "phase": "week 12, full caps"
+  },
+  "mistakes": [
+    "Checked, holds: paper-2026-11-24-allcash-21d-ac73 reason 2; Tenaga's results name FX losses for the quarter, not a cause for 11-23.",
+    "Open: paper-2026-11-22-allcash-21d-88be is wrong if the control ends its 21 sessions to 2026-12-22 above USD 829.28; it is 862.39 tonight."
+  ],
+  "mistakes_checked": [
+    "paper-2026-11-24-allcash-21d-ac73: reason 2, Tenaga no named cause (holds)"
+  ],
+  "grades_due": [
+    {
+      "prediction_id": "paper-2026-10-29-allcash-21d-2ead",
+      "on": "2026-11-30"
+    },
+    {
+      "prediction_id": "paper-2026-10-30-allcash-21d-2d1d",
+      "on": "2026-12-01"
+    },
+    {
+      "prediction_id": "paper-2026-10-31-allcash-21d-2c78",
+      "on": "2026-12-01"
+    },
+    {
+      "prediction_id": "paper-2026-11-01-allcash-21d-2da8",
+      "on": "2026-12-01"
+    }
+  ],
+  "lessons": [
+    "A cap can bind on price alone: Maybank left the fundable list at 25.1% of equity on its close."
+  ],
+  "dividend_boundary": {
+    "decided": "2026-10-10T15:25:31Z",
+    "control": "2026-10-10T15:25:31Z",
+    "index": "2026-10-10T15:25:31Z",
+    "note": "marks before it are not restated; no credit to the decided or control book yet"
+  },
+  "graded": [
+    {
+      "prediction_id": "paper-2026-09-11-allcash-21d-8bf9",
+      "benchmark": -0.024,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-12-allcash-21d-1661",
+      "benchmark": -0.024,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-13-allcash-21d-5baf",
+      "benchmark": -0.0237,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-14-allcash-21d-9d7e",
+      "benchmark": -0.0441,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-15-allcash-21d-af55",
+      "benchmark": -0.0466,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-16-allcash-21d-3865",
+      "benchmark": -0.0616,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-17-allcash-21d-7667",
+      "benchmark": -0.0616,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-18-allcash-21d-667a",
+      "benchmark": -0.0616,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-19-allcash-21d-b7bd",
+      "benchmark": -0.0557,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-20-allcash-21d-dbaf",
+      "benchmark": -0.0557,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-21-allcash-21d-c04f",
+      "benchmark": -0.0533,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-22-allcash-21d-33c5",
+      "benchmark": -0.0533,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-23-allcash-21d-b999",
+      "benchmark": -0.0469,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-24-allcash-21d-e5b2",
+      "benchmark": -0.0446,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-25-allcash-21d-468d",
+      "benchmark": -0.0433,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-26-allcash-21d-cf74",
+      "benchmark": -0.0435,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-27-allcash-21d-9d18",
+      "benchmark": -0.0435,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-28-allcash-21d-111e",
+      "benchmark": -0.0418,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-29-allcash-21d-7831",
+      "benchmark": -0.0266,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-09-30-allcash-21d-ee21",
+      "benchmark": -0.0253,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-10-01-allcash-21d-5a1e",
+      "benchmark": -0.009,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-10-07-allcash-21d-2b2c",
+      "benchmark": -0.0466,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-10-08-allcash-21d-7bb6",
+      "benchmark": -0.0539,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-10-09-allcash-21d-81d7",
+      "benchmark": -0.0592,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-10-10-allcash-21d-f51e",
+      "benchmark": -0.0674,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-10-11-allcash-21d-071b",
+      "benchmark": -0.0674,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-10-12-allcash-21d-a3c9",
+      "benchmark": -0.0757,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-10-13-allcash-21d-8010",
+      "benchmark": -0.0499,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-10-14-allcash-21d-a9b4",
+      "benchmark": -0.0584,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-10-15-allcash-21d-8274",
+      "benchmark": -0.0583,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-10-16-allcash-21d-2b02",
+      "benchmark": -0.0509,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-10-17-allcash-21d-30d1",
+      "benchmark": -0.0509,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-10-18-allcash-21d-a632",
+      "benchmark": -0.0509,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-10-19-allcash-21d-1a60",
+      "benchmark": -0.0605,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-10-20-allcash-21d-ee1f",
+      "benchmark": -0.0825,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-10-21-allcash-21d-2c51",
+      "benchmark": -0.0901,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-10-22-allcash-21d-b718",
+      "benchmark": -0.1251,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-10-23-allcash-21d-ad68",
+      "benchmark": -0.0863,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-10-24-allcash-21d-e08b",
+      "benchmark": -0.0863,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-10-25-allcash-21d-46fb",
+      "benchmark": -0.0863,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-10-26-allcash-21d-67b8",
+      "benchmark": -0.0939,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-10-27-allcash-21d-076d",
+      "benchmark": -0.1046,
+      "correct": true
+    },
+    {
+      "prediction_id": "paper-2026-10-28-allcash-21d-bc1b",
+      "benchmark": -0.106,
+      "correct": true
+    }
+  ],
+  "closes": {
+    "MYX:1155": 10.34,
+    "MYX:5347": 12.5,
+    "MYX:5183": 3.9,
+    "MYX:5225": 7.9,
+    "MYX:8869": 6.8,
+    "MYX:3182": 1.32,
+    "XNAS:NVDA": 150.49,
+    "XNAS:AAPL": 358.54,
+    "XNAS:MSFT": 492.85
+  },
+  "closes_note": "Friday 2026-11-27 closes",
+  "gap": {
+    "paper_pages_missing": [
+      "2026-11-25",
+      "2026-11-26"
+    ],
+    "decisions_missing": [
+      "2026-11-25",
+      "2026-11-26"
+    ],
+    "reason": "routines reached this session only at 2026-11-27T22:39Z; no decision backdated"
+  }
+}
